@@ -11,6 +11,7 @@ import { SearchInput } from '@/gradian-ui/form-builder/form-elements/components/
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { Badge } from '@/gradian-ui/form-builder/form-elements/components/Badge';
 import { Select } from '@/gradian-ui/form-builder/form-elements/components/Select';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 export const AllComponents: React.FC = () => {
   const [isTodosPickerOpen, setTodosPickerOpen] = useState(false);
@@ -168,64 +169,69 @@ export const AllComponents: React.FC = () => {
         <div className="text-xs text-gray-500 dark:text-gray-400">
           {filteredComponents.length} result{filteredComponents.length === 1 ? '' : 's'}
         </div>
-        <div className="space-y-3">
+        <Accordion type="multiple" className="space-y-2" defaultValue={groupedByCategory.map(([cat]) => cat)}>
           {groupedByCategory.map(([category, comps]) => (
-            <details key={category} className="rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden" open>
-              <summary className="cursor-pointer select-none bg-gray-50 dark:bg-gray-900 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {renderHighlightedText(category.toUpperCase(), catalogQuery)} ({comps.length})
-              </summary>
-              <div className="p-3 grid grid-cols-1 md:grid-cols-2 gap-3">
-                {comps.map((comp) => (
-                  <div
-                    key={comp.id}
-                    className="rounded-xl border p-3 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={cn(
-                        'h-10 w-10 rounded-lg flex items-center justify-center shrink-0 text-white',
-                        comp.color ? `bg-${comp.color}-600` : 'bg-gray-800'
-                      )}>
-                        {comp.icon ? <IconRenderer iconName={comp.icon} className="h-5 w-5" /> : null}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="min-w-0">
-                            <h3 className="text-sm font-semibold truncate">
-                              {renderHighlightedText(comp.label, catalogQuery)}
-                            </h3>
-                          </div>
-                          <Badge
-                            variant="outline"
-                            size="sm"
-                            className="px-1.5 py-0.5 text-[10px] leading-none font-mono bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700"
-                          >
-                            {renderHighlightedText(comp.id, catalogQuery)}
-                          </Badge>
+            <AccordionItem key={category} value={category} className="border border-gray-200 dark:border-gray-800 rounded-lg px-2">
+              <AccordionTrigger className="px-1 py-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                <div className="flex items-center gap-2">
+                  <span>{renderHighlightedText(category.toUpperCase(), catalogQuery)}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">({comps.length})</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-3">
+                <div className="p-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {comps.map((comp) => (
+                    <div
+                      key={comp.id}
+                      className="rounded-xl border p-3 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={cn(
+                          'h-10 w-10 rounded-lg flex items-center justify-center shrink-0 text-white',
+                          comp.color ? `bg-${comp.color}-600` : 'bg-gray-800'
+                        )}>
+                          {comp.icon ? <IconRenderer iconName={comp.icon} className="h-5 w-5" /> : null}
                         </div>
-                        {comp.description && (
-                          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
-                            {renderHighlightedText(comp.description, catalogQuery)}
-                          </p>
-                        )}
-                        {comp.usecase && (
-                          <p className="text-[11px] text-gray-500 mt-1">
-                            <span className="font-medium">Use case:</span>{' '}
-                            {renderHighlightedText(comp.usecase, catalogQuery)}
-                          </p>
-                        )}
-                        <div className="mt-2">
-                          <code className="text-[11px] bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded block overflow-x-auto">
-                            {renderHighlightedText(comp.directory, catalogQuery)}
-                          </code>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <h3 className="text-sm font-semibold truncate">
+                                {renderHighlightedText(comp.label, catalogQuery)}
+                              </h3>
+                            </div>
+                            <Badge
+                              variant="outline"
+                              size="sm"
+                              className="px-1.5 py-0.5 text-[10px] leading-none font-mono bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700"
+                            >
+                              {renderHighlightedText(comp.id, catalogQuery)}
+                            </Badge>
+                          </div>
+                          {comp.description && (
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                              {renderHighlightedText(comp.description, catalogQuery)}
+                            </p>
+                          )}
+                          {comp.usecase && (
+                            <p className="text-[11px] text-gray-500 mt-1">
+                              <span className="font-medium">Use case:</span>{' '}
+                              {renderHighlightedText(comp.usecase, catalogQuery)}
+                            </p>
+                          )}
+                          <div className="mt-2">
+                            <code className="text-[11px] bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded block overflow-x-auto">
+                              {renderHighlightedText(comp.directory, catalogQuery)}
+                            </code>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </details>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </div>
+        </Accordion>
       </section>
 
       <section className="space-y-4">
