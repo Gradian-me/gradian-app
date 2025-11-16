@@ -1,3 +1,4 @@
+'use client';
 // Copy Content Component
 // Button with copy functionality and micro animation
 

@@ -20,6 +20,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import Link from 'next/link';
 
 // Icon mapping
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
@@ -266,6 +267,17 @@ export default function BuilderPage() {
             Start by creating a schema for your entities, then define relationships between them. 
             Each builder provides a visual interface to configure your data models.
           </p>
+          <div className="mb-4">
+            <Button
+              size="sm"
+              onClick={() => router.push('/ui/components')}
+              className="inline-flex items-center gap-2"
+              variant="default"
+            >
+              <Layers className="h-4 w-4" />
+              Browse UI Components
+            </Button>
+          </div>
           <div className="flex flex-wrap gap-2 text-sm text-blue-700 dark:text-blue-200">
             <span className="font-semibold">Tip:</span>
             <span>Schemas define the structure of your data, while relation types connect different entities together.</span>
