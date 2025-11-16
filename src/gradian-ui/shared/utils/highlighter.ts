@@ -52,7 +52,7 @@ export const getHighlightSegments = (text: string, query: string): HighlightSegm
 export const renderHighlightedText = (
   text: string,
   query: string,
-  highlightClassName = 'bg-yellow-200 text-inherit rounded px-0.5'
+  highlightClassName = 'bg-yellow-200 text-gray-900 rounded px-0.5'
 ): ReactNode => {
   if (!text || !query) {
     return text;

@@ -178,6 +178,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   const includeKey = useMemo(() => (includeIds && includeIds.length > 0 ? includeIds.slice().sort().join(',') : ''), [includeIds]);
   const excludeKey = useMemo(() => (excludeIds && excludeIds.length > 0 ? excludeIds.slice().sort().join(',') : ''), [excludeIds]);
   const lastQueryKeyRef = useRef<string>('__init__');
+  const hasInitialLoadRef = useRef<boolean>(false);
 
   useEffect(() => {
     setPageMeta((prev) => ({
@@ -461,6 +462,21 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       setFilteredItems(staticItems);
     }
   }, [staticItems, isOpen]);
+
+  // Ensure initial load on open for paginated sources (schema or sourceUrl)
+  useEffect(() => {
+    if (!isOpen || !supportsPagination) {
+      hasInitialLoadRef.current = false;
+      return;
+    }
+    if (hasInitialLoadRef.current) {
+      return;
+    }
+    setPageMeta((prev) => ({ ...prev, page: 1, hasMore: true, totalItems: 0 }));
+    lastQueryKeyRef.current = `${searchQuery.trim()}|${includeKey}|${excludeKey}`;
+    hasInitialLoadRef.current = true;
+    void loadItems(1, false);
+  }, [isOpen, supportsPagination, includeKey, excludeKey, searchQuery, loadItems]);
 
   // Fetch items - only when modal opens (skipped for static datasets)
   // Array comparisons are done inside the effect to avoid dependency issues
@@ -777,9 +793,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   const renderItemCard = (item: any, index: number) => {
     const isSelected = isItemSelected(item);
 
-    const baseCardClasses = "relative p-4 rounded-xl border cursor-pointer transition-all duration-200 group";
-    const selectedCardClasses = "border-violet-500 bg-gradient-to-br from-violet-50 via-white to-white shadow-lg ring-1 ring-violet-200";
-    const defaultCardClasses = "border-gray-200 bg-white hover:border-violet-300 hover:shadow-md";
+    const baseCardClasses = "relative p-3 rounded-xl border cursor-pointer transition-all duration-200 group";
+    const selectedCardClasses = "border-violet-500 dark:border-violet-400 bg-gradient-to-br from-violet-50 via-white to-white dark:from-gray-900 dark:via-gray-800 dark:to-violet-900 shadow-lg ring-1 ring-violet-200 dark:ring-violet-800";
+    const defaultCardClasses = "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-violet-300 hover:shadow-md";
 
     const motionProps = {
       layout: true,
@@ -811,14 +827,14 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           >
             <div className="flex items-center gap-3">
               {iconName && (
-                <div className="h-10 w-10 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-lg bg-violet-50 dark:bg-gray-700 text-violet-600 dark:text-violet-300 flex items-center justify-center">
                   <IconRenderer iconName={iconName} className="h-5 w-5" />
                 </div>
               )}
             <div
               className={cn(
                 "font-medium text-sm",
-                isSelected ? "text-violet-900" : "text-gray-900"
+                isSelected ? "text-violet-900 dark:text-violet-100" : "text-gray-900 dark:text-gray-100"
               )}
             >
               {renderHighlightedText(displayName, highlightQuery)}
@@ -1002,7 +1018,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         </div>
 
         {/* Items Grid */}
-        <div ref={listContainerRef} className="flex-1 overflow-y-auto min-h-0">
+        <div ref={listContainerRef} className="flex-1 overflow-y-auto min-h-0 px-2 py-1">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
@@ -1015,7 +1031,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               {searchQuery ? `No items found matching "${searchQuery}"` : 'No items available'}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <AnimatePresence mode="sync">
                 {filteredItems.map((item, index) => renderItemCard(item, index))}
               </AnimatePresence>
