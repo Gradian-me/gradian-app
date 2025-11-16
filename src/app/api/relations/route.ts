@@ -2,6 +2,7 @@
 // Handles CRUD operations for data relations
 
 import { NextRequest, NextResponse } from 'next/server';
+import { isDemoModeEnabled, proxyDataRequest } from '../data/utils';
 import {
   readAllRelations,
   createRelation,
@@ -27,6 +28,12 @@ import { handleDomainError } from '@/gradian-ui/shared/domain/errors/domain.erro
  */
 export async function GET(request: NextRequest) {
   try {
+		// In non-demo mode, proxy to upstream data service
+		if (!isDemoModeEnabled()) {
+			const targetPath = `/api/relations${request.nextUrl.search}`;
+			return proxyDataRequest(request, targetPath);
+		}
+
     const { searchParams } = new URL(request.url);
     
     const schema = searchParams.get('schema');
@@ -107,6 +114,15 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+		// In non-demo mode, proxy to upstream data service
+		if (!isDemoModeEnabled()) {
+			const body = await request.json();
+			return proxyDataRequest(request, `/api/relations`, {
+				body,
+				headers: { 'content-type': 'application/json' },
+			});
+		}
+
     const body = await request.json();
 
     const { sourceSchema, sourceId, targetSchema, targetId, relationTypeId } = body;

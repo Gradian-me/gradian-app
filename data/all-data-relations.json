@@ -228,25 +228,5 @@
     "id": "01KA41AN3M7ERX5AS2YVZJZBY3",
     "createdAt": "2025-11-15T15:14:50.612Z",
     "updatedAt": "2025-11-15T15:14:50.612Z"
-  },
-  {
-    "sourceSchema": "users",
-    "sourceId": "01KA3BE5F2DVK2F069RF44XHPZ",
-    "targetSchema": "contacts",
-    "targetId": "01KA43HDS93SKY993X2SDDYWEN",
-    "relationTypeId": "has_contact",
-    "id": "01KA43HD56CR8M13JMM43BF5VY",
-    "createdAt": "2025-11-15T15:53:28.998Z",
-    "updatedAt": "2025-11-15T15:53:28.998Z"
-  },
-  {
-    "sourceSchema": "users",
-    "sourceId": "01KA3BE5F2DVK2F069RF44XHPZ",
-    "targetSchema": "contacts",
-    "targetId": "01KA5Q2FTHF5VJTA9AXW818YPK",
-    "relationTypeId": "has_contact",
-    "id": "01KA5Q2FW78XY4DFVY2AK0G1PN",
-    "createdAt": "2025-11-16T06:54:06.214Z",
-    "updatedAt": "2025-11-16T06:54:06.214Z"
   }
 ]

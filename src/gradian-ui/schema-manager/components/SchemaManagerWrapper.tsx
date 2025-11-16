@@ -107,24 +107,24 @@ export function SchemaManagerWrapper() {
         </div>
 
         <Tabs value={activeTab} onValueChange={value => setActiveTab(value as 'system' | 'business')}>
-          <TabsList className="w-full grid grid-cols-2 gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-slate-800 dark:bg-slate-900/40 select-none">
+          <TabsList className="w-full grid grid-cols-2 gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-slate-800 dark:bg-slate-900/40 select-none overflow-hidden">
             <TabsTrigger
               value="system"
-              className="flex items-center gap-2 flex-1 rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
+              className="flex items-center gap-2 flex-1 rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white min-w-0"
             >
               <Settings className="h-4 w-4" />
-              <span>System Schemas</span>
-              <Badge variant="secondary" className="ms-1 bg-violet-200 dark:bg-violet-500/20 dark:text-violet-100">
+              <span className="truncate">System Schemas</span>
+              <Badge variant="secondary" className="ms-1 shrink-0 bg-violet-200 dark:bg-violet-500/20 dark:text-violet-100">
                 {systemSchemasCount}
               </Badge>
             </TabsTrigger>
             <TabsTrigger
               value="business"
-              className="flex items-center gap-2 flex-1 rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
+              className="flex items-center gap-2 flex-1 rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white min-w-0"
             >
               <Building2 className="h-4 w-4" />
-              <span>Business Schemas</span>
-              <Badge variant="secondary" className="ms-1 bg-violet-200 dark:bg-violet-500/20 dark:text-violet-100">
+              <span className="truncate">Business Schemas</span>
+              <Badge variant="secondary" className="ms-1 shrink-0 bg-violet-200 dark:bg-violet-500/20 dark:text-violet-100">
                 {businessSchemasCount}
               </Badge>
             </TabsTrigger>

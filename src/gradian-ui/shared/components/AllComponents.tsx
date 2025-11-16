@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/PopupPicker';
+import Link from 'next/link';
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 import { cn } from '@/gradian-ui/shared/utils';
 import { ALL_COMPONENTS, ComponentMeta } from '@/gradian-ui/shared/components/component-registry';
@@ -181,10 +182,7 @@ export const AllComponents: React.FC = () => {
               <AccordionContent className="pb-3">
                 <div className="p-1 grid grid-cols-1 md:grid-cols-2 gap-3">
                   {comps.map((comp) => (
-                    <div
-                      key={comp.id}
-                      className="rounded-xl border p-3 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
-                    >
+                  <div key={comp.id} className="rounded-xl border p-3 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
                       <div className="flex items-start gap-3">
                         <div className={cn(
                           'h-10 w-10 rounded-lg flex items-center justify-center shrink-0 text-white',
@@ -223,6 +221,12 @@ export const AllComponents: React.FC = () => {
                               {renderHighlightedText(comp.directory, catalogQuery)}
                             </code>
                           </div>
+                        <div className="mt-3">
+                          <Link href={`/ui/components/${comp.id}`} className="text-xs inline-flex items-center gap-1 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                            <IconRenderer iconName="ExternalLink" className="h-3.5 w-3.5" />
+                            View details & samples
+                          </Link>
+                        </div>
                         </div>
                       </div>
                     </div>
