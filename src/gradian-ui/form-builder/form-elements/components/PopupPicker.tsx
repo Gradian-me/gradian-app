@@ -30,6 +30,7 @@ import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { AddButtonFull } from './AddButtonFull';
 import { EndLine } from '@/gradian-ui/layout';
+import { ColumnMapConfig, extractItemsFromPayload, extractMetaFromPayload, mapRequestParams } from '@/gradian-ui/shared/utils/column-mapper';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 12, scale: 0.96 },
@@ -128,6 +129,7 @@ export interface PopupPickerProps {
   canViewList?: boolean; // If true, shows a button to navigate to the list page
   viewListUrl?: string; // Custom URL for the list page (defaults to /page/{schemaId})
   allowMultiselect?: boolean; // Enables multi-select mode with confirm button
+  columnMap?: ColumnMapConfig; // Optional mapping for request/response and item fields
   staticItems?: any[]; // Optional static dataset (skips API calls when provided)
   pageSize?: number; // Page size for paginated data sources
 }
@@ -147,6 +149,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   canViewList = false,
   viewListUrl,
   allowMultiselect = false,
+  columnMap,
   staticItems,
   pageSize = 48,
 }) => {
@@ -241,23 +244,25 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       if (!sourceUrl) {
         return '';
       }
-      const params = new URLSearchParams();
-      params.set('page', pageToLoad.toString());
-      params.set('limit', effectivePageSize.toString());
+      const paramRecord: Record<string, string> = {
+        page: pageToLoad.toString(),
+        limit: effectivePageSize.toString(),
+      };
       const trimmedSearch = searchQuery.trim();
       if (trimmedSearch) {
-        params.set('search', trimmedSearch);
+        paramRecord.search = trimmedSearch;
       }
       if (includeIds && includeIds.length > 0) {
-        params.set('includeIds', includeIds.join(','));
+        paramRecord.includeIds = includeIds.join(',');
       }
       if (excludeIds && excludeIds.length > 0) {
-        params.set('excludeIds', excludeIds.join(','));
+        paramRecord.excludeIds = excludeIds.join(',');
       }
+      const params = mapRequestParams(paramRecord, columnMap);
       const queryString = params.toString();
       return `${sourceUrl}${sourceUrl.includes('?') ? '&' : '?'}${queryString}`;
     },
-    [sourceUrl, effectivePageSize, searchQuery, includeIds, excludeIds]
+    [sourceUrl, effectivePageSize, searchQuery, includeIds, excludeIds, columnMap]
   );
 
   const fetchSourceItems = useCallback(
@@ -278,25 +283,20 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           throw new Error(`Failed to fetch items (${response.status})`);
         }
         const payload = await response.json();
-        const dataArray = Array.isArray(payload)
-          ? payload
-          : payload &&
-              typeof payload === 'object' &&
-              'data' in payload &&
-              Array.isArray((payload as Record<string, any>).data)
-            ? ((payload as Record<string, any>).data as any[])
-            : [];
+        const dataArray = extractItemsFromPayload(payload, columnMap);
         setItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
         setFilteredItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
         setPageMeta((prev) => {
-          const meta = (payload as { meta?: { page?: number; limit?: number; totalItems?: number; hasMore?: boolean } }).meta;
-          const nextLimit = meta?.limit ?? effectivePageSize;
-          const nextPage = meta?.page ?? pageToLoad;
-          const nextTotal =
-            meta?.totalItems ??
-            (append ? (prev.totalItems || prev.page * prev.limit) + dataArray.length : dataArray.length);
-          const derivedHasMore =
-            typeof meta?.hasMore === 'boolean' ? meta.hasMore : nextPage * nextLimit < nextTotal;
+          const mappedMeta = extractMetaFromPayload(payload, columnMap, {
+            page: pageToLoad,
+            limit: effectivePageSize,
+            totalItems: append ? (prev.totalItems || prev.page * prev.limit) + dataArray.length : dataArray.length,
+            hasMore: undefined,
+          });
+          const nextLimit = mappedMeta.limit ?? effectivePageSize;
+          const nextPage = mappedMeta.page ?? pageToLoad;
+          const nextTotal = mappedMeta.totalItems ?? (append ? (prev.totalItems || prev.page * prev.limit) + dataArray.length : dataArray.length);
+          const derivedHasMore = typeof mappedMeta.hasMore === 'boolean' ? mappedMeta.hasMore : nextPage * nextLimit < nextTotal;
           return {
             page: nextPage,
             limit: nextLimit,
@@ -324,7 +324,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         }
       }
     },
-    [buildSourceRequestUrl, effectivePageSize, sourceUrl]
+    [buildSourceRequestUrl, effectivePageSize, sourceUrl, columnMap]
   );
 
   const fetchSchemaItems = useCallback(
