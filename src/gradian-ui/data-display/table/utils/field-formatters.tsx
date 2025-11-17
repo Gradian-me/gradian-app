@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link as LinkIcon } from 'lucide-react';
 import { formatCurrency, formatDate, formatNumber } from '@/gradian-ui/shared/utils';
 import { BadgeViewer } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
 import type { BadgeItem } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
@@ -12,6 +13,9 @@ import {
   getPickerDisplayValue,
   renderRatingValue,
 } from '../../utils/value-display';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Avatar } from '@/gradian-ui/form-builder/form-elements/components/Avatar';
+import { toast } from 'sonner';
 
 export const getFieldValue = (field: any, row: any): any => {
   if (!field || !row) return null;
@@ -63,6 +67,109 @@ export const formatFieldValue = (
   }
 
   const displayType = field?.type || 'text';
+  const componentType = (field?.component || '').toString().toLowerCase();
+
+  // Handle password fields - show masked value
+  if (displayType === 'password' || componentType === 'password') {
+    const passwordLength = String(value).length;
+    const maskedValue = '•'.repeat(Math.max(8, Math.min(passwordLength, 20)));
+    return (
+      <span className="font-mono text-gray-600 dark:text-gray-400">
+        {maskedValue}
+      </span>
+    );
+  }
+
+  // Handle color fields - show colored circle with color code on hover, copy on click
+  if (displayType === 'color-picker' || componentType === 'color-picker' || componentType === 'color') {
+    const colorValue = String(value).trim();
+    // Validate hex color format
+    const isValidHex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(colorValue);
+    const displayColor = isValidHex ? colorValue : '#808080'; // Default gray if invalid
+    
+    const handleCopyColor = async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      try {
+        await navigator.clipboard.writeText(colorValue);
+        toast.success(`Color code ${colorValue} copied to clipboard`);
+      } catch (err) {
+        toast.error('Failed to copy color code');
+      }
+    };
+    
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
+              className="w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm cursor-pointer hover:scale-110 transition-transform duration-200"
+              style={{ backgroundColor: displayColor }}
+              onClick={handleCopyColor}
+              title={`Click to copy ${colorValue}`}
+            />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="font-mono text-sm">{colorValue}</p>
+            <p className="text-xs text-gray-500 mt-1">Click to copy</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  // Handle avatar fields - show avatar image from URL
+  if (displayType === 'avatar' || componentType === 'avatar' || field?.role === 'avatar' || field?.role === 'image') {
+    const avatarUrl = String(value).trim();
+    // Check if it's a valid URL
+    const isValidUrl = avatarUrl && (
+      avatarUrl.startsWith('http://') || 
+      avatarUrl.startsWith('https://') || 
+      avatarUrl.startsWith('//') ||
+      avatarUrl.startsWith('/')
+    );
+    
+    // Get fallback text from title field or field name
+    const getInitials = (text: string): string => {
+      if (!text) return '?';
+      const words = text.trim().split(/\s+/);
+      if (words.length >= 2) {
+        return (words[0][0] + words[1][0]).toUpperCase();
+      }
+      return text.substring(0, 2).toUpperCase();
+    };
+    
+    const titleField = row ? (row.name || row.title || row.label || '') : '';
+    const fallbackText = getInitials(titleField);
+    
+    if (isValidUrl) {
+      const normalizedUrl = avatarUrl.startsWith('//') ? `https:${avatarUrl}` : avatarUrl;
+      return (
+        <Avatar
+          src={normalizedUrl}
+          alt={titleField || 'Avatar'}
+          fallback={fallbackText}
+          size="md"
+          variant="default"
+          className="border border-gray-200 dark:border-gray-700"
+        >
+          {fallbackText}
+        </Avatar>
+      );
+    }
+    
+    // If not a valid URL, show fallback avatar
+    return (
+      <Avatar
+        alt={titleField || 'Avatar'}
+        fallback={fallbackText}
+        size="md"
+        variant="default"
+        className="border border-gray-200 dark:border-gray-700"
+      >
+        {fallbackText}
+      </Avatar>
+    );
+  }
 
   if (field?.role === 'status') {
     const statusOptions = field.options || [];
@@ -188,16 +295,17 @@ export const formatFieldValue = (
         return <span>{stringValue}</span>;
       }
       // Get link label from componentTypeConfig or use default
-      const linkLabel = field?.componentTypeConfig?.label || 'show more';
+      const linkLabel = field?.componentTypeConfig?.label || 'URL';
       const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
       return (
         <a
           href={urlToOpen}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200"
+          className="inline-flex items-center gap-1.5 text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200"
           onClick={(e) => e.stopPropagation()}
         >
+          <LinkIcon className="h-3.5 w-3.5" />
           {linkLabel}
         </a>
       );
@@ -226,16 +334,17 @@ export const formatFieldValue = (
       const stringValue = String(value);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
       if (isUrl && (field?.type === 'url' || field?.component === 'url-input' || field?.component === 'url')) {
-        const linkLabel = field?.componentTypeConfig?.label || 'show more';
+        const linkLabel = field?.componentTypeConfig?.label || 'URL';
         const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
         return (
           <a
             href={urlToOpen}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200"
+            className="inline-flex items-center gap-1.5 text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200"
             onClick={(e) => e.stopPropagation()}
           >
+            <LinkIcon className="h-3.5 w-3.5" />
             {linkLabel}
           </a>
         );

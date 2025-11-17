@@ -1057,6 +1057,21 @@
           "label": "Schemas"
         }
       ]
+    },
+    {
+      "color": "#4E79A7",
+      "name": "Gradian ETL",
+      "address": "http://CG-BI-ETL",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KA99R0VJ2GKBDNSHJDAH8T37",
+      "createdAt": "2025-11-17T16:18:09.403Z",
+      "updatedAt": "2025-11-17T16:18:45.553Z",
+      "databases": [
+        {
+          "id": "01KA99S0PGBRJEQ61ZS1XZ41PQ",
+          "label": "Gradian_DW"
+        }
+      ]
     }
   ],
   "url-repository": [
@@ -1179,6 +1194,39 @@
       "targetDataPath": "data",
       "sourceDataPath": "data",
       "lastSynced": "2025-11-17T14:05:26.158Z"
+    }
+  ],
+  "databases": [
+    {
+      "name": "Gradian_DW",
+      "databaseType": [
+        {
+          "id": "SQL_SERVER",
+          "label": "SQL Server",
+          "icon": "Server",
+          "color": "info"
+        }
+      ],
+      "timezone": [
+        {
+          "id": "Asia/Tehran",
+          "label": "Asia/Tehran"
+        }
+      ],
+      "authenticationType": [
+        {
+          "id": "MANUAL",
+          "label": "Manual Authentication",
+          "icon": "Key",
+          "color": "warning"
+        }
+      ],
+      "username": "biuser",
+      "password": "BIP@ss7631",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KA99S0PGBRJEQ61ZS1XZ41PQ",
+      "createdAt": "2025-11-17T16:18:42.004Z",
+      "updatedAt": "2025-11-17T16:18:42.004Z"
     }
   ]
 }

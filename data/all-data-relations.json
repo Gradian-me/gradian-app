@@ -258,5 +258,15 @@
     "id": "01KA8VXHSPGS7HD1SZS2CHA1AW",
     "createdAt": "2025-11-17T12:16:30.517Z",
     "updatedAt": "2025-11-17T12:16:30.517Z"
+  },
+  {
+    "sourceSchema": "servers",
+    "sourceId": "01KA99R0VJ2GKBDNSHJDAH8T37",
+    "targetSchema": "databases",
+    "targetId": "01KA99S0PGBRJEQ61ZS1XZ41PQ",
+    "relationTypeId": "HAS_DATABASE",
+    "id": "01KA99S0R5KR6ZER5GVC73GR52",
+    "createdAt": "2025-11-17T16:18:42.053Z",
+    "updatedAt": "2025-11-17T16:18:42.053Z"
   }
 ]

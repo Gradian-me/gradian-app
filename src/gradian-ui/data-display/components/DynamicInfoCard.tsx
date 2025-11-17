@@ -8,11 +8,10 @@ import { resolveFieldById } from '../../form-builder/form-elements/utils/field-r
 import { CardContent, CardHeader, CardTitle, CardWrapper } from '../card/components/CardWrapper';
 import { DetailPageSection, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '../../shared/utils';
-import { formatNumber, formatCurrency, formatDate } from '../../shared/utils';
 import { isBadgeSection, getBadgeFields } from '../../schema-manager/utils/badge-utils';
 import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer';
-import { getDisplayStrings, getJoinedDisplayString, getPickerDisplayValue, renderRatingValue } from '../utils/value-display';
 import { CopyContent } from '../../form-builder/form-elements/components/CopyContent';
+import { formatFieldValue } from '../table/utils/field-formatters';
 
 export interface DynamicInfoCardProps {
   section: DetailPageSection;
@@ -23,186 +22,6 @@ export interface DynamicInfoCardProps {
   className?: string;
 }
 
-/**
- * Format field value based on field type and configuration
- */
-const formatFieldValue = (
-  field: any,
-  value: any,
-  data?: any,
-  section?: DetailPageSection
-): React.ReactNode => {
-  if (value === null || value === undefined || value === '') {
-    return <span className="text-gray-400">N/A</span>;
-  }
-
-  const optionLabels = getDisplayStrings(value);
-
-  // Handle badge-like fields (select, popup picker, etc.)
-  const candidateComponents = new Set([
-    'select',
-    'checkbox',
-    'radio',
-    'popup-picker',
-    'popuppicker',
-    'popup-picker-input',
-    'picker',
-    'pickerinput',
-    'combo',
-    'multiselect',
-    'multi-select'
-  ]);
-
-  const componentKey = (field?.component || field?.type || '').toString().toLowerCase();
-  const renderAsBadges =
-    (field?.role === 'badge' || candidateComponents.has(componentKey)) &&
-    (Array.isArray(value) || optionLabels.length > 0 || Array.isArray(field?.options));
-
-  if (renderAsBadges) {
-    const isPopupOrPicker =
-      field?.role === 'badge' ||
-      componentKey.includes('popup') ||
-      componentKey === 'picker' ||
-      field?.type === 'picker';
-    const badgeVariant = isPopupOrPicker
-      ? 'default'
-      : section?.badgeVariant ?? 'outline';
-    const enforceVariant = (
-      isPopupOrPicker ||
-      Boolean(section?.enforceBadgeVariant) ||
-      Boolean(section?.badgeVariant)
-    );
-    const handleBadgeClick = (item: any) => {
-      const candidateId = item.normalized?.id ?? item.id;
-      if (!candidateId || !field?.targetSchema) return;
-      const url = `/page/${field.targetSchema}/${encodeURIComponent(candidateId)}?showBack=true`;
-      if (typeof window !== 'undefined') {
-        window.open(url, '_self');
-      }
-    };
-
-    return (
-      <BadgeViewer
-        field={field}
-        value={value}
-        badgeVariant={badgeVariant}
-        enforceVariant={enforceVariant}
-        animate={true}
-        onBadgeClick={field?.targetSchema ? handleBadgeClick : undefined}
-        isItemClickable={
-          field?.targetSchema
-            ? (item) => Boolean(item.normalized?.id ?? item.id)
-            : () => Boolean(section?.badgeClickable)
-        }
-      />
-    );
-  }
-
-  // Handle picker fields - check for object values or resolved data
-  if (field?.type === 'picker' && field.targetSchema) {
-    const pickerDisplay = getPickerDisplayValue(field, value, { data });
-    if (pickerDisplay) {
-      return <span>{pickerDisplay}</span>;
-    }
-    return <span className="text-gray-400">N/A</span>;
-  }
-
-  // Use field type
-  const displayType = field?.type || 'text';
-
-  if (field?.role === 'rating') {
-    return (
-      <div className="inline-flex items-center">
-        {renderRatingValue(value, { size: 'sm', showValue: true })}
-      </div>
-    );
-  }
-
-  switch (displayType) {
-    case 'currency':
-      return <span>{formatCurrency(typeof value === 'number' ? value : parseFloat(value) || 0)}</span>;
-    case 'percentage':
-      const numValue = typeof value === 'number' ? value : parseFloat(value) || 0;
-      return <span>{numValue.toFixed(2)}%</span>;
-    case 'number':
-      return <span>{formatNumber(typeof value === 'number' ? value : parseFloat(value) || 0)}</span>;
-    case 'date':
-    case 'datetime-local':
-      try {
-        const dateValue = typeof value === 'string' ? new Date(value) : value;
-        if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
-          return <span>{formatDate(dateValue, { 
-            month: 'short', 
-            day: 'numeric', 
-            year: 'numeric' 
-          })}</span>;
-        }
-        return <span>{String(value)}</span>;
-      } catch {
-        return <span>{String(value)}</span>;
-      }
-    case 'url':
-    case 'url-input': {
-      const stringValue = String(value);
-      const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
-      if (!isUrl) {
-        return <span className="wrap-break-word">{stringValue}</span>;
-      }
-      // Get link label from componentTypeConfig or use default
-      const linkLabel = field?.componentTypeConfig?.label || 'show more';
-      const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
-      return (
-        <a
-          href={urlToOpen}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200 overflow-wrap-anywhere wrap-break-word"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {linkLabel}
-        </a>
-      );
-    }
-    case 'array':
-    case 'checkbox':
-      if (optionLabels.length > 0) {
-        return <span>{optionLabels.join(', ')}</span>;
-      }
-      if (Array.isArray(value)) {
-        return <span>{value.join(', ')}</span>;
-      }
-      return <span>{String(value)}</span>;
-    default:
-      // For URLs and long text, add word-break styling
-      const joined = getJoinedDisplayString(value);
-      if (joined) {
-        return <span>{joined}</span>;
-      }
-      const stringValue = String(value);
-      const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
-      // Check if it's a URL field type even if not explicitly in the switch
-      if (isUrl && (field?.type === 'url' || field?.component === 'url-input' || field?.component === 'url')) {
-        const linkLabel = field?.componentTypeConfig?.label || 'show more';
-        const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
-        return (
-          <a
-            href={urlToOpen}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200 overflow-wrap-anywhere wrap-break-word"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {linkLabel}
-          </a>
-        );
-      }
-      return (
-        <span className={isUrl || stringValue.length > 50 ? "overflow-wrap-anywhere wrap-break-word" : "wrap-break-word"}>
-          {stringValue}
-        </span>
-      );
-  }
-};
 
 /**
  * Get field value from data, handling nested paths
@@ -425,7 +244,7 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                 </label>
                 <div className="flex items-center gap-2">
                   <div className="text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word flex-1">
-                    {formatFieldValue(field, field.value, data, section)}
+                    {formatFieldValue(field, field.value, data)}
                   </div>
                   {field.canCopy && field.value && field.value !== '' && (
                     <div

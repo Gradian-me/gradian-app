@@ -2760,6 +2760,17 @@
         "columns": 2
       },
       {
+        "id": "databases",
+        "title": "Databases",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 0,
+          "targetSchema": "databases",
+          "relationTypeId": "HAS_DATABASE"
+        }
+      },
+      {
         "id": "url-repositories",
         "title": "URL Repositories",
         "columns": 2,
@@ -3218,6 +3229,318 @@
     "isSystemSchema": false,
     "isNotCompanyBased": true,
     "fields": [],
-    "sections": []
+    "sections": [],
+    "fieldsCount": 0,
+    "sectionsCount": 0,
+    "inactive": true
+  },
+  {
+    "id": "databases",
+    "description": "Manage database configurations and connection settings",
+    "singular_name": "Database",
+    "plural_name": "Databases",
+    "cardMetadata": [
+      {
+        "id": "database-info",
+        "title": "Database Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "database-name",
+          "database-type",
+          "timezone"
+        ]
+      },
+      {
+        "id": "authentication-info",
+        "title": "Authentication",
+        "colSpan": 1,
+        "fieldIds": [
+          "authentication-type",
+          "username"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "database-name",
+        "name": "name",
+        "label": "Database Name",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "Enter database name",
+        "required": true,
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "database-type",
+        "name": "databaseType",
+        "label": "Database Type",
+        "sectionId": "basic-information",
+        "type": "select",
+        "component": "select",
+        "placeholder": "Select database type",
+        "required": true,
+        "options": [
+          {
+            "id": "SQL_SERVER",
+            "label": "SQL Server",
+            "icon": "Server",
+            "color": "info"
+          },
+          {
+            "id": "POSTGRESQL",
+            "label": "PostgreSQL",
+            "icon": "Database",
+            "color": "info"
+          },
+          {
+            "id": "MYSQL",
+            "label": "MySQL",
+            "icon": "Database",
+            "color": "warning"
+          },
+          {
+            "id": "MONGODB",
+            "label": "MongoDB",
+            "icon": "Box",
+            "color": "success"
+          },
+          {
+            "id": "ORACLE",
+            "label": "Oracle",
+            "icon": "Database",
+            "color": "destructive"
+          },
+          {
+            "id": "SQLITE",
+            "label": "SQLite",
+            "icon": "HardDrive",
+            "color": "muted"
+          },
+          {
+            "id": "MARIADB",
+            "label": "MariaDB",
+            "icon": "Database",
+            "color": "warning"
+          },
+          {
+            "id": "REDIS",
+            "label": "Redis",
+            "icon": "Circle",
+            "color": "destructive"
+          },
+          {
+            "id": "CASSANDRA",
+            "label": "Cassandra",
+            "icon": "Database",
+            "color": "info"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "database-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "type": "textarea",
+        "component": "textarea",
+        "placeholder": "Enter database description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "timezone",
+        "name": "timezone",
+        "label": "Timezone",
+        "sectionId": "basic-information",
+        "type": "select",
+        "component": "select",
+        "placeholder": "Select timezone",
+        "required": true,
+        "options": [
+          {
+            "id": "America/New_York",
+            "label": "Eastern Time (ET)"
+          },
+          {
+            "id": "America/Chicago",
+            "label": "Central Time (CT)"
+          },
+          {
+            "id": "America/Denver",
+            "label": "Mountain Time (MT)"
+          },
+          {
+            "id": "America/Los_Angeles",
+            "label": "Pacific Time (PT)"
+          },
+          {
+            "id": "UTC",
+            "label": "UTC"
+          },
+          {
+            "id": "Europe/London",
+            "label": "Europe/London"
+          },
+          {
+            "id": "Europe/Berlin",
+            "label": "Europe/Berlin"
+          },
+          {
+            "id": "Europe/Paris",
+            "label": "Europe/Paris"
+          },
+          {
+            "id": "Asia/Dubai",
+            "label": "Asia/Dubai"
+          },
+          {
+            "id": "Asia/Tehran",
+            "label": "Asia/Tehran"
+          },
+          {
+            "id": "Asia/Tokyo",
+            "label": "Asia/Tokyo"
+          },
+          {
+            "id": "Asia/Shanghai",
+            "label": "Asia/Shanghai"
+          },
+          {
+            "id": "Asia/Kolkata",
+            "label": "Asia/Kolkata"
+          },
+          {
+            "id": "Australia/Sydney",
+            "label": "Australia/Sydney"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "authentication-type",
+        "name": "authenticationType",
+        "label": "Authentication Type",
+        "sectionId": "authentication-information",
+        "type": "select",
+        "component": "select",
+        "placeholder": "Select authentication type",
+        "required": true,
+        "options": [
+          {
+            "id": "WINDOWS",
+            "label": "Windows Authentication",
+            "icon": "Shield",
+            "color": "info"
+          },
+          {
+            "id": "MANUAL",
+            "label": "Manual Authentication",
+            "icon": "Key",
+            "color": "warning"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "username",
+        "name": "username",
+        "label": "Username",
+        "sectionId": "authentication-information",
+        "type": "name",
+        "component": "name",
+        "placeholder": "Enter username",
+        "required": false,
+        "validation": {
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "password",
+        "name": "password",
+        "label": "Password",
+        "sectionId": "authentication-information",
+        "type": "password",
+        "component": "password",
+        "placeholder": "Enter password",
+        "required": false,
+        "validation": {
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 3
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Database name, type, description, and timezone settings",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "authentication-information",
+        "title": "Authentication Information",
+        "description": "Database authentication configuration",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "database-overview",
+          "title": "Database Overview",
+          "description": "Basic database information and configuration",
+          "colSpan": 2,
+          "fieldIds": [
+            "database-name",
+            "database-type",
+            "database-description",
+            "timezone"
+          ]
+        },
+        {
+          "id": "authentication-overview",
+          "title": "Authentication Configuration",
+          "description": "Database authentication settings",
+          "colSpan": 2,
+          "fieldIds": [
+            "authentication-type",
+            "username",
+            "password"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "Database",
+    "isNotCompanyBased": true,
+    "isSystemSchema": true
   }
 ]
