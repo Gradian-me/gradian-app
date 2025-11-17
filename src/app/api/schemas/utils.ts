@@ -343,7 +343,22 @@ export const proxySchemaRequest = async (
     }
   }
 
-  const method = (options.method ?? request.method).toUpperCase();
+  // Ensure method is a string before calling toUpperCase
+  // Handle cases where request.method might be undefined or not a string
+  // Convert to string first to handle any edge cases
+  let methodValue: string;
+  if (options.method !== undefined && options.method !== null) {
+    methodValue = String(options.method);
+  } else if (request?.method) {
+    methodValue = String(request.method);
+  } else {
+    methodValue = 'GET';
+  }
+  
+  // Ensure it's a valid HTTP method string
+  const method = (typeof methodValue === 'string' && methodValue.length > 0) 
+    ? methodValue.toUpperCase() 
+    : 'GET';
 
   loggingCustom(
     LogType.CALL_BACKEND,

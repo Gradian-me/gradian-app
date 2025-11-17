@@ -1,8 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
 
-const DATA_FILE = join(process.cwd(), 'data', 'all-integrations.json');
+/**
+ * Get the API URL for internal server-side calls
+ * Server-side fetch requires absolute URLs, so we construct them here
+ */
+function getApiUrl(apiPath: string): string {
+  // If it's already a full URL, use it as-is
+  if (apiPath.startsWith('http')) {
+    return apiPath;
+  }
+
+  // For relative URLs, construct absolute URL for server-side fetch
+  // Priority: NEXTAUTH_URL > VERCEL_URL > localhost (default for development)
+  let baseUrl = process.env.NEXTAUTH_URL;
+
+  if (!baseUrl) {
+    // Use Vercel URL if available (for Vercel deployments)
+    if (process.env.VERCEL_URL) {
+      baseUrl = `https://${process.env.VERCEL_URL}`;
+    } else {
+      // Default to localhost for local development
+      const port = process.env.PORT || '3000';
+      baseUrl = `http://localhost:${port}`;
+    }
+  }
+
+  // Clean and combine paths
+  const cleanPath = apiPath.startsWith('/') ? apiPath : `/${apiPath}`;
+
+  // Remove trailing slash from baseUrl if present
+  const normalizedBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+
+  return `${normalizedBase}${cleanPath}`;
+}
 
 /**
  * Extract data from object using JSON path (e.g., "results", "data.items", "response.data")
@@ -41,11 +71,52 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Read integrations
-    const fileContent = await readFile(DATA_FILE, 'utf-8');
-    const integrations = JSON.parse(fileContent);
-    
-    const integration = integrations.find((i: any) => i.id === id);
+    // Fetch integration from dynamic data API
+    let integration: any = null;
+    try {
+      // Try to fetch by ID first
+      const byIdUrl = getApiUrl(`/api/data/integrations/${id}`);
+      const byIdResponse = await fetch(byIdUrl, {
+        method: 'GET' as any,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (byIdResponse.ok) {
+        const byIdData = await byIdResponse.json();
+        if (byIdData.success && byIdData.data) {
+          // Handle different response formats
+          integration = Array.isArray(byIdData.data) ? byIdData.data[0] : (byIdData.data?.data || byIdData.data);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to fetch integration by ID, trying list:', error);
+    }
+
+    // If not found by ID, fetch all and filter
+    if (!integration) {
+      try {
+        const listUrl = getApiUrl('/api/data/integrations');
+        const listResponse = await fetch(listUrl, {
+          method: 'GET' as any,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (listResponse.ok) {
+          const listData = await listResponse.json();
+          if (listData.success && listData.data) {
+            const integrations = Array.isArray(listData.data) ? listData.data : (listData.data?.data || listData.data?.items || []);
+            integration = integrations.find((i: any) => i.id === id);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching integrations list:', error);
+      }
+    }
+
     if (!integration) {
       return NextResponse.json(
         {
@@ -56,14 +127,32 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    if (!integration.targetRoute) {
+    // Extract targetRoute - handle both string and object (from picker fields)
+    let targetRoute: string | null = null;
+    if (typeof integration.targetRoute === 'string') {
+      targetRoute = integration.targetRoute;
+    } else if (integration.targetRoute && typeof integration.targetRoute === 'object') {
+      // If it's an object (from picker), try to extract the address/url
+      targetRoute = integration.targetRoute.address || integration.targetRoute.url || integration.targetRoute.value || null;
+    }
+    
+    if (!targetRoute) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Integration targetRoute is not configured'
+          error: 'Integration targetRoute is not configured or invalid'
         },
         { status: 400 }
       );
+    }
+    
+    // Extract sourceRoute - handle both string and object (from picker fields)
+    let sourceRoute: string | null = null;
+    if (typeof integration.sourceRoute === 'string') {
+      sourceRoute = integration.sourceRoute;
+    } else if (integration.sourceRoute && typeof integration.sourceRoute === 'object') {
+      // If it's an object (from picker), try to extract the address/url
+      sourceRoute = integration.sourceRoute.address || integration.sourceRoute.url || integration.sourceRoute.value || null;
     }
     
     let syncResponse = null;
@@ -71,10 +160,10 @@ export async function POST(request: NextRequest) {
     
     try {
       // Step 1: If sourceRoute exists, fetch data from it first
-      if (integration.sourceRoute) {
-        const sourceMethod = integration.sourceMethod || 'GET';
+      if (sourceRoute) {
+        const sourceMethod = String(integration.sourceMethod || 'GET').toUpperCase();
         const sourceFetchOptions: RequestInit = {
-          method: sourceMethod,
+          method: sourceMethod as any,
           headers: {
             'Content-Type': 'application/json',
           },
@@ -87,7 +176,7 @@ export async function POST(request: NextRequest) {
           sourceFetchOptions.body = JSON.stringify({});
         }
         
-        const sourceResponse = await fetch(integration.sourceRoute, sourceFetchOptions);
+        const sourceResponse = await fetch(sourceRoute, sourceFetchOptions);
         
         if (!sourceResponse.ok) {
           throw new Error(`Source route failed: ${sourceResponse.statusText}`);
@@ -107,10 +196,10 @@ export async function POST(request: NextRequest) {
       }
       
       // Step 3: Call targetRoute with the data (or empty if no sourceRoute)
-      const method = integration.targetMethod || 'GET';
-      let targetUrl = integration.targetRoute;
+      const method = String(integration.targetMethod || 'GET').toUpperCase();
+      let targetUrl = targetRoute;
       const fetchOptions: RequestInit = {
-        method: method,
+        method: method as any,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -159,11 +248,24 @@ export async function POST(request: NextRequest) {
       
       syncResponse = await targetResponse.json();
       
-      // Update lastSynced timestamp
-      const index = integrations.findIndex((i: any) => i.id === id);
-      if (index !== -1) {
-        integrations[index].lastSynced = new Date().toISOString();
-        await writeFile(DATA_FILE, JSON.stringify(integrations, null, 2), 'utf-8');
+      // Update lastSynced timestamp using the dynamic data API
+      try {
+        const updateUrl = getApiUrl(`/api/data/integrations/${id}`);
+        const updatedIntegration = {
+          ...integration,
+          lastSynced: new Date().toISOString(),
+        };
+        
+        await fetch(updateUrl, {
+          method: 'PUT' as any,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedIntegration),
+        });
+      } catch (error) {
+        console.error('Failed to update lastSynced timestamp:', error);
+        // Don't fail the sync if timestamp update fails
       }
     } catch (error) {
       return NextResponse.json(

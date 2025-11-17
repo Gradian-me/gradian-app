@@ -1043,6 +1043,20 @@
           "label": "Schema Bulk Sync"
         }
       ]
+    },
+    {
+      "color": "#4E79A7",
+      "name": "Gradian App",
+      "address": "http://localhost:3000",
+      "id": "01KA8VVZENR2AS7YWTAY4T6HM7",
+      "createdAt": "2025-11-17T12:15:38.970Z",
+      "updatedAt": "2025-11-17T12:16:32.930Z",
+      "url-repositories": [
+        {
+          "id": "01KA8VXHQFZR5TH0470163433K",
+          "label": "Schemas"
+        }
+      ]
     }
   ],
   "url-repository": [
@@ -1075,6 +1089,21 @@
       "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
       "createdAt": "2025-11-17T11:54:59.460Z",
       "updatedAt": "2025-11-17T11:54:59.460Z"
+    },
+    {
+      "title": "Schemas",
+      "address": "http://localhost:3000/api/schemas",
+      "methods": [
+        {
+          "id": "GET",
+          "label": "GET",
+          "icon": "ArrowRight",
+          "color": "info"
+        }
+      ],
+      "id": "01KA8VXHQFZR5TH0470163433K",
+      "createdAt": "2025-11-17T12:16:30.459Z",
+      "updatedAt": "2025-11-17T12:16:30.460Z"
     }
   ],
   "integrations": [
@@ -1101,6 +1130,43 @@
       "id": "emailtemplate",
       "createdAt": "2025-11-17T12:05:23.829Z",
       "updatedAt": "2025-11-17T12:05:23.829Z"
+    },
+    {
+      "color": "#930ec4",
+      "title": "Schemas Sync",
+      "description": "This Syncs Schema From App to DB",
+      "icon": "LucidePencilRuler",
+      "targetRoute": [
+        {
+          "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
+          "label": "Schema Bulk Sync"
+        }
+      ],
+      "targetMethod": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "Upload",
+          "color": "success"
+        }
+      ],
+      "sourceRoute": [
+        {
+          "id": "01KA8VXHQFZR5TH0470163433K",
+          "label": "Schemas"
+        }
+      ],
+      "sourceMethod": [
+        {
+          "id": "GET",
+          "label": "GET",
+          "icon": "Download",
+          "color": "info"
+        }
+      ],
+      "id": "schemas_sync",
+      "createdAt": "2025-11-17T12:19:40.582Z",
+      "updatedAt": "2025-11-17T12:19:40.582Z"
     }
   ]
 }

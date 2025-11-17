@@ -52,17 +52,36 @@ export default function SyncIntegrationPage() {
 
     const fetchIntegration = async () => {
       try {
-        const response = await apiRequest<Integration[]>('/api/integrations', {
-          method: 'GET',
-        });
-        
-        if (response.success && response.data) {
-          const found = response.data.find(i => i.id === integrationId);
-          if (found) {
-            setIntegration(found);
-          } else {
-            router.push('/integrations');
+        // Try to fetch by ID first
+        let found: Integration | null = null;
+        try {
+          const byIdResponse = await apiRequest<Integration>(`/api/data/integrations/${integrationId}`, {
+            method: 'GET',
+          });
+          if (byIdResponse.success && byIdResponse.data) {
+            found = Array.isArray(byIdResponse.data) ? byIdResponse.data[0] : (byIdResponse.data?.data || byIdResponse.data);
           }
+        } catch (error) {
+          // If fetching by ID fails, try fetching all and filtering
+          console.warn('Failed to fetch integration by ID, trying list:', error);
+        }
+        
+        // If not found by ID, fetch all and filter
+        if (!found) {
+          const response = await apiRequest<Integration[]>('/api/data/integrations', {
+            method: 'GET',
+          });
+          
+          if (response.success && response.data) {
+            const data = Array.isArray(response.data) ? response.data : (response.data?.data || response.data?.items || []);
+            found = data.find(i => i.id === integrationId) || null;
+          }
+        }
+        
+        if (found) {
+          setIntegration(found);
+        } else {
+          router.push('/integrations');
         }
       } catch (error) {
         console.error('Error fetching integration:', error);
@@ -92,13 +111,27 @@ export default function SyncIntegrationPage() {
       if (response.success) {
         setSyncResponse(response.data || 'Sync completed successfully');
         // Refresh integration to get updated lastSynced
-        const refreshResponse = await apiRequest<Integration[]>('/api/integrations', {
-          method: 'GET',
-        });
-        if (refreshResponse.success && refreshResponse.data) {
-          const updated = refreshResponse.data.find(i => i.id === integration.id);
-          if (updated) {
-            setIntegration(updated);
+        try {
+          const refreshResponse = await apiRequest<Integration>(`/api/data/integrations/${integration.id}`, {
+            method: 'GET',
+          });
+          if (refreshResponse.success && refreshResponse.data) {
+            const updated = Array.isArray(refreshResponse.data) ? refreshResponse.data[0] : (refreshResponse.data?.data || refreshResponse.data);
+            if (updated) {
+              setIntegration(updated);
+            }
+          }
+        } catch (error) {
+          // If fetching by ID fails, try fetching all and filtering
+          const refreshResponse = await apiRequest<Integration[]>('/api/data/integrations', {
+            method: 'GET',
+          });
+          if (refreshResponse.success && refreshResponse.data) {
+            const data = Array.isArray(refreshResponse.data) ? refreshResponse.data : (refreshResponse.data?.data || refreshResponse.data?.items || []);
+            const updated = data.find(i => i.id === integration.id);
+            if (updated) {
+              setIntegration(updated);
+            }
           }
         }
       } else {

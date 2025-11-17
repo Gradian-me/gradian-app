@@ -1,30 +1,23 @@
 'use client';
 
-import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SyncButton } from '@/gradian-ui/form-builder/form-elements';
-import dynamic from 'next/dynamic';
-import { ConfigureIntegrationForm } from './components/ConfigureIntegrationForm';
-
-const Modal = dynamic(() => import('@/gradian-ui/data-display').then(mod => ({ default: mod.Modal })), {
-  ssr: false
-});
+import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { 
   CheckCircle, 
   AlertCircle, 
   Clock,
   Settings,
-  RefreshCw,
   Download,
   Upload,
   Activity,
-  Plus,
-  Save
+  Plus
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -62,28 +55,21 @@ export default function IntegrationsPage() {
   const [iconLoading, setIconLoading] = useState<boolean>(false);
   const [iconError, setIconError] = useState<string | null>(null);
   const [syncResponse, setSyncResponse] = useState<Record<string, EmailTemplateSyncResponse | string | null>>({});
-  const [configureModalOpen, setConfigureModalOpen] = useState(false);
-  const [editingIntegrationId, setEditingIntegrationId] = useState<string | null>(null);
-  const formSubmitHandlerRef = useRef<(() => void) | null>(null);
-  const [formSaving, setFormSaving] = useState(false);
-
-  const handleSubmitRef = useCallback((submitFn: () => void) => {
-    formSubmitHandlerRef.current = submitFn;
-  }, []);
-
-  const handleSavingChange = useCallback((saving: boolean) => {
-    setFormSaving(saving);
-  }, []);
+  const [formModalSchemaId, setFormModalSchemaId] = useState<string | undefined>(undefined);
+  const [formModalEntityId, setFormModalEntityId] = useState<string | undefined>(undefined);
+  const [formModalMode, setFormModalMode] = useState<'create' | 'edit'>('create');
 
   useEffect(() => {
     const fetchIntegrations = async () => {
       try {
-        const response = await apiRequest<Integration[]>('/api/integrations', {
+        const response = await apiRequest<Integration[]>('/api/data/integrations', {
           method: 'GET',
         });
         
         if (response.success && response.data) {
-          setIntegrations(response.data);
+          // Handle both array response and wrapped response
+          const data = Array.isArray(response.data) ? response.data : (response.data?.data || response.data?.items || []);
+          setIntegrations(data);
         } else {
           console.error('Failed to fetch integrations:', response.error);
         }
@@ -180,11 +166,13 @@ export default function IntegrationsPage() {
           setSyncResponse(prev => ({ ...prev, [integration.id]: response.data as EmailTemplateSyncResponse }));
         }
         // Refresh integrations to get updated lastSynced
-        const refreshResponse = await apiRequest<Integration[]>('/api/integrations', {
+        const refreshResponse = await apiRequest<Integration[]>('/api/data/integrations', {
           method: 'GET',
         });
         if (refreshResponse.success && refreshResponse.data) {
-          setIntegrations(refreshResponse.data);
+          // Handle both array response and wrapped response
+          const data = Array.isArray(refreshResponse.data) ? refreshResponse.data : (refreshResponse.data?.data || refreshResponse.data?.items || []);
+          setIntegrations(data);
         }
       } else {
         const errorMessage = response.error || 'Sync failed';
@@ -229,8 +217,9 @@ export default function IntegrationsPage() {
           <div className="flex space-x-2">
             <Button
               onClick={() => {
-                setEditingIntegrationId(null);
-                setConfigureModalOpen(true);
+                setFormModalEntityId(undefined);
+                setFormModalMode('create');
+                setFormModalSchemaId('integrations');
               }}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -416,8 +405,9 @@ export default function IntegrationsPage() {
                           variant="outline" 
                           size="sm"
                           onClick={() => {
-                            setEditingIntegrationId(integration.id);
-                            setConfigureModalOpen(true);
+                            setFormModalEntityId(integration.id);
+                            setFormModalMode('edit');
+                            setFormModalSchemaId('integrations');
                           }}
                         >
                           <Settings className="h-4 w-4 mr-2" />
@@ -557,80 +547,32 @@ export default function IntegrationsPage() {
           </Card>
         </motion.div>
 
-        {/* Configure Integration Modal */}
-        <Modal
-          isOpen={configureModalOpen}
-          onClose={() => {
-            setConfigureModalOpen(false);
-            setEditingIntegrationId(null);
-            formSubmitHandlerRef.current = null;
+        {/* Schema-based Form Modal */}
+        <FormModal
+          schemaId={formModalSchemaId}
+          entityId={formModalEntityId}
+          mode={formModalMode}
+          onSuccess={async () => {
+            // Refresh integrations after successful create/update
+            const response = await apiRequest<Integration[]>('/api/data/integrations', {
+              method: 'GET',
+            });
+            if (response.success && response.data) {
+              // Handle both array response and wrapped response
+              const data = Array.isArray(response.data) ? response.data : (response.data?.data || response.data?.items || []);
+              setIntegrations(data);
+            }
+            // Reset form modal state
+            setFormModalSchemaId(undefined);
+            setFormModalEntityId(undefined);
           }}
-          title={editingIntegrationId ? 'Edit Integration' : 'Add New Integration'}
-          description={editingIntegrationId ? 'Update integration configuration' : 'Configure a new integration'}
-          size="md"
-          showCloseButton={false}
-          closeOnOutsideClick={false}
-          actions={
-            <div className="flex justify-end space-x-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setConfigureModalOpen(false);
-                  setEditingIntegrationId(null);
-                  formSubmitHandlerRef.current = null;
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={() => {
-                  if (formSubmitHandlerRef.current) {
-                    formSubmitHandlerRef.current();
-                  }
-                }}
-                disabled={formSaving}
-              >
-                {formSaving ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    {editingIntegrationId ? 'Update' : 'Create'}
-                  </>
-                )}
-              </Button>
-            </div>
-          }
-        >
-          <ConfigureIntegrationForm
-            integrationId={editingIntegrationId}
-            onSuccess={async () => {
-              setConfigureModalOpen(false);
-              setEditingIntegrationId(null);
-              formSubmitHandlerRef.current = null;
-              // Refresh integrations
-              const response = await apiRequest<Integration[]>('/api/integrations', {
-                method: 'GET',
-              });
-              if (response.success && response.data) {
-                setIntegrations(response.data);
-              }
-            }}
-            onCancel={() => {
-              setConfigureModalOpen(false);
-              setEditingIntegrationId(null);
-              formSubmitHandlerRef.current = null;
-            }}
-            onSubmitRef={handleSubmitRef}
-            onSavingChange={handleSavingChange}
-            hideActions={true}
-          />
-        </Modal>
+          onClose={() => {
+            // Reset form modal state when closed
+            setFormModalSchemaId(undefined);
+            setFormModalEntityId(undefined);
+          }}
+          size="xl"
+        />
       </div>
     </MainLayout>
   );
