@@ -24,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { NameInput } from '@/gradian-ui/form-builder/form-elements';
+import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { useEmailTemplates } from './hooks/useEmailTemplates';
 import { DEFAULT_TEMPLATE_HTML, extractPlaceholders, renderWithValues, normalizeTemplateId } from './utils';
 import type { EmailTemplate, PlaceholderValues } from './types';
@@ -535,15 +536,11 @@ export default function EmailTemplateBuilderPage() {
                     </pre>
                     </TabsContent>
                     <TabsContent value="html">
-                    <div className="rounded-2xl border bg-muted/60 p-4">
-                      <div className="flex items-center justify-between gap-3 mb-3">
-                        <p className="text-sm font-medium text-muted-foreground">Resolved HTML</p>
-                        <CopyContent content={resolvedHtml} />
-                      </div>
-                      <pre className="text-xs font-mono overflow-x-auto whitespace-pre-wrap">
-                        {resolvedHtml}
-                      </pre>
-                    </div>
+                      <CodeViewer
+                        code={resolvedHtml}
+                        programmingLanguage="html"
+                        title="Resolved HTML"
+                      />
                     </TabsContent>
                   </Tabs>
                 </CardContent>
