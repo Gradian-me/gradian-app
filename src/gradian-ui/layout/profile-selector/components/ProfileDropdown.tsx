@@ -1,9 +1,10 @@
 // Profile Dropdown Component
 
-import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
 import { ProfileDropdownProps } from '../types';
 import { cn } from '../../../shared/utils';
 import { Settings, User, LogOut, ChevronDown, Key } from 'lucide-react';
+import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
 
 const DROPDOWN_Z_INDEX = 2147483000;
 
@@ -23,6 +24,13 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [panelPlacement, setPanelPlacement] = useState<'top' | 'bottom'>('bottom');
+
+  // Register dropdown for back button handling on mobile
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+  
+  useDialogBackHandler(isOpen, handleClose, 'dropdown', 'profile-dropdown');
 
   const {
     layout = { variant: 'dropdown' },

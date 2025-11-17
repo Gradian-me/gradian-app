@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useRouter } from 'next/navigation';
+import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
 
 interface NotificationsDropdownProps {
   initialCount?: number;
@@ -17,7 +18,15 @@ interface NotificationsDropdownProps {
 export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdownProps) {
   const [notificationCount, setNotificationCount] = useState(initialCount);
   const [isMounted, setIsMounted] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+
+  // Register dropdown for back button handling on mobile
+  const handleClose = React.useCallback(() => {
+    setIsOpen(false);
+  }, []);
+  
+  useDialogBackHandler(isOpen, handleClose, 'dropdown', 'notifications-dropdown');
 
   useEffect(() => {
     setIsMounted(true);
@@ -57,7 +66,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
   }
 
   return (
-    <DropdownMenuPrimitive.Root>
+    <DropdownMenuPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuPrimitive.Trigger asChild>
           <Button 
             variant="outline" 

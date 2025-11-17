@@ -10,6 +10,7 @@ import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { getValueByRole } from '@/gradian-ui/data-display/utils';
 import { getPrimaryDisplayString, hasDisplayValue } from '@/gradian-ui/data-display/utils/value-display';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
 
 const EXCLUDED_TITLE_ROLES = new Set(['code', 'subtitle', 'description']);
 
@@ -164,6 +165,9 @@ export const FormModal: React.FC<FormModalProps> = ({
     getInitialSchema,
     getInitialEntityData,
   });
+
+  // Register dialog for back button handling on mobile
+  useDialogBackHandler(isOpen, closeFormModal, 'modal', 'form-modal');
 
   // Track the last opened combination to prevent duplicate opens
   const lastOpenedRef = React.useRef<{ schemaId?: string; entityId?: string; mode?: FormModalMode }>({});

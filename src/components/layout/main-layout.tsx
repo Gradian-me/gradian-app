@@ -17,6 +17,7 @@ import { DemoModeBadge } from './DemoModeBadge';
 import type { HeaderConfig } from '@/gradian-ui/layout/header';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useTheme } from 'next-themes';
+import { useDialogContext } from '@/gradian-ui/shared/contexts/DialogContext';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -63,6 +64,7 @@ export function MainLayout({
   const [isDesktop, setIsDesktop] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(() => getSidebarWidth(false, false));
   const { selectedCompany } = useCompanyStore();
+  const { closeAllDialogs, hasOpenDialogs, registerDialog, unregisterDialog } = useDialogContext();
   const pageTitle = title ? `${title} | Gradian App` : 'Gradian App';
 
   useEffect(() => {
@@ -86,6 +88,33 @@ export function MainLayout({
     setSidebarWidth((currentWidth) => (currentWidth === nextSidebarWidth ? currentWidth : nextSidebarWidth));
   }, [isDesktop, isSidebarCollapsed]);
 
+  // Handle browser back button on mobile - close dialogs/dropdowns first
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handlePopState = (event: PopStateEvent) => {
+      // Check if we're on mobile
+      const isMobile = window.innerWidth < DESKTOP_BREAKPOINT;
+      if (!isMobile) {
+        return; // Allow normal back navigation on desktop
+      }
+
+      // If there are open dialogs/dropdowns, close them and prevent navigation
+      if (hasOpenDialogs()) {
+        // Push a new state to prevent navigation
+        window.history.pushState({ dialogOpen: true }, '', window.location.href);
+        // Close all dialogs
+        closeAllDialogs();
+      }
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [closeAllDialogs, hasOpenDialogs]);
+
   const toggleSidebar = () => {
     setIsSidebarCollapsed((collapsed) => !collapsed);
   };
@@ -93,6 +122,20 @@ export function MainLayout({
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  // Register mobile menu as a dialog for back button handling
+  useEffect(() => {
+    const menuId = 'mobile-sidebar-menu';
+    
+    if (isMobileMenuOpen) {
+      registerDialog(menuId, 'sidebar', toggleMobileMenu);
+      return () => {
+        unregisterDialog(menuId);
+      };
+    } else {
+      unregisterDialog(menuId);
+    }
+  }, [isMobileMenuOpen, registerDialog, unregisterDialog, toggleMobileMenu]);
 
   const handleNotificationClick = () => {
     window.location.href = '/notifications';

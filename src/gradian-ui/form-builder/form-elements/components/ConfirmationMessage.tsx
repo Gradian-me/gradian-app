@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/gradian-ui/shared/utils';
+import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
 
 export interface ConfirmationButton {
   label: string;
@@ -81,6 +82,13 @@ export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
   className,
   variant = 'default',
 }) => {
+  // Register dialog for back button handling on mobile
+  const handleClose = React.useCallback(() => {
+    onOpenChange?.(false);
+  }, [onOpenChange]);
+  
+  useDialogBackHandler(isOpen, handleClose, 'dialog', 'confirmation-message');
+
   const sizeClasses = {
     sm: 'max-w-md',
     md: 'max-w-lg',

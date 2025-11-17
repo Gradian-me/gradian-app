@@ -1119,6 +1119,36 @@
       "id": "01KA8VXHQFZR5TH0470163433K",
       "createdAt": "2025-11-17T12:16:30.459Z",
       "updatedAt": "2025-11-17T12:16:30.460Z"
+    },
+    {
+      "title": "Lucide Icons",
+      "address": "http://localhost:3000/api/integrations/lucide-icons",
+      "methods": [
+        {
+          "id": "GET",
+          "label": "GET",
+          "icon": "ArrowRight",
+          "color": "info"
+        }
+      ],
+      "id": "01KA9LUCIDEICONS001",
+      "createdAt": "2025-11-17T18:00:00.000Z",
+      "updatedAt": "2025-11-17T18:00:00.000Z"
+    },
+    {
+      "title": "Lucide Icons Sync",
+      "address": "http://localhost:3000/api/integrations/lucide-icons/sync",
+      "methods": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "ArrowRight",
+          "color": "success"
+        }
+      ],
+      "id": "01KA9LUCIDEICONSYNC001",
+      "createdAt": "2025-11-17T18:00:00.000Z",
+      "updatedAt": "2025-11-17T18:00:00.000Z"
     }
   ],
   "integrations": [
@@ -1145,7 +1175,7 @@
           "color": "info"
         }
       ],
-      "id": "emailtemplate",
+      "id": "email_template_sync",
       "createdAt": "2025-11-17T12:05:23.829Z",
       "updatedAt": "2025-11-17T13:03:00.772Z"
     },
@@ -1194,6 +1224,50 @@
       "targetDataPath": "data",
       "sourceDataPath": "data",
       "lastSynced": "2025-11-17T14:05:26.158Z"
+    },
+    {
+      "color": "#8b5cf6",
+      "title": "Lucide Icons Sync",
+      "description": "Synchronize Lucide icon library from external source",
+      "icon": "Palette",
+      "targetRoute": [
+        {
+          "id": "01KA9LUCIDEICONSYNC001",
+          "label": "Lucide Icons Sync",
+          "metadata": {
+            "address": "http://localhost:3000/api/integrations/lucide-icons/sync"
+          }
+        }
+      ],
+      "targetMethod": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "Upload",
+          "color": "success"
+        }
+      ],
+      "sourceRoute": [
+        {
+          "id": "01KA9LUCIDEICONS001",
+          "label": "Lucide Icons",
+          "metadata": {
+            "address": "http://localhost:3000/api/integrations/lucide-icons"
+          }
+        }
+      ],
+      "sourceMethod": [
+        {
+          "id": "GET",
+          "label": "GET",
+          "icon": "Download",
+          "color": "info"
+        }
+      ],
+      "id": "lucide_icons_sync",
+      "createdAt": "2025-11-17T18:00:00.000Z",
+      "updatedAt": "2025-11-17T17:18:24.895Z",
+      "lastSynced": "2025-11-17T17:18:24.838Z"
     }
   ],
   "databases": [

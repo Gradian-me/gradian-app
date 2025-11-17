@@ -7,6 +7,7 @@ import { DynamicCardRenderer } from './DynamicCardRenderer';
 import { DynamicCardActionButtons } from './DynamicCardActionButtons';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '../../shared/utils';
+import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
 
 export interface DynamicCardDialogProps {
   /**
@@ -76,6 +77,9 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
   onEdit,
   onDelete
 }) => {
+  // Register dialog for back button handling on mobile
+  useDialogBackHandler(isOpen, onClose, 'dialog', 'dynamic-card-dialog');
+
   if (!isOpen || !data) {
     return null;
   }
