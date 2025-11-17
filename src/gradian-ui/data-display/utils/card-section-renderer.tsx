@@ -7,6 +7,7 @@ import { renderFieldValue } from './card-field-renderer';
 import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/ui/tooltip';
+import { CopyContent } from '../../form-builder/form-elements/components/CopyContent';
 
 interface RenderSectionProps {
   section: any;
@@ -70,36 +71,49 @@ export const renderCardSection = ({ section, schema, data, maxMetrics = 3, onBad
                 transition={{ duration: 0.2 }}
                 className="text-gray-600 dark:text-gray-300"
               >
-                <TooltipProvider disableHoverableContent>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div>
-                        <BadgeViewer
-                          field={field}
-                          value={value}
-                          maxBadges={(field as any).maxDisplay ?? 5}
-                          badgeVariant="default"
-                          enforceVariant={!(allowOptionColor && valuesHaveColor)}
-                          onBadgeClick={
-                            field.targetSchema
-                              ? (item) => {
-                                  const itemId = item.normalized?.id ?? item.id;
-                                  if (!itemId) return;
-                                  onBadgeNavigate?.(field.targetSchema!, itemId);
-                                }
-                              : undefined
-                          }
-                          isItemClickable={
-                            field.targetSchema ? isItemClickable : () => false
-                          }
-                        />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{labelText}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <TooltipProvider disableHoverableContent>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <BadgeViewer
+                              field={field}
+                              value={value}
+                              maxBadges={(field as any).maxDisplay ?? 5}
+                              badgeVariant="default"
+                              enforceVariant={!(allowOptionColor && valuesHaveColor)}
+                              onBadgeClick={
+                                field.targetSchema
+                                  ? (item) => {
+                                      const itemId = item.normalized?.id ?? item.id;
+                                      if (!itemId) return;
+                                      onBadgeNavigate?.(field.targetSchema!, itemId);
+                                    }
+                                  : undefined
+                              }
+                              isItemClickable={
+                                field.targetSchema ? isItemClickable : () => false
+                              }
+                            />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{labelText}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  {(field as any).canCopy && value && value !== '' && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
+                      <CopyContent content={typeof value === 'string' || typeof value === 'number' ? value : JSON.stringify(value)} />
+                    </div>
+                  )}
+                </div>
               </motion.div>
             );
           }
@@ -111,7 +125,20 @@ export const renderCardSection = ({ section, schema, data, maxMetrics = 3, onBad
               transition={{ duration: 0.2 }}
               className="text-gray-600 dark:text-gray-300"
             >
-              {renderFieldValue({ field, value, maxMetrics })}
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  {renderFieldValue({ field, value, maxMetrics })}
+                </div>
+                {(field as any).canCopy && value && value !== '' && (
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => e.stopPropagation()}
+                  >
+                    <CopyContent content={typeof value === 'string' || typeof value === 'number' ? value : JSON.stringify(value)} />
+                  </div>
+                )}
+              </div>
             </motion.div>
           );
         })}

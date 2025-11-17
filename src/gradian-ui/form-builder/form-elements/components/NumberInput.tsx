@@ -1,9 +1,9 @@
 // Number Input Component
 // Number input with type="number" embedded
 
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState, useEffect } from 'react';
 import { NumberInputProps, FormElementRef } from '../types';
-import { cn, validateField } from '../../../shared/utils';
+import { cn, validateField, formatNumber } from '../../../shared/utils';
 import { CopyContent } from './CopyContent';
 import { baseInputClasses, getLabelClasses, errorTextClasses } from '../utils/field-styles';
 
@@ -30,6 +30,35 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
     ref
   ) => {
     const inputRef = useRef<HTMLInputElement>(null);
+    const [isFocused, setIsFocused] = useState(false);
+    const [displayValue, setDisplayValue] = useState<string>('');
+
+    // Check if thousand separator formatting is enabled (default: true, can be disabled via config)
+    const useThousandSeparator = (config as any)?.useThousandSeparator !== false;
+
+    // Initialize display value
+    useEffect(() => {
+      if (value === '' || value === null || value === undefined) {
+        setDisplayValue('');
+      } else if (typeof value === 'number') {
+        setDisplayValue(useThousandSeparator ? formatNumber(value) : String(value));
+      } else {
+        setDisplayValue(String(value));
+      }
+    }, []); // Only run on mount
+
+    // Update display value when value changes (only when not focused)
+    useEffect(() => {
+      if (!isFocused) {
+        if (value === '' || value === null || value === undefined) {
+          setDisplayValue('');
+        } else if (typeof value === 'number') {
+          setDisplayValue(useThousandSeparator ? formatNumber(value) : String(value));
+        } else {
+          setDisplayValue(String(value));
+        }
+      }
+    }, [value, isFocused, useThousandSeparator]);
 
     useImperativeHandle(ref, () => ({
       focus: () => inputRef.current?.focus(),
@@ -46,16 +75,42 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
-      // Convert to number if not empty, otherwise keep empty string
-      const numValue = newValue === '' ? '' : Number(newValue);
-      onChange?.(numValue);
+      
+      if (useThousandSeparator) {
+        // Remove thousand separators and other non-numeric characters except decimal point and minus
+        const cleanedValue = newValue.replace(/[^\d.-]/g, '');
+        setDisplayValue(cleanedValue);
+        
+        // Convert to number if not empty, otherwise keep empty string
+        if (cleanedValue === '' || cleanedValue === '-') {
+          onChange?.('');
+        } else {
+          const numValue = Number(cleanedValue);
+          onChange?.(isNaN(numValue) ? '' : numValue);
+        }
+      } else {
+        // For non-formatted inputs, use standard number input behavior
+        const numValue = newValue === '' ? '' : Number(newValue);
+        onChange?.(numValue);
+        setDisplayValue(newValue);
+      }
     };
 
     const handleBlur = () => {
+      setIsFocused(false);
+      // Format the value on blur if thousand separator is enabled
+      if (useThousandSeparator && value !== '' && value !== null && value !== undefined && typeof value === 'number' && !isNaN(value)) {
+        setDisplayValue(formatNumber(value));
+      }
       onBlur?.();
     };
 
     const handleFocus = () => {
+      setIsFocused(true);
+      // Show raw number value when focused (no formatting)
+      if (useThousandSeparator && value !== '' && value !== null && value !== undefined) {
+        setDisplayValue(String(value));
+      }
       onFocus?.();
     };
 
@@ -82,7 +137,7 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
-            className={getLabelClasses({ error, required })}
+            className={getLabelClasses({ error: Boolean(error), required: Boolean(required) })}
           >
             {fieldLabel}
           </label>
@@ -92,24 +147,25 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
           ref={inputRef}
           id={fieldName}
           name={fieldName}
-          type="number"
-          value={value}
+          type={useThousandSeparator ? 'text' : 'number'}
+          inputMode={useThousandSeparator ? ('decimal' as const) : ('numeric' as const)}
+          value={useThousandSeparator ? displayValue : (value === '' ? '' : String(value))}
           onChange={handleChange}
           onBlur={handleBlur}
           onFocus={handleFocus}
           placeholder={fieldPlaceholder}
-          min={min ?? config.validation?.min}
-          max={max ?? config.validation?.max}
-          step={step || (config as any).step || '1'}
+          min={useThousandSeparator ? undefined : (min ?? config.validation?.min)}
+          max={useThousandSeparator ? undefined : (max ?? config.validation?.max)}
+          step={useThousandSeparator ? undefined : (step || (config as any).step || '1')}
           required={required ?? config.required ?? config.validation?.required ?? false}
           disabled={disabled}
           autoComplete="off"
           className={inputClasses}
           {...props}
         />
-          {canCopy && value !== '' && value !== null && value !== undefined && (
+          {canCopy && (value !== '' && value !== null && value !== undefined && (typeof value !== 'number' || !isNaN(value))) && (
             <div className="absolute right-1 top-1/2 -translate-y-1/2">
-              <CopyContent content={value} disabled={disabled} />
+              <CopyContent content={value} />
             </div>
           )}
         </div>

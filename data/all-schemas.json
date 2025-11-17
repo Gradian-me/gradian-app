@@ -1645,7 +1645,8 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 1
+        "order": 1,
+        "canCopy": true
       },
       {
         "id": "quotation-date",
@@ -1987,7 +1988,8 @@
           "min": 0
         },
         "colSpan": 1,
-        "order": 14
+        "order": 14,
+        "canCopy": true
       }
     ],
     "sections": [

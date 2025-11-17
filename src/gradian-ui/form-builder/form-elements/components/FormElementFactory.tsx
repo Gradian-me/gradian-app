@@ -96,28 +96,32 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   // Use component if available, otherwise fall back to type
   const elementType = (config as any).component || config.type;
   
-  // Extract canCopy from config if it exists
-  const canCopy = (config as any).canCopy ?? false;
+  // Extract canCopy from config or restProps if it exists
+  const canCopy = Boolean((config as any)?.canCopy ?? (restProps as any)?.canCopy ?? false);
+  
+  // Remove canCopy from restProps to avoid conflicts when we explicitly pass it
+  const { canCopy: _, ...restPropsWithoutCanCopy } = restProps;
 
   switch (elementType) {
     case 'text':
-      return <TextInput config={config} {...restProps} canCopy={canCopy} />;
+      return <TextInput config={config} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
     
     case 'email':
-      return <EmailInput config={config} {...restProps} canCopy={canCopy} />;
+      return <EmailInput config={config} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
     
     case 'phone':
     case 'tel':
-      return <PhoneInput config={config} {...restProps} canCopy={canCopy} />;
+      return <PhoneInput config={config} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
     
     case 'password':
-      return <PasswordInput config={config} {...restProps} />;
+      return <PasswordInput config={config} {...restPropsWithoutCanCopy} />;
 
     case 'name':
       return (
         <NameInput
           config={config}
-          {...restProps}
+          {...restPropsWithoutCanCopy}
+          canCopy={canCopy}
           isCustomizable={(restProps as any)?.isCustomizable ?? (config as any)?.isCustomizable}
           customMode={(restProps as any)?.customMode ?? (config as any)?.customMode}
           defaultCustomMode={(restProps as any)?.defaultCustomMode ?? (config as any)?.defaultCustomMode}
@@ -148,7 +152,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       );
     
     case 'number':
-      return <NumberInput config={config} {...restProps} canCopy={canCopy} />;
+      return <NumberInput config={config} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
     
     case 'select':
       // Convert options to SelectOption[] format if they have icon/color
@@ -184,7 +188,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       );
     
     case 'textarea':
-      return <Textarea config={config} {...restProps} canCopy={canCopy} />;
+      return <Textarea config={config} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
     
     case 'checkbox':
       return <Checkbox config={config} {...restProps} />;
@@ -276,7 +280,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       return <PickerInput config={config} {...restProps} />;
     
     case 'icon':
-      return <IconInput config={config} {...restProps} canCopy={canCopy} />;
+      return <IconInput config={config} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
     
     case 'image-text':
       return <ImageText config={config} value={restProps.value} {...restProps} />;

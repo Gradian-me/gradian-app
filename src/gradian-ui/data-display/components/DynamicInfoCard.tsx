@@ -12,6 +12,7 @@ import { formatNumber, formatCurrency, formatDate } from '../../shared/utils';
 import { isBadgeSection, getBadgeFields } from '../../schema-manager/utils/badge-utils';
 import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { getDisplayStrings, getJoinedDisplayString, getPickerDisplayValue, renderRatingValue } from '../utils/value-display';
+import { CopyContent } from '../../form-builder/form-elements/components/CopyContent';
 
 export interface DynamicInfoCardProps {
   section: DetailPageSection;
@@ -384,8 +385,19 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                   )}
                   {field.label}
                 </label>
-                <div className="text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word">
-                  {formatFieldValue(field, field.value, data, section)}
+                <div className="flex items-center gap-2">
+                  <div className="text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word flex-1">
+                    {formatFieldValue(field, field.value, data, section)}
+                  </div>
+                  {field.canCopy && field.value && field.value !== '' && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
+                      <CopyContent content={typeof field.value === 'string' || typeof field.value === 'number' ? field.value : JSON.stringify(field.value)} />
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}

@@ -106,7 +106,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
         />
           {canCopy && value && (
             <div className="absolute right-1 top-1/2 -translate-y-1/2">
-              <CopyContent content={value} disabled={disabled} />
+              <CopyContent content={value} />
             </div>
           )}
         </div>

@@ -119,7 +119,7 @@ export const EmailInput = forwardRef<FormElementRef, TextInputProps>(
           />
           <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
             {canCopy && hasValue && (
-              <CopyContent content={value} disabled={disabled} />
+              <CopyContent content={value} />
             )}
             {hasValue && (
               <Button

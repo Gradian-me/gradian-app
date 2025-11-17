@@ -175,7 +175,7 @@ export const IconInput = forwardRef<FormElementRef, IconInputProps>(
               )}
               {canCopy && !isEmpty && (
                 <div>
-                  <CopyContent content={iconValue} disabled={disabled} />
+                  <CopyContent content={iconValue} />
                 </div>
               )}
             </div>

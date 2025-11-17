@@ -106,7 +106,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
         />
           {canCopy && value && (
             <div className="absolute right-1 top-2">
-              <CopyContent content={value} disabled={disabled} />
+              <CopyContent content={value} />
             </div>
           )}
         </div>
