@@ -2435,6 +2435,18 @@
         "description": "Business area title, icon, and color",
         "initialState": "expanded",
         "columns": 2
+      },
+      {
+        "id": "applications",
+        "title": "Applications",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 0,
+          "targetSchema": "applications",
+          "relationTypeId": "HAS_ADDRESS",
+          "addType": "canSelectFromData"
+        }
       }
     ],
     "detailPageMetadata": {

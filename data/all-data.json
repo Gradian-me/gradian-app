@@ -905,7 +905,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K9724JFPP7A6RX7H6NTFHE1D",
       "createdAt": "2025-11-04T09:11:01.375Z",
-      "updatedAt": "2025-11-10T07:13:20.382Z",
+      "updatedAt": "2025-11-16T12:56:33.667Z",
       "vendorId": [
         {
           "id": "01K8QVCWS0ZSTMSVD5C6K7A806",
@@ -921,16 +921,16 @@
       ],
       "state": [
         {
-          "id": "SUBMITTED",
-          "label": "Submitted",
-          "icon": "Send",
-          "color": "info"
+          "id": "ACCEPTED",
+          "label": "Accepted",
+          "icon": "CheckCircle",
+          "color": "success"
         }
       ],
       "quotation-items": [
         {
           "id": "01K9725HNMEAFXGB98SCER6JVK",
-          "label": "HPLC Equipment Agilent 2190 "
+          "label": "HPLC Equipment Agilent 2190"
         },
         {
           "id": "01K9726N9T00JAG6QC7ZWMX650",

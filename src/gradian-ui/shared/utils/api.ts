@@ -246,7 +246,7 @@ export async function apiRequest<T>(
   const headersWithCaller =
     isDev && callerName
       ? { ...(baseHeaders || {}), 'x-function-name': callerName }
-      : baseHeaders;
+      : baseHeaders;  
 
   if (isDev && callerName) {
     console.info(`[apiRequest] ${method} ${endpoint} invoked by ${callerName}`);

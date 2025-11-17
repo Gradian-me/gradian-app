@@ -203,6 +203,7 @@
       "currency": "USD"
     },
     "updatedAt": "2025-11-05T10:43:10.009Z",
-    "interactionType": "canRead"
+    "interactionType": "canRead",
+    "readAt": "2025-11-16T12:57:42.583Z"
   }
 ]
