@@ -38,7 +38,7 @@ export const UnknownControl: React.FC<UnknownControlProps> = ({
         </label>
       )}
       <div className="flex items-center gap-2 w-full px-3 py-2 border border-yellow-400 rounded-lg bg-yellow-50 text-yellow-800">
-        <AlertCircle className="h-4 w-4 flex-shrink-0" />
+        <AlertCircle className="h-4 w-4 shrink-0" />
         <div className="flex-1">
           <p className="text-sm font-medium">
             Unknown component type: <span className="font-mono">{unknownType}</span>

@@ -43,7 +43,7 @@ export function SortableField({ id, children, isIncomplete = false, isInactive =
             <button
               {...attributes}
               {...listeners}
-              className={`cursor-grab active:cursor-grabbing transition-colors p-0.5 flex-shrink-0 ${
+              className={`cursor-grab active:cursor-grabbing transition-colors p-0.5 shrink-0 ${
                 isInactive ? 'text-gray-300' : 'text-gray-400 hover:text-gray-600'
               }`}
             >

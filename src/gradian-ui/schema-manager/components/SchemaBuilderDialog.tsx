@@ -235,7 +235,7 @@ export function SchemaBuilderDialog({
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-[95vw] sm:w-full max-w-7xl max-h-[90vh] flex flex-col p-0">
-          <DialogHeader className="px-6 pt-6 pb-4 border-b flex-shrink-0">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b shrink-0">
             <DialogTitle>Loading Schema</DialogTitle>
             <DialogDescription>Please wait while we load the schema...</DialogDescription>
           </DialogHeader>
@@ -251,7 +251,7 @@ export function SchemaBuilderDialog({
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-[95vw] sm:w-full max-w-7xl max-h-[90vh] flex flex-col p-0">
-          <DialogHeader className="px-6 pt-6 pb-4 border-b flex-shrink-0">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b shrink-0">
             <DialogTitle>Schema Not Found</DialogTitle>
             <DialogDescription>The requested schema could not be loaded.</DialogDescription>
           </DialogHeader>
@@ -271,7 +271,7 @@ export function SchemaBuilderDialog({
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-[95vw] sm:w-full max-w-7xl max-h-[90vh] flex flex-col p-0">
-          <DialogHeader className="px-6 pt-6 pb-4 border-b flex-shrink-0">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b shrink-0">
             <DialogTitle>{schema.plural_name || 'Schema Builder'}</DialogTitle>
             <DialogDescription>
               Edit and configure the schema structure, fields, and sections
