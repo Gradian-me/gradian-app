@@ -35,6 +35,16 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
 
     // Check if thousand separator formatting is enabled (default: true, can be disabled via config)
     const useThousandSeparator = (config as any)?.useThousandSeparator !== false;
+    
+    // Get component-specific config values
+    const componentConfig = {
+      useThousandSeparator,
+      decimalPoints: (config as any)?.decimalPoints,
+      allowNegative: (config as any)?.allowNegative !== false,
+      min: (config as any)?.min ?? min ?? config.validation?.min,
+      max: (config as any)?.max ?? max ?? config.validation?.max,
+      step: (config as any)?.step ?? step ?? '1',
+    };
 
     // Initialize display value
     useEffect(() => {
@@ -78,7 +88,21 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
       
       if (useThousandSeparator) {
         // Remove thousand separators and other non-numeric characters except decimal point and minus
-        const cleanedValue = newValue.replace(/[^\d.-]/g, '');
+        let cleanedValue = newValue.replace(/[^\d.-]/g, '');
+        
+        // Handle negative numbers
+        if (!componentConfig.allowNegative && cleanedValue.startsWith('-')) {
+          cleanedValue = cleanedValue.replace('-', '');
+        }
+        
+        // Handle decimal points limit
+        if (componentConfig.decimalPoints !== undefined && componentConfig.decimalPoints !== null) {
+          const parts = cleanedValue.split('.');
+          if (parts.length > 1 && parts[1].length > componentConfig.decimalPoints) {
+            cleanedValue = parts[0] + '.' + parts[1].substring(0, componentConfig.decimalPoints);
+          }
+        }
+        
         setDisplayValue(cleanedValue);
         
         // Convert to number if not empty, otherwise keep empty string
@@ -90,9 +114,16 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
         }
       } else {
         // For non-formatted inputs, use standard number input behavior
-        const numValue = newValue === '' ? '' : Number(newValue);
+        let processedValue = newValue;
+        
+        // Handle negative numbers
+        if (!componentConfig.allowNegative && processedValue.startsWith('-')) {
+          processedValue = processedValue.replace('-', '');
+        }
+        
+        const numValue = processedValue === '' ? '' : Number(processedValue);
         onChange?.(numValue);
-        setDisplayValue(newValue);
+        setDisplayValue(processedValue);
       }
     };
 
@@ -154,9 +185,9 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
           onBlur={handleBlur}
           onFocus={handleFocus}
           placeholder={fieldPlaceholder}
-          min={useThousandSeparator ? undefined : (min ?? config.validation?.min)}
-          max={useThousandSeparator ? undefined : (max ?? config.validation?.max)}
-          step={useThousandSeparator ? undefined : (step || (config as any).step || '1')}
+          min={useThousandSeparator ? undefined : componentConfig.min}
+          max={useThousandSeparator ? undefined : componentConfig.max}
+          step={useThousandSeparator ? undefined : componentConfig.step}
           required={required ?? config.required ?? config.validation?.required ?? false}
           disabled={disabled}
           autoComplete="off"

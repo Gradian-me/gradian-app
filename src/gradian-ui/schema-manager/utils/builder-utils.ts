@@ -12,6 +12,7 @@ export const FIELD_TYPES: Array<{
   { value: 'avatar', label: 'Avatar', description: 'Avatar/image display' },
   { value: 'badge', label: 'Badge', description: 'Badge display component' },
   { value: 'checkbox-list', label: 'Checkbox List', description: 'Multiple options checkbox list' },
+  { value: 'code-viewer', label: 'Code Viewer', description: 'Code block viewer with syntax highlighting' },
   { value: 'color-picker', label: 'Color Picker', description: 'Color picker component' },
   { value: 'countdown', label: 'Countdown', description: 'Countdown timer display' },
   { value: 'date', label: 'Date', description: 'Date picker' },

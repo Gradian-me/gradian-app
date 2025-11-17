@@ -152,7 +152,12 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       );
     
     case 'number':
-      return <NumberInput config={config} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
+      // Merge componentTypeConfig into config for NumberInput
+      const numberConfig = {
+        ...config,
+        ...((config as any)?.componentTypeConfig || {}),
+      };
+      return <NumberInput config={numberConfig} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
     
     case 'select':
       // Convert options to SelectOption[] format if they have icon/color
