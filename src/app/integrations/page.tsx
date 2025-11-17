@@ -1,13 +1,20 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SyncButton } from '@/gradian-ui/form-builder/form-elements';
+import dynamic from 'next/dynamic';
+import { ConfigureIntegrationForm } from './components/ConfigureIntegrationForm';
+
+const Modal = dynamic(() => import('@/gradian-ui/data-display').then(mod => ({ default: mod.Modal })), {
+  ssr: false
+});
+import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { 
-  Database, 
   CheckCircle, 
   AlertCircle, 
   Clock,
@@ -16,21 +23,25 @@ import {
   Download,
   Upload,
   Activity,
-  Mail
+  Plus,
+  Save
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import type { LucideIconLibraryItem } from '@/gradian-ui/shared/constants/lucide-icon-library';
 
-interface ERPIntegration {
+interface Integration {
   id: string;
-  name: string;
-  status: 'connected' | 'disconnected' | 'error' | 'syncing';
-  lastSync: Date;
-  recordsSynced: number;
-  errors: number;
+  title: string;
   description: string;
-  type?: 'erp' | 'email-template';
+  icon: string;
+  color: string;
+  lastSynced: string;
+  targetRoute: string;
+  targetMethod?: 'GET' | 'POST';
+  sourceRoute?: string;
+  sourceMethod?: 'GET' | 'POST';
+  sourceDataPath?: string;
 }
 
 interface EmailTemplateSyncResponse {
@@ -43,66 +54,42 @@ interface EmailTemplateSyncResponse {
 }
 
 export default function IntegrationsPage() {
-  const [integrations, setIntegrations] = useState<ERPIntegration[]>([]);
+  const router = useRouter();
+  const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState<string | null>(null);
   const [iconLibrary, setIconLibrary] = useState<LucideIconLibraryItem[]>([]);
   const [iconLoading, setIconLoading] = useState<boolean>(false);
   const [iconError, setIconError] = useState<string | null>(null);
   const [syncResponse, setSyncResponse] = useState<Record<string, EmailTemplateSyncResponse | string | null>>({});
+  const [configureModalOpen, setConfigureModalOpen] = useState(false);
+  const [editingIntegrationId, setEditingIntegrationId] = useState<string | null>(null);
+  const formSubmitHandlerRef = useRef<(() => void) | null>(null);
+  const [formSaving, setFormSaving] = useState(false);
+
+  const handleSubmitRef = useCallback((submitFn: () => void) => {
+    formSubmitHandlerRef.current = submitFn;
+  }, []);
+
+  const handleSavingChange = useCallback((saving: boolean) => {
+    setFormSaving(saving);
+  }, []);
 
   useEffect(() => {
     const fetchIntegrations = async () => {
       try {
-        // Mock data for now
-        const mockIntegrations: ERPIntegration[] = [
-          {
-            id: '1',
-            name: 'RAHKARAN ERP',
-            status: 'syncing',
-            lastSync: new Date(new Date().getTime() - 1000 * 60 * 60 * 24),
-            recordsSynced: 1247,
-            errors: 0,
-            description: 'Main ERP system for financial and inventory management',
-            type: 'erp',
-          },
-          {
-            id: '2',
-            name: 'SharePoint',
-            status: 'connected',
-            lastSync: new Date('2024-01-23T09:15:00'),
-            recordsSynced: 892,
-            errors: 2,
-            description: 'Cloud-based ERP for procurement and vendor management',
-            type: 'erp',
-          },
-          {
-            id: '3',
-            name: 'Microsoft Teams',
-            status: 'connected',
-            lastSync: new Date('2024-01-23T08:45:00'),
-            recordsSynced: 156,
-            errors: 0,
-            description: 'Customer relationship and sales management system',
-            type: 'erp',
-          },
-          {
-            id: '4',
-            name: 'Email Templates',
-            status: 'connected',
-            lastSync: new Date('2024-01-23T10:00:00'),
-            recordsSynced: 0,
-            errors: 0,
-            description: 'Email template cache synchronization and management',
-            type: 'email-template',
-          }
-        ];
+        const response = await apiRequest<Integration[]>('/api/integrations', {
+          method: 'GET',
+        });
         
-        console.log('Setting integrations:', mockIntegrations.length);
-        setIntegrations(mockIntegrations);
-        setLoading(false);
+        if (response.success && response.data) {
+          setIntegrations(response.data);
+        } else {
+          console.error('Failed to fetch integrations:', response.error);
+        }
       } catch (error) {
         console.error('Error fetching integrations:', error);
+      } finally {
         setLoading(false);
       }
     };
@@ -136,94 +123,77 @@ export default function IntegrationsPage() {
 
   const displayedIcons = useMemo(() => iconLibrary.slice(0, 24), [iconLibrary]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'connected': return 'success';
-      case 'disconnected': return 'destructive';
-      case 'error': return 'destructive';
-      case 'syncing': return 'warning';
-      default: return 'default';
-    }
+  const getStatusColor = (lastSynced: string) => {
+    if (!lastSynced) return 'default';
+    const lastSyncDate = new Date(lastSynced);
+    const daysSinceSync = (Date.now() - lastSyncDate.getTime()) / (1000 * 60 * 60 * 24);
+    if (daysSinceSync < 1) return 'success';
+    if (daysSinceSync < 7) return 'warning';
+    return 'destructive';
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'connected': return <CheckCircle className="h-4 w-4" />;
-      case 'disconnected': return <AlertCircle className="h-4 w-4" />;
-      case 'error': return <AlertCircle className="h-4 w-4" />;
-      case 'syncing': return <RefreshCw className="h-4 w-4 animate-spin" />;
-      default: return <Clock className="h-4 w-4" />;
-    }
+  const getStatusIcon = (lastSynced: string) => {
+    if (!lastSynced) return <Clock className="h-4 w-4" />;
+    const lastSyncDate = new Date(lastSynced);
+    const daysSinceSync = (Date.now() - lastSyncDate.getTime()) / (1000 * 60 * 60 * 24);
+    if (daysSinceSync < 1) return <CheckCircle className="h-4 w-4" />;
+    if (daysSinceSync < 7) return <AlertCircle className="h-4 w-4" />;
+    return <AlertCircle className="h-4 w-4" />;
   };
 
-  const formatDate = (date: Date) => {
+  const getStatusText = (lastSynced: string) => {
+    if (!lastSynced) return 'Never';
+    const lastSyncDate = new Date(lastSynced);
+    const daysSinceSync = (Date.now() - lastSyncDate.getTime()) / (1000 * 60 * 60 * 24);
+    if (daysSinceSync < 1) return 'Connected';
+    if (daysSinceSync < 7) return 'Stale';
+    return 'Disconnected';
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'Never';
+    const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
-    }).format(new Date(date));
+      minute: '2-digit',
+      second: '2-digit'
+    }).format(date);
   };
 
-  const handleSync = async (integrationId: string) => {
-    const integration = integrations.find(i => i.id === integrationId);
-    if (!integration) return;
-
-    setSyncing(integrationId);
-    setSyncResponse(prev => ({ ...prev, [integrationId]: null }));
+  const handleSync = async (integration: Integration) => {
+    setSyncing(integration.id);
+    setSyncResponse(prev => ({ ...prev, [integration.id]: null }));
 
     try {
-      if (integration.type === 'email-template') {
-        // Call email template sync API
-        const syncUrl = process.env.NEXT_PUBLIC_URL_SYNC_MAIL_TEMPLATE;
-        if (!syncUrl) {
-          throw new Error('Email template sync URL is not configured');
-        }
+      const response = await apiRequest<EmailTemplateSyncResponse>('/api/integrations/sync', {
+        method: 'POST',
+        body: {
+          id: integration.id,
+        },
+      });
 
-        const response = await fetch(syncUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      if (response.success) {
+        if (response.data) {
+          setSyncResponse(prev => ({ ...prev, [integration.id]: response.data as EmailTemplateSyncResponse }));
+        }
+        // Refresh integrations to get updated lastSynced
+        const refreshResponse = await apiRequest<Integration[]>('/api/integrations', {
+          method: 'GET',
         });
-
-        if (!response.ok) {
-          throw new Error(`Sync failed: ${response.statusText}`);
+        if (refreshResponse.success && refreshResponse.data) {
+          setIntegrations(refreshResponse.data);
         }
-
-        const data: EmailTemplateSyncResponse = await response.json();
-        setSyncResponse(prev => ({ ...prev, [integrationId]: data }));
-        
-        // Update integration status
-        setIntegrations(prev => prev.map(integration => 
-          integration.id === integrationId 
-            ? { 
-                ...integration, 
-                status: 'connected', 
-                lastSync: new Date(),
-                recordsSynced: data.totalRefreshed || 0
-              }
-            : integration
-        ));
       } else {
-        // Simulate sync process for other integrations
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        setIntegrations(prev => prev.map(integration => 
-          integration.id === integrationId 
-            ? { ...integration, status: 'connected', lastSync: new Date() }
-            : integration
-        ));
+        const errorMessage = response.error || 'Sync failed';
+        setSyncResponse(prev => ({ ...prev, [integration.id]: errorMessage }));
       }
     } catch (error) {
       console.error('Sync error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Sync failed';
-      setSyncResponse(prev => ({ ...prev, [integrationId]: errorMessage }));
-      setIntegrations(prev => prev.map(integration => 
-        integration.id === integrationId 
-          ? { ...integration, status: 'error' }
-          : integration
-      ));
+      setSyncResponse(prev => ({ ...prev, [integration.id]: errorMessage }));
     } finally {
       setSyncing(null);
     }
@@ -238,6 +208,9 @@ export default function IntegrationsPage() {
       </MainLayout>
     );
   }
+
+  const connectedCount = integrations.filter(i => i.lastSynced && new Date(i.lastSynced).getTime() > Date.now() - 24 * 60 * 60 * 1000).length;
+  const errorCount = integrations.filter(i => i.lastSynced && (Date.now() - new Date(i.lastSynced).getTime()) / (1000 * 60 * 60 * 24) > 7).length;
 
   return (
     <MainLayout title="Integrations">
@@ -254,12 +227,13 @@ export default function IntegrationsPage() {
             <p className="text-gray-600 dark:text-gray-400">Manage connections to external systems and icon libraries</p>
           </div>
           <div className="flex space-x-2">
-            <Button variant="outline">
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
-            </Button>
-            <Button>
-              <Database className="h-4 w-4 mr-2" />
+            <Button
+              onClick={() => {
+                setEditingIntegrationId(null);
+                setConfigureModalOpen(true);
+              }}
+            >
+              <Plus className="h-4 w-4 mr-2" />
               Add Integration
             </Button>
           </div>
@@ -278,7 +252,7 @@ export default function IntegrationsPage() {
                   <CheckCircle className="h-5 w-5 text-green-500" />
                   <div>
                     <div className="text-2xl font-bold text-green-500">
-                      {integrations.filter(i => i.status === 'connected').length}
+                      {connectedCount}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">Connected</div>
                   </div>
@@ -298,9 +272,9 @@ export default function IntegrationsPage() {
                   <AlertCircle className="h-5 w-5 text-red-500" />
                   <div>
                     <div className="text-2xl font-bold text-red-500">
-                      {integrations.filter(i => i.status === 'error').length}
+                      {errorCount}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">Errors</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">Disconnected</div>
                   </div>
                 </div>
               </CardContent>
@@ -318,9 +292,9 @@ export default function IntegrationsPage() {
                   <Activity className="h-5 w-5 text-blue-500" />
                   <div>
                     <div className="text-2xl font-bold text-blue-500">
-                      {integrations.reduce((sum, i) => sum + i.recordsSynced, 0).toLocaleString()}
+                      {integrations.length}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">Records Synced</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">Total Integrations</div>
                   </div>
                 </div>
               </CardContent>
@@ -338,7 +312,7 @@ export default function IntegrationsPage() {
                   <Clock className="h-5 w-5 text-yellow-500" />
                   <div>
                     <div className="text-2xl font-bold text-yellow-500">
-                      {integrations.filter(i => i.status === 'syncing').length}
+                      {syncing ? 1 : 0}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">Syncing</div>
                   </div>
@@ -358,7 +332,11 @@ export default function IntegrationsPage() {
           {integrations.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center">
-                <p className="text-gray-500 dark:text-gray-400">No integrations found.</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">No integrations found.</p>
+                <Button onClick={() => router.push('/integrations/configure')}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Your First Integration
+                </Button>
               </CardContent>
             </Card>
           ) : (
@@ -371,39 +349,31 @@ export default function IntegrationsPage() {
             >
               <Card className="hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-3 mb-2">
-                        {integration.type === 'email-template' ? (
-                          <Mail className="h-6 w-6 text-blue-600" />
-                        ) : (
-                          <Database className="h-6 w-6 text-blue-600" />
-                        )}
-                        <h3 className="text-lg font-semibold">{integration.name}</h3>
-                        <Badge variant={getStatusColor(integration.status)} className="flex items-center space-x-1">
-                          {getStatusIcon(integration.status)}
-                          <span>{integration.status}</span>
+                        <div 
+                          className="h-10 w-10 rounded flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: `${integration.color}20`, color: integration.color }}
+                        >
+                          <IconRenderer iconName={integration.icon} className="h-6 w-6" />
+                        </div>
+                        <h3 className="text-lg font-semibold">{integration.title}</h3>
+                        <Badge variant="outline" className="text-xs">
+                          {integration.id}
+                        </Badge>
+                        <Badge variant={getStatusColor(integration.lastSynced)} className="flex items-center space-x-1">
+                          {getStatusIcon(integration.lastSynced)}
+                          <span>{getStatusText(integration.lastSynced)}</span>
                         </Badge>
                       </div>
                       
                       <p className="text-gray-600 dark:text-gray-400 mb-4">{integration.description}</p>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div className="text-sm">
                         <div>
                           <span className="text-gray-500 dark:text-gray-400">Last Sync:</span>
-                          <div className="font-medium">{formatDate(integration.lastSync)}</div>
-                        </div>
-                        <div>
-                          <span className="text-gray-500 dark:text-gray-400">
-                            {integration.type === 'email-template' ? 'Templates Refreshed:' : 'Records Synced:'}
-                          </span>
-                          <div className="font-medium">{integration.recordsSynced.toLocaleString()}</div>
-                        </div>
-                        <div>
-                          <span className="text-gray-500 dark:text-gray-400">Errors:</span>
-                          <div className={`font-medium ${integration.errors > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                            {integration.errors}
-                          </div>
+                          <div className="font-medium">{formatDate(integration.lastSynced)}</div>
                         </div>
                       </div>
 
@@ -412,45 +382,52 @@ export default function IntegrationsPage() {
                         <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
                           {typeof syncResponse[integration.id] === 'string' ? (
                             <div className="text-sm text-red-600 dark:text-red-400">
-                              <strong>Error:</strong> {syncResponse[integration.id]}
+                              <strong>Error:</strong> {syncResponse[integration.id] as string}
                             </div>
                           ) : (
                             <div className="space-y-2">
                               <div className="text-sm font-semibold text-green-600 dark:text-green-400">
-                                ✓ Sync successful - {syncResponse[integration.id]?.totalRefreshed || 0} template(s) refreshed
-                              </div>
+                                ✓ Sync successful - {(syncResponse[integration.id] as EmailTemplateSyncResponse)?.totalRefreshed || 0} template(s) refreshed
+                        </div>
                               <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1 max-h-48 overflow-y-auto">
-                                {syncResponse[integration.id]?.results?.map((result, idx) => (
+                                {(syncResponse[integration.id] as EmailTemplateSyncResponse)?.results?.map((result: { cacheKey: string; refreshed: boolean; templateId: string }, idx: number) => (
                                   <div key={idx} className="flex items-center space-x-2">
-                                    <CheckCircle className="h-3 w-3 text-green-500 flex-shrink-0" />
+                                    <CheckCircle className="h-3 w-3 text-green-500 shrink-0" />
                                     <span>
                                       <strong>{result.cacheKey}</strong> - Template ID: {result.templateId}
                                     </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
                         </div>
+                                ))}
+                          </div>
+                        </div>
+                          )}
+                      </div>
                       )}
                     </div>
                     
-                    <div className="flex flex-col items-end space-y-2 ml-4">
-                      <div className="flex space-x-2">
+                    <div className="flex flex-col items-end space-y-2 shrink-0">
+                      <div className="flex flex-col space-y-2">
                         <SyncButton
-                          onClick={() => handleSync(integration.id)}
+                          onClick={() => handleSync(integration)}
                           syncing={syncing === integration.id}
                           label="Sync"
                         />
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setEditingIntegrationId(integration.id);
+                            setConfigureModalOpen(true);
+                          }}
+                        >
                           <Settings className="h-4 w-4 mr-2" />
                           Configure
                         </Button>
                       </div>
                       
-                      {integration.status === 'error' && (
-                        <div className="text-xs text-red-600 text-right">
-                          Check configuration
+                      {!integration.lastSynced && (
+                        <div className="text-xs text-yellow-600 text-right">
+                          Never synced
                         </div>
                       )}
                     </div>
@@ -579,9 +556,82 @@ export default function IntegrationsPage() {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Configure Integration Modal */}
+        <Modal
+          isOpen={configureModalOpen}
+          onClose={() => {
+            setConfigureModalOpen(false);
+            setEditingIntegrationId(null);
+            formSubmitHandlerRef.current = null;
+          }}
+          title={editingIntegrationId ? 'Edit Integration' : 'Add New Integration'}
+          description={editingIntegrationId ? 'Update integration configuration' : 'Configure a new integration'}
+          size="md"
+          showCloseButton={false}
+          closeOnOutsideClick={false}
+          actions={
+            <div className="flex justify-end space-x-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setConfigureModalOpen(false);
+                  setEditingIntegrationId(null);
+                  formSubmitHandlerRef.current = null;
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  if (formSubmitHandlerRef.current) {
+                    formSubmitHandlerRef.current();
+                  }
+                }}
+                disabled={formSaving}
+              >
+                {formSaving ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    {editingIntegrationId ? 'Update' : 'Create'}
+                  </>
+                )}
+              </Button>
+            </div>
+          }
+        >
+          <ConfigureIntegrationForm
+            integrationId={editingIntegrationId}
+            onSuccess={async () => {
+              setConfigureModalOpen(false);
+              setEditingIntegrationId(null);
+              formSubmitHandlerRef.current = null;
+              // Refresh integrations
+              const response = await apiRequest<Integration[]>('/api/integrations', {
+                method: 'GET',
+              });
+              if (response.success && response.data) {
+                setIntegrations(response.data);
+              }
+            }}
+            onCancel={() => {
+              setConfigureModalOpen(false);
+              setEditingIntegrationId(null);
+              formSubmitHandlerRef.current = null;
+            }}
+            onSubmitRef={handleSubmitRef}
+            onSavingChange={handleSavingChange}
+            hideActions={true}
+          />
+        </Modal>
       </div>
     </MainLayout>
   );
 }
-
-

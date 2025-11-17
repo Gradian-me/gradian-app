@@ -1,5 +1,7 @@
 // Modal Component
 
+'use client';
+
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../../components/ui/dialog';
 import { ModalProps } from '../types';
@@ -15,6 +17,7 @@ export const Modal: React.FC<ModalProps> = ({
   size = 'md',
   showCloseButton = true,
   closeOnOutsideClick = false,
+  actions,
   className,
   ...props
 }) => {
@@ -51,6 +54,11 @@ export const Modal: React.FC<ModalProps> = ({
             {title && <DialogTitle>{title}</DialogTitle>}
             {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>
+        )}
+        {actions && (
+          <div className="px-6 py-2 shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+            {actions}
+          </div>
         )}
         <div className="flex-1 sm:px-2 px-4 pb-4 overflow-y-auto">
           {children}

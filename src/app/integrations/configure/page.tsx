@@ -1,0 +1,51 @@
+'use client';
+
+import { useRouter, useSearchParams } from 'next/navigation';
+import { MainLayout } from '@/components/layout/main-layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ConfigureIntegrationForm } from '../components/ConfigureIntegrationForm';
+import { ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+export default function ConfigureIntegrationPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const integrationId = searchParams.get('id');
+  const isEdit = !!integrationId;
+
+  return (
+    <MainLayout title={isEdit ? 'Edit Integration' : 'Add Integration'}>
+      <div className="max-w-2xl mx-auto space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Integrations
+          </Button>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{isEdit ? 'Edit Integration' : 'Add New Integration'}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ConfigureIntegrationForm
+                integrationId={integrationId}
+                onSuccess={() => router.push('/integrations')}
+                onCancel={() => router.back()}
+              />
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </MainLayout>
+  );
+}
+

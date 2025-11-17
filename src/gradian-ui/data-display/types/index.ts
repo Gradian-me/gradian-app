@@ -315,6 +315,7 @@ export interface ModalProps extends BaseComponentProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
   showCloseButton?: boolean;
   closeOnOutsideClick?: boolean;
+  actions?: React.ReactNode;
 }
 
 // Data Table Component Types
