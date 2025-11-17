@@ -25,10 +25,14 @@ export interface PaginatedResponse<T> {
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
-  message?: string;
+  message?: string | Record<string, string>;
   error?: string;
   errors?: Record<string, string[]>;
   statusCode?: number;
+  messages?: Array<{
+    path?: string;
+    message: string | Record<string, string>;
+  }>;
 }
 
 export interface SelectOption {

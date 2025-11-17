@@ -6,6 +6,7 @@ export enum LogType {
   SCHEMA_LOADER = 'SCHEMA_LOADER',
   CALL_BACKEND = 'CALL_BACKEND',
   INDEXDB_CACHE = 'INDEXDB_CACHE',
+  INTEGRATION_LOG = 'INTEGRATION_LOG',
 }
 
 // Log flags configuration
@@ -16,6 +17,7 @@ export const LOG_CONFIG = {
   [LogType.SCHEMA_LOADER]: true,
   [LogType.CALL_BACKEND]: true,
   [LogType.INDEXDB_CACHE]: true,
+  [LogType.INTEGRATION_LOG]: true,
 };
 
 // Authentication configuration

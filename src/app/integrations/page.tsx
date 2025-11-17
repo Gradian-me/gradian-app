@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { SyncButton } from '@/gradian-ui/form-builder/form-elements';
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { 
   CheckCircle, 
   AlertCircle, 
@@ -55,6 +56,7 @@ export default function IntegrationsPage() {
   const [iconLoading, setIconLoading] = useState<boolean>(false);
   const [iconError, setIconError] = useState<string | null>(null);
   const [syncResponse, setSyncResponse] = useState<Record<string, EmailTemplateSyncResponse | string | null>>({});
+  const [syncMessages, setSyncMessages] = useState<Record<string, any>>({});
   const [formModalSchemaId, setFormModalSchemaId] = useState<string | undefined>(undefined);
   const [formModalEntityId, setFormModalEntityId] = useState<string | undefined>(undefined);
   const [formModalMode, setFormModalMode] = useState<'create' | 'edit'>('create');
@@ -152,6 +154,7 @@ export default function IntegrationsPage() {
   const handleSync = async (integration: Integration) => {
     setSyncing(integration.id);
     setSyncResponse(prev => ({ ...prev, [integration.id]: null }));
+    setSyncMessages(prev => ({ ...prev, [integration.id]: null }));
 
     try {
       const response = await apiRequest<EmailTemplateSyncResponse>('/api/integrations/sync', {
@@ -160,6 +163,17 @@ export default function IntegrationsPage() {
           id: integration.id,
         },
       });
+
+      // Store messages if present (both success and error responses can have messages)
+      if (response.messages || response.message) {
+        setSyncMessages(prev => ({ 
+          ...prev, 
+          [integration.id]: {
+            messages: response.messages,
+            message: response.message
+          }
+        }));
+      }
 
       if (response.success) {
         if (response.data) {
@@ -177,6 +191,15 @@ export default function IntegrationsPage() {
       } else {
         const errorMessage = response.error || 'Sync failed';
         setSyncResponse(prev => ({ ...prev, [integration.id]: errorMessage }));
+        // If there are no messages, show the error message
+        if (!response.messages && !response.message) {
+          setSyncMessages(prev => ({ 
+            ...prev, 
+            [integration.id]: {
+              message: errorMessage
+            }
+          }));
+        }
       }
     } catch (error) {
       console.error('Sync error:', error);
@@ -366,8 +389,20 @@ export default function IntegrationsPage() {
                         </div>
                       </div>
 
+                      {/* Messages Display */}
+                      {syncMessages[integration.id] && (
+                        <div className="mt-4">
+                          <MessageBoxContainer
+                            response={syncMessages[integration.id]}
+                            variant={typeof syncResponse[integration.id] === 'string' ? 'error' : 'success'}
+                            dismissible
+                            onDismiss={() => setSyncMessages(prev => ({ ...prev, [integration.id]: null }))}
+                          />
+                        </div>
+                      )}
+
                       {/* Sync Response Display */}
-                      {syncResponse[integration.id] && (
+                      {syncResponse[integration.id] && !syncMessages[integration.id] && (
                         <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
                           {typeof syncResponse[integration.id] === 'string' ? (
                             <div className="text-sm text-red-600 dark:text-red-400">

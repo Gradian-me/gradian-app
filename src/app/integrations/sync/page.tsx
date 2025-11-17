@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { SyncButton } from '@/gradian-ui/form-builder/form-elements';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { motion } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 
@@ -43,6 +44,7 @@ export default function SyncIntegrationPage() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncResponse, setSyncResponse] = useState<EmailTemplateSyncResponse | string | null>(null);
+  const [syncMessages, setSyncMessages] = useState<any>(null);
 
   useEffect(() => {
     if (!integrationId) {
@@ -99,6 +101,7 @@ export default function SyncIntegrationPage() {
 
     setSyncing(true);
     setSyncResponse(null);
+    setSyncMessages(null);
 
     try {
       const response = await apiRequest<EmailTemplateSyncResponse>('/api/integrations/sync', {
@@ -107,6 +110,14 @@ export default function SyncIntegrationPage() {
           id: integration.id,
         },
       });
+
+      // Store messages if present (both success and error responses can have messages)
+      if (response.messages || response.message) {
+        setSyncMessages({
+          messages: response.messages,
+          message: response.message
+        });
+      }
 
       if (response.success) {
         setSyncResponse(response.data || 'Sync completed successfully');
@@ -136,6 +147,12 @@ export default function SyncIntegrationPage() {
         }
       } else {
         setSyncResponse(response.error || 'Sync failed');
+        // If there are no messages, show the error message
+        if (!response.messages && !response.message) {
+          setSyncMessages({
+            message: response.error || 'Sync failed'
+          });
+        }
       }
     } catch (error) {
       console.error('Sync error:', error);
@@ -255,7 +272,23 @@ export default function SyncIntegrationPage() {
                   />
                 </div>
 
-                {syncResponse && (
+                {/* Messages Display */}
+                {syncMessages && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <MessageBoxContainer
+                      response={syncMessages}
+                      variant={typeof syncResponse === 'string' ? 'error' : 'success'}
+                      dismissible
+                      onDismiss={() => setSyncMessages(null)}
+                    />
+                  </motion.div>
+                )}
+
+                {/* Sync Response Display (fallback if no messages) */}
+                {syncResponse && !syncMessages && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}

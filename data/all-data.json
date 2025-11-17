@@ -1132,7 +1132,7 @@
       ],
       "id": "emailtemplate",
       "createdAt": "2025-11-17T12:05:23.829Z",
-      "updatedAt": "2025-11-17T12:54:58.722Z"
+      "updatedAt": "2025-11-17T13:03:00.772Z"
     },
     {
       "color": "#930ec4",
@@ -1175,7 +1175,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-17T12:55:44.104Z"
+      "updatedAt": "2025-11-17T14:05:26.260Z",
+      "targetDataPath": "data",
+      "sourceDataPath": "data",
+      "lastSynced": "2025-11-17T14:05:26.158Z"
     }
   ]
 }

@@ -141,12 +141,14 @@ export class ApiClient {
       };
 
       if (!response.ok) {
-        // Return error response with status code
+        // Return error response with status code, preserving messages if present
         return {
           success: false,
           error: data.error || data.message || `HTTP error! status: ${response.status}`,
           statusCode: response.status,
           data: null as any,
+          messages: data.messages,
+          message: data.message && typeof data.message === 'string' ? data.message : undefined,
         };
       }
 

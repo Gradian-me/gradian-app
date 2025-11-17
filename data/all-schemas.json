@@ -3052,7 +3052,7 @@
           "required": true
         },
         "colSpan": 2,
-        "order": 6
+        "order": 1
       },
       {
         "id": "integration-target-method",
@@ -3079,7 +3079,7 @@
           }
         ],
         "colSpan": 1,
-        "order": 7
+        "order": 2
       },
       {
         "id": "integration-source-route",
@@ -3093,7 +3093,7 @@
         "description": "If provided, fetch data from this route first",
         "targetSchema": "url-repository",
         "colSpan": 2,
-        "order": 8
+        "order": 4
       },
       {
         "id": "integration-source-method",
@@ -3120,7 +3120,7 @@
           }
         ],
         "colSpan": 1,
-        "order": 9
+        "order": 5
       },
       {
         "id": "integration-source-data-path",
@@ -3132,8 +3132,8 @@
         "placeholder": "results or data.items",
         "required": false,
         "description": "JSON path to extract data from source response (e.g., \"results\", \"data.items\")",
-        "colSpan": 2,
-        "order": 10
+        "colSpan": 1,
+        "order": 6
       },
       {
         "id": "integration-last-synced",
@@ -3146,6 +3146,15 @@
         "readonly": true,
         "colSpan": 2,
         "order": 11
+      },
+      {
+        "id": "field-1763386431784",
+        "name": "targetDataPath",
+        "label": "Target Data Path",
+        "sectionId": "routing-information",
+        "type": "text",
+        "component": "text",
+        "order": 3
       }
     ],
     "sections": [
