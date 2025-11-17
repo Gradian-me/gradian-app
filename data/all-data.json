@@ -1109,14 +1109,17 @@
   "integrations": [
     {
       "color": "#00d1ae",
-      "title": "Email Template",
+      "title": "Email Template Sync",
       "description": "Email template cache synchronization and management",
       "icon": "Mail",
       "lastSynced": "",
       "targetRoute": [
         {
           "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
-          "label": "Email Template Sync"
+          "label": "Email Template Sync",
+          "metadata": {
+            "address": "http://172.20.200.106:8504/notifications/cache/refresh"
+          }
         }
       ],
       "targetMethod": [
@@ -1129,7 +1132,7 @@
       ],
       "id": "emailtemplate",
       "createdAt": "2025-11-17T12:05:23.829Z",
-      "updatedAt": "2025-11-17T12:05:23.829Z"
+      "updatedAt": "2025-11-17T12:54:58.722Z"
     },
     {
       "color": "#930ec4",
@@ -1139,7 +1142,10 @@
       "targetRoute": [
         {
           "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
-          "label": "Schema Bulk Sync"
+          "label": "Schema Bulk Sync",
+          "metadata": {
+            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/bulk"
+          }
         }
       ],
       "targetMethod": [
@@ -1153,7 +1159,10 @@
       "sourceRoute": [
         {
           "id": "01KA8VXHQFZR5TH0470163433K",
-          "label": "Schemas"
+          "label": "Schemas",
+          "metadata": {
+            "address": "http://localhost:3000/api/schemas"
+          }
         }
       ],
       "sourceMethod": [
@@ -1166,7 +1175,7 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-17T12:19:40.582Z"
+      "updatedAt": "2025-11-17T12:55:44.104Z"
     }
   ]
 }

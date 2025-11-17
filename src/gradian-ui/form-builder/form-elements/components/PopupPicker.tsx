@@ -80,6 +80,28 @@ const buildSelectionEntry = (item: any, schema?: FormSchema | null): NormalizedO
 
   const baseId = item.id ? String(item.id) : '';
 
+  // Extract metadata from fields with addToReferenceMetadata: true
+  const extractMetadata = (item: any, schema?: FormSchema | null): Record<string, any> | undefined => {
+    if (!schema || !schema.fields) {
+      return undefined;
+    }
+
+    const metadataFields = schema.fields.filter(field => field.addToReferenceMetadata === true);
+    if (metadataFields.length === 0) {
+      return undefined;
+    }
+
+    const metadata: Record<string, any> = {};
+    metadataFields.forEach(field => {
+      const fieldName = field.name;
+      if (fieldName && item[fieldName] !== undefined && item[fieldName] !== null) {
+        metadata[fieldName] = item[fieldName];
+      }
+    });
+
+    return Object.keys(metadata).length > 0 ? metadata : undefined;
+  };
+
   if (!schema) {
     const fallbackLabel = item.name || item.title || baseId;
     return {
@@ -87,6 +109,7 @@ const buildSelectionEntry = (item: any, schema?: FormSchema | null): NormalizedO
       label: fallbackLabel || baseId,
       icon: item.icon,
       color: item.color,
+      metadata: extractMetadata(item, schema),
     };
   }
 
@@ -104,14 +127,17 @@ const buildSelectionEntry = (item: any, schema?: FormSchema | null): NormalizedO
     }
   }
 
+  const metadata = extractMetadata(item, schema);
+
   const normalized = normalizeOptionEntry({
     id: baseId,
     label: title || baseId,
     icon,
     color,
+    metadata,
   });
 
-  return normalized || { id: baseId, label: title || baseId, icon, color };
+  return normalized || { id: baseId, label: title || baseId, icon, color, metadata };
 };
 
 export interface PopupPickerProps {

@@ -13,6 +13,7 @@ export type OptionValueInput = OptionLike | string | number | null | undefined;
 export interface NormalizedOption extends OptionLike {
   id: string;
   value?: string;
+  metadata?: Record<string, any>; // Metadata object for fields with addToReferenceMetadata: true
 }
 
 const toStringSafe = (input: string | number): string => String(input);
