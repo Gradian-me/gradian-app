@@ -106,15 +106,24 @@ export function useDialogBackHandler(
   id?: string
 ) {
   const { registerDialog, unregisterDialog } = useDialogContext();
-  const dialogIdRef = useRef<string>(id || `dialog-${Math.random().toString(36).substring(7)}`);
+  const dialogIdRef = useRef<string | null>(id || null);
+  const idGeneratedRef = useRef<boolean>(!!id);
 
   useEffect(() => {
-    if (isOpen) {
+    // Generate ID lazily in effect to avoid calling Math.random during render
+    if (!idGeneratedRef.current && !dialogIdRef.current) {
+      dialogIdRef.current = `dialog-${Math.random().toString(36).substring(7)}`;
+      idGeneratedRef.current = true;
+    }
+
+    if (isOpen && dialogIdRef.current) {
       registerDialog(dialogIdRef.current, type, onClose);
       return () => {
-        unregisterDialog(dialogIdRef.current);
+        if (dialogIdRef.current) {
+          unregisterDialog(dialogIdRef.current);
+        }
       };
-    } else {
+    } else if (dialogIdRef.current) {
       unregisterDialog(dialogIdRef.current);
     }
   }, [isOpen, onClose, type, registerDialog, unregisterDialog]);

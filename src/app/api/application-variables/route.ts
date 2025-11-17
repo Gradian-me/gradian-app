@@ -185,7 +185,7 @@ export async function PUT(request: NextRequest) {
 
     // Update LOG_CONFIG
     if (LOG_CONFIG) {
-      let logConfigSection = fileContent.match(/export const LOG_CONFIG = \{([^}]+)\}/s);
+      const logConfigSection = fileContent.match(/export const LOG_CONFIG = \{([^}]+)\}/s);
       if (logConfigSection) {
         const logTypes = Object.keys(LOG_CONFIG);
         let newLogConfig = 'export const LOG_CONFIG = {\n';

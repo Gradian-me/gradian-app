@@ -30,7 +30,6 @@ const isIconExport = (value: unknown): boolean => {
 
 const buildRuntimeIconLibrary = (): LucideIconLibraryItem[] => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const LucideIcons = require('lucide-react');
     const seen = new Set<string>();
     return Object.keys(LucideIcons)
