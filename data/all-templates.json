@@ -1,12 +1,12 @@
 [
   {
     "id": "reset-password",
-    "name": "Password reset",
+    "name": "Reset Password",
     "description": "Secure link email sent when a user requests a reset.",
     "subject": "Gradian.me | Reset your password",
     "filePath": "src/app/builder/email-templates/templates/reset-password.html",
     "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2025-11-17T06:39:11.312Z"
+    "updatedAt": "2025-11-17T08:16:05.641Z"
   },
   {
     "id": "otp-code",

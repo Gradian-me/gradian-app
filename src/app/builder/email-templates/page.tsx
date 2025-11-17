@@ -21,7 +21,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { NameInput } from '@/gradian-ui/form-builder/form-elements';
@@ -50,6 +49,7 @@ export default function EmailTemplateBuilderPage() {
   const savingTemplateRef = useRef<string | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [htmlLanguage, setHtmlLanguage] = useState<string>('html');
 
   useEffect(() => {
     setSelectedTemplateId((current) => {
@@ -575,12 +575,13 @@ export default function EmailTemplateBuilderPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="template-html">HTML content</Label>
-                    <Textarea
-                      id="template-html"
-                      className="font-mono text-sm h-[420px]"
-                      value={workingTemplate.html}
-                      onChange={(event) => handleTemplateFieldChange('html', event.target.value)}
+                    <CodeViewer
+                      code={workingTemplate.html}
+                      programmingLanguage={htmlLanguage}
+                      title="HTML content"
+                      isEditable={true}
+                      onChange={(newCode) => handleTemplateFieldChange('html', newCode)}
+                      onLanguageChange={(newLanguage) => setHtmlLanguage(newLanguage)}
                     />
                   </div>
                 </CardContent>

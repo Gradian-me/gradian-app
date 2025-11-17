@@ -5,6 +5,7 @@ import { MainLayout } from '@/components/layout/main-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { SyncButton } from '@/gradian-ui/form-builder/form-elements';
 import { 
   Database, 
   CheckCircle, 
@@ -14,7 +15,8 @@ import {
   RefreshCw,
   Download,
   Upload,
-  Activity
+  Activity,
+  Mail
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -28,6 +30,16 @@ interface ERPIntegration {
   recordsSynced: number;
   errors: number;
   description: string;
+  type?: 'erp' | 'email-template';
+}
+
+interface EmailTemplateSyncResponse {
+  results: Array<{
+    cacheKey: string;
+    refreshed: boolean;
+    templateId: string;
+  }>;
+  totalRefreshed: number;
 }
 
 export default function IntegrationsPage() {
@@ -37,6 +49,7 @@ export default function IntegrationsPage() {
   const [iconLibrary, setIconLibrary] = useState<LucideIconLibraryItem[]>([]);
   const [iconLoading, setIconLoading] = useState<boolean>(false);
   const [iconError, setIconError] = useState<string | null>(null);
+  const [syncResponse, setSyncResponse] = useState<Record<string, EmailTemplateSyncResponse | string | null>>({});
 
   useEffect(() => {
     const fetchIntegrations = async () => {
@@ -51,6 +64,7 @@ export default function IntegrationsPage() {
             recordsSynced: 1247,
             errors: 0,
             description: 'Main ERP system for financial and inventory management',
+            type: 'erp',
           },
           {
             id: '2',
@@ -60,6 +74,7 @@ export default function IntegrationsPage() {
             recordsSynced: 892,
             errors: 2,
             description: 'Cloud-based ERP for procurement and vendor management',
+            type: 'erp',
           },
           {
             id: '3',
@@ -69,9 +84,21 @@ export default function IntegrationsPage() {
             recordsSynced: 156,
             errors: 0,
             description: 'Customer relationship and sales management system',
+            type: 'erp',
+          },
+          {
+            id: '4',
+            name: 'Email Templates',
+            status: 'connected',
+            lastSync: new Date('2024-01-23T10:00:00'),
+            recordsSynced: 0,
+            errors: 0,
+            description: 'Email template cache synchronization and management',
+            type: 'email-template',
           }
         ];
         
+        console.log('Setting integrations:', mockIntegrations.length);
         setIntegrations(mockIntegrations);
         setLoading(false);
       } catch (error) {
@@ -140,17 +167,66 @@ export default function IntegrationsPage() {
   };
 
   const handleSync = async (integrationId: string) => {
+    const integration = integrations.find(i => i.id === integrationId);
+    if (!integration) return;
+
     setSyncing(integrationId);
-    // Simulate sync process
-    setTimeout(() => {
-      setSyncing(null);
-      // Update integration status
+    setSyncResponse(prev => ({ ...prev, [integrationId]: null }));
+
+    try {
+      if (integration.type === 'email-template') {
+        // Call email template sync API
+        const syncUrl = process.env.NEXT_PUBLIC_URL_SYNC_MAIL_TEMPLATE;
+        if (!syncUrl) {
+          throw new Error('Email template sync URL is not configured');
+        }
+
+        const response = await fetch(syncUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Sync failed: ${response.statusText}`);
+        }
+
+        const data: EmailTemplateSyncResponse = await response.json();
+        setSyncResponse(prev => ({ ...prev, [integrationId]: data }));
+        
+        // Update integration status
+        setIntegrations(prev => prev.map(integration => 
+          integration.id === integrationId 
+            ? { 
+                ...integration, 
+                status: 'connected', 
+                lastSync: new Date(),
+                recordsSynced: data.totalRefreshed || 0
+              }
+            : integration
+        ));
+      } else {
+        // Simulate sync process for other integrations
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        setIntegrations(prev => prev.map(integration => 
+          integration.id === integrationId 
+            ? { ...integration, status: 'connected', lastSync: new Date() }
+            : integration
+        ));
+      }
+    } catch (error) {
+      console.error('Sync error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Sync failed';
+      setSyncResponse(prev => ({ ...prev, [integrationId]: errorMessage }));
       setIntegrations(prev => prev.map(integration => 
         integration.id === integrationId 
-          ? { ...integration, status: 'connected', lastSync: new Date() }
+          ? { ...integration, status: 'error' }
           : integration
       ));
-    }, 3000);
+    } finally {
+      setSyncing(null);
+    }
   };
 
   if (loading) {
@@ -273,8 +349,20 @@ export default function IntegrationsPage() {
         </div>
 
         {/* Integration List */}
-        <div className="space-y-4">
-          {integrations.map((integration, index) => (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.5 }}
+          className="space-y-4"
+        >
+          {integrations.length === 0 ? (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <p className="text-gray-500 dark:text-gray-400">No integrations found.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            integrations.map((integration, index) => (
             <motion.div
               key={integration.id}
               initial={{ opacity: 0, y: 20 }}
@@ -286,7 +374,11 @@ export default function IntegrationsPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
-                        <Database className="h-6 w-6 text-blue-600" />
+                        {integration.type === 'email-template' ? (
+                          <Mail className="h-6 w-6 text-blue-600" />
+                        ) : (
+                          <Database className="h-6 w-6 text-blue-600" />
+                        )}
                         <h3 className="text-lg font-semibold">{integration.name}</h3>
                         <Badge variant={getStatusColor(integration.status)} className="flex items-center space-x-1">
                           {getStatusIcon(integration.status)}
@@ -302,7 +394,9 @@ export default function IntegrationsPage() {
                           <div className="font-medium">{formatDate(integration.lastSync)}</div>
                         </div>
                         <div>
-                          <span className="text-gray-500 dark:text-gray-400">Records Synced:</span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            {integration.type === 'email-template' ? 'Templates Refreshed:' : 'Records Synced:'}
+                          </span>
                           <div className="font-medium">{integration.recordsSynced.toLocaleString()}</div>
                         </div>
                         <div>
@@ -312,23 +406,42 @@ export default function IntegrationsPage() {
                           </div>
                         </div>
                       </div>
+
+                      {/* Sync Response Display */}
+                      {syncResponse[integration.id] && (
+                        <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                          {typeof syncResponse[integration.id] === 'string' ? (
+                            <div className="text-sm text-red-600 dark:text-red-400">
+                              <strong>Error:</strong> {syncResponse[integration.id]}
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <div className="text-sm font-semibold text-green-600 dark:text-green-400">
+                                ✓ Sync successful - {syncResponse[integration.id]?.totalRefreshed || 0} template(s) refreshed
+                              </div>
+                              <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1 max-h-48 overflow-y-auto">
+                                {syncResponse[integration.id]?.results?.map((result, idx) => (
+                                  <div key={idx} className="flex items-center space-x-2">
+                                    <CheckCircle className="h-3 w-3 text-green-500 flex-shrink-0" />
+                                    <span>
+                                      <strong>{result.cacheKey}</strong> - Template ID: {result.templateId}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     
                     <div className="flex flex-col items-end space-y-2 ml-4">
                       <div className="flex space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
+                        <SyncButton
                           onClick={() => handleSync(integration.id)}
-                          disabled={syncing === integration.id}
-                        >
-                          {syncing === integration.id ? (
-                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                          ) : (
-                            <RefreshCw className="h-4 w-4 mr-2" />
-                          )}
-                          Sync
-                        </Button>
+                          syncing={syncing === integration.id}
+                          label="Sync"
+                        />
                         <Button variant="outline" size="sm">
                           <Settings className="h-4 w-4 mr-2" />
                           Configure
@@ -345,8 +458,9 @@ export default function IntegrationsPage() {
                 </CardContent>
               </Card>
             </motion.div>
-          ))}
-        </div>
+            ))
+          )}
+        </motion.div>
 
         {/* Integration Actions */}
         <motion.div
@@ -392,10 +506,7 @@ export default function IntegrationsPage() {
                 </p>
               </div>
               <div className="flex gap-2 w-full md:w-auto">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={iconLoading}
+                <SyncButton
                   onClick={async () => {
                     setIconLoading(true);
                     setIconError(null);
@@ -418,9 +529,9 @@ export default function IntegrationsPage() {
                       setIconLoading(false);
                     }
                   }}
-                >
-                  {iconLoading ? 'Syncing…' : 'Sync Now'}
-                </Button>
+                  syncing={iconLoading}
+                  label="Sync Now"
+                />
                 <Button
                   variant="outline"
                   size="sm"

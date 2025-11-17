@@ -40,6 +40,7 @@ export * from './components/NameInput';
 export { Label } from './components/Label';
 export * from './components/CTAButton';
 export * from './components/ButtonMinimal';
+export * from './components/SyncButton';
 export * from './go-to-top-form';
 export * from './components/Tabs';
 export * from './components/SortableSelector';
