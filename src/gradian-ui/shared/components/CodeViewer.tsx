@@ -174,7 +174,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
           )}
         </AnimatePresence>
         {needsTruncation && (
-          <div className="px-4 py-1.5 border-t border-gray-700 bg-gray-800/50 dark:bg-gray-800/50">
+          <div className="px-4 py-1.5 border-t border-gray-200 dark:border-gray-700 bg-gray-200 dark:bg-gray-800">
             {!isExpanded ? (
               <button
                 onClick={() => setIsExpanded(true)}
