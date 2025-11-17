@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType, DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 
 const TRUTHY_VALUES = new Set(['true', '1', 'yes', 'on']);
@@ -58,12 +58,7 @@ const truncateForLog = (value: string): string => {
 };
 
 export const isDemoModeEnabled = (): boolean => {
-  const rawValue = process.env.DEMO_MODE;
-  if (rawValue === undefined || rawValue === null) {
-    return true;
-  }
-
-  return TRUTHY_VALUES.has(rawValue.toLowerCase());
+  return DEMO_MODE;
 };
 
 const getPathWithoutQuery = (targetPath: string): string => {

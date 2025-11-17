@@ -13,6 +13,7 @@ import { CompanySelector } from './CompanySelector';
 import { useCompanyStore } from '@/stores/company.store';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { UserProfileSelector } from './UserProfileSelector';
+import { DemoModeBadge } from './DemoModeBadge';
 import type { HeaderConfig } from '@/gradian-ui/layout/header';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useTheme } from 'next-themes';
@@ -170,12 +171,14 @@ export function MainLayout({
   const headerActionsContent = (
     <div className="flex items-center gap-2">
       <div className="hidden lg:flex items-center space-x-4">
+        <DemoModeBadge />
         <CompanySelector />
         <ModeToggle />
         <NotificationsDropdown initialCount={5} />
         <UserProfileSelector theme={profileTheme} />
       </div>
       <div className="flex lg:hidden items-center space-x-2">
+        <DemoModeBadge />
         <Button
           variant="ghost"
           size="icon"

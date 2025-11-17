@@ -1,23 +1,10 @@
+// Import DEMO_MODE from application variables
+import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
+
 // Helper function to check if demo mode is enabled
-// Checks both DEMO_MODE (server-side) and NEXT_PUBLIC_DEMO_MODE (client-side)
-// DEMO_MODE takes precedence if both are set
+// Uses DEMO_MODE from application-variables.ts which references DEMO_MODE_PARAMS
 const isDemoModeEnabled = (): boolean => {
-  // Check server-side DEMO_MODE first (takes precedence)
-  const serverValue = process.env.DEMO_MODE;
-  if (serverValue !== undefined && serverValue !== null) {
-    const truthyValues = new Set(['true', '1', 'yes', 'on']);
-    return truthyValues.has(serverValue.toLowerCase());
-  }
-  
-  // Fall back to client-side NEXT_PUBLIC_DEMO_MODE
-  const clientValue = process.env.NEXT_PUBLIC_DEMO_MODE;
-  if (clientValue !== undefined && clientValue !== null) {
-    const truthyValues = new Set(['true', '1', 'yes', 'on']);
-    return truthyValues.has(clientValue.toLowerCase());
-  }
-  
-  // Default to true if neither is set
-  return true;
+  return DEMO_MODE;
 };
 
 // Get the schema API base URL based on demo mode

@@ -17,8 +17,8 @@ export const LOG_CONFIG = {
   [LogType.SCHEMA_LOADER]: true,
   [LogType.CALL_BACKEND]: true,
   [LogType.INDEXDB_CACHE]: true,
-  [LogType.INTEGRATION_LOG]: true,
-};
+  [LogType.INTEGRATION_LOG]: true
+};;;;;;
 
 // Authentication configuration
 export const AUTH_CONFIG = {
@@ -63,3 +63,11 @@ export const SCHEMA_SUMMARY_EXCLUDED_KEYS = [
   'sections',
   'detailPageMetadata',
 ] as const;
+
+// Demo mode configuration
+export const DEMO_MODE_PARAMS = {
+  DEMO_MODE: true,
+} as const;
+
+// Demo mode - uses DEMO_MODE_PARAMS (for backward compatibility)
+export const DEMO_MODE = DEMO_MODE_PARAMS.DEMO_MODE;

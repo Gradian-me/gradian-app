@@ -17,7 +17,8 @@ import {
   Layers,
   Palette,
   Settings,
-  RefreshCw
+  RefreshCw,
+  Mail
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
@@ -28,6 +29,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; style?: 
   Link2,
   Building2,
   Settings,
+  Mail,
 };
 
 interface BuilderOption {

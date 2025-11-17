@@ -58,6 +58,21 @@
       "Template cloning and reuse"
     ],
     "stats": []
+  },
+  {
+    "id": "application-variables",
+    "title": "Application Variables",
+    "description": "Configure application-wide constants including logging, authentication, UI parameters, and schema settings",
+    "icon": "Settings",
+    "href": "/builder/application-variables",
+    "color": "#6366F1",
+    "features": [
+      "Configure logging flags",
+      "Manage authentication settings",
+      "Adjust UI animation parameters",
+      "Customize schema summary exclusions"
+    ],
+    "stats": []
   }
 ]
 

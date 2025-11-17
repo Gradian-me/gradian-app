@@ -3208,5 +3208,16 @@
     "icon": "Settings",
     "isNotCompanyBased": true,
     "isSystemSchema": true
+  },
+  {
+    "id": "dw-objects",
+    "description": "",
+    "singular_name": "DW Object",
+    "plural_name": "DW Objects",
+    "showInNavigation": true,
+    "isSystemSchema": false,
+    "isNotCompanyBased": true,
+    "fields": [],
+    "sections": []
   }
 ]
