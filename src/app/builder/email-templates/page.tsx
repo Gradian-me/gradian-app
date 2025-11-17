@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { Skeleton } from '@/components/ui/skeleton';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { NameInput } from '@/gradian-ui/form-builder/form-elements';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
@@ -273,6 +274,107 @@ export default function EmailTemplateBuilderPage() {
     </Card>
   );
 
+  const renderSkeleton = () => (
+    <div className="grid gap-6 lg:grid-cols-3">
+      {/* Templates Sidebar Skeleton */}
+      <Card className="lg:col-span-1">
+        <CardHeader className="space-y-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+            <Skeleton className="h-9 w-16" />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-2xl border p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-5 w-12" />
+              </div>
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Main Content Skeleton */}
+      <div className="lg:col-span-2 space-y-6">
+        {/* Template Details Card Skeleton */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-4 w-48" />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton className="h-9 w-20" />
+                <Skeleton className="h-9 w-32" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-[420px] w-full" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Preview Card Skeleton */}
+        <Card>
+          <CardHeader>
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-40" />
+              <Skeleton className="h-4 w-56" />
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2">
+              {[1, 2].map((i) => (
+                <div key={i} className="space-y-1.5">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ))}
+            </div>
+            <Skeleton className="h-px w-full" />
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Skeleton className="h-10 w-24" />
+                <Skeleton className="h-10 w-32" />
+                <Skeleton className="h-10 w-28" />
+              </div>
+              <Skeleton className="h-64 w-full rounded-2xl" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
   if (isLoading) {
     return (
       <MainLayout
@@ -280,13 +382,16 @@ export default function EmailTemplateBuilderPage() {
         subtitle="Design, personalize, and preview transactional Gradian.me emails"
         icon="Mail"
       >
-        <div className="py-6">
-          <Card>
-            <CardContent className="flex items-center gap-3 py-6">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-              <span className="text-muted-foreground">Loading templates...</span>
-            </CardContent>
-          </Card>
+        <div className="py-4 md:py-6 space-y-6">
+          <div>
+            <Skeleton className="h-9 w-32" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Skeleton className="h-4 w-48" />
+            <Skeleton className="h-9 w-64 mt-2" />
+            <Skeleton className="h-5 w-96 mt-2" />
+          </div>
+          {renderSkeleton()}
         </div>
       </MainLayout>
     );
