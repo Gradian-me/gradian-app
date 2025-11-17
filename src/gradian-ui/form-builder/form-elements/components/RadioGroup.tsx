@@ -94,7 +94,7 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
           <fieldset>
             <legend
               className={cn(
-                'text-sm font-medium mb-2',
+                'text-xs font-medium mb-2',
                 error ? 'text-red-700' : 'text-gray-700',
                 required && 'after:content-["*"] after:ml-1 after:text-red-500'
               )}

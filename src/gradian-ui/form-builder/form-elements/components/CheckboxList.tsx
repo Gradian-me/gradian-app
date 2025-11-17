@@ -113,7 +113,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
         {fieldLabel && (
           <label
             className={cn(
-              'block text-sm font-medium',
+              'block text-xs font-medium',
               error ? 'text-red-700' : 'text-gray-700',
               required && 'after:content-["*"] after:ml-1 after:text-red-500'
             )}

@@ -134,28 +134,6 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
               value={tempField.placeholder || ''}
               onChange={(value) => setTempField({ ...tempField, placeholder: value })}
             />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Switch
-                config={{ name: `required-${field.id}`, label: 'Required' }}
-                value={tempField.required || false}
-                onChange={(checked: boolean) => setTempField({ ...tempField, required: checked })}
-              />
-              <Switch
-                config={{ name: `disabled-${field.id}`, label: 'Disabled' }}
-                value={tempField.disabled || false}
-                onChange={(checked: boolean) => setTempField({ ...tempField, disabled: checked })}
-              />
-              <Switch
-                config={{ name: `readonly-${field.id}`, label: 'Readonly' }}
-                value={tempField.readonly || false}
-                onChange={(checked: boolean) => setTempField({ ...tempField, readonly: checked })}
-              />
-              <Switch
-                config={{ name: `can-copy-${field.id}`, label: 'Can Copy' }}
-                value={tempField.canCopy || false}
-                onChange={(checked: boolean) => setTempField({ ...tempField, canCopy: checked })}
-              />
-            </div>
             <Select
               config={{ name: 'field-role', label: 'Role', placeholder: 'Select role...' }}
               value={tempField.role || ''}
@@ -178,6 +156,33 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
                 value={tempField.order ?? 1}
                 onChange={(value) => setTempField({ ...tempField, order: value === '' ? 1 : Number(value) || 1 })}
                 min={1}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Switch
+                config={{ name: `required-${field.id}`, label: 'Required' }}
+                value={tempField.required || false}
+                onChange={(checked: boolean) => setTempField({ ...tempField, required: checked })}
+              />
+              <Switch
+                config={{ name: `disabled-${field.id}`, label: 'Disabled' }}
+                value={tempField.disabled || false}
+                onChange={(checked: boolean) => setTempField({ ...tempField, disabled: checked })}
+              />
+              <Switch
+                config={{ name: `readonly-${field.id}`, label: 'Readonly' }}
+                value={tempField.readonly || false}
+                onChange={(checked: boolean) => setTempField({ ...tempField, readonly: checked })}
+              />
+              <Switch
+                config={{ name: `can-copy-${field.id}`, label: 'Can Copy' }}
+                value={tempField.canCopy || false}
+                onChange={(checked: boolean) => setTempField({ ...tempField, canCopy: checked })}
+              />
+              <Switch
+                config={{ name: `addToReferenceMetadata-${field.id}`, label: 'Add To Reference Metadata' }}
+                value={tempField.addToReferenceMetadata || false}
+                onChange={(checked: boolean) => setTempField({ ...tempField, addToReferenceMetadata: checked })}
               />
             </div>
           </div>

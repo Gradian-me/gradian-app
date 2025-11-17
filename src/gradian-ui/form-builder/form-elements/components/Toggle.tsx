@@ -67,7 +67,7 @@ export const Toggle = forwardRef<FormElementRef, ToggleProps>(
         {config?.label && (
           <div
             className={cn(
-              'flex items-center justify-between gap-2 text-sm font-medium',
+              'flex items-center justify-between gap-2 text-xs font-medium',
               error ? 'text-red-700' : 'text-gray-700',
               required && 'after:content-["*"] after:ml-1 after:text-red-500',
               disabled && 'opacity-60 cursor-not-allowed'

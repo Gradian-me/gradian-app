@@ -18,7 +18,7 @@ const Label = React.forwardRef<
   ...props
 }, ref) => {
   const labelClasses = cn(
-    'text-sm font-medium leading-none transition-colors',
+    'text-xs font-medium leading-none transition-colors',
     'peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
     error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
     disabled && 'text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-70',

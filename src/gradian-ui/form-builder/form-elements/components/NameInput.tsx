@@ -118,7 +118,7 @@ export const NameInput = forwardRef<FormElementRef, NameInputProps>(
               <label
                 htmlFor={fieldName}
                 className={cn(
-                  'block text-sm font-medium',
+                  'block text-xs font-medium',
                   error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
                   (required ?? config?.required ?? config?.validation?.required ?? false) && 'after:content-["*"] after:ml-1 after:text-red-500 dark:after:text-red-400'
                 )}

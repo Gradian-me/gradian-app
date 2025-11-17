@@ -97,7 +97,7 @@ export const IconInput = forwardRef<FormElementRef, IconInputProps>(
           <label
             htmlFor={fieldName}
             className={cn(
-              'block text-sm font-medium mb-1',
+              'block text-xs font-medium mb-1',
               error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-slate-200',
               required && 'after:content-["*"] after:ml-1 after:text-red-500'
             )}

@@ -2842,7 +2842,8 @@
         },
         "colSpan": 1,
         "order": 3,
-        "role": "subtitle"
+        "role": "subtitle",
+        "addToReferenceMetadata": true
       },
       {
         "id": "url-description",

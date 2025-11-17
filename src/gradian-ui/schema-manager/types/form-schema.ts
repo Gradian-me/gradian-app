@@ -19,6 +19,7 @@ export interface FormField {
   readonly?: boolean;
   canCopy?: boolean;
   inactive?: boolean;
+  addToReferenceMetadata?: boolean;
   role?: 'title' | 'subtitle' | 'description' | 'image' | 'avatar' | 'icon' | 'rating' | 'badge' | 'status' | 'email' | 'location' | 'tel' | 'duedate' | 'code';
   validation?: {
     required?: boolean;
