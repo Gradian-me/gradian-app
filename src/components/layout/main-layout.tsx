@@ -115,30 +115,30 @@ export function MainLayout({
   };
 
   const headerBrandContent = (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 flex-1 min-w-0">
       <Button
         variant="ghost"
         size="icon"
         onClick={toggleMobileMenu}
-        className="md:hidden text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+        className="md:hidden text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0"
         aria-label="Toggle sidebar"
       >
         <PanelLeftOpen className="h-5 w-5" />
       </Button>
-      <div className="flex flex-col">
+      <div className="flex flex-col min-w-0 flex-1">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 min-w-0"
         >
           {icon && (
             <IconRenderer
               iconName={icon}
-              className="h-5 w-5 md:h-6 md:w-6 text-violet-600 dark:text-violet-300"
+              className="h-5 w-5 md:h-6 md:w-6 text-violet-600 dark:text-violet-300 shrink-0"
             />
           )}
-          <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-gray-100 truncate min-w-0">
             {title}
           </h1>
           {isAdmin && editSchemaPath && (

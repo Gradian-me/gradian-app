@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { cn } from '../../../shared/utils';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { useSchemas } from '@/gradian-ui/schema-manager/hooks/use-schemas';
@@ -27,10 +27,34 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   initialSchemas,
 }) => {
   const pathname = usePathname();
-  const { schemas: allSchemas, isLoading } = useSchemas({
+  const { schemas: allSchemas, isLoading, refetch } = useSchemas({
     initialData: initialSchemas,
     summary: true,
   });
+
+  // Listen for cache clear events and refetch schemas
+  useEffect(() => {
+    const handleCacheClear = () => {
+      // Refetch schemas when cache is cleared
+      refetch();
+    };
+
+    // Listen for custom cache clear event
+    window.addEventListener('react-query-cache-clear', handleCacheClear);
+    
+    // Listen for storage events (from other tabs/windows)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'react-query-cache-cleared') {
+        refetch();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('react-query-cache-clear', handleCacheClear);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [refetch]);
 
   // Filter schemas that have showInNavigation enabled
   const schemas = useMemo(() => {

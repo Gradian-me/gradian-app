@@ -36,48 +36,49 @@ export const DynamicFilterPane = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-6 ${className}`}
+      className={`flex flex-col gap-2 sm:gap-3 lg:flex-row lg:items-center lg:justify-between mb-4 sm:mb-6 ${className}`}
     >
       <div className="flex-1 w-full">
         <SearchBar
           placeholder={searchPlaceholder}
           value={searchTerm}
           onChange={onSearchChange}
-          className="h-10 w-full"
+          className="h-9 sm:h-10 w-full"
         />
       </div>
-      <div className="flex flex-col sm:flex-row flex-wrap gap-2 items-stretch sm:items-center w-full lg:w-auto">
-        <Button variant="outline" size="sm" className="h-10 w-full sm:w-auto whitespace-nowrap">
-          <Filter className="h-4 w-4 mr-2" />
-          Filters
+      <div className="flex flex-row gap-1.5 sm:gap-2 items-center w-full lg:w-auto">
+        <Button variant="outline" size="sm" className="h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap">
+          <Filter className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">Filters</span>
         </Button>
         {onRefresh && (
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="h-10 w-full sm:w-10 p-0 justify-center"
+            className="h-9 sm:h-10 w-9 sm:w-10 p-0 justify-center shrink-0"
             onClick={onRefresh}
             title="Refresh"
           >
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           </Button>
         )}
-        <div className="border border-gray-300 dark:border-gray-500 rounded-md h-10 flex items-center w-full sm:w-auto justify-center">
+        <div className="border border-gray-300 dark:border-gray-500 rounded-md h-9 sm:h-10 flex items-center shrink-0">
           <ViewSwitcher
             currentView={viewMode}
             onViewChange={onViewModeChange}
-            className="h-full w-full sm:w-auto"
+            className="h-full"
           />
         </div>
         <Button 
           variant="default" 
           size="sm" 
-          className="h-10 w-full sm:w-auto whitespace-nowrap text-xs"
+          className="h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap text-xs sm:text-sm"
           onClick={onAddNew}
         >
-          <Plus className="h-4 w-4 mr-2" />
-          {addButtonText}
+          <Plus className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">{addButtonText}</span>
+          <span className="sm:hidden">Add</span>
         </Button>
       </div>
     </motion.div>

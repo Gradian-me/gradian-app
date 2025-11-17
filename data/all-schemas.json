@@ -3221,20 +3221,6 @@
     "isSystemSchema": true
   },
   {
-    "id": "dw-objects",
-    "description": "",
-    "singular_name": "DW Object",
-    "plural_name": "DW Objects",
-    "showInNavigation": true,
-    "isSystemSchema": false,
-    "isNotCompanyBased": true,
-    "fields": [],
-    "sections": [],
-    "fieldsCount": 0,
-    "sectionsCount": 0,
-    "inactive": true
-  },
-  {
     "id": "databases",
     "description": "Manage database configurations and connection settings",
     "singular_name": "Database",
@@ -3542,5 +3528,114 @@
     "icon": "Database",
     "isNotCompanyBased": true,
     "isSystemSchema": true
+  },
+  {
+    "id": "tags",
+    "description": "Create and manage tags with labels, icons, colors, and use cases",
+    "singular_name": "Tag",
+    "plural_name": "Tags",
+    "cardMetadata": [
+      {
+        "id": "tag-info",
+        "title": "Tag Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "tag-label",
+          "tag-icon",
+          "tag-color"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "tag-label",
+        "name": "label",
+        "label": "Label",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "Enter tag label",
+        "required": true,
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "tag-icon",
+        "name": "icon",
+        "label": "Icon",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "icon",
+        "placeholder": "Enter Lucide Icon name (e.g., Tag)",
+        "required": true,
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "tag-color",
+        "name": "color",
+        "label": "Color",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "color-picker",
+        "placeholder": "#000000",
+        "required": true,
+        "validation": {
+          "required": true,
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "tag-use-cases",
+        "name": "useCases",
+        "label": "Use Cases",
+        "sectionId": "basic-information",
+        "type": "textarea",
+        "component": "textarea",
+        "placeholder": "Enter use cases for this tag (optional)",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 4
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Tag label, icon, color, and use cases",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "tag-overview",
+          "title": "Tag Overview",
+          "description": "Basic tag information",
+          "colSpan": 2,
+          "fieldIds": [
+            "tag-label",
+            "tag-icon",
+            "tag-color",
+            "tag-use-cases"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "Tag",
+    "isNotCompanyBased": false
   }
 ]

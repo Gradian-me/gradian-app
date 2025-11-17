@@ -6,7 +6,7 @@ import { ArrowLeft, Plus, RefreshCw, Settings, Building2, FileText } from 'lucid
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { SchemaCardGrid, SchemaCardSkeletonGrid } from './SchemaCardGrid';
 import { CreateSchemaDialog } from './CreateSchemaDialog';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder';
@@ -129,54 +129,71 @@ export function SchemaManagerWrapper() {
               </Badge>
             </TabsTrigger>
           </TabsList>
-        </Tabs>
 
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <SearchInput
-              config={{ name: 'search', placeholder: 'Search schemas...' }}
-              value={searchQuery}
-              onChange={setSearchQuery}
-              onClear={() => setSearchQuery('')}
-              className="[&_input]:h-10"
-            />
-          </div>
-          {schemas.some(s => s.inactive) && (
-            <div className="flex items-center border border-gray-300 rounded-lg px-3 h-10">
-              <Switch
-                config={{ 
-                  name: 'show-inactive', 
-                  label: 'Show Inactive Schemas'
-                }}
-                checked={showInactive}
-                onChange={setShowInactive}
+          <div className="flex gap-2 mt-4">
+            <div className="flex-1">
+              <SearchInput
+                config={{ name: 'search', placeholder: 'Search schemas...' }}
+                value={searchQuery}
+                onChange={setSearchQuery}
+                onClear={() => setSearchQuery('')}
+                className="[&_input]:h-10"
               />
             </div>
-          )}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleRefresh}
-            disabled={loading || refreshing}
-            className="h-10 w-10"
-            title="Refresh"
-          >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
+            {schemas.some(s => s.inactive) && (
+              <div className="flex items-center border border-gray-300 rounded-lg px-3 h-10">
+                <Switch
+                  config={{ 
+                    name: 'show-inactive', 
+                    label: 'Show Inactive Schemas'
+                  }}
+                  checked={showInactive}
+                  onChange={setShowInactive}
+                />
+              </div>
+            )}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleRefresh}
+              disabled={loading || refreshing}
+              className="h-10 w-10"
+              title="Refresh"
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
 
-        {loading ? (
-          <SchemaCardSkeletonGrid />
-        ) : filteredSchemas.length > 0 ? (
-          <SchemaCardGrid
-            schemas={filteredSchemas}
-            onEdit={handleEditSchema}
-            onView={handleViewSchema}
-            onDelete={openDeleteDialog}
-          />
-        ) : (
-          emptyState
-        )}
+          <TabsContent value="system" className="mt-4">
+            {loading ? (
+              <SchemaCardSkeletonGrid />
+            ) : filteredSchemas.length > 0 ? (
+              <SchemaCardGrid
+                schemas={filteredSchemas}
+                onEdit={handleEditSchema}
+                onView={handleViewSchema}
+                onDelete={openDeleteDialog}
+              />
+            ) : (
+              emptyState
+            )}
+          </TabsContent>
+
+          <TabsContent value="business" className="mt-4">
+            {loading ? (
+              <SchemaCardSkeletonGrid />
+            ) : filteredSchemas.length > 0 ? (
+              <SchemaCardGrid
+                schemas={filteredSchemas}
+                onEdit={handleEditSchema}
+                onView={handleViewSchema}
+                onDelete={openDeleteDialog}
+              />
+            ) : (
+              emptyState
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
 
       <CreateSchemaDialog
