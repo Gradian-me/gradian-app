@@ -18,7 +18,7 @@ export const LOG_CONFIG = {
   [LogType.CALL_BACKEND]: true,
   [LogType.INDEXDB_CACHE]: true,
   [LogType.INTEGRATION_LOG]: true
-};;;;;;
+};;;;;;;;
 
 // Authentication configuration
 export const AUTH_CONFIG = {

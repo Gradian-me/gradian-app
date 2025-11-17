@@ -31,7 +31,13 @@ export function useSchemas(options?: UseSchemasOptions) {
     queryFn: async () => {
       console.log(`[REACT_QUERY] 🔄 Fetching ${isSummary ? 'schema summaries' : 'schemas'} from API...`);
       // Use /api/schemas directly (apiRequest will handle it correctly via resolveApiUrl)
-      const response = await apiRequest<FormSchema[]>(apiPath);
+      // Add cache-busting parameter for summary requests to ensure fresh data
+      const apiPathWithCacheBust = isSummary 
+        ? `${apiPath}${apiPath.includes('?') ? '&' : '?'}cacheBust=${Date.now()}`
+        : apiPath;
+      const response = await apiRequest<FormSchema[]>(apiPathWithCacheBust, {
+        disableCache: isSummary, // Disable IndexedDB cache for summary requests
+      });
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to fetch schemas');
       }
@@ -46,16 +52,17 @@ export function useSchemas(options?: UseSchemasOptions) {
       };
 
       const list = normalizeSchemas(response.data);
-      console.log(`[REACT_QUERY] ✅ Fetched ${list.length} ${isSummary ? 'schema summaries' : 'schemas'} - Caching for ${Math.round((cacheConfig.staleTime ?? 10 * 60 * 1000) / 1000)}s`);
+      const cacheTime = cacheConfig.staleTime ?? 10 * 60 * 1000;
+      console.log(`[REACT_QUERY] ✅ Fetched ${list.length} ${isSummary ? 'schema summaries' : 'schemas'}${isSummary ? ' (no cache)' : ` - Caching for ${Math.round(cacheTime / 1000)}s`}`);
       return list;
     },
     enabled: enabled !== false,
     initialData,
     staleTime: cacheConfig.staleTime ?? 10 * 60 * 1000,
     gcTime: cacheConfig.gcTime ?? 30 * 60 * 1000,
-    refetchOnMount: false, // Don't refetch on mount if data exists in cache
-    refetchOnWindowFocus: false, // Don't refetch on window focus
-    refetchOnReconnect: false, // Don't refetch on reconnect
+    refetchOnMount: isSummary ? true : false, // Always refetch on mount for summary requests
+    refetchOnWindowFocus: isSummary ? true : false, // Always refetch on window focus for summary requests
+    refetchOnReconnect: isSummary ? true : false, // Always refetch on reconnect for summary requests
     retry: 1, // Only retry once on failure
     retryDelay: 1000, // Wait 1 second before retrying
     placeholderData: (previousData) => previousData, // Use previous data as placeholder

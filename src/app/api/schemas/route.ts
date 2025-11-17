@@ -52,9 +52,10 @@ export function clearSchemaCache() {
 /**
  * Load schemas with shared cache
  */
-async function loadSchemas(): Promise<any[]> {
-  return await loadData<any[]>('schemas', '/api/schemas', {
-    ttl: CACHE_CONFIG.ttl,
+async function loadSchemas(bypassCache: boolean = false): Promise<any[]> {
+  const routeKey = bypassCache ? 'schemas-summary' : 'schemas';
+  return await loadData<any[]>(routeKey, '/api/schemas', {
+    ttl: bypassCache ? 0 : CACHE_CONFIG.ttl,
     logType: LogType.SCHEMA_LOADER,
     fetcher: async () => {
       const dataPath = path.join(process.cwd(), 'data', 'all-schemas.json');
@@ -87,8 +88,8 @@ export async function GET(request: NextRequest) {
     const summaryParam = searchParams.get('summary');
     const isSummaryRequested = summaryParam === 'true' || summaryParam === '1';
 
-    // Load schemas (with caching)
-    const schemas = await loadSchemas();
+    // Load schemas (bypass cache when summary=true to always get fresh data)
+    const schemas = await loadSchemas(isSummaryRequested);
     
     if (!schemas || schemas.length === 0) {
       return NextResponse.json(

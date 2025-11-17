@@ -36,12 +36,13 @@ export const CACHE_CONFIG: Record<string, RouteCacheConfig> = {
     description: 'All schemas list',
   },
   'schemas-summary': {
-    ttl: 10 * 60 * 1000,
-    staleTime: 10 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
+    ttl: 0, // No server-side cache
+    staleTime: 0, // Always treat as stale - refetch on mount
+    gcTime: 0, // Don't keep in cache
     reactQueryKeys: ['schemas-summary'],
     indexedDbKey: 'schemas-summary',
-    description: 'Schema summaries list',
+    disableServerCache: true, // Disable server-side in-memory cache
+    description: 'Schema summaries list (no caching)',
   },
   'schemas/:id': {
     ttl: 10 * 60 * 1000, // 10 minutes - server-side cache
