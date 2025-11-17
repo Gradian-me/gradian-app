@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { NameInput, Select } from '@/gradian-ui/form-builder/form-elements';
+import { NameInput, Select, PickerInput } from '@/gradian-ui/form-builder/form-elements';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { Save } from 'lucide-react';
+import { extractFirstId } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
 
 interface Integration {
   id: string;
@@ -69,6 +70,8 @@ export function ConfigureIntegrationForm({
     sourceMethod: 'GET',
     sourceDataPath: '',
   });
+  const [targetRoutePickerValue, setTargetRoutePickerValue] = useState<any>(null);
+  const [sourceRoutePickerValue, setSourceRoutePickerValue] = useState<any>(null);
   const formDataRef = useRef(formData);
   
   // Keep ref in sync with state
@@ -86,6 +89,21 @@ export function ConfigureIntegrationForm({
     }
   }, [formData.title, isIdCustomized, isEdit]);
 
+  // Helper function to find URL repository by address
+  const findUrlRepositoryByAddress = async (address: string): Promise<any> => {
+    if (!address) return null;
+    try {
+      const response = await apiRequest<any[]>('/api/data/url-repository');
+      if (response.success && response.data) {
+        const urlRepo = response.data.find((item: any) => item.address === address);
+        return urlRepo ? [{ id: urlRepo.id, label: urlRepo.title || urlRepo.address }] : null;
+      }
+    } catch (error) {
+      console.error('Error finding URL repository:', error);
+    }
+    return null;
+  };
+
   useEffect(() => {
     if (isEdit && integrationId) {
       const fetchIntegration = async () => {
@@ -99,6 +117,20 @@ export function ConfigureIntegrationForm({
             if (integration) {
               setFormData(integration);
               setIsIdCustomized(true); // In edit mode, ID is always considered customized
+              
+              // Load picker values for target and source routes
+              if (integration.targetRoute) {
+                const targetPickerValue = await findUrlRepositoryByAddress(integration.targetRoute);
+                if (targetPickerValue) {
+                  setTargetRoutePickerValue(targetPickerValue);
+                }
+              }
+              if (integration.sourceRoute) {
+                const sourcePickerValue = await findUrlRepositoryByAddress(integration.sourceRoute);
+                if (sourcePickerValue) {
+                  setSourceRoutePickerValue(sourcePickerValue);
+                }
+              }
             }
           }
         } catch (error) {
@@ -120,6 +152,63 @@ export function ConfigureIntegrationForm({
     label: 'Integration ID',
     required: true,
   }), []);
+
+  // Configs for picker inputs
+  const targetRoutePickerConfig = useMemo(() => ({
+    id: 'target-route-picker',
+    name: 'targetRoute',
+    label: 'Target Route',
+    required: true,
+    targetSchema: 'url-repository',
+  }), []);
+
+  const sourceRoutePickerConfig = useMemo(() => ({
+    id: 'source-route-picker',
+    name: 'sourceRoute',
+    label: 'Source Route',
+    required: false,
+    targetSchema: 'url-repository',
+  }), []);
+
+  // Handle target route picker change
+  const handleTargetRouteChange = useCallback(async (value: any) => {
+    setTargetRoutePickerValue(value);
+    if (value && Array.isArray(value) && value.length > 0) {
+      const urlId = extractFirstId(value[0]);
+      if (urlId) {
+        try {
+          const response = await apiRequest<any>(`/api/data/url-repository/${urlId}`);
+          if (response.success && response.data && response.data.address) {
+            setFormData(prev => ({ ...prev, targetRoute: response.data.address }));
+          }
+        } catch (error) {
+          console.error('Error fetching URL repository:', error);
+        }
+      }
+    } else {
+      setFormData(prev => ({ ...prev, targetRoute: '' }));
+    }
+  }, []);
+
+  // Handle source route picker change
+  const handleSourceRouteChange = useCallback(async (value: any) => {
+    setSourceRoutePickerValue(value);
+    if (value && Array.isArray(value) && value.length > 0) {
+      const urlId = extractFirstId(value[0]);
+      if (urlId) {
+        try {
+          const response = await apiRequest<any>(`/api/data/url-repository/${urlId}`);
+          if (response.success && response.data && response.data.address) {
+            setFormData(prev => ({ ...prev, sourceRoute: response.data.address }));
+          }
+        } catch (error) {
+          console.error('Error fetching URL repository:', error);
+        }
+      }
+    } else {
+      setFormData(prev => ({ ...prev, sourceRoute: '' }));
+    }
+  }, []);
 
   // Notify parent of saving state changes
   useEffect(() => {
@@ -272,12 +361,10 @@ export function ConfigureIntegrationForm({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2 space-y-2">
-          <Label htmlFor="targetRoute">Target Route *</Label>
-          <Input
-            id="targetRoute"
-            value={formData.targetRoute}
-            onChange={(e) => setFormData({ ...formData, targetRoute: e.target.value })}
-            placeholder="http://example.com/api/sync or /api/sync"
+          <PickerInput
+            config={targetRoutePickerConfig}
+            value={targetRoutePickerValue}
+            onChange={handleTargetRouteChange}
             required
           />
           <p className="text-xs text-gray-500">The endpoint to call for syncing</p>
@@ -303,12 +390,10 @@ export function ConfigureIntegrationForm({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2 space-y-2">
-          <Label htmlFor="sourceRoute">Source Route (Optional)</Label>
-          <Input
-            id="sourceRoute"
-            value={formData.sourceRoute || ''}
-            onChange={(e) => setFormData({ ...formData, sourceRoute: e.target.value })}
-            placeholder="http://example.com/api/data"
+          <PickerInput
+            config={sourceRoutePickerConfig}
+            value={sourceRoutePickerValue}
+            onChange={handleSourceRouteChange}
           />
           <p className="text-xs text-gray-500">If provided, fetch data from this route first</p>
         </div>

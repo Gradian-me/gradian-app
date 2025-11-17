@@ -180,6 +180,28 @@ export const formatFieldValue = (
       } catch {
         return <span>{String(value)}</span>;
       }
+    case 'url':
+    case 'url-input': {
+      const stringValue = String(value);
+      const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
+      if (!isUrl) {
+        return <span>{stringValue}</span>;
+      }
+      // Get link label from componentTypeConfig or use default
+      const linkLabel = field?.componentTypeConfig?.label || 'show more';
+      const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
+      return (
+        <a
+          href={urlToOpen}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {linkLabel}
+        </a>
+      );
+    }
     case 'array':
     case 'checkbox':
       if (displayStrings.length > 0) {
@@ -200,7 +222,25 @@ export const formatFieldValue = (
         const label = normalizedOptions[0].label ?? normalizedOptions[0].id;
         return <span>{String(label)}</span>;
       }
-      return <span>{String(value)}</span>;
+      // Check if it's a URL even if not explicitly typed as url
+      const stringValue = String(value);
+      const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
+      if (isUrl && (field?.type === 'url' || field?.component === 'url-input' || field?.component === 'url')) {
+        const linkLabel = field?.componentTypeConfig?.label || 'show more';
+        const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
+        return (
+          <a
+            href={urlToOpen}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {linkLabel}
+          </a>
+        );
+      }
+      return <span>{stringValue}</span>;
   }
 };
 

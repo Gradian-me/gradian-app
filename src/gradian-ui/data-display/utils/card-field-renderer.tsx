@@ -226,6 +226,35 @@ export const renderFieldValue = ({ field, value, maxMetrics = 3 }: RenderFieldVa
         </div>,
         field
       );
+    case 'url':
+    case 'url-input': {
+      const stringValue = String(value);
+      const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
+      if (!isUrl) {
+        return withTooltip(
+          <span className="text-gray-700 dark:text-gray-200">{stringValue}</span>,
+          field
+        );
+      }
+      // Get link label from componentTypeConfig or use default
+      const linkLabel = field?.componentTypeConfig?.label || 'show more';
+      const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
+      return withTooltip(
+        <div className="flex items-center space-x-2">
+          {customIcon || <IconRenderer iconName="Link" className="h-4 w-4 shrink-0 text-gray-500 dark:text-gray-400" />}
+          <a
+            href={urlToOpen}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {linkLabel}
+          </a>
+        </div>,
+        field
+      );
+    }
     case 'textarea':
       return withTooltip(
         <div className="text-gray-600 dark:text-gray-300 group-hover:text-gray-800 dark:group-hover:text-gray-100 transition-colors duration-200">
@@ -323,6 +352,26 @@ export const renderFieldValue = ({ field, value, maxMetrics = 3 }: RenderFieldVa
       }
       const stringValue = String(value);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
+      // Check if it's a URL field type even if not explicitly in the switch
+      if (isUrl && (field?.type === 'url' || field?.component === 'url-input' || field?.component === 'url')) {
+        const linkLabel = field?.componentTypeConfig?.label || 'show more';
+        const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
+        return withTooltip(
+          <div className="flex items-center space-x-2">
+            {customIcon || <IconRenderer iconName="Link" className="h-4 w-4 shrink-0 text-gray-500 dark:text-gray-400" />}
+            <a
+              href={urlToOpen}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {linkLabel}
+            </a>
+          </div>,
+          field
+        );
+      }
       return (
         <span className={cn(
           isUrl || stringValue.length > 50 ? "overflow-wrap-anywhere" : undefined,

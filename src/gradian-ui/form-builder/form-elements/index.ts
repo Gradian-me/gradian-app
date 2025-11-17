@@ -23,6 +23,7 @@ export * from './components/AddButtonFull';
 export * from './components/ImageText';
 export * from './components/ConfirmationMessage';
 export * from './components/EmailInput';
+export * from './components/URLInput';
 export * from './components/PhoneInput';
 export * from './components/PasswordInput';
 export * from './components/NumberInput';

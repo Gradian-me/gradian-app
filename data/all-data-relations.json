@@ -228,5 +228,25 @@
     "id": "01KA41AN3M7ERX5AS2YVZJZBY3",
     "createdAt": "2025-11-15T15:14:50.612Z",
     "updatedAt": "2025-11-15T15:14:50.612Z"
+  },
+  {
+    "sourceSchema": "servers",
+    "sourceId": "01KA8QZJ9SAJ6Y2GR05K42BQYF",
+    "targetSchema": "url-repository",
+    "targetId": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
+    "relationTypeId": "HAS_URL",
+    "id": "01KA8T4J5JXBQMGAMR4NTDSBS7",
+    "createdAt": "2025-11-17T11:45:23.121Z",
+    "updatedAt": "2025-11-17T11:45:23.121Z"
+  },
+  {
+    "sourceSchema": "servers",
+    "sourceId": "01KA8TM7H68FPKTRNNNSPWWBKD",
+    "targetSchema": "url-repository",
+    "targetId": "01KA8TP4ZVMWVCGK25KPDQDPW1",
+    "relationTypeId": "HAS_URL",
+    "id": "01KA8TP524YQEQ4ZJT4505NJ2T",
+    "createdAt": "2025-11-17T11:54:59.524Z",
+    "updatedAt": "2025-11-17T11:54:59.524Z"
   }
 ]

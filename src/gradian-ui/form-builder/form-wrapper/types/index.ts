@@ -74,6 +74,7 @@ export interface FormContentProps extends BaseComponentProps {
     gap?: number;
     direction?: 'row' | 'column';
   };
+  fieldTabIndexMap?: Record<string, number>;
 }
 
 export interface FormFooterProps extends BaseComponentProps {

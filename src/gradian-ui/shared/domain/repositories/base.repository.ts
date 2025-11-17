@@ -139,9 +139,27 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
       processedData
     );
     
+    // Check if an ID is provided in the data (for schemas like relation-types that allow custom IDs)
+    let entityId: string;
+    const providedId = (processedData as any).id;
+    
+    if (providedId && typeof providedId === 'string' && providedId.trim().length > 0) {
+      // Check if an entity with this ID already exists
+      const existingEntity = entities.find(entity => entity.id === providedId.trim());
+      if (existingEntity) {
+        throw new Error(`Entity with ID "${providedId}" already exists`);
+      }
+      entityId = providedId.trim();
+      // Remove id from processedData since we'll set it explicitly
+      delete (processedData as any).id;
+    } else {
+      // Generate a new ULID if no ID is provided
+      entityId = ulid();
+    }
+    
     const newEntity: T = {
       ...processedData,
-      id: ulid(), // Use ULID instead of UUID
+      id: entityId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     } as T;

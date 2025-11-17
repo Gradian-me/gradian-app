@@ -794,7 +794,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const isSelected = isItemSelected(item);
 
     const baseCardClasses = "relative p-3 rounded-xl border cursor-pointer transition-all duration-200 group";
-    const selectedCardClasses = "border-violet-500 dark:border-violet-400 bg-gradient-to-br from-violet-50 via-white to-white dark:from-gray-900 dark:via-gray-800 dark:to-violet-900 shadow-lg ring-1 ring-violet-200 dark:ring-violet-800";
+    const selectedCardClasses = "border-violet-500 dark:border-violet-400 bg-gradient-to-br from-gray-100 via-white to-violet-100 dark:from-gray-900 dark:via-gray-800 dark:to-violet-900 shadow-lg ring-1 ring-violet-200 dark:ring-violet-800";
     const defaultCardClasses = "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-violet-300 hover:shadow-md";
 
     const motionProps = {

@@ -16,6 +16,7 @@ export const FormContent: React.FC<FormContentProps> = ({
   layout,
   className,
   children,
+  fieldTabIndexMap,
   ...props
 }) => {
   const contentClasses = cn(
@@ -32,8 +33,8 @@ export const FormContent: React.FC<FormContentProps> = ({
   return (
     <div className={contentClasses} {...props}>
       {children || fields.map((field) => {
-        // Skip hidden fields
-        if ((field as any).hidden || field.layout?.hidden) {
+        // Skip hidden and inactive fields
+        if ((field as any).hidden || field.layout?.hidden || (field as any).inactive) {
           return null;
         }
 
@@ -64,6 +65,7 @@ export const FormContent: React.FC<FormContentProps> = ({
               error={errors[field.name]}
               disabled={disabled || field.behavior?.disabled || (field as any).disabled}
               required={field.required ?? field.validation?.required ?? false}
+              tabIndex={fieldTabIndexMap?.[field.name] !== undefined ? fieldTabIndexMap[field.name] : undefined}
             />
           </div>
         );

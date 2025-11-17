@@ -1564,7 +1564,8 @@
           "required": true
         },
         "colSpan": 1,
-        "order": 2
+        "order": 2,
+        "role": "icon"
       }
     ],
     "sections": [
@@ -2654,5 +2655,548 @@
     "showInNavigation": false,
     "icon": "Users",
     "isNotCompanyBased": false
+  },
+  {
+    "id": "servers",
+    "description": "Manage server configurations and endpoints",
+    "singular_name": "Server",
+    "plural_name": "Servers",
+    "cardMetadata": [
+      {
+        "id": "server-info",
+        "title": "Server Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "server-name",
+          "server-address"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "server-name",
+        "name": "name",
+        "label": "Server Name",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "Enter server name",
+        "required": true,
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "server-address",
+        "name": "address",
+        "label": "Server Address",
+        "sectionId": "basic-information",
+        "type": "url",
+        "component": "url-input",
+        "placeholder": "Enter server address (e.g., https://api.example.com)",
+        "required": true,
+        "validation": {
+          "required": true,
+          "pattern": "^https?:\\/\\/.+"
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "server-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "type": "textarea",
+        "component": "textarea",
+        "placeholder": "Enter server description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "server-avatar",
+        "name": "avatar",
+        "label": "Avatar",
+        "sectionId": "basic-information",
+        "type": "url",
+        "component": "url-input",
+        "placeholder": "Enter avatar image URL",
+        "required": false,
+        "role": "image",
+        "validation": {
+          "pattern": "^https?:\\/\\/.+\\.(jpg|jpeg|png|gif|webp|svg)$"
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "server-color",
+        "name": "color",
+        "label": "Color",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "color-picker",
+        "placeholder": "#000000",
+        "required": false,
+        "validation": {
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "colSpan": 1,
+        "order": 5
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Server Information",
+        "description": "Basic server details and configuration",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "url-repositories",
+        "title": "URL Repositories",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 0,
+          "targetSchema": "url-repository",
+          "relationTypeId": "HAS_URL"
+        }
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "server-overview",
+          "title": "Server Overview",
+          "description": "Server configuration details",
+          "colSpan": 2,
+          "fieldIds": [
+            "server-name",
+            "server-address",
+            "server-description",
+            "server-avatar",
+            "server-color"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "Server",
+    "isSystemSchema": true,
+    "isNotCompanyBased": true
+  },
+  {
+    "id": "url-repository",
+    "description": "Manage and organize URLs with associated metadata",
+    "singular_name": "URL Repository",
+    "plural_name": "URL Repositories",
+    "cardMetadata": [
+      {
+        "id": "url-info",
+        "title": "URL Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "url-title",
+          "url-address"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "url-title",
+        "name": "title",
+        "label": "URL Title",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "Enter URL title",
+        "required": true,
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "url-address",
+        "name": "address",
+        "label": "URL Address",
+        "sectionId": "basic-information",
+        "type": "url",
+        "component": "url-input",
+        "placeholder": "Enter URL address",
+        "required": true,
+        "validation": {
+          "required": true,
+          "pattern": "^https?:\\/\\/.+"
+        },
+        "colSpan": 1,
+        "order": 3,
+        "role": "subtitle"
+      },
+      {
+        "id": "url-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "type": "textarea",
+        "component": "textarea",
+        "placeholder": "Enter URL description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "url-methods",
+        "name": "methods",
+        "label": "Methods",
+        "sectionId": "basic-information",
+        "type": "select",
+        "component": "select",
+        "placeholder": "Select HTTP methods",
+        "required": false,
+        "allowMultiselect": true,
+        "options": [
+          {
+            "id": "GET",
+            "label": "GET",
+            "icon": "ArrowRight",
+            "color": "info"
+          },
+          {
+            "id": "POST",
+            "label": "POST",
+            "icon": "ArrowRight",
+            "color": "success"
+          },
+          {
+            "id": "PUT",
+            "label": "PUT",
+            "icon": "ArrowRight",
+            "color": "warning"
+          },
+          {
+            "id": "PATCH",
+            "label": "PATCH",
+            "icon": "ArrowRight",
+            "color": "warning"
+          },
+          {
+            "id": "DELETE",
+            "label": "DELETE",
+            "icon": "ArrowRight",
+            "color": "destructive"
+          },
+          {
+            "id": "OPTIONS",
+            "label": "OPTIONS",
+            "icon": "ArrowRight",
+            "color": "muted"
+          },
+          {
+            "id": "HEAD",
+            "label": "HEAD",
+            "icon": "ArrowRight",
+            "color": "muted"
+          }
+        ],
+        "colSpan": 2,
+        "order": 5
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "URL Information",
+        "description": "URL details and associated metadata",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "url-overview",
+          "title": "URL Overview",
+          "description": "URL repository information",
+          "colSpan": 2,
+          "fieldIds": [
+            "url-title",
+            "url-address",
+            "url-description",
+            "url-methods"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "Link",
+    "isNotCompanyBased": true,
+    "isSystemSchema": true
+  },
+  {
+    "id": "integrations",
+    "description": "Manage integrations with external systems and APIs",
+    "singular_name": "Integration",
+    "plural_name": "Integrations",
+    "cardMetadata": [
+      {
+        "id": "integration-info",
+        "title": "Integration Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "integration-id",
+          "integration-title",
+          "integration-description"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "integration-id",
+        "name": "id",
+        "label": "Integration ID",
+        "sectionId": "basic-information",
+        "type": "name",
+        "component": "name",
+        "placeholder": "e.g., email-templates",
+        "required": true,
+        "role": "subtitle",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "integration-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "e.g., Email Templates",
+        "required": true,
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "title"
+      },
+      {
+        "id": "integration-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "type": "textarea",
+        "component": "textarea",
+        "placeholder": "Brief description of the integration",
+        "required": true,
+        "role": "description",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "integration-icon",
+        "name": "icon",
+        "label": "Icon",
+        "sectionId": "basic-information",
+        "type": "icon",
+        "component": "icon",
+        "placeholder": "e.g., Mail, Database",
+        "required": false,
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "integration-color",
+        "name": "color",
+        "label": "Color",
+        "sectionId": "basic-information",
+        "type": "color-picker",
+        "component": "color-picker",
+        "required": false,
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "integration-target-route",
+        "name": "targetRoute",
+        "label": "Target Route",
+        "sectionId": "routing-information",
+        "type": "picker",
+        "component": "picker",
+        "placeholder": "Click to select target URL",
+        "required": true,
+        "description": "The endpoint to call for syncing",
+        "targetSchema": "url-repository",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 2,
+        "order": 6
+      },
+      {
+        "id": "integration-target-method",
+        "name": "targetMethod",
+        "label": "Target Method",
+        "sectionId": "routing-information",
+        "type": "select",
+        "component": "select",
+        "placeholder": "Select method",
+        "required": true,
+        "description": "HTTP method for target route",
+        "options": [
+          {
+            "id": "GET",
+            "label": "GET",
+            "icon": "Download",
+            "color": "info"
+          },
+          {
+            "id": "POST",
+            "label": "POST",
+            "icon": "Upload",
+            "color": "success"
+          }
+        ],
+        "colSpan": 1,
+        "order": 7
+      },
+      {
+        "id": "integration-source-route",
+        "name": "sourceRoute",
+        "label": "Source Route",
+        "sectionId": "routing-information",
+        "type": "picker",
+        "component": "picker",
+        "placeholder": "Click to select source URL (optional)",
+        "required": false,
+        "description": "If provided, fetch data from this route first",
+        "targetSchema": "url-repository",
+        "colSpan": 2,
+        "order": 8
+      },
+      {
+        "id": "integration-source-method",
+        "name": "sourceMethod",
+        "label": "Source Method",
+        "sectionId": "routing-information",
+        "type": "select",
+        "component": "select",
+        "placeholder": "Select method",
+        "required": false,
+        "description": "HTTP method for source route",
+        "options": [
+          {
+            "id": "GET",
+            "label": "GET",
+            "icon": "Download",
+            "color": "info"
+          },
+          {
+            "id": "POST",
+            "label": "POST",
+            "icon": "Upload",
+            "color": "success"
+          }
+        ],
+        "colSpan": 1,
+        "order": 9
+      },
+      {
+        "id": "integration-source-data-path",
+        "name": "sourceDataPath",
+        "label": "Source Data Path",
+        "sectionId": "routing-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "results or data.items",
+        "required": false,
+        "description": "JSON path to extract data from source response (e.g., \"results\", \"data.items\")",
+        "colSpan": 2,
+        "order": 10
+      },
+      {
+        "id": "integration-last-synced",
+        "name": "lastSynced",
+        "label": "Last Synced",
+        "sectionId": "basic-information",
+        "type": "datetime",
+        "component": "datetime",
+        "required": false,
+        "readonly": true,
+        "colSpan": 2,
+        "order": 11
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Integration details and configuration",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "routing-information",
+        "title": "Routing Information",
+        "description": "Source and target route configuration",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "integration-overview",
+          "title": "Integration Overview",
+          "description": "Integration details and configuration",
+          "colSpan": 2,
+          "fieldIds": [
+            "integration-id",
+            "integration-title",
+            "integration-description",
+            "integration-icon",
+            "integration-color",
+            "integration-last-synced"
+          ]
+        },
+        {
+          "id": "routing-overview",
+          "title": "Routing Configuration",
+          "description": "Source and target route settings",
+          "colSpan": 2,
+          "fieldIds": [
+            "integration-target-route",
+            "integration-target-method",
+            "integration-source-route",
+            "integration-source-method",
+            "integration-source-data-path"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "Settings",
+    "isNotCompanyBased": true,
+    "isSystemSchema": true
   }
 ]

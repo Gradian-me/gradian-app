@@ -20,6 +20,7 @@ export const FormSection: React.FC<FormSectionProps> = ({
   repeatingItems,
   onAddRepeatingItem,
   onRemoveRepeatingItem,
+  fieldTabIndexMap,
 }) => {
   // Get fields for this section from the schema
   const fields = getFieldsForSection(schema, section.id);
@@ -42,8 +43,8 @@ export const FormSection: React.FC<FormSectionProps> = ({
 
   const renderFields = (fieldsToRender: typeof fields, itemIndex?: number) => {
     return fieldsToRender.map((field) => {
-      // Skip hidden fields
-      if (field.hidden || (field as any).layout?.hidden) {
+      // Skip hidden and inactive fields
+      if (field.hidden || (field as any).layout?.hidden || field.inactive) {
         return null;
       }
 
@@ -95,6 +96,7 @@ export const FormSection: React.FC<FormSectionProps> = ({
             onBlur={() => onBlur(fieldName)}
             onFocus={() => onFocus(fieldName)}
             disabled={disabled || field.disabled}
+            tabIndex={fieldTabIndexMap?.[field.name] !== undefined ? fieldTabIndexMap[field.name] : undefined}
           />
         </div>
       );

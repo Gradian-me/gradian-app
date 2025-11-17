@@ -35,7 +35,7 @@
     "description": "Email template cache synchronization and management",
     "icon": "Mail",
     "color": "#10b981",
-    "lastSynced": "2025-11-17T10:47:54.352Z",
+    "lastSynced": "2025-11-17T12:01:38.010Z",
     "targetRoute": "http://172.20.200.106:8504/notifications/cache/refresh",
     "targetMethod": "POST",
     "sourceRoute": "",

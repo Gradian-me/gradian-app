@@ -141,6 +141,28 @@ const formatFieldValue = (
       } catch {
         return <span>{String(value)}</span>;
       }
+    case 'url':
+    case 'url-input': {
+      const stringValue = String(value);
+      const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
+      if (!isUrl) {
+        return <span className="wrap-break-word">{stringValue}</span>;
+      }
+      // Get link label from componentTypeConfig or use default
+      const linkLabel = field?.componentTypeConfig?.label || 'show more';
+      const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
+      return (
+        <a
+          href={urlToOpen}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200 overflow-wrap-anywhere wrap-break-word"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {linkLabel}
+        </a>
+      );
+    }
     case 'array':
     case 'checkbox':
       if (optionLabels.length > 0) {
@@ -158,6 +180,22 @@ const formatFieldValue = (
       }
       const stringValue = String(value);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
+      // Check if it's a URL field type even if not explicitly in the switch
+      if (isUrl && (field?.type === 'url' || field?.component === 'url-input' || field?.component === 'url')) {
+        const linkLabel = field?.componentTypeConfig?.label || 'show more';
+        const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
+        return (
+          <a
+            href={urlToOpen}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200 overflow-wrap-anywhere wrap-break-word"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {linkLabel}
+          </a>
+        );
+      }
       return (
         <span className={isUrl || stringValue.length > 50 ? "overflow-wrap-anywhere wrap-break-word" : "wrap-break-word"}>
           {stringValue}

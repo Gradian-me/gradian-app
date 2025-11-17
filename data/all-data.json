@@ -752,6 +752,22 @@
       "description": "Defines the addresses of entities",
       "color": "#ff9500",
       "icon": "MapPinHouse"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "Has Database",
+      "icon": "Database",
+      "id": "HAS_DATABASE",
+      "createdAt": "2025-11-17T11:37:15.874Z",
+      "updatedAt": "2025-11-17T11:37:15.874Z"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "Has URL Address",
+      "icon": "Link",
+      "id": "HAS_URL",
+      "createdAt": "2025-11-17T11:37:46.536Z",
+      "updatedAt": "2025-11-17T11:37:46.536Z"
     }
   ],
   "inquiry-vendors": [
@@ -1004,5 +1020,87 @@
   "production-plans": [],
   "applications": [],
   "production-actuals": [],
-  "business-areas": []
+  "business-areas": [],
+  "servers": [
+    {
+      "color": "#4E79A7",
+      "name": "Gradian Integration",
+      "address": "http://172.20.200.106:8504",
+      "id": "01KA8QZJ9SAJ6Y2GR05K42BQYF",
+      "createdAt": "2025-11-17T11:07:42.270Z",
+      "updatedAt": "2025-11-17T11:07:42.270Z"
+    },
+    {
+      "color": "#4E79A7",
+      "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/",
+      "name": "CG-GR-API-DEV-1",
+      "id": "01KA8TM7H68FPKTRNNNSPWWBKD",
+      "createdAt": "2025-11-17T11:53:56.527Z",
+      "updatedAt": "2025-11-17T11:55:03.483Z",
+      "url-repositories": [
+        {
+          "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
+          "label": "Schema Bulk Sync"
+        }
+      ]
+    }
+  ],
+  "url-repository": [
+    {
+      "title": "Email Template Sync",
+      "address": "http://172.20.200.106:8504/notifications/cache/refresh",
+      "methods": [
+        {
+          "id": "GET",
+          "label": "GET",
+          "icon": "ArrowRight",
+          "color": "info"
+        }
+      ],
+      "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
+      "createdAt": "2025-11-17T11:45:23.067Z",
+      "updatedAt": "2025-11-17T11:45:38.082Z"
+    },
+    {
+      "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/bulk",
+      "methods": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "ArrowRight",
+          "color": "success"
+        }
+      ],
+      "title": "Schema Bulk Sync",
+      "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
+      "createdAt": "2025-11-17T11:54:59.460Z",
+      "updatedAt": "2025-11-17T11:54:59.460Z"
+    }
+  ],
+  "integrations": [
+    {
+      "color": "#00d1ae",
+      "title": "Email Template",
+      "description": "Email template cache synchronization and management",
+      "icon": "Mail",
+      "lastSynced": "",
+      "targetRoute": [
+        {
+          "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
+          "label": "Email Template Sync"
+        }
+      ],
+      "targetMethod": [
+        {
+          "id": "GET",
+          "label": "GET",
+          "icon": "Download",
+          "color": "info"
+        }
+      ],
+      "id": "emailtemplate",
+      "createdAt": "2025-11-17T12:05:23.829Z",
+      "updatedAt": "2025-11-17T12:05:23.829Z"
+    }
+  ]
 }

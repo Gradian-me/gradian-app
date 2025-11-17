@@ -56,7 +56,7 @@ export const getFieldTabIndexMap = (schema: FormSchema | BuilderFormSchema): Rec
     const sectionFields = schema.fields
       .filter(field => field.sectionId === section.id)
       .map(field => applyFieldUIDefaults(field))
-      .filter(field => !field.hidden && !(field as any).layout?.hidden) // Exclude hidden fields
+      .filter(field => !field.hidden && !(field as any).layout?.hidden && !field.inactive) // Exclude hidden and inactive fields
       .sort((a, b) => {
         const orderA = a.order ?? 999;
         const orderB = b.order ?? 999;

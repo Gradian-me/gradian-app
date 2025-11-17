@@ -27,6 +27,7 @@ export type ComponentConfigValue =
   | TextareaConfig
   | PhoneInputConfig
   | EmailInputConfig
+  | URLInputConfig
   | CodeViewerConfig;
 
 // NumberInput configuration
@@ -95,6 +96,13 @@ export interface EmailInputConfig {
   allowMultiple?: boolean; // Default: false (comma-separated emails)
   validateDomain?: boolean; // Default: false
   allowedDomains?: string[]; // Whitelist of allowed domains
+}
+
+// URLInput configuration
+export interface URLInputConfig {
+  requireProtocol?: boolean; // Default: false (auto-add https:// if missing)
+  allowedProtocols?: string[]; // Whitelist of allowed protocols (e.g., ['http', 'https'])
+  label?: string; // Label for the link (default: "show more")
 }
 
 // CodeViewer configuration
@@ -214,6 +222,48 @@ export const ALL_COMPONENTS: ComponentMeta[] = [
           type: 'boolean',
           description: 'Validate email domain',
           defaultValue: false,
+        },
+      ],
+    },
+  },
+  { 
+    id: 'url-input', 
+    label: 'URLInput', 
+    color: 'sky', 
+    icon: 'Link', 
+    category: 'form-elements', 
+    description: 'URL-specific input with validation and open link functionality.', 
+    usecase: 'Collect and open URLs.', 
+    directory: 'src/gradian-ui/form-builder/form-elements/components/URLInput.tsx',
+    configSchema: {
+      fields: [
+        {
+          name: 'maxLength',
+          label: 'Max Length',
+          type: 'number',
+          description: 'Maximum number of characters',
+          min: 1,
+        },
+        {
+          name: 'minLength',
+          label: 'Min Length',
+          type: 'number',
+          description: 'Minimum number of characters',
+          min: 0,
+        },
+        {
+          name: 'requireProtocol',
+          label: 'Require Protocol',
+          type: 'boolean',
+          description: 'Require http:// or https:// in URL',
+          defaultValue: false,
+        },
+        {
+          name: 'label',
+          label: 'Link Label',
+          type: 'string',
+          description: 'Label text for the URL link (default: "show more")',
+          defaultValue: 'show more',
         },
       ],
     },
@@ -630,6 +680,7 @@ export function mapComponentTypeToId(componentType: string): string {
     'text': 'text-input',
     'textarea': 'textarea',
     'email': 'email-input',
+    'url': 'url-input',
     'tel': 'phone-input',
     'date': 'date-input',
     'datetime': 'date-time-input',

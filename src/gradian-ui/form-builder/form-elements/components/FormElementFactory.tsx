@@ -19,6 +19,7 @@ import { Rating } from './Rating';
 import { Badge } from './Badge';
 import { Countdown } from './Countdown';
 import { EmailInput } from './EmailInput';
+import { URLInput } from './URLInput';
 import { PhoneInput } from './PhoneInput';
 import { PasswordInput } from './PasswordInput';
 import { NumberInput } from './NumberInput';
@@ -38,6 +39,7 @@ export interface FormElementFactoryProps extends Omit<FormElementProps, 'config'
   config?: any;
   field?: FormField;
   touched?: boolean | boolean[];
+  tabIndex?: number;
 }
 
 export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => {
@@ -93,34 +95,52 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     return null;
   }
 
+  // Skip inactive fields (don't render them)
+  if ((config as any).inactive === true) {
+    return null;
+  }
+
   // Use component if available, otherwise fall back to type
   const elementType = (config as any).component || config.type;
   
   // Extract canCopy from config or restProps if it exists
   const canCopy = Boolean((config as any)?.canCopy ?? (restProps as any)?.canCopy ?? false);
   
-  // Remove canCopy from restProps to avoid conflicts when we explicitly pass it
-  const { canCopy: _, ...restPropsWithoutCanCopy } = restProps;
+  // Extract tabIndex from props or restProps
+  const tabIndex = props.tabIndex ?? (restProps as any)?.tabIndex;
+  
+  // Remove canCopy and tabIndex from restProps to avoid conflicts when we explicitly pass them
+  const { canCopy: _, tabIndex: __, ...restPropsWithoutCanCopy } = restProps;
+
+  // Common props to pass to all form elements
+  const commonProps = {
+    ...restPropsWithoutCanCopy,
+    tabIndex,
+  };
 
   switch (elementType) {
     case 'text':
-      return <TextInput config={config} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
+      return <TextInput config={config} {...commonProps} canCopy={canCopy} />;
     
     case 'email':
-      return <EmailInput config={config} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
+      return <EmailInput config={config} {...commonProps} canCopy={canCopy} />;
+    
+    case 'url':
+    case 'url-input':
+      return <URLInput config={config} {...commonProps} canCopy={canCopy} />;
     
     case 'phone':
     case 'tel':
-      return <PhoneInput config={config} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
+      return <PhoneInput config={config} {...commonProps} canCopy={canCopy} />;
     
     case 'password':
-      return <PasswordInput config={config} {...restPropsWithoutCanCopy} />;
+      return <PasswordInput config={config} {...commonProps} />;
 
     case 'name':
       return (
         <NameInput
           config={config}
-          {...restPropsWithoutCanCopy}
+          {...commonProps}
           canCopy={canCopy}
           isCustomizable={(restProps as any)?.isCustomizable ?? (config as any)?.isCustomizable}
           customMode={(restProps as any)?.customMode ?? (config as any)?.customMode}
@@ -142,6 +162,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           error={restProps.error}
           required={restProps.required}
           className={restProps.className}
+          tabIndex={tabIndex}
           resendDuration={config.resendDuration}
           resendButtonLabel={config.resendButtonLabel}
           autoStartTimer={config.autoStartTimer}
@@ -157,7 +178,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         ...config,
         ...((config as any)?.componentTypeConfig || {}),
       };
-      return <NumberInput config={numberConfig} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
+      return <NumberInput config={numberConfig} {...commonProps} canCopy={canCopy} />;
     
     case 'select':
       // Convert options to SelectOption[] format if they have icon/color
@@ -189,23 +210,24 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           error={restProps.error}
           required={config.required ?? config.validation?.required ?? false}
           placeholder={config.placeholder}
+          tabIndex={tabIndex}
         />
       );
     
     case 'textarea':
-      return <Textarea config={config} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
+      return <Textarea config={config} {...commonProps} canCopy={canCopy} />;
     
     case 'checkbox':
-      return <Checkbox config={config} {...restProps} />;
+      return <Checkbox config={config} {...commonProps} />;
     
     case 'checkbox-list':
-      return <CheckboxList config={config} options={config.options || []} {...restProps} />;
+      return <CheckboxList config={config} options={config.options || []} {...commonProps} />;
 
     case 'toggle':
       return (
         <Toggle
           config={config}
-          {...restProps}
+          {...commonProps}
           required={
             restProps.required ??
             config.required ??
@@ -258,6 +280,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           orientation={config.orientation}
           selectionBehavior={config.selectionBehavior}
           onNormalizedChange={handleToggleGroupChange}
+          tabIndex={tabIndex}
         />
       );
     }
@@ -269,26 +292,26 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           ...opt,
           id: String(opt.id),
         }));
-      return <RadioGroup config={config} options={radioOptions} {...restProps} />;
+      return <RadioGroup config={config} options={radioOptions} {...commonProps} />;
     
     case 'date':
-      return <DateInput config={config} {...restProps} />;
+      return <DateInput config={config} {...commonProps} />;
     
     case 'datetime-local':
     case 'datetime':
-      return <DateTimeInput config={config} {...restProps} />;
+      return <DateTimeInput config={config} {...commonProps} />;
     
     case 'file':
-      return <FileInput config={config} {...restProps} />;
+      return <FileInput config={config} {...commonProps} />;
     
     case 'picker':
-      return <PickerInput config={config} {...restProps} />;
+      return <PickerInput config={config} {...commonProps} />;
     
     case 'icon':
-      return <IconInput config={config} {...restPropsWithoutCanCopy} canCopy={canCopy} />;
+      return <IconInput config={config} {...commonProps} canCopy={canCopy} />;
     
     case 'image-text':
-      return <ImageText config={config} value={restProps.value} {...restProps} />;
+      return <ImageText config={config} value={restProps.value} {...commonProps} />;
     
     case 'button':
       return (
@@ -298,6 +321,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           disabled={restProps.disabled}
           onClick={(config as any).onClick || restProps.onChange}
           className={restProps.className}
+          tabIndex={tabIndex}
         >
           {(config as any).label || restProps.value || 'Button'}
         </Button>
@@ -313,6 +337,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           disabled={restProps.disabled}
           placeholder={(config as any).placeholder}
           className={restProps.className}
+          tabIndex={tabIndex}
           {...(restProps.onBlur ? { onBlur: restProps.onBlur } as any : {})}
           {...(restProps.onFocus ? { onFocus: restProps.onFocus } as any : {})}
         />
@@ -327,6 +352,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           size={(config as any).size || 'md'}
           variant={(config as any).variant || 'default'}
           className={restProps.className}
+          tabIndex={tabIndex}
         />
       );
     
@@ -343,6 +369,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           required={restProps.required}
           id={(config as any).name || (config as any).id}
           className={restProps.className}
+          tabIndex={tabIndex}
         />
       );
     
@@ -354,6 +381,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           size={(config as any).size || 'md'}
           showValue={(config as any).showValue || false}
           className={restProps.className}
+          tabIndex={tabIndex}
         />
       );
     
@@ -363,6 +391,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           variant={(config as any).variant || 'default'}
           size={(config as any).size || 'md'}
           className={restProps.className}
+          tabIndex={tabIndex}
         >
           {restProps.value || (config as any).label || 'Badge'}
         </Badge>
@@ -378,12 +407,13 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           size={(config as any).size || 'md'}
           className={restProps.className}
           fieldLabel={(config as any).label || (config as any).name || ''}
+          tabIndex={tabIndex}
         />
       );
     
     default:
       console.warn(`Unknown form element type: ${elementType}`, config);
-      return <UnknownControl config={config} componentType={elementType} {...restProps} />;
+      return <UnknownControl config={config} componentType={elementType} {...commonProps} />;
   }
 };
 

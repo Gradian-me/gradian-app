@@ -108,7 +108,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
   const renderFieldLabel = () =>
     fieldLabel ? (
-      <label htmlFor={fieldName} className={getLabelClasses({ error, required })}>
+      <label htmlFor={fieldName} className={getLabelClasses({ error: Boolean(error), required: Boolean(required) })}>
         {fieldLabel}
       </label>
     ) : null;
@@ -463,7 +463,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
         <div className={cn(selectClasses, 'flex items-center justify-center text-gray-500 border-gray-200')}>
           Loading options...
         </div>
-        {renderErrorMessage(optionsError)}
+        {renderErrorMessage(optionsError ?? undefined)}
         {renderErrorMessage(error)}
       </div>
     );

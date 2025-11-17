@@ -309,8 +309,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         {fieldsToRender.map((field, index) => {
           if (!field) return null;
 
-          // Skip hidden fields
-          if (field.hidden || (field as any).layout?.hidden) {
+          // Skip hidden and inactive fields
+          if (field.hidden || (field as any).layout?.hidden || field.inactive) {
             return null;
           }
 
@@ -718,12 +718,13 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       
       return (
         <>
-          <Card className={cn(
-            'border border-gray-200 rounded-2xl bg-gray-50/50',
-            'dark:border-gray-700 dark:bg-gray-800/30',
-            styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
-            styling?.variant === 'card' && 'shadow-sm bg-white dark:bg-gray-800/50 dark:border-gray-700'
-          )}>
+      <Card className={cn(
+        'border border-gray-200 rounded-2xl bg-gray-50/50',
+        'dark:border-gray-700 dark:bg-gray-800/30',
+        styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
+        styling?.variant === 'card' && 'shadow-sm bg-white dark:bg-gray-800/50 dark:border-gray-700',
+        'overflow-visible' // Allow dropdowns to overflow the card
+      )}>
             <CardHeader 
               className={cn(
                 "pb-4 px-6 pt-4 transition-colors",
@@ -809,7 +810,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className="overflow-hidden"
                 >
-                  <CardContent className="px-6 pb-6">
+                  <CardContent className="px-6 pb-6 overflow-visible">
                     <div className="space-y-4">
                       {isLoadingRelations ? (
                         <div className="space-y-3">
@@ -935,7 +936,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               )}
             </AnimatePresence>
           ) : (
-            <CardContent className="px-6 pb-6">
+            <CardContent className="px-6 pb-6 overflow-visible">
               <div className="space-y-4">
                 {isLoadingRelations ? (
                   <div className="space-y-3">
@@ -1117,7 +1118,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       <Card className={cn(
         'border border-gray-200 rounded-2xl bg-gray-50/50',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent',
-        styling?.variant === 'card' && 'shadow-sm bg-white'
+        styling?.variant === 'card' && 'shadow-sm bg-white',
+        'overflow-visible' // Allow dropdowns to overflow the card
       )}>
         <CardHeader 
           className="pb-4 px-6 pt-4 cursor-pointer hover:bg-gray-100/50 transition-colors"
@@ -1170,7 +1172,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                 className="overflow-hidden"
               >
-                <CardContent className="px-6 pb-6">
+                <CardContent className="px-6 pb-6 overflow-visible">
                 <div className="space-y-4">
                   {(repeatingItems || []).length === 0 ? (
                     <div className="text-center py-8 text-gray-500 bg-white rounded-lg border-2 border-dashed border-gray-200">
@@ -1238,7 +1240,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           )}
         </AnimatePresence>
       ) : (
-        <CardContent className="px-6 pb-6">
+        <CardContent className="px-6 pb-6 overflow-visible">
           <div className="space-y-4">
             {(repeatingItems || []).length === 0 ? (
               <div className="text-center py-8 text-gray-500 bg-white rounded-lg border-2 border-dashed border-gray-200">
@@ -1312,7 +1314,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
         'dark:border-gray-700 dark:bg-gray-800/30',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
-        styling?.variant === 'card' && 'shadow-sm bg-white dark:bg-gray-800/50 dark:border-gray-700'
+        styling?.variant === 'card' && 'shadow-sm bg-white dark:bg-gray-800/50 dark:border-gray-700',
+        'overflow-visible' // Allow dropdowns to overflow the card
       )}>
         <CardHeader 
           className={cn(
@@ -1365,7 +1368,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className="overflow-hidden"
             >
-              <CardContent className="px-6 pb-6">
+              <CardContent className="px-6 pb-6 overflow-visible">
                 <div className={sectionClasses}>
                   <div className={gridClasses}>
                     {renderFields(fields)}
@@ -1376,7 +1379,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           )}
         </AnimatePresence>
       ) : (
-        <CardContent className="px-6 pb-6">
+        <CardContent className="px-6 pb-6 overflow-visible">
           <div className={sectionClasses}>
             <div className={gridClasses}>
               {renderFields(fields)}
