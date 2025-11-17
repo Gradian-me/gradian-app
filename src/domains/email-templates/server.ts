@@ -101,3 +101,14 @@ export const deleteTemplateHtml = async (filePath: string) => {
   }
 };
 
+export const renameTemplateHtml = async (oldFilePath: string, newFilePath: string) => {
+  // Read the content from the old file
+  const content = await readTemplateHtml(oldFilePath);
+  
+  // Write to the new file
+  await writeTemplateHtml(newFilePath, content);
+  
+  // Delete the old file
+  await deleteTemplateHtml(oldFilePath);
+};
+

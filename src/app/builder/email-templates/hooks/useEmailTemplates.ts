@@ -86,9 +86,14 @@ export const useEmailTemplates = () => {
           body: JSON.stringify(payload),
         });
         const template = data.data as EmailTemplate;
-        setTemplates((current) =>
-          current.map((existing) => (existing.id === template.id ? template : existing)),
-        );
+        setTemplates((current) => {
+          // If ID changed, remove old template and add new one
+          if (template.id !== id) {
+            return current.filter((existing) => existing.id !== id).concat(template);
+          }
+          // Otherwise, just update the existing template
+          return current.map((existing) => (existing.id === template.id ? template : existing));
+        });
         return template;
       } finally {
         setMutationState((previous) => ({ ...previous, update: false }));

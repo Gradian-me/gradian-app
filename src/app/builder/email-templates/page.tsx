@@ -1,12 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
 import {
   Card,
   CardContent,
@@ -21,8 +23,9 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
+import { NameInput } from '@/gradian-ui/form-builder/form-elements';
 import { useEmailTemplates } from './hooks/useEmailTemplates';
-import { DEFAULT_TEMPLATE_HTML, extractPlaceholders, renderWithValues } from './utils';
+import { DEFAULT_TEMPLATE_HTML, extractPlaceholders, renderWithValues, normalizeTemplateId } from './utils';
 import type { EmailTemplate, PlaceholderValues } from './types';
 
 export default function EmailTemplateBuilderPage() {
@@ -41,21 +44,58 @@ export default function EmailTemplateBuilderPage() {
   const [workingTemplate, setWorkingTemplate] = useState<EmailTemplate | null>(null);
   const [placeholderValues, setPlaceholderValues] = useState<PlaceholderValues>({});
   const [localError, setLocalError] = useState<string | null>(null);
+  const [isCustomIdMode, setIsCustomIdMode] = useState(false);
+  const savingTemplateRef = useRef<string | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [templateToDelete, setTemplateToDelete] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     setSelectedTemplateId((current) => {
+      // If current ID exists in templates, keep it
       if (current && templates.some((template) => template.id === current)) {
         return current;
       }
-      return templates[0]?.id ?? '';
+      // If we're currently saving a template, don't reset - wait for save to complete
+      if (savingTemplateRef.current) {
+        return current;
+      }
+      // Only reset to first template if we don't have a current selection
+      if (!current && templates.length > 0) {
+        return templates[0].id;
+      }
+      return current;
     });
   }, [templates]);
 
   useEffect(() => {
+    // Don't update if we're currently saving
+    if (savingTemplateRef.current) {
+      return;
+    }
+
     const activeTemplate =
       templates.find((template) => template.id === selectedTemplateId) ?? templates[0] ?? null;
-    setWorkingTemplate(activeTemplate ? { ...activeTemplate } : null);
-    setPlaceholderValues({});
+    
+    // Only update workingTemplate if it's different from current or if we're switching templates
+    // This prevents overwriting unsaved changes when templates list updates
+    if (activeTemplate) {
+      setWorkingTemplate((current) => {
+        // If we're switching to a different template, update it
+        if (!current || current.id !== activeTemplate.id) {
+          // Reset placeholder values and custom mode only when switching templates
+          setPlaceholderValues({});
+          setIsCustomIdMode(false);
+          return { ...activeTemplate };
+        }
+        // If it's the same template, keep current workingTemplate to preserve unsaved changes
+        // Don't reset placeholder values or custom mode
+        return current;
+      });
+    } else {
+      setWorkingTemplate(null);
+      setPlaceholderValues({});
+      setIsCustomIdMode(false);
+    }
   }, [templates, selectedTemplateId]);
 
   const placeholders = useMemo(() => {
@@ -100,7 +140,29 @@ export default function EmailTemplateBuilderPage() {
 
   const handleTemplateFieldChange = <K extends keyof EmailTemplate>(field: K, value: EmailTemplate[K]) => {
     if (!workingTemplate) return;
-    setWorkingTemplate({ ...workingTemplate, [field]: value });
+    const updated = { ...workingTemplate, [field]: value };
+    
+    // Auto-generate ID from name if not in custom mode
+    if (field === 'name' && !isCustomIdMode) {
+      const generatedId = normalizeTemplateId(value as string);
+      updated.id = generatedId;
+    }
+    
+    setWorkingTemplate(updated);
+  };
+
+  const handleTemplateIdChange = (newId: string) => {
+    if (!workingTemplate) return;
+    setWorkingTemplate({ ...workingTemplate, id: newId });
+  };
+
+  const handleCustomModeChange = (isCustom: boolean) => {
+    setIsCustomIdMode(isCustom);
+    if (!isCustom && workingTemplate) {
+      // When switching back to auto mode, regenerate ID from name
+      const generatedId = normalizeTemplateId(workingTemplate.name);
+      setWorkingTemplate({ ...workingTemplate, id: generatedId });
+    }
   };
 
   const handleCreateTemplate = async () => {
@@ -124,13 +186,25 @@ export default function EmailTemplateBuilderPage() {
 
   const handleSaveTemplate = async () => {
     if (!workingTemplate) return;
+    const originalId = workingTemplate.id;
+    savingTemplateRef.current = originalId;
     try {
-      await updateTemplate(workingTemplate.id, {
+      const result = await updateTemplate(originalId, {
         name: workingTemplate.name,
         description: workingTemplate.description,
         subject: workingTemplate.subject,
         html: workingTemplate.html,
+        id: workingTemplate.id,
       });
+      
+      // Update working template with saved result to reflect any changes (like ID)
+      setWorkingTemplate({ ...result });
+      
+      // If ID changed, update the selected template ID
+      if (result.id !== originalId) {
+        setSelectedTemplateId(result.id);
+      }
+      
       toast.success('Template saved.');
       setLocalError(null);
       setTemplatesError(null);
@@ -138,21 +212,40 @@ export default function EmailTemplateBuilderPage() {
       const message = err instanceof Error ? err.message : 'Failed to save template.';
       toast.error(message);
       setLocalError(message);
+    } finally {
+      savingTemplateRef.current = null;
     }
   };
 
-  const handleDeleteTemplate = async () => {
-    if (!workingTemplate) return;
-    const confirmed = window.confirm(
-      `Delete "${workingTemplate.name}" template? This cannot be undone.`,
-    );
-    if (!confirmed) return;
+  const handleDeleteClick = (templateId?: string) => {
+    const idToDelete = templateId || workingTemplate?.id;
+    if (!idToDelete) return;
+    
+    const template = templates.find((t) => t.id === idToDelete);
+    if (!template) return;
+
+    setTemplateToDelete({ id: idToDelete, name: template.name });
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!templateToDelete) return;
 
     try {
-      await deleteTemplate(workingTemplate.id);
+      await deleteTemplate(templateToDelete.id);
+      
+      // If we deleted the currently selected template, the useEffect will handle
+      // switching to another template automatically when templates list updates
+      // But we can also clear it explicitly if it was the selected one
+      if (templateToDelete.id === selectedTemplateId) {
+        setSelectedTemplateId('');
+      }
+      
       toast.success('Template deleted.');
       setLocalError(null);
       setTemplatesError(null);
+      setDeleteConfirmOpen(false);
+      setTemplateToDelete(null);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to delete template.';
       toast.error(message);
@@ -247,21 +340,40 @@ export default function EmailTemplateBuilderPage() {
                 {templates.map((template) => {
                   const isActive = template.id === workingTemplate.id;
                   return (
-                    <button
+                    <div
                       key={template.id}
-                      onClick={() => setSelectedTemplateId(template.id)}
-                      className={`w-full rounded-2xl border p-4 text-left transition ${
+                      className={`group relative w-full rounded-2xl border p-4 transition ${
                         isActive
                           ? 'border-violet-500/60 bg-violet-500/5 shadow-sm'
                           : 'border-border hover:border-violet-500/40 hover:bg-muted/40'
                       }`}
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="font-medium">{template.name}</p>
-                        {isActive && <Badge variant="secondary">Active</Badge>}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">{template.description}</p>
-                    </button>
+                      <button
+                        onClick={() => setSelectedTemplateId(template.id)}
+                        className="w-full text-left"
+                      >
+                        <div className="flex items-center justify-between gap-2 pr-6">
+                          <p className="font-medium">{template.name}</p>
+                          {isActive && <Badge variant="secondary">Active</Badge>}
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">{template.description}</p>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(template.id);
+                        }}
+                        disabled={mutationState.delete}
+                        className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive disabled:opacity-50"
+                        title="Delete template"
+                      >
+                        {mutationState.delete ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <IconRenderer iconName="Trash2" className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   );
                 })}
               </CardContent>
@@ -270,8 +382,48 @@ export default function EmailTemplateBuilderPage() {
             <div className="lg:col-span-2 space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Template details</CardTitle>
-                  <CardDescription>Update the metadata and HTML source.</CardDescription>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <CardTitle>Template details</CardTitle>
+                      <CardDescription>Update the metadata and HTML source.</CardDescription>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => handleDeleteClick()}
+                        disabled={mutationState.delete}
+                      >
+                        {mutationState.delete ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <IconRenderer iconName="Trash2" className="mr-2 h-4 w-4" />
+                        )}
+                        Delete
+                      </Button>
+                      <Button 
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSaveTemplate();
+                        }} 
+                        disabled={mutationState.update}
+                      >
+                        {mutationState.update && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Save template
+                      </Button>
+                    </div>
+                  </div>
+                  {templateApiUrl && (
+                    <div className="mt-4 space-y-2">
+                      <Label>Template API URL</Label>
+                      <div className="flex items-center justify-between gap-3 rounded-xl border bg-muted/40 px-4 py-2 text-sm">
+                        <span className="truncate font-mono text-xs md:text-sm">{templateApiUrl}</span>
+                        <CopyContent content={templateApiUrl} />
+                      </div>
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-2">
@@ -293,6 +445,22 @@ export default function EmailTemplateBuilderPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
+                    <NameInput
+                      config={{
+                        id: 'template-id',
+                        name: 'template-id',
+                        label: 'Template ID',
+                        placeholder: 'template-id',
+                      }}
+                      value={workingTemplate.id}
+                      onChange={handleTemplateIdChange}
+                      isCustomizable={true}
+                      customMode={isCustomIdMode}
+                      onCustomModeChange={handleCustomModeChange}
+                      helperText="Used in API URLs and file names. Lowercase, numbers, hyphens(-), and underscores(_) are allowed."
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="template-subject">Subject</Label>
                     <Input
                       id="template-subject"
@@ -309,38 +477,11 @@ export default function EmailTemplateBuilderPage() {
                       onChange={(event) => handleTemplateFieldChange('html', event.target.value)}
                     />
                   </div>
-                  {templateApiUrl && (
-                    <div className="space-y-2">
-                      <Label>Template API URL</Label>
-                      <div className="flex items-center justify-between gap-3 rounded-xl border bg-muted/40 px-4 py-2 text-sm">
-                        <span className="truncate font-mono text-xs md:text-sm">{templateApiUrl}</span>
-                        <CopyContent content={templateApiUrl} />
-                      </div>
-                    </div>
-                  )}
                 </CardContent>
-                <CardFooter className="flex flex-wrap items-center justify-between gap-3">
+                <CardFooter>
                   <p className="text-sm text-muted-foreground">
                     Placeholders use double braces syntax, for example <code>{'{{userName}}'}</code>.
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={handleDeleteTemplate}
-                      disabled={mutationState.delete}
-                    >
-                      {mutationState.delete ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="mr-2 h-4 w-4" />
-                      )}
-                      Delete
-                    </Button>
-                    <Button onClick={handleSaveTemplate} disabled={mutationState.update}>
-                      {mutationState.update && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Save template
-                    </Button>
-                  </div>
                 </CardFooter>
               </Card>
 
@@ -411,6 +552,35 @@ export default function EmailTemplateBuilderPage() {
           </div>
         )}
       </div>
+
+      <ConfirmationMessage
+        isOpen={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Delete Template"
+        message={
+          templateToDelete
+            ? `Are you sure you want to delete "${templateToDelete.name}"? This action cannot be undone and will permanently remove the template and its file.`
+            : ''
+        }
+        variant="destructive"
+        buttons={[
+          {
+            label: 'Cancel',
+            variant: 'outline',
+            action: () => {
+              setDeleteConfirmOpen(false);
+              setTemplateToDelete(null);
+            },
+          },
+          {
+            label: 'Delete',
+            variant: 'destructive',
+            icon: 'Trash2',
+            action: handleDeleteConfirm,
+            disabled: mutationState.delete,
+          },
+        ]}
+      />
     </MainLayout>
   );
 }

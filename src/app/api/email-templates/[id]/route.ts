@@ -3,6 +3,7 @@ import {
   deleteTemplateHtml,
   ensureTemplatesSeeded,
   readTemplateHtml,
+  renameTemplateHtml,
   templateDirRelativePath,
   writeTemplateHtml,
   writeTemplatesFile,
@@ -27,7 +28,7 @@ export async function PUT(request: NextRequest, context: Params) {
   try {
     const params = await Promise.resolve(context.params);
     const body = await request.json();
-    const { name, description = '', subject, html } = body;
+    const { name, description = '', subject, html, id: newId } = body;
 
     if (!name || !subject || !html) {
       return errorResponse('Missing required fields: name, subject, html.', 400);
@@ -38,10 +39,16 @@ export async function PUT(request: NextRequest, context: Params) {
     const timestamp = new Date().toISOString();
 
     if (templateIndex === -1) {
-      const sanitizedId = normalizeId(params.id);
+      const sanitizedId = normalizeId(newId || params.id);
       if (!sanitizedId) {
         return errorResponse('Template not found.', 404);
       }
+      
+      // Check if new ID already exists
+      if (templates.some((t) => t.id === sanitizedId)) {
+        return errorResponse(`Template with id "${sanitizedId}" already exists.`, 409);
+      }
+      
       const filePath = templateDirRelativePath(`${sanitizedId}.html`);
       await writeTemplateHtml(filePath, html);
 
@@ -73,6 +80,49 @@ export async function PUT(request: NextRequest, context: Params) {
     }
 
     const template = templates[templateIndex];
+    const sanitizedNewId = newId ? normalizeId(newId) : template.id;
+    
+    // Check if ID is being changed
+    if (sanitizedNewId !== template.id) {
+      // Check if new ID already exists
+      if (templates.some((t) => t.id === sanitizedNewId && t.id !== template.id)) {
+        return errorResponse(`Template with id "${sanitizedNewId}" already exists.`, 409);
+      }
+      
+      // Rename the file
+      const newFilePath = templateDirRelativePath(`${sanitizedNewId}.html`);
+      await renameTemplateHtml(template.filePath, newFilePath);
+      
+      // Update template with new ID and file path
+      const updatedTemplate = {
+        ...template,
+        id: sanitizedNewId,
+        name,
+        description,
+        subject,
+        filePath: newFilePath,
+        updatedAt: timestamp,
+      };
+
+      const updatedTemplates = [...templates];
+      updatedTemplates[templateIndex] = updatedTemplate;
+      await writeTemplatesFile(updatedTemplates);
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          id: updatedTemplate.id,
+          name: updatedTemplate.name,
+          description: updatedTemplate.description,
+          subject: updatedTemplate.subject,
+          createdAt: updatedTemplate.createdAt,
+          updatedAt: updatedTemplate.updatedAt,
+          html,
+        },
+      });
+    }
+
+    // ID not changed, just update content
     await writeTemplateHtml(template.filePath, html);
 
     const updatedTemplate = {

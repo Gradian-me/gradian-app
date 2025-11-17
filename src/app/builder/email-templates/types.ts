@@ -8,7 +8,9 @@ export type EmailTemplate = {
   updatedAt?: string;
 };
 
-export type EmailTemplatePayload = Pick<EmailTemplate, 'name' | 'description' | 'subject' | 'html'>;
+export type EmailTemplatePayload = Pick<EmailTemplate, 'name' | 'description' | 'subject' | 'html'> & {
+  id?: string;
+};
 
 export type PlaceholderValues = Record<string, string>;
 

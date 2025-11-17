@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Reset your Gradian.me password</title>
+  <title>Your Gradian.me OTP Code</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body { margin:0; background:#0f0f15; font-family:'Inter',Arial,sans-serif; }
@@ -20,18 +20,12 @@
     }
     .title { font-size:28px; font-weight:600; margin:24px 0 12px; }
     .subtitle { margin:0 0 24px; color:#b6b2c9; line-height:1.5; }
-    .code-pill {
-      display:inline-flex; padding:6px 14px; border-radius:999px;
-      background:rgba(255,255,255,0.03); font-size:13px; color:#bfb7d8;
+    .otp-box {
+      display:inline-block; padding:16px 28px; border-radius:18px;
+      background:rgba(255,255,255,0.05); font-size:32px;
+      font-weight:600; letter-spacing:6px; color:#ffffff;
+      margin:12px 0 24px; text-align:center;
     }
-    .cta {
-      display:block; width:100%; text-align:center; margin:24px 0 12px;
-      padding:14px 0; border-radius:18px; background:#9b5bff;
-      color:#fdfaff; font-weight:600; text-decoration:none;
-    }
-    .cta:hover { background:#8b4ef3; }
-    .link-alt { text-align:center; font-size:13px; color:#9c96b4; }
-    .link-alt a { color:#c6a4ff; text-decoration:none; }
     .foot { margin-top:28px; font-size:12px; color:#7d7994; line-height:1.4; }
   </style>
 </head>
@@ -49,25 +43,23 @@
               />
             </div>
             <div class="badge">
-              <span>🔐 Password reset</span>
+              <span>🔐 Verification Code</span>
             </div>
-            <h1 class="title">Reset your password</h1>
+
+            <h1 class="title">Your OTP Code</h1>
             <p class="subtitle">
-              Hi {{userName}}, we received a request to reset the password for your Gradian.me account.
-              Use the secure link below to choose a new password. This link expires in {{expireMinutes}} minutes.
+              Use the one-time password below to continue your sign‑in or verification.
+              This code expires in <strong>{{expireMinutes}}</strong> minutes.
             </p>
 
-            <a class="cta" href="{{resetLink}}" target="_blank" rel="noopener">
-              Reset password
-            </a>
-            <p class="link-alt">
-              Button not working? Paste this link in your browser:<br />
-              <a href="{{resetLink}}" target="_blank" rel="noopener">{{resetLink}}</a>
+            <div class="otp-box">{{OTP}}</div>
+
+            <p class="subtitle" style="margin-top:0; text-align:center;">
+              If you didn’t request this code, someone may be trying to access your account.
+              We recommend changing your password immediately.
             </p>
 
             <div class="foot">
-              If you didn’t request this change, you can ignore this email.
-              For assistance, contact support@gradian.me.<br /><br />
               © {{year}} Gradian.me. All rights reserved.
             </div>
           </div>
@@ -77,4 +69,3 @@
   </div>
 </body>
 </html>
-

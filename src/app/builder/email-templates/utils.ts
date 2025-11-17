@@ -2,6 +2,17 @@ import { PlaceholderValues } from './types';
 
 const placeholderPattern = /{{\s*([\w.-]+)\s*}}/g;
 
+export const normalizeTemplateId = (value: string): string => {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9_-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '') || 'template';
+};
+
 export const renderWithValues = (content: string | undefined, values: PlaceholderValues) =>
   (content ?? '').replace(placeholderPattern, (_, key: string) =>
     values[key] !== undefined && values[key] !== '' ? values[key] : `{{${key}}}`,
