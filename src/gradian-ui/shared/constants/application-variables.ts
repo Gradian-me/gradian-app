@@ -9,65 +9,53 @@ export enum LogType {
   INTEGRATION_LOG = 'INTEGRATION_LOG',
 }
 
-// Log flags configuration
-export const LOG_CONFIG = {
-  [LogType.FORM_DATA]: true,
-  [LogType.REQUEST_BODY]: true,
-  [LogType.REQUEST_RESPONSE]: true,
-  [LogType.SCHEMA_LOADER]: true,
-  [LogType.CALL_BACKEND]: true,
-  [LogType.INDEXDB_CACHE]: true,
-  [LogType.INTEGRATION_LOG]: true
-};;;;;;;;
+// Try to import JSON file as single source of truth for defaults
+// If import fails, we'll use shared defaults
+let defaultVariables: any = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  defaultVariables = require('../../../../data/application-variables.json');
+} catch {
+  // JSON import failed, will use shared defaults
+}
 
-// Authentication configuration
-export const AUTH_CONFIG = {
-  // JWT Secret key from environment (fallback for development)
-  JWT_SECRET: process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'your-default-secret-key-change-in-production',
+import { DEFAULT_APPLICATION_VARIABLES } from './application-variables-defaults';
+
+// CLIENT-SAFE: This file must not import server-only modules
+// Server-side code that needs file system access should import
+// application-variables-loader directly
+
+function loadVariables() {
+  // Use imported JSON if available, otherwise use shared defaults
+  const defaults = defaultVariables || DEFAULT_APPLICATION_VARIABLES;
   
-  // Token expiration times (in seconds)
-  ACCESS_TOKEN_EXPIRY: parseInt(process.env.JWT_ACCESS_TOKEN_EXPIRY || '3600', 10), // 1 hour default
-  REFRESH_TOKEN_EXPIRY: parseInt(process.env.JWT_REFRESH_TOKEN_EXPIRY || '604800', 10), // 7 days default
-  
-  // Token cookie names
-  ACCESS_TOKEN_COOKIE: 'auth_token',
-  REFRESH_TOKEN_COOKIE: 'refresh_token',
-  
-  // API endpoints
-  USERS_API_PATH: '/api/data/users',
-  
-  // Error messages
-  ERROR_MESSAGES: {
-    USER_NOT_FOUND: 'User does not exist',
-    INVALID_PASSWORD: 'Password is incorrect',
-    INVALID_TOKEN: 'Invalid or expired token',
-    MISSING_TOKEN: 'Authentication token is required',
-    TOKEN_EXPIRED: 'Token has expired',
-    UNAUTHORIZED: 'Unauthorized access',
-    LOGIN_REQUIRED: 'Please log in to continue'
-  }
-};
+  // Ensure we always have a valid LOG_CONFIG structure
+  const sourceLogConfig = defaults?.LOG_CONFIG || DEFAULT_APPLICATION_VARIABLES.LOG_CONFIG || {};
+  const logConfig = Object.values(LogType).reduce((acc, logType) => {
+    acc[logType] = sourceLogConfig[logType] ?? DEFAULT_APPLICATION_VARIABLES.LOG_CONFIG[logType] ?? true;
+    return acc;
+  }, {} as Record<LogType, boolean>);
 
-// Shared animation delays for card collections
-export const UI_PARAMS = {
-  CARD_INDEX_DELAY: {
-    STEP: 0.05,
-    MAX: 0.4,
-    SKELETON_MAX: 0.25,
-  },
-} as const;
+  return {
+    LOG_CONFIG: logConfig,
+    AUTH_CONFIG: defaults?.AUTH_CONFIG || DEFAULT_APPLICATION_VARIABLES.AUTH_CONFIG,
+    UI_PARAMS: defaults?.UI_PARAMS || DEFAULT_APPLICATION_VARIABLES.UI_PARAMS,
+    SCHEMA_SUMMARY_EXCLUDED_KEYS: defaults?.SCHEMA_SUMMARY_EXCLUDED_KEYS || DEFAULT_APPLICATION_VARIABLES.SCHEMA_SUMMARY_EXCLUDED_KEYS,
+    DEMO_MODE: defaults?.DEMO_MODE ?? DEFAULT_APPLICATION_VARIABLES.DEMO_MODE,
+  };
+}
 
-// Schema summary configuration
-export const SCHEMA_SUMMARY_EXCLUDED_KEYS = [
-  'fields',
-  'sections',
-  'detailPageMetadata',
-] as const;
+const vars = loadVariables();
 
-// Demo mode configuration
-export const DEMO_MODE_PARAMS = {
-  DEMO_MODE: true,
-} as const;
+export const LOG_CONFIG = vars.LOG_CONFIG;
+export const AUTH_CONFIG = vars.AUTH_CONFIG;
+export const UI_PARAMS = vars.UI_PARAMS;
+export const SCHEMA_SUMMARY_EXCLUDED_KEYS = vars.SCHEMA_SUMMARY_EXCLUDED_KEYS;
+export const DEMO_MODE_PARAMS = { DEMO_MODE: vars.DEMO_MODE } as const;
+export const DEMO_MODE = vars.DEMO_MODE;
 
-// Demo mode - uses DEMO_MODE_PARAMS (for backward compatibility)
-export const DEMO_MODE = DEMO_MODE_PARAMS.DEMO_MODE;
+// Client-safe cache clear function (no-op on client, server code should use loader directly)
+export function clearCache() {
+  // This is a no-op for client-side code
+  // Server-side code should import and use clearApplicationVariablesCache from application-variables-loader
+}

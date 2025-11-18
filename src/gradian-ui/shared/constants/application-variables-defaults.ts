@@ -1,0 +1,43 @@
+// Application Variables Defaults
+// This file should match data/application-variables.json
+// It's used as fallback when JSON file can't be imported or accessed
+// Note: Using string literals instead of LogType enum to avoid circular dependency
+
+export const DEFAULT_APPLICATION_VARIABLES = {
+  LOG_CONFIG: {
+    FORM_DATA: true,
+    REQUEST_BODY: true,
+    REQUEST_RESPONSE: true,
+    SCHEMA_LOADER: true,
+    CALL_BACKEND: true,
+    INDEXDB_CACHE: true,
+    INTEGRATION_LOG: true,
+  },
+  AUTH_CONFIG: {
+    JWT_SECRET: 'your-default-secret-key-change-in-production',
+    ACCESS_TOKEN_EXPIRY: 3600,
+    REFRESH_TOKEN_EXPIRY: 604800,
+    ACCESS_TOKEN_COOKIE: 'auth_token',
+    REFRESH_TOKEN_COOKIE: 'refresh_token',
+    USERS_API_PATH: '/api/data/users',
+    ERROR_MESSAGES: {
+      USER_NOT_FOUND: 'User does not exist',
+      INVALID_PASSWORD: 'Password is incorrect',
+      INVALID_TOKEN: 'Invalid or expired token',
+      MISSING_TOKEN: 'Authentication token is required',
+      TOKEN_EXPIRED: 'Token has expired',
+      UNAUTHORIZED: 'Unauthorized access',
+      LOGIN_REQUIRED: 'Please log in to continue',
+    },
+  },
+  UI_PARAMS: {
+    CARD_INDEX_DELAY: {
+      STEP: 0.05,
+      MAX: 0.4,
+      SKELETON_MAX: 0.25,
+    },
+  },
+  SCHEMA_SUMMARY_EXCLUDED_KEYS: ['fields', 'sections', 'detailPageMetadata'],
+  DEMO_MODE: true,
+} as const;
+
