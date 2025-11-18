@@ -106,7 +106,7 @@ export const getValueByRole = (schema: FormSchema, data: any, role: string): str
           ? [rawValue]
           : [];
 
-      if (field.type === 'picker' && field.targetSchema) {
+      if (field.component === 'picker' && field.targetSchema) {
         const pickerStrings = valueArray
           .map((entry) => resolvePickerEntry(field, entry, data))
           .filter(Boolean);
@@ -148,7 +148,7 @@ export const getSingleValueByRole = (schema: FormSchema, data: any, role: string
     ? rawValue
     : [rawValue];
   
-  if (field.type === 'picker' && field.targetSchema) {
+  if (field.component === 'picker' && field.targetSchema) {
     const pickerStrings = valueArray
       .map((entry) => resolvePickerEntry(field, entry, data))
       .filter(Boolean);

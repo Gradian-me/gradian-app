@@ -58,7 +58,7 @@ export function validateField(
   }
 
   // Type-specific validation
-  switch (field.type) {
+  switch (field.component) {
     case 'email':
       if (!isValidEmail(value)) {
         errors.push({

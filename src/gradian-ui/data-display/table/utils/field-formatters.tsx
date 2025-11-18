@@ -58,7 +58,7 @@ export const formatFieldValue = (
     displayStrings.length > 0 &&
     (Array.isArray(value) || (typeof value === 'object' && value !== null));
 
-  if (field?.type === 'picker' && field.targetSchema && row) {
+  if (field?.component === 'picker' && field.targetSchema && row) {
     const pickerDisplay = getPickerDisplayValue(field, value, { row });
     if (pickerDisplay) {
       return <span>{pickerDisplay}</span>;
@@ -66,7 +66,7 @@ export const formatFieldValue = (
     return <span className="text-gray-400">—</span>;
   }
 
-  const displayType = field?.type || 'text';
+  const displayType = field?.component || 'text';
   const componentType = (field?.component || '').toString().toLowerCase();
 
   // Handle password fields - show masked value
@@ -178,7 +178,7 @@ export const formatFieldValue = (
       Array.isArray(value) ? value[0] : value
     );
     const badgeConfig = getBadgeConfig(statusValue, statusOptions);
-    const badgeColor = primaryOption?.color ?? badgeConfig.color;
+    const badgeColor = primaryOption?.color ?? field.roleColor ?? badgeConfig.color;
     const badgeIcon = primaryOption?.icon ?? badgeConfig.icon;
     const badgeLabel = primaryOption?.label ?? badgeConfig.label;
     return (
@@ -215,7 +215,7 @@ export const formatFieldValue = (
     'multiselect',
     'multi-select',
   ]);
-  const componentKey = (field?.component || field?.type || '').toString().toLowerCase();
+  const componentKey = (field?.component || '').toString().toLowerCase();
   const hasFieldOptions = Array.isArray(field?.options) && field.options.length > 0;
   const shouldRenderAsBadges =
     (field?.role === 'badge' || candidateComponents.has(componentKey)) &&
@@ -238,7 +238,7 @@ export const formatFieldValue = (
       <BadgeViewer
         field={field}
         value={value}
-        badgeVariant="default"
+        badgeVariant={field.roleColor || "default"}
         enforceVariant
         animate={true}
         onBadgeClick={field?.targetSchema ? handleBadgeClick : undefined}
@@ -302,7 +302,7 @@ export const formatFieldValue = (
           href={urlToOpen}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200"
+          className="inline-flex items-center gap-1.5 text-violet-600 hover:text-violet-800 dark:text-violet-300 dark:hover:text-violet-400 underline transition-colors duration-200"
           onClick={(e) => e.stopPropagation()}
         >
           <LinkIcon className="h-3.5 w-3.5" />
@@ -333,7 +333,7 @@ export const formatFieldValue = (
       // Check if it's a URL even if not explicitly typed as url
       const stringValue = String(value);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
-      if (isUrl && (field?.type === 'url' || field?.component === 'url-input' || field?.component === 'url')) {
+      if (isUrl && (field?.component === 'url' || field?.component === 'url-input')) {
         const linkLabel = field?.componentTypeConfig?.label || 'URL';
         const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
         return (
@@ -341,7 +341,7 @@ export const formatFieldValue = (
             href={urlToOpen}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200"
+            className="inline-flex items-center gap-1.5 text-violet-600 hover:text-violet-800 dark:text-violet-300 dark:hover:text-violet-400 underline transition-colors duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <LinkIcon className="h-3.5 w-3.5" />

@@ -94,7 +94,7 @@ export const renderFieldValue = ({ field, value, maxMetrics = 3 }: RenderFieldVa
   const fieldLabel = field?.label || field?.name || 'Field';
   
   // Format date values before rendering
-  const formattedValue = (field.type === 'date' || field.type === 'datetime-local') 
+  const formattedValue = (field.component === 'date' || field.component === 'datetime-local') 
     ? formatDateValue(value) 
     : value;
   
@@ -198,7 +198,7 @@ export const renderFieldValue = ({ field, value, maxMetrics = 3 }: RenderFieldVa
   const customIcon = field?.icon ? <IconRenderer iconName={field.icon} className="h-4 w-4 shrink-0" /> : null;
 
   // Handle date and datetime fields
-  if (field.type === 'date' || field.type === 'datetime-local') {
+  if (field.component === 'date' || field.component === 'datetime-local') {
     const dateValue = formatDateValue(value);
     return withTooltip(
       <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 group-hover:text-gray-800 dark:group-hover:text-gray-100 transition-colors duration-200">
@@ -209,7 +209,7 @@ export const renderFieldValue = ({ field, value, maxMetrics = 3 }: RenderFieldVa
     );
   }
   
-  switch (field.type) {
+  switch (field.component) {
     case 'email':
       return withTooltip(
         <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 group-hover:text-gray-800 dark:group-hover:text-gray-100 transition-colors duration-200">
@@ -246,7 +246,7 @@ export const renderFieldValue = ({ field, value, maxMetrics = 3 }: RenderFieldVa
             href={urlToOpen}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200"
+            className="text-violet-600 hover:text-violet-800 dark:text-violet-300 dark:hover:text-violet-300 underline transition-colors duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {linkLabel}
@@ -353,7 +353,7 @@ export const renderFieldValue = ({ field, value, maxMetrics = 3 }: RenderFieldVa
       const stringValue = String(value);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
       // Check if it's a URL field type even if not explicitly in the switch
-      if (isUrl && (field?.type === 'url' || field?.component === 'url-input' || field?.component === 'url')) {
+      if (isUrl && (field?.component === 'url' || field?.component === 'url-input')) {
         const linkLabel = field?.componentTypeConfig?.label || 'show more';
         const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
         return withTooltip(
@@ -363,7 +363,7 @@ export const renderFieldValue = ({ field, value, maxMetrics = 3 }: RenderFieldVa
               href={urlToOpen}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline transition-colors duration-200"
+              className="text-violet-600 hover:text-violet-800 dark:text-violet-300 dark:hover:text-violet-300 underline transition-colors duration-200"
               onClick={(e) => e.stopPropagation()}
             >
               {linkLabel}

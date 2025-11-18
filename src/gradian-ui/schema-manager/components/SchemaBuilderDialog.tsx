@@ -154,7 +154,6 @@ export function SchemaBuilderDialog({
       name: defaultName,
       label: defaultLabel,
       sectionId,
-      type: 'text',
       component: 'text',
       order: maxOrder + 1,
     };

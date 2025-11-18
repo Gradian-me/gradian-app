@@ -94,7 +94,7 @@ export function useRepeatingTableData(
 
         if (targetSchemaData?.fields?.length && entities.length > 0) {
           const pickerFields = targetSchemaData.fields.filter(
-            (field: any) => field.type === 'picker' && field.targetSchema
+            (field: any) => field.component === 'picker' && field.targetSchema
           );
 
           const resolvedPromises = entities.map(async (entity) => {

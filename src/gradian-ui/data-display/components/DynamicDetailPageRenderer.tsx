@@ -135,7 +135,7 @@ export const getPageTitle = (schema: FormSchema, data: any, dataId?: string): st
     const excludedRoles = ['code', 'subtitle', 'description'];
     const textFields = schema.fields
       .filter(field => 
-        field.type === 'text' && 
+        field.component === 'text' && 
         (!field.role || !excludedRoles.includes(field.role)) &&
         hasDisplayValue(data[field.name])
       )
@@ -174,7 +174,7 @@ const getHeaderInfo = (schema: FormSchema, data: any) => {
     const excludedRoles = ['code', 'subtitle', 'description'];
     const textFields = schema?.fields
       ?.filter(field => 
-        field.type === 'text' && 
+        field.component === 'text' && 
         (!field.role || !excludedRoles.includes(field.role)) &&
         hasDisplayValue(data[field.name])
       )

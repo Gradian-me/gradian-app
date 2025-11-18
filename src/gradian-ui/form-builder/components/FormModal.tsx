@@ -32,7 +32,7 @@ const getEntityDisplayTitle = (
   const textFields = schema.fields
     ?.filter(
       (field) =>
-        field.type === 'text' &&
+        field.component === 'text' &&
         (!field.role || !EXCLUDED_TITLE_ROLES.has(field.role)) &&
         hasDisplayValue(data[field.name])
     )

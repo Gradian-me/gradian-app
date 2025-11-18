@@ -40,19 +40,19 @@ export function SortableSelectedField({ id, label, name, onRemove }: SortableSel
             <button
               {...attributes}
               {...listeners}
-              className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 transition-colors p-0.5 shrink-0"
+              className="cursor-grab active:cursor-grabbing text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-0.5 shrink-0"
             >
               <GripVertical className="h-4 w-4" />
             </button>
             <div className="flex-1 min-w-0">
-              <span className="text-sm font-medium text-gray-800">{label}</span>
-              <span className="text-xs text-gray-500 ml-1">({name})</span>
+              <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{label}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({name})</span>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={onRemove}
-              className="h-6 w-6 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50 shrink-0"
+              className="h-6 w-6 p-0 text-gray-400 dark:text-gray-600 hover:text-red-600 hover:bg-red-50 shrink-0"
             >
               <X className="h-3.5 w-3.5" />
             </Button>

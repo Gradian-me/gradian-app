@@ -6,7 +6,6 @@ export interface FormField {
   name: string;
   label: string;
   sectionId: string; // Reference to the section this field belongs to
-  type: 'text' | 'email' | 'tel' | 'number' | 'password' | 'url' | 'url-input' | 'textarea' | 'select' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'datetime-local' | 'datetime' | 'file' | 'picker' | 'icon' | 'image-text' | 'name' | 'avatar' | 'color-picker' | 'rating' | 'badge' | 'countdown' | 'code-viewer';
   component: 'text' | 'email' | 'tel' | 'number' | 'password' | 'url' | 'url-input' | 'textarea' | 'select' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'datetime-local' | 'datetime' | 'file' | 'picker' | 'icon' | 'image-text' | 'name' | 'avatar' | 'color-picker' | 'rating' | 'badge' | 'countdown' | 'code-viewer';
   placeholder?: string;
   icon?: string;
@@ -21,6 +20,7 @@ export interface FormField {
   inactive?: boolean;
   addToReferenceMetadata?: boolean;
   role?: 'title' | 'subtitle' | 'description' | 'image' | 'avatar' | 'icon' | 'rating' | 'badge' | 'status' | 'email' | 'location' | 'tel' | 'duedate' | 'code';
+  roleColor?: 'default' | 'secondary' | 'outline' | 'destructive' | 'gradient' | 'success' | 'warning' | 'info' | 'muted';
   validation?: {
     required?: boolean;
     minLength?: number;

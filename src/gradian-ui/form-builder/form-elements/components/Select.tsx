@@ -94,7 +94,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
   const selectClasses = cn(
     sizeClasses[size],
-    error && 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-400 data-[state=open]:border-red-500 data-[state=open]:ring-red-400',
+    error && 'border-red-500 dark:border-red-600 focus:border-red-500 dark:focus:border-red-600 focus:ring-1 focus:ring-red-400 dark:focus:ring-red-500 data-[state=open]:border-red-500 dark:data-[state=open]:border-red-600 data-[state=open]:ring-red-400 dark:data-[state=open]:ring-red-500',
     className
   );
 
@@ -460,7 +460,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     return (
       <div className="w-full">
         {renderFieldLabel()}
-        <div className={cn(selectClasses, 'flex items-center justify-center text-gray-500 border-gray-200')}>
+        <div className={cn(selectClasses, 'flex items-center justify-center text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700')}>
           Loading options...
         </div>
         {renderErrorMessage(optionsError ?? undefined)}
@@ -474,7 +474,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     return (
       <div className="w-full">
         {renderFieldLabel()}
-        <div className={cn(selectClasses, 'flex items-center justify-center text-red-500 border-red-300')}>
+        <div className={cn(selectClasses, 'flex items-center justify-center text-red-500 dark:text-red-400 border-red-300 dark:border-red-700')}>
           {optionsError}
         </div>
         {renderErrorMessage(error)}
@@ -531,18 +531,18 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       } as const;
 
       const triggerClasses = cn(
-        'flex w-full items-center justify-between rounded-md border bg-white px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500',
+        'flex w-full items-center justify-between rounded-md border bg-white dark:bg-slate-800 px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400',
         triggerSizeClasses[size],
         disabled ? 'pointer-events-none opacity-60 cursor-not-allowed' : 'cursor-pointer',
         error
-          ? 'border-red-500 focus:ring-red-500'
-          : 'border-gray-200 hover:border-violet-400',
+          ? 'border-red-500 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-600'
+          : 'border-gray-200 dark:border-gray-700 hover:border-violet-400 dark:hover:border-violet-500',
         'items-start gap-2',
         className
       );
 
       const panelClasses = cn(
-        'absolute left-0 right-0 z-50 rounded-lg border border-gray-200 bg-white shadow-xl overflow-hidden',
+        'absolute left-0 right-0 z-50 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 shadow-xl overflow-hidden',
         panelPlacement === 'bottom' ? 'top-full' : 'bottom-full'
       );
 
@@ -550,14 +550,14 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
         cn(
           'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors text-left',
           isSelected
-            ? 'bg-violet-50 text-violet-700 border border-violet-200 shadow-inner'
-            : 'hover:bg-gray-50'
+            ? 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-700 shadow-inner'
+            : 'hover:bg-gray-50 dark:hover:bg-slate-700'
         );
 
       const renderMultiTriggerContent = () => {
         if (multiSelectionIds.length === 0) {
           return (
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-gray-400 dark:text-gray-500">
               {fieldPlaceholder}
             </span>
           );
@@ -569,7 +569,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
         if (selectedOptions.length === 0) {
           return (
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-gray-400 dark:text-gray-500">
               {fieldPlaceholder}
             </span>
           );
@@ -629,7 +629,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
               </div>
               <ChevronDown
                 className={cn(
-                  'ml-2 h-4 w-4 text-gray-500 transition-transform',
+                  'ml-2 h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform',
                   isDropdownOpen && 'rotate-180'
                 )}
               />
@@ -646,7 +646,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
               >
               <div className="max-h-full overflow-y-auto py-1">
                   {validOptions.length === 0 ? (
-                  <div className="px-3 py-2 text-sm text-gray-500">
+                  <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
                       No options available
                     </div>
                   ) : (
@@ -672,8 +672,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                             className={cn(
                               'flex h-4 w-4 items-center justify-center rounded border text-white transition-colors',
                               isSelected
-                                ? 'border-violet-500 bg-violet-500 shadow-sm'
-                                : 'border-gray-300 bg-white text-transparent'
+                                ? 'border-violet-500 dark:border-violet-400 bg-violet-500 dark:bg-violet-400 shadow-sm'
+                                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 text-transparent'
                             )}
                           >
                             <Check className="h-3 w-3" />

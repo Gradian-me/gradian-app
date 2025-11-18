@@ -283,7 +283,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     const excludedRoles = ['code', 'subtitle', 'description'];
     const textFields = schema?.fields
       ?.filter(field => 
-        field.type === 'text' && 
+        field.component === 'text' && 
         (!field.role || !excludedRoles.includes(field.role)) &&
         hasDisplayValue(data[field.name])
       )

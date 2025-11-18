@@ -4,7 +4,7 @@
 import { FormSchema, FormField, FormSection } from '../types/form-schema';
 
 export const FIELD_TYPES: Array<{
-  value: FormField['type'];
+  value: FormField['component'];
   label: string;
   icon?: string;
   description?: string;
@@ -156,7 +156,6 @@ export function createEmptySchema(): FormSchema {
         name: 'example_field',
         label: 'Example Field',
         sectionId: sectionId,
-        type: 'text',
         component: 'text',
         order: 1,
       },

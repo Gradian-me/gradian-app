@@ -22,7 +22,7 @@ interface RenderSectionProps {
 const renderValueByType = ({ field, value, data }: RenderFieldValueProps): React.ReactNode => {
   if (!value && value !== 0) return 'N/A';
 
-  switch (field.type) {
+  switch (field.component) {
     case 'text':
       return field.truncate ? (
         <span className="truncate">{value}</span>

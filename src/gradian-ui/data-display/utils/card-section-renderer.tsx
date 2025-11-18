@@ -49,7 +49,7 @@ export const renderCardSection = ({ section, schema, data, maxMetrics = 3, onBad
             'multi-select'
           ]);
 
-          const componentKey = (field.component || field.type || '').toString().toLowerCase();
+          const componentKey = (field.component || '').toString().toLowerCase();
           const normalizedValues = normalizeOptionArray(value as any);
           const hasOptionLikeValues = normalizedValues.length > 0;
           const hasFieldOptions = Array.isArray((field as any).options) && (field as any).options.length > 0;
@@ -81,7 +81,7 @@ export const renderCardSection = ({ section, schema, data, maxMetrics = 3, onBad
                               field={field}
                               value={value}
                               maxBadges={(field as any).maxDisplay ?? 5}
-                              badgeVariant="default"
+                              badgeVariant={field.roleColor || "default"}
                               enforceVariant={!(allowOptionColor && valuesHaveColor)}
                               onBadgeClick={
                                 field.targetSchema

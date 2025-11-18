@@ -84,7 +84,7 @@ export function FieldEditor({
       <div className="w-full flex items-center justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className={`text-sm font-medium truncate ${isIncomplete ? 'text-amber-700' : 'text-gray-800'}`}>
+            <span className={`text-sm font-medium truncate ${isIncomplete ? 'text-amber-700' : 'text-gray-800 dark:text-gray-200'}`}>
               {field.label || 'Unnamed Field'}
             </span>
             {isIncomplete && (
@@ -92,10 +92,10 @@ export function FieldEditor({
                 Incomplete
               </Badge>
             )}
-            <Badge variant="outline" size="sm" className="text-[10px] px-1.5 py-0">{field.type}</Badge>
+            <Badge variant="outline" size="sm" className="text-[10px] px-1.5 py-0">{field.component}</Badge>
             {field.required && <Badge variant="danger" size="sm" className="text-[10px] px-1.5 py-0">Required</Badge>}
           </div>
-          <span className={`text-[10px] truncate block mt-0.5 ${isIncomplete ? 'text-amber-600' : 'text-gray-400'}`}>
+          <span className={`text-[10px] truncate block mt-0.5 ${isIncomplete ? 'text-amber-600' : 'text-gray-400 dark:text-gray-300'}`}>
             {field.name}
           </span>
         </div>
@@ -120,7 +120,7 @@ export function FieldEditor({
       {showDialog && (
         <Dialog open={showDialog} onOpenChange={(open) => !open && setShowDialog(false)}>
           <DialogContent className="w-[95vw] sm:w-full max-w-3xl max-h-[90vh] flex flex-col p-0 rounded-2xl">
-            <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
+            <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-700 shrink-0">
               <DialogTitle>Edit Field</DialogTitle>
               <DialogDescription>
                 Configure field properties and settings
@@ -174,38 +174,20 @@ export function FieldEditor({
                   className="h-9"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Field Type</Label>
-                  <Select
-                    value={tempField.type || ''}
-                    onValueChange={(value) => {
-                      // Reset componentTypeConfig when field type changes
-                      setTempField({ 
-                        ...tempField, 
-                        type: value as any, 
-                        component: value as any,
-                        componentTypeConfig: undefined 
-                      });
-                    }}
-                    options={FIELD_TYPES.map((type) => ({ value: type.value, label: type.label }))}
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Component</Label>
-                  <Select
-                    value={tempField.component || ''}
-                    onValueChange={(value) => {
-                      // Reset componentTypeConfig when component type changes
-                      setTempField({ 
-                        ...tempField, 
-                        component: value as any,
-                        componentTypeConfig: undefined 
-                      });
-                    }}
-                    options={FIELD_TYPES.map((type) => ({ value: type.value, label: type.label }))}
-                  />
-                </div>
+              <div>
+                <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Component</Label>
+                <Select
+                  value={tempField.component || ''}
+                  onValueChange={(value) => {
+                    // Reset componentTypeConfig when component type changes
+                    setTempField({ 
+                      ...tempField, 
+                      component: value as any,
+                      componentTypeConfig: undefined 
+                    });
+                  }}
+                  options={FIELD_TYPES.map((type) => ({ value: type.value, label: type.label }))}
+                />
               </div>
               <div>
                 <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Section</Label>
@@ -241,18 +223,37 @@ export function FieldEditor({
                   />
                 </div>
                 <div>
-                  <Slider
-                    config={{
-                      name: 'colSpan',
-                      label: 'Column Span',
-                    }}
-                    value={tempField.colSpan || 1}
-                    onChange={(value) => setTempField({ ...tempField, colSpan: value })}
-                    min={1}
-                    max={4}
-                    step={1}
+                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Role Color</Label>
+                  <Select
+                    value={tempField.roleColor || ''}
+                    onValueChange={(value) => setTempField({ ...tempField, roleColor: value ? (value as any) : undefined })}
+                    options={[
+                      { value: '', label: 'Default' },
+                      { value: 'default', label: 'Default' },
+                      { value: 'secondary', label: 'Secondary' },
+                      { value: 'outline', label: 'Outline' },
+                      { value: 'destructive', label: 'Destructive' },
+                      { value: 'gradient', label: 'Gradient' },
+                      { value: 'success', label: 'Success' },
+                      { value: 'warning', label: 'Warning' },
+                      { value: 'info', label: 'Info' },
+                      { value: 'muted', label: 'Muted' },
+                    ]}
                   />
                 </div>
+              </div>
+              <div>
+                <Slider
+                  config={{
+                    name: 'colSpan',
+                    label: 'Column Span',
+                  }}
+                  value={tempField.colSpan || 1}
+                  onChange={(value) => setTempField({ ...tempField, colSpan: value })}
+                  min={1}
+                  max={4}
+                  step={1}
+                />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Switch
@@ -295,7 +296,7 @@ export function FieldEditor({
               )}
               </div>
             </div>
-            <DialogFooter className="px-6 pt-4 pb-6 border-t border-gray-100 shrink-0 flex-col sm:flex-row gap-2">
+            <DialogFooter className="px-6 pt-4 pb-6 border-t border-gray-100 dark:border-gray-700 shrink-0 flex-col sm:flex-row gap-2">
               <Button variant="outline" onClick={() => setShowDialog(false)} className="w-full sm:w-auto text-sm md:text-base">
                 Cancel
               </Button>

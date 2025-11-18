@@ -194,7 +194,6 @@ export function useSchemaBuilder(
         name: 'new_field',
         label: 'New Field',
         sectionId,
-        type: 'text',
         component: 'text',
         order: maxOrder + 1,
       };

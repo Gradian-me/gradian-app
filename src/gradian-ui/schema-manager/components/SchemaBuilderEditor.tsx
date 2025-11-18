@@ -195,7 +195,6 @@ export function SchemaBuilderEditor({
       name: defaultName,
       label: defaultLabel,
       sectionId,
-      type: 'text',
       component: 'text',
       order: maxOrder + 1,
     };

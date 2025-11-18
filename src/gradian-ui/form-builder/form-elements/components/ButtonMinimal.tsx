@@ -20,13 +20,13 @@ export const ButtonMinimal: React.FC<ButtonMinimalProps> = ({
   ...props
 }) => {
   const colorClasses = {
-    gray: 'text-gray-600 hover:text-gray-700 hover:bg-gray-100',
-    violet: 'text-violet-600 hover:text-violet-700 hover:bg-violet-50',
-    red: 'text-red-600 hover:text-red-700 hover:bg-red-50',
-    blue: 'text-blue-600 hover:text-blue-700 hover:bg-blue-50',
-    green: 'text-green-600 hover:text-green-700 hover:bg-green-50',
-    yellow: 'text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50',
-    orange: 'text-orange-600 hover:text-orange-700 hover:bg-orange-50',
+    gray: 'text-gray-600 dark:text-gray-400 hover:text-gray-700 hover:bg-gray-100',
+    violet: 'text-violet-600 dark:text-violet-400 hover:text-violet-700 hover:bg-violet-50',
+    red: 'text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-50',
+    blue: 'text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50',
+    green: 'text-green-600 dark:text-green-400 hover:text-green-700 hover:bg-green-50',
+    yellow: 'text-yellow-600 dark:text-yellow-400 hover:text-yellow-700 hover:bg-yellow-50',
+    orange: 'text-orange-600 dark:text-orange-400 hover:text-orange-700 hover:bg-orange-50',
   };
 
   const sizeClasses = {

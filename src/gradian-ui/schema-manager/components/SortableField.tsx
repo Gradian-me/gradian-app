@@ -31,12 +31,12 @@ export function SortableField({ id, children, isIncomplete = false, isInactive =
     <div ref={setNodeRef} style={style} className="relative">
       <div className={`w-full rounded-lg border hover:shadow-sm transition-all duration-200 ${
         isDragging 
-          ? 'border-violet-400 shadow-md ring-2 ring-violet-200 bg-white' 
+          ? 'border-violet-400 shadow-md ring-2 ring-violet-200 bg-white dark:bg-gray-800' 
           : isInactive
             ? 'border-gray-300 bg-gray-50 opacity-60'
             : isIncomplete 
               ? 'border-amber-300 bg-amber-50/50 ring-1 ring-amber-200' 
-              : 'border-gray-200 bg-white'
+              : 'border-gray-200 bg-white dark:bg-gray-800'
       }`}>
         <div className="p-3">
           <div className="flex items-center gap-2">
@@ -44,7 +44,7 @@ export function SortableField({ id, children, isIncomplete = false, isInactive =
               {...attributes}
               {...listeners}
               className={`cursor-grab active:cursor-grabbing transition-colors p-0.5 shrink-0 ${
-                isInactive ? 'text-gray-300' : 'text-gray-400 hover:text-gray-600'
+                isInactive ? 'text-gray-300 dark:text-gray-600' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
               }`}
             >
               <GripVertical className="h-4 w-4" />

@@ -139,7 +139,6 @@ export function SectionEditor({
     return (field.label === 'New Field' && field.name === 'newField') || 
            !field.label || 
            !field.name ||
-           !field.type ||
            !field.component ||
            field.label.trim() === '' ||
            field.name.trim() === '';

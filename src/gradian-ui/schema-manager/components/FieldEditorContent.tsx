@@ -58,7 +58,7 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
                   Inactive
                 </Badge>
               )}
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0">{field.type}</Badge>
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0">{field.component}</Badge>
               {field.required && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Required</Badge>}
             </div>
             <span className={`text-[10px] truncate block mt-0.5 ${
@@ -109,20 +109,12 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
                 isCustomizable={false}
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Select
-                config={{ name: 'field-type', label: 'Field Type' }}
-                value={tempField.type}
-                onValueChange={(value) => setTempField({ ...tempField, type: value as any, component: value as any })}
-                options={[...FIELD_TYPES]}
-              />
-              <Select
-                config={{ name: 'field-component', label: 'Component' }}
-                value={tempField.component}
-                onValueChange={(value) => setTempField({ ...tempField, component: value as any })}
-                options={[...FIELD_TYPES]}
-              />
-            </div>
+            <Select
+              config={{ name: 'field-component', label: 'Component' }}
+              value={tempField.component}
+              onValueChange={(value) => setTempField({ ...tempField, component: value as any })}
+              options={[...FIELD_TYPES]}
+            />
             <Select
               config={{ name: 'field-section', label: 'Section' }}
               value={tempField.sectionId}
@@ -134,15 +126,34 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
               value={tempField.placeholder || ''}
               onChange={(value) => setTempField({ ...tempField, placeholder: value })}
             />
-            <Select
-              config={{ name: 'field-role', label: 'Role', placeholder: 'Select role...' }}
-              value={tempField.role || ''}
-              onValueChange={(value) => setTempField({ ...tempField, role: value ? (value as any) : undefined })}
-              options={[
-                { value: '', label: 'None' },
-                ...ROLES,
-              ]}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Select
+                config={{ name: 'field-role', label: 'Role', placeholder: 'Select role...' }}
+                value={tempField.role || ''}
+                onValueChange={(value) => setTempField({ ...tempField, role: value ? (value as any) : undefined })}
+                options={[
+                  { value: '', label: 'None' },
+                  ...ROLES,
+                ]}
+              />
+              <Select
+                config={{ name: 'field-role-color', label: 'Role Color', placeholder: 'Select color...' }}
+                value={tempField.roleColor || ''}
+                onValueChange={(value) => setTempField({ ...tempField, roleColor: value ? (value as any) : undefined })}
+                options={[
+                  { value: '', label: 'Default' },
+                  { value: 'default', label: 'Default' },
+                  { value: 'secondary', label: 'Secondary' },
+                  { value: 'outline', label: 'Outline' },
+                  { value: 'destructive', label: 'Destructive' },
+                  { value: 'gradient', label: 'Gradient' },
+                  { value: 'success', label: 'Success' },
+                  { value: 'warning', label: 'Warning' },
+                  { value: 'info', label: 'Info' },
+                  { value: 'muted', label: 'Muted' },
+                ]}
+              />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <NumberInput
                 config={{ name: 'field-col-span', label: 'Column Span' }}

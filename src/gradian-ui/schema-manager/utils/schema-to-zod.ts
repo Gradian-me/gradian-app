@@ -11,13 +11,13 @@ type ValidationRule = NonNullable<FormField['validation']>;
  * Converts a validation rule from form schema to Zod schema
  */
 const convertValidationToZod = (field: FormField): any => {
-  const { validation, type, required } = field;
+  const { validation, component, required } = field;
   
   // Start with base type
   let zodType: z.ZodTypeAny;
   
-  // Determine base type from field type
-  switch (type) {
+  // Determine base type from field component
+  switch (component) {
     case 'number':
       zodType = z.number();
       break;
@@ -59,9 +59,9 @@ const convertValidationToZod = (field: FormField): any => {
     const errorMessage = validation.custom ? undefined : getErrorMessage(field, validation);
     
     if (isRequired) {
-      if (type === 'text' || type === 'textarea' || type === 'email' || type === 'url' || type === 'tel' || type === 'password') {
+      if (component === 'text' || component === 'textarea' || component === 'email' || component === 'url' || component === 'tel' || component === 'password') {
         zodType = (zodType as z.ZodString).min(1, errorMessage || `${field.label} is required`);
-      } else if (type === 'number') {
+      } else if (component === 'number') {
         // For number fields, we use refine instead of min for required validation
         zodType = (zodType as z.ZodNumber).refine(val => val !== undefined && val !== null, {
           message: errorMessage || `${field.label} is required`
@@ -70,7 +70,7 @@ const convertValidationToZod = (field: FormField): any => {
     }
     
     // Min length for strings
-    if (validation.minLength && (type === 'text' || type === 'textarea' || type === 'email' || type === 'url')) {
+    if (validation.minLength && (component === 'text' || component === 'textarea' || component === 'email' || component === 'url')) {
       zodType = (zodType as z.ZodString).min(
         validation.minLength, 
         errorMessage || `Minimum length is ${validation.minLength}`
@@ -78,7 +78,7 @@ const convertValidationToZod = (field: FormField): any => {
     }
     
     // Max length for strings
-    if (validation.maxLength && (type === 'text' || type === 'textarea' || type === 'email' || type === 'url')) {
+    if (validation.maxLength && (component === 'text' || component === 'textarea' || component === 'email' || component === 'url')) {
       zodType = (zodType as z.ZodString).max(
         validation.maxLength,
         errorMessage || `Maximum length is ${validation.maxLength}`
@@ -86,7 +86,7 @@ const convertValidationToZod = (field: FormField): any => {
     }
     
     // Min value for numbers
-    if (validation.min !== undefined && type === 'number') {
+    if (validation.min !== undefined && component === 'number') {
       zodType = (zodType as z.ZodNumber).min(
         validation.min,
         errorMessage || `Minimum value is ${validation.min}`
@@ -94,7 +94,7 @@ const convertValidationToZod = (field: FormField): any => {
     }
     
     // Max value for numbers
-    if (validation.max !== undefined && type === 'number') {
+    if (validation.max !== undefined && component === 'number') {
       zodType = (zodType as z.ZodNumber).max(
         validation.max,
         errorMessage || `Maximum value is ${validation.max}`
@@ -110,13 +110,13 @@ const convertValidationToZod = (field: FormField): any => {
         : validation.pattern;
       zodType = (zodType as z.ZodString).regex(pattern, errorMsg);
     }
-  } else if (required && type !== 'number') {
+  } else if (required && component !== 'number') {
     // If just required without validation object
     zodType = (zodType as z.ZodString).min(1, `${field.label} is required`);
   }
   
   // Checkbox with options (multi-select)
-  if (type === 'checkbox' && field.options && validation?.required) {
+  if (component === 'checkbox' && field.options && validation?.required) {
     zodType = (zodType as z.ZodArray<z.ZodString>).min(1, `At least one ${field.label} is required`);
   }
   
@@ -288,8 +288,8 @@ export const extractInitialValuesFromForm = <T extends FormSchema>(
         if (field.defaultValue !== undefined) {
           initialValues[field.name] = field.defaultValue;
         } else {
-          // Set appropriate defaults based on type
-          switch (field.type) {
+          // Set appropriate defaults based on component
+          switch (field.component) {
             case 'checkbox':
               if (field.options) {
                 initialValues[field.name] = [];

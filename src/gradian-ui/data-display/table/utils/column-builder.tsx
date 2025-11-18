@@ -12,7 +12,7 @@ export const buildTableColumns = (
   return fields.map((field) => {
     const widthSettings = resolveColumnWidth(field, columnWidths);
     const align =
-      field?.type === 'number' || field?.type === 'currency' || field?.type === 'percentage'
+      field?.component === 'number' || field?.displayType === 'currency' || field?.displayType === 'percentage'
         ? 'right'
         : 'left';
 
