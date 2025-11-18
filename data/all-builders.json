@@ -73,6 +73,23 @@
       "Customize schema summary exclusions"
     ],
     "stats": []
+  },
+  {
+    "id": "business-rules",
+    "title": "Business Rules",
+    "description": "Create and manage business rule conditions with logical operators, property comparisons, and nested groups",
+    "icon": "Code",
+    "href": "/builder/business-rules",
+    "color": "#F59E0B",
+    "features": [
+      "Visual condition builder",
+      "Property and operator selection",
+      "Nested logical groups (AND/OR/NOT)",
+      "Property reference comparisons",
+      "Real-time validation",
+      "Rule preview and testing"
+    ],
+    "stats": []
   }
 ]
 

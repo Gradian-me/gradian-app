@@ -1036,11 +1036,15 @@
       "name": "CG-GR-API-DEV-1",
       "id": "01KA8TM7H68FPKTRNNNSPWWBKD",
       "createdAt": "2025-11-17T11:53:56.527Z",
-      "updatedAt": "2025-11-17T11:55:03.483Z",
+      "updatedAt": "2025-11-18T13:58:56.610Z",
       "url-repositories": [
         {
           "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
           "label": "Schema Bulk Sync"
+        },
+        {
+          "id": "01KABM5QX5HRPWMPA1M7YK21WJ",
+          "label": "Schema Related Schemas Sync"
         }
       ]
     },
@@ -1149,6 +1153,21 @@
       "id": "01KA9LUCIDEICONSYNC001",
       "createdAt": "2025-11-17T18:00:00.000Z",
       "updatedAt": "2025-11-17T18:00:00.000Z"
+    },
+    {
+      "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/relations/generate",
+      "title": "Schema Related Schemas Sync",
+      "methods": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "ArrowRight",
+          "color": "success"
+        }
+      ],
+      "id": "01KABM5QX5HRPWMPA1M7YK21WJ",
+      "createdAt": "2025-11-18T13:58:53.618Z",
+      "updatedAt": "2025-11-18T13:58:53.618Z"
     }
   ],
   "integrations": [
@@ -1220,10 +1239,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-18T06:08:20.229Z",
+      "updatedAt": "2025-11-18T13:59:50.104Z",
       "targetDataPath": "data",
       "sourceDataPath": "data",
-      "lastSynced": "2025-11-18T06:08:20.215Z"
+      "lastSynced": "2025-11-18T13:59:50.018Z"
     },
     {
       "color": "#8b5cf6",
@@ -1268,6 +1287,34 @@
       "createdAt": "2025-11-17T18:00:00.000Z",
       "updatedAt": "2025-11-18T06:06:45.333Z",
       "lastSynced": "2025-11-18T06:06:45.323Z"
+    },
+    {
+      "color": "#2e84e0",
+      "title": "Schema Related Schemas Sync",
+      "description": "Schema Related Schemas Sync",
+      "icon": "FolderTree",
+      "targetRoute": [
+        {
+          "id": "01KABM5QX5HRPWMPA1M7YK21WJ",
+          "label": "Schema Related Schemas Sync",
+          "metadata": {
+            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/relations/generate"
+          }
+        }
+      ],
+      "targetMethod": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "Upload",
+          "color": "success"
+        }
+      ],
+      "targetDataPath": "",
+      "id": "schema_related_schemas_sync",
+      "createdAt": "2025-11-18T13:59:23.884Z",
+      "updatedAt": "2025-11-18T13:59:54.268Z",
+      "lastSynced": "2025-11-18T13:59:54.216Z"
     }
   ],
   "databases": [

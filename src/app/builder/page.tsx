@@ -18,7 +18,8 @@ import {
   Palette,
   Settings,
   RefreshCw,
-  Mail
+  Mail,
+  Code
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
@@ -30,6 +31,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; style?: 
   Building2,
   Settings,
   Mail,
+  Code,
 };
 
 interface BuilderOption {
