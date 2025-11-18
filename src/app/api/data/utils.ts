@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { LogType, DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
 
 const TRUTHY_VALUES = new Set(['true', '1', 'yes', 'on']);
 const DATA_ROUTE_PREFIX = '/api/data';
@@ -58,6 +59,17 @@ const truncateForLog = (value: string): string => {
 };
 
 export const isDemoModeEnabled = (): boolean => {
+  // On server, use the loader to get fresh values from the file system
+  if (typeof window === 'undefined') {
+    try {
+      const vars = loadApplicationVariables();
+      return vars.DEMO_MODE;
+    } catch {
+      // Fallback to static value if loader fails
+      return DEMO_MODE;
+    }
+  }
+  // On client, use static value (client can fetch from API if needed)
   return DEMO_MODE;
 };
 

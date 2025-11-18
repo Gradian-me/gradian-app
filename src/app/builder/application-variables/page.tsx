@@ -84,9 +84,26 @@ export default function ApplicationVariablesPage() {
       const result = await response.json();
 
       if (result.success) {
-        toast.success('Application variables updated successfully');
-        // Reload to get the latest data
-        await fetchData();
+        // Clear client-side caches by dispatching event
+        if (typeof window !== 'undefined') {
+          // Dispatch custom event to notify other components
+          window.dispatchEvent(new CustomEvent('application-variables-updated'));
+          
+          // Also use localStorage to notify other tabs/windows
+          window.localStorage.setItem('application-variables-updated', Date.now().toString());
+          window.localStorage.removeItem('application-variables-updated');
+        }
+
+        toast.success('Application variables updated successfully. Reloading page...');
+        
+        // Force refresh the router to reload server-side data
+        router.refresh();
+        
+        // Reload the entire page to ensure all modules reload with new variables
+        // Wait a brief moment for the toast to be visible
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
       } else {
         toast.error(result.error || 'Failed to update application variables');
       }

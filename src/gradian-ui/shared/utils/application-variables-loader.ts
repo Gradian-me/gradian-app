@@ -70,16 +70,32 @@ interface ApplicationVariablesData {
 }
 
 let cachedVariables: ApplicationVariablesData | null = null;
+let cachedFileMtime: number | null = null;
 
 /**
  * Load application variables from JSON file
  * Uses caching to avoid reading from disk on every call
+ * Cache is invalidated if file modification time changes
  */
 export function loadApplicationVariables(): ApplicationVariablesData {
-  // Return cached version if available
-  if (cachedVariables) {
+  // Check if file exists and get its modification time
+  let currentMtime: number | null = null;
+  try {
+    if (fs.existsSync(APPLICATION_VARIABLES_FILE)) {
+      const stats = fs.statSync(APPLICATION_VARIABLES_FILE);
+      currentMtime = stats.mtimeMs;
+    }
+  } catch {
+    // File doesn't exist or can't be accessed, will use defaults
+  }
+
+  // Return cached version if available and file hasn't changed
+  if (cachedVariables && cachedFileMtime !== null && currentMtime === cachedFileMtime) {
     return cachedVariables;
   }
+
+  // File changed or cache is empty, need to reload
+  cachedFileMtime = currentMtime;
 
   try {
     // Ensure data directory exists
@@ -128,5 +144,6 @@ export function loadApplicationVariables(): ApplicationVariablesData {
  */
 export function clearApplicationVariablesCache(): void {
   cachedVariables = null;
+  cachedFileMtime = null;
 }
 

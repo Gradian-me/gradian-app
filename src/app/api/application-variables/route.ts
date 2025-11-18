@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
+import { revalidatePath } from 'next/cache';
 import { clearApplicationVariablesCache } from '@/gradian-ui/shared/utils/application-variables-loader';
 
 const APPLICATION_VARIABLES_FILE = join(process.cwd(), 'data', 'application-variables.json');
@@ -131,12 +132,24 @@ export async function PUT(request: NextRequest) {
     // Write back to file
     await writeFile(APPLICATION_VARIABLES_FILE, JSON.stringify(updatedData, null, 2), 'utf-8');
 
-    // Clear cache so next read will get fresh data
+    // Clear server-side cache so next read will get fresh data
     clearApplicationVariablesCache();
+
+    // Revalidate Next.js page cache for the builder page and all pages that use application variables
+    try {
+      revalidatePath('/builder/application-variables', 'page');
+      revalidatePath('/builder/application-variables', 'layout');
+      // Also revalidate root pages that might use application variables
+      revalidatePath('/', 'layout');
+    } catch (error) {
+      console.warn('Could not revalidate application variables pages:', error);
+      // Don't throw - cache clearing should still succeed even if revalidation fails
+    }
 
     return NextResponse.json({
       success: true,
-      message: 'Application variables updated successfully'
+      message: 'Application variables updated successfully',
+      clearClientCache: true // Signal to client that it should clear its cache
     });
   } catch (error) {
     return NextResponse.json(

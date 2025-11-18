@@ -2,8 +2,11 @@
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 
 // Helper function to check if demo mode is enabled
-// Uses DEMO_MODE from application-variables.ts which references DEMO_MODE_PARAMS
+// For config object initialization, uses static value (evaluated at import time)
+// For runtime checks in API routes, use the server-side loader functions directly
 const isDemoModeEnabled = (): boolean => {
+  // Always use static value for config object (evaluated at module load time)
+  // API routes should use their own isDemoModeEnabled() functions that use the loader
   return DEMO_MODE;
 };
 
