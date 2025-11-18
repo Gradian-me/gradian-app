@@ -54,7 +54,8 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     const { field, value, error, touched, onChange, onBlur, onFocus, disabled, ...otherProps } = props;
     config = field;
     // Merge disabled from field.disabled with passed disabled prop
-    const mergedDisabled = disabled || field?.disabled || false;
+    const fieldDisabled = field?.disabled;
+    const mergedDisabled = disabled || (typeof fieldDisabled === 'string' ? fieldDisabled === 'true' : Boolean(fieldDisabled)) || false;
     restProps = {
       value,
       error,
@@ -75,7 +76,8 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     const { config: configProp, ...otherProps } = props;
     config = configProp;
     // Merge disabled from config.disabled with passed disabled prop
-    const mergedDisabled = (otherProps as any).disabled || configProp?.disabled || false;
+    const configDisabled = configProp?.disabled;
+    const mergedDisabled = (otherProps as any).disabled || (typeof configDisabled === 'string' ? configDisabled === 'true' : Boolean(configDisabled)) || false;
     restProps = {
       ...otherProps,
       disabled: mergedDisabled,
@@ -210,7 +212,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           error={restProps.error}
           required={config.required ?? config.validation?.required ?? false}
           placeholder={config.placeholder}
-          tabIndex={tabIndex}
         />
       );
     
@@ -321,7 +322,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           disabled={restProps.disabled}
           onClick={(config as any).onClick || restProps.onChange}
           className={restProps.className}
-          tabIndex={tabIndex}
         >
           {(config as any).label || restProps.value || 'Button'}
         </Button>
@@ -352,7 +352,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           size={(config as any).size || 'md'}
           variant={(config as any).variant || 'default'}
           className={restProps.className}
-          tabIndex={tabIndex}
         />
       );
     
@@ -369,7 +368,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           required={restProps.required}
           id={(config as any).name || (config as any).id}
           className={restProps.className}
-          tabIndex={tabIndex}
         />
       );
     
@@ -381,7 +379,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           size={(config as any).size || 'md'}
           showValue={(config as any).showValue || false}
           className={restProps.className}
-          tabIndex={tabIndex}
         />
       );
     
@@ -391,7 +388,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           variant={(config as any).variant || 'default'}
           size={(config as any).size || 'md'}
           className={restProps.className}
-          tabIndex={tabIndex}
         >
           {restProps.value || (config as any).label || 'Badge'}
         </Badge>
@@ -407,7 +403,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           size={(config as any).size || 'md'}
           className={restProps.className}
           fieldLabel={(config as any).label || (config as any).name || ''}
-          tabIndex={tabIndex}
         />
       );
     

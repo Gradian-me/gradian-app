@@ -197,7 +197,7 @@ export const FormModal: React.FC<FormModalProps> = ({
   }, [schemaId, entityId, mode, isOpen, targetSchema, isLoading, openFormModal]);
 
   const entityDisplayTitle = React.useMemo(
-    () => getEntityDisplayTitle(targetSchema, entityData || undefined),
+    () => getEntityDisplayTitle(targetSchema ?? undefined, entityData ?? undefined),
     [targetSchema, entityData]
   );
 

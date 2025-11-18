@@ -20,10 +20,10 @@ export async function GET(request: NextRequest) {
     
     // Parse the TypeScript file to extract values
     // This is a simplified parser - in production you might want to use a proper TS parser
-    const logConfigMatch = fileContent.match(/export const LOG_CONFIG = \{([^}]+)\}/s);
-    const authConfigMatch = fileContent.match(/export const AUTH_CONFIG = \{([^}]+(?:\{[^}]+\}[^}]*)*)\}/s);
-    const uiParamsMatch = fileContent.match(/export const UI_PARAMS = \{([^}]+(?:\{[^}]+\}[^}]*)*)\}/s);
-    const schemaSummaryMatch = fileContent.match(/export const SCHEMA_SUMMARY_EXCLUDED_KEYS = \[([^\]]+)\]/s);
+    const logConfigMatch = fileContent.match(/export const LOG_CONFIG = \{([\s\S]+?)\}/);
+    const authConfigMatch = fileContent.match(/export const AUTH_CONFIG = \{([\s\S]+?(?:\{[\s\S]+?\}[\s\S]*?)*?)\}/);
+    const uiParamsMatch = fileContent.match(/export const UI_PARAMS = \{([\s\S]+?(?:\{[\s\S]+?\}[\s\S]*?)*?)\}/);
+    const schemaSummaryMatch = fileContent.match(/export const SCHEMA_SUMMARY_EXCLUDED_KEYS = \[([\s\S]+?)\]/);
     const demoModeParamsMatch = fileContent.match(/export const DEMO_MODE_PARAMS = \{[\s\S]*?DEMO_MODE:\s*(true|false)[\s\S]*?\} as const;/);
 
     // Extract LOG_CONFIG values
@@ -185,7 +185,7 @@ export async function PUT(request: NextRequest) {
 
     // Update LOG_CONFIG
     if (LOG_CONFIG) {
-      const logConfigSection = fileContent.match(/export const LOG_CONFIG = \{([^}]+)\}/s);
+      const logConfigSection = fileContent.match(/export const LOG_CONFIG = \{([\s\S]+?)\}/);
       if (logConfigSection) {
         const logTypes = Object.keys(LOG_CONFIG);
         let newLogConfig = 'export const LOG_CONFIG = {\n';
@@ -195,7 +195,7 @@ export async function PUT(request: NextRequest) {
           else newLogConfig += '\n';
         });
         newLogConfig += '};';
-        fileContent = fileContent.replace(/export const LOG_CONFIG = \{([^}]+)\}/s, newLogConfig);
+        fileContent = fileContent.replace(/export const LOG_CONFIG = \{([\s\S]+?)\}/, newLogConfig);
       }
     }
 
@@ -279,7 +279,7 @@ export async function PUT(request: NextRequest) {
     if (SCHEMA_SUMMARY_EXCLUDED_KEYS && Array.isArray(SCHEMA_SUMMARY_EXCLUDED_KEYS)) {
       const keysString = SCHEMA_SUMMARY_EXCLUDED_KEYS.map(key => `  '${key}'`).join(',\n');
       fileContent = fileContent.replace(
-        /export const SCHEMA_SUMMARY_EXCLUDED_KEYS = \[([^\]]+)\]\s*as const;/s,
+        /export const SCHEMA_SUMMARY_EXCLUDED_KEYS = \[([\s\S]+?)\]\s*as const;/,
         `export const SCHEMA_SUMMARY_EXCLUDED_KEYS = [\n${keysString},\n] as const;`
       );
     }

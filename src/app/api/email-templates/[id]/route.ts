@@ -13,9 +13,9 @@ const errorResponse = (message: string, status = 500) =>
   NextResponse.json({ success: false, error: message }, { status });
 
 type Params = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 const normalizeId = (value: string) =>
@@ -25,8 +25,8 @@ const normalizeId = (value: string) =>
     .replace(/^-+|-+$/g, '');
 
 export async function PUT(request: NextRequest, context: Params) {
+  const params = await context.params;
   try {
-    const params = await Promise.resolve(context.params);
     const body = await request.json();
     const { name, description = '', subject, html, id: newId } = body;
 
@@ -156,8 +156,8 @@ export async function PUT(request: NextRequest, context: Params) {
 }
 
 export async function DELETE(_request: NextRequest, context: Params) {
+  const params = await context.params;
   try {
-    const params = await Promise.resolve(context.params);
     const templates = await ensureTemplatesSeeded();
     const templateIndex = templates.findIndex((template) => template.id === params.id);
 
@@ -178,8 +178,8 @@ export async function DELETE(_request: NextRequest, context: Params) {
 }
 
 export async function GET(_request: NextRequest, context: Params) {
+  const params = await context.params;
   try {
-    const params = await Promise.resolve(context.params);
     const templates = await ensureTemplatesSeeded();
     const template = templates.find((item) => item.id === params.id);
 

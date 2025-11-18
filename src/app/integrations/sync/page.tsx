@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,7 +35,7 @@ interface EmailTemplateSyncResponse {
   totalRefreshed: number;
 }
 
-export default function SyncIntegrationPage() {
+function SyncIntegrationPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const integrationId = searchParams.get('id');
@@ -57,11 +57,18 @@ export default function SyncIntegrationPage() {
         // Try to fetch by ID first
         let found: Integration | null = null;
         try {
-          const byIdResponse = await apiRequest<Integration>(`/api/data/integrations/${integrationId}`, {
+          const byIdResponse = await apiRequest<Integration | Integration[] | { data?: Integration }>(`/api/data/integrations/${integrationId}`, {
             method: 'GET',
           });
           if (byIdResponse.success && byIdResponse.data) {
-            found = Array.isArray(byIdResponse.data) ? byIdResponse.data[0] : (byIdResponse.data?.data || byIdResponse.data);
+            const data = byIdResponse.data;
+            if (Array.isArray(data)) {
+              found = data[0] || null;
+            } else if (data && typeof data === 'object' && 'data' in data) {
+              found = (data as { data?: Integration }).data || null;
+            } else {
+              found = data as Integration;
+            }
           }
         } catch (error) {
           // If fetching by ID fails, try fetching all and filtering
@@ -70,12 +77,22 @@ export default function SyncIntegrationPage() {
         
         // If not found by ID, fetch all and filter
         if (!found) {
-          const response = await apiRequest<Integration[]>('/api/data/integrations', {
+          const response = await apiRequest<Integration[] | { data?: Integration[]; items?: Integration[] }>('/api/data/integrations', {
             method: 'GET',
           });
           
           if (response.success && response.data) {
-            const data = Array.isArray(response.data) ? response.data : (response.data?.data || response.data?.items || []);
+            const responseData = response.data;
+            let data: Integration[] = [];
+            if (Array.isArray(responseData)) {
+              data = responseData;
+            } else if (responseData && typeof responseData === 'object') {
+              if ('data' in responseData && Array.isArray((responseData as any).data)) {
+                data = (responseData as any).data;
+              } else if ('items' in responseData && Array.isArray((responseData as any).items)) {
+                data = (responseData as any).items;
+              }
+            }
             found = data.find(i => i.id === integrationId) || null;
           }
         }
@@ -127,19 +144,39 @@ export default function SyncIntegrationPage() {
             method: 'GET',
           });
           if (refreshResponse.success && refreshResponse.data) {
-            const updated = Array.isArray(refreshResponse.data) ? refreshResponse.data[0] : (refreshResponse.data?.data || refreshResponse.data);
+            const responseData = refreshResponse.data;
+            let updated: Integration | null = null;
+            if (Array.isArray(responseData)) {
+              updated = responseData[0] || null;
+            } else if (responseData && typeof responseData === 'object') {
+              if ('data' in responseData && (responseData as any).data) {
+                updated = Array.isArray((responseData as any).data) ? (responseData as any).data[0] : (responseData as any).data;
+              } else {
+                updated = responseData as Integration;
+              }
+            }
             if (updated) {
               setIntegration(updated);
             }
           }
         } catch (error) {
           // If fetching by ID fails, try fetching all and filtering
-          const refreshResponse = await apiRequest<Integration[]>('/api/data/integrations', {
+          const refreshResponse = await apiRequest<Integration[] | { data?: Integration[]; items?: Integration[] }>('/api/data/integrations', {
             method: 'GET',
           });
           if (refreshResponse.success && refreshResponse.data) {
-            const data = Array.isArray(refreshResponse.data) ? refreshResponse.data : (refreshResponse.data?.data || refreshResponse.data?.items || []);
-            const updated = data.find(i => i.id === integration.id);
+            const responseData = refreshResponse.data;
+            let data: Integration[] = [];
+            if (Array.isArray(responseData)) {
+              data = responseData;
+            } else if (responseData && typeof responseData === 'object') {
+              if ('data' in responseData && Array.isArray((responseData as any).data)) {
+                data = (responseData as any).data;
+              } else if ('items' in responseData && Array.isArray((responseData as any).items)) {
+                data = (responseData as any).items;
+              }
+            }
+            const updated = data.find((i: Integration) => i.id === integration.id);
             if (updated) {
               setIntegration(updated);
             }
@@ -342,6 +379,20 @@ export default function SyncIntegrationPage() {
         </motion.div>
       </div>
     </MainLayout>
+  );
+}
+
+export default function SyncIntegrationPage() {
+  return (
+    <Suspense fallback={
+      <MainLayout title="Sync Integration">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </MainLayout>
+    }>
+      <SyncIntegrationPageContent />
+    </Suspense>
   );
 }
 

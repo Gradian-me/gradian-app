@@ -17,6 +17,12 @@ export interface UserProfile {
   joinedAt?: Date | string;
   lastLogin?: Date | string;
   metadata?: Record<string, any>;
+  metrics?: {
+    projects?: number;
+    experience?: number;
+    rating?: number;
+  };
+  availability?: string;
 }
 
 export interface ProfileSection {

@@ -200,7 +200,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       {fieldLabel && (
         <label
           htmlFor={fieldName}
-          className={getLabelClasses({ error, required })}
+          className={getLabelClasses({ error: Boolean(error), required })}
         >
           {fieldLabel}
         </label>

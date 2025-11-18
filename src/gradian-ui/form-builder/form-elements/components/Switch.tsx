@@ -76,7 +76,7 @@ export const Switch = forwardRef<FormElementRef, SwitchProps>(
             <Label
               htmlFor={config.name}
               className={getLabelClasses({
-                error,
+                error: Boolean(error),
                 required,
                 disabled,
                 className: 'text-xs cursor-pointer mb-0',

@@ -40,10 +40,10 @@ const isObject = (value: unknown): value is Record<string, any> =>
 export const getByPath = (obj: any, path?: string): any => {
   if (!obj || !path) return undefined;
   const parts = path.split('.').filter(Boolean);
-  let current = obj;
+  let current: any = obj;
   for (const part of parts) {
     if (!isObject(current) && !Array.isArray(current)) return undefined;
-    current = current?.[part];
+    current = (current as Record<string, any>)?.[part];
     if (current === undefined || current === null) break;
   }
   return current;

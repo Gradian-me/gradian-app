@@ -77,7 +77,7 @@ export const DateTimeInput = forwardRef<FormElementRef, DateInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
-            className={getLabelClasses({ error, required })}
+            className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}
           </label>

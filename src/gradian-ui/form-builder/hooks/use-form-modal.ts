@@ -388,11 +388,12 @@ export function useFormModal(
         
         // If both error and message exist, show error on top and message in FormAlert
         if (result.error && result.message) {
-          setFormError(result.error);
-          setFormMessage(result.message);
+          setFormError(typeof result.error === 'string' ? result.error : JSON.stringify(result.error));
+          setFormMessage(typeof result.message === 'string' ? result.message : JSON.stringify(result.message));
         } else {
           // Only error or only message
-          setFormError(result.error || result.message || `Failed to ${action} ${targetSchema.name}. Please try again.`);
+          const errorText = result.error || result.message;
+          setFormError(typeof errorText === 'string' ? errorText : (errorText ? JSON.stringify(errorText) : `Failed to ${action} ${targetSchema.name}. Please try again.`));
           setFormMessage(null);
         }
         setFormErrorStatusCode(result.statusCode);
