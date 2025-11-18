@@ -3637,5 +3637,145 @@
     "showInNavigation": true,
     "icon": "Tag",
     "isNotCompanyBased": false
+  },
+  {
+    "id": "logical-operators",
+    "description": "Manage logical operators with their symbols, SQL and Cypher equivalents",
+    "singular_name": "Logical Operator",
+    "plural_name": "Logical Operators",
+    "cardMetadata": [
+      {
+        "id": "logical-operator-info",
+        "title": "Logical Operator Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "logical-operator-name",
+          "logical-operator-title",
+          "logical-operator-symbol",
+          "logical-operator-color"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "logical-operator-name",
+        "name": "name",
+        "label": "Name",
+        "sectionId": "basic-information",
+        "type": "name",
+        "component": "name",
+        "placeholder": "e.g., and-operator",
+        "required": true,
+        "role": "subtitle",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "logical-operator-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "e.g., AND Operator",
+        "required": true,
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "logical-operator-color",
+        "name": "color",
+        "label": "Color",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "color-picker",
+        "placeholder": "#000000",
+        "required": false,
+        "validation": {
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "logical-operator-symbol",
+        "name": "symbol",
+        "label": "Symbol",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "e.g., &&, AND, &",
+        "required": true,
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "logical-operator-sql-equivalent",
+        "name": "sqlEquivalent",
+        "label": "SQL Equivalent",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "e.g., AND, OR, NOT",
+        "required": false,
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "logical-operator-cypher-equivalent",
+        "name": "cypherEquivalent",
+        "label": "Cypher Equivalent",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "e.g., AND, OR, NOT",
+        "required": false,
+        "colSpan": 1,
+        "order": 6
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Logical operator name, title, symbol, and equivalents",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "logical-operator-overview",
+          "title": "Logical Operator Overview",
+          "description": "Basic logical operator information",
+          "colSpan": 2,
+          "fieldIds": [
+            "logical-operator-name",
+            "logical-operator-title",
+            "logical-operator-symbol",
+            "logical-operator-color",
+            "logical-operator-sql-equivalent",
+            "logical-operator-cypher-equivalent"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "Code",
+    "isSystemSchema": true,
+    "isNotCompanyBased": true
   }
 ]
