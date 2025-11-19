@@ -3668,10 +3668,8 @@
       {
         "id": "logical-operator-info",
         "title": "Logical Operator Information",
-        "colSpan": 1,
+        "colSpan": 2,
         "fieldIds": [
-          "logical-operator-name",
-          "logical-operator-title",
           "logical-operator-symbol",
           "logical-operator-color"
         ]
@@ -3733,14 +3731,15 @@
         "label": "Symbol",
         "sectionId": "basic-information",
         "type": "text",
-        "component": "text",
+        "component": "icon",
         "placeholder": "e.g., &&, AND, &",
         "required": true,
         "validation": {
           "required": true
         },
         "colSpan": 1,
-        "order": 4
+        "order": 4,
+        "role": "icon"
       },
       {
         "id": "logical-operator-sql-equivalent",

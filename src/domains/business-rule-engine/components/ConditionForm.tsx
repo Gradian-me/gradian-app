@@ -7,7 +7,8 @@ import { OperatorSelector } from './OperatorSelector';
 import { ValueInput } from './ValueInput';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, Check } from 'lucide-react';
+import { ButtonMinimal } from '@/gradian-ui/form-builder/form-elements/components/ButtonMinimal';
 
 interface ConditionFormProps {
   condition: Condition;
@@ -15,6 +16,7 @@ interface ConditionFormProps {
   operators: Operator[];
   onChange: (updates: Partial<Condition>) => void;
   onDelete?: () => void;
+  onSave?: () => void;
   errors?: { field: string; message: string }[];
   showDelete?: boolean;
   compact?: boolean;
@@ -26,6 +28,7 @@ export function ConditionForm({
   operators,
   onChange,
   onDelete,
+  onSave,
   errors = [],
   showDelete = true,
   compact = true,
@@ -70,7 +73,16 @@ export function ConditionForm({
                 hideLabel={true}
               />
             </div>
-            <div className="col-span-1 sm:col-span-1 lg:col-span-1 flex justify-end">
+            <div className="col-span-1 sm:col-span-1 lg:col-span-1 flex justify-end gap-1">
+              {!showDelete && onSave && (
+                <ButtonMinimal
+                  icon={Check}
+                  title="Save condition"
+                  color="green"
+                  size="sm"
+                  onClick={onSave}
+                />
+              )}
               {showDelete && onDelete && (
                 <Button
                   variant="ghost"

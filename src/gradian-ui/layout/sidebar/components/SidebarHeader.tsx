@@ -33,9 +33,9 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
               <span className="text-white font-bold text-lg">{displayTitle[0]}</span>
             </div>
             <div>
-              <h1 className="font-bold text-xl text-white">{displayTitle}</h1>
+              <h1 className="font-bold text-xl text-white whitespace-nowrap truncate">{displayTitle}</h1>
               {displaySubtitle && (
-                <p className="text-xs text-gray-400">{displaySubtitle}</p>
+                <p className="text-xs text-gray-400 whitespace-nowrap truncate">{displaySubtitle}</p>
               )}
             </div>
           </motion.div>

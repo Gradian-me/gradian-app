@@ -119,6 +119,33 @@ export default function SchemaEditorPage({ params }: { params: Promise<{ 'schema
     if (!result.success) {
       throw new Error('Failed to save schema');
     }
+
+    // Automatically clear cache after successful save
+    // This ensures schema changes are reflected immediately in other pages/tabs
+    try {
+      const clearCacheResponse = await fetch('/api/schemas/clear-cache', {
+        method: 'POST',
+      });
+      const clearCacheData = await clearCacheResponse.json();
+      
+      if (clearCacheData.success && typeof window !== 'undefined' && clearCacheData.clearReactQueryCache) {
+        const reactQueryKeys: string[] = Array.isArray(clearCacheData.reactQueryKeys) && clearCacheData.reactQueryKeys.length > 0
+          ? clearCacheData.reactQueryKeys
+          : ['schemas', 'companies'];
+        
+        // Dispatch event to clear React Query caches
+        window.dispatchEvent(new CustomEvent('react-query-cache-clear', { 
+          detail: { queryKeys: reactQueryKeys } 
+        }));
+        
+        // Also trigger storage event for other tabs
+        window.localStorage.setItem('react-query-cache-cleared', JSON.stringify(reactQueryKeys));
+        window.localStorage.removeItem('react-query-cache-cleared');
+      }
+    } catch (error) {
+      // Don't throw - cache clearing failure shouldn't prevent save success
+      console.warn('Failed to clear cache after save:', error);
+    }
   };
 
   const handleReloadSchema = async () => {

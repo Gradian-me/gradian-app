@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '../../shared/utils';
 import { resolveFieldById } from '../../form-builder/form-elements/utils/field-resolver';
-import { renderFieldValue } from './card-field-renderer';
+import { formatFieldValue } from '../table/utils/field-formatters';
 import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/ui/tooltip';
@@ -127,7 +127,7 @@ export const renderCardSection = ({ section, schema, data, maxMetrics = 3, onBad
             >
               <div className="flex items-center gap-2">
                 <div className="flex-1">
-                  {renderFieldValue({ field, value, maxMetrics })}
+                  {formatFieldValue(field, value, data)}
                 </div>
                 {(field as any).canCopy && value && value !== '' && (
                   <div

@@ -82,13 +82,14 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   const rawStatusValueFromField = statusFieldDef ? data?.[statusFieldDef.name] : undefined;
   const statusOptions = findStatusFieldOptions();
 
-  // Check if rating, status, duedate, code, and avatar fields exist in schema
+  // Check if rating, status, duedate, code, avatar, and icon fields exist in schema
   const hasRatingField = schema?.fields?.some(field => field.role === 'rating') || false;
   const hasStatusField = schema?.fields?.some(field => field.role === 'status') || false;
   const hasDuedateField = schema?.fields?.some(field => field.role === 'duedate') || false;
   const duedateFieldLabel = schema?.fields?.find(field => field.role === 'duedate')?.label || 'Due Date';
   const hasCodeField = schema?.fields?.some(field => field.role === 'code') || false;
   const hasAvatarField = schema?.fields?.some(field => field.role === 'avatar') || false;
+  const hasIconField = schema?.fields?.some(field => field.role === 'icon') || false;
 
   // Filter out performance section from cardMetadata
   const filteredSections = cardMetadata.filter(section =>
@@ -300,6 +301,15 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     }
   }
 
+  const iconFieldValue =
+    getSingleValueByRole(schema, data, 'icon') ??
+    data?.icon ??
+    '';
+
+  const normalizedIconValue =
+    getPrimaryDisplayString(iconFieldValue) ??
+    (typeof iconFieldValue === 'string' ? iconFieldValue : '');
+
   const cardConfig = {
     title,
     subtitle,
@@ -315,6 +325,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     sections: filteredSections,
     statusOptions
   };
+
+  const shouldShowAvatar = hasAvatarField && Boolean(cardConfig.avatarField);
+  const shouldShowIconAvatar = !shouldShowAvatar && hasIconField && Boolean(normalizedIconValue);
 
 
   const cardClasses = cn(
@@ -390,7 +403,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
               {/* Avatar and Status Header */}
               <div className="flex justify-between space-x-3 mb-2 flex-nowrap w-full">
                 <div className="flex items-center gap-2 truncate">
-                  {hasAvatarField && (
+                  {shouldShowAvatar ? (
                     <motion.div
                       initial={disableAnimation ? false : { opacity: 0, scale: 0.8 }}
                       animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
@@ -406,11 +419,25 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         {getInitials(cardConfig.avatarField)}
                       </Avatar>
                     </motion.div>
-                  )}
+                  ) : shouldShowIconAvatar ? (
+                    <motion.div
+                      initial={disableAnimation ? false : { opacity: 0, scale: 0.8 }}
+                      animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                      transition={disableAnimation ? {} : { duration: 0.3 }}
+                      whileHover={disableAnimation ? undefined : { scale: 1.01, transition: { type: "spring", stiffness: 300, damping: 30 } }}
+                    >
+                      <div className="h-12 w-12 rounded-full border border-gray-100 dark:border-gray-700 bg-violet-50 dark:bg-gray-800 flex items-center justify-center">
+                        <IconRenderer
+                          iconName={normalizedIconValue}
+                          className="h-5 w-5 text-violet-600 dark:text-violet-300"
+                        />
+                      </div>
+                    </motion.div>
+                  ) : null}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <motion.div
-                        className="flex items-center gap-1.5 flex-1 min-w-0"
+                        className="flex items-center gap-1.5 flex-1 min-w-0 pe-2"
                         initial={disableAnimation ? false : { opacity: 0, x: -10 }}
                         animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                         transition={disableAnimation ? {} : { duration: 0.3 }}
@@ -612,7 +639,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
             // List view layout
             <div className="flex items-center space-x-4 w-full flex-wrap gap-2 justify-between">
               <div className="flex items-center gap-2">
-                {hasAvatarField && (
+                {shouldShowAvatar ? (
                   <motion.div
                     initial={disableAnimation ? false : { opacity: 0, scale: 0.8 }}
                     animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
@@ -628,7 +655,21 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       {getInitials(cardConfig.avatarField)}
                     </Avatar>
                   </motion.div>
-                )}
+                ) : shouldShowIconAvatar ? (
+                  <motion.div
+                    initial={disableAnimation ? false : { opacity: 0, scale: 0.8 }}
+                    animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                    transition={disableAnimation ? {} : { duration: 0.3 }}
+                    whileHover={disableAnimation ? undefined : { scale: 1.01, transition: { type: "spring", stiffness: 300, damping: 30 } }}
+                  >
+                    <div className="h-10 w-10 rounded-full border border-gray-100 dark:border-gray-700 bg-violet-50 dark:bg-gray-800 flex items-center justify-center">
+                      <IconRenderer
+                        iconName={normalizedIconValue}
+                        className="h-4 w-4 text-violet-600 dark:text-violet-300"
+                      />
+                    </div>
+                  </motion.div>
+                ) : null}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <motion.h3

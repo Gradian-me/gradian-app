@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { BusinessRule } from '../types';
 import { useBusinessRule } from '../hooks/useBusinessRule';
 import { useLogicalOperators } from '../hooks/useLogicalOperators';
@@ -119,9 +119,9 @@ export function BusinessRuleWrapper({
     }
   };
 
-  const handleAddCondition = (groupId: string) => {
+  const handleAddCondition = useCallback((groupId: string) => {
     return addCondition(groupId);
-  };
+  }, [addCondition]);
 
   const handleAddGroup = (parentGroupId: string) => {
     addGroup(parentGroupId, 'and');

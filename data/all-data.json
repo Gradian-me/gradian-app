@@ -1357,136 +1357,131 @@
       "id": "logical-operator-eq",
       "name": "eq",
       "title": "Equals",
-      "symbol": "=",
+      "symbol": "Equal",
       "color": "#4E79A7",
       "sqlEquivalent": "=",
-      "cypherEquivalent": "="
+      "cypherEquivalent": "=",
+      "updatedAt": "2025-11-19T07:36:52.939Z"
     },
     {
       "id": "logical-operator-neq",
       "name": "neq",
       "title": "Not Equals",
-      "symbol": "!=",
+      "symbol": "EqualNot",
       "color": "#E4572E",
       "sqlEquivalent": "<>",
-      "cypherEquivalent": "<>"
+      "cypherEquivalent": "<>",
+      "updatedAt": "2025-11-19T07:44:18.316Z"
     },
     {
       "id": "logical-operator-gt",
       "name": "gt",
       "title": "Greater Than",
-      "symbol": ">",
+      "symbol": "ChevronRight",
       "color": "#F58518",
       "sqlEquivalent": ">",
-      "cypherEquivalent": ">"
+      "cypherEquivalent": ">",
+      "updatedAt": "2025-11-19T07:38:40.164Z"
     },
     {
       "id": "logical-operator-gte",
       "name": "gte",
       "title": "Greater Than or Equal",
-      "symbol": ">=",
+      "symbol": "ChevronLast",
       "color": "#FF9DA7",
       "sqlEquivalent": ">=",
-      "cypherEquivalent": ">="
+      "cypherEquivalent": ">=",
+      "updatedAt": "2025-11-19T07:38:19.329Z"
     },
     {
       "id": "logical-operator-lt",
       "name": "lt",
       "title": "Less Than",
-      "symbol": "<",
+      "symbol": "ChevronLeft",
       "color": "#54A24B",
       "sqlEquivalent": "<",
-      "cypherEquivalent": "<"
+      "cypherEquivalent": "<",
+      "updatedAt": "2025-11-19T07:39:21.171Z"
     },
     {
       "id": "logical-operator-lte",
       "name": "lte",
       "title": "Less Than or Equal",
-      "symbol": "<=",
+      "symbol": "ChevronFirst",
       "color": "#72B7B2",
       "sqlEquivalent": "<=",
-      "cypherEquivalent": "<="
+      "cypherEquivalent": "<=",
+      "updatedAt": "2025-11-19T07:38:58.693Z"
     },
     {
       "id": "logical-operator-in",
       "name": "in",
       "title": "In Array",
-      "symbol": "IN",
+      "symbol": "LucideListCheck",
       "color": "#4C78A8",
       "sqlEquivalent": "IN",
-      "cypherEquivalent": "IN"
+      "cypherEquivalent": "IN",
+      "updatedAt": "2025-11-19T07:47:20.955Z"
     },
     {
       "id": "logical-operator-not-in",
       "name": "not_in",
       "title": "Not In Array",
-      "symbol": "NOT IN",
+      "symbol": "ListX",
       "color": "#B279A2",
       "sqlEquivalent": "NOT IN",
-      "cypherEquivalent": "NOT IN"
+      "cypherEquivalent": "NOT IN",
+      "updatedAt": "2025-11-19T07:46:53.849Z"
     },
     {
       "id": "logical-operator-contains",
       "name": "contains",
-      "title": "String Contains",
-      "symbol": "CONTAINS",
+      "title": "Contains",
+      "symbol": "Search",
       "color": "#9D755D",
       "sqlEquivalent": "LIKE %...%",
-      "cypherEquivalent": "CONTAINS"
+      "cypherEquivalent": "CONTAINS",
+      "updatedAt": "2025-11-19T07:49:27.068Z"
     },
     {
       "id": "logical-operator-starts-with",
       "name": "starts_with",
-      "title": "String Starts With",
-      "symbol": "STARTS WITH",
+      "title": "Starts With",
+      "symbol": "ArrowRightFromLine",
       "color": "#BAB0AC",
       "sqlEquivalent": "LIKE ...%",
-      "cypherEquivalent": "STARTS WITH"
+      "cypherEquivalent": "STARTS WITH",
+      "updatedAt": "2025-11-19T07:49:14.259Z"
     },
     {
       "id": "logical-operator-ends-with",
       "name": "ends_with",
-      "title": "String Ends With",
-      "symbol": "ENDS WITH",
+      "title": "Ends With",
+      "symbol": "ArrowLeftFromLine",
       "color": "#FF7F0E",
       "sqlEquivalent": "LIKE %...",
-      "cypherEquivalent": "ENDS WITH"
-    },
-    {
-      "id": "logical-operator-is-null",
-      "name": "is_null",
-      "title": "Is Null",
-      "symbol": "IS NULL",
-      "color": "#EDC948",
-      "sqlEquivalent": "IS NULL",
-      "cypherEquivalent": "IS NULL"
-    },
-    {
-      "id": "logical-operator-is-not-null",
-      "name": "is_not_null",
-      "title": "Is Not Null",
-      "symbol": "IS NOT NULL",
-      "color": "#59A14F",
-      "sqlEquivalent": "IS NOT NULL",
-      "cypherEquivalent": "IS NOT NULL"
+      "cypherEquivalent": "ENDS WITH",
+      "updatedAt": "2025-11-19T07:49:19.840Z"
     },
     {
       "id": "logical-operator-is-blank",
       "name": "is_blank",
-      "title": "Is Null or Empty",
-      "symbol": "IS NULL OR ''",
+      "title": "Is Blank",
+      "symbol": "CircleOff",
       "color": "#AF7AA1",
       "sqlEquivalent": "IS NULL OR = ''",
-      "cypherEquivalent": "IS NULL OR = ''"
+      "cypherEquivalent": "IS NULL OR = ''",
+      "updatedAt": "2025-11-19T07:45:11.901Z"
     },
     {
       "id": "logical-operator-is-not-blank",
       "name": "is_not_blank",
-      "title": "Is Not Null and Not Empty",
-      "symbol": "IS NOT NULL AND <> ''",
-      "color": "#FF9DA7",
+      "title": "Is Not Blank",
+      "symbol": "CircleCheck",
+      "color": "#9effec",
       "sqlEquivalent": "IS NOT NULL AND <> ''",
-      "cypherEquivalent": "IS NOT NULL AND <> ''"
+      "cypherEquivalent": "IS NOT NULL AND <> ''",
+      "updatedAt": "2025-11-19T07:45:52.249Z"
     }
   ],
   "aggregation-types": [

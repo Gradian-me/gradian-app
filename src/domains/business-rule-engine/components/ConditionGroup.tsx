@@ -1,16 +1,17 @@
 'use client';
 
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ConditionGroup as ConditionGroupType, Condition } from '../types';
 import { LogicalOperatorSelector } from './LogicalOperatorSelector';
 import { ConditionForm } from './ConditionForm';
 import { SchemaFieldSelector } from './SchemaFieldSelector';
 import { ConditionItem } from './ConditionItem';
-import { createEmptyCondition } from '../utils/rule-operations';
+import { createEmptyCondition, validateCondition } from '../utils/rule-operations';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2, Copy, ChevronDown, ChevronRight, Save, ShieldCheck, CheckCircle, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useState, useEffect, useRef } from 'react';
 import { ButtonMinimal } from '@/gradian-ui/form-builder/form-elements/components/ButtonMinimal';
+import { toast } from 'sonner';
 
 interface RootGroupActions {
   onReset: () => void;
@@ -59,8 +60,10 @@ export function ConditionGroup({
 }: ConditionGroupProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [editingConditionId, setEditingConditionId] = useState<string | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
   const isAddingRef = useRef(false);
   const lastAddedTimeRef = useRef<number>(0);
+  const previousConditionCountRef = useRef<number>(group.conditions.length);
 
   // Clear editingConditionId if the condition no longer exists
   useEffect(() => {
@@ -70,18 +73,30 @@ export function ConditionGroup({
         setEditingConditionId(null);
       }
     }
+    // Update previous count
+    previousConditionCountRef.current = group.conditions.length;
   }, [group.conditions, editingConditionId]);
 
   // Handle adding condition - auto-enter edit mode
-  const handleAddCondition = () => {
-    // Prevent duplicate additions within 500ms (debounce)
-    const now = Date.now();
-    if (isAddingRef.current || (now - lastAddedTimeRef.current < 500)) {
+  const handleAddCondition = useCallback((e?: React.MouseEvent) => {
+    // Prevent event propagation and default behavior
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    // Synchronous check - must happen before any async operations
+    if (isAddingRef.current) {
       return;
     }
     
+    // Set ref immediately to prevent any duplicate calls
     isAddingRef.current = true;
+    const now = Date.now();
     lastAddedTimeRef.current = now;
+    
+    // Update state for UI feedback
+    setIsAdding(true);
     
     try {
       const newConditionId = onAddCondition();
@@ -89,12 +104,13 @@ export function ConditionGroup({
         setEditingConditionId(newConditionId);
       }
     } finally {
-      // Reset after state update completes
+      // Reset after a delay to prevent rapid clicks
       setTimeout(() => {
         isAddingRef.current = false;
-      }, 300);
+        setIsAdding(false);
+      }, 1500);
     }
-  };
+  }, [onAddCondition]);
 
   const totalItems = group.conditions.length + group.groups.length;
   const indentClass = level > 0 ? `ml-${level * 4}` : '';
@@ -103,8 +119,28 @@ export function ConditionGroup({
     setEditingConditionId(conditionId);
   };
 
-  const handleSaveCondition = () => {
+  const handleSaveCondition = (conditionId: string) => {
+    // Find the condition being saved
+    const condition = group.conditions.find(c => c.id === conditionId);
+    if (!condition) {
+      return;
+    }
+
+    // Validate the condition
+    const validationErrors = validateCondition(condition);
+    
+    // If there are validation errors, don't save (errors will be displayed in the form)
+    if (validationErrors.length > 0) {
+      const errorMessages = validationErrors.map(e => e.message).join(', ');
+      toast.error('Please fix validation errors', {
+        description: errorMessages,
+      });
+      return;
+    }
+
+    // Validation passed, exit edit mode
     setEditingConditionId(null);
+    toast.success('Condition saved');
   };
 
   return (
@@ -229,6 +265,7 @@ export function ConditionGroup({
                       onDeleteCondition(condition.id);
                       setEditingConditionId(null);
                     }}
+                    onSave={() => handleSaveCondition(condition.id)}
                     errors={conditionErrors}
                     showDelete={false}
                     compact={true}
@@ -360,14 +397,12 @@ export function ConditionGroup({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAddCondition();
-                }}
+                onClick={handleAddCondition}
+                disabled={isAdding}
                 className="gap-2"
               >
                 <Plus className="h-4 w-4" />
-                Add Condition
+                {isAdding ? 'Adding...' : 'Add Condition'}
               </Button>
               <Button
                 variant="outline"

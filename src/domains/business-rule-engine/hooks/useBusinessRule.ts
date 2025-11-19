@@ -28,6 +28,7 @@ export function useBusinessRule(initialRule?: BusinessRule) {
   );
   const [validationErrors, setValidationErrors] = useState<RuleValidationError[]>([]);
   const lastAddTimeRef = useRef<{ [groupId: string]: number }>({});
+  const isAddingRef = useRef<{ [groupId: string]: boolean }>({});
 
   // Validate rule
   const validate = useCallback(() => {
@@ -51,13 +52,22 @@ export function useBusinessRule(initialRule?: BusinessRule) {
 
   // Add condition to group
   const addCondition = useCallback((groupId: string, condition?: Condition) => {
-    // Prevent rapid duplicate additions to the same group (debounce)
-    const now = Date.now();
-    const lastAddTime = lastAddTimeRef.current[groupId] || 0;
-    if (now - lastAddTime < 300) {
-      // Too soon after last add, return null to prevent duplicate
+    // Synchronous check - prevent duplicate calls immediately
+    if (isAddingRef.current[groupId]) {
       return null;
     }
+    
+    // Set lock immediately
+    isAddingRef.current[groupId] = true;
+    const now = Date.now();
+    const lastAddTime = lastAddTimeRef.current[groupId] || 0;
+    
+    // Also check timestamp as additional protection
+    if (now - lastAddTime < 1500) {
+      isAddingRef.current[groupId] = false;
+      return null;
+    }
+    
     lastAddTimeRef.current[groupId] = now;
 
     let newConditionId: string | null = null;
@@ -65,12 +75,37 @@ export function useBusinessRule(initialRule?: BusinessRule) {
       const newRule = { ...prev };
       const group = findGroupById(newRule.rootGroup, groupId);
       if (group) {
+        // Get count before we modify it
+        const countBeforeAdd = group.conditions.length;
+        
+        // Check if we're adding a duplicate condition
+        // If condition is provided, check by ID; otherwise create new
+        if (condition) {
+          const existingIndex = group.conditions.findIndex(c => c.id === condition.id);
+          if (existingIndex !== -1) {
+            // Condition already exists, return existing ID
+            newConditionId = group.conditions[existingIndex].id;
+            return newRule;
+          }
+        }
+        
         const newCondition = condition || createEmptyCondition();
         newConditionId = newCondition.id;
-        // Prevent duplicate conditions with the same ID
+        
+        // Double-check that this condition doesn't already exist (race condition protection)
         const existingIndex = group.conditions.findIndex(c => c.id === newCondition.id);
         if (existingIndex === -1) {
           group.conditions.push(newCondition);
+          
+          // Final safety check: if count increased by more than 1, remove extras
+          // This handles the case where two calls happened simultaneously
+          if (group.conditions.length - countBeforeAdd > 1) {
+            // Remove all but the first new condition
+            const newConditions = group.conditions.slice(0, countBeforeAdd + 1);
+            group.conditions = newConditions;
+            // Use the ID of the condition we kept
+            newConditionId = newConditions[newConditions.length - 1]?.id || newConditionId;
+          }
         } else {
           // Condition already exists, return existing ID
           newConditionId = group.conditions[existingIndex].id;
@@ -78,6 +113,12 @@ export function useBusinessRule(initialRule?: BusinessRule) {
       }
       return newRule;
     });
+    
+    // Release lock after state update
+    setTimeout(() => {
+      isAddingRef.current[groupId] = false;
+    }, 1500);
+    
     return newConditionId;
   }, []);
 

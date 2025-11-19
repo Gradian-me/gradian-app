@@ -4,7 +4,7 @@ import { formatCurrency, formatDate, formatNumber } from '@/gradian-ui/shared/ut
 import { BadgeViewer } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
 import type { BadgeItem } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
 import { Badge } from '@/gradian-ui/form-builder/form-elements/components/Badge';
-import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { IconRenderer, isValidLucideIcon } from '@/gradian-ui/shared/utils/icon-renderer';
 import { getBadgeConfig, mapBadgeColorToVariant } from '../../utils';
 import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
 import {
@@ -114,6 +114,24 @@ export const formatFieldValue = (
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
+    );
+  }
+
+  // Handle icon fields - show icon using IconRenderer
+  if (displayType === 'icon' || componentType === 'icon' || field?.role === 'icon') {
+    const iconName = String(value).trim();
+    if (!iconName) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    if (!isValidLucideIcon(iconName)) {
+      return <span className="text-gray-600 dark:text-gray-300">{iconName}</span>;
+    }
+    
+    return (
+      <div className="inline-flex items-center">
+        <IconRenderer iconName={iconName} className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+      </div>
     );
   }
 

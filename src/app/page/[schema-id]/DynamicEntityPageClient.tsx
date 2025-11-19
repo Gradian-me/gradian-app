@@ -109,6 +109,13 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
     [navigationSchemas]
   );
 
+  // Update React Query cache when initialSchema changes (e.g., after router.refresh())
+  useEffect(() => {
+    if (reconstructedInitialSchema) {
+      queryClient.setQueryData(['schemas', schemaId], reconstructedInitialSchema);
+    }
+  }, [queryClient, schemaId, reconstructedInitialSchema]);
+
   useEffect(() => {
     if (!reconstructedNavigationSchemas.length) {
       return;
@@ -130,14 +137,19 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
   });
   
   // Use fetched schema if available, otherwise use initial schema from server
+  // Always prefer the latest initialSchema from server after refresh
   const schema = fetchedSchema || reconstructedInitialSchema;
 
-  // Listen for React Query cache clear events - invalidate and refetch silently
+  // Listen for React Query cache clear events - invalidate cache and refresh router
   useEffect(() => {
     const handleCacheClear = async () => {
-      // Invalidate React Query cache for this schema and refetch silently
+      // Invalidate React Query cache for this schema
       await queryClient.invalidateQueries({ queryKey: ['schemas', schemaId] });
-      await refetchSchema();
+      // Remove the cached data to force a fresh fetch
+      queryClient.removeQueries({ queryKey: ['schemas', schemaId] });
+      // Force router refresh to get fresh server-side data
+      // This will cause the server component to re-render with fresh schema data
+      router.refresh();
     };
 
     // Listen for React Query cache clear event (same tab)
@@ -146,9 +158,11 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
     // Listen for storage events (from other tabs/windows)
     const handleStorageChange = async (e: StorageEvent) => {
       if (e.key === 'react-query-cache-cleared') {
-        // Invalidate and refetch silently
+        // Invalidate and remove cached data
         await queryClient.invalidateQueries({ queryKey: ['schemas', schemaId] });
-        await refetchSchema();
+        queryClient.removeQueries({ queryKey: ['schemas', schemaId] });
+        // Force router refresh to get fresh server-side data
+        router.refresh();
       }
     };
 
@@ -158,7 +172,7 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
       window.removeEventListener('react-query-cache-clear', handleCacheClear as EventListener);
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [schemaId, queryClient, refetchSchema]);
+  }, [schemaId, queryClient, router]);
 
   // Serialize schema for client component
   const serializedSchema = serializeSchema(schema);
