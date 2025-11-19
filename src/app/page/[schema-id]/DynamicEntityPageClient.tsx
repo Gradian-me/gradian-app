@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { DynamicPageRenderer } from '@/gradian-ui/data-display/components/DynamicPageRenderer';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -132,7 +132,7 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
   // Use initial schema from server as initialData to populate React Query cache
   // This ensures the cache is populated with server-side data, avoiding unnecessary fetches
   const { schema: fetchedSchema, refetch: refetchSchema } = useSchemaById(schemaId, {
-    enabled: false, // Don't fetch on mount, use initial schema from server
+    enabled: false, // We'll trigger a manual refresh to guarantee fresh data
     initialData: reconstructedInitialSchema, // Populate cache with server-side data
   });
   
@@ -173,6 +173,19 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
       window.removeEventListener('storage', handleStorageChange);
     };
   }, [schemaId, queryClient, router]);
+
+  // Trigger one fresh fetch per schema visit to ensure the client has the latest schema definition
+  const lastFetchedSchemaIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!schemaId) {
+      return;
+    }
+    if (lastFetchedSchemaIdRef.current === schemaId) {
+      return;
+    }
+    lastFetchedSchemaIdRef.current = schemaId;
+    void refetchSchema();
+  }, [schemaId, refetchSchema]);
 
   // Serialize schema for client component
   const serializedSchema = serializeSchema(schema);

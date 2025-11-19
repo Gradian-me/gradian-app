@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { cn } from '../../../shared/utils';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { useSchemas } from '@/gradian-ui/schema-manager/hooks/use-schemas';
@@ -27,10 +27,16 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   initialSchemas,
 }) => {
   const pathname = usePathname();
+  const [isMounted, setIsMounted] = useState(false);
   const { schemas: allSchemas, isLoading, refetch } = useSchemas({
     initialData: initialSchemas,
     summary: true,
   });
+
+  // Only render Accordion after client-side mount to avoid hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Listen for cache clear events and refetch schemas
   useEffect(() => {
@@ -75,81 +81,95 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
     <div className={cn("w-full px-0 mt-3", className)}>
       <Separator className="my-4 bg-gray-700" />
       
-      <Accordion type="single" collapsible className="w-full">
-        <AccordionItem value="applications" className="border-none">
-          <AccordionTrigger className={cn(
-            "px-3 py-2 text-gray-300 hover:text-white",
-            "hover:bg-gray-800 rounded-lg transition-colors",
-            "data-[state=open]:text-white"
-          )}>
+      {isMounted ? (
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="applications" className="border-none">
+            <AccordionTrigger className={cn(
+              "px-3 py-2 text-gray-300 hover:text-white",
+              "hover:bg-gray-800 rounded-lg transition-colors",
+              "data-[state=open]:text-white"
+            )}>
+              <div className="flex items-center space-x-3 flex-1">
+                <LayoutGrid className="h-5 w-5 shrink-0" />
+                <AnimatePresence>
+                  {(!isCollapsed || isMobile) && (
+                    <motion.span
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.3 }}
+                      className="text-xs font-medium"
+                    >
+                      Applications
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="pl-3 pr-0 pb-0">
+              <nav className="space-y-1 mt-1">
+                {schemas.map((schema, index) => {
+                  const active = isActive(schema.id);
+                  return (
+                    <Link key={schema.id} href={`/page/${schema.id}`}>
+                      <motion.div
+                        initial={{ opacity: 0, x:-1, y: 0}}
+                        animate={{ opacity: 1, x:0, y: 0}}
+                        transition={{
+                          duration: 0.25,
+                          delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX),
+                          ease: 'easeOut',
+                        }}
+                        whileHover={{ scale: 1.02 }}
+                        className={cn(
+                          "flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200",
+                          active
+                            ? "bg-gray-800 text-white"
+                            : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                        )}
+                      >
+                        {schema.icon ? (
+                          <IconRenderer 
+                            iconName={schema.icon} 
+                            className="h-5 w-5 shrink-0" 
+                          />
+                        ) : (
+                          <div className="h-5 w-5 shrink-0 rounded bg-gray-700" />
+                        )}
+                        <AnimatePresence>
+                          {(!isCollapsed || isMobile) && (
+                            <motion.span
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: -10 }}
+                              transition={{ duration: 0.3 }}
+                              className="text-xs font-medium"
+                            >
+                              {schema.plural_name}
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      ) : (
+        // Placeholder during SSR to maintain layout
+        <div className="w-full">
+          <div className="px-3 py-2 text-gray-300">
             <div className="flex items-center space-x-3 flex-1">
               <LayoutGrid className="h-5 w-5 shrink-0" />
-              <AnimatePresence>
-                {(!isCollapsed || isMobile) && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="text-xs font-medium"
-                  >
-                    Applications
-                  </motion.span>
-                )}
-              </AnimatePresence>
+              {(!isCollapsed || isMobile) && (
+                <span className="text-xs font-medium">Applications</span>
+              )}
             </div>
-          </AccordionTrigger>
-          <AccordionContent className="pl-3 pr-0 pb-0">
-            <nav className="space-y-1 mt-1">
-              {schemas.map((schema, index) => {
-                const active = isActive(schema.id);
-                return (
-                  <Link key={schema.id} href={`/page/${schema.id}`}>
-                    <motion.div
-                      initial={{ opacity: 0, x:-1, y: 0}}
-                      animate={{ opacity: 1, x:0, y: 0}}
-                      transition={{
-                        duration: 0.25,
-                        delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX),
-                        ease: 'easeOut',
-                      }}
-                      whileHover={{ scale: 1.02 }}
-                      className={cn(
-                        "flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200",
-                        active
-                          ? "bg-gray-800 text-white"
-                          : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                      )}
-                    >
-                      {schema.icon ? (
-                        <IconRenderer 
-                          iconName={schema.icon} 
-                          className="h-5 w-5 shrink-0" 
-                        />
-                      ) : (
-                        <div className="h-5 w-5 shrink-0 rounded bg-gray-700" />
-                      )}
-                      <AnimatePresence>
-                        {(!isCollapsed || isMobile) && (
-                          <motion.span
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -10 }}
-                            transition={{ duration: 0.3 }}
-                            className="text-xs font-medium"
-                          >
-                            {schema.plural_name}
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
-                  </Link>
-                );
-              })}
-            </nav>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
