@@ -1019,7 +1019,26 @@
   "tenders": [],
   "shipments": [],
   "invoices": [],
-  "production-plans": [],
+  "production-plans": [
+    {
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "product": [
+        {
+          "id": "monoclonal-antibody",
+          "label": "Monoclonal Antibody"
+        }
+      ],
+      "year": [
+        {
+          "id": "1404",
+          "label": "1404"
+        }
+      ],
+      "id": "01KAE3F9YZVBY6R1K0NNCT62ZJ",
+      "createdAt": "2025-11-19T13:04:44.527Z",
+      "updatedAt": "2025-11-19T13:04:44.527Z"
+    }
+  ],
   "applications": [],
   "production-actuals": [],
   "business-areas": [],
@@ -1585,5 +1604,45 @@
       "updatedAt": "2025-11-19T08:28:45.851Z"
     }
   ],
-  "tags": []
+  "tags": [],
+  "production-plan-items": [
+    {
+      "batchNumber": "B029AG",
+      "batchSizeQuantity": 12000,
+      "productionStartDate": "2025-11-20",
+      "productionEndDate": "2025-11-21",
+      "plannedReleaseDate": "2025-11-27",
+      "status": [
+        {
+          "id": "ready-for-release",
+          "label": "Ready for Release",
+          "icon": "Package",
+          "color": "warning"
+        }
+      ],
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KAE3GMR90MBXAH2866JMVQBN",
+      "createdAt": "2025-11-19T13:05:28.339Z",
+      "updatedAt": "2025-11-19T13:05:28.339Z"
+    },
+    {
+      "batchNumber": "A051ZW",
+      "batchSizeQuantity": 11000,
+      "productionStartDate": "2025-11-12",
+      "productionEndDate": "2025-11-27",
+      "plannedReleaseDate": "2025-11-20",
+      "status": [
+        {
+          "id": "ready-for-release",
+          "label": "Ready for Release",
+          "icon": "Package",
+          "color": "warning"
+        }
+      ],
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KAE3HG1DWRTPAYMT0FRFZE64",
+      "createdAt": "2025-11-19T13:05:56.285Z",
+      "updatedAt": "2025-11-19T13:05:56.285Z"
+    }
+  ]
 }

@@ -100,16 +100,38 @@ export function DynamicDetailPageClient({
     deleteEntity,
   } = useDynamicEntity(schemaState);
 
+  // Fetch schema from API on mount to ensure fresh data
   useEffect(() => {
-    const reconstructed = reconstructRegExp(rawSchema) as FormSchema;
-    setSchemaState(ensureSchemaActions(reconstructed));
-  }, [rawSchema]);
+    const fetchSchemaFromApi = async () => {
+      try {
+        // Fetch from /api/schemas/{schemaId} to get fresh schema data
+        // Disable cache to ensure we always get fresh data from the server
+        const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`, {
+          disableCache: true,
+          callerName: 'DynamicDetailPageClient',
+        });
+        if (response.success && response.data) {
+          const updated = reconstructRegExp(response.data) as FormSchema;
+          setSchemaState(ensureSchemaActions(updated));
+          queryClient.setQueryData(['schemas', schemaId], updated);
+        }
+      } catch (err) {
+        console.warn('[DetailPage] Error fetching schema from API, keeping server-provided schema:', err);
+      }
+    };
+
+    fetchSchemaFromApi();
+  }, [schemaId, queryClient]); // Only run on mount and when schemaId changes
 
   const refreshSchema = useCallback(async () => {
     try {
-      const response = await apiRequest<FormSchema[]>(`/api/schemas?schemaIds=${schemaId}`);
-      if (response.success && Array.isArray(response.data) && response.data.length > 0) {
-        const updated = reconstructRegExp(response.data[0]) as FormSchema;
+      // Use the same endpoint as initial fetch, disable cache to get fresh data
+      const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`, {
+        disableCache: true,
+        callerName: 'DynamicDetailPageClient-refresh',
+      });
+      if (response.success && response.data) {
+        const updated = reconstructRegExp(response.data) as FormSchema;
         setSchemaState(ensureSchemaActions(updated));
         queryClient.setQueryData(['schemas', schemaId], updated);
       } else {
@@ -119,6 +141,49 @@ export function DynamicDetailPageClient({
       console.error('Error refreshing schema after cache clear:', err);
     }
   }, [queryClient, schemaId]);
+
+  // Expose refresh function to window for development/debugging
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).refreshSchemaCache = async () => {
+        try {
+          // Clear server-side cache
+          const response = await apiRequest<{ success: boolean; reactQueryKeys?: string[] }>('/api/schemas/clear-cache', { method: 'POST' });
+          
+          if (response.success) {
+            const reactQueryKeys: string[] = Array.isArray(response.data?.reactQueryKeys) && response.data.reactQueryKeys.length > 0
+              ? response.data.reactQueryKeys
+              : ['schemas', 'companies'];
+            
+            // Dispatch event to clear React Query caches (this will be handled by query-provider)
+            window.dispatchEvent(new CustomEvent('react-query-cache-clear', { 
+              detail: { queryKeys: reactQueryKeys } 
+            }));
+            
+            // Also trigger storage event for other tabs
+            window.localStorage.setItem('react-query-cache-cleared', JSON.stringify(reactQueryKeys));
+            window.localStorage.removeItem('react-query-cache-cleared');
+            
+            // Wait a bit for cache to clear, then refresh
+            setTimeout(async () => {
+              await refreshSchema();
+              router.refresh();
+              console.log('✅ Schema cache cleared and refreshed');
+            }, 100);
+          } else {
+            console.error('❌ Failed to clear cache:', response.error);
+          }
+        } catch (error) {
+          console.error('❌ Failed to refresh schema cache:', error);
+        }
+      };
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).refreshSchemaCache;
+      }
+    };
+  }, [queryClient, refreshSchema, router]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {

@@ -278,5 +278,25 @@
     "id": "01KABM5QZEE4T31FMCYS2G17Q8",
     "createdAt": "2025-11-18T13:58:53.677Z",
     "updatedAt": "2025-11-18T13:58:53.677Z"
+  },
+  {
+    "sourceSchema": "production-plans",
+    "sourceId": "01KAE3F9YZVBY6R1K0NNCT62ZJ",
+    "targetSchema": "production-plan-items",
+    "targetId": "01KAE3GMR90MBXAH2866JMVQBN",
+    "relationTypeId": "HAS_PRODUCTION_PLAN_ITEM",
+    "id": "01KAE3GMTXBQD0JDH7GVSMXKSR",
+    "createdAt": "2025-11-19T13:05:28.412Z",
+    "updatedAt": "2025-11-19T13:05:28.412Z"
+  },
+  {
+    "sourceSchema": "production-plans",
+    "sourceId": "01KAE3F9YZVBY6R1K0NNCT62ZJ",
+    "targetSchema": "production-plan-items",
+    "targetId": "01KAE3HG1DWRTPAYMT0FRFZE64",
+    "relationTypeId": "HAS_PRODUCTION_PLAN_ITEM",
+    "id": "01KAE3HG41PPAF7TX05PPPW63W",
+    "createdAt": "2025-11-19T13:05:56.353Z",
+    "updatedAt": "2025-11-19T13:05:56.353Z"
   }
 ]

@@ -3939,5 +3939,350 @@
     "icon": "Sigma",
     "isSystemSchema": true,
     "isNotCompanyBased": true
+  },
+  {
+    "id": "production-plans",
+    "description": "Create and manage production plans for biotech products",
+    "singular_name": "Production Plan",
+    "plural_name": "Production Plans",
+    "cardMetadata": [
+      {
+        "id": "production-plan-info",
+        "title": "Production Plan Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "company",
+          "product",
+          "year"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "company",
+        "name": "companyId",
+        "label": "Company",
+        "sectionId": "basic-information",
+        "type": "picker",
+        "component": "picker",
+        "placeholder": "Click to select company",
+        "required": true,
+        "description": "Select company from popup picker",
+        "role": "title",
+        "targetSchema": "companies",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "product",
+        "name": "product",
+        "label": "Product",
+        "sectionId": "basic-information",
+        "type": "select",
+        "component": "select",
+        "placeholder": "Select product",
+        "required": true,
+        "options": [
+          {
+            "id": "recombinant-protein",
+            "label": "Recombinant Protein"
+          },
+          {
+            "id": "monoclonal-antibody",
+            "label": "Monoclonal Antibody"
+          },
+          {
+            "id": "vaccine",
+            "label": "Vaccine"
+          },
+          {
+            "id": "gene-therapy",
+            "label": "Gene Therapy"
+          },
+          {
+            "id": "cell-therapy",
+            "label": "Cell Therapy"
+          },
+          {
+            "id": "biologics",
+            "label": "Biologics"
+          },
+          {
+            "id": "biosimilar",
+            "label": "Biosimilar"
+          },
+          {
+            "id": "diagnostic-kit",
+            "label": "Diagnostic Kit"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "subtitle"
+      },
+      {
+        "id": "year",
+        "name": "year",
+        "label": "Year",
+        "sectionId": "basic-information",
+        "type": "select",
+        "component": "select",
+        "placeholder": "Select year",
+        "required": true,
+        "options": [
+          {
+            "id": "1404",
+            "label": "1404"
+          },
+          {
+            "id": "1405",
+            "label": "1405"
+          },
+          {
+            "id": "1406",
+            "label": "1406"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 3,
+        "role": "subtitle"
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Production Plan Information",
+        "description": "Basic production plan details",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "production-plan-items",
+        "title": "Production Plan Items",
+        "description": "Add items to this production plan",
+        "isRepeatingSection": true,
+        "initialState": "expanded",
+        "columns": 2,
+        "repeatingConfig": {
+          "minItems": 0,
+          "maxItems": 100,
+          "addButtonText": "Add Item",
+          "removeButtonText": "Remove Item",
+          "emptyMessage": "No items added yet",
+          "targetSchema": "production-plan-items",
+          "relationTypeId": "HAS_PRODUCTION_PLAN_ITEM",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": true
+        }
+      }
+    ],
+    "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "quick-action-1763557871386",
+          "label": "Add Company",
+          "action": "openFormDialog",
+          "variant": "default",
+          "icon": "Building2",
+          "targetSchema": "companies"
+        },
+        {
+          "id": "quick-action-1763557942209",
+          "label": "Open Dashboard",
+          "action": "openUrl",
+          "variant": "ghost",
+          "icon": "BarChart3",
+          "targetUrl": "https://insight.cinnagen.com/power_bi/powerbi/Production/Production%20vs%20Plan",
+          "passItemAsReference": false
+        }
+      ],
+      "sections": [
+        {
+          "id": "production-plan-overview",
+          "title": "Production Plan Overview",
+          "description": "Summary information",
+          "colSpan": 2,
+          "fieldIds": [
+            "company",
+            "product",
+            "year"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "Calendar",
+    "isSystemSchema": false,
+    "isNotCompanyBased": false
+  },
+  {
+    "id": "production-plan-items",
+    "description": "Items in a production plan",
+    "singular_name": "Production Plan Item",
+    "plural_name": "Production Plan Items",
+    "fields": [
+      {
+        "id": "batch-number",
+        "name": "batchNumber",
+        "label": "Batch Number",
+        "sectionId": "item-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "Enter batch number",
+        "required": false,
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "batch-size-quantity",
+        "name": "batchSizeQuantity",
+        "label": "Batch Size Quantity",
+        "sectionId": "item-information",
+        "type": "number",
+        "component": "number",
+        "placeholder": "Enter batch size quantity",
+        "required": true,
+        "validation": {
+          "required": true,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "production-start-date",
+        "name": "productionStartDate",
+        "label": "Production Start Date",
+        "sectionId": "item-information",
+        "type": "date",
+        "component": "date",
+        "placeholder": "Select production start date",
+        "required": true,
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "production-end-date",
+        "name": "productionEndDate",
+        "label": "Production End Date",
+        "sectionId": "item-information",
+        "type": "date",
+        "component": "date",
+        "placeholder": "Select production end date",
+        "required": true,
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "planned-release-date",
+        "name": "plannedReleaseDate",
+        "label": "Planned Release Date",
+        "sectionId": "item-information",
+        "type": "date",
+        "component": "date",
+        "placeholder": "Select planned release date",
+        "required": true,
+        "role": "duedate",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "status",
+        "name": "status",
+        "label": "Status",
+        "sectionId": "item-information",
+        "type": "select",
+        "component": "select",
+        "placeholder": "Select status",
+        "required": true,
+        "role": "status",
+        "options": [
+          {
+            "id": "draft",
+            "label": "Draft",
+            "icon": "FileText",
+            "color": "default"
+          },
+          {
+            "id": "in-production",
+            "label": "In Production",
+            "icon": "Cog",
+            "color": "info"
+          },
+          {
+            "id": "produced",
+            "label": "Produced",
+            "icon": "CheckCircle",
+            "color": "success"
+          },
+          {
+            "id": "ready-for-release",
+            "label": "Ready for Release",
+            "icon": "Package",
+            "color": "warning"
+          },
+          {
+            "id": "delivered-to-distributor",
+            "label": "Delivered to Distributor",
+            "icon": "Truck",
+            "color": "success"
+          },
+          {
+            "id": "cancelled",
+            "label": "Cancelled",
+            "icon": "XCircle",
+            "color": "destructive"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "item-information",
+        "type": "textarea",
+        "component": "textarea",
+        "placeholder": "Enter item description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 7
+      }
+    ],
+    "sections": [
+      {
+        "id": "item-information",
+        "title": "Item Information",
+        "description": "Details about the production plan item",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Package"
   }
 ]

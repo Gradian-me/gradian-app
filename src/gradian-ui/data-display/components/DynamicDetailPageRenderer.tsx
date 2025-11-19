@@ -322,6 +322,8 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     return cache;
   });
   const detailMetadata = schema.detailPageMetadata;
+  const quickActions = detailMetadata?.quickActions || [];
+  
   const isFetchingRef = useRef(false);
   const [documentTitle, setDocumentTitle] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -828,7 +830,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   const metadataSections = detailMetadata?.sections || [];
   const componentRenderers = detailMetadata?.componentRenderers || [];
   const tableRenderers = detailMetadata?.tableRenderers || [];
-  const quickActions = detailMetadata?.quickActions || [];
+  // quickActions already extracted above for debugging
 
   // Get default sections (includes badges if schema has badge fields)
   const defaultSections = getDefaultSections(schema);
@@ -1087,7 +1089,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
         </motion.div>
 
         {/* Main Content Grid */}
-        {hasSidebar && hasSidebarSections ? (
+        {hasSidebar ? (
           <div className={cn(
             "grid gap-6",
             totalColumns === 2 && "grid-cols-1 md:grid-cols-2",
@@ -1161,9 +1163,9 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
             {(hasSidebarSections || quickActions.length > 0 || sectionsForSidebar.length > 0) && (
               <div className={cn(
                 "space-y-6",
-                sidebarColumns === 1 && "md:col-span-1",
-                sidebarColumns === 2 && "md:col-span-2",
-                !sidebarColumns && "md:col-span-1"
+                sidebarColumns === 1 && "md:col-span-1 lg:col-span-1",
+                sidebarColumns === 2 && "md:col-span-2 lg:col-span-2",
+                !sidebarColumns && "md:col-span-1 lg:col-span-1"
               )}>
                 {/* Quick Actions - shown first in sidebar before badges */}
                 {quickActions.length > 0 && (
@@ -1264,62 +1266,10 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                 })}
               </div>
             )}
-
-            {/* Table Renderers - Full Width (Always after components and sections) */}
-                {tableRenderers.length > 0 && (
-              <div className="space-y-6 mt-6 w-full min-w-0">
-                {tableRenderers.map((tableConfig, index) => (
-                  <DynamicRepeatingTableViewer
-                    key={tableConfig.id}
-                    config={tableConfig}
-                    schema={schema}
-                    data={data}
-                    index={index + mainComponents.length + sectionsForMain.length}
-                    disableAnimation={disableAnimation}
-                    sourceSchemaId={schema.id}
-                    sourceId={data?.id}
-                    showRefreshButton
-                    initialTargetSchema={
-                      tableConfig.targetSchema
-                        ? targetSchemaCache[tableConfig.targetSchema]
-                        : null
-                    }
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Auto Table Renderers - Show relations to uncovered target schemas */}
-            {relatedSchemas.length > 0 && (
-              <div className="space-y-6 mt-6 w-full min-w-0">
-                {relatedSchemas.map((targetSchema, index) => (
-                  <DynamicRepeatingTableViewer
-                    key={`auto-table-${targetSchema}`}
-                    config={{
-                      id: `auto-table-${targetSchema}`,
-                      schemaId: schema.id,
-                      sectionId: '',
-                      targetSchema: targetSchema,
-                      // relationTypeId is optional - if not provided, will fetch all relations to this targetSchema
-                    }}
-                    schema={schema}
-                    data={data}
-                    index={tableRenderers.length + index + mainComponents.length + sectionsForMain.length}
-                    disableAnimation={disableAnimation}
-                    sourceSchemaId={schema.id}
-                    sourceId={data?.id}
-                    showRefreshButton
-                    initialTargetSchema={targetSchemaCache[targetSchema]}
-                  />
-                ))}
-              </div>
-            )}
           </div>
         )}
 
-        {/* Table Renderers - Full Width (Always after components and sections) - for sidebar layout */}
-        {hasSidebar && hasSidebarSections && (
-          <>
+        {/* Table Renderers - Full Width (Always after components and sections, regardless of sidebar) */}
         {tableRenderers.length > 0 && (
           <div className="space-y-6 mt-6 w-full min-w-0">
             {tableRenderers.map((tableConfig, index) => (
@@ -1328,7 +1278,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                 config={tableConfig}
                 schema={schema}
                 data={data}
-                index={index + mainComponents.length + sections.length + (hasSidebar ? sidebarComponents.length : 0)}
+                index={index + mainComponents.length + sectionsForMain.length}
                 disableAnimation={disableAnimation}
                 sourceSchemaId={schema.id}
                 sourceId={data?.id}
@@ -1341,34 +1291,32 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
               />
             ))}
           </div>
-            )}
+        )}
 
-            {/* Auto Table Renderers - Show relations to uncovered target schemas */}
-            {relatedSchemas.length > 0 && (
-              <div className="space-y-6 mt-6 w-full min-w-0">
-                {relatedSchemas.map((targetSchema, index) => (
-                  <DynamicRepeatingTableViewer
-                    key={`auto-table-${targetSchema}`}
-                    config={{
-                      id: `auto-table-${targetSchema}`,
-                      schemaId: schema.id,
-                      sectionId: '',
-                      targetSchema: targetSchema,
-                      // relationTypeId is optional - if not provided, will fetch all relations to this targetSchema
-                    }}
-                    schema={schema}
-                    data={data}
-                    index={tableRenderers.length + index + mainComponents.length + sections.length + (hasSidebar ? sidebarComponents.length : 0)}
-                    disableAnimation={disableAnimation}
-                    sourceSchemaId={schema.id}
-                    sourceId={data?.id}
-                    showRefreshButton
-                    initialTargetSchema={targetSchemaCache[targetSchema]}
-                  />
-                ))}
-              </div>
-            )}
-          </>
+        {/* Auto Table Renderers - Show relations to uncovered target schemas */}
+        {relatedSchemas.length > 0 && (
+          <div className="space-y-6 mt-6 w-full min-w-0">
+            {relatedSchemas.map((targetSchema, index) => (
+              <DynamicRepeatingTableViewer
+                key={`auto-table-${targetSchema}`}
+                config={{
+                  id: `auto-table-${targetSchema}`,
+                  schemaId: schema.id,
+                  sectionId: '',
+                  targetSchema: targetSchema,
+                  // relationTypeId is optional - if not provided, will fetch all relations to this targetSchema
+                }}
+                schema={schema}
+                data={data}
+                index={tableRenderers.length + index + mainComponents.length + sectionsForMain.length}
+                disableAnimation={disableAnimation}
+                sourceSchemaId={schema.id}
+                sourceId={data?.id}
+                showRefreshButton
+                initialTargetSchema={targetSchemaCache[targetSchema]}
+              />
+            ))}
+          </div>
         )}
       </div>
 
