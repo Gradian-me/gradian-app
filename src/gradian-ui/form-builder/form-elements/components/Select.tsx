@@ -168,6 +168,10 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     return map;
   }, [normalizedOptions, normalizedValueArray]);
   const hasNormalizedOptions = normalizedOptions.length > 0;
+  const validOptions = useMemo(
+    () => normalizedOptions.filter((opt) => opt.id && opt.id !== ''),
+    [normalizedOptions]
+  );
 
   useEffect(() => {
     if (!allowMultiselect || !isDropdownOpen) {
@@ -230,6 +234,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const [panelPlacement, setPanelPlacement] = useState<'bottom' | 'top'>('bottom');
   const [panelMaxHeight, setPanelMaxHeight] = useState<number>(256);
   const [panelOffset, setPanelOffset] = useState<number>(8);
+  const [shouldShowMultiChevron, setShouldShowMultiChevron] = useState(true);
 
   const updatePanelPosition = useCallback(() => {
     if (!allowMultiselect || !isDropdownOpen || disabled) {
@@ -316,6 +321,21 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       }
       return idsFromValue;
     });
+
+  const validOptionsCount = validOptions.length;
+
+  useEffect(() => {
+    if (!allowMultiselect) {
+      setShouldShowMultiChevron(true);
+      return;
+    }
+
+    const estimatedOptionHeight = size === 'sm' ? 34 : size === 'lg' ? 46 : 40;
+    const maxVisibleWithoutScroll = Math.max(1, Math.floor(panelMaxHeight / estimatedOptionHeight));
+    const needsScroll = validOptionsCount > maxVisibleWithoutScroll;
+
+    setShouldShowMultiChevron(needsScroll);
+  }, [allowMultiselect, panelMaxHeight, size, validOptionsCount]);
   }, [allowMultiselect, normalizedValueIdsKey]);
 
   const arraysMatch = useCallback(
@@ -488,8 +508,6 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
   if (hasNormalizedOptions) {
     const selectedOption = normalizedOptions.find((opt) => opt.id === normalizedCurrentValue);
-    // Filter out empty string values as Radix doesn't allow them
-    const validOptions = normalizedOptions.filter((opt) => opt.id && opt.id !== '');
     // Convert empty string to undefined so placeholder shows
     const selectValue = allowMultiselect
       ? undefined
@@ -627,12 +645,14 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
               <div className="flex flex-1 flex-wrap gap-1">
                 {renderMultiTriggerContent()}
               </div>
-              <ChevronDown
-                className={cn(
-                  'ml-2 h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform',
-                  isDropdownOpen && 'rotate-180'
-                )}
-              />
+              {shouldShowMultiChevron && (
+                <ChevronDown
+                  className={cn(
+                    'ml-2 h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform',
+                    isDropdownOpen && 'rotate-180'
+                  )}
+                />
+              )}
             </button>
             {isDropdownOpen && (
               <div

@@ -65,21 +65,32 @@ export function MainLayout({
   const router = useRouter();
   const { resolvedTheme } = useTheme();
   const profileTheme = resolvedTheme === 'dark' ? 'dark' : 'light';
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(getInitialSidebarState);
+  // Always start with false (expanded) to match server-side render
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notificationCount] = useState(3);
   const [isDesktop, setIsDesktop] = useState(() => {
     if (typeof window === 'undefined') return false;
     return window.innerWidth >= DESKTOP_BREAKPOINT;
   });
+  // Always start with expanded width to match server-side render
   const [sidebarWidth, setSidebarWidth] = useState(() => {
-    const initialCollapsed = getInitialSidebarState();
     const initialDesktop = typeof window !== 'undefined' ? window.innerWidth >= DESKTOP_BREAKPOINT : false;
-    return getSidebarWidth(initialDesktop, initialCollapsed);
+    return getSidebarWidth(initialDesktop, false);
   });
   const { selectedCompany } = useCompanyStore();
   const { closeAllDialogs, hasOpenDialogs, registerDialog, unregisterDialog } = useDialogContext();
   const pageTitle = title ? `${title} | Gradian App` : 'Gradian App';
+
+  // Read sidebar state from localStorage after mount (after hydration)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
+    const shouldBeCollapsed = stored === 'true';
+    if (shouldBeCollapsed !== isSidebarCollapsed) {
+      setIsSidebarCollapsed(shouldBeCollapsed);
+    }
+  }, []); // Only run once after mount
 
   useEffect(() => {
     if (typeof document === 'undefined') return;

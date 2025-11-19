@@ -174,28 +174,30 @@ export function FieldEditor({
                   className="h-9"
                 />
               </div>
-              <div>
-                <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Component</Label>
-                <Select
-                  value={tempField.component || ''}
-                  onValueChange={(value) => {
-                    // Reset componentTypeConfig when component type changes
-                    setTempField({ 
-                      ...tempField, 
-                      component: value as any,
-                      componentTypeConfig: undefined 
-                    });
-                  }}
-                  options={FIELD_TYPES.map((type) => ({ value: type.value, label: type.label }))}
-                />
-              </div>
-              <div>
-                <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Section</Label>
-                <Select
-                  value={tempField.sectionId || ''}
-                  onValueChange={(value) => setTempField({ ...tempField, sectionId: value })}
-                  options={sections.map((section) => ({ value: section.id, label: section.title }))}
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Component</Label>
+                  <Select
+                    value={tempField.component || ''}
+                    onValueChange={(value) => {
+                      // Reset componentTypeConfig when component type changes
+                      setTempField({ 
+                        ...tempField, 
+                        component: value as any,
+                        componentTypeConfig: undefined 
+                      });
+                    }}
+                    options={FIELD_TYPES.map((type) => ({ value: type.value, label: type.label }))}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Section</Label>
+                  <Select
+                    value={tempField.sectionId || ''}
+                    onValueChange={(value) => setTempField({ ...tempField, sectionId: value })}
+                    options={sections.map((section) => ({ value: section.id, label: section.title }))}
+                  />
+                </div>
               </div>
               <div>
                 <TextInput
