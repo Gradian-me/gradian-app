@@ -113,6 +113,31 @@ export const getValueByRole = (schema: FormSchema, data: any, role: string): str
         return pickerStrings.join(joiner).trim();
       }
 
+      // For select fields, resolve ID to label from options
+      if (field.component === 'select' && field.options && field.options.length > 0) {
+        const selectStrings = valueArray
+          .map((entry) => {
+            if (entry === null || entry === undefined) return '';
+            // If entry is an object, try to extract label
+            if (typeof entry === 'object') {
+              const labels = extractLabels(entry);
+              if (labels.length > 0) return labels[0];
+              return '';
+            }
+            // If entry is a string/number ID, find matching option
+            const entryId = String(entry);
+            const option = field.options.find(opt => 
+              String(opt.id) === entryId || String(opt.value) === entryId
+            );
+            if (option) {
+              return option.label || option.id || entryId;
+            }
+            return entryId;
+          })
+          .filter(Boolean);
+        return selectStrings.join(joiner).trim();
+      }
+
       const labels = extractLabels(valueArray);
       if (labels.length > 0) {
         return labels.join(joiner).trim();
@@ -157,6 +182,35 @@ export const getSingleValueByRole = (schema: FormSchema, data: any, role: string
       return pickerStrings[0];
     }
 
+    return defaultValue;
+  }
+
+  // For select fields, resolve ID to label from options
+  if (field.component === 'select' && field.options && field.options.length > 0) {
+    const selectStrings = valueArray
+      .map((entry) => {
+        if (entry === null || entry === undefined) return '';
+        // If entry is an object, try to extract label
+        if (typeof entry === 'object') {
+          const labels = extractLabels(entry);
+          if (labels.length > 0) return labels[0];
+          return '';
+        }
+        // If entry is a string/number ID, find matching option
+        const entryId = String(entry);
+        const option = field.options.find(opt => 
+          String(opt.id) === entryId || String(opt.value) === entryId
+        );
+        if (option) {
+          return option.label || option.id || entryId;
+        }
+        return entryId;
+      })
+      .filter(Boolean);
+    
+    if (selectStrings.length > 0) {
+      return selectStrings[0];
+    }
     return defaultValue;
   }
   

@@ -59,6 +59,11 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
                 </Badge>
               )}
               <Badge variant="outline" className="text-[10px] px-1.5 py-0">{field.component}</Badge>
+              {field.role && (
+                <Badge variant="default" className="text-[10px] px-1.5 py-0 bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-200">
+                  {field.role}
+                </Badge>
+              )}
               {field.required && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Required</Badge>}
             </div>
             <span className={`text-[10px] truncate block mt-0.5 ${

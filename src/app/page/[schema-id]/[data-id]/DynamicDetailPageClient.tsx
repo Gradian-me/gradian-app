@@ -8,6 +8,8 @@ import { useDynamicEntity } from '@/gradian-ui/shared/hooks/use-dynamic-entity';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { MainLayout } from '@/components/layout/main-layout';
 import { useQueryClient } from '@tanstack/react-query';
+import { getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
+import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 
 interface DynamicDetailPageClientProps {
   schema: FormSchema;
@@ -209,7 +211,17 @@ export function DynamicDetailPageClient({
     };
   }, [refreshSchema]);
 
-  // Fetch entity data
+  // Helper function to fetch schema client-side
+  const fetchSchemaClient = useCallback(async (schemaId: string): Promise<FormSchema | null> => {
+    const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);
+    if (response.success && response.data) {
+      await cacheSchemaClientSide(response.data);
+      return response.data;
+    }
+    return null;
+  }, []);
+
+  // Fetch entity data and resolve picker fields
   const loadData = useCallback(
     async ({ silent }: { silent?: boolean } = {}) => {
       if (!silent) {
@@ -220,7 +232,95 @@ export function DynamicDetailPageClient({
         const response = await apiRequest<any>(`/api/data/${schemaId}/${dataId}`);
 
         if (response.success && response.data) {
-          setData(response.data);
+          let entityData = response.data;
+
+          // Resolve picker fields for role-based display (resolve all picker fields, not just those with roles)
+          if (schemaState?.fields) {
+            const pickerFields = schemaState.fields.filter(
+              (field: any) => field.component === 'picker' && field.targetSchema
+            );
+
+            if (pickerFields.length > 0) {
+              const resolvedData = { ...entityData };
+
+              await Promise.all(
+                pickerFields
+                  .filter((field: any) => entityData[field.name])
+                  .map(async (field: any) => {
+                    const fieldValue = entityData[field.name];
+                    // Handle both string IDs and arrays of IDs
+                    const valueArray = Array.isArray(fieldValue) ? fieldValue : [fieldValue];
+                    
+                    for (const value of valueArray) {
+                      if (typeof value !== 'string' || value.trim() === '') {
+                        continue;
+                      }
+
+                      try {
+                        const resolvedResponse = await apiRequest<any>(
+                          `/api/data/${field.targetSchema}/${value}`
+                        );
+                        if (resolvedResponse.success && resolvedResponse.data) {
+                          const resolvedEntity = resolvedResponse.data;
+                          let resolvedLabel = resolvedEntity.name || resolvedEntity.title || value;
+
+                          const targetSchemaForPicker = await fetchSchemaClient(field.targetSchema);
+                          if (targetSchemaForPicker) {
+                            const titleByRole = getValueByRole(
+                              targetSchemaForPicker,
+                              resolvedEntity,
+                              'title'
+                            );
+                            if (titleByRole && titleByRole.trim() !== '') {
+                              resolvedLabel = titleByRole;
+                            }
+                          }
+
+                          // Store resolved data - handle both single and array cases
+                          // Ensure the resolved entity has the correct ID for matching
+                          const resolvedKey = `_${field.name}_resolved`;
+                          const resolvedEntityWithId = {
+                            ...resolvedEntity,
+                            id: value, // Ensure ID matches the entry value for proper lookup
+                            _resolvedLabel: resolvedLabel,
+                          };
+                          
+                          if (Array.isArray(fieldValue)) {
+                            if (!resolvedData[resolvedKey]) {
+                              resolvedData[resolvedKey] = [];
+                            }
+                            const existingIndex = resolvedData[resolvedKey].findIndex(
+                              (item: any) => String(item.id) === String(value)
+                            );
+                            if (existingIndex >= 0) {
+                              resolvedData[resolvedKey][existingIndex] = resolvedEntityWithId;
+                            } else {
+                              resolvedData[resolvedKey].push(resolvedEntityWithId);
+                            }
+                          } else {
+                            resolvedData[resolvedKey] = resolvedEntityWithId;
+                          }
+                          
+                          console.log(`[DetailPage] Resolved picker field ${field.name}:`, {
+                            fieldName: field.name,
+                            value,
+                            resolvedKey,
+                            resolvedLabel,
+                            resolvedEntityId: resolvedEntity.id,
+                          });
+                        }
+                      } catch (error) {
+                        console.error(`Error resolving picker field ${field.name}:`, error);
+                      }
+                    }
+                  })
+              );
+
+              entityData = resolvedData;
+            }
+          }
+
+          setData(entityData);
         } else {
           setError(response.error || 'Failed to fetch entity');
         }
@@ -232,7 +332,7 @@ export function DynamicDetailPageClient({
         }
       }
     },
-    [dataId, schemaId]
+    [dataId, schemaId, schemaState, fetchSchemaClient]
   );
 
   useEffect(() => {

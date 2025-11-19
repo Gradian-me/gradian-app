@@ -93,6 +93,11 @@ export function FieldEditor({
               </Badge>
             )}
             <Badge variant="outline" size="sm" className="text-[10px] px-1.5 py-0">{field.component}</Badge>
+            {field.role && (
+              <Badge variant="default" size="sm" className="text-[10px] px-1.5 py-0 bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-200">
+                {field.role}
+              </Badge>
+            )}
             {field.required && <Badge variant="danger" size="sm" className="text-[10px] px-1.5 py-0">Required</Badge>}
           </div>
           <span className={`text-[10px] truncate block mt-0.5 ${isIncomplete ? 'text-amber-600' : 'text-gray-400 dark:text-gray-300'}`}>
