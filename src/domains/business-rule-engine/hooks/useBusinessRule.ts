@@ -1,6 +1,6 @@
 // Hook to manage business rule state
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import {
   BusinessRule,
   Condition,
@@ -27,6 +27,7 @@ export function useBusinessRule(initialRule?: BusinessRule) {
     }
   );
   const [validationErrors, setValidationErrors] = useState<RuleValidationError[]>([]);
+  const lastAddTimeRef = useRef<{ [groupId: string]: number }>({});
 
   // Validate rule
   const validate = useCallback(() => {
@@ -50,6 +51,15 @@ export function useBusinessRule(initialRule?: BusinessRule) {
 
   // Add condition to group
   const addCondition = useCallback((groupId: string, condition?: Condition) => {
+    // Prevent rapid duplicate additions to the same group (debounce)
+    const now = Date.now();
+    const lastAddTime = lastAddTimeRef.current[groupId] || 0;
+    if (now - lastAddTime < 300) {
+      // Too soon after last add, return null to prevent duplicate
+      return null;
+    }
+    lastAddTimeRef.current[groupId] = now;
+
     let newConditionId: string | null = null;
     setRule((prev) => {
       const newRule = { ...prev };
@@ -57,7 +67,14 @@ export function useBusinessRule(initialRule?: BusinessRule) {
       if (group) {
         const newCondition = condition || createEmptyCondition();
         newConditionId = newCondition.id;
-        group.conditions.push(newCondition);
+        // Prevent duplicate conditions with the same ID
+        const existingIndex = group.conditions.findIndex(c => c.id === newCondition.id);
+        if (existingIndex === -1) {
+          group.conditions.push(newCondition);
+        } else {
+          // Condition already exists, return existing ID
+          newConditionId = group.conditions[existingIndex].id;
+        }
       }
       return newRule;
     });

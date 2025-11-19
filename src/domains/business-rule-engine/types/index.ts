@@ -34,6 +34,7 @@ export interface Condition {
   valueType: ValueType;
   fixedValue: any;
   propertyReference: Property | null;
+  aggregationType?: string | null; // Aggregation type name (e.g., 'sum', 'avg', 'min', 'max')
   description?: string;
 }
 

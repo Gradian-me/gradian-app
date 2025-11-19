@@ -324,7 +324,10 @@ export function SchemaBuilderEditor({
   }
 
   return (
-    <MainLayout title={title || `Editing: ${schema.plural_name}`} subtitle={subtitle}>
+    <MainLayout 
+      title={title || (schema.singular_name ? `Edit ${schema.singular_name}` : `Editing: ${schema.plural_name}`)} 
+      subtitle={subtitle}
+    >
       <div className="space-y-6">
         {/* Display API response messages if available */}
         {apiResponse && (

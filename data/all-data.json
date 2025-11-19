@@ -15,7 +15,9 @@
         "technology",
         "logistics",
         "manufacturing",
-        "finance"
+        "finance",
+        "healthcare",
+        "education"
       ],
       "status": [
         {
@@ -28,7 +30,7 @@
       "rating": 4,
       "id": "01K8QVCWS0ZSTMSVD5C6K7A806",
       "createdAt": "2025-10-29T11:24:37.540Z",
-      "updatedAt": "2025-11-08T08:30:56.740Z",
+      "updatedAt": "2025-11-19T06:27:25.854Z",
       "performanceMetrics": [
         {
           "id": "onTimeDelivery",
@@ -116,19 +118,19 @@
       "contacts": [
         {
           "id": "01K94Q59VYS8JA1VRMG7Q343GM",
-          "label": "Ghader | Ghaderi"
+          "label": "Ghader Ghaderi"
         },
         {
           "id": "01K94KYJ0TQCGVHJRJ3Q0D0E7G",
-          "label": "Masoud | Mirghasemi"
+          "label": "Masoud Mirghasemi"
         },
         {
           "id": "01K94Q1ZE6M64MSHAXJARG7F8G",
-          "label": "Mahyar | Abidi"
+          "label": "Mahyar Abidi"
         },
         {
           "id": "01K94KB42QKQNNH7VED2K06Y40",
-          "label": "Arash | Zarandi"
+          "label": "Arash Zarandi"
         }
       ]
     },
@@ -1285,8 +1287,8 @@
       ],
       "id": "lucide_icons_sync",
       "createdAt": "2025-11-17T18:00:00.000Z",
-      "updatedAt": "2025-11-18T06:06:45.333Z",
-      "lastSynced": "2025-11-18T06:06:45.323Z"
+      "updatedAt": "2025-11-19T06:26:01.829Z",
+      "lastSynced": "2025-11-19T06:26:01.712Z"
     },
     {
       "color": "#2e84e0",
@@ -1313,8 +1315,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-11-18T13:59:54.268Z",
-      "lastSynced": "2025-11-18T13:59:54.216Z"
+      "updatedAt": "2025-11-19T06:25:57.869Z",
+      "lastSynced": "2025-11-19T06:25:57.802Z"
     }
   ],
   "databases": [
@@ -1485,6 +1487,89 @@
       "color": "#FF9DA7",
       "sqlEquivalent": "IS NOT NULL AND <> ''",
       "cypherEquivalent": "IS NOT NULL AND <> ''"
+    }
+  ],
+  "aggregation-types": [
+    {
+      "id": "aggregation-type-sum",
+      "name": "sum",
+      "title": "Sum",
+      "symbol": "Σ",
+      "color": "#4E79A7",
+      "sqlEquivalent": "SUM",
+      "description": "Calculates the sum of all values in a column"
+    },
+    {
+      "id": "aggregation-type-avg",
+      "name": "avg",
+      "title": "Average",
+      "symbol": "μ",
+      "color": "#F58518",
+      "sqlEquivalent": "AVG",
+      "description": "Calculates the average (mean) of all values in a column"
+    },
+    {
+      "id": "aggregation-type-min",
+      "name": "min",
+      "title": "Minimum",
+      "symbol": "min",
+      "color": "#54A24B",
+      "sqlEquivalent": "MIN",
+      "description": "Returns the minimum value from a column"
+    },
+    {
+      "id": "aggregation-type-max",
+      "name": "max",
+      "title": "Maximum",
+      "symbol": "max",
+      "color": "#E4572E",
+      "sqlEquivalent": "MAX",
+      "description": "Returns the maximum value from a column"
+    },
+    {
+      "id": "aggregation-type-first",
+      "name": "first",
+      "title": "First",
+      "symbol": "first",
+      "color": "#72B7B2",
+      "sqlEquivalent": "FIRST_VALUE",
+      "description": "Returns the first value from a column"
+    },
+    {
+      "id": "aggregation-type-last",
+      "name": "last",
+      "title": "Last",
+      "symbol": "last",
+      "color": "#B279A2",
+      "sqlEquivalent": "LAST_VALUE",
+      "description": "Returns the last value from a column"
+    },
+    {
+      "id": "aggregation-type-count",
+      "name": "count",
+      "title": "Count",
+      "symbol": "n",
+      "color": "#4C78A8",
+      "sqlEquivalent": "COUNT",
+      "description": "Counts the number of rows in a column"
+    },
+    {
+      "id": "aggregation-type-countdistinct",
+      "name": "countdistinct",
+      "title": "Count Distinct",
+      "symbol": "n(D)",
+      "color": "#9D755D",
+      "sqlEquivalent": "COUNT(DISTINCT)",
+      "description": "Counts the number of unique values in a column"
+    },
+    {
+      "id": "aggregation-type-stdev",
+      "name": "stdev",
+      "title": "Standard Deviation",
+      "symbol": "σ",
+      "color": "#FF7F0E",
+      "sqlEquivalent": "STDEV",
+      "description": "Calculates the standard deviation of values in a column"
     }
   ]
 }

@@ -7,10 +7,20 @@ import { SchemaFieldSelector } from './SchemaFieldSelector';
 import { ConditionItem } from './ConditionItem';
 import { createEmptyCondition } from '../utils/rule-operations';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Copy, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Copy, ChevronDown, ChevronRight, Save, ShieldCheck, CheckCircle, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ButtonMinimal } from '@/gradian-ui/form-builder/form-elements/components/ButtonMinimal';
+
+interface RootGroupActions {
+  onReset: () => void;
+  onTest: () => void;
+  onSave: () => void;
+  isSaving: boolean;
+  isTesting: boolean;
+  testResult?: 'success' | 'error' | null;
+  hasValidationErrors: boolean;
+}
 
 interface ConditionGroupProps {
   group: ConditionGroupType;
@@ -27,6 +37,7 @@ interface ConditionGroupProps {
   errors?: any[];
   level?: number;
   isRoot?: boolean;
+  rootGroupActions?: RootGroupActions;
 }
 
 export function ConditionGroup({
@@ -44,15 +55,44 @@ export function ConditionGroup({
   errors = [],
   level = 0,
   isRoot = false,
+  rootGroupActions,
 }: ConditionGroupProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [editingConditionId, setEditingConditionId] = useState<string | null>(null);
+  const isAddingRef = useRef(false);
+  const lastAddedTimeRef = useRef<number>(0);
+
+  // Clear editingConditionId if the condition no longer exists
+  useEffect(() => {
+    if (editingConditionId) {
+      const conditionExists = group.conditions.some(c => c.id === editingConditionId);
+      if (!conditionExists) {
+        setEditingConditionId(null);
+      }
+    }
+  }, [group.conditions, editingConditionId]);
 
   // Handle adding condition - auto-enter edit mode
   const handleAddCondition = () => {
-    const newConditionId = onAddCondition();
-    if (newConditionId) {
-      setEditingConditionId(newConditionId);
+    // Prevent duplicate additions within 500ms (debounce)
+    const now = Date.now();
+    if (isAddingRef.current || (now - lastAddedTimeRef.current < 500)) {
+      return;
+    }
+    
+    isAddingRef.current = true;
+    lastAddedTimeRef.current = now;
+    
+    try {
+      const newConditionId = onAddCondition();
+      if (newConditionId) {
+        setEditingConditionId(newConditionId);
+      }
+    } finally {
+      // Reset after state update completes
+      setTimeout(() => {
+        isAddingRef.current = false;
+      }, 300);
     }
   };
 
@@ -95,7 +135,42 @@ export function ConditionGroup({
                 {isRoot ? 'Root Group' : `Group (${group.logicalOperator.toUpperCase()})`}
               </CardTitle>
             </div>
-            {!isRoot && (onDeleteGroup || onDuplicateGroup) && (
+            {isRoot && rootGroupActions ? (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={rootGroupActions.onReset}
+                >
+                  Reset
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={rootGroupActions.onTest}
+                  disabled={rootGroupActions.isTesting || rootGroupActions.hasValidationErrors}
+                  className="gap-2"
+                >
+                  {rootGroupActions.isTesting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : rootGroupActions.testResult === 'success' ? (
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <ShieldCheck className="h-4 w-4" />
+                  )}
+                  {rootGroupActions.isTesting ? 'Validating...' : 'Validate'}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={rootGroupActions.onSave}
+                  disabled={rootGroupActions.isSaving || rootGroupActions.hasValidationErrors}
+                  className="gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  {rootGroupActions.isSaving ? 'Saving...' : 'Save Rule'}
+                </Button>
+              </div>
+            ) : !isRoot && (onDeleteGroup || onDuplicateGroup) ? (
               <div className="flex items-center gap-1">
                 {onDuplicateGroup && (
                   <ButtonMinimal
@@ -116,7 +191,7 @@ export function ConditionGroup({
                   />
                 )}
               </div>
-            )}
+            ) : null}
           </div>
         </CardHeader>
         {!isCollapsed && (

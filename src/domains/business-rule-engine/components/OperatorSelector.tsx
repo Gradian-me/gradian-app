@@ -2,11 +2,12 @@
 
 import { useMemo } from 'react';
 import { Operator, Property } from '../types';
-import { Select, SelectOption } from '@/gradian-ui/form-builder/form-elements/components/Select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   getOperatorsForPropertyType,
   groupOperatorsByCategory,
 } from '../utils/operator-utils';
+import { cn } from '@/gradian-ui/shared/utils';
 
 interface OperatorSelectorProps {
   operators: Operator[];
@@ -38,60 +39,42 @@ export function OperatorSelector({
     [filteredOperators]
   );
 
-  // Convert to SelectOption format
-  const options: SelectOption[] = useMemo(() => {
-    const opts: SelectOption[] = [];
-    Object.entries(groupedOperators).forEach(([category, ops]) => {
-      ops.forEach((op) => {
-        opts.push({
-          id: op.id,
-          value: op.id,
-          label: `${op.symbol} ${op.title}`,
-          color: op.color,
-        });
-      });
-    });
-    return opts;
-  }, [groupedOperators]);
-
   const handleChange = (selectedId: string) => {
     const selected = operators.find((o) => o.id === selectedId);
     onChange(selected || null);
   };
 
-  if (compact) {
-    return (
-      <div className="space-y-1">
-        <Select
-          options={options}
-          value={value?.id || ''}
-          onValueChange={handleChange}
-          placeholder="Operator..."
-          config={{ name: 'operator', label: '' }}
-          error={error}
-          size="sm"
-          disabled={!property}
-        />
-        {error && <div className="text-xs text-red-500">{error}</div>}
-      </div>
-    );
-  }
+  const operatorValue = value?.id || '';
 
   return (
     <div className="space-y-2">
-      <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
-        Operator {required && <span className="text-red-500">*</span>}
-      </label>
+      {!compact && (
+        <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+          Operator {required && <span className="text-red-500">*</span>}
+        </label>
+      )}
       <Select
-        options={options}
-        value={value?.id || ''}
+        value={operatorValue}
         onValueChange={handleChange}
-        placeholder="Select operator..."
-        config={{ name: 'operator', label: '' }}
-        error={error}
-        size="sm"
         disabled={!property}
-      />
+      >
+        <SelectTrigger className={cn(
+          compact ? 'h-8 text-xs' : 'h-10 text-sm',
+          error ? 'border-red-500' : '',
+          !property ? 'opacity-50' : ''
+        )}>
+          <SelectValue placeholder={property ? "Select operator..." : "Select property first"} />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.entries(groupedOperators).map(([category, ops]) => (
+            ops.map((op) => (
+              <SelectItem key={op.id} value={op.id}>
+                {op.symbol} {op.title}
+              </SelectItem>
+            ))
+          ))}
+        </SelectContent>
+      </Select>
       {value && !compact && (
         <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
           {value.sqlEquivalent && (

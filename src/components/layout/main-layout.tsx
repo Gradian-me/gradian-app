@@ -69,7 +69,11 @@ export function MainLayout({
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
+    const previousTitle = document.title;
     document.title = pageTitle;
+    return () => {
+      document.title = previousTitle;
+    };
   }, [pageTitle]);
 
   // Check if we're on desktop

@@ -125,7 +125,7 @@ export default function BuilderPage() {
   return (
     <MainLayout
       title="Builder"
-      subtitle="Configure and manage your application's data models and relationships"
+      subtitle="Configure and manage your application"
       icon="Settings"
     >
       <div className="space-y-8">

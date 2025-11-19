@@ -1,6 +1,6 @@
 // Hook to fetch schemas from API
 
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 export interface Schema {
   id: string;
@@ -14,47 +14,42 @@ export interface Schema {
     type?: string;
     component?: string;
     description?: string;
+    placeholder?: string;
+    options?: Array<{ id?: string; label: string; value?: string; disabled?: boolean; icon?: string; color?: string }>;
   }>;
 }
 
+const SCHEMAS_QUERY_KEY = ['business-rules', 'schemas'] as const;
+
 export function useSchemas() {
-  const [schemas, setSchemas] = useState<Schema[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchSchemas = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch('/api/schemas?summary=true');
+  const { data: schemas = [], isLoading, error, refetch } = useQuery({
+    queryKey: SCHEMAS_QUERY_KEY,
+    queryFn: async () => {
+      // Fetch full schemas (without summary) to get fields for conditions
+      const response = await fetch('/api/schemas');
       if (!response.ok) {
         throw new Error('Failed to fetch schemas');
       }
 
       const result = await response.json();
       if (result.success && Array.isArray(result.data)) {
-        setSchemas(result.data);
+        return result.data as Schema[];
       } else {
         throw new Error('Invalid response format');
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load schemas');
-      console.error('Error fetching schemas:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchSchemas();
-  }, [fetchSchemas]);
+    },
+    staleTime: 0, // Always consider data stale (but won't auto-refetch)
+    gcTime: 0, // Don't cache in memory
+    refetchOnMount: false, // Don't refetch on mount - use cached data if available
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: false, // Don't refetch on reconnect
+  });
 
   return {
     schemas,
     isLoading,
-    error,
-    refetch: fetchSchemas,
+    error: error ? (error instanceof Error ? error.message : 'Failed to load schemas') : null,
+    refetch: () => refetch(),
   };
 }
 

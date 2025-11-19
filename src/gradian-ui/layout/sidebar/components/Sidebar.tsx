@@ -45,9 +45,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       />
 
       {/* Company Selector */}
-      <div className="px-4 py-3 border-b border-gray-800 sm:block lg:hidden">
-        <CompanySelector variant="dark" fullWidth showLogo="sidebar-avatar" />
-      </div>
+      {(!isCollapsed || isMobile) && (
+        <div className="px-4 py-3 border-b border-gray-800 sm:block lg:hidden">
+          <CompanySelector variant="dark" fullWidth showLogo="sidebar-avatar" />
+        </div>
+      )}
 
       {/* Navigation */}
       <SidebarNavigation
@@ -58,38 +60,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
       />
 
       {/* User Profile / Mode Toggle */}
-      <div className="mt-auto border-t border-gray-800 p-4">
-        <div className="flex items-center gap-3">
-          <UserProfileSelector
-            className={cn(
-              "flex-1",
-              isCollapsed && !isMobile ? "justify-center" : ""
-            )}
-            theme="dark"
-            config={{
-              layout: {
-                variant: 'dropdown',
-                size: isCollapsed && !isMobile ? 'sm' : 'md',
-                showAvatar: true,
-                showName: !isCollapsed || isMobile,
-                showEmail: false,
-                showRole: false,
-                showStatus: false,
-                fullWidth: true,
-                popoverPlacement: 'auto',
-              },
-              styling: {
-                variant: 'minimal',
-                theme: 'dark',
-                rounded: true,
-              },
-            }}
-          />
-          <div className="shrink-0">
-            <ModeToggle />
+      {(!isCollapsed || isMobile) && (
+        <div className="mt-auto border-t border-gray-800 p-4">
+          <div className="flex items-center gap-3">
+            <UserProfileSelector
+              className={cn(
+                "flex-1",
+                isCollapsed && !isMobile ? "justify-center" : ""
+              )}
+              theme="dark"
+              config={{
+                layout: {
+                  variant: 'dropdown',
+                  size: isCollapsed && !isMobile ? 'sm' : 'md',
+                  showAvatar: true,
+                  showName: !isCollapsed || isMobile,
+                  showEmail: false,
+                  showRole: false,
+                  showStatus: false,
+                  fullWidth: true,
+                  popoverPlacement: 'auto',
+                },
+                styling: {
+                  variant: 'minimal',
+                  theme: 'dark',
+                  rounded: true,
+                },
+              }}
+            />
+            <div className="shrink-0">
+              <ModeToggle />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </motion.div>
   );
 };

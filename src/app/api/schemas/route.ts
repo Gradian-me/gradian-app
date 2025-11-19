@@ -6,12 +6,8 @@ import fs from 'fs';
 import path from 'path';
 
 import { isDemoModeEnabled, proxySchemaRequest } from './utils';
-import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
-import { loadData, clearCache } from '@/gradian-ui/shared/utils/data-loader';
-import { LogType, SCHEMA_SUMMARY_EXCLUDED_KEYS } from '@/gradian-ui/shared/constants/application-variables';
+import { SCHEMA_SUMMARY_EXCLUDED_KEYS } from '@/gradian-ui/shared/constants/application-variables';
 
-// Get cache configuration
-const CACHE_CONFIG = getCacheConfigByPath('/api/schemas');
 const SCHEMA_SUMMARY_EXCLUDED_KEY_SET = new Set<string>(SCHEMA_SUMMARY_EXCLUDED_KEYS);
 
 function buildSchemaSummary<T extends Record<string, any>>(schema: T): T {
@@ -43,31 +39,24 @@ function buildSchemaSummary<T extends Record<string, any>>(schema: T): T {
 }
 
 /**
- * Clear schema cache (useful for development)
+ * Clear schema cache (no-op, kept for compatibility)
  */
 export function clearSchemaCache() {
-  clearCache('schemas');
+  // No-op: caching is disabled
 }
 
 /**
- * Load schemas with shared cache
+ * Load schemas (always fresh, no caching)
  */
-async function loadSchemas(bypassCache: boolean = false): Promise<any[]> {
-  const routeKey = bypassCache ? 'schemas-summary' : 'schemas';
-  return await loadData<any[]>(routeKey, '/api/schemas', {
-    ttl: bypassCache ? 0 : CACHE_CONFIG.ttl,
-    logType: LogType.SCHEMA_LOADER,
-    fetcher: async () => {
-      const dataPath = path.join(process.cwd(), 'data', 'all-schemas.json');
-      
-      if (!fs.existsSync(dataPath)) {
-        return [];
-      }
-      
-      const fileContents = fs.readFileSync(dataPath, 'utf8');
-      return JSON.parse(fileContents);
-    },
-  });
+async function loadSchemas(): Promise<any[]> {
+  const dataPath = path.join(process.cwd(), 'data', 'all-schemas.json');
+  
+  if (!fs.existsSync(dataPath)) {
+    return [];
+  }
+  
+  const fileContents = fs.readFileSync(dataPath, 'utf8');
+  return JSON.parse(fileContents);
 }
 
 /**
@@ -88,8 +77,8 @@ export async function GET(request: NextRequest) {
     const summaryParam = searchParams.get('summary');
     const isSummaryRequested = summaryParam === 'true' || summaryParam === '1';
 
-    // Load schemas (bypass cache when summary=true to always get fresh data)
-    const schemas = await loadSchemas(isSummaryRequested);
+    // Load schemas (always fresh, no caching)
+    const schemas = await loadSchemas();
     
     if (!schemas || schemas.length === 0) {
       return NextResponse.json(
@@ -219,9 +208,6 @@ export async function POST(request: NextRequest) {
     // Write back to file
     const schemaFilePath = path.join(process.cwd(), 'data', 'all-schemas.json');
     fs.writeFileSync(schemaFilePath, JSON.stringify(schemas, null, 2), 'utf8');
-    
-    // Clear cache to force reload on next request
-    clearCache('schemas');
 
     return NextResponse.json({
       success: true,

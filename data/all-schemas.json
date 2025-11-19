@@ -141,6 +141,14 @@
         "role": "description",
         "colSpan": 2,
         "order": 5
+      },
+      {
+        "id": "field-1763532942500",
+        "name": "newField",
+        "label": "New Field",
+        "sectionId": "basic-information",
+        "component": "text",
+        "order": 6
       }
     ],
     "sections": [
@@ -189,6 +197,17 @@
           "deleteType": "itemAndRelation",
           "addType": "addOnly",
           "isUnique": true
+        }
+      },
+      {
+        "id": "contacts",
+        "title": "Contacts",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 0,
+          "targetSchema": "contacts",
+          "relationTypeId": "HAS_CONTACT"
         }
       }
     ],
@@ -306,7 +325,9 @@
       ]
     },
     "showInNavigation": true,
-    "icon": "FileSearch"
+    "icon": "FileSearch",
+    "isSystemSchema": false,
+    "isNotCompanyBased": false
   },
   {
     "id": "inquiry-items",
@@ -3775,6 +3796,147 @@
     },
     "showInNavigation": true,
     "icon": "Code",
+    "isSystemSchema": true,
+    "isNotCompanyBased": true
+  },
+  {
+    "id": "aggregation-types",
+    "description": "Manage aggregation types with their symbols, SQL equivalents and formulas",
+    "singular_name": "Aggregation Type",
+    "plural_name": "Aggregation Types",
+    "cardMetadata": [
+      {
+        "id": "aggregation-type-info",
+        "title": "Aggregation Type Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "aggregation-type-name",
+          "aggregation-type-title",
+          "aggregation-type-symbol",
+          "aggregation-type-color"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "aggregation-type-name",
+        "name": "name",
+        "label": "Name",
+        "sectionId": "basic-information",
+        "type": "name",
+        "component": "name",
+        "placeholder": "e.g., sum, avg, min",
+        "required": true,
+        "role": "subtitle",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "aggregation-type-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "e.g., Sum, Average, Minimum",
+        "required": true,
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "aggregation-type-color",
+        "name": "color",
+        "label": "Color",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "color-picker",
+        "placeholder": "#000000",
+        "required": false,
+        "validation": {
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "aggregation-type-symbol",
+        "name": "symbol",
+        "label": "Symbol",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "e.g., Σ, μ, min, max",
+        "required": true,
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "aggregation-type-sql-equivalent",
+        "name": "sqlEquivalent",
+        "label": "SQL Equivalent",
+        "sectionId": "basic-information",
+        "type": "text",
+        "component": "text",
+        "placeholder": "e.g., SUM, AVG, MIN, MAX, COUNT",
+        "required": false,
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "aggregation-type-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "type": "textarea",
+        "component": "textarea",
+        "placeholder": "Enter description of what this aggregation type does",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 6
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Aggregation type name, title, symbol, SQL equivalent and description",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "aggregation-type-overview",
+          "title": "Aggregation Type Overview",
+          "description": "Basic aggregation type information",
+          "colSpan": 2,
+          "fieldIds": [
+            "aggregation-type-name",
+            "aggregation-type-title",
+            "aggregation-type-symbol",
+            "aggregation-type-color",
+            "aggregation-type-sql-equivalent",
+            "aggregation-type-description"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "Function",
     "isSystemSchema": true,
     "isNotCompanyBased": true
   }

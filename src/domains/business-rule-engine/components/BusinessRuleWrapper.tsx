@@ -6,14 +6,15 @@ import { useBusinessRule } from '../hooks/useBusinessRule';
 import { useLogicalOperators } from '../hooks/useLogicalOperators';
 import { useProperties } from '../hooks/useProperties';
 import { ConditionGroup } from './ConditionGroup';
-import { RulePreview } from './RulePreview';
 import { ValidationMessage } from './ValidationMessage';
+import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Save, TestTube, RefreshCw } from 'lucide-react';
+import { Save, TestTube, RefreshCw, CheckCircle, Loader2 } from 'lucide-react';
+import { validateRule } from '../utils/rule-operations';
 import { toast } from 'sonner';
 import { MainLayout } from '@/components/layout/main-layout';
 
@@ -53,6 +54,7 @@ export function BusinessRuleWrapper({
 
   const [isSaving, setIsSaving] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState<'success' | 'error' | null>(null);
 
   const handleSave = async () => {
     if (!validate()) {
@@ -77,21 +79,40 @@ export function BusinessRuleWrapper({
   };
 
   const handleTest = async () => {
-    if (!validate()) {
-      toast.error('Please fix validation errors before testing');
-      return;
-    }
-
     setIsTesting(true);
+    setTestResult(null);
+    
     try {
+      // Validate the rule first - get errors directly from validation
+      const errors = validateRule(rule);
+      validate(); // Also update the validation errors state for the UI
+      
+      // Simulate a brief validation delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      if (errors.length > 0) {
+        const errorCount = errors.length;
+        setTestResult('error');
+        toast.error(`Rule validation failed: ${errorCount} error${errorCount !== 1 ? 's' : ''} found`, {
+          description: errors[0]?.message || 'Please check your rule configuration',
+        });
+        return;
+      }
+
+      // If custom test handler is provided, use it
       if (onTest) {
         await onTest(rule);
+        setTestResult('success');
+        toast.success('Rule test passed successfully');
       } else {
-        // Default test behavior
-        console.log('Testing rule:', rule);
-        toast.info('Rule test functionality not implemented');
+        // Default test behavior - rule is valid
+        setTestResult('success');
+        toast.success('Rule validation passed', {
+          description: 'All conditions are properly configured',
+        });
       }
     } catch (error) {
+      setTestResult('error');
       toast.error(error instanceof Error ? error.message : 'Failed to test rule');
     } finally {
       setIsTesting(false);
@@ -217,27 +238,7 @@ export function BusinessRuleWrapper({
         {/* Condition Builder */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Conditions</CardTitle>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddCondition}
-                  disabled={operatorsLoading || propertiesLoading}
-                >
-                  Add Condition
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddGroup}
-                  disabled={operatorsLoading || propertiesLoading}
-                >
-                  Add Group
-                </Button>
-              </div>
-            </div>
+            <CardTitle>Conditions</CardTitle>
           </CardHeader>
           <CardContent>
             <ConditionGroup
@@ -261,46 +262,38 @@ export function BusinessRuleWrapper({
               errors={validationErrors}
               level={0}
               isRoot={true}
+              rootGroupActions={{
+                onReset: () => {
+                  resetRule();
+                  setTestResult(null);
+                  toast.info('Rule reset');
+                },
+                onTest: handleTest,
+                onSave: handleSave,
+                isSaving,
+                isTesting,
+                testResult,
+                hasValidationErrors: validationErrors.length > 0,
+              }}
             />
           </CardContent>
         </Card>
 
         {/* Rule Preview */}
-        <RulePreview rootGroup={rule.rootGroup} />
-
-        {/* Actions */}
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-end gap-3">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  resetRule();
-                  toast.info('Rule reset');
-                }}
-              >
-                Reset
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleTest}
-                disabled={isTesting || validationErrors.length > 0}
-                className="gap-2"
-              >
-                <TestTube className="h-4 w-4" />
-                Test Rule
-              </Button>
-              <Button
-                onClick={handleSave}
-                disabled={isSaving || validationErrors.length > 0}
-                className="gap-2"
-              >
-                <Save className="h-4 w-4" />
-                {isSaving ? 'Saving...' : 'Save Rule'}
-              </Button>
-            </div>
+          <CardHeader>
+            <CardTitle>Rule Preview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CodeViewer
+              code={JSON.stringify(rule, null, 2)}
+              programmingLanguage="json"
+              title="Business Rule JSON"
+              initialLineNumbers={30}
+            />
           </CardContent>
         </Card>
+
       </div>
     </MainLayout>
   );
