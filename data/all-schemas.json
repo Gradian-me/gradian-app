@@ -3960,7 +3960,7 @@
     "fields": [
       {
         "id": "company",
-        "name": "companyId",
+        "name": "company",
         "label": "Company",
         "sectionId": "basic-information",
         "type": "picker",

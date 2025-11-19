@@ -1036,7 +1036,23 @@
       ],
       "id": "01KAE3F9YZVBY6R1K0NNCT62ZJ",
       "createdAt": "2025-11-19T13:04:44.527Z",
-      "updatedAt": "2025-11-19T13:04:44.527Z"
+      "updatedAt": "2025-11-19T13:57:51.558Z",
+      "production-plan-items": [
+        {
+          "id": "01KAE3GMR90MBXAH2866JMVQBN",
+          "label": "01KAE3GMR90MBXAH2866JMVQBN"
+        },
+        {
+          "id": "01KAE3HG1DWRTPAYMT0FRFZE64",
+          "label": "01KAE3HG1DWRTPAYMT0FRFZE64"
+        }
+      ],
+      "company": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ]
     }
   ],
   "applications": [],
