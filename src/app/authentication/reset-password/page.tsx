@@ -247,7 +247,7 @@ function ResetPasswordContent() {
               Reset password
             </h1>
             <p className="animate-element animate-delay-200 text-muted-foreground hidden md:block">
-              Verify your identity with a one-time code and create a secure new password.
+              Verify your identity and create a secure new password.
             </p>
 
             {error && (

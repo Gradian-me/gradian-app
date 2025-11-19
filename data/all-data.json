@@ -1013,6 +1013,26 @@
       "lastName": "Abidi",
       "postTitle": "CAO",
       "company": "CinnaGen"
+    },
+    {
+      "status": [
+        {
+          "id": "active",
+          "label": "Active",
+          "icon": "CheckCircle",
+          "color": "success"
+        }
+      ],
+      "company": "CinnaGen",
+      "username": "heydarzadehn",
+      "firstName": "Nima",
+      "lastName": "Heydarzadeh",
+      "email": "heydarzadehn@cinnagen.com",
+      "postTitle": "AI Engineer",
+      "id": "01KAEC9VRPRR23C24QHTR0NSF9",
+      "createdAt": "2025-11-19T15:39:03.349Z",
+      "updatedAt": "2025-11-19T15:39:48.891Z",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     }
   ],
   "purchaseOrders": [],

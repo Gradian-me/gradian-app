@@ -168,14 +168,22 @@ export default function SignUpPage() {
 
   const handleSubmit = useCallback(
     async (values: Record<string, any>) => {
-      const companyId = getCompanyId();
+      // Check if schema is company-based
+      const isNotCompanyBased = schema?.isNotCompanyBased === true;
+      const isCompanyBased = !isNotCompanyBased;
 
-      if (!companyId) {
-        setSubmitFeedback({
-          type: 'error',
-          message: 'Please select a company before creating an account.',
-        });
-        return;
+      // Only require companyId if schema is company-based
+      let companyId: string | null = null;
+      if (isCompanyBased) {
+        companyId = getCompanyId();
+
+        if (!companyId) {
+          setSubmitFeedback({
+            type: 'error',
+            message: 'Please select a company before creating an account.',
+          });
+          return;
+        }
       }
 
       setIsSubmitting(true);
@@ -184,15 +192,18 @@ export default function SignUpPage() {
       try {
         // Use config to determine correct URL based on demo mode
         const apiUrl = `${config.dataApi.basePath}/users`;
+        
+        // Only include companyId in request body if schema is company-based
+        const requestBody = isCompanyBased && companyId
+          ? { ...values, companyId }
+          : { ...values };
+
         const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            ...values,
-            companyId,
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         const result = await response.json();
@@ -222,7 +233,7 @@ export default function SignUpPage() {
         setIsSubmitting(false);
       }
     },
-    [getCompanyId, router]
+    [getCompanyId, router, schema]
   );
 
   const renderContent = useMemo(() => {
