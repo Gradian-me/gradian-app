@@ -192,7 +192,7 @@
     "type": "warning",
     "category": "vendor",
     "priority": "high",
-    "isRead": false,
+    "isRead": true,
     "createdAt": "2024-12-10T13:45:00.000Z",
     "actionUrl": "/contracts/transfarma",
     "metadata": {

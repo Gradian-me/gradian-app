@@ -1322,8 +1322,8 @@
       ],
       "id": "lucide_icons_sync",
       "createdAt": "2025-11-17T18:00:00.000Z",
-      "updatedAt": "2025-11-19T06:26:01.829Z",
-      "lastSynced": "2025-11-19T06:26:01.712Z"
+      "updatedAt": "2025-11-19T15:14:54.950Z",
+      "lastSynced": "2025-11-19T15:14:54.799Z"
     },
     {
       "color": "#2e84e0",
@@ -1352,6 +1352,51 @@
       "createdAt": "2025-11-18T13:59:23.884Z",
       "updatedAt": "2025-11-19T06:25:57.869Z",
       "lastSynced": "2025-11-19T06:25:57.802Z"
+    },
+    {
+      "color": "#4E79A7",
+      "title": "AI Agent Sync",
+      "description": "AI Agent Sync",
+      "icon": "Bot",
+      "targetRoute": [
+        {
+          "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
+          "label": "Schema Bulk Sync",
+          "metadata": {
+            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/bulk"
+          }
+        }
+      ],
+      "targetMethod": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "Upload",
+          "color": "success"
+        }
+      ],
+      "targetDataPath": "data",
+      "sourceRoute": [
+        {
+          "id": "01KA8VXHQFZR5TH0470163433K",
+          "label": "Schemas",
+          "metadata": {
+            "address": "http://localhost:3000/api/schemas"
+          }
+        }
+      ],
+      "sourceMethod": [
+        {
+          "id": "GET",
+          "label": "GET",
+          "icon": "Download",
+          "color": "info"
+        }
+      ],
+      "sourceDataPath": "data",
+      "id": "ai_agents_sync",
+      "createdAt": "2025-11-19T15:14:24.958Z",
+      "updatedAt": "2025-11-19T15:14:24.958Z"
     }
   ],
   "databases": [
@@ -1620,7 +1665,24 @@
       "updatedAt": "2025-11-19T08:28:45.851Z"
     }
   ],
-  "tags": [],
+  "tags": [
+    {
+      "color": "#13aac9",
+      "label": "MRP",
+      "icon": "ShoppingBasket",
+      "id": "01KAE9PZYDK8XYP0PNDHX0HGFN",
+      "createdAt": "2025-11-19T14:53:47.878Z",
+      "updatedAt": "2025-11-19T14:53:47.878Z"
+    },
+    {
+      "color": "#80f4be",
+      "label": "eQMS",
+      "icon": "Verified",
+      "id": "01KAE9R3R8XZ41613Y9AS2BXC1",
+      "createdAt": "2025-11-19T14:54:24.545Z",
+      "updatedAt": "2025-11-19T14:54:24.545Z"
+    }
+  ],
   "production-plan-items": [
     {
       "batchNumber": "B029AG",
@@ -1659,6 +1721,88 @@
       "id": "01KAE3HG1DWRTPAYMT0FRFZE64",
       "createdAt": "2025-11-19T13:05:56.285Z",
       "updatedAt": "2025-11-19T13:05:56.285Z"
+    }
+  ],
+  "mcp-tools": [
+    {
+      "title": "Weather Tool",
+      "name": "weather_tool",
+      "protocol": [
+        {
+          "id": "Rest",
+          "label": "Rest"
+        }
+      ],
+      "method": [
+        {
+          "id": "GET",
+          "label": "GET"
+        }
+      ],
+      "retryPolicy": [
+        {
+          "id": "try-5-times-every-5-seconds",
+          "label": "Try 5 times every 5 seconds"
+        }
+      ],
+      "id": "01KAE8W40RKM03W8QNJQ61R08J",
+      "createdAt": "2025-11-19T14:39:07.325Z",
+      "updatedAt": "2025-11-19T14:39:49.712Z",
+      "url": [
+        {
+          "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
+          "label": "Schema Bulk Sync",
+          "metadata": {
+            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/bulk"
+          }
+        }
+      ]
+    }
+  ],
+  "mcp-examples": [
+    {
+      "userPrompt": "Test User Prompt",
+      "bodyType": [
+        {
+          "id": "string",
+          "label": "String"
+        }
+      ],
+      "bodyExample": "What is the weather at tehran",
+      "responseExample": "{\"data\":\"27\"}",
+      "responseType": [
+        {
+          "id": "object",
+          "label": "Object"
+        }
+      ],
+      "id": "01KAE92V7SR58K6G2V0NY5K8JX",
+      "createdAt": "2025-11-19T14:42:47.704Z",
+      "updatedAt": "2025-11-19T14:42:47.704Z"
+    }
+  ],
+  "ai-agents": [
+    {
+      "title": "MRP Agent",
+      "name": "mrp_agent",
+      "tags": [
+        {
+          "id": "01KAE9PZYDK8XYP0PNDHX0HGFN",
+          "label": "MRP",
+          "icon": "ShoppingBasket"
+        }
+      ],
+      "systemPrompt": "xxx",
+      "developerPrompt": "yyy",
+      "id": "01KAE9TE111735AEBZD5ZHT3E5",
+      "createdAt": "2025-11-19T14:55:40.631Z",
+      "updatedAt": "2025-11-19T14:56:55.289Z",
+      "mcp-tools": [
+        {
+          "id": "01KAE8W40RKM03W8QNJQ61R08J",
+          "label": "Weather Tool"
+        }
+      ]
     }
   ]
 }

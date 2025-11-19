@@ -298,5 +298,25 @@
     "id": "01KAE3HG41PPAF7TX05PPPW63W",
     "createdAt": "2025-11-19T13:05:56.353Z",
     "updatedAt": "2025-11-19T13:05:56.353Z"
+  },
+  {
+    "sourceSchema": "mcp-tools",
+    "sourceId": "01KAE8W40RKM03W8QNJQ61R08J",
+    "targetSchema": "mcp-examples",
+    "targetId": "01KAE92V7SR58K6G2V0NY5K8JX",
+    "relationTypeId": "HAS_MCP_EXAMPLE",
+    "id": "01KAE92VC4AMA175R0D4XV8C84",
+    "createdAt": "2025-11-19T14:42:47.812Z",
+    "updatedAt": "2025-11-19T14:42:47.812Z"
+  },
+  {
+    "sourceSchema": "ai-agents",
+    "sourceId": "01KAE9TE111735AEBZD5ZHT3E5",
+    "targetSchema": "mcp-tools",
+    "targetId": "01KAE8W40RKM03W8QNJQ61R08J",
+    "relationTypeId": "HAS_MCP_TOOL",
+    "id": "01KAE9WJHCNYBCFPYBRJRWX8A1",
+    "createdAt": "2025-11-19T14:56:50.732Z",
+    "updatedAt": "2025-11-19T14:56:50.732Z"
   }
 ]
