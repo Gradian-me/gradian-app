@@ -1,3 +1,5 @@
+'use client';
+
 // CheckboxList Component - Multiple checkbox selection
 
 import React, { forwardRef, useImperativeHandle } from 'react';

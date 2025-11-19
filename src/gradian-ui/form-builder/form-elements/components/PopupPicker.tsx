@@ -31,6 +31,7 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { AddButtonFull } from './AddButtonFull';
 import { EndLine } from '@/gradian-ui/layout';
 import { ColumnMapConfig, extractItemsFromPayload, extractMetaFromPayload, mapRequestParams } from '@/gradian-ui/shared/utils/column-mapper';
+import { useCompanyStore } from '@/stores/company.store';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 12, scale: 0.96 },
@@ -58,6 +59,8 @@ interface PendingSelection {
   normalized?: NormalizedOption | null;
   raw?: any | null;
 }
+
+const COMPANY_REQUIRED_MESSAGE = 'Please select a company to view these records.';
 
 const normalizeIdList = (ids?: Array<string | number>): string[] =>
   (ids ?? []).map((id) => String(id));
@@ -198,6 +201,25 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     totalItems: 0,
     hasMore: true,
   });
+  const selectedCompany = useCompanyStore((state) => state.selectedCompany);
+  const activeCompanyId = selectedCompany && selectedCompany.id !== -1 ? String(selectedCompany.id) : null;
+  const effectiveSchema = useMemo(() => schema ?? providedSchema ?? null, [schema, providedSchema]);
+  const shouldFilterByCompany = useMemo(() => {
+    if (effectiveSchema) {
+      return effectiveSchema.id !== 'companies' && effectiveSchema.isNotCompanyBased !== true;
+    }
+    if (schemaId && schemaId !== 'companies') {
+      return true;
+    }
+    return false;
+  }, [effectiveSchema, schemaId]);
+  const companyQueryParam = shouldFilterByCompany && activeCompanyId ? activeCompanyId : null;
+  const companyKey = useMemo(() => {
+    if (!shouldFilterByCompany) {
+      return '__company_not_required__';
+    }
+    return companyQueryParam ?? '__missing_company__';
+  }, [shouldFilterByCompany, companyQueryParam]);
 
   const baseSelectedIdsRef = useRef<Set<string>>(new Set());
   const baseSelectedIds = baseSelectedIdsRef.current;
@@ -220,6 +242,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   const prevExcludeIdsRef = useRef<string>('');
   const prevIncludeIdsRef = useRef<string>('');
   const prevSelectedIdsKeyRef = useRef<string>('');
+  const prevCompanyKeyRef = useRef<string>('');
 
   // Fetch schema if not provided
   useEffect(() => {
@@ -284,16 +307,27 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       if (excludeIds && excludeIds.length > 0) {
         paramRecord.excludeIds = excludeIds.join(',');
       }
+      if (companyQueryParam) {
+        paramRecord.companyIds = companyQueryParam;
+      }
       const params = mapRequestParams(paramRecord, columnMap);
       const queryString = params.toString();
       return `${sourceUrl}${sourceUrl.includes('?') ? '&' : '?'}${queryString}`;
     },
-    [sourceUrl, effectivePageSize, searchQuery, includeIds, excludeIds, columnMap]
+    [sourceUrl, effectivePageSize, searchQuery, includeIds, excludeIds, columnMap, companyQueryParam]
   );
 
   const fetchSourceItems = useCallback(
     async (pageToLoad = 1, append = false) => {
       if (!sourceUrl) {
+        return;
+      }
+      if (shouldFilterByCompany && !companyQueryParam) {
+        setError(COMPANY_REQUIRED_MESSAGE);
+        if (!append) {
+          setItems([]);
+          setFilteredItems([]);
+        }
         return;
       }
       setError(null);
@@ -350,12 +384,20 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         }
       }
     },
-    [buildSourceRequestUrl, effectivePageSize, sourceUrl, columnMap]
+    [buildSourceRequestUrl, effectivePageSize, sourceUrl, columnMap, shouldFilterByCompany, companyQueryParam]
   );
 
   const fetchSchemaItems = useCallback(
     async (pageToLoad = 1, append = false) => {
       if (!schemaId) {
+        return;
+      }
+      if (shouldFilterByCompany && !companyQueryParam) {
+        setError(COMPANY_REQUIRED_MESSAGE);
+        if (!append) {
+          setItems([]);
+          setFilteredItems([]);
+        }
         return;
       }
       setError(null);
@@ -378,6 +420,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         }
         if (excludeIds && excludeIds.length > 0) {
           params.excludeIds = excludeIds.join(',');
+        }
+        if (companyQueryParam) {
+          params.companyIds = companyQueryParam;
         }
 
         const response = await apiRequest<any>(`/api/data/${schemaId}`, { params });
@@ -425,7 +470,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         }
       }
     },
-    [schemaId, effectivePageSize, searchQuery, includeIds, excludeIds]
+    [schemaId, effectivePageSize, searchQuery, includeIds, excludeIds, shouldFilterByCompany, companyQueryParam]
   );
 
   const loadItems = useCallback(
@@ -436,6 +481,13 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       }
       if (supportsPagination && schemaId) {
         await fetchSchemaItems(pageToLoad, append);
+        return;
+      }
+
+      if (!staticItems && shouldFilterByCompany && !companyQueryParam) {
+        setError(COMPANY_REQUIRED_MESSAGE);
+        setItems([]);
+        setFilteredItems([]);
         return;
       }
 
@@ -459,6 +511,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           queryParams.append('excludeIds', excludeIds.join(','));
         }
 
+        if (companyQueryParam) {
+          queryParams.append('companyIds', companyQueryParam);
+        }
+
         const url = `/api/data/${schemaId}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
         const response = await apiRequest<any[]>(url);
 
@@ -475,7 +531,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         setIsLoading(false);
       }
     },
-    [sourceUrl, fetchSourceItems, fetchSchemaItems, supportsPagination, schemaId, staticItems, includeIds, excludeIds]
+    [sourceUrl, fetchSourceItems, fetchSchemaItems, supportsPagination, schemaId, staticItems, includeIds, excludeIds, shouldFilterByCompany, companyQueryParam]
   );
 
   // Keep items in sync when static dataset changes or when modal opens
@@ -499,10 +555,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       return;
     }
     setPageMeta((prev) => ({ ...prev, page: 1, hasMore: true, totalItems: 0 }));
-    lastQueryKeyRef.current = `${searchQuery.trim()}|${includeKey}|${excludeKey}`;
+    lastQueryKeyRef.current = `${searchQuery.trim()}|${includeKey}|${excludeKey}|${companyKey}`;
     hasInitialLoadRef.current = true;
     void loadItems(1, false);
-  }, [isOpen, supportsPagination, includeKey, excludeKey, searchQuery, loadItems]);
+  }, [isOpen, supportsPagination, includeKey, excludeKey, searchQuery, loadItems, companyKey]);
 
   // Fetch items - only when modal opens (skipped for static datasets)
   // Array comparisons are done inside the effect to avoid dependency issues
@@ -524,7 +580,14 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const includeIdsChanged = includeIdsKey !== prevIncludeIdsRef.current;
 
     // Only fetch if this is the first time opening OR if arrays have changed
-    const shouldFetch = prevExcludeIdsRef.current === '' || prevIncludeIdsRef.current === '' || excludeIdsChanged || includeIdsChanged;
+    const companyKeyChanged = companyKey !== prevCompanyKeyRef.current;
+    const shouldFetch =
+      prevExcludeIdsRef.current === '' ||
+      prevIncludeIdsRef.current === '' ||
+      prevCompanyKeyRef.current === '' ||
+      excludeIdsChanged ||
+      includeIdsChanged ||
+      companyKeyChanged;
 
     if (!shouldFetch) {
       return;
@@ -533,11 +596,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     // Update refs with current values
     prevExcludeIdsRef.current = excludeIdsKey;
     prevIncludeIdsRef.current = includeIdsKey;
+    prevCompanyKeyRef.current = companyKey;
 
     void loadItems();
     // Note: excludeIds and includeIds are intentionally not in dependencies
     // We compare them inside the effect using refs to avoid infinite loops
-  }, [schemaId, isOpen, staticItems, sourceUrl, loadItems]);
+  }, [schemaId, isOpen, staticItems, sourceUrl, loadItems, companyKey]);
   const handleRefresh = async (event?: React.MouseEvent<HTMLButtonElement>) => {
     event?.preventDefault();
     event?.stopPropagation();
@@ -565,7 +629,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       return;
     }
     const trimmed = searchQuery.trim();
-    const queryKey = `${trimmed}|${includeKey}|${excludeKey}`;
+    const queryKey = `${trimmed}|${includeKey}|${excludeKey}|${companyKey}`;
     if (queryKey === lastQueryKeyRef.current) {
       return;
     }
@@ -580,7 +644,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       void loadItems(1, false);
     }, 250);
     return () => clearTimeout(handler);
-  }, [isOpen, supportsPagination, searchQuery, includeKey, excludeKey, loadItems]);
+  }, [isOpen, supportsPagination, searchQuery, includeKey, excludeKey, loadItems, companyKey]);
 
   useEffect(() => {
     if (supportsPagination) {

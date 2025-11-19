@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState, useMemo } from 'react';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';

@@ -28,18 +28,19 @@ export const DateInput = forwardRef<FormElementRef, DateInputProps>(
     ref
   ) => {
     const inputRef = useRef<HTMLInputElement>(null);
+    const normalizedValue = value ?? '';
 
     useImperativeHandle(ref, () => ({
       focus: () => inputRef.current?.focus(),
       blur: () => inputRef.current?.blur(),
       validate: () => {
         if (!config?.validation) return true;
-        const result = validateField(value, config.validation);
+        const result = validateField(normalizedValue, config.validation);
         return result.isValid;
       },
       reset: () => onChange?.(''),
-      getValue: () => value,
-      setValue: (newValue) => onChange?.(newValue),
+      getValue: () => normalizedValue,
+      setValue: (newValue) => onChange?.(newValue ?? ''),
     }));
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,7 +88,7 @@ export const DateInput = forwardRef<FormElementRef, DateInputProps>(
           id={fieldName}
           name={fieldName}
           type="date"
-          value={value}
+          value={normalizedValue}
           onChange={handleChange}
           onBlur={handleBlur}
           onFocus={handleFocus}

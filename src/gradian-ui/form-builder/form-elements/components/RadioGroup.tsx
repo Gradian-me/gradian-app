@@ -1,3 +1,5 @@
+'use client';
+
 // Radio Group Component
 
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';

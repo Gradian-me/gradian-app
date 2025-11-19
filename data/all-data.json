@@ -844,14 +844,14 @@
     {
       "partCode": "5052",
       "partName": "Himedia Feed Alpha",
-      "quantity": 150,
+      "quantity": 170,
       "unit": "2",
       "demandDate": "2025-11-12",
       "minimumExpirationDate": "2025-11-19",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01K96E06Z9H5G8FKH5QY0538JB",
       "createdAt": "2025-11-04T03:19:07.006Z",
-      "updatedAt": "2025-11-04T12:57:46.157Z",
+      "updatedAt": "2025-11-19T08:55:28.123Z",
       "description": "Test Description of Himedia Feed Alpha"
     },
     {

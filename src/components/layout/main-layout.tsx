@@ -65,19 +65,13 @@ export function MainLayout({
   const router = useRouter();
   const { resolvedTheme } = useTheme();
   const profileTheme = resolvedTheme === 'dark' ? 'dark' : 'light';
-  // Always start with false (expanded) to match server-side render
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  // Default to collapsed so SSR markup matches closed sidebar
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notificationCount] = useState(3);
-  const [isDesktop, setIsDesktop] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth >= DESKTOP_BREAKPOINT;
-  });
+  const [isDesktop, setIsDesktop] = useState(false);
   // Always start with expanded width to match server-side render
-  const [sidebarWidth, setSidebarWidth] = useState(() => {
-    const initialDesktop = typeof window !== 'undefined' ? window.innerWidth >= DESKTOP_BREAKPOINT : false;
-    return getSidebarWidth(initialDesktop, false);
-  });
+  const [sidebarWidth, setSidebarWidth] = useState(() => getSidebarWidth(false, false));
   const { selectedCompany } = useCompanyStore();
   const { closeAllDialogs, hasOpenDialogs, registerDialog, unregisterDialog } = useDialogContext();
   const pageTitle = title ? `${title} | Gradian App` : 'Gradian App';
@@ -103,17 +97,17 @@ export function MainLayout({
 
   // Check if we're on desktop (only on resize, not on every render)
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const checkDesktop = () => {
       const isDesktopNow = window.innerWidth >= DESKTOP_BREAKPOINT;
       setIsDesktop((prev) => {
         if (prev !== isDesktopNow) {
-          // Only update if changed
           return isDesktopNow;
         }
         return prev;
       });
     };
-    // Only add resize listener, initial check already done in useState
+    checkDesktop();
     window.addEventListener('resize', checkDesktop);
     return () => window.removeEventListener('resize', checkDesktop);
   }, []);
