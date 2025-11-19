@@ -65,7 +65,9 @@ function ReactQueryCacheClearHandler() {
       } catch (error) {
         console.warn('[schema-cache] Failed to clear companies IndexedDB cache:', error);
       }
-      // Invalidate and refetch all queries for the specified keys
+      // Clear ALL React Query caches first
+      await queryClient.clear();
+      // Then invalidate and refetch all queries for the specified keys
       for (const queryKey of queryKeys) {
         await queryClient.invalidateQueries({ queryKey: [queryKey] });
         // Force refetch active queries immediately
@@ -90,7 +92,9 @@ function ReactQueryCacheClearHandler() {
         } catch (error) {
           console.warn('[schema-cache] Failed to clear companies cache from storage event:', error);
         }
-        // Invalidate and refetch all queries for the specified keys
+        // Clear ALL React Query caches first
+        await queryClient.clear();
+        // Then invalidate and refetch all queries for the specified keys
         for (const queryKey of queryKeys) {
           await queryClient.invalidateQueries({ queryKey: [queryKey] });
           // Force refetch active queries immediately

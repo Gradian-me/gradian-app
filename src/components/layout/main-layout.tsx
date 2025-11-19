@@ -145,7 +145,32 @@ export function MainLayout({
     window.location.href = '/notifications';
   };
 
-  const handleEditSchemaClick = () => {
+  const handleEditSchemaMouseDown = (e: React.MouseEvent) => {
+    // Middle click (button 1) should open page view in new tab
+    if (e.button === 1) {
+      e.preventDefault();
+      e.stopPropagation();
+      // Extract schema ID from editSchemaPath (format: /builder/schemas/[schema-id])
+      const schemaId = editSchemaPath?.replace('/builder/schemas/', '');
+      if (schemaId) {
+        window.open(`/page/${schemaId}`, '_blank');
+      }
+    }
+  };
+
+  const handleEditSchemaClick = (e: React.MouseEvent) => {
+    // Ctrl/Cmd + click should also open page view in new tab
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      e.stopPropagation();
+      // Extract schema ID from editSchemaPath (format: /builder/schemas/[schema-id])
+      const schemaId = editSchemaPath?.replace('/builder/schemas/', '');
+      if (schemaId) {
+        window.open(`/page/${schemaId}`, '_blank');
+      }
+      return;
+    }
+    // Regular click - navigate to builder
     if (editSchemaPath) {
       router.push(editSchemaPath);
     }
@@ -192,10 +217,11 @@ export function MainLayout({
             <Button
               variant="ghost"
               size="sm"
+              onMouseDown={handleEditSchemaMouseDown}
               onClick={handleEditSchemaClick}
               className="hidden md:inline-flex h-8 w-8 p-0 hover:bg-violet-50 dark:hover:bg-violet-500/10 hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
               aria-label="Edit schema"
-              title="Edit schema"
+              title="Edit schema (Middle-click to view page in new tab)"
             >
               <PencilRuler className="h-4 w-4" />
             </Button>
