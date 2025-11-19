@@ -5,6 +5,7 @@ import { TableColumn } from '../types';
 import { getCellValue } from '../utils';
 import { cn } from '../../../shared/utils';
 import { extractLabels } from '../../../form-builder/form-elements/utils/option-normalizer';
+import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 
 export interface TableBodyProps<T = any> {
   data: T[];
@@ -17,6 +18,7 @@ export interface TableBodyProps<T = any> {
   hoverable?: boolean;
   bordered?: boolean;
   selectionEnabled?: boolean;
+  highlightQuery?: string;
 }
 
 export function TableBody<T = any>({
@@ -30,7 +32,36 @@ export function TableBody<T = any>({
   hoverable,
   bordered,
   selectionEnabled,
+  highlightQuery,
 }: TableBodyProps<T>) {
+  const applyHighlight = (node: React.ReactNode): React.ReactNode => {
+    if (!highlightQuery || node === null || node === undefined || typeof node === 'boolean') {
+      return node;
+    }
+
+    if (typeof node === 'string' || typeof node === 'number') {
+      return renderHighlightedText(String(node), highlightQuery);
+    }
+
+    if (Array.isArray(node)) {
+      return node.map((child) => applyHighlight(child));
+    }
+
+    if (React.isValidElement(node)) {
+      const highlightedChildren = React.Children.map(
+        node.props.children,
+        (child) => applyHighlight(child)
+      );
+
+      if (highlightedChildren === node.props.children) {
+        return node;
+      }
+
+      return React.cloneElement(node, node.props, highlightedChildren);
+    }
+
+    return node;
+  };
   const trClasses = (index: number, isSelected: boolean) =>
     cn(
       'transition-colors',
@@ -150,30 +181,36 @@ export function TableBody<T = any>({
                     }}
                 >
                   {column.render ? (
-                    column.render(value, row, rowIndex)
+                    applyHighlight(column.render(value, row, rowIndex))
                   ) : (
                     <span className="block">
                       {(() => {
+                        let textValue: string;
                         if (value === null || value === undefined) {
-                          return '—';
-                        }
-                        const isStructured = Array.isArray(value) || (typeof value === 'object' && value !== null);
-                        if (isStructured) {
-                          const labels = extractLabels(value);
-                          if (labels.length > 0) {
-                            return labels.join(', ');
+                          textValue = '—';
+                        } else {
+                          const isStructured = Array.isArray(value) || (typeof value === 'object' && value !== null);
+                          if (isStructured) {
+                            const labels = extractLabels(value);
+                            if (labels.length > 0) {
+                              textValue = labels.join(', ');
+                            } else if (Array.isArray(value)) {
+                              textValue = value
+                                .map((entry) => {
+                                  if (entry && typeof entry === 'object') {
+                                    return entry.label || entry.name || entry.id || JSON.stringify(entry);
+                                  }
+                                  return String(entry);
+                                })
+                                .join(', ');
+                            } else {
+                              textValue = JSON.stringify(value);
+                            }
+                          } else {
+                            textValue = String(value);
                           }
-                          if (Array.isArray(value)) {
-                            return value.map(entry => {
-                              if (entry && typeof entry === 'object') {
-                                return entry.label || entry.name || entry.id || JSON.stringify(entry);
-                              }
-                              return String(entry);
-                            }).join(', ');
-                          }
-                          return JSON.stringify(value);
                         }
-                        return String(value);
+                        return applyHighlight(textValue);
                       })()}
                     </span>
                   )}

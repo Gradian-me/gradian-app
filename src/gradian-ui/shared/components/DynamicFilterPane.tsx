@@ -9,8 +9,8 @@ import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher'
 interface DynamicFilterPaneProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  viewMode: 'grid' | 'list';
-  onViewModeChange: (mode: 'grid' | 'list') => void;
+  viewMode: 'grid' | 'list' | 'table';
+  onViewModeChange: (mode: 'grid' | 'list' | 'table') => void;
   onAddNew: () => void;
   onRefresh?: () => void;
   isRefreshing?: boolean;

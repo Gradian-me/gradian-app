@@ -4,11 +4,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '../../../components/ui/button';
 import { cn } from '../../shared/utils';
-import { Grid3X3, List } from 'lucide-react';
+import { Grid3X3, List, Table2 } from 'lucide-react';
 
 export interface ViewSwitcherProps {
-  currentView: 'grid' | 'list';
-  onViewChange: (view: 'grid' | 'list') => void;
+  currentView: 'grid' | 'list' | 'table';
+  onViewChange: (view: 'grid' | 'list' | 'table') => void;
   className?: string;
 }
 
@@ -44,6 +44,19 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
         )}
       >
         <List className="h-4 w-4" />
+      </Button>
+      <Button
+        variant={currentView === 'table' ? 'default' : 'ghost'}
+        size="sm"
+        onClick={() => onViewChange('table')}
+        className={cn(
+          'h-full w-10 p-0 rounded-md',
+          currentView === 'table' 
+            ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-sm' 
+            : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50'
+        )}
+      >
+        <Table2 className="h-4 w-4" />
       </Button>
     </div>
   );

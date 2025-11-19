@@ -67,6 +67,7 @@ export interface TableProps<T = any> {
   className?: string;
   onRowClick?: (row: T, index: number) => void;
   onCellClick?: (value: any, row: T, column: TableColumn<T>, index: number) => void;
+  highlightQuery?: string;
 }
 
 export interface TableState {

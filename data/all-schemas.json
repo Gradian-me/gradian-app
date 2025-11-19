@@ -3803,19 +3803,7 @@
     "description": "Manage aggregation types with their symbols, SQL equivalents and formulas",
     "singular_name": "Aggregation Type",
     "plural_name": "Aggregation Types",
-    "cardMetadata": [
-      {
-        "id": "aggregation-type-info",
-        "title": "Aggregation Type Information",
-        "colSpan": 1,
-        "fieldIds": [
-          "aggregation-type-name",
-          "aggregation-type-title",
-          "aggregation-type-symbol",
-          "aggregation-type-color"
-        ]
-      }
-    ],
+    "cardMetadata": [],
     "fields": [
       {
         "id": "aggregation-type-name",
@@ -3872,14 +3860,15 @@
         "label": "Symbol",
         "sectionId": "basic-information",
         "type": "text",
-        "component": "text",
+        "component": "icon",
         "placeholder": "e.g., Σ, μ, min, max",
         "required": true,
         "validation": {
           "required": true
         },
         "colSpan": 1,
-        "order": 4
+        "order": 4,
+        "role": "icon"
       },
       {
         "id": "aggregation-type-sql-equivalent",

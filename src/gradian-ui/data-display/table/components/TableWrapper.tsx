@@ -19,6 +19,8 @@ export interface TableWrapperProps<T = any> {
   isLoading?: boolean;
   skeletonRowCount?: number;
   skeletonCardCount?: number;
+  onRowClick?: (row: T, index: number) => void;
+  highlightQuery?: string;
 }
 
 export function TableWrapper<T = any>({
@@ -35,6 +37,8 @@ export function TableWrapper<T = any>({
   isLoading = false,
   skeletonRowCount,
   skeletonCardCount,
+  onRowClick,
+  highlightQuery,
 }: TableWrapperProps<T>) {
   const effectiveColumnCount = Math.max(
     1,
@@ -83,7 +87,7 @@ export function TableWrapper<T = any>({
       ) : (
         <>
           <div className="mx-0 min-w-0">
-            <Table config={tableConfig} />
+            <Table config={tableConfig} onRowClick={onRowClick} highlightQuery={highlightQuery} />
           </div>
           {aggregations.length > 0 && (
             <TableAggregations

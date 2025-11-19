@@ -17,6 +17,7 @@ export function Table<T = any>({
   className,
   onRowClick,
   onCellClick,
+  highlightQuery,
 }: TableProps<T>) {
   const {
     state,
@@ -89,6 +90,7 @@ export function Table<T = any>({
           striped={config.striped}
           hoverable={config.hoverable}
           bordered={config.bordered}
+          highlightQuery={highlightQuery}
         />
       </table>
 

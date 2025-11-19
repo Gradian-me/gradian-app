@@ -1489,82 +1489,100 @@
       "id": "aggregation-type-sum",
       "name": "sum",
       "title": "Sum",
-      "symbol": "Σ",
+      "symbol": "Sigma",
       "color": "#4E79A7",
       "sqlEquivalent": "SUM",
-      "description": "Calculates the sum of all values in a column"
+      "description": "Calculates the sum of all values in a column",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "updatedAt": "2025-11-19T08:21:27.547Z"
     },
     {
       "id": "aggregation-type-avg",
       "name": "avg",
       "title": "Average",
-      "symbol": "μ",
+      "symbol": "LucideAlignVerticalJustifyCenter",
       "color": "#F58518",
       "sqlEquivalent": "AVG",
-      "description": "Calculates the average (mean) of all values in a column"
+      "description": "Calculates the average (mean) of all values in a column",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "updatedAt": "2025-11-19T08:23:06.292Z"
     },
     {
       "id": "aggregation-type-min",
       "name": "min",
       "title": "Minimum",
-      "symbol": "min",
+      "symbol": "SortAsc",
       "color": "#54A24B",
       "sqlEquivalent": "MIN",
-      "description": "Returns the minimum value from a column"
+      "description": "Returns the minimum value from a column",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "updatedAt": "2025-11-19T08:25:52.030Z"
     },
     {
       "id": "aggregation-type-max",
       "name": "max",
       "title": "Maximum",
-      "symbol": "max",
+      "symbol": "SortDesc",
       "color": "#E4572E",
       "sqlEquivalent": "MAX",
-      "description": "Returns the maximum value from a column"
+      "description": "Returns the maximum value from a column",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "updatedAt": "2025-11-19T08:25:33.667Z"
     },
     {
       "id": "aggregation-type-first",
       "name": "first",
       "title": "First",
-      "symbol": "first",
+      "symbol": "ListStart",
       "color": "#72B7B2",
       "sqlEquivalent": "FIRST_VALUE",
-      "description": "Returns the first value from a column"
+      "description": "Returns the first value from a column",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "updatedAt": "2025-11-19T08:25:10.472Z"
     },
     {
       "id": "aggregation-type-last",
       "name": "last",
       "title": "Last",
-      "symbol": "last",
+      "symbol": "ListEnd",
       "color": "#B279A2",
       "sqlEquivalent": "LAST_VALUE",
-      "description": "Returns the last value from a column"
+      "description": "Returns the last value from a column",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "updatedAt": "2025-11-19T08:24:51.112Z"
     },
     {
       "id": "aggregation-type-count",
       "name": "count",
       "title": "Count",
-      "symbol": "n",
+      "symbol": "CircleGauge",
       "color": "#4C78A8",
       "sqlEquivalent": "COUNT",
-      "description": "Counts the number of rows in a column"
+      "description": "Counts the number of rows in a column",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "updatedAt": "2025-11-19T08:27:24.757Z"
     },
     {
       "id": "aggregation-type-countdistinct",
       "name": "countdistinct",
       "title": "Count Distinct",
-      "symbol": "n(D)",
+      "symbol": "CircleSlash",
       "color": "#9D755D",
       "sqlEquivalent": "COUNT(DISTINCT)",
-      "description": "Counts the number of unique values in a column"
+      "description": "Counts the number of unique values in a column",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "updatedAt": "2025-11-19T08:27:48.390Z"
     },
     {
       "id": "aggregation-type-stdev",
       "name": "stdev",
       "title": "Standard Deviation",
-      "symbol": "σ",
+      "symbol": "AlignVerticalSpaceBetween",
       "color": "#FF7F0E",
       "sqlEquivalent": "STDEV",
-      "description": "Calculates the standard deviation of values in a column"
+      "description": "Calculates the standard deviation of values in a column",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "updatedAt": "2025-11-19T08:28:45.851Z"
     }
   ]
 }

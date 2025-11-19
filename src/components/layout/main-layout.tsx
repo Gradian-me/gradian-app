@@ -35,12 +35,19 @@ interface MainLayoutProps {
 const DESKTOP_BREAKPOINT = 768;
 const SIDEBAR_COLLAPSED_WIDTH = 80;
 const SIDEBAR_EXPANDED_WIDTH = 280;
+const SIDEBAR_STATE_KEY = 'gradian-sidebar-collapsed';
 
 const getSidebarWidth = (isDesktop: boolean, isCollapsed: boolean) => {
   if (!isDesktop) {
     return 0;
   }
   return isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH;
+};
+
+const getInitialSidebarState = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
+  return stored === 'true';
 };
 
 export function MainLayout({ 
@@ -58,11 +65,18 @@ export function MainLayout({
   const router = useRouter();
   const { resolvedTheme } = useTheme();
   const profileTheme = resolvedTheme === 'dark' ? 'dark' : 'light';
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(getInitialSidebarState);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notificationCount] = useState(3);
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(() => getSidebarWidth(false, false));
+  const [isDesktop, setIsDesktop] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth >= DESKTOP_BREAKPOINT;
+  });
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const initialCollapsed = getInitialSidebarState();
+    const initialDesktop = typeof window !== 'undefined' ? window.innerWidth >= DESKTOP_BREAKPOINT : false;
+    return getSidebarWidth(initialDesktop, initialCollapsed);
+  });
   const { selectedCompany } = useCompanyStore();
   const { closeAllDialogs, hasOpenDialogs, registerDialog, unregisterDialog } = useDialogContext();
   const pageTitle = title ? `${title} | Gradian App` : 'Gradian App';
@@ -76,21 +90,41 @@ export function MainLayout({
     };
   }, [pageTitle]);
 
-  // Check if we're on desktop
+  // Check if we're on desktop (only on resize, not on every render)
   useEffect(() => {
     const checkDesktop = () => {
       const isDesktopNow = window.innerWidth >= DESKTOP_BREAKPOINT;
-      setIsDesktop((prev) => (prev === isDesktopNow ? prev : isDesktopNow));
+      setIsDesktop((prev) => {
+        if (prev !== isDesktopNow) {
+          // Only update if changed
+          return isDesktopNow;
+        }
+        return prev;
+      });
     };
-    checkDesktop();
+    // Only add resize listener, initial check already done in useState
     window.addEventListener('resize', checkDesktop);
     return () => window.removeEventListener('resize', checkDesktop);
   }, []);
 
+  // Update sidebar width only when desktop state or collapsed state changes
   useEffect(() => {
     const nextSidebarWidth = getSidebarWidth(isDesktop, isSidebarCollapsed);
-    setSidebarWidth((currentWidth) => (currentWidth === nextSidebarWidth ? currentWidth : nextSidebarWidth));
+    setSidebarWidth((currentWidth) => {
+      // Only update if width actually changed
+      if (currentWidth !== nextSidebarWidth) {
+        return nextSidebarWidth;
+      }
+      return currentWidth;
+    });
   }, [isDesktop, isSidebarCollapsed]);
+
+  // Persist sidebar collapsed state to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(SIDEBAR_STATE_KEY, String(isSidebarCollapsed));
+    }
+  }, [isSidebarCollapsed]);
 
   // Handle browser back button on mobile - close dialogs/dropdowns first
   useEffect(() => {

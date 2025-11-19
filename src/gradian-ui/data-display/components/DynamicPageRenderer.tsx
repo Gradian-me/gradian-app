@@ -37,6 +37,7 @@ import { useCompanies } from '@/gradian-ui/shared/hooks/use-companies';
 import { debounce } from '@/gradian-ui/shared/utils';
 import { toast } from 'sonner';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
+import { TableWrapper, TableConfig, buildTableColumns, TableColumn } from '@/gradian-ui/data-display/table';
 
 interface DynamicPageRendererProps {
   schema: FormSchema;
@@ -96,7 +97,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     };
   }, [schema.plural_name, schema.title, schema.name]);
   
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table'>('grid');
   const [formError, setFormError] = useState<string | null>(null);
   const [isEditLoading, setIsEditLoading] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -182,6 +183,13 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     setSelectedEntityForDetail(entity);
     setIsDetailDialogOpen(true);
   }, []);
+
+  const handleTableRowClick = useCallback(
+    (entity: any) => {
+      handleViewEntity(entity);
+    },
+    [handleViewEntity]
+  );
 
   // Navigate to detail page (view button click)
   const handleViewDetailPage = useCallback((entity: any) => {
@@ -388,6 +396,118 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     
     return entities;
   }, [entities, debouncedSearchTerm]);
+
+  // Build table columns from all schema fields
+  const tableColumns = useMemo(() => {
+    if (!schema?.fields || schema.fields.length === 0) {
+      return [];
+    }
+
+    // Get all fields from schema (excluding hidden fields)
+    const visibleFields = schema.fields.filter((field: any) => !field.hidden);
+    
+    // Build columns from fields
+    const baseColumns = buildTableColumns(visibleFields, schema);
+    
+    // Add action column
+    const actionColumn: TableColumn = {
+      id: 'actions',
+      label: 'Actions',
+      accessor: 'id',
+      sortable: false,
+      align: 'center',
+      width: 120,
+      render: (value: any, row: any) => {
+        return (
+          <div className="flex items-center justify-center gap-1">
+            <UIButton
+              variant="outline"
+              size="sm"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleViewDetailPage(row);
+              }}
+              className="h-8 w-8 p-0 hover:bg-sky-50 hover:border-sky-300 hover:text-sky-700 transition-all duration-200"
+              title="View Details"
+            >
+              <IconRenderer iconName="Eye" className="h-4 w-4" />
+            </UIButton>
+            <UIButton
+              variant="outline"
+              size="sm"
+              onClick={(event) => {
+                event.stopPropagation();
+                if (!isEditLoading[row.id]) {
+                  handleEditEntity(row);
+                }
+              }}
+              className="h-8 w-8 p-0 hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition-all duration-200"
+              disabled={isEditLoading[row.id]}
+              title="Edit"
+            >
+              <IconRenderer iconName="Edit" className="h-4 w-4" />
+            </UIButton>
+            <UIButton
+              variant="outline"
+              size="sm"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleDeleteWithConfirmation(row);
+              }}
+              className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-all duration-200"
+              title="Delete"
+            >
+              <IconRenderer iconName="Trash2" className="h-4 w-4" />
+            </UIButton>
+          </div>
+        );
+      },
+    };
+
+    return [actionColumn, ...baseColumns];
+  }, [schema, handleViewDetailPage, handleEditEntity, handleDeleteWithConfirmation, isEditLoading]);
+
+  // Create table config
+  const tableConfig: TableConfig = useMemo(
+    () => ({
+      id: `table-${schema.id}`,
+      columns: tableColumns,
+      data: filteredEntities,
+      pagination: {
+        enabled: filteredEntities.length > 10,
+        pageSize: 10,
+        showPageSizeSelector: true,
+        pageSizeOptions: [5, 10, 25, 50],
+        alwaysShow: false,
+      },
+      sorting: {
+        enabled: true,
+      },
+      filtering: {
+        enabled: false,
+      },
+      selection: {
+        enabled: false,
+      },
+      emptyState: {
+        message: searchTermLocal
+          ? `No ${pluralName.toLowerCase()} found matching your search.`
+          : `No ${pluralName.toLowerCase()} found`,
+      },
+      loading: isLoading,
+      striped: true,
+      hoverable: true,
+      bordered: true,
+    }),
+    [
+      schema.id,
+      tableColumns,
+      filteredEntities,
+      isLoading,
+      pluralName,
+      searchTermLocal,
+    ]
+  );
 
   // Group entities by companyId - only when "All Companies" (-1) is selected and schema is company-based
   const groupedEntities = useMemo(() => {
@@ -606,8 +726,27 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 pt-2 md:pt-4 mx-2" : "space-y-4 pt-2 md:pt-4 mx-2"}>
-                      {companyEntities.map((entity: any, index: number) => (
+                    {viewMode === 'table' ? (
+                      <div className="w-full pt-2 md:pt-4 mx-2">
+                        <TableWrapper
+                          tableConfig={{
+                            ...tableConfig,
+                            id: `table-${schema.id}-${companyId}`,
+                            data: companyEntities,
+                          }}
+                          columns={tableColumns}
+                          data={companyEntities}
+                          showCards={false}
+                          disableAnimation={false}
+                          index={0}
+                          isLoading={isLoading}
+                          onRowClick={handleTableRowClick}
+                          highlightQuery={debouncedSearchTerm}
+                        />
+                      </div>
+                    ) : (
+                      <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 pt-2 md:pt-4 mx-2" : "space-y-4 pt-2 md:pt-4 mx-2"}>
+                        {companyEntities.map((entity: any, index: number) => (
                         <div key={entity.id} className="relative">
                           {isEditLoading[entity.id] && (
                             <div className="absolute inset-0 bg-white/70 dark:bg-gray-800/30 flex items-center justify-center z-10 rounded-lg">
@@ -638,7 +777,8 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                           />
                         </div>
                       ))}
-                    </div>
+                      </div>
+                    )}
                   </AccordionContent>
                 </AccordionItem>
               );
@@ -656,8 +796,27 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 pt-2 md:pt-4 mx-2" : "space-y-4 pt-2 md:pt-4 mx-2"}>
-                    {groupedEntities.ungrouped.map((entity: any, index: number) => (
+                  {viewMode === 'table' ? (
+                    <div className="w-full pt-2 md:pt-4 mx-2">
+                      <TableWrapper
+                        tableConfig={{
+                          ...tableConfig,
+                          id: `table-${schema.id}-ungrouped`,
+                          data: groupedEntities.ungrouped,
+                        }}
+                        columns={tableColumns}
+                        data={groupedEntities.ungrouped}
+                        showCards={false}
+                        disableAnimation={false}
+                        index={0}
+                        isLoading={isLoading}
+                      onRowClick={handleTableRowClick}
+                      highlightQuery={debouncedSearchTerm}
+                      />
+                    </div>
+                  ) : (
+                    <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 pt-2 md:pt-4 mx-2" : "space-y-4 pt-2 md:pt-4 mx-2"}>
+                      {groupedEntities.ungrouped.map((entity: any, index: number) => (
                       <div key={entity.id} className="relative">
                         {isEditLoading[entity.id] && (
                           <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/60 flex items-center justify-center z-10 rounded-lg">
@@ -688,11 +847,27 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                         />
                       </div>
                     ))}
-                  </div>
+                    </div>
+                  )}
                 </AccordionContent>
               </AccordionItem>
             )}
           </Accordion>
+        ) : viewMode === 'table' ? (
+          // Table view
+          <div className="w-full">
+            <TableWrapper
+              tableConfig={tableConfig}
+              columns={tableColumns}
+              data={filteredEntities}
+              showCards={false}
+              disableAnimation={false}
+              index={0}
+              isLoading={isLoading}
+              onRowClick={handleTableRowClick}
+              highlightQuery={debouncedSearchTerm}
+            />
+          </div>
         ) : (
           // Regular list view (no grouping)
           <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4" : "space-y-4"}>
