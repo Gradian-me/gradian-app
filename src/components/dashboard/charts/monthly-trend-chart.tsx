@@ -36,8 +36,11 @@ export function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
       animationEasing: CHART_ANIMATION_CONFIG.easing,
       grid: {
         ...chartTheme.grid,
+        left: '8%',
+        right: '12%',
         top: '26%',
         bottom: '18%',
+        containLabel: true,
       },
       xAxis: {
         ...chartTheme.xAxis,
@@ -55,7 +58,7 @@ export function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
           type: 'value',
           name: 'Spend ($)',
           nameLocation: 'middle',
-          nameGap: 50,
+          nameGap: 40,
           nameTextStyle: {
             color: CHART_COLOR_PALETTE[0],
             fontWeight: '600',
@@ -73,8 +76,8 @@ export function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
           ...chartTheme.yAxis,
           type: 'value',
           name: 'Orders',
-          nameLocation: 'middle',
-          nameGap: 50,
+          nameLocation: 'end',
+          nameGap: 10,
           nameTextStyle: {
             color: CHART_COLOR_PALETTE[4],
             fontWeight: '600',
@@ -212,11 +215,11 @@ export function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
             <span>Monthly Spend Trend</span>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="h-80">
+        <CardContent className="overflow-hidden p-4">
+          <div className="h-80 w-full overflow-hidden relative">
             <ReactECharts
               option={chartOption}
-              style={{ height: '100%', width: '100%' }}
+              style={{ height: '100%', width: '100%', maxWidth: '100%' }}
               opts={{ renderer: 'svg' }}
             />
           </div>

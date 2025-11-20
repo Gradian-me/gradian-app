@@ -52,9 +52,9 @@ export function SpendAnalysisChart({ data }: SpendAnalysisChartProps) {
         {
           name: 'Spend by Category',
           type: 'pie',
-          radius: ['40%', '68%'],
-          center: ['60%', '48%'],
-          avoidLabelOverlap: false,
+          radius: ['30%', '60%'],
+          center: ['45%', '50%'],
+          avoidLabelOverlap: true,
           itemStyle: {
             borderRadius: 8,
             borderColor: '#fff',
@@ -64,15 +64,24 @@ export function SpendAnalysisChart({ data }: SpendAnalysisChartProps) {
             show: true,
             position: 'outside',
             formatter: '{b}\n{d}%',
-            fontSize: 11,
+            fontSize: 10,
             fontWeight: '500',
             color: labelColor,
+            overflow: 'truncate',
+            width: 70,
+            rich: {
+              b: {
+                fontSize: 10,
+                lineHeight: 14,
+              },
+            },
           },
           labelLine: {
             show: true,
-            length: 15,
-            length2: 10,
+            length: 10,
+            length2: 6,
             smooth: true,
+            maxSurfaceAngle: 90,
           },
           emphasis: {
             itemStyle: {
@@ -136,11 +145,11 @@ export function SpendAnalysisChart({ data }: SpendAnalysisChartProps) {
             <span>Spend by Category</span>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="h-80">
+        <CardContent className="overflow-hidden p-4">
+          <div className="h-80 w-full overflow-hidden relative">
             <ReactECharts
               option={chartOption}
-              style={{ height: '100%', width: '100%' }}
+              style={{ height: '100%', width: '100%', maxWidth: '100%' }}
               opts={{ renderer: 'svg' }}
             />
           </div>

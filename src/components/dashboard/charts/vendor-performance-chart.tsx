@@ -39,8 +39,11 @@ export function VendorPerformanceChart({ data }: VendorPerformanceChartProps) {
       animationEasing: CHART_ANIMATION_CONFIG.easing,
       grid: {
         ...chartTheme.grid,
+        left: '8%',
+        right: '12%',
         top: '15%',
-        bottom: '15%',
+        bottom: '20%',
+        containLabel: true,
       },
       xAxis: {
         ...chartTheme.xAxis,
@@ -58,7 +61,7 @@ export function VendorPerformanceChart({ data }: VendorPerformanceChartProps) {
           type: 'value',
           name: 'Rating & Scores',
           nameLocation: 'middle',
-          nameGap: 50,
+          nameGap: 40,
           min: 0,
           max: 5,
           axisLabel: {
@@ -70,8 +73,8 @@ export function VendorPerformanceChart({ data }: VendorPerformanceChartProps) {
           ...chartTheme.yAxis,
           type: 'value',
           name: 'On-Time Delivery (%)',
-          nameLocation: 'middle',
-          nameGap: 50,
+          nameLocation: 'end',
+          nameGap: 10,
           min: 0,
           max: 100,
           axisLabel: {
@@ -233,11 +236,11 @@ export function VendorPerformanceChart({ data }: VendorPerformanceChartProps) {
             <span>Vendor Performance</span>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="h-80">
+        <CardContent className="overflow-hidden p-4">
+          <div className="h-80 w-full overflow-hidden relative">
             <ReactECharts
               option={chartOption}
-              style={{ height: '100%', width: '100%' }}
+              style={{ height: '100%', width: '100%', maxWidth: '100%' }}
               opts={{ renderer: 'svg' }}
             />
           </div>

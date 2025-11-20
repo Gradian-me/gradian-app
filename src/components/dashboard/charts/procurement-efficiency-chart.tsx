@@ -40,8 +40,11 @@ export function ProcurementEfficiencyChart({ data }: ProcurementEfficiencyChartP
       animationEasing: CHART_ANIMATION_CONFIG.easing,
       grid: {
         ...chartTheme.grid,
+        left: '8%',
+        right: '12%',
         top: '26%',
         bottom: '15%',
+        containLabel: true,
       },
       xAxis: {
         ...chartTheme.xAxis,
@@ -59,7 +62,7 @@ export function ProcurementEfficiencyChart({ data }: ProcurementEfficiencyChartP
           type: 'value',
           name: 'Days',
           nameLocation: 'middle',
-          nameGap: 50,
+          nameGap: 40,
           nameTextStyle: {
             color: CHART_COLOR_PALETTE[0],
             fontWeight: '600',
@@ -73,8 +76,8 @@ export function ProcurementEfficiencyChart({ data }: ProcurementEfficiencyChartP
           ...chartTheme.yAxis,
           type: 'value',
           name: 'Cost Savings ($)',
-          nameLocation: 'middle',
-          nameGap: 50,
+          nameLocation: 'end',
+          nameGap: 10,
           nameTextStyle: {
             color: CHART_COLOR_PALETTE[4],
             fontWeight: '600',
@@ -91,8 +94,8 @@ export function ProcurementEfficiencyChart({ data }: ProcurementEfficiencyChartP
           ...chartTheme.yAxis,
           type: 'value',
           name: 'Automation Rate (%)',
-          nameLocation: 'middle',
-          nameGap: 50,
+          nameLocation: 'end',
+          nameGap: 10,
           nameTextStyle: {
             color: CHART_COLOR_PALETTE[2],
             fontWeight: '600',
@@ -302,11 +305,11 @@ export function ProcurementEfficiencyChart({ data }: ProcurementEfficiencyChartP
             <span>Procurement Efficiency</span>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="h-80">
+        <CardContent className="overflow-hidden p-4">
+          <div className="h-80 w-full overflow-hidden relative">
             <ReactECharts
               option={chartOption}
-              style={{ height: '100%', width: '100%' }}
+              style={{ height: '100%', width: '100%', maxWidth: '100%' }}
               opts={{ renderer: 'svg' }}
             />
           </div>
