@@ -38,10 +38,7 @@
     "detailPageMetadata",
     "cardMetadata",
     "fieldsCount",
-    "sectionsCount",
-    "fieldsCount",
-    "showInNavigation",
-    ""
+    "sectionsCount"
   ],
   "DEMO_MODE": true,
   "AI_CONFIG": {
