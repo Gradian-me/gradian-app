@@ -346,41 +346,77 @@ export default function AiBuilderPage() {
       let requestBody: any;
 
       // Determine if we should parse as JSON
-      // Check requiredOutputFormat, or try to detect JSON
+      // Check requiredOutputFormat, or try to detect JSON (object or array)
+      const trimmedResponse = aiResponse.trim();
       const shouldParseAsJson = selectedAgent?.requiredOutputFormat === 'json' || 
-        (selectedAgent?.requiredOutputFormat !== 'string' && aiResponse.trim().startsWith('{'));
+        (selectedAgent?.requiredOutputFormat !== 'string' && (trimmedResponse.startsWith('{') || trimmedResponse.startsWith('[')));
 
       // If required output format is JSON, parse it
       if (shouldParseAsJson) {
         try {
           const parsed = JSON.parse(aiResponse);
           
-          // Validate that it's an object and has required fields
-          if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-            throw new Error('Parsed JSON must be an object, not an array or primitive value.');
+          // Handle both single schema object and array of schemas
+          if (Array.isArray(parsed)) {
+            // Validate array of schemas
+            if (parsed.length === 0) {
+              throw new Error('Schema array cannot be empty.');
+            }
+            
+            // Validate each schema in the array
+            parsed.forEach((schema, index) => {
+              if (!schema || typeof schema !== 'object' || Array.isArray(schema)) {
+                throw new Error(`Invalid schema at index ${index}: must be an object`);
+              }
+              
+              if (!schema.id) {
+                throw new Error(`Schema at index ${index} must have an "id" field.`);
+              }
+              
+              if (!schema.singular_name) {
+                throw new Error(`Schema at index ${index} must have a "singular_name" field.`);
+              }
+              
+              if (!schema.plural_name) {
+                throw new Error(`Schema at index ${index} must have a "plural_name" field.`);
+              }
+              
+              if (!Array.isArray(schema.fields)) {
+                throw new Error(`Schema at index ${index} must have a "fields" array.`);
+              }
+              
+              if (!Array.isArray(schema.sections)) {
+                throw new Error(`Schema at index ${index} must have a "sections" array.`);
+              }
+            });
+            
+            requestBody = parsed;
+          } else if (parsed && typeof parsed === 'object') {
+            // Validate single schema object
+            if (!parsed.id) {
+              throw new Error('Schema must have an "id" field.');
+            }
+            
+            if (!parsed.singular_name) {
+              throw new Error('Schema must have a "singular_name" field.');
+            }
+            
+            if (!parsed.plural_name) {
+              throw new Error('Schema must have a "plural_name" field.');
+            }
+            
+            if (!Array.isArray(parsed.fields)) {
+              throw new Error('Schema must have a "fields" array.');
+            }
+            
+            if (!Array.isArray(parsed.sections)) {
+              throw new Error('Schema must have a "sections" array.');
+            }
+            
+            requestBody = parsed;
+          } else {
+            throw new Error('Parsed JSON must be an object or an array of objects.');
           }
-          
-          if (!parsed.id) {
-            throw new Error('Schema must have an "id" field.');
-          }
-          
-          if (!parsed.singular_name) {
-            throw new Error('Schema must have a "singular_name" field.');
-          }
-          
-          if (!parsed.plural_name) {
-            throw new Error('Schema must have a "plural_name" field.');
-          }
-          
-          if (!Array.isArray(parsed.fields)) {
-            throw new Error('Schema must have a "fields" array.');
-          }
-          
-          if (!Array.isArray(parsed.sections)) {
-            throw new Error('Schema must have a "sections" array.');
-          }
-          
-          requestBody = parsed;
         } catch (parseError) {
           if (parseError instanceof SyntaxError) {
             throw new Error('Invalid JSON in response. Please check the AI response.');
@@ -525,34 +561,38 @@ export default function AiBuilderPage() {
 
         {/* Do the Magic Button */}
         <div className="flex justify-center items-center gap-3">
-          <Button
-            onClick={handleDoMagic}
-            disabled={isLoading || !userPrompt.trim()}
-            size="lg"
-            className="min-w-[200px] relative"
-          >
-            {isLoading ? (
-              <>
+          {isLoading ? (
+            <>
+              <Button
+                onClick={handleDoMagic}
+                disabled={true}
+                size="lg"
+                className="min-w-[200px]"
+              >
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 Generating...
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleStop();
-                  }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center transition-colors shadow-sm"
-                  aria-label="Stop generation"
-                >
-                  <Square className="h-3 w-3 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
-                </button>
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-5 w-5" />
-                Do the Magic
-              </>
-            )}
-          </Button>
+              </Button>
+              <Button
+                onClick={handleStop}
+                variant="outline"
+                size="lg"
+                className="min-w-[150px]"
+              >
+                <Square className="mr-2 h-5 w-5 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
+                Stop
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={handleDoMagic}
+              disabled={!userPrompt.trim()}
+              size="lg"
+              className="min-w-[200px]"
+            >
+              <Sparkles className="mr-2 h-5 w-5" />
+              Do the Magic
+            </Button>
+          )}
           {DEMO_MODE && (
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
