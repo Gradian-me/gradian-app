@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
+import { preloadRoutes } from '@/gradian-ui/shared/utils/preload-routes';
 
 /**
  * Load AI agents from JSON file
@@ -26,7 +27,38 @@ function loadAiAgents(): any[] {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    // Check if request body exists
+    let requestBody: string;
+    try {
+      requestBody = await request.text();
+    } catch (error) {
+      // Handle aborted requests or network errors
+      if (error instanceof Error && (error.name === 'AbortError' || error.message.includes('aborted'))) {
+        return NextResponse.json(
+          { success: false, error: 'Request was cancelled' },
+          { status: 499 } // Client Closed Request
+        );
+      }
+      throw error;
+    }
+    
+    if (!requestBody || requestBody.trim() === '') {
+      return NextResponse.json(
+        { success: false, error: 'Request body is empty' },
+        { status: 400 }
+      );
+    }
+
+    let body;
+    try {
+      body = JSON.parse(requestBody);
+    } catch (parseError) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+
     const { userPrompt, agentId } = body;
 
     if (!userPrompt || typeof userPrompt !== 'string') {
@@ -68,11 +100,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get base URL for preload routes
+    const url = new URL(request.url);
+    const baseUrl = `${url.protocol}//${url.host}`;
+
+    // Preload routes if configured
+    let preloadedContext = '';
+    if (agent.preloadRoutes && Array.isArray(agent.preloadRoutes) && agent.preloadRoutes.length > 0) {
+      try {
+        preloadedContext = await preloadRoutes(agent.preloadRoutes, baseUrl);
+      } catch (error) {
+        console.error('Error preloading routes:', error);
+        // Continue even if preload fails
+      }
+    }
+
+    // Prepare system prompt with preloaded context
+    const systemPrompt = (agent.systemPrompt || '') + preloadedContext;
+
     // Prepare messages for AvalAI API
     const messages = [
       {
         role: 'system' as const,
-        content: agent.systemPrompt || ''
+        content: systemPrompt
       },
       {
         role: 'user' as const,
@@ -146,6 +196,18 @@ export async function POST(request: NextRequest) {
       }
     });
   } catch (error) {
+    // Handle aborted requests or JSON parsing errors gracefully
+    if (error instanceof SyntaxError) {
+      console.error('JSON parsing error in AI builder API:', error);
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Invalid request body. The request may have been cancelled.' 
+        },
+        { status: 400 }
+      );
+    }
+    
     console.error('Error in AI builder API:', error);
     return NextResponse.json(
       { 

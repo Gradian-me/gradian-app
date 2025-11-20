@@ -1824,39 +1824,5 @@
         }
       ]
     }
-  ],
-  "issue-tracking": [],
-  "pharmaceutical-project-impediments": [
-    {
-      "title": "Decrease in Sialic Acid",
-      "category": [
-        {
-          "id": "technical",
-          "label": "Technical"
-        }
-      ],
-      "description": "test Decrease in Sialic Acid",
-      "projectId": "Galsulface",
-      "status": [
-        {
-          "id": "in-progress",
-          "label": "In Progress",
-          "icon": "RotateRight",
-          "color": "info"
-        }
-      ],
-      "assignedTo": [
-        {
-          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-          "label": "Mahyar Abidi"
-        }
-      ],
-      "rootCauseAnalysis": "test root cause",
-      "resolutionDate": "2025-11-19",
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KAGQ7YZ31PF3YZ9GCKGAX52P",
-      "createdAt": "2025-11-20T13:28:44.295Z",
-      "updatedAt": "2025-11-20T13:28:44.298Z"
-    }
   ]
 }
