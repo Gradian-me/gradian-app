@@ -148,15 +148,15 @@ export async function POST(
     
     // If single item, use controller (maintains existing behavior)
     if (!isArray) {
-      const controller = await createController(schemaId);
-      const response = await controller.create(request);
-      
-      // Clear companies cache if a company was created
-      if (schemaId === 'companies') {
-        clearCompaniesCache();
-      }
-      
-      return response;
+    const controller = await createController(schemaId);
+    const response = await controller.create(request);
+    
+    // Clear companies cache if a company was created
+    if (schemaId === 'companies') {
+      clearCompaniesCache();
+    }
+    
+    return response;
     }
 
     // Handle array of entities

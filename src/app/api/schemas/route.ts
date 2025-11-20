@@ -265,6 +265,27 @@ export async function POST(request: NextRequest) {
     const schemaFilePath = path.join(process.cwd(), 'data', 'all-schemas.json');
     fs.writeFileSync(schemaFilePath, JSON.stringify(schemas, null, 2), 'utf8');
 
+    // Always call clear-cache API endpoint after creating schemas
+    // This ensures caches are cleared even when demo mode is off (will proxy to remote)
+    try {
+      const url = new URL(request.url);
+      const baseUrl = `${url.protocol}//${url.host}`;
+      const clearCacheUrl = `${baseUrl}/api/schemas/clear-cache`;
+      
+      await fetch(clearCacheUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).catch((error) => {
+        // Log but don't fail the request if cache clearing fails
+        console.warn('Failed to clear cache after schema creation:', error);
+      });
+    } catch (error) {
+      // Log but don't fail the request if cache clearing fails
+      console.warn('Error clearing cache after schema creation:', error);
+    }
+
     // Return single object if single was sent, array if array was sent
     const responseData = Array.isArray(requestData) ? newSchemas : newSchemas[0];
     const message = newSchemas.length === 1
