@@ -906,10 +906,12 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   const mainComponents = componentRenderers.filter((comp, index) => index < mainColumns * 2);
   const sidebarComponents = componentRenderers.slice(mainColumns * 2);
 
-  // Determine if sidebar should be shown - show if layout specifies sidebar columns or if we have sidebar sections or quick actions
+  // Determine if sidebar should be shown - only show if we have actual sidebar content (sections, quick actions, or sidebar components)
   // Table renderers are always full width and rendered after all components and sections, so they don't affect sidebar
   const hasSidebarSections = sections.some(s => s.columnArea === 'sidebar');
-  const hasSidebar = (totalColumns > mainColumns && sidebarColumns > 0) || hasSidebarSections || quickActions.length > 0;
+  const hasSidebarContent = hasSidebarSections || quickActions.length > 0 || sidebarComponents.length > 0;
+  // Only use grid layout if we actually have sidebar content to display
+  const hasSidebar = hasSidebarContent;
 
   // If there's no sidebar sections, set all sections to colSpan: 1 for full width
   // But keep colSpan: 2 if explicitly set when there IS a sidebar
