@@ -4396,7 +4396,8 @@
     ],
     "showInNavigation": false,
     "isNotCompanyBased": true,
-    "isSystemSchema": true
+    "isSystemSchema": true,
+    "icon": "PenTool"
   },
   {
     "id": "mcp-tools",
