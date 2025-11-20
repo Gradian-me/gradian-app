@@ -39,5 +39,8 @@ export const DEFAULT_APPLICATION_VARIABLES = {
   },
   SCHEMA_SUMMARY_EXCLUDED_KEYS: ['fields', 'sections', 'detailPageMetadata'],
   DEMO_MODE: true,
+  AI_CONFIG: {
+    LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions',
+  },
 } as const;
 

@@ -1,11 +1,12 @@
 // AI Builder API Route
-// Handles AI agent requests via AvalAI API
+// Handles AI agent requests via LLM API (OpenAI, OpenRouter, AvalAI, etc.)
 
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
 import { preloadRoutes } from '@/gradian-ui/shared/utils/preload-routes';
+import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
 
 /**
  * Load AI agents from JSON file
@@ -82,12 +83,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get API key from environment
-    const apiKey = process.env.AVALAI_API_KEY;
+    // Get API key from environment (supports LLM_API_KEY or AVALAI_API_KEY for backward compatibility)
+    const apiKey = process.env.LLM_API_KEY || process.env.AVALAI_API_KEY;
     
     if (!apiKey) {
       return NextResponse.json(
-        { success: false, error: 'AVALAI_API_KEY is not configured' },
+        { success: false, error: 'LLM_API_KEY is not configured' },
         { status: 500 }
       );
     }
@@ -110,7 +111,7 @@ export async function POST(request: NextRequest) {
     // Prepare system prompt with preloaded context
     const systemPrompt = (agent.systemPrompt || '') + preloadedContext;
 
-    // Prepare messages for AvalAI API
+    // Prepare messages for LLM API
     const messages = [
       {
         role: 'system' as const,
@@ -122,22 +123,29 @@ export async function POST(request: NextRequest) {
       }
     ];
 
-    // Call AvalAI API
-    const response = await fetch('https://api.avalai.ir/v1/chat/completions', {
+    // Get model from agent config or use default
+    const model = agent.model || 'gpt-4o-mini';
+
+    // Get LLM API URL from application variables
+    const appVars = loadApplicationVariables();
+    const llmApiUrl = appVars.AI_CONFIG?.LLM_API_URL || 'https://api.openai.com/v1/chat/completions';
+
+    // Call LLM API
+    const response = await fetch(llmApiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model,
         messages
       })
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('AvalAI API error:', errorText);
+      console.error('LLM API error:', errorText);
       return NextResponse.json(
         { success: false, error: `AI API request failed: ${response.statusText}` },
         { status: response.status }
@@ -153,6 +161,13 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Extract token usage information
+    const tokenUsage = data.usage ? {
+      prompt_tokens: data.usage.prompt_tokens || 0,
+      completion_tokens: data.usage.completion_tokens || 0,
+      total_tokens: data.usage.total_tokens || 0,
+    } : null;
 
     // Extract JSON if required output format is JSON
     let processedResponse = aiResponseContent;
@@ -178,6 +193,7 @@ export async function POST(request: NextRequest) {
       data: {
         response: processedResponse,
         format: agent.requiredOutputFormat || 'string',
+        tokenUsage,
         agent: {
           id: agent.id,
           label: agent.label,

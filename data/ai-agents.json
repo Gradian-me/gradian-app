@@ -5,6 +5,7 @@
     "icon": "Sparkles",
     "description": "Generates complete form schemas from natural language descriptions",
     "requiredOutputFormat": "json",
+    "model": "gpt-4o-mini",
     "nextAction": {
       "label": "Approve Response",
       "icon": "CheckCircle2",

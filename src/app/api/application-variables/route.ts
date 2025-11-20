@@ -53,7 +53,10 @@ async function ensureApplicationVariablesFile(): Promise<void> {
         'sections',
         'detailPageMetadata'
       ],
-      DEMO_MODE: true
+      DEMO_MODE: true,
+      AI_CONFIG: {
+        LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions'
+      }
     };
     await writeFile(APPLICATION_VARIABLES_FILE, JSON.stringify(defaultData, null, 2), 'utf-8');
   }
@@ -126,7 +129,13 @@ export async function PUT(request: NextRequest) {
       ...(body.SCHEMA_SUMMARY_EXCLUDED_KEYS !== undefined && {
         SCHEMA_SUMMARY_EXCLUDED_KEYS: body.SCHEMA_SUMMARY_EXCLUDED_KEYS
       }),
-      ...(body.DEMO_MODE !== undefined && { DEMO_MODE: body.DEMO_MODE })
+      ...(body.DEMO_MODE !== undefined && { DEMO_MODE: body.DEMO_MODE }),
+      ...(body.AI_CONFIG && {
+        AI_CONFIG: {
+          ...currentData.AI_CONFIG,
+          ...body.AI_CONFIG
+        }
+      })
     };
 
     // Write back to file

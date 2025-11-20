@@ -42,6 +42,7 @@ function loadVariables() {
     UI_PARAMS: defaults?.UI_PARAMS || DEFAULT_APPLICATION_VARIABLES.UI_PARAMS,
     SCHEMA_SUMMARY_EXCLUDED_KEYS: defaults?.SCHEMA_SUMMARY_EXCLUDED_KEYS || DEFAULT_APPLICATION_VARIABLES.SCHEMA_SUMMARY_EXCLUDED_KEYS,
     DEMO_MODE: defaults?.DEMO_MODE ?? DEFAULT_APPLICATION_VARIABLES.DEMO_MODE,
+    AI_CONFIG: defaults?.AI_CONFIG || DEFAULT_APPLICATION_VARIABLES.AI_CONFIG,
   };
 }
 
@@ -53,6 +54,7 @@ export const UI_PARAMS = vars.UI_PARAMS;
 export const SCHEMA_SUMMARY_EXCLUDED_KEYS = vars.SCHEMA_SUMMARY_EXCLUDED_KEYS;
 export const DEMO_MODE_PARAMS = { DEMO_MODE: vars.DEMO_MODE } as const;
 export const DEMO_MODE = vars.DEMO_MODE;
+export const AI_CONFIG = vars.AI_CONFIG;
 
 // Client-safe cache clear function (no-op on client, server code should use loader directly)
 export function clearCache() {

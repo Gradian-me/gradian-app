@@ -35,7 +35,16 @@
   "SCHEMA_SUMMARY_EXCLUDED_KEYS": [
     "fields",
     "sections",
-    "detailPageMetadata"
+    "detailPageMetadata",
+    "cardMetadata",
+    "fieldsCount",
+    "sectionsCount",
+    "fieldsCount",
+    "showInNavigation",
+    ""
   ],
-  "DEMO_MODE": true
+  "DEMO_MODE": true,
+  "AI_CONFIG": {
+    "LLM_API_URL": "https://api.avalai.ir/v1/chat/completions"
+  }
 }

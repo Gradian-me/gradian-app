@@ -10,7 +10,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  FormTabs,
+  FormTabsList,
+  FormTabsTrigger,
+  FormTabsContent,
+} from '@/gradian-ui/form-builder/form-elements';
 import { ArrowLeft, Save, RefreshCw } from 'lucide-react';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
@@ -34,6 +39,9 @@ interface ApplicationVariablesData {
   };
   SCHEMA_SUMMARY_EXCLUDED_KEYS: string[];
   DEMO_MODE?: boolean;
+  AI_CONFIG?: {
+    LLM_API_URL?: string;
+  };
 }
 
 export default function ApplicationVariablesPage() {
@@ -45,6 +53,7 @@ export default function ApplicationVariablesPage() {
     AUTH_CONFIG: {},
     UI_PARAMS: {},
     SCHEMA_SUMMARY_EXCLUDED_KEYS: [],
+    AI_CONFIG: {},
   });
 
   useEffect(() => {
@@ -238,17 +247,30 @@ export default function ApplicationVariablesPage() {
         </div>
 
         {/* Configuration Tabs */}
-        <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="logging">Logging</TabsTrigger>
-            <TabsTrigger value="auth">Authentication</TabsTrigger>
-            <TabsTrigger value="ui">UI Parameters</TabsTrigger>
-            <TabsTrigger value="schema">Schema</TabsTrigger>
-          </TabsList>
+        <FormTabs defaultValue="general" className="w-full">
+          <FormTabsList className="min-w-full bg-gray-100 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 select-none">
+            <FormTabsTrigger value="general" className="px-4 py-1.5 text-sm">
+              General
+            </FormTabsTrigger>
+            <FormTabsTrigger value="logging" className="px-4 py-1.5 text-sm">
+              Logging
+            </FormTabsTrigger>
+            <FormTabsTrigger value="auth" className="px-4 py-1.5 text-sm">
+              Authentication
+            </FormTabsTrigger>
+            <FormTabsTrigger value="ui" className="px-4 py-1.5 text-sm">
+              UI Parameters
+            </FormTabsTrigger>
+            <FormTabsTrigger value="schema" className="px-4 py-1.5 text-sm">
+              Schema
+            </FormTabsTrigger>
+            <FormTabsTrigger value="ai" className="px-4 py-1.5 text-sm">
+              AI Configuration
+            </FormTabsTrigger>
+          </FormTabsList>
 
           {/* General Configuration */}
-          <TabsContent value="general" className="space-y-4">
+          <FormTabsContent value="general" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>General Configuration</CardTitle>
@@ -271,10 +293,10 @@ export default function ApplicationVariablesPage() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </FormTabsContent>
 
           {/* Logging Configuration */}
-          <TabsContent value="logging" className="space-y-4">
+          <FormTabsContent value="logging" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>Log Configuration</CardTitle>
@@ -308,10 +330,10 @@ export default function ApplicationVariablesPage() {
                 ))}
               </CardContent>
             </Card>
-          </TabsContent>
+          </FormTabsContent>
 
           {/* Authentication Configuration */}
-          <TabsContent value="auth" className="space-y-4">
+          <FormTabsContent value="auth" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>Authentication Configuration</CardTitle>
@@ -437,10 +459,10 @@ export default function ApplicationVariablesPage() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </FormTabsContent>
 
           {/* UI Parameters */}
-          <TabsContent value="ui" className="space-y-4">
+          <FormTabsContent value="ui" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>UI Parameters</CardTitle>
@@ -508,10 +530,10 @@ export default function ApplicationVariablesPage() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </FormTabsContent>
 
           {/* Schema Configuration */}
-          <TabsContent value="schema" className="space-y-4">
+          <FormTabsContent value="schema" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>Schema Summary Configuration</CardTitle>
@@ -548,8 +570,41 @@ export default function ApplicationVariablesPage() {
                 </Button>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          </FormTabsContent>
+
+          {/* AI Configuration */}
+          <FormTabsContent value="ai" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>AI Configuration</CardTitle>
+                <CardDescription>
+                  Configure AI service endpoints and settings
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="llm-api-url">LLM API URL</Label>
+                  <Input
+                    id="llm-api-url"
+                    type="url"
+                    value={data.AI_CONFIG?.LLM_API_URL || ''}
+                    onChange={(e) => setData((prev) => ({
+                      ...prev,
+                      AI_CONFIG: {
+                        ...prev.AI_CONFIG,
+                        LLM_API_URL: e.target.value,
+                      },
+                    }))}
+                    placeholder="https://api.openai.com/v1/chat/completions"
+                  />
+                  <p className="text-xs text-gray-500">
+                    The API endpoint URL for LLM chat completions service (e.g., OpenAI, OpenRouter, AvalAI)
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </FormTabsContent>
+        </FormTabs>
       </div>
     </MainLayout>
   );

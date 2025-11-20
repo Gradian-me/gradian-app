@@ -25,6 +25,7 @@ interface AiAgent {
   icon: string;
   description: string;
   requiredOutputFormat: 'json' | 'string';
+  model?: string;
   systemPrompt?: string;
   preloadRoutes?: Array<{
     route: string;
@@ -45,6 +46,7 @@ interface AiAgent {
 export default function AiBuilderPage() {
   const [userPrompt, setUserPrompt] = useState('');
   const [aiResponse, setAiResponse] = useState('');
+  const [tokenUsage, setTokenUsage] = useState<{ prompt_tokens: number; completion_tokens: number; total_tokens: number } | null>(null);
   const [aiAgents, setAiAgents] = useState<AiAgent[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
   const [isLoadingAgents, setIsLoadingAgents] = useState(true);
@@ -203,7 +205,7 @@ export default function AiBuilderPage() {
     ];
 
     return {
-      model: 'gpt-4o',
+      model: selectedAgent.model || 'gpt-4o',
       messages
     };
   };
@@ -236,6 +238,7 @@ export default function AiBuilderPage() {
   // Clear response when agent changes
   useEffect(() => {
     setAiResponse('');
+    setTokenUsage(null);
     setError(null);
     setSuccessMessage(null);
   }, [selectedAgentId]);
@@ -308,6 +311,7 @@ export default function AiBuilderPage() {
       }
 
       setAiResponse(data.data.response);
+      setTokenUsage(data.data.tokenUsage || null);
     } catch (err) {
       // Don't show error if request was aborted
       if (err instanceof Error && err.name === 'AbortError') {
@@ -316,6 +320,7 @@ export default function AiBuilderPage() {
       } else {
         setError(err instanceof Error ? err.message : 'An error occurred');
         setAiResponse('');
+        setTokenUsage(null);
       }
     } finally {
       setIsLoading(false);
@@ -329,6 +334,7 @@ export default function AiBuilderPage() {
       setIsLoading(false);
       setError(null);
       setAiResponse('');
+      setTokenUsage(null);
       abortControllerRef.current = null;
     }
   };
@@ -446,10 +452,32 @@ export default function AiBuilderPage() {
       }
 
       setSuccessMessage(data.message || 'Schema created successfully!');
+      
+      // Refresh schemas sidebar after successful creation
+      if (typeof window !== 'undefined') {
+        // Dispatch event to clear React Query caches for schemas
+        window.dispatchEvent(new CustomEvent('react-query-cache-clear', { 
+          detail: { queryKeys: ['schemas'] } 
+        }));
+        
+        // Also trigger storage event for other tabs
+        window.localStorage.setItem('react-query-cache-cleared', JSON.stringify(['schemas']));
+        window.localStorage.removeItem('react-query-cache-cleared');
+        
+        // Force refresh the schemas endpoint
+        fetch('/api/schemas?summary=true&cacheBust=' + Date.now(), {
+          method: 'GET',
+          cache: 'no-store',
+        }).catch(err => {
+          console.warn('Failed to refresh schemas:', err);
+        });
+      }
+      
       // Clear the form after successful creation
       setTimeout(() => {
         setUserPrompt('');
         setAiResponse('');
+        setTokenUsage(null);
         setSuccessMessage(null);
       }, 3000);
     } catch (err) {
@@ -694,31 +722,38 @@ export default function AiBuilderPage() {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                 Your Creation
               </h2>
-              {selectedAgent?.nextAction && (
-                <Button
-                  onClick={handleApprove}
-                  disabled={isApproving}
-                  variant="default"
-                  size="default"
-                >
-                  {isApproving ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      {selectedAgent.nextAction.icon && (
-                        <IconRenderer 
-                          iconName={selectedAgent.nextAction.icon} 
-                          className="mr-2 h-4 w-4" 
-                        />
-                      )}
-                      {selectedAgent.nextAction.label}
-                    </>
-                  )}
-                </Button>
-              )}
+              <div className="flex items-center gap-3">
+                {tokenUsage && (
+                  <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                    <span>Tokens: {tokenUsage.prompt_tokens} + {tokenUsage.completion_tokens} = {tokenUsage.total_tokens}</span>
+                  </div>
+                )}
+                {selectedAgent?.nextAction && (
+                  <Button
+                    onClick={handleApprove}
+                    disabled={isApproving}
+                    variant="default"
+                    size="default"
+                  >
+                    {isApproving ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        {selectedAgent.nextAction.icon && (
+                          <IconRenderer 
+                            iconName={selectedAgent.nextAction.icon} 
+                            className="mr-2 h-4 w-4" 
+                          />
+                        )}
+                        {selectedAgent.nextAction.label}
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
             <CodeViewer
               code={aiResponse}
