@@ -48,16 +48,17 @@ export function TableBody<T = any>({
     }
 
     if (React.isValidElement(node)) {
+      const props = node.props as { children?: React.ReactNode };
       const highlightedChildren = React.Children.map(
-        node.props.children,
+        props.children,
         (child) => applyHighlight(child)
       );
 
-      if (highlightedChildren === node.props.children) {
+      if (highlightedChildren === props.children) {
         return node;
       }
 
-      return React.cloneElement(node, node.props, highlightedChildren);
+      return React.cloneElement(node, props, highlightedChildren);
     }
 
     return node;

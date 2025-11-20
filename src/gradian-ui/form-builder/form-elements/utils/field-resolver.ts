@@ -126,7 +126,7 @@ export const getValueByRole = (schema: FormSchema, data: any, role: string): str
             }
             // If entry is a string/number ID, find matching option
             const entryId = String(entry);
-            const option = field.options.find(opt => 
+            const option = field.options.find((opt: { id?: string; value?: string }) => 
               String(opt.id) === entryId || String(opt.value) === entryId
             );
             if (option) {
@@ -198,7 +198,7 @@ export const getSingleValueByRole = (schema: FormSchema, data: any, role: string
         }
         // If entry is a string/number ID, find matching option
         const entryId = String(entry);
-        const option = field.options.find(opt => 
+        const option = field.options.find((opt: { id?: string; value?: string }) => 
           String(opt.id) === entryId || String(opt.value) === entryId
         );
         if (option) {

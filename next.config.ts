@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
             rotateStringArray: true,
             stringArray: true,
             stringArrayCallsTransform: true,
-            stringArrayEncoding: ["base64"],
+            stringArrayEncoding: [],
             stringArrayIndexShift: true,
             stringArrayRotate: true,
             stringArrayShuffle: true,
@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
             stringArrayThreshold: 0.75,
             unicodeEscapeSequence: false,
           },
-          ["**/node_modules/**", "**/server/**"]
+          ["**/node_modules/**", "**/server/**", "**/api/**"]
         )
       );
     }

@@ -175,7 +175,8 @@ export default function SignUpPage() {
       // Only require companyId if schema is company-based
       let companyId: string | null = null;
       if (isCompanyBased) {
-        companyId = getCompanyId();
+        const companyIdValue = getCompanyId();
+        companyId = companyIdValue !== null && companyIdValue !== undefined ? String(companyIdValue) : null;
 
         if (!companyId) {
           setSubmitFeedback({

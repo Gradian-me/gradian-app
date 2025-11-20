@@ -40,8 +40,9 @@ function buildSchemaSummary<T extends Record<string, any>>(schema: T): T {
 
 /**
  * Clear schema cache (no-op, kept for compatibility)
+ * Note: Not exported to avoid Next.js route handler type conflicts
  */
-export function clearSchemaCache() {
+function clearSchemaCache() {
   // No-op: caching is disabled
 }
 

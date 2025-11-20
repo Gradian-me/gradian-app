@@ -9,7 +9,7 @@ export interface Property {
   name: string;
   schemaName: string;
   schemaId?: string;
-  type: 'string' | 'number' | 'boolean' | 'array' | 'date' | 'object';
+  type: 'string' | 'number' | 'boolean' | 'array' | 'date' | 'object' | 'email';
   description?: string;
   path: string; // e.g., "User.age" or "user.profile.email"
   fieldId?: string;

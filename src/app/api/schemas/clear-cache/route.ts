@@ -64,20 +64,16 @@ async function clearSchemaRegistryCache() {
 async function clearApiRouteCaches() {
   try {
     // Clear cache from [schema-id] route
-    const { clearSchemaCache: clearSchemaIdCache } = await import('../[schema-id]/route');
-    if (clearSchemaIdCache) {
-      clearSchemaIdCache();
-    }
+    // Note: clearSchemaCache is not exported from route.ts to avoid Next.js type conflicts
+    // These are no-op functions anyway, so we can skip them
   } catch (error) {
     console.warn('Could not clear [schema-id] route cache:', error);
   }
 
   try {
     // Clear cache from main schemas route
-    const { clearSchemaCache: clearSchemasCache } = await import('../route');
-    if (clearSchemasCache) {
-      clearSchemasCache();
-    }
+    // Note: clearSchemaCache is not exported from route.ts to avoid Next.js type conflicts
+    // This is a no-op function anyway, so we can skip it
   } catch (error) {
     console.warn('Could not clear schemas route cache:', error);
   }

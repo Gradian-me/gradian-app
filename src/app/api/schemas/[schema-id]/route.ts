@@ -19,8 +19,9 @@ const CACHE_TTL_MS = CACHE_CONFIG.ttl;
 
 /**
  * Clear schema cache (useful for development)
+ * Note: Not exported to avoid Next.js route handler type conflicts
  */
-export function clearSchemaCache() {
+function clearSchemaCache() {
   cachedSchemas = null;
   cacheTimestamp = null;
 }

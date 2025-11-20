@@ -59,7 +59,7 @@ export interface FieldEditorProps {
 }
 
 export interface FieldTypeOption {
-  value: FormField['type'];
+  value: FormField['component'];
   label: string;
   icon?: string;
   description?: string;

@@ -20,6 +20,7 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { useAggregationTypes } from '../hooks/useAggregationTypes';
 import { useSchemas } from '../hooks/useSchemas';
 import { FormElementFactory } from '@/gradian-ui/form-builder/form-elements/components/FormElementFactory';
+import type { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 
 interface ValueInputProps {
   condition: Condition;
@@ -54,7 +55,7 @@ export function ValueInput({ condition, properties, onChange, error, compact = f
       return null;
     }
     
-    const field = schema.fields.find((f) => f.id === property.fieldId);
+    const field = schema.fields.find((f) => f.id === property.fieldId) as FormField | undefined;
     if (!field) {
       return null;
     }
@@ -62,8 +63,8 @@ export function ValueInput({ condition, properties, onChange, error, compact = f
     // Return field config for FormElementFactory
     return {
       ...field,
-      component: field.component || field.type || 'text',
-      type: field.type || 'text',
+      sectionId: field.sectionId, // sectionId is required in FormField
+      component: (field.component || 'text') as FormField['component'],
       label: hideLabel ? '' : (field.label || field.name), // Hide label if hideLabel prop is true
       placeholder: field.placeholder || `Enter ${field.label || field.name}`,
       required: false, // Don't make it required in the condition value input
