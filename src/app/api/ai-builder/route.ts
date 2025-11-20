@@ -27,34 +27,26 @@ function loadAiAgents(): any[] {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Check if request body exists
-    let requestBody: string;
+    // Parse request body - handle errors gracefully
+    let body: { userPrompt?: string; agentId?: string };
     try {
-      requestBody = await request.text();
+      body = await request.json();
     } catch (error) {
-      // Handle aborted requests or network errors
+      // Handle aborted requests, empty body, or JSON parsing errors
+      if (error instanceof SyntaxError || (error instanceof Error && error.message.includes('JSON'))) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid JSON in request body or request was cancelled' },
+          { status: 400 }
+        );
+      }
       if (error instanceof Error && (error.name === 'AbortError' || error.message.includes('aborted'))) {
         return NextResponse.json(
           { success: false, error: 'Request was cancelled' },
           { status: 499 } // Client Closed Request
         );
       }
-      throw error;
-    }
-    
-    if (!requestBody || requestBody.trim() === '') {
       return NextResponse.json(
-        { success: false, error: 'Request body is empty' },
-        { status: 400 }
-      );
-    }
-
-    let body;
-    try {
-      body = JSON.parse(requestBody);
-    } catch (parseError) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid JSON in request body' },
+        { success: false, error: 'Failed to read request body' },
         { status: 400 }
       );
     }

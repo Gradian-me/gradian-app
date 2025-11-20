@@ -26,6 +26,15 @@ interface AiAgent {
   description: string;
   requiredOutputFormat: 'json' | 'string';
   systemPrompt?: string;
+  preloadRoutes?: Array<{
+    route: string;
+    title: string;
+    description: string;
+    method?: 'GET' | 'POST';
+    jsonPath?: string;
+    body?: any;
+    queryParameters?: Record<string, string>;
+  }>;
   nextAction: {
     label: string;
     icon?: string;
@@ -44,11 +53,135 @@ export default function AiBuilderPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [preloadedContext, setPreloadedContext] = useState<string>('');
+  const [isLoadingPreload, setIsLoadingPreload] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Get selected agent
   const selectedAgent = aiAgents.find(agent => agent.id === selectedAgentId) || null;
+
+  // Load preload routes when agent or sheet opens
+  useEffect(() => {
+    const loadPreloadRoutes = async () => {
+      if (!selectedAgent?.preloadRoutes || !Array.isArray(selectedAgent.preloadRoutes) || selectedAgent.preloadRoutes.length === 0) {
+        setPreloadedContext('');
+        return;
+      }
+
+      setIsLoadingPreload(true);
+      try {
+        const baseUrl = window.location.origin;
+        const results = await Promise.all(
+          selectedAgent.preloadRoutes.map(async (route: any) => {
+            try {
+              const method = route.method || 'GET';
+              let routePath = route.route;
+
+              // Build URL with query parameters for GET requests
+              if (method === 'GET' && route.queryParameters) {
+                const [path, existingQuery] = routePath.split('?');
+                const searchParams = new URLSearchParams(existingQuery || '');
+                Object.entries(route.queryParameters).forEach(([key, value]) => {
+                  searchParams.set(key, value as string);
+                });
+                const queryString = searchParams.toString();
+                routePath = queryString ? `${path}?${queryString}` : path;
+              }
+
+              const fullUrl = routePath.startsWith('http') 
+                ? routePath 
+                : `${baseUrl}${routePath.startsWith('/') ? routePath : '/' + routePath}`;
+
+              const fetchOptions: RequestInit = {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+              };
+
+              if (method === 'POST' && route.body) {
+                fetchOptions.body = JSON.stringify(route.body);
+              }
+
+              const response = await fetch(fullUrl, fetchOptions);
+              
+              if (!response.ok) {
+                return {
+                  route: route.route,
+                  title: route.title,
+                  description: route.description,
+                  success: false,
+                  error: `HTTP ${response.status}: ${response.statusText}`,
+                };
+              }
+
+              const responseData = await response.json();
+              
+              // Extract data using jsonPath
+              let extractedData = responseData;
+              if (route.jsonPath) {
+                const pathParts = route.jsonPath.split('.');
+                for (const part of pathParts) {
+                  if (extractedData && typeof extractedData === 'object' && part in extractedData) {
+                    extractedData = extractedData[part];
+                  } else {
+                    extractedData = null;
+                    break;
+                  }
+                }
+              }
+
+              return {
+                route: route.route,
+                title: route.title,
+                description: route.description,
+                success: true,
+                data: extractedData,
+              };
+            } catch (error) {
+              return {
+                route: route.route,
+                title: route.title,
+                description: route.description,
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
+              };
+            }
+          })
+        );
+
+        // Format results for system prompt
+        const sections: string[] = [];
+        results.forEach((result) => {
+          if (result.success && result.data) {
+            sections.push(
+              `## ${result.title}\n${result.description}\n\n` +
+              `Data from ${result.route}:\n\`\`\`json\n${JSON.stringify(result.data, null, 2)}\n\`\`\`\n`
+            );
+          } else {
+            sections.push(
+              `## ${result.title}\n${result.description}\n\n` +
+              `⚠️ Failed to load data from ${result.route}: ${result.error || 'Unknown error'}\n`
+            );
+          }
+        });
+
+        const context = sections.length > 0 
+          ? `\n\n## Preloaded Context Data\n\n${sections.join('\n')}\n`
+          : '';
+        
+        setPreloadedContext(context);
+      } catch (error) {
+        console.error('Error loading preload routes:', error);
+        setPreloadedContext('');
+      } finally {
+        setIsLoadingPreload(false);
+      }
+    };
+
+    if (isSheetOpen && selectedAgent) {
+      loadPreloadRoutes();
+    }
+  }, [isSheetOpen, selectedAgent?.id, selectedAgent?.preloadRoutes]);
 
   // Get the prompt that would be sent to LLM
   const getPromptForLLM = () => {
@@ -56,10 +189,12 @@ export default function AiBuilderPage() {
       return null;
     }
 
+    const systemPrompt = (selectedAgent.systemPrompt || '') + preloadedContext;
+
     const messages = [
       {
         role: 'system' as const,
-        content: selectedAgent.systemPrompt || ''
+        content: systemPrompt
       },
       {
         role: 'user' as const,
@@ -296,17 +431,36 @@ export default function AiBuilderPage() {
         subtitle="Transform your ideas into reality with the power of AI"
         icon="Sparkles"
       >
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-3xl mx-auto">
           {/* User Prompt Input Skeleton */}
-          <div className="space-y-2">
-            <Skeleton className="h-5 w-48" />
-            <Skeleton className="h-10 w-full rounded-lg" />
-            <Skeleton className="h-32 w-full rounded-lg" />
+          <div className="space-y-3">
+            {/* Label and Select Row Skeleton */}
+            <div className="flex flex-row justify-between items-center flex-wrap gap-2">
+              <Skeleton className="h-5 w-48 rounded-md" />
+              <Skeleton className="h-10 w-48 rounded-lg" />
+            </div>
+            
+            {/* Textarea Skeleton */}
+            <Skeleton className="h-32 w-full rounded-2xl" />
           </div>
 
           {/* Button Skeleton */}
-          <div className="flex justify-center">
+          <div className="flex justify-center items-center gap-3">
             <Skeleton className="h-12 w-48 rounded-lg" />
+            <Skeleton className="h-12 w-36 rounded-lg" />
+          </div>
+
+          {/* Animated shimmer effect container */}
+          <div className="space-y-4 mt-8">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-4 w-4 rounded-full" />
+              <Skeleton className="h-4 w-32 rounded-md" />
+            </div>
+            <Skeleton className="h-24 w-full rounded-lg" />
+            <div className="flex gap-2">
+              <Skeleton className="h-8 w-20 rounded-md" />
+              <Skeleton className="h-8 w-20 rounded-md" />
+            </div>
           </div>
         </div>
       </MainLayout>
@@ -386,10 +540,10 @@ export default function AiBuilderPage() {
                     e.stopPropagation();
                     handleStop();
                   }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center transition-colors shadow-sm"
                   aria-label="Stop generation"
                 >
-                  <Square className="h-3 w-3 text-white fill-white" />
+                  <Square className="h-3 w-3 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
                 </button>
               </>
             ) : (
@@ -399,7 +553,7 @@ export default function AiBuilderPage() {
               </>
             )}
           </Button>
-          {DEMO_MODE && !isLoading && (
+          {DEMO_MODE && (
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
                 <Button
@@ -412,25 +566,34 @@ export default function AiBuilderPage() {
                   View Prompt
                 </Button>
               </SheetTrigger>
-              <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
-                <SheetHeader>
+              <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0 h-full">
+                <SheetHeader className="px-6 pt-6 pb-4 pr-12 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 sticky top-0 bg-white dark:bg-gray-900 z-10">
                   <SheetTitle>Prompt Sent to LLM</SheetTitle>
                   <SheetDescription>
                     This is the prompt that will be sent to the Language Model when you click "Do the Magic".
                   </SheetDescription>
                 </SheetHeader>
-                <div className="mt-6">
+                <div className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
                   {getPromptForLLM() ? (
                     <div className="space-y-4">
                       <div>
                         <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
                           System Prompt:
                         </h3>
-                        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
-                          <pre className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">
-                            {selectedAgent?.systemPrompt || '(No system prompt configured)'}
-                          </pre>
-                        </div>
+                        {isLoadingPreload ? (
+                          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Loading preloaded context...
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+                            <pre className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">
+                              {(selectedAgent?.systemPrompt || '') + preloadedContext || '(No system prompt configured)'}
+                            </pre>
+                          </div>
+                        )}
                       </div>
                       <div>
                         <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
