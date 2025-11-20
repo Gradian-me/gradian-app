@@ -171,30 +171,47 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * POST - Create a new schema
- * Example: POST /api/schemas - creates a new schema
+ * POST - Create a new schema or multiple schemas
+ * Example: 
+ * - POST /api/schemas - creates a new schema (single object)
+ * - POST /api/schemas - creates multiple schemas (array of objects)
  */
 export async function POST(request: NextRequest) {
   try {
-    const newSchema = await request.json();
+    const requestData = await request.json();
 
-    // Validate that we received a valid schema object
-    if (!newSchema || typeof newSchema !== 'object' || Array.isArray(newSchema)) {
+    // Normalize to array: if single object, wrap it in an array
+    const schemasToCreate = Array.isArray(requestData) ? requestData : [requestData];
+
+    // Validate that we received valid schema objects
+    if (!schemasToCreate || schemasToCreate.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'Invalid schema: must be an object' },
+        { success: false, error: 'Invalid request: must be a schema object or an array of schema objects' },
         { status: 400 }
       );
     }
 
-    if (!newSchema.id || typeof newSchema.id !== 'string') {
-      return NextResponse.json(
-        { success: false, error: 'Invalid schema: missing or invalid "id" field' },
-        { status: 400 }
-      );
+    // Validate each schema
+    for (let i = 0; i < schemasToCreate.length; i++) {
+      const schema = schemasToCreate[i];
+      
+      if (!schema || typeof schema !== 'object' || Array.isArray(schema)) {
+        return NextResponse.json(
+          { success: false, error: `Invalid schema at index ${i}: must be an object` },
+          { status: 400 }
+        );
+      }
+
+      if (!schema.id || typeof schema.id !== 'string') {
+        return NextResponse.json(
+          { success: false, error: `Invalid schema at index ${i}: missing or invalid "id" field` },
+          { status: 400 }
+        );
+      }
     }
 
     if (!isDemoModeEnabled()) {
-      return proxySchemaRequest(request, '/api/schemas', { body: newSchema });
+      return proxySchemaRequest(request, '/api/schemas', { body: requestData });
     }
 
     // Load schemas (with caching)
@@ -207,27 +224,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if schema with same ID already exists
-    const existingSchema = schemas.find((s: any) => s.id === newSchema.id);
-    
-    if (existingSchema) {
+    // Check for duplicate IDs in the request
+    const requestIds = schemasToCreate.map(s => s.id);
+    const duplicateIds = requestIds.filter((id, index) => requestIds.indexOf(id) !== index);
+    if (duplicateIds.length > 0) {
       return NextResponse.json(
-        { success: false, error: `Schema with ID "${newSchema.id}" already exists` },
+        { success: false, error: `Duplicate schema IDs in request: ${duplicateIds.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Check if any schema with same ID already exists
+    const existingSchemas: any[] = [];
+    const newSchemas: any[] = [];
+    
+    for (const newSchema of schemasToCreate) {
+      const existingSchema = schemas.find((s: any) => s.id === newSchema.id);
+      
+      if (existingSchema) {
+        existingSchemas.push(newSchema.id);
+      } else {
+        newSchemas.push(newSchema);
+      }
+    }
+
+    if (existingSchemas.length > 0) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: `Schema(s) with ID(s) "${existingSchemas.join(', ')}" already exist(s)` 
+        },
         { status: 409 }
       );
     }
 
-    // Add the new schema
-    schemas.push(newSchema);
+    // Add all new schemas
+    schemas.push(...newSchemas);
 
     // Write back to file
     const schemaFilePath = path.join(process.cwd(), 'data', 'all-schemas.json');
     fs.writeFileSync(schemaFilePath, JSON.stringify(schemas, null, 2), 'utf8');
 
+    // Return single object if single was sent, array if array was sent
+    const responseData = Array.isArray(requestData) ? newSchemas : newSchemas[0];
+    const message = newSchemas.length === 1
+      ? `Schema "${newSchemas[0].id}" created successfully`
+      : `${newSchemas.length} schemas created successfully`;
+
     return NextResponse.json({
       success: true,
-      data: newSchema,
-      message: `Schema "${newSchema.id}" created successfully`
+      data: responseData,
+      message
     }, { status: 201 });
   } catch (error) {
     console.error('Error creating schema:', error);

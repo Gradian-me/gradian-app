@@ -114,8 +114,10 @@ export async function GET(
 }
 
 /**
- * POST - Create new entity
- * Example: POST /api/data/vendors
+ * POST - Create new entity or multiple entities
+ * Example: 
+ * - POST /api/data/vendors - creates a new entity (single object)
+ * - POST /api/data/vendors - creates multiple entities (array of objects)
  */
 export async function POST(
   request: NextRequest,
@@ -141,15 +143,127 @@ export async function POST(
       );
     }
 
-    const controller = await createController(schemaId);
-    const response = await controller.create(request);
+    const requestBody = await request.json();
+    const isArray = Array.isArray(requestBody);
     
+    // If single item, use controller (maintains existing behavior)
+    if (!isArray) {
+      const controller = await createController(schemaId);
+      const response = await controller.create(request);
+      
+      // Clear companies cache if a company was created
+      if (schemaId === 'companies') {
+        clearCompaniesCache();
+      }
+      
+      return response;
+    }
+
+    // Handle array of entities
+    const entitiesToCreate = requestBody;
+
+    // Validate that we received valid entity objects
+    if (!entitiesToCreate || entitiesToCreate.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request: array must contain at least one entity object' },
+        { status: 400 }
+      );
+    }
+
+    // Get schema to check if it's company-based
+    const schema = await getSchemaById(schemaId);
+    const isNotCompanyBased = schema.isNotCompanyBased || false;
+
+    // Create service for batch operations
+    const repository = new BaseRepository<BaseEntity>(schemaId);
+    const service = new BaseService<BaseEntity>(repository, schema.singular_name || 'Entity', schemaId);
+
+    const createdEntities: any[] = [];
+    const errors: Array<{ index: number; error: string }> = [];
+
+    // Process each entity
+    for (let i = 0; i < entitiesToCreate.length; i++) {
+      const entity = entitiesToCreate[i];
+      
+      try {
+        // Replicate controller's company validation logic
+        if (!isNotCompanyBased) {
+          const companyId = entity.companyId;
+          
+          if (!companyId) {
+            errors.push({
+              index: i,
+              error: 'Company ID is required. Please select a company before creating a record.'
+            });
+            continue;
+          }
+          
+          if (companyId === '-1' || companyId === '' || companyId === null || companyId === undefined) {
+            errors.push({
+              index: i,
+              error: 'Cannot create records when "All Companies" is selected. Please select a specific company first.'
+            });
+            continue;
+          }
+        }
+
+        // Use service directly for batch operations
+        const result = await service.create(entity);
+
+        if (result.success && result.data) {
+          createdEntities.push(result.data);
+        } else {
+          errors.push({
+            index: i,
+            error: result.error || 'Failed to create entity'
+          });
+        }
+      } catch (error) {
+        errors.push({
+          index: i,
+          error: error instanceof Error ? error.message : 'Failed to create entity'
+        });
+      }
+    }
+
+    // If all failed, return error
+    if (createdEntities.length === 0 && errors.length > 0) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: `Failed to create entities: ${errors.map(e => `Index ${e.index}: ${e.error}`).join('; ')}` 
+        },
+        { status: 400 }
+      );
+    }
+
+    // If some succeeded and some failed, return partial success
+    if (errors.length > 0) {
+      return NextResponse.json(
+        { 
+          success: true,
+          data: createdEntities,
+          message: `Created ${createdEntities.length} of ${entitiesToCreate.length} entity(ies)`,
+          errors: errors.length > 0 ? errors : undefined,
+          partial: true
+        },
+        { status: 207 } // 207 Multi-Status for partial success
+      );
+    }
+
+    // All succeeded
     // Clear companies cache if a company was created
     if (schemaId === 'companies') {
       clearCompaniesCache();
     }
-    
-    return response;
+
+    const message = `${createdEntities.length} entities created successfully`;
+
+    return NextResponse.json({
+      success: true,
+      data: createdEntities,
+      message
+    }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
       { 
