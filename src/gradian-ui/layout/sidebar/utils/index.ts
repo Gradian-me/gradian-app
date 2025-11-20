@@ -15,7 +15,8 @@ import {
   User,
   Folder,
   LucideIcon,
-  PencilRuler
+  PencilRuler,
+  Sparkles
 } from 'lucide-react';
 import { NavigationItem } from '../types';
 
@@ -47,6 +48,11 @@ export const defaultNavigationItems: NavigationItem[] = [
     name: 'Builder',
     href: '/builder',
     icon: PencilRuler,
+  },
+  {
+    name: 'AI Builder',
+    href: '/ai-builder',
+    icon: Sparkles,
   }
 ];
 

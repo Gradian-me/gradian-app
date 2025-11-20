@@ -4828,5 +4828,180 @@
     "icon": "Bot",
     "isNotCompanyBased": true,
     "isSystemSchema": true
+  },
+  {
+    "id": "issue-tracking",
+    "description": "Track and manage issues with different statuses and priorities",
+    "singular_name": "Issue",
+    "plural_name": "Issues",
+    "cardMetadata": [
+      {
+        "id": "issue-info",
+        "title": "Issue Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "issue-title",
+          "issue-status",
+          "issue-priority"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "issue-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "details",
+        "type": "text",
+        "component": "text",
+        "placeholder": "Enter issue title",
+        "required": true,
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 5
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "issue-status",
+        "name": "status",
+        "label": "Status",
+        "sectionId": "details",
+        "type": "select",
+        "component": "select",
+        "placeholder": "Select status",
+        "required": true,
+        "role": "status",
+        "options": [
+          {
+            "id": "open",
+            "label": "Open",
+            "icon": "AlertCircle",
+            "color": "warning"
+          },
+          {
+            "id": "in-progress",
+            "label": "In Progress",
+            "icon": "RefreshCcw",
+            "color": "primary"
+          },
+          {
+            "id": "closed",
+            "label": "Closed",
+            "icon": "CheckCircle",
+            "color": "success"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "issue-priority",
+        "name": "priority",
+        "label": "Priority",
+        "sectionId": "details",
+        "type": "select",
+        "component": "select",
+        "placeholder": "Select priority",
+        "required": true,
+        "options": [
+          {
+            "id": "low",
+            "label": "Low",
+            "icon": "ArrowDownCircle",
+            "color": "success"
+          },
+          {
+            "id": "medium",
+            "label": "Medium",
+            "icon": "MinusCircle",
+            "color": "info"
+          },
+          {
+            "id": "high",
+            "label": "High",
+            "icon": "ArrowUpCircle",
+            "color": "destructive"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "issue-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "details",
+        "type": "textarea",
+        "component": "textarea",
+        "placeholder": "Enter issue description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "issue-assignee",
+        "name": "assignee",
+        "label": "Assignee",
+        "sectionId": "details",
+        "type": "text",
+        "component": "text",
+        "placeholder": "Enter assignee name",
+        "required": false,
+        "colSpan": 2,
+        "order": 5
+      },
+      {
+        "id": "issue-due-date",
+        "name": "dueDate",
+        "label": "Due Date",
+        "sectionId": "details",
+        "type": "date",
+        "component": "date",
+        "placeholder": "Select due date",
+        "required": false,
+        "role": "duedate",
+        "colSpan": 1,
+        "order": 6
+      }
+    ],
+    "sections": [
+      {
+        "id": "details",
+        "title": "Issue Details",
+        "description": "General information and status of the issue",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "issue-overview",
+          "title": "Issue Overview",
+          "description": "Detailed view of the issue",
+          "colSpan": 2,
+          "fieldIds": [
+            "issue-title",
+            "issue-status",
+            "issue-priority",
+            "issue-description",
+            "issue-assignee",
+            "issue-due-date"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "AlertTriangle"
   }
 ]

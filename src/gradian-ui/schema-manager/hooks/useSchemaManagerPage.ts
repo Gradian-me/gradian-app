@@ -74,12 +74,20 @@ export const useSchemaManagerPage = () => {
   }, [schemasError]);
 
   const systemSchemas = useMemo(
-    () => schemas.filter(schema => schema.isSystemSchema === true).sort((a, b) => a.plural_name.localeCompare(b.plural_name)),
+    () => schemas.filter(schema => schema.isSystemSchema === true).sort((a, b) => {
+      const aName = a.plural_name || a.singular_name || a.id || '';
+      const bName = b.plural_name || b.singular_name || b.id || '';
+      return aName.localeCompare(bName);
+    }),
     [schemas],
   );
 
   const businessSchemas = useMemo(
-    () => schemas.filter(schema => schema.isSystemSchema !== true).sort((a, b) => a.plural_name.localeCompare(b.plural_name)),
+    () => schemas.filter(schema => schema.isSystemSchema !== true).sort((a, b) => {
+      const aName = a.plural_name || a.singular_name || a.id || '';
+      const bName = b.plural_name || b.singular_name || b.id || '';
+      return aName.localeCompare(bName);
+    }),
     [schemas],
   );
 
@@ -108,10 +116,13 @@ export const useSchemaManagerPage = () => {
 
       // Filter by search query
       const query = searchQuery.toLowerCase();
+      const pluralName = schema.plural_name?.toLowerCase() || '';
+      const singularName = schema.singular_name?.toLowerCase() || '';
+      const schemaId = schema.id?.toLowerCase() || '';
       return (
-        schema.plural_name.toLowerCase().includes(query) ||
-        schema.singular_name.toLowerCase().includes(query) ||
-        schema.id.toLowerCase().includes(query)
+        pluralName.includes(query) ||
+        singularName.includes(query) ||
+        schemaId.includes(query)
       );
     });
   }, [activeTab, businessSchemas, searchQuery, showInactive, systemSchemas]);

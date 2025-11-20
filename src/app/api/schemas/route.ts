@@ -175,13 +175,28 @@ export async function GET(request: NextRequest) {
  * Example: POST /api/schemas - creates a new schema
  */
 export async function POST(request: NextRequest) {
-  const newSchema = await request.json();
-
-  if (!isDemoModeEnabled()) {
-    return proxySchemaRequest(request, '/api/schemas', { body: newSchema });
-  }
-
   try {
+    const newSchema = await request.json();
+
+    // Validate that we received a valid schema object
+    if (!newSchema || typeof newSchema !== 'object' || Array.isArray(newSchema)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid schema: must be an object' },
+        { status: 400 }
+      );
+    }
+
+    if (!newSchema.id || typeof newSchema.id !== 'string') {
+      return NextResponse.json(
+        { success: false, error: 'Invalid schema: missing or invalid "id" field' },
+        { status: 400 }
+      );
+    }
+
+    if (!isDemoModeEnabled()) {
+      return proxySchemaRequest(request, '/api/schemas', { body: newSchema });
+    }
+
     // Load schemas (with caching)
     const schemas = await loadSchemas();
     
@@ -216,6 +231,15 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
   } catch (error) {
     console.error('Error creating schema:', error);
+    
+    // Handle JSON parsing errors
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
       { 
         success: false, 
