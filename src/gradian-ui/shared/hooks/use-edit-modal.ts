@@ -9,6 +9,7 @@ import { asFormBuilderSchema } from '@/gradian-ui/schema-manager/utils/schema-ut
 import type { FormSchema as FormBuilderSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useCompanyStore } from '@/stores/company.store';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { filterFormDataForSubmission } from '@/gradian-ui/form-builder/utils/form-data-filter';
 
 /**
  * Reconstruct RegExp objects from serialized schema
@@ -244,8 +245,15 @@ export function useEditModal(
     setIsSubmitting(true);
     
     try {
+      // Filter form data to remove temporary IDs, hidden fields, etc.
+      const filteredData = filterFormDataForSubmission(formData, targetSchema, {
+        keepEntityId: true, // Keep entity ID for edit mode
+        removeRepeatingItemIds: true, // Remove temporary IDs from repeating sections
+        removeEmptyValues: false, // Keep empty values (let backend decide)
+      });
+
       // Enrich data if provided
-      let enrichedData = enrichData ? enrichData(formData, entityId) : formData;
+      let enrichedData = enrichData ? enrichData(filteredData, entityId) : filteredData;
 
       // Automatically add companyId from store if not already present
       // Only add if entity doesn't have companyId (preserve existing companyId for updates)

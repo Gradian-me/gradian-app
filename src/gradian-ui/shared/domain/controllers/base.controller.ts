@@ -140,15 +140,16 @@ export class BaseController<T extends BaseEntity> {
   /**
    * POST - Create new entity
    */
-  async create(request: NextRequest): Promise<NextResponse> {
+  async create(request: NextRequest, body?: any): Promise<NextResponse> {
     try {
-      const body = await request.json();
+      // Use provided body if available, otherwise read from request
+      const requestBody = body !== undefined ? body : await request.json();
       
       // Skip company validation if schema is not company-based
       if (!this.isNotCompanyBased) {
         // SECURITY: Require companyId in request body (from Zustand store)
         // Validate that it's provided and not "All Companies" (-1)
-        const companyId = body.companyId;
+        const companyId = requestBody.companyId;
         
         if (!companyId) {
           return NextResponse.json(
@@ -167,7 +168,7 @@ export class BaseController<T extends BaseEntity> {
       }
       
       // CompanyId is provided in body - use it directly (or skip if not company-based)
-      const enrichedBody = { ...body };
+      const enrichedBody = { ...requestBody };
       
       const result = await this.service.create(enrichedBody);
 
