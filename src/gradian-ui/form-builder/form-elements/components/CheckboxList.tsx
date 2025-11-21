@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { extractIds, normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
+import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
 
 export interface CheckboxListProps extends FormElementProps {
   options?: Array<{ id?: string; label: string; value?: string; disabled?: boolean; icon?: string; color?: string }>;
@@ -24,6 +25,10 @@ export interface CheckboxListProps extends FormElementProps {
    * Transform function to convert API response to option format
    */
   transform?: (data: any) => Array<{ id?: string; label?: string; name?: string; title?: string; icon?: string; color?: string; disabled?: boolean; value?: string }>;
+  /**
+   * Sort order for options: 'ASC' (ascending), 'DESC' (descending), or null (no sorting, default)
+   */
+  sortType?: SortType;
 }
 
 export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
@@ -43,6 +48,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
       sourceUrl,
       queryParams,
       transform,
+      sortType = null,
       ...props
     },
     ref
@@ -76,7 +82,10 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
         ? options
         : ((config.options as CheckboxListProps['options']) ?? []);
 
-    const normalizedOptions: NormalizedOption[] = normalizeOptionArray(checkboxOptions);
+    const normalizedOptions: NormalizedOption[] = sortNormalizedOptions(
+      normalizeOptionArray(checkboxOptions),
+      sortType
+    );
 
     useImperativeHandle(ref, () => ({
       focus: () => {

@@ -7,6 +7,7 @@ import { ToggleGroup as ToggleGroupRoot, ToggleGroupItem } from '@/components/ui
 import { NormalizedOption, normalizeOptionArray } from '../utils/option-normalizer';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
+import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
 
 const isBadgeVariant = (color?: string): color is keyof typeof BADGE_SELECTED_VARIANT_CLASSES => {
   if (!color) return false;
@@ -57,6 +58,7 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
       sourceUrl,
       queryParams,
       transform,
+      sortType = null,
       ...props
     },
     ref
@@ -124,12 +126,14 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
         ? options
         : config?.options || [];
     const normalizedOptions: NormalizedOption[] = useMemo(
-      () =>
-        normalizeOptionArray(rawOptions).map((opt) => ({
+      () => {
+        const normalized = normalizeOptionArray(rawOptions).map((opt) => ({
           ...opt,
           label: opt.label ?? opt.id,
-        })),
-      [rawOptions]
+        }));
+        return sortNormalizedOptions(normalized, sortType);
+      },
+      [rawOptions, sortType]
     );
 
     const normalizedValue = useMemo(() => normalizeOptionArray(value), [value]);

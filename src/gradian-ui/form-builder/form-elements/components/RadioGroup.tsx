@@ -7,6 +7,7 @@ import { RadioProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
 import { extractFirstId, normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
+import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
 
 export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
   (
@@ -25,6 +26,7 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
       sourceUrl,
       queryParams,
       transform,
+      sortType = null,
       ...props
     },
     ref
@@ -86,7 +88,10 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
       className
     );
 
-    const normalizedOptions: NormalizedOption[] = normalizeOptionArray(resolvedOptions);
+    const normalizedOptions: NormalizedOption[] = sortNormalizedOptions(
+      normalizeOptionArray(resolvedOptions),
+      sortType
+    );
 
     const resolvedValue = extractFirstId(value);
 

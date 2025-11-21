@@ -3,6 +3,7 @@
 import React from 'react';
 import { BaseComponentProps, FormFieldConfig, ValidationRule } from '../../../shared/types';
 import { NormalizedOption } from '../utils/option-normalizer';
+import { SortType } from '@/gradian-ui/shared/utils/sort-utils';
 
 export interface FormElementProps {
   config: any;
@@ -119,6 +120,10 @@ export interface ToggleGroupProps extends FormElementProps {
    * Transform function to convert API response to option format
    */
   transform?: (data: any) => Array<{ id?: string; label?: string; name?: string; title?: string; icon?: string; color?: string; disabled?: boolean; value?: string }>;
+  /**
+   * Sort order for options: 'ASC' (ascending), 'DESC' (descending), or null (no sorting, default)
+   */
+  sortType?: SortType;
 }
 
 export interface RadioProps extends FormElementProps {
@@ -136,6 +141,10 @@ export interface RadioProps extends FormElementProps {
    * Transform function to convert API response to option format
    */
   transform?: (data: any) => Array<{ id?: string; label?: string; name?: string; title?: string; icon?: string; color?: string; disabled?: boolean; value?: string }>;
+  /**
+   * Sort order for options: 'ASC' (ascending), 'DESC' (descending), or null (no sorting, default)
+   */
+  sortType?: SortType;
 }
 
 export interface DateInputProps extends FormElementProps {

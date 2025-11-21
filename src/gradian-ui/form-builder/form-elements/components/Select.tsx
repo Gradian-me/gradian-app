@@ -20,6 +20,7 @@ import { BadgeViewer } from '../utils/badge-viewer';
 import { Check, ChevronDown } from 'lucide-react';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
+import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
 
 export interface SelectOption {
   id?: string;
@@ -51,6 +52,10 @@ export interface SelectWithBadgesProps extends Omit<SelectProps, 'children'> {
    * Transform function to convert API response to option format
    */
   transform?: (data: any) => Array<{ id?: string; label?: string; name?: string; title?: string; icon?: string; color?: string; disabled?: boolean; value?: string }>;
+  /**
+   * Sort order for options: 'ASC' (ascending), 'DESC' (descending), or null (no sorting, default)
+   */
+  sortType?: SortType;
 }
 
 export const Select: React.FC<SelectWithBadgesProps> = ({
@@ -71,6 +76,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   sourceUrl,
   queryParams,
   transform,
+  sortType = null,
   ...props
 }) => {
   // Fetch options from URL if sourceUrl is provided
@@ -139,20 +145,22 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     if (sourceUrl && optionsError) {
       return [] as NormalizedOption[];
     }
-    // If fetching from URL and has options, use them directly
+    // If fetching from URL and has options, sort them
     if (sourceUrl && urlOptions.length > 0) {
-      return urlOptions;
+      return sortNormalizedOptions(urlOptions, sortType);
     }
     // If no resolved options, return empty array
     if (!resolvedOptions || resolvedOptions.length === 0) {
       return [] as NormalizedOption[];
     }
     // Otherwise, normalize the provided options
-    return normalizeOptionArray(resolvedOptions).map((opt) => ({
+    const normalized = normalizeOptionArray(resolvedOptions).map((opt) => ({
       ...opt,
       label: opt.label ?? opt.id,
     }));
-  }, [resolvedOptions, sourceUrl, urlOptions, isLoadingOptions, optionsError]);
+    // Sort options if sortType is specified
+    return sortNormalizedOptions(normalized, sortType);
+  }, [resolvedOptions, sourceUrl, urlOptions, isLoadingOptions, optionsError, sortType]);
 
   const normalizedOptionsLookup = useMemo(() => {
     const map = new Map<string, NormalizedOption>();

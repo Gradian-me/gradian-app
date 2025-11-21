@@ -341,8 +341,8 @@ export function SectionEditor({
                   staticItems={availableSchemas.map(s => ({ id: s.id, name: s.name, title: s.name }))}
                   onSelect={async (selections, rawItems) => {
                     if (selections.length > 0 && rawItems.length > 0) {
-                      setTempSection({
-                        ...tempSection,
+                  setTempSection({
+                    ...tempSection,
                         repeatingConfig: { ...tempSection.repeatingConfig, targetSchema: selections[0].id || undefined },
                       });
                     }
@@ -374,8 +374,8 @@ export function SectionEditor({
                   staticItems={relationTypes.map(rt => ({ id: rt.id, name: rt.label, title: rt.label }))}
                   onSelect={async (selections, rawItems) => {
                     if (selections.length > 0 && rawItems.length > 0) {
-                      setTempSection({
-                        ...tempSection,
+                  setTempSection({
+                    ...tempSection,
                         repeatingConfig: { ...tempSection.repeatingConfig, relationTypeId: selections[0].id || undefined },
                       });
                     }

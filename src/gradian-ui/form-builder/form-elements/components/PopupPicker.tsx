@@ -32,6 +32,7 @@ import { AddButtonFull } from './AddButtonFull';
 import { EndLine } from '@/gradian-ui/layout';
 import { ColumnMapConfig, extractItemsFromPayload, extractMetaFromPayload, mapRequestParams } from '@/gradian-ui/shared/utils/column-mapper';
 import { useCompanyStore } from '@/stores/company.store';
+import { sortOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 12, scale: 0.96 },
@@ -161,6 +162,7 @@ export interface PopupPickerProps {
   columnMap?: ColumnMapConfig; // Optional mapping for request/response and item fields
   staticItems?: any[]; // Optional static dataset (skips API calls when provided)
   pageSize?: number; // Page size for paginated data sources
+  sortType?: 'ASC' | 'DESC' | null; // Sort order for items (null = no sorting, default)
 }
 
 export const PopupPicker: React.FC<PopupPickerProps> = ({
@@ -181,6 +183,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   columnMap,
   staticItems,
   pageSize = 48,
+  sortType = null,
 }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -344,8 +347,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         }
         const payload = await response.json();
         const dataArray = extractItemsFromPayload(payload, columnMap);
-        setItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
-        setFilteredItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
+        const sortedArray = sortOptions(dataArray, sortType);
+        setItems((prev) => (append ? [...prev, ...sortedArray] : sortedArray));
+        setFilteredItems((prev) => (append ? [...prev, ...sortedArray] : sortedArray));
         setPageMeta((prev) => {
           const mappedMeta = extractMetaFromPayload(payload, columnMap, {
             page: pageToLoad,
@@ -384,7 +388,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         }
       }
     },
-    [buildSourceRequestUrl, effectivePageSize, sourceUrl, columnMap, shouldFilterByCompany, companyQueryParam]
+    [buildSourceRequestUrl, effectivePageSize, sourceUrl, columnMap, shouldFilterByCompany, companyQueryParam, sortType]
   );
 
   const fetchSchemaItems = useCallback(
@@ -431,8 +435,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         }
 
         const dataArray = response.data;
-        setItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
-        setFilteredItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
+        const sortedArray = sortOptions(dataArray, sortType);
+        setItems((prev) => (append ? [...prev, ...sortedArray] : sortedArray));
+        setFilteredItems((prev) => (append ? [...prev, ...sortedArray] : sortedArray));
 
         setPageMeta((prev) => {
           const meta = (response as { meta?: { page?: number; limit?: number; totalItems?: number; hasMore?: boolean } }).meta;
@@ -470,7 +475,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         }
       }
     },
-    [schemaId, effectivePageSize, searchQuery, includeIds, excludeIds, shouldFilterByCompany, companyQueryParam]
+    [schemaId, effectivePageSize, searchQuery, includeIds, excludeIds, shouldFilterByCompany, companyQueryParam, sortType]
   );
 
   const loadItems = useCallback(
@@ -495,8 +500,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       setError(null);
       try {
         if (staticItems) {
-          setItems(staticItems);
-          setFilteredItems(staticItems);
+          const sortedStaticItems = sortOptions(staticItems, sortType);
+          setItems(sortedStaticItems);
+          setFilteredItems(sortedStaticItems);
           return;
         }
 
@@ -520,8 +526,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
         if (response.success && response.data) {
           const itemsArray = Array.isArray(response.data) ? response.data : [];
-          setItems(itemsArray);
-          setFilteredItems(itemsArray);
+          const sortedArray = sortOptions(itemsArray, sortType);
+          setItems(sortedArray);
+          setFilteredItems(sortedArray);
         } else {
           setError(response.error || 'Failed to fetch items');
         }
@@ -531,7 +538,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         setIsLoading(false);
       }
     },
-    [sourceUrl, fetchSourceItems, fetchSchemaItems, supportsPagination, schemaId, staticItems, includeIds, excludeIds, shouldFilterByCompany, companyQueryParam]
+    [sourceUrl, fetchSourceItems, fetchSchemaItems, supportsPagination, schemaId, staticItems, includeIds, excludeIds, shouldFilterByCompany, companyQueryParam, sortType]
   );
 
   // Keep items in sync when static dataset changes or when modal opens
@@ -540,10 +547,11 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       return;
     }
     if (isOpen) {
-      setItems(staticItems);
-      setFilteredItems(staticItems);
+      const sortedStaticItems = sortOptions(staticItems, sortType);
+      setItems(sortedStaticItems);
+      setFilteredItems(sortedStaticItems);
     }
-  }, [staticItems, isOpen]);
+  }, [staticItems, isOpen, sortType]);
 
   // Ensure initial load on open for paginated sources (schema or sourceUrl)
   useEffect(() => {
@@ -652,7 +660,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     }
 
     if (!searchQuery.trim()) {
-      setFilteredItems(items);
+      const sortedItems = sortOptions(items, sortType);
+      setFilteredItems(sortedItems);
       return;
     }
 
@@ -669,8 +678,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       return title.toLowerCase().includes(query) || subtitle.toLowerCase().includes(query);
     });
 
-    setFilteredItems(filtered);
-  }, [supportsPagination, searchQuery, items, schema]);
+    const sortedFiltered = sortOptions(filtered, sortType);
+    setFilteredItems(sortedFiltered);
+  }, [supportsPagination, searchQuery, items, schema, sortType]);
 
   useEffect(() => {
     if (!supportsPagination || !isOpen) {
