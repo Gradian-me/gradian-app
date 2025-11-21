@@ -961,7 +961,13 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             transition={{ duration: 0.3 }}
           >
             <EmptyState
-              icon={<Building className="h-12 w-12 text-gray-400" />}
+              icon={
+                schema.icon ? (
+                  <IconRenderer iconName={schema.icon} className="h-12 w-12 text-gray-400" />
+                ) : (
+                  <Building className="h-12 w-12 text-gray-400" />
+                )
+              }
               title={`No ${pluralName.toLowerCase()} found`}
               description={
                 searchTermLocal
