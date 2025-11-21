@@ -310,6 +310,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     getPrimaryDisplayString(iconFieldValue) ??
     (typeof iconFieldValue === 'string' ? iconFieldValue : '');
 
+  // Check if entity is incomplete
+  const isIncomplete = data.incomplete === true;
+
   const cardConfig = {
     title,
     subtitle,
@@ -323,7 +326,8 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     metricsField: data.performanceMetrics || null,
     duedateField,
     sections: filteredSections,
-    statusOptions
+    statusOptions,
+    isIncomplete
   };
 
   const shouldShowAvatar = hasAvatarField && Boolean(cardConfig.avatarField);
@@ -467,6 +471,19 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                           transition={disableAnimation ? {} : { duration: 0.2 }}
                         >
                           <CodeBadge code={cardConfig.codeField} />
+                        </motion.div>
+                      )}
+                      {/* Incomplete Badge */}
+                      {cardConfig.isIncomplete && (
+                        <motion.div
+                          initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
+                          animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                          transition={disableAnimation ? {} : { duration: 0.2 }}
+                        >
+                          <Badge variant="warning" className="flex items-center gap-1 px-1.5 py-0.5 shadow-sm">
+                            <IconRenderer iconName="AlertTriangle" className="h-3 w-3" />
+                            <span className="text-[0.625rem]">Incomplete</span>
+                          </Badge>
                         </motion.div>
                       )}
                     </div>
@@ -704,6 +721,19 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         transition={disableAnimation ? {} : { duration: 0.2 }}
                       >
                         <CodeBadge code={cardConfig.codeField} />
+                      </motion.div>
+                    )}
+                    {/* Incomplete Badge */}
+                    {cardConfig.isIncomplete && (
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
+                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                        transition={disableAnimation ? {} : { duration: 0.2 }}
+                      >
+                        <Badge variant="warning" className="flex items-center gap-1 px-1.5 py-0.5 shadow-sm">
+                          <IconRenderer iconName="AlertTriangle" className="h-3 w-3" />
+                          <span className="text-xs">Incomplete</span>
+                        </Badge>
                       </motion.div>
                     )}
                   </div>

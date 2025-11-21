@@ -1,6 +1,7 @@
 // Dynamic Page Route
 // Renders any entity page based on schema ID
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import { DynamicEntityPageClient } from './DynamicEntityPageClient';
 import { getAllSchemasArray, getAvailableSchemaIds } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
 import { fetchSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry';
@@ -58,11 +59,19 @@ export default async function DynamicEntityPage({ params }: PageProps) {
 
   // Pass schema to client component which will handle caching
   return (
-    <DynamicEntityPageClient 
-      initialSchema={serializedSchema}
-      schemaId={schemaId}
-      navigationSchemas={serializedNavigationSchemas}
-    />
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600"></div>
+        </div>
+      </div>
+    }>
+      <DynamicEntityPageClient 
+        initialSchema={serializedSchema}
+        schemaId={schemaId}
+        navigationSchemas={serializedNavigationSchemas}
+      />
+    </Suspense>
   );
 }
 

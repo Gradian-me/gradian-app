@@ -8,10 +8,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { SchemaCardGrid, SchemaCardSkeletonGrid } from './SchemaCardGrid';
+import { SchemaListView } from './SchemaListView';
+import { SchemaTableView } from './SchemaTableView';
 import { CreateSchemaDialog } from './CreateSchemaDialog';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder';
 import { SearchInput, Switch } from '@/gradian-ui/form-builder/form-elements';
 import { MessageBox } from '@/gradian-ui/layout/message-box';
+import { DynamicFilterPane } from '@/gradian-ui/shared/components';
+import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
 import { useSchemaManagerPage } from '../hooks/useSchemaManagerPage';
 import { FormSchema } from '../types';
 
@@ -26,6 +30,8 @@ export function SchemaManagerWrapper() {
     setActiveTab,
     showInactive,
     setShowInactive,
+    viewMode,
+    setViewMode,
     filteredSchemas,
     schemas,
     systemSchemas,
@@ -132,7 +138,7 @@ export function SchemaManagerWrapper() {
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-4 items-center">
             <div className="flex-1">
               <SearchInput
                 config={{ name: 'search', placeholder: 'Search schemas...' }}
@@ -154,6 +160,13 @@ export function SchemaManagerWrapper() {
                 />
               </div>
             )}
+            <div className="border border-gray-300 dark:border-gray-500 rounded-md h-10 flex items-center shrink-0">
+              <ViewSwitcher
+                currentView={viewMode}
+                onViewChange={setViewMode}
+                className="h-full"
+              />
+            </div>
             <Button
               variant="outline"
               size="icon"
@@ -168,14 +181,43 @@ export function SchemaManagerWrapper() {
 
           <TabsContent value="system" className="mt-4">
             {loading ? (
-              <SchemaCardSkeletonGrid />
+              viewMode === 'table' ? (
+                <div className="w-full">
+                  <SchemaTableView
+                    schemas={[]}
+                    onEdit={handleEditSchema}
+                    onView={handleViewSchema}
+                    onDelete={openDeleteDialog}
+                    isLoading={true}
+                  />
+                </div>
+              ) : (
+                <SchemaCardSkeletonGrid />
+              )
             ) : filteredSchemas.length > 0 ? (
-              <SchemaCardGrid
-                schemas={filteredSchemas}
-                onEdit={handleEditSchema}
-                onView={handleViewSchema}
-                onDelete={openDeleteDialog}
-              />
+              viewMode === 'table' ? (
+                <SchemaTableView
+                  schemas={filteredSchemas}
+                  onEdit={handleEditSchema}
+                  onView={handleViewSchema}
+                  onDelete={openDeleteDialog}
+                  isLoading={false}
+                />
+              ) : viewMode === 'list' ? (
+                <SchemaListView
+                  schemas={filteredSchemas}
+                  onEdit={handleEditSchema}
+                  onView={handleViewSchema}
+                  onDelete={openDeleteDialog}
+                />
+              ) : (
+                <SchemaCardGrid
+                  schemas={filteredSchemas}
+                  onEdit={handleEditSchema}
+                  onView={handleViewSchema}
+                  onDelete={openDeleteDialog}
+                />
+              )
             ) : (
               emptyState
             )}
@@ -183,14 +225,43 @@ export function SchemaManagerWrapper() {
 
           <TabsContent value="business" className="mt-4">
             {loading ? (
-              <SchemaCardSkeletonGrid />
+              viewMode === 'table' ? (
+                <div className="w-full">
+                  <SchemaTableView
+                    schemas={[]}
+                    onEdit={handleEditSchema}
+                    onView={handleViewSchema}
+                    onDelete={openDeleteDialog}
+                    isLoading={true}
+                  />
+                </div>
+              ) : (
+                <SchemaCardSkeletonGrid />
+              )
             ) : filteredSchemas.length > 0 ? (
-              <SchemaCardGrid
-                schemas={filteredSchemas}
-                onEdit={handleEditSchema}
-                onView={handleViewSchema}
-                onDelete={openDeleteDialog}
-              />
+              viewMode === 'table' ? (
+                <SchemaTableView
+                  schemas={filteredSchemas}
+                  onEdit={handleEditSchema}
+                  onView={handleViewSchema}
+                  onDelete={openDeleteDialog}
+                  isLoading={false}
+                />
+              ) : viewMode === 'list' ? (
+                <SchemaListView
+                  schemas={filteredSchemas}
+                  onEdit={handleEditSchema}
+                  onView={handleViewSchema}
+                  onDelete={openDeleteDialog}
+                />
+              ) : (
+                <SchemaCardGrid
+                  schemas={filteredSchemas}
+                  onEdit={handleEditSchema}
+                  onView={handleViewSchema}
+                  onDelete={openDeleteDialog}
+                />
+              )
             ) : (
               emptyState
             )}

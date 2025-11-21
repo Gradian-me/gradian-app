@@ -346,9 +346,16 @@ export function useFormModal(
         : formData;
 
       // Enrich data if provided (pass entityId for edit mode)
+      // Preserve incomplete flag when enriching data
+      const incompleteFlag = filteredData.incomplete;
       let enrichedData = enrichData 
         ? enrichData(filteredData, mode === 'edit' ? entityId || undefined : undefined)
         : filteredData;
+      
+      // Ensure incomplete flag is preserved after enrichment
+      if (incompleteFlag !== undefined) {
+        enrichedData = { ...enrichedData, incomplete: incompleteFlag };
+      }
 
       // Automatically add companyId from store if not already present
       // Only add for create mode or if entity doesn't have companyId (for edit mode)
@@ -380,18 +387,52 @@ export function useFormModal(
           targetSchema.name ||
           targetSchema.title ||
           'Record';
-        const successTitle =
-          mode === 'edit'
-            ? `${entityLabel} updated`
-            : `${entityLabel} created`;
-        const successDescription =
-          mode === 'edit'
-            ? 'Changes saved successfully.'
-            : 'New record created successfully.';
+        // Check incomplete flag from enrichedData (submitted) or result.data (returned from API)
+        const isIncomplete = enrichedData.incomplete === true || result.data?.incomplete === true;
+        
+        if (isIncomplete) {
+          // Form is incomplete - don't close, show warning message
+          const incompleteTitle = mode === 'edit'
+            ? `${entityLabel} saved (incomplete)`
+            : `${entityLabel} created (incomplete)`;
+          const incompleteDescription = 'Form saved but incomplete. Please complete all required sections.';
+          
+          toast.warning(incompleteTitle, { description: incompleteDescription });
+          setFormMessage(incompleteDescription);
+          // Don't close the form - keep it open so user can add repeating items
+          // Update entityId if this was a create operation
+          if (mode === 'create' && result.data?.id) {
+            setEntityId(result.data.id);
+            setMode('edit'); // Switch to edit mode so user can continue
+            setEntityData(result.data); // Update entity data with the saved incomplete entity
+          } else if (mode === 'edit' && result.data) {
+            // Update entity data when editing incomplete form
+            setEntityData(result.data);
+          }
+          // IMPORTANT: Do NOT call closeFormModal() - keep form open
+          // Call onSuccess but form should remain open (onSuccess shouldn't close modal)
+          onSuccess?.(result.data);
+          // Explicitly ensure modal stays open
+          setIsOpen(true);
+        } else {
+          // Form is complete - update entity data and close normally
+          if (result.data) {
+            setEntityData(result.data); // Update entity data with complete entity (incomplete flag cleared)
+          }
+          
+          const successTitle =
+            mode === 'edit'
+              ? `${entityLabel} updated`
+              : `${entityLabel} created`;
+          const successDescription =
+            mode === 'edit'
+              ? 'Changes saved successfully.'
+              : 'New record created successfully.';
 
-        toast.success(successTitle, { description: successDescription });
-        closeFormModal();
-        onSuccess?.(result.data);
+          toast.success(successTitle, { description: successDescription });
+          closeFormModal();
+          onSuccess?.(result.data);
+        }
       } else {
         const action = mode === 'edit' ? 'update' : 'create';
         console.error(`Failed to ${action} ${targetSchema.name}:`, result.error);

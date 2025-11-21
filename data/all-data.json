@@ -770,6 +770,15 @@
       "id": "HAS_URL",
       "createdAt": "2025-11-17T11:37:46.536Z",
       "updatedAt": "2025-11-17T11:37:46.536Z"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "Has Member",
+      "icon": "ListTree",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "HAS_MEMBER",
+      "createdAt": "2025-11-21T06:27:24.490Z",
+      "updatedAt": "2025-11-21T07:01:29.013Z"
     }
   ],
   "inquiry-vendors": [
@@ -985,7 +994,18 @@
       "updatedAt": "2025-11-04T11:27:12.239Z"
     }
   ],
-  "user-roles": [],
+  "user-roles": [
+    {
+      "color": "#4E79A7",
+      "name": "sss",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KAJP7BE1JS1FJWMGNFS0RPFX",
+      "createdAt": "2025-11-21T07:49:24.562Z",
+      "updatedAt": "2025-11-21T07:49:47.467Z",
+      "members": []
+    }
+  ],
   "users": [
     {
       "username": "abidim",

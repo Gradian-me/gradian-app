@@ -357,6 +357,11 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   });
   
   const [addItemErrors, setAddItemErrors] = React.useState<Record<string, string | null>>({});
+  const [isIncomplete, setIsIncomplete] = React.useState(false);
+  // Track if form has been submitted at least once (to show incomplete message only after submit)
+  const [hasSubmitted, setHasSubmitted] = React.useState(false);
+  // Track which sections need items (for better error message)
+  const [incompleteSections, setIncompleteSections] = React.useState<string[]>([]);
   
   // State to track which sections are expanded
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>(() => {
@@ -378,6 +383,14 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     if (prevInitialValuesRef.current !== currentInitialValues) {
       prevInitialValuesRef.current = currentInitialValues;
       dispatch({ type: 'RESET', initialValues, schema });
+      // Check if loaded entity is incomplete (only for edit mode)
+      if (initialValues?.incomplete === true) {
+        setIsIncomplete(true);
+        setHasSubmitted(true); // Entity was already saved, so consider it submitted
+      } else {
+        setIsIncomplete(false);
+        setHasSubmitted(false); // Reset on new form
+      }
     }
   }, [initialValues, schema]);
 
@@ -423,14 +436,242 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     return !state.errors[fieldName];
   }, [schema, state.errors]);
 
-  const validateForm = useCallback(async () => {
-    // Validate synchronously and update state
+  const validateForm = useCallback(async (): Promise<{ isValid: boolean; isIncomplete: boolean }> => {
+    // STEP 1: Validate main form first (required fields, maxItems, field validations)
+    // This sets isValid - if false, form should not save
     let isValid = true;
     const newErrors: FormErrors = {};
     
+    schema.sections.forEach(section => {
+      // Check repeating section constraints
+      if (section.isRepeatingSection && section.repeatingConfig) {
+        const { maxItems } = section.repeatingConfig;
+        
+        // Check if this is a relation-based repeating section
+        const isRelationBased = section.repeatingConfig.targetSchema && section.repeatingConfig.relationTypeId;
+        
+        // For regular repeating sections, get item count from form values
+        if (!isRelationBased) {
+          const items = state.values[section.id] || [];
+          const itemCount = items.length;
+          
+          // Validate maxItems (this is a real validation error, not incomplete)
+          if (maxItems !== undefined && itemCount > maxItems) {
+            const sectionLabel = section.title || section.id;
+            const errorMessage = `Maximum ${maxItems} item(s) allowed for ${sectionLabel}`;
+            newErrors[section.id] = errorMessage;
+            isValid = false;
+          }
+          
+          // Validate fields within each repeating item
+          const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
+          items.forEach((item: any, itemIndex: number) => {
+            sectionFields.forEach(field => {
+              // Check if field is required or has validation rules
+              const isRequired = field.required ?? field.validation?.required ?? false;
+              if (isRequired || field.validation) {
+                const validationRules = {
+                  ...field.validation,
+                  required: field.required ?? field.validation?.required ?? false
+                };
+                const fieldValue = item[field.name];
+                const result = validateFieldUtil(fieldValue, validationRules);
+                if (!result.isValid) {
+                  const errorKey = `${section.id}[${itemIndex}].${field.name}`;
+                  newErrors[errorKey] = result.error || 'Invalid value';
+                  isValid = false;
+                }
+              }
+            });
+          });
+        }
+        // Note: For relation-based sections, field validation is handled by the relation items themselves
+      } else {
+        // Validate individual fields in non-repeating sections
+        const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
+        sectionFields.forEach(field => {
+          // Check if field is required or has validation rules
+          const isRequired = field.required ?? field.validation?.required ?? false;
+          if (isRequired || field.validation) {
+            const validationRules = {
+              ...field.validation,
+              required: field.required ?? field.validation?.required ?? false
+            };
+            const result = validateFieldUtil(state.values[field.name], validationRules);
+            if (!result.isValid) {
+              newErrors[field.name] = result.error || 'Invalid value';
+              isValid = false;
+            }
+          }
+        });
+      }
+    });
+    
+    // Update errors in state immediately and mark fields as touched
+    Object.entries(newErrors).forEach(([fieldName, error]) => {
+      dispatch({ type: 'SET_ERROR', fieldName, error });
+      dispatch({ type: 'SET_TOUCHED', fieldName, touched: true });
+    });
+    
+    // Clear errors for fields that are now valid
+    Object.keys(state.errors).forEach(fieldName => {
+      if (!newErrors[fieldName] && state.errors[fieldName]) {
+        dispatch({ type: 'SET_ERROR', fieldName, error: '' });
+      }
+    });
+    
+    // STEP 2: Check minItems - if form is already incomplete, minItems becomes a blocking validation error
+    // If form is not yet incomplete, allow saving with incomplete flag (first save)
+    let isIncomplete = false;
+    const isAlreadyIncomplete = state.values?.incomplete === true || initialValues?.incomplete === true;
+    
+    if (isValid) {
+      // For relation-based sections, we need to fetch relations count for validation
+      const relationCounts: Record<string, number> = {};
+      const hasEntityId = !!(state.values?.id);
+      
+      // Fetch relation counts for relation-based sections
+      if (hasEntityId) {
+        const relationPromises = schema.sections
+          .filter(section => 
+            section.isRepeatingSection && 
+            section.repeatingConfig?.targetSchema && 
+            section.repeatingConfig?.relationTypeId
+          )
+          .map(async (section) => {
+            try {
+              const response = await apiRequest<any>(
+                `/api/relations?sourceSchema=${schema.id}&sourceId=${state.values.id}&relationTypeId=${section.repeatingConfig!.relationTypeId}&targetSchema=${section.repeatingConfig!.targetSchema}`
+              );
+              if (response.success) {
+                const countFromResponse = (response as { count?: number }).count;
+                const resolvedCount =
+                  typeof countFromResponse === 'number'
+                    ? countFromResponse
+                    : Array.isArray(response.data)
+                      ? response.data.length
+                      : 0;
+                relationCounts[section.id] = resolvedCount;
+              } else {
+                relationCounts[section.id] = 0;
+              }
+            } catch (error) {
+              console.error(`Error fetching relations count for section ${section.id}:`, error);
+              relationCounts[section.id] = 0;
+            }
+          });
+        
+        await Promise.all(relationPromises);
+      }
+      
+      // Check minItems for all repeating sections (only if main form is valid)
+      const sectionsNeedingItems: string[] = [];
+      schema.sections.forEach(section => {
+        if (section.isRepeatingSection && section.repeatingConfig) {
+          const { minItems } = section.repeatingConfig;
+          
+          if (minItems !== undefined && minItems > 0) {
+            const isRelationBased = section.repeatingConfig.targetSchema && section.repeatingConfig.relationTypeId;
+            
+            let itemCount: number;
+            if (isRelationBased) {
+              const relationValueArray = Array.isArray(state.values[section.id]) ? state.values[section.id] : [];
+              if (hasEntityId && relationCounts[section.id] !== undefined) {
+                itemCount = relationCounts[section.id];
+              } else {
+                itemCount = relationValueArray.length;
+              }
+            } else {
+              const items = state.values[section.id] || [];
+              itemCount = items.length;
+            }
+            
+            if (itemCount < minItems) {
+              const sectionLabel = section.title || section.id;
+              const itemLabel = minItems === 1 ? 'item' : 'items';
+              const errorMessage = `At least ${minItems} ${itemLabel} required for ${sectionLabel}`;
+              sectionsNeedingItems.push(sectionLabel);
+              
+              // If form is already incomplete, minItems becomes a blocking validation error
+              // Otherwise, allow first save with incomplete flag
+              if (isAlreadyIncomplete) {
+                // Form is already incomplete - minItems is now a blocking error
+                newErrors[section.id] = errorMessage;
+                isValid = false; // Block submission
+              } else {
+                // First save - allow with incomplete flag
+                isIncomplete = true;
+                newErrors[section.id] = errorMessage; // Show error but allow save
+              }
+            }
+          }
+        }
+      });
+      
+      // Update incomplete sections list
+      setIncompleteSections(sectionsNeedingItems);
+      
+      // Update section errors for incomplete sections (after main validation)
+      Object.entries(newErrors).forEach(([fieldName, error]) => {
+        // Only update section-level errors (not field errors which were already updated)
+        if (schema.sections.some(s => s.id === fieldName && s.isRepeatingSection)) {
+          dispatch({ type: 'SET_ERROR', fieldName, error });
+          dispatch({ type: 'SET_TOUCHED', fieldName, touched: true });
+        }
+      });
+      
+      // Clear errors for sections that are now complete
+      schema.sections.forEach(section => {
+        if (section.isRepeatingSection && section.repeatingConfig) {
+          const { minItems } = section.repeatingConfig;
+          if (minItems !== undefined && minItems > 0) {
+            const isRelationBased = section.repeatingConfig.targetSchema && section.repeatingConfig.relationTypeId;
+            let itemCount: number;
+            if (isRelationBased) {
+              const relationValueArray = Array.isArray(state.values[section.id]) ? state.values[section.id] : [];
+              if (hasEntityId && relationCounts[section.id] !== undefined) {
+                itemCount = relationCounts[section.id];
+              } else {
+                itemCount = relationValueArray.length;
+              }
+            } else {
+              const items = state.values[section.id] || [];
+              itemCount = items.length;
+            }
+            
+            // Clear error if minItems is now met
+            if (itemCount >= minItems && state.errors[section.id] && !newErrors[section.id]) {
+              dispatch({ type: 'SET_ERROR', fieldName: section.id, error: '' });
+            }
+          }
+        }
+      });
+    } else {
+      // If form is invalid, clear incomplete sections and their errors
+      setIncompleteSections([]);
+      // Clear any incomplete section errors when form is invalid
+      schema.sections.forEach(section => {
+        if (section.isRepeatingSection && section.repeatingConfig?.minItems && state.errors[section.id]) {
+          // Only clear if it's an incomplete error (not a maxItems error)
+          const errorMsg = state.errors[section.id];
+          if (errorMsg && errorMsg.includes('At least')) {
+            dispatch({ type: 'SET_ERROR', fieldName: section.id, error: '' });
+          }
+        }
+      });
+    }
+    
+    return { isValid, isIncomplete };
+  }, [schema, state.values, state.errors]);
+  
+  // Check incomplete status (minItems) without full validation
+  // This only checks for incomplete status, not required field validation
+  const checkIncompleteStatus = useCallback(async (): Promise<boolean> => {
+    let isIncomplete = false;
+    const hasEntityId = !!(state.values?.id);
+    
     // For relation-based sections, we need to fetch relations count for validation
     const relationCounts: Record<string, number> = {};
-    const hasEntityId = !!(state.values?.id);
     
     // Fetch relation counts for relation-based sections
     if (hasEntityId) {
@@ -466,115 +707,37 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       await Promise.all(relationPromises);
     }
     
+    // Only check minItems for incomplete status, don't validate required fields
     schema.sections.forEach(section => {
-      // Check repeating section constraints
       if (section.isRepeatingSection && section.repeatingConfig) {
-        const { minItems, maxItems } = section.repeatingConfig;
+        const { minItems } = section.repeatingConfig;
         
-        // Check if this is a relation-based repeating section
-        const isRelationBased = section.repeatingConfig.targetSchema && section.repeatingConfig.relationTypeId;
-        
-        // For relation-based sections, use relation count; for regular sections, use form values
-        let itemCount: number;
-        if (isRelationBased) {
-          const relationValueArray = Array.isArray(state.values[section.id]) ? state.values[section.id] : [];
-          if (hasEntityId && relationCounts[section.id] !== undefined) {
-            itemCount = relationCounts[section.id];
-          } else if (relationCounts[section.id] !== undefined) {
-            itemCount = relationCounts[section.id];
-          } else {
-            itemCount = relationValueArray.length;
-          }
-        } else {
-          // For regular repeating sections, items are in form values
-          const items = state.values[section.id] || [];
-          itemCount = items.length;
-        }
-        
-        // For relation-based sections, only enforce minItems after the entity has been saved (has an ID)
-        // This allows users to save the form first, then add related items
-        if (minItems !== undefined && itemCount < minItems) {
-          const sectionLabel = section.title || section.id;
-          const itemLabel = minItems === 1 ? 'item is' : 'items are';
-          const errorMessage = `At least ${minItems} ${itemLabel} required for ${sectionLabel}`;
-          newErrors[section.id] = errorMessage;
-          isValid = false;
-        }
-        
-        if (maxItems !== undefined && itemCount > maxItems) {
-          const sectionLabel = section.title || section.id;
-          const errorMessage = `Maximum ${maxItems} item(s) allowed for ${sectionLabel}`;
-          newErrors[section.id] = errorMessage;
-          isValid = false;
-        }
-        
-        // Validate fields within each repeating item
-        // Note: For relation-based sections, field validation is handled by the relation items themselves
-        // We only validate inline form values for non-relation-based sections
-        if (!isRelationBased) {
-          const items = state.values[section.id] || [];
-          const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
-          items.forEach((item: any, itemIndex: number) => {
-            sectionFields.forEach(field => {
-              // Check if field is required or has validation rules
-              // Prioritize field.required over field.validation?.required
-              const isRequired = field.required ?? field.validation?.required ?? false;
-              if (isRequired || field.validation) {
-                const validationRules = {
-                  ...field.validation,
-                  // Prioritize field.required over field.validation?.required
-                  required: field.required ?? field.validation?.required ?? false
-                };
-                const fieldValue = item[field.name];
-                const result = validateFieldUtil(fieldValue, validationRules);
-                if (!result.isValid) {
-                  const errorKey = `${section.id}[${itemIndex}].${field.name}`;
-                  newErrors[errorKey] = result.error || 'Invalid value';
-                  isValid = false;
-                }
-              }
-            });
-          });
-        }
-      } else {
-        // Validate individual fields in non-repeating sections
-        const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
-        sectionFields.forEach(field => {
-          // Check if field is required or has validation rules
-          // Prioritize field.required over field.validation?.required
-          const isRequired = field.required ?? field.validation?.required ?? false;
-          if (isRequired || field.validation) {
-            const validationRules = {
-              ...field.validation,
-              // Prioritize field.required over field.validation?.required
-              required: field.required ?? field.validation?.required ?? false
-            };
-            const result = validateFieldUtil(state.values[field.name], validationRules);
-            if (!result.isValid) {
-              newErrors[field.name] = result.error || 'Invalid value';
-              isValid = false;
+        if (minItems !== undefined && minItems > 0) {
+          const isRelationBased = section.repeatingConfig.targetSchema && section.repeatingConfig.relationTypeId;
+          
+          let itemCount: number;
+          if (isRelationBased) {
+            const relationValueArray = Array.isArray(state.values[section.id]) ? state.values[section.id] : [];
+            if (hasEntityId && relationCounts[section.id] !== undefined) {
+              itemCount = relationCounts[section.id];
+            } else {
+              itemCount = relationValueArray.length;
             }
+          } else {
+            const items = state.values[section.id] || [];
+            itemCount = items.length;
           }
-        });
+          
+          if (itemCount < minItems) {
+            isIncomplete = true;
+          }
+        }
       }
     });
     
-    // Update errors in state immediately and mark fields as touched
-    Object.entries(newErrors).forEach(([fieldName, error]) => {
-      dispatch({ type: 'SET_ERROR', fieldName, error });
-      dispatch({ type: 'SET_TOUCHED', fieldName, touched: true });
-    });
-    
-    // Clear errors for fields that are now valid
-    Object.keys(state.errors).forEach(fieldName => {
-      if (!newErrors[fieldName] && state.errors[fieldName]) {
-        dispatch({ type: 'SET_ERROR', fieldName, error: '' });
-      }
-    });
-    
-    return isValid;
-  }, [schema, state.values, state.errors]);
-
+    return isIncomplete;
+  }, [schema, state.values]);
+  
   const reset = useCallback(() => {
     dispatch({ type: 'RESET', initialValues, schema });
     onReset?.();
@@ -703,7 +866,10 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   }, []);
 
   const submit = useCallback(async () => {
-    if (disabled) return;
+    if (disabled) return { isValid: false, isIncomplete: false };
+    
+    // Mark that form has been submitted (to show incomplete message)
+    setHasSubmitted(true);
     
     dispatch({ type: 'SET_SUBMITTING', isSubmitting: true });
     
@@ -712,10 +878,11 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     loggingCustom(LogType.FORM_DATA, 'info', `Form Values: ${JSON.stringify(state.values, null, 2)}`);
     
     // Validate synchronously
-    const isValid = await validateForm();
+    const validationResult = await validateForm();
+    const { isValid, isIncomplete } = validationResult;
     
     // Log validation results
-    loggingCustom(LogType.FORM_DATA, isValid ? 'info' : 'warn', `Form Validation Status: ${isValid ? 'VALID' : 'INVALID'}`);
+    loggingCustom(LogType.FORM_DATA, isValid ? 'info' : 'warn', `Form Validation Status: ${isValid ? 'VALID' : 'INVALID'}${isIncomplete ? ' (INCOMPLETE)' : ''}`);
     
     // Log errors for each field
     Object.entries(state.errors).forEach(([fieldName, error]) => {
@@ -777,22 +944,47 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     
     // Log overall validation summary
     const totalErrors = Object.values(state.errors).filter(err => err).length;
-    loggingCustom(LogType.FORM_DATA, 'info', `Validation Summary: ${totalErrors} error(s) found`);
+    loggingCustom(LogType.FORM_DATA, 'info', `Validation Summary: ${totalErrors} error(s) found${isIncomplete ? ', form is incomplete' : ''}`);
     
+    // Update incomplete status
+    setIsIncomplete(isIncomplete);
+    
+    // Only allow submission if form is valid (no validation errors)
+    // isIncomplete is just a flag for minItems, not a validation error
+    // If isValid is false, there are real validation errors and we should not save
     if (isValid && onSubmit) {
       try {
-        await onSubmit(state.values);
-        loggingCustom(LogType.FORM_DATA, 'info', 'Form submitted successfully');
+        // If form is incomplete (minItems missing), add incomplete flag
+        // Otherwise, explicitly set to false when complete
+        const submissionData = isIncomplete 
+          ? { ...state.values, incomplete: true }
+          : { ...state.values, incomplete: false }; // Explicitly set to false when complete
+        await onSubmit(submissionData, { isIncomplete });
+        loggingCustom(LogType.FORM_DATA, 'info', `Form submitted successfully${isIncomplete ? ' (with incomplete flag)' : ' (complete)'}`);
+        
+        // Update incomplete status based on validation result
+        setIsIncomplete(isIncomplete);
+        
+        // If form was incomplete but is now complete, clear incomplete flag
+        if (!isIncomplete) {
+          // Form is now complete - clear the incomplete flag from state
+          if (state.values.incomplete === true) {
+            dispatch({ type: 'SET_VALUE', fieldName: 'incomplete', value: false });
+          }
+          setIncompleteSections([]);
+        }
       } catch (error) {
         loggingCustom(LogType.FORM_DATA, 'error', `Form submission error: ${error instanceof Error ? error.message : String(error)}`);
       }
     } else {
+      // Form has validation errors - don't save
       loggingCustom(LogType.FORM_DATA, 'warn', 'Form submission blocked due to validation errors');
     }
     
     loggingCustom(LogType.FORM_DATA, 'info', '=== FORM SUBMISSION ENDED ===');
     
     dispatch({ type: 'SET_SUBMITTING', isSubmitting: false });
+    return { isValid, isIncomplete };
   }, [disabled, validateForm, onSubmit, state.values, state.errors, schema]);
 
   // Get action configurations dynamically
@@ -957,8 +1149,25 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     <>
       {children || (
         <>
+          {/* Incomplete Badge - shown when form is saved but incomplete, only after submit */}
+          {isIncomplete && hasSubmitted && (
+            <div className="mb-4">
+              <FormAlert 
+                type="warning" 
+                message="Form saved but incomplete" 
+                subtitle={
+                  incompleteSections.length > 0
+                    ? `Please add at least one item to the following section${incompleteSections.length > 1 ? 's' : ''}: ${incompleteSections.join(', ')}. The form will remain open until all requirements are met.`
+                    : "Please complete all required sections to finish. The form will remain open until all requirements are met."
+                }
+                onDismiss={undefined}
+                dismissible={false}
+              />
+            </div>
+          )}
+          
           {/* Message Alert - shown only when there's a message and no blocking errors */}
-          {message && !(error || firstValidationError) && (
+          {message && !(error || firstValidationError) && !isIncomplete && (
             <div className="mb-4">
               <FormAlert 
                 type="info" 

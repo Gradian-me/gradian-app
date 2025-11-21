@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bell, PanelLeftOpen, PencilRuler, Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { GoToTop, Header, ModeToggle } from '@/gradian-ui/layout';
 import { Sidebar } from '@/gradian-ui/layout/sidebar';
@@ -63,6 +63,7 @@ export function MainLayout({
   navigationSchemas,
 }: MainLayoutProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { resolvedTheme } = useTheme();
   const profileTheme = resolvedTheme === 'dark' ? 'dark' : 'light';
   // Default to collapsed so SSR markup matches closed sidebar
@@ -185,27 +186,53 @@ export function MainLayout({
   };
 
   const handleEditSchemaMouseDown = (e: React.MouseEvent) => {
-    // Middle click (button 1) should open page view in new tab
+    // Middle click (button 1) should open schema builder in new tab
     if (e.button === 1) {
       e.preventDefault();
       e.stopPropagation();
-      // Extract schema ID from editSchemaPath (format: /builder/schemas/[schema-id])
-      const schemaId = editSchemaPath?.replace('/builder/schemas/', '');
+      // Extract schema ID from editSchemaPath or from current pathname
+      let schemaId: string | undefined;
+      
+      if (editSchemaPath) {
+        // Extract schema ID from editSchemaPath (format: /builder/schemas/[schema-id])
+        schemaId = editSchemaPath.replace('/builder/schemas/', '');
+      } else if (pathname) {
+        // Fallback: extract schema ID from current pathname (format: /page/[schema-id])
+        const match = pathname.match(/^\/page\/([^/]+)/);
+        if (match) {
+          schemaId = match[1];
+        }
+      }
+      
+      // Open builder path in new tab
       if (schemaId) {
-        window.open(`/page/${schemaId}`, '_blank');
+        window.open(`/builder/schemas/${schemaId}`, '_blank');
       }
     }
   };
 
   const handleEditSchemaClick = (e: React.MouseEvent) => {
-    // Ctrl/Cmd + click should also open page view in new tab
+    // Ctrl/Cmd + click should open schema builder in new tab (same as middle-click)
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
       e.stopPropagation();
-      // Extract schema ID from editSchemaPath (format: /builder/schemas/[schema-id])
-      const schemaId = editSchemaPath?.replace('/builder/schemas/', '');
+      // Extract schema ID from editSchemaPath or from current pathname
+      let schemaId: string | undefined;
+      
+      if (editSchemaPath) {
+        // Extract schema ID from editSchemaPath (format: /builder/schemas/[schema-id])
+        schemaId = editSchemaPath.replace('/builder/schemas/', '');
+      } else if (pathname) {
+        // Fallback: extract schema ID from current pathname (format: /page/[schema-id])
+        const match = pathname.match(/^\/page\/([^/]+)/);
+        if (match) {
+          schemaId = match[1];
+        }
+      }
+      
+      // Open builder path in new tab
       if (schemaId) {
-        window.open(`/page/${schemaId}`, '_blank');
+        window.open(`/builder/schemas/${schemaId}`, '_blank');
       }
       return;
     }

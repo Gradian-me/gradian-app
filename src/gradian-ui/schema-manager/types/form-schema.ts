@@ -379,7 +379,7 @@ export interface FormActions {
   setError: (fieldName: string, error: string) => void;
   setTouched: (fieldName: string, touched: boolean) => void;
   validateField: (fieldName: string) => boolean;
-  validateForm: () => Promise<boolean>;
+  validateForm: () => Promise<{ isValid: boolean; isIncomplete: boolean }>;
   reset: () => void;
   submit: () => Promise<void>;
   addRepeatingItem: (sectionId: string) => void;
@@ -394,7 +394,7 @@ export interface FormContextType {
 
 export interface FormWrapperProps {
   schema: FormSchema;
-  onSubmit: (data: FormData) => void | Promise<void>;
+  onSubmit: (data: FormData, options?: { isIncomplete?: boolean }) => void | Promise<void>;
   onReset?: () => void;
   onCancel?: () => void;
   onFieldChange?: (fieldName: string, value: any) => void;

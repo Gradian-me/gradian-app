@@ -2367,6 +2367,20 @@
         "description": "User role name and color",
         "initialState": "expanded",
         "columns": 2
+      },
+      {
+        "id": "members",
+        "title": "Members",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 1,
+          "targetSchema": "users",
+          "relationTypeId": "HAS_MEMBER",
+          "deleteType": "relationOnly",
+          "addType": "canSelectFromData",
+          "isUnique": true
+        }
       }
     ],
     "detailPageMetadata": {

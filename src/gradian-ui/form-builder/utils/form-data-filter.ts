@@ -104,6 +104,9 @@ export function filterFormDataForSubmission(
   // Build cleaned form data
   const cleaned: FormData = {};
 
+  // Metadata fields that should always be preserved (not in schema but needed for backend)
+  const metadataFields = new Set(['incomplete']);
+
   Object.keys(formData).forEach(key => {
     const value = formData[key];
 
@@ -114,6 +117,12 @@ export function filterFormDataForSubmission(
 
     // Keep entity ID if requested (for edit mode)
     if (key === 'id' && keepEntityId) {
+      cleaned[key] = value;
+      return;
+    }
+
+    // Preserve metadata fields (like incomplete flag)
+    if (metadataFields.has(key)) {
       cleaned[key] = value;
       return;
     }
