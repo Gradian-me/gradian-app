@@ -49,7 +49,7 @@ export function PromptPreviewSheet({
       </Button>
       <Sheet open={isOpen} onOpenChange={onOpenChange}>
         <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0 h-full">
-          <SheetHeader className="px-6 pt-6 pb-4 pr-12 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 sticky top-0 bg-white dark:bg-gray-900 z-10">
+          <SheetHeader className="px-6 pt-6 pb-4 pr-12 border-b border-gray-200 dark:border-gray-700 shrink-0 sticky top-0 bg-white dark:bg-gray-900 z-10">
             <SheetTitle>Prompt Sent to LLM</SheetTitle>
             <SheetDescription>
               This is the prompt that will be sent to the Language Model when you click "Do the Magic".
