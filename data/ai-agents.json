@@ -1,9 +1,9 @@
 [
   {
-    "id": "schema-generator",
-    "label": "Schema Generator",
+    "id": "app-builder",
+    "label": "App Builder",
     "icon": "Sparkles",
-    "description": "Generates complete form schemas from natural language descriptions",
+    "description": "Generates complete app builder from natural language descriptions",
     "requiredOutputFormat": "json",
     "model": "gpt-4o-mini",
     "nextAction": {

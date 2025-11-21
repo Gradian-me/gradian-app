@@ -178,6 +178,9 @@ export async function POST(request: NextRequest) {
     const appVars = loadApplicationVariables();
     const llmApiUrl = appVars.AI_CONFIG?.LLM_API_URL || 'https://api.openai.com/v1/chat/completions';
 
+    // Track timing
+    const startTime = Date.now();
+
     // Call LLM API
     const response = await fetch(llmApiUrl, {
       method: 'POST',
@@ -191,6 +194,10 @@ export async function POST(request: NextRequest) {
       })
     });
 
+    // Track response time (time when response is received)
+    const responseTime = Date.now();
+    const responseTimeMs = responseTime - startTime;
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('LLM API error:', errorText);
@@ -201,6 +208,10 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json();
+    
+    // Track total duration (time to process response)
+    const endTime = Date.now();
+    const durationMs = endTime - startTime;
     const aiResponseContent = data.choices?.[0]?.message?.content || '';
 
     if (!aiResponseContent) {
@@ -257,6 +268,10 @@ export async function POST(request: NextRequest) {
         response: processedResponse,
         format: agent.requiredOutputFormat || 'string',
         tokenUsage,
+        timing: {
+          responseTime: responseTimeMs, // Time to receive response
+          duration: durationMs, // Total time from start to completion
+        },
         agent: {
           id: agent.id,
           label: agent.label,
