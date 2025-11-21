@@ -348,7 +348,7 @@ export function useFormModal(
       // Enrich data if provided (pass entityId for edit mode)
       // Preserve incomplete flag when enriching data
       const incompleteFlag = filteredData.incomplete;
-      let enrichedData = enrichData 
+      let enrichedData: Record<string, any> = enrichData 
         ? enrichData(filteredData, mode === 'edit' ? entityId || undefined : undefined)
         : filteredData;
       
@@ -376,7 +376,7 @@ export function useFormModal(
       
       const method = mode === 'edit' ? 'PUT' : 'POST';
 
-      const result = await apiRequest(apiEndpoint, {
+      const result = await apiRequest<Record<string, any>>(apiEndpoint, {
         method,
         body: enrichedData,
       });

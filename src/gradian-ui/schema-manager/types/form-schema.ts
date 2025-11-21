@@ -382,7 +382,7 @@ export interface FormActions {
   validateField: (fieldName: string) => boolean;
   validateForm: () => Promise<{ isValid: boolean; isIncomplete: boolean }>;
   reset: () => void;
-  submit: () => Promise<void>;
+  submit: () => Promise<{ isValid: boolean; isIncomplete: boolean }>;
   addRepeatingItem: (sectionId: string) => void;
   removeRepeatingItem: (sectionId: string, index: number) => void;
 }
@@ -404,7 +404,7 @@ export interface FormWrapperProps {
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
-  onMount?: (submitFn: () => void) => void;
+  onMount?: (submitFn: () => Promise<{ isValid: boolean; isIncomplete: boolean }>) => void;
   hideActions?: boolean;
   error?: string | null;
   message?: string | null;

@@ -126,7 +126,7 @@ export function SectionEditor({
             const schemas = result.data
               .filter((s: FormSchema) => s.id !== currentSchemaId)
               .map((s: FormSchema) => ({ id: s.id, name: s.plural_name || s.singular_name }))
-              .sort((a, b) => a.name.localeCompare(b.name));
+              .sort((a: { id: string; name: string }, b: { id: string; name: string }) => a.name.localeCompare(b.name));
             setAvailableSchemas(schemas);
           }
         }
