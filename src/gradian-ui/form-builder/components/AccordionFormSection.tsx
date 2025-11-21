@@ -23,6 +23,8 @@ import { getInitials, getBadgeConfig } from '../../data-display/utils';
 import { NormalizedOption } from '../form-elements/utils/option-normalizer';
 import { BadgeViewer } from '../form-elements/utils/badge-viewer';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 const fieldVariants = {
   hidden: { opacity: 0, y: 12 },
   visible: (index: number) => ({
@@ -93,11 +95,25 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   }>({ open: false, relationId: null });
   const [targetSchemaData, setTargetSchemaData] = useState<FormSchema | null>(null);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [naConfirmDialog, setNaConfirmDialog] = useState<{
+    open: boolean;
+    willEnable: boolean;
+  }>({ open: false, willEnable: false });
   const queryClient = useQueryClient();
   
   // Get current entity ID from form values (for creating relations)
   const currentEntityId = values?.id || (values as any)?.[schema.id]?.id;
   const sourceSchemaId = schema.id;
+  
+  // Check if section is eligible for N.A switch
+  // Eligible if: IS a repeating section, AND NOT a repeating section with minItems > 1, AND showNotApplicable is not false
+  const isEligibleForNA = isRepeatingSection && (section.repeatingConfig?.minItems ?? 0) <= 1;
+  const showNotApplicableSwitch = section.showNotApplicable !== false && isEligibleForNA;
+  
+  // Read N.A state from form values (sections array)
+  const sectionsNAArray = Array.isArray(values?.sections) ? values.sections : [];
+  const sectionNAEntry = sectionsNAArray.find((s: any) => s.sectionId === section.id);
+  const isNotApplicable = sectionNAEntry?.isNA === true;
   
   // Get addType from config (default: 'addOnly')
   const addType = section.repeatingConfig?.addType || 'addOnly';
@@ -226,9 +242,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   // Use controlled state if provided, otherwise use internal state
   const [internalIsExpanded, setInternalIsExpanded] = useState(initialState === 'expanded');
   // If not collapsible, always keep expanded
+  // If N.A is active, force collapse
   const isExpanded = isCollapsible 
-    ? (controlledIsExpanded !== undefined ? controlledIsExpanded : internalIsExpanded)
-    : true;
+    ? (isNotApplicable ? false : (controlledIsExpanded !== undefined ? controlledIsExpanded : internalIsExpanded))
+    : (!isNotApplicable);
   
   // Get section-level error
   const sectionError = errors?.[section.id];
@@ -404,7 +421,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 onChange={(value) => onChange(fieldName, value)}
                 onBlur={() => onBlur(fieldName)}
                 onFocus={() => onFocus(fieldName)}
-                disabled={disabled || field.disabled}
+                disabled={disabled || field.disabled || isNotApplicable}
                 tabIndex={fieldTabIndexMap?.[field.name] !== undefined ? fieldTabIndexMap[field.name] : undefined}
               />
             </motion.div>
@@ -523,6 +540,141 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   // to ensure each item can only be selected once
   const selectedIds = relations.map(r => r.targetId);
   const shouldExcludeIds = section.repeatingConfig?.isUnique === true;
+
+  // Helper function to check if section has any items/values
+  const hasSectionItems = (): boolean => {
+    // For relation-based sections, check if there are any related entities
+    if (isRelationBased) {
+      return relatedEntities.length > 0;
+    }
+    
+    // For non-relation-based repeating sections, check if there are any items
+    if (isRepeatingSection && !isRelationBased) {
+      return (repeatingItems || []).length > 0;
+    }
+    
+    // For regular sections, check if any field has a non-empty value
+    const nestedValues = (values as any) || {};
+    return fields.some(field => {
+      const fieldValue = nestedValues[field.name];
+      // Consider value as non-empty if it's not null, undefined, or empty string
+      return fieldValue !== null && fieldValue !== undefined && fieldValue !== '';
+    });
+  };
+
+  // Handler for N.A switch toggle
+  const handleNAToggle = (checked: boolean) => {
+    if (checked) {
+      // If section has no items, enable N.A directly without confirmation
+      if (!hasSectionItems()) {
+        handleNAEnable();
+      } else {
+        // Show confirmation dialog when enabling N.A (only if section has items)
+        setNaConfirmDialog({ open: true, willEnable: true });
+      }
+    } else {
+      // Disable N.A immediately (no confirmation needed)
+      handleNADisable();
+    }
+  };
+
+  // Handler for disabling N.A (no confirmation needed)
+  const handleNADisable = () => {
+    // Update sections array in form values
+    const currentSections = Array.isArray(values?.sections) ? [...values.sections] : [];
+    const existingIndex = currentSections.findIndex((s: any) => s.sectionId === section.id);
+    
+    // Remove N.A entry
+    if (existingIndex >= 0) {
+      currentSections.splice(existingIndex, 1);
+    }
+    
+    // Update sections array
+    onChange('sections', currentSections.length > 0 ? currentSections : undefined);
+  };
+
+  // Handler for enabling N.A (called directly when section is empty, or after confirmation)
+  const handleNAEnable = async () => {
+    // Update sections array in form values
+    const currentSections = Array.isArray(values?.sections) ? [...values.sections] : [];
+    const existingIndex = currentSections.findIndex((s: any) => s.sectionId === section.id);
+    
+    // Enable N.A
+    if (existingIndex >= 0) {
+      currentSections[existingIndex] = { sectionId: section.id, isNA: true };
+    } else {
+      currentSections.push({ sectionId: section.id, isNA: true });
+    }
+    
+    // Update sections array
+    onChange('sections', currentSections);
+    
+    // Force collapse accordion
+    if (onToggleExpanded && isExpanded) {
+      onToggleExpanded();
+    } else if (!onToggleExpanded) {
+      setInternalIsExpanded(false);
+    }
+    
+    // Clear all field values in the section
+    fields.forEach(field => {
+      const fieldName = field.name;
+      onChange(fieldName, null);
+    });
+    
+    // For relation-based sections, handle deletion based on deleteType
+    if (isRelationBased && relations.length > 0) {
+      const deleteType = section.repeatingConfig?.deleteType || 'itemAndRelation';
+      
+      // Delete all relations for this section
+      for (const relation of relations) {
+        try {
+          // First, delete the relation
+          const relationResponse = await apiRequest(`/api/relations/${relation.id}`, {
+            method: 'DELETE',
+          });
+          
+          if (relationResponse.success) {
+            // If deleteType is 'itemAndRelation', also delete the target item
+            if (deleteType === 'itemAndRelation' && relation && targetSchema) {
+              const itemResponse = await apiRequest(`/api/data/${targetSchema}/${relation.targetId}`, {
+                method: 'DELETE',
+              });
+              
+              if (!itemResponse.success) {
+                console.error('Failed to delete target item:', itemResponse.error);
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error removing relation for N.A:', error);
+        }
+      }
+      
+      // Refresh relations to get updated data
+      fetchRelations();
+    }
+    
+    // Clear repeating section items if it's a non-relation-based repeating section
+    if (isRepeatingSection && !isRelationBased && repeatingItems && repeatingItems.length > 0) {
+      // Remove all items
+      for (let i = repeatingItems.length - 1; i >= 0; i--) {
+        onRemoveRepeatingItem?.(i);
+      }
+    }
+  };
+
+  // Handler for N.A confirmation (when enabling with items present)
+  const handleNAConfirm = async (confirmed: boolean) => {
+    setNaConfirmDialog({ open: false, willEnable: false });
+    
+    if (!confirmed) {
+      return;
+    }
+
+    // Enable N.A (same logic as handleNAEnable)
+    await handleNAEnable();
+  };
 
   // Render entity summary (for relation-based sections) - Beautiful card UI
   const renderEntitySummary = (entity: any, index: number, actionButtons?: React.ReactNode) => {
@@ -734,7 +886,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <CardTitle className="text-base font-medium text-gray-900 dark:text-gray-100">{title}</CardTitle>
+                  <CardTitle className={cn(
+                    "text-base font-medium text-gray-900 dark:text-gray-100",
+                    isNotApplicable && "opacity-50"
+                  )}>{title}</CardTitle>
                   <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
                     {itemsCount}
                   </span>
@@ -759,6 +914,26 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   </Button>
                 </div>
                 <div className="flex items-center gap-2">
+                  {/* N.A Switch */}
+                  {showNotApplicableSwitch && (
+                    <div 
+                      className="flex items-center gap-1.5"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Switch
+                        checked={isNotApplicable}
+                        onCheckedChange={handleNAToggle}
+                        disabled={disabled}
+                        id={`na-switch-${section.id}`}
+                      />
+                      <Label 
+                        htmlFor={`na-switch-${section.id}`}
+                        className="text-xs text-gray-600 dark:text-gray-400 cursor-pointer"
+                      >
+                        N.A
+                      </Label>
+                    </div>
+                  )}
                   {/* Select button for canSelectFromData or mustSelectFromData */}
                   {(addType === 'canSelectFromData' || addType === 'mustSelectFromData') && targetSchema && (
                     <Button
@@ -770,7 +945,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                         e.stopPropagation();
                         setIsPickerOpen(true);
                       }}
-                      disabled={disabled || !currentEntityId}
+                      disabled={disabled || !currentEntityId || isNotApplicable}
                       className="text-xs"
                     >
                       Select {targetSchemaData?.plural_name || targetSchemaData?.singular_name || targetSchema}
@@ -910,7 +1085,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                             <AddButtonFull
                               label={section.repeatingConfig?.addButtonText || `Add ${title}`}
                               onClick={onAddRepeatingItem}
-                              disabled={disabled || !currentEntityId}
+                              disabled={disabled || !currentEntityId || isNotApplicable}
                               loading={isAddingItem}
                             />
                           </div>
@@ -1020,7 +1195,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                       <AddButtonFull
                         label={section.repeatingConfig?.addButtonText || `Add ${title}`}
                         onClick={onAddRepeatingItem}
-                        disabled={disabled || !currentEntityId}
+                        disabled={disabled || !currentEntityId || isNotApplicable}
                         loading={isAddingItem}
                       />
                     </div>
@@ -1109,12 +1284,38 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               viewListUrl={`/page/${targetSchema}`}
             />
           )}
+          
+          {/* N.A Confirmation Dialog */}
+          <ConfirmationMessage
+            isOpen={naConfirmDialog.open}
+            onOpenChange={(open) => setNaConfirmDialog({ open, willEnable: naConfirmDialog.willEnable })}
+            title="Mark Section as Not Applicable"
+            message={
+              isRelationBased
+                ? `Are you sure you want to mark this section as Not Applicable? This will clear all field values and ${section.repeatingConfig?.deleteType === 'relationOnly' ? 'remove all relations' : 'delete all related items and their relations'}. This action cannot be undone.`
+                : `Are you sure you want to mark this section as Not Applicable? This will clear all field values in this section. This action cannot be undone.`
+            }
+            variant="destructive"
+            buttons={[
+              {
+                label: 'Cancel',
+                variant: 'outline',
+                action: () => setNaConfirmDialog({ open: false, willEnable: false }),
+              },
+              {
+                label: 'Mark as N.A',
+                variant: 'destructive',
+                action: () => handleNAConfirm(true),
+              },
+            ]}
+          />
         </>
       );
     }
     
     // For traditional inline fields repeating sections
     return (
+      <>
       <Card className={cn(
         'border border-gray-200 rounded-2xl bg-gray-50/50',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent',
@@ -1128,7 +1329,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <CardTitle className="text-base font-medium text-gray-900 dark:text-gray-100">{title}</CardTitle>
+                <CardTitle className={cn(
+                  "text-base font-medium text-gray-900 dark:text-gray-100",
+                  isNotApplicable && "opacity-50"
+                )}>{title}</CardTitle>
                 <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
                   {(repeatingItems || []).length}
                 </span>
@@ -1142,21 +1346,43 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{description}</p>
               )}
             </div>
-            {isCollapsible && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="p-1 h-6 w-6 hover:bg-gray-200"
-                onClick={(e) => { e.stopPropagation(); toggleExpanded(); }}
-              >
-                {isExpanded ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {/* N.A Switch */}
+              {showNotApplicableSwitch && (
+                <div 
+                  className="flex items-center gap-1.5"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Switch
+                    checked={isNotApplicable}
+                    onCheckedChange={handleNAToggle}
+                    disabled={disabled}
+                    id={`na-switch-${section.id}`}
+                  />
+                  <Label 
+                    htmlFor={`na-switch-${section.id}`}
+                    className="text-xs text-gray-600 dark:text-gray-400 cursor-pointer"
+                  >
+                    N.A
+                  </Label>
+                </div>
+              )}
+              {isCollapsible && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="p-1 h-6 w-6 hover:bg-gray-200"
+                  onClick={(e) => { e.stopPropagation(); toggleExpanded(); }}
+                >
+                  {isExpanded ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
         
@@ -1221,7 +1447,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                         <AddButtonFull
                           label={section.repeatingConfig?.addButtonText || `Add ${title}`}
                           onClick={onAddRepeatingItem}
-                          disabled={disabled}
+                          disabled={disabled || isNotApplicable}
                           loading={isAddingItem}
                         />
                       </div>
@@ -1306,10 +1532,33 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         </CardContent>
       )}
       </Card>
+      
+      {/* N.A Confirmation Dialog */}
+      <ConfirmationMessage
+        isOpen={naConfirmDialog.open}
+        onOpenChange={(open) => setNaConfirmDialog({ open, willEnable: naConfirmDialog.willEnable })}
+        title="Mark Section as Not Applicable"
+        message="Are you sure you want to mark this section as Not Applicable? This will clear all field values in this section. This action cannot be undone."
+        variant="destructive"
+        buttons={[
+          {
+            label: 'Cancel',
+            variant: 'outline',
+            action: () => setNaConfirmDialog({ open: false, willEnable: false }),
+          },
+          {
+            label: 'Mark as N.A',
+            variant: 'destructive',
+            action: () => handleNAConfirm(true),
+          },
+        ]}
+      />
+      </>
     );
   }
 
   return (
+    <>
       <Card className={cn(
         'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
         'dark:border-gray-700 dark:bg-gray-800/30',
@@ -1327,7 +1576,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <CardTitle className="text-base font-medium text-gray-900 dark:text-gray-100">{title}</CardTitle>
+                <CardTitle className={cn(
+                  "text-base font-medium text-gray-900 dark:text-gray-100",
+                  isNotApplicable && "opacity-50"
+                )}>{title}</CardTitle>
                 {displaySectionError && (
                   <span className="text-sm text-red-600 dark:text-red-400" role="alert">
                     • {displaySectionError}
@@ -1338,21 +1590,43 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{description}</p>
             )}
           </div>
-          {isCollapsible && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="p-1 h-6 w-6 hover:bg-gray-200"
-              onClick={(e) => { e.stopPropagation(); toggleExpanded(); }}
-            >
-              {isExpanded ? (
-                <ChevronDown className="h-4 w-4" />
-              ) : (
-                <ChevronRight className="h-4 w-4" />
-              )}
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {/* N.A Switch */}
+            {showNotApplicableSwitch && (
+              <div 
+                className="flex items-center gap-1.5"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Switch
+                  checked={isNotApplicable}
+                  onCheckedChange={handleNAToggle}
+                  disabled={disabled}
+                  id={`na-switch-${section.id}`}
+                />
+                <Label 
+                  htmlFor={`na-switch-${section.id}`}
+                  className="text-xs text-gray-600 dark:text-gray-400 cursor-pointer"
+                >
+                  N.A
+                </Label>
+              </div>
+            )}
+            {isCollapsible && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="p-1 h-6 w-6 hover:bg-gray-200"
+                onClick={(e) => { e.stopPropagation(); toggleExpanded(); }}
+              >
+                {isExpanded ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
       
@@ -1387,7 +1661,29 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           </div>
         </CardContent>
       )}
-    </Card>
+      </Card>
+      
+      {/* N.A Confirmation Dialog */}
+      <ConfirmationMessage
+        isOpen={naConfirmDialog.open}
+        onOpenChange={(open) => setNaConfirmDialog({ open, willEnable: naConfirmDialog.willEnable })}
+        title="Mark Section as Not Applicable"
+        message="Are you sure you want to mark this section as Not Applicable? This will clear all field values in this section. This action cannot be undone."
+        variant="destructive"
+        buttons={[
+          {
+            label: 'Cancel',
+            variant: 'outline',
+            action: () => setNaConfirmDialog({ open: false, willEnable: false }),
+          },
+          {
+            label: 'Mark as N.A',
+            variant: 'destructive',
+            action: () => handleNAConfirm(true),
+          },
+        ]}
+      />
+    </>
   );
 };
 

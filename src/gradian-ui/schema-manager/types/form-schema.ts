@@ -108,6 +108,7 @@ export interface FormSection {
     isUnique?: boolean; // If true, each item can only be selected once (excludes already selected items)
   };
   initialState?: 'expanded' | 'collapsed';
+  showNotApplicable?: boolean; // If true, shows N.A switch in section header (only for sections that are NOT repeating sections with minItems > 1)
 }
 
 // Card-related types

@@ -105,7 +105,7 @@ export function filterFormDataForSubmission(
   const cleaned: FormData = {};
 
   // Metadata fields that should always be preserved (not in schema but needed for backend)
-  const metadataFields = new Set(['incomplete']);
+  const metadataFields = new Set(['incomplete', 'sections']);
 
   Object.keys(formData).forEach(key => {
     const value = formData[key];

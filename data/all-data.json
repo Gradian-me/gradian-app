@@ -995,6 +995,15 @@
     }
   ],
   "user-roles": [
+    {
+      "color": "#4E79A7",
+      "name": "jhgjhg",
+      "incomplete": true,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KAKR8W9BWJXHEV2BZ80Q07P0",
+      "createdAt": "2025-11-21T17:44:26.171Z",
+      "updatedAt": "2025-11-21T17:44:26.171Z"
+    }
   ],
   "users": [
     {

@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '../../../components/ui/button';
-import { TextInput, Textarea, NumberInput, Switch, Select, Slider, ButtonMinimal, NameInput } from '@/gradian-ui/form-builder/form-elements';
+import { TextInput, Textarea, NumberInput, Switch, Select, Slider, ButtonMinimal, NameInput, PopupPicker } from '@/gradian-ui/form-builder/form-elements';
 import { Pencil, Trash2 } from 'lucide-react';
 import { SectionEditorProps } from '../types/builder';
 import { FieldEditor } from './FieldEditor';
@@ -51,6 +51,8 @@ export function SectionEditor({
   const [relationTypes, setRelationTypes] = useState<Array<{ id: string; label: string }>>([]);
   const [availableSchemas, setAvailableSchemas] = useState<Array<{ id: string; name: string }>>([]);
   const [isSectionIdCustom, setIsSectionIdCustom] = useState(false);
+  const [isTargetSchemaPickerOpen, setIsTargetSchemaPickerOpen] = useState(false);
+  const [isRelationTypePickerOpen, setIsRelationTypePickerOpen] = useState(false);
   
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -101,7 +103,11 @@ export function SectionEditor({
         if (response.ok) {
           const result = await response.json();
           if (result.success) {
-            setRelationTypes(result.data || []);
+            // Sort relation types by label
+            const sorted = (result.data || []).sort((a: any, b: any) => 
+              (a.label || '').localeCompare(b.label || '')
+            );
+            setRelationTypes(sorted);
           }
         }
       } catch (error) {
@@ -116,10 +122,11 @@ export function SectionEditor({
         if (response.ok) {
           const result = await response.json();
           if (result.success) {
-            // Filter out current schema from available schemas
+            // Filter out current schema from available schemas and sort by name
             const schemas = result.data
               .filter((s: FormSchema) => s.id !== currentSchemaId)
-              .map((s: FormSchema) => ({ id: s.id, name: s.plural_name || s.singular_name }));
+              .map((s: FormSchema) => ({ id: s.id, name: s.plural_name || s.singular_name }))
+              .sort((a, b) => a.name.localeCompare(b.name));
             setAvailableSchemas(schemas);
           }
         }
@@ -283,6 +290,24 @@ export function SectionEditor({
                 });
               }}
             />
+            {/* Show N.A switch option only for repeating sections (not with minItems > 1) */}
+            {tempSection.isRepeatingSection && (tempSection.repeatingConfig?.minItems ?? 0) <= 1 && (
+              <Switch
+                config={{ name: `show-not-applicable-${section.id}`, label: 'Show Not Applicable Switch' }}
+                value={tempSection.showNotApplicable !== false}
+                onChange={(checked: boolean) => {
+                  const updates: any = { showNotApplicable: checked };
+                  // When enabling N.A switch, set minItems to 0
+                  if (checked) {
+                    updates.repeatingConfig = {
+                      ...tempSection.repeatingConfig,
+                      minItems: 0,
+                    };
+                  }
+                  setTempSection({ ...tempSection, ...updates });
+                }}
+              />
+            )}
           </div>
 
           {/* Repeating Section Configuration */}
@@ -296,35 +321,71 @@ export function SectionEditor({
             
             {/* Relation-based configuration */}
             <div className="grid grid-cols-2 gap-4">
-              <Select
-                config={{ name: 'target-schema', label: 'Target Schema', placeholder: 'Select target schema...' }}
-                value={tempSection.repeatingConfig?.targetSchema || ''}
-                onValueChange={(value) =>
-                  setTempSection({
-                    ...tempSection,
-                    repeatingConfig: { ...tempSection.repeatingConfig, targetSchema: value || undefined },
-                  })
-                }
-                options={[
-                  { value: '', label: 'Select target schema...' },
-                  ...availableSchemas.map((schema) => ({ value: schema.id, label: schema.name })),
-                ]}
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Target Schema</label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-between"
+                  onClick={() => setIsTargetSchemaPickerOpen(true)}
+                >
+                  <span className="truncate">
+                    {tempSection.repeatingConfig?.targetSchema
+                      ? availableSchemas.find(s => s.id === tempSection.repeatingConfig?.targetSchema)?.name || tempSection.repeatingConfig.targetSchema
+                      : 'Select target schema...'}
+                  </span>
+                </Button>
+                <PopupPicker
+                  isOpen={isTargetSchemaPickerOpen}
+                  onClose={() => setIsTargetSchemaPickerOpen(false)}
+                  staticItems={availableSchemas.map(s => ({ id: s.id, name: s.name, title: s.name }))}
+                  onSelect={async (selections, rawItems) => {
+                    if (selections.length > 0 && rawItems.length > 0) {
+                      setTempSection({
+                        ...tempSection,
+                        repeatingConfig: { ...tempSection.repeatingConfig, targetSchema: selections[0].id || undefined },
+                      });
+                    }
+                    setIsTargetSchemaPickerOpen(false);
+                  }}
+                  title="Select Target Schema"
+                  description="Choose a schema to link to this repeating section"
+                  allowMultiselect={false}
+                />
+              </div>
 
-              <Select
-                config={{ name: 'relation-type', label: 'Relation Type', placeholder: 'Select relation type...' }}
-                value={tempSection.repeatingConfig?.relationTypeId || ''}
-                onValueChange={(value) =>
-                  setTempSection({
-                    ...tempSection,
-                    repeatingConfig: { ...tempSection.repeatingConfig, relationTypeId: value || undefined },
-                  })
-                }
-                options={[
-                  { value: '', label: 'Select relation type...' },
-                  ...relationTypes.map((rt) => ({ value: rt.id, label: rt.label })),
-                ]}
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Relation Type</label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-between"
+                  onClick={() => setIsRelationTypePickerOpen(true)}
+                >
+                  <span className="truncate">
+                    {tempSection.repeatingConfig?.relationTypeId
+                      ? relationTypes.find(rt => rt.id === tempSection.repeatingConfig?.relationTypeId)?.label || tempSection.repeatingConfig.relationTypeId
+                      : 'Select relation type...'}
+                  </span>
+                </Button>
+                <PopupPicker
+                  isOpen={isRelationTypePickerOpen}
+                  onClose={() => setIsRelationTypePickerOpen(false)}
+                  staticItems={relationTypes.map(rt => ({ id: rt.id, name: rt.label, title: rt.label }))}
+                  onSelect={async (selections, rawItems) => {
+                    if (selections.length > 0 && rawItems.length > 0) {
+                      setTempSection({
+                        ...tempSection,
+                        repeatingConfig: { ...tempSection.repeatingConfig, relationTypeId: selections[0].id || undefined },
+                      });
+                    }
+                    setIsRelationTypePickerOpen(false);
+                  }}
+                  title="Select Relation Type"
+                  description="Choose a relation type for this repeating section"
+                  allowMultiselect={false}
+                />
+              </div>
             </div>
 
             {/* Common repeating config fields */}

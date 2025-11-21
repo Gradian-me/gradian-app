@@ -146,12 +146,15 @@ export function SortableSection({
                     >
                       {section.title || 'Untitled Section'}
                     </CardTitle>
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] px-1.5 py-0 bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-100"
-                    >
-                      {fields.length} {fields.length === 1 ? 'field' : 'fields'}
-                    </Badge>
+                    {/* Don't show badge for repeating sections when field count is 0 */}
+                    {!(section.isRepeatingSection && fields.length === 0) && (
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] px-1.5 py-0 bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-100"
+                      >
+                        {fields.length} {fields.length === 1 ? 'field' : 'fields'}
+                      </Badge>
+                    )}
                     {isInactive && (
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
                         Inactive
