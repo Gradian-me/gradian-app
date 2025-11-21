@@ -410,8 +410,8 @@ export function useFormModal(
             setEntityData(result.data);
           }
           // IMPORTANT: Do NOT call closeFormModal() - keep form open
-          // Call onSuccess but form should remain open (onSuccess shouldn't close modal)
-          onSuccess?.(result.data);
+          // IMPORTANT: Do NOT call onSuccess() when incomplete - it might close the modal
+          // (onSuccess callbacks often reset state that controls modal visibility)
           // Explicitly ensure modal stays open
           setIsOpen(true);
         } else {
