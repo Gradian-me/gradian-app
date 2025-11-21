@@ -46,7 +46,19 @@ interface AiAgent {
 export default function AiBuilderPage() {
   const [userPrompt, setUserPrompt] = useState('');
   const [aiResponse, setAiResponse] = useState('');
-  const [tokenUsage, setTokenUsage] = useState<{ prompt_tokens: number; completion_tokens: number; total_tokens: number } | null>(null);
+  const [tokenUsage, setTokenUsage] = useState<{ 
+    prompt_tokens: number; 
+    completion_tokens: number; 
+    total_tokens: number;
+    pricing?: {
+      input_price_per_1m: number;
+      output_price_per_1m: number;
+      input_cost: number;
+      output_cost: number;
+      total_cost: number;
+      model_id: string;
+    } | null;
+  } | null>(null);
   const [aiAgents, setAiAgents] = useState<AiAgent[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
   const [isLoadingAgents, setIsLoadingAgents] = useState(true);
@@ -725,7 +737,16 @@ export default function AiBuilderPage() {
               <div className="flex items-center gap-3">
                 {tokenUsage && (
                   <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                    <span>Tokens: {tokenUsage.prompt_tokens} + {tokenUsage.completion_tokens} = {tokenUsage.total_tokens}</span>
+                    <span>
+                      Tokens: {tokenUsage.prompt_tokens}
+                      {tokenUsage.pricing && ` ($${tokenUsage.pricing.input_price_per_1m.toFixed(2)}/1M)`}
+                      {' + '}
+                      {tokenUsage.completion_tokens}
+                      {tokenUsage.pricing && ` ($${tokenUsage.pricing.output_price_per_1m.toFixed(2)}/1M)`}
+                      {' = '}
+                      {tokenUsage.total_tokens}
+                      {tokenUsage.pricing && ` | Total: $${tokenUsage.pricing.total_cost.toFixed(4)}`}
+                    </span>
                   </div>
                 )}
                 {selectedAgent?.nextAction && (

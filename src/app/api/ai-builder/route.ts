@@ -23,6 +23,54 @@ function loadAiAgents(): any[] {
 }
 
 /**
+ * Load AI models from JSON file
+ */
+function loadAiModels(): any[] {
+  const dataPath = path.join(process.cwd(), 'data', 'ai-models.json');
+  
+  if (!fs.existsSync(dataPath)) {
+    return [];
+  }
+  
+  const fileContents = fs.readFileSync(dataPath, 'utf8');
+  return JSON.parse(fileContents);
+}
+
+/**
+ * Calculate pricing for token usage
+ */
+function calculatePricing(modelId: string, promptTokens: number, completionTokens: number): { 
+  inputPricePer1M: number; 
+  outputPricePer1M: number; 
+  inputPrice: number; 
+  outputPrice: number; 
+  totalPrice: number 
+} | null {
+  const models = loadAiModels();
+  const model = models.find((m: any) => m.id === modelId);
+  
+  if (!model || !model.pricing) {
+    return null;
+  }
+  
+  const inputPricePerMillion = model.pricing.input || 0;
+  const outputPricePerMillion = model.pricing.output || 0;
+  
+  // Calculate prices (pricing is per 1 million tokens)
+  const inputPrice = (promptTokens / 1_000_000) * inputPricePerMillion;
+  const outputPrice = (completionTokens / 1_000_000) * outputPricePerMillion;
+  const totalPrice = inputPrice + outputPrice;
+  
+  return {
+    inputPricePer1M: inputPricePerMillion,
+    outputPricePer1M: outputPricePerMillion,
+    inputPrice,
+    outputPrice,
+    totalPrice
+  };
+}
+
+/**
  * POST - Process user prompt with AI agent
  * Body: { userPrompt: string, agentId?: string }
  */
@@ -163,10 +211,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Extract token usage information
+    const promptTokens = data.usage?.prompt_tokens || 0;
+    const completionTokens = data.usage?.completion_tokens || 0;
+    const totalTokens = data.usage?.total_tokens || 0;
+    
+    // Calculate pricing
+    const pricing = calculatePricing(model, promptTokens, completionTokens);
+    
     const tokenUsage = data.usage ? {
-      prompt_tokens: data.usage.prompt_tokens || 0,
-      completion_tokens: data.usage.completion_tokens || 0,
-      total_tokens: data.usage.total_tokens || 0,
+      prompt_tokens: promptTokens,
+      completion_tokens: completionTokens,
+      total_tokens: totalTokens,
+      pricing: pricing ? {
+        input_price_per_1m: pricing.inputPricePer1M || 0,
+        output_price_per_1m: pricing.outputPricePer1M || 0,
+        input_cost: pricing.inputPrice,
+        output_cost: pricing.outputPrice,
+        total_cost: pricing.totalPrice,
+        model_id: model
+      } : null
     } : null;
 
     // Extract JSON if required output format is JSON

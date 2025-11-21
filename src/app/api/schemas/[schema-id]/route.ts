@@ -12,6 +12,7 @@ import { clearCache as clearSharedSchemaCache } from '@/gradian-ui/shared/utils/
 // Cache for loaded schemas
 let cachedSchemas: any[] | null = null;
 let cacheTimestamp: number | null = null;
+let cachedFileMtime: number | null = null;
 // Get cache TTL from configuration (this route handles /api/schemas/:id)
 // Use a placeholder ID for pattern matching - the config will match 'schemas/:id' pattern
 const CACHE_CONFIG = getCacheConfigByPath('/api/schemas/placeholder-id');
@@ -24,30 +25,48 @@ const CACHE_TTL_MS = CACHE_CONFIG.ttl;
 function clearSchemaCache() {
   cachedSchemas = null;
   cacheTimestamp = null;
+  cachedFileMtime = null;
 }
 
 /**
  * Load schemas with caching
- * Always uses cache if available and valid, regardless of environment
+ * Cache is invalidated if file modification time changes or TTL expires
  */
 function loadSchemas(): any[] {
-  const now = Date.now();
-  
-  // Check if cache is valid and return it (works in all environments)
-  if (cachedSchemas !== null && cacheTimestamp !== null && (now - cacheTimestamp) < CACHE_TTL_MS) {
-    return cachedSchemas;
-  }
-  
-  // Cache miss or expired - read from file and update cache
   const dataPath = path.join(process.cwd(), 'data', 'all-schemas.json');
   
   if (!fs.existsSync(dataPath)) {
     return [];
   }
   
+  // Check file modification time
+  let currentMtime: number | null = null;
+  try {
+    const stats = fs.statSync(dataPath);
+    currentMtime = stats.mtimeMs;
+  } catch {
+    // If we can't get file stats, invalidate cache and reload
+    cachedFileMtime = null;
+  }
+  
+  const now = Date.now();
+  
+  // Check if cache is valid:
+  // 1. Cache exists
+  // 2. File modification time hasn't changed
+  // 3. Cache hasn't expired (TTL check)
+  const fileUnchanged = cachedFileMtime !== null && currentMtime === cachedFileMtime;
+  const cacheNotExpired = cacheTimestamp !== null && (now - cacheTimestamp) < CACHE_TTL_MS;
+  
+  if (cachedSchemas !== null && fileUnchanged && cacheNotExpired) {
+    return cachedSchemas;
+  }
+  
+  // Cache miss, expired, or file changed - read from file and update cache
   const fileContents = fs.readFileSync(dataPath, 'utf8');
   cachedSchemas = JSON.parse(fileContents);
   cacheTimestamp = now;
+  cachedFileMtime = currentMtime;
   
   return cachedSchemas || [];
 }
@@ -180,6 +199,7 @@ export async function PUT(
     // Clear caches to force reload on next request
     cachedSchemas = null;
     cacheTimestamp = null;
+    cachedFileMtime = null;
     clearSharedSchemaCache('schemas');
 
     return NextResponse.json({
@@ -252,6 +272,7 @@ export async function DELETE(
     // Clear caches to force reload on next request
     cachedSchemas = null;
     cacheTimestamp = null;
+    cachedFileMtime = null;
     clearSharedSchemaCache('schemas');
 
     return NextResponse.json({
