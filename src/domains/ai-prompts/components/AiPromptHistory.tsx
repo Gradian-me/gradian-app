@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { MetricCard } from '@/gradian-ui/analytics';
+import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { config } from '@/lib/config';
 import { History, Search, X, DollarSign, Hash, Clock, Timer, Sparkles, Coins, Cpu, User, ChevronDown, ChevronUp } from 'lucide-react';
 import { format } from 'date-fns';
@@ -467,9 +468,12 @@ function PromptCard({ prompt, agent, isExpanded, onToggle }: PromptCardProps) {
         <div className="space-y-4">
           {/* User Prompt */}
           <div>
-            <h4 className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">
-              User Prompt:
-            </h4>
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                User Prompt:
+              </h4>
+              <CopyContent content={prompt.userPrompt} />
+            </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 p-3 rounded-md">
               {prompt.userPrompt}
             </p>

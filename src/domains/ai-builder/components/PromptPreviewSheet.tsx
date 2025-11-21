@@ -52,7 +52,7 @@ export function PromptPreviewSheet({
           <SheetHeader className="px-6 pt-6 pb-4 pr-12 border-b border-gray-200 dark:border-gray-700 shrink-0 sticky top-0 bg-white dark:bg-gray-900 z-10">
             <SheetTitle>Prompt Sent to LLM</SheetTitle>
             <SheetDescription>
-              This is the prompt that will be sent to the Language Model when you click "Do the Magic".
+              This is the prompt that is being sent (or was sent) to the Language Model. You can preview it at any time, including during generation.
             </SheetDescription>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-6 py-6 min-h-0">

@@ -147,6 +147,16 @@ export function AiBuilderForm({
           
           {/* Buttons on Right */}
           <div className="flex items-center gap-2">
+            {onSheetOpenChange && (
+              <PromptPreviewSheet
+                isOpen={isSheetOpen}
+                onOpenChange={onSheetOpenChange}
+                systemPrompt={systemPrompt}
+                userPrompt={userPrompt}
+                isLoadingPreload={isLoadingPreload}
+                disabled={!userPrompt.trim() || disabled}
+              />
+            )}
             {isLoading ? (
               <>
                 <Button
@@ -170,28 +180,16 @@ export function AiBuilderForm({
                 </Button>
               </>
             ) : (
-              <>
-                {DEMO_MODE && onSheetOpenChange && (
-                  <PromptPreviewSheet
-                    isOpen={isSheetOpen}
-                    onOpenChange={onSheetOpenChange}
-                    systemPrompt={systemPrompt}
-                    userPrompt={userPrompt}
-                    isLoadingPreload={isLoadingPreload}
-                    disabled={!userPrompt.trim() || disabled}
-                  />
-                )}
-                <Button
-                  onClick={onGenerate}
-                  disabled={!userPrompt.trim() || disabled}
-                  size="default"
-                  variant="default"
-                  className="h-10"
-                >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Do the Magic
-                </Button>
-              </>
+              <Button
+                onClick={onGenerate}
+                disabled={!userPrompt.trim() || disabled}
+                size="default"
+                variant="default"
+                className="h-10"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Do the Magic
+              </Button>
             )}
           </div>
         </div>
