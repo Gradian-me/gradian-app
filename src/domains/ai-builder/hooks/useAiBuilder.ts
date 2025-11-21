@@ -6,7 +6,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import type { AiAgent, AiBuilderResponse, GeneratePromptRequest, TokenUsage, PreloadRouteResult } from '../types';
+import type { AiAgent, AiBuilderResponseData, GeneratePromptRequest, TokenUsage, PreloadRouteResult } from '../types';
 import { useAiPrompts } from '@/domains/ai-prompts/hooks/useAiPrompts';
 import { useUserStore } from '@/stores/user.store';
 
@@ -202,7 +202,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
         throw new Error(data.error || 'Failed to get AI response');
       }
 
-      const builderResponse: AiBuilderResponse = data.data;
+      const builderResponse: AiBuilderResponseData = data.data;
       setAiResponse(builderResponse.response);
       setTokenUsage(builderResponse.tokenUsage || null);
 

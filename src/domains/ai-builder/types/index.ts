@@ -40,7 +40,7 @@ export interface TokenUsage {
   } | null;
 }
 
-export interface AiBuilderResponse {
+export interface AiBuilderResponseData {
   response: string;
   format: 'json' | 'string';
   tokenUsage: TokenUsage | null;
