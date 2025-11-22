@@ -2034,7 +2034,9 @@
       ]
     },
     "showInNavigation": true,
-    "icon": "FileText"
+    "icon": "FileText",
+    "allowDataInactive": true,
+    "allowDataForce": true
   },
   {
     "id": "quotation-items",

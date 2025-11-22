@@ -1,32 +1,29 @@
 // Schema-based Form Wrapper Component
 
-import React, { createContext, useContext, useReducer, useCallback, useMemo, useEffect } from 'react';
-import { ulid } from 'ulid';
-import { 
-  FormWrapperProps, 
-  FormState, 
-  FormContextType, 
-  FormSchema, 
-  FormData, 
-  FormErrors, 
-  FormTouched 
-} from '@/gradian-ui/schema-manager/types/form-schema';
-import { FormSection } from './FormSection';
-import { AccordionFormSection } from './AccordionFormSection';
-import { RepeatingSection } from './RepeatingSection';
-import { FormElementFactory } from '../form-elements';
+import { CompanySelector } from '@/components/layout/CompanySelector';
 import { Button } from '@/components/ui/button';
 import { FormAlert } from '@/components/ui/form-alert';
-import { cn, validateField as validateFieldUtil } from '@/gradian-ui/shared/utils';
-import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import {
+  FormContextType,
+  FormData,
+  FormErrors,
+  FormSchema,
+  FormState,
+  FormWrapperProps
+} from '@/gradian-ui/schema-manager/types/form-schema';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
-import { getActionConfig, getSingularName, isEditMode } from '../utils/action-config';
-import { ChevronsDown, ChevronsUp } from 'lucide-react';
-import { GoToTopForm } from '../form-elements/go-to-top-form';
-import { FormModal } from './FormModal';
+import { cn, validateField as validateFieldUtil } from '@/gradian-ui/shared/utils';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
-import { CompanySelector } from '@/components/layout/CompanySelector';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { ChevronsDown, ChevronsUp } from 'lucide-react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
+import { ulid } from 'ulid';
+import { GoToTopForm } from '../form-elements/go-to-top-form';
 import { getFieldTabIndexMap } from '../form-elements/utils/field-resolver';
+import { getActionConfig, getSingularName, isEditMode } from '../utils/action-config';
+import { AccordionFormSection } from './AccordionFormSection';
+import { FormModal } from './FormModal';
+import { FormSystemSection } from './FormSystemSection';
 
 // Form Context
 const FormContext = createContext<FormContextType | null>(null);
@@ -1307,6 +1304,13 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           )}
           
           <div className="space-y-4">
+            <FormSystemSection
+              schema={schema}
+              values={state.values}
+              onChange={setValue}
+              onBlur={(fieldName: string) => setTouched(fieldName, true)}
+              disabled={disabled}
+            />
             {renderSections()}
           </div>
         </>
