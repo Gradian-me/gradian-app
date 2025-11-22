@@ -10,6 +10,7 @@ import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Loader2 } from 'lucide-react';
+import { MetricCard } from '@/gradian-ui/analytics';
 import type { AiAgent, TokenUsage } from '../types';
 
 interface AiBuilderResponseProps {
@@ -37,48 +38,64 @@ export function AiBuilderResponse({
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
           Your Creation
         </h2>
-        <div className="flex items-center gap-3">
-          {tokenUsage && (
-            <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
-              <span>
-                Tokens: {tokenUsage.prompt_tokens}
-                {tokenUsage.pricing && ` ($${tokenUsage.pricing.input_price_per_1m.toFixed(2)}/1M)`}
-                {' + '}
-                {tokenUsage.completion_tokens}
-                {tokenUsage.pricing && ` ($${tokenUsage.pricing.output_price_per_1m.toFixed(2)}/1M)`}
-                {' = '}
-                {tokenUsage.total_tokens}
-                {tokenUsage.pricing && ` | Total: $${tokenUsage.pricing.total_cost.toFixed(4)}`}
-              </span>
-            </div>
-          )}
-          {agent?.nextAction && (
-            <Button
-              onClick={onApprove}
-              disabled={isApproving}
-              variant="default"
-              size="default"
-            >
-              {isApproving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  {agent.nextAction.icon && (
-                    <IconRenderer 
-                      iconName={agent.nextAction.icon} 
-                      className="mr-2 h-4 w-4" 
-                    />
-                  )}
-                  {agent.nextAction.label}
-                </>
-              )}
-            </Button>
-          )}
-        </div>
+        {agent?.nextAction && (
+          <Button
+            onClick={onApprove}
+            disabled={isApproving}
+            variant="default"
+            size="default"
+          >
+            {isApproving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                {agent.nextAction.icon && (
+                  <IconRenderer 
+                    iconName={agent.nextAction.icon} 
+                    className="mr-2 h-4 w-4" 
+                  />
+                )}
+                {agent.nextAction.label}
+              </>
+            )}
+          </Button>
+        )}
       </div>
+
+      {/* Token Usage & Pricing - MetricCard */}
+      {tokenUsage && (
+        <MetricCard
+          metrics={[
+            {
+              id: 'total-tokens',
+              label: 'Total Tokens',
+              value: tokenUsage.total_tokens,
+              unit: 'tokens',
+              icon: 'Hash',
+              iconColor: 'violet',
+              format: 'number',
+            },
+            {
+              id: 'total-cost',
+              label: 'Total Cost',
+              value: tokenUsage.pricing?.total_cost || 0,
+              prefix: '$',
+              icon: 'Coins',
+              iconColor: 'emerald',
+              format: 'currency',
+              precision: 4,
+            },
+          ]}
+          footer={{
+            icon: 'Sparkles',
+            text: 'Powered by Gradian AI • Efficient & Cost-Effective',
+          }}
+        />
+      )}
+
       <CodeViewer
         code={response}
         programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}

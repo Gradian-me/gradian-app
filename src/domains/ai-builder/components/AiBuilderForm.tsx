@@ -73,124 +73,131 @@ export function AiBuilderForm({
 
   return (
     <div className="space-y-6">
-      {/* User Prompt Input */}
-      <div className="space-y-2 flex flex-col items-center">
-        <div className="flex flex-row justify-between items-center flex-wrap gap-2 w-full max-w-3xl">
-          <label
-            htmlFor="user-prompt"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            What would you like to create?
-          </label>
-          <div className="flex items-center gap-2">
-            <div className="w-48">
-              <Select
-                config={{
-                  name: 'ai-agent-select',
-                  label: '',
-                }}
-                options={agents.map(agent => ({
-                  id: agent.id,
-                  label: agent.label,
-                  icon: agent.icon,
-                }))}
-                value={selectedAgentId}
-                onValueChange={(value) => onAgentChange(value)}
-                placeholder="Select agent"
-                size="md"
-                className="w-full"
-              />
-            </div>
-            <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="sm" className="gap-2 shrink-0">
-                <History className="h-4 w-4" />
-                Prompt History
-              </Button>
-            </Link>
-          </div>
-        </div>
-        <textarea
-          ref={textareaRef}
-          id="user-prompt"
-          value={userPrompt}
-          onChange={(e) => onPromptChange(e.target.value)}
-          placeholder="Describe your vision... Let AI bring your ideas to life with intelligent automation and creative solutions."
-          className={cn(
-            'w-full max-w-3xl min-h-[120px] px-4 py-3 rounded-2xl border',
-            'bg-white dark:bg-gray-800',
-            'border-gray-300 dark:border-gray-600',
-            'text-gray-900 dark:text-gray-100',
-            'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-            'focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent',
-            'resize-none shadow-sm',
-            'transition-all duration-200'
-          )}
-          disabled={isLoading || disabled}
-          rows={1}
-        />
-        
-        {/* Model Badge and Buttons Row */}
-        <div className="flex justify-between items-center w-full max-w-3xl">
-          {/* Model Badge on Left */}
-          {selectedAgent?.model && (
-            <Badge 
-              className={cn(
-                'shrink-0',
-                'bg-violet-100 text-violet-700 border-violet-200',
-                'dark:bg-violet-900/50 dark:text-violet-300 dark:border-violet-800',
-                'font-medium'
-              )}
+      {/* Modern Gradient Card Container */}
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200/50 dark:border-violet-800/50 shadow-sm">
+        <div className="relative p-6 space-y-4">
+          {/* Header Section */}
+          <div className="flex flex-row justify-between items-center flex-wrap gap-4">
+            <label
+              htmlFor="user-prompt"
+              className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide"
             >
-              {selectedAgent.model}
-            </Badge>
-          )}
+              What would you like to create?
+            </label>
+            <div className="flex items-center gap-2">
+              <div className="w-48">
+                <Select
+                  config={{
+                    name: 'ai-agent-select',
+                    label: '',
+                  }}
+                  options={agents.map(agent => ({
+                    id: agent.id,
+                    label: agent.label,
+                    icon: agent.icon,
+                  }))}
+                  value={selectedAgentId}
+                  onValueChange={(value) => onAgentChange(value)}
+                  placeholder="Select agent"
+                  size="md"
+                  className="w-full"
+                />
+              </div>
+              <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" size="sm" className="gap-2 shrink-0">
+                  <History className="h-4 w-4" />
+                  Prompt History
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Textarea with modern styling */}
+          <div className="relative">
+            <textarea
+              ref={textareaRef}
+              id="user-prompt"
+              value={userPrompt}
+              onChange={(e) => onPromptChange(e.target.value)}
+              placeholder="Describe your vision... Let AI bring your ideas to life with intelligent automation and creative solutions."
+              className={cn(
+                'w-full min-h-[140px] px-5 py-4 rounded-xl border',
+                'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm',
+                'border-violet-200/50 dark:border-violet-700/50',
+                'text-gray-900 dark:text-gray-100',
+                'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+                'focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-400',
+                'resize-none shadow-sm',
+                'transition-all duration-200'
+              )}
+              disabled={isLoading || disabled}
+              rows={1}
+            />
+          </div>
           
-          {/* Buttons on Right */}
-          <div className="flex items-center gap-2">
-            {onSheetOpenChange && (
-              <PromptPreviewSheet
-                isOpen={isSheetOpen}
-                onOpenChange={onSheetOpenChange}
-                systemPrompt={systemPrompt}
-                userPrompt={userPrompt}
-                isLoadingPreload={isLoadingPreload}
-                disabled={!userPrompt.trim() || disabled}
-              />
+          {/* Footer Section with Model Badge and Buttons */}
+          <div className="flex justify-between items-center pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
+            {/* Model Badge on Left */}
+            {selectedAgent?.model && (
+              <Badge 
+                className={cn(
+                  'shrink-0',
+                  'bg-violet-100 text-violet-700 border-violet-200',
+                  'dark:bg-violet-900/50 dark:text-violet-300 dark:border-violet-800',
+                  'font-medium shadow-sm'
+                )}
+              >
+                {selectedAgent.model}
+              </Badge>
             )}
-            {isLoading ? (
-              <>
+            
+            {/* Buttons on Right */}
+            <div className="flex items-center gap-2">
+              {onSheetOpenChange && (
+                <PromptPreviewSheet
+                  isOpen={isSheetOpen}
+                  onOpenChange={onSheetOpenChange}
+                  systemPrompt={systemPrompt}
+                  userPrompt={userPrompt}
+                  isLoadingPreload={isLoadingPreload}
+                  disabled={!userPrompt.trim() || disabled}
+                />
+              )}
+              {isLoading ? (
+                <>
+                  <Button
+                    onClick={onGenerate}
+                    disabled={true}
+                    size="default"
+                    variant="default"
+                    className="h-10 shadow-sm"
+                  >
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Generating
+                  </Button>
+                  <Button
+                    onClick={onStop}
+                    variant="outline"
+                    size="default"
+                    className="h-10 shadow-sm"
+                  >
+                    <Square className="h-4 w-4 mr-2 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
+                    Stop
+                  </Button>
+                </>
+              ) : (
                 <Button
                   onClick={onGenerate}
-                  disabled={true}
+                  disabled={!userPrompt.trim() || disabled}
                   size="default"
                   variant="default"
-                  className="h-10"
+                  className="h-10 shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
                 >
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Generating
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Do the Magic
                 </Button>
-                <Button
-                  onClick={onStop}
-                  variant="outline"
-                  size="default"
-                  className="h-10"
-                >
-                  <Square className="h-4 w-4 mr-2 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
-                  Stop
-                </Button>
-              </>
-            ) : (
-              <Button
-                onClick={onGenerate}
-                disabled={!userPrompt.trim() || disabled}
-                size="default"
-                variant="default"
-                className="h-10"
-              >
-                <Sparkles className="h-4 w-4 mr-2" />
-                Do the Magic
-              </Button>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

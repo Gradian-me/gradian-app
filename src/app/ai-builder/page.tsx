@@ -168,7 +168,7 @@ export default function AiBuilderPage() {
       subtitle="Transform your ideas into reality with the power of AI"
       icon="Sparkles"
     >
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-5xl mx-auto">
         <AiBuilderForm
           userPrompt={userPrompt}
           onPromptChange={setUserPrompt}
