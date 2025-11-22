@@ -1,45 +1,5 @@
 [
   {
-    "sourceSchema": "vendors",
-    "sourceId": "01K8QVCWS0ZSTMSVD5C6K7A806",
-    "targetSchema": "contacts",
-    "targetId": "01K94MXW0JPJ583YTR06B20MBH",
-    "relationTypeId": "HAS_CONTACT",
-    "id": "01K94MXW2SFW0W410QZ7RVFW68",
-    "createdAt": "2025-11-03T10:41:41.465Z",
-    "updatedAt": "2025-11-03T10:41:41.465Z"
-  },
-  {
-    "sourceSchema": "vendors",
-    "sourceId": "01K8QVCWS0ZSTMSVD5C6K7A806",
-    "targetSchema": "contacts",
-    "targetId": "01K94Q59VYS8JA1VRMG7Q343GM",
-    "relationTypeId": "HAS_CONTACT",
-    "id": "01K94Q59XVQEZ5DE3RQESBF4XM",
-    "createdAt": "2025-11-03T11:20:42.171Z",
-    "updatedAt": "2025-11-03T11:20:42.171Z"
-  },
-  {
-    "sourceSchema": "vendors",
-    "sourceId": "01K8QVCWS0ZSTMSVD5C6K7A806",
-    "targetSchema": "contacts",
-    "targetId": "01K94KYJ0TQCGVHJRJ3Q0D0E7G",
-    "relationTypeId": "HAS_CONTACT",
-    "id": "01K958ZTSYQE6GC0P2PHXQNFMD",
-    "createdAt": "2025-11-03T16:32:17.214Z",
-    "updatedAt": "2025-11-03T16:32:17.214Z"
-  },
-  {
-    "sourceSchema": "vendors",
-    "sourceId": "01K8QVCWS0ZSTMSVD5C6K7A806",
-    "targetSchema": "contacts",
-    "targetId": "01K94Q1ZE6M64MSHAXJARG7F8G",
-    "relationTypeId": "HAS_CONTACT",
-    "id": "01K959PSRDE02PA6CH0JX55209",
-    "createdAt": "2025-11-03T16:44:49.805Z",
-    "updatedAt": "2025-11-03T16:44:49.805Z"
-  },
-  {
     "sourceSchema": "inquiries",
     "sourceId": "01K945BGN1YV7RG3XKG169CGS1",
     "targetSchema": "inquiry-items",
@@ -68,16 +28,6 @@
     "id": "01K96ZBCCJXAE4RN98KD4P7AJR",
     "createdAt": "2025-11-04T08:22:18.768Z",
     "updatedAt": "2025-11-04T08:22:18.768Z"
-  },
-  {
-    "sourceSchema": "vendors",
-    "sourceId": "01K970QMFCN6MSGJFJ0ZCW8T3N",
-    "targetSchema": "contacts",
-    "targetId": "01K94K5N3QPZ03XEHXHY21GF2P",
-    "relationTypeId": "HAS_CONTACT",
-    "id": "01K970QWDG12Z5VMB7CPGC9S64",
-    "createdAt": "2025-11-04T08:46:36.976Z",
-    "updatedAt": "2025-11-04T08:46:36.976Z"
   },
   {
     "sourceSchema": "inquiries",
@@ -298,16 +248,6 @@
     "id": "01KAE9WJHCNYBCFPYBRJRWX8A1",
     "createdAt": "2025-11-19T14:56:50.732Z",
     "updatedAt": "2025-11-19T14:56:50.732Z"
-  },
-  {
-    "sourceSchema": "user-roles",
-    "sourceId": "01KAJP7BE1JS1FJWMGNFS0RPFX",
-    "targetSchema": "users",
-    "targetId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-    "relationTypeId": "HAS_MEMBER",
-    "id": "01KAJP7YT2AXSVE6VSK6SBDE7Q",
-    "createdAt": "2025-11-21T07:49:44.386Z",
-    "updatedAt": "2025-11-21T07:49:44.386Z"
   },
   {
     "sourceSchema": "servers",

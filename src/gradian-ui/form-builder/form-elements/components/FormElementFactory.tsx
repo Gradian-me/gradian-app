@@ -131,7 +131,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       return <EmailInput config={config} {...commonProps} canCopy={canCopy} />;
     
     case 'url':
-    case 'url-input':
       return <URLInput config={config} {...commonProps} canCopy={canCopy} />;
     
     case 'phone':

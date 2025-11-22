@@ -119,6 +119,7 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
               value={tempField.component}
               onValueChange={(value) => setTempField({ ...tempField, component: value as any })}
               options={[...FIELD_TYPES]}
+              sortType="ASC"
             />
             <Select
               config={{ name: 'field-section', label: 'Section' }}
@@ -140,6 +141,7 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
                   { value: '', label: 'None' },
                   ...ROLES,
                 ]}
+                sortType="ASC"
               />
               <Select
                 config={{ name: 'field-role-color', label: 'Role Color', placeholder: 'Select color...' }}

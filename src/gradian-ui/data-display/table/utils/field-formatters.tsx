@@ -305,8 +305,7 @@ export const formatFieldValue = (
       } catch {
         return <span>{String(value)}</span>;
       }
-    case 'url':
-    case 'url-input': {
+    case 'url': {
       const stringValue = String(value);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
       if (!isUrl) {
@@ -351,7 +350,7 @@ export const formatFieldValue = (
       // Check if it's a URL even if not explicitly typed as url
       const stringValue = String(value);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
-      if (isUrl && (field?.component === 'url' || field?.component === 'url-input')) {
+      if (isUrl && field?.component === 'url') {
         const linkLabel = field?.componentTypeConfig?.label || 'URL';
         const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
         return (

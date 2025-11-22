@@ -34,7 +34,6 @@ export const FIELD_TYPES: Array<{
   { value: 'text', label: 'Text', description: 'Single-line text input' },
   { value: 'textarea', label: 'Textarea', description: 'Multi-line text input' },
   { value: 'url', label: 'URL', description: 'URL input' },
-  { value: 'url-input', label: 'URL Input', description: 'URL input with validation' },
   { value: 'tag-input', label: 'Tag Input', description: 'Tag input with badge display' },
 ];
 

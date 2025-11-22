@@ -193,6 +193,7 @@ export function FieldEditor({
                       });
                     }}
                     options={FIELD_TYPES.map((type) => ({ value: type.value, label: type.label }))}
+                    sortType="ASC"
                   />
                 </div>
                 <div>
@@ -227,6 +228,7 @@ export function FieldEditor({
                       { value: '', label: 'None' },
                       ...ROLES.map((role) => ({ value: role.value, label: role.label }))
                     ]}
+                    sortType="ASC"
                   />
                 </div>
                 <div>

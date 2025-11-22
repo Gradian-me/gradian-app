@@ -226,8 +226,7 @@ export const renderFieldValue = ({ field, value, maxMetrics = 3 }: RenderFieldVa
         </div>,
         field
       );
-    case 'url':
-    case 'url-input': {
+    case 'url': {
       const stringValue = String(value);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
       if (!isUrl) {
@@ -353,7 +352,7 @@ export const renderFieldValue = ({ field, value, maxMetrics = 3 }: RenderFieldVa
       const stringValue = String(value);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
       // Check if it's a URL field type even if not explicitly in the switch
-      if (isUrl && (field?.component === 'url' || field?.component === 'url-input')) {
+      if (isUrl && field?.component === 'url') {
         const linkLabel = field?.componentTypeConfig?.label || 'show more';
         const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
         return withTooltip(
