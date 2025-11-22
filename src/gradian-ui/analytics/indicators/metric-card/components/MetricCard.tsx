@@ -157,7 +157,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl bg-gradient-to-br border shadow-sm',
+        'relative overflow-hidden rounded-xl bg-linear-to-br border shadow-sm',
         gradientClass,
         className
       )}

@@ -63,7 +63,7 @@ export function PromptPreviewSheet({
                     User Prompt:
                   </h3>
                   <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
-                    <pre className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">
+                    <pre className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap wrap-break-word">
                       {userPrompt.trim()}
                     </pre>
                   </div>
@@ -81,7 +81,7 @@ export function PromptPreviewSheet({
                     </div>
                   ) : (
                     <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
-                      <pre className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">
+                      <pre className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap wrap-break-word">
                         {systemPrompt || '(No system prompt configured)'}
                       </pre>
                     </div>

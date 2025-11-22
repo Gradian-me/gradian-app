@@ -314,7 +314,7 @@ export default function AiBuilderPage() {
             {/* Textarea Skeleton with gradient effect */}
             <div className="relative w-full max-w-3xl">
               <Skeleton className="h-32 w-full rounded-2xl bg-gray-300 dark:bg-gray-700" />
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-50/50 via-transparent to-purple-50/50 dark:from-violet-950/20 dark:via-transparent dark:to-purple-950/20" />
+              <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-violet-50/50 via-transparent to-purple-50/50 dark:from-violet-950/20 dark:via-transparent dark:to-purple-950/20" />
             </div>
             
             {/* Model Badge and Buttons Row Skeleton - matches new layout */}
@@ -329,7 +329,7 @@ export default function AiBuilderPage() {
                 )}
                 <div className="relative overflow-hidden rounded-md">
                   <Skeleton className="h-10 w-36 rounded-md bg-gray-300 dark:bg-gray-700" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/10 animate-shimmer" />
+                  <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent dark:via-white/10 animate-shimmer" />
                 </div>
               </div>
             </div>
@@ -347,7 +347,7 @@ export default function AiBuilderPage() {
             </div>
             
             {/* CodeViewer Skeleton */}
-            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-50 to-gray-100/50 dark:from-gray-900/50 dark:to-gray-800/30 overflow-hidden">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-linear-to-br from-gray-50 to-gray-100/50 dark:from-gray-900/50 dark:to-gray-800/30 overflow-hidden">
               {/* CodeViewer Header */}
               <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-100/50 dark:bg-gray-800/50">
                 <Skeleton className="h-4 w-48 rounded-md bg-gray-300 dark:bg-gray-700" />
