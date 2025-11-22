@@ -131,7 +131,8 @@ export function AiBuilderForm({
                 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
                 'focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:border-violet-400',
                 'shadow-sm',
-                'transition-all duration-200'
+                'transition-all duration-200',
+                'direction-auto'
               )}
               aiAgentId="professional-writing"
             />

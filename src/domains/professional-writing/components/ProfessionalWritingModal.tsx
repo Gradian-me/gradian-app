@@ -28,7 +28,7 @@ import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/
 import { useProfessionalWriting } from '../hooks/useProfessionalWriting';
 import type { WritingStyle } from '../types';
 import { SUPPORTED_LANGUAGES as LANGUAGES } from '../types';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProfessionalWritingModalProps {
@@ -235,10 +235,24 @@ export function ProfessionalWritingModal({
                   readOnly
                   rows={6}
                   className={cn(
-                    "direction-auto resize-none bg-gray-50 dark:bg-gray-800 pr-10"
+                    "direction-auto resize-none bg-gray-50 dark:bg-gray-800 pr-20"
                   )}
                 />
-                <div className="absolute right-2 top-2">
+                <div className="absolute right-2 top-2 flex items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setInputText(enhancedText);
+                      clearResponse();
+                    }}
+                    className="h-7 w-7 p-0 hover:bg-violet-100 hover:text-violet-600 dark:hover:bg-violet-900 dark:hover:text-violet-400"
+                    title="Replace input text with enhanced text"
+                    aria-label="Replace input text"
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </Button>
                   <CopyContent content={enhancedText} />
                 </div>
               </div>

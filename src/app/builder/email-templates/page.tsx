@@ -23,11 +23,13 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
-import { NameInput } from '@/gradian-ui/form-builder/form-elements';
+import { NameInput, TagInput } from '@/gradian-ui/form-builder/form-elements';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
+import { MessageBox } from '@/gradian-ui/layout/message-box';
 import { useEmailTemplates } from './hooks/useEmailTemplates';
 import { DEFAULT_TEMPLATE_HTML, extractPlaceholders, renderWithValues, normalizeTemplateId } from './utils';
 import type { EmailTemplate, PlaceholderValues } from './types';
+import { Send } from 'lucide-react';
 
 export default function EmailTemplateBuilderPage() {
   const {
@@ -50,6 +52,15 @@ export default function EmailTemplateBuilderPage() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<{ id: string; name: string } | null>(null);
   const [htmlLanguage, setHtmlLanguage] = useState<string>('html');
+  const [testEmailTo, setTestEmailTo] = useState<string[]>([]);
+  const [testEmailCc, setTestEmailCc] = useState<string[]>([]);
+  const [testEmailBcc, setTestEmailBcc] = useState<string[]>([]);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [emailResponse, setEmailResponse] = useState<{ 
+    message?: string; 
+    messages?: Array<{ path?: string; message: string }>; 
+    data?: Record<string, any>;
+  } | null>(null);
 
   useEffect(() => {
     setSelectedTemplateId((current) => {
@@ -258,6 +269,75 @@ export default function EmailTemplateBuilderPage() {
   const handlePlaceholderChange = (key: string, value: string) => {
     setPlaceholderValues((current) => ({ ...current, [key]: value }));
   };
+
+  const handleSendTestEmail = async () => {
+    if (!workingTemplate || testEmailTo.length === 0) {
+      setEmailResponse({
+        message: 'Please provide at least one recipient email address.',
+      });
+      return;
+    }
+
+    setIsSendingEmail(true);
+    try {
+      const emailPayload = {
+        templateId: workingTemplate.id,
+        to: testEmailTo,
+        cc: testEmailCc.length > 0 ? testEmailCc : undefined,
+        bcc: testEmailBcc.length > 0 ? testEmailBcc : undefined,
+        templateData: placeholderValues,
+      };
+
+      const sendEmailUrl = process.env.NEXT_PUBLIC_URL_SEND_EMAIL || process.env.URL_SEND_EMAIL || '/api/email-templates/send';
+      
+      const response = await fetch(sendEmailUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailPayload),
+      });
+
+      const responseData = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setEmailResponse({
+          message: responseData.message || 'Failed to send email',
+          messages: responseData.messages,
+        });
+        return;
+      }
+
+      // Success response
+      const successMessage = responseData.message || responseData.success || 'Test email sent successfully!';
+      setEmailResponse({
+        message: successMessage,
+        messages: responseData.messages,
+      });
+      
+      setTestEmailTo([]);
+      setTestEmailCc([]);
+      setTestEmailBcc([]);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to send test email.';
+      setEmailResponse({
+        message,
+      });
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
+  const renderedJson = useMemo(() => {
+    if (!workingTemplate) return '';
+    return JSON.stringify({
+      templateId: workingTemplate.id,
+      to: testEmailTo,
+      cc: testEmailCc.length > 0 ? testEmailCc : undefined,
+      bcc: testEmailBcc.length > 0 ? testEmailBcc : undefined,
+      templateData: placeholderValues,
+    }, null, 2);
+  }, [workingTemplate, testEmailTo, testEmailCc, testEmailBcc, placeholderValues]);
 
   const renderEmptyState = () => (
     <Card>
@@ -621,11 +701,110 @@ export default function EmailTemplateBuilderPage() {
 
                   <Separator />
 
+                  <div className="space-y-4">
+                    {emailResponse && (() => {
+                      const messageText = typeof emailResponse.message === 'string' 
+                        ? emailResponse.message 
+                        : String(emailResponse.message || '');
+                      const messageLower = messageText.toLowerCase();
+                      const isSuccess = messageLower.includes('success') || 
+                                       messageLower.includes('sent') ||
+                                       messageLower.includes('successfully');
+                      
+                      // Format data object as key-value pairs for messages
+                      const dataMessages = emailResponse.data && typeof emailResponse.data === 'object' && !Array.isArray(emailResponse.data)
+                        ? Object.entries(emailResponse.data).map(([key, value]) => ({
+                            path: key,
+                            message: typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value),
+                          }))
+                        : [];
+                      
+                      // Combine existing messages with data key-value pairs
+                      const allMessages = [
+                        ...(emailResponse.messages?.map(m => ({ path: m.path, message: m.message })) || []),
+                        ...dataMessages,
+                      ];
+                      
+                      return (
+                        <MessageBox
+                          message={messageText}
+                          messages={allMessages.length > 0 ? allMessages : undefined}
+                          variant={isSuccess ? 'success' : 'error'}
+                          dismissible={true}
+                          onDismiss={() => setEmailResponse(null)}
+                        />
+                      );
+                    })()}
+                    <div>
+                      <Label className="text-sm font-semibold mb-3 block">Test Email</Label>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="test-email-to" className="text-xs">To</Label>
+                          <TagInput
+                            config={{
+                              name: 'test-email-to',
+                              label: '',
+                              placeholder: 'Enter recipient email addresses...',
+                            }}
+                            value={testEmailTo}
+                            onChange={setTestEmailTo}
+                            validateEmail={true}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="test-email-cc" className="text-xs">CC (optional)</Label>
+                          <TagInput
+                            config={{
+                              name: 'test-email-cc',
+                              label: '',
+                              placeholder: 'Enter CC email addresses...',
+                            }}
+                            value={testEmailCc}
+                            onChange={setTestEmailCc}
+                            validateEmail={true}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="test-email-bcc" className="text-xs">BCC (optional)</Label>
+                          <TagInput
+                            config={{
+                              name: 'test-email-bcc',
+                              label: '',
+                              placeholder: 'Enter BCC email addresses...',
+                            }}
+                            value={testEmailBcc}
+                            onChange={setTestEmailBcc}
+                            validateEmail={true}
+                          />
+                        </div>
+                        <Button
+                          onClick={handleSendTestEmail}
+                          disabled={isSendingEmail || testEmailTo.length === 0}
+                          className="w-full"
+                        >
+                          {isSendingEmail ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Sending...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="mr-2 h-4 w-4" />
+                              Send Test Email
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   <Tabs defaultValue="preview">
                     <TabsList>
                       <TabsTrigger value="preview">Preview</TabsTrigger>
-                      <TabsTrigger value="subject">Rendered subject</TabsTrigger>
                       <TabsTrigger value="html">Resolved HTML</TabsTrigger>
+                      <TabsTrigger value="json">Rendered JSON</TabsTrigger>
                     </TabsList>
                     <TabsContent value="preview">
                       <div className="rounded-2xl border bg-background px-6 py-6">
@@ -636,16 +815,18 @@ export default function EmailTemplateBuilderPage() {
                         />
                       </div>
                     </TabsContent>
-                  <TabsContent value="subject">
-                    <pre className="rounded-2xl border bg-muted/60 p-4 text-sm font-mono whitespace-pre-wrap">
-                      {resolvedSubject}
-                    </pre>
-                    </TabsContent>
                     <TabsContent value="html">
                       <CodeViewer
                         code={resolvedHtml}
                         programmingLanguage="html"
                         title="Resolved HTML"
+                      />
+                    </TabsContent>
+                    <TabsContent value="json">
+                      <CodeViewer
+                        code={renderedJson}
+                        programmingLanguage="json"
+                        title="Rendered JSON"
                       />
                     </TabsContent>
                   </Tabs>

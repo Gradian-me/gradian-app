@@ -580,6 +580,7 @@ export const ALL_COMPONENTS: ComponentMeta[] = [
   },
   { id: 'otp-input', label: 'OTPInput', color: 'fuchsia', icon: 'Keyboard', category: 'form-elements', description: 'One-time-password input with slots.', usecase: 'Verification codes.', directory: 'src/gradian-ui/form-builder/form-elements/components/OTPInput.tsx' },
   { id: 'list-input', label: 'ListInput', color: 'indigo', icon: 'List', category: 'form-elements', description: 'Drag-and-drop list input with inline editing for managing arrays of items.', usecase: 'Annotations, tags, notes, and ordered lists.', directory: 'src/gradian-ui/form-builder/form-elements/components/ListInput.tsx' },
+  { id: 'tag-input', label: 'TagInput', color: 'cyan', icon: 'Tags', category: 'form-elements', description: 'Tag input with badge display for multiple values.', usecase: 'Email addresses, tags, labels, and multiple selections.', directory: 'src/gradian-ui/form-builder/form-elements/components/TagInput.tsx' },
   { id: 'rating', label: 'Rating', color: 'yellow', icon: 'Star', category: 'form-elements', description: 'Star rating input.', usecase: 'Feedback and reviews.', directory: 'src/gradian-ui/form-builder/form-elements/components/Rating.tsx' },
   { id: 'avatar', label: 'Avatar', color: 'pink', icon: 'User', category: 'form-elements', description: 'Avatar display component.', usecase: 'Initials-based avatar.', directory: 'src/gradian-ui/form-builder/form-elements/components/Avatar.tsx' },
   { id: 'cta-button', label: 'CTAButton', color: 'indigo', icon: 'ArrowRight', category: 'form-elements', description: 'Call-to-action button with icon and color variants.', usecase: 'Primary action buttons.', directory: 'src/gradian-ui/form-builder/form-elements/components/CTAButton.tsx' },
@@ -689,6 +690,7 @@ export function mapComponentTypeToId(componentType: string): string {
     'select': 'select',
     'slider': 'slider',
     'code-viewer': 'code-viewer',
+    'tag-input': 'tag-input',
   };
   
   return typeMap[componentType] || componentType;

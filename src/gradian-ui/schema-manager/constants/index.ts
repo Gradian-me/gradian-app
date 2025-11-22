@@ -34,6 +34,7 @@ export const FIELD_TYPES = [
   { value: 'rating', label: 'Rating' },
   { value: 'badge', label: 'Badge' },
   { value: 'countdown', label: 'Countdown' },
+  { value: 'tag-input', label: 'Tag Input' },
 ] as const;
 
 export const ROLES = [

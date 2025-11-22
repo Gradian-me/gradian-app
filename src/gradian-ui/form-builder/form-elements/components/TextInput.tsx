@@ -58,6 +58,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
 
     const inputClasses = cn(
       baseInputClasses,
+      'direction-auto',
       error
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',
@@ -101,6 +102,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
           required={required ?? (config as any).required ?? (config as any).validation?.required ?? false}
           disabled={disabled}
           autoComplete="off"
+          dir="auto"
           className={inputClasses}
           {...props}
         />

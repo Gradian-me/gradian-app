@@ -34,6 +34,7 @@ import { UnknownControl } from './UnknownControl';
 import { OTPInput } from './OTPInput';
 import { NameInput } from './NameInput';
 import { ListInput } from './ListInput';
+import { TagInput } from './TagInput';
 
 // Support both config-based and field-based interfaces
 export interface FormElementFactoryProps extends Omit<FormElementProps, 'config' | 'touched'> {
@@ -415,6 +416,16 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           placeholder={(config as any).placeholder || 'Enter annotation...'}
           addButtonText={(config as any).addButtonText || 'Add Item'}
           className={restProps.className}
+        />
+      );
+    
+    case 'tag-input':
+      return (
+        <TagInput
+          config={config}
+          {...commonProps}
+          validateEmail={(config as any)?.validateEmail ?? false}
+          maxTags={(config as any)?.maxTags}
         />
       );
     
