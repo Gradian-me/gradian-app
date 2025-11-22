@@ -2,6 +2,7 @@
 
 import { Button } from '../../../components/ui/button';
 import { TextInput, Textarea, NumberInput, Switch, Select, Slider, ButtonMinimal, NameInput, PopupPicker } from '@/gradian-ui/form-builder/form-elements';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Pencil, Trash2 } from 'lucide-react';
 import { SectionEditorProps } from '../types/builder';
 import { FieldEditor } from './FieldEditor';
@@ -62,7 +63,16 @@ export function SectionEditor({
   );
 
   useEffect(() => {
-    setTempSection(section);
+    // Initialize tempSection from section
+    // If it's a repeating section without fieldRelationType, default to 'addFields'
+    const updatedSection = { ...section };
+    if (updatedSection.isRepeatingSection && updatedSection.repeatingConfig && !updatedSection.repeatingConfig.fieldRelationType) {
+      updatedSection.repeatingConfig = {
+        ...updatedSection.repeatingConfig,
+        fieldRelationType: 'addFields',
+      };
+    }
+    setTempSection(updatedSection);
     setIsSectionIdCustom(false);
   }, [section]);
 
@@ -92,6 +102,7 @@ export function SectionEditor({
   };
 
   const isRelationBased = tempSection.isRepeatingSection && 
+    tempSection.repeatingConfig?.fieldRelationType === 'connectToSchema' &&
     tempSection.repeatingConfig?.targetSchema && 
     tempSection.repeatingConfig?.relationTypeId;
 
@@ -168,17 +179,35 @@ export function SectionEditor({
                          tempSection.title.trim() === '' || 
                          tempSection.title.trim() === 'New Section';
   
+  // Check if connectToSchema requires target schema and relation type
+  const requiresConnectionConfig = tempSection.isRepeatingSection && 
+    tempSection.repeatingConfig?.fieldRelationType === 'connectToSchema';
+  const hasConnectionConfig = requiresConnectionConfig &&
+    tempSection.repeatingConfig?.targetSchema &&
+    tempSection.repeatingConfig?.relationTypeId;
+  const isConnectionConfigIncomplete = requiresConnectionConfig && !hasConnectionConfig;
+
+  // Determine if fields can be added (for repeating sections, only if fieldRelationType is 'addFields' or undefined)
+  const canAddFieldsToSection = !tempSection.isRepeatingSection || 
+    (tempSection.repeatingConfig?.fieldRelationType === 'addFields' || tempSection.repeatingConfig?.fieldRelationType === undefined);
+
   // Disable "Add Field" if:
   // 1. Section doesn't exist in schema, OR
   // 2. It's a new section that hasn't been saved (still has default "New Section" title), OR
   // 3. There are unsaved changes (must save before adding fields), OR
-  // 4. There are incomplete fields
-  const canAddField = sectionExistsInSchema && !isNewUnsavedSection && !hasUnsavedChanges && !hasIncompleteFields;
+  // 4. There are incomplete fields, OR
+  // 5. Field relation type is 'connectToSchema' (fields are managed in target schema)
+  const canAddField = sectionExistsInSchema && 
+    !isNewUnsavedSection && 
+    !hasUnsavedChanges && 
+    !hasIncompleteFields &&
+    canAddFieldsToSection;
   
   // Disable "Save" if:
   // 1. Title is invalid (empty, whitespace, or "New Section"), OR
-  // 2. There are incomplete fields
-  const canSave = !isTitleInvalid && !hasIncompleteFields;
+  // 2. There are incomplete fields, OR
+  // 3. Connection config is incomplete (connectToSchema selected but missing target schema or relation type)
+  const canSave = !isTitleInvalid && !hasIncompleteFields && !isConnectionConfigIncomplete;
 
   const handleSave = () => {
     if (hasIncompleteFields || isTitleInvalid) {
@@ -285,11 +314,50 @@ export function SectionEditor({
                   isRepeatingSection: checked,
                   repeatingConfig:
                     checked && !tempSection.repeatingConfig
-                      ? { minItems: 0, maxItems: undefined }
+                      ? { fieldRelationType: 'addFields', minItems: 0, maxItems: undefined }
                       : tempSection.repeatingConfig,
                 });
               }}
             />
+            {/* Field Relation Type Toggle Group - Only show for repeating sections */}
+            {tempSection.isRepeatingSection && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Field Relation Type</label>
+                <ToggleGroup
+                  type="single"
+                  value={tempSection.repeatingConfig?.fieldRelationType || 'addFields'}
+                  onValueChange={(value) => {
+                    if (value) {
+                      setTempSection({
+                        ...tempSection,
+                        repeatingConfig: {
+                          ...tempSection.repeatingConfig,
+                          fieldRelationType: value as 'addFields' | 'connectToSchema',
+                          // Clear targetSchema and relationTypeId when switching to 'addFields'
+                          ...(value === 'addFields' && {
+                            targetSchema: undefined,
+                            relationTypeId: undefined,
+                          }),
+                        },
+                      });
+                    }
+                  }}
+                  className="w-full"
+                >
+                  <ToggleGroupItem value="addFields" className="flex-1">
+                    Add Fields
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="connectToSchema" className="flex-1">
+                    Connect To Schema
+                  </ToggleGroupItem>
+                </ToggleGroup>
+                <p className="text-xs text-gray-500">
+                  {tempSection.repeatingConfig?.fieldRelationType === 'connectToSchema'
+                    ? 'Fields will be managed in the connected schema. Configure target schema and relation type below.'
+                    : 'Fields will be added directly to this section.'}
+                </p>
+              </div>
+            )}
             {/* Show N.A switch option only for repeating sections (not with minItems > 1) */}
             {tempSection.isRepeatingSection && (tempSection.repeatingConfig?.minItems ?? 0) <= 1 && (
               <Switch
@@ -319,74 +387,95 @@ export function SectionEditor({
               <div className="h-px flex-1 bg-gray-200"></div>
             </div>
             
-            {/* Relation-based configuration */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Target Schema</label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full justify-between"
-                  onClick={() => setIsTargetSchemaPickerOpen(true)}
-                >
-                  <span className="truncate">
-                    {tempSection.repeatingConfig?.targetSchema
-                      ? availableSchemas.find(s => s.id === tempSection.repeatingConfig?.targetSchema)?.name || tempSection.repeatingConfig.targetSchema
-                      : 'Select target schema...'}
-                  </span>
-                </Button>
-                <PopupPicker
-                  isOpen={isTargetSchemaPickerOpen}
-                  onClose={() => setIsTargetSchemaPickerOpen(false)}
-                  staticItems={availableSchemas.map(s => ({ id: s.id, name: s.name, title: s.name }))}
-                  onSelect={async (selections, rawItems) => {
-                    if (selections.length > 0 && rawItems.length > 0) {
-                  setTempSection({
-                    ...tempSection,
-                        repeatingConfig: { ...tempSection.repeatingConfig, targetSchema: selections[0].id || undefined },
-                      });
-                    }
-                    setIsTargetSchemaPickerOpen(false);
-                  }}
-                  title="Select Target Schema"
-                  description="Choose a schema to link to this repeating section"
-                  allowMultiselect={false}
-                />
-              </div>
+            {/* Relation-based configuration - Only show when fieldRelationType is 'connectToSchema' */}
+            {tempSection.repeatingConfig?.fieldRelationType === 'connectToSchema' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Target Schema <span className="text-red-500">*</span>
+                  </label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={`w-full justify-between ${!tempSection.repeatingConfig?.targetSchema && isConnectionConfigIncomplete ? 'border-red-300' : ''}`}
+                    onClick={() => setIsTargetSchemaPickerOpen(true)}
+                  >
+                    <span className="truncate">
+                      {tempSection.repeatingConfig?.targetSchema
+                        ? availableSchemas.find(s => s.id === tempSection.repeatingConfig?.targetSchema)?.name || tempSection.repeatingConfig.targetSchema
+                        : 'Select target schema...'}
+                    </span>
+                  </Button>
+                  {!tempSection.repeatingConfig?.targetSchema && isConnectionConfigIncomplete && (
+                    <p className="text-xs text-red-600">Target schema is required when using "Connect To Schema"</p>
+                  )}
+                  <PopupPicker
+                    isOpen={isTargetSchemaPickerOpen}
+                    onClose={() => setIsTargetSchemaPickerOpen(false)}
+                    staticItems={availableSchemas.map(s => ({ id: s.id, name: s.name, title: s.name }))}
+                    onSelect={async (selections, rawItems) => {
+                      if (selections.length > 0 && rawItems.length > 0) {
+                    setTempSection({
+                      ...tempSection,
+                          repeatingConfig: { ...tempSection.repeatingConfig, targetSchema: selections[0].id || undefined },
+                        });
+                      }
+                      setIsTargetSchemaPickerOpen(false);
+                    }}
+                    title="Select Target Schema"
+                    description="Choose a schema to link to this repeating section"
+                    allowMultiselect={false}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Relation Type</label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full justify-between"
-                  onClick={() => setIsRelationTypePickerOpen(true)}
-                >
-                  <span className="truncate">
-                    {tempSection.repeatingConfig?.relationTypeId
-                      ? relationTypes.find(rt => rt.id === tempSection.repeatingConfig?.relationTypeId)?.label || tempSection.repeatingConfig.relationTypeId
-                      : 'Select relation type...'}
-                  </span>
-                </Button>
-                <PopupPicker
-                  isOpen={isRelationTypePickerOpen}
-                  onClose={() => setIsRelationTypePickerOpen(false)}
-                  staticItems={relationTypes.map(rt => ({ id: rt.id, name: rt.label, title: rt.label }))}
-                  onSelect={async (selections, rawItems) => {
-                    if (selections.length > 0 && rawItems.length > 0) {
-                  setTempSection({
-                    ...tempSection,
-                        repeatingConfig: { ...tempSection.repeatingConfig, relationTypeId: selections[0].id || undefined },
-                      });
-                    }
-                    setIsRelationTypePickerOpen(false);
-                  }}
-                  title="Select Relation Type"
-                  description="Choose a relation type for this repeating section"
-                  allowMultiselect={false}
-                />
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Relation Type <span className="text-red-500">*</span>
+                  </label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={`w-full justify-between ${!tempSection.repeatingConfig?.relationTypeId && isConnectionConfigIncomplete ? 'border-red-300' : ''}`}
+                    onClick={() => setIsRelationTypePickerOpen(true)}
+                  >
+                    <span className="truncate">
+                      {tempSection.repeatingConfig?.relationTypeId
+                        ? relationTypes.find(rt => rt.id === tempSection.repeatingConfig?.relationTypeId)?.label || tempSection.repeatingConfig.relationTypeId
+                        : 'Select relation type...'}
+                    </span>
+                  </Button>
+                  {!tempSection.repeatingConfig?.relationTypeId && isConnectionConfigIncomplete && (
+                    <p className="text-xs text-red-600">Relation type is required when using "Connect To Schema"</p>
+                  )}
+                  <PopupPicker
+                    isOpen={isRelationTypePickerOpen}
+                    onClose={() => setIsRelationTypePickerOpen(false)}
+                    staticItems={relationTypes.map(rt => ({ id: rt.id, name: rt.label, title: rt.label }))}
+                    onSelect={async (selections, rawItems) => {
+                      if (selections.length > 0 && rawItems.length > 0) {
+                    setTempSection({
+                      ...tempSection,
+                          repeatingConfig: { ...tempSection.repeatingConfig, relationTypeId: selections[0].id || undefined },
+                        });
+                      }
+                      setIsRelationTypePickerOpen(false);
+                    }}
+                    title="Select Relation Type"
+                    description="Choose a relation type for this repeating section"
+                    allowMultiselect={false}
+                  />
+                </div>
               </div>
+              {isConnectionConfigIncomplete && (
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-xs text-amber-700">
+                    <span className="font-medium">Required:</span> Please select both Target Schema and Relation Type to save this section.
+                  </p>
+                </div>
+              )}
             </div>
+            )}
 
             {/* Common repeating config fields */}
             <div className="grid grid-cols-2 gap-4">
@@ -419,39 +508,6 @@ export function SectionEditor({
                 min={0}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <TextInput
-                config={{ name: 'add-button-text', label: 'Add Button Text', placeholder: 'Add item...' }}
-                value={tempSection.repeatingConfig?.addButtonText || ''}
-                onChange={(value) =>
-                  setTempSection({
-                    ...tempSection,
-                    repeatingConfig: { ...tempSection.repeatingConfig, addButtonText: value || undefined },
-                  })
-                }
-              />
-              <TextInput
-                config={{ name: 'remove-button-text', label: 'Remove Button Text', placeholder: 'Remove...' }}
-                value={tempSection.repeatingConfig?.removeButtonText || ''}
-                onChange={(value) =>
-                  setTempSection({
-                    ...tempSection,
-                    repeatingConfig: { ...tempSection.repeatingConfig, removeButtonText: value || undefined },
-                  })
-                }
-              />
-            </div>
-            <TextInput
-              config={{ name: 'empty-message', label: 'Empty Message', placeholder: 'No items yet...' }}
-              value={tempSection.repeatingConfig?.emptyMessage || ''}
-              onChange={(value) =>
-                setTempSection({
-                  ...tempSection,
-                  repeatingConfig: { ...tempSection.repeatingConfig, emptyMessage: value || undefined },
-                })
-              }
-            />
-              
               {isRelationBased && (
                 <>
                   <div>
@@ -532,8 +588,8 @@ export function SectionEditor({
           </div>
         )}
 
-          {/* Fields Section - Only show for non-relation-based repeating sections or regular sections */}
-          {(!tempSection.isRepeatingSection || !isRelationBased) && (
+          {/* Fields Section - Only show for non-repeating sections or repeating sections with 'addFields' type */}
+          {(!tempSection.isRepeatingSection || !tempSection.repeatingConfig || tempSection.repeatingConfig?.fieldRelationType === 'addFields' || tempSection.repeatingConfig?.fieldRelationType === undefined) && (
           <div className="pt-4 space-y-4 border-t border-gray-100">
             <div className="flex items-center gap-2">
               <h4 className="text-sm font-semibold text-gray-900">Fields</h4>
@@ -610,17 +666,27 @@ export function SectionEditor({
           </div>
         </div>
         <DialogFooter className="px-6 pt-4 pb-6 border-t border-gray-100 shrink-0 flex-col sm:flex-row gap-2">
-          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto text-sm md:text-base">
-            Cancel
-          </Button>
-            <Button 
-              onClick={handleSave} 
-              disabled={!canSave}
-              className="w-full sm:w-auto text-sm md:text-base"
-            >
+          <div className="w-full space-y-2">
+            {isConnectionConfigIncomplete && (
+              <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5 flex items-start gap-2">
+                <span className="text-red-600">⚠</span>
+                <span>Please select both Target Schema and Relation Type to save this section.</span>
+              </div>
+            )}
+            <div className="flex flex-col sm:flex-row gap-2 w-full">
+              <Button variant="outline" onClick={onClose} className="w-full sm:w-auto text-sm md:text-base">
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSave} 
+                disabled={!canSave}
+                className="w-full sm:w-auto text-sm md:text-base"
+              >
                 <span className="hidden md:inline">Save Changes</span>
                 <span className="md:hidden">Save</span>
               </Button>
+            </div>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

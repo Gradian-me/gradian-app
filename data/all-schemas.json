@@ -169,9 +169,6 @@
         "repeatingConfig": {
           "minItems": 1,
           "maxItems": 100,
-          "addButtonText": "Add Item",
-          "removeButtonText": "Remove Item",
-          "emptyMessage": "No items added yet",
           "targetSchema": "inquiry-items",
           "relationTypeId": "HAS_INQUIRY_ITEM",
           "deleteType": "itemAndRelation",
@@ -189,9 +186,6 @@
         "repeatingConfig": {
           "minItems": 0,
           "maxItems": 100,
-          "addButtonText": "Add Vendor",
-          "removeButtonText": "Remove Vendor",
-          "emptyMessage": "No vendors selected yet",
           "targetSchema": "inquiry-vendors",
           "relationTypeId": "HAS_INQUIRY_VENDOR",
           "deleteType": "itemAndRelation",
@@ -662,9 +656,9 @@
         "type": "text",
         "component": "text",
         "placeholder": "Enter registration number",
-        "required": true,
+        "required": false,
         "validation": {
-          "required": true
+          "required": false
         },
         "colSpan": 1,
         "order": 4
@@ -677,9 +671,9 @@
         "type": "text",
         "component": "text",
         "placeholder": "Enter tax ID",
-        "required": true,
+        "required": false,
         "validation": {
-          "required": true
+          "required": false
         },
         "colSpan": 1,
         "order": 5
@@ -692,7 +686,7 @@
         "type": "select",
         "component": "select",
         "placeholder": "Select country",
-        "required": true,
+        "required": false,
         "role": "location",
         "options": [
           {
@@ -737,7 +731,7 @@
           }
         ],
         "validation": {
-          "required": true
+          "required": false
         },
         "colSpan": 1,
         "order": 6
@@ -789,9 +783,9 @@
         "type": "textarea",
         "component": "textarea",
         "placeholder": "Enter full address",
-        "required": true,
+        "required": false,
         "validation": {
-          "required": true
+          "required": false
         },
         "colSpan": 3,
         "order": 1
@@ -804,9 +798,9 @@
         "type": "text",
         "component": "text",
         "placeholder": "Enter city",
-        "required": true,
+        "required": false,
         "validation": {
-          "required": true
+          "required": false
         },
         "colSpan": 1,
         "order": 2
@@ -819,9 +813,9 @@
         "type": "text",
         "component": "text",
         "placeholder": "Enter state",
-        "required": true,
+        "required": false,
         "validation": {
-          "required": true
+          "required": false
         },
         "colSpan": 1,
         "order": 3
@@ -834,9 +828,9 @@
         "type": "text",
         "component": "text",
         "placeholder": "Enter ZIP code",
-        "required": true,
+        "required": false,
         "validation": {
-          "required": true
+          "required": false
         },
         "colSpan": 1,
         "order": 4
@@ -886,7 +880,7 @@
           }
         ],
         "validation": {
-          "required": true
+          "required": false
         },
         "colSpan": 3,
         "order": 1
@@ -916,7 +910,7 @@
         "placeholder": "Enter year",
         "required": false,
         "validation": {
-          "min": 1800
+          "required": false
         },
         "colSpan": 1,
         "order": 3
@@ -931,6 +925,7 @@
         "placeholder": "Enter employee count",
         "required": false,
         "validation": {
+          "required": false,
           "min": 1
         },
         "colSpan": 1,
@@ -957,7 +952,7 @@
         "type": "select",
         "component": "select",
         "placeholder": "Select status",
-        "required": true,
+        "required": false,
         "role": "status",
         "options": [
           {
@@ -986,7 +981,7 @@
           }
         ],
         "validation": {
-          "required": true
+          "required": false
         },
         "colSpan": 1,
         "order": 6
@@ -1033,9 +1028,6 @@
         "repeatingConfig": {
           "minItems": 1,
           "maxItems": 5,
-          "addButtonText": "Add Contact Person",
-          "removeButtonText": "Remove Contact",
-          "emptyMessage": "No contact persons added yet",
           "targetSchema": "contacts",
           "relationTypeId": "HAS_CONTACT",
           "deleteType": "relationOnly",
@@ -2051,9 +2043,6 @@
         "repeatingConfig": {
           "minItems": 1,
           "maxItems": 100,
-          "addButtonText": "Add Item",
-          "removeButtonText": "Remove Item",
-          "emptyMessage": "No items added yet",
           "targetSchema": "quotation-items",
           "relationTypeId": "HAS_QUOTATION_ITEM",
           "deleteType": "itemAndRelation",
@@ -3079,10 +3068,7 @@
         "isRepeatingSection": true,
         "repeatingConfig": {
           "minItems": 0,
-          "maxItems": 100,
-          "addButtonText": "Add Parameter",
-          "removeButtonText": "Remove Parameter",
-          "emptyMessage": "No parameters added yet"
+          "maxItems": 100
         }
       }
     ],
@@ -4199,9 +4185,6 @@
         "repeatingConfig": {
           "minItems": 0,
           "maxItems": 100,
-          "addButtonText": "Add Item",
-          "removeButtonText": "Remove Item",
-          "emptyMessage": "No items added yet",
           "targetSchema": "production-plan-items",
           "relationTypeId": "HAS_PRODUCTION_PLAN_ITEM",
           "deleteType": "itemAndRelation",
@@ -4755,9 +4738,6 @@
         "repeatingConfig": {
           "minItems": 0,
           "maxItems": 100,
-          "addButtonText": "Add Example",
-          "removeButtonText": "Remove Example",
-          "emptyMessage": "No examples added yet",
           "targetSchema": "mcp-examples",
           "relationTypeId": "HAS_MCP_EXAMPLE",
           "deleteType": "itemAndRelation",
@@ -4923,9 +4903,6 @@
         "repeatingConfig": {
           "minItems": 0,
           "maxItems": 100,
-          "addButtonText": "Add MCP Tool",
-          "removeButtonText": "Remove MCP Tool",
-          "emptyMessage": "No MCP tools selected yet",
           "targetSchema": "mcp-tools",
           "relationTypeId": "HAS_MCP_TOOL",
           "deleteType": "relationOnly",

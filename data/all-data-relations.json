@@ -210,26 +210,6 @@
     "updatedAt": "2025-11-08T05:30:25.177Z"
   },
   {
-    "sourceSchema": "users",
-    "sourceId": "01KA3BE5F2DVK2F069RF44XHPZ",
-    "targetSchema": "contacts",
-    "targetId": "01KA40NNCTJ6VV6BGCVNAW7CC5",
-    "relationTypeId": "has_contact",
-    "id": "01KA40NMTZ5E0814AX41W0BHQR",
-    "createdAt": "2025-11-15T15:03:22.206Z",
-    "updatedAt": "2025-11-15T15:03:22.206Z"
-  },
-  {
-    "sourceSchema": "users",
-    "sourceId": "01KA3BE5F2DVK2F069RF44XHPZ",
-    "targetSchema": "contacts",
-    "targetId": "01KA41ANP1AP685Z2SR5EKAJFS",
-    "relationTypeId": "has_contact",
-    "id": "01KA41AN3M7ERX5AS2YVZJZBY3",
-    "createdAt": "2025-11-15T15:14:50.612Z",
-    "updatedAt": "2025-11-15T15:14:50.612Z"
-  },
-  {
     "sourceSchema": "servers",
     "sourceId": "01KA8QZJ9SAJ6Y2GR05K42BQYF",
     "targetSchema": "url-repository",

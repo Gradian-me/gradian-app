@@ -55,6 +55,7 @@ export default function IntegrationsPage() {
   const [syncing, setSyncing] = useState<Set<string>>(new Set());
   const [syncResponse, setSyncResponse] = useState<Record<string, EmailTemplateSyncResponse | string | null>>({});
   const [syncMessages, setSyncMessages] = useState<Record<string, any>>({});
+  const [syncResponseStatus, setSyncResponseStatus] = useState<Record<string, boolean | null>>({});
   const [formModalSchemaId, setFormModalSchemaId] = useState<string | undefined>(undefined);
   const [formModalEntityId, setFormModalEntityId] = useState<string | undefined>(undefined);
   const [formModalMode, setFormModalMode] = useState<'create' | 'edit'>('create');
@@ -131,6 +132,7 @@ export default function IntegrationsPage() {
     setSyncing(prev => new Set(prev).add(integration.id));
     setSyncResponse(prev => ({ ...prev, [integration.id]: null }));
     setSyncMessages(prev => ({ ...prev, [integration.id]: null }));
+    setSyncResponseStatus(prev => ({ ...prev, [integration.id]: null }));
 
     try {
       const response = await apiRequest<EmailTemplateSyncResponse>('/api/integrations/sync', {
@@ -139,6 +141,63 @@ export default function IntegrationsPage() {
           id: integration.id,
         },
       });
+
+      // Check if response has success: false
+      if (response.success === false) {
+        // Mark this response as failed
+        setSyncResponseStatus(prev => ({ ...prev, [integration.id]: false }));
+        // Build error message with summary if available
+        let errorMessage = response.error || 'Sync failed';
+        const summaryMessages: Array<{ path?: string; message: string }> = [];
+        
+        // Check for summary in response.summary or response.data?.summary
+        const summary = (response as any).summary || ((response as any).data?.summary);
+        
+        if (summary) {
+          const summaryParts: string[] = [];
+          
+          if (summary.nodesCreated !== undefined) summaryParts.push(`Nodes Created: ${summary.nodesCreated}`);
+          if (summary.nodesFailed !== undefined) summaryParts.push(`Nodes Failed: ${summary.nodesFailed}`);
+          if (summary.edgesCreated !== undefined) summaryParts.push(`Edges Created: ${summary.edgesCreated}`);
+          if (summary.edgesFailed !== undefined) summaryParts.push(`Edges Failed: ${summary.edgesFailed}`);
+          
+          if (summaryParts.length > 0) {
+            summaryMessages.push({
+              path: 'Summary',
+              message: summaryParts.join(', ')
+            });
+          }
+          
+          // Add errors from summary if available
+          if (summary.errors && Array.isArray(summary.errors) && summary.errors.length > 0) {
+            summary.errors.forEach((error: string, index: number) => {
+              summaryMessages.push({
+                path: `Error ${index + 1}`,
+                message: error
+              });
+            });
+          }
+        }
+        
+        // Combine response.messages with summaryMessages if both exist
+        const allMessages = [
+          ...(response.messages || []),
+          ...summaryMessages
+        ];
+        
+        // Set error message with summary
+        setSyncMessages(prev => ({ 
+          ...prev, 
+          [integration.id]: {
+            messages: allMessages.length > 0 ? allMessages : undefined,
+            message: errorMessage
+          }
+        }));
+        
+        // Also set syncResponse for backward compatibility (as string for error)
+        setSyncResponse(prev => ({ ...prev, [integration.id]: errorMessage }));
+        return;
+      }
 
       // Store messages if present (both success and error responses can have messages)
       if (response.messages || response.message) {
@@ -152,6 +211,8 @@ export default function IntegrationsPage() {
       }
 
       if (response.success) {
+        // Mark this response as successful
+        setSyncResponseStatus(prev => ({ ...prev, [integration.id]: true }));
         if (response.data) {
           setSyncResponse(prev => ({ ...prev, [integration.id]: response.data as EmailTemplateSyncResponse }));
         }
@@ -470,11 +531,16 @@ export default function IntegrationsPage() {
                     <div className="mt-4 w-full">
                       <MessageBoxContainer
                         response={syncMessages[integration.id]}
-                        variant={typeof syncResponse[integration.id] === 'string' ? 'error' : 'success'}
+                        variant={
+                          syncResponseStatus[integration.id] === false || typeof syncResponse[integration.id] === 'string'
+                            ? 'error' 
+                            : 'success'
+                        }
                         dismissible
                         onDismiss={() => {
                           setSyncMessages(prev => ({ ...prev, [integration.id]: null }));
                           setSyncResponse(prev => ({ ...prev, [integration.id]: null }));
+                          setSyncResponseStatus(prev => ({ ...prev, [integration.id]: null }));
                         }}
                       />
                     </div>

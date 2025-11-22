@@ -113,7 +113,6 @@
           "id": "01K92B9DNEAR4H93KTK58FGGE8"
         }
       ],
-      "establishedYear": 1800,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "contacts": [
         {
@@ -147,7 +146,7 @@
       "country": "",
       "categories": [],
       "status": "PENDING",
-      "rating": 0,
+      "rating": 1,
       "id": "01K9MP000000000000000000001",
       "createdAt": "2025-11-04T12:00:00.000Z",
       "updatedAt": "2025-11-04T12:00:00.000Z",
@@ -218,7 +217,6 @@
         }
       ],
       "certifications": [],
-      "establishedYear": 0,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
@@ -311,7 +309,6 @@
         "fda",
         "iso14001"
       ],
-      "establishedYear": 0,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "contacts": [
         {
@@ -336,7 +333,7 @@
       "country": "",
       "categories": [],
       "status": "PENDING",
-      "rating": 0,
+      "rating": 1,
       "id": "01K9EX000000000000000000001",
       "createdAt": "2025-11-04T12:00:00.000Z",
       "updatedAt": "2025-11-04T12:00:00.000Z",
@@ -407,7 +404,6 @@
         }
       ],
       "certifications": [],
-      "establishedYear": 0,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
@@ -423,7 +419,7 @@
       "country": "",
       "categories": [],
       "status": "PENDING",
-      "rating": 0,
+      "rating": 1,
       "id": "01K9PG000000000000000000001",
       "createdAt": "2025-11-04T12:00:00.000Z",
       "updatedAt": "2025-11-04T12:00:00.000Z",
@@ -494,7 +490,6 @@
         }
       ],
       "certifications": [],
-      "establishedYear": 0,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     }
   ],
@@ -1247,7 +1242,7 @@
     },
     {
       "title": "Graph API",
-      "address": "http://localhost:3000/api/graph?includedSchemaIds=users",
+      "address": "http://localhost:3000/api/graph",
       "methods": [
         {
           "id": "GET",
@@ -1258,7 +1253,7 @@
       ],
       "id": "01KANYZDJKCA9FNEFE7ZEY0KSD",
       "createdAt": "2025-11-22T14:19:24.000Z",
-      "updatedAt": "2025-11-22T15:24:46.524Z",
+      "updatedAt": "2025-11-22T15:56:39.570Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
@@ -1350,10 +1345,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-22T15:08:44.696Z",
+      "updatedAt": "2025-11-22T16:08:07.922Z",
       "targetDataPath": "data",
       "sourceDataPath": "data",
-      "lastSynced": "2025-11-22T15:08:36.583Z"
+      "lastSynced": "2025-11-22T16:08:07.884Z"
     },
     {
       "color": "#8b5cf6",
@@ -1471,9 +1466,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-11-22T15:25:13.006Z",
+      "updatedAt": "2025-11-22T16:08:10.526Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-11-22T15:25:12.947Z"
+      "lastSynced": "2025-11-22T16:08:10.488Z"
     }
   ],
   "databases": [

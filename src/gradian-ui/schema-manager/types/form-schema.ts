@@ -95,11 +95,9 @@ export interface FormSection {
   };
   isRepeatingSection?: boolean;
   repeatingConfig?: {
+    fieldRelationType?: 'addFields' | 'connectToSchema'; // Default: 'addFields' - determines if fields are added directly or connected to another schema
     minItems?: number;
     maxItems?: number;
-    addButtonText?: string;
-    removeButtonText?: string;
-    emptyMessage?: string;
     itemTitle?: (index: number) => string;
     targetSchema?: string; // Schema ID for relation-based repeating sections
     relationTypeId?: string; // Relation type ID for relation-based repeating sections
