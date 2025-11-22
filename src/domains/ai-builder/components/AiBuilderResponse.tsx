@@ -108,8 +108,8 @@ export function AiBuilderResponse({
               value: duration < 1000 ? duration : duration / 1000,
               unit: duration < 1000 ? 'ms' : 's',
               icon: 'Timer',
-              iconColor: 'blue',
-              format: 'number',
+              iconColor: 'blue' as const,
+              format: 'number' as const,
               precision: duration < 1000 ? 0 : 2,
             }] : []),
           ]}

@@ -117,6 +117,7 @@ export function AiBuilderForm({
               config={{
                 name: 'user-prompt',
                 label: '',
+                placeholder: 'Describe your vision... Let AI bring your ideas to life with intelligent automation and creative solutions.',
               }}
               value={userPrompt}
               onChange={onPromptChange}
@@ -132,7 +133,6 @@ export function AiBuilderForm({
                 'shadow-sm',
                 'transition-all duration-200'
               )}
-              placeholder="Describe your vision... Let AI bring your ideas to life with intelligent automation and creative solutions."
               aiAgentId="professional-writing"
             />
           </div>

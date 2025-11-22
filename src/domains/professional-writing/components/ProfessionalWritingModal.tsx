@@ -234,7 +234,7 @@ export function ProfessionalWritingModal({
                   readOnly
                   rows={6}
                   className={cn(
-                    "resize-none bg-gray-50 dark:bg-gray-800 pr-10"
+                    "direction-auto resize-none bg-gray-50 dark:bg-gray-800 pr-10"
                   )}
                 />
                 <div className="absolute right-2 top-2">

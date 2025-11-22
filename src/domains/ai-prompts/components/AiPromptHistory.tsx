@@ -593,8 +593,8 @@ function PromptCard({ prompt, agent, isExpanded, onToggle, router }: PromptCardP
                 value: prompt.duration < 1000 ? prompt.duration : prompt.duration / 1000,
                 unit: prompt.duration < 1000 ? 'ms' : 's',
                 icon: 'Timer',
-                iconColor: 'blue',
-                format: 'number',
+                iconColor: 'blue' as const,
+                format: 'number' as const,
                 precision: prompt.duration < 1000 ? 0 : 2,
               }] : []),
             ]}
