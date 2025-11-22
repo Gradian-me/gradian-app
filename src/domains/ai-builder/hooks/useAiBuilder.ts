@@ -15,6 +15,7 @@ interface UseAiBuilderReturn {
   setUserPrompt: (prompt: string) => void;
   aiResponse: string;
   tokenUsage: TokenUsage | null;
+  duration: number | null;
   isLoading: boolean;
   isApproving: boolean;
   error: string | null;
@@ -38,6 +39,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const [userPrompt, setUserPrompt] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
+  const [duration, setDuration] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -210,6 +212,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
       const builderResponse: AiBuilderResponseData = data.data;
       setAiResponse(builderResponse.response);
       setTokenUsage(builderResponse.tokenUsage || null);
+      setDuration(builderResponse.timing?.duration || null);
 
       // Save prompt to history
       if (builderResponse.response && builderResponse.tokenUsage) {
@@ -248,6 +251,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
         setError(err instanceof Error ? err.message : 'An error occurred');
         setAiResponse('');
         setTokenUsage(null);
+        setDuration(null);
       }
     } finally {
       setIsLoading(false);
@@ -262,6 +266,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
       setError(null);
       setAiResponse('');
       setTokenUsage(null);
+      setDuration(null);
       abortControllerRef.current = null;
     }
   }, []);
@@ -404,6 +409,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
         setUserPrompt('');
         setAiResponse('');
         setTokenUsage(null);
+        setDuration(null);
         setSuccessMessage(null);
       }, 3000);
     } catch (err) {
@@ -416,6 +422,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const clearResponse = useCallback(() => {
     setAiResponse('');
     setTokenUsage(null);
+    setDuration(null);
   }, []);
 
   const clearError = useCallback(() => {
@@ -431,6 +438,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
     setUserPrompt,
     aiResponse,
     tokenUsage,
+    duration,
     isLoading,
     isApproving,
     error,

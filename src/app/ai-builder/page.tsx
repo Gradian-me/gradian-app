@@ -41,6 +41,7 @@ export default function AiBuilderPage() {
     setUserPrompt,
     aiResponse,
     tokenUsage,
+    duration,
     isLoading,
     isApproving,
     error,
@@ -398,6 +399,7 @@ export default function AiBuilderPage() {
             response={aiResponse}
             agent={selectedAgent}
             tokenUsage={tokenUsage}
+            duration={duration}
             isApproving={isApproving}
             onApprove={handleApprove}
             onCardClick={handleCardClick}

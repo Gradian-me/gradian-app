@@ -74,6 +74,7 @@ export interface TextareaProps extends FormElementProps {
   resize?: 'none' | 'both' | 'horizontal' | 'vertical';
   maxLength?: number;
   canCopy?: boolean;
+  aiAgentId?: string;
 }
 
 export interface CheckboxProps extends FormElementProps {

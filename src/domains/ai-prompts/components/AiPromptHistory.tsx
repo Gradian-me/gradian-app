@@ -19,7 +19,7 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { MetricCard } from '@/gradian-ui/analytics';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { config } from '@/lib/config';
-import { History, Search, X, DollarSign, Hash, Clock, Timer, Sparkles, Coins, Cpu, User, ChevronDown, ChevronUp, FileText, ExternalLink } from 'lucide-react';
+import { History, Search, X, DollarSign, Hash, Timer, Sparkles, Coins, Cpu, User, ChevronDown, ChevronUp, FileText, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ModifiedPromptsList } from './ModifiedPromptsList';
 import { format } from 'date-fns';
@@ -261,23 +261,6 @@ export function AiPromptHistory({
                             </div>
                           </div>
                         ))}
-                      </div>
-                      {/* Timing Information Skeleton */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                          <Skeleton className="h-4 w-4 rounded-full bg-gray-300 dark:bg-gray-600" />
-                          <div className="space-y-1 flex-1">
-                            <Skeleton className="h-3 w-20 rounded-md bg-gray-300 dark:bg-gray-600" />
-                            <Skeleton className="h-2 w-16 rounded-md bg-gray-200 dark:bg-gray-700" />
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                          <Skeleton className="h-4 w-4 rounded-full bg-gray-300 dark:bg-gray-600" />
-                          <div className="space-y-1 flex-1">
-                            <Skeleton className="h-3 w-20 rounded-md bg-gray-300 dark:bg-gray-600" />
-                            <Skeleton className="h-2 w-16 rounded-md bg-gray-200 dark:bg-gray-700" />
-                          </div>
-                        </div>
                       </div>
                       {/* Total Tokens & Price Skeleton */}
                       <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/40 dark:via-purple-950/40 dark:to-indigo-950/40 border border-violet-200/50 dark:border-violet-800/50">
@@ -540,79 +523,49 @@ function PromptCard({ prompt, agent, isExpanded, onToggle, router }: PromptCardP
             </p>
           </div>
 
-          {/* Token Usage & Pricing */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <Hash className="h-4 w-4 text-gray-500" />
-              <div>
-                <div className="font-medium">Input</div>
-                <div className="text-xs text-gray-500">
-                  {prompt.inputTokens.toLocaleString()} tokens
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-gray-500" />
-              <div>
-                <div className="font-medium">Input Cost</div>
-                <div className="text-xs text-gray-500">
-                  ${prompt.inputPrice.toFixed(4)}
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Hash className="h-4 w-4 text-gray-500" />
-              <div>
-                <div className="font-medium">Output</div>
-                <div className="text-xs text-gray-500">
-                  {prompt.outputTokens.toLocaleString()} tokens
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-gray-500" />
-              <div>
-                <div className="font-medium">Output Cost</div>
-                <div className="text-xs text-gray-500">
-                  ${prompt.outputPrice.toFixed(4)}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Timing Information */}
-          {(prompt.responseTime !== undefined || prompt.duration !== undefined) && (
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              {prompt.responseTime !== undefined && (
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-gray-500" />
-                  <div>
-                    <div className="font-medium">Response Time</div>
-                    <div className="text-xs text-gray-500">
-                      {prompt.responseTime < 1000 
-                        ? `${prompt.responseTime}ms` 
-                        : `${(prompt.responseTime / 1000).toFixed(2)}s`}
-                    </div>
+          {/* Input/Output Keys - Only show when expanded */}
+          {isExpanded && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <Hash className="h-4 w-4 text-gray-500" />
+                <div>
+                  <div className="font-medium">Input</div>
+                  <div className="text-xs text-gray-500">
+                    {prompt.inputTokens.toLocaleString()} tokens
                   </div>
                 </div>
-              )}
-              {prompt.duration !== undefined && (
-                <div className="flex items-center gap-2">
-                  <Timer className="h-4 w-4 text-gray-500" />
-                  <div>
-                    <div className="font-medium">Duration</div>
-                    <div className="text-xs text-gray-500">
-                      {prompt.duration < 1000 
-                        ? `${prompt.duration}ms` 
-                        : `${(prompt.duration / 1000).toFixed(2)}s`}
-                    </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-gray-500" />
+                <div>
+                  <div className="font-medium">Input Cost</div>
+                  <div className="text-xs text-gray-500">
+                    ${prompt.inputPrice.toFixed(4)}
                   </div>
                 </div>
-              )}
+              </div>
+              <div className="flex items-center gap-2">
+                <Hash className="h-4 w-4 text-gray-500" />
+                <div>
+                  <div className="font-medium">Output</div>
+                  <div className="text-xs text-gray-500">
+                    {prompt.outputTokens.toLocaleString()} tokens
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-gray-500" />
+                <div>
+                  <div className="font-medium">Output Cost</div>
+                  <div className="text-xs text-gray-500">
+                    ${prompt.outputPrice.toFixed(4)}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Total Tokens & Price - Beautiful Card */}
+          {/* Total Tokens & Price - Beautiful Card - Always visible */}
           <MetricCard
             metrics={[
               {
@@ -634,6 +587,16 @@ function PromptCard({ prompt, agent, isExpanded, onToggle, router }: PromptCardP
                 format: 'currency',
                 precision: 4,
               },
+              ...(prompt.duration !== undefined ? [{
+                id: 'duration',
+                label: 'Duration',
+                value: prompt.duration < 1000 ? prompt.duration : prompt.duration / 1000,
+                unit: prompt.duration < 1000 ? 'ms' : 's',
+                icon: 'Timer',
+                iconColor: 'blue',
+                format: 'number',
+                precision: prompt.duration < 1000 ? 0 : 2,
+              }] : []),
             ]}
             footer={{
               icon: 'Sparkles',

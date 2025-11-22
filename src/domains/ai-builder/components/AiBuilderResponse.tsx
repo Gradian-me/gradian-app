@@ -9,7 +9,7 @@ import React from 'react';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Timer } from 'lucide-react';
 import { MetricCard } from '@/gradian-ui/analytics';
 import { ResponseCardViewer } from './ResponseCardViewer';
 import { ResponseAnnotationViewer } from './ResponseAnnotationViewer';
@@ -19,6 +19,7 @@ interface AiBuilderResponseProps {
   response: string;
   agent: AiAgent | null;
   tokenUsage: TokenUsage | null;
+  duration: number | null;
   isApproving: boolean;
   onApprove: () => void;
   onCardClick?: (cardData: { id: string; label: string; icon?: string }, schemaData: any) => void;
@@ -32,6 +33,7 @@ export function AiBuilderResponse({
   response,
   agent,
   tokenUsage,
+  duration,
   isApproving,
   onApprove,
   onCardClick,
@@ -100,6 +102,16 @@ export function AiBuilderResponse({
               format: 'currency',
               precision: 4,
             },
+            ...(duration !== null ? [{
+              id: 'duration',
+              label: 'Duration',
+              value: duration < 1000 ? duration : duration / 1000,
+              unit: duration < 1000 ? 'ms' : 's',
+              icon: 'Timer',
+              iconColor: 'blue',
+              format: 'number',
+              precision: duration < 1000 ? 0 : 2,
+            }] : []),
           ]}
           footer={{
             icon: 'Sparkles',

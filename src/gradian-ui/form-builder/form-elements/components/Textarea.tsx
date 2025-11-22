@@ -1,9 +1,11 @@
 // Textarea Component
 
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { TextareaProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
 import { CopyContent } from './CopyContent';
+import { ProfessionalWritingModal } from '@/domains/professional-writing';
+import { IconRenderer } from '../../../shared/utils/icon-renderer';
 
 export const Textarea = forwardRef<FormElementRef, TextareaProps>(
   (
@@ -23,11 +25,13 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       className,
       touched,
       canCopy = false,
+      aiAgentId,
       ...props
     },
     ref
   ) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useImperativeHandle(ref, () => ({
       focus: () => textareaRef.current?.focus(),
@@ -55,6 +59,17 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       onFocus?.();
     };
 
+    const handleAiAgentClick = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsModalOpen(true);
+    };
+
+    const handleApplyEnhancedText = (enhancedText: string) => {
+      onChange?.(enhancedText);
+      setIsModalOpen(false);
+    };
+
     const textareaClasses = cn(
       'w-full direction-auto px-3 py-2 border rounded-lg border-gray-300 bg-white text-sm text-gray-900 ring-offset-background placeholder:text-gray-400 transition-colors',
       'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-violet-300 focus-visible:ring-offset-1 focus-visible:border-violet-400',
@@ -67,7 +82,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       resize === 'horizontal' && 'resize-x',
       resize === 'vertical' && 'resize-y',
       resize === 'both' && 'resize',
-      canCopy && 'pr-10',
+      (canCopy || aiAgentId) && 'pr-10',
       className
     );
 
@@ -104,11 +119,28 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
           className={textareaClasses}
           {...props}
         />
-          {canCopy && value && (
-            <div className="absolute right-1 top-2">
+          <div className="absolute right-1 top-2 flex items-center gap-1">
+            {canCopy && value && (
               <CopyContent content={value} />
-            </div>
-          )}
+            )}
+            {aiAgentId && value && value.trim() && (
+              <button
+                type="button"
+                onClick={handleAiAgentClick}
+                disabled={disabled}
+                className={cn(
+                  'p-1.5 rounded-md transition-colors',
+                  'hover:bg-violet-100 dark:hover:bg-violet-900/30',
+                  'text-violet-600 dark:text-violet-400',
+                  'disabled:opacity-50 disabled:cursor-not-allowed',
+                  'focus:outline-none focus:ring-2 focus:ring-violet-300 dark:focus:ring-violet-700'
+                )}
+                title="Enhance with AI"
+              >
+                <IconRenderer iconName="Sparkles" className="h-4 w-4" />
+              </button>
+            )}
+          </div>
         </div>
         {error && (
           <p className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
@@ -119,6 +151,14 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
           <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             {value.length}/{config.validation.maxLength}
           </p>
+        )}
+        {aiAgentId && (
+          <ProfessionalWritingModal
+            isOpen={isModalOpen}
+            onOpenChange={setIsModalOpen}
+            initialText={value || ''}
+            onApply={handleApplyEnhancedText}
+          />
         )}
       </div>
     );

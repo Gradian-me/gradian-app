@@ -5,9 +5,10 @@
 
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Select } from '@/gradian-ui/form-builder/form-elements/components/Select';
+import { Textarea } from '@/gradian-ui/form-builder/form-elements/components/Textarea';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/gradian-ui/shared/utils';
@@ -47,11 +48,9 @@ export function AiBuilderForm({
   onSheetOpenChange,
   disabled = false,
 }: AiBuilderFormProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   // Auto-resize textarea with max 8 lines
   useEffect(() => {
-    const textarea = textareaRef.current;
+    const textarea = document.getElementById('user-prompt') as HTMLTextAreaElement;
     if (textarea) {
       textarea.style.height = 'auto';
       const scrollHeight = textarea.scrollHeight;
@@ -114,24 +113,27 @@ export function AiBuilderForm({
 
           {/* Textarea with modern styling */}
           <div className="relative">
-            <textarea
-              ref={textareaRef}
-              id="user-prompt"
+            <Textarea
+              config={{
+                name: 'user-prompt',
+                label: '',
+              }}
               value={userPrompt}
-              onChange={(e) => onPromptChange(e.target.value)}
-              placeholder="Describe your vision... Let AI bring your ideas to life with intelligent automation and creative solutions."
+              onChange={onPromptChange}
+              disabled={isLoading || disabled}
+              rows={1}
               className={cn(
-                'w-full min-h-[140px] px-5 py-4 rounded-xl border',
+                'min-h-[140px] px-5 py-4 rounded-xl border',
                 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm',
                 'border-violet-200/50 dark:border-violet-700/50',
                 'text-gray-900 dark:text-gray-100',
                 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-                'focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-400',
-                'resize-none shadow-sm',
+                'focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:border-violet-400',
+                'shadow-sm',
                 'transition-all duration-200'
               )}
-              disabled={isLoading || disabled}
-              rows={1}
+              placeholder="Describe your vision... Let AI bring your ideas to life with intelligent automation and creative solutions."
+              aiAgentId="professional-writing"
             />
           </div>
           
