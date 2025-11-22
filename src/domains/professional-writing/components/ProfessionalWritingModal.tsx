@@ -148,6 +148,7 @@ export function ProfessionalWritingModal({
                 <SelectItem value="professional">Professional</SelectItem>
                 <SelectItem value="casual">Casual</SelectItem>
                 <SelectItem value="translate">Translate</SelectItem>
+                <SelectItem value="extended">Extended</SelectItem>
               </SelectContent>
             </Select>
           </div>
