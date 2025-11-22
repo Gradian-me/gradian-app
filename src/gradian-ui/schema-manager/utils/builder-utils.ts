@@ -22,6 +22,7 @@ export const FIELD_TYPES: Array<{
   { value: 'file', label: 'File', description: 'File upload' },
   { value: 'icon', label: 'Icon', description: 'Icon name input with preview' },
   { value: 'image-text', label: 'Image Text', description: 'Image with text display' },
+  { value: 'list-input', label: 'List Input', description: 'Drag-and-drop list with inline editing' },
   { value: 'name', label: 'Name Input', description: 'Name input field' },
   { value: 'number', label: 'Number', description: 'Numeric input' },
   { value: 'password', label: 'Password', description: 'Password input (masked)' },

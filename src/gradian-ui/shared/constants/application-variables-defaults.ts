@@ -37,7 +37,15 @@ export const DEFAULT_APPLICATION_VARIABLES = {
       SKELETON_MAX: 0.25,
     },
   },
-  SCHEMA_SUMMARY_EXCLUDED_KEYS: ['fields', 'sections', 'detailPageMetadata'],
+  SCHEMA_SUMMARY_EXCLUDED_KEYS: [
+    "fields",
+    "sections",
+    "detailPageMetadata",
+    "cardMetadata",
+    "customButtons",
+    "fieldsCount",
+    "sectionsCount"
+  ],
   DEMO_MODE: true,
   AI_CONFIG: {
     LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions',

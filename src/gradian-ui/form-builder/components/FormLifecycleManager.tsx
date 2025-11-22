@@ -345,6 +345,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   message,
   errorStatusCode,
   onErrorDismiss,
+  hideCollapseExpandButtons = false,
+  forceExpandedSections = false,
+  hideGoToTopButton = false,
   ...props
 }) => {
   const [state, dispatch] = useReducer(formReducer, {
@@ -365,10 +368,11 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   
   // State to track which sections are expanded
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>(() => {
-    // Initialize based on section initialState prop
+    // Initialize based on section initialState prop or forceExpandedSections
     const initial: Record<string, boolean> = {};
     schema.sections.forEach(section => {
-      initial[section.id] = section.initialState !== 'collapsed';
+      // If forceExpandedSections is true, always expand; otherwise use initialState
+      initial[section.id] = forceExpandedSections ? true : (section.initialState !== 'collapsed');
     });
     return initial;
   });
@@ -400,14 +404,16 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     setExpandedSections(prev => {
       const newExpanded: Record<string, boolean> = {};
       schema.sections.forEach(section => {
-        // Preserve existing state if section still exists, otherwise use initialState
-        newExpanded[section.id] = prev[section.id] !== undefined 
-          ? prev[section.id]
-          : (section.initialState !== 'collapsed');
+        // If forceExpandedSections is true, always expand; otherwise preserve existing state or use initialState
+        newExpanded[section.id] = forceExpandedSections 
+          ? true 
+          : (prev[section.id] !== undefined 
+            ? prev[section.id]
+            : (section.initialState !== 'collapsed'));
       });
       return newExpanded;
     });
-  }, [sectionIds]);
+  }, [sectionIds, forceExpandedSections]);
 
   const setValue = useCallback((fieldName: string, value: any) => {
     loggingCustom(LogType.FORM_DATA, 'info', `Setting field "${fieldName}" to: ${JSON.stringify(value)}`);
@@ -1273,7 +1279,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           )}
           
           {/* Collapse/Expand All Buttons */}
-          {schema.sections.length > 0 && schema.isCollapsibleSections !== false && (
+          {schema.sections.length > 0 && schema.isCollapsibleSections !== false && !hideCollapseExpandButtons && (
             <div className="flex justify-end gap-2 mb-4">
               <Button
                 type="button"
@@ -1381,7 +1387,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         )}
       </FormContext.Provider>
       {/* Go to Top Button */}
-      <GoToTopForm threshold={100} />
+      {!hideGoToTopButton && <GoToTopForm threshold={100} />}
     </>
   );
 };

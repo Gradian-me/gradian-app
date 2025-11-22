@@ -77,7 +77,17 @@ function calculatePricing(modelId: string, promptTokens: number, completionToken
 export async function POST(request: NextRequest) {
   try {
     // Parse request body - handle errors gracefully
-    let body: { userPrompt?: string; agentId?: string };
+    let body: { 
+      userPrompt?: string; 
+      agentId?: string; 
+      previousAiResponse?: string;
+      previousUserPrompt?: string;
+      annotations?: Array<{
+        schemaId: string;
+        schemaName: string;
+        annotations: Array<{ id: string; label: string }>;
+      }>;
+    };
     try {
       body = await request.json();
     } catch (error) {
@@ -100,7 +110,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { userPrompt, agentId } = body;
+    const { userPrompt, agentId, previousAiResponse, previousUserPrompt, annotations } = body;
 
     if (!userPrompt || typeof userPrompt !== 'string') {
       return NextResponse.json(
@@ -157,7 +167,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Prepare system prompt with preloaded context
-    const systemPrompt = (agent.systemPrompt || '') + preloadedContext;
+    let systemPrompt = (agent.systemPrompt || '') + preloadedContext;
+    
+    // If annotations are provided, add annotation instructions to system prompt
+    if (annotations && Array.isArray(annotations) && annotations.length > 0 && previousAiResponse) {
+      const annotationsJson = JSON.stringify(annotations, null, 2);
+      const annotationInstructions = `\n\n## IMPORTANT: Update Instructions\n\nPlease update the following AI-generated content based on the annotations provided. Keep all other things the same and only make changes based on the annotations:\n\nPrevious AI Response:\n\`\`\`json\n${previousAiResponse}\n\`\`\`\n\nAnnotations:\n\`\`\`json\n${annotationsJson}\n\`\`\`\n\nApply only the changes specified in the annotations while keeping everything else unchanged.`;
+      systemPrompt += annotationInstructions;
+    }
 
     // Prepare messages for LLM API
     const messages = [
@@ -181,22 +198,30 @@ export async function POST(request: NextRequest) {
     // Track timing
     const startTime = Date.now();
 
-    // Call LLM API
-    const response = await fetch(llmApiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model,
-        messages
-      })
-    });
+    // Create AbortController with longer timeout (120 seconds)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 seconds
 
-    // Track response time (time when response is received)
-    const responseTime = Date.now();
-    const responseTimeMs = responseTime - startTime;
+    try {
+      // Call LLM API
+      const response = await fetch(llmApiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model,
+          messages
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      // Track response time (time when response is received)
+      const responseTime = Date.now();
+      const responseTimeMs = responseTime - startTime;
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -262,25 +287,43 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        response: processedResponse,
-        format: agent.requiredOutputFormat || 'string',
-        tokenUsage,
-        timing: {
-          responseTime: responseTimeMs, // Time to receive response
-          duration: durationMs, // Total time from start to completion
-        },
-        agent: {
-          id: agent.id,
-          label: agent.label,
-          description: agent.description,
-          requiredOutputFormat: agent.requiredOutputFormat,
-          nextAction: agent.nextAction
+      return NextResponse.json({
+        success: true,
+        data: {
+          response: processedResponse,
+          format: agent.requiredOutputFormat || 'string',
+          tokenUsage,
+          timing: {
+            responseTime: responseTimeMs, // Time to receive response
+            duration: durationMs, // Total time from start to completion
+          },
+          agent: {
+            id: agent.id,
+            label: agent.label,
+            description: agent.description,
+            requiredOutputFormat: agent.requiredOutputFormat,
+            nextAction: agent.nextAction
+          }
         }
+      });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      
+      // Handle timeout errors specifically
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        console.error('Request timeout in AI builder API:', fetchError);
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: 'Request timeout. The AI service took too long to respond. Please try again.' 
+          },
+          { status: 504 }
+        );
       }
-    });
+      
+      // Re-throw to be caught by outer catch
+      throw fetchError;
+    }
   } catch (error) {
     // Handle aborted requests or JSON parsing errors gracefully
     if (error instanceof SyntaxError) {

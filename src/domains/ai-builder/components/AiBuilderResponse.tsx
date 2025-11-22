@@ -11,7 +11,9 @@ import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Loader2 } from 'lucide-react';
 import { MetricCard } from '@/gradian-ui/analytics';
-import type { AiAgent, TokenUsage } from '../types';
+import { ResponseCardViewer } from './ResponseCardViewer';
+import { ResponseAnnotationViewer } from './ResponseAnnotationViewer';
+import type { AiAgent, TokenUsage, SchemaAnnotation, AnnotationItem } from '../types';
 
 interface AiBuilderResponseProps {
   response: string;
@@ -19,6 +21,11 @@ interface AiBuilderResponseProps {
   tokenUsage: TokenUsage | null;
   isApproving: boolean;
   onApprove: () => void;
+  onCardClick?: (cardData: { id: string; label: string; icon?: string }, schemaData: any) => void;
+  annotations?: SchemaAnnotation[];
+  onAnnotationsChange?: (schemaId: string, annotations: AnnotationItem[]) => void;
+  onRemoveSchema?: (schemaId: string) => void;
+  onApplyAnnotations?: (annotations: SchemaAnnotation[]) => void;
 }
 
 export function AiBuilderResponse({
@@ -27,6 +34,11 @@ export function AiBuilderResponse({
   tokenUsage,
   isApproving,
   onApprove,
+  onCardClick,
+  annotations = [],
+  onAnnotationsChange,
+  onRemoveSchema,
+  onApplyAnnotations,
 }: AiBuilderResponseProps) {
   if (!response) {
     return null;
@@ -96,11 +108,29 @@ export function AiBuilderResponse({
         />
       )}
 
+      {agent?.responseCards && agent.responseCards.length > 0 && onCardClick && (
+        <ResponseCardViewer
+          response={response}
+          responseCards={agent.responseCards}
+          onCardClick={onCardClick}
+        />
+      )}
+
+      {/* Schema Annotations - shown on top of AI generated content */}
+      {annotations.length > 0 && onAnnotationsChange && onRemoveSchema && (
+        <ResponseAnnotationViewer
+          annotations={annotations}
+          onAnnotationsChange={onAnnotationsChange}
+          onRemoveSchema={onRemoveSchema}
+          onApply={onApplyAnnotations}
+        />
+      )}
+
       <CodeViewer
         code={response}
         programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}
         title="AI Generated Content"
-        initialLineNumbers={30}
+        initialLineNumbers={10}
       />
     </div>
   );

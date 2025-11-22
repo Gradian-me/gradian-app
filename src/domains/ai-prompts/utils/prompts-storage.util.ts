@@ -70,6 +70,8 @@ export function createPrompt(data: CreateAiPromptRequest): AiPrompt {
     totalPrice: data.totalPrice,
     responseTime: data.responseTime,
     duration: data.duration,
+    referenceId: data.referenceId,
+    annotations: data.annotations,
   };
   
   prompts.push(newPrompt);

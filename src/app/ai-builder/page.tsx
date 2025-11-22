@@ -1,9 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
+import { Modal } from '@/gradian-ui/data-display/components/Modal';
+import { SchemaFormWrapper } from '@/gradian-ui/form-builder/components/FormLifecycleManager';
+import { ListInput } from '@/gradian-ui/form-builder/form-elements';
+import { Spinner } from '@/components/ui/spinner';
 import {
   useAiAgents,
   useAiBuilder,
@@ -11,10 +15,25 @@ import {
   AiBuilderResponse,
   MessageDisplay,
 } from '@/domains/ai-builder';
+import { ResponseAnnotationViewer } from '@/domains/ai-builder/components/ResponseAnnotationViewer';
+import type { SchemaAnnotation, AnnotationItem } from '@/domains/ai-builder/types';
+import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { useAiPrompts } from '@/domains/ai-prompts';
+import { useUserStore } from '@/stores/user.store';
 
 export default function AiBuilderPage() {
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [previewSchema, setPreviewSchema] = useState<{ schema: FormSchema; schemaId: string } | null>(null);
+  const [annotations, setAnnotations] = useState<Map<string, SchemaAnnotation>>(new Map());
+  const [lastPromptId, setLastPromptId] = useState<string | null>(null);
+  const [firstPromptId, setFirstPromptId] = useState<string | null>(null); // Track the first/original prompt ID
+  const [previousUserPrompt, setPreviousUserPrompt] = useState<string>('');
+  const [previousAiResponse, setPreviousAiResponse] = useState<string>('');
+  const [isApplyingAnnotations, setIsApplyingAnnotations] = useState(false); // Track if current generation is from Apply
+  
+  const user = useUserStore((state) => state.user);
+  const { createPrompt } = useAiPrompts();
 
   const { agents, loading: isLoadingAgents } = useAiAgents();
   const {
@@ -28,12 +47,48 @@ export default function AiBuilderPage() {
     successMessage,
     preloadedContext,
     isLoadingPreload,
+    lastPromptId: hookLastPromptId,
     generateResponse,
     stopGeneration,
     approveResponse,
     loadPreloadRoutes,
     clearResponse,
   } = useAiBuilder();
+  
+  // Sync hook's lastPromptId with local state
+  useEffect(() => {
+    if (hookLastPromptId) {
+      setLastPromptId(hookLastPromptId);
+      // Set first prompt ID only if it's not already set (first generation)
+      if (!firstPromptId) {
+        setFirstPromptId(hookLastPromptId);
+      }
+    }
+  }, [hookLastPromptId, firstPromptId]);
+
+  // Track previous prompt and response when a new response is successfully generated
+  // This happens after the response is complete and saved
+  // Also clear annotations for fresh generations (not from Apply)
+  useEffect(() => {
+    if (aiResponse && tokenUsage && !isLoading && hookLastPromptId) {
+      // If this is NOT from Apply, clear annotations (fresh generation)
+      if (!isApplyingAnnotations) {
+        // This is a fresh generation - clear previous annotations
+        setAnnotations(new Map());
+      }
+      
+      // Always update previous values for future Apply operations
+      if (userPrompt) {
+        setPreviousUserPrompt(userPrompt);
+      }
+      if (aiResponse) {
+        setPreviousAiResponse(aiResponse);
+      }
+      
+      // Reset the flag after processing
+      setIsApplyingAnnotations(false);
+    }
+  }, [aiResponse, tokenUsage, isLoading, userPrompt, hookLastPromptId, isApplyingAnnotations]);
 
   // Get selected agent
   const selectedAgent = agents.find(agent => agent.id === selectedAgentId) || null;
@@ -48,6 +103,12 @@ export default function AiBuilderPage() {
   // Clear response when agent changes
   useEffect(() => {
     clearResponse();
+    // Clear annotations when agent changes
+    setAnnotations(new Map());
+    setFirstPromptId(null);
+    setLastPromptId(null);
+    setPreviousUserPrompt('');
+    setPreviousAiResponse('');
   }, [selectedAgentId, clearResponse]);
 
   // Load preload routes when agent or sheet opens
@@ -57,13 +118,24 @@ export default function AiBuilderPage() {
     }
   }, [isSheetOpen, selectedAgent?.id, loadPreloadRoutes]);
 
+  // Convert annotations map to array for ResponseAnnotationViewer
+  const annotationsArray = Array.from(annotations.values());
+
   // Get the prompt that would be sent to LLM
   const getPromptForLLM = () => {
     if (!selectedAgent || !userPrompt.trim()) {
       return null;
     }
 
-    const systemPrompt = (selectedAgent.systemPrompt || '') + preloadedContext;
+    let systemPrompt = (selectedAgent.systemPrompt || '') + preloadedContext;
+    
+    // In demo mode, if we have annotations and previous response, show annotation instructions in system prompt
+    if (DEMO_MODE && annotationsArray.length > 0 && (previousAiResponse || aiResponse)) {
+      const responseToUse = previousAiResponse || aiResponse;
+      const annotationsJson = JSON.stringify(annotationsArray, null, 2);
+      const annotationInstructions = `\n\n## IMPORTANT: Update Instructions\n\nPlease update the following AI-generated content based on the annotations provided. Keep all other things the same and only make changes based on the annotations:\n\nPrevious AI Response:\n\`\`\`json\n${responseToUse}\n\`\`\`\n\nAnnotations:\n\`\`\`json\n${annotationsJson}\n\`\`\`\n\nApply only the changes specified in the annotations while keeping everything else unchanged.`;
+      systemPrompt += annotationInstructions;
+    }
 
     return {
       systemPrompt,
@@ -79,10 +151,145 @@ export default function AiBuilderPage() {
     });
   };
 
+  const handleApplyAnnotations = useCallback(async (annotationsList: SchemaAnnotation[]) => {
+    if (!selectedAgentId) {
+      console.error('No agent selected');
+      return;
+    }
+    
+    // Use current aiResponse if previousAiResponse is not set
+    // This ensures we always have values to work with
+    const responseToUse = previousAiResponse || aiResponse;
+    const promptToUse = previousUserPrompt || userPrompt;
+    
+    if (!responseToUse) {
+      console.error('Missing AI response', { 
+        hasPreviousResponse: !!previousAiResponse, 
+        hasCurrentResponse: !!aiResponse
+      });
+      alert('No AI response available. Please generate a response first.');
+      return;
+    }
+    
+    if (!promptToUse) {
+      console.error('Missing user prompt', {
+        hasPreviousPrompt: !!previousUserPrompt,
+        hasCurrentPrompt: !!userPrompt 
+      });
+      alert('No user prompt available. Please enter a prompt first.');
+      return;
+    }
+
+    // Convert SchemaAnnotation to the format expected by GeneratePromptRequest
+    const annotationsForSave = annotationsList.map(ann => ({
+      schemaId: ann.schemaId,
+      schemaName: ann.schemaLabel,
+      annotations: ann.annotations,
+    }));
+
+    console.log('Applying annotations and regenerating...', {
+      referenceId: firstPromptId,
+      annotationsCount: annotationsForSave.length,
+      hasReferenceId: !!firstPromptId
+    });
+
+    // Keep user prompt clean - don't update it with annotation instructions
+    // The annotation instructions will be added to system prompt in the API
+    
+    // Set flag to indicate this generation is from Apply
+    setIsApplyingAnnotations(true);
+    
+    try {
+      await generateResponse({
+        userPrompt: promptToUse, // Keep original prompt clean
+        agentId: selectedAgentId,
+        referenceId: firstPromptId || undefined, // Always reference the first/original prompt
+        annotations: annotationsForSave,
+        previousAiResponse: responseToUse, // Pass previous response for system prompt
+        previousUserPrompt: promptToUse, // Pass previous prompt for system prompt
+      });
+      console.log('Generation started with annotations');
+    } catch (error) {
+      console.error('Error generating response with annotations:', error);
+      setIsApplyingAnnotations(false); // Reset flag on error
+      alert('Failed to generate response. Please try again.');
+    }
+  }, [selectedAgentId, previousUserPrompt, previousAiResponse, firstPromptId, setUserPrompt, generateResponse, aiResponse, userPrompt]);
+
   const handleApprove = () => {
     if (!selectedAgent || !aiResponse) return;
     approveResponse(aiResponse, selectedAgent);
   };
+
+  const handleCardClick = useCallback((cardData: { id: string; label: string; icon?: string }, schemaData: any) => {
+    // Convert schema data to FormSchema format
+    const formSchema: FormSchema = schemaData;
+    const previewSchemaId = `preview-${cardData.id}`;
+    
+    setPreviewSchema({
+      schema: formSchema,
+      schemaId: previewSchemaId,
+    });
+
+    // Initialize annotations for this schema if not exists
+    if (!annotations.has(cardData.id)) {
+      setAnnotations((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(cardData.id, {
+          schemaId: cardData.id,
+          schemaLabel: cardData.label,
+          schemaIcon: cardData.icon,
+          annotations: [],
+        });
+        return newMap;
+      });
+    }
+  }, [annotations]);
+
+  const handleAnnotationChange = useCallback((schemaId: string, newAnnotations: AnnotationItem[]) => {
+    setAnnotations((prev) => {
+      const newMap = new Map(prev);
+      const existing = newMap.get(schemaId);
+      if (existing) {
+        newMap.set(schemaId, {
+          ...existing,
+          annotations: newAnnotations,
+        });
+      }
+      return newMap;
+    });
+  }, []);
+
+  const handleRemoveSchema = useCallback((schemaId: string) => {
+    setAnnotations((prev) => {
+      const newMap = new Map(prev);
+      newMap.delete(schemaId);
+      return newMap;
+    });
+  }, []);
+
+  const getInitialSchema = useCallback((schemaId: string): FormSchema | null => {
+    if (previewSchema && previewSchema.schemaId === schemaId) {
+      return previewSchema.schema;
+    }
+    return null;
+  }, [previewSchema]);
+
+  const handleFormModalClose = useCallback(() => {
+    setPreviewSchema(null);
+  }, []);
+
+  // Get current schema annotation for the preview modal
+  const currentSchemaAnnotation = previewSchema 
+    ? annotations.get(previewSchema.schema.id) 
+    : null;
+
+  const handleModalAnnotationChange = useCallback((items: AnnotationItem[]) => {
+    if (previewSchema) {
+      const schemaId = previewSchema.schema.id;
+      handleAnnotationChange(schemaId, items);
+    }
+  }, [previewSchema, handleAnnotationChange]);
 
   // Skeleton component for loading state
   if (isLoadingAgents) {
@@ -193,7 +400,56 @@ export default function AiBuilderPage() {
             tokenUsage={tokenUsage}
             isApproving={isApproving}
             onApprove={handleApprove}
+            onCardClick={handleCardClick}
+            annotations={annotationsArray}
+            onAnnotationsChange={handleAnnotationChange}
+            onRemoveSchema={handleRemoveSchema}
+            onApplyAnnotations={handleApplyAnnotations}
           />
+        )}
+
+        {/* Preview Form Modal with Annotations */}
+        {previewSchema && (
+          <Modal
+            isOpen={!!previewSchema}
+            onClose={handleFormModalClose}
+            title={`Preview: ${previewSchema.schema.singular_name || previewSchema.schema.name}`}
+            description="Review the generated schema and add annotations"
+            size="xl"
+            showCloseButton={true}
+          >
+            <div className="space-y-6">
+              {/* Form */}
+              <SchemaFormWrapper
+                schema={previewSchema.schema}
+                onSubmit={async () => {
+                  // Preview mode - don't submit
+                  console.log('Preview mode - form submission disabled');
+                }}
+                onReset={() => {}}
+                onCancel={handleFormModalClose}
+                initialValues={{}}
+                hideActions={true}
+                disabled={false}
+                hideCollapseExpandButtons={true}
+                forceExpandedSections={true}
+                hideGoToTopButton={true}
+              />
+              
+              {/* Annotation Section */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                  Add Annotations
+                </h4>
+                <ListInput
+                  value={currentSchemaAnnotation?.annotations || []}
+                  onChange={handleModalAnnotationChange}
+                  placeholder="Enter annotation..."
+                  addButtonText="Add Annotation"
+                />
+              </div>
+            </div>
+          </Modal>
         )}
       </div>
     </MainLayout>

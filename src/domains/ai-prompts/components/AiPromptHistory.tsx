@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAiPrompts } from '../hooks/useAiPrompts';
 import type { AiPrompt, AiPromptFilters } from '../types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,8 +19,15 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { MetricCard } from '@/gradian-ui/analytics';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { config } from '@/lib/config';
-import { History, Search, X, DollarSign, Hash, Clock, Timer, Sparkles, Coins, Cpu, User, ChevronDown, ChevronUp } from 'lucide-react';
+import { History, Search, X, DollarSign, Hash, Clock, Timer, Sparkles, Coins, Cpu, User, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import { format } from 'date-fns';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 
 interface AiPromptHistoryProps {
   className?: string;
@@ -54,6 +61,8 @@ export function AiPromptHistory({
   const [expandedPrompt, setExpandedPrompt] = useState<string | null>(null);
   const [agents, setAgents] = useState<AiAgent[]>([]);
   const [users, setUsers] = useState<UserData[]>([]);
+  const [selectedModifiedPrompt, setSelectedModifiedPrompt] = useState<AiPrompt | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const { prompts, loading, error, refreshPrompts } = useAiPrompts(filters);
 
@@ -182,7 +191,30 @@ export function AiPromptHistory({
     setFilters({});
   };
 
-  const displayPrompts = maxItems ? prompts.slice(0, maxItems) : prompts;
+  // Group prompts: parent prompts and their modified versions
+  const promptGroups = useMemo(() => {
+    const parentPrompts: AiPrompt[] = [];
+    const modifiedPromptsMap = new Map<string, AiPrompt[]>();
+    
+    prompts.forEach(prompt => {
+      if (prompt.referenceId) {
+        // This is a modified prompt
+        if (!modifiedPromptsMap.has(prompt.referenceId)) {
+          modifiedPromptsMap.set(prompt.referenceId, []);
+        }
+        modifiedPromptsMap.get(prompt.referenceId)!.push(prompt);
+      } else {
+        // This is a parent prompt
+        parentPrompts.push(prompt);
+      }
+    });
+    
+    return { parentPrompts, modifiedPromptsMap };
+  }, [prompts]);
+
+  const displayPrompts = maxItems 
+    ? promptGroups.parentPrompts.slice(0, maxItems) 
+    : promptGroups.parentPrompts;
 
   if (loading && prompts.length === 0) {
     return (
@@ -379,24 +411,91 @@ export function AiPromptHistory({
             <div className="space-y-4">
               {displayPrompts.map((prompt) => {
                 const agent = agentMap.get(prompt.aiAgent);
+                const modifiedPrompts = promptGroups.modifiedPromptsMap.get(prompt.id) || [];
                 return (
-                  <PromptCard
-                    key={prompt.id}
-                    prompt={prompt}
-                    agent={agent ? {
-                      id: agent.id,
-                      label: agent.label,
-                      icon: agent.icon,
-                      model: agent.model,
-                    } : undefined}
-                    isExpanded={expandedPrompt === prompt.id}
-                    onToggle={() => setExpandedPrompt(
-                      expandedPrompt === prompt.id ? null : prompt.id
+                  <div key={prompt.id} className="space-y-2">
+                    <PromptCard
+                      prompt={prompt}
+                      agent={agent ? {
+                        id: agent.id,
+                        label: agent.label,
+                        icon: agent.icon,
+                        model: agent.model,
+                      } : undefined}
+                      isExpanded={expandedPrompt === prompt.id}
+                      onToggle={() => setExpandedPrompt(
+                        expandedPrompt === prompt.id ? null : prompt.id
+                      )}
+                    />
+                    {/* Modified Prompts */}
+                    {modifiedPrompts.length > 0 && (
+                      <div className="ml-6 pl-4 border-l-2 border-violet-200 dark:border-violet-800 space-y-2">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-violet-600 dark:text-violet-400 mb-2">
+                          <FileText className="h-4 w-4" />
+                          Modified Prompts ({modifiedPrompts.length})
+                        </div>
+                        {modifiedPrompts.map((modifiedPrompt) => {
+                          const modifiedAgent = agentMap.get(modifiedPrompt.aiAgent);
+                          return (
+                            <div
+                              key={modifiedPrompt.id}
+                              className="cursor-pointer hover:bg-violet-50 dark:hover:bg-violet-950/20 rounded-lg p-2 transition-colors"
+                              onClick={() => {
+                                setSelectedModifiedPrompt(modifiedPrompt);
+                                setIsSheetOpen(true);
+                              }}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  {modifiedAgent?.icon && (
+                                    <div className="p-1 rounded bg-violet-100 dark:bg-violet-900/30">
+                                      <IconRenderer
+                                        iconName={modifiedAgent.icon}
+                                        className="h-3 w-3 text-violet-600 dark:text-violet-400"
+                                      />
+                                    </div>
+                                  )}
+                                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {format(new Date(modifiedPrompt.timestamp), 'PPpp')}
+                                  </span>
+                                  {modifiedPrompt.annotations && modifiedPrompt.annotations.length > 0 && (
+                                    <Badge variant="outline" className="text-xs">
+                                      {modifiedPrompt.annotations.length} annotation{modifiedPrompt.annotations.length !== 1 ? 's' : ''}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <ChevronDown className="h-4 w-4 text-gray-400" />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     )}
-                  />
+                  </div>
                 );
               })}
             </div>
+          )}
+          
+          {/* Modified Prompt Sheet */}
+          {selectedModifiedPrompt && (
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+              <SheetContent className="w-full sm:max-w-3xl flex flex-col p-0 h-full overflow-y-auto">
+                <SheetHeader className="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
+                  <SheetTitle>Modified Prompt Details</SheetTitle>
+                  <SheetDescription>
+                    View details of the modified prompt with annotations
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="flex-1 overflow-y-auto px-6 py-6">
+                  <ModifiedPromptViewer 
+                    prompt={selectedModifiedPrompt} 
+                    agentMap={agentMap} 
+                    userMap={userMap}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
           )}
         </CardContent>
       </Card>
@@ -597,6 +696,157 @@ function PromptCard({ prompt, agent, isExpanded, onToggle }: PromptCardProps) {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+interface ModifiedPromptViewerProps {
+  prompt: AiPrompt;
+  agentMap: Map<string, AiAgent>;
+  userMap: Map<string, UserData>;
+}
+
+function ModifiedPromptViewer({ prompt, agentMap, userMap }: ModifiedPromptViewerProps) {
+  const agent = agentMap.get(prompt.aiAgent);
+  const user = userMap.get(prompt.username);
+  const date = new Date(prompt.timestamp);
+  const isJson = prompt.agentResponse.trim().startsWith('{') || 
+                 prompt.agentResponse.trim().startsWith('[');
+
+  return (
+    <div className="space-y-6">
+      {/* Header Info */}
+      <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3">
+          {agent?.icon && (
+            <div className="p-2 rounded-lg bg-violet-100 dark:bg-violet-900/30">
+              <IconRenderer
+                iconName={agent.icon}
+                className="h-5 w-5 text-violet-600 dark:text-violet-400"
+              />
+            </div>
+          )}
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+              {agent?.label || prompt.aiAgent}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {format(date, 'PPpp')} • by {user?.name || prompt.username}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* User Prompt */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            User Prompt:
+          </h4>
+          <CopyContent content={prompt.userPrompt} />
+        </div>
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+          <pre className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">
+            {prompt.userPrompt}
+          </pre>
+        </div>
+      </div>
+
+      {/* Annotations */}
+      {prompt.annotations && prompt.annotations.length > 0 && (
+        <div>
+          <h4 className="text-sm font-semibold mb-3 text-gray-900 dark:text-gray-100">
+            Annotations ({prompt.annotations.length} schema{prompt.annotations.length !== 1 ? 's' : ''})
+          </h4>
+          <div className="space-y-3">
+            {prompt.annotations.map((schemaAnnotation) => (
+              <div
+                key={schemaAnnotation.schemaId}
+                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50"
+              >
+                <h5 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                  {schemaAnnotation.schemaName}
+                </h5>
+                {schemaAnnotation.annotations.length > 0 ? (
+                  <ul className="space-y-1">
+                    {schemaAnnotation.annotations.map((annotation, index) => (
+                      <li
+                        key={annotation.id}
+                        className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"
+                      >
+                        <span className="text-violet-600 dark:text-violet-400 font-medium shrink-0">
+                          {index + 1}.
+                        </span>
+                        <span>{annotation.label}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                    No annotations
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* AI Response */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            AI Response:
+          </h4>
+          <CopyContent content={prompt.agentResponse} />
+        </div>
+        <CodeViewer
+          code={prompt.agentResponse}
+          programmingLanguage={isJson ? 'json' : 'text'}
+          title=""
+          initialLineNumbers={10}
+        />
+      </div>
+
+      {/* Token Usage */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div className="flex items-center gap-2">
+          <Hash className="h-4 w-4 text-gray-500" />
+          <div>
+            <div className="font-medium">Input</div>
+            <div className="text-xs text-gray-500">
+              {prompt.inputTokens.toLocaleString()} tokens
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <DollarSign className="h-4 w-4 text-gray-500" />
+          <div>
+            <div className="font-medium">Input Cost</div>
+            <div className="text-xs text-gray-500">
+              ${prompt.inputPrice.toFixed(4)}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Hash className="h-4 w-4 text-gray-500" />
+          <div>
+            <div className="font-medium">Output</div>
+            <div className="text-xs text-gray-500">
+              {prompt.outputTokens.toLocaleString()} tokens
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <DollarSign className="h-4 w-4 text-gray-500" />
+          <div>
+            <div className="font-medium">Output Cost</div>
+            <div className="text-xs text-gray-500">
+              ${prompt.outputPrice.toFixed(4)}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

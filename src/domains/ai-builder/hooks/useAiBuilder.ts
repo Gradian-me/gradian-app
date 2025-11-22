@@ -28,6 +28,7 @@ interface UseAiBuilderReturn {
   clearResponse: () => void;
   clearError: () => void;
   clearSuccessMessage: () => void;
+  lastPromptId: string | null; // ID of the last saved prompt
 }
 
 /**
@@ -43,6 +44,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [preloadedContext, setPreloadedContext] = useState('');
   const [isLoadingPreload, setIsLoadingPreload] = useState(false);
+  const [lastPromptId, setLastPromptId] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   
   const user = useUserStore((state) => state.user);
@@ -192,6 +194,9 @@ export function useAiBuilder(): UseAiBuilderReturn {
         body: JSON.stringify({
           userPrompt: request.userPrompt.trim(),
           agentId: request.agentId,
+          previousAiResponse: request.previousAiResponse,
+          previousUserPrompt: request.previousUserPrompt,
+          annotations: request.annotations,
         }),
         signal: abortController.signal,
       });
@@ -211,7 +216,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
         const username = user?.name || user?.email || 'anonymous';
         const pricing = builderResponse.tokenUsage.pricing;
         
-        await createPrompt({
+        const savedPrompt = await createPrompt({
           username,
           aiAgent: request.agentId,
           userPrompt: request.userPrompt.trim(),
@@ -226,7 +231,13 @@ export function useAiBuilder(): UseAiBuilderReturn {
           totalPrice: pricing?.total_cost || 0,
           responseTime: builderResponse.timing?.responseTime,
           duration: builderResponse.timing?.duration,
+          referenceId: request.referenceId,
+          annotations: request.annotations,
         });
+        
+        if (savedPrompt?.id) {
+          setLastPromptId(savedPrompt.id);
+        }
       }
     } catch (err) {
       // Don't show error if request was aborted
@@ -433,6 +444,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
     clearResponse,
     clearError,
     clearSuccessMessage,
+    lastPromptId,
   };
 }
 

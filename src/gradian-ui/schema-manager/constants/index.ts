@@ -24,6 +24,7 @@ export const FIELD_TYPES = [
   { value: 'picker', label: 'Picker' },
   { value: 'icon', label: 'Icon' },
   { value: 'image-text', label: 'Image Text' },
+  { value: 'list-input', label: 'List Input' },
   { value: 'button', label: 'Button' },
   { value: 'input', label: 'Input' },
   { value: 'otp', label: 'OTP Input' },

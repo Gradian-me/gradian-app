@@ -292,6 +292,8 @@ export const FormModal: React.FC<FormModalProps> = ({
           errorStatusCode={formErrorStatusCode}
           onErrorDismiss={clearFormError}
           disabled={isSubmitting}
+          hideCollapseExpandButtons={true}
+          forceExpandedSections={true}
         />
       )}
     </Modal>

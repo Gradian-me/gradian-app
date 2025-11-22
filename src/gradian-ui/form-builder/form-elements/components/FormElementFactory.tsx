@@ -33,6 +33,7 @@ import { ToggleGroup } from './ToggleGroup';
 import { UnknownControl } from './UnknownControl';
 import { OTPInput } from './OTPInput';
 import { NameInput } from './NameInput';
+import { ListInput } from './ListInput';
 
 // Support both config-based and field-based interfaces
 export interface FormElementFactoryProps extends Omit<FormElementProps, 'config' | 'touched'> {
@@ -403,6 +404,17 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           size={(config as any).size || 'md'}
           className={restProps.className}
           fieldLabel={(config as any).label || (config as any).name || ''}
+        />
+      );
+    
+    case 'list-input':
+      return (
+        <ListInput
+          value={restProps.value || []}
+          onChange={(items) => restProps.onChange?.(items)}
+          placeholder={(config as any).placeholder || 'Enter annotation...'}
+          addButtonText={(config as any).addButtonText || 'Add Item'}
+          className={restProps.className}
         />
       );
     
