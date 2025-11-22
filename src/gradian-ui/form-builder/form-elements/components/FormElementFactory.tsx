@@ -30,6 +30,7 @@ import { PickerInput } from './PickerInput';
 import { IconInput } from './IconInput';
 import { Toggle } from './Toggle';
 import { ToggleGroup } from './ToggleGroup';
+import { Switch } from './Switch';
 import { UnknownControl } from './UnknownControl';
 import { OTPInput } from './OTPInput';
 import { NameInput } from './NameInput';
@@ -225,6 +226,24 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     
     case 'checkbox-list':
       return <CheckboxList config={config} options={config.options || []} {...commonProps} />;
+
+    case 'switch': {
+      // Filter out touched and other non-DOM props from commonProps
+      const { touched, ...switchProps } = commonProps;
+      return (
+        <Switch
+          config={config}
+          {...switchProps}
+          checked={restProps.checked}
+          required={
+            restProps.required ??
+            config.required ??
+            config.validation?.required ??
+            false
+          }
+        />
+      );
+    }
 
     case 'toggle':
       return (

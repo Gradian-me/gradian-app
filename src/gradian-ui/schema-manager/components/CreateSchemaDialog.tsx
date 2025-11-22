@@ -32,6 +32,10 @@ const INITIAL_FORM_STATE: CreateSchemaPayload = {
   showInNavigation: false,
   isSystemSchema: false,
   isNotCompanyBased: false,
+  allowDataInactive: false,
+  allowDataForce: false,
+  allowDataHardDelete: false,
+  statusId: '',
 };
 
 export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchemaDialogProps) {
@@ -95,7 +99,7 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
     setFormState(prev => ({ ...prev, schemaId: value }));
   };
 
-  const handleSwitchChange = (key: 'showInNavigation' | 'isSystemSchema' | 'isNotCompanyBased') => (checked: boolean) => {
+  const handleSwitchChange = (key: 'showInNavigation' | 'isSystemSchema' | 'isNotCompanyBased' | 'allowDataInactive' | 'allowDataForce' | 'allowDataHardDelete') => (checked: boolean) => {
     setFormState(prev => ({
       ...prev,
       [key]: checked,
@@ -240,6 +244,34 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
               value={formState.isNotCompanyBased}
               onChange={handleSwitchChange('isNotCompanyBased')}
             />
+          </div>
+          <div className="border-t pt-4 mt-4">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Data Management Options</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <FormSwitch
+                config={{ name: 'allowDataInactive', label: 'Allow Data Inactive' }}
+                value={formState.allowDataInactive || false}
+                onChange={handleSwitchChange('allowDataInactive')}
+              />
+              <FormSwitch
+                config={{ name: 'allowDataForce', label: 'Allow Data Force' }}
+                value={formState.allowDataForce || false}
+                onChange={handleSwitchChange('allowDataForce')}
+              />
+              <FormSwitch
+                config={{ name: 'allowDataHardDelete', label: 'Allow Data Hard Delete' }}
+                value={formState.allowDataHardDelete || false}
+                onChange={handleSwitchChange('allowDataHardDelete')}
+              />
+            </div>
+            <div className="mt-4">
+              <TextInput
+                config={{ name: 'statusId', label: 'Status ID' }}
+                value={formState.statusId || ''}
+                onChange={(value) => setFormState(prev => ({ ...prev, statusId: value || undefined }))}
+                placeholder="Enter status schema ID (optional)"
+              />
+            </div>
           </div>
         </div>
         <DialogFooter>

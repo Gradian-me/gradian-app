@@ -85,6 +85,38 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
             disabled={readonly}
           />
         </div>
+        <div className="border-t pt-4 mt-4">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Data Management Options</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <Switch
+              config={{ name: 'allow-data-inactive', label: 'Allow Data Inactive' }}
+              value={schema.allowDataInactive || false}
+              onChange={(checked: boolean) => onUpdate({ allowDataInactive: checked })}
+              disabled={readonly}
+            />
+            <Switch
+              config={{ name: 'allow-data-force', label: 'Allow Data Force' }}
+              value={schema.allowDataForce || false}
+              onChange={(checked: boolean) => onUpdate({ allowDataForce: checked })}
+              disabled={readonly}
+            />
+            <Switch
+              config={{ name: 'allow-data-hard-delete', label: 'Allow Data Hard Delete' }}
+              value={schema.allowDataHardDelete || false}
+              onChange={(checked: boolean) => onUpdate({ allowDataHardDelete: checked })}
+              disabled={readonly}
+            />
+          </div>
+        </div>
+        <div>
+          <TextInput
+            config={{ name: 'status-id', label: 'Status ID' }}
+            value={schema.statusId || ''}
+            onChange={(value) => onUpdate({ statusId: value || undefined })}
+            placeholder="Enter status schema ID (optional)"
+            disabled={readonly}
+          />
+        </div>
       </CardContent>
     </Card>
   );

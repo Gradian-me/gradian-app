@@ -1244,6 +1244,41 @@
       "id": "01KABM5QX5HRPWMPA1M7YK21WJ",
       "createdAt": "2025-11-18T13:58:53.618Z",
       "updatedAt": "2025-11-18T13:58:53.618Z"
+    },
+    {
+      "title": "Graph API",
+      "address": "http://localhost:3000/api/graph?includedSchemaIds=users",
+      "methods": [
+        {
+          "id": "GET",
+          "label": "GET",
+          "icon": "ArrowRight",
+          "color": "info"
+        }
+      ],
+      "id": "01KANYZDJKCA9FNEFE7ZEY0KSD",
+      "createdAt": "2025-11-22T14:19:24.000Z",
+      "updatedAt": "2025-11-22T15:24:46.524Z",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+    },
+    {
+      "title": "Backend Graph API",
+      "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/graph",
+      "methods": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "ArrowRight",
+          "color": "success"
+        }
+      ],
+      "url-parameters": [],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KANZNMEFM5H7211V450ZX2P8",
+      "createdAt": "2025-11-22T14:32:13.019Z",
+      "updatedAt": "2025-11-22T14:32:13.020Z"
     }
   ],
   "integrations": [
@@ -1315,10 +1350,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-18T13:59:50.104Z",
+      "updatedAt": "2025-11-22T15:08:44.696Z",
       "targetDataPath": "data",
       "sourceDataPath": "data",
-      "lastSynced": "2025-11-18T13:59:50.018Z"
+      "lastSynced": "2025-11-22T15:08:36.583Z"
     },
     {
       "color": "#8b5cf6",
@@ -1361,8 +1396,8 @@
       ],
       "id": "lucide_icons_sync",
       "createdAt": "2025-11-17T18:00:00.000Z",
-      "updatedAt": "2025-11-19T15:14:54.950Z",
-      "lastSynced": "2025-11-19T15:14:54.799Z"
+      "updatedAt": "2025-11-22T15:08:53.297Z",
+      "lastSynced": "2025-11-22T15:08:52.923Z"
     },
     {
       "color": "#2e84e0",
@@ -1389,20 +1424,20 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-11-19T06:25:57.869Z",
-      "lastSynced": "2025-11-19T06:25:57.802Z"
+      "updatedAt": "2025-11-22T15:29:19.773Z",
+      "lastSynced": "2025-11-22T15:29:19.698Z"
     },
     {
       "color": "#4E79A7",
-      "title": "AI Agent Sync",
-      "description": "AI Agent Sync",
-      "icon": "Bot",
+      "title": "Graph Data Sync",
+      "description": "Graph Data Sync",
+      "icon": "GitGraph",
       "targetRoute": [
         {
-          "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
-          "label": "Schema Bulk Sync",
+          "id": "01KANZNMEFM5H7211V450ZX2P8",
+          "label": "Backend Graph API",
           "metadata": {
-            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/bulk"
+            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/graph"
           }
         }
       ],
@@ -1414,13 +1449,12 @@
           "color": "success"
         }
       ],
-      "targetDataPath": "data",
       "sourceRoute": [
         {
-          "id": "01KA8VXHQFZR5TH0470163433K",
-          "label": "Schemas",
+          "id": "01KANYZDJKCA9FNEFE7ZEY0KSD",
+          "label": "Graph API",
           "metadata": {
-            "address": "http://localhost:3000/api/schemas"
+            "address": "http://localhost:3000/api/graph"
           }
         }
       ],
@@ -1433,9 +1467,13 @@
         }
       ],
       "sourceDataPath": "data",
-      "id": "ai_agents_sync",
-      "createdAt": "2025-11-19T15:14:24.958Z",
-      "updatedAt": "2025-11-19T15:14:24.958Z"
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "graph_data_sync",
+      "createdAt": "2025-11-22T14:38:40.167Z",
+      "updatedAt": "2025-11-22T15:25:13.006Z",
+      "targetDataPath": "data",
+      "lastSynced": "2025-11-22T15:25:12.947Z"
     }
   ],
   "databases": [

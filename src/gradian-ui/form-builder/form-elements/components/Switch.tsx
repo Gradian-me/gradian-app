@@ -53,6 +53,9 @@ export const Switch = forwardRef<FormElementRef, SwitchProps>(
 
     const isChecked = checked !== undefined ? checked : value;
 
+    // Filter out non-DOM props that shouldn't be passed to RadixSwitch
+    const { touched, ...radixProps } = props;
+
     return (
       <div className="w-full">
         <div className="flex items-center gap-2">
@@ -70,7 +73,7 @@ export const Switch = forwardRef<FormElementRef, SwitchProps>(
               error && 'border-red-500 dark:border-red-600 focus-visible:ring-red-500 dark:focus-visible:ring-red-600',
               className
             )}
-            {...props}
+            {...radixProps}
           />
           {config.label && (
             <Label

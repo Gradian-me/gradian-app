@@ -328,5 +328,15 @@
     "id": "01KAJP7YT2AXSVE6VSK6SBDE7Q",
     "createdAt": "2025-11-21T07:49:44.386Z",
     "updatedAt": "2025-11-21T07:49:44.386Z"
+  },
+  {
+    "sourceSchema": "servers",
+    "sourceId": "01KA8TM7H68FPKTRNNNSPWWBKD",
+    "targetSchema": "url-repository",
+    "targetId": "01KANZNMEFM5H7211V450ZX2P8",
+    "relationTypeId": "HAS_URL",
+    "id": "01KANZNMGVQSKVNPMN9B45M5EW",
+    "createdAt": "2025-11-22T14:32:13.083Z",
+    "updatedAt": "2025-11-22T14:32:13.083Z"
   }
 ]

@@ -2972,6 +2972,94 @@
         ],
         "colSpan": 2,
         "order": 5
+      },
+      {
+        "id": "url-param-schema",
+        "name": "schema",
+        "label": "Parameter Name",
+        "sectionId": "url-parameters",
+        "type": "text",
+        "component": "text",
+        "placeholder": "Enter parameter name (e.g., includedSchemaIds)",
+        "required": true,
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "url-param-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "url-parameters",
+        "type": "text",
+        "component": "text",
+        "placeholder": "Enter parameter title",
+        "required": true,
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "url-param-data-type",
+        "name": "dataType",
+        "label": "Data Type",
+        "sectionId": "url-parameters",
+        "type": "select",
+        "component": "select",
+        "placeholder": "Select data type",
+        "required": true,
+        "validation": {
+          "required": true
+        },
+        "options": [
+          {
+            "id": "string",
+            "label": "String"
+          },
+          {
+            "id": "number",
+            "label": "Number"
+          },
+          {
+            "id": "object",
+            "label": "Object"
+          },
+          {
+            "id": "array",
+            "label": "Array"
+          }
+        ],
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "url-param-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "url-parameters",
+        "type": "textarea",
+        "component": "textarea",
+        "placeholder": "Enter parameter description",
+        "required": false,
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "url-param-is-required",
+        "name": "isRequired",
+        "label": "Is Required",
+        "sectionId": "url-parameters",
+        "type": "switch",
+        "component": "switch",
+        "required": false,
+        "colSpan": 1,
+        "order": 5
       }
     ],
     "sections": [
@@ -2981,6 +3069,21 @@
         "description": "URL details and associated metadata",
         "initialState": "expanded",
         "columns": 2
+      },
+      {
+        "id": "url-parameters",
+        "title": "URL Parameters",
+        "description": "Define query parameters for the URL",
+        "initialState": "expanded",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 0,
+          "maxItems": 100,
+          "addButtonText": "Add Parameter",
+          "removeButtonText": "Remove Parameter",
+          "emptyMessage": "No parameters added yet"
+        }
       }
     ],
     "detailPageMetadata": {
@@ -2996,6 +3099,12 @@
             "url-description",
             "url-methods"
           ]
+        },
+        {
+          "id": "url-parameters-section",
+          "title": "URL Parameters",
+          "description": "Query parameters for this URL",
+          "colSpan": 2
         }
       ]
     },

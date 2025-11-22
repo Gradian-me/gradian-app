@@ -19,8 +19,10 @@ export const revalidate = 0;
  *   - For nodes: only entities from these schemas are included
  *   - For edges: edges are included if EITHER sourceSchema OR targetSchema matches
  * - excludedSchemaIds: Comma-separated list of schema IDs to exclude (optional)
+ * - graphType: Filter by graph type - 'nodes' to return only nodes, 'edges' to return only edges (optional)
+ *   - If not provided, returns both nodes and edges
  * 
- * Returns: { nodes: [], edges: [] }
+ * Returns: { success: true, data: { nodes: [], edges: [] }, message: string }
  */
 export async function GET(request: NextRequest) {
   try {
@@ -29,6 +31,7 @@ export async function GET(request: NextRequest) {
     // Parse query parameters
     const includedSchemaIdsParam = searchParams.get('includedSchemaIds');
     const excludedSchemaIdsParam = searchParams.get('excludedSchemaIds');
+    const graphTypeParam = searchParams.get('graphType');
     
     const includedSchemaIds = includedSchemaIdsParam 
       ? includedSchemaIdsParam.split(',').map(id => id.trim()).filter(Boolean)
@@ -37,6 +40,19 @@ export async function GET(request: NextRequest) {
     const excludedSchemaIds = excludedSchemaIdsParam
       ? excludedSchemaIdsParam.split(',').map(id => id.trim()).filter(Boolean)
       : [];
+    
+    // Validate graphType parameter
+    const graphType = graphTypeParam?.toLowerCase();
+    const validGraphTypes = ['nodes', 'edges'];
+    if (graphType && !validGraphTypes.includes(graphType)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Invalid graphType. Must be one of: ${validGraphTypes.join(', ')}`,
+        },
+        { status: 400 }
+      );
+    }
 
     // Read all data
     const allData = readAllData();
@@ -88,8 +104,8 @@ export async function GET(request: NextRequest) {
       if (schemaMatches && !isExcluded) {
         edges.push({
           id: relation.id,
-          source: relation.sourceId,
-          target: relation.targetId,
+          sourceId: relation.sourceId,
+          targetId: relation.targetId,
           sourceSchema: relation.sourceSchema,
           targetSchema: relation.targetSchema,
           relationTypeId: relation.relationTypeId,
@@ -99,9 +115,27 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Filter response based on graphType
+    const responseData: { nodes?: any[]; edges?: any[] } = {};
+    let message = '';
+    
+    if (graphType === 'nodes') {
+      responseData.nodes = nodes;
+      message = `Retrieved ${nodes.length} nodes`;
+    } else if (graphType === 'edges') {
+      responseData.edges = edges;
+      message = `Retrieved ${edges.length} edges`;
+    } else {
+      // Return both if graphType is not specified
+      responseData.nodes = nodes;
+      responseData.edges = edges;
+      message = `Retrieved ${nodes.length} nodes and ${edges.length} edges`;
+    }
+
     return NextResponse.json({
-      nodes,
-      edges,
+      success: true,
+      data: responseData,
+      message,
     });
   } catch (error) {
     const errorResponse = handleDomainError(error);

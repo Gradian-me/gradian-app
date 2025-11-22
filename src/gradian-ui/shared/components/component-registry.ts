@@ -535,7 +535,16 @@ export const ALL_COMPONENTS: ComponentMeta[] = [
       ],
     },
   },
-  { id: 'switch', label: 'Switch', color: 'emerald', icon: 'ToggleRight', category: 'form-elements', description: 'Boolean toggle switch.', usecase: 'Enable/disable flags.', directory: 'src/gradian-ui/form-builder/form-elements/components/Switch.tsx' },
+  { 
+    id: 'switch', 
+    label: 'Switch', 
+    color: 'emerald', 
+    icon: 'ToggleRight', 
+    category: 'form-elements', 
+    description: 'Boolean toggle switch.', 
+    usecase: 'Enable/disable flags.', 
+    directory: 'src/gradian-ui/form-builder/form-elements/components/Switch.tsx' 
+  },
   { id: 'radio-group', label: 'RadioGroup', color: 'purple', icon: 'CircleDot', category: 'form-elements', description: 'Radio buttons group.', usecase: 'Pick one option.', directory: 'src/gradian-ui/form-builder/form-elements/components/RadioGroup.tsx' },
   { id: 'checkbox', label: 'Checkbox', color: 'purple', icon: 'CheckSquare', category: 'form-elements', description: 'Single checkbox input.', usecase: 'Single boolean.', directory: 'src/gradian-ui/form-builder/form-elements/components/Checkbox.tsx' },
   { id: 'checkbox-list', label: 'CheckboxList', color: 'purple', icon: 'SquareCheck', category: 'form-elements', description: 'Checklist for multiple selections.', usecase: 'Multiple booleans/options.', directory: 'src/gradian-ui/form-builder/form-elements/components/CheckboxList.tsx' },
@@ -691,6 +700,8 @@ export function mapComponentTypeToId(componentType: string): string {
     'slider': 'slider',
     'code-viewer': 'code-viewer',
     'tag-input': 'tag-input',
+    'switch': 'switch',
+    'checkbox': 'checkbox',
   };
   
   return typeMap[componentType] || componentType;

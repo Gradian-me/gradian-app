@@ -323,6 +323,10 @@ export interface FormSchema {
   isSystemSchema?: boolean;
   isNotCompanyBased?: boolean;
   inactive?: boolean;
+  allowDataInactive?: boolean;
+  allowDataForce?: boolean;
+  allowDataHardDelete?: boolean;
+  statusId?: string;
   fields: FormField[]; // All fields at schema level, each with a sectionId
   sections: FormSection[]; // Sections no longer contain fields
   fieldsCount?: number;

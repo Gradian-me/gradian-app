@@ -16,6 +16,10 @@ export interface CreateSchemaPayload {
   showInNavigation: boolean;
   isSystemSchema: boolean;
   isNotCompanyBased: boolean;
+  allowDataInactive?: boolean;
+  allowDataForce?: boolean;
+  allowDataHardDelete?: boolean;
+  statusId?: string;
 }
 
 export interface SchemaCreateResult {
