@@ -18,7 +18,7 @@
         }
       }
     ],
-        "responseCards": [
+    "responseCards": [
       {
         "idPath": "$.id",
         "labelPath": "$.singular_name",

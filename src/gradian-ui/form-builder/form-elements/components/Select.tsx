@@ -330,6 +330,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       }
       return idsFromValue;
     });
+  }, [allowMultiselect, normalizedValueIdsKey]);
 
   const validOptionsCount = validOptions.length;
 
@@ -345,7 +346,6 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
     setShouldShowMultiChevron(needsScroll);
   }, [allowMultiselect, panelMaxHeight, size, validOptionsCount]);
-  }, [allowMultiselect, normalizedValueIdsKey]);
 
   const arraysMatch = useCallback(
     (a: string[], b: string[]) => {
