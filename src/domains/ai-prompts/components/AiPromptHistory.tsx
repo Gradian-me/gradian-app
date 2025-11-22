@@ -19,7 +19,9 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { MetricCard } from '@/gradian-ui/analytics';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { config } from '@/lib/config';
-import { History, Search, X, DollarSign, Hash, Clock, Timer, Sparkles, Coins, Cpu, User, ChevronDown, ChevronUp, FileText } from 'lucide-react';
+import { History, Search, X, DollarSign, Hash, Clock, Timer, Sparkles, Coins, Cpu, User, ChevronDown, ChevronUp, FileText, ExternalLink } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ModifiedPromptsList } from './ModifiedPromptsList';
 import { format } from 'date-fns';
 import {
   Sheet,
@@ -54,6 +56,7 @@ export function AiPromptHistory({
   maxItems,
   showFilters = true 
 }: AiPromptHistoryProps) {
+  const router = useRouter();
   const [filters, setFilters] = useState<AiPromptFilters>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAgent, setSelectedAgent] = useState<string>('');
@@ -61,8 +64,6 @@ export function AiPromptHistory({
   const [expandedPrompt, setExpandedPrompt] = useState<string | null>(null);
   const [agents, setAgents] = useState<AiAgent[]>([]);
   const [users, setUsers] = useState<UserData[]>([]);
-  const [selectedModifiedPrompt, setSelectedModifiedPrompt] = useState<AiPrompt | null>(null);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const { prompts, loading, error, refreshPrompts } = useAiPrompts(filters);
 
@@ -426,50 +427,16 @@ export function AiPromptHistory({
                       onToggle={() => setExpandedPrompt(
                         expandedPrompt === prompt.id ? null : prompt.id
                       )}
+                      router={router}
                     />
                     {/* Modified Prompts */}
                     {modifiedPrompts.length > 0 && (
-                      <div className="ml-6 pl-4 border-l-2 border-violet-200 dark:border-violet-800 space-y-2">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-violet-600 dark:text-violet-400 mb-2">
-                          <FileText className="h-4 w-4" />
-                          Modified Prompts ({modifiedPrompts.length})
-                        </div>
-                        {modifiedPrompts.map((modifiedPrompt) => {
-                          const modifiedAgent = agentMap.get(modifiedPrompt.aiAgent);
-                          return (
-                            <div
-                              key={modifiedPrompt.id}
-                              className="cursor-pointer hover:bg-violet-50 dark:hover:bg-violet-950/20 rounded-lg p-2 transition-colors"
-                              onClick={() => {
-                                setSelectedModifiedPrompt(modifiedPrompt);
-                                setIsSheetOpen(true);
-                              }}
-                            >
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  {modifiedAgent?.icon && (
-                                    <div className="p-1 rounded bg-violet-100 dark:bg-violet-900/30">
-                                      <IconRenderer
-                                        iconName={modifiedAgent.icon}
-                                        className="h-3 w-3 text-violet-600 dark:text-violet-400"
-                                      />
-                                    </div>
-                                  )}
-                                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    {format(new Date(modifiedPrompt.timestamp), 'PPpp')}
-                                  </span>
-                                  {modifiedPrompt.annotations && modifiedPrompt.annotations.length > 0 && (
-                                    <Badge variant="outline" className="text-xs">
-                                      {modifiedPrompt.annotations.length} annotation{modifiedPrompt.annotations.length !== 1 ? 's' : ''}
-                                    </Badge>
-                                  )}
-                                </div>
-                                <ChevronDown className="h-4 w-4 text-gray-400" />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
+                      <ModifiedPromptsList
+                        parentPromptId={prompt.id}
+                        modifiedPrompts={modifiedPrompts}
+                        agentMap={agentMap}
+                        userMap={userMap}
+                      />
                     )}
                   </div>
                 );
@@ -477,26 +444,6 @@ export function AiPromptHistory({
             </div>
           )}
           
-          {/* Modified Prompt Sheet */}
-          {selectedModifiedPrompt && (
-            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-              <SheetContent className="w-full sm:max-w-3xl flex flex-col p-0 h-full overflow-y-auto">
-                <SheetHeader className="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
-                  <SheetTitle>Modified Prompt Details</SheetTitle>
-                  <SheetDescription>
-                    View details of the modified prompt with annotations
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="flex-1 overflow-y-auto px-6 py-6">
-                  <ModifiedPromptViewer 
-                    prompt={selectedModifiedPrompt} 
-                    agentMap={agentMap} 
-                    userMap={userMap}
-                  />
-                </div>
-              </SheetContent>
-            </Sheet>
-          )}
         </CardContent>
       </Card>
     </div>
@@ -508,9 +455,10 @@ interface PromptCardProps {
   agent?: { id: string; label: string; icon: string; model?: string } | undefined;
   isExpanded: boolean;
   onToggle: () => void;
+  router: ReturnType<typeof useRouter>;
 }
 
-function PromptCard({ prompt, agent, isExpanded, onToggle }: PromptCardProps) {
+function PromptCard({ prompt, agent, isExpanded, onToggle, router }: PromptCardProps) {
   const date = new Date(prompt.timestamp);
   const isJson = prompt.agentResponse.trim().startsWith('{') || 
                  prompt.agentResponse.trim().startsWith('[');
@@ -552,15 +500,29 @@ function PromptCard({ prompt, agent, isExpanded, onToggle }: PromptCardProps) {
               {format(date, 'PPpp')}
             </CardDescription>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggle}
-            className="flex flex-row items-center gap-1"
-          >
-            {isExpanded ? 'Collapse' : 'Expand'}
-            {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push(`/ai-builder/${prompt.id}`);
+              }}
+              className="flex flex-row items-center gap-1"
+            >
+              <ExternalLink className="h-3 w-3" />
+              Open in AI Builder
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggle}
+              className="flex flex-row items-center gap-1"
+            >
+              {isExpanded ? 'Collapse' : 'Expand'}
+              {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -699,154 +661,4 @@ function PromptCard({ prompt, agent, isExpanded, onToggle }: PromptCardProps) {
   );
 }
 
-interface ModifiedPromptViewerProps {
-  prompt: AiPrompt;
-  agentMap: Map<string, AiAgent>;
-  userMap: Map<string, UserData>;
-}
-
-function ModifiedPromptViewer({ prompt, agentMap, userMap }: ModifiedPromptViewerProps) {
-  const agent = agentMap.get(prompt.aiAgent);
-  const user = userMap.get(prompt.username);
-  const date = new Date(prompt.timestamp);
-  const isJson = prompt.agentResponse.trim().startsWith('{') || 
-                 prompt.agentResponse.trim().startsWith('[');
-
-  return (
-    <div className="space-y-6">
-      {/* Header Info */}
-      <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-3">
-          {agent?.icon && (
-            <div className="p-2 rounded-lg bg-violet-100 dark:bg-violet-900/30">
-              <IconRenderer
-                iconName={agent.icon}
-                className="h-5 w-5 text-violet-600 dark:text-violet-400"
-              />
-            </div>
-          )}
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-              {agent?.label || prompt.aiAgent}
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {format(date, 'PPpp')} • by {user?.name || prompt.username}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* User Prompt */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-            User Prompt:
-          </h4>
-          <CopyContent content={prompt.userPrompt} />
-        </div>
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
-          <pre className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">
-            {prompt.userPrompt}
-          </pre>
-        </div>
-      </div>
-
-      {/* Annotations */}
-      {prompt.annotations && prompt.annotations.length > 0 && (
-        <div>
-          <h4 className="text-sm font-semibold mb-3 text-gray-900 dark:text-gray-100">
-            Annotations ({prompt.annotations.length} schema{prompt.annotations.length !== 1 ? 's' : ''})
-          </h4>
-          <div className="space-y-3">
-            {prompt.annotations.map((schemaAnnotation) => (
-              <div
-                key={schemaAnnotation.schemaId}
-                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50"
-              >
-                <h5 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
-                  {schemaAnnotation.schemaName}
-                </h5>
-                {schemaAnnotation.annotations.length > 0 ? (
-                  <ul className="space-y-1">
-                    {schemaAnnotation.annotations.map((annotation, index) => (
-                      <li
-                        key={annotation.id}
-                        className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"
-                      >
-                        <span className="text-violet-600 dark:text-violet-400 font-medium shrink-0">
-                          {index + 1}.
-                        </span>
-                        <span>{annotation.label}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                    No annotations
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* AI Response */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-            AI Response:
-          </h4>
-          <CopyContent content={prompt.agentResponse} />
-        </div>
-        <CodeViewer
-          code={prompt.agentResponse}
-          programmingLanguage={isJson ? 'json' : 'text'}
-          title=""
-          initialLineNumbers={10}
-        />
-      </div>
-
-      {/* Token Usage */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-        <div className="flex items-center gap-2">
-          <Hash className="h-4 w-4 text-gray-500" />
-          <div>
-            <div className="font-medium">Input</div>
-            <div className="text-xs text-gray-500">
-              {prompt.inputTokens.toLocaleString()} tokens
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <DollarSign className="h-4 w-4 text-gray-500" />
-          <div>
-            <div className="font-medium">Input Cost</div>
-            <div className="text-xs text-gray-500">
-              ${prompt.inputPrice.toFixed(4)}
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Hash className="h-4 w-4 text-gray-500" />
-          <div>
-            <div className="font-medium">Output</div>
-            <div className="text-xs text-gray-500">
-              {prompt.outputTokens.toLocaleString()} tokens
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <DollarSign className="h-4 w-4 text-gray-500" />
-          <div>
-            <div className="font-medium">Output Cost</div>
-            <div className="text-xs text-gray-500">
-              ${prompt.outputPrice.toFixed(4)}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 

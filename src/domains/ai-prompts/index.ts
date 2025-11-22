@@ -19,4 +19,6 @@ export { useAiPrompts } from './hooks/useAiPrompts';
 
 // Components
 export { AiPromptHistory } from './components/AiPromptHistory';
+export { ModifiedPromptsList } from './components/ModifiedPromptsList';
+export { ModifiedPromptViewer } from './components/ModifiedPromptViewer';
 
