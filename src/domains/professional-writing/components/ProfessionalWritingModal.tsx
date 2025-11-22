@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } from '@/gradian-ui/form-builder/form-elements/components/Textarea';
 import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { useProfessionalWriting } from '../hooks/useProfessionalWriting';
@@ -182,18 +182,19 @@ export function ProfessionalWritingModal({
 
           {/* Input Textarea */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Input Text
-            </label>
             <Textarea
+              config={{
+                name: 'input-text',
+                label: 'Input Text',
+                placeholder: 'Enter text to enhance...',
+              }}
               value={inputText}
-              onChange={(e) => {
-                setInputText(e.target.value);
+              onChange={(value) => {
+                setInputText(value);
                 clearResponse();
               }}
-              placeholder="Enter text to enhance..."
               rows={6}
-              className="resize-none"
+              resize="none"
             />
           </div>
 
@@ -226,35 +227,34 @@ export function ProfessionalWritingModal({
           {/* Output Textarea */}
           {enhancedText && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Enhanced Text
-              </label>
-              <div className="relative">
-                <Textarea
-                  value={enhancedText}
-                  readOnly
-                  rows={6}
-                  className={cn(
-                    "direction-auto resize-none bg-gray-50 dark:bg-gray-800 pr-20"
-                  )}
-                />
-                <div className="absolute right-2 top-2 flex items-center gap-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setInputText(enhancedText);
-                      clearResponse();
-                    }}
-                    className="h-7 w-7 p-0 hover:bg-violet-100 hover:text-violet-600 dark:hover:bg-violet-900 dark:hover:text-violet-400"
-                    title="Replace input text with enhanced text"
-                    aria-label="Replace input text"
-                  >
-                    <ArrowUp className="h-4 w-4" />
-                  </Button>
-                  <CopyContent content={enhancedText} />
-                </div>
+              <Textarea
+                config={{
+                  name: 'enhanced-text',
+                  label: 'Enhanced Text',
+                }}
+                value={enhancedText}
+                disabled={true}
+                rows={6}
+                resize="none"
+                canCopy={true}
+                className="bg-gray-50 dark:bg-gray-800"
+              />
+              <div className="flex justify-end mt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setInputText(enhancedText);
+                    clearResponse();
+                  }}
+                  className="h-8 px-3 hover:bg-violet-100 hover:text-violet-600 dark:hover:bg-violet-900 dark:hover:text-violet-400"
+                  title="Replace input text with enhanced text"
+                  aria-label="Replace input text"
+                >
+                  <ArrowUp className="h-4 w-4 mr-2" />
+                  Replace Input Text
+                </Button>
               </div>
             </div>
           )}
