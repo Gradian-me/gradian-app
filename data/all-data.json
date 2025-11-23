@@ -927,7 +927,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K9724JFPP7A6RX7H6NTFHE1D",
       "createdAt": "2025-11-04T09:11:01.375Z",
-      "updatedAt": "2025-11-16T12:56:33.667Z",
+      "updatedAt": "2025-11-23T06:34:28.574Z",
       "vendorId": [
         {
           "id": "01K8QVCWS0ZSTMSVD5C6K7A806",
@@ -949,16 +949,8 @@
           "color": "success"
         }
       ],
-      "quotation-items": [
-        {
-          "id": "01K9725HNMEAFXGB98SCER6JVK",
-          "label": "HPLC Equipment Agilent 2190"
-        },
-        {
-          "id": "01K9726N9T00JAG6QC7ZWMX650",
-          "label": "Himedia Feed Alpha"
-        }
-      ]
+      "quotation-items": [],
+      "incomplete": false
     }
   ],
   "quotation-items": [
@@ -1278,33 +1270,6 @@
   ],
   "integrations": [
     {
-      "color": "#00d1ae",
-      "title": "Email Template Sync",
-      "description": "Email template cache synchronization and management",
-      "icon": "Mail",
-      "lastSynced": "",
-      "targetRoute": [
-        {
-          "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
-          "label": "Email Template Sync",
-          "metadata": {
-            "address": "http://172.20.200.106:8504/notifications/cache/refresh"
-          }
-        }
-      ],
-      "targetMethod": [
-        {
-          "id": "GET",
-          "label": "GET",
-          "icon": "Download",
-          "color": "info"
-        }
-      ],
-      "id": "email_template_sync",
-      "createdAt": "2025-11-17T12:05:23.829Z",
-      "updatedAt": "2025-11-17T13:03:00.772Z"
-    },
-    {
       "color": "#930ec4",
       "title": "Schemas Sync",
       "description": "This Syncs Schema From App to DB",
@@ -1349,50 +1314,6 @@
       "targetDataPath": "data",
       "sourceDataPath": "data",
       "lastSynced": "2025-11-22T16:20:09.318Z"
-    },
-    {
-      "color": "#8b5cf6",
-      "title": "Lucide Icons Sync",
-      "description": "Synchronize Lucide icon library from external source",
-      "icon": "Palette",
-      "targetRoute": [
-        {
-          "id": "01KA9LUCIDEICONSYNC001",
-          "label": "Lucide Icons Sync",
-          "metadata": {
-            "address": "http://localhost:3000/api/integrations/lucide-icons/sync"
-          }
-        }
-      ],
-      "targetMethod": [
-        {
-          "id": "POST",
-          "label": "POST",
-          "icon": "Upload",
-          "color": "success"
-        }
-      ],
-      "sourceRoute": [
-        {
-          "id": "01KA9LUCIDEICONS001",
-          "label": "Lucide Icons",
-          "metadata": {
-            "address": "http://localhost:3000/api/integrations/lucide-icons"
-          }
-        }
-      ],
-      "sourceMethod": [
-        {
-          "id": "GET",
-          "label": "GET",
-          "icon": "Download",
-          "color": "info"
-        }
-      ],
-      "id": "lucide_icons_sync",
-      "createdAt": "2025-11-17T18:00:00.000Z",
-      "updatedAt": "2025-11-22T15:08:53.297Z",
-      "lastSynced": "2025-11-22T15:08:52.923Z"
     },
     {
       "color": "#2e84e0",
@@ -1469,6 +1390,77 @@
       "updatedAt": "2025-11-22T16:42:08.729Z",
       "targetDataPath": "data",
       "lastSynced": "2025-11-22T16:42:08.574Z"
+    },
+    {
+      "color": "#00d1ae",
+      "title": "Email Template Sync",
+      "description": "Email template cache synchronization and management",
+      "icon": "Mail",
+      "lastSynced": "",
+      "targetRoute": [
+        {
+          "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
+          "label": "Email Template Sync",
+          "metadata": {
+            "address": "http://172.20.200.106:8504/notifications/cache/refresh"
+          }
+        }
+      ],
+      "targetMethod": [
+        {
+          "id": "GET",
+          "label": "GET",
+          "icon": "Download",
+          "color": "info"
+        }
+      ],
+      "id": "email_template_sync",
+      "createdAt": "2025-11-17T12:05:23.829Z",
+      "updatedAt": "2025-11-17T13:03:00.772Z"
+    },
+    {
+      "color": "#8b5cf6",
+      "title": "Lucide Icons Sync",
+      "description": "Synchronize Lucide icon library from external source",
+      "icon": "Palette",
+      "targetRoute": [
+        {
+          "id": "01KA9LUCIDEICONSYNC001",
+          "label": "Lucide Icons Sync",
+          "metadata": {
+            "address": "http://localhost:3000/api/integrations/lucide-icons/sync"
+          }
+        }
+      ],
+      "targetMethod": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "Upload",
+          "color": "success"
+        }
+      ],
+      "sourceRoute": [
+        {
+          "id": "01KA9LUCIDEICONS001",
+          "label": "Lucide Icons",
+          "metadata": {
+            "address": "http://localhost:3000/api/integrations/lucide-icons"
+          }
+        }
+      ],
+      "sourceMethod": [
+        {
+          "id": "GET",
+          "label": "GET",
+          "icon": "Download",
+          "color": "info"
+        }
+      ],
+      "id": "lucide_icons_sync",
+      "createdAt": "2025-11-17T18:00:00.000Z",
+      "updatedAt": "2025-11-22T15:08:53.297Z",
+      "lastSynced": "2025-11-22T15:08:52.923Z"
     }
   ],
   "databases": [

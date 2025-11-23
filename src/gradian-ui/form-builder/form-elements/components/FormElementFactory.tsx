@@ -69,8 +69,8 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       disabled: mergedDisabled,
       ...otherProps,
     };
-    // Prioritize field.required over field.validation?.required
-    const derivedRequired = field?.required ?? field?.validation?.required ?? false;
+    // Use validation.required
+    const derivedRequired = field?.validation?.required ?? false;
     if (typeof restProps.required === 'undefined') {
       restProps.required = derivedRequired;
     }
@@ -85,11 +85,8 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       ...otherProps,
       disabled: mergedDisabled,
     };
-    // Prioritize config.required over config.validation?.required
-    const derivedRequired =
-      configProp?.required ??
-      configProp?.validation?.required ??
-      false;
+    // Use validation.required
+    const derivedRequired = configProp?.validation?.required ?? false;
     if (typeof restProps.required === 'undefined') {
       restProps.required = derivedRequired;
     }
@@ -212,7 +209,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           options={selectOptions}
           className={restProps.className}
           error={restProps.error}
-          required={config.required ?? config.validation?.required ?? false}
+          required={config.validation?.required ?? false}
           placeholder={config.placeholder}
         />
       );
@@ -236,7 +233,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           checked={restProps.checked}
           required={
             restProps.required ??
-            config.required ??
             config.validation?.required ??
             false
           }
@@ -251,7 +247,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           {...commonProps}
           required={
             restProps.required ??
-            config.required ??
             config.validation?.required ??
             false
           }
@@ -292,7 +287,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           className={restProps.className}
           required={
             restProps.required ??
-            config.required ??
             config.validation?.required ??
             false
           }

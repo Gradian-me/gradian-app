@@ -64,7 +64,7 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
                   {field.role}
                 </Badge>
               )}
-              {field.required && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Required</Badge>}
+              {field.validation?.required && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Required</Badge>}
             </div>
             <span className={`text-[10px] truncate block mt-0.5 ${
               field.inactive ? 'text-gray-400' : 'text-gray-400'
@@ -179,8 +179,14 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <Switch
                 config={{ name: `required-${field.id}`, label: 'Required' }}
-                value={tempField.required || false}
-                onChange={(checked: boolean) => setTempField({ ...tempField, required: checked })}
+                value={tempField.validation?.required || false}
+                onChange={(checked: boolean) => setTempField({ 
+                  ...tempField, 
+                  validation: { 
+                    ...tempField.validation, 
+                    required: checked 
+                  } 
+                })}
               />
               <Switch
                 config={{ name: `disabled-${field.id}`, label: 'Disabled' }}

@@ -67,7 +67,7 @@ export const Switch = forwardRef<FormElementRef, SwitchProps>(
             onCheckedChange={handleCheckedChange}
             onBlur={handleBlur}
             onFocus={handleFocus}
-            required={required ?? config.required ?? config.validation?.required ?? false}
+            required={required ?? config.validation?.required ?? false}
             disabled={disabled}
             className={cn(
               error && 'border-red-500 dark:border-red-600 focus-visible:ring-red-500 dark:focus-visible:ring-red-600',

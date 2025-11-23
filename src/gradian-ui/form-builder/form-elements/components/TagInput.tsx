@@ -208,7 +208,7 @@ export const TagInput = forwardRef<FormElementRef, TagInputProps>(
             onFocus={handleFocus}
             placeholder={tags.length === 0 ? fieldPlaceholder : ''}
             disabled={disabled}
-            required={required ?? config.required ?? config.validation?.required ?? false}
+            required={required ?? config.validation?.required ?? false}
             className="flex-1 min-w-[120px] outline-none bg-transparent text-sm"
             {...props}
           />

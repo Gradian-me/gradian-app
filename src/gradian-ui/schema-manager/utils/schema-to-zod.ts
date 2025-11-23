@@ -11,7 +11,7 @@ type ValidationRule = NonNullable<FormField['validation']>;
  * Converts a validation rule from form schema to Zod schema
  */
 const convertValidationToZod = (field: FormField): any => {
-  const { validation, component, required } = field;
+  const { validation, component } = field;
   
   // Start with base type
   let zodType: z.ZodTypeAny;
@@ -55,7 +55,7 @@ const convertValidationToZod = (field: FormField): any => {
   // Apply validation rules
   if (validation) {
     // Required validation
-    const isRequired = required ?? validation.required ?? false;
+    const isRequired = validation.required ?? false;
     const errorMessage = validation.custom ? undefined : getErrorMessage(field, validation);
     
     if (isRequired) {
@@ -110,9 +110,6 @@ const convertValidationToZod = (field: FormField): any => {
         : validation.pattern;
       zodType = (zodType as z.ZodString).regex(pattern, errorMsg);
     }
-  } else if (required && component !== 'number') {
-    // If just required without validation object
-    zodType = (zodType as z.ZodString).min(1, `${field.label} is required`);
   }
   
   // Checkbox with options (multi-select)
@@ -121,7 +118,7 @@ const convertValidationToZod = (field: FormField): any => {
   }
   
   // For non-required fields, make it optional
-  if (!required && !validation?.required) {
+  if (!validation?.required) {
     zodType = zodType.optional();
   }
   
@@ -230,11 +227,6 @@ export const generateValidationRulesFromForm = <T extends FormSchema>(
           Object.assign(fieldRules, field.validation);
         }
         
-        // Also check the required prop on the field itself
-        if (field.required && !field.validation?.required) {
-          fieldRules.required = true;
-        }
-        
         if (Object.keys(fieldRules).length > 0) {
           // For repeating sections, store rules at the field level
           // These will be applied to each item in the array
@@ -249,11 +241,6 @@ export const generateValidationRulesFromForm = <T extends FormSchema>(
         
         if (field.validation) {
           Object.assign(fieldRules, field.validation);
-        }
-        
-        // Also check the required prop on the field itself
-        if (field.required && !field.validation?.required) {
-          fieldRules.required = true;
         }
         
         if (Object.keys(fieldRules).length > 0) {

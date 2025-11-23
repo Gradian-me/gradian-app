@@ -242,14 +242,12 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
       if (!field) return state;
       
       // Check if field should be validated (required or has validation rules)
-      // Prioritize field.required over field.validation?.required
-      const isRequired = field.required ?? field.validation?.required ?? false;
+      const isRequired = field.validation?.required ?? false;
       if (!isRequired && !field.validation) return state;
       
       const validationRules = {
         ...field.validation,
-        // Prioritize field.required over field.validation?.required
-        required: field.required ?? field.validation?.required ?? false
+        required: field.validation?.required ?? false
       };
       const result = validateFieldUtil(fieldValue, validationRules);
       return {
@@ -267,13 +265,11 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
       
       action.schema.fields.forEach(field => {
         // Check if field is required or has validation rules
-        // Prioritize field.required over field.validation?.required
-        const isRequired = field.required ?? field.validation?.required ?? false;
+        const isRequired = field.validation?.required ?? false;
         if (isRequired || field.validation) {
           const validationRules = {
             ...field.validation,
-            // Prioritize field.required over field.validation?.required
-            required: field.required ?? field.validation?.required ?? false
+            required: field.validation?.required ?? false
           };
           const result = validateFieldUtil(state.values[field.name], validationRules);
           if (!result.isValid) {
@@ -471,11 +467,11 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           items.forEach((item: any, itemIndex: number) => {
             sectionFields.forEach(field => {
               // Check if field is required or has validation rules
-              const isRequired = field.required ?? field.validation?.required ?? false;
+              const isRequired = field.validation?.required ?? false;
               if (isRequired || field.validation) {
                 const validationRules = {
                   ...field.validation,
-                  required: field.required ?? field.validation?.required ?? false
+                  required: field.validation?.required ?? false
                 };
                 const fieldValue = item[field.name];
                 const result = validateFieldUtil(fieldValue, validationRules);
@@ -494,11 +490,11 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
         sectionFields.forEach(field => {
           // Check if field is required or has validation rules
-          const isRequired = field.required ?? field.validation?.required ?? false;
+          const isRequired = field.validation?.required ?? false;
           if (isRequired || field.validation) {
             const validationRules = {
               ...field.validation,
-              required: field.required ?? field.validation?.required ?? false
+              required: field.validation?.required ?? false
             };
             const result = validateFieldUtil(state.values[field.name], validationRules);
             if (!result.isValid) {
@@ -805,13 +801,11 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       items.forEach((item: any, itemIndex: number) => {
         sectionFields.forEach(field => {
           // Check if field is required or has validation rules
-          // Prioritize field.required over field.validation?.required
-          const isRequired = field.required ?? field.validation?.required ?? false;
+          const isRequired = field.validation?.required ?? false;
           if (isRequired || field.validation) {
             const validationRules = {
               ...field.validation,
-              // Prioritize field.required over field.validation?.required
-              required: field.required ?? field.validation?.required ?? false
+              required: field.validation?.required ?? false
             };
             const fieldValue = item[field.name];
             const result = validateFieldUtil(fieldValue, validationRules);

@@ -64,7 +64,7 @@ export const FormContent: React.FC<FormContentProps> = ({
               onFocus={() => onFocus(field.name)}
               error={errors[field.name]}
               disabled={disabled || field.behavior?.disabled || (field as any).disabled}
-              required={field.required ?? field.validation?.required ?? false}
+              required={field.validation?.required ?? false}
               tabIndex={fieldTabIndexMap?.[field.name] !== undefined ? fieldTabIndexMap[field.name] : undefined}
             />
           </div>

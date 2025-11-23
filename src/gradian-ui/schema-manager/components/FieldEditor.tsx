@@ -98,7 +98,7 @@ export function FieldEditor({
                 {field.role}
               </Badge>
             )}
-            {field.required && <Badge variant="danger" size="sm" className="text-[10px] px-1.5 py-0">Required</Badge>}
+            {field.validation?.required && <Badge variant="danger" size="sm" className="text-[10px] px-1.5 py-0">Required</Badge>}
           </div>
           <span className={`text-[10px] truncate block mt-0.5 ${isIncomplete ? 'text-amber-600' : 'text-gray-400 dark:text-gray-300'}`}>
             {field.name}
@@ -267,8 +267,14 @@ export function FieldEditor({
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Switch
                   config={{ name: `required-${field.id}`, label: 'Required' }}
-                  checked={tempField.required || false}
-                  onChange={(checked) => setTempField({ ...tempField, required: checked })}
+                  checked={tempField.validation?.required || false}
+                  onChange={(checked) => setTempField({ 
+                    ...tempField, 
+                    validation: { 
+                      ...tempField.validation, 
+                      required: checked 
+                    } 
+                  })}
                 />
                 <Switch
                   config={{ name: `disabled-${field.id}`, label: 'Disabled' }}

@@ -12,7 +12,6 @@ export interface FormField {
   displayType?: 'text' | 'number' | 'currency' | 'percentage' | 'array' | 'computed';
   truncate?: boolean;
   description?: string;
-  required?: boolean;
   disabled?: boolean;
   hidden?: boolean;
   readonly?: boolean;

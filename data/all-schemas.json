@@ -32,7 +32,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter inquiry number",
-        "required": true,
         "canCopy": true,
         "role": "title",
         "validation": {
@@ -49,7 +48,6 @@
         "sectionId": "basic-information",
         "component": "datetime-local",
         "placeholder": "Select inquiry date and time",
-        "required": true,
         "role": "subtitle",
         "validation": {
           "required": true
@@ -64,7 +62,6 @@
         "sectionId": "basic-information",
         "component": "datetime-local",
         "placeholder": "Select deadline date and time",
-        "required": true,
         "role": "duedate",
         "validation": {
           "required": true
@@ -79,7 +76,6 @@
         "sectionId": "basic-information",
         "component": "select",
         "placeholder": "Select status",
-        "required": true,
         "role": "status",
         "options": [
           {
@@ -136,14 +132,6 @@
         "role": "description",
         "colSpan": 2,
         "order": 5
-      },
-      {
-        "id": "field-1763532942500",
-        "name": "newField",
-        "label": "New Field",
-        "sectionId": "basic-information",
-        "component": "text",
-        "order": 6
       }
     ],
     "sections": [
@@ -335,7 +323,6 @@
         "component": "text",
         "placeholder": "Enter part code",
         "role": "code",
-        "required": true,
         "validation": {
           "required": true
         },
@@ -349,7 +336,6 @@
         "sectionId": "item-information",
         "component": "text",
         "placeholder": "Enter part name",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true
@@ -365,7 +351,6 @@
         "component": "number",
         "placeholder": "Enter quantity",
         "role": "description",
-        "required": true,
         "validation": {
           "required": true,
           "min": 0
@@ -380,7 +365,6 @@
         "sectionId": "item-information",
         "component": "select",
         "placeholder": "Select unit",
-        "required": true,
         "options": [
           {
             "id": "1",
@@ -428,7 +412,6 @@
         "sectionId": "item-information",
         "component": "date",
         "placeholder": "Select demand date",
-        "required": true,
         "validation": {
           "required": true
         },
@@ -442,7 +425,6 @@
         "sectionId": "item-information",
         "component": "date",
         "placeholder": "Select minimum expiration date",
-        "required": true,
         "validation": {
           "required": true
         },
@@ -487,7 +469,6 @@
         "sectionId": "vendor-information",
         "component": "picker",
         "placeholder": "Click to select vendor",
-        "required": true,
         "description": "Select vendor from popup picker",
         "role": "title",
         "targetSchema": "vendors",
@@ -504,7 +485,6 @@
         "sectionId": "vendor-information",
         "component": "select",
         "placeholder": "Select status",
-        "required": true,
         "role": "status",
         "options": [
           {
@@ -592,7 +572,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter company name",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -609,7 +588,6 @@
         "component": "email",
         "placeholder": "Enter email address",
         "icon": "Home",
-        "required": true,
         "role": "subtitle",
         "validation": {
           "required": true,
@@ -626,7 +604,6 @@
         "component": "phone",
         "placeholder": "Enter phone number",
         "icon": "Phone",
-        "required": true,
         "role": "phone",
         "validation": {
           "required": true
@@ -1200,8 +1177,10 @@
         "component": "text",
         "order": 1,
         "placeholder": "Enter contact name",
-        "required": true,
-        "role": "title"
+        "role": "title",
+        "validation": {
+          "required": true
+        }
       },
       {
         "id": "field-1762151456340",
@@ -1210,8 +1189,10 @@
         "sectionId": "section-1762151413279",
         "component": "text",
         "order": 2,
-        "required": true,
-        "role": "title"
+        "role": "title",
+        "validation": {
+          "required": true
+        }
       },
       {
         "id": "field-1762151478649",
@@ -1231,8 +1212,10 @@
         "sectionId": "section-1762151413279",
         "component": "tel",
         "order": 4,
-        "required": true,
-        "role": "tel"
+        "role": "tel",
+        "validation": {
+          "required": true
+        }
       }
     ],
     "sections": [
@@ -1290,7 +1273,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter company name",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -1480,7 +1462,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter relation type ID (e.g., HAS_INQUIRY_ITEM)",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -1497,7 +1478,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter display label",
-        "required": true,
         "role": "subtitle",
         "validation": {
           "required": true,
@@ -1525,7 +1505,6 @@
         "sectionId": "visual-style",
         "component": "color-picker",
         "placeholder": "#000000",
-        "required": true,
         "validation": {
           "required": true,
           "pattern": "^#[0-9A-Fa-f]{6}$"
@@ -1540,7 +1519,6 @@
         "sectionId": "visual-style",
         "component": "icon",
         "placeholder": "Enter Lucide Icon name (e.g., ShoppingBasket)",
-        "required": true,
         "validation": {
           "required": true
         },
@@ -1619,7 +1597,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter quotation number",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -1636,7 +1613,6 @@
         "sectionId": "basic-information",
         "component": "date",
         "placeholder": "Select quotation date",
-        "required": true,
         "role": "subtitle",
         "validation": {
           "required": true
@@ -1651,7 +1627,6 @@
         "sectionId": "basic-information",
         "component": "date",
         "placeholder": "Select expiration date",
-        "required": true,
         "role": "duedate",
         "validation": {
           "required": true
@@ -1666,7 +1641,6 @@
         "sectionId": "basic-information",
         "component": "picker",
         "placeholder": "Click to select vendor",
-        "required": true,
         "allowMultiselect": true,
         "description": "Select vendor from popup picker",
         "targetSchema": "vendors",
@@ -1683,7 +1657,6 @@
         "sectionId": "basic-information",
         "component": "select",
         "placeholder": "Select state",
-        "required": true,
         "role": "status",
         "options": [
           {
@@ -1736,7 +1709,6 @@
         "sectionId": "basic-information",
         "component": "select",
         "placeholder": "Select currency",
-        "required": true,
         "options": [
           {
             "id": "USD",
@@ -1949,7 +1921,6 @@
         "sectionId": "financial-information",
         "component": "number",
         "placeholder": "Enter net price",
-        "required": true,
         "displayType": "currency",
         "validation": {
           "required": true,
@@ -2057,7 +2028,6 @@
         "sectionId": "item-information",
         "component": "picker",
         "placeholder": "Click to select inquiry item",
-        "required": true,
         "description": "Select inquiry item from popup picker",
         "targetSchema": "inquiry-items",
         "role": "title",
@@ -2074,7 +2044,6 @@
         "sectionId": "item-information",
         "component": "number",
         "placeholder": "Enter unit price",
-        "required": true,
         "displayType": "currency",
         "validation": {
           "required": true,
@@ -2090,7 +2059,6 @@
         "sectionId": "item-information",
         "component": "number",
         "placeholder": "Enter total price",
-        "required": true,
         "displayType": "currency",
         "validation": {
           "required": true,
@@ -2106,7 +2074,6 @@
         "sectionId": "item-information",
         "component": "date",
         "placeholder": "Select estimated delivery date",
-        "required": true,
         "role": "duedate",
         "validation": {
           "required": true
@@ -2174,7 +2141,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter application name",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -2190,7 +2156,6 @@
         "sectionId": "basic-information",
         "component": "icon",
         "placeholder": "Enter Lucide Icon name (e.g., ShoppingBasket)",
-        "required": true,
         "validation": {
           "required": true
         },
@@ -2260,7 +2225,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter user role name",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -2276,7 +2240,6 @@
         "sectionId": "basic-information",
         "component": "color-picker",
         "placeholder": "#000000",
-        "required": true,
         "validation": {
           "required": true,
           "pattern": "^#[0-9A-Fa-f]{6}$"
@@ -2362,7 +2325,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter business area title",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -2378,7 +2340,6 @@
         "sectionId": "basic-information",
         "component": "icon",
         "placeholder": "Enter Lucide Icon name (e.g., ShoppingBasket)",
-        "required": true,
         "validation": {
           "required": true
         },
@@ -2392,7 +2353,6 @@
         "sectionId": "basic-information",
         "component": "color-picker",
         "placeholder": "#000000",
-        "required": true,
         "validation": {
           "required": true,
           "pattern": "^#[0-9A-Fa-f]{6}$"
@@ -2472,7 +2432,6 @@
         "component": "name",
         "icon": "User",
         "placeholder": "Enter username",
-        "required": true,
         "role": "subtitle",
         "validation": {
           "required": true,
@@ -2489,7 +2448,6 @@
         "component": "text",
         "placeholder": "Enter first name",
         "role": "title",
-        "required": true,
         "validation": {
           "required": true,
           "minLength": 1
@@ -2504,7 +2462,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter last name",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -2520,7 +2477,6 @@
         "sectionId": "basic-information",
         "component": "email",
         "placeholder": "Enter email address",
-        "required": true,
         "validation": {
           "required": true,
           "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
@@ -2558,7 +2514,6 @@
         "sectionId": "basic-information",
         "component": "select",
         "placeholder": "Select status",
-        "required": true,
         "role": "status",
         "options": [
           {
@@ -2644,7 +2599,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter server name",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -2660,7 +2614,6 @@
         "sectionId": "basic-information",
         "component": "url",
         "placeholder": "Enter server address (e.g., https://api.example.com)",
-        "required": true,
         "validation": {
           "required": true,
           "pattern": "^https?:\\/\\/.+"
@@ -2789,7 +2742,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter URL title",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -2805,7 +2757,6 @@
         "sectionId": "basic-information",
         "component": "url",
         "placeholder": "Enter URL address",
-        "required": true,
         "validation": {
           "required": true,
           "pattern": "^https?:\\/\\/.+"
@@ -2890,7 +2841,6 @@
         "sectionId": "url-parameters",
         "component": "text",
         "placeholder": "Enter parameter name (e.g., includedSchemaIds)",
-        "required": true,
         "validation": {
           "required": true,
           "minLength": 1
@@ -2905,7 +2855,6 @@
         "sectionId": "url-parameters",
         "component": "text",
         "placeholder": "Enter parameter title",
-        "required": true,
         "validation": {
           "required": true,
           "minLength": 1
@@ -2920,7 +2869,6 @@
         "sectionId": "url-parameters",
         "component": "select",
         "placeholder": "Select data type",
-        "required": true,
         "validation": {
           "required": true
         },
@@ -3041,7 +2989,6 @@
         "sectionId": "basic-information",
         "component": "name",
         "placeholder": "e.g., email-templates",
-        "required": true,
         "role": "subtitle",
         "validation": {
           "required": true,
@@ -3057,7 +3004,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "e.g., Email Templates",
-        "required": true,
         "validation": {
           "required": true,
           "minLength": 2
@@ -3073,7 +3019,6 @@
         "sectionId": "basic-information",
         "component": "textarea",
         "placeholder": "Brief description of the integration",
-        "required": true,
         "role": "description",
         "validation": {
           "required": true
@@ -3109,7 +3054,6 @@
         "sectionId": "routing-information",
         "component": "picker",
         "placeholder": "Click to select target URL",
-        "required": true,
         "description": "The endpoint to call for syncing",
         "targetSchema": "url-repository",
         "validation": {
@@ -3125,7 +3069,6 @@
         "sectionId": "routing-information",
         "component": "select",
         "placeholder": "Select method",
-        "required": true,
         "description": "HTTP method for target route",
         "options": [
           {
@@ -3142,7 +3085,10 @@
           }
         ],
         "colSpan": 1,
-        "order": 2
+        "order": 2,
+        "validation": {
+          "required": true
+        }
       },
       {
         "id": "integration-source-route",
@@ -3301,7 +3247,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter database name",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -3317,7 +3262,6 @@
         "sectionId": "basic-information",
         "component": "select",
         "placeholder": "Select database type",
-        "required": true,
         "options": [
           {
             "id": "SQL_SERVER",
@@ -3399,7 +3343,6 @@
         "sectionId": "basic-information",
         "component": "select",
         "placeholder": "Select timezone",
-        "required": true,
         "options": [
           {
             "id": "America/New_York",
@@ -3471,7 +3414,6 @@
         "sectionId": "authentication-information",
         "component": "select",
         "placeholder": "Select authentication type",
-        "required": true,
         "options": [
           {
             "id": "WINDOWS",
@@ -3594,7 +3536,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter tag label",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -3610,7 +3551,6 @@
         "sectionId": "basic-information",
         "component": "icon",
         "placeholder": "Enter Lucide Icon name (e.g., Tag)",
-        "required": true,
         "validation": {
           "required": true
         },
@@ -3624,7 +3564,6 @@
         "sectionId": "basic-information",
         "component": "color-picker",
         "placeholder": "#000000",
-        "required": true,
         "validation": {
           "required": true,
           "pattern": "^#[0-9A-Fa-f]{6}$"
@@ -3699,7 +3638,6 @@
         "sectionId": "basic-information",
         "component": "name",
         "placeholder": "e.g., and-operator",
-        "required": true,
         "role": "subtitle",
         "validation": {
           "required": true,
@@ -3715,7 +3653,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "e.g., AND Operator",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -3745,7 +3682,6 @@
         "sectionId": "basic-information",
         "component": "icon",
         "placeholder": "e.g., &&, AND, &",
-        "required": true,
         "validation": {
           "required": true
         },
@@ -3822,7 +3758,6 @@
         "sectionId": "basic-information",
         "component": "name",
         "placeholder": "e.g., sum, avg, min",
-        "required": true,
         "role": "subtitle",
         "validation": {
           "required": true,
@@ -3838,7 +3773,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "e.g., Sum, Average, Minimum",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -3868,7 +3802,6 @@
         "sectionId": "basic-information",
         "component": "icon",
         "placeholder": "e.g., Σ, μ, min, max",
-        "required": true,
         "validation": {
           "required": true
         },
@@ -3957,7 +3890,6 @@
         "sectionId": "basic-information",
         "component": "picker",
         "placeholder": "Click to select company",
-        "required": true,
         "description": "Select company from popup picker",
         "role": "title",
         "targetSchema": "companies",
@@ -3974,7 +3906,6 @@
         "sectionId": "basic-information",
         "component": "select",
         "placeholder": "Select product",
-        "required": true,
         "options": [
           {
             "id": "recombinant-protein",
@@ -4023,7 +3954,6 @@
         "sectionId": "basic-information",
         "component": "select",
         "placeholder": "Select year",
-        "required": true,
         "options": [
           {
             "id": "1404",
@@ -4136,7 +4066,6 @@
         "sectionId": "item-information",
         "component": "number",
         "placeholder": "Enter batch size quantity",
-        "required": true,
         "validation": {
           "required": true,
           "min": 0
@@ -4151,7 +4080,6 @@
         "sectionId": "item-information",
         "component": "date",
         "placeholder": "Select production start date",
-        "required": true,
         "validation": {
           "required": true
         },
@@ -4165,7 +4093,6 @@
         "sectionId": "item-information",
         "component": "date",
         "placeholder": "Select production end date",
-        "required": true,
         "validation": {
           "required": true
         },
@@ -4179,7 +4106,6 @@
         "sectionId": "item-information",
         "component": "date",
         "placeholder": "Select planned release date",
-        "required": true,
         "role": "duedate",
         "validation": {
           "required": true
@@ -4194,7 +4120,6 @@
         "sectionId": "item-information",
         "component": "select",
         "placeholder": "Select status",
-        "required": true,
         "role": "status",
         "options": [
           {
@@ -4398,7 +4323,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter tool title",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -4414,7 +4338,6 @@
         "sectionId": "basic-information",
         "component": "name",
         "placeholder": "Enter tool name",
-        "required": true,
         "validation": {
           "required": true,
           "minLength": 2
@@ -4441,7 +4364,6 @@
         "sectionId": "basic-information",
         "component": "select",
         "placeholder": "Select protocol",
-        "required": true,
         "options": [
           {
             "id": "Rest",
@@ -4657,7 +4579,6 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter agent title",
-        "required": true,
         "role": "title",
         "validation": {
           "required": true,
@@ -4673,7 +4594,6 @@
         "sectionId": "basic-information",
         "component": "name",
         "placeholder": "Enter agent name",
-        "required": true,
         "validation": {
           "required": true,
           "minLength": 2
