@@ -1199,10 +1199,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-23T10:09:24.988Z",
+      "updatedAt": "2025-11-23T10:32:07.197Z",
       "targetDataPath": "data",
       "sourceDataPath": "data",
-      "lastSynced": "2025-11-23T10:09:24.886Z",
+      "lastSynced": "2025-11-23T10:32:07.142Z",
       "incomplete": false
     },
     {
@@ -1230,8 +1230,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-11-23T10:09:29.786Z",
-      "lastSynced": "2025-11-23T10:09:29.749Z"
+      "updatedAt": "2025-11-23T10:32:11.614Z",
+      "lastSynced": "2025-11-23T10:32:11.578Z"
     },
     {
       "color": "#4E79A7",
@@ -1277,9 +1277,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-11-23T10:25:30.914Z",
+      "updatedAt": "2025-11-23T10:35:50.769Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-11-23T10:25:30.865Z"
+      "lastSynced": "2025-11-23T10:35:50.709Z"
     },
     {
       "color": "#00d1ae",
