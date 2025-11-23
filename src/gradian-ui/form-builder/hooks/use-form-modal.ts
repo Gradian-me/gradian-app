@@ -267,21 +267,27 @@ export function useFormModal(
           }
         }
 
-        if (entitySource) {
-          setEntityData(entitySource);
-          setEntityId(editEntityId);
+        // Only fetch from API if we don't have initial entity data
+        if (!entitySource) {
+          const apiEndpoint = `/api/data/${schemaId}/${editEntityId}`;
+          const entityResult = await apiRequest(apiEndpoint, {
+            method: 'GET',
+          });
+
+          if (!entityResult.success || !entityResult.data) {
+            // Handle error gracefully instead of throwing
+            const errorMessage = entityResult.error || `Entity not found: ${editEntityId}`;
+            console.error('Failed to load entity:', errorMessage);
+            setLoadError(errorMessage);
+            setIsLoading(false);
+            return; // Exit early without opening the modal
+          }
+
+          entitySource = entityResult.data;
         }
 
-        const apiEndpoint = `/api/data/${schemaId}/${editEntityId}`;
-        const entityResult = await apiRequest(apiEndpoint, {
-          method: 'GET',
-        });
-
-        if (!entityResult.success || !entityResult.data) {
-          throw new Error(`Entity not found: ${editEntityId}`);
-        }
-
-        setEntityData(entityResult.data);
+        // Set entity data (either from initial source or API)
+        setEntityData(entitySource);
         setEntityId(editEntityId);
       } else {
         // Create mode - clear entity data
