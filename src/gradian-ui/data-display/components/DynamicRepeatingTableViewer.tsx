@@ -162,7 +162,7 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
           ? config.title
             ? `No ${config.title.toLowerCase()} found`
             : 'No items found'
-          : section?.repeatingConfig?.emptyMessage || 'No items found',
+          : 'No items found',
       },
       loading: isLoading,
       striped: true,
@@ -178,7 +178,6 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
       isRelationBased,
       paginationEnabled,
       paginationPageSize,
-      section?.repeatingConfig?.emptyMessage,
       sectionData,
       sortingEnabled,
     ]

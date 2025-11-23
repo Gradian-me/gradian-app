@@ -13,7 +13,6 @@ export enum LogType {
 // If import fails, we'll use shared defaults
 let defaultVariables: any = null;
 try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   defaultVariables = require('../../../../data/application-variables.json');
 } catch {
   // JSON import failed, will use shared defaults

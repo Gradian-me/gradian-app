@@ -30,7 +30,7 @@ function getValueByPath(obj: any, path: string): any {
   }
 
   // Remove leading $ and . if present
-  let normalizedPath = path.replace(/^\$\.?/, '');
+  const normalizedPath = path.replace(/^\$\.?/, '');
   
   if (!normalizedPath) {
     return obj;

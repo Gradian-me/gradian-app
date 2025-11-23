@@ -121,7 +121,7 @@ export const FormSection: React.FC<FormSectionProps> = ({
 
           {repeatingItems.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <p>{section.repeatingConfig?.emptyMessage || 'No items added yet'}</p>
+              <p>No items added yet</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -170,7 +170,7 @@ export const FormSection: React.FC<FormSectionProps> = ({
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                {section.repeatingConfig?.addButtonText || `Add ${title}`}
+                Add {title}
               </button>
             </div>
           )}
