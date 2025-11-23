@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageBox } from '@/gradian-ui/layout/message-box';
 import { CreateSchemaPayload, SchemaCreateResult } from '../types/schema-manager-page';
 import { generatePluralName, generateSchemaId } from '../utils/schema-form';
@@ -139,14 +140,15 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+        <DialogHeader className="shrink-0">
           <DialogTitle>Create New Schema</DialogTitle>
           <DialogDescription>
             Add a new schema to start building dynamic forms
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-4">
+        <ScrollArea className="flex-1 px-1">
+          <div className="space-y-4 py-4 pr-4">
           {errorResult && ((errorResult.messages && errorResult.messages.length > 0) || errorResult.message) && (
             <MessageBox
               messages={errorResult.messages}
@@ -273,8 +275,9 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
               />
             </div>
           </div>
-        </div>
-        <DialogFooter>
+          </div>
+        </ScrollArea>
+        <DialogFooter className="shrink-0">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}

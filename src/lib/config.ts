@@ -10,30 +10,22 @@ const isDemoModeEnabled = (): boolean => {
   return DEMO_MODE;
 };
 
-// Get the schema API base URL based on demo mode
+// Get the schema API base URL
+// IMPORTANT: Always return relative URL so client requests go through Next.js API routes
+// The Next.js API routes will handle proxying to external backend when demo mode is false
 const getSchemaApiBaseUrl = (): string => {
-  const isDemo = isDemoModeEnabled();
-  if (isDemo) {
-    // In demo mode, use local API routes
-    return process.env.NEXT_PUBLIC_SCHEMA_API_BASE || '/api/schemas';
-  } else {
-    // In non-demo mode, use external API URL
-    const externalUrl = process.env.NEXT_PUBLIC_URL_SCHEMA_CRUD?.replace(/\/+$/, '') || '';
-    return externalUrl ? `${externalUrl}/api/schemas` : '/api/schemas';
-  }
+  // Use environment variable if set, otherwise default to '/api/schemas'
+  // Always use relative URL so requests go through Next.js API routes
+  return process.env.NEXT_PUBLIC_SCHEMA_API_BASE || '/api/schemas';
 };
 
-// Get the data API base URL based on demo mode
+// Get the data API base URL
+// IMPORTANT: Always return '/api/data' so client requests go through Next.js API routes
+// The Next.js API routes will handle proxying to external backend when demo mode is false
 const getDataApiBaseUrl = (): string => {
-  const isDemo = isDemoModeEnabled();
-  if (isDemo) {
-    // In demo mode, use local API routes
-    return '/api/data';
-  } else {
-    // In non-demo mode, use external API URL
-    const externalUrl = process.env.NEXT_PUBLIC_URL_DATA_CRUD?.replace(/\/+$/, '') || '';
-    return externalUrl ? `${externalUrl}/api/data` : '/api/data';
-  }
+  // Always use relative URL so requests go through Next.js API routes
+  // The API routes check isDemoModeEnabled() and proxy when needed
+  return '/api/data';
 };
 
 export const config = {

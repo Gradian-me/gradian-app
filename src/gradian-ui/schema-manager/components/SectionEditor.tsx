@@ -49,8 +49,6 @@ export function SectionEditor({
   onClose,
 }: SectionEditorProps & { onClose?: () => void }) {
   const [tempSection, setTempSection] = useState(section);
-  const [relationTypes, setRelationTypes] = useState<Array<{ id: string; label: string }>>([]);
-  const [availableSchemas, setAvailableSchemas] = useState<Array<{ id: string; name: string }>>([]);
   const [isSectionIdCustom, setIsSectionIdCustom] = useState(false);
   const [isTargetSchemaPickerOpen, setIsTargetSchemaPickerOpen] = useState(false);
   const [isRelationTypePickerOpen, setIsRelationTypePickerOpen] = useState(false);
@@ -105,52 +103,6 @@ export function SectionEditor({
     tempSection.repeatingConfig?.fieldRelationType === 'connectToSchema' &&
     tempSection.repeatingConfig?.targetSchema && 
     tempSection.repeatingConfig?.relationTypeId;
-
-  // Fetch relation types
-  useEffect(() => {
-    const fetchRelationTypes = async () => {
-      try {
-        const response = await fetch('/api/data/relation-types');
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success) {
-            // Sort relation types by label
-            const sorted = (result.data || []).sort((a: any, b: any) => 
-              (a.label || '').localeCompare(b.label || '')
-            );
-            setRelationTypes(sorted);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching relation types:', error);
-      }
-    };
-
-    // Fetch available schemas
-    const fetchSchemas = async () => {
-      try {
-        const response = await fetch('/api/schemas');
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success) {
-            // Filter out current schema from available schemas and sort by name
-            const schemas = result.data
-              .filter((s: FormSchema) => s.id !== currentSchemaId)
-              .map((s: FormSchema) => ({ id: s.id, name: s.plural_name || s.singular_name }))
-              .sort((a: { id: string; name: string }, b: { id: string; name: string }) => a.name.localeCompare(b.name));
-            setAvailableSchemas(schemas);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching schemas:', error);
-      }
-    };
-
-    if (tempSection.isRepeatingSection) {
-      fetchRelationTypes();
-      fetchSchemas();
-    }
-  }, [tempSection.isRepeatingSection, currentSchemaId]);
 
   // Check if a field is incomplete (has default values)
   const isFieldIncomplete = (field: any): boolean => {
@@ -402,9 +354,7 @@ export function SectionEditor({
                     onClick={() => setIsTargetSchemaPickerOpen(true)}
                   >
                     <span className="truncate">
-                      {tempSection.repeatingConfig?.targetSchema
-                        ? availableSchemas.find(s => s.id === tempSection.repeatingConfig?.targetSchema)?.name || tempSection.repeatingConfig.targetSchema
-                        : 'Select target schema...'}
+                      {tempSection.repeatingConfig?.targetSchema || 'Select target schema...'}
                     </span>
                   </Button>
                   {!tempSection.repeatingConfig?.targetSchema && isConnectionConfigIncomplete && (
@@ -413,12 +363,17 @@ export function SectionEditor({
                   <PopupPicker
                     isOpen={isTargetSchemaPickerOpen}
                     onClose={() => setIsTargetSchemaPickerOpen(false)}
-                    staticItems={availableSchemas.map(s => ({ id: s.id, name: s.name, title: s.name }))}
+                    sourceUrl="/api/schemas"
+                    excludeIds={currentSchemaId ? [currentSchemaId] : []}
+                    selectedIds={tempSection.repeatingConfig?.targetSchema ? [tempSection.repeatingConfig.targetSchema] : []}
                     onSelect={async (selections, rawItems) => {
-                      if (selections.length > 0 && rawItems.length > 0) {
-                    setTempSection({
-                      ...tempSection,
-                          repeatingConfig: { ...tempSection.repeatingConfig, targetSchema: selections[0].id || undefined },
+                      if (selections.length > 0) {
+                        setTempSection({
+                          ...tempSection,
+                          repeatingConfig: { 
+                            ...tempSection.repeatingConfig, 
+                            targetSchema: selections[0].id || undefined 
+                          },
                         });
                       }
                       setIsTargetSchemaPickerOpen(false);
@@ -426,6 +381,16 @@ export function SectionEditor({
                     title="Select Target Schema"
                     description="Choose a schema to link to this repeating section"
                     allowMultiselect={false}
+                    columnMap={{
+                      response: { data: 'data' },
+                      item: { 
+                        id: 'id', 
+                        label: 'plural_name',
+                        title: 'plural_name',
+                        name: 'singular_name',
+                      },
+                    }}
+                    sortType="ASC"
                   />
                 </div>
 
@@ -440,9 +405,7 @@ export function SectionEditor({
                     onClick={() => setIsRelationTypePickerOpen(true)}
                   >
                     <span className="truncate">
-                      {tempSection.repeatingConfig?.relationTypeId
-                        ? relationTypes.find(rt => rt.id === tempSection.repeatingConfig?.relationTypeId)?.label || tempSection.repeatingConfig.relationTypeId
-                        : 'Select relation type...'}
+                      {tempSection.repeatingConfig?.relationTypeId || 'Select relation type...'}
                     </span>
                   </Button>
                   {!tempSection.repeatingConfig?.relationTypeId && isConnectionConfigIncomplete && (
@@ -451,12 +414,16 @@ export function SectionEditor({
                   <PopupPicker
                     isOpen={isRelationTypePickerOpen}
                     onClose={() => setIsRelationTypePickerOpen(false)}
-                    staticItems={relationTypes.map(rt => ({ id: rt.id, name: rt.label, title: rt.label }))}
+                    schemaId="relation-types"
+                    selectedIds={tempSection.repeatingConfig?.relationTypeId ? [tempSection.repeatingConfig.relationTypeId] : []}
                     onSelect={async (selections, rawItems) => {
-                      if (selections.length > 0 && rawItems.length > 0) {
-                    setTempSection({
-                      ...tempSection,
-                          repeatingConfig: { ...tempSection.repeatingConfig, relationTypeId: selections[0].id || undefined },
+                      if (selections.length > 0) {
+                        setTempSection({
+                          ...tempSection,
+                          repeatingConfig: { 
+                            ...tempSection.repeatingConfig, 
+                            relationTypeId: selections[0].id || undefined 
+                          },
                         });
                       }
                       setIsRelationTypePickerOpen(false);
@@ -464,6 +431,15 @@ export function SectionEditor({
                     title="Select Relation Type"
                     description="Choose a relation type for this repeating section"
                     allowMultiselect={false}
+                    columnMap={{
+                      response: { data: 'data' },
+                      item: { 
+                        id: 'id', 
+                        label: 'label',
+                        title: 'label',
+                      },
+                    }}
+                    sortType="ASC"
                   />
                 </div>
               </div>

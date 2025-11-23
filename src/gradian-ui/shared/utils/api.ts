@@ -10,25 +10,19 @@ import {
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
-// Helper function to resolve API endpoint URL based on demo mode
+// Helper function to resolve API endpoint URL
+// IMPORTANT: Always use relative URLs so requests go through Next.js API routes
+// The Next.js API routes will handle proxying to external backend when demo mode is false
 function resolveApiUrl(endpoint: string): string {
   // If endpoint is already a full URL, return as is
   if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
     return endpoint;
   }
 
-  // Handle data API endpoints (with or without trailing slash)
-  if (endpoint.startsWith('/api/data')) {
-    const path = endpoint.replace('/api/data', '');
-    return `${config.dataApi.basePath}${path}`;
-  }
-
-  // Handle schema API endpoints (with or without trailing slash)
-  if (endpoint.startsWith('/api/schemas')) {
-    const path = endpoint.replace('/api/schemas', '');
-    return `${config.schemaApi.basePath}${path}`;
-  }
-
+  // Always use relative URLs for /api/data and /api/schemas
+  // This ensures requests go through Next.js API routes which handle proxying
+  // when demo mode is false. The API routes check isDemoModeEnabled() and
+  // proxy to the backend using proxyDataRequest() when needed.
   // For other endpoints, use as-is (relative URLs)
   return endpoint;
 }
