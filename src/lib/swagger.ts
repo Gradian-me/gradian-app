@@ -1,5 +1,22 @@
 const API_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? '1.0.0';
 const BASE_SERVER_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+const LOCALHOST_URL = 'http://localhost:3000';
+
+// Build servers array, avoiding duplicates
+const servers = [
+  {
+    url: BASE_SERVER_URL,
+    description: 'Primary server',
+  },
+];
+
+// Only add localhost server if it's different from BASE_SERVER_URL
+if (BASE_SERVER_URL !== LOCALHOST_URL) {
+  servers.push({
+    url: LOCALHOST_URL,
+    description: 'Local development',
+  });
+}
 
 const successResponse = {
   type: 'object',
@@ -30,16 +47,7 @@ export const swaggerDocument = {
       url: 'https://gradian.me',
     },
   },
-  servers: [
-    {
-      url: BASE_SERVER_URL,
-      description: 'Primary server',
-    },
-    {
-      url: 'http://localhost:3000',
-      description: 'Local development',
-    },
-  ],
+  servers,
   tags: [
     {
       name: 'Auth',
@@ -52,6 +60,10 @@ export const swaggerDocument = {
     {
       name: 'Schemas',
       description: 'Schema registry endpoints for forms and dynamic pages.',
+    },
+    {
+      name: 'Git',
+      description: 'Git and CI/CD integration endpoints.',
     },
   ],
   paths: {
@@ -522,6 +534,117 @@ export const swaggerDocument = {
         },
       },
     },
+    '/api/git/sync-env': {
+      post: {
+        tags: ['Git'],
+        summary: 'Sync environment variables to GitLab CI/CD',
+        description:
+          'Reads environment variables from the .env file and syncs them to GitLab CI/CD variables. Automatically creates new variables or updates existing ones. Excludes GitLab-specific variables (GITLAB_TOKEN, GITLAB_PROJECT_ID, GITLAB_API_URL) from syncing.\n\n' +
+          '**Replace All Mode**: Set `replaceAll: true` in request body to delete all existing GitLab variables before syncing. This ensures a clean sync with only variables from the .env file.\n\n' +
+          'Supports variable options via request body or .env file comments:\n' +
+          '- **protected**: Only available in protected branches/tags\n' +
+          '- **masked**: Mask the value in CI/CD logs\n' +
+          '- **raw** (hidden): Hide variable from GitLab UI\n\n' +
+          'Example .env comment format:\n' +
+          '```\n' +
+          '# GITLAB_DATABASE_URL: protected=true, masked=true, raw=true\n' +
+          'DATABASE_URL=postgresql://...\n' +
+          '```',
+        requestBody: {
+          required: false,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/GitSyncEnvRequest' },
+              examples: {
+                default: {
+                  value: {
+                    replaceAll: true,
+                    defaultOptions: {
+                      protected: true,
+                      masked: true,
+                      raw: true,
+                      environment_scope: '*',
+                    },
+                    variableOptions: {
+                      DATABASE_URL: {
+                        protected: true,
+                        masked: true,
+                        raw: false,
+                      },
+                      JWT_SECRET: {
+                        protected: true,
+                        masked: true,
+                        raw: true,
+                      },
+                    },
+                  },
+                  description: 'Default behavior: delete all existing variables and recreate from .env file',
+                },
+                incremental: {
+                  value: {
+                    replaceAll: false,
+                    defaultOptions: {
+                      protected: true,
+                      masked: true,
+                      raw: true,
+                      environment_scope: '*',
+                    },
+                  },
+                  description: 'Incremental sync: only create new variables and update existing ones',
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Environment variables synced successfully.',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/GitSyncEnvResponse' },
+                examples: {
+                  success: {
+                    value: {
+                      success: true,
+                      message: 'Synced 15 environment variable(s) to GitLab',
+                      synced: 15,
+                      created: 10,
+                      updated: 5,
+                      failed: 0,
+                      details: {
+                        created: ['DATABASE_URL', 'NEXTAUTH_SECRET', 'JWT_SECRET'],
+                        updated: ['NEXT_PUBLIC_CLIENT_ID', 'CLIENT_ID'],
+                        failed: [],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          207: {
+            description: 'Partial success - some variables failed to sync.',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/GitSyncEnvResponse' },
+              },
+            },
+          },
+          400: {
+            description: 'Missing required GitLab configuration.',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          404: {
+            description: '.env file not found.',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          500: {
+            description: 'Failed to sync environment variables.',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+        },
+      },
+    },
   },
   components: {
     securitySchemes: {
@@ -685,6 +808,144 @@ export const swaggerDocument = {
             additionalProperties: true,
           },
         },
+      },
+      GitSyncEnvRequest: {
+        type: 'object',
+        properties: {
+          replaceAll: {
+            type: 'boolean',
+            example: true,
+            default: true,
+            description: 'If true, delete all existing GitLab variables before syncing new ones. This ensures a clean sync with only variables from the .env file. Default: true.',
+          },
+          defaultOptions: {
+            type: 'object',
+            description: 'Default options applied to all variables unless overridden',
+            properties: {
+              protected: {
+                type: 'boolean',
+                example: true,
+                description: 'Only available in protected branches/tags (default: true)',
+              },
+              masked: {
+                type: 'boolean',
+                example: true,
+                description: 'Mask the value in CI/CD logs (default: true)',
+              },
+              raw: {
+                type: 'boolean',
+                example: true,
+                description: 'Hide variable from GitLab UI (raw mode, default: true)',
+              },
+              environment_scope: {
+                type: 'string',
+                example: '*',
+                description: 'Environment scope (default: "*" for all environments)',
+              },
+            },
+          },
+          variableOptions: {
+            type: 'object',
+            description: 'Per-variable options (overrides defaultOptions)',
+            additionalProperties: {
+              type: 'object',
+              properties: {
+                protected: {
+                  type: 'boolean',
+                  description: 'Only available in protected branches/tags',
+                },
+                masked: {
+                  type: 'boolean',
+                  description: 'Mask the value in CI/CD logs',
+                },
+                raw: {
+                  type: 'boolean',
+                  description: 'Hide variable from GitLab UI (raw mode)',
+                },
+                environment_scope: {
+                  type: 'string',
+                  description: 'Environment scope',
+                },
+              },
+            },
+          },
+        },
+      },
+      GitSyncEnvResponse: {
+        type: 'object',
+        properties: {
+          success: {
+            type: 'boolean',
+            example: true,
+            description: 'True if all variables synced successfully, false if any failed.',
+          },
+          message: {
+            type: 'string',
+            example: 'Synced 15 environment variable(s) to GitLab',
+            description: 'Summary message of the sync operation.',
+          },
+          synced: {
+            type: 'integer',
+            example: 15,
+            description: 'Total number of variables successfully synced (created + updated).',
+          },
+          created: {
+            type: 'integer',
+            example: 10,
+            description: 'Number of new variables created in GitLab.',
+          },
+          updated: {
+            type: 'integer',
+            example: 5,
+            description: 'Number of existing variables updated in GitLab.',
+          },
+          failed: {
+            type: 'integer',
+            example: 0,
+            description: 'Number of variables that failed to sync.',
+          },
+          deleted: {
+            type: 'integer',
+            example: 0,
+            description: 'Number of variables deleted (only when replaceAll is true).',
+          },
+          details: {
+            type: 'object',
+            properties: {
+              created: {
+                type: 'array',
+                items: { type: 'string' },
+                example: ['DATABASE_URL', 'NEXTAUTH_SECRET'],
+                description: 'List of variable keys that were created.',
+              },
+              updated: {
+                type: 'array',
+                items: { type: 'string' },
+                example: ['NEXT_PUBLIC_CLIENT_ID'],
+                description: 'List of variable keys that were updated.',
+              },
+              failed: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    key: { type: 'string', example: 'SOME_VAR' },
+                    error: { type: 'string', example: 'Failed to create GitLab variable' },
+                  },
+                },
+                description: 'List of variables that failed to sync with error details.',
+              },
+              deleted: {
+                type: 'array',
+                items: { type: 'string' },
+                example: ['OLD_VAR_1', 'OLD_VAR_2'],
+                description: 'List of variable keys that were deleted (only when replaceAll is true).',
+              },
+            },
+            required: ['created', 'updated', 'failed', 'deleted'],
+          },
+        },
+        required: ['success', 'synced', 'created', 'updated', 'failed', 'deleted', 'details'],
       },
     },
   },

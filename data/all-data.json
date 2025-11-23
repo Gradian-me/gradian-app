@@ -1155,6 +1155,21 @@
       "id": "01KANZNMEFM5H7211V450ZX2P8",
       "createdAt": "2025-11-22T14:32:13.019Z",
       "updatedAt": "2025-11-22T14:32:13.020Z"
+    },
+    {
+      "title": "Git Sync Environment Variables",
+      "address": "http://localhost:3000/api/git/sync-env",
+      "methods": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "ArrowRight",
+          "color": "success"
+        }
+      ],
+      "id": "01KASYNCENV001GITLABSYNC",
+      "createdAt": "2025-11-23T15:00:59.000Z",
+      "updatedAt": "2025-11-23T15:00:59.000Z"
     }
   ],
   "integrations": [
@@ -1277,9 +1292,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-11-23T10:57:39.927Z",
+      "updatedAt": "2025-11-23T11:36:00.823Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-11-23T10:57:39.890Z"
+      "lastSynced": "2025-11-23T11:35:58.108Z"
     },
     {
       "color": "#00d1ae",
@@ -1351,6 +1366,33 @@
       "createdAt": "2025-11-17T18:00:00.000Z",
       "updatedAt": "2025-11-22T15:08:53.297Z",
       "lastSynced": "2025-11-22T15:08:52.923Z"
+    },
+    {
+      "color": "#f59e0b",
+      "title": "Git Sync Environment Variables",
+      "description": "Sync environment variables from .env file to GitLab CI/CD variables",
+      "icon": "GitBranch",
+      "targetRoute": [
+        {
+          "id": "01KASYNCENV001GITLABSYNC",
+          "label": "Git Sync Environment Variables",
+          "metadata": {
+            "address": "http://localhost:3000/api/git/sync-env"
+          }
+        }
+      ],
+      "targetMethod": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "Upload",
+          "color": "success"
+        }
+      ],
+      "id": "git_sync_env",
+      "createdAt": "2025-11-23T15:00:59.000Z",
+      "updatedAt": "2025-11-23T11:50:46.194Z",
+      "lastSynced": "2025-11-23T11:50:45.980Z"
     }
   ],
   "databases": [
