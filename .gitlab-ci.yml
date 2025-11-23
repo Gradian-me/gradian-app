@@ -24,6 +24,7 @@ build:
     - CG-GR-API-DEV
   only:
     - main
+    - master
   retry:
     max: 2
     when:
@@ -78,6 +79,7 @@ deploy_staging:
     - CG-GR-Publish
   only:
     - main
+    - master
   retry:
     max: 2
     when:
