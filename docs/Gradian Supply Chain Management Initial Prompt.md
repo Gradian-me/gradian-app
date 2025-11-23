@@ -4,6 +4,7 @@
 
 ---
 
+
 ## 0) Vision & Design
 
 A next‑generation **Procure‑to‑Pay** platform combining functional depth with elegant UX. Built with **Next.js**, **ShadCN/UI**, and **Framer Motion** for micro‑interactions and transitions. Designed for scalability, modularity, and mobile performance.
