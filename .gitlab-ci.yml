@@ -23,9 +23,9 @@ build:
     - echo "✅ Build completed!"
   tags:
     - CG-GR-API-DEV
-  only:
-    - main
-    - master
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "master"
   retry:
     max: 2
     when:
@@ -78,9 +78,9 @@ deploy_staging:
     url: https://staging.gradian-api.com
   tags:
     - CG-GR-APP-PRD-1
-  only:
-    - main
-    - master
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "master"
   retry:
     max: 2
     when:
