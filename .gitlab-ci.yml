@@ -134,7 +134,7 @@ deploy_staging:
     name: staging
     url: https://staging.gradian-api.com
   tags:
-    - CG-GR-Publish
+    - CG-GR-APP-PRD-1
   retry:
     max: 2
     when:
