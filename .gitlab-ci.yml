@@ -5,10 +5,18 @@ stages:
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
+  DOCKER_TLS_VERIFY: "0"
 
 before_script:
   - echo "Authenticating with Docker Registry..."
-  - echo $CI_REGISTRY_PASSWORD | docker --tlsverify=false login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - export DOCKER_TLS_VERIFY=0
+  - |
+    # Extract hostname:port without protocol (http/https)
+    REGISTRY_HOST=$(echo $CI_REGISTRY | sed 's|https\?://||' | sed 's|/.*||')
+    echo "Using registry: $REGISTRY_HOST (without protocol)"
+    echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $REGISTRY_HOST
+    # Update CI_REGISTRY_IMAGE to use hostname:port without protocol
+    export CI_REGISTRY_IMAGE=$(echo $CI_REGISTRY_IMAGE | sed 's|https\?://||')
 
 build:
   stage: build
