@@ -1,94 +1,89 @@
 stages:
   - build
   - deploy
+  - rollback
 
 variables:
   DOCKER_DRIVER: overlay2
-  DOCKER_TLS_VERIFY: "0"
   DOCKER_TLS_CERTDIR: ""
 
 before_script:
-  - echo "Authenticating with Docker Registry..."
-  - export DOCKER_TLS_VERIFY=0
+  - echo "🔐 Authenticating with Docker Registry..."
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - echo "⚙️ Setting up environment files..."
   - |
-    # Extract hostname:port without protocol
-    REGISTRY_HOST=$(echo $CI_REGISTRY | sed 's|https\?://||' | sed 's|/.*||')
-    echo "Using registry: $REGISTRY_HOST (without protocol)"
-    echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $REGISTRY_HOST
-    export CI_REGISTRY_IMAGE=$(echo $CI_REGISTRY_IMAGE | sed 's|https\?://||')
+    cat > .env << EOF
+    AVALAI_API_KEY=$AVALAI_API_KEY
+    CLIENT_ID=$CLIENT_ID
+    DATABASE_URL=$DATABASE_URL
+    JWT_SECRET=$JWT_SECRET
+    NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+    NEXTAUTH_URL=$NEXTAUTH_URL
+    NEXT_PUBLIC_CLIENT_ID=$NEXT_PUBLIC_CLIENT_ID
+    NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY
+    NEXT_PUBLIC_SCHEMA_API_BASE=$NEXT_PUBLIC_SCHEMA_API_BASE
+    NEXT_PUBLIC_SECRET_KEY=$NEXT_PUBLIC_SECRET_KEY
+    NEXT_PUBLIC_URL_DATA_CRUD=$NEXT_PUBLIC_URL_DATA_CRUD
+    NEXT_PUBLIC_URL_SCHEMA_CRUD=$NEXT_PUBLIC_URL_SCHEMA_CRUD
+    NEXT_PUBLIC_URL_SYNC_MAIL_TEMPLATE=$NEXT_PUBLIC_URL_SYNC_MAIL_TEMPLATE
+    PEPPER=$PEPPER
+    SECRET_KEY=$SECRET_KEY
+    URL_DATA_CRUD=$URL_DATA_CRUD
+    URL_SCHEMA_CRUD=$URL_SCHEMA_CRUD
+    URL_SEND_EMAIL=$URL_SEND_EMAIL
+    URL_SYNC_MAIL_TEMPLATE=$URL_SYNC_MAIL_TEMPLATE
+    EOF
 
 build:
   stage: build
-  script:
-    - echo "🚀 Starting Docker image build..."
-    - docker build --tag="$CI_REGISTRY_IMAGE:latest" --tag="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" .
-    - echo "📤 Pushing images to registry..."
-    - docker push "$CI_REGISTRY_IMAGE:latest"
-    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
-    - echo "✅ Build completed!"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
+    - when: never
   tags:
     - CG-GR-API-DEV
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "master"
-  retry:
-    max: 2
-    when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
+  script:
+    - echo "🚀 Building Docker image..."
+    - SHORT_SHA=${CI_COMMIT_SHA:0:8}
+    - docker build --tag="$CI_REGISTRY_IMAGE:latest" --tag="$CI_REGISTRY_IMAGE:$SHORT_SHA" --build-arg NODE_ENV=$NODE_ENV .
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+    - docker push "$CI_REGISTRY_IMAGE:$SHORT_SHA"
+    - echo "🧹 Cleaning Docker after build..."
+    - docker system prune -af
+    - docker volume prune -f
 
 deploy_staging:
   stage: deploy
   needs:
     - job: build
-      artifacts: true
-  variables:
-    AVALAI_API_KEY: ${AVALAI_API_KEY}
-    CLIENT_ID: ${CLIENT_ID}
-    DATABASE_URL: ${DATABASE_URL}
-    JWT_SECRET: ${JWT_SECRET}
-    NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
-    NEXTAUTH_URL: ${NEXTAUTH_URL}
-    NEXT_PUBLIC_CLIENT_ID: ${NEXT_PUBLIC_CLIENT_ID}
-    NEXT_PUBLIC_ENCRYPTION_KEY: ${NEXT_PUBLIC_ENCRYPTION_KEY}
-    NEXT_PUBLIC_SCHEMA_API_BASE: ${NEXT_PUBLIC_SCHEMA_API_BASE}
-    NEXT_PUBLIC_SECRET_KEY: ${NEXT_PUBLIC_SECRET_KEY}
-    NEXT_PUBLIC_URL_DATA_CRUD: ${NEXT_PUBLIC_URL_DATA_CRUD}
-    NEXT_PUBLIC_URL_SCHEMA_CRUD: ${NEXT_PUBLIC_URL_SCHEMA_CRUD}
-    NEXT_PUBLIC_URL_SYNC_MAIL_TEMPLATE: ${NEXT_PUBLIC_URL_SYNC_MAIL_TEMPLATE}
-    PEPPER: ${PEPPER}
-    SECRET_KEY: ${SECRET_KEY}
-    URL_DATA_CRUD: ${URL_DATA_CRUD}
-    URL_SCHEMA_CRUD: ${URL_SCHEMA_CRUD}
-    URL_SEND_EMAIL: ${URL_SEND_EMAIL}
-    URL_SYNC_MAIL_TEMPLATE: ${URL_SYNC_MAIL_TEMPLATE}
-  script:
-    - echo "🚀 Starting deployment..."
-    - docker compose pull
-    - docker compose down --remove-orphans || true
-    - docker compose up -d
-    - echo "🏥 Performing health check..."
-    - sleep 10
-    - docker compose ps
-    - echo "🧹 Cleaning up old images..."
-    - |
-      docker images --format "table {{.Repository}}:{{.Tag}}\t{{.ID}}" \
-        | grep "$CI_REGISTRY_IMAGE" | grep -v "latest" | awk '{print $2}' \
-        | xargs -r docker rmi || echo "No old images to remove"
-      docker image prune -f
-      echo "📋 Remaining images:"
-      docker images | grep "$CI_REGISTRY_IMAGE" || echo "No images found"
-    - echo "✅ Deployment completed!"
-  environment:
-    name: staging
-    url: https://staging.gradian-api.com
+      optional: false
+  rules:
+    - when: always
   tags:
     - CG-GR-APP-PRD-1
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "master"
-  retry:
-    max: 2
-    when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
+  script:
+    - echo "🚀 Deploying to staging..."
+    # Backup current container image (previous stable)
+    - PREV_IMAGE=$(docker compose images -q app | head -n1) || true
+    - docker ps -q > current_containers.txt || true
+    - docker compose pull
+    - docker compose down --remove-orphans || true
+    # Attempt to start new containers
+    - |
+      if ! docker compose up -d; then
+        echo "❌ Deployment failed. Rolling back to previous image..."
+        if [ -n "$PREV_IMAGE" ]; then
+          docker run -d --name app "$PREV_IMAGE"
+        fi
+        exit 1
+      fi
+    - sleep 10
+    - docker compose ps
+    - echo "🧹 Cleaning Docker after deploy..."
+    - docker system prune -af
+    - docker volume prune -f
+  after_script:
+    - rm -f current_containers.txt || true
+  environment:
+    name: staging
+    url: https://api-dev.cinnagen.com/
