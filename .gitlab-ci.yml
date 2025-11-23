@@ -86,8 +86,13 @@ deploy_staging:
     - |
       # Configure Docker to use insecure registry (for self-signed or expired certificates)
       # Extract registry hostname from CI_REGISTRY
-      REGISTRY_HOST=$(echo $CI_REGISTRY | sed 's|https\?://||' | sed 's|:.*||')
-      REGISTRY_PORT=$(echo $CI_REGISTRY | sed 's|https\?://||' | sed 's|.*:||' | sed 's|/.*||')
+      if [[ "$CI_REGISTRY" =~ ^https?:// ]]; then
+        REGISTRY_HOST_PORT=$(echo $CI_REGISTRY | sed 's|https\?://||' | sed 's|/.*||')
+      else
+        REGISTRY_HOST_PORT="$CI_REGISTRY"
+      fi
+      REGISTRY_HOST=$(echo $REGISTRY_HOST_PORT | cut -d: -f1)
+      REGISTRY_PORT=$(echo $REGISTRY_HOST_PORT | cut -d: -f2)
       echo "Configuring Docker for insecure registry: $REGISTRY_HOST:$REGISTRY_PORT"
       
       # Try to configure Docker daemon (requires sudo, may fail on some runners)
@@ -97,13 +102,13 @@ deploy_staging:
           sudo cp /etc/docker/daemon.json /etc/docker/daemon.json.bak 2>/dev/null || true
           # Add insecure-registries if not already present
           if command -v jq >/dev/null 2>&1; then
-            sudo jq --arg host "$REGISTRY_HOST:$REGISTRY_PORT" '.insecure-registries = (.insecure-registries // []) + [$host] | unique' /etc/docker/daemon.json > /tmp/daemon.json 2>/dev/null && sudo mv /tmp/daemon.json /etc/docker/daemon.json || echo "Could not modify daemon.json (may need manual configuration)"
+            sudo jq --arg host "$REGISTRY_HOST_PORT" '.insecure-registries = (.insecure-registries // []) + [$host] | unique' /etc/docker/daemon.json > /tmp/daemon.json 2>/dev/null && sudo mv /tmp/daemon.json /etc/docker/daemon.json || echo "Could not modify daemon.json (may need manual configuration)"
           else
             echo "jq not available, skipping daemon.json modification"
           fi
         else
           echo "Creating new daemon.json"
-          echo "{\"insecure-registries\": [\"$REGISTRY_HOST:$REGISTRY_PORT\"]}" | sudo tee /etc/docker/daemon.json > /dev/null 2>/dev/null || echo "Could not create daemon.json (may need manual configuration)"
+          echo "{\"insecure-registries\": [\"$REGISTRY_HOST_PORT\"]}" | sudo tee /etc/docker/daemon.json > /dev/null 2>/dev/null || echo "Could not create daemon.json (may need manual configuration)"
         fi
         
         # Try to restart Docker daemon (may fail if no permission)
@@ -113,62 +118,107 @@ deploy_staging:
       else
         echo "sudo not available, skipping Docker daemon configuration"
         echo "⚠️  WARNING: Docker daemon may need to be configured manually with insecure-registries"
-        echo "Add to /etc/docker/daemon.json: {\"insecure-registries\": [\"$REGISTRY_HOST:$REGISTRY_PORT\"]}"
+        echo "Add to /etc/docker/daemon.json: {\"insecure-registries\": [\"$REGISTRY_HOST_PORT\"]}"
       fi
+      
+      # Alternative: Set DOCKER_TLS_VERIFY=0 for this session (may not work for all Docker versions)
+      export DOCKER_TLS_VERIFY=0
+      echo "Set DOCKER_TLS_VERIFY=0 (may not work for all Docker versions)"
   script:
     - echo "🚀 Starting deployment..."
     - echo "🔐 Authenticating to GitLab registry for pulling images..."
     - |
       # Convert HTTPS to HTTP for registry URL (bypasses TLS certificate issues)
-      # Extract registry hostname and port
-      export REGISTRY_HOST_PORT=$(echo $CI_REGISTRY | sed 's|https\?://||' | sed 's|/.*||')
-      export REGISTRY_HTTP="http://$REGISTRY_HOST_PORT"
-      export REGISTRY_HTTPS="$CI_REGISTRY"
+      # CI_REGISTRY might be just hostname:port or full URL
+      if [[ "$CI_REGISTRY" =~ ^https?:// ]]; then
+        # Already has protocol
+        export REGISTRY_HOST_PORT=$(echo $CI_REGISTRY | sed 's|https\?://||' | sed 's|/.*||')
+        export REGISTRY_HTTP="http://$REGISTRY_HOST_PORT"
+        export REGISTRY_HTTPS="https://$REGISTRY_HOST_PORT"
+      else
+        # No protocol, assume it's hostname:port
+        export REGISTRY_HOST_PORT="$CI_REGISTRY"
+        export REGISTRY_HTTP="http://$REGISTRY_HOST_PORT"
+        export REGISTRY_HTTPS="https://$REGISTRY_HOST_PORT"
+      fi
       
       echo "Registry (HTTPS): $REGISTRY_HTTPS"
       echo "Registry (HTTP): $REGISTRY_HTTP"
       echo "Registry Image: $CI_REGISTRY_IMAGE"
       
-      # Try HTTP first (if nginx supports it), then fall back to HTTPS with insecure flag
+      # Try HTTP first (if nginx supports it), then fall back to HTTPS
       # Use CI_JOB_TOKEN (GitLab's recommended method for Container Registry)
       # When using CI_JOB_TOKEN, username should be 'gitlab-ci-token'
       if [ -n "$CI_JOB_TOKEN" ]; then
         echo "Using CI_JOB_TOKEN for GitLab registry authentication"
         REGISTRY_USER="${CI_REGISTRY_USER:-gitlab-ci-token}"
         
-        # Try HTTP first
-        if echo $CI_JOB_TOKEN | docker login -u "$REGISTRY_USER" --password-stdin $REGISTRY_HTTP 2>/dev/null; then
+        # Try HTTP first (show errors for debugging)
+        echo "Attempting login via HTTP..."
+        HTTP_LOGIN_OUTPUT=$(echo $CI_JOB_TOKEN | docker login -u "$REGISTRY_USER" --password-stdin $REGISTRY_HTTP 2>&1)
+        HTTP_LOGIN_STATUS=$?
+        
+        if [ $HTTP_LOGIN_STATUS -eq 0 ]; then
           echo "✅ Successfully authenticated to GitLab registry via HTTP"
           export DOCKER_REGISTRY_URL="$REGISTRY_HTTP"
-        # Try HTTPS with HTTP registry
-        elif echo $CI_JOB_TOKEN | docker login -u "$REGISTRY_USER" --password-stdin $REGISTRY_HTTPS 2>/dev/null; then
-          echo "✅ Successfully authenticated to GitLab registry via HTTPS"
-          export DOCKER_REGISTRY_URL="$REGISTRY_HTTPS"
         else
-          echo "❌ Failed to login to GitLab registry with CI_JOB_TOKEN"
-          echo "Trying with alternative username..."
-          if echo $CI_JOB_TOKEN | docker login -u "gitlab-ci-token" --password-stdin $REGISTRY_HTTP 2>/dev/null; then
-            echo "✅ Successfully authenticated via HTTP with alternative username"
-            export DOCKER_REGISTRY_URL="$REGISTRY_HTTP"
-          elif echo $CI_JOB_TOKEN | docker login -u "gitlab-ci-token" --password-stdin $REGISTRY_HTTPS 2>/dev/null; then
-            echo "✅ Successfully authenticated via HTTPS with alternative username"
+          echo "❌ HTTP login failed: $HTTP_LOGIN_OUTPUT"
+          echo "Attempting login via HTTPS..."
+          HTTPS_LOGIN_OUTPUT=$(echo $CI_JOB_TOKEN | docker login -u "$REGISTRY_USER" --password-stdin $REGISTRY_HTTPS 2>&1)
+          HTTPS_LOGIN_STATUS=$?
+          
+          if [ $HTTPS_LOGIN_STATUS -eq 0 ]; then
+            echo "✅ Successfully authenticated to GitLab registry via HTTPS"
             export DOCKER_REGISTRY_URL="$REGISTRY_HTTPS"
           else
-            echo "❌ Failed to login to GitLab registry (both usernames and both protocols)"
-            exit 1
+            echo "❌ HTTPS login failed: $HTTPS_LOGIN_OUTPUT"
+            echo "Trying with alternative username 'gitlab-ci-token'..."
+            
+            # Try with explicit username
+            HTTP_LOGIN_OUTPUT2=$(echo $CI_JOB_TOKEN | docker login -u "gitlab-ci-token" --password-stdin $REGISTRY_HTTP 2>&1)
+            HTTP_LOGIN_STATUS2=$?
+            
+            if [ $HTTP_LOGIN_STATUS2 -eq 0 ]; then
+              echo "✅ Successfully authenticated via HTTP with alternative username"
+              export DOCKER_REGISTRY_URL="$REGISTRY_HTTP"
+            else
+              echo "❌ HTTP login with alternative username failed: $HTTP_LOGIN_OUTPUT2"
+              HTTPS_LOGIN_OUTPUT2=$(echo $CI_JOB_TOKEN | docker login -u "gitlab-ci-token" --password-stdin $REGISTRY_HTTPS 2>&1)
+              HTTPS_LOGIN_STATUS2=$?
+              
+              if [ $HTTPS_LOGIN_STATUS2 -eq 0 ]; then
+                echo "✅ Successfully authenticated via HTTPS with alternative username"
+                export DOCKER_REGISTRY_URL="$REGISTRY_HTTPS"
+              else
+                echo "❌ HTTPS login with alternative username failed: $HTTPS_LOGIN_OUTPUT2"
+                echo "❌ Failed to login to GitLab registry (all attempts failed)"
+                exit 1
+              fi
+            fi
           fi
         fi
       elif [ -n "$CI_REGISTRY_PASSWORD" ]; then
         echo "Using CI_REGISTRY_PASSWORD for GitLab registry authentication"
-        if echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $REGISTRY_HTTP 2>/dev/null; then
+        HTTP_LOGIN_OUTPUT=$(echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $REGISTRY_HTTP 2>&1)
+        HTTP_LOGIN_STATUS=$?
+        
+        if [ $HTTP_LOGIN_STATUS -eq 0 ]; then
           echo "✅ Successfully authenticated via HTTP"
           export DOCKER_REGISTRY_URL="$REGISTRY_HTTP"
-        elif echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $REGISTRY_HTTPS 2>/dev/null; then
-          echo "✅ Successfully authenticated via HTTPS"
-          export DOCKER_REGISTRY_URL="$REGISTRY_HTTPS"
         else
-          echo "❌ Failed to login to GitLab registry with CI_REGISTRY_PASSWORD"
-          exit 1
+          echo "❌ HTTP login failed: $HTTP_LOGIN_OUTPUT"
+          echo "Attempting HTTPS..."
+          HTTPS_LOGIN_OUTPUT=$(echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $REGISTRY_HTTPS 2>&1)
+          HTTPS_LOGIN_STATUS=$?
+          
+          if [ $HTTPS_LOGIN_STATUS -eq 0 ]; then
+            echo "✅ Successfully authenticated via HTTPS"
+            export DOCKER_REGISTRY_URL="$REGISTRY_HTTPS"
+          else
+            echo "❌ HTTPS login failed: $HTTPS_LOGIN_OUTPUT"
+            echo "❌ Failed to login to GitLab registry with CI_REGISTRY_PASSWORD"
+            exit 1
+          fi
         fi
       else
         echo "❌ Neither CI_JOB_TOKEN nor CI_REGISTRY_PASSWORD is set"
