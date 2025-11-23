@@ -3234,8 +3234,7 @@
         "title": "Authentication",
         "colSpan": 1,
         "fieldIds": [
-          "authentication-type",
-          "username"
+          "authentication-type"
         ]
       }
     ],
@@ -3499,9 +3498,7 @@
           "description": "Database authentication settings",
           "colSpan": 2,
           "fieldIds": [
-            "authentication-type",
-            "username",
-            "password"
+            "authentication-type"
           ]
         }
       ]

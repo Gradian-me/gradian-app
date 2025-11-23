@@ -1300,10 +1300,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-23T07:53:23.257Z",
+      "updatedAt": "2025-11-23T09:47:02.773Z",
       "targetDataPath": "data",
       "sourceDataPath": "data",
-      "lastSynced": "2025-11-23T07:53:23.097Z",
+      "lastSynced": "2025-11-23T09:47:02.697Z",
       "incomplete": false
     },
     {

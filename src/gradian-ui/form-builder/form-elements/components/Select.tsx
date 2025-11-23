@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Select as RadixSelect,
   SelectContent,
@@ -193,7 +194,13 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
     const handleClickOutside = (event: MouseEvent) => {
       if (!containerRef.current) return;
-      if (!containerRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      // Check if click is outside both the trigger container and the portaled panel
+      const isOutsideTrigger = !containerRef.current.contains(target);
+      const isInsidePanel = panelRef.current?.contains(target);
+      
+      // Only close if click is outside trigger AND outside panel
+      if (isOutsideTrigger && !isInsidePanel) {
         setIsDropdownOpen(false);
         onOpenChange?.(false);
       }
@@ -248,6 +255,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const [panelMaxHeight, setPanelMaxHeight] = useState<number>(256);
   const [panelOffset, setPanelOffset] = useState<number>(8);
   const [shouldShowMultiChevron, setShouldShowMultiChevron] = useState(true);
+  const [panelPosition, setPanelPosition] = useState<{ left: number; top: number; width: number } | null>(null);
 
   const updatePanelPosition = useCallback(() => {
     if (!allowMultiselect || !isDropdownOpen || disabled) {
@@ -286,28 +294,59 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     const maxHeight = Math.max(120, Math.min(Math.floor(safeSpace), 360));
     const offset = Math.max(6, Math.min(12, Math.floor(Math.min(safeSpace / 6, 12))));
 
+    // Calculate fixed position for portaled dropdown
+    const left = triggerRect.left;
+    const top = placement === 'bottom' 
+      ? triggerRect.bottom + offset
+      : triggerRect.top - offset;
+    const width = triggerRect.width;
+
     setPanelPlacement(placement);
     setPanelMaxHeight(maxHeight);
     setPanelOffset(offset);
+    setPanelPosition({ left, top, width });
   }, [allowMultiselect, disabled, isDropdownOpen]);
 
   useLayoutEffect(() => {
-    updatePanelPosition();
-  }, [updatePanelPosition, multiSelectionIds, normalizedOptionsLookup]);
+    if (isDropdownOpen) {
+      updatePanelPosition();
+    }
+  }, [updatePanelPosition, isDropdownOpen, multiSelectionIds, normalizedOptionsLookup]);
 
   useEffect(() => {
     if (!allowMultiselect || !isDropdownOpen) {
       return;
     }
 
+    // Use ResizeObserver to watch for trigger element size changes
+    const triggerEl = containerRef.current;
+    let resizeObserver: ResizeObserver | null = null;
+
+    if (triggerEl && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        updatePanelPosition();
+      });
+      resizeObserver.observe(triggerEl);
+    }
+
     window.addEventListener('resize', updatePanelPosition);
     window.addEventListener('scroll', updatePanelPosition, true);
 
     return () => {
+      if (resizeObserver && triggerEl) {
+        resizeObserver.unobserve(triggerEl);
+        resizeObserver.disconnect();
+      }
       window.removeEventListener('resize', updatePanelPosition);
       window.removeEventListener('scroll', updatePanelPosition, true);
     };
   }, [allowMultiselect, isDropdownOpen, updatePanelPosition]);
+
+  useEffect(() => {
+    if (!isDropdownOpen) {
+      setPanelPosition(null);
+    }
+  }, [isDropdownOpen]);
 
   useEffect(() => {
     if (!allowMultiselect) {
@@ -573,8 +612,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       );
 
       const panelClasses = cn(
-        'absolute left-0 right-0 z-50 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-lg overflow-hidden',
-        panelPlacement === 'bottom' ? 'top-full' : 'bottom-full'
+        'fixed z-[9999] rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-lg overflow-hidden',
+        panelPlacement === 'bottom' ? 'mt-0' : 'mb-0'
       );
 
       const optionButtonClasses = (isSelected: boolean) =>
@@ -647,13 +686,14 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
             <button
               type="button"
               className={triggerClasses}
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 setIsDropdownOpen((prev) => {
                   const next = !prev;
                   onOpenChange?.(next);
                   return next;
-                })
-              }
+                });
+              }}
             >
               <div className="flex flex-1 flex-wrap gap-1">
                 {renderMultiTriggerContent()}
@@ -667,60 +707,73 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                 />
               )}
             </button>
-            {isDropdownOpen && (
+            {isDropdownOpen && panelPosition && typeof document !== 'undefined' && createPortal(
               <div
                 className={panelClasses}
                 ref={panelRef}
                 style={{
+                  left: `${panelPosition.left}px`,
+                  top: `${panelPosition.top}px`,
+                  transform: panelPlacement === 'top' ? 'translateY(-100%)' : 'none',
+                  width: `${panelPosition.width}px`,
                   maxHeight: panelMaxHeight,
-                  marginTop: panelPlacement === 'bottom' ? panelOffset : undefined,
-                  marginBottom: panelPlacement === 'top' ? panelOffset : undefined,
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
                 }}
               >
-              <div className="max-h-full overflow-y-auto py-1">
+                <div className="max-h-full overflow-y-auto py-1">
                   {validOptions.length === 0 ? (
-                  <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
                       No options available
                     </div>
                   ) : (
-                  validOptions.map((option, index) => {
-                    const optionId = option.id ?? '';
-                    const isSelected = multiSelectionSet.has(optionId);
-                    return (
-                      <motion.div
-                        key={optionId}
-                        initial={{ opacity: 0, y: 4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.17, delay: Math.min(index * 0.04, 0.25) }}
-                      >
-                        <button
-                          type="button"
-                          className={optionButtonClasses(isSelected)}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            toggleOption(option);
-                          }}
+                    validOptions.map((option, index) => {
+                      const optionId = option.id ?? '';
+                      const isSelected = multiSelectionSet.has(optionId);
+                      return (
+                        <motion.div
+                          key={optionId}
+                          initial={{ opacity: 0, y: 4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.17, delay: Math.min(index * 0.04, 0.25) }}
                         >
-                          <span
-                            className={cn(
-                              'flex h-4 w-4 items-center justify-center rounded border transition-colors',
-                              isSelected
-                                ? 'border-violet-500 dark:border-violet-400 bg-violet-500 dark:bg-violet-400 shadow-sm text-white'
-                                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50'
-                            )}
+                          <button
+                            type="button"
+                            className={optionButtonClasses(isSelected)}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              toggleOption(option);
+                            }}
+                            onMouseDown={(event) => {
+                              event.stopPropagation();
+                            }}
                           >
-                            {isSelected && <Check className="h-3 w-3" />}
-                          </span>
-                          <span className="flex min-w-0 flex-1 items-center gap-2">
-                            {renderBadgeContent(option)}
-                          </span>
-                        </button>
-                      </motion.div>
-                    );
-                  })
+                            <span
+                              className={cn(
+                                'flex h-4 w-4 items-center justify-center rounded border transition-colors',
+                                isSelected
+                                  ? 'border-violet-500 dark:border-violet-400 bg-violet-500 dark:bg-violet-400 shadow-sm text-white'
+                                  : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50'
+                              )}
+                            >
+                              {isSelected && <Check className="h-3 w-3" />}
+                            </span>
+                            <span className="flex min-w-0 flex-1 items-center gap-2">
+                              {renderBadgeContent(option)}
+                            </span>
+                          </button>
+                        </motion.div>
+                      );
+                    })
                   )}
                 </div>
-              </div>
+              </div>,
+              document.body
             )}
           </div>
           {error && renderErrorMessage(error)}
