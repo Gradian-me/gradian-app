@@ -1,7 +1,6 @@
 stages:
   - build
   - deploy
-  - rollback
 
 variables:
   DOCKER_DRIVER: overlay2
@@ -37,7 +36,7 @@ before_script:
 build:
   stage: build
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
       when: manual
     - when: never
   tags:
@@ -58,7 +57,8 @@ deploy_staging:
     - job: build
       optional: true
   rules:
-    - when: always
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
+    - when: never
   tags:
     - CG-GR-APP-PRD-1
   script:
