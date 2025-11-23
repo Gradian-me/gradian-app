@@ -8,9 +8,7 @@ FROM node:20-slim AS builder
 # Install build dependencies for native modules (argon2, etc.)
 # Combined into single layer to reduce image size
 # Added DEBIAN_FRONTEND=noninteractive and retry logic to prevent hanging
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    export DEBIAN_FRONTEND=noninteractive && \
+RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update -qq && \
     apt-get install -y --no-install-recommends \
         python3 \
@@ -28,9 +26,8 @@ WORKDIR /app
 # Copy package files first for better layer caching
 COPY package*.json ./
 
-# Install dependencies with cache mount for faster rebuilds
-RUN --mount=type=cache,target=/root/.npm,sharing=locked \
-    npm ci --legacy-peer-deps --include=optional --prefer-offline --no-audit
+# Install dependencies
+RUN npm ci --legacy-peer-deps --include=optional --prefer-offline --no-audit
 
 # Copy source code
 COPY . .
@@ -39,9 +36,7 @@ COPY . .
 RUN npx prisma generate
 
 # Build the application
-# Using BuildKit cache mount for .next directory
-RUN --mount=type=cache,target=/app/.next/cache,sharing=locked \
-    npm run build
+RUN npm run build
 
 # =============================================================================
 # Production stage
