@@ -7,9 +7,11 @@ FROM node:20-slim AS builder
 
 # Install build dependencies for native modules (argon2, etc.)
 # Combined into single layer to reduce image size
+# Added DEBIAN_FRONTEND=noninteractive and retry logic to prevent hanging
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update -qq && \
     apt-get install -y --no-install-recommends \
         python3 \
         make \
@@ -17,7 +19,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         gcc \
         libc6-dev \
         ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
 
 # Set working directory
 WORKDIR /app
@@ -54,14 +57,17 @@ ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1
 
 # Create a non-root user and install tini and curl in a single layer
-RUN groupadd --system --gid 1001 nodejs && \
+# Added DEBIAN_FRONTEND=noninteractive to prevent hanging
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs nextjs && \
-    apt-get update && \
+    apt-get update -qq && \
     apt-get install -y --no-install-recommends \
         tini \
         curl \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/* && \
+    apt-get clean && \
     chown -R nextjs:nodejs /app
 
 # Copy necessary files from builder
