@@ -1,0 +1,27 @@
+services:
+  gradian-app:
+    image: ${CI_REGISTRY_IMAGE}:latest
+    container_name: gradian-app
+    restart: unless-stopped
+    ports:
+      - '8502:8502' # Host port 9501 maps to container port 8502
+    volumes:
+      # Optional: Mount logs directory if you want to persist logs
+      - ./logs:/app/logs
+    networks:
+      - gradian-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8502/api/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      - NODE_ENV=production
+      - PORT=8502
+      - HOSTNAME=0.0.0.0
+
+networks:
+  gradian-network:
+    external: true
+
