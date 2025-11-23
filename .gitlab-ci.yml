@@ -41,7 +41,7 @@ build:
       when: manual
     - when: never
   tags:
-    - CG-GR-API-DEV
+    - CG-GR-APP-DEV-shell
   script:
     - echo "🚀 Building Docker image..."
     - SHORT_SHA=${CI_COMMIT_SHA:0:8}
@@ -56,7 +56,7 @@ deploy_staging:
   stage: deploy
   needs:
     - job: build
-      optional: false
+      optional: true
   rules:
     - when: always
   tags:
