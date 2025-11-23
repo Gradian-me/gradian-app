@@ -1277,9 +1277,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-11-23T10:18:13.349Z",
+      "updatedAt": "2025-11-23T10:25:30.914Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-11-23T10:18:13.283Z"
+      "lastSynced": "2025-11-23T10:25:30.865Z"
     },
     {
       "color": "#00d1ae",
