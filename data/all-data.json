@@ -10,7 +10,12 @@
       "zipCode": "1468943381",
       "registrationNumber": "TF-2019-001",
       "taxId": "TR-TAX-0012",
-      "country": "TR",
+      "country": [
+        {
+          "id": "FR",
+          "label": "France"
+        }
+      ],
       "categories": [
         "technology",
         "logistics",
@@ -30,7 +35,7 @@
       "rating": 4,
       "id": "01K8QVCWS0ZSTMSVD5C6K7A806",
       "createdAt": "2025-10-29T11:24:37.540Z",
-      "updatedAt": "2025-11-19T06:27:25.854Z",
+      "updatedAt": "2025-11-23T10:18:08.122Z",
       "performanceMetrics": [
         {
           "id": "onTimeDelivery",
@@ -103,53 +108,21 @@
         "reach",
         "iso14001"
       ],
-      "section-1762088953746": [
-        {
-          "day": "Sunday",
-          "id": "01K92B97TF0SX254XE9RM2NNNF"
-        },
-        {
-          "day": "Monday",
-          "id": "01K92B9DNEAR4H93KTK58FGGE8"
-        }
-      ],
+      "section-1762088953746": [],
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "contacts": [
-        {
-          "id": "01K94Q59VYS8JA1VRMG7Q343GM",
-          "label": "Ghader Ghaderi"
-        },
-        {
-          "id": "01K94KYJ0TQCGVHJRJ3Q0D0E7G",
-          "label": "Masoud Mirghasemi"
-        },
-        {
-          "id": "01K94Q1ZE6M64MSHAXJARG7F8G",
-          "label": "Mahyar Abidi"
-        },
-        {
-          "id": "01K94KB42QKQNNH7VED2K06Y40",
-          "label": "Arash Zarandi"
-        }
-      ]
+      "contacts": [],
+      "incomplete": false
     },
     {
       "name": "Mana Pharma",
       "email": "info@manapharma.com",
       "phone": "+1 555 123 4567",
-      "address": "",
-      "city": "",
-      "state": "",
-      "zipCode": "",
-      "registrationNumber": "",
-      "taxId": "",
-      "country": "",
       "categories": [],
       "status": "PENDING",
       "rating": 1,
       "id": "01K9MP000000000000000000001",
       "createdAt": "2025-11-04T12:00:00.000Z",
-      "updatedAt": "2025-11-04T12:00:00.000Z",
+      "updatedAt": "2025-11-23T10:14:35.840Z",
       "performanceMetrics": [
         {
           "id": "onTimeDelivery",
@@ -217,7 +190,15 @@
         }
       ],
       "certifications": [],
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "contacts": [],
+      "country": [
+        {
+          "id": "CAN",
+          "label": "Canada"
+        }
+      ],
+      "incomplete": false
     },
     {
       "name": "Ottana Pharmed",
@@ -238,7 +219,7 @@
       "rating": 5,
       "id": "01K9OP000000000000000000001",
       "createdAt": "2025-11-04T12:00:00.000Z",
-      "updatedAt": "2025-11-04T09:24:50.709Z",
+      "updatedAt": "2025-11-23T10:14:42.252Z",
       "performanceMetrics": [
         {
           "id": "onTimeDelivery",
@@ -310,119 +291,19 @@
         "iso14001"
       ],
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "contacts": [
-        {
-          "name": "Ottana Pharmed",
-          "email": "info@ottanapharmed.com",
-          "phone": "+1 555 123 4568",
-          "position": "Primary Contact",
-          "isPrimary": true
-        }
-      ]
-    },
-    {
-      "name": "Exapilog",
-      "email": "info@exapilog.com",
-      "phone": "+1 555 123 4569",
-      "address": "",
-      "city": "",
-      "state": "",
-      "zipCode": "",
-      "registrationNumber": "",
-      "taxId": "",
-      "country": "",
-      "categories": [],
-      "status": "PENDING",
-      "rating": 1,
-      "id": "01K9EX000000000000000000001",
-      "createdAt": "2025-11-04T12:00:00.000Z",
-      "updatedAt": "2025-11-04T12:00:00.000Z",
-      "performanceMetrics": [
-        {
-          "id": "onTimeDelivery",
-          "label": "On Time Delivery",
-          "value": 91,
-          "unit": "%",
-          "trend": "down",
-          "icon": "Clock"
-        },
-        {
-          "id": "qualityScore",
-          "label": "Quality Score",
-          "value": 88,
-          "unit": "",
-          "trend": "same",
-          "icon": "CheckCircle"
-        },
-        {
-          "id": "totalOrders",
-          "label": "Total Orders",
-          "value": 65,
-          "unit": "",
-          "trend": "down",
-          "icon": "Package"
-        },
-        {
-          "id": "totalValue",
-          "label": "Total Value",
-          "value": 1400000,
-          "unit": "USD",
-          "trend": "down",
-          "icon": "DollarSign"
-        },
-        {
-          "id": "averageOrderValue",
-          "label": "Average Order Value",
-          "value": 21538.46,
-          "unit": "USD",
-          "trend": "same",
-          "icon": "BarChart"
-        },
-        {
-          "id": "priceCompetitiveness",
-          "label": "Price Competitiveness",
-          "value": 85,
-          "unit": "%",
-          "trend": "down",
-          "icon": "TrendingUp"
-        },
-        {
-          "id": "responsiveness",
-          "label": "Responsiveness",
-          "value": 86,
-          "unit": "%",
-          "trend": "down",
-          "icon": "MessageSquare"
-        },
-        {
-          "id": "complianceScore",
-          "label": "Compliance Score",
-          "value": 90,
-          "unit": "",
-          "trend": "same",
-          "icon": "FileCheck"
-        }
-      ],
-      "certifications": [],
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+      "contacts": [],
+      "incomplete": false
     },
     {
       "name": "Pharmagona",
       "email": "info@pharmagona.com",
       "phone": "+1 555 123 4570",
-      "address": "",
-      "city": "",
-      "state": "",
-      "zipCode": "",
-      "registrationNumber": "",
-      "taxId": "",
-      "country": "",
       "categories": [],
       "status": "PENDING",
       "rating": 1,
       "id": "01K9PG000000000000000000001",
       "createdAt": "2025-11-04T12:00:00.000Z",
-      "updatedAt": "2025-11-04T12:00:00.000Z",
+      "updatedAt": "2025-11-23T10:16:47.113Z",
       "performanceMetrics": [
         {
           "id": "onTimeDelivery",
@@ -490,7 +371,15 @@
         }
       ],
       "certifications": [],
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "country": [
+        {
+          "id": "CAN",
+          "label": "Canada"
+        }
+      ],
+      "incomplete": false,
+      "contacts": []
     }
   ],
   "inquiries": [
@@ -685,6 +574,16 @@
       ],
       "status": "ACTIVE",
       "rating": 5
+    },
+    {
+      "name": "Bahareh",
+      "last_name": "Cheshmehkhavar",
+      "phone_number": "124125121",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KAR3EADG1YK5TNS947582TJQ",
+      "createdAt": "2025-11-23T10:16:36.544Z",
+      "updatedAt": "2025-11-23T10:16:36.544Z"
     }
   ],
   "companies": [
@@ -1300,10 +1199,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-23T09:47:02.773Z",
+      "updatedAt": "2025-11-23T10:09:24.988Z",
       "targetDataPath": "data",
       "sourceDataPath": "data",
-      "lastSynced": "2025-11-23T09:47:02.697Z",
+      "lastSynced": "2025-11-23T10:09:24.886Z",
       "incomplete": false
     },
     {
@@ -1331,8 +1230,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-11-23T07:53:57.609Z",
-      "lastSynced": "2025-11-23T07:53:57.463Z"
+      "updatedAt": "2025-11-23T10:09:29.786Z",
+      "lastSynced": "2025-11-23T10:09:29.749Z"
     },
     {
       "color": "#4E79A7",
@@ -1378,9 +1277,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-11-23T07:55:18.783Z",
+      "updatedAt": "2025-11-23T10:18:13.349Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-11-23T07:55:18.682Z"
+      "lastSynced": "2025-11-23T10:18:13.283Z"
     },
     {
       "color": "#00d1ae",

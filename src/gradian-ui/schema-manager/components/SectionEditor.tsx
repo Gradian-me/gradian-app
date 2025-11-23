@@ -64,12 +64,12 @@ export function SectionEditor({
 
   useEffect(() => {
     // Initialize tempSection from section
-    // If it's a repeating section without fieldRelationType, default to 'addFields'
+    // If it's a repeating section without fieldRelationType, default to 'connectToSchema'
     const updatedSection = { ...section };
     if (updatedSection.isRepeatingSection && updatedSection.repeatingConfig && !updatedSection.repeatingConfig.fieldRelationType) {
       updatedSection.repeatingConfig = {
         ...updatedSection.repeatingConfig,
-        fieldRelationType: 'addFields',
+        fieldRelationType: 'connectToSchema',
       };
     }
     setTempSection(updatedSection);
@@ -314,7 +314,7 @@ export function SectionEditor({
                   isRepeatingSection: checked,
                   repeatingConfig:
                     checked && !tempSection.repeatingConfig
-                      ? { fieldRelationType: 'addFields', minItems: 0, maxItems: undefined }
+                      ? { fieldRelationType: 'connectToSchema', minItems: 0, maxItems: undefined }
                       : tempSection.repeatingConfig,
                 });
               }}
@@ -325,7 +325,7 @@ export function SectionEditor({
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Field Relation Type</label>
                 <ToggleGroup
                   type="single"
-                  value={tempSection.repeatingConfig?.fieldRelationType || 'addFields'}
+                  value={tempSection.repeatingConfig?.fieldRelationType || 'connectToSchema'}
                   onValueChange={(value) => {
                     if (value) {
                       setTempSection({
@@ -344,11 +344,11 @@ export function SectionEditor({
                   }}
                   className="w-full"
                 >
-                  <ToggleGroupItem value="addFields" className="flex-1">
-                    Add Fields
-                  </ToggleGroupItem>
                   <ToggleGroupItem value="connectToSchema" className="flex-1">
                     Connect To Schema
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="addFields" className="flex-1">
+                    Add Fields
                   </ToggleGroupItem>
                 </ToggleGroup>
                 <p className="text-xs text-gray-500">
@@ -362,7 +362,7 @@ export function SectionEditor({
             {tempSection.isRepeatingSection && (tempSection.repeatingConfig?.minItems ?? 0) <= 1 && (
               <Switch
                 config={{ name: `show-not-applicable-${section.id}`, label: 'Show Not Applicable Switch' }}
-                value={tempSection.showNotApplicable !== false}
+                value={tempSection.showNotApplicable === true}
                 onChange={(checked: boolean) => {
                   const updates: any = { showNotApplicable: checked };
                   // When enabling N.A switch, set minItems to 0

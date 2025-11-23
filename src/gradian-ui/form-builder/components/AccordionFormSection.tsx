@@ -106,9 +106,9 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   const sourceSchemaId = schema.id;
   
   // Check if section is eligible for N.A switch
-  // Eligible if: IS a repeating section, AND NOT a repeating section with minItems > 1, AND showNotApplicable is not false
+  // Eligible if: IS a repeating section, AND NOT a repeating section with minItems > 1, AND showNotApplicable is explicitly true
   const isEligibleForNA = isRepeatingSection && (section.repeatingConfig?.minItems ?? 0) <= 1;
-  const showNotApplicableSwitch = section.showNotApplicable !== false && isEligibleForNA;
+  const showNotApplicableSwitch = section.showNotApplicable === true && isEligibleForNA;
   
   // Read N.A state from form values (sections array)
   const sectionsNAArray = Array.isArray(values?.sections) ? values.sections : [];

@@ -300,7 +300,7 @@ export default function AiBuilderPage() {
         subtitle="Transform your ideas into reality with the power of AI"
         icon="Sparkles"
       >
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-5xl mx-auto">
           {/* User Prompt Input Skeleton - matches AiBuilderForm structure */}
           <div className="space-y-2 flex flex-col items-center">
             {/* Label and Select Row Skeleton - matches new layout */}
