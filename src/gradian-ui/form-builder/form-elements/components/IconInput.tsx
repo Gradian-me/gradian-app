@@ -70,6 +70,7 @@ export const IconInput = forwardRef<FormElementRef, IconInputProps>(
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const inputClasses = cn(
       baseInputClasses,
+      'bg-white dark:bg-gray-800/50', // Ensure background matches EmailInput
       error
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',

@@ -558,7 +558,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       } as const;
 
       const triggerClasses = cn(
-        'flex w-full items-center justify-between rounded-md border bg-white dark:bg-slate-800 px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400',
+        'flex w-full items-center justify-between rounded-md border bg-white dark:bg-gray-800/50 px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400',
         triggerSizeClasses[size],
         disabled ? 'pointer-events-none opacity-60 cursor-not-allowed' : 'cursor-pointer',
         error
@@ -569,7 +569,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       );
 
       const panelClasses = cn(
-        'absolute left-0 right-0 z-50 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 shadow-xl overflow-hidden',
+        'absolute left-0 right-0 z-50 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 shadow-xl overflow-hidden',
         panelPlacement === 'bottom' ? 'top-full' : 'bottom-full'
       );
 
@@ -702,7 +702,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                               'flex h-4 w-4 items-center justify-center rounded border text-white transition-colors',
                               isSelected
                                 ? 'border-violet-500 dark:border-violet-400 bg-violet-500 dark:bg-violet-400 shadow-sm'
-                                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 text-transparent'
+                                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 text-transparent'
                             )}
                           >
                             <Check className="h-3 w-3" />
