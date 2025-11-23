@@ -99,9 +99,13 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     lg: 'h-12',
   };
 
+  // Base classes from SelectTrigger - we'll merge with size and error
+  const baseSelectClasses = 'rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 text-sm text-gray-900 dark:text-gray-100 shadow-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 ring-offset-background dark:ring-offset-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:ring-offset-1 focus:border-violet-400 dark:focus:border-violet-500 data-[state=open]:outline-none data-[state=open]:ring-1 data-[state=open]:ring-violet-300 dark:data-[state=open]:ring-violet-500 data-[state=open]:ring-offset-1 data-[state=open]:border-violet-400 dark:data-[state=open]:border-violet-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-gray-800/30 disabled:text-gray-500 dark:disabled:text-gray-400 transition-colors';
+  
   const selectClasses = cn(
+    baseSelectClasses,
     sizeClasses[size],
-    error && 'border-red-500 dark:border-red-600 focus:border-red-500 dark:focus:border-red-600 focus:ring-1 focus:ring-red-400 dark:focus:ring-red-500 data-[state=open]:border-red-500 dark:data-[state=open]:border-red-600 data-[state=open]:ring-red-400 dark:data-[state=open]:ring-red-500',
+    error && 'border-red-500 dark:border-red-500 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-300 dark:focus:ring-red-400 data-[state=open]:border-red-500 dark:data-[state=open]:border-red-500 data-[state=open]:ring-red-300 dark:data-[state=open]:ring-red-400',
     className
   );
 
@@ -558,26 +562,26 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       } as const;
 
       const triggerClasses = cn(
-        'flex w-full items-center justify-between rounded-md border bg-white dark:bg-gray-800/50 px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400',
+        'flex w-full items-center justify-between rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 shadow-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 ring-offset-background dark:ring-offset-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:ring-offset-1 focus:border-violet-400 dark:focus:border-violet-500 transition-colors',
         triggerSizeClasses[size],
-        disabled ? 'pointer-events-none opacity-60 cursor-not-allowed' : 'cursor-pointer',
+        disabled ? 'pointer-events-none opacity-60 cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-gray-800/30 disabled:text-gray-500 dark:disabled:text-gray-400' : 'cursor-pointer',
         error
-          ? 'border-red-500 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-600'
-          : 'border-gray-200 dark:border-gray-700 hover:border-violet-400 dark:hover:border-violet-500',
+          ? 'border-red-500 dark:border-red-500 focus:ring-red-300 dark:focus:ring-red-400 focus:border-red-500 dark:focus:border-red-500'
+          : 'hover:border-violet-400 dark:hover:border-violet-500',
         'items-start gap-2',
         className
       );
 
       const panelClasses = cn(
-        'absolute left-0 right-0 z-50 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 shadow-xl overflow-hidden',
+        'absolute left-0 right-0 z-50 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-lg overflow-hidden',
         panelPlacement === 'bottom' ? 'top-full' : 'bottom-full'
       );
 
       const optionButtonClasses = (isSelected: boolean) =>
         cn(
-          'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors text-left',
+          'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors text-left',
           isSelected
-            ? 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-700 shadow-inner'
+            ? 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 shadow-inner'
             : 'hover:bg-gray-50 dark:hover:bg-slate-700'
         );
 
@@ -657,7 +661,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
               {shouldShowMultiChevron && (
                 <ChevronDown
                   className={cn(
-                    'ml-2 h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform',
+                    'ml-2 h-4 w-4 text-gray-600 dark:text-gray-300 opacity-70 transition-transform shrink-0',
                     isDropdownOpen && 'rotate-180'
                   )}
                 />
@@ -699,13 +703,13 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                         >
                           <span
                             className={cn(
-                              'flex h-4 w-4 items-center justify-center rounded border text-white transition-colors',
+                              'flex h-4 w-4 items-center justify-center rounded border transition-colors',
                               isSelected
-                                ? 'border-violet-500 dark:border-violet-400 bg-violet-500 dark:bg-violet-400 shadow-sm'
-                                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 text-transparent'
+                                ? 'border-violet-500 dark:border-violet-400 bg-violet-500 dark:bg-violet-400 shadow-sm text-white'
+                                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50'
                             )}
                           >
-                            <Check className="h-3 w-3" />
+                            {isSelected && <Check className="h-3 w-3" />}
                           </span>
                           <span className="flex min-w-0 flex-1 items-center gap-2">
                             {renderBadgeContent(option)}
