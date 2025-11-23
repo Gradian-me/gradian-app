@@ -14,7 +14,6 @@ export const DataTable: React.FC<DataTableProps> = ({
   sortBy,
   sortDirection = 'asc',
   loading = false,
-  emptyMessage = 'No data available',
   className,
   ...props
 }) => {
@@ -79,7 +78,7 @@ export const DataTable: React.FC<DataTableProps> = ({
           {data.length === 0 ? (
             <tr>
               <td colSpan={columns.length} className="px-6 py-12 text-center text-gray-500">
-                {emptyMessage}
+                No data available
               </td>
             </tr>
           ) : (

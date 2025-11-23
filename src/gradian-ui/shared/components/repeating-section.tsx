@@ -14,8 +14,6 @@ interface RepeatingSectionProps {
   onCopy?: (index: number) => void;
   onMove?: (fromIndex: number, toIndex: number) => void;
   renderItem: (item: any, index: number) => React.ReactNode;
-  addButtonText?: string;
-  emptyMessage?: string;
   maxItems?: number;
   minItems?: number;
   className?: string;
@@ -29,8 +27,6 @@ export function RepeatingSection({
   onCopy,
   onMove,
   renderItem,
-  addButtonText = 'Add Item',
-  emptyMessage = 'No items added yet',
   maxItems,
   minItems = 0,
   className = '',
@@ -51,7 +47,7 @@ export function RepeatingSection({
       <CardContent>
         {items.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p>{emptyMessage}</p>
+            <p>No items added yet</p>
             {canAdd && (
               <Button
                 type="button"
@@ -61,7 +57,7 @@ export function RepeatingSection({
                 className="mt-4"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                {addButtonText}
+                Add {title}
               </Button>
             )}
           </div>
@@ -140,7 +136,7 @@ export function RepeatingSection({
                   className="w-full flex items-center justify-center gap-2"
                 >
                   <Plus className="h-4 w-4" />
-                  {addButtonText}
+                  Add {title}
                 </Button>
               </motion.div>
             )}

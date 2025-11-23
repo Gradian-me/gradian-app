@@ -661,7 +661,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     }
     
     return { isValid, isIncomplete };
-  }, [schema, state.values, state.errors]);
+  }, [schema, state.values, state.errors, initialValues]);
   
   // Check incomplete status (minItems) without full validation
   // This only checks for incomplete status, not required field validation

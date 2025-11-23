@@ -185,8 +185,6 @@ export function PurchaseOrderForm({ onSubmit, onCancel, isLoading = false, vendo
         items={fields}
         onAdd={addItem}
         onRemove={remove}
-        addButtonText="Add Item"
-        emptyMessage="No items added yet"
         minItems={1}
         renderItem={(item, index) => (
           <div className="space-y-4">

@@ -25,9 +25,6 @@ export const RepeatingSection: React.FC<RepeatingSectionProps> = ({
   const {
     minItems = 0,
     maxItems,
-    addButtonText = 'Add Item',
-    removeButtonText = 'Remove',
-    emptyMessage = 'No items added yet',
     itemTitle = (index: number) => `${title} ${index + 1}`,
   } = repeatingConfig || {};
 
@@ -59,7 +56,7 @@ export const RepeatingSection: React.FC<RepeatingSectionProps> = ({
 
       {items.length === 0 ? (
         <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-          <p>{emptyMessage}</p>
+          <p>No items added yet</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -80,7 +77,7 @@ export const RepeatingSection: React.FC<RepeatingSectionProps> = ({
                       className="text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors duration-200 p-2"
                     >
                       <Trash2 className="w-4 h-4" />
-                      <span className="sr-only">{removeButtonText}</span>
+                      <span className="sr-only">Remove</span>
                     </Button>
                   )}
                 </div>
@@ -103,7 +100,7 @@ export const RepeatingSection: React.FC<RepeatingSectionProps> = ({
             className="w-full flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-violet-400 hover:text-violet-600 hover:bg-violet-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="w-5 h-5 mr-2" />
-            {addButtonText}
+            Add {title}
           </Button>
         </div>
       )}
