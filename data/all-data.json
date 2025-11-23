@@ -1161,7 +1161,7 @@
       "updatedAt": "2025-11-17T11:45:38.082Z"
     },
     {
-      "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/bulk",
+      "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas",
       "methods": [
         {
           "id": "POST",
@@ -1173,7 +1173,8 @@
       "title": "Schema Bulk Sync",
       "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
       "createdAt": "2025-11-17T11:54:59.460Z",
-      "updatedAt": "2025-11-17T11:54:59.460Z"
+      "updatedAt": "2025-11-23T07:30:21.432Z",
+      "incomplete": false
     },
     {
       "title": "Schemas",
@@ -1282,7 +1283,7 @@
           "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
           "label": "Schema Bulk Sync",
           "metadata": {
-            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/bulk"
+            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas"
           }
         }
       ],
@@ -1313,10 +1314,11 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-22T16:20:09.517Z",
+      "updatedAt": "2025-11-23T07:34:40.352Z",
       "targetDataPath": "data",
       "sourceDataPath": "data",
-      "lastSynced": "2025-11-22T16:20:09.318Z"
+      "lastSynced": "2025-11-23T07:34:40.286Z",
+      "incomplete": false
     },
     {
       "color": "#2e84e0",
@@ -1343,8 +1345,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-11-22T16:32:44.592Z",
-      "lastSynced": "2025-11-22T16:32:44.491Z"
+      "updatedAt": "2025-11-23T07:34:46.585Z",
+      "lastSynced": "2025-11-23T07:34:46.536Z"
     },
     {
       "color": "#4E79A7",
@@ -1820,7 +1822,7 @@
           "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
           "label": "Schema Bulk Sync",
           "metadata": {
-            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/bulk"
+            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas"
           }
         }
       ]
