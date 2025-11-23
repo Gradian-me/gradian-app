@@ -168,7 +168,8 @@
           "relationTypeId": "HAS_INQUIRY_ITEM",
           "deleteType": "itemAndRelation",
           "addType": "addOnly",
-          "isUnique": true
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
         }
       },
       {
@@ -185,7 +186,8 @@
           "relationTypeId": "HAS_INQUIRY_VENDOR",
           "deleteType": "itemAndRelation",
           "addType": "addOnly",
-          "isUnique": true
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
         }
       },
       {
@@ -196,7 +198,8 @@
         "repeatingConfig": {
           "minItems": 0,
           "targetSchema": "contacts",
-          "relationTypeId": "HAS_CONTACT"
+          "relationTypeId": "HAS_CONTACT",
+          "fieldRelationType": "connectToSchema"
         }
       }
     ],
@@ -1000,7 +1003,8 @@
           "relationTypeId": "HAS_CONTACT",
           "deleteType": "relationOnly",
           "addType": "canSelectFromData",
-          "isUnique": true
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
         }
       },
       {
@@ -1026,7 +1030,8 @@
           "minItems": 0,
           "targetSchema": "users",
           "relationTypeId": "HAS_CONTACT",
-          "addType": "canSelectFromData"
+          "addType": "canSelectFromData",
+          "fieldRelationType": "connectToSchema"
         }
       }
     ],
@@ -1984,7 +1989,8 @@
           "relationTypeId": "HAS_QUOTATION_ITEM",
           "deleteType": "itemAndRelation",
           "addType": "addOnly",
-          "isUnique": false
+          "isUnique": false,
+          "fieldRelationType": "connectToSchema"
         },
         "inactive": false
       }
@@ -2298,7 +2304,8 @@
           "relationTypeId": "HAS_MEMBER",
           "deleteType": "relationOnly",
           "addType": "canSelectFromData",
-          "isUnique": true
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
         }
       }
     ],
@@ -2411,7 +2418,8 @@
           "minItems": 0,
           "targetSchema": "applications",
           "relationTypeId": "HAS_ADDRESS",
-          "addType": "canSelectFromData"
+          "addType": "canSelectFromData",
+          "fieldRelationType": "connectToSchema"
         }
       }
     ],
@@ -2718,7 +2726,8 @@
         "repeatingConfig": {
           "minItems": 0,
           "targetSchema": "databases",
-          "relationTypeId": "HAS_DATABASE"
+          "relationTypeId": "HAS_DATABASE",
+          "fieldRelationType": "connectToSchema"
         }
       },
       {
@@ -2729,7 +2738,8 @@
         "repeatingConfig": {
           "minItems": 0,
           "targetSchema": "url-repository",
-          "relationTypeId": "HAS_URL"
+          "relationTypeId": "HAS_URL",
+          "fieldRelationType": "connectToSchema"
         }
       }
     ],
@@ -2974,7 +2984,8 @@
         "isRepeatingSection": true,
         "repeatingConfig": {
           "minItems": 0,
-          "maxItems": 100
+          "maxItems": 100,
+          "fieldRelationType": "addFields"
         }
       }
     ],
@@ -4057,7 +4068,8 @@
           "relationTypeId": "HAS_PRODUCTION_PLAN_ITEM",
           "deleteType": "itemAndRelation",
           "addType": "addOnly",
-          "isUnique": true
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
         }
       }
     ],
@@ -4588,7 +4600,8 @@
           "relationTypeId": "HAS_MCP_EXAMPLE",
           "deleteType": "itemAndRelation",
           "addType": "addOnly",
-          "isUnique": false
+          "isUnique": false,
+          "fieldRelationType": "connectToSchema"
         }
       }
     ],
@@ -4747,7 +4760,8 @@
           "relationTypeId": "HAS_MCP_TOOL",
           "deleteType": "relationOnly",
           "addType": "mustSelectFromData",
-          "isUnique": true
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
         }
       }
     ],

@@ -3,7 +3,7 @@
 import React from 'react';
 import { FormSchema, FormData } from '@/gradian-ui/schema-manager/types/form-schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '../form-elements/components/Switch';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '../../shared/utils';
@@ -48,37 +48,29 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
         <div className="space-y-4">
           <div className="flex flex-row items-center gap-6">
             {schema.allowDataInactive && (
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={inactiveValue}
-                  onCheckedChange={(checked) => onChange('inactive', checked)}
-                  disabled={disabled}
-                  id="system-inactive"
-                />
-                <Label 
-                  htmlFor="system-inactive"
-                  className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
-                >
-                  Inactive
-                </Label>
-              </div>
+              <Switch
+                config={{
+                  name: 'system-inactive',
+                  label: 'Inactive',
+                }}
+                checked={inactiveValue}
+                onChange={(checked) => onChange('inactive', checked)}
+                onBlur={() => onBlur('inactive')}
+                disabled={disabled}
+              />
             )}
             
             {schema.allowDataForce && (
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={forceValue}
-                  onCheckedChange={(checked) => onChange('force', checked)}
-                  disabled={disabled}
-                  id="system-force"
-                />
-                <Label 
-                  htmlFor="system-force"
-                  className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
-                >
-                  Force
-                </Label>
-              </div>
+              <Switch
+                config={{
+                  name: 'system-force',
+                  label: 'Force',
+                }}
+                checked={forceValue}
+                onChange={(checked) => onChange('force', checked)}
+                onBlur={() => onBlur('force')}
+                disabled={disabled}
+              />
             )}
           </div>
           
