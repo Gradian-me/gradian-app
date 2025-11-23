@@ -122,7 +122,7 @@ function TableSkeleton({ columnCount, rowCount, bordered }: TableSkeletonProps) 
       <div
         className={`relative overflow-hidden bg-white dark:bg-gray-800 ${bordered ? 'border border-gray-200 dark:border-gray-500 rounded-lg m-2' : 'rounded-lg'}`}
       >
-        <div className="hidden md:block border-b border-gray-100 dark:border-gray-500 bg-gray-50/60 px-6 py-4">
+        <div className="hidden md:block border-b border-gray-100 dark:border-gray-700 bg-gray-50/60 px-6 py-4">
           <div className="flex items-center gap-6">
             {columns.map((_, index) => (
               <Skeleton key={`header-${index}`} className="h-4 w-32 flex-1" />
@@ -201,7 +201,7 @@ interface AggregationSkeletonProps {
 function AggregationSkeleton({ count, gridColumns }: AggregationSkeletonProps) {
   const items = Array.from({ length: count });
   return (
-    <div className="border-t border-gray-100 dark:border-gray-500 px-4 py-4">
+    <div className="border-t border-gray-100 dark:border-gray-700 px-4 py-4">
       <div
         className="grid gap-4"
         style={{ gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))` }}

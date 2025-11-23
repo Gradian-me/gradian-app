@@ -872,7 +872,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         <>
       <Card className={cn(
         'border border-gray-200 rounded-2xl bg-gray-50/50',
-        'dark:border-gray-700 dark:bg-gray-800/30',
+        'dark:border-gray-700 dark:bg-gray-800',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
         styling?.variant === 'card' && 'shadow-sm bg-white dark:bg-gray-800/50 dark:border-gray-700',
         'overflow-visible' // Allow dropdowns to overflow the card
@@ -1026,7 +1026,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                         </div>
                       ) : itemsCount === 0 ? (
                         <div className="text-center py-8 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
-                          <p>{section.repeatingConfig?.emptyMessage || 'No items added yet'}</p>
+                          <p>No items added yet</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
@@ -1083,7 +1083,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                         <div className="space-y-2">
                           <div className="flex justify-center mb-4">
                             <AddButtonFull
-                              label={section.repeatingConfig?.addButtonText || `Add ${title}`}
+                              label={`Add ${title}`}
                               onClick={onAddRepeatingItem}
                               disabled={disabled || !currentEntityId || isNotApplicable}
                               loading={isAddingItem}
@@ -1136,7 +1136,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   </div>
                 ) : itemsCount === 0 ? (
                   <div className="text-center py-8 text-gray-500 bg-white rounded-lg border-2 border-dashed border-gray-200">
-                    <p>{section.repeatingConfig?.emptyMessage || 'No items added yet'}</p>
+                    <p>No items added yet</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -1193,7 +1193,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   <div className="space-y-2">
                     <div className="flex justify-center mb-4">
                       <AddButtonFull
-                        label={section.repeatingConfig?.addButtonText || `Add ${title}`}
+                        label={`Add ${title}`}
                         onClick={onAddRepeatingItem}
                         disabled={disabled || !currentEntityId || isNotApplicable}
                         loading={isAddingItem}
@@ -1402,7 +1402,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 <div className="space-y-4">
                   {(repeatingItems || []).length === 0 ? (
                     <div className="text-center py-8 text-gray-500 bg-white rounded-lg border-2 border-dashed border-gray-200">
-                      <p>{section.repeatingConfig?.emptyMessage || 'No items added yet'}</p>
+                      <p>No items added yet</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -1445,7 +1445,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                     <div className="space-y-2">
                       <div className="flex justify-center mb-4">
                         <AddButtonFull
-                          label={section.repeatingConfig?.addButtonText || `Add ${title}`}
+                          label={`Add ${title}`}
                           onClick={onAddRepeatingItem}
                           disabled={disabled || isNotApplicable}
                           loading={isAddingItem}
@@ -1470,7 +1470,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           <div className="space-y-4">
             {(repeatingItems || []).length === 0 ? (
               <div className="text-center py-8 text-gray-500 bg-white rounded-lg border-2 border-dashed border-gray-200">
-                <p>{section.repeatingConfig?.emptyMessage || 'No items added yet'}</p>
+                <p>No items added yet</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -1513,7 +1513,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               <div className="space-y-2">
                 <div className="flex justify-center mb-4">
                   <AddButtonFull
-                    label={section.repeatingConfig?.addButtonText || `Add ${title}`}
+                    label={`Add ${title}`}
                     onClick={onAddRepeatingItem}
                     disabled={disabled}
                     loading={isAddingItem}
@@ -1561,7 +1561,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     <>
       <Card className={cn(
         'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
-        'dark:border-gray-700 dark:bg-gray-800/30',
+        'dark:border-gray-700 dark:bg-gray-800',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
         styling?.variant === 'card' && 'shadow-sm bg-white dark:bg-gray-800/50 dark:border-gray-700',
         'overflow-visible' // Allow dropdowns to overflow the card

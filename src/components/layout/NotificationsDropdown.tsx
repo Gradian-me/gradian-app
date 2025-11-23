@@ -99,7 +99,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
           align="end"
           sideOffset={4}
         >
-          <div className="p-4 border-b border-gray-100 dark:border-gray-500">
+          <div className="p-4 border-b border-gray-100 dark:border-gray-700">
             <DropdownMenuPrimitive.Label className="text-sm font-semibold text-gray-900 dark:text-gray-200 flex items-center justify-between">
               Notifications
               <Badge variant="default" className="text-xs">{notificationCount}</Badge>
@@ -210,7 +210,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
             </div>
           </ScrollArea>
           
-          <div className="p-3 border-t border-gray-100 dark:border-gray-500">
+          <div className="p-3 border-t border-gray-100 dark:border-gray-700">
             <Button 
               variant="ghost" 
               size="sm" 

@@ -33,7 +33,7 @@ export function TableHeader<T = any>({
   bordered,
 }: TableHeaderProps<T>) {
   const headerClasses = cn(
-    'bg-gray-50/50 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-500',
+    'bg-gray-50/50 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-700',
     striped && 'bg-gray-50/50',
     bordered && 'border-b border-gray-100'
   );
