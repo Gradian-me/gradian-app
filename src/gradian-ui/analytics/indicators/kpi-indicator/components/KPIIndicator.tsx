@@ -68,11 +68,11 @@ export const KPIIndicator: React.FC<KPIIndicatorProps> = ({
       case 'minimal':
         return 'bg-transparent border-none shadow-none';
       case 'card':
-        return 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-500 shadow-sm';
+        return 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm';
       case 'compact':
         return 'p-3';
       default:
-        return 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-500 shadow-sm';
+        return 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm';
     }
   };
 

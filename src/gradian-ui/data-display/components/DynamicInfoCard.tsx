@@ -156,9 +156,9 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                 size: 'md'
               }
             }}
-            className="h-auto bg-white dark:bg-gray-700  border border-gray-200 dark:border-gray-500 shadow-sm"
+            className="h-auto bg-white dark:bg-gray-700  border border-gray-200 dark:border-gray-700 shadow-sm"
           >
-            <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-500 rounded-t-xl">
+            <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
               <div className="flex items-center gap-2">
                 <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{section.title}</CardTitle>
                 <ForceIcon isForce={data?.isForce === true} size="sm" />
@@ -223,9 +223,9 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
             size: 'md'
           }
         }}
-        className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-500 shadow-sm"
+        className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm"
       >
-        <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-500 rounded-t-xl">
+        <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
           <div className="flex items-center gap-2">
             <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{section.title}</CardTitle>
             <ForceIcon isForce={data?.isForce === true} size="sm" />

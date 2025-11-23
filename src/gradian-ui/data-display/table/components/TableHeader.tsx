@@ -47,7 +47,7 @@ export function TableHeader<T = any>({
       column.sticky === 'left' && 'sticky left-0 z-10 bg-gray-50/50 dark:bg-gray-700',
       column.sticky === 'right' && 'sticky right-0 z-10 bg-gray-50/50 dark:bg-gray-700',
       stickyHeader && 'sticky top-0 z-20',
-      bordered && 'border-r border-gray-200 dark:border-gray-500 last:border-r-0',
+      bordered && 'border-r border-gray-200 dark:border-gray-700 last:border-r-0',
       // Match padding with td cells - use same padding as TableBody
       'px-4 py-3'
     );

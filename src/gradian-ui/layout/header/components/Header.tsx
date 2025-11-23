@@ -31,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
   } = config;
 
   const headerClasses = cn(
-    'w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-500',
+    'w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700',
     styling?.variant === 'minimal' && 'border-none',
     styling?.variant === 'elevated' && 'shadow-md',
     styling?.variant === 'transparent' && 'bg-transparent border-none',

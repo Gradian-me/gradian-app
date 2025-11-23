@@ -656,19 +656,6 @@
       "last_name": "Abidi",
       "phone_number": "09126184056",
       "email": "abidi.mahyar@gmail.com",
-      "categories": [
-        "general"
-      ],
-      "contacts": [
-        {
-          "name": "Mahyar",
-          "email": "abidi.mahyar@gmail.com",
-          "position": "Primary Contact",
-          "isPrimary": true,
-          "department": "",
-          "notes": ""
-        }
-      ],
       "status": "ACTIVE",
       "rating": 5,
       "id": "01K94Q1ZE6M64MSHAXJARG7F8G",
@@ -1011,7 +998,6 @@
           "color": "success"
         }
       ],
-      "rating": 5,
       "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "createdAt": "2025-11-05T15:49:06.366Z",
       "updatedAt": "2025-11-10T15:16:03.480Z",

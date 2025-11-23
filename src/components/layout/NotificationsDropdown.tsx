@@ -89,7 +89,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
       <DropdownMenuPrimitive.Portal>
         <DropdownMenuPrimitive.Content
           className={cn(
-            "z-50 w-80 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 p-0 text-gray-900 dark:text-gray-200 shadow-lg",
+            "z-50 w-80 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-0 text-gray-900 dark:text-gray-200 shadow-lg",
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
             "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
             "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",

@@ -71,7 +71,7 @@ export function TableBody<T = any>({
       hoverable && 'hover:bg-gray-200 dark:hover:bg-gray-600',
       hoverable && onRowClick && 'cursor-pointer',
       isSelected && 'bg-blue-50',
-      bordered && 'border-b border-gray-200 dark:border-gray-500'
+      bordered && 'border-b border-gray-200 dark:border-gray-700'
     );
 
   const tdClasses = (column: TableColumn<T>, rowIndex: number, isSelected: boolean) =>
@@ -89,7 +89,7 @@ export function TableBody<T = any>({
       column.sticky === 'right' && (isSelected ? 'bg-blue-50' : (striped && rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800')),
       // For non-sticky columns, use transparent to show row background
       !column.sticky && striped && 'bg-transparent',
-      bordered && 'border-r border-gray-200 dark:border-gray-500 last:border-r-0'
+      bordered && 'border-r border-gray-200 dark:border-gray-700 last:border-r-0'
     );
 
   const handleRowClick = (row: T, index: number) => {

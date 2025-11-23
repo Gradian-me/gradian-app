@@ -185,18 +185,18 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
 
   // Check if subtitle role exists in schema
   const hasSubtitleRole = schema?.fields?.some(field => field.role === 'subtitle') || false;
-  
+
   // Get subtitle value(s) - concatenate multiple fields with same role using |
   const subtitleValue = hasSubtitleRole ? getValueByRole(schema, data, 'subtitle') : null;
   const subtitleStrings = getDisplayStrings(subtitleValue);
   const subtitle = subtitleStrings.length > 0 ? subtitleStrings.join(' | ') : null;
 
   // Check if description role exists in schema OR if any field label contains "description"
-  const hasDescriptionRole = schema?.fields?.some(field => 
-    field.role === 'description' || 
+  const hasDescriptionRole = schema?.fields?.some(field =>
+    field.role === 'description' ||
     (field.label && typeof field.label === 'string' && field.label.toLowerCase().includes('description'))
   ) || false;
-  
+
   // Get description value(s) - concatenate multiple fields with same role using |
   let descriptionValue: any = null;
   if (hasDescriptionRole) {
@@ -208,9 +208,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     } else {
       // If not found by role, find by field label containing "description"
       if (schema?.fields) {
-        const descriptionFields = schema.fields.filter(field => 
-          field.label && 
-          typeof field.label === 'string' && 
+        const descriptionFields = schema.fields.filter(field =>
+          field.label &&
+          typeof field.label === 'string' &&
           field.label.toLowerCase().includes('description') &&
           !field.role // Only if it doesn't already have a role
         );
@@ -225,7 +225,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
       }
     }
   }
-  
+
   const descriptionStrings = getDisplayStrings(descriptionValue);
   const description = descriptionStrings.length > 0 ? descriptionStrings.join(' | ') : null;
 
@@ -275,7 +275,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   // Get title - check if role "title" exists, otherwise use first text field
   const hasTitleRole = schema?.fields?.some(field => field.role === 'title') || false;
   let title: string = '';
-  
+
   if (hasTitleRole) {
     // Use title role value
     title = getValueByRole(schema, data, 'title') || data.name || 'Unknown';
@@ -283,15 +283,15 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     // Find first text field that doesn't have excluded roles (sorted by order)
     const excludedRoles = ['code', 'subtitle', 'description'];
     const textFields = schema?.fields
-      ?.filter(field => 
-        field.component === 'text' && 
+      ?.filter(field =>
+        field.component === 'text' &&
         (!field.role || !excludedRoles.includes(field.role)) &&
         hasDisplayValue(data[field.name])
       )
       .sort((a, b) => (a.order || 999) - (b.order || 999)) || [];
-    
+
     const firstTextField = textFields[0];
-    
+
     if (firstTextField) {
       const fieldValue = data[firstTextField.name];
       const primaryText = getPrimaryDisplayString(fieldValue);
@@ -312,7 +312,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
 
   // Check if entity is incomplete
   const isIncomplete = data.incomplete === true;
-  
+
   // Check if entity is forced
   const isForce = data.isForce === true;
   const forceReason = data.forceReason || '';
@@ -357,13 +357,13 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
         disableAnimation
           ? {}
           : {
-              duration: 0.3,
-              delay: Math.min(
-                index * UI_PARAMS.CARD_INDEX_DELAY.STEP,
-                UI_PARAMS.CARD_INDEX_DELAY.MAX
-              ),
-              ease: 'easeOut',
-            }
+            duration: 0.3,
+            delay: Math.min(
+              index * UI_PARAMS.CARD_INDEX_DELAY.STEP,
+              UI_PARAMS.CARD_INDEX_DELAY.MAX
+            ),
+            ease: 'easeOut',
+          }
       }
       whileHover={undefined}
       whileTap={disableAnimation ? undefined : {
@@ -393,7 +393,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
         }}
         className={cn(
           "h-full bg-white dark:bg-gray-800 rounded-2xl overflow-hidden",
-          !className?.includes('border-none') && "border border-gray-200 dark:border-gray-600",
+          !className?.includes('border-none') && "border border-gray-200 dark:border-gray-700",
           !disableAnimation && "transition-all duration-200 hover:shadow-sm hover:border-gray-400",
           className?.includes('border-none') ? "focus-within:ring-0" : "focus-within:ring-2 focus-within:ring-violet-400 focus-within:ring-offset-0 focus-within:rounded-xl"
         )}
@@ -452,23 +452,22 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         whileHover={{ x: 2, transition: { duration: 0.15, delay: 0 } }}
                       >
                         <motion.h3
-                        className="text-md font-semibold text-gray-900 dark:text-gray-50 group-hover:text-violet-800 dark:group-hover:text-violet-300 transition-colors duration-100 truncate flex-1 min-w-0"
+                          className="text-md font-semibold text-gray-900 dark:text-gray-50 group-hover:text-violet-800 dark:group-hover:text-violet-300 transition-colors duration-100 truncate flex-1 min-w-0"
                           whileHover={{ x: 2, transition: { duration: 0.15, delay: 0 } }}
-                      >
-                        <span className="inline-flex items-center gap-1.5">
-                          <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} />
-                          {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
-                        </span>
-                      </motion.h3>
-                        {cardConfig.title && (
-                          <div
-                            onClick={(e) => e.stopPropagation()}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onKeyDown={(e) => e.stopPropagation()}
-                          >
-                            <CopyContent content={cardConfig.title} />
-                          </div>
-                        )}
+                        >
+                          <span className="inline-flex items-center gap-1.5">
+                            <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} />
+                            {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
+                            <span
+                              onClick={(e) => e.stopPropagation()}
+                              onMouseDown={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => e.stopPropagation()}
+                              className="ms-1"
+                            >
+                              <CopyContent content={cardConfig.title} />
+                            </span>
+                          </span>
+                        </motion.h3>
                       </motion.div>
                       {/* Code Badge */}
                       {hasCodeField && cardConfig.codeField && (
@@ -495,17 +494,17 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       )}
                     </div>
                     {cardConfig.subtitle && (
-                    <motion.div
-                      initial={disableAnimation ? false : { opacity: 0, x: 5 }}
-                      animate={disableAnimation ? false : { opacity: 1, x: 0 }}
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, x: 5 }}
+                        animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                         transition={disableAnimation ? {} : { duration: 0.3 }}
-                      className="text-xs text-gray-500 dark:text-gray-400 truncate"
+                        className="text-xs text-gray-500 dark:text-gray-400 truncate"
                         whileHover={{ x: 2, transition: { duration: 0.15, delay: 0 } }}
                       >
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                           {renderHighlightedText(cardConfig.subtitle, normalizedHighlightQuery)}
                         </p>
-                    </motion.div>
+                      </motion.div>
                     )}
                   </div>
                 </div>
@@ -537,13 +536,13 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         <Badge variant={cardConfig.statusMetadata.color as BadgeProps['variant']} className="flex items-center gap-1 px-1 py-0.5 shadow-sm">
                           {cardConfig.statusMetadata.icon && <IconRenderer iconName={cardConfig.statusMetadata.icon} className="h-3 w-3" />}
                           <span className="text-[0.625rem]">{cardConfig.statusMetadata.label}</span>
-                            </Badge>
+                        </Badge>
                       </motion.div>
                     )}
                   </div>
                 )}
               </div>
-              
+
               {/* Description */}
               {hasDescriptionRole && description && (
                 <motion.div
@@ -551,7 +550,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   animate={disableAnimation ? false : { opacity: 1, y: 0 }}
                   transition={disableAnimation ? {} : { duration: 0.3 }}
                   className="w-full mb-2"
-                  whileHover={{ x: 2, transition: { duration: 0.15} }}
+                  whileHover={{ x: 2, transition: { duration: 0.15 } }}
                 >
                   <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
                     {renderHighlightedText(description, normalizedHighlightQuery)}
@@ -615,7 +614,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                 <motion.div
                   initial={disableAnimation ? false : { opacity: 0, y: 10 }}
                   animate={disableAnimation ? false : { opacity: 1, y: 0 }}
-                  transition={disableAnimation ? {} : { duration: 0.3}}
+                  transition={disableAnimation ? {} : { duration: 0.3 }}
                   className="w-full mb-2 border-t border-gray-100 dark:border-gray-800 pt-2 mt-2"
                 >
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Performance:</div>
@@ -646,7 +645,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     includeTime={true}
                     size="sm"
                     showIcon={true}
-                  fieldLabel={duedateFieldLabel}
+                    fieldLabel={duedateFieldLabel}
                   />
                 </motion.div>
               )}
@@ -726,17 +725,16 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       <span className="inline-flex items-center gap-1.5">
                         <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} />
                         {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
+                        <span
+                          onClick={(e) => e.stopPropagation()}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onKeyDown={(e) => e.stopPropagation()}
+                          className="ms-1"
+                        >
+                          <CopyContent content={cardConfig.title} />
+                        </span>
                       </span>
                     </motion.h3>
-                    {cardConfig.title && (
-                      <div
-                        onClick={(e) => e.stopPropagation()}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onKeyDown={(e) => e.stopPropagation()}
-                      >
-                        <CopyContent content={cardConfig.title} />
-                      </div>
-                    )}
                     {/* Code Badge */}
                     {hasCodeField && cardConfig.codeField && (
                       <motion.div
@@ -762,21 +760,21 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     )}
                   </div>
                   {cardConfig.subtitle && (
-                  <motion.p
-                    initial={disableAnimation ? false : { opacity: 0, x: 5 }}
-                    animate={disableAnimation ? false : { opacity: 1, x: 0 }}
-                    transition={disableAnimation ? {} : { duration: 0.3 }}
-                    className={cn(
-                      "text-xs text-gray-500 dark:text-gray-400 truncate",
-                      !disableAnimation && "group-hover:text-gray-700 transition-colors duration-200"
-                    )}
-                    whileHover={disableAnimation ? undefined : {
-                      x: 2,
-                      transition: { type: "spring", stiffness: 400, damping: 25 }
-                    }}
-                  >
-                    {renderHighlightedText(cardConfig.subtitle, normalizedHighlightQuery)}
-                  </motion.p>
+                    <motion.p
+                      initial={disableAnimation ? false : { opacity: 0, x: 5 }}
+                      animate={disableAnimation ? false : { opacity: 1, x: 0 }}
+                      transition={disableAnimation ? {} : { duration: 0.3 }}
+                      className={cn(
+                        "text-xs text-gray-500 dark:text-gray-400 truncate",
+                        !disableAnimation && "group-hover:text-gray-700 transition-colors duration-200"
+                      )}
+                      whileHover={disableAnimation ? undefined : {
+                        x: 2,
+                        transition: { type: "spring", stiffness: 400, damping: 25 }
+                      }}
+                    >
+                      {renderHighlightedText(cardConfig.subtitle, normalizedHighlightQuery)}
+                    </motion.p>
                   )}
                   {/* Force Reason */}
                   {isForce && forceReason && (
@@ -797,33 +795,33 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     onMouseDown={(e) => e.stopPropagation()}
                     onKeyDown={(e) => e.stopPropagation()}
                   >
-                  {cardConfig.badgeField && Array.isArray(cardConfig.badgeValues) && cardConfig.badgeValues.length > 0 ? (
-                  <BadgeViewer
-                      field={cardConfig.badgeField}
-                      value={cardConfig.badgeValues}
-                      maxBadges={maxBadges}
+                    {cardConfig.badgeField && Array.isArray(cardConfig.badgeValues) && cardConfig.badgeValues.length > 0 ? (
+                      <BadgeViewer
+                        field={cardConfig.badgeField}
+                        value={cardConfig.badgeValues}
+                        maxBadges={maxBadges}
                         badgeVariant="default"
                         enforceVariant
-                      animate={!disableAnimation}
-                      onBadgeClick={
-                        badgeValueTargetSchema.size > 0 ? handleBadgeClick : undefined
-                      }
-                      isItemClickable={isBadgeItemClickable}
-                    />
-                  ) : (
-                    cardConfig.badgeValues.length > 0 && (
-                      <BadgeRenderer
-                        items={cardConfig.badgeValues}
-                        maxBadges={maxBadges}
-                        badgeVariant="outline"
                         animate={!disableAnimation}
+                        onBadgeClick={
+                          badgeValueTargetSchema.size > 0 ? handleBadgeClick : undefined
+                        }
+                        isItemClickable={isBadgeItemClickable}
+                      />
+                    ) : (
+                      cardConfig.badgeValues.length > 0 && (
+                        <BadgeRenderer
+                          items={cardConfig.badgeValues}
+                          maxBadges={maxBadges}
+                          badgeVariant="outline"
+                          animate={!disableAnimation}
                           onBadgeClick={
                             badgeValueTargetSchema.size > 0 ? handleBadgeClick : undefined
                           }
                           isItemClickable={isBadgeItemClickable}
-                      />
-                    )
-                  )}
+                        />
+                      )
+                    )}
                   </div>
                 </div>
               </div>
@@ -886,7 +884,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                             <IconRenderer iconName={cardConfig.statusMetadata.icon} className="h-3 w-3" />
                           )}
                           <span className="text-xs">{cardConfig.statusMetadata.label ?? cardConfig.statusField}</span>
-                            </Badge>
+                        </Badge>
                       </motion.div>
                     )}
                   </div>

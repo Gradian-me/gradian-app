@@ -1025,7 +1025,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                           ))}
                         </div>
                       ) : itemsCount === 0 ? (
-                        <div className="text-center py-8 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
+                        <div className="text-center py-8 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
                           <p>No items added yet</p>
                         </div>
                       ) : (
@@ -1135,7 +1135,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                     ))}
                   </div>
                 ) : itemsCount === 0 ? (
-                  <div className="text-center py-8 text-gray-500 bg-white rounded-lg border-2 border-dashed border-gray-200">
+                  <div className="text-center py-8 text-gray-500 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
                     <p>No items added yet</p>
                   </div>
                 ) : (
@@ -1401,7 +1401,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 <CardContent className="px-6 pb-6 overflow-visible">
                 <div className="space-y-4">
                   {(repeatingItems || []).length === 0 ? (
-                    <div className="text-center py-8 text-gray-500 bg-white rounded-lg border-2 border-dashed border-gray-200">
+                    <div className="text-center py-8 text-gray-500 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
                       <p>No items added yet</p>
                     </div>
                   ) : (
@@ -1469,7 +1469,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         <CardContent className="px-6 pb-6 overflow-visible">
           <div className="space-y-4">
             {(repeatingItems || []).length === 0 ? (
-              <div className="text-center py-8 text-gray-500 bg-white rounded-lg border-2 border-dashed border-gray-200">
+              <div className="text-center py-8 text-gray-500 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
                 <p>No items added yet</p>
               </div>
             ) : (

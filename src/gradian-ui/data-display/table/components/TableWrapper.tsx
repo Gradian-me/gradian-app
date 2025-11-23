@@ -120,7 +120,7 @@ function TableSkeleton({ columnCount, rowCount, bordered }: TableSkeletonProps) 
   return (
     <div className="mx-0 min-w-0">
       <div
-        className={`relative overflow-hidden bg-white dark:bg-gray-800 ${bordered ? 'border border-gray-200 dark:border-gray-500 rounded-lg m-2' : 'rounded-lg'}`}
+        className={`relative overflow-hidden bg-white dark:bg-gray-800 ${bordered ? 'border border-gray-200 dark:border-gray-700 rounded-lg m-2' : 'rounded-lg'}`}
       >
         <div className="hidden md:block border-b border-gray-100 dark:border-gray-700 bg-gray-50/60 px-6 py-4">
           <div className="flex items-center gap-6">
@@ -164,7 +164,7 @@ function TableCardSkeleton({ count, columnCount, cardColumns }: TableCardSkeleto
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={`card-${index}`}
-          className="rounded-lg border border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 p-4 shadow-sm space-y-4"
+          className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm space-y-4"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-2">
@@ -209,7 +209,7 @@ function AggregationSkeleton({ count, gridColumns }: AggregationSkeletonProps) {
         {items.map((_, index) => (
           <div
             key={`aggregation-${index}`}
-            className="rounded-lg border border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 p-4 shadow-sm space-y-3"
+            className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm space-y-3"
           >
             <Skeleton className="h-3 w-1/3" />
             <Skeleton className="h-5 w-1/2" />

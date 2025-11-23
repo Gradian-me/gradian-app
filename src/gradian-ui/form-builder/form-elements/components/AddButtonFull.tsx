@@ -77,7 +77,7 @@ export const AddButtonFull: React.FC<AddButtonFullProps> = ({
       onClick={onClick}
       disabled={disabled || loading}
       className={cn(
-        'flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-violet-400 hover:text-violet-600 hover:bg-violet-200 dark:hover:bg-violet-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
+        'flex items-center justify-center px-4 py-3 border-2 border-dashed border-violet-300 rounded-lg bg-violet-200 dark:bg-violet-600/10 text-violet-800 hover:border-violet-400 hover:text-violet-600 hover:bg-violet-200 dark:hover:bg-violet-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
         fullWidth && 'w-full',
         textSize,
         className

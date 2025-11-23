@@ -179,13 +179,36 @@ export default function IntegrationsPage() {
           }
         }
         
+        // Check if response.data exists and has error information
+        if ((response as any).data) {
+          const responseData = (response as any).data;
+          // If data has nodes/edges but success is false, it's a partial failure
+          if (responseData.nodes || responseData.edges) {
+            if (!errorMessage || errorMessage === 'Sync failed') {
+              errorMessage = 'Sync completed with errors';
+            }
+            // Add information about the data that was returned
+            if (responseData.nodes && Array.isArray(responseData.nodes)) {
+              summaryMessages.push({
+                path: 'Data Returned',
+                message: `${responseData.nodes.length} node(s) in response`
+              });
+            }
+          }
+        }
+        
         // Combine response.messages with summaryMessages if both exist
         const allMessages = [
           ...(response.messages || []),
           ...summaryMessages
         ];
         
-        // Set error message with summary
+        // Always set error message to ensure error box is shown
+        // If no error message is provided, use a default one
+        if (!errorMessage || errorMessage === 'Sync failed') {
+          errorMessage = 'Sync operation failed';
+        }
+        
         setSyncMessages(prev => ({ 
           ...prev, 
           [integration.id]: {
@@ -476,7 +499,7 @@ export default function IntegrationsPage() {
                     <div className="flex-1 min-w-0 w-full">
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                         <div 
-                          className="h-10 w-10 rounded flex items-center justify-center shrink-0"
+                          className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
                           style={{ backgroundColor: `${integration.color}20`, color: integration.color }}
                         >
                           <IconRenderer iconName={integration.icon} className="h-6 w-6" />
