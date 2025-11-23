@@ -4,25 +4,23 @@ stages:
 
 variables:
   DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
   DOCKER_TLS_VERIFY: "0"
+  DOCKER_TLS_CERTDIR: ""
 
 before_script:
   - echo "Authenticating with Docker Registry..."
   - export DOCKER_TLS_VERIFY=0
   - |
-    # Extract hostname:port without protocol (http/https)
+    # Extract hostname:port without protocol
     REGISTRY_HOST=$(echo $CI_REGISTRY | sed 's|https\?://||' | sed 's|/.*||')
     echo "Using registry: $REGISTRY_HOST (without protocol)"
     echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $REGISTRY_HOST
-    # Update CI_REGISTRY_IMAGE to use hostname:port without protocol
     export CI_REGISTRY_IMAGE=$(echo $CI_REGISTRY_IMAGE | sed 's|https\?://||')
 
 build:
   stage: build
   script:
     - echo "🚀 Starting Docker image build..."
-    - echo "📦 Building image with tags latest, $CI_COMMIT_SHORT_SHA"
     - docker build --tag="$CI_REGISTRY_IMAGE:latest" --tag="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" .
     - echo "📤 Pushing images to registry..."
     - docker push "$CI_REGISTRY_IMAGE:latest"
@@ -45,7 +43,6 @@ deploy_staging:
     - job: build
       artifacts: true
   variables:
-    # Environment variables for the application
     AVALAI_API_KEY: ${AVALAI_API_KEY}
     CLIENT_ID: ${CLIENT_ID}
     DATABASE_URL: ${DATABASE_URL}
@@ -75,7 +72,9 @@ deploy_staging:
     - docker compose ps
     - echo "🧹 Cleaning up old images..."
     - |
-      docker images --format "table {{.Repository}}:{{.Tag}}\t{{.ID}}" | grep "$CI_REGISTRY_IMAGE" | grep -v "latest" | awk '{print $2}' | xargs -r docker rmi || echo "No old images to remove"
+      docker images --format "table {{.Repository}}:{{.Tag}}\t{{.ID}}" \
+        | grep "$CI_REGISTRY_IMAGE" | grep -v "latest" | awk '{print $2}' \
+        | xargs -r docker rmi || echo "No old images to remove"
       docker image prune -f
       echo "📋 Remaining images:"
       docker images | grep "$CI_REGISTRY_IMAGE" || echo "No images found"
