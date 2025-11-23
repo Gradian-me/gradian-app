@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { TableColumn, ColumnWidthMap } from '../types';
 import { buildTableColumns } from '../utils';
+import { ForceIcon } from '@/gradian-ui/form-builder/form-elements/components/ForceIcon';
 
 export interface UseRepeatingTableColumnsOptions {
   fields: any[];
@@ -45,14 +46,33 @@ export function useRepeatingTableColumns({
       },
     };
 
+    const forceColumn: TableColumn = {
+      id: 'force',
+      label: '',
+      accessor: 'isForce',
+      sortable: false,
+      align: 'center',
+      width: 40,
+      render: (_value: any, row: any) => {
+        return <ForceIcon isForce={row?.isForce === true} size="sm" forceReason={row?.forceReason} />;
+      },
+    };
+
     const existingActionIndex = baseColumns.findIndex((column) => column.id === 'actions');
     if (existingActionIndex !== -1) {
       const cloned = [...baseColumns];
       cloned[existingActionIndex] = viewColumn;
+      // Add force column after actions
+      const existingForceIndex = cloned.findIndex((column) => column.id === 'force');
+      if (existingForceIndex !== -1) {
+        cloned[existingForceIndex] = forceColumn;
+      } else {
+        cloned.splice(existingActionIndex + 1, 0, forceColumn);
+      }
       return cloned;
     }
 
-    return [viewColumn, ...baseColumns];
+    return [viewColumn, forceColumn, ...baseColumns];
   }, [baseColumns, getRowId, renderActionCell]);
 
   return columnsWithActions;

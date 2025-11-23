@@ -47,4 +47,5 @@ export * from './components/Tabs';
 export * from './components/SortableSelector';
 export * from './components/ListInput';
 export * from './components/TagInput';
+export * from './components/ForceIcon';
 export * from './hooks/useOptionsFromUrl';

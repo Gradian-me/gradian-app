@@ -127,7 +127,7 @@ export const renderCardSection = ({ section, schema, data, maxMetrics = 3, onBad
             >
               <div className="flex items-center gap-2">
                 <div className="flex-1">
-                  {formatFieldValue(field, value, data)}
+                  {formatFieldValue(field, value, data, false)}
                 </div>
                 {(field as any).canCopy && value && value !== '' && (
                   <div

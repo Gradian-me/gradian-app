@@ -11,6 +11,7 @@ import { cn } from '../../shared/utils';
 import { isBadgeSection, getBadgeFields } from '../../schema-manager/utils/badge-utils';
 import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { CopyContent } from '../../form-builder/form-elements/components/CopyContent';
+import { ForceIcon } from '../../form-builder/form-elements/components/ForceIcon';
 import { formatFieldValue } from '../table/utils/field-formatters';
 
 export interface DynamicInfoCardProps {
@@ -158,7 +159,10 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
             className="h-auto bg-white dark:bg-gray-700  border border-gray-200 dark:border-gray-500 shadow-sm"
           >
             <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-500 rounded-t-xl">
-              <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{section.title}</CardTitle>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{section.title}</CardTitle>
+                <ForceIcon isForce={data?.isForce === true} size="sm" />
+              </div>
               {section.description && (
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5">{section.description}</p>
               )}
@@ -222,7 +226,10 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
         className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-500 shadow-sm"
       >
         <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-500 rounded-t-xl">
-          <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{section.title}</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{section.title}</CardTitle>
+            <ForceIcon isForce={data?.isForce === true} size="sm" />
+          </div>
           {section.description && (
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5">{section.description}</p>
           )}
@@ -244,7 +251,7 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                 </label>
                 <div className="flex items-center gap-2">
                   <div className="text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word flex-1">
-                    {formatFieldValue(field, field.value, data)}
+                    {formatFieldValue(field, field.value, data, false)}
                   </div>
                   {field.canCopy && field.value && field.value !== '' && (
                     <div

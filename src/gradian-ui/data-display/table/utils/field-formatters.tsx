@@ -15,6 +15,7 @@ import {
 } from '../../utils/value-display';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Avatar } from '@/gradian-ui/form-builder/form-elements/components/Avatar';
+import { ForceIcon } from '@/gradian-ui/form-builder/form-elements/components/ForceIcon';
 import { toast } from 'sonner';
 
 export const getFieldValue = (field: any, row: any): any => {
@@ -43,12 +44,40 @@ export const formatRelationType = (value: string | null | undefined): string | n
   return cleaned.replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
+// Helper to wrap content with ForceIcon if isForce is true and field is title role
+const wrapWithForceIcon = (content: React.ReactNode, isForce: boolean, field?: any, row?: any): React.ReactNode => {
+  // Only show ForceIcon for title role fields
+  if (!isForce || field?.role !== 'title') return content;
+  // Get title from row data
+  const titleValue = row ? getFieldValue(field, row) : undefined;
+  const title = titleValue ? String(titleValue).trim() : undefined;
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <ForceIcon isForce={isForce} size="md" forceReason={row?.forceReason} title={title} />
+      {content}
+    </span>
+  );
+};
+
 export const formatFieldValue = (
   field: any,
   value: any,
-  row?: any
+  row?: any,
+  showForceIcon: boolean = true
 ): React.ReactNode => {
+  // Check if row has isForce flag - only show for title role fields
+  const isForce = showForceIcon && row?.isForce === true && field?.role === 'title';
+  
   if (value === null || value === undefined || value === '') {
+    // Still show ForceIcon even if value is empty (only for title role)
+    if (isForce && field?.role === 'title') {
+      return (
+        <span className="inline-flex items-center gap-1.5">
+          <ForceIcon isForce={isForce} size="md" forceReason={row?.forceReason} />
+          <span className="text-gray-400">—</span>
+        </span>
+      );
+    }
     return <span className="text-gray-400">—</span>;
   }
 
@@ -61,9 +90,14 @@ export const formatFieldValue = (
   if (field?.component === 'picker' && field.targetSchema && row) {
     const pickerDisplay = getPickerDisplayValue(field, value, { row });
     if (pickerDisplay) {
-      return <span>{pickerDisplay}</span>;
+      return wrapWithForceIcon(<span>{pickerDisplay}</span>, isForce, field, row);
     }
-    return <span className="text-gray-400">—</span>;
+    return isForce && field?.role === 'title' ? (
+      <span className="inline-flex items-center gap-1.5">
+        <ForceIcon isForce={isForce} size="md" forceReason={row?.forceReason} />
+        <span className="text-gray-400">—</span>
+      </span>
+    ) : <span className="text-gray-400">—</span>;
   }
 
   const displayType = field?.component || 'text';
@@ -252,7 +286,7 @@ export const formatFieldValue = (
       }
     };
 
-    return (
+    return wrapWithForceIcon(
       <BadgeViewer
         field={field}
         value={value}
@@ -265,56 +299,73 @@ export const formatFieldValue = (
             ? (item) => Boolean(item.normalized?.id ?? item.id)
             : () => false
         }
-      />
+      />,
+      isForce,
+      field,
+      row
     );
   }
 
   switch (displayType) {
     case 'currency':
-      return (
+      return wrapWithForceIcon(
         <span className="whitespace-nowrap">
           {formatCurrency(typeof value === 'number' ? value : parseFloat(value) || 0)}
-        </span>
+        </span>,
+        isForce,
+        field,
+        row
       );
     case 'percentage': {
       const numValue = typeof value === 'number' ? value : parseFloat(value) || 0;
-      return <span className="whitespace-nowrap">{numValue.toFixed(2)}%</span>;
+      return wrapWithForceIcon(
+        <span className="whitespace-nowrap">{numValue.toFixed(2)}%</span>,
+        isForce,
+        field,
+        row
+      );
     }
     case 'number':
-      return (
+      return wrapWithForceIcon(
         <span className="whitespace-nowrap">
           {formatNumber(typeof value === 'number' ? value : parseFloat(value) || 0)}
-        </span>
+        </span>,
+        isForce,
+        field,
+        row
       );
     case 'date':
     case 'datetime-local':
       try {
         const dateValue = typeof value === 'string' ? new Date(value) : value;
         if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
-          return (
+          return wrapWithForceIcon(
             <span>
               {formatDate(dateValue, {
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric',
               })}
-            </span>
+            </span>,
+            isForce,
+            field,
+            row
           );
         }
-        return <span>{String(value)}</span>;
+        return wrapWithForceIcon(<span>{String(value)}</span>, isForce, field, row);
       } catch {
-        return <span>{String(value)}</span>;
+        return wrapWithForceIcon(<span>{String(value)}</span>, isForce, field, row);
       }
     case 'url': {
       const stringValue = String(value);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
       if (!isUrl) {
-        return <span>{stringValue}</span>;
+        return wrapWithForceIcon(<span>{stringValue}</span>, isForce, field, row);
       }
       // Get link label from componentTypeConfig or use default
       const linkLabel = field?.componentTypeConfig?.label || 'URL';
       const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
-      return (
+      return wrapWithForceIcon(
         <a
           href={urlToOpen}
           target="_blank"
@@ -324,28 +375,31 @@ export const formatFieldValue = (
         >
           <LinkIcon className="h-3.5 w-3.5" />
           {linkLabel}
-        </a>
+        </a>,
+        isForce,
+        field,
+        row
       );
     }
     case 'array':
     case 'checkbox':
       if (displayStrings.length > 0) {
-        return <span>{displayStrings.join(', ')}</span>;
+        return wrapWithForceIcon(<span>{displayStrings.join(', ')}</span>, isForce, field, row);
       }
       if (Array.isArray(value)) {
-        return <span>{value.join(', ')}</span>;
+        return wrapWithForceIcon(<span>{value.join(', ')}</span>, isForce, field, row);
       }
-      return <span>{String(value)}</span>;
+      return wrapWithForceIcon(<span>{String(value)}</span>, isForce, field, row);
     default:
       if (hasStructuredOptions) {
         const joined = getJoinedDisplayString(value);
         if (joined) {
-          return <span>{joined}</span>;
+          return wrapWithForceIcon(<span>{joined}</span>, isForce, field, row);
         }
       }
       if (normalizedOptions.length > 0 && !(Array.isArray(value) || typeof value === 'object')) {
         const label = normalizedOptions[0].label ?? normalizedOptions[0].id;
-        return <span>{String(label)}</span>;
+        return wrapWithForceIcon(<span>{String(label)}</span>, isForce, field, row);
       }
       // Check if it's a URL even if not explicitly typed as url
       const stringValue = String(value);
@@ -353,7 +407,7 @@ export const formatFieldValue = (
       if (isUrl && field?.component === 'url') {
         const linkLabel = field?.componentTypeConfig?.label || 'URL';
         const urlToOpen = stringValue.startsWith('//') ? `https:${stringValue}` : stringValue;
-        return (
+        return wrapWithForceIcon(
           <a
             href={urlToOpen}
             target="_blank"
@@ -363,10 +417,13 @@ export const formatFieldValue = (
           >
             <LinkIcon className="h-3.5 w-3.5" />
             {linkLabel}
-          </a>
+          </a>,
+          isForce,
+          field,
+          row
         );
       }
-      return <span>{stringValue}</span>;
+      return wrapWithForceIcon(<span>{stringValue}</span>, isForce, field, row);
   }
 };
 

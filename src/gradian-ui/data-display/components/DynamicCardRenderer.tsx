@@ -5,7 +5,7 @@ import React, { KeyboardEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import type { BadgeProps } from '@/components/ui/badge';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { Avatar, Rating, Countdown, CodeBadge } from '@/gradian-ui/form-builder/form-elements';
+import { Avatar, Rating, Countdown, CodeBadge, ForceIcon } from '@/gradian-ui/form-builder/form-elements';
 import { CardSection, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '@/gradian-ui/shared/utils';
 import { CardContent } from '@/gradian-ui/data-display/card/components/CardContent';
@@ -312,6 +312,10 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
 
   // Check if entity is incomplete
   const isIncomplete = data.incomplete === true;
+  
+  // Check if entity is forced
+  const isForce = data.isForce === true;
+  const forceReason = data.forceReason || '';
 
   const cardConfig = {
     title,
@@ -370,9 +374,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
       role="button"
       tabIndex={0}
       onClick={(e) => {
-        // Only open dialog if click is not on action buttons
+        // Only open dialog if click is not on action buttons or tooltip triggers
         const target = e.target as HTMLElement;
-        if (!target.closest('[data-action-button]')) {
+        if (!target.closest('[data-action-button]') && !target.closest('[data-tooltip-trigger]')) {
           e.preventDefault();
           e.stopPropagation();
           if (onView) onView(data);
@@ -388,9 +392,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
           behavior: { hoverable: !disableAnimation, clickable: true }
         }}
         className={cn(
-          "h-full bg-white dark:bg-gray-900/50 rounded-2xl overflow-hidden",
-          !className?.includes('border-none') && "border border-gray-200 dark:border-gray-500",
-          !disableAnimation && "transition-all duration-200 hover:shadow-sm hover:border-gray-300",
+          "h-full bg-white dark:bg-gray-800 rounded-2xl overflow-hidden",
+          !className?.includes('border-none') && "border border-gray-200 dark:border-gray-600",
+          !disableAnimation && "transition-all duration-200 hover:shadow-sm hover:border-gray-400",
           className?.includes('border-none') ? "focus-within:ring-0" : "focus-within:ring-2 focus-within:ring-violet-400 focus-within:ring-offset-0 focus-within:rounded-xl"
         )}
         onKeyDown={(e: KeyboardEvent) => {
@@ -442,7 +446,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <motion.div
                         className="flex items-center gap-1.5 flex-1 min-w-0 pe-2"
-                        initial={disableAnimation ? false : { opacity: 0, x: -10 }}
+                        initial={disableAnimation ? false : { opacity: 0, x: 5 }}
                         animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                         transition={disableAnimation ? {} : { duration: 0.3 }}
                         whileHover={{ x: 2, transition: { duration: 0.15, delay: 0 } }}
@@ -451,7 +455,10 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         className="text-md font-semibold text-gray-900 dark:text-gray-50 group-hover:text-violet-800 dark:group-hover:text-violet-300 transition-colors duration-100 truncate flex-1 min-w-0"
                           whileHover={{ x: 2, transition: { duration: 0.15, delay: 0 } }}
                       >
-                        {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
+                        <span className="inline-flex items-center gap-1.5">
+                          <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} />
+                          {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
+                        </span>
                       </motion.h3>
                         {cardConfig.title && (
                           <div
@@ -489,7 +496,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     </div>
                     {cardConfig.subtitle && (
                     <motion.div
-                      initial={disableAnimation ? false : { opacity: 0, x: -10 }}
+                      initial={disableAnimation ? false : { opacity: 0, x: 5 }}
                       animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                         transition={disableAnimation ? {} : { duration: 0.3 }}
                       className="text-xs text-gray-500 dark:text-gray-400 truncate"
@@ -548,6 +555,20 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                 >
                   <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
                     {renderHighlightedText(description, normalizedHighlightQuery)}
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Force Reason */}
+              {isForce && forceReason && (
+                <motion.div
+                  initial={disableAnimation ? false : { opacity: 0, y: 5 }}
+                  animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+                  transition={disableAnimation ? {} : { duration: 0.3 }}
+                  className="w-full mb-2"
+                >
+                  <p className="text-xs text-pink-700 dark:text-pink-400 line-clamp-2">
+                    <span className="font-medium">Force Reason:</span> {forceReason}
                   </p>
                 </motion.div>
               )}
@@ -690,7 +711,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <motion.h3
-                      initial={disableAnimation ? false : { opacity: 0, x: -5 }}
+                      initial={disableAnimation ? false : { opacity: 0, x: 5 }}
                       animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                       transition={disableAnimation ? {} : { duration: 0.3 }}
                       className={cn(
@@ -702,7 +723,10 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         transition: { type: "spring", stiffness: 400, damping: 25 }
                       }}
                     >
-                      {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
+                      <span className="inline-flex items-center gap-1.5">
+                        <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} />
+                        {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
+                      </span>
                     </motion.h3>
                     {cardConfig.title && (
                       <div
@@ -739,7 +763,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   </div>
                   {cardConfig.subtitle && (
                   <motion.p
-                    initial={disableAnimation ? false : { opacity: 0, x: -10 }}
+                    initial={disableAnimation ? false : { opacity: 0, x: 5 }}
                     animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                     transition={disableAnimation ? {} : { duration: 0.3 }}
                     className={cn(
@@ -753,6 +777,19 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   >
                     {renderHighlightedText(cardConfig.subtitle, normalizedHighlightQuery)}
                   </motion.p>
+                  )}
+                  {/* Force Reason */}
+                  {isForce && forceReason && (
+                    <motion.div
+                      initial={disableAnimation ? false : { opacity: 0, x: 5 }}
+                      animate={disableAnimation ? false : { opacity: 1, x: 0 }}
+                      transition={disableAnimation ? {} : { duration: 0.3 }}
+                      className="mt-1"
+                    >
+                      <p className="text-xs text-pink-700 dark:text-pink-400 truncate">
+                        <span className="font-medium">Force Reason:</span> {forceReason}
+                      </p>
+                    </motion.div>
                   )}
                   <div
                     className="mt-1"

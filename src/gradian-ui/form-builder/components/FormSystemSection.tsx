@@ -31,7 +31,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
   }
 
   const inactiveValue = values.inactive === true;
-  const forceValue = values.force === true;
+  const forceValue = values.isForce === true;
   const forceReasonValue = values.forceReason || '';
 
   return (
@@ -67,8 +67,8 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
                   label: 'Force',
                 }}
                 checked={forceValue}
-                onChange={(checked) => onChange('force', checked)}
-                onBlur={() => onBlur('force')}
+                onChange={(checked) => onChange('isForce', checked)}
+                onBlur={() => onBlur('isForce')}
                 disabled={disabled}
               />
             )}

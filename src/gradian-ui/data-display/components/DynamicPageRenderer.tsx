@@ -703,7 +703,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             {Object.entries(groupedEntities.grouped).map(([companyId, companyEntities]) => {
               const companyInfo = getCompanyInfo(companyId);
               return (
-                <AccordionItem key={companyId} value={companyId} className="border border-gray-200 dark:border-gray-500 rounded-2xl px-2 md:px-4 bg-gray-50 dark:bg-gray-800/30 border-b border-b-gray-200 dark:border-b-gray-500">
+                <AccordionItem key={companyId} value={companyId} className="border border-gray-200 dark:border-gray-700 rounded-2xl px-2 md:px-4 bg-gray-50 dark:bg-gray-800/30 border-b border-b-gray-200 dark:border-b-gray-500">
                   <AccordionTrigger className="hover:no-underline py-3 [&>svg]:text-violet-600">
                     <div className="flex items-center gap-2">
                       {isLoadingCompanies ? (

@@ -114,7 +114,9 @@ interface TableSkeletonProps {
 }
 
 function TableSkeleton({ columnCount, rowCount, bordered }: TableSkeletonProps) {
-  const columns = Array.from({ length: columnCount });
+  // Limit skeleton columns to a maximum of 4 for cleaner appearance
+  const skeletonColumnCount = Math.min(columnCount, 7);
+  const columns = Array.from({ length: skeletonColumnCount });
   return (
     <div className="mx-0 min-w-0">
       <div
@@ -132,11 +134,10 @@ function TableSkeleton({ columnCount, rowCount, bordered }: TableSkeletonProps) 
             <div
               key={`row-${rowIndex}`}
               className="flex flex-col gap-4 px-4 py-4 md:grid"
-              style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}
+              style={{ gridTemplateColumns: `repeat(${skeletonColumnCount}, minmax(0, 1fr))` }}
             >
               {columns.map((_, colIndex) => (
-                <div key={`cell-${rowIndex}-${colIndex}`} className="flex flex-col gap-2">
-                  <Skeleton className="h-3 w-1/2 max-w-32 text-gray-900 dark:text-gray-200" />
+                <div key={`cell-${rowIndex}-${colIndex}`} className="flex items-center">
                   <Skeleton className="h-4 w-full text-gray-900 dark:text-gray-200" />
                 </div>
               ))}
@@ -155,7 +156,9 @@ interface TableCardSkeletonProps {
 }
 
 function TableCardSkeleton({ count, columnCount, cardColumns }: TableCardSkeletonProps) {
-  const columnsPerRow = Math.min(columnCount, cardColumns * 2);
+  // Limit skeleton columns to a maximum of 4 for cleaner appearance
+  const skeletonColumnCount = Math.min(columnCount, 7);
+  const columnsPerRow = Math.min(skeletonColumnCount, cardColumns * 2);
   return (
     <div className="grid grid-cols-1 gap-3 p-2 lg:p-4">
       {Array.from({ length: count }).map((_, index) => (
@@ -174,9 +177,8 @@ function TableCardSkeleton({ count, columnCount, cardColumns }: TableCardSkeleto
             className="grid gap-3"
             style={{ gridTemplateColumns: `repeat(${Math.max(1, columnsPerRow)}, minmax(0, 1fr))` }}
           >
-            {Array.from({ length: columnCount }).map((_, colIndex) => (
-              <div key={`card-cell-${index}-${colIndex}`} className="space-y-2">
-                <Skeleton className="h-3 w-1/2" />
+            {Array.from({ length: skeletonColumnCount }).map((_, colIndex) => (
+              <div key={`card-cell-${index}-${colIndex}`} className="flex items-center">
                 <Skeleton className="h-4 w-full" />
               </div>
             ))}
