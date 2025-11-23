@@ -1,0 +1,142 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+build:
+  stage: build
+  script:
+    - echo "🚀 Starting Docker image build..."
+    - echo "📦 Building image with tags latest, $CI_COMMIT_SHORT_SHA"
+    - docker build --tag="$CI_REGISTRY_IMAGE:latest" --tag="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" .
+    - echo "🔐 Authenticating to GitLab registry for pushing images..."
+    - |
+      # Login to GitLab registry for pushing the built image
+      echo "Registry: $CI_REGISTRY"
+      echo "Registry Image: $CI_REGISTRY_IMAGE"
+      
+      # Use CI_JOB_TOKEN (GitLab's recommended method for Container Registry)
+      # When using CI_JOB_TOKEN, username should be 'gitlab-ci-token'
+      if [ -n "$CI_JOB_TOKEN" ]; then
+        echo "Using CI_JOB_TOKEN for GitLab registry authentication"
+        REGISTRY_USER="${CI_REGISTRY_USER:-gitlab-ci-token}"
+        if ! echo $CI_JOB_TOKEN | docker login -u "$REGISTRY_USER" --password-stdin $CI_REGISTRY; then
+          echo "❌ Failed to login to GitLab registry with CI_JOB_TOKEN"
+          echo "Trying with alternative username..."
+          if ! echo $CI_JOB_TOKEN | docker login -u "gitlab-ci-token" --password-stdin $CI_REGISTRY; then
+            echo "❌ Failed to login to GitLab registry (both usernames)"
+            exit 1
+          fi
+        fi
+        echo "✅ Successfully authenticated to GitLab registry"
+      elif [ -n "$CI_REGISTRY_PASSWORD" ]; then
+        echo "Using CI_REGISTRY_PASSWORD for GitLab registry authentication"
+        if ! echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY; then
+          echo "❌ Failed to login to GitLab registry with CI_REGISTRY_PASSWORD"
+          exit 1
+        fi
+        echo "✅ Successfully authenticated to GitLab registry"
+      else
+        echo "❌ Neither CI_JOB_TOKEN nor CI_REGISTRY_PASSWORD is set"
+        echo "One of these is required for pushing to GitLab registry"
+        exit 1
+      fi
+    - echo "📤 Pushing images to registry..."
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+    - echo "✅ Build completed!"
+  tags:
+    - CG-GR-APP-DEV
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+deploy_staging:
+  stage: deploy
+  needs:
+    - job: build
+      artifacts: true   # Use .env from build
+  variables:
+    # Environment variables for the application
+    AVALAI_API_KEY: ${AVALAI_API_KEY}
+    CLIENT_ID: ${CLIENT_ID}
+    DATABASE_URL: ${DATABASE_URL}
+    JWT_SECRET: ${JWT_SECRET}
+    NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+    NEXTAUTH_URL: ${NEXTAUTH_URL}
+    NEXT_PUBLIC_CLIENT_ID: ${NEXT_PUBLIC_CLIENT_ID}
+    NEXT_PUBLIC_ENCRYPTION_KEY: ${NEXT_PUBLIC_ENCRYPTION_KEY}
+    NEXT_PUBLIC_SCHEMA_API_BASE: ${NEXT_PUBLIC_SCHEMA_API_BASE}
+    NEXT_PUBLIC_SECRET_KEY: ${NEXT_PUBLIC_SECRET_KEY}
+    NEXT_PUBLIC_URL_DATA_CRUD: ${NEXT_PUBLIC_URL_DATA_CRUD}
+    NEXT_PUBLIC_URL_SCHEMA_CRUD: ${NEXT_PUBLIC_URL_SCHEMA_CRUD}
+    NEXT_PUBLIC_URL_SYNC_MAIL_TEMPLATE: ${NEXT_PUBLIC_URL_SYNC_MAIL_TEMPLATE}
+    PEPPER: ${PEPPER}
+    SECRET_KEY: ${SECRET_KEY}
+    URL_DATA_CRUD: ${URL_DATA_CRUD}
+    URL_SCHEMA_CRUD: ${URL_SCHEMA_CRUD}
+    URL_SEND_EMAIL: ${URL_SEND_EMAIL}
+    URL_SYNC_MAIL_TEMPLATE: ${URL_SYNC_MAIL_TEMPLATE}
+  script:
+    - echo "🚀 Starting deployment..."
+    - echo "🔐 Authenticating to GitLab registry for pulling images..."
+    - |
+      # Login to GitLab registry for pulling the image
+      echo "Registry: $CI_REGISTRY"
+      echo "Registry Image: $CI_REGISTRY_IMAGE"
+      
+      # Use CI_JOB_TOKEN (GitLab's recommended method for Container Registry)
+      # When using CI_JOB_TOKEN, username should be 'gitlab-ci-token'
+      if [ -n "$CI_JOB_TOKEN" ]; then
+        echo "Using CI_JOB_TOKEN for GitLab registry authentication"
+        REGISTRY_USER="${CI_REGISTRY_USER:-gitlab-ci-token}"
+        if ! echo $CI_JOB_TOKEN | docker login -u "$REGISTRY_USER" --password-stdin $CI_REGISTRY; then
+          echo "❌ Failed to login to GitLab registry with CI_JOB_TOKEN"
+          echo "Trying with alternative username..."
+          if ! echo $CI_JOB_TOKEN | docker login -u "gitlab-ci-token" --password-stdin $CI_REGISTRY; then
+            echo "❌ Failed to login to GitLab registry (both usernames)"
+            exit 1
+          fi
+        fi
+        echo "✅ Successfully authenticated to GitLab registry"
+      elif [ -n "$CI_REGISTRY_PASSWORD" ]; then
+        echo "Using CI_REGISTRY_PASSWORD for GitLab registry authentication"
+        if ! echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY; then
+          echo "❌ Failed to login to GitLab registry with CI_REGISTRY_PASSWORD"
+          exit 1
+        fi
+        echo "✅ Successfully authenticated to GitLab registry"
+      else
+        echo "❌ Neither CI_JOB_TOKEN nor CI_REGISTRY_PASSWORD is set"
+        echo "One of these is required for pulling from GitLab registry"
+        exit 1
+      fi
+    - echo "📥 Pulling latest images..."
+    - docker compose pull
+    - docker compose down --remove-orphans || true
+    - docker compose up -d
+    - echo "🏥 Performing health check..."
+    - sleep 10
+    - docker compose ps
+    - echo "🧹 Cleaning up old images..."
+    - |
+      docker images --format "table {{.Repository}}:{{.Tag}}\t{{.ID}}" | grep "$CI_REGISTRY_IMAGE" | grep -v "latest" | awk '{print $2}' | xargs -r docker rmi || echo "No old images to remove"
+      docker image prune -f
+      echo "📋 Remaining images:"
+      docker images | grep "$CI_REGISTRY_IMAGE" || echo "No images found"
+    - echo "✅ Deployment completed!"
+  environment:
+    name: staging
+    url: https://staging.gradian-api.com
+  tags:
+    - CG-GR-Publish
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure

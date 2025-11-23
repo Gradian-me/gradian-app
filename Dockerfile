@@ -3,7 +3,7 @@
 # =============================================================================
 # Build stage
 # =============================================================================
-FROM reg.cinnagen.com:8083/node:20-slim AS builder
+FROM node:20-slim AS builder
 
 # Install build dependencies for native modules (argon2, etc.)
 # Combined into single layer to reduce image size
@@ -43,7 +43,7 @@ RUN --mount=type=cache,target=/app/.next/cache,sharing=locked \
 # =============================================================================
 # Production stage
 # =============================================================================
-FROM reg.cinnagen.com:8083/node:20-slim AS runner
+FROM node:20-slim AS runner
 
 WORKDIR /app
 
