@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-import { isDemoModeEnabled, proxySchemaRequest } from '../utils';
+import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData } from '../utils';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
 import { clearCache as clearSharedSchemaCache } from '@/gradian-ui/shared/utils/data-loader';
 
@@ -159,7 +159,9 @@ export async function PUT(
   }
 
   if (!isDemoModeEnabled()) {
-    const updatedSchema = await request.json();
+    const updatedSchemaRaw = await request.json();
+    // Normalize nested fields (e.g., parse repeatingConfig JSON strings to objects)
+    const updatedSchema = normalizeSchemaData(updatedSchemaRaw);
     return proxySchemaRequest(request, `/api/schemas/${schemaId}`, {
       body: updatedSchema,
       method: 'PUT',
@@ -167,7 +169,10 @@ export async function PUT(
   }
 
   try {
-    const updatedSchema = await request.json();
+    const updatedSchemaRaw = await request.json();
+
+    // Normalize nested fields (e.g., parse repeatingConfig JSON strings to objects)
+    const updatedSchema = normalizeSchemaData(updatedSchemaRaw);
 
     // Load schemas (with caching)
     const schemas = loadSchemas();
