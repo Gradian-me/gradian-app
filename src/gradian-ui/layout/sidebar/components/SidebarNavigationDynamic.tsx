@@ -20,6 +20,8 @@ interface SidebarNavigationDynamicProps {
   initialSchemas?: FormSchema[];
 }
 
+const ACCORDION_STATE_KEY = 'gradian-sidebar-accordion-open';
+
 export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> = ({
   isCollapsed,
   isMobile,
@@ -28,6 +30,12 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
 }) => {
   const pathname = usePathname();
   const [isMounted, setIsMounted] = useState(false);
+  // Persist accordion state across route changes
+  const [accordionValue, setAccordionValue] = useState<string | undefined>(() => {
+    if (typeof window === 'undefined') return undefined; // SSR default
+    const stored = localStorage.getItem(ACCORDION_STATE_KEY);
+    return stored === 'open' ? 'applications' : undefined;
+  });
   const { schemas: allSchemas, isLoading, refetch } = useSchemas({
     initialData: initialSchemas,
     summary: true,
@@ -37,6 +45,12 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Persist accordion state to localStorage when it changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(ACCORDION_STATE_KEY, accordionValue === 'applications' ? 'open' : 'closed');
+  }, [accordionValue]);
 
   // Listen for cache clear events and refetch schemas
   useEffect(() => {
@@ -82,7 +96,13 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
       <Separator className="my-4 bg-gray-700" />
       
       {isMounted ? (
-        <Accordion type="single" collapsible className="w-full">
+        <Accordion 
+          type="single" 
+          collapsible 
+          className="w-full"
+          value={accordionValue}
+          onValueChange={setAccordionValue}
+        >
           <AccordionItem value="applications" className="border-none">
             <AccordionTrigger className={cn(
               "px-3 py-2 text-gray-300 hover:text-white",

@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bell, PanelLeftOpen, PencilRuler, Plus } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { GoToTop, Header, ModeToggle } from '@/gradian-ui/layout';
 import { Sidebar } from '@/gradian-ui/layout/sidebar';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -37,6 +37,9 @@ const SIDEBAR_COLLAPSED_WIDTH = 80;
 const SIDEBAR_EXPANDED_WIDTH = 280;
 const SIDEBAR_STATE_KEY = 'gradian-sidebar-collapsed';
 
+// Track if this is the first mount across all route changes
+let hasMountedBefore = false;
+
 const getSidebarWidth = (isDesktop: boolean, isCollapsed: boolean) => {
   if (!isDesktop) {
     return 0;
@@ -66,26 +69,16 @@ export function MainLayout({
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
   const profileTheme = resolvedTheme === 'dark' ? 'dark' : 'light';
-  // Default to collapsed so SSR markup matches closed sidebar
+  // Always start with collapsed state to match SSR (prevents hydration mismatch)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notificationCount] = useState(3);
   const [isDesktop, setIsDesktop] = useState(false);
-  // Always start with expanded width to match server-side render
-  const [sidebarWidth, setSidebarWidth] = useState(() => getSidebarWidth(false, false));
+  // Always start with collapsed width to match SSR (prevents hydration mismatch)
+  const [sidebarWidth, setSidebarWidth] = useState(() => getSidebarWidth(false, true));
   const { selectedCompany } = useCompanyStore();
   const { closeAllDialogs, hasOpenDialogs, registerDialog, unregisterDialog } = useDialogContext();
   const pageTitle = title ? `${title} | Gradian App` : 'Gradian App';
-
-  // Read sidebar state from localStorage after mount (after hydration)
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
-    const shouldBeCollapsed = stored === 'true';
-    if (shouldBeCollapsed !== isSidebarCollapsed) {
-      setIsSidebarCollapsed(shouldBeCollapsed);
-    }
-  }, []); // Only run once after mount
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -95,6 +88,14 @@ export function MainLayout({
       document.title = previousTitle;
     };
   }, [pageTitle]);
+
+  // Hydrate sidebar state from localStorage after mount (prevents hydration mismatch)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
+    const shouldBeCollapsed = stored === 'true';
+    setIsSidebarCollapsed(shouldBeCollapsed);
+  }, []);
 
   // Check if we're on desktop (only on resize, not on every render)
   useEffect(() => {
@@ -108,12 +109,14 @@ export function MainLayout({
         return prev;
       });
     };
-    checkDesktop();
+    // Set initial desktop state
+    const isDesktopInitial = window.innerWidth >= DESKTOP_BREAKPOINT;
+    setIsDesktop(isDesktopInitial);
     window.addEventListener('resize', checkDesktop);
     return () => window.removeEventListener('resize', checkDesktop);
   }, []);
 
-  // Update sidebar width only when desktop state or collapsed state changes
+  // Update sidebar width only when desktop state or collapsed state actually changes
   useEffect(() => {
     const nextSidebarWidth = getSidebarWidth(isDesktop, isSidebarCollapsed);
     setSidebarWidth((currentWidth) => {
@@ -124,6 +127,17 @@ export function MainLayout({
       return currentWidth;
     });
   }, [isDesktop, isSidebarCollapsed]);
+
+  // Mark that we've mounted (after first render)
+  useEffect(() => {
+    hasMountedBefore = true;
+  }, []);
+
+  // Memoize the main content style to prevent recalculation on every render
+  const mainContentStyle = useMemo(() => ({
+    width: `calc(100% - ${sidebarWidth}px)`,
+    minWidth: 0,
+  }), [sidebarWidth]);
 
   // Persist sidebar collapsed state to localStorage
   useEffect(() => {
@@ -409,7 +423,7 @@ export function MainLayout({
           marginLeft: sidebarWidth
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        style={{ width: `calc(100% - ${sidebarWidth}px)` }}
+        style={mainContentStyle}
       >
         {/* Header */}
         <Header
@@ -421,7 +435,7 @@ export function MainLayout({
 
         {/* Page Content */}
         <motion.main
-          initial={{ opacity: 0, y: 20 }}
+          initial={!hasMountedBefore ? { opacity: 0, y: 20 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="flex-1 overflow-y-auto p-2 md:p-4 lg:p-6 bg-gray-50 dark:bg-gray-900"

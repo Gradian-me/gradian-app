@@ -653,7 +653,12 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
               {/* Content Sections */}
               <div className="flex-1">
                 <motion.div
-                  className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs"
+                  className={cn(
+                    "grid gap-4 text-xs",
+                    filteredSections.length === 1 
+                      ? "grid-cols-1" 
+                      : "grid-cols-1 sm:grid-cols-2"
+                  )}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
