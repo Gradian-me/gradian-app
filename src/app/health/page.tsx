@@ -7,8 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card/components/MetricCard';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { CircularTimer } from '@/components/ui/circular-timer';
+import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { 
   CheckCircle, 
   AlertCircle, 
@@ -18,7 +23,9 @@ import {
   Server,
   Database,
   Globe,
-  Zap
+  Zap,
+  Settings,
+  Power
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -31,6 +38,8 @@ interface HealthService {
   color: string;
   healthApi: string;
   healthyJsonPath: string;
+  isActive?: boolean;
+  monitoringEnabled?: boolean;
 }
 
 interface HealthCheckResponse {
@@ -67,6 +76,30 @@ export default function HealthPage() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshIntervalSeconds, setRefreshIntervalSeconds] = useState<number>(30);
   const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
+  const [timerKey, setTimerKey] = useState(0); // Key to reset timer
+  const [testUnhealthyServices, setTestUnhealthyServices] = useState<Set<string>>(new Set()); // Services in test unhealthy mode
+  const [isDemoMode, setIsDemoMode] = useState(DEMO_MODE); // Demo mode state
+  const [configServiceId, setConfigServiceId] = useState<string | null>(null); // Service ID for configuration
+  const [showMonitoringConfig, setShowMonitoringConfig] = useState(false); // Show monitoring configuration dialog
+
+  // Fetch demo mode from API
+  useEffect(() => {
+    const fetchDemoMode = async () => {
+      try {
+        const response = await fetch('/api/application-variables');
+        const result = await response.json();
+        
+        if (result.success && result.data?.DEMO_MODE !== undefined) {
+          setIsDemoMode(result.data.DEMO_MODE);
+        }
+      } catch (error) {
+        console.error('Error fetching demo mode:', error);
+        // Keep default value on error
+      }
+    };
+
+    fetchDemoMode();
+  }, []);
 
   // Fetch services from API
   useEffect(() => {
@@ -109,6 +142,11 @@ export default function HealthPage() {
 
   // Fetch health status for a service
   const checkHealth = async (service: HealthService) => {
+    // Skip if monitoring is disabled
+    if (service.monitoringEnabled === false) {
+      return;
+    }
+
     setRefreshing(prev => new Set(prev).add(service.id));
     setHealthStatuses(prev => ({
       ...prev,
@@ -165,15 +203,24 @@ export default function HealthPage() {
     }
   };
 
-  // Check all services
+  // Check all services (only active ones)
   const checkAllHealth = async () => {
-    const promises = services.map(service => checkHealth(service));
+    const activeServices = services.filter(service => service.monitoringEnabled !== false);
+    const promises = activeServices.map(service => checkHealth(service));
     await Promise.all(promises);
+    // Reset timer after check completes
+    if (autoRefresh && refreshIntervalSeconds > 0) {
+      setTimerKey(prev => prev + 1);
+    }
   };
 
   // Auto-refresh effect
   useEffect(() => {
-    if (autoRefresh && services.length > 0 && refreshIntervalSeconds > 0) {
+    const activeServices = services.filter(service => service.monitoringEnabled !== false);
+    if (autoRefresh && activeServices.length > 0 && refreshIntervalSeconds > 0) {
+      // Reset timer when starting
+      setTimerKey(prev => prev + 1);
+      
       // Initial check
       checkAllHealth();
       
@@ -237,8 +284,22 @@ export default function HealthPage() {
   };
 
   // Calculate metrics for a service
-  const getServiceMetrics = (status: ServiceHealthStatus): MetricItem[] => {
+  const getServiceMetrics = (status: ServiceHealthStatus, serviceId: string): MetricItem[] => {
+    const isTestUnhealthy = testUnhealthyServices.has(serviceId);
+    
     if (!status.data) {
+      // If test unhealthy is enabled, show unhealthy even without data
+      if (isTestUnhealthy) {
+        return [
+          {
+            id: 'status',
+            label: 'Status',
+            value: 'Unhealthy',
+            icon: 'AlertCircle',
+            iconColor: 'red',
+          },
+        ];
+      }
       return [
         {
           id: 'status',
@@ -251,15 +312,17 @@ export default function HealthPage() {
     }
 
     const { data } = status;
+    // Override status to unhealthy if in test mode
+    const displayStatus = isTestUnhealthy ? 'unhealthy' : data.status;
     const metrics: MetricItem[] = [];
 
     // Overall status
     metrics.push({
       id: 'status',
       label: 'Status',
-      value: data.status === 'healthy' ? 'Healthy' : data.status === 'unhealthy' ? 'Unhealthy' : 'Degraded',
-      icon: data.status === 'healthy' ? 'CheckCircle' : 'AlertCircle',
-      iconColor: data.status === 'healthy' ? 'green' : data.status === 'unhealthy' ? 'red' : 'yellow',
+      value: displayStatus === 'healthy' ? 'Healthy' : displayStatus === 'unhealthy' ? 'Unhealthy' : 'Degraded',
+      icon: displayStatus === 'healthy' ? 'CheckCircle' : 'AlertCircle',
+      iconColor: displayStatus === 'healthy' ? 'green' : displayStatus === 'unhealthy' ? 'red' : 'yellow',
     });
 
     // Response time
@@ -300,16 +363,87 @@ export default function HealthPage() {
     return metrics;
   };
 
-  // Calculate overall stats
-  const healthyCount = Object.values(healthStatuses).filter(
-    s => s.data?.status === 'healthy'
-  ).length;
-  const unhealthyCount = Object.values(healthStatuses).filter(
-    s => s.data?.status === 'unhealthy'
-  ).length;
-  const degradedCount = Object.values(healthStatuses).filter(
-    s => s.data?.status === 'degraded'
-  ).length;
+  // Calculate overall stats (including test unhealthy services, excluding inactive)
+  const activeServices = services.filter(service => service.monitoringEnabled !== false);
+  const inactiveCount = services.filter(service => service.monitoringEnabled === false).length;
+  
+  const healthyCount = activeServices.filter(service => {
+    const status = healthStatuses[service.id];
+    const isTestUnhealthy = testUnhealthyServices.has(service.id);
+    return !isTestUnhealthy && status?.data?.status === 'healthy';
+  }).length;
+  const unhealthyCount = activeServices.filter(service => {
+    const status = healthStatuses[service.id];
+    const isTestUnhealthy = testUnhealthyServices.has(service.id);
+    // Only count as unhealthy if test unhealthy OR actually unhealthy (not degraded)
+    return isTestUnhealthy || status?.data?.status === 'unhealthy';
+  }).length;
+
+  // Get unhealthy services (only unhealthy, not degraded, including test unhealthy, only active)
+  const unhealthyServices = activeServices.filter(service => {
+    const status = healthStatuses[service.id];
+    const actualStatus = status?.data?.status;
+    const isTestUnhealthy = testUnhealthyServices.has(service.id);
+    // Only include truly unhealthy services, not degraded ones
+    return isTestUnhealthy || actualStatus === 'unhealthy';
+  });
+
+  // Get inactive services
+  const inactiveServices = services.filter(service => service.monitoringEnabled === false);
+
+  // Scroll to service card
+  const scrollToService = (serviceId: string) => {
+    const element = document.getElementById(`service-card-${serviceId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Add a highlight effect
+      element.classList.add('ring-2', 'ring-red-500', 'ring-offset-2');
+      setTimeout(() => {
+        element.classList.remove('ring-2', 'ring-red-500', 'ring-offset-2');
+      }, 2000);
+    }
+  };
+
+  // Toggle monitoring for a service
+  const toggleMonitoring = async (serviceId: string, enabled: boolean) => {
+    try {
+      const service = services.find(s => s.id === serviceId);
+      if (!service) return;
+
+      const response = await apiRequest(`/api/data/health`, {
+        method: 'PUT',
+        body: {
+          ...service,
+          monitoringEnabled: enabled,
+        },
+      });
+
+      if (response.success) {
+        // Update local state
+        setServices(prev => prev.map(s => 
+          s.id === serviceId ? { ...s, monitoringEnabled: enabled } : s
+        ));
+        
+        // If disabling, clear health status
+        if (!enabled) {
+          setHealthStatuses(prev => ({
+            ...prev,
+            [serviceId]: {
+              ...prev[serviceId],
+              data: null,
+              error: null,
+            },
+          }));
+        } else {
+          // If enabling, check health immediately
+          const updatedService = { ...service, monitoringEnabled: enabled };
+          await checkHealth(updatedService);
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling monitoring:', error);
+    }
+  };
 
 
   return (
@@ -326,21 +460,54 @@ export default function HealthPage() {
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Health Monitoring</h2>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Monitor the health and status of all services</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto">
             <Button
               variant="outline"
-              onClick={() => setAutoRefresh(!autoRefresh)}
-              className="w-full sm:w-auto"
+              size="sm"
+              onClick={() => setShowMonitoringConfig(true)}
+              className="flex items-center gap-2"
             >
-              <Activity className={`h-4 w-4 mr-2 ${autoRefresh ? 'animate-pulse' : ''}`} />
-              <span className="hidden sm:inline">{autoRefresh ? 'Auto Refresh On' : 'Auto Refresh Off'}</span>
-              <span className="sm:hidden">{autoRefresh ? 'Auto On' : 'Auto Off'}</span>
+              <Settings className="h-4 w-4" />
+              Configure Monitoring
             </Button>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="auto-refresh"
+                  checked={autoRefresh}
+                  onCheckedChange={setAutoRefresh}
+                />
+                <Label 
+                  htmlFor="auto-refresh" 
+                  className="text-sm font-medium cursor-pointer flex items-center gap-2"
+                >
+                  <Activity className={`h-4 w-4 ${autoRefresh ? 'animate-pulse text-violet-500' : 'text-gray-400'}`} />
+                  <span>Auto Refresh</span>
+                </Label>
+              </div>
+            </div>
+            {autoRefresh && refreshIntervalSeconds > 0 && (
+              <div className="flex items-center gap-2">
+                <CircularTimer
+                  key={timerKey}
+                  duration={refreshIntervalSeconds}
+                  isPlaying={autoRefresh}
+                  size={40}
+                  strokeWidth={4}
+                  onComplete={() => {
+                    // Timer completed, refresh will be triggered by interval
+                    // Reset timer for next cycle
+                    setTimerKey(prev => prev + 1);
+                  }}
+                  colors={['#7C3AED', '#F97316', '#FACC15', '#EF4444']}
+                />
+              </div>
+            )}
             {autoRefresh && (
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <label htmlFor="refresh-interval" className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="refresh-interval" className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
                   Interval (s):
-                </label>
+                </Label>
                 <Input
                   id="refresh-interval"
                   type="number"
@@ -360,7 +527,13 @@ export default function HealthPage() {
             )}
             <Button
               variant="outline"
-              onClick={checkAllHealth}
+              onClick={async () => {
+                await checkAllHealth();
+                // Reset timer after manual refresh
+                if (autoRefresh && refreshIntervalSeconds > 0) {
+                  setTimerKey(prev => prev + 1);
+                }
+              }}
               disabled={loading || refreshing.size > 0}
               className="w-full sm:w-auto"
             >
@@ -450,12 +623,12 @@ export default function HealthPage() {
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-2">
-                      <AlertCircle className="h-5 w-5 text-yellow-500 shrink-0" />
+                      <AlertCircle className="h-5 w-5 text-gray-400 shrink-0" />
                       <div className="min-w-0">
-                        <div className="text-2xl font-bold text-yellow-500">
-                          {degradedCount}
+                        <div className="text-2xl font-bold text-gray-400">
+                          {inactiveCount}
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 truncate">Degraded</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400 truncate">Inactive</div>
                       </div>
                     </div>
                   </CardContent>
@@ -467,15 +640,22 @@ export default function HealthPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.3 }}
               >
-                <Card>
+                <Card className={unhealthyCount > 0 ? 'bg-red-100 dark:bg-red-950/20 border-2 border-red-300 dark:border-red-800' : ''}>
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-2">
-                      <AlertCircle className="h-5 w-5 text-red-500 shrink-0" />
+                      {unhealthyCount > 0 ? (
+                        <div className="relative">
+                          <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>
+                          <AlertCircle className="relative h-5 w-5 text-red-600 dark:text-red-500 shrink-0" />
+                        </div>
+                      ) : (
+                        <AlertCircle className="h-5 w-5 text-red-500 shrink-0" />
+                      )}
                       <div className="min-w-0">
-                        <div className="text-2xl font-bold text-red-500">
+                        <div className={`text-2xl font-bold ${unhealthyCount > 0 ? 'text-red-700 dark:text-red-400' : 'text-red-500'}`}>
                           {unhealthyCount}
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 truncate">Unhealthy</div>
+                        <div className={`text-sm truncate font-medium ${unhealthyCount > 0 ? 'text-red-800 dark:text-red-300' : 'text-gray-600 dark:text-gray-400'}`}>Unhealthy</div>
                       </div>
                     </div>
                   </CardContent>
@@ -505,6 +685,150 @@ export default function HealthPage() {
           )}
         </div>
 
+        {/* Inactive Services Summary Cards */}
+        {!loading && inactiveServices.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.35 }}
+            className="space-y-3"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Power className="h-5 w-5 text-gray-400" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Inactive Services ({inactiveServices.length})
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              {inactiveServices.map((service) => {
+                return (
+                  <motion.div
+                    key={service.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Card 
+                      className="cursor-pointer hover:shadow-lg transition-all duration-200 border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50/50 dark:bg-gray-900/50 opacity-60"
+                      onClick={() => scrollToService(service.id)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div 
+                                className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0 bg-gray-200 dark:bg-gray-700"
+                              >
+                                <IconRenderer 
+                                  iconName={service.icon} 
+                                  className="h-5 w-5 text-gray-400"
+                                />
+                              </div>
+                              <h4 className="font-semibold text-sm text-gray-500 dark:text-gray-400 truncate">
+                                {service.serviceTitle}
+                              </h4>
+                            </div>
+                            <Badge 
+                              variant="outline"
+                              className="font-bold text-xs bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400 border-gray-300 dark:border-gray-600"
+                            >
+                              INACTIVE
+                            </Badge>
+                          </div>
+                          <Power className="h-5 w-5 shrink-0 text-gray-400" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Unhealthy Services Summary Cards */}
+        {!loading && unhealthyServices.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.4 }}
+            className="space-y-3"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <AlertCircle className="h-5 w-5 text-red-500" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Unhealthy Services ({unhealthyServices.length})
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              {unhealthyServices.map((service) => {
+                const status = healthStatuses[service.id];
+                const actualStatus = status?.data?.status;
+                const isTestUnhealthy = testUnhealthyServices.has(service.id);
+                // Override to unhealthy if in test mode
+                const serviceStatus = isTestUnhealthy ? 'unhealthy' : actualStatus;
+                const isUnhealthy = serviceStatus === 'unhealthy';
+                
+                return (
+                  <motion.div
+                    key={service.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Card 
+                      className="cursor-pointer hover:shadow-lg transition-all duration-200 border-2 border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600 bg-red-50/50 dark:bg-red-950/20"
+                      onClick={() => scrollToService(service.id)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div 
+                                className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0"
+                                style={{ backgroundColor: isUnhealthy ? '#ef444420' : '#f59e0b20' }}
+                              >
+                                <IconRenderer 
+                                  iconName={service.icon} 
+                                  className={`h-5 w-5 ${isUnhealthy ? 'text-red-500' : 'text-yellow-500'}`}
+                                />
+                              </div>
+                              <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">
+                                {service.serviceTitle}
+                              </h4>
+                            </div>
+                            <Badge 
+                              variant={isUnhealthy ? 'destructive' : 'default'}
+                              className={`font-bold text-xs ${
+                                isUnhealthy 
+                                  ? 'bg-red-600 text-white dark:bg-red-700' 
+                                  : 'bg-yellow-500 text-white dark:bg-yellow-600'
+                              }`}
+                            >
+                              {isUnhealthy ? 'UNHEALTHY' : 'DEGRADED'}
+                            </Badge>
+                            {status?.data?.responseTime !== undefined && (
+                              <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                                Response: {status.data.responseTime}ms
+                              </div>
+                            )}
+                            {status?.error && (
+                              <div className="mt-2 text-xs text-red-600 dark:text-red-400 truncate">
+                                {status.error}
+                              </div>
+                            )}
+                          </div>
+                          <AlertCircle className={`h-5 w-5 shrink-0 ${isUnhealthy ? 'text-red-500' : 'text-yellow-500'}`} />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+
         {/* Service Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -513,128 +837,66 @@ export default function HealthPage() {
           className="space-y-4"
         >
           {loading ? (
-            <>
-              <Card className="hover:shadow-lg transition-shadow duration-200">
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-4">
-                    <div className="flex-1 min-w-0 w-full">
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                        <Skeleton className="h-10 w-10 rounded-lg" />
-                        <Skeleton className="h-6 w-32" />
-                        <Skeleton className="h-5 w-20 rounded-full" />
-                        <Skeleton className="h-5 w-24 rounded-full" />
-                      </div>
-                      <Skeleton className="h-4 w-full mb-2" />
-                      <Skeleton className="h-3 w-48" />
+            <Card className="hover:shadow-lg transition-shadow duration-200">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-4">
+                  <div className="flex-1 min-w-0 w-full">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                      <Skeleton className="h-10 w-10 rounded-lg" />
+                      <Skeleton className="h-6 w-32" />
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                      <Skeleton className="h-5 w-24 rounded-full" />
                     </div>
-                    <div className="flex flex-row items-end space-x-2 w-full sm:w-auto shrink-0">
-                      <Skeleton className="h-9 w-20" />
-                      <Skeleton className="h-9 w-24" />
-                    </div>
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-3 w-48" />
                   </div>
-                  <div className="rounded-xl border bg-gradient-to-br from-blue-50 via-cyan-50 to-sky-50 dark:from-blue-950/30 dark:via-cyan-950/30 dark:to-sky-950/30 border-blue-200/50 dark:border-blue-800/50 p-4 mb-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-10 w-10 rounded-lg" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-6 w-20" />
-                        </div>
+                  <div className="flex flex-row items-end space-x-2 w-full sm:w-auto shrink-0">
+                    <Skeleton className="h-9 w-20" />
+                    <Skeleton className="h-9 w-24" />
+                  </div>
+                </div>
+                <div className="rounded-xl border bg-gradient-to-br from-blue-50 via-cyan-50 to-sky-50 dark:from-blue-950/30 dark:via-cyan-950/30 dark:to-sky-950/30 border-blue-200/50 dark:border-blue-800/50 p-4 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-10 w-10 rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-3 w-16" />
+                        <Skeleton className="h-6 w-20" />
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-10 w-10 rounded-lg" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-3 w-20" />
-                          <Skeleton className="h-6 w-16" />
-                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-10 w-10 rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-3 w-20" />
+                        <Skeleton className="h-6 w-16" />
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-10 w-10 rounded-lg" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-6 w-24" />
-                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-10 w-10 rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-3 w-16" />
+                        <Skeleton className="h-6 w-24" />
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-10 w-10 rounded-lg" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-6 w-20" />
-                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-10 w-10 rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-3 w-16" />
+                        <Skeleton className="h-6 w-20" />
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Skeleton className="h-3 w-32" />
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                      <Skeleton className="h-10 w-full rounded-lg" />
-                      <Skeleton className="h-10 w-full rounded-lg" />
-                      <Skeleton className="h-10 w-full rounded-lg" />
-                    </div>
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-3 w-32" />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
                   </div>
-                </CardContent>
-              </Card>
-              <Card className="hover:shadow-lg transition-shadow duration-200">
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-4">
-                    <div className="flex-1 min-w-0 w-full">
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                        <Skeleton className="h-10 w-10 rounded-lg" />
-                        <Skeleton className="h-6 w-32" />
-                        <Skeleton className="h-5 w-20 rounded-full" />
-                        <Skeleton className="h-5 w-24 rounded-full" />
-                      </div>
-                      <Skeleton className="h-4 w-full mb-2" />
-                      <Skeleton className="h-3 w-48" />
-                    </div>
-                    <div className="flex flex-row items-end space-x-2 w-full sm:w-auto shrink-0">
-                      <Skeleton className="h-9 w-20" />
-                      <Skeleton className="h-9 w-24" />
-                    </div>
-                  </div>
-                  <div className="rounded-xl border bg-gradient-to-br from-blue-50 via-cyan-50 to-sky-50 dark:from-blue-950/30 dark:via-cyan-950/30 dark:to-sky-950/30 border-blue-200/50 dark:border-blue-800/50 p-4 mb-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-10 w-10 rounded-lg" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-6 w-20" />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-10 w-10 rounded-lg" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-3 w-20" />
-                          <Skeleton className="h-6 w-16" />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-10 w-10 rounded-lg" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-6 w-24" />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-10 w-10 rounded-lg" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-6 w-20" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Skeleton className="h-3 w-32" />
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                      <Skeleton className="h-10 w-full rounded-lg" />
-                      <Skeleton className="h-10 w-full rounded-lg" />
-                      <Skeleton className="h-10 w-full rounded-lg" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </>
+                </div>
+              </CardContent>
+            </Card>
           ) : services.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center">
@@ -644,18 +906,24 @@ export default function HealthPage() {
           ) : (
             services.map((service, index) => {
               const status = healthStatuses[service.id];
-              const serviceStatus = status?.data?.status || null;
+              const actualStatus = status?.data?.status || null;
+              const isTestUnhealthy = testUnhealthyServices.has(service.id);
+              // Override status to unhealthy if in test mode
+              const serviceStatus = isTestUnhealthy ? 'unhealthy' : actualStatus;
               const isHealthy = serviceStatus === 'healthy';
               const isRefreshing = refreshing.has(service.id);
+              const isMonitoringDisabled = service.monitoringEnabled === false;
 
               return (
                 <motion.div
                   key={service.id}
+                  id={`service-card-${service.id}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
+                  className="scroll-mt-4 transition-all duration-300"
                 >
-                  <Card className="hover:shadow-lg transition-shadow duration-200">
+                  <Card className={`hover:shadow-lg transition-shadow duration-200 ${isMonitoringDisabled ? 'opacity-60 bg-gray-50 dark:bg-gray-900/50' : ''}`}>
                     <CardContent className="p-4 sm:p-6">
                       {/* Service Header */}
                       <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-4">
@@ -663,14 +931,14 @@ export default function HealthPage() {
                           <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                             <div 
                               className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
-                              style={{ backgroundColor: `${status?.data?.status === 'healthy' ? '#10b981' : status?.data?.status === 'unhealthy' ? '#ef4444' : '#f59e0b'}20` }}
+                              style={{ backgroundColor: `${serviceStatus === 'healthy' ? '#10b981' : serviceStatus === 'unhealthy' ? '#ef4444' : '#f59e0b'}20` }}
                             >
                               <IconRenderer 
                                 iconName={service.icon} 
                                 className={`h-6 w-6 ${
-                                  status?.data?.status === 'healthy' 
+                                  serviceStatus === 'healthy' 
                                     ? 'text-green-500' 
-                                    : status?.data?.status === 'unhealthy' 
+                                    : serviceStatus === 'unhealthy' 
                                     ? 'text-red-500' 
                                     : 'text-yellow-500'
                                 }`}
@@ -710,12 +978,55 @@ export default function HealthPage() {
                           )}
                         </div>
                         
-                        <div className="flex flex-row items-end space-x-2 w-full sm:w-auto shrink-0">
+                        <div className="flex flex-row items-end gap-2 w-full sm:w-auto shrink-0">
+                          <div className="flex items-center gap-2 px-2 py-1 border rounded-md bg-gray-50 dark:bg-gray-900/50">
+                            <Label htmlFor={`monitoring-${service.id}`} className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap cursor-pointer">
+                              Monitoring
+                            </Label>
+                            <Switch
+                              id={`monitoring-${service.id}`}
+                              checked={service.monitoringEnabled !== false}
+                              onCheckedChange={(checked) => toggleMonitoring(service.id, checked)}
+                            />
+                          </div>
+                          {isDemoMode && (
+                            <div className="flex items-center gap-2 px-2 py-1 border rounded-md bg-gray-50 dark:bg-gray-900/50">
+                              <Label htmlFor={`test-unhealthy-${service.id}`} className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap cursor-pointer">
+                                Test Unhealthy
+                              </Label>
+                              <Switch
+                                id={`test-unhealthy-${service.id}`}
+                                checked={isTestUnhealthy}
+                                disabled={isMonitoringDisabled}
+                                onCheckedChange={(checked) => {
+                                  setTestUnhealthyServices(prev => {
+                                    const next = new Set(prev);
+                                    if (checked) {
+                                      next.add(service.id);
+                                    } else {
+                                      next.delete(service.id);
+                                    }
+                                    return next;
+                                  });
+                                }}
+                              />
+                            </div>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setConfigServiceId(service.id)}
+                            className="flex-1 sm:flex-none"
+                          >
+                            <Settings className="h-4 w-4 mr-2" />
+                            <span className="hidden sm:inline">Configure</span>
+                            <span className="sm:hidden">Config</span>
+                          </Button>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => checkHealth(service)}
-                            disabled={isRefreshing}
+                            disabled={isRefreshing || isMonitoringDisabled}
                             className="flex-1 sm:flex-none"
                           >
                             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -739,17 +1050,24 @@ export default function HealthPage() {
                       )}
 
                       {/* Metrics Card */}
-                      {status?.data && !status?.loading && (
-                        <div className="mb-4">
+                      {isMonitoringDisabled ? (
+                        <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg">
+                          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                            <Power className="h-4 w-4" />
+                            <span className="text-sm font-medium">Monitoring is disabled for this service</span>
+                          </div>
+                        </div>
+                      ) : status?.data && !status?.loading ? (
+                        <div className="mb-4" key={`metrics-${service.id}-${isTestUnhealthy}`}>
                           <MetricCard
-                            metrics={getServiceMetrics(status)}
+                            metrics={getServiceMetrics(status, service.id)}
                             gradient={service.color as any || 'blue'}
                             showPattern={true}
                             layout="grid"
                             columns={4}
                           />
                         </div>
-                      )}
+                      ) : null}
 
                       {/* Health Checks Details */}
                       {status?.data?.checks && !status?.loading && (
@@ -852,6 +1170,105 @@ export default function HealthPage() {
             })
           )}
         </motion.div>
+
+        {/* Monitoring Configuration Dialog */}
+        <Dialog open={showMonitoringConfig} onOpenChange={setShowMonitoringConfig}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Configure Monitoring</DialogTitle>
+              <DialogDescription>
+                Enable or disable monitoring for each service. Inactive services will not be checked.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              {services.map((service) => (
+                <div
+                  key={service.id}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div 
+                      className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: `${service.color || 'blue'}20` }}
+                    >
+                      <IconRenderer 
+                        iconName={service.icon} 
+                        className={`h-6 w-6 text-${service.color || 'blue'}-500`}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-gray-900 dark:text-gray-100 truncate">
+                        {service.serviceTitle}
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                        {service.id}
+                      </div>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={service.monitoringEnabled !== false}
+                    onCheckedChange={(checked) => toggleMonitoring(service.id, checked)}
+                  />
+                </div>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Service Configuration Dialog */}
+        <Dialog open={configServiceId !== null} onOpenChange={(open) => !open && setConfigServiceId(null)}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Configure Service</DialogTitle>
+              <DialogDescription>
+                {configServiceId && services.find(s => s.id === configServiceId)?.serviceTitle}
+              </DialogDescription>
+            </DialogHeader>
+            {configServiceId && (() => {
+              const service = services.find(s => s.id === configServiceId);
+              if (!service) return null;
+              
+              return (
+                <div className="space-y-4 mt-4">
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <div className="font-medium text-gray-900 dark:text-gray-100">Monitoring</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        Enable health checks for this service
+                      </div>
+                    </div>
+                    <Switch
+                      checked={service.monitoringEnabled !== false}
+                      onCheckedChange={(checked) => {
+                        toggleMonitoring(service.id, checked);
+                        setConfigServiceId(null);
+                      }}
+                    />
+                  </div>
+                  <div className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-900/50">
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Service Details</div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">ID:</span>
+                        <span className="text-gray-900 dark:text-gray-100 font-mono">{service.id}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">API:</span>
+                        <span className="text-gray-900 dark:text-gray-100 font-mono text-xs truncate max-w-[200px]">
+                          {service.healthApi}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Status Path:</span>
+                        <span className="text-gray-900 dark:text-gray-100 font-mono">{service.healthyJsonPath}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </DialogContent>
+        </Dialog>
       </div>
     </MainLayout>
   );

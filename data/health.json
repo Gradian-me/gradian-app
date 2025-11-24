@@ -5,7 +5,7 @@
     "icon": "Activity",
     "color": "blue",
     "healthApi": "http://localhost:3000/api/health",
-    "healthyJsonPath": "status"
+    "healthyJsonPath": "status",
+    "monitoringEnabled": true
   }
 ]
-

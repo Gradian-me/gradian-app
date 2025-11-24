@@ -81,6 +81,8 @@ export async function POST(request: NextRequest) {
       color: body.color || 'blue',
       healthApi: body.healthApi,
       healthyJsonPath: body.healthyJsonPath || 'status',
+      isActive: body.isActive !== undefined ? body.isActive : true, // Default to active
+      monitoringEnabled: body.monitoringEnabled !== undefined ? body.monitoringEnabled : true, // Default to enabled
     };
     
     healthServices.push(newService);
