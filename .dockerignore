@@ -50,7 +50,6 @@ dist
 
 # Docker
 Dockerfile*
-.dockerignore
 docker-compose*.yml
 
 # Documentation
@@ -78,7 +77,3 @@ Thumbs.db
 
 # Scripts (optional - remove if you need them at runtime)
 scripts
-
-# Data files (optional - remove if you need them at runtime)
-data
-
