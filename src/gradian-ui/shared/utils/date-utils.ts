@@ -98,3 +98,37 @@ export function formatCustom(
   return format(dateObj, formatString, { locale: enUS });
 }
 
+/**
+ * Formats a date with date and time, with fallback for null/empty values
+ * @param dateString - The date string to format (can be null or empty)
+ * @param fallback - Fallback text when date is null/empty (default: 'Never')
+ * @returns Formatted date string or fallback
+ * 
+ * @example
+ * formatDateTimeWithFallback('2024-12-10T10:30:00Z') // "Dec 10, 2024 10:30 AM"
+ * formatDateTimeWithFallback(null) // "Never"
+ * formatDateTimeWithFallback(null, 'Not set') // "Not set"
+ */
+export function formatDateTimeWithFallback(
+  dateString: string | null | undefined,
+  fallback: string = 'Never'
+): string {
+  if (!dateString) return fallback;
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return fallback;
+    
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    }).format(date);
+  } catch {
+    return fallback;
+  }
+}
+

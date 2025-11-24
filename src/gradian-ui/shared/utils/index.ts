@@ -305,6 +305,8 @@ export * from './api';
 export * from './validation';
 export * from './logging-custom';
 export * from './date-utils';
+export * from './time-utils';
+export * from './dom-utils';
 export * from './icon-renderer';
 export * from './number-formatter';
 export * from './highlighter';
