@@ -9,6 +9,7 @@ import {
 } from '@/gradian-ui/indexdb-manager/cache-strategies';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { toast } from 'sonner';
 
 // Helper function to resolve API endpoint URL
 // IMPORTANT: Always use relative URLs so requests go through Next.js API routes
@@ -63,6 +64,56 @@ const extractCallerFromStack = (): string | undefined => {
 };
 
 const isBrowserEnvironment = (): boolean => typeof window !== 'undefined';
+
+/**
+ * Checks if an error is a connection/timeout error
+ */
+const isConnectionError = (error: any, statusCode?: number): boolean => {
+  // Check for 502 Bad Gateway status (proxy errors)
+  if (statusCode === 502) {
+    return true;
+  }
+
+  // Check for fetch failed errors
+  if (error?.message?.toLowerCase().includes('fetch failed')) {
+    return true;
+  }
+
+  // Check for timeout errors
+  if (error?.code === 'UND_ERR_CONNECT_TIMEOUT' || 
+      error?.name === 'ConnectTimeoutError' ||
+      error?.message?.toLowerCase().includes('timeout') ||
+      error?.message?.toLowerCase().includes('connect timeout')) {
+    return true;
+  }
+
+  // Check for network errors
+  if (error?.name === 'TypeError' && error?.message?.toLowerCase().includes('failed to fetch')) {
+    return true;
+  }
+
+  // Check for connection refused or connection errors
+  if (error?.message?.toLowerCase().includes('connection') && 
+      (error?.message?.toLowerCase().includes('refused') || 
+       error?.message?.toLowerCase().includes('out') ||
+       error?.message?.toLowerCase().includes('failed'))) {
+    return true;
+  }
+
+  return false;
+};
+
+/**
+ * Shows a connection error toast notification (only on client side)
+ */
+const showConnectionErrorToast = (): void => {
+  if (isBrowserEnvironment()) {
+    toast.error('Connection is out', {
+      description: 'Unable to connect to the server. Please check your connection and try again.',
+      duration: 5000,
+    });
+  }
+};
 
 function normalizeEndpointWithParams(endpoint: string, params?: Record<string, any>): string {
   const [basePath, queryString = ''] = endpoint.split('?');
@@ -135,10 +186,16 @@ export class ApiClient {
       };
 
       if (!response.ok) {
+        const errorMessage = data.error || data.message || '';
+        // Check if it's a connection error (502 Bad Gateway or error message indicates connection issue)
+        if (isConnectionError(null, response.status) || isConnectionError({ message: errorMessage })) {
+          showConnectionErrorToast();
+        }
+        
         // Return error response with status code, preserving messages if present
         return {
           success: false,
-          error: data.error || data.message || `HTTP error! status: ${response.status}`,
+          error: errorMessage || `HTTP error! status: ${response.status}`,
           statusCode: response.status,
           data: null as any,
           messages: data.messages,
@@ -148,6 +205,11 @@ export class ApiClient {
 
       return responseWithStatus;
     } catch (error) {
+      // Check if it's a connection/timeout error
+      if (isConnectionError(error)) {
+        showConnectionErrorToast();
+      }
+      
       // If it's a network error, we don't have a status code
       const errorResponse = handleError(error);
       return {
@@ -317,8 +379,21 @@ export async function apiRequest<T>(
       return await cacheStrategy.postRequest(cacheStrategyContext, response, cacheStrategyPreResult);
     }
 
+    // Check for connection errors in the response
+    if (!response.success) {
+      const errorMessage = response.error || '';
+      if (isConnectionError(null, response.statusCode) || isConnectionError({ message: errorMessage })) {
+        showConnectionErrorToast();
+      }
+    }
+
     return response;
   } catch (error) {
+    // Check if it's a connection/timeout error
+    if (isConnectionError(error)) {
+      showConnectionErrorToast();
+    }
+    
     return {
       success: false,
       error: formatApiError(error),
