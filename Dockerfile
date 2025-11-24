@@ -79,6 +79,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 
+# Copy data directory (contains JSON files used at runtime)
+COPY --from=builder --chown=nextjs:nodejs /app/data ./data
+
 # Switch to non-root user
 USER nextjs
 
