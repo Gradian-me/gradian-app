@@ -4,7 +4,7 @@
     "serviceTitle": "Gradian App",
     "icon": "Activity",
     "color": "indigo",
-    "healthApi": "http://localhost:3000/api/health",
+    "healthApi": "/api/health",
     "healthyJsonPath": "status",
     "monitoringEnabled": true,
     "isActive": true

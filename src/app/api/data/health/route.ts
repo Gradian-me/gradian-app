@@ -1,16 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile, writeFile } from 'fs/promises';
+import { readFile, writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
+import { existsSync } from 'fs';
 
 const DATA_FILE = join(process.cwd(), 'data', 'health.json');
+const DATA_DIR = join(process.cwd(), 'data');
+
+/**
+ * Ensure data directory and file exist
+ */
+async function ensureDataFile(): Promise<void> {
+  try {
+    // Ensure data directory exists
+    if (!existsSync(DATA_DIR)) {
+      await mkdir(DATA_DIR, { recursive: true });
+    }
+    
+    // Ensure health.json file exists
+    if (!existsSync(DATA_FILE)) {
+      const defaultServices: any[] = [];
+      await writeFile(DATA_FILE, JSON.stringify(defaultServices, null, 2), 'utf-8');
+    }
+  } catch (error) {
+    console.error('Error ensuring data file:', error);
+    // Continue anyway - will handle in read operations
+  }
+}
+
+/**
+ * Read health services from file
+ */
+async function readHealthServices(): Promise<any[]> {
+  try {
+    await ensureDataFile();
+    const fileContent = await readFile(DATA_FILE, 'utf-8');
+    const healthServices = JSON.parse(fileContent);
+    return Array.isArray(healthServices) ? healthServices : [];
+  } catch (error) {
+    // If file doesn't exist or is invalid, return empty array
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      await ensureDataFile();
+      return [];
+    }
+    console.error('Error reading health services:', error);
+    return [];
+  }
+}
 
 /**
  * GET - Get all health services
  */
 export async function GET(request: NextRequest) {
   try {
-    const fileContent = await readFile(DATA_FILE, 'utf-8');
-    const healthServices = JSON.parse(fileContent);
+    const healthServices = await readHealthServices();
     
     // Support search parameter
     const searchParams = request.nextUrl.searchParams;
@@ -20,8 +62,8 @@ export async function GET(request: NextRequest) {
     if (search) {
       const searchLower = search.toLowerCase();
       filteredServices = healthServices.filter((service: any) =>
-        service.serviceTitle.toLowerCase().includes(searchLower) ||
-        service.id.toLowerCase().includes(searchLower)
+        service.serviceTitle?.toLowerCase().includes(searchLower) ||
+        service.id?.toLowerCase().includes(searchLower)
       );
     }
     
@@ -31,6 +73,7 @@ export async function GET(request: NextRequest) {
       count: filteredServices.length
     });
   } catch (error) {
+    console.error('Error in GET /api/data/health:', error);
     return NextResponse.json(
       {
         success: false,
@@ -59,8 +102,7 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const fileContent = await readFile(DATA_FILE, 'utf-8');
-    const healthServices = JSON.parse(fileContent);
+    const healthServices = await readHealthServices();
     
     // Check if service with same id already exists
     if (healthServices.find((s: any) => s.id === body.id)) {
@@ -87,6 +129,9 @@ export async function POST(request: NextRequest) {
     
     healthServices.push(newService);
     
+    // Ensure data file exists before writing
+    await ensureDataFile();
+    
     // Write back to file
     await writeFile(DATA_FILE, JSON.stringify(healthServices, null, 2), 'utf-8');
     
@@ -95,6 +140,7 @@ export async function POST(request: NextRequest) {
       data: newService
     }, { status: 201 });
   } catch (error) {
+    console.error('Error in POST /api/data/health:', error);
     return NextResponse.json(
       {
         success: false,
@@ -122,8 +168,7 @@ export async function PUT(request: NextRequest) {
       );
     }
     
-    const fileContent = await readFile(DATA_FILE, 'utf-8');
-    const healthServices = JSON.parse(fileContent);
+    const healthServices = await readHealthServices();
     
     const index = healthServices.findIndex((s: any) => s.id === body.id);
     if (index === -1) {
@@ -143,6 +188,9 @@ export async function PUT(request: NextRequest) {
       id: body.id, // Ensure id doesn't change
     };
     
+    // Ensure data file exists before writing
+    await ensureDataFile();
+    
     // Write back to file
     await writeFile(DATA_FILE, JSON.stringify(healthServices, null, 2), 'utf-8');
     
@@ -151,6 +199,7 @@ export async function PUT(request: NextRequest) {
       data: healthServices[index]
     });
   } catch (error) {
+    console.error('Error in PUT /api/data/health:', error);
     return NextResponse.json(
       {
         success: false,
@@ -179,8 +228,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
     
-    const fileContent = await readFile(DATA_FILE, 'utf-8');
-    const healthServices = JSON.parse(fileContent);
+    const healthServices = await readHealthServices();
     
     const index = healthServices.findIndex((s: any) => s.id === id);
     if (index === -1) {
@@ -196,6 +244,9 @@ export async function DELETE(request: NextRequest) {
     // Remove service
     healthServices.splice(index, 1);
     
+    // Ensure data file exists before writing
+    await ensureDataFile();
+    
     // Write back to file
     await writeFile(DATA_FILE, JSON.stringify(healthServices, null, 2), 'utf-8');
     
@@ -204,6 +255,7 @@ export async function DELETE(request: NextRequest) {
       message: `Health service "${id}" deleted successfully`
     });
   } catch (error) {
+    console.error('Error in DELETE /api/data/health:', error);
     return NextResponse.json(
       {
         success: false,

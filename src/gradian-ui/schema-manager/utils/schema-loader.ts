@@ -9,6 +9,7 @@ import { config } from '@/lib/config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { loadData, loadDataById, clearCache as clearDataCache } from '@/gradian-ui/shared/utils/data-loader';
+import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
 import fs from 'fs';
 import path from 'path';
 
@@ -169,6 +170,7 @@ export async function loadAllSchemas(): Promise<FormSchema[]> {
   
   // Always use API endpoint with caching (works for both DEMO_MODE=true and DEMO_MODE=false)
   // When DEMO_MODE=true and schemaApi.basePath points to local API, we can read directly from file to avoid nested HTTP calls
+  // When DEMO_MODE=false, we must use API route which will proxy to external backend
   const apiPath = config.schemaApi.basePath;
   const isServerRuntime = typeof window === 'undefined';
   const isLocalApiPath =
@@ -176,7 +178,18 @@ export async function loadAllSchemas(): Promise<FormSchema[]> {
     apiPath.startsWith('/api') ||
     apiPath.startsWith('http://localhost') ||
     apiPath.startsWith('https://localhost');
-  const shouldReadFromFile = isServerRuntime && isLocalApiPath;
+  
+  // Check demo mode - only read from file if demo mode is enabled
+  let isDemoMode = true; // Default to true for safety
+  try {
+    // Use loadApplicationVariables directly (same as isDemoModeEnabled but without API dependency)
+    const vars = loadApplicationVariables();
+    isDemoMode = vars.DEMO_MODE;
+  } catch {
+    // If loader fails, assume demo mode is true (safe default)
+  }
+  
+  const shouldReadFromFile = isServerRuntime && isLocalApiPath && isDemoMode;
 
   try {
     return await loadData<FormSchema[]>(
@@ -208,16 +221,21 @@ export async function loadAllSchemas(): Promise<FormSchema[]> {
     loggingCustom(
       LogType.SCHEMA_LOADER,
       'warn',
-      `Failed to load schemas from API (${error instanceof Error ? error.message : 'Unknown error'}). Falling back to filesystem.`
+      `Failed to load schemas from API (${error instanceof Error ? error.message : 'Unknown error'}). ${isDemoMode ? 'Falling back to filesystem.' : 'Demo mode is disabled, cannot fallback to filesystem.'}`
     );
 
-    // Fallback to filesystem if API fails
-    const schemasFromFile = readSchemasFromFile();
-    if (schemasFromFile) {
-      return schemasFromFile;
+    // Only fallback to filesystem if demo mode is enabled
+    // When demo mode is false, API failures should propagate (external API is required)
+    if (isDemoMode) {
+      const schemasFromFile = readSchemasFromFile();
+      if (schemasFromFile) {
+        return schemasFromFile;
+      }
+      loggingCustom(LogType.SCHEMA_LOADER, 'error', 'Schemas file not found while attempting filesystem fallback.');
+    } else {
+      loggingCustom(LogType.SCHEMA_LOADER, 'error', 'API request failed and demo mode is disabled. External API is required.');
     }
-
-    loggingCustom(LogType.SCHEMA_LOADER, 'error', 'Schemas file not found while attempting filesystem fallback.');
+    
     return [];
   }
 }
@@ -264,16 +282,37 @@ export async function loadSchemaById(schemaId: string): Promise<FormSchema | nul
   const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build';
   
   if (isBuildTime) {
-    // Build time - read directly from file system (no API calls during build)
     const schemasFromFile = readSchemasFromFile();
     if (schemasFromFile) {
       const fileSchema = schemasFromFile.find(s => s.id === schemaId);
       if (fileSchema) {
-        return processSchema(fileSchema);
+        return fileSchema; // Already processed by readSchemasFromFile
       }
     }
-    // Schema not found in file
     return null;
+  }
+  
+  // Check demo mode - if false, always use API (which will proxy to external backend)
+  // If true, try filesystem first for performance, then fall back to API
+  let shouldTryFilesystem = false;
+  try {
+    // Use loadApplicationVariables directly (same as isDemoModeEnabled but without API dependency)
+    const vars = loadApplicationVariables();
+    shouldTryFilesystem = vars.DEMO_MODE;
+  } catch {
+    // If loader fails, assume demo mode is true (safe default for filesystem reads)
+    shouldTryFilesystem = true;
+  }
+  
+  // Try filesystem first only if demo mode is enabled
+  if (shouldTryFilesystem) {
+    const schemasFromFile = readSchemasFromFile();
+    if (schemasFromFile) {
+      const fileSchema = schemasFromFile.find(s => s.id === schemaId);
+      if (fileSchema) {
+        return fileSchema; // Already processed by readSchemasFromFile
+      }
+    }
   }
   
   // Runtime - use loadDataById to cache individual schemas in an array
@@ -311,18 +350,10 @@ export async function loadSchemaById(schemaId: string): Promise<FormSchema | nul
     loggingCustom(
       LogType.SCHEMA_LOADER,
       'warn',
-      `Failed to load schema ${schemaId} from API (${error instanceof Error ? error.message : 'Unknown error'}). Falling back to filesystem.`
+      `Failed to load schema ${schemaId} from API (${error instanceof Error ? error.message : 'Unknown error'}). Filesystem already tried.`
     );
     
-    // Fallback to filesystem if API fails
-    const schemasFromFile = readSchemasFromFile();
-    if (schemasFromFile) {
-      const fileSchema = schemasFromFile.find(s => s.id === schemaId);
-      if (fileSchema) {
-        return processSchema(fileSchema);
-      }
-    }
-    
+    // Filesystem already tried at the beginning, return null
     return null;
   }
 }

@@ -3,7 +3,6 @@
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
-import { fetchSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry';
 import { DynamicDetailPageClient } from './DynamicDetailPageClient';
 import { getAllSchemasArray } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
 
@@ -70,7 +69,9 @@ export default async function DynamicDetailPage({ params }: PageProps) {
 
 export async function generateMetadata({ params }: PageProps) {
   const { 'schema-id': schemaId, 'data-id': dataId } = await params;
-  const schema = await fetchSchemaById(schemaId);
+  // Use getAllSchemasArray and find schema for consistency and reliability
+  const navigationSchemas = await getAllSchemasArray();
+  const schema = navigationSchemas.find((entry) => entry.id === schemaId) ?? null;
 
   if (!schema) {
     return {

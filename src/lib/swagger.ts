@@ -547,8 +547,8 @@ export const swaggerDocument = {
           '- **raw** (hidden): Hide variable from GitLab UI\n\n' +
           'Example .env comment format:\n' +
           '```\n' +
-          '# GITLAB_DATABASE_URL: protected=true, masked=true, raw=true\n' +
-          'DATABASE_URL=postgresql://...\n' +
+          '# GITLAB_JWT_SECRET: protected=true, masked=true, raw=true\n' +
+          'JWT_SECRET=your-secret-key\n' +
           '```',
         requestBody: {
           required: false,
@@ -566,11 +566,6 @@ export const swaggerDocument = {
                       environment_scope: '*',
                     },
                     variableOptions: {
-                      DATABASE_URL: {
-                        protected: true,
-                        masked: true,
-                        raw: false,
-                      },
                       JWT_SECRET: {
                         protected: true,
                         masked: true,
@@ -612,7 +607,7 @@ export const swaggerDocument = {
                       updated: 5,
                       failed: 0,
                       details: {
-                        created: ['DATABASE_URL', 'NEXTAUTH_SECRET', 'JWT_SECRET'],
+                        created: ['NEXTAUTH_SECRET', 'JWT_SECRET'],
                         updated: ['NEXT_PUBLIC_CLIENT_ID', 'CLIENT_ID'],
                         failed: [],
                       },
@@ -915,7 +910,7 @@ export const swaggerDocument = {
               created: {
                 type: 'array',
                 items: { type: 'string' },
-                example: ['DATABASE_URL', 'NEXTAUTH_SECRET'],
+                example: ['NEXTAUTH_SECRET', 'JWT_SECRET'],
                 description: 'List of variable keys that were created.',
               },
               updated: {

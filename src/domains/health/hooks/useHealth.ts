@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { toast } from 'sonner';
 import { HealthService, ServiceHealthStatus, HealthCheckResponse } from '../types';
@@ -16,6 +16,7 @@ export interface UseHealthReturn {
   refreshing: Set<string>;
   autoRefresh: boolean;
   refreshIntervalSeconds: number;
+  timerKey: number;
   testUnhealthyServices: Set<string>;
   isDemoMode: boolean;
   
@@ -24,6 +25,7 @@ export interface UseHealthReturn {
   setRefreshIntervalSeconds: (seconds: number) => void;
   checkHealth: (service: HealthService) => Promise<void>;
   checkAllHealth: () => Promise<void>;
+  handleTimerComplete: () => Promise<void>;
   toggleTestUnhealthy: (serviceId: string, enabled: boolean) => void;
   toggleMonitoring: (serviceId: string, enabled: boolean) => Promise<void>;
   refreshServices: () => Promise<void>;
@@ -39,7 +41,6 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
   const [timerKey, setTimerKey] = useState(0);
   const [testUnhealthyServices, setTestUnhealthyServices] = useState<Set<string>>(new Set());
   const [isDemoMode, setIsDemoMode] = useState(false);
-  const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch demo mode from API
   useEffect(() => {
@@ -114,6 +115,8 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
         ...prev[service.id],
         loading: true,
         error: null,
+        // Preserve existing data during refresh
+        data: prev[service.id]?.data || null,
       },
     }));
 
@@ -168,13 +171,16 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
     const activeServices = services.filter(service => service.monitoringEnabled !== false);
     const promises = activeServices.map(service => checkHealth(service));
     await Promise.all(promises);
-    // Reset timer after check completes
-    if (autoRefresh && refreshIntervalSeconds > 0) {
-      setTimerKey(prev => prev + 1);
-    }
-  }, [services, checkHealth, autoRefresh, refreshIntervalSeconds]);
+  }, [services, checkHealth]);
 
-  // Auto-refresh effect
+  // Handle timer completion - triggers health check
+  const handleTimerComplete = useCallback(async () => {
+    if (autoRefresh) {
+      await checkAllHealth();
+    }
+  }, [autoRefresh, checkAllHealth]);
+
+  // Auto-refresh effect - initialize timer and do initial check
   useEffect(() => {
     const activeServices = services.filter(service => service.monitoringEnabled !== false);
 
@@ -182,34 +188,15 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
       autoRefresh && activeServices.length > 0 && refreshIntervalSeconds > 0;
 
     if (!shouldAutoRefresh) {
-      if (refreshIntervalRef.current) {
-        clearInterval(refreshIntervalRef.current);
-        refreshIntervalRef.current = null;
-      }
       return;
     }
 
-    // Reset timer when starting auto refresh
+    // Reset timer when starting auto refresh or when interval changes
+    // This restarts the timer with the new duration
     setTimerKey(prev => prev + 1);
 
     // Initial check
     checkAllHealth();
-
-    // Set up interval with user-defined seconds
-    const interval = setInterval(() => {
-      checkAllHealth();
-    }, refreshIntervalSeconds * 1000);
-
-    refreshIntervalRef.current = interval;
-
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-        if (refreshIntervalRef.current === interval) {
-          refreshIntervalRef.current = null;
-        }
-      }
-    };
   }, [autoRefresh, services, refreshIntervalSeconds, checkAllHealth]);
 
   // Toggle test unhealthy
@@ -274,6 +261,7 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
     refreshing,
     autoRefresh,
     refreshIntervalSeconds,
+    timerKey,
     testUnhealthyServices,
     isDemoMode,
     
@@ -282,6 +270,7 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
     setRefreshIntervalSeconds,
     checkHealth,
     checkAllHealth,
+    handleTimerComplete,
     toggleTestUnhealthy,
     toggleMonitoring,
     refreshServices,

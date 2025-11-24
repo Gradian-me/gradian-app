@@ -8,6 +8,7 @@
 import React from 'react';
 import { cn } from '@/gradian-ui/shared/utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { PingOnChange } from '@/gradian-ui/layout/ping-on-change';
 import type { MetricCardProps, MetricItem } from '../types';
 
 const gradientClasses: Record<string, string> = {
@@ -139,6 +140,9 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   layout = 'grid',
   columns,
   className,
+  pingOnChange = false,
+  getMetricValue,
+  getPingColor,
   ...props
 }) => {
   // Auto-detect columns from metrics length if not provided
@@ -220,12 +224,31 @@ export const MetricCard: React.FC<MetricCardProps> = ({
                         {metric.prefix}
                       </span>
                     )}
-                    <span className={cn(
-                      'text-2xl font-bold',
-                      valueColor
-                    )}>
-                      {formatValue(metric)}
-                    </span>
+                    {pingOnChange && getMetricValue ? (
+                      <PingOnChange 
+                        value={getMetricValue(metric.id)} 
+                        color={getPingColor ? getPingColor(metric) : (
+                          metric.iconColor === 'green' ? 'green' : 
+                          metric.iconColor === 'red' ? 'red' : 
+                          metric.iconColor === 'yellow' ? 'yellow' : 
+                          'blue'
+                        )}
+                      >
+                        <span className={cn(
+                          'text-2xl font-bold',
+                          valueColor
+                        )}>
+                          {formatValue(metric)}
+                        </span>
+                      </PingOnChange>
+                    ) : (
+                      <span className={cn(
+                        'text-2xl font-bold',
+                        valueColor
+                      )}>
+                        {formatValue(metric)}
+                      </span>
+                    )}
                     {metric.unit && (
                       <span className={cn(
                         'text-sm font-medium',

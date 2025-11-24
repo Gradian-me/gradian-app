@@ -137,7 +137,8 @@ export async function fetchSchemaById(schemaId: string): Promise<FormSchema | nu
       // Direct import path works here since we're already inside server-side check        
       const { loadSchemaById } = await import('./schema-loader') as typeof import('./schema-loader');
       const schema = await loadSchemaById(schemaId);
-      return schema ? processSchema(schema) : null;
+      // loadSchemaById already returns a processed FormSchema, so no need to process again
+      return schema;
     } else {
       // Client side - fetch from API with cache-busting
       const response = await fetch(`${config.schemaApi.basePath}/${schemaId}`, {

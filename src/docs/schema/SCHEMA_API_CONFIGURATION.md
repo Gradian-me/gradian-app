@@ -58,10 +58,6 @@ Server-side schema loading continues to read directly from `data/all-schemas.jso
 `src/lib/config.ts`:
 ```typescript
 export const config = {
-  dataSource: process.env.DATA_SOURCE || 'mock',
-  database: {
-    url: process.env.DATABASE_URL || '',
-  },
   schemaApi: {
     basePath: process.env.NEXT_PUBLIC_SCHEMA_API_BASE || '/api/schemas',
   },

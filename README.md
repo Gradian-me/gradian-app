@@ -44,12 +44,11 @@ gradian-scm/
 │   ├── stores/             # Zustand stores for realtime state
 │   └── shared/             # Cross-cutting utils, types, constants
 ├── docs/                   # Vision, prompts, architecture deep dives
-└── prisma/                 # Optional relational mirror of the graph
 ```
 
 ### Core Layers
 
-- **Graph Data Layer** – JSON-first graph definitions fed into Prisma or external sources when needed.
+- **Graph Data Layer** – JSON-first graph definitions for all data storage.
 - **Decision Services** – Domain services transform raw signals into alerts, recommendations, or automation triggers.
 - **Experience Kit** – `gradian-ui` delivers interactive graph canvases, analytics lenses, and narrative dashboards.
 
@@ -114,14 +113,13 @@ npm run start     # Run production build locally
 npm run lint      # ESLint + formatting checks
 ```
 
-Additional scripts live in `scripts/` for data conversion, schema cleanup, and database setup. See `DATABASE_SETUP.md` for Prisma usage.
+Additional scripts live in `scripts/` for data conversion and schema cleanup.
 
 ## 📚 Deep Dives
 
 - [Quick Start Guide](./QUICK_START_GUIDE.md)
 - [Dynamic CRUD Architecture](./DYNAMIC_CRUD_ARCHITECTURE.md)
 - [Schema to Page Flow](./SCHEMA_TO_PAGE_FLOW.md)
-- [Mock Data Refactor](./MOCK_DATA_REFACTOR.md)
 - [Schema API Configuration](./SCHEMA_API_CONFIGURATION.md)
 
 ## 🤝 Contributing

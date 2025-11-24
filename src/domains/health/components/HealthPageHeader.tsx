@@ -6,30 +6,30 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { CircularTimer } from '@/components/ui/circular-timer';
-import { Activity, RefreshCw, Settings, Plus } from 'lucide-react';
+import { Activity, RefreshCw, Plus } from 'lucide-react';
 
 interface HealthPageHeaderProps {
   onNewService: () => void;
-  onConfigureMonitoring: () => void;
   autoRefresh: boolean;
   refreshIntervalSeconds: number;
   timerKey: number;
   onAutoRefreshChange: (enabled: boolean) => void;
   onRefreshIntervalChange: (seconds: number) => void;
   onRefreshAll: () => Promise<void>;
+  onTimerComplete: () => void;
   refreshing: boolean;
   loading: boolean;
 }
 
 export function HealthPageHeader({
   onNewService,
-  onConfigureMonitoring,
   autoRefresh,
   refreshIntervalSeconds,
   timerKey,
   onAutoRefreshChange,
   onRefreshIntervalChange,
   onRefreshAll,
+  onTimerComplete,
   refreshing,
   loading,
 }: HealthPageHeaderProps) {
@@ -53,15 +53,6 @@ export function HealthPageHeader({
         >
           <Plus className="h-4 w-4" />
           New Service
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onConfigureMonitoring}
-          className="flex items-center gap-2"
-        >
-          <Settings className="h-4 w-4" />
-          Configure Monitoring
         </Button>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -88,7 +79,8 @@ export function HealthPageHeader({
               size={40}
               strokeWidth={4}
               onComplete={() => {
-                // Timer will reset automatically
+                // Trigger health check when timer completes
+                onTimerComplete();
               }}
               colors={['#7C3AED', '#F97316', '#FACC15', '#EF4444']}
             />

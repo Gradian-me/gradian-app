@@ -229,7 +229,7 @@ InvoiceItem {
 ## 8) Data & Persistence
 
 * Start with TypeScript/JSON data under `/data`.
-* Repositories abstracted for DB migration (Prisma with Postgres ready).
+* Repositories abstracted for data access using JSON-based storage.
 
 ---
 

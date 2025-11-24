@@ -189,15 +189,6 @@ du -sh .next/cache
 
 If cache becomes too large (>500MB), consider clearing it.
 
-### 4. Prisma Client Caching
-
-Prisma client generation is also cached. The generated client is stored in `node_modules/.prisma/client/` and is cached by npm.
-
-To regenerate Prisma client:
-
-```bash
-npm run db:generate
-```
 
 ## Troubleshooting
 

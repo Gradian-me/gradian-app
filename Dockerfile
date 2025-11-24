@@ -32,9 +32,6 @@ RUN npm ci --legacy-peer-deps --include=optional --prefer-offline --no-audit
 # Copy source code
 COPY . .
 
-# Generate Prisma Client (required before build)
-RUN npx prisma generate
-
 # Build the application
 RUN npm run build
 
@@ -74,10 +71,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 
 # Copy static files
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy Prisma files if needed (for migrations at runtime)
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 
 # Copy data directory (contains JSON files used at runtime)
 COPY --from=builder --chown=nextjs:nodejs /app/data ./data

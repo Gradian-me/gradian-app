@@ -11,9 +11,7 @@ import { InactiveServicesSummary } from './InactiveServicesSummary';
 import { UnhealthyServicesSummary } from './UnhealthyServicesSummary';
 import { ServiceCardsList } from './ServiceCardsList';
 import { ServiceFormDialog } from './ServiceFormDialog';
-import { MonitoringConfigDialog } from './MonitoringConfigDialog';
 import { ServiceConfigDialog } from './ServiceConfigDialog';
-// import { ServiceConfigDialog } from './ServiceConfigDialog';
 
 export function HealthPage() {
   const {
@@ -23,12 +21,14 @@ export function HealthPage() {
     refreshing,
     autoRefresh,
     refreshIntervalSeconds,
+    timerKey,
     testUnhealthyServices,
     isDemoMode,
     setAutoRefresh,
     setRefreshIntervalSeconds,
     checkHealth,
     checkAllHealth,
+    handleTimerComplete,
     toggleTestUnhealthy,
     toggleMonitoring,
     refreshServices,
@@ -47,8 +47,6 @@ export function HealthPage() {
   } = useHealthService();
 
   const [configServiceId, setConfigServiceId] = useState<string | null>(null);
-  const [showMonitoringConfig, setShowMonitoringConfig] = useState(false);
-  const [timerKey, setTimerKey] = useState(0);
 
   const stats = calculateHealthStats(services, healthStatuses, testUnhealthyServices);
 
@@ -74,7 +72,6 @@ export function HealthPage() {
       <div className="space-y-6">
         <HealthPageHeader
           onNewService={openNewServiceForm}
-          onConfigureMonitoring={() => setShowMonitoringConfig(true)}
           autoRefresh={autoRefresh}
           refreshIntervalSeconds={refreshIntervalSeconds}
           timerKey={timerKey}
@@ -82,10 +79,8 @@ export function HealthPage() {
           onRefreshIntervalChange={setRefreshIntervalSeconds}
           onRefreshAll={async () => {
             await checkAllHealth();
-            if (autoRefresh && refreshIntervalSeconds > 0) {
-              setTimerKey(prev => prev + 1);
-            }
           }}
+          onTimerComplete={handleTimerComplete}
           refreshing={refreshing.size > 0}
           loading={loading}
         />
@@ -136,13 +131,6 @@ export function HealthPage() {
           onSave={handleSaveService}
         />
 
-        <MonitoringConfigDialog
-          isOpen={showMonitoringConfig}
-          onClose={() => setShowMonitoringConfig(false)}
-          services={services}
-          onToggleMonitoring={toggleMonitoring}
-        />
-
         {configServiceId && (
           <ServiceConfigDialog
             serviceId={configServiceId}
@@ -151,6 +139,9 @@ export function HealthPage() {
             onEdit={openEditServiceForm}
             onDelete={handleDeleteService}
             onToggleMonitoring={toggleMonitoring}
+            onToggleTestUnhealthy={toggleTestUnhealthy}
+            isDemoMode={isDemoMode}
+            isTestUnhealthy={testUnhealthyServices.has(configServiceId)}
           />
         )}
       </div>

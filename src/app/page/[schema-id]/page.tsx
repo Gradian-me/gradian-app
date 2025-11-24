@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { DynamicEntityPageClient } from './DynamicEntityPageClient';
 import { getAllSchemasArray, getAvailableSchemaIds } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
-import { fetchSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 
 // Set revalidate to 0 to force dynamic rendering
@@ -46,8 +45,9 @@ function serializeSchema(schema: FormSchema): any {
 
 export default async function DynamicEntityPage({ params }: PageProps) {
   const { 'schema-id': schemaId } = await params;
-  const schema = await fetchSchemaById(schemaId);
+  // Load all schemas and find the specific one for consistency and reliability
   const navigationSchemas = await getAllSchemasArray();
+  const schema = navigationSchemas.find((entry) => entry.id === schemaId) ?? null;
 
   if (!schema) {
     notFound();
@@ -77,7 +77,9 @@ export default async function DynamicEntityPage({ params }: PageProps) {
 
 export async function generateMetadata({ params }: PageProps) {
   const { 'schema-id': schemaId } = await params;
-  const schema = await fetchSchemaById(schemaId);
+  // Load all schemas and find the specific one for consistency and reliability
+  const navigationSchemas = await getAllSchemasArray();
+  const schema = navigationSchemas.find((entry) => entry.id === schemaId) ?? null;
 
   if (!schema) {
     return {

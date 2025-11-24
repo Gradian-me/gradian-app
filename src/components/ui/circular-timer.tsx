@@ -64,7 +64,7 @@ export function CircularTimer({
         onUpdate={onUpdate}
         onComplete={() => {
           onComplete?.();
-          return { shouldRepeat: false };
+          return { shouldRepeat: true, delay: 0 };
         }}
       >
         {({ remainingTime }) => (

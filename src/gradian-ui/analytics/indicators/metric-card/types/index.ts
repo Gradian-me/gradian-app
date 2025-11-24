@@ -58,5 +58,22 @@ export interface MetricCardProps extends BaseComponentProps {
    * Number of columns for grid layout
    */
   columns?: 1 | 2 | 3 | 4;
+  
+  /**
+   * Enable ping animation on individual metric value changes
+   * @default false
+   */
+  pingOnChange?: boolean;
+  
+  /**
+   * Function to get the raw value for a metric ID (for ping tracking)
+   * Should return the actual value to track changes, not the formatted display value
+   */
+  getMetricValue?: (metricId: string) => any;
+  
+  /**
+   * Ping color for each metric (optional, defaults to metric's iconColor or 'blue')
+   */
+  getPingColor?: (metric: MetricItem) => 'blue' | 'green' | 'red' | 'yellow' | 'purple' | 'orange' | 'gray';
 }
 

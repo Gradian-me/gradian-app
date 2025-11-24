@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { config } from '@/lib/config';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Health check endpoint for Docker/Kubernetes
@@ -21,92 +22,176 @@ export async function GET() {
   let overallStatus: 'healthy' | 'unhealthy' | 'degraded' = 'healthy';
   let httpStatus = 200;
 
-  // Check 1: Application Health (always passes if endpoint is reachable)
-  checks.application = {
-    status: 'healthy',
-    responseTime: 0,
-  };
+  try {
+    // Check 1: Application Health (always passes if endpoint is reachable)
+    checks.application = {
+      status: 'healthy',
+      responseTime: 0,
+    };
 
-  // Check 2: Database Connectivity
-  if (config.dataSource === 'database') {
+    // Check 2: Data Folder Access - Verify data folder file access
+    const dataCheckStartTime = Date.now();
     try {
-      const dbStartTime = Date.now();
-      // Simple query to check database connectivity
-      await prisma.$queryRaw`SELECT 1`;
-      const dbResponseTime = Date.now() - dbStartTime;
+      const dataDir = path.join(process.cwd(), 'data');
+      const criticalFiles = [
+        'health.json',
+        'all-schemas.json',
+        'application-variables.json'
+      ];
       
-      checks.database = {
-        status: 'healthy',
-        message: 'Database connection successful',
-        responseTime: dbResponseTime,
-      };
+      // Check if data directory exists
+      if (!fs.existsSync(dataDir)) {
+        checks.database = {
+          status: 'unhealthy',
+          message: 'Data directory not found',
+          responseTime: Date.now() - dataCheckStartTime,
+        };
+        overallStatus = 'unhealthy';
+        httpStatus = 503;
+      } else {
+        // Check accessibility of critical files
+        const accessibleFiles: string[] = [];
+        const missingFiles: string[] = [];
+        const unreadableFiles: string[] = [];
+        
+        for (const fileName of criticalFiles) {
+          const filePath = path.join(dataDir, fileName);
+          if (!fs.existsSync(filePath)) {
+            missingFiles.push(fileName);
+          } else {
+            try {
+              // Try to read the file to verify read permissions
+              fs.readFileSync(filePath, 'utf-8');
+              accessibleFiles.push(fileName);
+            } catch (readError) {
+              unreadableFiles.push(fileName);
+            }
+          }
+        }
+        
+        // Determine status based on file accessibility
+        if (accessibleFiles.length === criticalFiles.length) {
+          checks.database = {
+            status: 'healthy',
+            message: `All critical files accessible (${accessibleFiles.join(', ')})`,
+            responseTime: Date.now() - dataCheckStartTime,
+          };
+        } else if (accessibleFiles.length > 0) {
+          const messages: string[] = [];
+          if (accessibleFiles.length > 0) {
+            messages.push(`Accessible: ${accessibleFiles.join(', ')}`);
+          }
+          if (missingFiles.length > 0) {
+            messages.push(`Missing: ${missingFiles.join(', ')}`);
+          }
+          if (unreadableFiles.length > 0) {
+            messages.push(`Unreadable: ${unreadableFiles.join(', ')}`);
+          }
+          
+          checks.database = {
+            status: 'degraded',
+            message: `Partial file access - ${messages.join('; ')}`,
+            responseTime: Date.now() - dataCheckStartTime,
+          };
+          if (overallStatus === 'healthy') {
+            overallStatus = 'degraded';
+          }
+        } else {
+          checks.database = {
+            status: 'unhealthy',
+            message: `No critical files accessible. Missing: ${missingFiles.join(', ')}${unreadableFiles.length > 0 ? `; Unreadable: ${unreadableFiles.join(', ')}` : ''}`,
+            responseTime: Date.now() - dataCheckStartTime,
+          };
+          overallStatus = 'unhealthy';
+          httpStatus = 503;
+        }
+      }
     } catch (error) {
-      overallStatus = 'unhealthy';
-      httpStatus = 503;
       checks.database = {
         status: 'unhealthy',
-        message: error instanceof Error ? error.message : 'Database connection failed',
+        message: `Data folder check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        responseTime: Date.now() - dataCheckStartTime,
       };
+      overallStatus = 'unhealthy';
+      httpStatus = 503;
     }
-  } else {
-    // Mock data mode - database not required
-    checks.database = {
-      status: 'healthy',
-      message: 'Using mock data (database not required)',
+
+    // Check 3: Environment Configuration
+    try {
+      const requiredEnvVars = ['NODE_ENV'];
+      const missingEnvVars: string[] = [];
+      
+      requiredEnvVars.forEach((varName) => {
+        if (!process.env[varName]) {
+          missingEnvVars.push(varName);
+        }
+      });
+
+      if (missingEnvVars.length > 0) {
+        checks.environment = {
+          status: 'degraded',
+          message: `Missing environment variables: ${missingEnvVars.join(', ')}`,
+        };
+        if (overallStatus === 'healthy') {
+          overallStatus = 'degraded';
+        }
+      } else {
+        checks.environment = {
+          status: 'healthy',
+          message: 'All required environment variables are set',
+        };
+      }
+    } catch (error) {
+      checks.environment = {
+        status: 'unhealthy',
+        message: error instanceof Error ? error.message : 'Environment check failed',
+      };
+      overallStatus = 'unhealthy';
+      httpStatus = 503;
+    }
+
+    // Calculate total response time
+    const totalResponseTime = Date.now() - startTime;
+
+    // Build response
+    const response = {
+      status: overallStatus,
+      timestamp,
+      service: 'gradian-app',
+      version: process.env.npm_package_version || 'unknown',
+      environment: process.env.NODE_ENV || 'unknown',
+      uptime: process.uptime(), // seconds
+      checks,
+      responseTime: totalResponseTime, // milliseconds
     };
-  }
 
-  // Check 3: Environment Configuration
-  try {
-    const requiredEnvVars = ['NODE_ENV'];
-    const missingEnvVars: string[] = [];
-    
-    requiredEnvVars.forEach((varName) => {
-      if (!process.env[varName]) {
-        missingEnvVars.push(varName);
-      }
-    });
-
-    if (missingEnvVars.length > 0) {
-      checks.environment = {
-        status: 'degraded',
-        message: `Missing environment variables: ${missingEnvVars.join(', ')}`,
-      };
-      if (overallStatus === 'healthy') {
-        overallStatus = 'degraded';
-      }
-    } else {
-      checks.environment = {
-        status: 'healthy',
-        message: 'All required environment variables are set',
-      };
-    }
+    // Return appropriate HTTP status code
+    // 200 = healthy, 503 = unhealthy/degraded
+    return NextResponse.json(response, { status: httpStatus });
   } catch (error) {
-    checks.environment = {
+    // If any error occurs (including fetch failures), return unhealthy status
+    const totalResponseTime = Date.now() - startTime;
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    
+    checks.application = {
       status: 'unhealthy',
-      message: error instanceof Error ? error.message : 'Environment check failed',
+      message: `Health check failed: ${errorMessage}`,
+      responseTime: totalResponseTime,
     };
-    overallStatus = 'unhealthy';
-    httpStatus = 503;
+
+    const errorResponse = {
+      status: 'unhealthy' as const,
+      timestamp,
+      service: 'gradian-app',
+      version: process.env.npm_package_version || 'unknown',
+      environment: process.env.NODE_ENV || 'unknown',
+      uptime: process.uptime(),
+      checks,
+      responseTime: totalResponseTime,
+      error: errorMessage,
+    };
+
+    // Return 503 (Service Unavailable) for unhealthy status
+    return NextResponse.json(errorResponse, { status: 503 });
   }
-
-  // Calculate total response time
-  const totalResponseTime = Date.now() - startTime;
-
-  // Build response
-  const response = {
-    status: overallStatus,
-    timestamp,
-    service: 'gradian-app',
-    version: process.env.npm_package_version || 'unknown',
-    environment: process.env.NODE_ENV || 'unknown',
-    dataSource: config.dataSource,
-    uptime: process.uptime(), // seconds
-    checks,
-    responseTime: totalResponseTime, // milliseconds
-  };
-
-  // Return appropriate HTTP status code
-  // 200 = healthy, 503 = unhealthy/degraded
-  return NextResponse.json(response, { status: httpStatus });
 }

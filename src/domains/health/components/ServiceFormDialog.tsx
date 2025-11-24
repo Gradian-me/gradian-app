@@ -115,7 +115,7 @@ export function ServiceFormDialog({
               id="health-api"
               value={formData.healthApi || ''}
               onChange={(e) => onFormDataChange({ ...formData, healthApi: e.target.value })}
-              placeholder="http://localhost:3000/api/health"
+              placeholder="/api/health"
               type="url"
             />
             <p className="text-xs text-gray-500 dark:text-gray-400">

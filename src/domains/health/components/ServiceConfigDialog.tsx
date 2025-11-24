@@ -13,6 +13,9 @@ interface ServiceConfigDialogProps {
   onEdit: (service: HealthService) => void;
   onDelete: (serviceId: string) => Promise<void>;
   onToggleMonitoring: (serviceId: string, enabled: boolean) => Promise<void>;
+  onToggleTestUnhealthy?: (serviceId: string, enabled: boolean) => void;
+  isDemoMode?: boolean;
+  isTestUnhealthy?: boolean;
 }
 
 export function ServiceConfigDialog({
@@ -22,6 +25,9 @@ export function ServiceConfigDialog({
   onEdit,
   onDelete,
   onToggleMonitoring,
+  onToggleTestUnhealthy,
+  isDemoMode = false,
+  isTestUnhealthy = false,
 }: ServiceConfigDialogProps) {
   if (!service) return null;
 
@@ -50,6 +56,24 @@ export function ServiceConfigDialog({
               }}
             />
           </div>
+          {isDemoMode && onToggleTestUnhealthy && (
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <div className="font-medium text-gray-900 dark:text-gray-100">Test Unhealthy</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Simulate unhealthy status for testing
+                </div>
+              </div>
+              <Switch
+                checked={isTestUnhealthy}
+                disabled={service.monitoringEnabled === false}
+                onCheckedChange={(checked) => {
+                  onToggleTestUnhealthy(service.id, checked);
+                  onClose();
+                }}
+              />
+            </div>
+          )}
           <div className="flex gap-2">
             <Button
               variant="outline"
