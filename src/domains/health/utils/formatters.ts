@@ -5,6 +5,8 @@
 export { formatUptime, formatDuration } from '@/gradian-ui/shared/utils/time-utils';
 export { formatDateTimeWithFallback } from '@/gradian-ui/shared/utils/date-utils';
 
+import { formatDateTimeWithFallback } from '@/gradian-ui/shared/utils/date-utils';
+
 /**
  * Format date string to readable format
  * @deprecated Use formatDateTimeWithFallback from @/gradian-ui/shared/utils/date-utils instead

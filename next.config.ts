@@ -53,27 +53,34 @@ const nextConfig: NextConfig = {
     // Only obfuscate in production builds and for client-side code
     if (!dev && !isServer) {
       // Use dynamic require to avoid issues with Next.js config compilation
-      const WebpackObfuscator = require("webpack-obfuscator").default || require("webpack-obfuscator");
-      config.plugins.push(
-        new WebpackObfuscator(
-          {
-            rotateStringArray: true,
-            stringArray: true,
-            stringArrayCallsTransform: true,
-            stringArrayEncoding: [],
-            stringArrayIndexShift: true,
-            stringArrayRotate: true,
-            stringArrayShuffle: true,
-            stringArrayWrappersCount: 2,
-            stringArrayWrappersChainedCalls: true,
-            stringArrayWrappersParametersMaxCount: 4,
-            stringArrayWrappersType: "function",
-            stringArrayThreshold: 0.75,
-            unicodeEscapeSequence: false,
-          },
-          ["**/node_modules/**", "**/server/**", "**/api/**"]
-        )
-      );
+      try {
+        const webpackObfuscatorModule = require("webpack-obfuscator");
+        const WebpackObfuscator = webpackObfuscatorModule.default || webpackObfuscatorModule;
+        if (WebpackObfuscator) {
+          config.plugins.push(
+            new WebpackObfuscator(
+              {
+                rotateStringArray: true,
+                stringArray: true,
+                stringArrayCallsTransform: true,
+                stringArrayEncoding: [],
+                stringArrayIndexShift: true,
+                stringArrayRotate: true,
+                stringArrayShuffle: true,
+                stringArrayWrappersCount: 2,
+                stringArrayWrappersChainedCalls: true,
+                stringArrayWrappersParametersMaxCount: 4,
+                stringArrayWrappersType: "function",
+                stringArrayThreshold: 0.75,
+                unicodeEscapeSequence: false,
+              },
+              ["**/node_modules/**", "**/server/**", "**/api/**"]
+            )
+          );
+        }
+      } catch (error) {
+        console.warn("Failed to load webpack-obfuscator:", error);
+      }
     }
     return config;
   },

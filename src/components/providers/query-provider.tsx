@@ -1,6 +1,6 @@
 'use client';
 
-import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { ReactNode, useEffect } from 'react';
 import { getCacheConfig } from '@/gradian-ui/shared/configs/cache-config';
 import { clearSchemaCache } from '@/gradian-ui/indexdb-manager/schema-cache';
@@ -53,9 +53,24 @@ const isConnectionError = (error: any): boolean => {
   return false;
 };
 
+const notifyConnectionError = (error: unknown) => {
+  if (isConnectionError(error)) {
+    toast.error('Connection is out', {
+      description: 'Unable to connect to the server. Please check your connection and try again.',
+      duration: 5000,
+    });
+  }
+};
+
 // Create a client factory function
 function makeQueryClient() {
   return new QueryClient({
+    queryCache: new QueryCache({
+      onError: notifyConnectionError,
+    }),
+    mutationCache: new MutationCache({
+      onError: notifyConnectionError,
+    }),
     defaultOptions: {
       queries: {
         // With SSR, we usually want to set some default staleTime
@@ -66,28 +81,6 @@ function makeQueryClient() {
         refetchOnMount: false, // Don't refetch on mount if data exists in cache
         refetchOnWindowFocus: false, // Don't refetch on window focus
         refetchOnReconnect: false, // Don't refetch on reconnect
-        // Global error handler for queries
-        onError: (error: any) => {
-          // Only show toast for connection errors
-          if (isConnectionError(error)) {
-            toast.error('Connection is out', {
-              description: 'Unable to connect to the server. Please check your connection and try again.',
-              duration: 5000,
-            });
-          }
-        },
-      },
-      mutations: {
-        // Global error handler for mutations
-        onError: (error: any) => {
-          // Only show toast for connection errors
-          if (isConnectionError(error)) {
-            toast.error('Connection is out', {
-              description: 'Unable to connect to the server. Please check your connection and try again.',
-              duration: 5000,
-            });
-          }
-        },
       },
     },
   });

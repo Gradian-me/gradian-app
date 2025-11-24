@@ -14,7 +14,11 @@ export interface UseHealthServiceReturn {
   openEditServiceForm: (service: HealthService) => void;
   closeServiceForm: () => void;
   setFormData: (data: Partial<HealthService>) => void;
-  saveService: (services: HealthService[], healthStatuses: Record<string, ServiceHealthStatus>, checkHealth: (service: HealthService) => Promise<void>) => Promise<void>;
+  saveService: (
+    services: HealthService[],
+    healthStatuses: Record<string, ServiceHealthStatus>,
+    checkHealth: (service: HealthService) => Promise<void>
+  ) => Promise<{ success: boolean; service?: HealthService }>;
   deleteService: (serviceId: string, onDelete: (id: string) => void) => Promise<void>;
 }
 
@@ -76,13 +80,13 @@ export const useHealthService = (): UseHealthServiceReturn => {
       // Validation
       if (!formData.id || !formData.serviceTitle || !formData.healthApi) {
         toast.error('Please fill in all required fields');
-        return;
+        return { success: false };
       }
 
       // Check if ID already exists (for new services)
       if (!editingService && services.find(s => s.id === formData.id)) {
         toast.error(`Service with ID "${formData.id}" already exists`);
-        return;
+        return { success: false };
       }
 
       const serviceData: HealthService = {
