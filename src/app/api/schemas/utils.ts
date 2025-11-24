@@ -314,6 +314,99 @@ const normalizeUpstreamSchemaResponse = (payload: unknown, context: NormalizeCon
   return payload;
 };
 
+/**
+ * Checks if a string looks like JSON and attempts to parse it
+ */
+const tryParseJsonString = (str: string): { isJson: boolean; parsed?: any } => {
+  if (typeof str !== 'string' || str.trim().length === 0) {
+    return { isJson: false };
+  }
+
+  const trimmed = str.trim();
+  const firstChar = trimmed[0];
+  const lastChar = trimmed[trimmed.length - 1];
+  
+  // Check if it looks like JSON (starts and ends with {} or [])
+  if ((firstChar === '{' && lastChar === '}') || (firstChar === '[' && lastChar === ']')) {
+    try {
+      const parsed = JSON.parse(str);
+      return { isJson: true, parsed };
+    } catch (error) {
+      // Not valid JSON, return as-is
+      return { isJson: false };
+    }
+  }
+  
+  return { isJson: false };
+};
+
+/**
+ * Normalizes schema data by parsing JSON strings in nested fields to objects/arrays
+ * Specifically handles repeatingConfig fields that may be sent as JSON strings
+ */
+export const normalizeSchemaData = (data: any): any => {
+  if (data === null || data === undefined) {
+    return data;
+  }
+
+  // If it's a string, check if it's a JSON string and try to parse it
+  if (typeof data === 'string') {
+    const { isJson, parsed } = tryParseJsonString(data);
+    if (isJson && parsed !== undefined) {
+      // Recursively normalize the parsed object
+      const result = normalizeSchemaData(parsed);
+      // Log when we successfully parse a JSON string
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[normalizeSchemaData] Parsed JSON string to object:', {
+          original: data.substring(0, 100),
+          parsed: result
+        });
+      }
+      return result;
+    }
+    return data;
+  }
+
+  // If it's an array, normalize each item
+  if (Array.isArray(data)) {
+    return data.map(item => normalizeSchemaData(item));
+  }
+
+  // If it's not an object, return as-is
+  if (typeof data !== 'object') {
+    return data;
+  }
+
+  // Create a copy to avoid mutating the original
+  const normalized: any = {};
+
+  // Process all keys in the object
+  for (const key in data) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      const value = data[key];
+      
+      // Special handling for repeatingConfig field - ensure it's always an object/array, never a string
+      if (key === 'repeatingConfig' && typeof value === 'string') {
+        const { isJson, parsed } = tryParseJsonString(value);
+        if (isJson && parsed !== undefined) {
+          normalized[key] = normalizeSchemaData(parsed);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[normalizeSchemaData] Normalized repeatingConfig from string to object');
+          }
+        } else {
+          // If it's not valid JSON, keep it as string (shouldn't happen, but handle gracefully)
+          normalized[key] = value;
+        }
+      } else {
+        // Recursively normalize the value
+        normalized[key] = normalizeSchemaData(value);
+      }
+    }
+  }
+
+  return normalized;
+};
+
 export const proxySchemaRequest = async (
   request: NextRequest,
   targetPathWithQuery: string,

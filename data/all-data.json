@@ -12,8 +12,8 @@
       "taxId": "TR-TAX-0012",
       "country": [
         {
-          "id": "FR",
-          "label": "France"
+          "id": "TR",
+          "label": "Turkey"
         }
       ],
       "categories": [
@@ -35,7 +35,7 @@
       "rating": 4,
       "id": "01K8QVCWS0ZSTMSVD5C6K7A806",
       "createdAt": "2025-10-29T11:24:37.540Z",
-      "updatedAt": "2025-11-23T10:18:08.122Z",
+      "updatedAt": "2025-11-23T12:43:00.527Z",
       "performanceMetrics": [
         {
           "id": "onTimeDelivery",
@@ -1214,10 +1214,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-23T10:57:08.661Z",
+      "updatedAt": "2025-11-23T16:33:51.303Z",
       "targetDataPath": "data",
       "sourceDataPath": "data",
-      "lastSynced": "2025-11-23T10:57:08.587Z",
+      "lastSynced": "2025-11-23T16:33:51.217Z",
       "incomplete": false
     },
     {
@@ -1245,8 +1245,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-11-23T10:57:14.681Z",
-      "lastSynced": "2025-11-23T10:57:14.295Z"
+      "updatedAt": "2025-11-23T16:33:53.951Z",
+      "lastSynced": "2025-11-23T16:33:53.921Z"
     },
     {
       "color": "#4E79A7",
@@ -1292,9 +1292,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-11-23T11:36:00.823Z",
+      "updatedAt": "2025-11-23T16:34:01.794Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-11-23T11:35:58.108Z"
+      "lastSynced": "2025-11-23T16:34:01.623Z"
     },
     {
       "color": "#00d1ae",

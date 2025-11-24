@@ -45,7 +45,10 @@ export async function GET(
     // Validate schema ID
     if (!(await isValidSchemaId(schemaId))) {
       return NextResponse.json(
-        { success: false, error: `Invalid schema ID: ${schemaId}` },
+        { 
+          success: false, 
+          error: `Schema "${schemaId}" not found. Please ensure the schema exists in your schema registry before querying data.` 
+        },
         { status: 404 }
       );
     }
@@ -124,21 +127,53 @@ export async function POST(
   { params }: { params: Promise<{ 'schema-id': string }> }
 ) {
   const { 'schema-id': schemaId } = await params;
+  
+  if (!schemaId) {
+    return NextResponse.json(
+      { success: false, error: 'Schema ID is required' },
+      { status: 400 }
+    );
+  }
+
   const targetPath = `/api/data/${schemaId}`;
 
   if (!isDemoModeEnabled()) {
-    const body = await request.json();
-    return proxyDataRequest(request, targetPath, {
-      body,
-      headers: { 'content-type': 'application/json' },
-    });
+    try {
+      let body;
+      try {
+        body = await request.json();
+      } catch (error) {
+        // If body parsing fails, still try to proxy (might be empty body)
+        console.warn(`[POST /api/data/${schemaId}] Failed to parse request body, proxying with undefined body:`, error);
+        body = undefined;
+      }
+      
+      console.log(`[POST /api/data/${schemaId}] Proxying to: ${targetPath}`);
+      return proxyDataRequest(request, targetPath, {
+        body,
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
+      });
+    } catch (error) {
+      console.error(`[POST /api/data/${schemaId}] Error proxying request:`, error);
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: error instanceof Error ? error.message : 'Failed to proxy request' 
+        },
+        { status: 500 }
+      );
+    }
   }
 
   try {
     // Validate schema ID
     if (!(await isValidSchemaId(schemaId))) {
       return NextResponse.json(
-        { success: false, error: `Invalid schema ID: ${schemaId}` },
+        { 
+          success: false, 
+          error: `Schema "${schemaId}" not found. Please ensure the schema exists in your schema registry before creating data.` 
+        },
         { status: 404 }
       );
     }

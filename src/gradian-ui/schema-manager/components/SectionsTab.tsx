@@ -66,6 +66,9 @@ export function SectionsTab({
     })
   );
 
+  // Ensure sections is always an array
+  const safeSections = sections || [];
+
   // Check if a section is incomplete (has default values or missing required fields)
   const isSectionIncomplete = (section: FormSection): boolean => {
     // If it's still the default "New Section", it's incomplete
@@ -85,25 +88,25 @@ export function SectionsTab({
   };
 
   // Check if there are any incomplete sections
-  const hasIncompleteSections = sections.some(isSectionIncomplete);
+  const hasIncompleteSections = safeSections.some(isSectionIncomplete);
   
   // Check if there are any inactive sections
-  const hasInactiveSections = useMemo(() => sections.some(s => s.inactive), [sections]);
+  const hasInactiveSections = useMemo(() => safeSections.some(s => s.inactive), [safeSections]);
   const [showInactiveSections, setShowInactiveSections] = useState(false);
   
   // Calculate section count based on showInactiveSections
   const sectionsCount = useMemo(() => {
     return showInactiveSections 
-      ? sections.length 
-      : sections.filter(s => !s.inactive).length;
-  }, [sections, showInactiveSections]);
+      ? safeSections.length 
+      : safeSections.filter(s => !s.inactive).length;
+  }, [safeSections, showInactiveSections]);
   
   // Get sections to display
   const sectionsToDisplay = useMemo(() => {
     return showInactiveSections 
-      ? sections 
-      : sections.filter(s => !s.inactive);
-  }, [sections, showInactiveSections]);
+      ? safeSections 
+      : safeSections.filter(s => !s.inactive);
+  }, [safeSections, showInactiveSections]);
 
   return (
     <Card>
@@ -171,7 +174,7 @@ export function SectionsTab({
                         onDelete={() => onDeleteSection(section.id)}
                         onUpdate={(updates) => onUpdateSection(section.id, updates)}
                         fields={fields}
-                        sections={sections}
+                        sections={safeSections}
                         onAddField={(sectionId) => onAddField(sectionId || section.id)}
                         onFieldUpdate={onFieldUpdate}
                         onFieldDelete={onFieldDelete}

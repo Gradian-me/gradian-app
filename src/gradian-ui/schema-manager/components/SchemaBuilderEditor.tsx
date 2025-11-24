@@ -402,7 +402,7 @@ export function SchemaBuilderEditor({
 
           <TabsContent value="sections" className="space-y-4">
             <SectionsTab
-              sections={schema.sections}
+              sections={schema.sections || []}
               getFieldsForSection={getFieldsForSection}
               expandedSection={expandedSection}
               onToggleSection={toggleSection}

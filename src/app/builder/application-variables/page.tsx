@@ -248,23 +248,27 @@ export default function ApplicationVariablesPage() {
 
         {/* Configuration Tabs */}
         <FormTabs defaultValue="general" className="w-full">
-          <FormTabsList className="min-w-full bg-gray-100 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 select-none">
-            <FormTabsTrigger value="general" className="px-4 py-1.5 text-sm">
+          <FormTabsList 
+            className="bg-gray-100 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 select-none"
+            showScrollBar={true}
+            scrollAreaClassName="w-full"
+          >
+            <FormTabsTrigger value="general" className="px-4 py-1.5 text-sm shrink-0">
               General
             </FormTabsTrigger>
-            <FormTabsTrigger value="logging" className="px-4 py-1.5 text-sm">
+            <FormTabsTrigger value="logging" className="px-4 py-1.5 text-sm shrink-0">
               Logging
             </FormTabsTrigger>
-            <FormTabsTrigger value="auth" className="px-4 py-1.5 text-sm">
+            <FormTabsTrigger value="auth" className="px-4 py-1.5 text-sm shrink-0">
               Authentication
             </FormTabsTrigger>
-            <FormTabsTrigger value="ui" className="px-4 py-1.5 text-sm">
+            <FormTabsTrigger value="ui" className="px-4 py-1.5 text-sm shrink-0">
               UI Parameters
             </FormTabsTrigger>
-            <FormTabsTrigger value="schema" className="px-4 py-1.5 text-sm">
+            <FormTabsTrigger value="schema" className="px-4 py-1.5 text-sm shrink-0">
               Schema
             </FormTabsTrigger>
-            <FormTabsTrigger value="ai" className="px-4 py-1.5 text-sm">
+            <FormTabsTrigger value="ai" className="px-4 py-1.5 text-sm shrink-0">
               AI Configuration
             </FormTabsTrigger>
           </FormTabsList>

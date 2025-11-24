@@ -21,16 +21,6 @@
   },
   {
     "sourceSchema": "inquiries",
-    "sourceId": "01K945BGN1YV7RG3XKG169CGS1",
-    "targetSchema": "vendors",
-    "targetId": "01K8QVCWS0ZSTMSVD5C6K7A806",
-    "relationTypeId": "HAS_VENDOR",
-    "id": "01K96ZBCCJXAE4RN98KD4P7AJR",
-    "createdAt": "2025-11-04T08:22:18.768Z",
-    "updatedAt": "2025-11-04T08:22:18.768Z"
-  },
-  {
-    "sourceSchema": "inquiries",
     "sourceId": "01K971SXSZZ6SBNF152M93FY64",
     "targetSchema": "inquiry-items",
     "targetId": "01K971TX4B7S8YBED0NEDH79TN",

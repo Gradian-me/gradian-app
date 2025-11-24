@@ -292,7 +292,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   }, [selectedIds]);
 
   const buildSourceRequestUrl = useCallback(
-    (pageToLoad: number) => {
+    (pageToLoad: number, forceRefresh = false) => {
       if (!sourceUrl) {
         return '';
       }
@@ -313,15 +313,24 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       if (companyQueryParam) {
         paramRecord.companyIds = companyQueryParam;
       }
+      // Add cache-busting parameter for refresh
+      if (forceRefresh) {
+        paramRecord._t = Date.now().toString();
+      }
       const params = mapRequestParams(paramRecord, columnMap);
       const queryString = params.toString();
-      return `${sourceUrl}${sourceUrl.includes('?') ? '&' : '?'}${queryString}`;
+      
+      // Always use relative URLs so requests go through Next.js API routes
+      // The API routes will check isDemoModeEnabled() and proxy to backend if needed
+      // This centralizes the proxying logic in the API routes
+      const separator = sourceUrl.includes('?') ? '&' : '?';
+      return `${sourceUrl}${queryString ? `${separator}${queryString}` : ''}`;
     },
     [sourceUrl, effectivePageSize, searchQuery, includeIds, excludeIds, columnMap, companyQueryParam]
   );
 
   const fetchSourceItems = useCallback(
-    async (pageToLoad = 1, append = false) => {
+    async (pageToLoad = 1, append = false, forceRefresh = false) => {
       if (!sourceUrl) {
         return;
       }
@@ -340,7 +349,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         setIsFetchingMore(true);
       }
       try {
-        const requestUrl = buildSourceRequestUrl(pageToLoad);
+        const requestUrl = buildSourceRequestUrl(pageToLoad, forceRefresh);
         const response = await fetch(requestUrl, { cache: 'no-store' });
         if (!response.ok) {
           throw new Error(`Failed to fetch items (${response.status})`);
@@ -392,7 +401,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   );
 
   const fetchSchemaItems = useCallback(
-    async (pageToLoad = 1, append = false) => {
+    async (pageToLoad = 1, append = false, forceRefresh = false) => {
       if (!schemaId) {
         return;
       }
@@ -428,8 +437,15 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         if (companyQueryParam) {
           params.companyIds = companyQueryParam;
         }
+        // Add cache-busting parameter for refresh
+        if (forceRefresh) {
+          params._t = Date.now().toString();
+        }
 
+        // Always use apiRequest which goes through Next.js API routes
+        // The API routes will check isDemoModeEnabled() and proxy to backend if needed
         const response = await apiRequest<any>(`/api/data/${schemaId}`, { params });
+
         if (!response.success || !Array.isArray(response.data)) {
           throw new Error(response.error || 'Failed to fetch items');
         }
@@ -521,8 +537,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           queryParams.append('companyIds', companyQueryParam);
         }
 
-        const url = `/api/data/${schemaId}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-        const response = await apiRequest<any[]>(url);
+        const queryString = queryParams.toString();
+        const relativeUrl = `/api/data/${schemaId}${queryString ? `?${queryString}` : ''}`;
+        
+        // Always use apiRequest which goes through Next.js API routes
+        // The API routes will check isDemoModeEnabled() and proxy to backend if needed
+        const response = await apiRequest<any[]>(relativeUrl);
 
         if (response.success && response.data) {
           const itemsArray = Array.isArray(response.data) ? response.data : [];
@@ -614,15 +634,68 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     event?.preventDefault();
     event?.stopPropagation();
     if (staticItems) {
-      setItems(staticItems);
+      const sortedStaticItems = sortOptions(staticItems, sortType);
+      setItems(sortedStaticItems);
+      setFilteredItems(sortedStaticItems);
       return;
     }
+    // Clear items to show loading state
+    setItems([]);
+    setFilteredItems([]);
+    setError(null);
+    
+    // Reset query key to ensure reload happens (before setting loading state)
+    lastQueryKeyRef.current = '';
+    
     if (supportsPagination) {
-      setPageMeta((prev) => ({ ...prev, page: 1, hasMore: true }));
-      await loadItems(1, false);
-      return;
+      // Reset pagination state
+      setPageMeta((prev) => ({ ...prev, page: 1, hasMore: true, totalItems: 0 }));
+      
+      // Directly call the appropriate fetch function with forceRefresh flag
+      if (sourceUrl) {
+        await fetchSourceItems(1, false, true);
+      } else if (schemaId) {
+        await fetchSchemaItems(1, false, true);
+      }
+    } else {
+      // For non-paginated sources, we need to add cache-busting to loadItems
+      // Build query params with cache-busting
+      const queryParams = new URLSearchParams();
+      if (includeIds && includeIds.length > 0) {
+        queryParams.append('includeIds', includeIds.join(','));
+      }
+      if (excludeIds && excludeIds.length > 0) {
+        queryParams.append('excludeIds', excludeIds.join(','));
+      }
+      if (companyQueryParam) {
+        queryParams.append('companyIds', companyQueryParam);
+      }
+      queryParams.append('_t', Date.now().toString()); // Cache-busting
+      
+        const queryString = queryParams.toString();
+        const relativeUrl = `/api/data/${schemaId}${queryString ? `?${queryString}` : ''}`;
+        
+        setIsLoading(true);
+        setError(null);
+        try {
+          // Always use apiRequest which goes through Next.js API routes
+          // The API routes will check isDemoModeEnabled() and proxy to backend if needed
+          const response = await apiRequest<any[]>(relativeUrl);
+
+        if (response.success && response.data) {
+          const itemsArray = Array.isArray(response.data) ? response.data : [];
+          const sortedArray = sortOptions(itemsArray, sortType);
+          setItems(sortedArray);
+          setFilteredItems(sortedArray);
+        } else {
+          setError(response.error || 'Failed to fetch items');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch items');
+      } finally {
+        setIsLoading(false);
+      }
     }
-    await loadItems(1, false);
   };
 
   const handleLoadMore = useCallback(() => {

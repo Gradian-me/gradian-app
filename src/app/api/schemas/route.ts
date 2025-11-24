@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-import { isDemoModeEnabled, proxySchemaRequest } from './utils';
+import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData } from './utils';
 import { SCHEMA_SUMMARY_EXCLUDED_KEYS } from '@/gradian-ui/shared/constants/application-variables';
 
 const SCHEMA_SUMMARY_EXCLUDED_KEY_SET = new Set<string>(SCHEMA_SUMMARY_EXCLUDED_KEYS);
@@ -181,8 +181,36 @@ export async function POST(request: NextRequest) {
   try {
     const requestData = await request.json();
 
+    // Normalize nested fields (e.g., parse repeatingConfig JSON strings to objects)
+    const normalizedRequestData = Array.isArray(requestData)
+      ? requestData.map(schema => normalizeSchemaData(schema))
+      : normalizeSchemaData(requestData);
+
+    // Debug: Log if repeatingConfig was normalized (in development)
+    if (process.env.NODE_ENV === 'development') {
+      const checkNormalization = (schema: any, path = '') => {
+        if (schema?.sections) {
+          schema.sections.forEach((section: any, idx: number) => {
+            if (section.repeatingConfig) {
+              const isString = typeof section.repeatingConfig === 'string';
+              if (isString) {
+                console.warn(`[POST /api/schemas] repeatingConfig is still a string at ${path}sections[${idx}].repeatingConfig:`, section.repeatingConfig.substring(0, 100));
+              } else {
+                console.log(`[POST /api/schemas] repeatingConfig normalized at ${path}sections[${idx}].repeatingConfig`);
+              }
+            }
+          });
+        }
+      };
+      if (Array.isArray(normalizedRequestData)) {
+        normalizedRequestData.forEach((schema, idx) => checkNormalization(schema, `[${idx}].`));
+      } else {
+        checkNormalization(normalizedRequestData);
+      }
+    }
+
     // Normalize to array: if single object, wrap it in an array
-    const schemasToCreate = Array.isArray(requestData) ? requestData : [requestData];
+    const schemasToCreate = Array.isArray(normalizedRequestData) ? normalizedRequestData : [normalizedRequestData];
 
     // Validate that we received valid schema objects
     if (!schemasToCreate || schemasToCreate.length === 0) {
@@ -212,7 +240,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!isDemoModeEnabled()) {
-      return proxySchemaRequest(request, '/api/schemas', { body: requestData });
+      return proxySchemaRequest(request, '/api/schemas', { body: normalizedRequestData });
     }
 
     // Load schemas (with caching)
@@ -288,7 +316,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Return single object if single was sent, array if array was sent
-    const responseData = Array.isArray(requestData) ? newSchemas : newSchemas[0];
+    const responseData = Array.isArray(normalizedRequestData) ? newSchemas : newSchemas[0];
     const message = newSchemas.length === 1
       ? `Schema "${newSchemas[0].id}" created successfully`
       : `${newSchemas.length} schemas created successfully`;

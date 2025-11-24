@@ -70,7 +70,7 @@ export const Rating: React.FC<RatingProps> = ({
   const hasHalfStar = safeValue % 1 >= 0.5;
 
   return (
-    <div className={cn("flex items-center gap-0.2", className)}>
+    <div className={cn("flex items-center gap-0.2 flex-nowrap whitespace-nowrap", className)}>
       {Array.from({ length: maxValue }, (_, i) => {
         if (i < fullStars) {
           return (
@@ -105,7 +105,7 @@ export const Rating: React.FC<RatingProps> = ({
         }
       })}
       {showValue && (
-        <span className={cn("ml-1 text-gray-500", textSizeClasses[size])}>
+        <span className={cn("ml-1 text-gray-500 whitespace-nowrap", textSizeClasses[size])}>
           {safeValue.toFixed(1)}
         </span>
       )}

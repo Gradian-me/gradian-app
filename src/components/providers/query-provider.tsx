@@ -5,9 +5,53 @@ import { ReactNode, useEffect } from 'react';
 import { getCacheConfig } from '@/gradian-ui/shared/configs/cache-config';
 import { clearSchemaCache } from '@/gradian-ui/indexdb-manager/schema-cache';
 import { clearCompaniesCache } from '@/gradian-ui/indexdb-manager/companies-cache';
+import { toast } from 'sonner';
 
 // Get default cache configuration from config file
 const defaultCacheConfig = getCacheConfig('schemas');
+
+/**
+ * Checks if an error is a connection/timeout error
+ */
+const isConnectionError = (error: any): boolean => {
+  // Check for fetch failed errors
+  if (error?.message?.toLowerCase().includes('fetch failed')) {
+    return true;
+  }
+
+  // Check for timeout errors
+  if (error?.code === 'UND_ERR_CONNECT_TIMEOUT' || 
+      error?.name === 'ConnectTimeoutError' ||
+      error?.message?.toLowerCase().includes('timeout') ||
+      error?.message?.toLowerCase().includes('connect timeout')) {
+    return true;
+  }
+
+  // Check for network errors
+  if (error?.name === 'TypeError' && error?.message?.toLowerCase().includes('failed to fetch')) {
+    return true;
+  }
+
+  // Check for connection refused or connection errors
+  if (error?.message?.toLowerCase().includes('connection') && 
+      (error?.message?.toLowerCase().includes('refused') || 
+       error?.message?.toLowerCase().includes('out') ||
+       error?.message?.toLowerCase().includes('failed'))) {
+    return true;
+  }
+
+  // Check if error has a statusCode of 502 (Bad Gateway)
+  if (error?.statusCode === 502) {
+    return true;
+  }
+
+  // Check if the error response has a 502 status
+  if (error?.response?.status === 502 || error?.response?.statusCode === 502) {
+    return true;
+  }
+
+  return false;
+};
 
 // Create a client factory function
 function makeQueryClient() {
@@ -22,6 +66,28 @@ function makeQueryClient() {
         refetchOnMount: false, // Don't refetch on mount if data exists in cache
         refetchOnWindowFocus: false, // Don't refetch on window focus
         refetchOnReconnect: false, // Don't refetch on reconnect
+        // Global error handler for queries
+        onError: (error: any) => {
+          // Only show toast for connection errors
+          if (isConnectionError(error)) {
+            toast.error('Connection is out', {
+              description: 'Unable to connect to the server. Please check your connection and try again.',
+              duration: 5000,
+            });
+          }
+        },
+      },
+      mutations: {
+        // Global error handler for mutations
+        onError: (error: any) => {
+          // Only show toast for connection errors
+          if (isConnectionError(error)) {
+            toast.error('Connection is out', {
+              description: 'Unable to connect to the server. Please check your connection and try again.',
+              duration: 5000,
+            });
+          }
+        },
       },
     },
   });

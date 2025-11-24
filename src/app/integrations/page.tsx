@@ -20,7 +20,8 @@ import {
   Upload,
   Activity,
   Plus,
-  RefreshCw
+  RefreshCw,
+  HeartPulse
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -626,7 +627,7 @@ export default function IntegrationsPage() {
               <CardTitle className="text-gray-800 dark:text-gray-200">Integration Tools</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
                   <Download className="h-6 w-6" />
                   <span>Export Data</span>
@@ -638,6 +639,14 @@ export default function IntegrationsPage() {
                 <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
                   <Activity className="h-6 w-6" />
                   <span>View Logs</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex flex-col items-center justify-center space-y-2"
+                  onClick={() => router.push('/health')}
+                >
+                  <HeartPulse className="h-6 w-6" />
+                  <span>Health Monitor</span>
                 </Button>
               </div>
             </CardContent>
