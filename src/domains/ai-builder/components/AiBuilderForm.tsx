@@ -545,7 +545,7 @@ export function AiBuilderForm({
                   />
                 </div>
               ) : (
-                <div className="w-48">
+                <div className="w-56">
                   <FormElementFactory
                     config={{
                       id: 'ai-agent-select',

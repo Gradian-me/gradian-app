@@ -46,6 +46,7 @@ const SortableListItem: React.FC<{
   onEnterPress?: (id: string, label: string) => void; // Callback when Enter is pressed
   onEditStateChange?: (id: string, isEditing: boolean) => void; // Callback when edit state changes
   inputRef?: React.RefObject<HTMLInputElement | null>; // Ref for focusing input
+  onPasteSplit?: (id: string, items: string[]) => void; // Callback when comma-separated values are pasted
 }> = ({ 
   item, 
   onEdit, 
@@ -55,6 +56,7 @@ const SortableListItem: React.FC<{
   onEnterPress,
   onEditStateChange,
   inputRef,
+  onPasteSplit,
 }) => {
   const [internalIsEditing, setInternalIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(item.label);
@@ -124,6 +126,33 @@ const SortableListItem: React.FC<{
     } else {
       setInternalIsEditing(false);
     }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedText = e.clipboardData.getData('text');
+    
+    // Check if pasted text contains comma-separated values
+    if (pastedText.includes(',')) {
+      e.preventDefault();
+      
+      // Split by comma and clean up each item
+      const items = pastedText
+        .split(',')
+        .map(item => item.trim())
+        .filter(item => item.length > 0);
+      
+      if (items.length > 1 && onPasteSplit) {
+        // If multiple items, use the split handler
+        onPasteSplit(item.id, items);
+      } else if (items.length === 1) {
+        // If only one item after splitting, just update the current value
+        setEditValue(items[0]);
+      } else {
+        // If no valid items, just paste normally
+        setEditValue(pastedText);
+      }
+    }
+    // If no comma, let the default paste behavior happen
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -198,6 +227,7 @@ const SortableListItem: React.FC<{
                   type="text"
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
+                  onPaste={handlePaste}
                   onBlur={(e) => {
                     // Don't save on blur if we're deleting or clicking a button
                     if (isDeletingRef.current) {
@@ -409,6 +439,51 @@ export const ListInput: React.FC<ListInputProps> = ({
     [value, onChange, editingItemId]
   );
 
+  const handlePasteSplit = useCallback(
+    (id: string, items: string[]) => {
+      // Find the current item index
+      const currentIndex = value.findIndex((item) => item.id === id);
+      if (currentIndex === -1) return;
+
+      // Update the current item with the first value
+      const updatedItems = value.map((item) =>
+        item.id === id ? { ...item, label: items[0] } : item
+      );
+
+      // Add new items for the remaining values
+      const newItems = items.slice(1).map((label) => ({
+        id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        label: label.trim(),
+      }));
+
+      // Insert new items after the current item
+      const finalItems = [
+        ...updatedItems.slice(0, currentIndex + 1),
+        ...newItems,
+        ...updatedItems.slice(currentIndex + 1),
+      ];
+
+      onChange(finalItems);
+
+      // If there are new items, open the last one in edit mode
+      if (newItems.length > 0) {
+        const lastNewItemId = newItems[newItems.length - 1].id;
+        setEditingItemId(lastNewItemId);
+        // Focus the new item's input after it's rendered
+        setTimeout(() => {
+          const newItemRef = inputRefs.current.get(lastNewItemId);
+          if (newItemRef?.current) {
+            newItemRef.current.focus();
+          }
+        }, 0);
+      } else {
+        // Close edit mode for current item
+        setEditingItemId(null);
+      }
+    },
+    [value, onChange]
+  );
+
   const itemIds = useMemo(() => value.map((item) => item.id), [value]);
   
   // Check if there's an empty item to disable add button
@@ -427,6 +502,7 @@ export const ListInput: React.FC<ListInputProps> = ({
           onEnterPress={handleEnterPress}
           onEditStateChange={handleEditStateChange}
           inputRef={getInputRef(item.id)}
+          onPasteSplit={handlePasteSplit}
         />
       ))}
     </div>
