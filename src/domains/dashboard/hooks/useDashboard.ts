@@ -6,8 +6,6 @@ export const useDashboard = () => {
     stats,
     spendAnalysisData,
     kpiCards,
-    recentActivity,
-    upcomingDeadlines,
     performanceMetrics,
     filters,
     isLoading,
@@ -15,8 +13,6 @@ export const useDashboard = () => {
     fetchDashboardStats,
     fetchSpendAnalysisData,
     fetchKpiCards,
-    fetchRecentActivity,
-    fetchUpcomingDeadlines,
     fetchPerformanceMetrics,
     setFilters,
     clearError,
@@ -35,20 +31,6 @@ export const useDashboard = () => {
       return fetchSpendAnalysisData(newFilters);
     },
     [fetchSpendAnalysisData]
-  );
-
-  const handleFetchRecentActivity = useCallback(
-    (limit?: number) => {
-      return fetchRecentActivity(limit);
-    },
-    [fetchRecentActivity]
-  );
-
-  const handleFetchUpcomingDeadlines = useCallback(
-    (limit?: number) => {
-      return fetchUpcomingDeadlines(limit);
-    },
-    [fetchUpcomingDeadlines]
   );
 
   const handleSetFilters = useCallback(
@@ -71,8 +53,6 @@ export const useDashboard = () => {
     stats,
     spendAnalysisData,
     kpiCards,
-    recentActivity,
-    upcomingDeadlines,
     performanceMetrics,
     filters,
     isLoading,
@@ -82,8 +62,6 @@ export const useDashboard = () => {
     fetchDashboardStats: handleFetchDashboardStats,
     fetchSpendAnalysisData: handleFetchSpendAnalysisData,
     fetchKpiCards,
-    fetchRecentActivity: handleFetchRecentActivity,
-    fetchUpcomingDeadlines: handleFetchUpcomingDeadlines,
     fetchPerformanceMetrics,
     setFilters: handleSetFilters,
     clearError: handleClearError,

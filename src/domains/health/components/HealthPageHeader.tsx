@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { CircularTimer } from '@/components/ui/circular-timer';
+import { CircularProgress } from '@/gradian-ui/analytics/indicators/kpi-list/components/CircularProgress';
 import { Activity, RefreshCw, Plus } from 'lucide-react';
 
 interface HealthPageHeaderProps {
@@ -72,17 +72,18 @@ export function HealthPageHeader({
         </div>
         {autoRefresh && refreshIntervalSeconds > 0 && (
           <div className="flex items-center gap-2">
-            <CircularTimer
+            <CircularProgress
               key={timerKey}
               duration={refreshIntervalSeconds}
               isPlaying={autoRefresh}
+              isTimer={true}
               size={40}
               strokeWidth={4}
               onComplete={() => {
                 // Trigger health check when timer completes
                 onTimerComplete();
               }}
-              colors={['#7C3AED', '#F97316', '#FACC15', '#EF4444']}
+              color={['#7C3AED', '#F97316', '#FACC15', '#EF4444']}
             />
           </div>
         )}

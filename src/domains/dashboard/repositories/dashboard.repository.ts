@@ -1,4 +1,4 @@
-import { DashboardStats, SpendAnalysisData, KpiCard, ActivityItem, DeadlineItem } from '../types';
+import { DashboardStats, SpendAnalysisData, KpiCard } from '../types';
 import { apiClient } from '@/gradian-ui/shared/utils/api';
 import { API_ENDPOINTS } from '@/gradian-ui/shared/constants';
 
@@ -6,9 +6,8 @@ export interface IDashboardRepository {
   getDashboardStats(): Promise<DashboardStats>;
   getSpendAnalysisData(): Promise<SpendAnalysisData>;
   getKpiCards(): Promise<KpiCard[]>;
-  getRecentActivity(): Promise<ActivityItem[]>;
-  getUpcomingDeadlines(): Promise<DeadlineItem[]>;
   getPerformanceMetrics(): Promise<any>;
+  getKpiLists(type?: string): Promise<any[]>;
 }
 
 export class DashboardRepository implements IDashboardRepository {
@@ -38,26 +37,21 @@ export class DashboardRepository implements IDashboardRepository {
     return response.data;
   }
 
-  async getRecentActivity(): Promise<ActivityItem[]> {
-    const response = await apiClient.get<ActivityItem[]>(`${this.baseEndpoint}/recent-activity`);
-    if (!response.success || !response.data) {
-      throw new Error('Failed to fetch recent activity');
-    }
-    return response.data;
-  }
-
-  async getUpcomingDeadlines(): Promise<DeadlineItem[]> {
-    const response = await apiClient.get<DeadlineItem[]>(`${this.baseEndpoint}/upcoming-deadlines`);
-    if (!response.success || !response.data) {
-      throw new Error('Failed to fetch upcoming deadlines');
-    }
-    return response.data;
-  }
-
   async getPerformanceMetrics(): Promise<any> {
     const response = await apiClient.get<any>(`${this.baseEndpoint}/performance-metrics`);
     if (!response.success || !response.data) {
       throw new Error('Failed to fetch performance metrics');
+    }
+    return response.data;
+  }
+
+  async getKpiLists(type?: string): Promise<any[]> {
+    const url = type 
+      ? `${this.baseEndpoint}/kpi-lists?type=${encodeURIComponent(type)}`
+      : `${this.baseEndpoint}/kpi-lists`;
+    const response = await apiClient.get<any[]>(url);
+    if (!response.success || !response.data) {
+      throw new Error('Failed to fetch KPI lists');
     }
     return response.data;
   }

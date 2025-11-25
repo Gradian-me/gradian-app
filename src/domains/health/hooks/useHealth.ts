@@ -23,8 +23,8 @@ export interface UseHealthReturn {
   // Actions
   setAutoRefresh: (enabled: boolean) => void;
   setRefreshIntervalSeconds: (seconds: number) => void;
-  checkHealth: (service: HealthService) => Promise<void>;
-  checkAllHealth: () => Promise<void>;
+  checkHealth: (service: HealthService, showToast?: boolean) => Promise<void>;
+  checkAllHealth: (showToast?: boolean) => Promise<void>;
   handleTimerComplete: () => Promise<void>;
   toggleTestUnhealthy: (serviceId: string, enabled: boolean) => void;
   toggleMonitoring: (serviceId: string, enabled: boolean) => Promise<void>;
@@ -102,7 +102,7 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
   }, []);
 
   // Fetch health status for a service
-  const checkHealth = useCallback(async (service: HealthService) => {
+  const checkHealth = useCallback(async (service: HealthService, showToast = false) => {
     // Skip if monitoring is disabled
     if (service.monitoringEnabled === false) {
       return;
@@ -121,42 +121,150 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
     }));
 
     try {
-      // Fetch from the health API
-      const response = await fetch(service.healthApi, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      // Determine if this is an external URL (not relative path)
+      const isExternalUrl = !service.healthApi.startsWith('/');
+      
+      // For external URLs, use the proxy to bypass CORS
+      // For relative URLs, fetch directly
+      let fetchUrl: string;
+      if (isExternalUrl) {
+        // Use proxy for external services
+        fetchUrl = `/api/health/proxy?url=${encodeURIComponent(service.healthApi)}`;
+      } else {
+        // Relative path - make it absolute using current origin
+        fetchUrl = `${window.location.origin}${service.healthApi}`;
       }
 
-      const data: HealthCheckResponse = await response.json();
-      
-      setHealthStatuses(prev => ({
-        ...prev,
-        [service.id]: {
-          ...prev[service.id],
-          data,
-          loading: false,
-          error: null,
-          lastChecked: new Date().toISOString(),
-        },
-      }));
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout (longer for proxy)
+
+      try {
+        // Fetch from the health API (or proxy)
+        const response = await fetch(fetchUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+          setHealthStatuses(prev => ({
+            ...prev,
+            [service.id]: {
+              ...prev[service.id],
+              data: null,
+              loading: false,
+              error: errorMsg,
+              lastChecked: new Date().toISOString(),
+            },
+          }));
+          if (showToast) {
+            toast.error(`Health check failed for ${service.serviceTitle}: ${errorMsg}`);
+          }
+          return;
+        }
+
+        const result = await response.json();
+        
+        // Handle proxy response format
+        let data: HealthCheckResponse;
+        if (isExternalUrl && result.success === false) {
+          // Proxy returned an error - handle gracefully
+          const errorMsg = result.error || 'Failed to check health';
+          setHealthStatuses(prev => ({
+            ...prev,
+            [service.id]: {
+              ...prev[service.id],
+              data: null,
+              loading: false,
+              error: errorMsg,
+              lastChecked: new Date().toISOString(),
+            },
+          }));
+          if (showToast) {
+            toast.error(`Health check failed for ${service.serviceTitle}: ${errorMsg}`);
+          }
+          return;
+        } else if (isExternalUrl && result.success === true) {
+          // Proxy returned success
+          data = result.data;
+        } else {
+          // Direct response (relative URL)
+          data = result;
+        }
+        
+        setHealthStatuses(prev => ({
+          ...prev,
+          [service.id]: {
+            ...prev[service.id],
+            data,
+            loading: false,
+            error: null,
+            lastChecked: new Date().toISOString(),
+          },
+        }));
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        
+        // Handle specific error types gracefully (don't throw)
+        let errorMessage = 'Failed to check health';
+        
+        if (fetchError instanceof Error) {
+          if (fetchError.name === 'AbortError') {
+            errorMessage = 'Request timeout: Health check took too long';
+          } else if (fetchError.message.includes('Failed to fetch') || fetchError.message.includes('NetworkError')) {
+            // CORS or network errors - handle gracefully
+            errorMessage = isExternalUrl
+              ? `Unable to reach ${service.healthApi}. The service may be down or unreachable.`
+              : `Unable to reach ${service.healthApi}. Check network connectivity.`;
+          } else {
+            errorMessage = fetchError.message;
+          }
+        }
+        
+        // Set error state (don't throw)
+        setHealthStatuses(prev => ({
+          ...prev,
+          [service.id]: {
+            ...prev[service.id],
+            data: null,
+            loading: false,
+            error: errorMessage,
+            lastChecked: new Date().toISOString(),
+          },
+        }));
+        
+        // Only show toast on manual refresh, not auto-refresh
+        if (showToast) {
+          toast.error(`Health check failed for ${service.serviceTitle}: ${errorMessage}`);
+        }
+      }
     } catch (error) {
+      // Catch any unexpected errors and handle gracefully
       console.error(`Error checking health for ${service.id}:`, error);
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Failed to check health';
+      
       setHealthStatuses(prev => ({
         ...prev,
         [service.id]: {
           ...prev[service.id],
           data: null,
           loading: false,
-          error: error instanceof Error ? error.message : 'Failed to check health',
+          error: errorMessage,
           lastChecked: new Date().toISOString(),
         },
       }));
+      
+      if (showToast) {
+        toast.error(`Health check failed for ${service.serviceTitle}: ${errorMessage}`);
+      }
     } finally {
       setRefreshing(prev => {
         const next = new Set(prev);
@@ -167,17 +275,19 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
   }, []);
 
   // Check all services (only active ones)
-  const checkAllHealth = useCallback(async () => {
+  const checkAllHealth = useCallback(async (showToast = false) => {
     const activeServices = services.filter(service => service.monitoringEnabled !== false);
-    const promises = activeServices.map(service => checkHealth(service));
+    const promises = activeServices.map(service => checkHealth(service, showToast));
     await Promise.all(promises);
   }, [services, checkHealth]);
 
   // Handle timer completion - triggers health check
   const handleTimerComplete = useCallback(async () => {
     if (autoRefresh) {
-      await checkAllHealth();
+      await checkAllHealth(false); // Don't show toast on auto-refresh
     }
+    // Reset timer
+    setTimerKey(prev => prev + 1);
   }, [autoRefresh, checkAllHealth]);
 
   // Auto-refresh effect - initialize timer and do initial check
@@ -245,7 +355,7 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
         } else {
           // If enabling, check health immediately
           const updatedService = { ...service, monitoringEnabled: enabled };
-          await checkHealth(updatedService);
+          await checkHealth(updatedService, false); // Don't show toast when toggling monitoring
         }
       }
     } catch (error) {

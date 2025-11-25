@@ -78,7 +78,7 @@ export function HealthPage() {
           onAutoRefreshChange={setAutoRefresh}
           onRefreshIntervalChange={setRefreshIntervalSeconds}
           onRefreshAll={async () => {
-            await checkAllHealth();
+            await checkAllHealth(true); // Show toast on manual refresh
           }}
           onTimerComplete={handleTimerComplete}
           refreshing={refreshing.size > 0}

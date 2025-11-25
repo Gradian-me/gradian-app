@@ -1,4 +1,4 @@
-import { DashboardStats, SpendAnalysisData, KpiCard, ActivityItem, DeadlineItem } from '../types';
+import { DashboardStats, SpendAnalysisData, KpiCard } from '../types';
 import { IDashboardRepository, dashboardRepository } from '../repositories/dashboard.repository';
 import { 
   DashboardDataNotFoundError,
@@ -7,8 +7,7 @@ import {
   ChartDataError,
   KpiCalculationError,
   PerformanceMetricsError,
-  ActivityDataError,
-  DeadlineDataError
+  ActivityDataError
 } from '../errors';
 import { dashboardFiltersSchema } from '../schemas';
 import { validateFormData } from '@/gradian-ui/shared/utils/validation';
@@ -17,9 +16,8 @@ export interface IDashboardService {
   getDashboardStats(filters?: any): Promise<DashboardStats>;
   getSpendAnalysisData(filters?: any): Promise<SpendAnalysisData>;
   getKpiCards(): Promise<KpiCard[]>;
-  getRecentActivity(limit?: number): Promise<ActivityItem[]>;
-  getUpcomingDeadlines(limit?: number): Promise<DeadlineItem[]>;
   getPerformanceMetrics(): Promise<any>;
+  getKpiLists(type?: string, limit?: number): Promise<any[]>;
   validateFilters(filters: any): { success: true; data: any } | { success: false; errors: Record<string, string> };
 }
 
@@ -69,29 +67,20 @@ export class DashboardService implements IDashboardService {
     }
   }
 
-  async getRecentActivity(limit: number = 10): Promise<ActivityItem[]> {
-    try {
-      const activities = await this.dashboardRepository.getRecentActivity();
-      return activities.slice(0, limit);
-    } catch (error) {
-      throw new ActivityDataError();
-    }
-  }
-
-  async getUpcomingDeadlines(limit: number = 10): Promise<DeadlineItem[]> {
-    try {
-      const deadlines = await this.dashboardRepository.getUpcomingDeadlines();
-      return deadlines.slice(0, limit);
-    } catch (error) {
-      throw new DeadlineDataError();
-    }
-  }
-
   async getPerformanceMetrics(): Promise<any> {
     try {
       return await this.dashboardRepository.getPerformanceMetrics();
     } catch (error) {
       throw new PerformanceMetricsError();
+    }
+  }
+
+  async getKpiLists(type?: string, limit?: number): Promise<any[]> {
+    try {
+      const kpiLists = await this.dashboardRepository.getKpiLists(type);
+      return limit ? kpiLists.slice(0, limit) : kpiLists;
+    } catch (error) {
+      throw new ActivityDataError();
     }
   }
 

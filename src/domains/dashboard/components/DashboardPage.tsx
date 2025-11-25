@@ -5,6 +5,8 @@ import { ProcurementEfficiencyChart } from '@/components/dashboard/charts/procur
 import { SpendAnalysisChart } from '@/components/dashboard/charts/spend-analysis-chart';
 import { VendorPerformanceChart } from '@/components/dashboard/charts/vendor-performance-chart';
 import { KPICard } from '@/gradian-ui/analytics/indicators/kpi-card';
+import { KPIList } from '@/gradian-ui/analytics/indicators/kpi-list';
+import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,9 +19,18 @@ import {
   Shield,
   ShoppingCart,
   TrendingUp,
-  Users
+  Users,
+  UserPlus,
+  FileCheck,
+  ShoppingBag,
+  Award,
+  AlertCircle,
+  Clock,
+  Star,
+  Timer,
+  TrendingDown
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useUserStore } from '@/stores/user.store';
 import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
@@ -34,29 +45,47 @@ export function DashboardPage() {
     stats,
     spendAnalysisData,
     kpiCards,
-    recentActivity,
-    upcomingDeadlines,
     performanceMetrics,
     isLoading,
     error,
     fetchDashboardStats,
     fetchSpendAnalysisData,
     fetchKpiCards,
-    fetchRecentActivity,
-    fetchUpcomingDeadlines,
     fetchPerformanceMetrics,
     clearError,
   } = useDashboard();
+
+  const [recentActivityKpi, setRecentActivityKpi] = useState<any[]>([]);
+  const [upcomingDeadlinesKpi, setUpcomingDeadlinesKpi] = useState<any[]>([]);
 
   useEffect(() => {
     // Fetch all dashboard data
     fetchDashboardStats();
     fetchSpendAnalysisData();
     fetchKpiCards();
-    fetchRecentActivity(5);
-    fetchUpcomingDeadlines(5);
     fetchPerformanceMetrics();
-  }, [fetchDashboardStats, fetchSpendAnalysisData, fetchKpiCards, fetchRecentActivity, fetchUpcomingDeadlines, fetchPerformanceMetrics]);
+
+    // Fetch unified KPI lists
+    const fetchKpiLists = async () => {
+      try {
+        const [recentActivityData, deadlinesData] = await Promise.all([
+          fetch('/api/dashboard/kpi-lists?type=recent_activity').then(res => res.json()),
+          fetch('/api/dashboard/kpi-lists?type=upcoming_deadlines').then(res => res.json())
+        ]);
+        
+        if (recentActivityData.success) {
+          setRecentActivityKpi(recentActivityData.data);
+        }
+        if (deadlinesData.success) {
+          setUpcomingDeadlinesKpi(deadlinesData.data);
+        }
+      } catch (error) {
+        console.error('Error fetching KPI lists:', error);
+      }
+    };
+
+    fetchKpiLists();
+  }, [fetchDashboardStats, fetchSpendAnalysisData, fetchKpiCards, fetchPerformanceMetrics]);
 
   if (isLoading) {
     return (
@@ -240,175 +269,42 @@ export function DashboardPage() {
         {/* Recent Activity and Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Activity */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.5 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <TrendingUp className="h-5 w-5" />
-                  <span>Recent Activity</span>
-                </CardTitle>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Latest updates from your business operations.
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {recentActivity.length > 0 ? (
-                  recentActivity.map((activity, index) => (
-                    <motion.div
-                      key={activity.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.6 + index * 0.1 }}
-                      className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 dark:bg-gray-900 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100">{activity.title}</h4>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {activity.userName} • {new Date(activity.timestamp).toLocaleString()}
-                        </p>
-                      </div>
-                      <Badge
-                        variant="secondary"
-                        className="text-xs bg-violet-50 text-violet-700 border border-violet-100 dark:bg-violet-500/20 dark:text-violet-100 dark:border-violet-500/40"
-                      >
-                        {activity.type.replace('_', ' ')}
-                      </Badge>
-                    </motion.div>
-                  ))
-                ) : (
-                  <div className="space-y-3">
-                    {[
-                      { id: '1', title: 'New Vendor Added', userName: 'Mahyar Abidi', timestamp: new Date('2024-12-10T10:30:00'), type: 'vendor_created' },
-                      { id: '2', title: 'Tender Published', userName: 'Dr. Sarah Chen', timestamp: new Date('2024-12-10T08:45:00'), type: 'tender_published' },
-                      { id: '3', title: 'Purchase Order Created', userName: 'John Smith', timestamp: new Date('2024-12-10T06:20:00'), type: 'po_created' },
-                      { id: '4', title: 'PO Approved', userName: 'Dr. Sarah Chen', timestamp: new Date('2024-12-10T04:15:00'), type: 'po_approved' },
-                      { id: '5', title: 'Tender Awarded', userName: 'Mahyar Abidi', timestamp: new Date('2024-12-09T16:30:00'), type: 'tender_awarded' }
-                    ].map((activity, index) => (
-                      <motion.div
-                        key={activity.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: 0.6 + index * 0.1 }}
-                        className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 dark:bg-gray-900 transition-colors"
-                      >
-                        <div className="flex-1">
-                          <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100">{activity.title}</h4>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
-                            {activity.userName} • {activity.timestamp.toLocaleString()}
-                          </p>
-                        </div>
-                        <Badge 
-                          variant={activity.type === 'vendor_created' ? 'default' : 
-                                  activity.type === 'tender_published' ? 'default' : 
-                                  activity.type === 'po_created' ? 'secondary' : 
-                                  activity.type === 'po_approved' ? 'default' : 
-                                  'secondary'}
-                          className={`text-xs ${
-                            activity.type === 'vendor_created' ? 'bg-blue-100 text-blue-800' :
-                            activity.type === 'tender_published' ? 'bg-green-100 text-green-800' :
-                            activity.type === 'po_created' ? 'bg-violet-100 text-violet-800' :
-                            activity.type === 'po_approved' ? 'bg-emerald-100 text-emerald-800' :
-                            'bg-gray-100 text-gray-800 dark:text-gray-200'
-                          }`}
-                        >
-                          {activity.type.replace('_', ' ')}
-                        </Badge>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
+          <KPIList
+            title="Recent Activity"
+            subtitle="Latest updates from your business operations."
+            icon="TrendingUp"
+            items={
+              recentActivityKpi.length > 0
+                ? recentActivityKpi.slice(0, 5).map((item) => ({
+                    title: item.title,
+                    subtitle: item.subtitle,
+                    color: item.color,
+                    progress: item.progress,
+                    status: item.status,
+                    url: item.url,
+                  }))
+                : []
+            }
+          />
 
           {/* Upcoming Deadlines */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.6 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <CheckCircle className="h-5 w-5" />
-                  <span>Upcoming Deadlines</span>
-                </CardTitle>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Important dates and deadlines to keep track of.
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {upcomingDeadlines.length > 0 ? (
-                  upcomingDeadlines.map((deadline, index) => (
-                    <motion.div
-                      key={deadline.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.7 + index * 0.1 }}
-                      className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 dark:bg-gray-900 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100">{deadline.title}</h4>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {deadline.description}
-                        </p>
-                        <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
-                          Due: {new Date(deadline.dueDate).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <Badge 
-                        variant={deadline.priority === 'high' ? 'destructive' : deadline.priority === 'medium' ? 'default' : 'secondary'}
-                        className="text-xs"
-                      >
-                        {deadline.priority}
-                      </Badge>
-                    </motion.div>
-                  ))
-                ) : (
-                  <div className="space-y-3">
-                    {[
-                      { id: '1', title: 'HPLC Equipment Tender', description: 'Submission deadline for HPLC equipment tender', dueDate: new Date('2024-12-12T17:00:00'), priority: 'high' },
-                      { id: '2', title: 'Purchase Order Delivery', description: 'Expected delivery of medical supplies', dueDate: new Date('2024-12-15T09:00:00'), priority: 'medium' },
-                      { id: '3', title: 'Vendor Evaluation', description: 'Quarterly vendor performance review', dueDate: new Date('2024-12-17T14:00:00'), priority: 'medium' },
-                      { id: '4', title: 'Contract Renewal', description: 'Annual contract renewal with key supplier', dueDate: new Date('2024-12-24T16:00:00'), priority: 'low' }
-                    ].map((deadline, index) => (
-                      <motion.div
-                        key={deadline.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: 0.7 + index * 0.1 }}
-                        className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 dark:bg-gray-900 transition-colors"
-                      >
-                        <div className="flex-1">
-                          <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100">{deadline.title}</h4>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
-                            {deadline.description}
-                          </p>
-                          <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
-                            Due: {deadline.dueDate.toLocaleDateString()}
-                          </p>
-                        </div>
-                        <Badge 
-                          variant={deadline.priority === 'high' ? 'destructive' : deadline.priority === 'medium' ? 'default' : 'secondary'}
-                          className={`text-xs ${
-                            deadline.priority === 'high' ? 'bg-red-100 text-red-800 border-red-200 dark:border-red-800' :
-                            deadline.priority === 'medium' ? 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:border-yellow-800' :
-                            'bg-gray-100 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-800'
-                          }`}
-                        >
-                          {deadline.priority}
-                        </Badge>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
+          <KPIList
+            title="Upcoming Deadlines"
+            subtitle="Important dates and deadlines to keep track of."
+            icon="CheckCircle"
+            items={
+              upcomingDeadlinesKpi.length > 0
+                ? upcomingDeadlinesKpi.slice(0, 5).map((item) => ({
+                    title: item.title,
+                    subtitle: item.subtitle,
+                    color: item.color,
+                    progress: item.progress,
+                    status: item.status,
+                    url: item.url,
+                  }))
+                : []
+            }
+          />
         </div>
 
         {/* Performance Metrics */}
@@ -418,36 +314,46 @@ export function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.7 }}
           >
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Metrics</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Key performance indicators for your business operations.
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="text-center">
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                      {performanceMetrics.vendorPerformance?.averageRating?.toFixed(1) || 'N/A'}
-                    </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Average Vendor Rating</p>
-                  </div>
-                  <div className="text-center">
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                      {performanceMetrics.procurementEfficiency?.averageProcessingTime || 'N/A'} days
-                    </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Average Processing Time</p>
-                  </div>
-                  <div className="text-center">
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                      ${performanceMetrics.procurementEfficiency?.costSavings?.toLocaleString() || 'N/A'}
-                    </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Cost Savings</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <MetricCard
+              metrics={[
+                {
+                  id: 'average-rating',
+                  label: 'Average Vendor Rating',
+                  value: performanceMetrics.vendorPerformance?.averageRating || 0,
+                  format: 'number',
+                  precision: 1,
+                  icon: 'Star',
+                  iconColor: 'amber',
+                },
+                {
+                  id: 'processing-time',
+                  label: 'Average Processing Time',
+                  value: performanceMetrics.procurementEfficiency?.averageProcessingTime || 0,
+                  unit: 'days',
+                  format: 'number',
+                  precision: 0,
+                  icon: 'Timer',
+                  iconColor: 'blue',
+                },
+                {
+                  id: 'cost-savings',
+                  label: 'Cost Savings',
+                  value: performanceMetrics.procurementEfficiency?.costSavings || 0,
+                  format: 'currency',
+                  precision: 0,
+                  prefix: '$',
+                  icon: 'TrendingDown',
+                  iconColor: 'emerald',
+                },
+              ]}
+              gradient="violet"
+              layout="grid"
+              columns={3}
+              footer={{
+                icon: 'TrendingUp',
+                text: 'Key performance indicators for your business operations.',
+              }}
+            />
           </motion.div>
         )}
       </div>

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/gradian-ui/shared/utils';
-import { CircularTimer } from '@/components/ui/circular-timer';
+import { CircularProgress } from '@/gradian-ui/analytics/indicators/kpi-list/components/CircularProgress';
 import type { FormElementRef } from '../types';
 import type { OTPInputProps } from '../types';
 import { validateField } from '@/gradian-ui/shared/utils';
@@ -208,10 +208,11 @@ const InputOTPPrimitive = React.forwardRef<HTMLDivElement, InputOTPPrimitiveProp
 
               <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <div className="flex items-center gap-3">
-                  <CircularTimer
+                  <CircularProgress
                     key={timerKey}
                     duration={resendDuration}
                     isPlaying={isCounting}
+                    isTimer={true}
                     onUpdate={setRemainingTime}
                     onComplete={handleTimerComplete}
                     size={44}

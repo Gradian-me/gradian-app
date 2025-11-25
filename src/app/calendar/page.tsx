@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { KPIList } from '@/gradian-ui/analytics/indicators/kpi-list';
 import { 
   Calendar, 
   Clock, 
@@ -29,60 +29,68 @@ export default function CalendarPage() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [overdueKpi, setOverdueKpi] = useState<any[]>([]);
+  const [todayKpi, setTodayKpi] = useState<any[]>([]);
+  const [upcomingKpi, setUpcomingKpi] = useState<any[]>([]);
+  const [completedKpi, setCompletedKpi] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        // Mock data for now
-        const mockEvents: CalendarEvent[] = [
-          {
-            id: '1',
-            title: 'HPLC Columns Tender Closes',
-            type: 'tender',
-            date: new Date('2024-02-15'),
-            status: 'upcoming',
-            description: 'Annual tender for HPLC columns and related consumables',
-            priority: 'high',
-          },
-          {
-            id: '2',
-            title: 'Merck Solvents Delivery',
-            type: 'delivery',
-            date: new Date('2024-01-30'),
-            status: 'today',
-            description: 'Expected delivery of HPLC grade solvents',
-            priority: 'medium',
-          },
-          {
-            id: '3',
-            title: 'Vendor Performance Review',
-            type: 'meeting',
-            date: new Date('2024-02-01'),
-            status: 'upcoming',
-            description: 'Quarterly review with Transfarma',
-            priority: 'medium',
-          },
-          {
-            id: '4',
-            title: 'Purchase Order Approval Deadline',
-            type: 'deadline',
-            date: new Date('2024-01-25'),
-            status: 'overdue',
-            description: 'PO-2024-003 needs approval',
-            priority: 'high',
-          },
-          {
-            id: '5',
-            title: 'Biotech Consumables Delivery',
-            type: 'delivery',
-            date: new Date('2024-01-28'),
-            status: 'completed',
-            description: 'Cell culture flasks delivered successfully',
-            priority: 'low',
-          },
+        // Fetch unified KPI lists for calendar events
+        const [overdueData, todayData, upcomingData, completedData] = await Promise.all([
+          fetch('/api/dashboard/kpi-lists?type=overdue_events').then(res => res.json()),
+          fetch('/api/dashboard/kpi-lists?type=today_events').then(res => res.json()),
+          fetch('/api/dashboard/kpi-lists?type=upcoming_events').then(res => res.json()),
+          fetch('/api/dashboard/kpi-lists?type=recently_completed').then(res => res.json())
+        ]);
+
+        if (overdueData.success) setOverdueKpi(overdueData.data);
+        if (todayData.success) setTodayKpi(todayData.data);
+        if (upcomingData.success) setUpcomingKpi(upcomingData.data);
+        if (completedData.success) setCompletedKpi(completedData.data);
+
+        // Transform KPI data to CalendarEvent format for backward compatibility
+        const allKpiItems = [
+          ...overdueData.data || [],
+          ...todayData.data || [],
+          ...upcomingData.data || [],
+          ...completedData.data || []
         ];
-        
-        setEvents(mockEvents);
+
+        const transformedEvents: CalendarEvent[] = allKpiItems.map((item: any) => {
+          let eventType: 'tender' | 'delivery' | 'deadline' | 'meeting' = 'meeting';
+          if (item.metadata?.eventType) {
+            const type = item.metadata.eventType;
+            if (type === 'tender') eventType = 'tender';
+            else if (type === 'delivery') eventType = 'delivery';
+            else if (type === 'deadline') eventType = 'deadline';
+            else if (type === 'meeting') eventType = 'meeting';
+          }
+
+          let status: 'upcoming' | 'today' | 'overdue' | 'completed' = 'upcoming';
+          if (item.type === 'overdue_events') status = 'overdue';
+          else if (item.type === 'today_events') status = 'today';
+          else if (item.type === 'recently_completed') status = 'completed';
+          else status = 'upcoming';
+
+          let priority: 'low' | 'medium' | 'high' = 'medium';
+          if (item.metadata?.priority) {
+            priority = item.metadata.priority as 'low' | 'medium' | 'high';
+          }
+
+          return {
+            id: item.id,
+            title: item.title,
+            type: eventType,
+            date: new Date(item.timestamp),
+            status: status,
+            description: item.subtitle,
+            priority: priority,
+          };
+        });
+
+        setEvents(transformedEvents);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -95,40 +103,40 @@ export default function CalendarPage() {
 
   const getEventTypeIcon = (type: string) => {
     switch (type) {
-      case 'tender': return <FileText className="h-4 w-4" />;
-      case 'delivery': return <Calendar className="h-4 w-4" />;
-      case 'deadline': return <Clock className="h-4 w-4" />;
-      case 'meeting': return <Calendar className="h-4 w-4" />;
-      default: return <Calendar className="h-4 w-4" />;
+      case 'tender': return FileText;
+      case 'delivery': return Calendar;
+      case 'deadline': return Clock;
+      case 'meeting': return Calendar;
+      default: return Calendar;
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): string => {
     switch (status) {
-      case 'upcoming': return 'info';
-      case 'today': return 'warning';
-      case 'overdue': return 'destructive';
-      case 'completed': return 'success';
-      default: return 'default';
+      case 'upcoming': return 'blue';
+      case 'today': return 'amber';
+      case 'overdue': return 'red';
+      case 'completed': return 'green';
+      default: return 'gray';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'upcoming': return <Clock className="h-4 w-4" />;
-      case 'today': return <AlertCircle className="h-4 w-4" />;
-      case 'overdue': return <AlertCircle className="h-4 w-4" />;
-      case 'completed': return <CheckCircle className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
+      case 'upcoming': return Clock;
+      case 'today': return AlertCircle;
+      case 'overdue': return AlertCircle;
+      case 'completed': return CheckCircle;
+      default: return Clock;
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityColor = (priority: string): string => {
     switch (priority) {
-      case 'high': return 'destructive';
-      case 'medium': return 'warning';
-      case 'low': return 'success';
-      default: return 'default';
+      case 'high': return 'red';
+      case 'medium': return 'amber';
+      case 'low': return 'green';
+      default: return 'gray';
     }
   };
 
@@ -160,11 +168,11 @@ export default function CalendarPage() {
     return `${diffDays} days`;
   };
 
-  // Group events by status
-  const upcomingEvents = events.filter(e => e.status === 'upcoming');
-  const todayEvents = events.filter(e => e.status === 'today');
-  const overdueEvents = events.filter(e => e.status === 'overdue');
-  const completedEvents = events.filter(e => e.status === 'completed');
+  // Use KPI data directly instead of filtering events
+  const upcomingEvents = upcomingKpi;
+  const todayEvents = todayKpi;
+  const overdueEvents = overdueKpi;
+  const completedEvents = completedKpi;
 
   if (loading) {
     return (
@@ -281,132 +289,63 @@ export default function CalendarPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Overdue Events */}
           {overdueEvents.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.5 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2 text-gray-800 dark:text-gray-200">
-                    <AlertCircle className="h-5 w-5" />
-                    <span>Overdue Events</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {overdueEvents.map((event) => (
-                    <div key={event.id} className="flex items-center justify-between p-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40">
-                      <div className="flex items-center space-x-3 text-gray-800 dark:text-gray-200">
-                        {getEventTypeIcon(event.type)}
-                        <div>
-                          <div className="font-medium">{event.title}</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">{formatDate(event.date)}</div>
-                        </div>
-                      </div>
-                      <Badge variant="destructive">{getDaysUntilEvent(event.date)}</Badge>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </motion.div>
+            <KPIList
+              title="Overdue Events"
+              icon="AlertCircle"
+              items={overdueEvents.map((item) => ({
+                title: item.title,
+                subtitle: item.subtitle,
+                color: item.color,
+                progress: item.progress,
+                status: item.status,
+                url: item.url,
+              }))}
+            />
           )}
 
           {/* Today's Events */}
           {todayEvents.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.6 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2 text-gray-800 dark:text-gray-200">
-                    <Clock className="h-5 w-5" />
-                    <span>Today's Events</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {todayEvents.map((event) => (
-                    <div key={event.id} className="flex items-center justify-between p-3 rounded-lg border border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/30">
-                      <div className="flex items-center space-x-3 text-gray-800 dark:text-gray-200">
-                        {getEventTypeIcon(event.type)}
-                        <div>
-                          <div className="font-medium">{event.title}</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">{formatTime(event.date)}</div>
-                        </div>
-                      </div>
-                      <Badge variant="warning">Today</Badge>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </motion.div>
+            <KPIList
+              title="Today's Events"
+              icon="Clock"
+              items={todayEvents.map((item) => ({
+                title: item.title,
+                subtitle: item.subtitle,
+                color: item.color,
+                progress: item.progress,
+                status: item.status,
+                url: item.url,
+              }))}
+            />
           )}
 
           {/* Upcoming Events */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.7 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-gray-800 dark:text-gray-200">
-                  <Calendar className="h-5 w-5" />
-                  <span>Upcoming Events</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {upcomingEvents.map((event) => (
-                  <div key={event.id} className="flex items-center justify-between p-3 rounded-lg border border-indigo-100 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-gray-50 dark:hover:bg-gray-900 dark:bg-gray-900">
-                    <div className="flex items-center space-x-3 text-gray-800 dark:text-gray-200">
-                      {getEventTypeIcon(event.type)}
-                      <div>
-                        <div className="font-medium">{event.title}</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">{formatDate(event.date)}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge variant={getPriorityColor(event.priority)} className="text-xs">
-                        {event.priority}
-                      </Badge>
-                      <Badge variant="info">{getDaysUntilEvent(event.date)}</Badge>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </motion.div>
+          <KPIList
+            title="Upcoming Events"
+            icon="Calendar"
+            items={upcomingEvents.map((item) => ({
+              title: item.title,
+              subtitle: item.subtitle,
+              color: item.color,
+              progress: item.progress,
+              status: item.status,
+              url: item.url,
+            }))}
+          />
 
           {/* Recent Completed Events */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.8 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-gray-800 dark:text-gray-200">
-                  <CheckCircle className="h-5 w-5" />
-                  <span>Recently Completed</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {completedEvents.map((event) => (
-                  <div key={event.id} className="flex items-center justify-between p-3 rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/30">
-                    <div className="flex items-center space-x-3 text-gray-800 dark:text-gray-200">
-                      {getEventTypeIcon(event.type)}
-                      <div>
-                        <div className="font-medium">{event.title}</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">{formatDate(event.date)}</div>
-                      </div>
-                    </div>
-                    <Badge variant="success">Completed</Badge>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </motion.div>
+          <KPIList
+            title="Recently Completed"
+            icon="CheckCircle"
+            items={completedEvents.map((item) => ({
+              title: item.title,
+              subtitle: item.subtitle,
+              color: item.color,
+              progress: item.progress,
+              status: item.status,
+              url: item.url,
+            }))}
+          />
         </div>
       </div>
     </MainLayout>

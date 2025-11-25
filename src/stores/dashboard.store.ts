@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { DashboardStats, SpendAnalysisData, KpiCard, ActivityItem, DeadlineItem } from '../domains/dashboard/types';
+import { DashboardStats, SpendAnalysisData, KpiCard } from '../domains/dashboard/types';
 import { dashboardService } from '../domains/dashboard/services/dashboard.service';
 import { LoadingState } from '@/gradian-ui/shared/types/common';
 
@@ -8,8 +8,6 @@ interface DashboardState extends LoadingState {
   stats: DashboardStats | null;
   spendAnalysisData: SpendAnalysisData | null;
   kpiCards: KpiCard[];
-  recentActivity: ActivityItem[];
-  upcomingDeadlines: DeadlineItem[];
   performanceMetrics: any;
   filters: any;
 }
@@ -19,8 +17,6 @@ interface DashboardActions {
   fetchDashboardStats: (filters?: any) => Promise<void>;
   fetchSpendAnalysisData: (filters?: any) => Promise<void>;
   fetchKpiCards: () => Promise<void>;
-  fetchRecentActivity: (limit?: number) => Promise<void>;
-  fetchUpcomingDeadlines: (limit?: number) => Promise<void>;
   fetchPerformanceMetrics: () => Promise<void>;
   
   // State management
@@ -33,8 +29,6 @@ const initialState: DashboardState = {
   stats: null,
   spendAnalysisData: null,
   kpiCards: [],
-  recentActivity: [],
-  upcomingDeadlines: [],
   performanceMetrics: null,
   filters: {},
   isLoading: false,
@@ -93,40 +87,6 @@ export const useDashboardStore = create<DashboardState & DashboardActions>()(
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Failed to fetch KPI cards',
-            isLoading: false,
-          });
-        }
-      },
-
-      fetchRecentActivity: async (limit: number = 10) => {
-        set({ isLoading: true, error: null });
-        
-        try {
-          const recentActivity = await dashboardService.getRecentActivity(limit);
-          set({
-            recentActivity,
-            isLoading: false,
-          });
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : 'Failed to fetch recent activity',
-            isLoading: false,
-          });
-        }
-      },
-
-      fetchUpcomingDeadlines: async (limit: number = 10) => {
-        set({ isLoading: true, error: null });
-        
-        try {
-          const upcomingDeadlines = await dashboardService.getUpcomingDeadlines(limit);
-          set({
-            upcomingDeadlines,
-            isLoading: false,
-          });
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : 'Failed to fetch upcoming deadlines',
             isLoading: false,
           });
         }

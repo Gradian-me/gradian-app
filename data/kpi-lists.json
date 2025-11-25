@@ -1,0 +1,405 @@
+[
+  {
+    "id": "kpi-1",
+    "title": "New Vendor Added",
+    "subtitle": "Mahyar Abidi • 12/10/2024, 10:30:00 AM",
+    "type": "recent_activity",
+    "timestamp": "2024-12-10T10:30:00Z",
+    "userId": "user1",
+    "userName": "Mahyar Abidi",
+    "color": "blue",
+    "status": {
+      "id": "vendor_created",
+      "label": "vendor created",
+      "icon": "UserPlus",
+      "color": "blue"
+    },
+    "metadata": {
+      "vendorId": "vendor1",
+      "vendorName": "ABC Pharmaceuticals",
+      "action": "created"
+    }
+  },
+  {
+    "id": "kpi-2",
+    "title": "Tender Published",
+    "subtitle": "Dr. Sarah Chen • 12/10/2024, 8:45:00 AM",
+    "type": "recent_activity",
+    "timestamp": "2024-12-10T08:45:00Z",
+    "userId": "user2",
+    "userName": "Dr. Sarah Chen",
+    "color": "green",
+    "status": {
+      "id": "tender_published",
+      "label": "tender published",
+      "icon": "FileText",
+      "color": "green"
+    },
+    "metadata": {
+      "tenderId": "tender1",
+      "tenderName": "HPLC Equipment Tender",
+      "action": "published"
+    }
+  },
+  {
+    "id": "kpi-3",
+    "title": "Purchase Order Created",
+    "subtitle": "John Smith • 12/10/2024, 6:20:00 AM",
+    "type": "recent_activity",
+    "timestamp": "2024-12-10T06:20:00Z",
+    "userId": "user3",
+    "userName": "John Smith",
+    "color": "violet",
+    "progress": 45,
+    "status": {
+      "id": "po_created",
+      "label": "po created",
+      "icon": "ShoppingBag",
+      "color": "violet"
+    },
+    "metadata": {
+      "poId": "po1",
+      "amount": 50000,
+      "currency": "USD",
+      "action": "created"
+    }
+  },
+  {
+    "id": "kpi-4",
+    "title": "PO Approved",
+    "subtitle": "Dr. Sarah Chen • 12/10/2024, 4:15:00 AM",
+    "type": "recent_activity",
+    "timestamp": "2024-12-10T04:15:00Z",
+    "userId": "user2",
+    "userName": "Dr. Sarah Chen",
+    "color": "emerald",
+    "progress": 100,
+    "status": {
+      "id": "po_approved",
+      "label": "po approved",
+      "icon": "FileCheck",
+      "color": "emerald"
+    },
+    "metadata": {
+      "poId": "po1",
+      "approverId": "user2",
+      "action": "approved"
+    }
+  },
+  {
+    "id": "kpi-5",
+    "title": "Tender Awarded",
+    "subtitle": "Mahyar Abidi • 12/9/2024, 4:30:00 PM",
+    "type": "recent_activity",
+    "timestamp": "2024-12-09T16:30:00Z",
+    "userId": "user1",
+    "userName": "Mahyar Abidi",
+    "color": "purple",
+    "status": {
+      "id": "tender_awarded",
+      "label": "tender awarded",
+      "icon": "Award",
+      "color": "purple"
+    },
+    "metadata": {
+      "tenderId": "tender2",
+      "vendorId": "vendor2",
+      "amount": 150000,
+      "action": "awarded"
+    }
+  },
+  {
+    "id": "kpi-6",
+    "title": "HPLC Equipment Tender",
+    "subtitle": "Submission deadline for HPLC equipment tender • Due: 12/12/2024",
+    "type": "upcoming_deadlines",
+    "timestamp": "2024-12-12T17:00:00Z",
+    "userId": "user2",
+    "userName": "Dr. Sarah Chen",
+    "color": "red",
+    "status": {
+      "id": "high",
+      "label": "high",
+      "icon": "AlertCircle",
+      "color": "red"
+    },
+    "metadata": {
+      "deadlineType": "tender_closing",
+      "entityId": "tender3",
+      "entityType": "tender",
+      "priority": "high"
+    }
+  },
+  {
+    "id": "kpi-7",
+    "title": "Purchase Order Delivery",
+    "subtitle": "Expected delivery of medical supplies • Due: 12/15/2024",
+    "type": "upcoming_deadlines",
+    "timestamp": "2024-12-15T09:00:00Z",
+    "userId": "user3",
+    "userName": "John Smith",
+    "color": "amber",
+    "progress": 75,
+    "status": {
+      "id": "medium",
+      "label": "medium",
+      "icon": "Clock",
+      "color": "amber"
+    },
+    "metadata": {
+      "deadlineType": "po_delivery",
+      "entityId": "po2",
+      "entityType": "purchase_order",
+      "priority": "medium"
+    }
+  },
+  {
+    "id": "kpi-8",
+    "title": "Vendor Evaluation",
+    "subtitle": "Quarterly vendor performance review • Due: 12/17/2024",
+    "type": "upcoming_deadlines",
+    "timestamp": "2024-12-17T14:00:00Z",
+    "userId": "user1",
+    "userName": "Mahyar Abidi",
+    "color": "amber",
+    "status": {
+      "id": "medium",
+      "label": "medium",
+      "icon": "Clock",
+      "color": "amber"
+    },
+    "metadata": {
+      "deadlineType": "approval_due",
+      "entityId": "eval1",
+      "entityType": "approval",
+      "priority": "medium"
+    }
+  },
+  {
+    "id": "kpi-9",
+    "title": "Contract Renewal",
+    "subtitle": "Annual contract renewal with key supplier • Due: 12/24/2024",
+    "type": "upcoming_deadlines",
+    "timestamp": "2024-12-24T16:00:00Z",
+    "userId": "user1",
+    "userName": "Mahyar Abidi",
+    "color": "green",
+    "status": {
+      "id": "low",
+      "label": "low",
+      "icon": "CheckCircle",
+      "color": "green"
+    },
+    "metadata": {
+      "deadlineType": "approval_due",
+      "entityId": "contract1",
+      "entityType": "approval",
+      "priority": "low"
+    }
+  },
+  {
+    "id": "kpi-10",
+    "title": "Purchase Order Approval Deadline",
+    "subtitle": "PO-2024-003 needs approval",
+    "type": "overdue_events",
+    "timestamp": "2024-01-25T00:00:00Z",
+    "userId": "user2",
+    "userName": "Dr. Sarah Chen",
+    "color": "red",
+    "status": {
+      "id": "overdue",
+      "label": "Overdue",
+      "icon": "AlertCircle",
+      "color": "red"
+    },
+    "metadata": {
+      "eventType": "deadline",
+      "poId": "po-2024-003",
+      "priority": "high",
+      "daysOverdue": 15
+    }
+  },
+  {
+    "id": "kpi-11",
+    "title": "Merck Solvents Delivery",
+    "subtitle": "Expected delivery of HPLC grade solvents",
+    "type": "today_events",
+    "timestamp": "2024-01-30T00:00:00Z",
+    "userId": "user3",
+    "userName": "John Smith",
+    "color": "amber",
+    "progress": 90,
+    "status": {
+      "id": "today",
+      "label": "Today",
+      "icon": "AlertCircle",
+      "color": "amber"
+    },
+    "metadata": {
+      "eventType": "delivery",
+      "supplier": "Merck",
+      "priority": "medium",
+      "expectedTime": "09:00"
+    }
+  },
+  {
+    "id": "kpi-12",
+    "title": "HPLC Columns Tender Closes",
+    "subtitle": "Annual tender for HPLC columns and related consumables",
+    "type": "upcoming_events",
+    "timestamp": "2024-02-15T00:00:00Z",
+    "userId": "user2",
+    "userName": "Dr. Sarah Chen",
+    "color": "blue",
+    "status": {
+      "id": "high",
+      "label": "high • 16 days",
+      "icon": "FileText",
+      "color": "red"
+    },
+    "metadata": {
+      "eventType": "tender",
+      "tenderId": "tender-hplc-001",
+      "priority": "high",
+      "daysUntil": 16
+    }
+  },
+  {
+    "id": "kpi-13",
+    "title": "Vendor Performance Review",
+    "subtitle": "Quarterly review with Transfarma",
+    "type": "upcoming_events",
+    "timestamp": "2024-02-01T00:00:00Z",
+    "userId": "user1",
+    "userName": "Mahyar Abidi",
+    "color": "blue",
+    "progress": 30,
+    "status": {
+      "id": "medium",
+      "label": "medium • 2 days",
+      "icon": "Calendar",
+      "color": "amber"
+    },
+    "metadata": {
+      "eventType": "meeting",
+      "vendorId": "vendor-transfarma",
+      "priority": "medium",
+      "daysUntil": 2
+    }
+  },
+  {
+    "id": "kpi-14",
+    "title": "Biotech Consumables Delivery",
+    "subtitle": "Cell culture flasks delivered successfully",
+    "type": "recently_completed",
+    "timestamp": "2024-01-28T00:00:00Z",
+    "userId": "user3",
+    "userName": "John Smith",
+    "color": "green",
+    "progress": 100,
+    "status": {
+      "id": "completed",
+      "label": "Completed",
+      "icon": "CheckCircle",
+      "color": "green"
+    },
+    "metadata": {
+      "eventType": "delivery",
+      "poId": "po-bio-001",
+      "action": "completed",
+      "completedAt": "2024-01-28T14:30:00Z"
+    }
+  },
+  {
+    "id": "kpi-15",
+    "title": "Laboratory Equipment Installation",
+    "subtitle": "New HPLC system installation completed",
+    "type": "recently_completed",
+    "timestamp": "2024-01-27T00:00:00Z",
+    "userId": "user1",
+    "userName": "Mahyar Abidi",
+    "color": "green",
+    "progress": 100,
+    "status": {
+      "id": "completed",
+      "label": "Completed",
+      "icon": "CheckCircle",
+      "color": "green"
+    },
+    "metadata": {
+      "eventType": "installation",
+      "equipmentId": "eq-hplc-001",
+      "action": "completed",
+      "completedAt": "2024-01-27T16:00:00Z"
+    }
+  },
+  {
+    "id": "kpi-16",
+    "title": "Vendor Contract Signed",
+    "subtitle": "Mahyar Abidi • 12/8/2024, 2:15:00 PM",
+    "type": "recent_activity",
+    "timestamp": "2024-12-08T14:15:00Z",
+    "userId": "user1",
+    "userName": "Mahyar Abidi",
+    "color": "emerald",
+    "status": {
+      "id": "contract_signed",
+      "label": "contract signed",
+      "icon": "FileCheck",
+      "color": "emerald"
+    },
+    "metadata": {
+      "contractId": "contract-001",
+      "vendorId": "vendor3",
+      "action": "signed",
+      "value": 200000
+    }
+  },
+  {
+    "id": "kpi-17",
+    "title": "Quality Inspection Scheduled",
+    "subtitle": "Scheduled quality inspection for incoming shipment",
+    "type": "upcoming_events",
+    "timestamp": "2024-02-05T00:00:00Z",
+    "userId": "user2",
+    "userName": "Dr. Sarah Chen",
+    "color": "blue",
+    "progress": 20,
+    "status": {
+      "id": "low",
+      "label": "low • 6 days",
+      "icon": "Calendar",
+      "color": "green"
+    },
+    "metadata": {
+      "eventType": "inspection",
+      "shipmentId": "ship-001",
+      "priority": "low",
+      "daysUntil": 6
+    }
+  },
+  {
+    "id": "kpi-18",
+    "title": "Payment Processing",
+    "subtitle": "John Smith • 12/7/2024, 11:30:00 AM",
+    "type": "recent_activity",
+    "timestamp": "2024-12-07T11:30:00Z",
+    "userId": "user3",
+    "userName": "John Smith",
+    "color": "violet",
+    "progress": 60,
+    "status": {
+      "id": "payment_processing",
+      "label": "payment processing",
+      "icon": "DollarSign",
+      "color": "violet"
+    },
+    "metadata": {
+      "paymentId": "pay-001",
+      "amount": 75000,
+      "currency": "USD",
+      "action": "processing"
+    }
+  }
+]
+
