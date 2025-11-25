@@ -35,8 +35,7 @@ import { useUserStore } from '@/stores/user.store';
 import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { useDashboard } from '../hooks/useDashboard';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { LoadingSpinner } from '@/gradian-ui/layout/components';
+import { LoadingSpinner, WelcomeCard } from '@/gradian-ui/layout/components';
 
 export function DashboardPage() {
   const user = useUserStore((state) => state.user);
@@ -120,46 +119,28 @@ export function DashboardPage() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="mb-12"
         >
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-modern border border-gray-200 dark:border-gray-800">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6 mb-6">
-              <Avatar className="h-20 w-20 border-4 border-violet-100 dark:border-violet-500/40 shadow-lg">
-                {user?.avatar ? (
-                  <AvatarImage src={user.avatar} alt={userDisplayName} />
-                ) : null}
-                <AvatarFallback className="text-2xl bg-violet-100 text-violet-800">
-                  {userInitials}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
-              Welcome back, {userDisplayName}! 👋
-            </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400">
-              Here's what's happening with your business today.
-            </p>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Badge
-                variant="secondary"
-                className="text-sm px-3 py-1 bg-violet-50 text-violet-700 border border-violet-100 dark:bg-violet-500/15 dark:text-violet-100 dark:border-violet-500/40 shadow-sm"
-              >
-                🚀 3 New Vendors This Week
-              </Badge>
-              <Badge
-                variant="secondary"
-                className="text-sm px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-500/15 dark:text-emerald-100 dark:border-emerald-500/40 shadow-sm"
-              >
-                📈 15% Cost Savings
-              </Badge>
-              <Badge
-                variant="secondary"
-                className="text-sm px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-100 dark:bg-indigo-500/15 dark:text-indigo-100 dark:border-indigo-500/40 shadow-sm"
-              >
-                ⚡ 98% On-Time Delivery
-              </Badge>
-            </div>
-          </div>
+          <WelcomeCard
+            userName={userDisplayName}
+            avatar={user?.avatar}
+            initials={userInitials}
+            subtitle="Here's what's happening with your business today."
+            badges={[
+              {
+                label: '🚀 3 New Vendors This Week',
+                color: 'violet',
+              },
+              {
+                label: '📈 15% Cost Savings',
+                color: 'emerald',
+              },
+              {
+                label: '⚡ 98% On-Time Delivery',
+                color: 'indigo',
+              },
+            ]}
+            gradient="violet"
+            showPattern={true}
+          />
         </motion.div>
 
         {/* Error Display */}

@@ -153,11 +153,28 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
 
         if (!response.ok) {
           const errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+          // Mark as unhealthy when fetch fails
+          const unhealthyData: HealthCheckResponse = {
+            status: 'unhealthy',
+            timestamp: new Date().toISOString(),
+            service: service.serviceTitle,
+            version: 'unknown',
+            environment: 'unknown',
+            dataSource: 'health-check',
+            uptime: 0,
+            checks: {
+              fetch: {
+                status: 'unhealthy',
+                message: errorMsg,
+              },
+            },
+            responseTime: 0,
+          };
           setHealthStatuses(prev => ({
             ...prev,
             [service.id]: {
               ...prev[service.id],
-              data: null,
+              data: unhealthyData,
               loading: false,
               error: errorMsg,
               lastChecked: new Date().toISOString(),
@@ -174,13 +191,29 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
         // Handle proxy response format
         let data: HealthCheckResponse;
         if (isExternalUrl && result.success === false) {
-          // Proxy returned an error - handle gracefully
+          // Proxy returned an error - mark as unhealthy
           const errorMsg = result.error || 'Failed to check health';
+          const unhealthyData: HealthCheckResponse = {
+            status: 'unhealthy',
+            timestamp: new Date().toISOString(),
+            service: service.serviceTitle,
+            version: 'unknown',
+            environment: 'unknown',
+            dataSource: 'health-check',
+            uptime: 0,
+            checks: {
+              fetch: {
+                status: 'unhealthy',
+                message: errorMsg,
+              },
+            },
+            responseTime: 0,
+          };
           setHealthStatuses(prev => ({
             ...prev,
             [service.id]: {
               ...prev[service.id],
-              data: null,
+              data: unhealthyData,
               loading: false,
               error: errorMsg,
               lastChecked: new Date().toISOString(),
@@ -227,12 +260,30 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
           }
         }
         
+        // Mark as unhealthy when fetch fails
+        const unhealthyData: HealthCheckResponse = {
+          status: 'unhealthy',
+          timestamp: new Date().toISOString(),
+          service: service.serviceTitle,
+          version: 'unknown',
+          environment: 'unknown',
+          dataSource: 'health-check',
+          uptime: 0,
+          checks: {
+            fetch: {
+              status: 'unhealthy',
+              message: errorMessage,
+            },
+          },
+          responseTime: 0,
+        };
+        
         // Set error state (don't throw)
         setHealthStatuses(prev => ({
           ...prev,
           [service.id]: {
             ...prev[service.id],
-            data: null,
+            data: unhealthyData,
             loading: false,
             error: errorMessage,
             lastChecked: new Date().toISOString(),
@@ -251,11 +302,29 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
         ? error.message 
         : 'Failed to check health';
       
+      // Mark as unhealthy when any error occurs
+      const unhealthyData: HealthCheckResponse = {
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        service: service.serviceTitle,
+        version: 'unknown',
+        environment: 'unknown',
+        dataSource: 'health-check',
+        uptime: 0,
+        checks: {
+          error: {
+            status: 'unhealthy',
+            message: errorMessage,
+          },
+        },
+        responseTime: 0,
+      };
+      
       setHealthStatuses(prev => ({
         ...prev,
         [service.id]: {
           ...prev[service.id],
-          data: null,
+          data: unhealthyData,
           loading: false,
           error: errorMessage,
           lastChecked: new Date().toISOString(),

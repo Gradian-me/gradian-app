@@ -118,17 +118,27 @@ const formatValue = (metric: MetricItem): string => {
     return value;
   }
   
+  // Options for toLocaleString to always include thousand separators
+  const numberFormatOptions: Intl.NumberFormatOptions = {
+    minimumFractionDigits: precision,
+    maximumFractionDigits: precision,
+    useGrouping: true, // Always use thousand separators
+  };
+  
   switch (format) {
     case 'currency':
-      return `${prefix || '$'}${value.toFixed(precision || 4)}`;
+      // Use toLocaleString with currency formatting
+      return `${prefix || '$'}${value.toLocaleString('en-US', numberFormatOptions)}`;
     case 'percentage':
-      return `${value.toFixed(precision)}%`;
+      // For percentage, format the number with separators, then add %
+      return `${value.toLocaleString('en-US', numberFormatOptions)}%`;
     case 'number':
-      return value.toLocaleString();
+      return value.toLocaleString('en-US', numberFormatOptions);
     case 'custom':
       return String(value);
     default:
-      return value.toFixed(precision);
+      // Default case: always use thousand separators
+      return value.toLocaleString('en-US', numberFormatOptions);
   }
 };
 
