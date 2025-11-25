@@ -20,9 +20,14 @@ import {
   Users
 } from 'lucide-react';
 import { useEffect } from 'react';
+import { useUserStore } from '@/stores/user.store';
+import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
+import { useLanguageStore } from '@/stores/language.store';
 import { useDashboard } from '../hooks/useDashboard';
 
 export function DashboardPage() {
+  const user = useUserStore((state) => state.user);
+  const language = useLanguageStore((state) => state.language || 'en');
   const {
     stats,
     spendAnalysisData,
@@ -53,7 +58,7 @@ export function DashboardPage() {
 
   if (isLoading) {
     return (
-      <MainLayout title="Business Dashboard">
+      <MainLayout title="Dashboard" subtitle="Loading dashboard data…" icon="LayoutDashboard">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
@@ -61,8 +66,13 @@ export function DashboardPage() {
     );
   }
 
+  const userFirstName = user ? resolveLocalizedField(user.name, language, 'en') : '';
+  const userDisplayName = userFirstName || user?.email || 'there';
+
+  const subtitle = `Welcome back, ${userDisplayName}!`;
+
   return (
-    <MainLayout title="Business Dashboard">
+    <MainLayout title="Dashboard" subtitle={subtitle} icon="LayoutDashboard">
       <div className="space-y-6">
         {/* Welcome Section */}
         <motion.div
@@ -73,7 +83,7 @@ export function DashboardPage() {
         >
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-modern border border-gray-200 dark:border-gray-800">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
-              Welcome back, Mahyar! 👋
+              Welcome back, {userDisplayName}! 👋
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
               Here's what's happening with your business today.

@@ -311,3 +311,4 @@ export * from './icon-renderer';
 export * from './number-formatter';
 export * from './highlighter';
 export * from './sort-utils';
+export * from './localization';

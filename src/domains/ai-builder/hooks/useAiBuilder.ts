@@ -220,7 +220,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
         const pricing = builderResponse.tokenUsage.pricing;
         
         const savedPrompt = await createPrompt({
-          username,
+          username: user?.username || '',
           aiAgent: request.agentId,
           userPrompt: request.userPrompt.trim(),
           agentResponse: typeof builderResponse.response === 'string' 

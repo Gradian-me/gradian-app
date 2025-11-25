@@ -1,6 +1,8 @@
-'use client';
+import { HealthPage } from '@/domains/health/components/HealthPage';
 
-import { HealthPage } from '@/domains/health';
+export const metadata = {
+  title: 'Health Monitoring',
+};
 
 export default function HealthPageRoute() {
   return <HealthPage />;

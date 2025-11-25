@@ -33,6 +33,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const shouldAnimate = prevWidthRef.current !== width;
 
+  const showUserControls = (!isCollapsed || isMobile);
+
   return (
     <motion.div
       initial={false}
@@ -71,21 +73,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
       />
 
       {/* User Profile / Mode Toggle */}
-      {(!isCollapsed || isMobile) && (
+      {showUserControls && (
         <div className="mt-auto border-t border-gray-800 p-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 overflow-hidden">
             <UserProfileSelector
-              className={cn(
-                "flex-1",
-                isCollapsed && !isMobile ? "justify-center" : ""
-              )}
+              className="flex-1 min-w-0"
               theme="dark"
               config={{
                 layout: {
                   variant: 'dropdown',
-                  size: isCollapsed && !isMobile ? 'sm' : 'md',
+                  size: 'sm',
                   showAvatar: true,
-                  showName: !isCollapsed || isMobile,
+                  showName: true,
                   showEmail: false,
                   showRole: false,
                   showStatus: false,

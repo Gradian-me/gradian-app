@@ -34,9 +34,7 @@ export async function GET() {
     try {
       const dataDir = path.join(process.cwd(), 'data');
       const criticalFiles = [
-        'health.json',
-        'all-schemas.json',
-        'application-variables.json'
+        'health.json'
       ];
       
       // Check if data directory exists

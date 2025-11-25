@@ -33,7 +33,10 @@ export function KPICard({
       whileHover={{ y: -2, scale: 1.005 }}
       className="group"
     >
-      <Card className="relative overflow-hidden border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:shadow-lg transition-all duration-300">
+      <Card 
+        className="relative h-auto overflow-hidden border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:shadow-lg transition-all duration-300"
+        style={{ height: '-webkit-fill-available' }}
+      >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-sm font-semibold text-gray-600 dark:text-gray-300 group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors">
             {title}

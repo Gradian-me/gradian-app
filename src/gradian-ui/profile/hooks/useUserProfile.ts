@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { UserProfile } from '../types';
 import { getUserInitials } from '../utils';
 import { config } from '@/lib/config';
+import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 export interface UseUserProfileReturn {
   profile: UserProfile | null;
@@ -17,9 +19,9 @@ export interface UseUserProfileReturn {
 /**
  * Convert API user data to UserProfile format
  */
-function convertUserToProfile(user: any): UserProfile {
-  const firstName = user.name || '';
-  const lastName = user.lastname || '';
+function convertUserToProfile(user: any, language: string): UserProfile {
+  const firstName = resolveLocalizedField(user.name, language, 'en');
+  const lastName = resolveLocalizedField(user.lastname, language, 'en');
   const fullName = lastName 
     ? `${firstName} ${lastName}`.trim()
     : firstName;
@@ -51,10 +53,12 @@ function convertUserToProfile(user: any): UserProfile {
 
 export const useUserProfile = (userId: string): UseUserProfileReturn => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [rawUser, setRawUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isValid, setIsValid] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const language = useLanguageStore((state) => state.language || 'en');
 
   const fetchProfile = async () => {
     if (!userId) {
@@ -90,9 +94,7 @@ export const useUserProfile = (userId: string): UseUserProfileReturn => {
       }
 
       // Convert API user data to UserProfile format
-      const userProfile = convertUserToProfile(result.data);
-      
-      setProfile(userProfile);
+      setRawUser(result.data);
       setIsValid(true);
       setValidationErrors([]);
       
@@ -112,6 +114,14 @@ export const useUserProfile = (userId: string): UseUserProfileReturn => {
       fetchProfile();
     }
   }, [userId]);
+
+  useEffect(() => {
+    if (rawUser) {
+      setProfile(convertUserToProfile(rawUser, language));
+    } else {
+      setProfile(null);
+    }
+  }, [rawUser, language]);
 
   return {
     profile,

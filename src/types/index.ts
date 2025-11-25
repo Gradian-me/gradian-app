@@ -1,9 +1,12 @@
 // User and Authentication Types
+export type LocalizedField = string | Record<string, string>;
+
 export interface User {
   id: string;
   email: string;
-  name: string;
-  lastname?: string; // Last name field
+  name: LocalizedField;
+  username?: string;
+  lastname?: LocalizedField; // Last name field
   role: 'admin' | 'procurement' | 'vendor';
   department?: string;
   avatar?: string;

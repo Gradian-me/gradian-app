@@ -74,9 +74,9 @@ export default function LoginPage() {
           ...(fingerprintValue ? { 'x-fingerprint': fingerprintValue } : {}),
         },
         body: JSON.stringify({
-          email,
+          emailOrUsername: email,
           password,
-          fingerprint: fingerprintValue,
+          deviceFingerprint: fingerprintValue,
         }),
       });
 
@@ -99,6 +99,7 @@ export default function LoginPage() {
         setUser({
           id: data.user.id,
           email: data.user.email,
+          username: data.user.username,
           name: data.user.name,
           lastname: data.user.lastname,
           role: data.user.role as 'admin' | 'procurement' | 'vendor',

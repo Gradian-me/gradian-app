@@ -19,6 +19,8 @@ export const DEFAULT_APPLICATION_VARIABLES = {
     REFRESH_TOKEN_EXPIRY: 604800,
     ACCESS_TOKEN_COOKIE: 'auth_token',
     REFRESH_TOKEN_COOKIE: 'refresh_token',
+    SESSION_TOKEN_COOKIE: 'session_token',
+    USER_SESSION_ID_COOKIE: 'user_session_id',
     USERS_API_PATH: '/api/data/users',
     ERROR_MESSAGES: {
       USER_NOT_FOUND: 'User does not exist',
