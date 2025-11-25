@@ -4,14 +4,15 @@ import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import type { ColorFormat } from 'react-countdown-circle-timer';
 import { cn } from '@/lib/utils';
 
-type ColorArray = [`#${string}`, `#${string}`, ...`#${string}`[]];
+type HexColor = `#${string}`;
+type ColorArray = [HexColor, HexColor, ...HexColor[]];
 
 type CountdownColorProps =
   | { colors: ColorFormat; colorsTime?: never }
   | { colors: ColorArray; colorsTime: [number, number, ...number[]] };
 
 // Tailwind color name to hex mapping (using 500 shade as default)
-const TAILWIND_COLOR_MAP: Record<string, string> = {
+const TAILWIND_COLOR_MAP = {
   blue: '#3B82F6',
   red: '#EF4444',
   violet: '#8B5CF6',
@@ -34,18 +35,21 @@ const TAILWIND_COLOR_MAP: Record<string, string> = {
   zinc: '#71717A',
   neutral: '#737373',
   stone: '#78716C',
-};
+} as const satisfies Record<string, HexColor>;
 
-const getColorHex = (colorName?: string): string => {
+const getColorHex = (colorName?: string): HexColor => {
   if (!colorName) return TAILWIND_COLOR_MAP.blue;
   
   // If already a hex color, return as is
   if (colorName.startsWith('#')) {
-    return colorName;
+    return colorName as HexColor;
   }
   
   // Map Tailwind color name to hex
-  return TAILWIND_COLOR_MAP[colorName.toLowerCase()] || TAILWIND_COLOR_MAP.blue;
+  return (
+    TAILWIND_COLOR_MAP[colorName.toLowerCase() as keyof typeof TAILWIND_COLOR_MAP] ??
+    TAILWIND_COLOR_MAP.blue
+  );
 };
 
 export interface CircularProgressProps {
@@ -80,15 +84,16 @@ export function CircularProgress({
   className,
   colorsTime,
 }: CircularProgressProps) {
-  const colorHex = getColorHex(Array.isArray(color) ? color[0] : color);
+  const colorHex: ColorFormat = getColorHex(Array.isArray(color) ? color[0] : color);
   
   // Timer mode (shows remaining time - empty part fills as time passes)
   if (duration !== undefined || isTimer) {
-    const timerColors: ColorFormat = Array.isArray(color) && color.length > 0
+    const countdownDuration = duration ?? 0;
+    const timerColors = Array.isArray(color) && color.length > 0
       ? (color.map(c => getColorHex(c)) as ColorArray)
-      : colorHex;
+      : (colorHex as HexColor);
     
-    const timerColorsTime = colorsTime || (Array.isArray(color) && color.length > 1
+    const timerColorsTime = colorsTime || (Array.isArray(color) && color.length > 1 && typeof duration === 'number'
       ? (() => {
           const step = duration / (color.length - 1);
           return Array.from({ length: color.length }, (_, i) => 
@@ -99,13 +104,13 @@ export function CircularProgress({
 
     const countdownColorProps: CountdownColorProps = Array.isArray(timerColors) && timerColorsTime
       ? { colors: timerColors as ColorArray, colorsTime: timerColorsTime }
-      : { colors: timerColors };
+      : { colors: timerColors as ColorFormat };
 
     return (
       <div className={cn('relative flex items-center justify-center', className)}>
         <CountdownCircleTimer
           isPlaying={isPlaying}
-          duration={duration}
+          duration={countdownDuration}
           initialRemainingTime={initialRemainingTime}
           size={size}
           strokeWidth={strokeWidth}

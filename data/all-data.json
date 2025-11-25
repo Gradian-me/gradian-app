@@ -976,10 +976,13 @@
     {
       "color": "#4E79A7",
       "name": "Gradian Integration",
-      "address": "http://172.20.200.106:8504",
+      "address": "https://octa.cinnagen.com/integration",
       "id": "01KA8QZJ9SAJ6Y2GR05K42BQYF",
       "createdAt": "2025-11-17T11:07:42.270Z",
-      "updatedAt": "2025-11-17T11:07:42.270Z"
+      "updatedAt": "2025-11-25T15:21:03.554Z",
+      "url-repositories": [],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "color": "#4E79A7",
@@ -1032,7 +1035,7 @@
   "url-repository": [
     {
       "title": "Email Template Sync",
-      "address": "http://172.20.200.106:8504/notifications/cache/refresh",
+      "address": "https://octa.cinnagen.com/integration/notifications/cache/refresh",
       "methods": [
         {
           "id": "GET",
@@ -1043,7 +1046,9 @@
       ],
       "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
       "createdAt": "2025-11-17T11:45:23.067Z",
-      "updatedAt": "2025-11-17T11:45:38.082Z"
+      "updatedAt": "2025-11-25T15:20:44.099Z",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas",
@@ -1307,7 +1312,7 @@
           "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
           "label": "Email Template Sync",
           "metadata": {
-            "address": "http://172.20.200.106:8504/notifications/cache/refresh"
+            "address": "https://octa.cinnagen.com/integration/notifications/cache/refresh"
           }
         }
       ],
@@ -1321,7 +1326,9 @@
       ],
       "id": "email_template_sync",
       "createdAt": "2025-11-17T12:05:23.829Z",
-      "updatedAt": "2025-11-17T13:03:00.772Z"
+      "updatedAt": "2025-11-25T15:21:48.768Z",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "color": "#8b5cf6",
@@ -1364,8 +1371,8 @@
       ],
       "id": "lucide_icons_sync",
       "createdAt": "2025-11-17T18:00:00.000Z",
-      "updatedAt": "2025-11-22T15:08:53.297Z",
-      "lastSynced": "2025-11-22T15:08:52.923Z"
+      "updatedAt": "2025-11-25T15:19:28.271Z",
+      "lastSynced": "2025-11-25T15:19:28.271Z"
     },
     {
       "color": "#f59e0b",
@@ -1391,8 +1398,8 @@
       ],
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-11-23T11:50:46.194Z",
-      "lastSynced": "2025-11-23T11:50:45.980Z"
+      "updatedAt": "2025-11-25T15:19:29.220Z",
+      "lastSynced": "2025-11-25T15:19:29.220Z"
     }
   ],
   "databases": [
