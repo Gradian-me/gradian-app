@@ -10,6 +10,7 @@ import {
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { toast } from 'sonner';
+import { getFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
 
 // Helper function to resolve API endpoint URL
 // IMPORTANT: Always use relative URLs so requests go through Next.js API routes
@@ -64,6 +65,36 @@ const extractCallerFromStack = (): string | undefined => {
 };
 
 const isBrowserEnvironment = (): boolean => typeof window !== 'undefined';
+
+const headersToObject = (headers?: HeadersInit): Record<string, string> => {
+  if (!headers) {
+    return {};
+  }
+
+  if (headers instanceof Headers) {
+    return Object.fromEntries(headers.entries());
+  }
+
+  if (Array.isArray(headers)) {
+    return headers.reduce<Record<string, string>>((acc, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    }, {});
+  }
+
+  return { ...(headers as Record<string, string>) };
+};
+
+const appendFingerprintHeader = (headers?: HeadersInit): HeadersInit => {
+  const fingerprint = getFingerprintCookie();
+  if (!fingerprint) {
+    return headers ?? {};
+  }
+
+  const headerObject = headersToObject(headers);
+  headerObject['x-fingerprint'] = fingerprint;
+  return headerObject;
+};
 
 /**
  * Checks if an error is a connection/timeout error
@@ -174,6 +205,8 @@ export class ApiClient {
       },
       ...options,
     };
+
+    requestConfig.headers = appendFingerprintHeader(requestConfig.headers);
 
     try {
       const response = await fetch(url, requestConfig);
