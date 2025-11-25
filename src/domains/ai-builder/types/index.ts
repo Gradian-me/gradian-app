@@ -2,6 +2,8 @@
  * AI Builder Domain Types
  */
 
+import { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
+
 export interface AiAgent {
   id: string;
   label: string;
@@ -10,6 +12,13 @@ export interface AiAgent {
   requiredOutputFormat: 'json' | 'string';
   model?: string;
   systemPrompt?: string;
+  renderComponents?: Array<Partial<FormField> & {
+    id: string;
+    name: string;
+    component: string;
+    aiAgentId?: string; // For AI agent integration (e.g., professional-writing)
+    [key: string]: any; // Allow additional properties from JSON
+  }>;
   preloadRoutes?: Array<{
     route: string;
     title: string;
