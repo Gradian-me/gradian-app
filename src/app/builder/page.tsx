@@ -137,7 +137,6 @@ export default function BuilderPage() {
           <div className="flex items-start justify-between gap-4 mb-4 w-full flex-wrap">
             <p className="text-gray-600 dark:text-gray-400 text-md max-w-4xl">
               Use the builders below to configure your application.
-              Define schemas for your entities and establish relationships between them.
             </p>
             <div className="flex items-end">
               <Button
@@ -261,7 +260,7 @@ export default function BuilderPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-6"
+          className="bg-blue-50 dark:bg-violet-800/30 border border-blue-200 dark:border-violet-800 rounded-xl p-6"
         >
           <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-200 mb-2 flex items-center gap-2">
             <Palette className="h-5 w-5" />

@@ -34,7 +34,7 @@ export function KPICard({
       className="group"
     >
       <Card 
-        className="relative h-auto overflow-hidden border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:shadow-lg transition-all duration-300"
+        className="relative h-auto overflow-hidden border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 hover:shadow-lg transition-all duration-300"
         style={{ height: '-webkit-fill-available' }}
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">

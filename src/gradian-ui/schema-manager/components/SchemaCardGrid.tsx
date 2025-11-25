@@ -14,7 +14,7 @@ import { PencilRuler, LayoutList, Trash2, Layers, Type } from 'lucide-react';
 import { FormSchema } from '../types';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
-import { Skeleton } from '@/components/ui/skeleton';
+import { LoadingSkeleton } from '@/gradian-ui/layout/components';
 
 interface SchemaCardGridProps {
   schemas: FormSchema[];
@@ -163,47 +163,11 @@ export function SchemaCardGrid({ schemas, onEdit, onView, onDelete }: SchemaCard
 
 export function SchemaCardSkeletonGrid({ count = 6 }: SchemaCardSkeletonGridProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {Array.from({ length: count }).map((_, index) => {
-        const animationDelay = Math.min(
-          index * UI_PARAMS.CARD_INDEX_DELAY.STEP,
-          UI_PARAMS.CARD_INDEX_DELAY.SKELETON_MAX,
-        );
-
-        return (
-          <motion.div
-            key={`schema-card-skeleton-${index}`}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25, delay: animationDelay, ease: 'easeOut' }}
-          >
-            <Card className="h-full flex flex-col border border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-              <CardHeader className="pb-3 pt-4 px-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <Skeleton className="h-5 w-5 rounded shrink-0" />
-                      <Skeleton className="h-5 w-32" />
-                    </div>
-                    <Skeleton className="h-3 w-48 mt-1" />
-                  </div>
-                  <div className="flex gap-0.5 ml-2 shrink-0">
-                    <Skeleton className="h-7 w-7 rounded" />
-                    <Skeleton className="h-7 w-7 rounded" />
-                    <Skeleton className="h-7 w-7 rounded" />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-2 px-4 pb-4">
-                <div className="flex items-center gap-4">
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-4 w-16" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        );
-      })}
-    </div>
+    <LoadingSkeleton
+      variant="card"
+      count={count}
+      columns={{ default: 1, md: 2, lg: 3 }}
+      gap={6}
+    />
   );
 }

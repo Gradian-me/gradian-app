@@ -9,7 +9,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-card-foreground shadow-sm hover:shadow-md hover:border-gray-300 transition-all duration-200 overflow-hidden",
+      "rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 text-card-foreground shadow-sm hover:shadow-md hover:border-gray-300 transition-all duration-200 overflow-hidden",
       className
     )}
     style={{ height: '-webkit-fill-available' }}

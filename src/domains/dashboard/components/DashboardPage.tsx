@@ -24,6 +24,7 @@ import { useUserStore } from '@/stores/user.store';
 import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { useDashboard } from '../hooks/useDashboard';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export function DashboardPage() {
   const user = useUserStore((state) => state.user);
@@ -68,6 +69,16 @@ export function DashboardPage() {
 
   const userFirstName = user ? resolveLocalizedField(user.name, language, 'en') : '';
   const userDisplayName = userFirstName || user?.email || 'there';
+  const userInitials = (() => {
+    const source = userDisplayName?.trim() || 'GR';
+    return source
+      .split(' ')
+      .map((word) => word[0])
+      .filter(Boolean)
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  })();
 
   const subtitle = `Welcome back, ${userDisplayName}!`;
 
@@ -81,13 +92,25 @@ export function DashboardPage() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="mb-12"
         >
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-modern border border-gray-200 dark:border-gray-800">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-modern border border-gray-200 dark:border-gray-800">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6 mb-6">
+              <Avatar className="h-20 w-20 border-4 border-violet-100 dark:border-violet-500/40 shadow-lg">
+                {user?.avatar ? (
+                  <AvatarImage src={user.avatar} alt={userDisplayName} />
+                ) : null}
+                <AvatarFallback className="text-2xl bg-violet-100 text-violet-800">
+                  {userInitials}
+                </AvatarFallback>
+              </Avatar>
+              <div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
               Welcome back, {userDisplayName}! 👋
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                <p className="text-lg text-gray-600 dark:text-gray-400">
               Here's what's happening with your business today.
             </p>
+              </div>
+            </div>
             <div className="flex flex-wrap gap-3">
               <Badge
                 variant="secondary"

@@ -27,7 +27,7 @@ import { useDynamicEntity } from '@/gradian-ui/shared/hooks';
 import { FormModal } from '../../form-builder';
 import { ConfirmationMessage } from '../../form-builder';
 import { getValueByRole, getSingleValueByRole } from '../../form-builder/form-elements/utils/field-resolver';
-import { Skeleton } from '@/components/ui/skeleton';
+import { LoadingSkeleton } from '@/gradian-ui/layout/components';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { useCompanyStore } from '@/stores/company.store';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -873,51 +873,17 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4" : "space-y-4"}>
             {isLoading ? (
               // Skeleton cards while loading
-              Array.from({ length: 8 }).map((_, index) => (
-                <motion.div
-                  key={`skeleton-${index}`}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: Math.min(
-                      index * UI_PARAMS.CARD_INDEX_DELAY.STEP,
-                      UI_PARAMS.CARD_INDEX_DELAY.SKELETON_MAX
-                    ),
-                    ease: 'easeOut',
-                  }}
-                  className="rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 overflow-hidden"
-                >
-                  <div className="p-4 sm:p-6">
-                    {/* Header with avatar and title */}
-                    <div className="flex items-start gap-3 mb-3">
-                      <Skeleton className="h-10 w-10 rounded-full shrink-0" />
-                      <div className="flex-1 min-w-0 space-y-2">
-                        <Skeleton className="h-4 w-2/3" />
-                        <Skeleton className="h-3 w-1/2" />
-                      </div>
-                    </div>
-                    
-                    {/* Badges */}
-                    <div className="flex gap-2 mb-3">
-                      <Skeleton className="h-5 w-16 rounded-full" />
-                      <Skeleton className="h-5 w-12 rounded-full" />
-                    </div>
-                    
-                    {/* Metrics */}
-                    <div className="space-y-1.5 mb-3">
-                      <Skeleton className="h-3 w-full" />
-                      <Skeleton className="h-3 w-4/5" />
-                    </div>
-                    
-                    {/* Action buttons */}
-                    <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-50 dark:border-gray-800">
-                      <Skeleton className="h-7 w-14" />
-                      <Skeleton className="h-7 w-14" />
-                    </div>
-                  </div>
-                </motion.div>
-              ))
+              viewMode === 'grid' ? (
+                <LoadingSkeleton
+                  variant="card"
+                  count={8}
+                  columns={{ default: 1, sm: 2, md: 2, lg: 3, xl: 4 }}
+                  gap={4}
+                  className="col-span-full"
+                />
+              ) : (
+                <LoadingSkeleton variant="card" count={8} gap={4} />
+              )
             ) : (
               filteredEntities.map((entity: any, index: number) => (
                 <div key={entity.id} className="relative">

@@ -208,7 +208,6 @@ export function UserProfileSelector({
               <AvatarImage
                 src={user.avatar}
                 alt={displayName}
-                className="object-cover"
               />
             ) : null}
             <AvatarFallback className="bg-violet-100 text-violet-800 text-xs">

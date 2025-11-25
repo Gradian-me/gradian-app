@@ -1,4 +1,5 @@
 import React from 'react';
+import { LoadingSkeleton } from '@/gradian-ui/layout/components';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table } from './Table';
 import { TableAggregations, AggregationConfig } from './TableAggregations';
@@ -54,7 +55,7 @@ export function TableWrapper<T = any>({
         {showCards ? (
           <TableCardSkeleton count={effectiveCardCount} columnCount={effectiveColumnCount} cardColumns={cardColumns} />
         ) : (
-          <TableSkeleton columnCount={effectiveColumnCount} rowCount={effectiveRowCount} bordered={tableConfig.bordered} />
+          <LoadingSkeleton variant="table" count={effectiveRowCount} />
         )}
         {aggregations.length > 0 && (
           <AggregationSkeleton count={aggregations.length} gridColumns={aggregationColumns} />
@@ -107,47 +108,6 @@ export function TableWrapper<T = any>({
 TableWrapper.displayName = 'TableWrapper';
 
 
-interface TableSkeletonProps {
-  columnCount: number;
-  rowCount: number;
-  bordered?: boolean;
-}
-
-function TableSkeleton({ columnCount, rowCount, bordered }: TableSkeletonProps) {
-  // Limit skeleton columns to a maximum of 4 for cleaner appearance
-  const skeletonColumnCount = Math.min(columnCount, 7);
-  const columns = Array.from({ length: skeletonColumnCount });
-  return (
-    <div className="mx-0 min-w-0">
-      <div
-        className={`relative overflow-hidden bg-white dark:bg-gray-800 ${bordered ? 'border border-gray-200 dark:border-gray-700 rounded-lg m-2' : 'rounded-lg'}`}
-      >
-        <div className="hidden md:block border-b border-gray-100 dark:border-gray-700 bg-gray-50/60 px-6 py-4">
-          <div className="flex items-center gap-6">
-            {columns.map((_, index) => (
-              <Skeleton key={`header-${index}`} className="h-4 w-32 flex-1" />
-            ))}
-          </div>
-        </div>
-        <div className="divide-y divide-gray-100 dark:divide-gray-500">
-          {Array.from({ length: rowCount }).map((_, rowIndex) => (
-            <div
-              key={`row-${rowIndex}`}
-              className="flex flex-col gap-4 px-4 py-4 md:grid"
-              style={{ gridTemplateColumns: `repeat(${skeletonColumnCount}, minmax(0, 1fr))` }}
-            >
-              {columns.map((_, colIndex) => (
-                <div key={`cell-${rowIndex}-${colIndex}`} className="flex items-center">
-                  <Skeleton className="h-4 w-full text-gray-900 dark:text-gray-200" />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 interface TableCardSkeletonProps {
   count: number;

@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import * as LucideIcons from 'lucide-react';
 import { GridBuilder } from '../../layout/grid-builder';
+import { LoadingSkeleton } from '../../layout/components';
 import { DynamicCard } from './DynamicCard';
 import { CardSection, FormSchema, ListMetadata } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '../../shared/utils';
@@ -76,22 +77,16 @@ export const DynamicList: React.FC<DynamicListProps> = ({
   // Loading state
   if (isLoading) {
     if (listMetadata.loadingState?.skeleton) {
+      const columns = listMetadata.layout.columns || { default: 1, sm: 2, md: 3, lg: 4 };
+      const gap = listMetadata.layout.gap || 6;
       return (
-        <div className={cn("space-y-6", className)}>
-          <GridBuilder config={{
-            id: listMetadata.id,
-            name: listMetadata.name,
-            columns: listMetadata.layout.columns || { default: 1, sm: 2, md: 3, lg: 4 },
-            gap: listMetadata.layout.gap || 6,
-            responsive: true
-          }}>
-            {Array.from({ length: listMetadata.loadingState.count || 8 }, (_, index) => (
-              <div key={index} className="animate-pulse">
-                <div className="bg-gray-200 rounded-lg h-64 w-full"></div>
-              </div>
-            ))}
-          </GridBuilder>
-        </div>
+        <LoadingSkeleton
+          variant="card"
+          count={listMetadata.loadingState.count || 8}
+          columns={columns}
+          gap={gap}
+          className={className}
+        />
       );
     }
 
