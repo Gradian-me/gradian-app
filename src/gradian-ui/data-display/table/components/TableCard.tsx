@@ -70,9 +70,9 @@ export function TableCard<T = any>({
               })();
 
           return (
-            <div key={column.id} className="flex flex-col gap-1 min-w-0">
+            <div key={column.id} className="flex flex-col gap-1 min-w-0" dir="auto">
               <span className="text-sm font-medium text-gray-400 dark:text-gray-400">{column.label}:</span>
-              <div className="text-sm text-gray-900 dark:text-gray-100 wrap-break-word min-w-0">{cellContent}</div>
+              <div className="text-sm text-gray-900 dark:text-gray-100 wrap-break-word min-w-0" dir="auto">{cellContent}</div>
             </div>
           );
         })}

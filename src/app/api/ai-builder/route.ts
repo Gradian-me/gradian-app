@@ -278,7 +278,7 @@ export async function POST(request: NextRequest) {
 
     // Extract JSON if required output format is JSON
     let processedResponse = aiResponseContent;
-    if (agent.requiredOutputFormat === 'json') {
+    if (agent.requiredOutputFormat === 'json' || agent.requiredOutputFormat === 'table') {
       const extractedJson = extractJson(aiResponseContent);
       if (extractedJson) {
         processedResponse = extractedJson;
@@ -299,7 +299,7 @@ export async function POST(request: NextRequest) {
         success: true,
         data: {
           response: processedResponse,
-          format: agent.requiredOutputFormat || 'string',
+          format: agent.requiredOutputFormat === 'table' ? 'json' : (agent.requiredOutputFormat || 'string'),
           tokenUsage,
           timing: {
             responseTime: responseTimeMs, // Time to receive response

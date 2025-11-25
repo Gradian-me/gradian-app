@@ -436,6 +436,7 @@ export default function AiBuilderPage() {
             tokenUsage={tokenUsage}
             duration={duration}
             isApproving={isApproving}
+            isLoading={isLoading}
             onApprove={handleApprove}
             onCardClick={handleCardClick}
             annotations={annotationsArray}

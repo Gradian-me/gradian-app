@@ -5,7 +5,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -13,6 +13,8 @@ import { Loader2, Timer } from 'lucide-react';
 import { MetricCard } from '@/gradian-ui/analytics';
 import { ResponseCardViewer } from './ResponseCardViewer';
 import { ResponseAnnotationViewer } from './ResponseAnnotationViewer';
+import { TableWrapper } from '@/gradian-ui/data-display/table/components/TableWrapper';
+import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
 import type { AiAgent, TokenUsage, SchemaAnnotation, AnnotationItem } from '../types';
 
 interface AiBuilderResponseProps {
@@ -21,6 +23,7 @@ interface AiBuilderResponseProps {
   tokenUsage: TokenUsage | null;
   duration: number | null;
   isApproving: boolean;
+  isLoading?: boolean;
   onApprove: () => void;
   onCardClick?: (cardData: { id: string; label: string; icon?: string }, schemaData: any) => void;
   annotations?: SchemaAnnotation[];
@@ -29,12 +32,83 @@ interface AiBuilderResponseProps {
   onApplyAnnotations?: (annotations: SchemaAnnotation[]) => void;
 }
 
+// Utility function to generate table columns from JSON data
+function generateColumnsFromData(data: any[]): TableColumn[] {
+  if (!data || data.length === 0) return [];
+
+  // Get all unique keys from all objects in the array
+  const allKeys = new Set<string>();
+  data.forEach((item) => {
+    if (item && typeof item === 'object') {
+      Object.keys(item).forEach((key) => allKeys.add(key));
+    }
+  });
+
+  // Generate columns from keys
+  return Array.from(allKeys).map((key) => {
+    // Format key to label (e.g., "firstName" -> "First Name")
+    const label = key
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, (str) => str.toUpperCase())
+      .trim();
+
+    // Determine alignment based on value type
+    const firstValue = data.find((item) => item?.[key] != null)?.[key];
+    const isNumeric = typeof firstValue === 'number';
+    const align = isNumeric ? 'right' : 'left';
+
+    return {
+      id: key,
+      label,
+      accessor: key,
+      sortable: true,
+      align,
+      render: (value: any) => {
+        if (value === null || value === undefined) {
+          return '—';
+        }
+        if (typeof value === 'object') {
+          return JSON.stringify(value);
+        }
+        return String(value);
+      },
+    } as TableColumn;
+  });
+}
+
+// Utility function to parse JSON and extract array data
+function parseTableData(response: string): { data: any[]; isValid: boolean } {
+  try {
+    const parsed = JSON.parse(response);
+    
+    // If it's already an array, return it
+    if (Array.isArray(parsed)) {
+      return { data: parsed, isValid: true };
+    }
+    
+    // If it's an object with a single array property, extract that
+    if (typeof parsed === 'object' && parsed !== null) {
+      const keys = Object.keys(parsed);
+      if (keys.length === 1 && Array.isArray(parsed[keys[0]])) {
+        return { data: parsed[keys[0]], isValid: true };
+      }
+      // If it's an object, wrap it in an array
+      return { data: [parsed], isValid: true };
+    }
+    
+    return { data: [], isValid: false };
+  } catch {
+    return { data: [], isValid: false };
+  }
+}
+
 export function AiBuilderResponse({
   response,
   agent,
   tokenUsage,
   duration,
   isApproving,
+  isLoading = false,
   onApprove,
   onCardClick,
   annotations = [],
@@ -42,14 +116,86 @@ export function AiBuilderResponse({
   onRemoveSchema,
   onApplyAnnotations,
 }: AiBuilderResponseProps) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const prevIsLoadingRef = useRef<boolean>(isLoading);
+
+  // Scroll to "Your Creation" heading when generation finishes
+  useEffect(() => {
+    // Check if generation just finished (isLoading changed from true to false)
+    if (prevIsLoadingRef.current === true && isLoading === false && response && headingRef.current) {
+      // Longer delay to ensure DOM is fully updated and rendered
+      setTimeout(() => {
+        if (headingRef.current) {
+          // Calculate offset to account for any fixed headers
+          const element = headingRef.current;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - 20; // 20px offset from top
+          
+          // Use smooth scroll with requestAnimationFrame for better performance
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 300);
+    }
+    prevIsLoadingRef.current = isLoading;
+  }, [isLoading, response]);
+
   if (!response) {
     return null;
   }
 
+  // Check if we should render as table
+  const shouldRenderTable = agent?.requiredOutputFormat === 'table';
+  const { data: tableData, isValid: isValidTable } = useMemo(() => {
+    if (shouldRenderTable) {
+      return parseTableData(response);
+    }
+    return { data: [], isValid: false };
+  }, [response, shouldRenderTable]);
+
+  const tableColumns = useMemo(() => {
+    if (shouldRenderTable && isValidTable && tableData.length > 0) {
+      return generateColumnsFromData(tableData);
+    }
+    return [];
+  }, [shouldRenderTable, isValidTable, tableData]);
+
+  const tableConfig: TableConfig = useMemo(() => {
+    return {
+      id: 'ai-response-table',
+      columns: tableColumns,
+      data: tableData,
+      pagination: {
+        enabled: tableData.length > 10,
+        pageSize: 10,
+        showPageSizeSelector: true,
+        pageSizeOptions: [10, 25, 50, 100],
+      },
+      sorting: {
+        enabled: true,
+      },
+      filtering: {
+        enabled: true,
+        globalSearch: true,
+      },
+      emptyState: {
+        message: 'No data available',
+      },
+      striped: true,
+      hoverable: true,
+      bordered: false,
+    };
+  }, [tableColumns, tableData]);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+        <h2 
+          ref={headingRef}
+          className="text-xl font-semibold text-gray-900 dark:text-gray-100"
+        >
           Your Creation
         </h2>
         {agent?.nextAction && (
@@ -138,12 +284,39 @@ export function AiBuilderResponse({
         />
       )}
 
-      <CodeViewer
-        code={response}
-        programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}
-        title="AI Generated Content"
-        initialLineNumbers={10}
-      />
+      {shouldRenderTable && isValidTable && tableData.length > 0 ? (
+        <div className="space-y-4">
+          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
+            <TableWrapper
+              tableConfig={tableConfig}
+              columns={tableColumns}
+              data={tableData}
+              showCards={false}
+              disableAnimation={false}
+            />
+          </div>
+          <details className="text-sm">
+            <summary className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+              View Raw JSON
+            </summary>
+            <div className="mt-2">
+              <CodeViewer
+                code={response}
+                programmingLanguage="json"
+                title="Raw JSON Response"
+                initialLineNumbers={10}
+              />
+            </div>
+          </details>
+        </div>
+      ) : (
+        <CodeViewer
+          code={response}
+          programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}
+          title="AI Generated Content"
+          initialLineNumbers={10}
+        />
+      )}
     </div>
   );
 }

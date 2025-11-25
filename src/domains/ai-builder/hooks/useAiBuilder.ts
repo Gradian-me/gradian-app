@@ -271,7 +271,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
 
       // Determine if we should parse as JSON
       const trimmedResponse = response.trim();
-      const shouldParseAsJson = agent.requiredOutputFormat === 'json' || 
+      const shouldParseAsJson = agent.requiredOutputFormat === 'json' || agent.requiredOutputFormat === 'table' || 
         (agent.requiredOutputFormat !== 'string' && (trimmedResponse.startsWith('{') || trimmedResponse.startsWith('[')));
 
       // If required output format is JSON, parse it

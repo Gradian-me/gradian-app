@@ -9,7 +9,7 @@ export interface AiAgent {
   label: string;
   icon: string;
   description: string;
-  requiredOutputFormat: 'json' | 'string';
+  requiredOutputFormat: 'json' | 'string' | 'table';
   model?: string;
   systemPrompt?: string;
   renderComponents?: Array<Partial<FormField> & {
@@ -54,7 +54,7 @@ export interface TokenUsage {
 
 export interface AiBuilderResponseData {
   response: string;
-  format: 'json' | 'string';
+  format: 'json' | 'string' | 'table';
   tokenUsage: TokenUsage | null;
   timing?: {
     responseTime: number; // Time to receive response in milliseconds
@@ -64,7 +64,7 @@ export interface AiBuilderResponseData {
     id: string;
     label: string;
     description: string;
-    requiredOutputFormat: 'json' | 'string';
+    requiredOutputFormat: 'json' | 'string' | 'table';
     nextAction: {
       label: string;
       icon?: string;

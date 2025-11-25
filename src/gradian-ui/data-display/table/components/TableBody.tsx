@@ -151,6 +151,7 @@ export function TableBody<T = any>({
                 <td
                   key={column.id}
                   className={cn(tdClasses(column, rowIndex, isSelected), cellClassName)}
+                  dir="auto"
                   style={{
                     // Only set width if explicitly provided, otherwise let content determine width
                     width: column.width ? (typeof column.width === 'number' ? `${column.width}px` : column.width) : undefined,
@@ -173,6 +174,7 @@ export function TableBody<T = any>({
                 >
                   <div 
                     className={shouldAllowWrapping ? "min-w-0 w-full" : ""} // Allow shrinking and full width if wrapping is allowed
+                    dir="auto"
                     style={{
                       // Limit to 3 lines max for wrapped text columns with ellipsis
                       // For badge columns, we rely on BadgeViewer's flex-wrap to handle wrapping

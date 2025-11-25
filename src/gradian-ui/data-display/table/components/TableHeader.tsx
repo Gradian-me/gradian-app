@@ -83,6 +83,7 @@ export function TableHeader<T = any>({
           <th
             key={column.id}
             className={thClasses(column)}
+            dir="auto"
             style={{
               // Only set width if explicitly provided, otherwise let content determine width
               width: column.width ? (typeof column.width === 'number' ? `${column.width}px` : column.width) : undefined,
