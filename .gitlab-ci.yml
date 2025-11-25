@@ -7,6 +7,8 @@ variables:
   DOCKER_TLS_CERTDIR: ""
 
 before_script:
+  - echo "🔐 Ensuring clean Docker auth..."
+  - docker logout "$CI_REGISTRY" || true
   - echo "🔐 Authenticating with Docker Registry..."
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   - echo "⚙️ Setting up environment files..."
@@ -35,6 +37,7 @@ before_script:
 
 build:
   stage: build
+  retry: 3
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
       when: manual
@@ -53,6 +56,7 @@ build:
 
 deploy_staging:
   stage: deploy
+  retry: 3
   needs:
     - job: build
       optional: true
@@ -86,4 +90,4 @@ deploy_staging:
     - rm -f current_containers.txt || true
   environment:
     name: staging
-    url: https://api-dev.cinnagen.com/
+    url: https://scm.cinnagen.com/
