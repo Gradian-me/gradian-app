@@ -18,6 +18,8 @@ import { getStatusColor, getStatusText, getStatusIcon } from '../utils';
 import { formatDateTimeWithFallback } from '@/gradian-ui/shared/utils/date-utils';
 import { cn } from '@/gradian-ui/shared/utils';
 
+export type HealthCardViewMode = 'wide' | 'compact';
+
 interface ServiceCardsListProps {
   services: HealthService[];
   healthStatuses: Record<string, ServiceHealthStatus>;
@@ -31,6 +33,7 @@ interface ServiceCardsListProps {
   onToggleTestUnhealthy: (serviceId: string, enabled: boolean) => void;
   onToggleMonitoring: (serviceId: string, enabled: boolean) => Promise<void>;
   getServiceMetrics: (status: ServiceHealthStatus, serviceId: string) => MetricItem[];
+  viewMode?: HealthCardViewMode;
 }
 
 export function ServiceCardsList({
@@ -46,6 +49,7 @@ export function ServiceCardsList({
   onToggleTestUnhealthy,
   onToggleMonitoring,
   getServiceMetrics,
+  viewMode = 'wide',
 }: ServiceCardsListProps) {
   const prevStatusesRef = useRef<Record<string, ServiceHealthStatus>>({});
 
@@ -98,7 +102,7 @@ export function ServiceCardsList({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.5 }}
-      className="space-y-4"
+      className={viewMode === 'compact' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}
     >
       {services.map((service, index) => {
         const status = healthStatuses[service.id];
@@ -109,6 +113,90 @@ export function ServiceCardsList({
         const isRefreshing = refreshing.has(service.id);
         const isMonitoringDisabled = service.monitoringEnabled === false;
         const StatusIcon = getStatusIcon(serviceStatus);
+
+        if (viewMode === 'compact') {
+          return (
+            <motion.div
+              key={service.id}
+              id={`service-card-${service.id}`}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.3 + index * 0.05 }}
+              className="scroll-mt-4 transition-all duration-300"
+            >
+              <Card className={`hover:shadow-md transition-shadow duration-200 ${isMonitoringDisabled ? 'opacity-60 bg-gray-50 dark:bg-gray-900/50' : ''}`}>
+                <CardContent className="p-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div
+                        className="h-12 w-12 rounded-xl flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: `${serviceStatus === 'healthy' ? '#10b981' : serviceStatus === 'unhealthy' ? '#ef4444' : '#f59e0b'}20` }}
+                      >
+                        <IconRenderer
+                          iconName={service.icon}
+                          className={`h-6 w-6 ${
+                            serviceStatus === 'healthy'
+                              ? 'text-green-500'
+                              : serviceStatus === 'unhealthy'
+                              ? 'text-red-500'
+                              : 'text-yellow-500'
+                          }`}
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate">{service.serviceTitle}</p>
+                          <Badge variant="outline" className="text-[10px] uppercase tracking-wide">{service.id}</Badge>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <Badge
+                            variant={getStatusColor(serviceStatus)}
+                            className="flex items-center gap-1 text-xs"
+                          >
+                            <StatusIcon className="h-3.5 w-3.5" />
+                            {getStatusText(serviceStatus)}
+                          </Badge>
+                          {status?.lastChecked && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              Checked {formatDateTimeWithFallback(status.lastChecked)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onConfigureService(service.id)}
+                        className="border border-gray-200 dark:border-gray-800"
+                      >
+                        <Settings className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="default"
+                        size="icon"
+                        onClick={() => onCheckHealth(service)}
+                        disabled={isRefreshing || isMonitoringDisabled}
+                      >
+                        <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {status?.error && (
+                    <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                        <p className="text-xs text-red-700 dark:text-red-300">{status.error}</p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        }
 
         return (
           <motion.div

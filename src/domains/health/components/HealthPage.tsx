@@ -9,9 +9,10 @@ import { HealthPageHeader } from './HealthPageHeader';
 import { HealthStatsCards } from './HealthStatsCards';
 import { InactiveServicesSummary } from './InactiveServicesSummary';
 import { UnhealthyServicesSummary } from './UnhealthyServicesSummary';
-import { ServiceCardsList } from './ServiceCardsList';
+import { ServiceCardsList, HealthCardViewMode } from './ServiceCardsList';
 import { ServiceFormDialog } from './ServiceFormDialog';
 import { ServiceConfigDialog } from './ServiceConfigDialog';
+import { HealthViewToggle } from './HealthViewToggle';
 
 export function HealthPage() {
   const {
@@ -47,6 +48,7 @@ export function HealthPage() {
   } = useHealthService();
 
   const [configServiceId, setConfigServiceId] = useState<string | null>(null);
+  const [cardViewMode, setCardViewMode] = useState<HealthCardViewMode>('wide');
 
   const stats = calculateHealthStats(services, healthStatuses, testUnhealthyServices);
 
@@ -85,6 +87,10 @@ export function HealthPage() {
           loading={loading}
         />
 
+        <div className="flex items-center justify-end">
+          <HealthViewToggle value={cardViewMode} onChange={setCardViewMode} />
+        </div>
+
         <HealthStatsCards
           loading={loading}
           healthyCount={stats.healthyCount}
@@ -120,6 +126,7 @@ export function HealthPage() {
           getServiceMetrics={(status, serviceId) =>
             getServiceMetrics(status, serviceId, testUnhealthyServices)
           }
+          viewMode={cardViewMode}
         />
 
         <ServiceFormDialog

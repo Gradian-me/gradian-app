@@ -13,7 +13,7 @@
     "id": "gradian-auth",
     "serviceTitle": "Gradian Authentication",
     "icon": "LucideUserLock",
-    "color": "blue",
+    "color": "indigo",
     "healthApi": "https://auth.cinnagen.com/health",
     "healthyJsonPath": "status",
     "isActive": true,
@@ -23,8 +23,18 @@
     "id": "gradian-genora",
     "serviceTitle": "Gradian Genora",
     "icon": "Blocks",
-    "color": "blue",
+    "color": "indigo",
     "healthApi": "https://genora.cinnagen.com/health",
+    "healthyJsonPath": "status",
+    "isActive": true,
+    "monitoringEnabled": true
+  },
+  {
+    "id": "gradian-genora-dev",
+    "serviceTitle": "Gradian Genora Dev",
+    "icon": "Blocks",
+    "color": "blue",
+    "healthApi": "http://cg-gr-api-dev-1.cinnagen.com:3001/health",
     "healthyJsonPath": "status",
     "isActive": true,
     "monitoringEnabled": true
