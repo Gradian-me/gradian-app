@@ -9,6 +9,11 @@ import { useState, useRef, useCallback } from 'react';
 import type { AiAgent, AiBuilderResponseData, GeneratePromptRequest, TokenUsage, PreloadRouteResult } from '../types';
 import { useAiPrompts } from '@/domains/ai-prompts/hooks/useAiPrompts';
 import { useUserStore } from '@/stores/user.store';
+import {
+  extractDataByPath,
+  formatPreloadRouteResult,
+  type PreloadRoute,
+} from '@/gradian-ui/shared/utils/preload-routes';
 
 interface UseAiBuilderReturn {
   userPrompt: string;
@@ -105,19 +110,8 @@ export function useAiBuilder(): UseAiBuilderReturn {
 
             const responseData = await response.json();
             
-            // Extract data using jsonPath
-            let extractedData = responseData;
-            if (route.jsonPath) {
-              const pathParts = route.jsonPath.split('.');
-              for (const part of pathParts) {
-                if (extractedData && typeof extractedData === 'object' && part in extractedData) {
-                  extractedData = extractedData[part];
-                } else {
-                  extractedData = null;
-                  break;
-                }
-              }
-            }
+            // Extract data using jsonPath (using shared utility)
+            const extractedData = extractDataByPath(responseData, route.jsonPath);
 
             return {
               route: route.route,
@@ -138,20 +132,12 @@ export function useAiBuilder(): UseAiBuilderReturn {
         })
       );
 
-      // Format results for system prompt
+      // Format results for system prompt using shared formatting function
       const sections: string[] = [];
-      results.forEach((result) => {
-        if (result.success && result.data) {
-          sections.push(
-            `## ${result.title}\n${result.description}\n\n` +
-            `Data from ${result.route}:\n\`\`\`json\n${JSON.stringify(result.data, null, 2)}\n\`\`\`\n`
-          );
-        } else {
-          sections.push(
-            `## ${result.title}\n${result.description}\n\n` +
-            `⚠️ Failed to load data from ${result.route}: ${result.error || 'Unknown error'}\n`
-          );
-        }
+      
+      results.forEach((result, index) => {
+        const route = agent.preloadRoutes![index] as PreloadRoute;
+        sections.push(formatPreloadRouteResult(result, route));
       });
 
       const context = sections.length > 0 

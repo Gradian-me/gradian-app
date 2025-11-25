@@ -60,7 +60,7 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
           onClick={() => router.push('/apps')}
           variant="outline"
           size="sm"
-          className="h-10 w-10 p-0"
+          className="h-10 w-10 p-0 rounded-lg"
           title="Go to Apps"
         >
           <Home className="h-4 w-4" />
@@ -74,7 +74,7 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
             onClick={() => setIsQRDialogOpen(true)}
             variant="outline"
             size="sm"
-            className="h-10 w-10 p-0"
+            className="h-10 w-10 p-0 rounded-lg"
             title="Show QR Code"
           >
             <QrCode className="h-4 w-4" />
@@ -87,7 +87,8 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
             title="Share this page"
             text="Check out this page"
             variant="outline"
-            size="md"
+            size="sm"
+            className="rounded-lg"
           />
         )}
       </div>

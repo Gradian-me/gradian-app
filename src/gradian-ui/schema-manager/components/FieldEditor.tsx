@@ -5,7 +5,8 @@ import { TextInput, NumberInput, Label, Badge, Switch, ButtonMinimal, Select, Sl
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit } from 'lucide-react';
 import { FieldEditorProps } from '../types/builder';
-import { FIELD_TYPES, ROLES } from '../utils/builder-utils';
+import { ROLES } from '../utils/builder-utils';
+import { fetchFormComponents } from '../utils/component-registry-client';
 import { FormField } from '../types/form-schema';
 import {
   Dialog,
@@ -33,6 +34,30 @@ export function FieldEditor({
   const [tempField, setTempField] = useState<Partial<FormField>>(field);
   const [nameManuallyEdited, setNameManuallyEdited] = useState(false);
   const [isNameCustom, setIsNameCustom] = useState(false);
+  const [availableComponents, setAvailableComponents] = useState<Array<{ value: string; label: string; description?: string }>>([]);
+  const [componentsLoading, setComponentsLoading] = useState(true);
+  const [componentsError, setComponentsError] = useState<string | null>(null);
+
+  // Fetch components from API - rigid access, no fallback
+  useEffect(() => {
+    const loadComponents = async () => {
+      try {
+        setComponentsLoading(true);
+        setComponentsError(null);
+        const components = await fetchFormComponents();
+        setAvailableComponents(components);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to load components';
+        setComponentsError(errorMessage);
+        console.error('Failed to load components from component registry:', error);
+        // Don't set empty array - keep previous state or show error
+      } finally {
+        setComponentsLoading(false);
+      }
+    };
+
+    loadComponents();
+  }, []);
 
   useEffect(() => {
     setTempField(field);
@@ -182,19 +207,51 @@ export function FieldEditor({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Component</Label>
-                  <Select
-                    value={tempField.component || ''}
-                    onValueChange={(value) => {
-                      // Reset componentTypeConfig when component type changes
-                      setTempField({ 
-                        ...tempField, 
-                        component: value as any,
-                        componentTypeConfig: undefined 
-                      });
-                    }}
-                    options={FIELD_TYPES.map((type) => ({ value: type.value, label: type.label }))}
-                    sortType="ASC"
-                  />
+                  {componentsError ? (
+                    <div className="space-y-1.5">
+                      <Select
+                        value={tempField.component || ''}
+                        onValueChange={(value) => {
+                          setTempField({ 
+                            ...tempField, 
+                            component: value as any,
+                            componentTypeConfig: undefined 
+                          });
+                        }}
+                        options={availableComponents.map((comp) => ({ value: comp.value, label: comp.label }))}
+                        sortType="ASC"
+                        disabled={true}
+                      />
+                      <p className="text-xs text-red-600 dark:text-red-400">
+                        Error loading components: {componentsError}
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <Select
+                        value={tempField.component || ''}
+                        onValueChange={(value) => {
+                          // Reset componentTypeConfig when component type changes
+                          setTempField({ 
+                            ...tempField, 
+                            component: value as any,
+                            componentTypeConfig: undefined 
+                          });
+                        }}
+                        options={availableComponents.map((comp) => ({ value: comp.value, label: comp.label }))}
+                        sortType="ASC"
+                        disabled={componentsLoading}
+                      />
+                      {!componentsLoading && availableComponents.length > 0 && tempField.component && (
+                        <p className="text-xs text-gray-500 mt-1.5">
+                          {availableComponents.find(c => c.value === tempField.component)?.description || ''}
+                        </p>
+                      )}
+                      {componentsLoading && (
+                        <p className="text-xs text-gray-500 mt-1.5">Loading components...</p>
+                      )}
+                    </>
+                  )}
                 </div>
                 <div>
                   <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Section</Label>

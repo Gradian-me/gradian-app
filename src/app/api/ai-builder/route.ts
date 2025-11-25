@@ -168,12 +168,20 @@ export async function POST(request: NextRequest) {
 
     // Prepare system prompt with preloaded context
     let systemPrompt = (agent.systemPrompt || '') + preloadedContext;
-    
-    // If annotations are provided, add annotation instructions to system prompt
+
+    // Format annotations in TOON-like format and add to user prompt
+    let finalUserPrompt = userPrompt;
     if (annotations && Array.isArray(annotations) && annotations.length > 0 && previousAiResponse) {
-      const annotationsJson = JSON.stringify(annotations, null, 2);
-      const annotationInstructions = `\n\n## IMPORTANT: Update Instructions\n\nPlease update the following AI-generated content based on the annotations provided. Keep all other things the same and only make changes based on the annotations:\n\nPrevious AI Response:\n\`\`\`json\n${previousAiResponse}\n\`\`\`\n\nAnnotations:\n\`\`\`json\n${annotationsJson}\n\`\`\`\n\nApply only the changes specified in the annotations while keeping everything else unchanged.`;
-      systemPrompt += annotationInstructions;
+      // Format annotations in TOON-like structure
+      const annotationSections = annotations.map(ann => {
+        const changes = ann.annotations.map(a => `- ${a.label}`).join('\n');
+        return `${ann.schemaName}\n\n${changes}`;
+      }).join('\n\n');
+      
+      // Build the modification request in user prompt
+      const modificationRequest = `\n\n---\n\n## MODIFY EXISTING SCHEMA(S)\n\nPlease update the following schema(s) based on the requested modifications. Apply ONLY the specified changes while keeping everything else exactly the same.\n\nRequested Modifications:\n\n${annotationSections}\n\nPrevious Schema(s):\n\`\`\`json\n${previousAiResponse}\n\`\`\`\n\n---\n\nIMPORTANT: You are the world's best schema editor. Apply these modifications precisely while preserving all other aspects of the schema(s). Output the complete updated schema(s) in the same format (single object or array).`;
+      
+      finalUserPrompt = userPrompt + modificationRequest;
     }
 
     // Prepare messages for LLM API
@@ -184,7 +192,7 @@ export async function POST(request: NextRequest) {
       },
       {
         role: 'user' as const,
-        content: userPrompt
+        content: finalUserPrompt
       }
     ];
 

@@ -26,6 +26,7 @@ import { useUserStore } from '@/stores/user.store';
 import { config } from '@/lib/config';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
 
 export default function AiBuilderPromptPage() {
   const params = useParams();
@@ -46,6 +47,7 @@ export default function AiBuilderPromptPage() {
   const [modifiedPrompts, setModifiedPrompts] = useState<AiPrompt[]>([]);
   const [agents, setAgents] = useState<Array<{ id: string; label: string; icon?: string; model?: string }>>([]);
   const [users, setUsers] = useState<Array<{ id: string; name: string; lastname?: string; username?: string }>>([]);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   
   const user = useUserStore((state) => state.user);
   const { createPrompt } = useAiPrompts();
@@ -218,18 +220,32 @@ export default function AiBuilderPromptPage() {
       return null;
     }
 
-    let systemPrompt = (selectedAgent.systemPrompt || '') + preloadedContext;
+    // Combine system prompt with preloaded context
+    // preloadedContext already includes proper formatting with newlines
+    const systemPrompt = (selectedAgent.systemPrompt || '') + (preloadedContext || '');
 
-    if (DEMO_MODE && annotationsArray.length > 0 && (previousAiResponse || aiResponse)) {
-      const responseToUse = previousAiResponse || aiResponse;
-      const annotationsJson = JSON.stringify(annotationsArray, null, 2);
-      const annotationInstructions = `\n\n## IMPORTANT: Update Instructions\n\nPlease update the following AI-generated content based on the annotations provided. Keep all other things the same and only make changes based on the annotations:\n\nPrevious AI Response:\n\`\`\`json\n${responseToUse}\n\`\`\`\n\nAnnotations:\n\`\`\`json\n${annotationsJson}\n\`\`\`\n\nApply only the changes specified in the annotations while keeping everything else unchanged.`;
-      systemPrompt += annotationInstructions;
+    // Format user prompt - if annotations are present, include modification request
+    // This matches what the API route does
+    // When annotations are applied, use the prompt that would be sent (previousUserPrompt if available, otherwise userPrompt)
+    const basePrompt = (annotationsArray.length > 0 && previousUserPrompt) ? previousUserPrompt : userPrompt;
+    let finalUserPrompt = basePrompt.trim();
+    
+    if (annotationsArray.length > 0 && previousAiResponse) {
+      // Format annotations in TOON-like structure (matching API route logic)
+      const annotationSections = annotationsArray.map(ann => {
+        const changes = ann.annotations.map(a => `- ${a.label}`).join('\n');
+        return `${ann.schemaLabel}\n\n${changes}`;
+      }).join('\n\n');
+      
+      // Build the modification request in user prompt (matching API route)
+      const modificationRequest = `\n\n---\n\n## MODIFY EXISTING SCHEMA(S)\n\nPlease update the following schema(s) based on the requested modifications. Apply ONLY the specified changes while keeping everything else exactly the same.\n\nRequested Modifications:\n\n${annotationSections}\n\nPrevious Schema(s):\n\`\`\`json\n${previousAiResponse}\n\`\`\`\n\n---\n\nIMPORTANT: You are the world's best schema editor. Apply these modifications precisely while preserving all other aspects of the schema(s). Output the complete updated schema(s) in the same format (single object or array).`;
+      
+      finalUserPrompt = basePrompt.trim() + modificationRequest;
     }
 
     return {
       systemPrompt,
-      userPrompt: userPrompt.trim(),
+      userPrompt: finalUserPrompt,
     };
   };
 
@@ -245,6 +261,27 @@ export default function AiBuilderPromptPage() {
       agentId: selectedAgentId,
     });
   };
+
+  const handleReset = useCallback(() => {
+    setShowResetConfirm(true);
+  }, []);
+
+  const handleResetConfirm = useCallback(() => {
+    // Clear everything
+    setUserPrompt('');
+    setSelectedAgentId('');
+    setAnnotations(new Map());
+    setPreviousUserPrompt('');
+    setPreviousAiResponse('');
+    setLastPromptId(null);
+    setFirstPromptId(null);
+    setPreviewSchema(null);
+    setIsApplyingAnnotations(false);
+    clearResponse();
+    setShowResetConfirm(false);
+    // Navigate back to main AI builder page
+    router.push('/ai-builder');
+  }, [setUserPrompt, clearResponse, router]);
 
   const handleApplyAnnotations = useCallback(async (annotationsList: SchemaAnnotation[]) => {
     if (!selectedAgentId) {
@@ -452,6 +489,7 @@ export default function AiBuilderPromptPage() {
           isLoading={isLoading}
           isLoadingPreload={isLoadingPreload}
           systemPrompt={promptForLLM?.systemPrompt}
+          onReset={handleReset}
         />
 
         <MessageDisplay
@@ -530,6 +568,28 @@ export default function AiBuilderPromptPage() {
             </div>
           </Modal>
         )}
+
+        {/* Reset Confirmation Dialog */}
+        <ConfirmationMessage
+          isOpen={showResetConfirm}
+          onOpenChange={setShowResetConfirm}
+          title="Reset Everything"
+          message="Are you sure you want to reset everything? This will clear your prompt, selected agent, AI response, annotations, and all related data. This action cannot be undone."
+          variant="warning"
+          buttons={[
+            {
+              label: 'Cancel',
+              variant: 'outline',
+              action: () => setShowResetConfirm(false),
+            },
+            {
+              label: 'Reset',
+              variant: 'destructive',
+              icon: 'RotateCcw',
+              action: handleResetConfirm,
+            },
+          ]}
+        />
       </div>
     </MainLayout>
   );

@@ -12,7 +12,7 @@ import { Textarea } from '@/gradian-ui/form-builder/form-elements/components/Tex
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/gradian-ui/shared/utils';
-import { Sparkles, Loader2, Square, History } from 'lucide-react';
+import { Sparkles, Loader2, Square, History, RotateCcw } from 'lucide-react';
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { PromptPreviewSheet } from './PromptPreviewSheet';
 import type { AiAgent } from '../types';
@@ -31,6 +31,7 @@ interface AiBuilderFormProps {
   isSheetOpen?: boolean;
   onSheetOpenChange?: (open: boolean) => void;
   disabled?: boolean;
+  onReset?: () => void;
 }
 
 export function AiBuilderForm({
@@ -47,6 +48,7 @@ export function AiBuilderForm({
   isSheetOpen = false,
   onSheetOpenChange,
   disabled = false,
+  onReset,
 }: AiBuilderFormProps) {
   // Auto-resize textarea with max 8 lines
   useEffect(() => {
@@ -102,6 +104,17 @@ export function AiBuilderForm({
                   className="w-full"
                 />
               </div>
+              {onReset && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onReset}
+                  className="h-9 w-9 p-0 shrink-0"
+                  title="Reset everything"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
+              )}
               <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" size="sm" className="gap-2 shrink-0">
                   <History className="h-4 w-4" />

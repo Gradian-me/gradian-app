@@ -1,6 +1,8 @@
 // Preload Routes Utility
 // Handles parallel API calls for preloading data before LLM requests
 
+import { cleanText, formatToToon } from './text-utils';
+
 export interface PreloadRoute {
   route: string;
   title: string;
@@ -9,9 +11,11 @@ export interface PreloadRoute {
   jsonPath?: string; // Path to extract from response (e.g., "data" or "data.schemas")
   body?: any; // For POST requests
   queryParameters?: Record<string, string>; // For GET requests
+  outputFormat?: 'json' | 'string' | 'toon'; // Format for output: json (default), string, or toon
+  includedFields?: string[]; // Filter response to only include these fields (e.g., ["id", "description", "plural_name"])
 }
 
-interface PreloadResult {
+export interface PreloadResult {
   route: string;
   title: string;
   description: string;
@@ -22,8 +26,9 @@ interface PreloadResult {
 
 /**
  * Build URL with query parameters
+ * Exported for use in both server and client
  */
-function buildUrlWithQuery(route: string, queryParams?: Record<string, string>): string {
+export function buildUrlWithQuery(route: string, queryParams?: Record<string, string>): string {
   if (!queryParams || Object.keys(queryParams).length === 0) {
     return route;
   }
@@ -43,8 +48,9 @@ function buildUrlWithQuery(route: string, queryParams?: Record<string, string>):
 
 /**
  * Extract data from response using jsonPath
+ * Exported for use in both server and client
  */
-function extractDataByPath(data: any, jsonPath?: string): any {
+export function extractDataByPath(data: any, jsonPath?: string): any {
   if (!jsonPath) {
     return data;
   }
@@ -61,6 +67,72 @@ function extractDataByPath(data: any, jsonPath?: string): any {
   }
 
   return result;
+}
+
+/**
+ * Get dynamic includedFields based on outputFormat and route context
+ * Exported for use in both server and client
+ */
+export function getDynamicIncludedFields(
+  outputFormat?: string,
+  route?: string,
+  explicitIncludedFields?: string[]
+): string[] | undefined {
+  // If explicitly provided, use that (manual override)
+  if (explicitIncludedFields && explicitIncludedFields.length > 0) {
+    return explicitIncludedFields;
+  }
+
+  // Auto-determine based on outputFormat (case-insensitive)
+  const normalizedFormat = (outputFormat || '').toLowerCase();
+  if (normalizedFormat === 'toon') {
+    // For toon format, check if route is related to schemas
+    if (route && (route.includes('/api/schemas') || route.includes('schemas'))) {
+      return ['id', 'description', 'plural_name'];
+    }
+    // For other toon routes, you could add more logic here
+    // For now, return undefined to include all fields
+  }
+
+  // For json or string formats, don't filter by default
+  return undefined;
+}
+
+/**
+ * Filter data to only include specified fields
+ * Exported for use in both server and client
+ */
+export function filterFields(data: any, includedFields?: string[]): any {
+  if (!includedFields || includedFields.length === 0) {
+    return data;
+  }
+
+  if (Array.isArray(data)) {
+    // Filter each object in the array
+    return data.map((item: any) => {
+      if (item && typeof item === 'object' && !Array.isArray(item)) {
+        const filtered: any = {};
+        includedFields.forEach((field) => {
+          if (field in item) {
+            filtered[field] = item[field];
+          }
+        });
+        return filtered;
+      }
+      return item;
+    });
+  } else if (data && typeof data === 'object' && !Array.isArray(data)) {
+    // Filter single object
+    const filtered: any = {};
+    includedFields.forEach((field) => {
+      if (field in data) {
+        filtered[field] = data[field];
+      }
+    });
+    return filtered;
+  }
+
+  return data;
 }
 
 /**
@@ -110,6 +182,9 @@ async function callPreloadRoute(
 
     const responseData = await response.json();
     const extractedData = extractDataByPath(responseData, preloadRoute.jsonPath);
+    
+    // Always return full JSON - filtering will happen later during formatting
+    // This ensures we have all data available for dynamic field selection
 
     return {
       route: preloadRoute.route,
@@ -126,6 +201,137 @@ async function callPreloadRoute(
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
     };
+  }
+}
+
+/**
+ * Extract entity name from route (e.g., "/api/schemas" -> "schemas")
+ * Exported for use in both server and client
+ */
+export function extractEntityNameFromRoute(route: string): string {
+  // Remove leading/trailing slashes and split
+  const parts = route.replace(/^\/+|\/+$/g, '').split('/');
+  // Get the last meaningful part (usually the entity name)
+  const lastPart = parts[parts.length - 1];
+  // Remove query parameters if any
+  const entityName = lastPart.split('?')[0];
+  return cleanText(entityName) || 'items';
+}
+
+/**
+ * Format data in TOON format using the formatToToon utility
+ * Exported for use in both server and client
+ */
+export function formatDataInToonFormat(data: any, route: string, includedFields?: string[]): string {
+  // Ensure data is an array
+  let dataArray: any[] = [];
+  if (Array.isArray(data)) {
+    dataArray = data;
+  } else if (data && typeof data === 'object') {
+    dataArray = [data];
+  } else {
+    // For non-object/non-array data, return empty or format as single value
+    return '';
+  }
+
+  if (dataArray.length === 0) {
+    return '';
+  }
+
+  // Determine fields to use - prioritize includedFields
+  let fields: string[] = [];
+  if (includedFields && includedFields.length > 0) {
+    fields = includedFields;
+  } else if (dataArray[0] && typeof dataArray[0] === 'object') {
+    // Fallback to keys from first item
+    fields = Object.keys(dataArray[0]);
+  }
+
+  if (fields.length === 0) {
+    // If no fields available, return empty string (shouldn't happen in practice)
+    return '';
+  }
+
+  // Extract entity name from route
+  const entityName = extractEntityNameFromRoute(route);
+
+  // Use the formatToToon utility - this will always return TOON format
+  const toonResult = formatToToon(entityName, dataArray, fields);
+  
+  // If formatToToon returns empty (shouldn't happen), fallback to basic format
+  if (!toonResult) {
+    // Last resort: create basic TOON format manually
+    const header = `${entityName}[${dataArray.length}]{${fields.join(',')}}:`;
+    const rows = dataArray.map((item: any) => {
+      const values = fields.map((field) => cleanText(item?.[field] || ''));
+      return `  ${values.join(',')}`;
+    });
+    return `${header}\n\n${rows.join('\n')}`;
+  }
+
+  return toonResult;
+}
+
+/**
+ * Format a single preload route result based on outputFormat and includedFields
+ * This function is shared between server and client
+ */
+export function formatPreloadRouteResult(
+  result: PreloadResult,
+  route: PreloadRoute
+): string {
+  if (!result.success || !result.data) {
+    return `## ${cleanText(result.title)}\n${cleanText(result.description)}\n\n` +
+      `⚠️ Failed to load data from ${result.route}: ${cleanText(result.error || 'Unknown error')}\n`;
+  }
+
+  const outputFormat = (route.outputFormat || 'json').toLowerCase();
+
+  if (outputFormat === 'toon') {
+    // TOON format: Get includedFields dynamically, filter data, then format to TOON
+    const dynamicIncludedFields = getDynamicIncludedFields(
+      route.outputFormat,
+      route.route,
+      route.includedFields
+    );
+    
+    // Filter the full JSON data using includedFields
+    const filteredData = filterFields(result.data, dynamicIncludedFields);
+    
+    // Determine which fields to use for TOON format
+    let fieldsToUse: string[] | undefined = dynamicIncludedFields;
+    if (!fieldsToUse || fieldsToUse.length === 0) {
+      if (Array.isArray(filteredData) && filteredData.length > 0) {
+        fieldsToUse = Object.keys(filteredData[0] || {});
+      } else if (filteredData && typeof filteredData === 'object') {
+        fieldsToUse = Object.keys(filteredData);
+      }
+    }
+    
+    // Format filtered data to TOON format
+    const toonFormatted = formatDataInToonFormat(
+      filteredData,
+      result.route,
+      fieldsToUse
+    );
+    
+    return `## ${cleanText(result.title)}\n${cleanText(result.description)}\n\n` +
+      `Data from ${result.route}:\n\`\`\`\n${toonFormatted}\n\`\`\`\n`;
+  } else if (outputFormat === 'string') {
+    // String format
+    let stringFormatted: string;
+    if (typeof result.data === 'string') {
+      stringFormatted = cleanText(result.data);
+    } else {
+      const jsonString = JSON.stringify(result.data, null, 2);
+      stringFormatted = cleanText(jsonString);
+    }
+    return `## ${cleanText(result.title)}\n${cleanText(result.description)}\n\n` +
+      `Data from ${result.route}:\n\`\`\`\n${stringFormatted}\n\`\`\`\n`;
+  } else {
+    // Default JSON formatting
+    return `## ${cleanText(result.title)}\n${cleanText(result.description)}\n\n` +
+      `Data from ${result.route}:\n\`\`\`json\n${JSON.stringify(result.data, null, 2)}\n\`\`\`\n`;
   }
 }
 
@@ -148,19 +354,9 @@ export async function preloadRoutes(
   // Format results for system prompt
   const sections: string[] = [];
 
-  results.forEach((result) => {
-    if (result.success && result.data) {
-      sections.push(
-        `## ${result.title}\n${result.description}\n\n` +
-        `Data from ${result.route}:\n\`\`\`json\n${JSON.stringify(result.data, null, 2)}\n\`\`\`\n`
-      );
-    } else {
-      // Include error information but don't fail the entire request
-      sections.push(
-        `## ${result.title}\n${result.description}\n\n` +
-        `⚠️ Failed to load data from ${result.route}: ${result.error || 'Unknown error'}\n`
-      );
-    }
+  results.forEach((result, index) => {
+    const route = preloadRoutes[index];
+    sections.push(formatPreloadRouteResult(result, route));
   });
 
   if (sections.length > 0) {

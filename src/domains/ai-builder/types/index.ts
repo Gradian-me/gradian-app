@@ -18,6 +18,8 @@ export interface AiAgent {
     jsonPath?: string;
     body?: any;
     queryParameters?: Record<string, string>;
+    outputFormat?: 'json' | 'string' | 'toon'; // Format for output: json (default), string, or toon
+    includedFields?: string[]; // Filter response to only include these fields (e.g., ["id", "description", "plural_name"])
   }>;
   nextAction: {
     label: string;
