@@ -37,7 +37,7 @@ before_script:
 
 build:
   stage: build
-  retry: 3
+  retry: 2
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
       when: manual
@@ -56,7 +56,7 @@ build:
 
 deploy_staging:
   stage: deploy
-  retry: 3
+  retry: 2
   needs:
     - job: build
       optional: true
