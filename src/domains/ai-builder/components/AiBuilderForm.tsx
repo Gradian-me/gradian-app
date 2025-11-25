@@ -145,8 +145,8 @@ export function AiBuilderForm({
               <Badge 
                 className={cn(
                   'shrink-0',
-                  'bg-violet-100 text-violet-700 border-violet-200',
-                  'dark:bg-violet-900/50 dark:text-violet-300 dark:border-violet-800',
+                  'bg-violet-100 text-cyan-700 border-cyan-200',
+                  'dark:bg-cyan-900/50 dark:text-cyan-300 dark:border-cyan-800',
                   'font-medium shadow-sm'
                 )}
               >

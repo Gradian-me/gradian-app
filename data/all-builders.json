@@ -62,32 +62,37 @@
     "stats": []
   },
   {
-    "id": "relation-types",
-    "title": "Relation Types",
-    "description": "Define and manage relationships between entities in your supply chain",
-    "icon": "Link2",
-    "href": "/page/relation-types",
-    "color": "#4E79A7",
+    "id": "health",
+    "title": "Health Monitoring",
+    "description": "Monitor the health and status of all services with real-time status tracking and automated health checks",
+    "icon": "HeartPulse",
+    "href": "/health",
+    "color": "#EF4444",
     "features": [
-      "Create entity relationships",
-      "Set visual indicators",
-      "Configure icons and colors",
-      "Manage relation metadata"
+      "Service health status tracking",
+      "Automated health checks",
+      "Auto-refresh functionality",
+      "Service management (add, edit, delete)",
+      "Health statistics dashboard",
+      "Inactive and unhealthy services alerts",
+      "Service configuration and monitoring"
     ],
     "stats": []
   },
   {
-    "id": "companies",
-    "title": "Companies",
-    "description": "Manage company information including registration, address, and contact details",
-    "icon": "Building2",
-    "href": "/page/companies",
-    "color": "#10B981",
+    "id": "qr-generator",
+    "title": "QR Code Generator",
+    "description": "Generate custom QR codes with various styles, colors, and configurations",
+    "icon": "QrCode",
+    "href": "/qr/generate",
+    "color": "#7f22fe",
     "features": [
-      "Company registration details",
-      "Address and location data",
-      "National ID and registration codes",
-      "Company logo management"
+      "Custom QR code content (text, URLs, etc.)",
+      "Multiple style variants (gravity, rounded, dots, etc.)",
+      "Customizable colors for eyes and body",
+      "Adjustable size, padding, and margin",
+      "Download and share QR codes",
+      "Copy to clipboard functionality"
     ],
     "stats": []
   }

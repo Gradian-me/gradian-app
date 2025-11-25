@@ -6,6 +6,13 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect, useMemo } from 'react';
 import { GoToTop, Header, ModeToggle } from '@/gradian-ui/layout';
 import { Sidebar } from '@/gradian-ui/layout/sidebar';
+import dynamic from 'next/dynamic';
+
+// Dynamically import PageActionButtons to avoid SSR issues with HTMLCanvasElement
+const PageActionButtons = dynamic(
+  () => import('@/gradian-ui/layout/components/PageActionButtons').then(mod => ({ default: mod.PageActionButtons })),
+  { ssr: false }
+);
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -432,6 +439,11 @@ export function MainLayout({
           actionsContent={headerActionsContent}
           className="bg-white/90 border-b border-gray-200 dark:bg-gray-900/80 dark:border-gray-700 backdrop-blur-sm"
         />
+
+        {/* Page Action Buttons - Top of page */}
+        <div className="sticky top-0 z-30 bg-white/90 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-4 py-2">
+          <PageActionButtons />
+        </div>
 
         {/* Page Content */}
         <motion.main
