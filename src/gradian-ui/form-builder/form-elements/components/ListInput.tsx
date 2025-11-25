@@ -45,6 +45,7 @@ const SortableListItem: React.FC<{
   isEditingControlled?: boolean; // If provided, use controlled editing state
   onEnterPress?: (id: string, label: string) => void; // Callback when Enter is pressed
   onEditStateChange?: (id: string, isEditing: boolean) => void; // Callback when edit state changes
+  inputRef?: React.RefObject<HTMLInputElement | null>; // Ref for focusing input
 }> = ({ 
   item, 
   onEdit, 
@@ -53,9 +54,13 @@ const SortableListItem: React.FC<{
   isEditingControlled,
   onEnterPress,
   onEditStateChange,
+  inputRef,
 }) => {
   const [internalIsEditing, setInternalIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(item.label);
+  const internalInputRef = React.useRef<HTMLInputElement>(null);
+  const inputElementRef = inputRef || internalInputRef;
+  const isDeletingRef = React.useRef(false);
   
   // Use controlled editing state if provided, otherwise use internal state
   const isEditing = isEditingControlled !== undefined ? isEditingControlled : internalIsEditing;
@@ -66,6 +71,16 @@ const SortableListItem: React.FC<{
       setEditValue(item.label);
     }
   }, [item.label, isEditing]);
+
+  // Focus input when editing starts
+  React.useEffect(() => {
+    if (isEditing && inputElementRef.current) {
+      // Small delay to ensure the input is rendered
+      setTimeout(() => {
+        inputElementRef.current?.focus();
+      }, 0);
+    }
+  }, [isEditing, inputElementRef]);
 
   const {
     attributes,
@@ -115,35 +130,44 @@ const SortableListItem: React.FC<{
     if (e.key === 'Enter') {
       e.preventDefault();
       e.stopPropagation();
+      // Save current item if it has content, then switch to view mode
       if (editValue.trim()) {
-        if (onEnterPress) {
-          // Call onEnterPress callback (for adding new item after saving)
-          // Save current item first
-          onEdit(item.id, editValue.trim());
-          // Close edit mode for current item
-          if (onEditStateChange) {
-            onEditStateChange(item.id, false);
-          } else {
-            setInternalIsEditing(false);
-          }
-          // Then trigger enter press (which will add new item)
-          onEnterPress(item.id, editValue.trim());
-        } else {
-          handleSaveEdit();
-        }
+        onEdit(item.id, editValue.trim());
+      }
+      // Always switch to view mode for current item
+      if (onEditStateChange) {
+        onEditStateChange(item.id, false);
+      } else {
+        setInternalIsEditing(false);
+      }
+      // If onEnterPress is provided, add new item (which will be in edit mode)
+      if (onEnterPress) {
+        onEnterPress(item.id, editValue.trim());
       }
     } else if (e.key === 'Escape') {
       e.preventDefault();
       e.stopPropagation();
-      handleCancelEdit();
+      // If item is newly added (has no original content), delete it; otherwise just cancel editing
+      if (!item.label || item.label.trim() === '') {
+        onDelete(item.id);
+      } else {
+        handleCancelEdit();
+      }
     }
   };
   
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // Always delete the item, regardless of edit state
-    onDelete(item.id);
+    // Show confirmation dialog
+    const confirmed = window.confirm('Are you sure you want to delete this item?');
+    if (confirmed) {
+      // Delete the item directly, regardless of edit state
+      onDelete(item.id);
+    } else {
+      // Reset the flag if user cancelled
+      isDeletingRef.current = false;
+    }
   };
 
   return (
@@ -170,11 +194,16 @@ const SortableListItem: React.FC<{
             <div className="flex-1 min-w-0">
               {isEditing ? (
                 <input
+                  ref={inputElementRef}
                   type="text"
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   onBlur={(e) => {
-                    // Don't save on blur if clicking a button (relatedTarget check)
+                    // Don't save on blur if we're deleting or clicking a button
+                    if (isDeletingRef.current) {
+                      isDeletingRef.current = false; // Reset the flag
+                      return;
+                    }
                     const relatedTarget = e.relatedTarget as HTMLElement;
                     if (!relatedTarget || !relatedTarget.closest('button')) {
                       handleSaveEdit();
@@ -182,7 +211,6 @@ const SortableListItem: React.FC<{
                   }}
                   onKeyDown={handleKeyDown}
                   className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-                  autoFocus
                 />
               ) : (
                 <span
@@ -225,6 +253,10 @@ const SortableListItem: React.FC<{
                     title="Delete"
                     color="red"
                     size="sm"
+                    onMouseDown={(e) => {
+                      // Set flag before blur fires
+                      isDeletingRef.current = true;
+                    }}
                     onClick={handleDelete}
                   />
                 </>
@@ -251,6 +283,26 @@ export const ListInput: React.FC<ListInputProps> = ({
   enableReordering = true,
 }) => {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const inputRefs = React.useRef<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map());
+  
+  // Get or create ref for an item
+  const getInputRef = useCallback((itemId: string): React.RefObject<HTMLInputElement | null> => {
+    if (!inputRefs.current.has(itemId)) {
+      inputRefs.current.set(itemId, React.createRef<HTMLInputElement>());
+    }
+    return inputRefs.current.get(itemId)!;
+  }, []);
+
+  // Clean up refs for deleted items
+  React.useEffect(() => {
+    const currentIds = new Set(value.map(item => item.id));
+    for (const [id] of inputRefs.current) {
+      if (!currentIds.has(id)) {
+        inputRefs.current.delete(id);
+      }
+    }
+  }, [value]);
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -289,6 +341,13 @@ export const ListInput: React.FC<ListInputProps> = ({
     onChange([...value, newItem]);
     // Automatically open new item in edit mode
     setEditingItemId(newId);
+    // Focus the new item's input after it's rendered
+    setTimeout(() => {
+      const newItemRef = inputRefs.current.get(newId);
+      if (newItemRef?.current) {
+        newItemRef.current.focus();
+      }
+    }, 0);
   }, [value, onChange]);
 
   const handleEditItem = useCallback(
@@ -319,6 +378,13 @@ export const ListInput: React.FC<ListInputProps> = ({
       onChange([...updatedItems, newItem]);
       // Close edit mode for current item and open for new item
       setEditingItemId(newId);
+      // Focus the new item's input after it's rendered
+      setTimeout(() => {
+        const newItemRef = inputRefs.current.get(newId);
+        if (newItemRef?.current) {
+          newItemRef.current.focus();
+        }
+      }, 0);
     },
     [value, onChange]
   );
@@ -360,6 +426,7 @@ export const ListInput: React.FC<ListInputProps> = ({
           isEditingControlled={editingItemId === item.id}
           onEnterPress={handleEnterPress}
           onEditStateChange={handleEditStateChange}
+          inputRef={getInputRef(item.id)}
         />
       ))}
     </div>

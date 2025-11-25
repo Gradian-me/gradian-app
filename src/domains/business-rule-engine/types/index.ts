@@ -82,3 +82,22 @@ export interface RuleTemplate {
   category?: string;
 }
 
+// Push-based Business Rule with Effects
+export type ObjectType = 'field' | 'section';
+
+export interface RuleTarget {
+  id: string;
+  type: ObjectType;
+}
+
+export interface BusinessRuleEffects {
+  requiredObjects?: RuleTarget[];
+  hiddenObjects?: RuleTarget[];
+  visibleObjects?: RuleTarget[];
+  disabledObjects?: RuleTarget[];
+}
+
+export interface BusinessRuleWithEffects extends BusinessRule {
+  effects: BusinessRuleEffects;
+}
+

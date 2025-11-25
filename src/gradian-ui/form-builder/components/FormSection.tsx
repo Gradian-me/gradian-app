@@ -1,12 +1,12 @@
 // Form Section Component
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { FormSectionProps, FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 import { FormElementFactory } from '../form-elements';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { cn } from '../../shared/utils';
 import { getFieldsForSection } from '../form-elements/utils/field-resolver';
-import { useFieldRules } from '@/domains/business-rule-engine';
+import { useBusinessRuleEffects, getFieldEffects } from '@/domains/business-rule-engine';
 
 export const FormSection: React.FC<FormSectionProps> = ({
   section,
@@ -26,6 +26,18 @@ export const FormSection: React.FC<FormSectionProps> = ({
   // Get fields for this section from the schema
   const fields = getFieldsForSection(schema, section.id);
   const { title, description, layout, styling, isRepeatingSection } = section;
+
+  // Get all field IDs and section IDs for business rule effects
+  const fieldIds = useMemo(() => schema.fields.map((f) => f.id), [schema.fields]);
+  const sectionIds = useMemo(() => schema.sections.map((s) => s.id), [schema.sections]);
+
+  // Evaluate business rule effects (push-based model)
+  const ruleEffects = useBusinessRuleEffects(
+    schema.businessRules,
+    values,
+    fieldIds,
+    sectionIds
+  );
 
   const sectionClasses = cn(
     'space-y-3',
@@ -49,15 +61,11 @@ export const FormSection: React.FC<FormSectionProps> = ({
   }
 
   const FieldItem: React.FC<FieldItemProps> = ({ field, itemIndex }) => {
-    // Evaluate business rules for this field
-    // For repeating sections, use the item's values if available
-    const fieldValues = itemIndex !== undefined && values[field.name]?.[itemIndex]
-      ? { ...values, [field.name]: values[field.name][itemIndex] }
-      : values;
-    const fieldRules = useFieldRules(field, fieldValues);
+    // Get business rule effects for this field (includes section-level effects)
+    const fieldEffects = getFieldEffects(field.id, section.id, ruleEffects);
 
     // Skip hidden and inactive fields (including business rule visibility)
-    if (field.hidden || (field as any).layout?.hidden || field.inactive || !fieldRules.isVisible) {
+    if (field.hidden || (field as any).layout?.hidden || field.inactive || !fieldEffects.isVisible) {
       return null;
     }
 
@@ -88,9 +96,9 @@ export const FormSection: React.FC<FormSectionProps> = ({
     }
 
     // Merge required state: business rule OR validation.required
-    const isRequired = fieldRules.isRequired || (field.validation?.required ?? false);
+    const isRequired = fieldEffects.isRequired || (field.validation?.required ?? false);
     // Merge disabled state: business rule OR existing disabled flags
-    const isDisabled = fieldRules.isDisabled || disabled || field.disabled;
+    const isDisabled = fieldEffects.isDisabled || disabled || field.disabled;
 
     return (
       <div

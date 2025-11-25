@@ -30,18 +30,17 @@ export function useFieldRules(
     return extractFieldsFromRules(field.businessRules);
   }, [field.businessRules]);
 
-  // Create a stable serialized key from watched values for dependency tracking
-  const watchedValuesKey = useMemo(() => {
+  // Extract only the watched field values to avoid re-computation when unrelated fields change
+  // This is critical for performance - we only want to re-evaluate when watched fields change
+  const watchedValues = useMemo(() => {
     if (watchFields.length === 0) {
-      return '';
+      return {};
     }
-    // Create a stable string representation of the watched values
-    return JSON.stringify(
-      watchFields.map((fieldName) => ({
-        field: fieldName,
-        value: formValues[fieldName],
-      })).sort((a, b) => a.field.localeCompare(b.field))
-    );
+    const result: Record<string, any> = {};
+    watchFields.forEach((fieldName) => {
+      result[fieldName] = formValues[fieldName];
+    });
+    return result;
   }, [watchFields, formValues]);
 
   return useMemo(() => {
@@ -55,25 +54,25 @@ export function useFieldRules(
       return results;
     }
 
-    // Evaluate visibleRule
+    // Evaluate visibleRule using only watched values (more efficient)
     if (field.businessRules.visibleRule) {
-      results.isVisible = evaluateRule(field.businessRules.visibleRule, formValues);
+      results.isVisible = evaluateRule(field.businessRules.visibleRule, watchedValues);
     }
 
-    // Evaluate requiredRule
+    // Evaluate requiredRule using only watched values (more efficient)
     if (field.businessRules.requiredRule) {
-      results.isRequired = evaluateRule(field.businessRules.requiredRule, formValues);
+      results.isRequired = evaluateRule(field.businessRules.requiredRule, watchedValues);
     }
 
-    // Evaluate disabledRule
+    // Evaluate disabledRule using only watched values (more efficient)
     if (field.businessRules.disabledRule) {
-      results.isDisabled = evaluateRule(field.businessRules.disabledRule, formValues);
+      results.isDisabled = evaluateRule(field.businessRules.disabledRule, watchedValues);
     }
 
     return results;
-    // Only depend on the specific fields referenced in rules via the serialized key
+    // Only depend on the specific fields referenced in rules via watchedValues
     // This ensures we only re-evaluate when watched fields change, not when any field changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [field.businessRules, watchedValuesKey]);
+  }, [field.businessRules, watchedValues]);
 }
 

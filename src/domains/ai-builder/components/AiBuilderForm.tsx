@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import Link from 'next/link';
 import { FormElementFactory } from '@/gradian-ui/form-builder/form-elements/components/FormElementFactory';
 import { Button } from '@/components/ui/button';
@@ -15,8 +15,128 @@ import { Sparkles, Loader2, Square, History, RotateCcw } from 'lucide-react';
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { PromptPreviewSheet } from './PromptPreviewSheet';
 import type { AiAgent } from '../types';
-import { useFieldRules } from '@/domains/business-rule-engine';
+import { useBusinessRuleEffects, getFieldEffects, useFieldRules } from '@/domains/business-rule-engine';
 import type { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
+import type { BusinessRuleWithEffects, BusinessRuleEffectsMap } from '@/domains/business-rule-engine';
+
+// Separate component for field item to allow hook usage
+interface FieldItemProps {
+  field: any;
+  formValues: Record<string, any>;
+  formErrors: Record<string, string>;
+  touched: Record<string, boolean>;
+  isLoading: boolean;
+  disabled: boolean;
+  handleFieldChange: (fieldName: string, value: any) => void;
+  handleFieldBlur: (fieldName: string) => void;
+  handleFieldFocus: (fieldName: string) => void;
+  ruleEffects?: BusinessRuleEffectsMap;
+  agentBusinessRules?: BusinessRuleWithEffects[] | undefined;
+}
+
+const FieldItem: React.FC<FieldItemProps> = memo(({
+  field,
+  formValues,
+  formErrors,
+  touched,
+  isLoading,
+  disabled,
+  handleFieldChange,
+  handleFieldBlur,
+  handleFieldFocus,
+  ruleEffects,
+  agentBusinessRules,
+}) => {
+  // Always call hooks unconditionally (Rules of Hooks)
+  // For pull-based model (backward compatibility)
+  const fieldRules = useFieldRules(field as FormField, formValues);
+  
+  // Get business rule effects (push-based model) or fall back to pull-based model
+  let fieldEffects;
+  if (agentBusinessRules && agentBusinessRules.length > 0 && ruleEffects) {
+    // Use push-based model: get effects from ruleEffects
+    const fieldId = field.id || field.name;
+    const sectionId = field.sectionId || 'basic-info';
+    fieldEffects = getFieldEffects(fieldId, sectionId, ruleEffects);
+  } else {
+    // Fall back to pull-based model: use fieldRules from hook
+    fieldEffects = {
+      isVisible: fieldRules.isVisible,
+      isRequired: fieldRules.isRequired,
+      isDisabled: fieldRules.isDisabled,
+    };
+  }
+
+  // Skip hidden fields (including business rule visibility)
+  if (!fieldEffects.isVisible) {
+    return null;
+  }
+
+  const fieldValue = formValues[field.name] ?? field.defaultValue ?? '';
+  const fieldError = formErrors[field.name];
+  const fieldTouched = touched[field.name];
+
+  // Determine column span: textarea = 2 (full width), others = 1 (half width)
+  const colSpan = field.component === 'textarea' ? 2 : 1;
+  const colSpanClass = colSpan === 2 ? 'col-span-2' : 'col-span-1';
+
+  // Special styling for textarea/prompt field
+  const isPromptField = field.name === 'userPrompt' || field.id === 'user-prompt';
+  const customClassName = isPromptField
+    ? cn(
+        'min-h-[140px] px-5 py-4 rounded-xl border',
+        'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm',
+        'border-violet-200/50 dark:border-violet-700/50',
+        'text-gray-900 dark:text-gray-100',
+        'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+        'focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:border-violet-400',
+        'shadow-sm',
+        'transition-all duration-200',
+        'direction-auto'
+      )
+    : undefined;
+
+  // Merge required state: business rule OR validation.required
+  const validationRequired = field.validation?.required ?? false;
+  const isRequired = fieldEffects.isRequired || validationRequired;
+  // Merge disabled state: business rule OR existing disabled flags
+  const isDisabled = fieldEffects.isDisabled || isLoading || disabled;
+
+  return (
+    <div 
+      className={cn('relative space-y-2', colSpanClass)}
+      style={{
+        gridColumn: colSpan === 2 ? 'span 2 / span 2' : 'span 1 / span 1'
+      }}
+    >
+      {field.label && (
+        <label
+          htmlFor={field.id || field.name}
+          className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide mb-2 block"
+        >
+          {field.label}
+          {isRequired && <span className="text-red-500 ml-1">*</span>}
+        </label>
+      )}
+      <FormElementFactory
+        config={{
+          ...field,
+          label: '', // Hide default label since we're rendering custom one
+        }}
+        value={fieldValue}
+        onChange={(value) => handleFieldChange(field.name, value)}
+        onBlur={() => handleFieldBlur(field.name)}
+        onFocus={() => handleFieldFocus(field.name)}
+        disabled={isDisabled}
+        error={undefined} // Don't show error messages
+        touched={fieldTouched}
+        required={isRequired}
+        className={customClassName}
+        {...(field.aiAgentId ? { aiAgentId: field.aiAgentId } : {})}
+      />
+    </div>
+  );
+});
 
 interface AiBuilderFormProps {
   userPrompt: string;
@@ -203,7 +323,7 @@ export function AiBuilderForm({
   }, [userPrompt, formValues, buildConcatenatedPrompt]);
 
   // Handle field value change
-  const handleFieldChange = (fieldName: string, value: any) => {
+  const handleFieldChange = useCallback((fieldName: string, value: any) => {
     // Extract the actual value from NormalizedOption array for select fields
     let actualValue = value;
     const currentField = formFields.find((f) => f.name === fieldName);
@@ -249,10 +369,10 @@ export function AiBuilderForm({
         }));
       }
     }
-  };
+  }, [formValues, formFields, formErrors, buildConcatenatedPrompt, onPromptChange]);
 
   // Handle field blur
-  const handleFieldBlur = (fieldName: string) => {
+  const handleFieldBlur = useCallback((fieldName: string) => {
     setTouched((prev) => ({
       ...prev,
       [fieldName]: true,
@@ -276,7 +396,7 @@ export function AiBuilderForm({
         });
       }
     }
-  };
+  }, [formValues, formFields]);
 
   // Validate all required fields
   const validateAllFields = useCallback(() => {
@@ -325,9 +445,9 @@ export function AiBuilderForm({
   }, [formFields, formValues, formErrors]);
 
   // Handle field focus
-  const handleFieldFocus = (fieldName: string) => {
+  const handleFieldFocus = useCallback((fieldName: string) => {
     // Could add focus handling if needed
-  };
+  }, []);
 
   // Auto-resize textarea with max 8 lines (for textarea fields)
   useEffect(() => {
@@ -368,102 +488,24 @@ export function AiBuilderForm({
     return orderA - orderB;
   });
 
-  // Separate component for field item to allow hook usage
-  interface FieldItemProps {
-    field: typeof formFields[0];
-    formValues: Record<string, any>;
-    formErrors: Record<string, string>;
-    touched: Record<string, boolean>;
-    isLoading: boolean;
-    disabled: boolean;
-    handleFieldChange: (fieldName: string, value: any) => void;
-    handleFieldBlur: (fieldName: string) => void;
-    handleFieldFocus: (fieldName: string) => void;
-  }
+  // Get all field IDs for business rule effects (push-based model)
+  const fieldIds = useMemo(() => sortedFields.map((f) => f.id || f.name), [sortedFields]);
+  const sectionIds = useMemo(() => {
+    const sections = new Set<string>();
+    sortedFields.forEach((f) => {
+      if (f.sectionId) sections.add(f.sectionId);
+    });
+    return Array.from(sections);
+  }, [sortedFields]);
 
-  const FieldItem: React.FC<FieldItemProps> = ({
-    field,
+  // Evaluate business rule effects (push-based model) if businessRules exist at agent level
+  const agentBusinessRules = (selectedAgent as any)?.businessRules as BusinessRuleWithEffects[] | undefined;
+  const ruleEffects = useBusinessRuleEffects(
+    agentBusinessRules,
     formValues,
-    formErrors,
-    touched,
-    isLoading,
-    disabled,
-    handleFieldChange,
-    handleFieldBlur,
-    handleFieldFocus,
-  }) => {
-    // Evaluate business rules for this field
-    const fieldRules = useFieldRules(field as FormField, formValues);
-
-    // Skip hidden fields (including business rule visibility)
-    if (!fieldRules.isVisible) {
-      return null;
-    }
-
-    const fieldValue = formValues[field.name] ?? field.defaultValue ?? '';
-    const fieldError = formErrors[field.name];
-    const fieldTouched = touched[field.name];
-
-    // Determine column span: textarea = 2 (full width), others = 1 (half width)
-    const colSpan = field.component === 'textarea' ? 2 : 1;
-    const colSpanClass = colSpan === 2 ? 'col-span-2' : 'col-span-1';
-
-    // Special styling for textarea/prompt field
-    const isPromptField = field.name === 'userPrompt' || field.id === 'user-prompt';
-    const customClassName = isPromptField
-      ? cn(
-          'min-h-[140px] px-5 py-4 rounded-xl border',
-          'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm',
-          'border-violet-200/50 dark:border-violet-700/50',
-          'text-gray-900 dark:text-gray-100',
-          'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-          'focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:border-violet-400',
-          'shadow-sm',
-          'transition-all duration-200',
-          'direction-auto'
-        )
-      : undefined;
-
-    // Merge required state: business rule OR validation.required
-    const isRequired = fieldRules.isRequired || (field.validation?.required ?? false);
-    // Merge disabled state: business rule OR existing disabled flags
-    const isDisabled = fieldRules.isDisabled || isLoading || disabled;
-
-    return (
-      <div 
-        className={cn('relative space-y-2', colSpanClass)}
-        style={{
-          gridColumn: colSpan === 2 ? 'span 2 / span 2' : 'span 1 / span 1'
-        }}
-      >
-        {field.label && (
-          <label
-            htmlFor={field.id || field.name}
-            className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide mb-2 block"
-          >
-            {field.label}
-            {isRequired && <span className="text-red-500 ml-1">*</span>}
-          </label>
-        )}
-        <FormElementFactory
-          config={{
-            ...field,
-            label: '', // Hide default label since we're rendering custom one
-          }}
-          value={fieldValue}
-          onChange={(value) => handleFieldChange(field.name, value)}
-          onBlur={() => handleFieldBlur(field.name)}
-          onFocus={() => handleFieldFocus(field.name)}
-          disabled={isDisabled}
-          error={undefined} // Don't show error messages
-          touched={fieldTouched}
-          required={isRequired}
-          className={customClassName}
-          {...(field.aiAgentId ? { aiAgentId: field.aiAgentId } : {})}
-        />
-      </div>
-    );
-  };
+    fieldIds,
+    sectionIds
+  );
 
   return (
     <div className="space-y-6">
@@ -571,6 +613,8 @@ export function AiBuilderForm({
                   handleFieldChange={handleFieldChange}
                   handleFieldBlur={handleFieldBlur}
                   handleFieldFocus={handleFieldFocus}
+                  ruleEffects={ruleEffects}
+                  agentBusinessRules={agentBusinessRules}
                 />
               );
             })}

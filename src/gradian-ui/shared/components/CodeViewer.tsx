@@ -236,13 +236,13 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
                     padding: '1rem',
                     fontSize: '0.875rem',
                     lineHeight: '1.5rem',
-                    borderRadius: 0,
+                    borderRadius: 0
                   }}
                   codeTagProps={{
                     style: {
                       fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
                       whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word',
+                      wordBreak: 'break-word'
                     },
                   }}
                   lineNumberStyle={{

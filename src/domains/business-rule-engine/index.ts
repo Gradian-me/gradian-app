@@ -10,6 +10,9 @@ export * from './utils/property-utils';
 export * from './utils/operator-utils';
 export * from './utils/value-utils';
 
+// Re-export specific types for convenience
+export type { BusinessRuleWithEffects, RuleTarget, BusinessRuleEffects } from './types';
+
 // Re-export ConditionGroup type explicitly to avoid conflict with component
 export type { ConditionGroup } from './types';
 

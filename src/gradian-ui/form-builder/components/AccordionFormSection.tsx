@@ -1,6 +1,6 @@
 // Accordion Form Section Component
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FormSectionProps } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -25,7 +25,7 @@ import { BadgeViewer } from '../form-elements/utils/badge-viewer';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useFieldRules } from '@/domains/business-rule-engine';
+import { useBusinessRuleEffects, getFieldEffects } from '@/domains/business-rule-engine';
 import type { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 const fieldVariants = {
   hidden: { opacity: 0, y: 12 },
@@ -79,6 +79,18 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     styling, 
     isRepeatingSection 
   } = section;
+
+  // Get all field IDs and section IDs for business rule effects
+  const fieldIds = useMemo(() => schema.fields.map((f) => f.id), [schema.fields]);
+  const sectionIds = useMemo(() => schema.sections.map((s) => s.id), [schema.sections]);
+
+  // Evaluate business rule effects (push-based model)
+  const ruleEffects = useBusinessRuleEffects(
+    schema.businessRules,
+    values,
+    fieldIds,
+    sectionIds
+  );
   
   // Check if this is a relation-based repeating section
   const isRelationBased = isRepeatingSection && section.repeatingConfig?.targetSchema && section.repeatingConfig?.relationTypeId;
@@ -327,9 +339,39 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     field: FormField;
     itemIndex?: number;
     index: number;
+    values: FormData;
+    errors: FormErrors;
+    touched: FormTouched;
+    disabled: boolean;
+    onChange: (fieldName: string, value: any) => void;
+    onBlur: (fieldName: string) => void;
+    onFocus: (fieldName: string) => void;
+    fieldTabIndexMap?: Record<string, number>;
+    section: FormSection;
+    columns: number;
+    isRepeatingSection: boolean;
+    isNotApplicable: boolean;
+    ruleEffects: BusinessRuleEffectsMap;
   }
 
-  const FieldItem: React.FC<FieldItemProps> = ({ field, itemIndex, index }) => {
+  const FieldItem: React.FC<FieldItemProps> = memo(({ 
+    field, 
+    itemIndex, 
+    index,
+    values,
+    errors,
+    touched,
+    disabled,
+    onChange,
+    onBlur,
+    onFocus,
+    fieldTabIndexMap,
+    section,
+    columns,
+    isRepeatingSection,
+    isNotApplicable,
+    ruleEffects,
+  }) => {
     // Build name/value/error/touched for normal vs repeating sections
     const isItem = itemIndex !== undefined && isRepeatingSection;
 
@@ -342,14 +384,15 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     const nestedErrors = (errors as any) || {};
     const nestedTouched = (touched as any) || {};
 
-    // For business rules evaluation, use the appropriate values context
-    const fieldValuesForRules = isItem 
-      ? { ...nestedValues, [field.name]: nestedValues?.[section.id]?.[itemIndex]?.[field.name] }
-      : nestedValues;
-    const fieldRules = useFieldRules(field, fieldValuesForRules);
+    // Get business rule effects for this field (includes section-level effects)
+    // Memoize this to avoid recalculating on every render
+    const fieldEffects = useMemo(
+      () => getFieldEffects(field.id, section.id, ruleEffects),
+      [field.id, section.id, ruleEffects]
+    );
 
     // Skip hidden and inactive fields (including business rule visibility)
-    if (!field || field.hidden || (field as any).layout?.hidden || field.inactive || !fieldRules.isVisible) {
+    if (!field || field.hidden || (field as any).layout?.hidden || field.inactive || !fieldEffects.isVisible) {
       return null;
     }
 
@@ -409,9 +452,9 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
 
     // Merge required state: business rule OR validation.required
     const validationRequired = field.validation?.required ?? false;
-    const isRequired = fieldRules.isRequired || validationRequired;
+    const isRequired = fieldEffects.isRequired || validationRequired;
     // Merge disabled state: business rule OR existing disabled flags
-    const isDisabled = fieldRules.isDisabled || disabled || field.disabled || isNotApplicable;
+    const isDisabled = fieldEffects.isDisabled || disabled || field.disabled || isNotApplicable;
 
     return (
       <motion.div
@@ -443,7 +486,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         />
       </motion.div>
     );
-  };
+  });
 
   const renderFields = (fieldsToRender: typeof fields, itemIndex?: number) => {
     return (
@@ -454,6 +497,19 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             field={field}
             itemIndex={itemIndex}
             index={index}
+            values={values}
+            errors={errors}
+            touched={touched}
+            disabled={disabled}
+            onChange={onChange}
+            onBlur={onBlur}
+            onFocus={onFocus}
+            fieldTabIndexMap={fieldTabIndexMap}
+            section={section}
+            columns={columns}
+            isRepeatingSection={isRepeatingSection}
+            isNotApplicable={isNotApplicable}
+            ruleEffects={ruleEffects}
           />
         ))}
       </AnimatePresence>

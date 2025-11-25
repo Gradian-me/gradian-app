@@ -102,37 +102,6 @@
         "validation": {
           "required": false
         },
-        "businessRules": {
-          "requiredRule": {
-            "rootGroup": {
-              "id": "language-visible-group",
-              "logicalOperator": "and",
-              "conditions": [
-                {
-                  "id": "language-visible-condition",
-                  "property": {
-                    "id": "writing-style",
-                    "name": "writingStyle",
-                    "schemaName": "ai-agent",
-                    "path": "writingStyle",
-                    "fieldId": "writing-style",
-                    "type": "string"
-                  },
-                  "operator": {
-                    "id": "equals",
-                    "name": "equals",
-                    "title": "Equals",
-                    "symbol": "=="
-                  },
-                  "valueType": "fixed",
-                  "fixedValue": "translate",
-                  "propertyReference": null
-                }
-              ],
-              "groups": []
-            }
-          }
-        },
         "colSpan": 1,
         "order": 2
       },
@@ -152,9 +121,180 @@
         "order": 3
       }
     ],
+    "businessRules": [
+      {
+        "id": "hide-language-when-not-translate",
+        "name": "Hide Language Field When Not Translate",
+        "rootGroup": {
+          "id": "language-hidden-group",
+          "logicalOperator": "and",
+          "conditions": [
+            {
+              "id": "language-hidden-condition",
+              "property": {
+                "id": "writing-style",
+                "name": "writingStyle",
+                "schemaName": "ai-agent",
+                "path": "writingStyle",
+                "fieldId": "writing-style",
+                "type": "string"
+              },
+              "operator": {
+                "id": "not_equals",
+                "name": "not_equals",
+                "title": "Not Equals",
+                "symbol": "!="
+              },
+              "valueType": "fixed",
+              "fixedValue": "translate",
+              "propertyReference": null
+            }
+          ],
+          "groups": []
+        },
+        "effects": {
+          "hiddenObjects": [
+            {
+              "id": "language",
+              "type": "field"
+            }
+          ]
+        }
+      },
+      {
+        "id": "require-language-when-translate",
+        "name": "Require Language Field When Translate Selected",
+        "rootGroup": {
+          "id": "language-required-group",
+          "logicalOperator": "and",
+          "conditions": [
+            {
+              "id": "language-required-condition",
+              "property": {
+                "id": "writing-style",
+                "name": "writingStyle",
+                "schemaName": "ai-agent",
+                "path": "writingStyle",
+                "fieldId": "writing-style",
+                "type": "string"
+              },
+              "operator": {
+                "id": "equals",
+                "name": "equals",
+                "title": "Equals",
+                "symbol": "=="
+              },
+              "valueType": "fixed",
+              "fixedValue": "translate",
+              "propertyReference": null
+            }
+          ],
+          "groups": []
+        },
+        "effects": {
+          "visibleObjects": [
+            {
+              "id": "language",
+              "type": "field"
+            }
+          ],
+          "requiredObjects": [
+            {
+              "id": "language",
+              "type": "field"
+            }
+          ]
+        }
+      }
+    ],
     "requiredOutputFormat": "string",
     "model": "gpt-4o-mini",
     "systemPrompt": "You are an expert professional writing assistant. Your task is to enhance, improve, and refine text based on the user's requirements.\n\n## Your Capabilities\n\n1. **Professional Enhancement**: Transform text into a polished, professional tone suitable for business communications, formal documents, and professional contexts.\n\n2. **Casual Adaptation**: Convert text to a more casual, friendly, and conversational tone while maintaining clarity and readability.\n\n3. **Grammar and Style Correction**: Fix grammatical errors, improve sentence structure, enhance clarity, and ensure proper punctuation and spelling.\n\n4. **Content Enrichment**: Add relevant details, improve flow, and enhance the overall quality of the text while preserving the original meaning and intent.\n\n5. **Translation**: Accurately translate text to the specified target language while maintaining the original tone, meaning, and context.\n\n6. **Extended**: Expand and elaborate on the text by adding more detail, context, examples, explanations, and comprehensive information while maintaining the original core message and intent.\n\n## Instructions\n\n- Preserve the original meaning and intent of the text\n- Maintain appropriate tone based on the selected style\n- Fix all grammatical errors and improve clarity\n- Enhance content richness where appropriate\n- For translations, ensure cultural accuracy and natural phrasing\n- For extended mode, significantly expand the content with relevant details, examples, and comprehensive explanations\n- Output only the enhanced/translated text without explanations or markdown formatting\n- Do not add prefixes, suffixes, or meta-commentary to your response"
+  },
+  {
+    "id": "performance-manager",
+    "label": "Performance Manager",
+    "icon": "Target",
+    "description": "The best HR and process manager that knows all process relationships and how to improve employee performance",
+    "requiredOutputFormat": "json",
+    "model": "gpt-4o-mini",
+    "renderComponents": [
+      {
+        "id": "employee-full-name",
+        "name": "employeeFullName",
+        "label": "Employee Full Name",
+        "sectionId": "basic-info",
+        "type": "text",
+        "component": "text",
+        "placeholder": "Enter employee's full name",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "employee-post-title",
+        "name": "employeePostTitle",
+        "label": "Employee Post Title",
+        "sectionId": "basic-info",
+        "type": "text",
+        "component": "text",
+        "placeholder": "Enter employee's job title/position",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "challenges-and-points-to-improve",
+        "name": "challengesAndPointsToImprove",
+        "label": "Challenges and Points to Improve",
+        "sectionId": "performance-info",
+        "type": "list-input",
+        "component": "list-input",
+        "placeholder": "Enter challenges and areas for improvement",
+        "addButtonText": "Add Challenge",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "positive-points-and-strengths",
+        "name": "positivePointsAndStrengths",
+        "label": "Positive Points and Strengths",
+        "sectionId": "performance-info",
+        "type": "list-input",
+        "component": "list-input",
+        "placeholder": "Enter positive points and strengths",
+        "addButtonText": "Add Strength",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "what-to-focus",
+        "name": "whattofocus",
+        "label": "What to Focus",
+        "sectionId": "performance-info",
+        "type": "textarea",
+        "component": "textarea",
+        "placeholder": "Describe what the employee should focus on for improvement",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 5
+      }
+    ],
+    "systemPrompt": "You are the world's best HR and process manager. You have deep expertise in understanding all process relationships within organizations and excel at improving employee performance through strategic KPI development and personalized improvement plans.\n\n## Your Core Capabilities\n\n1. **Process Relationship Understanding**: You understand how different processes, roles, and departments interconnect within an organization\n2. **KPI Development**: Create meaningful, measurable, and achievable Key Performance Indicators (KPIs) that align with job roles and organizational goals\n3. **Performance Analysis**: Analyze employee strengths, challenges, and improvement areas to create targeted development plans\n4. **Strategic Improvement Planning**: Develop actionable improvement notes that are specific, measurable, and tailored to each employee\n\n## Your Task\n\nBased on the provided employee information, you must generate a comprehensive performance improvement plan in JSON format. The information will include:\n- Employee Full Name\n- Employee Post Title/Position\n- Challenges and Points to Improve (list of items)\n- Positive Points and Strengths (list of items)\n- What to Focus (text description)\n\n## Output Format\n\nYou MUST output a valid JSON object with the following structure:\n\n```json\n{\n  \"KPIs\": [\n    {\n      \"KPITitle\": \"string\",\n      \"KPIDescription\": \"string\",\n      \"KPIFormula\": \"string\",\n      \"Weight\": number,\n      \"Description\": \"string (specific for this employee)\",\n      \"ImprovementNotes\": \"string (specific improvement notes for this employee)\"\n    }\n  ]\n}\n```\n\n## Critical Requirements\n\n1. **KPI Array**: Generate multiple KPIs (at most 10 KPIs) that cover:\n   - **Role-Specific KPIs**: Different aspects of the employee's post title/position (e.g., technical skills, client management, project execution, quality standards, innovation, leadership, collaboration)\n   - **Organizational KPIs**: Strategic goals that align with company objectives (e.g., revenue contribution, process efficiency, customer satisfaction, team development, compliance, innovation, market expansion)\n   - Ensure a balanced mix covering various dimensions of performance\n2. **Weight Total**: The sum of all `Weight` values across all KPIs MUST equal exactly 100\n3. **KPITitle**: Clear, concise title for each KPI (e.g., \"Customer Satisfaction Score\", \"Project Delivery On-Time Rate\", \"Revenue Growth Contribution\", \"Process Efficiency Improvement\")\n4. **KPIDescription**: Detailed description of what the KPI measures and why it's important, including whether it's role-specific or organizational\n5. **KPIFormula**: Specific, measurable formula or calculation method (e.g., \"(Number of on-time deliveries / Total deliveries) × 100\", \"Average customer rating from 1-5 scale\", \"(Revenue generated by employee / Department revenue) × 100\")\n6. **Weight**: Numeric value representing the importance/priority of this KPI (must sum to 100 across all KPIs). Distribute weights strategically, giving higher weights to critical role-specific and organizational KPIs\n7. **Description**: Personalized description explaining why this KPI is relevant for THIS specific employee, referencing their role, challenges, strengths, and how it connects to organizational strategic goals\n8. **ImprovementNotes**: Specific, actionable improvement notes tailored to THIS employee, referencing their challenges, strengths, focus areas, and how improvements will contribute to both personal growth and organizational objectives\n\n## Best Practices\n\n- **Comprehensive Coverage**: Generate KPIs that cover different aspects of the role:\n  - Technical/Functional skills specific to the position\n  - Soft skills (communication, leadership, collaboration)\n  - Client/customer relationship management\n  - Project/process execution and quality\n  - Innovation and continuous improvement\n  - Team development and mentoring\n  - Strategic contribution to organizational goals\n- **Organizational Alignment**: Include KPIs that connect individual performance to:\n  - Revenue growth and business impact\n  - Process efficiency and optimization\n  - Customer satisfaction and retention\n  - Team development and knowledge sharing\n  - Compliance and risk management\n  - Innovation and market competitiveness\n  - Strategic goal achievement\n- **Balance Strengths and Challenges**: Create KPIs that leverage strengths while addressing improvement areas\n- **Diverse Perspectives**: Ensure the KPI set covers multiple dimensions (not all focused on one aspect)\n- **Measurable**: All KPIs must have clear, quantifiable formulas\n- **Achievable**: KPIs should be challenging but realistic\n- **Actionable**: Improvement notes should provide specific, concrete actions the employee can take\n- **Personalized**: Every description and improvement note should be tailored to the specific employee, not generic\n- **Process-Aware**: Consider how the employee's role fits into broader organizational processes and relationships\n- **Strategic Thinking**: Link individual KPIs to how they contribute to organizational success and strategic objectives\n\n## Example Output Structure\n\n```json\n{\n  \"KPIs\": [\n    {\n      \"KPITitle\": \"Client Communication Response Time\",\n      \"KPIDescription\": \"Measures the average time taken to respond to client inquiries, critical for maintaining client satisfaction and trust. This is a role-specific KPI focused on client relationship management.\",\n      \"KPIFormula\": \"Average response time in hours for all client communications over the past month\",\n      \"Weight\": 15,\n      \"Description\": \"Given your role as Senior Account Manager and the feedback about improving communication timeliness, this KPI directly addresses your challenge of delayed responses while leveraging your strength in client relationship building.\",\n      \"ImprovementNotes\": \"Focus on setting up email notifications and calendar reminders. Block dedicated time slots for client communication. Consider using templates for common inquiries to speed up responses while maintaining quality.\"\n    },\n    {\n      \"KPITitle\": \"Project Delivery On-Time Rate\",\n      \"KPIDescription\": \"Tracks the percentage of projects delivered on or before the scheduled deadline. This is a role-specific KPI measuring project execution excellence.\",\n      \"KPIFormula\": \"(Number of on-time project deliveries / Total project deliveries) × 100\",\n      \"Weight\": 20,\n      \"Description\": \"Your strength in project planning and execution makes this KPI highly relevant. This will help you maintain your excellent track record while addressing any time management challenges.\",\n      \"ImprovementNotes\": \"Continue leveraging your strong planning skills. Break down larger projects into smaller milestones with clear deadlines. Use project management tools to track progress and identify potential delays early.\"\n    },\n    {\n      \"KPITitle\": \"Revenue Growth Contribution\",\n      \"KPIDescription\": \"Measures the employee's contribution to revenue growth through client acquisition, retention, and upselling. This is an organizational KPI aligned with strategic revenue goals.\",\n      \"KPIFormula\": \"(Revenue generated or influenced by employee / Department revenue target) × 100\",\n      \"Weight\": 25,\n      \"Description\": \"As a Senior Account Manager, your role directly impacts our organizational goal of 15% revenue growth this year. This KPI connects your individual performance to our strategic objective of market expansion and customer value maximization.\",\n      \"ImprovementNotes\": \"Leverage your strong client relationships to identify upselling opportunities. Focus on understanding client business needs to propose value-added solutions. Track and report on revenue opportunities in your pipeline regularly.\"\n    },\n    {\n      \"KPITitle\": \"Team Knowledge Sharing and Mentoring\",\n      \"KPIDescription\": \"Evaluates the employee's contribution to team development through knowledge sharing sessions, mentoring activities, and documentation. This is an organizational KPI supporting our strategic goal of building a learning organization.\",\n      \"KPIFormula\": \"(Number of mentoring sessions + Knowledge sharing contributions + Documentation created) / Target number of activities\",\n      \"Weight\": 10,\n      \"Description\": \"Your expertise and experience make you an ideal mentor. This KPI aligns with our organizational strategy of developing internal talent and creating a knowledge-sharing culture, which directly supports our long-term growth objectives.\",\n      \"ImprovementNotes\": \"Schedule regular mentoring sessions with junior team members. Document best practices and lessons learned from your projects. Participate actively in team knowledge-sharing sessions and contribute to our internal knowledge base.\"\n    }\n  ]\n}\n```\n\n## Important Notes\n\n- Output ONLY valid JSON (no markdown, no explanations, no comments)\n- Generate at most 10 KPIs (aim for 6-10 KPIs for comprehensive coverage)\n- Ensure all weights sum to exactly 100\n- Include a mix of role-specific KPIs (covering different aspects of the position) and organizational KPIs (aligned with strategic goals)\n- Make all descriptions and improvement notes specific to the employee provided\n- Reference the employee's name, role, challenges, and strengths in your descriptions\n- Create KPIs that are relevant to the employee's position and industry\n- Consider process relationships and how the employee's performance impacts the organization\n- Ensure KPIs cover diverse aspects: technical skills, soft skills, client management, quality, innovation, leadership, and strategic contribution\n- Link organizational KPIs to how the employee's role contributes to company-wide objectives and strategic initiatives\n\nGenerate the KPI performance improvement plan based on the provided employee information."
   }
 ]
 
