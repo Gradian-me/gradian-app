@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../../../shared/utils';
 import { SidebarProps } from '../types';
@@ -24,12 +24,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
   navigationSchemas,
 }) => {
   const width = isMobile ? 320 : (isCollapsed ? config.styling?.collapsedWidth || 80 : config.styling?.expandedWidth || 280);
+  const prevWidthRef = useRef<number>(width);
+
+  // Only animate if width actually changed
+  useEffect(() => {
+    prevWidthRef.current = width;
+  }, [width]);
+
+  const shouldAnimate = prevWidthRef.current !== width;
 
   return (
     <motion.div
       initial={false}
       animate={{ width }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      transition={{ 
+        duration: shouldAnimate ? 0.3 : 0,
+        ease: "easeOut" 
+      }}
       className={cn(
         "relative h-full bg-gray-900 text-white flex flex-col",
         !isMobile && "border-r border-gray-800",

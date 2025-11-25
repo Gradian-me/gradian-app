@@ -289,51 +289,50 @@ export function ServiceCardsList({
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                       {Object.entries(status.data.checks).map(([checkName, check]) => {
-                        const checkValue = JSON.stringify({ status: check.status, message: check.message, responseTime: check.responseTime });
-                        const pingColor = check.status === 'healthy' ? 'green' : check.status === 'unhealthy' ? 'red' : 'yellow';
                         return (
-                          <PingOnChange key={checkName} value={checkValue} color={pingColor}>
-                            <div
-                              className={`p-3 rounded-lg border ${
-                                check.status === 'healthy'
-                                  ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800'
-                                  : check.status === 'unhealthy'
-                                  ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'
-                                  : 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between mb-1">
-                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">
-                                  {checkName}
-                                </div>
-                                {check.status === 'healthy' ? (
-                                  <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
-                                ) : (
-                                  <AlertCircle className={`h-4 w-4 shrink-0 ${
-                                    check.status === 'unhealthy' ? 'text-red-500' : 'text-yellow-500'
-                                  }`} />
-                                )}
+                          <div
+                            key={checkName}
+                            className={`p-3 rounded-lg border ${
+                              check.status === 'healthy'
+                                ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800'
+                                : check.status === 'unhealthy'
+                                ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'
+                                : 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">
+                                {checkName}
                               </div>
-                              {check.message && (
-                                <div className={`text-xs mt-1 ${
+                              {check.status === 'healthy' ? (
+                                <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                              ) : (
+                                <AlertCircle
+                                  className={`h-4 w-4 shrink-0 ${
+                                    check.status === 'unhealthy' ? 'text-red-500' : 'text-yellow-500'
+                                  }`}
+                                />
+                              )}
+                            </div>
+                            {check.message && (
+                              <div
+                                className={`text-xs mt-1 ${
                                   check.status === 'healthy'
                                     ? 'text-green-700 dark:text-green-300'
                                     : check.status === 'unhealthy'
                                     ? 'text-red-700 dark:text-red-300'
                                     : 'text-yellow-700 dark:text-yellow-300'
-                                }`}>
-                                  {check.message}
-                                </div>
-                              )}
-                              {check.responseTime !== undefined && (
-                                <PingOnChange value={check.responseTime} color="blue">
-                                  <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                    {check.responseTime}ms
-                                  </div>
-                                </PingOnChange>
-                              )}
-                            </div>
-                          </PingOnChange>
+                                }`}
+                              >
+                                {check.message}
+                              </div>
+                            )}
+                            {check.responseTime !== undefined && (
+                              <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                {check.responseTime}ms
+                              </div>
+                            )}
+                          </div>
                         );
                       })}
                     </div>

@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bell, PanelLeftOpen, PencilRuler, Plus } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { GoToTop, Header, ModeToggle } from '@/gradian-ui/layout';
 import { Sidebar } from '@/gradian-ui/layout/sidebar';
 import dynamic from 'next/dynamic';
@@ -46,6 +46,10 @@ const SIDEBAR_STATE_KEY = 'gradian-sidebar-collapsed';
 
 // Track if this is the first mount across all route changes
 let hasMountedBefore = false;
+// Track if sidebar state has been hydrated (persists across route changes)
+let sidebarStateHydrated = false;
+// Track the last known sidebar width across route changes
+let lastSidebarWidth: number | null = null;
 
 const getSidebarWidth = (isDesktop: boolean, isCollapsed: boolean) => {
   if (!isDesktop) {
@@ -76,13 +80,35 @@ export function MainLayout({
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
   const profileTheme = resolvedTheme === 'dark' ? 'dark' : 'light';
-  // Always start with collapsed state to match SSR (prevents hydration mismatch)
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+  // Initialize sidebar state from localStorage if available, otherwise default to collapsed
+  // This prevents the flash of collapsed sidebar when navigating
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    if (typeof window !== 'undefined' && sidebarStateHydrated) {
+      const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
+      return stored === 'true';
+    }
+    return true; // Default for SSR
+  });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notificationCount] = useState(3);
   const [isDesktop, setIsDesktop] = useState(false);
   // Always start with collapsed width to match SSR (prevents hydration mismatch)
-  const [sidebarWidth, setSidebarWidth] = useState(() => getSidebarWidth(false, true));
+  // Use previous width if available to prevent animation on route change
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    if (typeof window !== 'undefined') {
+      if (lastSidebarWidth !== null) {
+        return lastSidebarWidth;
+      }
+      if (sidebarStateHydrated) {
+        const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
+        const shouldBeCollapsed = stored === 'true';
+        const isDesktopNow = window.innerWidth >= DESKTOP_BREAKPOINT;
+        return getSidebarWidth(isDesktopNow, shouldBeCollapsed);
+      }
+    }
+    return getSidebarWidth(false, true);
+  });
+  const prevSidebarWidthRef = useRef<number | null>(sidebarWidth);
   const { selectedCompany } = useCompanyStore();
   const { closeAllDialogs, hasOpenDialogs, registerDialog, unregisterDialog } = useDialogContext();
   const pageTitle = title ? `${title} | Gradian App` : 'Gradian App';
@@ -97,11 +123,22 @@ export function MainLayout({
   }, [pageTitle]);
 
   // Hydrate sidebar state from localStorage after mount (prevents hydration mismatch)
+  // Only do this once across all route changes
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (sidebarStateHydrated) return; // Already hydrated, skip
+    
     const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
     const shouldBeCollapsed = stored === 'true';
     setIsSidebarCollapsed(shouldBeCollapsed);
+    sidebarStateHydrated = true;
+    
+    // Also set initial sidebar width based on hydrated state
+    const isDesktopNow = window.innerWidth >= DESKTOP_BREAKPOINT;
+    const initialWidth = getSidebarWidth(isDesktopNow, shouldBeCollapsed);
+    setSidebarWidth(initialWidth);
+    prevSidebarWidthRef.current = initialWidth;
+    lastSidebarWidth = initialWidth;
   }, []);
 
   // Check if we're on desktop (only on resize, not on every render)
@@ -129,11 +166,19 @@ export function MainLayout({
     setSidebarWidth((currentWidth) => {
       // Only update if width actually changed
       if (currentWidth !== nextSidebarWidth) {
+        lastSidebarWidth = nextSidebarWidth;
         return nextSidebarWidth;
       }
       return currentWidth;
     });
   }, [isDesktop, isSidebarCollapsed]);
+
+  useEffect(() => {
+    prevSidebarWidthRef.current = sidebarWidth;
+    if (typeof window !== 'undefined') {
+      lastSidebarWidth = sidebarWidth;
+    }
+  }, [sidebarWidth]);
 
   // Mark that we've mounted (after first render)
   useEffect(() => {
@@ -369,6 +414,8 @@ export function MainLayout({
     </div>
   );
 
+  const shouldAnimateSidebar = prevSidebarWidthRef.current !== null && prevSidebarWidthRef.current !== sidebarWidth;
+
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-950 relative">
       {/* Desktop Sidebar - Fixed Position */}
@@ -425,11 +472,14 @@ export function MainLayout({
       {/* Main Content - Adjust margin based on sidebar width */}
       <motion.div 
         className="flex-1 flex flex-col min-h-0"
-        initial={false}
+        initial={{ marginLeft: sidebarWidth }}
         animate={{ 
           marginLeft: sidebarWidth
         }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        transition={{ 
+          duration: shouldAnimateSidebar ? 0.3 : 0,
+          ease: "easeOut" 
+        }}
         style={mainContentStyle}
       >
         {/* Header */}
@@ -447,9 +497,10 @@ export function MainLayout({
 
         {/* Page Content */}
         <motion.main
+          key={pathname}
           initial={!hasMountedBefore ? { opacity: 0, y: 20 } : false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
           className="flex-1 overflow-y-auto p-2 md:p-4 lg:p-6 bg-gray-50 dark:bg-gray-900"
           data-scroll-container="main-content"
         >

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
+import { readSchemaData, writeSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
 
 /**
  * Get the API URL for internal server-side calls
@@ -55,6 +57,180 @@ function extractDataByPath(data: any, path: string): any {
   return result;
 }
 
+type IntegrationEntity = Record<string, any>;
+
+function isServerDemoMode(): boolean {
+  try {
+    const vars = loadApplicationVariables();
+    return Boolean(vars?.DEMO_MODE);
+  } catch (error) {
+    loggingCustom(
+      LogType.INTEGRATION_LOG,
+      'warn',
+      `Failed to read application variables for demo mode detection: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+    return true;
+  }
+}
+
+function findLocalIntegrationById(id: string): IntegrationEntity | null {
+  try {
+    const integrations = readSchemaData<IntegrationEntity>('integrations');
+    return integrations.find(integration => integration.id === id) || null;
+  } catch (error) {
+    loggingCustom(
+      LogType.INTEGRATION_LOG,
+      'warn',
+      `Failed to read integrations from local storage: ${error instanceof Error ? error.message : String(error)}`
+    );
+    return null;
+  }
+}
+
+function saveLocalIntegration(updatedIntegration: IntegrationEntity): void {
+  try {
+    const integrations = readSchemaData<IntegrationEntity>('integrations');
+    const index = integrations.findIndex(integration => integration.id === updatedIntegration.id);
+    if (index === -1) {
+      loggingCustom(
+        LogType.INTEGRATION_LOG,
+        'warn',
+        `Attempted to update non-existent integration locally: ${updatedIntegration.id}`
+      );
+      return;
+    }
+    integrations[index] = updatedIntegration;
+    writeSchemaData('integrations', integrations);
+  } catch (error) {
+    loggingCustom(
+      LogType.INTEGRATION_LOG,
+      'warn',
+      `Failed to persist integration update locally: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+async function updateIntegrationLastSyncedTimestamp(
+  id: string,
+  integration: IntegrationEntity,
+  useLocalData: boolean
+): Promise<IntegrationEntity> {
+  const timestamp = new Date().toISOString();
+  const updatedIntegration: IntegrationEntity = {
+    ...integration,
+    lastSynced: timestamp,
+    updatedAt: timestamp,
+    id,
+  };
+
+  if (useLocalData) {
+    saveLocalIntegration(updatedIntegration);
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'lastSynced timestamp updated in local storage');
+    return updatedIntegration;
+  }
+
+  try {
+    const updateUrl = getApiUrl(`/api/data/integrations/${id}`);
+    await fetch(updateUrl, {
+      method: 'PUT' as any,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedIntegration),
+      cache: 'no-store',
+    });
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'lastSynced timestamp updated via data API');
+  } catch (error) {
+    loggingCustom(
+      LogType.INTEGRATION_LOG,
+      'warn',
+      `Failed to update lastSynced timestamp via data API: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+
+  return updatedIntegration;
+}
+
+async function fetchIntegrationFromApi(id: string): Promise<IntegrationEntity | null> {
+  loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Fetching integration with id via API: ${id}`);
+  try {
+    const byIdUrl = getApiUrl(`/api/data/integrations/${id}`);
+    const byIdResponse = await fetch(byIdUrl, {
+      method: 'GET' as any,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    });
+
+    if (byIdResponse.ok) {
+      const byIdData = await byIdResponse.json();
+      if (byIdData.success && byIdData.data) {
+        const integrationCandidate = Array.isArray(byIdData.data)
+          ? byIdData.data[0]
+          : byIdData.data?.data || byIdData.data;
+        if (integrationCandidate) {
+          loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Integration fetched successfully via API by ID: ${id}`);
+          return integrationCandidate;
+        }
+      }
+    } else {
+      loggingCustom(
+        LogType.INTEGRATION_LOG,
+        'warn',
+        `Integration API returned ${byIdResponse.status} when querying by ID ${id}`
+      );
+    }
+  } catch (error) {
+    loggingCustom(
+      LogType.INTEGRATION_LOG,
+      'warn',
+      `Failed to fetch integration by ID via API: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+
+  try {
+    const listUrl = getApiUrl('/api/data/integrations');
+    const listResponse = await fetch(listUrl, {
+      method: 'GET' as any,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    });
+
+    if (listResponse.ok) {
+      const listData = await listResponse.json();
+      if (listData.success && listData.data) {
+        const integrations = Array.isArray(listData.data)
+          ? listData.data
+          : listData.data?.data || listData.data?.items || [];
+        const integration = integrations.find((integration: IntegrationEntity) => integration.id === id) || null;
+        if (integration) {
+          loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Integration located via API list fallback: ${id}`);
+          return integration;
+        }
+      }
+    } else {
+      loggingCustom(
+        LogType.INTEGRATION_LOG,
+        'warn',
+        `Integration list API returned ${listResponse.status} when searching for ${id}`
+      );
+    }
+  } catch (error) {
+    loggingCustom(
+      LogType.INTEGRATION_LOG,
+      'error',
+      `Error fetching integrations list from API: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+
+  return null;
+}
+
 /**
  * POST - Sync an integration
  */
@@ -75,56 +251,26 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
-    // Fetch integration from dynamic data API
-    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Fetching integration with id: ${id}`);
-    let integration: any = null;
-    try {
-      // Try to fetch by ID first
-      const byIdUrl = getApiUrl(`/api/data/integrations/${id}`);
-      const byIdResponse = await fetch(byIdUrl, {
-        method: 'GET' as any,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
 
-      if (byIdResponse.ok) {
-        const byIdData = await byIdResponse.json();
-        if (byIdData.success && byIdData.data) {
-          // Handle different response formats
-          integration = Array.isArray(byIdData.data) ? byIdData.data[0] : (byIdData.data?.data || byIdData.data);
-          loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Integration fetched successfully by ID: ${id}`);
-        }
+    const useLocalData = isServerDemoMode();
+    let integration: IntegrationEntity | null = null;
+
+    if (useLocalData) {
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Attempting to resolve integration from local data store');
+      integration = findLocalIntegrationById(id);
+      if (integration) {
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Integration resolved from local data: ${id}`);
+      } else {
+        loggingCustom(
+          LogType.INTEGRATION_LOG,
+          'warn',
+          `Integration ${id} not found in local data, falling back to API lookup`
+        );
       }
-    } catch (error) {
-      loggingCustom(LogType.INTEGRATION_LOG, 'warn', `Failed to fetch integration by ID, trying list: ${error instanceof Error ? error.message : String(error)}`);
     }
 
-    // If not found by ID, fetch all and filter
     if (!integration) {
-      try {
-        const listUrl = getApiUrl('/api/data/integrations');
-        const listResponse = await fetch(listUrl, {
-          method: 'GET' as any,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (listResponse.ok) {
-          const listData = await listResponse.json();
-          if (listData.success && listData.data) {
-            const integrations = Array.isArray(listData.data) ? listData.data : (listData.data?.data || listData.data?.items || []);
-            integration = integrations.find((i: any) => i.id === id);
-            if (integration) {
-              loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Integration found in list: ${id}`);
-            }
-          }
-        }
-      } catch (error) {
-        loggingCustom(LogType.INTEGRATION_LOG, 'error', `Error fetching integrations list: ${error instanceof Error ? error.message : String(error)}`);
-      }
+      integration = await fetchIntegrationFromApi(id);
     }
 
     if (!integration) {
@@ -371,26 +517,8 @@ export async function POST(request: NextRequest) {
               });
             }
             
-            // Update lastSynced timestamp using the dynamic data API
-            try {
-              loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Updating lastSynced timestamp');
-              const updateUrl = getApiUrl(`/api/data/integrations/${id}`);
-              const updatedIntegration = {
-                ...integration,
-                lastSynced: new Date().toISOString(),
-              };
-              
-              await fetch(updateUrl, {
-                method: 'PUT' as any,
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updatedIntegration),
-              });
-              loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'lastSynced timestamp updated successfully');
-            } catch (error) {
-              loggingCustom(LogType.INTEGRATION_LOG, 'warn', `Failed to update lastSynced timestamp: ${error instanceof Error ? error.message : String(error)}`);
-              // Don't fail the sync if timestamp update fails
+            if (integration) {
+              integration = await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData);
             }
             
             loggingCustom(LogType.INTEGRATION_LOG, 'info', `Integration sync completed successfully for id: ${id}`);
@@ -484,26 +612,8 @@ export async function POST(request: NextRequest) {
               });
             }
             
-            // Update lastSynced timestamp using the dynamic data API
-            try {
-              loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Updating lastSynced timestamp');
-              const updateUrl = getApiUrl(`/api/data/integrations/${id}`);
-              const updatedIntegration = {
-                ...integration,
-                lastSynced: new Date().toISOString(),
-              };
-              
-              await fetch(updateUrl, {
-                method: 'PUT' as any,
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updatedIntegration),
-              });
-              loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'lastSynced timestamp updated successfully');
-            } catch (error) {
-              loggingCustom(LogType.INTEGRATION_LOG, 'warn', `Failed to update lastSynced timestamp: ${error instanceof Error ? error.message : String(error)}`);
-              // Don't fail the sync if timestamp update fails
+            if (integration) {
+              integration = await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData);
             }
             
             loggingCustom(LogType.INTEGRATION_LOG, 'info', `Integration sync completed successfully for id: ${id}`);
@@ -595,26 +705,8 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      // Update lastSynced timestamp using the dynamic data API
-      try {
-        loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Updating lastSynced timestamp');
-        const updateUrl = getApiUrl(`/api/data/integrations/${id}`);
-        const updatedIntegration = {
-          ...integration,
-          lastSynced: new Date().toISOString(),
-        };
-        
-        await fetch(updateUrl, {
-          method: 'PUT' as any,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedIntegration),
-        });
-        loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'lastSynced timestamp updated successfully');
-      } catch (error) {
-        loggingCustom(LogType.INTEGRATION_LOG, 'warn', `Failed to update lastSynced timestamp: ${error instanceof Error ? error.message : String(error)}`);
-        // Don't fail the sync if timestamp update fails
+      if (integration) {
+        integration = await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData);
       }
       
       loggingCustom(LogType.INTEGRATION_LOG, 'info', `Integration sync completed successfully for id: ${id}`);

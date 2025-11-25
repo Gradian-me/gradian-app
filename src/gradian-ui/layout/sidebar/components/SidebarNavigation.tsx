@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,6 +10,9 @@ import { isActiveNavigationItem } from '../utils';
 import { cn } from '../../../shared/utils';
 import { SidebarNavigationDynamic } from './SidebarNavigationDynamic';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
+
+// Track if navigation items have been mounted before (persists across route changes)
+let navigationItemsMounted = false;
 
 export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   items,
@@ -22,6 +25,14 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
 }) => {
   const pathname = usePathname();
   const currentPath = activePath || pathname;
+  const hasMountedRef = useRef(navigationItemsMounted);
+
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      navigationItemsMounted = true;
+      hasMountedRef.current = true;
+    }
+  }, []);
 
   return (
     <ScrollArea className={cn("flex-1 px-4", className)}>
@@ -33,11 +44,11 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
           return (
             <Link key={item.name} href={item.href} onClick={() => onItemClick?.(item)}>
               <motion.div
-                initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                initial={!hasMountedRef.current ? { opacity: 0, y: 6, scale: 0.98 } : false}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{
                   duration: 0.25,
-                  delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX),
+                  delay: !hasMountedRef.current ? Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX) : 0,
                   ease: 'easeOut',
                 }}
                 whileHover={{ scale: 1.02 }}
