@@ -4,7 +4,7 @@ import { MonthlyTrendChart } from '@/components/dashboard/charts/monthly-trend-c
 import { ProcurementEfficiencyChart } from '@/components/dashboard/charts/procurement-efficiency-chart';
 import { SpendAnalysisChart } from '@/components/dashboard/charts/spend-analysis-chart';
 import { VendorPerformanceChart } from '@/components/dashboard/charts/vendor-performance-chart';
-import { KPICard } from '@/components/dashboard/kpi-card';
+import { KPICard } from '@/gradian-ui/analytics/indicators/kpi-card';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,7 @@ import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { useDashboard } from '../hooks/useDashboard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { LoadingSpinner } from '@/gradian-ui/layout/components';
 
 export function DashboardPage() {
   const user = useUserStore((state) => state.user);
@@ -60,9 +61,7 @@ export function DashboardPage() {
   if (isLoading) {
     return (
       <MainLayout title="Dashboard" subtitle="Loading dashboard data…" icon="LayoutDashboard">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
+        <LoadingSpinner centered containerClassName="h-64" />
       </MainLayout>
     );
   }

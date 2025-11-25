@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import * as LucideIcons from 'lucide-react';
 import { GridBuilder } from '../../layout/grid-builder';
-import { LoadingSkeleton } from '../../layout/components';
+import { LoadingSkeleton, LoadingSpinner } from '../../layout/components';
 import { DynamicCard } from './DynamicCard';
 import { CardSection, FormSchema, ListMetadata } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '../../shared/utils';
@@ -91,9 +91,7 @@ export const DynamicList: React.FC<DynamicListProps> = ({
     }
 
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <LoadingSpinner centered containerClassName="h-64" />
     );
   }
 

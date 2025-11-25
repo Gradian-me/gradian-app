@@ -28,6 +28,7 @@ import {
 import { motion } from 'framer-motion';
 import { DashboardMetrics, SpendAnalysis, MonthlyTrend } from '@/types';
 import ReactECharts from 'echarts-for-react';
+import { LoadingSpinner } from '@/gradian-ui/layout/components';
 import { CHART_ANIMATION_CONFIG, CHART_COLOR_PALETTE, createChartTheme } from '@/gradian-ui/shared/constants/chart-theme';
 import { useTheme } from 'next-themes';
 
@@ -372,9 +373,7 @@ export default function AnalyticsPage() {
   if (loading) {
     return (
       <MainLayout title="Analytics & Reporting">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
+        <LoadingSpinner centered containerClassName="h-64" />
       </MainLayout>
     );
   }

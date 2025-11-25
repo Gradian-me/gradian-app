@@ -11,6 +11,7 @@ import { ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { motion } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { LoadingSpinner } from '@/gradian-ui/layout/components';
 
 interface Integration {
   id: string;
@@ -202,9 +203,7 @@ function SyncIntegrationPageContent() {
   if (loading) {
     return (
       <MainLayout title="Sync Integration">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
+        <LoadingSpinner centered containerClassName="h-64" />
       </MainLayout>
     );
   }
@@ -386,9 +385,7 @@ export default function SyncIntegrationPage() {
   return (
     <Suspense fallback={
       <MainLayout title="Sync Integration">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
+        <LoadingSpinner centered containerClassName="h-64" />
       </MainLayout>
     }>
       <SyncIntegrationPageContent />

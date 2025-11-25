@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
 import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { LoadingSpinner } from '@/gradian-ui/layout/components';
 
 function ConfigureIntegrationPageContent() {
   const router = useRouter();
@@ -61,9 +62,7 @@ export default function ConfigureIntegrationPage() {
   return (
     <Suspense fallback={
       <MainLayout title="Configure Integration">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
+        <LoadingSpinner centered containerClassName="h-64" />
       </MainLayout>
     }>
       <ConfigureIntegrationPageContent />

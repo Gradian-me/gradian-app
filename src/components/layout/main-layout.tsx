@@ -331,7 +331,7 @@ export function MainLayout({
       </Button>
       <div className="flex flex-col min-w-0 flex-1">
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: 0, x: 5 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="flex items-center gap-2 min-w-0"
@@ -361,7 +361,7 @@ export function MainLayout({
         </motion.div>
         {subtitle && (
           <motion.p
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: 5 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
             className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 hidden lg:block"
