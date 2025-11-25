@@ -25,6 +25,8 @@ import { BadgeViewer } from '../form-elements/utils/badge-viewer';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { useFieldRules } from '@/domains/business-rule-engine';
+import type { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 const fieldVariants = {
   hidden: { opacity: 0, y: 12 },
   visible: (index: number) => ({
@@ -320,113 +322,140 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     return 1;
   };
 
+  // Separate component for field item to allow hook usage
+  interface FieldItemProps {
+    field: FormField;
+    itemIndex?: number;
+    index: number;
+  }
+
+  const FieldItem: React.FC<FieldItemProps> = ({ field, itemIndex, index }) => {
+    // Build name/value/error/touched for normal vs repeating sections
+    const isItem = itemIndex !== undefined && isRepeatingSection;
+
+    const fieldName = isItem 
+      ? `${section.id}[${itemIndex}].${field.name}`
+      : field.name;
+
+    // Safe access helpers for nested structures
+    const nestedValues = (values as any) || {};
+    const nestedErrors = (errors as any) || {};
+    const nestedTouched = (touched as any) || {};
+
+    // For business rules evaluation, use the appropriate values context
+    const fieldValuesForRules = isItem 
+      ? { ...nestedValues, [field.name]: nestedValues?.[section.id]?.[itemIndex]?.[field.name] }
+      : nestedValues;
+    const fieldRules = useFieldRules(field, fieldValuesForRules);
+
+    // Skip hidden and inactive fields (including business rule visibility)
+    if (!field || field.hidden || (field as any).layout?.hidden || field.inactive || !fieldRules.isVisible) {
+      return null;
+    }
+
+    let fieldValue = isItem 
+      ? nestedValues?.[section.id]?.[itemIndex]?.[field.name]
+      : nestedValues?.[field.name];
+    
+    // Use defaultValue if value is undefined, null, or empty string
+    if ((fieldValue === undefined || fieldValue === null || fieldValue === '') && field.defaultValue !== undefined) {
+      fieldValue = field.defaultValue;
+    }
+
+    const fieldError = isItem 
+      ? (nestedErrors?.[section.id]?.[itemIndex]?.[field.name] 
+          || nestedErrors?.[`${section.id}[${itemIndex}].${field.name}`])
+      : nestedErrors?.[field.name];
+
+    const fieldTouched = isItem 
+      ? Boolean(
+          nestedTouched?.[section.id]?.[itemIndex]?.[field.name] 
+          || nestedTouched?.[`${section.id}[${itemIndex}].${field.name}`]
+        )
+      : Boolean(nestedTouched?.[field.name]);
+
+    // Calculate column span for this field
+    const colSpan = getColSpan(field);
+    
+    // Generate the appropriate column span class
+    // Default to single column on mobile to avoid overlap,
+    // and apply the actual span at md and up.
+    let colSpanClass = 'col-span-1';
+    if (colSpan === columns) {
+      colSpanClass = 'col-span-1 md:col-span-full';
+    } else {
+      // For responsive layouts at md+
+      if (columns === 3) {
+        if (colSpan === 2) {
+          colSpanClass = 'col-span-1 md:col-span-2';
+        }
+      } else if (columns === 2) {
+        if (colSpan === 2) {
+          colSpanClass = 'col-span-1 md:col-span-2';
+        }
+      } else if (columns === 4) {
+        if (colSpan === 2) {
+          colSpanClass = 'col-span-1 md:col-span-2';
+        } else if (colSpan === 3) {
+          colSpanClass = 'col-span-1 md:col-span-3';
+        }
+      } else if (columns === 6 || columns === 12) {
+        colSpanClass = `col-span-1 md:col-span-${colSpan}`;
+      } else {
+        // Default for other column counts
+        colSpanClass = `col-span-1 md:col-span-${colSpan}`;
+      }
+    }
+
+    // Merge required state: business rule OR validation.required
+    const validationRequired = field.validation?.required ?? false;
+    const isRequired = fieldRules.isRequired || validationRequired;
+    // Merge disabled state: business rule OR existing disabled flags
+    const isDisabled = fieldRules.isDisabled || disabled || field.disabled || isNotApplicable;
+
+    return (
+      <motion.div
+        key={field.id}
+        className={cn(
+          'space-y-2',
+          colSpanClass,
+          (field as any).layout?.rowSpan && `row-span-${(field as any).layout.rowSpan}`
+        )}
+        layout
+        variants={fieldVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        custom={index}
+        style={{ order: field.order ?? (field as any).layout?.order }}
+      >
+        <FormElementFactory
+          field={field as any}
+          value={fieldValue}
+          error={fieldError}
+          touched={fieldTouched}
+          onChange={(value) => onChange(fieldName, value)}
+          onBlur={() => onBlur(fieldName)}
+          onFocus={() => onFocus(fieldName)}
+          disabled={isDisabled}
+          required={isRequired}
+          tabIndex={fieldTabIndexMap?.[field.name] !== undefined ? fieldTabIndexMap[field.name] : undefined}
+        />
+      </motion.div>
+    );
+  };
+
   const renderFields = (fieldsToRender: typeof fields, itemIndex?: number) => {
     return (
       <AnimatePresence>
-        {fieldsToRender.map((field, index) => {
-          if (!field) return null;
-
-          // Skip hidden and inactive fields
-          if (field.hidden || (field as any).layout?.hidden || field.inactive) {
-            return null;
-          }
-
-          // Build name/value/error/touched for normal vs repeating sections
-          const isItem = itemIndex !== undefined && isRepeatingSection;
-
-          const fieldName = isItem 
-            ? `${section.id}[${itemIndex}].${field.name}`
-            : field.name;
-
-          // Safe access helpers for nested structures
-          const nestedValues = (values as any) || {};
-          const nestedErrors = (errors as any) || {};
-          const nestedTouched = (touched as any) || {};
-
-          let fieldValue = isItem 
-            ? nestedValues?.[section.id]?.[itemIndex]?.[field.name]
-            : nestedValues?.[field.name];
-          
-          // Use defaultValue if value is undefined, null, or empty string
-          if ((fieldValue === undefined || fieldValue === null || fieldValue === '') && field.defaultValue !== undefined) {
-            fieldValue = field.defaultValue;
-          }
-
-          const fieldError = isItem 
-            ? (nestedErrors?.[section.id]?.[itemIndex]?.[field.name] 
-                || nestedErrors?.[`${section.id}[${itemIndex}].${field.name}`])
-            : nestedErrors?.[field.name];
-
-          const fieldTouched = isItem 
-            ? Boolean(
-                nestedTouched?.[section.id]?.[itemIndex]?.[field.name] 
-                || nestedTouched?.[`${section.id}[${itemIndex}].${field.name}`]
-              )
-            : Boolean(nestedTouched?.[field.name]);
-
-          // Calculate column span for this field
-          const colSpan = getColSpan(field);
-          
-          // Generate the appropriate column span class
-          // Default to single column on mobile to avoid overlap,
-          // and apply the actual span at md and up.
-          let colSpanClass = 'col-span-1';
-          if (colSpan === columns) {
-            colSpanClass = 'col-span-1 md:col-span-full';
-          } else {
-            // For responsive layouts at md+
-            if (columns === 3) {
-              if (colSpan === 2) {
-                colSpanClass = 'col-span-1 md:col-span-2';
-              }
-            } else if (columns === 2) {
-              if (colSpan === 2) {
-                colSpanClass = 'col-span-1 md:col-span-2';
-              }
-            } else if (columns === 4) {
-              if (colSpan === 2) {
-                colSpanClass = 'col-span-1 md:col-span-2';
-              } else if (colSpan === 3) {
-                colSpanClass = 'col-span-1 md:col-span-3';
-              }
-            } else if (columns === 6 || columns === 12) {
-              colSpanClass = `col-span-1 md:col-span-${colSpan}`;
-            } else {
-              // Default for other column counts
-              colSpanClass = `col-span-1 md:col-span-${colSpan}`;
-            }
-          }
-
-          return (
-            <motion.div
-              key={field.id}
-              className={cn(
-                'space-y-2',
-                colSpanClass,
-                (field as any).layout?.rowSpan && `row-span-${(field as any).layout.rowSpan}`
-              )}
-              layout
-              variants={fieldVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              custom={index}
-              style={{ order: field.order ?? (field as any).layout?.order }}
-            >
-              <FormElementFactory
-                field={field as any}
-                value={fieldValue}
-                error={fieldError}
-                touched={fieldTouched}
-                onChange={(value) => onChange(fieldName, value)}
-                onBlur={() => onBlur(fieldName)}
-                onFocus={() => onFocus(fieldName)}
-                disabled={disabled || field.disabled || isNotApplicable}
-                tabIndex={fieldTabIndexMap?.[field.name] !== undefined ? fieldTabIndexMap[field.name] : undefined}
-              />
-            </motion.div>
-          );
-        })}
+        {fieldsToRender.map((field, index) => (
+          <FieldItem
+            key={field.id}
+            field={field}
+            itemIndex={itemIndex}
+            index={index}
+          />
+        ))}
       </AnimatePresence>
     );
   };

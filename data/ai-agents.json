@@ -102,6 +102,37 @@
         "validation": {
           "required": false
         },
+        "businessRules": {
+          "requiredRule": {
+            "rootGroup": {
+              "id": "language-visible-group",
+              "logicalOperator": "and",
+              "conditions": [
+                {
+                  "id": "language-visible-condition",
+                  "property": {
+                    "id": "writing-style",
+                    "name": "writingStyle",
+                    "schemaName": "ai-agent",
+                    "path": "writingStyle",
+                    "fieldId": "writing-style",
+                    "type": "string"
+                  },
+                  "operator": {
+                    "id": "equals",
+                    "name": "equals",
+                    "title": "Equals",
+                    "symbol": "=="
+                  },
+                  "valueType": "fixed",
+                  "fixedValue": "translate",
+                  "propertyReference": null
+                }
+              ],
+              "groups": []
+            }
+          }
+        },
         "colSpan": 1,
         "order": 2
       },

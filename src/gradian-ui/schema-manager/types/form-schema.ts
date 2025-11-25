@@ -1,6 +1,8 @@
 // Unified Form Schema Types
 // This is the single source of truth for all form schema types
 
+import type { BusinessRule } from '@/domains/business-rule-engine';
+
 export interface FormField {
   id: string;
   name: string;
@@ -71,6 +73,12 @@ export interface FormField {
   };
   // Component-specific configuration
   componentTypeConfig?: Record<string, any>; // Component-specific config (e.g., { useThousandSeparator: true, decimalPoints: 2 } for NumberInput)
+  // Business rules for dynamic field behavior
+  businessRules?: {
+    visibleRule?: BusinessRule;
+    requiredRule?: BusinessRule;
+    disabledRule?: BusinessRule;
+  };
 }
 
 export interface FormSection {
