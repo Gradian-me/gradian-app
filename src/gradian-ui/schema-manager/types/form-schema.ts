@@ -1,8 +1,6 @@
 // Unified Form Schema Types
 // This is the single source of truth for all form schema types
 
-import type { BusinessRule, BusinessRuleWithEffects } from '@/domains/business-rule-engine';
-
 export interface FormField {
   id: string;
   name: string;
@@ -73,12 +71,6 @@ export interface FormField {
   };
   // Component-specific configuration
   componentTypeConfig?: Record<string, any>; // Component-specific config (e.g., { useThousandSeparator: true, decimalPoints: 2 } for NumberInput)
-  // Business rules for dynamic field behavior
-  businessRules?: {
-    visibleRule?: BusinessRule;
-    requiredRule?: BusinessRule;
-    disabledRule?: BusinessRule;
-  };
 }
 
 export interface FormSection {
@@ -359,7 +351,6 @@ export interface FormSchema {
   };
   customButtons?: QuickAction[]; // Custom buttons shown above filter pane in list page
   isCollapsibleSections?: boolean; // If false, sections are always expanded and collapse/expand UI is hidden (default: true)
-  businessRules?: BusinessRuleWithEffects[]; // Push-based business rules that affect fields and sections
 }
 
 // Form state and data types

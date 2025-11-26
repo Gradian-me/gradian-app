@@ -1,9 +1,9 @@
 // Accordion Form Section Component
 
-import React, { useState, useEffect, useMemo, memo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FormSectionProps, FormErrors, FormTouched, FormSection, FormData } from '@/gradian-ui/schema-manager/types/form-schema';
+import { FormSectionProps } from '@/gradian-ui/schema-manager/types/form-schema';
 import { FormElementFactory } from '../form-elements';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
@@ -25,8 +25,6 @@ import { BadgeViewer } from '../form-elements/utils/badge-viewer';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useBusinessRuleEffects, getFieldEffects, type BusinessRuleEffectsMap } from '@/domains/business-rule-engine';
-import type { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 const fieldVariants = {
   hidden: { opacity: 0, y: 12 },
   visible: (index: number) => ({
@@ -48,7 +46,7 @@ const fieldVariants = {
 } as const;
 
 
-const AccordionFormSectionComponent: React.FC<FormSectionProps> = ({
+export const AccordionFormSection: React.FC<FormSectionProps> = ({
   section,
   schema,
   values,
@@ -79,18 +77,6 @@ const AccordionFormSectionComponent: React.FC<FormSectionProps> = ({
     styling, 
     isRepeatingSection 
   } = section;
-
-  // Get all field IDs and section IDs for business rule effects
-  const fieldIds = useMemo(() => schema.fields.map((f) => f.id), [schema.fields]);
-  const sectionIds = useMemo(() => schema.sections.map((s) => s.id), [schema.sections]);
-
-  // Evaluate business rule effects (push-based model)
-  const ruleEffects = useBusinessRuleEffects(
-    schema.businessRules,
-    values,
-    fieldIds,
-    sectionIds
-  );
   
   // Check if this is a relation-based repeating section
   const isRelationBased = isRepeatingSection && section.repeatingConfig?.targetSchema && section.repeatingConfig?.relationTypeId;
@@ -240,8 +226,6 @@ const AccordionFormSectionComponent: React.FC<FormSectionProps> = ({
       };
     });
 
-    // Only check current value when relatedEntities or targetSchemaData changes
-    // Don't depend on values to avoid running on every field change
     const currentValue = Array.isArray(values?.[section.id]) ? values[section.id] : [];
     const currentSerialized = JSON.stringify(currentValue);
     const normalizedSerialized = JSON.stringify(normalized);
@@ -249,8 +233,7 @@ const AccordionFormSectionComponent: React.FC<FormSectionProps> = ({
     if (currentSerialized !== normalizedSerialized) {
       onChange(section.id, normalized);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRelationBased, relatedEntities, onChange, section.id, targetSchemaData]);
+  }, [isRelationBased, relatedEntities, onChange, section.id, targetSchemaData, values]);
   
   
   // Check if sections are collapsible (default to true for backward compatibility)
@@ -337,184 +320,113 @@ const AccordionFormSectionComponent: React.FC<FormSectionProps> = ({
     return 1;
   };
 
-  // Separate component for field item to allow hook usage
-  interface FieldItemProps {
-    field: FormField;
-    itemIndex?: number;
-    index: number;
-    values: FormData;
-    errors: FormErrors;
-    touched: FormTouched;
-    disabled: boolean;
-    onChange: (fieldName: string, value: any) => void;
-    onBlur: (fieldName: string) => void;
-    onFocus: (fieldName: string) => void;
-    fieldTabIndexMap?: Record<string, number>;
-    section: FormSection;
-    columns: number;
-    isRepeatingSection: boolean | undefined;
-    isNotApplicable: boolean;
-    ruleEffects: BusinessRuleEffectsMap;
-  }
-
-  const FieldItem: React.FC<FieldItemProps> = memo(({ 
-    field, 
-    itemIndex, 
-    index,
-    values,
-    errors,
-    touched,
-    disabled,
-    onChange,
-    onBlur,
-    onFocus,
-    fieldTabIndexMap,
-    section,
-    columns,
-    isRepeatingSection,
-    isNotApplicable,
-    ruleEffects,
-  }) => {
-    // Build name/value/error/touched for normal vs repeating sections
-    const isItem = itemIndex !== undefined && isRepeatingSection;
-
-    const fieldName = isItem 
-      ? `${section.id}[${itemIndex}].${field.name}`
-      : field.name;
-
-    // Safe access helpers for nested structures
-    const nestedValues = (values as any) || {};
-    const nestedErrors = (errors as any) || {};
-    const nestedTouched = (touched as any) || {};
-
-    // Get business rule effects for this field (includes section-level effects)
-    // Memoize this to avoid recalculating on every render
-    const fieldEffects = useMemo(
-      () => getFieldEffects(field.id, section.id, ruleEffects),
-      [field.id, section.id, ruleEffects]
-    );
-
-    // Skip hidden and inactive fields (including business rule visibility)
-    if (!field || field.hidden || (field as any).layout?.hidden || field.inactive || !fieldEffects.isVisible) {
-      return null;
-    }
-
-    let fieldValue = isItem 
-      ? nestedValues?.[section.id]?.[itemIndex]?.[field.name]
-      : nestedValues?.[field.name];
-    
-    // Use defaultValue if value is undefined, null, or empty string
-    if ((fieldValue === undefined || fieldValue === null || fieldValue === '') && field.defaultValue !== undefined) {
-      fieldValue = field.defaultValue;
-    }
-
-    const fieldError = isItem 
-      ? (nestedErrors?.[section.id]?.[itemIndex]?.[field.name] 
-          || nestedErrors?.[`${section.id}[${itemIndex}].${field.name}`])
-      : nestedErrors?.[field.name];
-
-    const fieldTouched = isItem 
-      ? Boolean(
-          nestedTouched?.[section.id]?.[itemIndex]?.[field.name] 
-          || nestedTouched?.[`${section.id}[${itemIndex}].${field.name}`]
-        )
-      : Boolean(nestedTouched?.[field.name]);
-
-    // Calculate column span for this field
-    const colSpan = getColSpan(field);
-    
-    // Generate the appropriate column span class
-    // Default to single column on mobile to avoid overlap,
-    // and apply the actual span at md and up.
-    let colSpanClass = 'col-span-1';
-    if (colSpan === columns) {
-      colSpanClass = 'col-span-1 md:col-span-full';
-    } else {
-      // For responsive layouts at md+
-      if (columns === 3) {
-        if (colSpan === 2) {
-          colSpanClass = 'col-span-1 md:col-span-2';
-        }
-      } else if (columns === 2) {
-        if (colSpan === 2) {
-          colSpanClass = 'col-span-1 md:col-span-2';
-        }
-      } else if (columns === 4) {
-        if (colSpan === 2) {
-          colSpanClass = 'col-span-1 md:col-span-2';
-        } else if (colSpan === 3) {
-          colSpanClass = 'col-span-1 md:col-span-3';
-        }
-      } else if (columns === 6 || columns === 12) {
-        colSpanClass = `col-span-1 md:col-span-${colSpan}`;
-      } else {
-        // Default for other column counts
-        colSpanClass = `col-span-1 md:col-span-${colSpan}`;
-      }
-    }
-
-    // Merge required state: business rule OR validation.required
-    const validationRequired = field.validation?.required ?? false;
-    const isRequired = fieldEffects.isRequired || validationRequired;
-    // Merge disabled state: business rule OR existing disabled flags
-    const isDisabled = fieldEffects.isDisabled || disabled || field.disabled || isNotApplicable;
-
-    return (
-      <motion.div
-        key={field.id}
-        className={cn(
-          'space-y-2',
-          colSpanClass,
-          (field as any).layout?.rowSpan && `row-span-${(field as any).layout.rowSpan}`
-        )}
-        layout
-        variants={fieldVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        custom={index}
-        style={{ order: field.order ?? (field as any).layout?.order }}
-      >
-        <FormElementFactory
-          field={field as any}
-          value={fieldValue}
-          error={fieldError}
-          touched={fieldTouched}
-          onChange={(value) => onChange(fieldName, value)}
-          onBlur={() => onBlur(fieldName)}
-          onFocus={() => onFocus(fieldName)}
-          disabled={isDisabled}
-          required={isRequired}
-          tabIndex={fieldTabIndexMap?.[field.name] !== undefined ? fieldTabIndexMap[field.name] : undefined}
-        />
-      </motion.div>
-    );
-  });
-
   const renderFields = (fieldsToRender: typeof fields, itemIndex?: number) => {
     return (
       <AnimatePresence>
-        {fieldsToRender.map((field, index) => (
-          <FieldItem
-            key={field.id}
-            field={field}
-            itemIndex={itemIndex}
-            index={index}
-            values={values}
-            errors={errors}
-            touched={touched}
-            disabled={disabled}
-            onChange={onChange}
-            onBlur={onBlur}
-            onFocus={onFocus}
-            fieldTabIndexMap={fieldTabIndexMap}
-            section={section}
-            columns={columns}
-            isRepeatingSection={isRepeatingSection}
-            isNotApplicable={isNotApplicable}
-            ruleEffects={ruleEffects}
-          />
-        ))}
+        {fieldsToRender.map((field, index) => {
+          if (!field) return null;
+
+          // Skip hidden and inactive fields
+          if (field.hidden || (field as any).layout?.hidden || field.inactive) {
+            return null;
+          }
+
+          // Build name/value/error/touched for normal vs repeating sections
+          const isItem = itemIndex !== undefined && isRepeatingSection;
+
+          const fieldName = isItem 
+            ? `${section.id}[${itemIndex}].${field.name}`
+            : field.name;
+
+          // Safe access helpers for nested structures
+          const nestedValues = (values as any) || {};
+          const nestedErrors = (errors as any) || {};
+          const nestedTouched = (touched as any) || {};
+
+          let fieldValue = isItem 
+            ? nestedValues?.[section.id]?.[itemIndex]?.[field.name]
+            : nestedValues?.[field.name];
+          
+          // Use defaultValue if value is undefined, null, or empty string
+          if ((fieldValue === undefined || fieldValue === null || fieldValue === '') && field.defaultValue !== undefined) {
+            fieldValue = field.defaultValue;
+          }
+
+          const fieldError = isItem 
+            ? (nestedErrors?.[section.id]?.[itemIndex]?.[field.name] 
+                || nestedErrors?.[`${section.id}[${itemIndex}].${field.name}`])
+            : nestedErrors?.[field.name];
+
+          const fieldTouched = isItem 
+            ? Boolean(
+                nestedTouched?.[section.id]?.[itemIndex]?.[field.name] 
+                || nestedTouched?.[`${section.id}[${itemIndex}].${field.name}`]
+              )
+            : Boolean(nestedTouched?.[field.name]);
+
+          // Calculate column span for this field
+          const colSpan = getColSpan(field);
+          
+          // Generate the appropriate column span class
+          // Default to single column on mobile to avoid overlap,
+          // and apply the actual span at md and up.
+          let colSpanClass = 'col-span-1';
+          if (colSpan === columns) {
+            colSpanClass = 'col-span-1 md:col-span-full';
+          } else {
+            // For responsive layouts at md+
+            if (columns === 3) {
+              if (colSpan === 2) {
+                colSpanClass = 'col-span-1 md:col-span-2';
+              }
+            } else if (columns === 2) {
+              if (colSpan === 2) {
+                colSpanClass = 'col-span-1 md:col-span-2';
+              }
+            } else if (columns === 4) {
+              if (colSpan === 2) {
+                colSpanClass = 'col-span-1 md:col-span-2';
+              } else if (colSpan === 3) {
+                colSpanClass = 'col-span-1 md:col-span-3';
+              }
+            } else if (columns === 6 || columns === 12) {
+              colSpanClass = `col-span-1 md:col-span-${colSpan}`;
+            } else {
+              // Default for other column counts
+              colSpanClass = `col-span-1 md:col-span-${colSpan}`;
+            }
+          }
+
+          return (
+            <motion.div
+              key={field.id}
+              className={cn(
+                'space-y-2',
+                colSpanClass,
+                (field as any).layout?.rowSpan && `row-span-${(field as any).layout.rowSpan}`
+              )}
+              layout
+              variants={fieldVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              custom={index}
+              style={{ order: field.order ?? (field as any).layout?.order }}
+            >
+              <FormElementFactory
+                field={field as any}
+                value={fieldValue}
+                error={fieldError}
+                touched={fieldTouched}
+                onChange={(value) => onChange(fieldName, value)}
+                onBlur={() => onBlur(fieldName)}
+                onFocus={() => onFocus(fieldName)}
+                disabled={disabled || field.disabled || isNotApplicable}
+                tabIndex={fieldTabIndexMap?.[field.name] !== undefined ? fieldTabIndexMap[field.name] : undefined}
+              />
+            </motion.div>
+          );
+        })}
       </AnimatePresence>
     );
   };
@@ -1775,57 +1687,4 @@ const AccordionFormSectionComponent: React.FC<FormSectionProps> = ({
   );
 };
 
-AccordionFormSectionComponent.displayName = 'AccordionFormSection';
-
-// Memoize the component to prevent unnecessary re-renders when other sections change
-// Only re-render if props relevant to this section actually change
-export const AccordionFormSection = React.memo(AccordionFormSectionComponent, (prevProps, nextProps) => {
-  // Always re-render if these critical props change
-  if (prevProps.section.id !== nextProps.section.id) return false;
-  if (prevProps.schema.id !== nextProps.schema.id) return false;
-  if (prevProps.disabled !== nextProps.disabled) return false;
-  if (prevProps.isExpanded !== nextProps.isExpanded) return false;
-  if (prevProps.addItemError !== nextProps.addItemError) return false;
-  if (prevProps.refreshRelationsTrigger !== nextProps.refreshRelationsTrigger) return false;
-  if (prevProps.isAddingItem !== nextProps.isAddingItem) return false;
-  
-  // Check if business rules changed (they might affect this section)
-  const prevBusinessRules = prevProps.schema.businessRules;
-  const nextBusinessRules = nextProps.schema.businessRules;
-  if (JSON.stringify(prevBusinessRules) !== JSON.stringify(nextBusinessRules)) return false;
-  
-  // Check if section-specific values changed
-  const sectionId = prevProps.section.id;
-  const prevSectionValue = prevProps.values?.[sectionId];
-  const nextSectionValue = nextProps.values?.[sectionId];
-  if (JSON.stringify(prevSectionValue) !== JSON.stringify(nextSectionValue)) return false;
-  
-  // Check if section-specific errors changed
-  const prevSectionError = prevProps.errors?.[sectionId];
-  const nextSectionError = nextProps.errors?.[sectionId];
-  if (prevSectionError !== nextSectionError) return false;
-  
-  // Check if section-specific touched changed (only for this section's fields)
-  const sectionFields = prevProps.schema.fields?.filter(f => f.sectionId === sectionId) || [];
-  for (const field of sectionFields) {
-    const prevTouched = prevProps.touched?.[field.name];
-    const nextTouched = nextProps.touched?.[field.name];
-    if (prevTouched !== nextTouched) return false;
-  }
-  
-  // Check if repeating items changed (for repeating sections)
-  if (prevProps.section.isRepeatingSection) {
-    const prevItems = prevProps.repeatingItems || [];
-    const nextItems = nextProps.repeatingItems || [];
-    if (prevItems.length !== nextItems.length) return false;
-    if (JSON.stringify(prevItems) !== JSON.stringify(nextItems)) return false;
-  }
-  
-  // Check if callbacks changed (these should be stable, but check anyway)
-  if (prevProps.onChange !== nextProps.onChange) return false;
-  if (prevProps.onBlur !== nextProps.onBlur) return false;
-  if (prevProps.onToggleExpanded !== nextProps.onToggleExpanded) return false;
-  
-  // If we get here, nothing relevant to this section changed, so skip re-render
-  return true;
-});
+AccordionFormSection.displayName = 'AccordionFormSection';
