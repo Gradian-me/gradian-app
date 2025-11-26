@@ -46,28 +46,53 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: animationDelay, ease: 'easeOut' }}
+      initial={{ opacity: 0, y: 20, scale: 0.985 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.18, delay: animationDelay, ease: 'easeOut' }}
+      whileHover={{
+        scale: 1.01,
+        transition: { type: 'spring', stiffness: 420, damping: 22 },
+      }}
     >
-      <Card className={`hover:shadow-sm transition-all duration-200 h-full flex flex-col border ${
-        isInactive 
-          ? 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 opacity-60' 
-          : 'border-gray-200 dark:border-gray-700 dark:bg-gray-900'
-      }`}>
-        <CardHeader className="pb-3 pt-4 px-4">
+      <Card
+        className={`group relative flex h-full flex-col overflow-hidden border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300/80 hover:shadow-lg ${
+          isInactive
+            ? 'border-gray-200 bg-gray-50/95 dark:border-slate-800/70 dark:bg-slate-900/75 opacity-75'
+            : [
+                // Light mode: soft violet gradient
+                'border-violet-100/80 bg-gradient-to-br from-violet-50/90 via-white to-indigo-50/80',
+                // Dark mode: softer neutral (less black)
+                'dark:border-slate-700/80 dark:bg-gradient-to-br dark:from-slate-900/85 dark:via-slate-900/80 dark:to-zinc-900/80',
+              ].join(' ')
+        }`}
+      >
+        {!isInactive && (
+          <div
+            className="pointer-events-none absolute inset-0 opacity-20 dark:opacity-10"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle at 2px 2px, rgba(148,163,184,0.30) 1px, transparent 0)',
+              backgroundSize: '22px 22px',
+            }}
+          />
+        )}
+        <CardHeader className="relative z-10 pb-3 pt-4 px-4">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1.5">
                 {schema.icon && (
                   <IconRenderer 
                     iconName={schema.icon} 
-                    className={`h-5 w-5 shrink-0 ${isInactive ? 'text-gray-400' : 'text-violet-600 dark:text-violet-300'}`} 
+                    className={`h-5 w-5 shrink-0 ${
+                      isInactive ? 'text-gray-400' : 'text-violet-600 dark:text-violet-300'
+                    }`} 
                   />
                 )}
-                <CardTitle className={`text-base font-semibold truncate ${
-                  isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'
-                }`}>
+                <CardTitle
+                  className={`text-base font-semibold truncate ${
+                    isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'
+                  }`}
+                >
                   {schema.plural_name}
                 </CardTitle>
                 {isInactive && (
@@ -89,7 +114,7 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
                 variant="ghost"
                 size="icon"
                 onClick={() => onView(schema)}
-                className="h-7 w-7"
+                className="h-7 w-7 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:text-violet-200 dark:hover:bg-violet-500/10"
                 title="View List"
               >
                 <LayoutList className="h-3.5 w-3.5" />
@@ -98,7 +123,7 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
                 variant="ghost"
                 size="icon"
                 onClick={() => onEdit(schema)}
-                className="h-7 w-7"
+                className="h-7 w-7 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:text-violet-200 dark:hover:bg-violet-500/10"
                 title="Edit Schema"
               >
                 <PencilRuler className="h-3.5 w-3.5" />
@@ -107,7 +132,7 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
                 variant="ghost"
                 size="icon"
                 onClick={() => onDelete(schema)}
-                className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="h-7 w-7 rounded-full text-red-600 hover:text-red-700 hover:bg-red-50/80"
                 title="Delete Schema"
               >
                 <Trash2 className="h-3.5 w-3.5" />
@@ -116,7 +141,7 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
           </div>
         </CardHeader>
         {showStats && (
-          <CardContent className="pt-2 px-4 pb-4">
+          <CardContent className="relative z-10 pt-2 px-4 pb-4">
             <div
               className={`flex items-center gap-4 text-xs ${
                 isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500 dark:text-gray-400'
@@ -163,11 +188,21 @@ export function SchemaCardGrid({ schemas, onEdit, onView, onDelete }: SchemaCard
 
 export function SchemaCardSkeletonGrid({ count = 6 }: SchemaCardSkeletonGridProps) {
   return (
-    <LoadingSkeleton
-      variant="card"
-      count={count}
-      columns={{ default: 1, md: 2, lg: 3 }}
-      gap={6}
-    />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {Array.from({ length: count }).map((_, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 0.25,
+            delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.SKELETON_MAX ?? 0.25),
+            ease: 'easeOut',
+          }}
+        >
+          <div className="h-32 rounded-xl border border-violet-100/70 bg-gradient-to-br from-violet-50/70 via-white to-indigo-50/70 shadow-sm dark:border-slate-700/80 dark:bg-gradient-to-br dark:from-slate-900/85 dark:via-slate-900/80 dark:to-zinc-900/80 animate-pulse" />
+        </motion.div>
+      ))}
+    </div>
   );
 }

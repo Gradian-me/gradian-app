@@ -55,6 +55,10 @@ export const DEMO_MODE_PARAMS = { DEMO_MODE: vars.DEMO_MODE } as const;
 export const DEMO_MODE = vars.DEMO_MODE;
 export const AI_CONFIG = vars.AI_CONFIG;
 
+// Common URLs
+export const URL_HOME: string =
+  (vars?.UI_PARAMS as any)?.HOME_URL ?? '/apps';
+
 // Client-safe cache clear function (no-op on client, server code should use loader directly)
 export function clearCache() {
   // This is a no-op for client-side code

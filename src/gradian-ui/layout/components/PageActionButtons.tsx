@@ -3,20 +3,14 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { QrCode, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { ShareButton } from './ShareButton';
-import { QRCodeDialog } from './QRCodeDialog';
 import { cn } from '@/gradian-ui/shared/utils';
+import { URL_HOME } from '@/gradian-ui/shared/constants/application-variables';
+import { Home, QrCode } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { QRCodeDialog } from './QRCodeDialog';
+import { ShareButton } from './ShareButton';
 
 export interface PageActionButtonsProps {
   value?: string;
@@ -57,7 +51,7 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
       {/* Left side - Home button */}
       {showHome && (
         <Button
-          onClick={() => router.push('/apps')}
+          onClick={() => router.push(URL_HOME)}
           variant="outline"
           size="sm"
           className="h-10 w-10 p-0 rounded-lg"
@@ -87,7 +81,7 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
             title="Share this page"
             text="Check out this page"
             variant="outline"
-            size="sm"
+            size="md"
             className="rounded-lg"
           />
         )}

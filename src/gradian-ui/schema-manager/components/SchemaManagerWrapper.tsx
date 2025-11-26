@@ -6,13 +6,19 @@ import { ArrowLeft, Plus, RefreshCw, Settings, Building2, FileText } from 'lucid
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { SchemaCardGrid, SchemaCardSkeletonGrid } from './SchemaCardGrid';
 import { SchemaListView } from './SchemaListView';
 import { SchemaTableView } from './SchemaTableView';
 import { CreateSchemaDialog } from './CreateSchemaDialog';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder';
-import { SearchInput, Switch } from '@/gradian-ui/form-builder/form-elements';
+import {
+  SearchInput,
+  Switch,
+  FormTabs,
+  FormTabsList,
+  FormTabsTrigger,
+  FormTabsContent,
+} from '@/gradian-ui/form-builder/form-elements';
 import { MessageBox } from '@/gradian-ui/layout/message-box';
 import { DynamicFilterPane } from '@/gradian-ui/shared/components';
 import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
@@ -114,9 +120,12 @@ export function SchemaManagerWrapper() {
           </Button>
         </div>
 
-        <Tabs value={activeTab} onValueChange={value => setActiveTab(value as 'system' | 'business')}>
-          <TabsList className="inline-grid! w-full grid-cols-2 gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-slate-800 dark:bg-slate-900/40 select-none overflow-hidden h-auto! items-stretch">
-            <TabsTrigger
+        <FormTabs
+          value={activeTab}
+          onValueChange={value => setActiveTab(value as 'system' | 'business')}
+        >
+          <FormTabsList className="inline-grid! w-full grid-cols-2 gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-slate-800 dark:bg-slate-900/40 select-none overflow-hidden h-auto! items-stretch">
+            <FormTabsTrigger
               value="system"
               className="flex items-center gap-2 flex-1 rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white min-w-0"
             >
@@ -125,8 +134,8 @@ export function SchemaManagerWrapper() {
               <Badge variant="secondary" className="ms-1 shrink-0 bg-violet-200 dark:bg-violet-500/20 dark:text-violet-100">
                 {systemSchemasCount}
               </Badge>
-            </TabsTrigger>
-            <TabsTrigger
+            </FormTabsTrigger>
+            <FormTabsTrigger
               value="business"
               className="flex items-center gap-2 flex-1 rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white min-w-0"
             >
@@ -135,8 +144,8 @@ export function SchemaManagerWrapper() {
               <Badge variant="secondary" className="ms-1 shrink-0 bg-violet-200 dark:bg-violet-500/20 dark:text-violet-100">
                 {businessSchemasCount}
               </Badge>
-            </TabsTrigger>
-          </TabsList>
+            </FormTabsTrigger>
+          </FormTabsList>
 
           <div className="flex gap-2 mt-4 items-center">
             <div className="flex-1">
@@ -179,7 +188,7 @@ export function SchemaManagerWrapper() {
             </Button>
           </div>
 
-          <TabsContent value="system" className="mt-4">
+          <FormTabsContent value="system" className="mt-4">
             {loading ? (
               viewMode === 'table' ? (
                 <div className="w-full">
@@ -221,9 +230,9 @@ export function SchemaManagerWrapper() {
             ) : (
               emptyState
             )}
-          </TabsContent>
+          </FormTabsContent>
 
-          <TabsContent value="business" className="mt-4">
+          <FormTabsContent value="business" className="mt-4">
             {loading ? (
               viewMode === 'table' ? (
                 <div className="w-full">
@@ -265,8 +274,8 @@ export function SchemaManagerWrapper() {
             ) : (
               emptyState
             )}
-          </TabsContent>
-        </Tabs>
+          </FormTabsContent>
+        </FormTabs>
       </div>
 
       <CreateSchemaDialog

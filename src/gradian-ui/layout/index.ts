@@ -11,3 +11,4 @@ export * from './mode-toggle';
 export * from './ping-on-change';
 export * from './end-line/components/EndLine';
 export * from './components';
+export * from './app-list';

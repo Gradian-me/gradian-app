@@ -33,6 +33,7 @@ export const DEFAULT_APPLICATION_VARIABLES = {
     },
   },
   UI_PARAMS: {
+    HOME_URL: '/apps',
     CARD_INDEX_DELAY: {
       STEP: 0.05,
       MAX: 0.4,
