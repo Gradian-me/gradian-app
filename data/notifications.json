@@ -26,7 +26,7 @@
     "type": "info",
     "category": "purchase_order",
     "priority": "high",
-    "isRead": false,
+    "isRead": true,
     "createdAt": "2024-12-10T09:15:00.000Z",
     "actionUrl": "/purchase-orders/1",
     "metadata": {
@@ -36,7 +36,8 @@
       "vendor": "Merck",
       "approver": "Finance Team"
     },
-    "interactionType": "canRead"
+    "interactionType": "canRead",
+    "readAt": "2025-11-26T09:49:45.345Z"
   },
   {
     "id": "3",
@@ -172,7 +173,7 @@
     "type": "success",
     "category": "system",
     "priority": "medium",
-    "isRead": true,
+    "isRead": false,
     "createdAt": "2024-12-10T12:15:00.000Z",
     "actionUrl": "/quality-control/qc-2024-001",
     "metadata": {

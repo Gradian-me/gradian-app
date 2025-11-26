@@ -227,6 +227,11 @@ export const FormModal: React.FC<FormModalProps> = ({
 
     return defaultTitle;
   }, [title, isEdit, schemaIconName, defaultTitle]);
+  
+  // Memoize initialValues to prevent unnecessary form resets
+  const memoizedInitialValues = React.useMemo(() => {
+    return isEdit && entityData ? entityData : {};
+  }, [isEdit, entityData]);
     
   const modalDescription = description || (isEdit
     ? `Update ${(targetSchema?.name || 'item').toLowerCase()} information`
@@ -286,7 +291,7 @@ export const FormModal: React.FC<FormModalProps> = ({
           onSubmit={handleSubmit}
           onReset={() => {}}
           onCancel={closeFormModal}
-          initialValues={isEdit && entityData ? entityData : {}}
+          initialValues={memoizedInitialValues}
           error={formError || undefined}
           message={formMessage}
           errorStatusCode={formErrorStatusCode}

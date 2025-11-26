@@ -48,7 +48,7 @@ const fieldVariants = {
 } as const;
 
 
-export const AccordionFormSection: React.FC<FormSectionProps> = ({
+const AccordionFormSectionComponent: React.FC<FormSectionProps> = ({
   section,
   schema,
   values,
@@ -240,6 +240,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       };
     });
 
+    // Only check current value when relatedEntities or targetSchemaData changes
+    // Don't depend on values to avoid running on every field change
     const currentValue = Array.isArray(values?.[section.id]) ? values[section.id] : [];
     const currentSerialized = JSON.stringify(currentValue);
     const normalizedSerialized = JSON.stringify(normalized);
@@ -247,7 +249,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     if (currentSerialized !== normalizedSerialized) {
       onChange(section.id, normalized);
     }
-  }, [isRelationBased, relatedEntities, onChange, section.id, targetSchemaData, values]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRelationBased, relatedEntities, onChange, section.id, targetSchemaData]);
   
   
   // Check if sections are collapsible (default to true for backward compatibility)
@@ -1772,4 +1775,57 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   );
 };
 
-AccordionFormSection.displayName = 'AccordionFormSection';
+AccordionFormSectionComponent.displayName = 'AccordionFormSection';
+
+// Memoize the component to prevent unnecessary re-renders when other sections change
+// Only re-render if props relevant to this section actually change
+export const AccordionFormSection = React.memo(AccordionFormSectionComponent, (prevProps, nextProps) => {
+  // Always re-render if these critical props change
+  if (prevProps.section.id !== nextProps.section.id) return false;
+  if (prevProps.schema.id !== nextProps.schema.id) return false;
+  if (prevProps.disabled !== nextProps.disabled) return false;
+  if (prevProps.isExpanded !== nextProps.isExpanded) return false;
+  if (prevProps.addItemError !== nextProps.addItemError) return false;
+  if (prevProps.refreshRelationsTrigger !== nextProps.refreshRelationsTrigger) return false;
+  if (prevProps.isAddingItem !== nextProps.isAddingItem) return false;
+  
+  // Check if business rules changed (they might affect this section)
+  const prevBusinessRules = prevProps.schema.businessRules;
+  const nextBusinessRules = nextProps.schema.businessRules;
+  if (JSON.stringify(prevBusinessRules) !== JSON.stringify(nextBusinessRules)) return false;
+  
+  // Check if section-specific values changed
+  const sectionId = prevProps.section.id;
+  const prevSectionValue = prevProps.values?.[sectionId];
+  const nextSectionValue = nextProps.values?.[sectionId];
+  if (JSON.stringify(prevSectionValue) !== JSON.stringify(nextSectionValue)) return false;
+  
+  // Check if section-specific errors changed
+  const prevSectionError = prevProps.errors?.[sectionId];
+  const nextSectionError = nextProps.errors?.[sectionId];
+  if (prevSectionError !== nextSectionError) return false;
+  
+  // Check if section-specific touched changed (only for this section's fields)
+  const sectionFields = prevProps.schema.fields?.filter(f => f.sectionId === sectionId) || [];
+  for (const field of sectionFields) {
+    const prevTouched = prevProps.touched?.[field.name];
+    const nextTouched = nextProps.touched?.[field.name];
+    if (prevTouched !== nextTouched) return false;
+  }
+  
+  // Check if repeating items changed (for repeating sections)
+  if (prevProps.section.isRepeatingSection) {
+    const prevItems = prevProps.repeatingItems || [];
+    const nextItems = nextProps.repeatingItems || [];
+    if (prevItems.length !== nextItems.length) return false;
+    if (JSON.stringify(prevItems) !== JSON.stringify(nextItems)) return false;
+  }
+  
+  // Check if callbacks changed (these should be stable, but check anyway)
+  if (prevProps.onChange !== nextProps.onChange) return false;
+  if (prevProps.onBlur !== nextProps.onBlur) return false;
+  if (prevProps.onToggleExpanded !== nextProps.onToggleExpanded) return false;
+  
+  // If we get here, nothing relevant to this section changed, so skip re-render
+  return true;
+});

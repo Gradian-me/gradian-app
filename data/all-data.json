@@ -386,44 +386,24 @@
     {
       "number": "CGN-2025-09",
       "inquiryDate": "2025-11-03T09:38",
-      "inquiryDeadlineDate": "2025-11-21T11:30",
+      "inquiryDeadlineDate": "2025-11-28T11:30",
       "state": [
         {
-          "id": "2",
-          "label": "In Review",
-          "icon": "Clock",
-          "color": "warning"
+          "id": "3",
+          "label": "Approved",
+          "icon": "CheckCircle",
+          "color": "success"
         }
       ],
       "description": "Test Description",
-      "inquiry-items": [
-        {
-          "id": "01K96E06Z9H5G8FKH5QY0538JB",
-          "label": "Himedia Feed Alpha"
-        },
-        {
-          "id": "01K96WRHRE30636NDY6QVJT5AR",
-          "label": "HPLC Equipment Agilent 2190"
-        }
-      ],
+      "inquiry-items": [],
       "id": "01K945BGN1YV7RG3XKG169CGS1",
       "createdAt": "2025-11-03T06:09:31.312Z",
-      "updatedAt": "2025-11-14T08:57:57.661Z",
+      "updatedAt": "2025-11-26T06:38:08.502Z",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "inquiry-vendors": [
-        {
-          "id": "01K97208RABW053BGN3A6W05FD",
-          "label": "Transfarma"
-        },
-        {
-          "id": "01K9720G4M9G75V3YWB9PGKBTM",
-          "label": "Exapilog"
-        },
-        {
-          "id": "01K97F0QV3S1JH1R8NJ1XWEPEG",
-          "label": "Ottana Pharmed"
-        }
-      ]
+      "inquiry-vendors": [],
+      "incomplete": false,
+      "contacts": []
     },
     {
       "number": "AGN-2025-12",
@@ -1371,8 +1351,8 @@
       ],
       "id": "lucide_icons_sync",
       "createdAt": "2025-11-17T18:00:00.000Z",
-      "updatedAt": "2025-11-25T15:19:28.271Z",
-      "lastSynced": "2025-11-25T15:19:28.271Z"
+      "updatedAt": "2025-11-26T09:47:15.032Z",
+      "lastSynced": "2025-11-26T09:47:15.032Z"
     },
     {
       "color": "#f59e0b",
@@ -1398,8 +1378,8 @@
       ],
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-11-25T15:19:29.220Z",
-      "lastSynced": "2025-11-25T15:19:29.220Z"
+      "updatedAt": "2025-11-26T09:47:21.210Z",
+      "lastSynced": "2025-11-26T09:47:21.210Z"
     }
   ],
   "databases": [
@@ -1807,5 +1787,31 @@
         }
       ]
     }
-  ]
+  ],
+  "deviations": [
+    {
+      "number": 12,
+      "deviationTitle": [
+        "asdsa",
+        "asdasd"
+      ],
+      "description": "tss",
+      "isForce": true,
+      "forceReason": "test",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KAZDVZS58E50MPV5KK2NEB6A",
+      "createdAt": "2025-11-26T06:33:31.189Z",
+      "updatedAt": "2025-11-26T06:34:59.558Z",
+      "responsible": null,
+      "dueDate": null,
+      "follow-ups": [
+        {
+          "responsible": "",
+          "dueDate": "2025-11-27"
+        }
+      ]
+    }
+  ],
+  "pharmaceutical-deviation-management-system": []
 }

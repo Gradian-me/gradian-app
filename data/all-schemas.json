@@ -4700,5 +4700,318 @@
     "icon": "Bot",
     "isNotCompanyBased": true,
     "isSystemSchema": true
+  },
+  {
+    "id": "deviations",
+    "description": "Deviation Management",
+    "singular_name": "Deviation",
+    "plural_name": "Deviations",
+    "showInNavigation": true,
+    "isSystemSchema": false,
+    "isNotCompanyBased": false,
+    "allowDataInactive": true,
+    "allowDataForce": true,
+    "allowDataHardDelete": false,
+    "statusId": "",
+    "fields": [
+      {
+        "id": "field-1764138250118",
+        "name": "number",
+        "label": "Number",
+        "sectionId": "base-info",
+        "component": "number",
+        "order": 1,
+        "role": "code",
+        "validation": {
+          "required": true
+        }
+      },
+      {
+        "id": "field-1764138270038",
+        "name": "deviationTitle",
+        "label": "Deviation Title",
+        "sectionId": "base-info",
+        "component": "tag-input",
+        "order": 2,
+        "role": "title",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 4,
+        "canCopy": false
+      },
+      {
+        "id": "field-1764138301857",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "base-info",
+        "component": "textarea",
+        "order": 3,
+        "role": "description"
+      },
+      {
+        "id": "field-1764138388718",
+        "name": "responsible",
+        "label": "Responsible",
+        "sectionId": "follow-ups",
+        "component": "picker",
+        "order": 1
+      },
+      {
+        "id": "field-1764138491735",
+        "name": "dueDate",
+        "label": "Due Date",
+        "sectionId": "follow-ups",
+        "component": "date",
+        "order": 2,
+        "role": "duedate"
+      }
+    ],
+    "sections": [
+      {
+        "id": "base-info",
+        "title": "Base Info",
+        "columns": 2
+      },
+      {
+        "id": "follow-ups",
+        "title": "Follow Ups",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "addFields",
+          "minItems": 0
+        },
+        "showNotApplicable": true
+      }
+    ]
+  },
+  {
+    "id": "pharmaceutical-deviation-management-system",
+    "description": "A comprehensive system for managing pharmaceutical deviations to ensure product quality and compliance with industry standards.",
+    "singular_name": "Pharmaceutical Deviation Management",
+    "plural_name": "Pharmaceutical Deviation Managements",
+    "icon": "FileSearch",
+    "fields": [
+      {
+        "id": "deviation-date-time",
+        "name": "deviationDateTime",
+        "label": "Date of Deviation Occurrence",
+        "sectionId": "deviation-details",
+        "type": "date",
+        "component": "date-input",
+        "required": true,
+        "order": 1
+      },
+      {
+        "id": "deviation-type",
+        "name": "deviationType",
+        "label": "Type of Deviation",
+        "sectionId": "deviation-details",
+        "type": "select",
+        "component": "select",
+        "required": true,
+        "options": [
+          {
+            "id": "quality",
+            "label": "Quality",
+            "icon": "CheckCircle",
+            "color": "success"
+          },
+          {
+            "id": "quantity",
+            "label": "Quantity",
+            "icon": "Package",
+            "color": "info"
+          },
+          {
+            "id": "process",
+            "label": "Process",
+            "icon": "Settings",
+            "color": "warning"
+          }
+        ],
+        "order": 2
+      },
+      {
+        "id": "deviation-details",
+        "name": "deviationDetails",
+        "label": "Deviation Details",
+        "sectionId": "deviation-details",
+        "type": "textarea",
+        "component": "textarea",
+        "required": true,
+        "order": 3
+      },
+      {
+        "id": "associated-product",
+        "name": "associatedProduct",
+        "label": "Associated Products",
+        "sectionId": "deviation-details",
+        "type": "picker",
+        "component": "picker",
+        "targetSchema": "pharmaceutical-products",
+        "required": true,
+        "order": 4
+      },
+      {
+        "id": "batch-number",
+        "name": "batchNumber",
+        "label": "Batch Number",
+        "sectionId": "deviation-details",
+        "type": "text",
+        "component": "text",
+        "required": true,
+        "order": 5
+      },
+      {
+        "id": "responsible-individual",
+        "name": "responsibleIndividual",
+        "label": "Responsible Individual",
+        "sectionId": "deviation-details",
+        "type": "picker",
+        "component": "picker",
+        "targetSchema": "users",
+        "required": true,
+        "order": 6
+      },
+      {
+        "id": "initial-actions",
+        "name": "initialActions",
+        "label": "Initial Actions Taken",
+        "sectionId": "deviation-details",
+        "type": "textarea",
+        "component": "textarea",
+        "order": 7
+      },
+      {
+        "id": "root-cause-analysis",
+        "name": "rootCauseAnalysis",
+        "label": "Root Cause Analysis",
+        "sectionId": "analysis-section",
+        "type": "textarea",
+        "component": "textarea",
+        "order": 8
+      },
+      {
+        "id": "risk-assessment",
+        "name": "riskAssessment",
+        "label": "Risk Assessment",
+        "sectionId": "analysis-section",
+        "type": "textarea",
+        "component": "textarea",
+        "order": 9
+      },
+      {
+        "id": "corrective-action",
+        "name": "correctiveAction",
+        "label": "Corrective Actions Undertaken",
+        "sectionId": "capa-section",
+        "type": "textarea",
+        "component": "textarea",
+        "order": 10
+      },
+      {
+        "id": "preventive-action",
+        "name": "preventiveAction",
+        "label": "Preventive Actions Scheduled",
+        "sectionId": "capa-section",
+        "type": "textarea",
+        "component": "textarea",
+        "order": 11
+      },
+      {
+        "id": "effectiveness-evaluation",
+        "name": "effectivenessEvaluation",
+        "label": "Effectiveness Evaluation of Preventive Measures",
+        "sectionId": "capa-section",
+        "type": "textarea",
+        "component": "textarea",
+        "order": 12
+      },
+      {
+        "id": "reporting-tools",
+        "name": "reportingTools",
+        "label": "Reporting Tools for Analysis",
+        "sectionId": "reporting-section",
+        "type": "textarea",
+        "component": "textarea",
+        "role": "description",
+        "order": 13
+      },
+      {
+        "id": "training-support",
+        "name": "trainingSupport",
+        "label": "Training and Support for Users",
+        "sectionId": "support-section",
+        "type": "text",
+        "component": "text",
+        "order": 14
+      },
+      {
+        "id": "legal-compliance",
+        "name": "legalCompliance",
+        "label": "Legal and Compliance Considerations",
+        "sectionId": "compliance-section",
+        "type": "textarea",
+        "component": "textarea",
+        "role": "description",
+        "order": 15
+      },
+      {
+        "id": "integration-systems",
+        "name": "integrationSystems",
+        "label": "Integration with Other Systems",
+        "sectionId": "integration-section",
+        "type": "textarea",
+        "component": "textarea",
+        "role": "description",
+        "order": 16
+      }
+    ],
+    "sections": [
+      {
+        "id": "deviation-details",
+        "title": "Deviation Details",
+        "columns": 2,
+        "initialState": "expanded"
+      },
+      {
+        "id": "analysis-section",
+        "title": "Analysis",
+        "columns": 2,
+        "initialState": "collapsed"
+      },
+      {
+        "id": "capa-section",
+        "title": "Corrective and Preventive Actions (CAPA)",
+        "columns": 2,
+        "initialState": "collapsed"
+      },
+      {
+        "id": "reporting-section",
+        "title": "Reporting",
+        "columns": 2,
+        "initialState": "collapsed"
+      },
+      {
+        "id": "support-section",
+        "title": "Training and Support",
+        "columns": 2,
+        "initialState": "collapsed"
+      },
+      {
+        "id": "compliance-section",
+        "title": "Legal and Compliance",
+        "columns": 2,
+        "initialState": "collapsed"
+      },
+      {
+        "id": "integration-section",
+        "title": "System Integration",
+        "columns": 2,
+        "initialState": "collapsed"
+      }
+    ]
   }
 ]

@@ -372,12 +372,25 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
   // Deep comparison to avoid unnecessary resets
   const prevInitialValuesRef = React.useRef<string>(JSON.stringify(initialValues));
+  const isInitialMountRef = React.useRef<boolean>(true);
   
   // Update form state when initialValues change (for editing scenarios)
-  // Only reset if the actual content has changed
+  // Only reset if the actual content has changed AND form is not dirty (user hasn't made changes)
   useEffect(() => {
     const currentInitialValues = JSON.stringify(initialValues);
-    if (prevInitialValuesRef.current !== currentInitialValues) {
+    
+    // On initial mount, always initialize (but don't reset if form is already initialized)
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      prevInitialValuesRef.current = currentInitialValues;
+      // Don't reset on initial mount - form is already initialized with initialValues in useReducer
+      return;
+    }
+    
+    // Only reset if:
+    // 1. The actual content has changed (not just reference)
+    // 2. The form is not dirty (user hasn't made changes)
+    if (prevInitialValuesRef.current !== currentInitialValues && !state.dirty) {
       prevInitialValuesRef.current = currentInitialValues;
       dispatch({ type: 'RESET', initialValues, schema });
       // Check if loaded entity is incomplete (only for edit mode)
@@ -388,8 +401,11 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         setIsIncomplete(false);
         setHasSubmitted(false); // Reset on new form
       }
+    } else if (prevInitialValuesRef.current !== currentInitialValues) {
+      // Update the ref even if we don't reset (to prevent future false positives)
+      prevInitialValuesRef.current = currentInitialValues;
     }
-  }, [initialValues, schema]);
+  }, [initialValues, schema, state.dirty]);
 
   // Update expanded sections when schema sections change
   const sectionIds = useMemo(() => schema.sections.map(s => s.id).join(','), [schema.sections]);
