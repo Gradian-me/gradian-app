@@ -63,9 +63,10 @@ export async function fetchFormComponents(): Promise<ComponentOption[]> {
     }));
 
   // Remove duplicates and sort
-  const uniqueComponents = Array.from(
-    new Map(components.map(c => [c.value, c])).values()
-  ).sort((a, b) => a.label.localeCompare(b.label));
+  type ComponentOption = { value: FormField['component']; label: string; description?: string };
+  const uniqueComponents = (Array.from(
+    new Map(components.map((c: ComponentOption) => [c.value, c])).values()
+  ) as ComponentOption[]).sort((a, b) => a.label.localeCompare(b.label));
 
   return uniqueComponents;
 }
