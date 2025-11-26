@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, memo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FormSectionProps } from '@/gradian-ui/schema-manager/types/form-schema';
+import { FormSectionProps, FormErrors, FormTouched, FormSection, FormData } from '@/gradian-ui/schema-manager/types/form-schema';
 import { FormElementFactory } from '../form-elements';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
@@ -25,7 +25,7 @@ import { BadgeViewer } from '../form-elements/utils/badge-viewer';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useBusinessRuleEffects, getFieldEffects } from '@/domains/business-rule-engine';
+import { useBusinessRuleEffects, getFieldEffects, type BusinessRuleEffectsMap } from '@/domains/business-rule-engine';
 import type { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 const fieldVariants = {
   hidden: { opacity: 0, y: 12 },
@@ -349,7 +349,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     fieldTabIndexMap?: Record<string, number>;
     section: FormSection;
     columns: number;
-    isRepeatingSection: boolean;
+    isRepeatingSection: boolean | undefined;
     isNotApplicable: boolean;
     ruleEffects: BusinessRuleEffectsMap;
   }
