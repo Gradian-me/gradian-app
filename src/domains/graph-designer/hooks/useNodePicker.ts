@@ -13,7 +13,10 @@ interface PickerState {
   schema: FormSchema | null;
 }
 
-export function useNodePicker(updateNode: (node: GraphNodeData) => void) {
+export function useNodePicker(
+  updateNode: (node: GraphNodeData) => void,
+  existingNodes?: GraphNodeData[]
+) {
   const [pickerState, setPickerState] = useState<PickerState>({
     isOpen: false,
     node: null,
@@ -60,6 +63,20 @@ export function useNodePicker(updateNode: (node: GraphNodeData) => void) {
       return;
     }
 
+    // Check if this entity ID (nodeId) is already linked to another node in the graph
+    if (existingNodes) {
+      const duplicateNode = existingNodes.find(
+        (n) => n.nodeId === selectedItem.id && n.id !== pickerState.node?.id
+      );
+      if (duplicateNode) {
+        toast.error(
+          `This entity is already linked to node "${duplicateNode.title || duplicateNode.id}". Each entity can only be linked once.`
+        );
+        closePicker();
+        return;
+      }
+    }
+
     // Fetch the full entity data
     try {
       const response = await apiRequest<any>(
@@ -81,13 +98,16 @@ export function useNodePicker(updateNode: (node: GraphNodeData) => void) {
           selectedItem.id;
 
         // Update the node with the selected entity's data
+        // nodeId should be the selected entity's ID from the picker, not the graph node's ID
         const updatedNode: GraphNodeData = {
           ...pickerState.node,
           title,
           incomplete: false,
+          nodeId: selectedItem.id, // nodeId is the selected entity's ID from the popup picker
           payload: {
-            ...entityData,
-            id: selectedItem.id,
+            ...(pickerState.node.payload || {}), // Preserve existing payload
+            ...entityData, // Add/update with entity data
+            id: selectedItem.id, // Entity ID
           },
         };
 

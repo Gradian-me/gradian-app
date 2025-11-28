@@ -58,6 +58,7 @@ export function validateGraph(graph: GraphRecord | null): GraphValidationResult 
 
   const nodeIds = new Set<string>();
   const nodeMap = new Map<string, GraphNodeData>();
+  const nodeEntityIds = new Map<string, { nodeId: string; index: number }>(); // Track nodeId (entity ID) duplicates
 
   for (let i = 0; i < graph.nodes.length; i++) {
     const node = graph.nodes[i];
@@ -81,6 +82,20 @@ export function validateGraph(graph: GraphRecord | null): GraphValidationResult 
       } else {
         nodeIds.add(node.id);
         nodeMap.set(node.id, node);
+      }
+    }
+
+    // Check for duplicate nodeId (entity ID) - each entity can only be linked once
+    if (node.nodeId && typeof node.nodeId === 'string' && node.nodeId.trim() !== '') {
+      const existing = nodeEntityIds.get(node.nodeId);
+      if (existing) {
+        errors.push({
+          field: `${prefix}.nodeId`,
+          message: `Duplicate entity ID (nodeId): "${node.nodeId}" is already linked to node "${graph.nodes[existing.index].title || graph.nodes[existing.index].id}" at index ${existing.index}`,
+          severity: 'error',
+        });
+      } else {
+        nodeEntityIds.set(node.nodeId, { nodeId: node.nodeId, index: i });
       }
     }
 

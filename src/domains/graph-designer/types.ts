@@ -5,6 +5,7 @@ export type GraphLayout = 'dagre' | 'dagre-lr' | 'cose' | 'breadthfirst';
 export interface GraphNodeData {
   id: string;
   schemaId: string;
+  nodeId?: string; // The selected entity's ID from the popup picker (optional, only set when entity is selected)
   title?: string;
   incomplete: boolean;
   parentId?: string | null;

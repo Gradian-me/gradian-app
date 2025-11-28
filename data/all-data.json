@@ -1664,6 +1664,106 @@
       "id": "01KAE9R3R8XZ41613Y9AS2BXC1",
       "createdAt": "2025-11-19T14:54:24.545Z",
       "updatedAt": "2025-11-19T14:54:24.545Z"
+    },
+    {
+      "color": "#1d72cd",
+      "label": "General",
+      "icon": "Airplay",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB5X4QCVD4RE23PHN68X4D2J",
+      "createdAt": "2025-11-28T18:55:52.754Z",
+      "updatedAt": "2025-11-28T18:55:52.756Z"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "General 2",
+      "icon": "Accessibility",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB5XRZF85N7Q3RR04P6A22AG",
+      "createdAt": "2025-11-28T19:06:56.373Z",
+      "updatedAt": "2025-11-28T19:07:08.270Z"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "General 3",
+      "icon": "User",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB5YSTGPEVPW4KXPFXCMPRPJ",
+      "createdAt": "2025-11-28T19:24:52.655Z",
+      "updatedAt": "2025-11-28T19:24:52.658Z"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "gen 3",
+      "icon": "Mail",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB5Z6223WG8NGKJJ7MNSF8PN",
+      "createdAt": "2025-11-28T19:31:33.580Z",
+      "updatedAt": "2025-11-28T19:31:33.581Z"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "gen 4",
+      "icon": "User",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB5ZHBVDJ4DJP8C0DQMHAZQJ",
+      "createdAt": "2025-11-28T19:37:44.048Z",
+      "updatedAt": "2025-11-28T19:37:44.048Z"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "gen 5",
+      "icon": "Mail",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB60HCRFAV96EC248HS2X1XS",
+      "createdAt": "2025-11-28T19:55:13.569Z",
+      "updatedAt": "2025-11-28T19:55:13.571Z"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "tag 6",
+      "icon": "Mail",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB60T6SJK43M31SB2S0QCE1D",
+      "createdAt": "2025-11-28T20:00:02.373Z",
+      "updatedAt": "2025-11-28T20:01:14.928Z"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "gen 7",
+      "icon": "Mail",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB6140Y9P71HR41KQE5MWFTZ",
+      "createdAt": "2025-11-28T20:05:24.107Z",
+      "updatedAt": "2025-11-28T20:05:24.107Z"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "gen 8",
+      "icon": "Mail",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB61FF21M6P6NQFRESYPX0P2",
+      "createdAt": "2025-11-28T20:11:38.964Z",
+      "updatedAt": "2025-11-28T20:11:38.966Z"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "gen 8",
+      "icon": "Settings",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB61QM4S3MY78XHX8GCPPCNP",
+      "createdAt": "2025-11-28T20:16:06.307Z",
+      "updatedAt": "2025-11-28T20:16:06.309Z"
     }
   ],
   "production-plan-items": [

@@ -53,11 +53,43 @@ async function loadSchemas(): Promise<any[]> {
   const dataPath = path.join(process.cwd(), 'data', 'all-schemas.json');
   
   if (!fs.existsSync(dataPath)) {
+    console.warn(`[API] Schemas file not found at: ${dataPath}`);
     return [];
   }
   
-  const fileContents = fs.readFileSync(dataPath, 'utf8');
-  return JSON.parse(fileContents);
+  try {
+    const fileContents = fs.readFileSync(dataPath, 'utf8');
+    
+    // Check if file is empty or just whitespace
+    if (!fileContents || fileContents.trim().length === 0) {
+      console.warn(`[API] Schemas file is empty at: ${dataPath}`);
+      return [];
+    }
+    
+    const parsed = JSON.parse(fileContents);
+    
+    // Ensure we return an array
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+    
+    // If it's an object, try to extract an array from it
+    if (typeof parsed === 'object' && parsed !== null) {
+      if (Array.isArray(parsed.data)) {
+        return parsed.data;
+      }
+      // If it's an object with schema IDs as keys, convert to array
+      if (Object.keys(parsed).length > 0) {
+        return Object.values(parsed);
+      }
+    }
+    
+    console.warn(`[API] Schemas file contains invalid data format at: ${dataPath}`);
+    return [];
+  } catch (error) {
+    console.error(`[API] Error parsing schemas file at ${dataPath}:`, error);
+    throw new Error(`Failed to parse schemas file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 /**

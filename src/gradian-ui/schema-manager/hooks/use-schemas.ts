@@ -31,12 +31,8 @@ export function useSchemas(options?: UseSchemasOptions) {
     queryFn: async () => {
       console.log(`[REACT_QUERY] 🔄 Fetching ${isSummary ? 'schema summaries' : 'schemas'} from API...`);
       // Use /api/schemas directly (apiRequest will handle it correctly via resolveApiUrl)
-      // Add cache-busting parameter for summary requests to ensure fresh data
-      const apiPathWithCacheBust = isSummary 
-        ? `${apiPath}${apiPath.includes('?') ? '&' : '?'}cacheBust=${Date.now()}`
-        : apiPath;
-      const response = await apiRequest<FormSchema[]>(apiPathWithCacheBust, {
-        disableCache: isSummary, // Disable IndexedDB cache for summary requests
+      const response = await apiRequest<FormSchema[]>(apiPath, {
+        disableCache: false, // Use cache for better performance
       });
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to fetch schemas');
@@ -60,9 +56,9 @@ export function useSchemas(options?: UseSchemasOptions) {
     initialData,
     staleTime: cacheConfig.staleTime ?? 10 * 60 * 1000,
     gcTime: cacheConfig.gcTime ?? 30 * 60 * 1000,
-    refetchOnMount: isSummary ? true : false, // Always refetch on mount for summary requests
-    refetchOnWindowFocus: isSummary ? true : false, // Always refetch on window focus for summary requests
-    refetchOnReconnect: isSummary ? true : false, // Always refetch on reconnect for summary requests
+    refetchOnMount: false, // Don't refetch on mount - only fetch once on initial load
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: false, // Don't refetch on reconnect
     retry: 1, // Only retry once on failure
     retryDelay: 1000, // Wait 1 second before retrying
     placeholderData: (previousData) => previousData, // Use previous data as placeholder

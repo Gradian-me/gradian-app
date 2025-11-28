@@ -45,6 +45,7 @@ interface GraphToolbarProps {
   onToggleMultiSelect: () => void;
   edgeModeEnabled: boolean;
   onToggleEdgeMode: () => void;
+  canGroupSelection: boolean;
   onGroupSelection: () => void;
   onExportPng: () => void;
   onSave: () => void;
@@ -66,6 +67,7 @@ export function GraphToolbar(props: GraphToolbarProps) {
     onToggleMultiSelect,
     edgeModeEnabled,
     onToggleEdgeMode,
+    canGroupSelection,
     onGroupSelection,
     onExportPng,
     onSave,
@@ -149,7 +151,8 @@ export function GraphToolbar(props: GraphToolbarProps) {
           variant="outline"
           size="icon"
           onClick={onGroupSelection}
-          title="Group selected nodes"
+          disabled={!canGroupSelection}
+          title={canGroupSelection ? "Group selected nodes" : "Select 2 or more nodes to group"}
         >
           <Group className="h-4 w-4" />
         </Button>

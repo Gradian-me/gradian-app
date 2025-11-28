@@ -1090,8 +1090,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                       className={cn(
                         "text-sm font-semibold truncate transition-colors flex-1 min-w-0",
                         isSelected
-                          ? "text-violet-900"
-                          : "text-gray-900 group-hover:text-violet-700 dark:group-hover:text-violet-300"
+                          ? "text-violet-900 dark:text-violet-100"
+                          : "text-gray-900 dark:text-gray-100 group-hover:text-violet-700 dark:group-hover:text-violet-300"
                       )}
                     >
                       {renderHighlightedText(title, highlightQuery)}
@@ -1101,7 +1101,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                       <CodeBadge code={codeField} />
                     )}
                   </div>
-                  {subtitle && (
+                  {subtitle && subtitle.trim() && (
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                       {renderHighlightedText(subtitle, highlightQuery)}
                     </p>
@@ -1109,11 +1109,13 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
                 </div>
 
-                {/* Rating and Status */}
-                <div className="flex flex-col items-end gap-1.5 shrink-0">
-                  {ratingFieldNode && <div className="flex items-center gap-1">{ratingFieldNode}</div>}
-                  {statusFieldNode && <div className="flex items-center gap-1">{statusFieldNode}</div>}
-                </div>
+                {/* Rating and Status - Only render if at least one exists */}
+                {(ratingFieldNode || statusFieldNode) && (
+                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                    {ratingFieldNode && <div className="flex items-center gap-1">{ratingFieldNode}</div>}
+                    {statusFieldNode && <div className="flex items-center gap-1">{statusFieldNode}</div>}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1148,7 +1150,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               <DialogTitle>{title || `Select ${schemaName}`}</DialogTitle>
               {description && <DialogDescription>{description}</DialogDescription>}
             </div>
-            <div className="flex items-center gap-2 me-4">
+            <div className="flex items-center gap-2 me-6">
               <Button
                 type="button"
                 variant="ghost"
