@@ -548,5 +548,21 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KB69K55KV46PKYHCNF3BMZK5",
+    "timestamp": "2025-11-28T22:33:28.502Z",
+    "version": "1.01.002",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "Update tag schema configuration - remove tag-label and tag-icon from fieldIds, add role property to tag-icon field",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema",
+          "form-builder"
+        ]
+      }
+    ]
   }
 ]
