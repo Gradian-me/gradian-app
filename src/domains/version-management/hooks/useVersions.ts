@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
-import { AppVersion, VersionFilters, ViewMode } from '../types';
+import { AppVersion, VersionFilters, ViewMode, Priority } from '../types';
 
 export interface UseVersionsReturn {
   versions: AppVersion[];
@@ -78,9 +78,9 @@ export const useVersions = (): UseVersionsReturn => {
       
       // Determine the highest priority from changes
       const highestPriority = changes.reduce((max, change) => {
-        const priorityOrder = { LOW: 1, Medium: 2, High: 3 };
+        const priorityOrder: Record<Priority, number> = { LOW: 1, Medium: 2, High: 3 };
         return priorityOrder[change.priority] > priorityOrder[max] ? change.priority : max;
-      }, priority as Priority);
+      }, priority);
       
       const response = await apiRequest<AppVersion>('/api/app/versions', {
         method: 'POST',

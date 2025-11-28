@@ -1,10 +1,10 @@
-import type { StylesheetCSS } from 'cytoscape';
+import type { StylesheetJson } from 'cytoscape';
 
 /**
  * Cytoscape stylesheet configuration for graph visualization
  * Defines styles for nodes, edges, and various states
  */
-export const GRAPH_STYLES: StylesheetCSS[] = [
+export const GRAPH_STYLES: StylesheetJson = [
   {
     selector: 'node',
     style: {
