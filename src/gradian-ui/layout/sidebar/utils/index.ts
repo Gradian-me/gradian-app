@@ -16,7 +16,8 @@ import {
   Folder,
   LucideIcon,
   PencilRuler,
-  Sparkles
+  Sparkles,
+  Share2,
 } from 'lucide-react';
 import { NavigationItem } from '../types';
 
@@ -43,6 +44,11 @@ export const defaultNavigationItems: NavigationItem[] = [
     name: 'Integrations',
     href: '/integrations',
     icon: Database,
+  },
+  {
+    name: 'Graph Designer',
+    href: '/builder/graphs',
+    icon: Share2,
   },
   {
     name: 'Builder',

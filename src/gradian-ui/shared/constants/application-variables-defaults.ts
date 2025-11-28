@@ -12,6 +12,7 @@ export const DEFAULT_APPLICATION_VARIABLES = {
     CALL_BACKEND: true,
     INDEXDB_CACHE: true,
     INTEGRATION_LOG: true,
+    GRAPH_LOG: true,
   },
   AUTH_CONFIG: {
     JWT_SECRET: 'your-default-secret-key-change-in-production',

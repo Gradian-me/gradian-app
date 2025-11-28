@@ -324,6 +324,7 @@ export default function ApplicationVariablesPage() {
                         {logType === LogType.CALL_BACKEND && 'Log backend API calls'}
                         {logType === LogType.INDEXDB_CACHE && 'Log IndexDB cache operations'}
                         {logType === LogType.INTEGRATION_LOG && 'Log integration operations'}
+                        {logType === LogType.GRAPH_LOG && 'Log graph designer operations and edge creation'}
                       </p>
                     </div>
                     <Switch

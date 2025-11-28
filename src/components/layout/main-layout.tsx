@@ -31,6 +31,7 @@ interface MainLayoutProps {
   title: string;
   subtitle?: string | React.ReactNode;
   icon?: string;
+  showActionButtons?: boolean;
   showCreateButton?: boolean;
   createButtonText?: string;
   onCreateClick?: () => void;
@@ -69,6 +70,7 @@ export function MainLayout({
   title,
   subtitle,
   icon,
+  showActionButtons = true,
   showCreateButton = false, 
   createButtonText = "Create",
   onCreateClick,
@@ -491,20 +493,22 @@ export function MainLayout({
         />
 
         {/* Page Action Buttons - Top of page */}
-        <div className="sticky top-0 z-30 bg-white/90 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-4 py-2">
-          <PageActionButtons />
-        </div>
+        {showActionButtons && (
+          <div className="sticky top-0 z-30 bg-white/90 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-4 py-2">
+            <PageActionButtons />
+          </div>
+        )}
 
         {/* Page Content */}
         <motion.main
           key={pathname}
-          initial={!hasMountedBefore ? { opacity: 0, y: 20 } : false}
+          initial={!hasMountedBefore ? { opacity: 0, y: 10 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           className="flex-1 overflow-y-auto p-2 md:p-4 lg:p-6 bg-gray-50 dark:bg-gray-900"
           data-scroll-container="main-content"
         >
-          <div className="max-w-7xl mx-auto w-full">
+          <div className="max-w-9xl mx-auto w-full h-full">
             {children}
           </div>
         </motion.main>

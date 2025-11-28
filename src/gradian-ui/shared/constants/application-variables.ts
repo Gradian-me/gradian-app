@@ -7,6 +7,7 @@ export enum LogType {
   CALL_BACKEND = 'CALL_BACKEND',
   INDEXDB_CACHE = 'INDEXDB_CACHE',
   INTEGRATION_LOG = 'INTEGRATION_LOG',
+  GRAPH_LOG = 'GRAPH_LOG',
 }
 
 // Try to import JSON file as single source of truth for defaults
