@@ -15,8 +15,7 @@ import { Sparkles, Loader2, Square, History, RotateCcw } from 'lucide-react';
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { PromptPreviewSheet } from './PromptPreviewSheet';
 import type { AiAgent } from '../types';
-import { useBusinessRuleEffects, getFieldEffects, useFieldRules } from '@/domains/business-rule-engine';
-import type { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
+import { useBusinessRuleEffects, getFieldEffects } from '@/domains/business-rule-engine';
 import type { BusinessRuleWithEffects, BusinessRuleEffectsMap } from '@/domains/business-rule-engine';
 
 // Separate component for field item to allow hook usage
@@ -47,11 +46,7 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
   ruleEffects,
   agentBusinessRules,
 }) => {
-  // Always call hooks unconditionally (Rules of Hooks)
-  // For pull-based model (backward compatibility)
-  const fieldRules = useFieldRules(field as FormField, formValues);
-  
-  // Get business rule effects (push-based model) or fall back to pull-based model
+  // Get business rule effects (push-based model)
   let fieldEffects;
   if (agentBusinessRules && agentBusinessRules.length > 0 && ruleEffects) {
     // Use push-based model: get effects from ruleEffects
@@ -59,11 +54,11 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
     const sectionId = field.sectionId || 'basic-info';
     fieldEffects = getFieldEffects(fieldId, sectionId, ruleEffects);
   } else {
-    // Fall back to pull-based model: use fieldRules from hook
+    // Default effects when no business rules
     fieldEffects = {
-      isVisible: fieldRules.isVisible,
-      isRequired: fieldRules.isRequired,
-      isDisabled: fieldRules.isDisabled,
+      isVisible: true,
+      isRequired: false,
+      isDisabled: false,
     };
   }
 

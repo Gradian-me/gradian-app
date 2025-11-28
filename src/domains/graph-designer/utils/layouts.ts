@@ -34,7 +34,7 @@ export const LAYOUTS: Record<GraphLayout, cytoscape.LayoutOptions> = {
     gravity: 0.25,
     numIter: 2500,
     initialEnergyOnIncremental: 0.3,
-  },
+  } as any,
   breadthfirst: {
     name: 'breadthfirst',
     directed: true,

@@ -4,9 +4,7 @@ import React from 'react';
 import { FormContentProps } from '../types';
 import { FormElementFactory } from '../../form-elements';
 import { cn } from '../../../shared/utils';
-import { useFieldRules } from '@/domains/business-rule-engine';
 import type { FormElementConfig } from '../../form-elements/types';
-import type { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 
 // Separate component for field item to allow hook usage
 interface FieldItemProps {
@@ -32,11 +30,8 @@ const FieldItem: React.FC<FieldItemProps> = ({
   layout,
   fieldTabIndexMap,
 }) => {
-  // Evaluate business rules for this field
-  const fieldRules = useFieldRules(field as unknown as FormField, values);
-
-  // Skip hidden and inactive fields (including business rule visibility)
-  if ((field as any).hidden || (field as any).inactive || !fieldRules.isVisible) {
+  // Skip hidden and inactive fields
+  if ((field as any).hidden || (field as any).inactive) {
     return null;
   }
 
@@ -46,10 +41,10 @@ const FieldItem: React.FC<FieldItemProps> = ({
     fieldValue = (field as any).defaultValue;
   }
 
-    // Merge required state: business rule OR validation.required
-    const isRequired = fieldRules.isRequired || (field.validation?.required ?? false);
-  // Merge disabled state: business rule OR existing disabled flags
-  const isDisabled = fieldRules.isDisabled || disabled || (field as any).disabled;
+  // Use validation.required for required state
+  const isRequired = field.validation?.required ?? false;
+  // Use existing disabled flags
+  const isDisabled = disabled || (field as any).disabled;
 
   return (
     <div
