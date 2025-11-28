@@ -1,0 +1,58 @@
+# Cursor Project Rules
+
+## Version Management
+
+### Automatic Version Creation on Commits
+
+When making commits, automatically create a new version entry by calling the `/api/app/versions` POST endpoint with the following structure:
+
+**Required Fields:**
+- `changes`: Array of change objects, each containing:
+  - `changeType`: One of `'feature' | 'refactor' | 'add' | 'restore' | 'enhance' | 'update'`
+  - `description`: Clear description of the change
+  - `priority`: One of `'LOW' | 'Medium' | 'High'`
+  - `affectedDomains`: Array of domain names affected by this change
+
+**Version Increment Rules:**
+- **LOW or Medium priority**: Increments patch version (zzz) - e.g., 1.00.000 → 1.00.001
+- **High priority**: Increments minor version (yy) and resets patch - e.g., 1.00.000 → 1.01.000
+- **Major version (x)**: Never auto-incremented, must be manually updated
+
+**Example Request:**
+```json
+{
+  "changes": [
+    {
+      "changeType": "feature",
+      "description": "Added new user authentication flow",
+      "priority": "High",
+      "affectedDomains": ["auth", "user-management"]
+    },
+    {
+      "changeType": "refactor",
+      "description": "Improved API response formatting",
+      "priority": "Medium",
+      "affectedDomains": ["api"]
+    }
+  ],
+  "priority": "High"
+}
+```
+
+**Note:** The API will automatically:
+1. Determine the highest priority from all changes
+2. Increment the version accordingly
+3. Sync the version to `package.json`
+4. Create a timestamped version entry in `data/app-versions.json`
+
+### Commit Message Format
+
+When committing, include version information in the commit message or use the API to create a version entry. The version management system will:
+- Auto-detect priority from commit messages (if possible)
+- Extract affected domains from changed files
+- Create appropriate version entries
+
+### Manual Version Creation
+
+For manual version creation, use the `/app/versions` page or call the API directly with the desired changes array.
+
