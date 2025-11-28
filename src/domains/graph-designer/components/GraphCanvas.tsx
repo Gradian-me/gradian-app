@@ -30,7 +30,8 @@ interface GraphCanvasProps {
   nodes: GraphNodeData[];
   edges: GraphEdgeData[];
   layout: GraphLayout;
-  onNodeClick?: (node: GraphNodeData) => void;
+  onNodeClick?: (node: GraphNodeData, isMultiSelect: boolean) => void;
+  onBackgroundClick?: () => void;
   onElementsChange?: (nodes: GraphNodeData[], edges: GraphEdgeData[]) => void;
   onReady?: (handle: GraphCanvasHandle) => void;
   onNodeContextAction?: (action: 'edit' | 'delete' | 'select', node: GraphNodeData) => void;
@@ -39,6 +40,8 @@ interface GraphCanvasProps {
   onEdgeCreated?: (source: GraphNodeData, target: GraphNodeData) => void;
   onEdgeModeDisable?: () => void;
   selectedNodeId?: string | null;
+  selectedNodeIds?: Set<string>;
+  multiSelectEnabled?: boolean;
 }
 
 export function GraphCanvas(props: GraphCanvasProps) {
@@ -47,6 +50,7 @@ export function GraphCanvas(props: GraphCanvasProps) {
     edges,
     layout,
     onNodeClick,
+    onBackgroundClick,
     onElementsChange,
     onReady,
     onNodeContextAction,
@@ -55,11 +59,14 @@ export function GraphCanvas(props: GraphCanvasProps) {
     onEdgeCreated,
     onEdgeModeDisable,
     selectedNodeId,
+    selectedNodeIds,
+    multiSelectEnabled = false,
   } = props;
   const containerRef = useRef<HTMLDivElement | null>(null);
   const cyRef = useRef<Core | null>(null);
   const edgeHandlesRef = useRef<any | null>(null);
   const edgeModeEnabledRef = useRef(edgeModeEnabled);
+  const multiSelectEnabledRef = useRef(multiSelectEnabled);
   const edgesRef = useRef(edges);
 
   useEffect(() => {
@@ -214,6 +221,17 @@ export function GraphCanvas(props: GraphCanvasProps) {
       // Don't handle clicks when edge mode is enabled (edgehandles will handle it)
       if (edgeModeEnabledRef.current) return;
       if (!onNodeClick) return;
+      
+      // Check if Ctrl/Cmd key is pressed (for multiselect)
+      const originalEvent = event.originalEvent as MouseEvent | TouchEvent;
+      const isCtrlPressed = originalEvent && (
+        (originalEvent instanceof MouseEvent && (originalEvent.ctrlKey || originalEvent.metaKey)) ||
+        (originalEvent instanceof TouchEvent && false) // Touch events don't have modifier keys
+      );
+      
+      // Multiselect is active if toggle is enabled OR Ctrl is pressed
+      const isMultiSelect = multiSelectEnabledRef.current || isCtrlPressed;
+      
       const data = event.target.data() as any;
       const node: GraphNodeData = {
         id: data.id,
@@ -223,7 +241,19 @@ export function GraphCanvas(props: GraphCanvasProps) {
         parentId: data.parentId ?? null,
         payload: data.payload ?? {},
       };
-      onNodeClick(node);
+      onNodeClick(node, isMultiSelect);
+    });
+
+    // Background click handler - clear selection when clicking empty space
+    cy.on('tap', (event) => {
+      // Only clear if clicking on background (not on a node or edge)
+      if (edgeModeEnabledRef.current) return;
+      const target = event.target;
+      // Check if we clicked on the core/background (not a node or edge)
+      if ((target === cy || (!target.isNode() && !target.isEdge())) && onBackgroundClick) {
+        // Clicked on background - clear selection
+        onBackgroundClick();
+      }
     });
 
     if (onNodeContextAction) {
@@ -533,28 +563,50 @@ export function GraphCanvas(props: GraphCanvasProps) {
     }
   }, [edgeModeEnabled]);
 
+  // Update ref when multiSelectEnabled changes
+  useEffect(() => {
+    multiSelectEnabledRef.current = multiSelectEnabled;
+  }, [multiSelectEnabled]);
+
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy) return;
-    if (!selectedNodeId) {
+    
+    // Use selectedNodeIds if available, otherwise fall back to selectedNodeId
+    const nodeIdsToSelect = selectedNodeIds && selectedNodeIds.size > 0 
+      ? Array.from(selectedNodeIds)
+      : selectedNodeId 
+        ? [selectedNodeId]
+        : [];
+    
+    if (nodeIdsToSelect.length === 0) {
       cy.elements().unselect();
       return;
     }
 
     cy.elements().unselect();
-    const node = cy.$id(selectedNodeId);
-    if (node && node.length > 0) {
-      node.select();
-      // Smooth center animation
+    
+    // Select all nodes in the selection set
+    const nodesToSelect = cy.collection();
+    nodeIdsToSelect.forEach((nodeId) => {
+      const node = cy.$id(nodeId);
+      if (node && node.length > 0) {
+        node.select();
+        nodesToSelect.merge(node);
+      }
+    });
+    
+    // Smooth center animation on first selected node (or all if multiple)
+    if (nodesToSelect.length > 0) {
       cy.animate({
         center: {
-          eles: node,
+          eles: nodesToSelect,
         },
         duration: 500,
         easing: 'ease-out',
       });
     }
-  }, [selectedNodeId]);
+  }, [selectedNodeId, selectedNodeIds]);
 
   useEffect(() => {
     const cy = cyRef.current;

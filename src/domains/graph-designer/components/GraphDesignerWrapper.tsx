@@ -58,7 +58,7 @@ export function GraphDesignerWrapper() {
 
   // Custom hooks
   const { handleSave } = useGraphActions(graph);
-  const { selectedNodeId, activeNodeForForm, setSelectedNodeId, setActiveNodeForForm, handleNodeClick, handleEditNode, clearSelection } = useNodeSelection();
+  const { selectedNodeId, selectedNodeIds, activeNodeForForm, setSelectedNodeId, setActiveNodeForForm, handleNodeClick, handleEditNode, clearSelection } = useNodeSelection();
   const { pickerState, openPicker, closePicker, handleSelect } = useNodePicker(updateNode);
   const { deleteConfirmation, openDeleteConfirmation, closeDeleteConfirmation, confirmDelete } = useGraphDeletion(removeNode, removeEdge);
   const { handleDropOnCanvas, handleDragOverCanvas, handleAddSchema } = useSchemaDragDrop({
@@ -171,6 +171,7 @@ export function GraphDesignerWrapper() {
               edges={edges}
               layout={layout}
               onNodeClick={handleNodeClick}
+              onBackgroundClick={clearSelection}
               onElementsChange={setGraphElements}
               onReady={(handle) => {
                 canvasHandleRef.current = handle;
@@ -183,6 +184,8 @@ export function GraphDesignerWrapper() {
                 setEdgeModeEnabled(false);
               }}
               selectedNodeId={selectedNodeId}
+              selectedNodeIds={selectedNodeIds}
+              multiSelectEnabled={multiSelectEnabled}
               onNodeContextAction={(action, node) => {
                 if (action === 'edit') {
                   handleEditNode(node);
