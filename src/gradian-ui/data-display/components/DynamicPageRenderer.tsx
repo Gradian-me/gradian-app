@@ -217,69 +217,6 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     setDeleteConfirmDialog({ open: true, entity });
   }, []);
 
-  // Handle changing parent for hierarchical items
-  const handleChangeParent = useCallback((entity: any) => {
-    if (!entity?.id || !schema?.id) {
-      return;
-    }
-    setEntityForParentChange(entity);
-    setChangeParentPickerOpen(true);
-  }, [schema?.id]);
-
-  // Handle parent selection from picker
-  const handleParentSelected = useCallback(async (selections: any[], rawItems: any[]) => {
-    if (!entityForParentChange || !schema?.id || !selections || selections.length === 0) {
-      setChangeParentPickerOpen(false);
-      setEntityForParentChange(null);
-      return;
-    }
-
-    const newParentId = selections[0]?.id ? String(selections[0].id) : null;
-    const childId = String(entityForParentChange.id);
-
-    try {
-      setIsSubmitting(true);
-
-      // Update the entity's parent field
-      const updateResponse = await apiRequest(`/api/data/${schema.id}/${childId}`, {
-        method: 'PUT',
-        body: {
-          ...entityForParentChange,
-          parent: newParentId,
-        },
-      });
-
-      if (!updateResponse.success) {
-        throw new Error(updateResponse.error || 'Failed to update parent');
-      }
-
-      // Sync the IS_PARENT_OF relation
-      await syncParentRelation({
-        schemaId: schema.id,
-        childId,
-        parentId: newParentId,
-      });
-
-      // Refresh entities to show updated hierarchy with current filters and cache disabled
-      const filters = buildFilters();
-      if (filters) {
-        await fetchEntities(filters, { disableCache: true });
-      } else {
-        // Fallback: refresh without filters if buildFilters returns null
-        await fetchEntities(undefined, { disableCache: true });
-      }
-
-      toast.success('Parent updated successfully');
-      setChangeParentPickerOpen(false);
-      setEntityForParentChange(null);
-    } catch (error) {
-      console.error('Failed to change parent:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to change parent');
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [entityForParentChange, schema?.id, fetchEntities, buildFilters]);
-
   // Use shared companies hook for client-side caching
   const { companies: companiesData, isLoading: isLoadingCompaniesData } = useCompanies();
 
@@ -355,6 +292,69 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     
     return filters;
   }, [currentFilters, selectedCompany, schema?.isNotCompanyBased, availableCompanyIds]);
+
+  // Handle changing parent for hierarchical items
+  const handleChangeParent = useCallback((entity: any) => {
+    if (!entity?.id || !schema?.id) {
+      return;
+    }
+    setEntityForParentChange(entity);
+    setChangeParentPickerOpen(true);
+  }, [schema?.id]);
+
+  // Handle parent selection from picker
+  const handleParentSelected = useCallback(async (selections: any[], rawItems: any[]) => {
+    if (!entityForParentChange || !schema?.id || !selections || selections.length === 0) {
+      setChangeParentPickerOpen(false);
+      setEntityForParentChange(null);
+      return;
+    }
+
+    const newParentId = selections[0]?.id ? String(selections[0].id) : null;
+    const childId = String(entityForParentChange.id);
+
+    try {
+      setIsSubmitting(true);
+
+      // Update the entity's parent field
+      const updateResponse = await apiRequest(`/api/data/${schema.id}/${childId}`, {
+        method: 'PUT',
+        body: {
+          ...entityForParentChange,
+          parent: newParentId,
+        },
+      });
+
+      if (!updateResponse.success) {
+        throw new Error(updateResponse.error || 'Failed to update parent');
+      }
+
+      // Sync the IS_PARENT_OF relation
+      await syncParentRelation({
+        schemaId: schema.id,
+        childId,
+        parentId: newParentId,
+      });
+
+      // Refresh entities to show updated hierarchy with current filters and cache disabled
+      const filters = buildFilters();
+      if (filters) {
+        await fetchEntities(filters, { disableCache: true });
+      } else {
+        // Fallback: refresh without filters if buildFilters returns null
+        await fetchEntities(undefined, { disableCache: true });
+      }
+
+      toast.success('Parent updated successfully');
+      setChangeParentPickerOpen(false);
+      setEntityForParentChange(null);
+    } catch (error) {
+      console.error('Failed to change parent:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to change parent');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [entityForParentChange, schema?.id, fetchEntities, buildFilters]);
 
   const handleManualRefresh = useCallback(async () => {
     const filters = buildFilters();
