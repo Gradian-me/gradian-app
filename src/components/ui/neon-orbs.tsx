@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react"
 
-export function NeonBeams() {
+interface NeonOrbsProps {
+  title?: string;
+  subtitle?: string;
+}
+
+export function NeonOrbs({ 
+  title = "BEYOND LIMITS",
+  subtitle = "by Gradian.me"
+}: NeonOrbsProps) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -10,8 +18,8 @@ export function NeonBeams() {
   }, [])
 
   return (
-    <div className="relative w-full h-screen overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-[#050a18] transition-colors duration-500">
-      {/* Top-left beam */}
+    <div className="absolute inset-4 rounded-3xl overflow-hidden w-full h-full flex items-center justify-center bg-slate-100 dark:bg-[#050a18] transition-colors duration-500">
+      {/* Top-left orb */}
       <div
         className={`absolute transition-all duration-1000 ease-out ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-10"
@@ -25,14 +33,14 @@ export function NeonBeams() {
           maxHeight: "800px",
         }}
       >
-        <div className="w-full h-full rounded-full relative beam-light transition-all duration-500">
+        <div className="w-full h-full rounded-full relative orb-light transition-all duration-500">
           <div className="beam-container beam-spin-8">
             <div className="beam-light" />
           </div>
         </div>
       </div>
 
-      {/* Bottom-center beam */}
+      {/* Bottom-center orb */}
       <div
         className={`absolute transition-all duration-1000 ease-out delay-300 ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
@@ -47,14 +55,14 @@ export function NeonBeams() {
           maxHeight: "1000px",
         }}
       >
-        <div className="w-full h-full rounded-full relative beam-light transition-all duration-500">
+        <div className="w-full h-full rounded-full relative orb-light transition-all duration-500">
           <div className="beam-container beam-spin-10-reverse">
             <div className="beam-light" />
           </div>
         </div>
       </div>
 
-      {/* Top-right beam */}
+      {/* Top-right orb */}
       <div
         className={`absolute transition-all duration-1000 ease-out delay-500 ${
           mounted ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
@@ -68,14 +76,14 @@ export function NeonBeams() {
           maxHeight: "700px",
         }}
       >
-        <div className="w-full h-full rounded-full relative beam-light transition-all duration-500">
+        <div className="w-full h-full rounded-full relative orb-light transition-all duration-500">
           <div className="beam-container beam-spin-6">
             <div className="beam-light" />
           </div>
         </div>
       </div>
 
-      {/* Bottom-right beam */}
+      {/* Bottom-right orb */}
       <div
         className={`absolute transition-all duration-1000 ease-out delay-700 ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
@@ -89,7 +97,7 @@ export function NeonBeams() {
           maxHeight: "750px",
         }}
       >
-        <div className="w-full h-full rounded-full relative beam-light transition-all duration-500">
+        <div className="w-full h-full rounded-full relative orb-light transition-all duration-500">
           <div className="beam-container beam-spin-7-reverse">
             <div className="beam-light" />
           </div>
@@ -100,33 +108,33 @@ export function NeonBeams() {
       <div className="relative z-10 text-center text-indigo-900 dark:text-white transition-colors duration-500">
         <h1 
           className={`text-4xl md:text-7xl font-extralight tracking-[0.2em] mb-4 transition-all duration-1000 ease-out ${
-            mounted 
-              ? "opacity-100 translate-y-0 blur-0" 
-              : "opacity-0 translate-y-8 blur-sm"
-          }`}
-          style={{ transitionDelay: "500ms" }}
-        >
-          {"BEYOND LIMITS".split("").map((char, i) => (
-            <span
-              key={i}
-              className={`inline-block transition-all duration-500 ${
-                mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
-              style={{ transitionDelay: `${800 + i * 50}ms` }}
-            >
-              {char === " " ? "\u00A0" : char}
-            </span>
-          ))}
-        </h1>
-        <p 
-          className={`text-lg md:text-xl font-light tracking-widest text-indigo-600/60 dark:text-white/60 transition-all duration-1000 ease-out ${
-            mounted 
-              ? "opacity-100 translate-y-0 blur-0" 
-              : "opacity-0 translate-y-4 blur-sm"
-          }`}
-          style={{ transitionDelay: "1500ms" }}
-        >
-          THE FUTURE IS NOW
+              mounted 
+                ? "opacity-100 translate-y-0 blur-0" 
+                : "opacity-0 translate-y-8 blur-sm"
+            }`}
+            style={{ transitionDelay: "500ms" }}
+          >
+            {title.split("").map((char, i) => (
+              <span
+                key={i}
+                className={`inline-block transition-all duration-500 ${
+                  mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                }`}
+                style={{ transitionDelay: `${800 + i * 50}ms` }}
+              >
+                {char === " " ? "\u00A0" : char}
+              </span>
+            ))}
+          </h1>
+          <p 
+            className={`text-lg md:text-xl font-light tracking-widest text-indigo-600/60 dark:text-white/60 transition-all duration-1000 ease-out ${
+              mounted 
+                ? "opacity-100 translate-y-0 blur-0" 
+                : "opacity-0 translate-y-4 blur-sm"
+            }`}
+            style={{ transitionDelay: "1500ms" }}
+          >
+          {subtitle}
         </p>
       </div>
 
@@ -153,11 +161,11 @@ export function NeonBeams() {
         }
         
         .dark .beam-light {
-          background: linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.5) 30%, rgba(150, 200, 255, 0.9) 70%, white 100%);
-          box-shadow: 0 0 20px 4px rgba(100, 180, 255, 0.8), 0 0 40px 8px rgba(59, 130, 246, 0.4);
+          background: linear-gradient(90deg, transparent 0%, rgba(99, 102, 241, 0.5) 30%, rgba(167, 139, 250, 0.9) 70%, rgba(139, 92, 246, 1) 100%);
+          box-shadow: 0 0 20px 4px rgba(167, 139, 250, 0.8), 0 0 40px 8px rgba(99, 102, 241, 0.4);
         }
         
-        .beam-light {
+        .orb-light {
           background: radial-gradient(circle at 50% 50%, #f0f4ff 0%, #f0f4ff 90%, transparent 100%);
           box-shadow: 
             0 0 60px 2px rgba(99, 102, 241, 0.3),
@@ -166,13 +174,13 @@ export function NeonBeams() {
           border: 1px solid rgba(99, 102, 241, 0.4);
         }
         
-        .dark .beam-light {
+        .dark .orb-light {
           background: radial-gradient(circle at 50% 50%, #050a18 0%, #050a18 90%, transparent 100%);
           box-shadow: 
-            0 0 60px 2px rgba(59, 130, 246, 0.4),
-            0 0 100px 5px rgba(59, 130, 246, 0.2),
-            inset 0 0 60px 2px rgba(59, 130, 246, 0.1);
-          border: 1px solid rgba(100, 180, 255, 0.3);
+            0 0 60px 2px rgba(99, 102, 241, 0.4),
+            0 0 100px 5px rgba(139, 92, 246, 0.2),
+            inset 0 0 60px 2px rgba(167, 139, 250, 0.1);
+          border: 1px solid rgba(167, 139, 250, 0.3);
         }
         
         .beam-spin-6 {
@@ -204,3 +212,4 @@ export function NeonBeams() {
     </div>
   )
 }
+

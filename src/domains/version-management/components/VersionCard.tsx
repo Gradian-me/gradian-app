@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { AppVersion, ChangeType, Priority } from '../types';
+import { AppVersion, ChangeType, Priority, VersionFilters, VersionChange } from '../types';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { format } from 'date-fns';
 import { Tag, Calendar, GitBranch } from 'lucide-react';
@@ -18,6 +18,45 @@ interface VersionCardProps {
   version: AppVersion;
   index: number;
   query: string;
+  filters?: VersionFilters;
+}
+
+// Filter changes based on search query and filters
+function filterChanges(changes: VersionChange[], filters?: VersionFilters): VersionChange[] {
+  if (!filters) return changes;
+  
+  let filtered = [...changes];
+  
+  // Filter by search query
+  if (filters.search) {
+    const searchLower = filters.search.toLowerCase();
+    filtered = filtered.filter(change =>
+      change.description.toLowerCase().includes(searchLower) ||
+      change.affectedDomains.some(d => d.toLowerCase().includes(searchLower))
+    );
+  }
+  
+  // Filter by change type
+  if (filters.changeType && filters.changeType !== 'all') {
+    const changeType = filters.changeType as ChangeType;
+    filtered = filtered.filter(change => change.changeType === changeType);
+  }
+  
+  // Filter by priority
+  if (filters.priority && filters.priority !== 'all') {
+    const priority = filters.priority as Priority;
+    filtered = filtered.filter(change => change.priority === priority);
+  }
+  
+  // Filter by domain
+  if (filters.domain && filters.domain !== 'all') {
+    const domain = filters.domain.toLowerCase();
+    filtered = filtered.filter(change =>
+      change.affectedDomains.some(d => d.toLowerCase() === domain)
+    );
+  }
+  
+  return filtered;
 }
 
 const changeTypeColors: Record<ChangeType, string> = {
@@ -35,8 +74,9 @@ const priorityColors: Record<Priority, string> = {
   High: 'bg-red-200 text-red-800 dark:bg-red-500/20 dark:text-red-200',
 };
 
-export const VersionCard: React.FC<VersionCardProps> = ({ version, index, query }) => {
+export const VersionCard: React.FC<VersionCardProps> = ({ version, index, query, filters }) => {
   const animationDelay = Math.min(index * 0.05, 0.3);
+  const filteredChanges = filterChanges(version.changes, filters);
 
   return (
     <motion.div
@@ -80,7 +120,8 @@ export const VersionCard: React.FC<VersionCardProps> = ({ version, index, query 
           </div>
           
           <div className="space-y-2">
-            {version.changes.map((change, changeIndex) => (
+            {filteredChanges.length > 0 ? (
+              filteredChanges.map((change, changeIndex) => (
               <div
                 key={changeIndex}
                 className="rounded-lg border border-gray-200/50 bg-white/50 p-2.5 dark:border-gray-700/50 dark:bg-gray-800/30"
@@ -121,7 +162,14 @@ export const VersionCard: React.FC<VersionCardProps> = ({ version, index, query 
                   </div>
                 )}
               </div>
-            ))}
+              ))
+            ) : (
+              <div className="rounded-lg border border-gray-200/50 bg-white/50 p-2.5 dark:border-gray-700/50 dark:bg-gray-800/30">
+                <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                  No changes match the current filters
+                </p>
+              </div>
+            )}
           </div>
         </CardHeader>
         <CardContent className="relative z-10 flex items-center justify-between gap-3 px-4 pb-4 pt-0">
@@ -130,7 +178,10 @@ export const VersionCard: React.FC<VersionCardProps> = ({ version, index, query 
               variant="outline"
               className="border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-200"
             >
-              {version.changes.length} change{version.changes.length !== 1 ? 's' : ''}
+              {filteredChanges.length} change{filteredChanges.length !== 1 ? 's' : ''}
+              {filteredChanges.length !== version.changes.length && (
+                <span className="ml-1 text-gray-400">/ {version.changes.length}</span>
+              )}
             </Badge>
           </div>
         </CardContent>

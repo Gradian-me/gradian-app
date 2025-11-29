@@ -66,7 +66,7 @@
     "title": "Health Monitoring",
     "description": "Monitor the health and status of all services with real-time status tracking and automated health checks",
     "icon": "HeartPulse",
-    "href": "/health",
+    "href": "/builder/health",
     "color": "#EF4444",
     "features": [
       "Service health status tracking",

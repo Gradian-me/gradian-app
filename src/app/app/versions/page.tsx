@@ -315,6 +315,7 @@ export default function VersionsPage() {
                     version={version}
                     index={index}
                     query={filters.search || ''}
+                    filters={filters}
                   />
                 ))}
               </motion.div>
@@ -333,6 +334,7 @@ export default function VersionsPage() {
                     version={version}
                     index={index}
                     query={filters.search || ''}
+                    filters={filters}
                   />
                 ))}
               </motion.div>

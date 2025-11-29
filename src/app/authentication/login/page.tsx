@@ -2,31 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SignInPage, Testimonial } from '@/components/ui/sign-in';
+import { SignInPage } from '@/components/ui/sign-in';
 import { ensureFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
 import { useUserStore } from '@/stores/user.store';
 import { toast } from 'sonner';
-
-const sampleTestimonials: Testimonial[] = [
-  {
-    avatarSrc: 'https://randomuser.me/api/portraits/women/57.jpg',
-    name: 'Sarah Chen',
-    handle: 'Supply Chain Director',
-    text: 'Gradian has revolutionized our business management. Real-time tracking and inventory visibility have reduced our operational costs by 30%.',
-  },
-  {
-    avatarSrc: 'https://randomuser.me/api/portraits/men/64.jpg',
-    name: 'Marcus Johnson',
-    handle: 'Operations Manager',
-    text: 'The comprehensive dashboard and analytics in Gradian give us complete visibility into our business. Compliance tracking has never been easier.',
-  },
-  {
-    avatarSrc: 'https://randomuser.me/api/portraits/men/32.jpg',
-    name: 'David Martinez',
-    handle: 'Procurement Lead',
-    text: "Gradian's intuitive interface and powerful features make managing complex business operations effortless. It's transformed our workflow completely.",
-  },
-];
 
 export default function LoginPage() {
   const router = useRouter();
@@ -132,8 +111,7 @@ export default function LoginPage() {
 
   return (
     <SignInPage
-      heroImageSrc="/screenshots/gradian.me_bg_desktop.png"
-      testimonials={sampleTestimonials}
+      //heroImageSrc="/screenshots/gradian.me_bg_desktop.png"
       onSignIn={handleSignIn}
       onResetPassword={handleResetPassword}
       onCreateAccount={handleCreateAccount}

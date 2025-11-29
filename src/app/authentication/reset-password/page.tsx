@@ -4,7 +4,6 @@ import { FormEvent, Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, LockIcon, ShieldCheck, UserIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { ModeToggle } from '@/gradian-ui/layout';
 
 import {
   InputOTP,
@@ -12,55 +11,9 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from '@/gradian-ui/form-builder/form-elements/components/OTPInput';
-
-type Testimonial = {
-  avatarSrc: string;
-  name: string;
-  handle: string;
-  text: string;
-};
-
-const sampleTestimonials: Testimonial[] = [
-  {
-    avatarSrc: 'https://randomuser.me/api/portraits/women/57.jpg',
-    name: 'Sarah Chen',
-    handle: 'Supply Chain Director',
-    text: 'Gradian has revolutionized our business management. Real-time tracking and inventory visibility have reduced our operational costs by 30%.',
-  },
-  {
-    avatarSrc: 'https://randomuser.me/api/portraits/men/64.jpg',
-    name: 'Marcus Johnson',
-    handle: 'Operations Manager',
-    text: 'The comprehensive dashboard and analytics in Gradian give us complete visibility into our business. Compliance tracking has never been easier.',
-  },
-  {
-    avatarSrc: 'https://randomuser.me/api/portraits/men/32.jpg',
-    name: 'David Martinez',
-    handle: 'Procurement Lead',
-    text: "Gradian's intuitive interface and powerful features make managing complex business operations effortless. It's transformed our workflow completely.",
-  },
-];
+import { AuthenticationLayout, GlassInputWrapper } from '@/components/authentication';
 
 const OTP_LENGTH = 6;
-
-const GlassInputWrapper = ({ children }: { children: React.ReactNode }) => (
-  <div className="relative flex gap-2 flex-nowrap items-center rounded-2xl border border-border bg-foreground/5 backdrop-blur-sm transition-colors focus-within:border-violet-400/70 focus-within:bg-violet-500/10">
-    {children}
-  </div>
-);
-
-const TestimonialCard = ({ testimonial, delay }: { testimonial: Testimonial; delay: string }) => (
-  <div
-    className={`animate-testimonial ${delay} flex items-start gap-3 rounded-3xl bg-card/40 dark:bg-zinc-800/40 backdrop-blur-xl border border-white/10 p-5 w-64`}
-  >
-    <img src={testimonial.avatarSrc} className="h-10 w-10 object-cover rounded-2xl" alt="avatar" />
-    <div className="text-sm leading-snug">
-      <p className="flex items-center gap-1 font-medium">{testimonial.name}</p>
-      <p className="text-muted-foreground">{testimonial.handle}</p>
-      <p className="mt-1 text-foreground/80">{testimonial.text}</p>
-    </div>
-  </div>
-);
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -236,189 +189,164 @@ function ResetPasswordContent() {
   };
 
   return (
-    <div className="min-h-screen h-screen flex flex-col md:flex-row font-sans overflow-hidden">
-      <section className="flex-1 flex items-center justify-center p-8 overflow-y-auto min-h-0 relative">
-        <div className="absolute top-8 right-8 z-10">
-          <ModeToggle />
-        </div>
-        <div className="w-full max-w-md">
-          <div className="flex flex-col gap-6">
-            <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">
-              Reset password
-            </h1>
-            <p className="animate-element animate-delay-200 text-muted-foreground hidden md:block">
-              Verify your identity and create a secure new password.
-            </p>
+    <AuthenticationLayout
+      heroImageSrc="/screenshots/gradian.me_bg_desktop.png"
+    >
+      <div className="w-full max-w-md">
+        <div className="flex flex-col gap-6">
+          <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">
+            Reset password
+          </h1>
+          <p className="animate-element animate-delay-200 text-muted-foreground hidden md:block">
+            Verify your identity and create a secure new password.
+          </p>
 
-            {error && (
-              <div className="animate-element animate-delay-250 rounded-2xl border border-red-500/50 bg-red-500/10 dark:bg-red-500/5 p-4">
-                <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
-              </div>
-            )}
+          {error && (
+            <div className="animate-element animate-delay-250 rounded-2xl border border-red-500/50 bg-red-500/10 dark:bg-red-500/5 p-4">
+              <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
+            </div>
+          )}
 
-            <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-              <div className="animate-element animate-delay-300 flex flex-col gap-2">
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <UserIcon className="h-4 w-4" />
-                  Username or email
-                </label>
-                <GlassInputWrapper>
-                  <input
-                    name="username"
-                    type="text"
-                    value={username}
-                    onChange={(event) => {
-                      setUsername(event.target.value);
-                      setError(null);
-                    }}
-                    placeholder="Enter your username or email"
-                    autoComplete="username"
-                    className="flex-1 bg-transparent text-sm p-4 rounded-2xl focus:outline-none"
-                  />
-                </GlassInputWrapper>
-              </div>
+          <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+            <div className="animate-element animate-delay-300 flex flex-col gap-2">
+              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <UserIcon className="h-4 w-4" />
+                Username or email
+              </label>
+              <GlassInputWrapper>
+                <input
+                  name="username"
+                  type="text"
+                  value={username}
+                  onChange={(event) => {
+                    setUsername(event.target.value);
+                    setError(null);
+                  }}
+                  placeholder="Enter your username or email"
+                  autoComplete="username"
+                  className="flex-1 bg-transparent text-sm p-4 rounded-2xl focus:outline-none"
+                />
+              </GlassInputWrapper>
+            </div>
 
-              <div className="animate-element animate-delay-350 flex flex-col gap-2">
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4" />
-                  Verification code
-                </label>
-                <InputOTP
-                  maxLength={OTP_LENGTH}
-                  value={otp}
-                  onChange={setOtp}
-                  disabled={isLoading}
-                  aria-label="One-time verification code"
-                  resendDuration={10}
-                  onResend={handleResendCode}
-                  resendButtonLabel="Send verification code"
+            <div className="animate-element animate-delay-350 flex flex-col gap-2">
+              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4" />
+                Verification code
+              </label>
+              <InputOTP
+                maxLength={OTP_LENGTH}
+                value={otp}
+                onChange={setOtp}
+                disabled={isLoading}
+                aria-label="One-time verification code"
+                resendDuration={10}
+                onResend={handleResendCode}
+                resendButtonLabel="Send verification code"
+              >
+                <InputOTPGroup>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <InputOTPSlot key={index} index={index} aria-label={`Digit ${index + 1}`} />
+                  ))}
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup>
+                  {Array.from({ length: 3 }).map((_, index) => {
+                    const slotIndex = index + 3;
+                    return (
+                      <InputOTPSlot
+                        key={slotIndex}
+                        index={slotIndex}
+                        aria-label={`Digit ${slotIndex + 1}`}
+                      />
+                    );
+                  })}
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+
+            <div className="animate-element animate-delay-400 flex flex-col gap-2">
+              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <LockIcon className="h-4 w-4" />
+                New password
+              </label>
+              <GlassInputWrapper>
+                <input
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  autoComplete="new-password"
+                  placeholder="Create a strong password"
+                  className="flex-1 bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-3 flex items-center z-10"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  <InputOTPGroup>
-                    {Array.from({ length: 3 }).map((_, index) => (
-                      <InputOTPSlot key={index} index={index} aria-label={`Digit ${index + 1}`} />
-                    ))}
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
-                    {Array.from({ length: 3 }).map((_, index) => {
-                      const slotIndex = index + 3;
-                      return (
-                        <InputOTPSlot
-                          key={slotIndex}
-                          index={slotIndex}
-                          aria-label={`Digit ${slotIndex + 1}`}
-                        />
-                      );
-                    })}
-                  </InputOTPGroup>
-                </InputOTP>
-              </div>
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
+                  ) : (
+                    <Eye className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
+                  )}
+                </button>
+              </GlassInputWrapper>
+            </div>
 
-              <div className="animate-element animate-delay-400 flex flex-col gap-2">
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <LockIcon className="h-4 w-4" />
-                  New password
-                </label>
-                <GlassInputWrapper>
-                  <input
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    autoComplete="new-password"
-                    placeholder="Create a strong password"
-                    className="flex-1 bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute inset-y-0 right-3 flex items-center z-10"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
-                    ) : (
-                      <Eye className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
-                    )}
-                  </button>
-                </GlassInputWrapper>
-              </div>
+            <div className="animate-element animate-delay-450 flex flex-col gap-2">
+              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <LockIcon className="h-4 w-4" />
+                Confirm password
+              </label>
+              <GlassInputWrapper>
+                <input
+                  name="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  autoComplete="new-password"
+                  placeholder="Repeat your new password"
+                  className="flex-1 bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-3 flex items-center z-10"
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
+                  ) : (
+                    <Eye className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
+                  )}
+                </button>
+              </GlassInputWrapper>
+            </div>
 
-              <div className="animate-element animate-delay-450 flex flex-col gap-2">
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <LockIcon className="h-4 w-4" />
-                  Confirm password
-                </label>
-                <GlassInputWrapper>
-                  <input
-                    name="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    value={confirmPassword}
-                    onChange={(event) => setConfirmPassword(event.target.value)}
-                    autoComplete="new-password"
-                    placeholder="Repeat your new password"
-                    className="flex-1 bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword((prev) => !prev)}
-                    className="absolute inset-y-0 right-3 flex items-center z-10"
-                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
-                    ) : (
-                      <Eye className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
-                    )}
-                  </button>
-                </GlassInputWrapper>
-              </div>
+            <button
+              type="submit"
+              disabled={isSubmitDisabled}
+              className="animate-element animate-delay-550 w-full rounded-2xl bg-violet-500 py-4 font-medium text-violet-50 hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? 'Updating password...' : 'Reset password'}
+            </button>
+          </form>
 
-              <button
-                type="submit"
-                disabled={isSubmitDisabled}
-                className="animate-element animate-delay-550 w-full rounded-2xl bg-violet-500 py-4 font-medium text-violet-50 hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? 'Updating password...' : 'Reset password'}
-              </button>
-            </form>
-
-            <p className="animate-element animate-delay-700 text-center text-sm text-muted-foreground">
-              Remembered your password?{' '}
-              <button
-                type="button"
-                onClick={() => router.push('/authentication/login')}
-                className="text-violet-400 hover:underline transition-colors"
-              >
-                Return to login
-              </button>
-            </p>
-          </div>
+          <p className="animate-element animate-delay-700 text-center text-sm text-muted-foreground">
+            Remembered your password?{' '}
+            <button
+              type="button"
+              onClick={() => router.push('/authentication/login')}
+              className="text-violet-400 hover:underline transition-colors"
+            >
+              Return to login
+            </button>
+          </p>
         </div>
-      </section>
-
-      <section className="hidden md:block flex-1 relative p-4 overflow-hidden">
-        <div
-          className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center"
-          style={{ backgroundImage: 'url(/screenshots/gradian.me_bg_desktop.png)' }}
-        ></div>
-        {sampleTestimonials.length > 0 && (
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-4 px-8 w-full justify-center">
-            <TestimonialCard testimonial={sampleTestimonials[0]} delay="animate-delay-1000" />
-            {sampleTestimonials[1] && (
-              <div className="hidden xl:flex">
-                <TestimonialCard testimonial={sampleTestimonials[1]} delay="animate-delay-1200" />
-              </div>
-            )}
-            {sampleTestimonials[2] && (
-              <div className="hidden 2xl:flex">
-                <TestimonialCard testimonial={sampleTestimonials[2]} delay="animate-delay-1400" />
-              </div>
-            )}
-          </div>
-        )}
-      </section>
-    </div>
+      </div>
+    </AuthenticationLayout>
   );
 }
 

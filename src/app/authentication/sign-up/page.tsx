@@ -11,48 +11,7 @@ import { asFormBuilderSchema } from '@/gradian-ui/schema-manager/utils/schema-ut
 import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { config } from '@/lib/config';
 import { useCompanyStore } from '@/stores/company.store';
-import { ModeToggle } from '@/gradian-ui/layout';
-
-type Testimonial = {
-  avatarSrc: string;
-  name: string;
-  handle: string;
-  text: string;
-};
-
-const sampleTestimonials: Testimonial[] = [
-  {
-    avatarSrc: 'https://randomuser.me/api/portraits/women/57.jpg',
-    name: 'Sarah Chen',
-    handle: 'Supply Chain Director',
-    text: 'Gradian has revolutionized our business management. Real-time tracking and inventory visibility have reduced our operational costs by 30%.',
-  },
-  {
-    avatarSrc: 'https://randomuser.me/api/portraits/men/64.jpg',
-    name: 'Marcus Johnson',
-    handle: 'Operations Manager',
-    text: 'The comprehensive dashboard and analytics in Gradian give us complete visibility into our business. Compliance tracking has never been easier.',
-  },
-  {
-    avatarSrc: 'https://randomuser.me/api/portraits/men/32.jpg',
-    name: 'David Martinez',
-    handle: 'Procurement Lead',
-    text: "Gradian's intuitive interface and powerful features make managing complex business operations effortless. It's transformed our workflow completely.",
-  },
-];
-
-const TestimonialCard = ({ testimonial, delay }: { testimonial: Testimonial; delay: string }) => (
-  <div
-    className={`animate-testimonial ${delay} flex items-start gap-3 rounded-3xl bg-card/40 dark:bg-zinc-800/40 backdrop-blur-xl border border-white/10 p-5 w-64`}
-  >
-    <img src={testimonial.avatarSrc} className="h-10 w-10 object-cover rounded-2xl" alt="avatar" />
-    <div className="text-sm leading-snug">
-      <p className="flex items-center gap-1 font-medium">{testimonial.name}</p>
-      <p className="text-muted-foreground">{testimonial.handle}</p>
-      <p className="mt-1 text-foreground/80">{testimonial.text}</p>
-    </div>
-  </div>
-);
+import { AuthenticationLayout } from '@/components/authentication';
 
 interface FeedbackState {
   type: 'success' | 'error';
@@ -329,93 +288,68 @@ export default function SignUpPage() {
   }, [isLoading, loadError, schema, handleSubmit, isSubmitting]);
 
   return (
-    <div className="min-h-screen h-screen flex flex-col md:flex-row font-sans overflow-hidden">
-      <section className="flex-1 flex items-center justify-center p-8 overflow-y-auto min-h-0 relative">
-        <div className="absolute top-8 right-8 z-10">
-          <ModeToggle />
-        </div>
-        <div className="w-full max-w-md">
-          <div className="flex flex-col gap-6">
-            <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">
-              Create account
-            </h1>
-            <p className="animate-element animate-delay-200 text-muted-foreground hidden md:block">
-              The password link would be sent to your email address after the account is activated by administrator.
-            </p>
+    <AuthenticationLayout
+      heroImageSrc="/screenshots/gradian.me_bg_desktop.png"
+    >
+      <div className="w-full max-w-md">
+        <div className="flex flex-col gap-6">
+          <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">
+            Create account
+          </h1>
+          <p className="animate-element animate-delay-200 text-muted-foreground hidden md:block">
+            The password link would be sent to your email address after the account is activated by administrator.
+          </p>
 
-            {submitFeedback && (
-              <div className={`animate-element animate-delay-250 rounded-2xl border p-4 ${
+          {submitFeedback && (
+            <div className={`animate-element animate-delay-250 rounded-2xl border p-4 ${
+              submitFeedback.type === 'error'
+                ? 'border-red-500/50 bg-red-500/10 dark:bg-red-500/5'
+                : 'border-emerald-500/50 bg-emerald-500/10 dark:bg-emerald-500/5'
+            }`}>
+              <p className={`text-sm font-medium ${
                 submitFeedback.type === 'error'
-                  ? 'border-red-500/50 bg-red-500/10 dark:bg-red-500/5'
-                  : 'border-emerald-500/50 bg-emerald-500/10 dark:bg-emerald-500/5'
+                  ? 'text-red-600 dark:text-red-400'
+                  : 'text-emerald-600 dark:text-emerald-400'
               }`}>
-                <p className={`text-sm font-medium ${
-                  submitFeedback.type === 'error'
-                    ? 'text-red-600 dark:text-red-400'
-                    : 'text-emerald-600 dark:text-emerald-400'
-                }`}>
-                  {submitFeedback.message}
-                </p>
-              </div>
-            )}
-
-            {loadError && (
-              <div className="animate-element animate-delay-250">
-                <FormAlert
-                  type="error"
-                  message={loadError}
-                  dismissible
-                  onDismiss={() => setLoadError(null)}
-                />
-              </div>
-            )}
-
-            <div className="animate-element animate-delay-300">
-              {renderContent}
-            </div>
-
-            <div className="animate-element animate-delay-500 flex flex-col gap-4">
-              <Button
-                type="button"
-                onClick={() => submitForm?.()}
-                disabled={!submitForm || isSubmitting || isLoading || !!loadError}
-                className="w-full rounded-2xl bg-violet-500 py-4 font-medium text-violet-50 hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Creating Account...' : 'Create Account'}
-              </Button>
-
-              <p className="animate-element animate-delay-700 text-center text-sm text-muted-foreground">
-                Already have an account?{' '}
-                <Link href="/authentication/login" className="text-violet-400 hover:underline transition-colors">
-                  Sign in instead
-                </Link>
+                {submitFeedback.message}
               </p>
             </div>
+          )}
+
+          {loadError && (
+            <div className="animate-element animate-delay-250">
+              <FormAlert
+                type="error"
+                message={loadError}
+                dismissible
+                onDismiss={() => setLoadError(null)}
+              />
+            </div>
+          )}
+
+          <div className="animate-element animate-delay-300">
+            {renderContent}
+          </div>
+
+          <div className="animate-element animate-delay-500 flex flex-col gap-4">
+            <Button
+              type="button"
+              onClick={() => submitForm?.()}
+              disabled={!submitForm || isSubmitting || isLoading || !!loadError}
+              className="w-full rounded-2xl bg-violet-500 py-4 font-medium text-violet-50 hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? 'Creating Account...' : 'Create Account'}
+            </Button>
+
+            <p className="animate-element animate-delay-700 text-center text-sm text-muted-foreground">
+              Already have an account?{' '}
+              <Link href="/authentication/login" className="text-violet-400 hover:underline transition-colors">
+                Sign in instead
+              </Link>
+            </p>
           </div>
         </div>
-      </section>
-
-      <section className="hidden md:block flex-1 relative p-4 overflow-hidden">
-        <div
-          className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center"
-          style={{ backgroundImage: 'url(/screenshots/gradian.me_bg_desktop.png)' }}
-        ></div>
-        {sampleTestimonials.length > 0 && (
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-4 px-8 w-full justify-center">
-            <TestimonialCard testimonial={sampleTestimonials[0]} delay="animate-delay-1000" />
-            {sampleTestimonials[1] && (
-              <div className="hidden xl:flex">
-                <TestimonialCard testimonial={sampleTestimonials[1]} delay="animate-delay-1200" />
-              </div>
-            )}
-            {sampleTestimonials[2] && (
-              <div className="hidden 2xl:flex">
-                <TestimonialCard testimonial={sampleTestimonials[2]} delay="animate-delay-1400" />
-              </div>
-            )}
-          </div>
-        )}
-      </section>
-    </div>
+      </div>
+    </AuthenticationLayout>
   );
 }

@@ -16,5 +16,14 @@
     "filePath": "src/app/builder/email-templates/templates/otp-code.html",
     "createdAt": "2025-11-17T06:24:23.707Z",
     "updatedAt": "2025-11-17T06:37:31.482Z"
+  },
+  {
+    "id": "monitoring-error",
+    "name": "Monitoring Error",
+    "description": "Alert email sent when a service in /builder/health is unhealthy with detailed error information",
+    "subject": "Gradian.me | Service Health Alert: {{serviceName}}",
+    "filePath": "src/app/builder/email-templates/templates/monitoring-error.html",
+    "createdAt": "2025-01-27T00:00:00.000Z",
+    "updatedAt": "2025-01-27T00:00:00.000Z"
   }
 ]
