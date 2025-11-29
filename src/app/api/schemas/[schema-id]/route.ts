@@ -9,6 +9,42 @@ import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData } from '../u
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
 import { clearCache as clearSharedSchemaCache } from '@/gradian-ui/shared/utils/data-loader';
 
+/**
+ * Get CORS headers for cross-origin requests
+ * Prepares for future API key authentication
+ */
+function getCorsHeaders(request: NextRequest): Record<string, string> {
+  const origin = request.headers.get('origin');
+  const allowedOrigins = process.env.FORM_EMBED_ALLOWED_ORIGINS
+    ? process.env.FORM_EMBED_ALLOWED_ORIGINS.split(',')
+    : ['*']; // Default to allow all for development
+
+  // Check if origin is allowed
+  const isAllowed = allowedOrigins.includes('*') || (origin && allowedOrigins.includes(origin));
+
+  const headers: Record<string, string> = {
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-API-Key',
+  };
+
+  if (isAllowed && origin) {
+    headers['Access-Control-Allow-Origin'] = origin;
+    headers['Access-Control-Allow-Credentials'] = 'true';
+  } else if (allowedOrigins.includes('*')) {
+    headers['Access-Control-Allow-Origin'] = '*';
+  }
+
+  return headers;
+}
+
+/**
+ * Handle OPTIONS request for CORS preflight
+ */
+export async function OPTIONS(request: NextRequest) {
+  const corsHeaders = getCorsHeaders(request);
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 // Cache for loaded schemas
 let cachedSchemas: any[] | null = null;
 let cacheTimestamp: number | null = null;
@@ -118,6 +154,9 @@ export async function GET(
       );
     }
 
+    // Get CORS headers
+    const corsHeaders = getCorsHeaders(request);
+
     // Return response with cache-busting headers to prevent browser caching
     return NextResponse.json({
       success: true,
@@ -127,6 +166,7 @@ export async function GET(
         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0',
+        ...corsHeaders,
       },
     });
   } catch (error) {

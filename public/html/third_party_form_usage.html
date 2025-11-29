@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gradian Form Embed - Third Party Usage Example</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .controls {
+      padding: 30px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .control-group {
+      display: flex;
+      gap: 15px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #495057;
+      font-size: 0.9rem;
+    }
+
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #dee2e6;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      border: 1px solid #f5c6cb;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      border: 1px solid #c3e6cb;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    th {
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #e9ecef;
+      font-size: 0.9rem;
+    }
+
+    tbody tr:hover {
+      background: #f8f9fa;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6c757d;
+    }
+
+    .empty-state svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .badge-warning {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .badge-danger {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+
+    .btn-edit {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-edit:hover {
+      background: #5568d3;
+    }
+
+    .info-box {
+      background: #e7f3ff;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .info-box strong {
+      color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚀 Gradian Form Embed Demo</h1>
+      <p>Third-party application integration example</p>
+    </div>
+
+    <div class="controls">
+      <div class="info-box">
+        <strong>Base URL:</strong> <span id="baseUrlDisplay">Loading...</span>
+        <br>
+        <small>Change the base URL below to point to your Gradian app</small>
+      </div>
+
+      <div class="control-group">
+        <div class="form-group">
+          <label for="baseUrl">Base URL</label>
+          <input 
+            type="text" 
+            id="baseUrl" 
+            placeholder="https://yourapp.com" 
+            value="http://localhost:3000"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="schemaSelect">Schema</label>
+          <select id="schemaSelect">
+            <option value="tags">Tags</option>
+            <option value="companies">Companies</option>
+            <option value="users">Users</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <button class="btn btn-primary" id="createBtn" onclick="handleCreate()">
+            ➕ Create New
+          </button>
+        </div>
+
+        <div class="form-group">
+          <button class="btn btn-secondary" id="refreshBtn" onclick="loadData()">
+            🔄 Refresh Data
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div id="message"></div>
+      <div id="loading" class="loading" style="display: none;">Loading data</div>
+      <div id="dataContainer"></div>
+    </div>
+  </div>
+
+  <!-- Load the Gradian Form Embed Helper from CDN -->
+  <script src="/cdn/form-embed-helper.min.js"></script>
+
+  <script>
+    // Configuration
+    let currentSchema = 'tags';
+    let baseUrl = 'http://localhost:3000';
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load base URL from input
+      const baseUrlInput = document.getElementById('baseUrl');
+      baseUrl = baseUrlInput.value || 'http://localhost:3000';
+      document.getElementById('baseUrlDisplay').textContent = baseUrl;
+
+      // Update base URL when changed
+      baseUrlInput.addEventListener('change', function() {
+        baseUrl = this.value || 'http://localhost:3000';
+        document.getElementById('baseUrlDisplay').textContent = baseUrl;
+        loadData();
+      });
+
+      // Update schema when changed
+      document.getElementById('schemaSelect').addEventListener('change', function() {
+        currentSchema = this.value;
+        loadData();
+      });
+
+      // Initial load
+      loadData();
+
+      // Check if helper is loaded
+      if (typeof GradianFormEmbed === 'undefined') {
+        showMessage('⚠️ Form embed helper not loaded. Make sure the script is available at /cdn/form-embed-helper.min.js', 'error');
+      }
+    });
+
+    // Show message
+    function showMessage(text, type = 'success') {
+      const messageDiv = document.getElementById('message');
+      messageDiv.className = type;
+      messageDiv.textContent = text;
+      messageDiv.style.display = 'block';
+
+      if (type === 'success') {
+        setTimeout(() => {
+          messageDiv.style.display = 'none';
+        }, 3000);
+      }
+    }
+
+    // Handle create button click
+    async function handleCreate() {
+      if (typeof GradianFormEmbed === 'undefined') {
+        showMessage('❌ Form embed helper not loaded. Please check the script path.', 'error');
+        return;
+      }
+
+      const schemaId = document.getElementById('schemaSelect').value;
+      const createBtn = document.getElementById('createBtn');
+      
+      createBtn.disabled = true;
+      createBtn.textContent = '⏳ Opening form...';
+
+      try {
+        const result = await GradianFormEmbed.createData(schemaId, {
+          baseUrl: baseUrl,
+        });
+
+        if (result.success) {
+          showMessage(`✅ ${schemaId} created successfully! ID: ${result.entityId}`, 'success');
+          // Refresh data after successful creation
+          setTimeout(() => {
+            loadData();
+          }, 500);
+        } else {
+          showMessage(`❌ Failed to create ${schemaId}: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        if (error.message.includes('popup blocker')) {
+          showMessage('❌ Popup blocked. Please allow popups for this site.', 'error');
+        } else {
+          showMessage(`❌ Error: ${error.message}`, 'error');
+        }
+      } finally {
+        createBtn.disabled = false;
+        createBtn.textContent = '➕ Create New';
+      }
+    }
+
+    // Handle edit button click
+    async function handleEdit(entityId) {
+      if (typeof GradianFormEmbed === 'undefined') {
+        showMessage('❌ Form embed helper not loaded.', 'error');
+        return;
+      }
+
+      const schemaId = document.getElementById('schemaSelect').value;
+
+      try {
+        const result = await GradianFormEmbed.editData(schemaId, entityId, {
+          baseUrl: baseUrl,
+        });
+
+        if (result.success) {
+          showMessage(`✅ ${schemaId} updated successfully!`, 'success');
+          // Refresh data after successful update
+          setTimeout(() => {
+            loadData();
+          }, 500);
+        } else {
+          showMessage(`❌ Failed to update ${schemaId}: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        if (error.message.includes('popup blocker')) {
+          showMessage('❌ Popup blocked. Please allow popups for this site.', 'error');
+        } else {
+          showMessage(`❌ Error: ${error.message}`, 'error');
+        }
+      }
+    }
+
+    // Load data from API
+    async function loadData() {
+      const schemaId = document.getElementById('schemaSelect').value;
+      const loadingDiv = document.getElementById('loading');
+      const dataContainer = document.getElementById('dataContainer');
+      const refreshBtn = document.getElementById('refreshBtn');
+
+      loadingDiv.style.display = 'block';
+      dataContainer.innerHTML = '';
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = '⏳ Loading...';
+
+      try {
+        const response = await fetch(`${baseUrl}/api/data/${schemaId}`);
+        const result = await response.json();
+
+        if (result.success && Array.isArray(result.data)) {
+          displayData(result.data, schemaId);
+        } else if (result.success && result.data) {
+          // Single object response
+          displayData([result.data], schemaId);
+        } else {
+          showMessage(`❌ Failed to load data: ${result.error || 'Unknown error'}`, 'error');
+          dataContainer.innerHTML = '<div class="empty-state">No data available</div>';
+        }
+      } catch (error) {
+        showMessage(`❌ Error loading data: ${error.message}`, 'error');
+        dataContainer.innerHTML = '<div class="empty-state">Failed to load data. Check your base URL and API endpoint.</div>';
+      } finally {
+        loadingDiv.style.display = 'none';
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = '🔄 Refresh Data';
+      }
+    }
+
+    // Display data in table
+    function displayData(data, schemaId) {
+      const dataContainer = document.getElementById('dataContainer');
+
+      if (!data || data.length === 0) {
+        dataContainer.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3>No ${schemaId} found</h3>
+            <p>Click "Create New" to add your first ${schemaId.slice(0, -1)}</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Get all unique keys from all objects
+      const allKeys = new Set();
+      data.forEach(item => {
+        Object.keys(item).forEach(key => {
+          // Filter out internal keys
+          if (!key.startsWith('_') && key !== 'password' && key !== 'token') {
+            allKeys.add(key);
+          }
+        });
+      });
+
+      // Sort keys: id first, then name/title, then others
+      const sortedKeys = Array.from(allKeys).sort((a, b) => {
+        if (a === 'id') return -1;
+        if (b === 'id') return 1;
+        if (a === 'name' || a === 'title') return -1;
+        if (b === 'name' || b === 'title') return 1;
+        return a.localeCompare(b);
+      });
+
+      // Limit to first 10 keys for display
+      const displayKeys = sortedKeys.slice(0, 10);
+
+      let tableHTML = `
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                ${displayKeys.map(key => `<th>${formatKey(key)}</th>`).join('')}
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      data.forEach(item => {
+        tableHTML += '<tr>';
+        displayKeys.forEach(key => {
+          const value = item[key];
+          tableHTML += `<td>${formatValue(value)}</td>`;
+        });
+        tableHTML += `
+          <td>
+            <div class="actions">
+              <button class="btn btn-sm btn-edit" onclick="handleEdit('${item.id}')">
+                ✏️ Edit
+              </button>
+            </div>
+          </td>
+        `;
+        tableHTML += '</tr>';
+      });
+
+      tableHTML += `
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top: 15px; color: #6c757d; font-size: 0.85rem;">
+          Showing ${data.length} ${data.length === 1 ? schemaId.slice(0, -1) : schemaId}
+        </div>
+      `;
+
+      dataContainer.innerHTML = tableHTML;
+    }
+
+    // Format key for display
+    function formatKey(key) {
+      return key
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, str => str.toUpperCase())
+        .trim();
+    }
+
+    // Format value for display
+    function formatValue(value) {
+      if (value === null || value === undefined) {
+        return '<span style="color: #adb5bd;">—</span>';
+      }
+
+      if (typeof value === 'boolean') {
+        return value 
+          ? '<span class="badge badge-success">Yes</span>' 
+          : '<span class="badge badge-danger">No</span>';
+      }
+
+      if (typeof value === 'object') {
+        if (Array.isArray(value)) {
+          return value.length > 0 
+            ? `<span class="badge badge-warning">${value.length} items</span>`
+            : '<span style="color: #adb5bd;">Empty</span>';
+        }
+        return '<span class="badge badge-warning">Object</span>';
+      }
+
+      if (typeof value === 'string' && value.length > 50) {
+        return value.substring(0, 50) + '...';
+      }
+
+      return String(value);
+    }
+  </script>
+</body>
+</html>
+
