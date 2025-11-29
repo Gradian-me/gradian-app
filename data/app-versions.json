@@ -564,5 +564,79 @@
         ]
       }
     ]
+  },
+  {
+    "id": "MIJY0U3F078A1DC357F971",
+    "timestamp": "2025-11-29T07:01:35.451Z",
+    "version": "1.02.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Added hierarchical parent-child relationships support in schemas with allowHierarchicalParent flag",
+        "priority": "High",
+        "affectedDomains": [
+          "schema-manager",
+          "form-builder"
+        ]
+      },
+      {
+        "changeType": "feature",
+        "description": "Implemented hierarchy view in dynamic pages with expand/collapse, search, and auto-expansion",
+        "priority": "High",
+        "affectedDomains": [
+          "data-display"
+        ]
+      },
+      {
+        "changeType": "feature",
+        "description": "Added Change parent functionality in hierarchy view with popup picker",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "form-builder"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Changed parent field storage from array of objects to single ID for live data updates",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "data-display"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Added hierarchy view as default view mode for schemas with allowHierarchicalParent",
+        "priority": "Low",
+        "affectedDomains": [
+          "data-display"
+        ]
+      },
+      {
+        "changeType": "fix",
+        "description": "Fixed sidebar navigation highlighting for Builder and Graph Designer routes",
+        "priority": "Low",
+        "affectedDomains": [
+          "layout"
+        ]
+      },
+      {
+        "changeType": "fix",
+        "description": "Fixed global-error.tsx component for proper error handling",
+        "priority": "Low",
+        "affectedDomains": [
+          "infrastructure"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Updated baseline-browser-mapping to latest version",
+        "priority": "Low",
+        "affectedDomains": [
+          "infrastructure"
+        ]
+      }
+    ]
   }
 ]
