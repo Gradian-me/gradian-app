@@ -6,6 +6,7 @@ import { IService } from '../interfaces/service.interface';
 import { BaseEntity, FilterParams } from '../types/base.types';
 import { handleDomainError } from '../errors/domain.errors';
 import { parsePaginationParams, paginateArray, buildPaginationMeta } from '@/gradian-ui/shared/utils/pagination-utils';
+import { parseSortArray, multiSort } from '@/gradian-ui/shared/utils/sort-utils';
 
 export class BaseController<T extends BaseEntity> {
   constructor(
@@ -63,7 +64,7 @@ export class BaseController<T extends BaseEntity> {
     // Backward compatibility: Handle single companyId (will be converted to companyIds array in repository)
     // Add any other query params as filters (excluding params we've already handled)
     searchParams.forEach((value, key) => {
-      if (!['search', 'status', 'category', 'includeIds', 'excludeIds', 'includeIds[]', 'excludeIds[]', 'companyIds', 'companyId'].includes(key)) {
+      if (!['search', 'status', 'category', 'includeIds', 'excludeIds', 'includeIds[]', 'excludeIds[]', 'companyIds', 'companyId', 'sortArray', 'sortBy', 'sortOrder', 'page', 'limit'].includes(key)) {
         filters[key] = value;
       }
     });
@@ -86,15 +87,36 @@ export class BaseController<T extends BaseEntity> {
           })
         : null;
 
+      // Parse sortArray parameter
+      const sortArrayParam = searchParams.get('sortArray');
+      const sortArray = parseSortArray(sortArrayParam);
+
       const result = await this.service.getAll(filters);
 
       if (!result.success) {
         return NextResponse.json(result, { status: 400 });
       }
 
-      if (pagination && Array.isArray(result.data)) {
-        const totalItems = result.data.length;
-        const pageItems = paginateArray(result.data, pagination.page, pagination.limit);
+      let processedData = result.data;
+
+      // Apply multi-sort if sortArray is provided
+      if (sortArray && Array.isArray(processedData)) {
+        processedData = multiSort(processedData, sortArray);
+      } else if (!sortArray && Array.isArray(processedData)) {
+        // Fallback to single sort for backward compatibility
+        const sortBy = searchParams.get('sortBy');
+        const sortOrder = searchParams.get('sortOrder') || 'asc';
+        if (sortBy) {
+          processedData = multiSort(processedData, [{
+            column: sortBy,
+            isAscending: sortOrder === 'asc'
+          }]);
+        }
+      }
+
+      if (pagination && Array.isArray(processedData)) {
+        const totalItems = processedData.length;
+        const pageItems = paginateArray(processedData, pagination.page, pagination.limit);
         const meta = buildPaginationMeta(totalItems, pagination.page, pagination.limit);
         return NextResponse.json(
           {
@@ -106,7 +128,7 @@ export class BaseController<T extends BaseEntity> {
         );
       }
 
-      return NextResponse.json(result, { status: 200 });
+      return NextResponse.json({ ...result, data: processedData }, { status: 200 });
     } catch (error) {
       const errorResponse = handleDomainError(error);
       return NextResponse.json(

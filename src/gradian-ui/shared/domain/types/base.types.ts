@@ -12,6 +12,7 @@ export interface PaginationParams {
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  sortArray?: Array<{ column: string; isAscending: boolean }>;
 }
 
 export interface FilterParams {

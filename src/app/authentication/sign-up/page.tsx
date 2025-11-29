@@ -291,65 +291,65 @@ export default function SignUpPage() {
     <AuthenticationLayout
       heroImageSrc="/screenshots/gradian.me_bg_desktop.png"
     >
-      <div className="w-full max-w-md">
-        <div className="flex flex-col gap-6">
-          <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">
-            Create account
-          </h1>
-          <p className="animate-element animate-delay-200 text-muted-foreground hidden md:block">
-            The password link would be sent to your email address after the account is activated by administrator.
-          </p>
+        <div className="w-full max-w-md">
+          <div className="flex flex-col gap-6">
+            <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">
+              Create account
+            </h1>
+            <p className="animate-element animate-delay-200 text-muted-foreground hidden md:block">
+              The password link would be sent to your email address after the account is activated by administrator.
+            </p>
 
-          {submitFeedback && (
-            <div className={`animate-element animate-delay-250 rounded-2xl border p-4 ${
-              submitFeedback.type === 'error'
-                ? 'border-red-500/50 bg-red-500/10 dark:bg-red-500/5'
-                : 'border-emerald-500/50 bg-emerald-500/10 dark:bg-emerald-500/5'
-            }`}>
-              <p className={`text-sm font-medium ${
+            {submitFeedback && (
+              <div className={`animate-element animate-delay-250 rounded-2xl border p-4 ${
                 submitFeedback.type === 'error'
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-emerald-600 dark:text-emerald-400'
+                  ? 'border-red-500/50 bg-red-500/10 dark:bg-red-500/5'
+                  : 'border-emerald-500/50 bg-emerald-500/10 dark:bg-emerald-500/5'
               }`}>
-                {submitFeedback.message}
+                <p className={`text-sm font-medium ${
+                  submitFeedback.type === 'error'
+                    ? 'text-red-600 dark:text-red-400'
+                    : 'text-emerald-600 dark:text-emerald-400'
+                }`}>
+                  {submitFeedback.message}
+                </p>
+              </div>
+            )}
+
+            {loadError && (
+              <div className="animate-element animate-delay-250">
+                <FormAlert
+                  type="error"
+                  message={loadError}
+                  dismissible
+                  onDismiss={() => setLoadError(null)}
+                />
+              </div>
+            )}
+
+            <div className="animate-element animate-delay-300">
+              {renderContent}
+            </div>
+
+            <div className="animate-element animate-delay-500 flex flex-col gap-4">
+              <Button
+                type="button"
+                onClick={() => submitForm?.()}
+                disabled={!submitForm || isSubmitting || isLoading || !!loadError}
+                className="w-full rounded-2xl bg-violet-500 py-4 font-medium text-violet-50 hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? 'Creating Account...' : 'Create Account'}
+              </Button>
+
+              <p className="animate-element animate-delay-700 text-center text-sm text-muted-foreground">
+                Already have an account?{' '}
+                <Link href="/authentication/login" className="text-violet-400 hover:underline transition-colors">
+                  Sign in instead
+                </Link>
               </p>
             </div>
-          )}
-
-          {loadError && (
-            <div className="animate-element animate-delay-250">
-              <FormAlert
-                type="error"
-                message={loadError}
-                dismissible
-                onDismiss={() => setLoadError(null)}
-              />
-            </div>
-          )}
-
-          <div className="animate-element animate-delay-300">
-            {renderContent}
-          </div>
-
-          <div className="animate-element animate-delay-500 flex flex-col gap-4">
-            <Button
-              type="button"
-              onClick={() => submitForm?.()}
-              disabled={!submitForm || isSubmitting || isLoading || !!loadError}
-              className="w-full rounded-2xl bg-violet-500 py-4 font-medium text-violet-50 hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? 'Creating Account...' : 'Create Account'}
-            </Button>
-
-            <p className="animate-element animate-delay-700 text-center text-sm text-muted-foreground">
-              Already have an account?{' '}
-              <Link href="/authentication/login" className="text-violet-400 hover:underline transition-colors">
-                Sign in instead
-              </Link>
-            </p>
           </div>
         </div>
-      </div>
     </AuthenticationLayout>
   );
 }
