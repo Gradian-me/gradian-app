@@ -19,7 +19,10 @@ import {
   Settings,
   RefreshCw,
   Mail,
-  Code
+  Code,
+  Share2,
+  GitBranch,
+  HeartPulse
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
@@ -32,6 +35,9 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; style?: 
   Settings,
   Mail,
   Code,
+  Share2,
+  GitBranch,
+  HeartPulse,
 };
 
 interface BuilderOption {
@@ -128,7 +134,7 @@ export default function BuilderPage() {
       subtitle="Configure and manage your application"
       icon="Settings"
     >
-      <div className="space-y-8">
+      <div className="space-y-8 pb-6">
         {/* Header Description */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -260,7 +266,7 @@ export default function BuilderPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-blue-50 dark:bg-violet-800/30 border border-blue-200 dark:border-violet-800 rounded-xl p-6"
+          className="bg-blue-50 dark:bg-violet-800/30 border border-blue-200 dark:border-violet-800 rounded-xl p-6 mb-12"
         >
           <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-200 mb-2 flex items-center gap-2">
             <Palette className="h-5 w-5" />

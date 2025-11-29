@@ -89,49 +89,33 @@
                 <span class="info-label">Detected At:</span>
                 <span class="info-value">{{timestamp}}</span>
               </div>
-              {{#if responseTime}}
               <div class="info-row">
                 <span class="info-label">Response Time:</span>
-                <span class="info-value">{{responseTime}}ms</span>
+                <span class="info-value">{{responseTime}}</span>
               </div>
-              {{/if}}
-              {{#if version}}
               <div class="info-row">
                 <span class="info-label">Version:</span>
                 <span class="info-value">{{version}}</span>
               </div>
-              {{/if}}
-              {{#if environment}}
               <div class="info-row">
                 <span class="info-label">Environment:</span>
                 <span class="info-value">{{environment}}</span>
               </div>
-              {{/if}}
+              <div class="info-row">
+                <span class="info-label">Health API:</span>
+                <span class="info-value">{{healthApi}}</span>
+              </div>
             </div>
 
-            {{#if errorMessage}}
             <div class="error-details">
               <div class="error-title">Error Details:</div>
               <div class="error-message">{{errorMessage}}</div>
             </div>
-            {{/if}}
 
-            {{#if checks}}
             <div class="checks-section">
               <div class="error-title" style="margin-bottom:12px;">Component Checks:</div>
-              {{#each checks}}
-              <div class="check-item">
-                <div class="check-name">{{@key}}: {{this.status}}</div>
-                {{#if this.message}}
-                <div class="check-message">{{this.message}}</div>
-                {{/if}}
-                {{#if this.responseTime}}
-                <div class="check-time">Response Time: {{this.responseTime}}ms</div>
-                {{/if}}
-              </div>
-              {{/each}}
+              <div class="error-message" style="white-space:pre-wrap;">{{checksDetails}}</div>
             </div>
-            {{/if}}
 
             <a class="cta" href="{{healthDashboardUrl}}" target="_blank" rel="noopener">
               View Health Dashboard

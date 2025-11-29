@@ -15,6 +15,22 @@
     "stats": []
   },
   {
+    "id": "graphs",
+    "title": "Graph Designer",
+    "description": "Design and manage data relationship graphs with visual node connections and edge configurations",
+    "icon": "Share2",
+    "href": "/builder/graphs",
+    "color": "#10B981",
+    "features": [
+      "Visual graph editor",
+      "Node and edge management",
+      "Relationship mapping",
+      "Graph visualization",
+      "Export and import graphs"
+    ],
+    "stats": []
+  },
+  {
     "id": "email-templates",
     "title": "Email Templates",
     "description": "Design branded transactional messages, set placeholders, and preview personalized content",
@@ -76,6 +92,24 @@
       "Health statistics dashboard",
       "Inactive and unhealthy services alerts",
       "Service configuration and monitoring"
+    ],
+    "stats": []
+  },
+  {
+    "id": "app-versions",
+    "title": "App Versions",
+    "description": "Track and manage application versions with change logs, priorities, and affected domains",
+    "icon": "GitBranch",
+    "href": "/app/versions",
+    "color": "#3B82F6",
+    "features": [
+      "Version tracking and history",
+      "Change log management",
+      "Priority-based versioning",
+      "Domain impact tracking",
+      "Search and filter versions",
+      "Grid and list view modes",
+      "Automatic version incrementing"
     ],
     "stats": []
   },
