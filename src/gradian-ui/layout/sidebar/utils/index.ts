@@ -84,6 +84,13 @@ export const isActiveNavigationItem = (
   if (item.href === '/') {
     return pathname === '/';
   }
-  return pathname.startsWith(item.href);
+
+  // Builder should only be active on its exact route (/builder), not on nested routes like /builder/graphs
+  if (item.href === '/builder') {
+    return pathname === '/builder';
+  }
+
+  // For other items, treat the item as active for itself and its sub-paths
+  return pathname === item.href || pathname.startsWith(`${item.href}/`);
 };
 

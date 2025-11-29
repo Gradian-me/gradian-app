@@ -323,6 +323,7 @@ export interface FormSchema {
   allowDataInactive?: boolean;
   allowDataForce?: boolean;
   allowDataHardDelete?: boolean;
+  allowHierarchicalParent?: boolean;
   statusId?: string;
   fields: FormField[]; // All fields at schema level, each with a sectionId
   sections: FormSection[]; // Sections no longer contain fields

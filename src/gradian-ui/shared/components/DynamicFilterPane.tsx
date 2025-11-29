@@ -5,18 +5,21 @@ import { Filter, Plus, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/gradian-ui/data-display/components/SearchBar';
 import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
+import { HierarchyExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 
 interface DynamicFilterPaneProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  viewMode: 'grid' | 'list' | 'table';
-  onViewModeChange: (mode: 'grid' | 'list' | 'table') => void;
+  viewMode: 'grid' | 'list' | 'table' | 'hierarchy';
+  onViewModeChange: (mode: 'grid' | 'list' | 'table' | 'hierarchy') => void;
   onAddNew: () => void;
   onRefresh?: () => void;
   isRefreshing?: boolean;
   searchPlaceholder?: string;
   addButtonText?: string;
   className?: string;
+  onExpandAllHierarchy?: () => void;
+  onCollapseAllHierarchy?: () => void;
 }
 
 export const DynamicFilterPane = ({
@@ -30,6 +33,8 @@ export const DynamicFilterPane = ({
   searchPlaceholder = "Search...",
   addButtonText = "Add New",
   className = "",
+  onExpandAllHierarchy,
+  onCollapseAllHierarchy,
 }: DynamicFilterPaneProps) => {
   return (
     <motion.div
@@ -69,6 +74,12 @@ export const DynamicFilterPane = ({
             onViewChange={onViewModeChange}
             className="h-full"
           />
+          {viewMode === 'hierarchy' && onExpandAllHierarchy && onCollapseAllHierarchy && (
+            <HierarchyExpandCollapseControls
+              onExpandAll={onExpandAllHierarchy}
+              onCollapseAll={onCollapseAllHierarchy}
+            />
+          )}
         </div>
         <Button 
           variant="default" 

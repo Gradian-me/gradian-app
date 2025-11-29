@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Eye, EyeOff, LockIcon, UserIcon } from 'lucide-react';
-import { ModeToggle } from '@/gradian-ui/layout';
+import { ModeToggle, NeonBeams } from '@/gradian-ui/layout';
 
 // --- TYPE DEFINITIONS ---
 
@@ -164,6 +164,12 @@ export const SignInPage: React.FC<SignInPageProps> = ({
       </section>
 
       {/* Right column: hero image + testimonials */}
+      {!heroImageSrc && (
+        <section className="hidden md:block flex-1 relative p-4 overflow-hidden">
+          <NeonBeams />
+        </section>
+      )}
+      
       {heroImageSrc && (
         <section className="hidden md:block flex-1 relative p-4 overflow-hidden">
           <div className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center" style={{ backgroundImage: `url(${heroImageSrc})` }}></div>

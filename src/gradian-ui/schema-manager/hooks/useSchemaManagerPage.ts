@@ -54,7 +54,7 @@ export const useSchemaManagerPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<SchemaTab>('system');
   const [showInactive, setShowInactive] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table' | 'hierarchy'>('grid');
   const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState>({ open: false, schema: null });
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [messages, setMessages] = useState<MessagesResponse | null>(null);

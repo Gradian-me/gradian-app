@@ -106,6 +106,12 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
               onChange={(checked: boolean) => onUpdate({ allowDataHardDelete: checked })}
               disabled={readonly}
             />
+            <Switch
+              config={{ name: 'allow-hierarchical-parent', label: 'Allow Hierarchical Parent' }}
+              value={schema.allowHierarchicalParent || false}
+              onChange={(checked: boolean) => onUpdate({ allowHierarchicalParent: checked })}
+              disabled={readonly}
+            />
           </div>
         </div>
         <div>

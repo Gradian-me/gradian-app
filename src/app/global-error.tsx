@@ -1,10 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
-
-// Force dynamic rendering to avoid static generation issues
-export const dynamic = 'force-dynamic';
-
 export default function GlobalError({
   error,
   reset,
@@ -12,11 +7,6 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    // Log the error to an error reporting service
-    console.error('Global error:', error);
-  }, [error]);
-
   return (
     <html>
       <body>

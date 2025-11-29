@@ -2196,6 +2196,7 @@
     "singular_name": "User Role",
     "plural_name": "User Roles",
     "isSystemSchema": true,
+    "allowHierarchicalParent": true,
     "customButtons": [
       {
         "id": "go-to-schemas",
@@ -2262,7 +2263,7 @@
         "columns": 2,
         "isRepeatingSection": true,
         "repeatingConfig": {
-          "minItems": 1,
+          "minItems": 0,
           "targetSchema": "users",
           "relationTypeId": "HAS_MEMBER",
           "deleteType": "relationOnly",

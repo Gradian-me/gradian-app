@@ -13,6 +13,7 @@ import { useCompanyStore } from '@/stores/company.store';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { toast } from 'sonner';
 import { filterFormDataForSubmission } from '../utils/form-data-filter';
+import { syncParentRelation } from '@/gradian-ui/shared/utils/parent-relation.util';
 
 /**
  * Reconstruct RegExp objects from serialized schema
@@ -421,6 +422,35 @@ export function useFormModal(
           // Explicitly ensure modal stays open
           setIsOpen(true);
         } else {
+          // Synchronize hierarchical parent relation when enabled on schema
+          if ((targetSchema as any).allowHierarchicalParent) {
+            try {
+              const effectiveChildId = (result.data && (result.data as any).id) || entityId;
+              if (effectiveChildId) {
+                const parentValue = (enrichedData as any).parent;
+                let newParentId: string | null = null;
+                if (Array.isArray(parentValue) && parentValue.length > 0) {
+                  const first = parentValue[0];
+                  if (first) {
+                    if (typeof first === 'string' || typeof first === 'number') {
+                      newParentId = String(first);
+                    } else if (first.id) {
+                      newParentId = String(first.id);
+                    }
+                  }
+                }
+
+                await syncParentRelation({
+                  schemaId: targetSchema.id,
+                  childId: String(effectiveChildId),
+                  parentId: newParentId,
+                });
+              }
+            } catch (error) {
+              console.warn('[useFormModal] Failed to sync hierarchical parent relation', error);
+            }
+          }
+
           // Form is complete - update entity data and close normally
           if (result.data) {
             setEntityData(result.data); // Update entity data with complete entity (incomplete flag cleared)

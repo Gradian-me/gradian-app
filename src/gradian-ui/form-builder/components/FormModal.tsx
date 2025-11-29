@@ -103,6 +103,11 @@ export interface FormModalProps extends UseFormModalOptions {
    * Optional preloaded entity data for edit mode to skip refetching.
    */
   getInitialEntityData?: UseFormModalOptions['getInitialEntityData'];
+
+  /**
+   * Optional initial values for create mode (e.g. pre-filled parent in hierarchy view)
+   */
+  initialValues?: Record<string, any>;
 }
 
 /**
@@ -141,6 +146,7 @@ export const FormModal: React.FC<FormModalProps> = ({
   onClose,
   getInitialSchema,
   getInitialEntityData,
+  initialValues,
 }) => {
   const {
     targetSchema,
@@ -262,10 +268,10 @@ export const FormModal: React.FC<FormModalProps> = ({
 
       {/* Loading indicator for form submission */}
       {isSubmitting && (
-        <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-50 rounded-lg">
-          <div className="flex flex-col items-center space-y-3 bg-white p-6 rounded-xl shadow-lg border border-blue-100">
+        <div className="absolute inset-0 bg-white/60 dark:bg-gray-800/60 flex items-center justify-center z-50 rounded-lg">
+          <div className="flex flex-col items-center space-y-3 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-blue-100 dark:border-gray-700">
             <Spinner size="lg" variant="primary" />
-            <span className="text-lg font-medium text-blue-700">
+            <span className="text-lg font-medium text-violet-700 dark:text-violet-300">
               {isEdit ? 'Updating' : 'Creating'} {targetSchema?.name?.toLowerCase() || 'item'}...
             </span>
           </div>
@@ -291,7 +297,11 @@ export const FormModal: React.FC<FormModalProps> = ({
           onSubmit={handleSubmit}
           onReset={() => {}}
           onCancel={closeFormModal}
-          initialValues={memoizedInitialValues}
+          initialValues={
+            isEdit && entityData
+              ? memoizedInitialValues
+              : initialValues || memoizedInitialValues
+          }
           error={formError || undefined}
           message={formMessage}
           errorStatusCode={formErrorStatusCode}

@@ -14,7 +14,7 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { AnimatePresence, motion } from 'framer-motion';
-import { List, Loader2, RefreshCw } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronsDown, ChevronsUp, List, Loader2, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -33,6 +33,7 @@ import { EndLine } from '@/gradian-ui/layout';
 import { ColumnMapConfig, extractItemsFromPayload, extractMetaFromPayload, mapRequestParams } from '@/gradian-ui/shared/utils/column-mapper';
 import { useCompanyStore } from '@/stores/company.store';
 import { sortOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
+import { buildHierarchyTree, getAncestorIds, HierarchyNode } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 12, scale: 0.96 },
@@ -207,6 +208,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   const selectedCompany = useCompanyStore((state) => state.selectedCompany);
   const activeCompanyId = selectedCompany && selectedCompany.id !== -1 ? String(selectedCompany.id) : null;
   const effectiveSchema = useMemo(() => schema ?? providedSchema ?? null, [schema, providedSchema]);
+  const isHierarchical = Boolean(effectiveSchema?.allowHierarchicalParent);
   const shouldFilterByCompany = useMemo(() => {
     if (effectiveSchema) {
       return effectiveSchema.id !== 'companies' && effectiveSchema.isNotCompanyBased !== true;
@@ -233,6 +235,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   const excludeKey = useMemo(() => (excludeIds && excludeIds.length > 0 ? excludeIds.slice().sort().join(',') : ''), [excludeIds]);
   const lastQueryKeyRef = useRef<string>('__init__');
   const hasInitialLoadRef = useRef<boolean>(false);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     setPageMeta((prev) => ({
@@ -1126,6 +1129,268 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
   const schemaName = schema?.plural_name || schema?.singular_name || schemaId;
 
+  // Hierarchy helpers (used when schema.allowHierarchicalParent is true)
+  const { roots: hierarchyRoots, nodeMap: hierarchyNodeMap } = useMemo(() => {
+    if (!isHierarchical) {
+      return { roots: [] as HierarchyNode[], nodeMap: new Map<string, HierarchyNode>() };
+    }
+    return buildHierarchyTree(filteredItems || []);
+  }, [isHierarchical, filteredItems]);
+
+  const handleHierarchyToggle = useCallback((id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleHierarchyExpandAll = useCallback(() => {
+    const allIds = new Set<string>();
+    hierarchyNodeMap.forEach((node) => {
+      if (node.children.length > 0) {
+        allIds.add(node.id);
+      }
+    });
+    setExpandedIds(allIds);
+  }, [hierarchyNodeMap]);
+
+  const handleHierarchyCollapseAll = useCallback(() => {
+    setExpandedIds(new Set());
+  }, []);
+
+  // Auto-expand ancestors of matches when searching
+  useEffect(() => {
+    if (!isHierarchical) return;
+    const normalized = searchQuery.trim().toLowerCase();
+    if (!normalized) return;
+
+    const matches = new Set<string>();
+    hierarchyNodeMap.forEach((node) => {
+      const data = node.entity;
+      const candidateFields: any[] = [];
+      if (schema) {
+        candidateFields.push(
+          getValueByRole(schema, data, 'title'),
+          getSingleValueByRole(schema, data, 'subtitle', data.email)
+        );
+      }
+      candidateFields.push(data.name, data.title, data.email, data.description);
+
+      if (
+        candidateFields.some(
+          (val) => typeof val === 'string' && val.toLowerCase().includes(normalized)
+        )
+      ) {
+        matches.add(node.id);
+      }
+    });
+
+    if (matches.size > 0) {
+      const nextExpanded = new Set<string>();
+      matches.forEach((id) => {
+        const ancestors = getAncestorIds(hierarchyNodeMap, id);
+        ancestors.forEach((ancestorId) => nextExpanded.add(ancestorId));
+      });
+      setExpandedIds((prev) => {
+        const merged = new Set(prev);
+        nextExpanded.forEach((id) => merged.add(id));
+        return merged;
+      });
+    }
+  }, [isHierarchical, searchQuery, hierarchyNodeMap, schema]);
+
+  // When search is cleared in hierarchical mode, collapse all
+  useEffect(() => {
+    if (!isHierarchical) return;
+    if (!searchQuery.trim()) {
+      setExpandedIds(new Set());
+    }
+  }, [isHierarchical, searchQuery]);
+
+  const renderHierarchyNode = (node: HierarchyNode, depth: number, index: number) => {
+    const item = node.entity;
+    const isSelected = isItemSelected(item);
+    const highlightQuery = searchQuery.trim();
+
+    const baseCardClasses = 'relative p-3 rounded-xl border cursor-pointer transition-all duration-200 group';
+    const selectedCardClasses =
+      'border-violet-500 dark:border-violet-400 bg-gradient-to-br from-gray-100 via-white to-violet-100 dark:from-gray-900 dark:via-gray-800 dark:to-violet-900 shadow-lg ring-1 ring-violet-200 dark:ring-violet-800';
+    const defaultCardClasses =
+      'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-violet-300 hover:shadow-md';
+
+    const motionProps = {
+      layout: true,
+      variants: cardVariants,
+      initial: 'hidden',
+      animate: 'visible',
+      exit: 'exit',
+      custom: index,
+    } as const;
+
+    const hasChildren = node.children.length > 0;
+    const isExpanded = expandedIds.has(node.id);
+
+    if (!schema) {
+      const displayName = item.name || item.title || item.id || `Item ${index + 1}`;
+      const iconName = item.icon || item.name || item.title;
+      return (
+        <motion.div key={item.id || index} {...motionProps} style={{ marginLeft: depth * 16 }}>
+          <div
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleSelection(item);
+            }}
+            className={cn(baseCardClasses, isSelected ? selectedCardClasses : defaultCardClasses)}
+          >
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleHierarchyToggle(node.id);
+                }}
+                className={cn(
+                  'h-6 w-6 flex items-center justify-center rounded-md border text-gray-500 dark:text-gray-400',
+                  'border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/60',
+                  !hasChildren && 'opacity-40 cursor-default'
+                )}
+                disabled={!hasChildren}
+              >
+                {hasChildren ? (
+                  isExpanded ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )
+                ) : (
+                  <span className="h-1 w-1 rounded-full bg-gray-400" />
+                )}
+              </button>
+              {iconName && (
+                <div className="h-10 w-10 rounded-lg bg-violet-50 dark:bg-gray-700 text-violet-600 dark:text-violet-300 flex items-center justify-center">
+                  <IconRenderer iconName={iconName} className="h-5 w-5" />
+                </div>
+              )}
+              <div
+                className={cn(
+                  'font-medium text-sm',
+                  isSelected ? 'text-violet-900 dark:text-violet-100' : 'text-gray-900 dark:text-gray-100'
+                )}
+              >
+                {renderHighlightedText(displayName, highlightQuery)}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      );
+    }
+
+    // Schema-aware rendering
+    const title = getValueByRole(schema, item, 'title') || item.name || `Item ${index + 1}`;
+    const subtitle = getSingleValueByRole(schema, item, 'subtitle', item.email) || item.email || '';
+    const avatarField = getSingleValueByRole(schema, item, 'avatar', item.name) || item.name || '?';
+
+    const hasCodeField = schema.fields?.some((f) => f.role === 'code') || false;
+    const codeField = getSingleValueByRole(schema, item, 'code');
+
+    return (
+      <div key={item.id || index} className="space-y-1" style={{ marginLeft: depth * 16 }}>
+        <motion.div {...motionProps}>
+          <div
+            onClick={() => toggleSelection(item)}
+            className={cn(baseCardClasses, isSelected ? selectedCardClasses : defaultCardClasses)}
+          >
+            <div className="flex items-start gap-3">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleHierarchyToggle(node.id);
+                }}
+                className={cn(
+                  'h-6 w-6 mt-1 flex items-center justify-center rounded-md border text-gray-500 dark:text-gray-400',
+                  'border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/60',
+                  !hasChildren && 'opacity-40 cursor-default'
+                )}
+                disabled={!hasChildren}
+              >
+                {hasChildren ? (
+                  isExpanded ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )
+                ) : (
+                  <span className="h-1 w-1 rounded-full bg-gray-400" />
+                )}
+              </button>
+              <Avatar
+                fallback={getInitials(avatarField)}
+                size="md"
+                variant="primary"
+                className={cn(
+                  'border shrink-0 transition-colors',
+                  isSelected ? 'border-violet-400' : 'border-gray-200 group-hover:border-violet-300'
+                )}
+              >
+                {getInitials(avatarField)}
+              </Avatar>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h4
+                        className={cn(
+                          'text-sm font-semibold truncate transition-colors flex-1 min-w-0',
+                          isSelected
+                            ? 'text-violet-900 dark:text-violet-100'
+                            : 'text-gray-900 dark:text-gray-100 group-hover:text-violet-700 dark:group-hover:text-violet-300'
+                        )}
+                      >
+                        {renderHighlightedText(title, highlightQuery)}
+                      </h4>
+                      {hasCodeField && codeField && <CodeBadge code={codeField} />}
+                    </div>
+                    {subtitle && subtitle.trim() && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                        {renderHighlightedText(subtitle, highlightQuery)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <AnimatePresence initial={false}>
+          {isExpanded && node.children.length > 0 && (
+            <motion.div
+              key={`${node.id}-children`}
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+            >
+              <div className="space-y-1 border-l border-dashed border-gray-200 dark:border-gray-700 ml-4 pl-3">
+                {node.children.map((child, idx) =>
+                  renderHierarchyNode(child, depth + 1, index + idx + 1)
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
       // Only close if explicitly set to false (not opening)
@@ -1161,6 +1426,38 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               >
                 <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-violet-600' : ''}`} />
               </Button>
+              {isHierarchical && (
+                <div className="flex items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleHierarchyExpandAll();
+                    }}
+                    disabled={isLoading || isSubmitting}
+                    aria-label="Expand all"
+                  >
+                    <ChevronsDown className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleHierarchyCollapseAll();
+                    }}
+                    disabled={isLoading || isSubmitting}
+                    aria-label="Collapse all"
+                  >
+                    <ChevronsUp className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
               {canViewList && (
                 <Button
                   type="button"
@@ -1192,7 +1489,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           />
         </div>
 
-        {/* Items Grid */}
+        {/* Items Grid / Hierarchy */}
         <div ref={listContainerRef} className="flex-1 overflow-y-auto min-h-0 px-2 py-1">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -1206,37 +1503,45 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               {searchQuery ? `No items found matching "${searchQuery}"` : 'No items available'}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <AnimatePresence mode="sync">
-                {filteredItems.map((item, index) => renderItemCard(item, index))}
-              </AnimatePresence>
-              {supportsPagination && (
-                <>
-                  <div ref={loadMoreTriggerRef} className="col-span-full h-1 w-full" />
-                  {isFetchingMore && (
-                    <div className="col-span-full flex items-center justify-center py-4 text-sm text-gray-500">
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Loading more icons...
-                    </div>
+            <>
+              {isHierarchical ? (
+                <div className="space-y-2">
+                  {hierarchyRoots.map((node, index) => renderHierarchyNode(node, 0, index))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <AnimatePresence mode="sync">
+                    {filteredItems.map((item, index) => renderItemCard(item, index))}
+                  </AnimatePresence>
+                  {supportsPagination && (
+                    <>
+                      <div ref={loadMoreTriggerRef} className="col-span-full h-1 w-full" />
+                      {isFetchingMore && (
+                        <div className="col-span-full flex items-center justify-center py-4 text-sm text-gray-500">
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Loading more icons...
+                        </div>
+                      )}
+                      {!pageMeta.hasMore && filteredItems.length > 0 && !isFetchingMore && (
+                        <div className="col-span-full">
+                          <EndLine />
+                        </div>
+                      )}
+                      {pageMeta.hasMore && (
+                        <div className="col-span-full">
+                          <AddButtonFull
+                            label="Load More"
+                            onClick={handleLoadMore}
+                            loading={isFetchingMore}
+                            disabled={isLoading || isFetchingMore}
+                          />
+                        </div>
+                      )}
+                    </>
                   )}
-                  {!pageMeta.hasMore && filteredItems.length > 0 && !isFetchingMore && (
-                    <div className="col-span-full">
-                      <EndLine />
-                    </div>
-                  )}
-                  {pageMeta.hasMore && (
-                    <div className="col-span-full">
-                      <AddButtonFull
-                        label="Load More"
-                        onClick={handleLoadMore}
-                        loading={isFetchingMore}
-                        disabled={isLoading || isFetchingMore}
-                      />
-                    </div>
-                  )}
-                </>
+                </div>
               )}
-            </div>
+            </>
           )}
         </div>
 

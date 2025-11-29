@@ -258,5 +258,25 @@
     "id": "01KAR3EAJ22NH3V8NJVVCDK5XW",
     "createdAt": "2025-11-23T10:16:36.674Z",
     "updatedAt": "2025-11-23T10:16:36.674Z"
+  },
+  {
+    "sourceSchema": "user-roles",
+    "sourceId": "01KAKR8W9BWJXHEV2BZ80Q07P0",
+    "targetSchema": "user-roles",
+    "targetId": "01KB72KXGVX9ZNFTPEA6BHM8E8",
+    "relationTypeId": "IS_PARENT_OF",
+    "id": "01KB72THKAKF9YQ9J60FFY3F4H",
+    "createdAt": "2025-11-29T05:54:25.001Z",
+    "updatedAt": "2025-11-29T05:54:25.001Z"
+  },
+  {
+    "sourceSchema": "user-roles",
+    "sourceId": "01KB74PCQPGFPPG4JS9GWAZET0",
+    "targetSchema": "user-roles",
+    "targetId": "01KB74HT51NKX7HJZZ0FXMWR2M",
+    "relationTypeId": "IS_PARENT_OF",
+    "id": "01KB758E0X4SGPCFS5AF1N3ZEE",
+    "createdAt": "2025-11-29T06:36:57.244Z",
+    "updatedAt": "2025-11-29T06:36:57.244Z"
   }
 ]

@@ -105,8 +105,8 @@ export function filterFormDataForSubmission(
   const cleaned: FormData = {};
 
   // Metadata fields that should always be preserved (not in schema but needed for backend)
-  // System section fields: inactive, isForce, forceReason
-  const metadataFields = new Set(['incomplete', 'sections', 'inactive', 'isForce', 'forceReason']);
+  // System section fields: inactive, isForce, forceReason, parent (hierarchical)
+  const metadataFields = new Set(['incomplete', 'sections', 'inactive', 'isForce', 'forceReason', 'parent']);
 
   Object.keys(formData).forEach(key => {
     const value = formData[key];
@@ -122,9 +122,25 @@ export function filterFormDataForSubmission(
       return;
     }
 
-    // Preserve metadata fields (like incomplete flag)
+    // Preserve metadata fields (like incomplete flag), with special handling for parent
     if (metadataFields.has(key)) {
-      cleaned[key] = value;
+      if (key === 'parent') {
+        // Normalize parent to a single ID (not array of objects) so latest parent data is always resolved dynamically
+        let parentId: any = value;
+        if (Array.isArray(value) && value.length > 0) {
+          const first = value[0];
+          if (typeof first === 'string' || typeof first === 'number') {
+            parentId = String(first);
+          } else if (first && typeof first === 'object' && first.id) {
+            parentId = String(first.id);
+          }
+        } else if (value && typeof value === 'object' && (value as any).id) {
+          parentId = String((value as any).id);
+        }
+        cleaned[key] = parentId ?? null;
+      } else {
+        cleaned[key] = value;
+      }
       return;
     }
 

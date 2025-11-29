@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
 import {
   AlertCircle,
@@ -39,6 +40,10 @@ import { debounce } from '@/gradian-ui/shared/utils';
 import { toast } from 'sonner';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { TableWrapper, TableConfig, buildTableColumns, TableColumn } from '@/gradian-ui/data-display/table';
+import { HierarchyView } from '@/gradian-ui/data-display/hierarchy/HierarchyView';
+import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/PopupPicker';
+import { syncParentRelation } from '@/gradian-ui/shared/utils/parent-relation.util';
+import { getParentIdFromEntity } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
 
 interface DynamicPageRendererProps {
   schema: FormSchema;
@@ -98,7 +103,9 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     };
   }, [schema.plural_name, schema.title, schema.name]);
   
-  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table' | 'hierarchy'>(
+    schema?.allowHierarchicalParent === true ? 'hierarchy' : 'grid'
+  );
   const [formError, setFormError] = useState<string | null>(null);
   const [isEditLoading, setIsEditLoading] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -113,6 +120,11 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     entity: any | null;
   }>({ open: false, entity: null });
   const [isManualRefresh, setIsManualRefresh] = useState(false);
+  const [fixedParentForCreate, setFixedParentForCreate] = useState<any | null>(null);
+  const [hierarchyExpandToken, setHierarchyExpandToken] = useState(0);
+  const [hierarchyCollapseToken, setHierarchyCollapseToken] = useState(0);
+  const [changeParentPickerOpen, setChangeParentPickerOpen] = useState(false);
+  const [entityForParentChange, setEntityForParentChange] = useState<any | null>(null);
   
   // State for companies data and grouping
   const [companies, setCompanies] = useState<any[]>([]);
@@ -144,7 +156,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const { selectedCompany } = useCompanyStore();
 
   // Handle opening create modal
-  const handleOpenCreateModal = useCallback(() => {
+  const handleOpenCreateModal = useCallback((parent?: any) => {
     // Skip company check if schema is not company-based (isNotCompanyBased === true)
     // Also skip for "companies" schema specifically (it's always not company-based)
     // Only check for company selection if schema is company-based (isNotCompanyBased === false or undefined)
@@ -163,7 +175,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         selectedCompany: selectedCompany?.id,
       });
     }
-    
+
     if (isCompanyBased) {
       // Check if a company is selected (not "All Companies" with id === -1)
       if (!selectedCompany || selectedCompany.id === -1) {
@@ -175,6 +187,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     }
     
     if (schema?.id) {
+      setFixedParentForCreate(parent || null);
       setCreateModalOpen(true);
     }
   }, [schema?.id, schema?.isNotCompanyBased, selectedCompany]);
@@ -203,6 +216,69 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const handleDeleteWithConfirmation = useCallback((entity: any) => {
     setDeleteConfirmDialog({ open: true, entity });
   }, []);
+
+  // Handle changing parent for hierarchical items
+  const handleChangeParent = useCallback((entity: any) => {
+    if (!entity?.id || !schema?.id) {
+      return;
+    }
+    setEntityForParentChange(entity);
+    setChangeParentPickerOpen(true);
+  }, [schema?.id]);
+
+  // Handle parent selection from picker
+  const handleParentSelected = useCallback(async (selections: any[], rawItems: any[]) => {
+    if (!entityForParentChange || !schema?.id || !selections || selections.length === 0) {
+      setChangeParentPickerOpen(false);
+      setEntityForParentChange(null);
+      return;
+    }
+
+    const newParentId = selections[0]?.id ? String(selections[0].id) : null;
+    const childId = String(entityForParentChange.id);
+
+    try {
+      setIsSubmitting(true);
+
+      // Update the entity's parent field
+      const updateResponse = await apiRequest(`/api/data/${schema.id}/${childId}`, {
+        method: 'PUT',
+        body: {
+          ...entityForParentChange,
+          parent: newParentId,
+        },
+      });
+
+      if (!updateResponse.success) {
+        throw new Error(updateResponse.error || 'Failed to update parent');
+      }
+
+      // Sync the IS_PARENT_OF relation
+      await syncParentRelation({
+        schemaId: schema.id,
+        childId,
+        parentId: newParentId,
+      });
+
+      // Refresh entities to show updated hierarchy with current filters and cache disabled
+      const filters = buildFilters();
+      if (filters) {
+        await fetchEntities(filters, { disableCache: true });
+      } else {
+        // Fallback: refresh without filters if buildFilters returns null
+        await fetchEntities(undefined, { disableCache: true });
+      }
+
+      toast.success('Parent updated successfully');
+      setChangeParentPickerOpen(false);
+      setEntityForParentChange(null);
+    } catch (error) {
+      console.error('Failed to change parent:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to change parent');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [entityForParentChange, schema?.id, fetchEntities, buildFilters]);
 
   // Use shared companies hook for client-side caching
   const { companies: companiesData, isLoading: isLoadingCompaniesData } = useCompanies();
@@ -397,6 +473,15 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     
     return entities;
   }, [entities, debouncedSearchTerm]);
+
+  // Collapse all hierarchy nodes when search is cleared
+  const prevSearchRef = React.useRef<string>('');
+  React.useEffect(() => {
+    if (viewMode === 'hierarchy' && prevSearchRef.current && !searchTermLocal.trim()) {
+      setHierarchyCollapseToken((prev) => prev + 1);
+    }
+    prevSearchRef.current = searchTermLocal;
+  }, [searchTermLocal, viewMode]);
 
   // Build table columns from all schema fields
   const tableColumns = useMemo(() => {
@@ -694,10 +779,24 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           isRefreshing={isLoading || isManualRefresh}
           searchPlaceholder={`Search ${pluralName.toLowerCase()}...`}
           addButtonText={`Add ${singularName}`}
+        onExpandAllHierarchy={() => setHierarchyExpandToken((prev) => prev + 1)}
+        onCollapseAllHierarchy={() => setHierarchyCollapseToken((prev) => prev + 1)}
         />
 
         {/* Entities List - Grouped by Company or Regular List */}
-        {groupedEntities ? (
+        {viewMode === 'hierarchy' ? (
+          <HierarchyView
+            schema={schema}
+            items={entities || []}
+            searchTerm={debouncedSearchTerm}
+            onAddChild={(entity) => handleOpenCreateModal(entity)}
+            onEdit={handleEditEntity}
+            onDelete={handleDeleteWithConfirmation}
+            onChangeParent={handleChangeParent}
+            expandAllTrigger={hierarchyExpandToken}
+            collapseAllTrigger={hierarchyCollapseToken}
+          />
+        ) : groupedEntities ? (
           // Grouped view with accordion
           <Accordion type="multiple" defaultValue={accordionDefaultValues} className="w-full space-y-2">
             {/* Groups by Company */}
@@ -971,6 +1070,26 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           schemaId={schema.id}
           mode="create"
           getInitialSchema={(requestedId) => (requestedId === schema.id ? schema : null)}
+          initialValues={
+            fixedParentForCreate && (schema as any).allowHierarchicalParent
+              ? {
+                  parent: [
+                    {
+                      id: String(fixedParentForCreate.id),
+                      label:
+                        getValueByRole(schema, fixedParentForCreate, 'title') ||
+                        fixedParentForCreate.name ||
+                        fixedParentForCreate.title ||
+                        String(fixedParentForCreate.id),
+                      icon:
+                        getSingleValueByRole(schema, fixedParentForCreate, 'icon', fixedParentForCreate.icon) ||
+                        undefined,
+                    },
+                  ],
+                  __parentLocked: true,
+                }
+              : undefined
+          }
           enrichData={(formData) => {
             // Email validation function
             const isValidEmail = (email: string) => {
@@ -1040,9 +1159,11 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             if (filters) {
               await fetchEntities(filters, { disableCache: true });
             }
+            setFixedParentForCreate(null);
             setCreateModalOpen(false);
           }}
           onClose={() => {
+            setFixedParentForCreate(null);
             setCreateModalOpen(false);
           }}
         />
@@ -1164,6 +1285,27 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           onClose={() => {
             setEditEntityId(null);
           }}
+        />
+      )}
+
+      {/* Change Parent Picker */}
+      {schema?.allowHierarchicalParent && entityForParentChange && (
+        <PopupPicker
+          isOpen={changeParentPickerOpen}
+          onClose={() => {
+            setChangeParentPickerOpen(false);
+            setEntityForParentChange(null);
+          }}
+          schemaId={schema.id}
+          schema={schema as any}
+          onSelect={handleParentSelected}
+          title={`Change parent for ${schema.singular_name || 'item'}`}
+          description={`Select a new parent ${schema.singular_name || 'item'} for this ${schema.singular_name || 'item'}`}
+          excludeIds={entityForParentChange?.id ? [String(entityForParentChange.id)] : []}
+          selectedIds={getParentIdFromEntity(entityForParentChange) ? [getParentIdFromEntity(entityForParentChange)!] : []}
+          canViewList={true}
+          viewListUrl={`/page/${schema.id}`}
+          allowMultiselect={false}
         />
       )}
       
