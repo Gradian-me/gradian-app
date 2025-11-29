@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.03.000",
+  "version": "1.04.000",
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
@@ -9,7 +9,9 @@
     "lint": "eslint",
     "build:cdn": "node scripts/build-cdn.js",
     "build:cdn:watch": "node scripts/build-cdn.js --watch",
-    "build:cdn:webpack": "webpack --config webpack.cdn.config.js"
+    "build:cdn:webpack": "webpack --config webpack.cdn.config.js",
+    "build:cdn:modal": "webpack --config webpack.cdn.modal.config.js",
+    "build:cdn:all": "npm run build:cdn && npm run build:cdn:modal"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -30,6 +30,8 @@ If you prefer not to copy files, implement it manually using the postMessage API
 
 Host the helper as a standalone script on a CDN for easy integration. See [CDN Implementation Guide](./CDN_IMPLEMENTATION.md) for details.
 
+#### Popup Version (Default)
+
 ```html
 <!-- Include the CDN script -->
 <script src="https://cdn.yourapp.com/form-embed-helper.min.js"></script>
@@ -42,6 +44,106 @@ Host the helper as a standalone script on a CDN for easy integration. See [CDN I
   });
 </script>
 ```
+
+#### Modal Version (No Popup, No Iframe)
+
+The modal version creates a dialog directly in your page instead of opening a popup:
+
+```html
+<!-- Include the modal version CDN script -->
+<script src="https://cdn.yourapp.com/form-embed-helper-modal.min.js"></script>
+
+<script>
+  // Opens a modal dialog in the current page (no popup!)
+  const result = await GradianFormEmbedModal.createData('tags', {
+    baseUrl: 'https://yourapp.com',
+    initialValues: { name: 'New Tag' },
+  });
+</script>
+```
+
+**React Example:**
+
+See the complete React implementation at `/tests/third_party_form_usage_modal` in this codebase, or check the example below:
+
+```tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+
+// Declare global type for CDN script
+declare global {
+  interface Window {
+    GradianFormEmbedModal?: {
+      createData: (schemaId: string, options?: {
+        baseUrl?: string;
+        initialValues?: Record<string, any>;
+      }) => Promise<{ success: boolean; data?: any; entityId?: string; error?: string }>;
+      editData: (schemaId: string, entityId: string, options?: {
+        baseUrl?: string;
+      }) => Promise<{ success: boolean; data?: any; entityId?: string; error?: string }>;
+    };
+  }
+}
+
+export default function MyComponent() {
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+
+  // Load CDN script
+  useEffect(() => {
+    const cdnUrl = 'https://cdn.yourapp.com/form-embed-helper-modal.min.js';
+    
+    if (window.GradianFormEmbedModal) {
+      setScriptLoaded(true);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = cdnUrl;
+    script.async = true;
+    script.onload = () => setScriptLoaded(true);
+    document.body.appendChild(script);
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, []);
+
+  const handleCreate = async () => {
+    if (!window.GradianFormEmbedModal) return;
+
+    const result = await window.GradianFormEmbedModal.createData('tags', {
+      baseUrl: 'https://yourapp.com',
+    });
+
+    if (result.success) {
+      console.log('Created:', result.entityId);
+    }
+  };
+
+  return (
+    <button onClick={handleCreate} disabled={!scriptLoaded}>
+      Create Tag
+    </button>
+  );
+}
+```
+
+**Full React Example:**
+
+A complete working example is available at:
+- **Route**: `/tests/third_party_form_usage_modal`
+- **File**: `src/app/tests/third_party_form_usage_modal/page.tsx`
+
+This example includes:
+- Dynamic CDN script loading
+- Schema selection
+- Create and Edit functionality
+- Data table display
+- Error handling
+- Loading states
 
 ## Example 1: Generic Create Data Function
 

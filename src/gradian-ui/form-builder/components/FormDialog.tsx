@@ -139,7 +139,7 @@ export const FormDialog: React.FC<FormDialogProps> = ({
         {/* Form Actions */}
         {actionConfigs.length > 0 && (
           <div className="px-2 md:px-6 py-1 md:pb-2 shrink-0 bg-white border-b border-gray-200 relative z-20">
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end space-x-3 py-1">
               {actionConfigs.map((config) => {
                 if (config.type === 'submit') {
                   return (

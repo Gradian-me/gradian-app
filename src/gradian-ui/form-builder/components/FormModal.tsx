@@ -108,6 +108,18 @@ export interface FormModalProps extends UseFormModalOptions {
    * Optional initial values for create mode (e.g. pre-filled parent in hierarchy view)
    */
   initialValues?: Record<string, any>;
+
+  /**
+   * Hide the dialog header (title/description) when true
+   * Useful when embedding in a modal to avoid duplicate headers
+   */
+  hideDialogHeader?: boolean;
+
+  /**
+   * Hide the X close button in the top right when true
+   * Useful when embedding in a modal to avoid duplicate close buttons
+   */
+  hideCloseButton?: boolean;
 }
 
 /**
@@ -147,6 +159,8 @@ export const FormModal: React.FC<FormModalProps> = ({
   getInitialSchema,
   getInitialEntityData,
   initialValues,
+  hideDialogHeader = false,
+  hideCloseButton = false,
 }) => {
   const {
     targetSchema,
@@ -255,6 +269,8 @@ export const FormModal: React.FC<FormModalProps> = ({
       description={modalDescription}
       size={size}
       showCloseButton={false}
+      hideDialogHeader={hideDialogHeader}
+      hideCloseButton={hideCloseButton}
     >
       {/* Loading indicator for schema/entity loading */}
       {isLoading && showLoadingSpinner && (

@@ -6,7 +6,9 @@ The Form Embedding System allows external applications to open your forms in a p
 
 ## Features
 
-- ✅ **Popup-based**: Opens forms in a popup window (no iframe required)
+- ✅ **Multiple Embed Modes**: 
+  - **Popup Mode** (default): Opens forms in a popup window
+  - **Modal Mode**: Embeds forms as a modal dialog directly in your page (no popup, no iframe)
 - ✅ **Create & Edit Modes**: Support for both creating new records and editing existing ones
 - ✅ **Initial Values**: Pre-fill forms with initial data
 - ✅ **Type-Safe Communication**: TypeScript types for all postMessage events
@@ -17,7 +19,28 @@ The Form Embedding System allows external applications to open your forms in a p
 
 ## Quick Start
 
-### 1. Using the Helper Function (Recommended)
+### 1. Popup Mode (Default)
+
+Opens forms in a popup window. Use `GradianFormEmbed`:
+
+### 2. Modal Mode (No Popup, No Iframe)
+
+Embeds forms as a modal dialog directly in your page. Use `GradianFormEmbedModal`:
+
+```html
+<!-- Load the modal version -->
+<script src="https://cdn.yourapp.com/form-embed-helper-modal.min.js"></script>
+
+<script>
+  // Opens a modal dialog in the current page
+  const result = await GradianFormEmbedModal.createData('tags', {
+    baseUrl: 'https://yourapp.com',
+    initialValues: { name: 'New Tag' },
+  });
+</script>
+```
+
+### 3. Using the Helper Function (Popup Mode)
 
 The easiest way to embed forms is using the `openFormEmbed` helper function:
 

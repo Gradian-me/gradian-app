@@ -688,5 +688,56 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KB89HZ60DJCGT23SZXRJ495E",
+    "timestamp": "2025-11-29T17:11:18.475Z",
+    "version": "1.04.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "THIRD PARTY FORM EMBEDDING | Added support for multiple CDN build configurations including modal and popup modes",
+        "priority": "High",
+        "affectedDomains": [
+          "form-embedding",
+          "cdn",
+          "build"
+        ]
+      },
+      {
+        "changeType": "feature",
+        "description": "Implemented modal mode for form embedding, allowing forms to be displayed as modal dialogs",
+        "priority": "High",
+        "affectedDomains": [
+          "form-embedding",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated build scripts to handle multiple output files and improved logging for build processes",
+        "priority": "Medium",
+        "affectedDomains": [
+          "build",
+          "cdn"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Enhanced FormEmbedClient to support modal mode and improved message handling",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-embedding"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Revised documentation to reflect new embedding options and usage examples",
+        "priority": "LOW",
+        "affectedDomains": [
+          "documentation"
+        ]
+      }
+    ]
   }
 ]

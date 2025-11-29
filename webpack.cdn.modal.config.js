@@ -3,14 +3,14 @@ const WebpackObfuscator = require('webpack-obfuscator');
 
 module.exports = {
   mode: 'production',
-  entry: './src/gradian-ui/form-builder/utils/form-embed-helper.cdn.js',
+  entry: './src/gradian-ui/form-builder/utils/form-embed-helper-modal.cdn.js',
   output: {
     path: path.resolve(__dirname, 'public/cdn'),
-    filename: 'form-embed-helper.min.js',
-    library: 'GradianFormEmbed',
+    filename: 'form-embed-helper-modal.min.js',
+    library: 'GradianFormEmbedModal',
     libraryTarget: 'umd',
     globalObject: 'this',
-    clean: false, // Don't clean, we're building multiple files
+    clean: false, // Don't clean, keep other files
   },
   optimization: {
     minimize: true,
@@ -32,19 +32,19 @@ module.exports = {
         stringArrayThreshold: 0.75,
         unicodeEscapeSequence: false,
         compact: true,
-        controlFlowFlattening: false, // Disable to keep performance
-        deadCodeInjection: false, // Disable to keep performance
-        debugProtection: false, // Disable for CDN usage
+        controlFlowFlattening: false,
+        deadCodeInjection: false,
+        debugProtection: false,
         debugProtectionInterval: 0,
-        disableConsoleOutput: false, // Keep console for debugging
+        disableConsoleOutput: false,
         identifierNamesGenerator: 'hexadecimal',
         log: false,
-        numbersToExpressions: false, // Disable to keep performance
+        numbersToExpressions: false,
         renameGlobals: false,
-        selfDefending: false, // Disable for CDN usage
+        selfDefending: false,
         simplify: true,
-        splitStrings: false, // Disable to keep performance
-        transformObjectKeys: false, // Keep API names readable
+        splitStrings: false,
+        transformObjectKeys: false,
       },
       []
     ),

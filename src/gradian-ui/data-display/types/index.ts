@@ -316,6 +316,8 @@ export interface ModalProps extends BaseComponentProps {
   showCloseButton?: boolean;
   closeOnOutsideClick?: boolean;
   actions?: React.ReactNode;
+  hideDialogHeader?: boolean; // Hide the dialog header (title/description) when true
+  hideCloseButton?: boolean; // Hide the X close button in top right when true
 }
 
 // Data Table Component Types

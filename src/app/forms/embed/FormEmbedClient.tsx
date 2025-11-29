@@ -42,12 +42,23 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
     }
   }, [initialValuesParam]);
 
+  // Check if we're in modal mode
+  const isModalMode = searchParams?.get('modalMode') === 'true';
+
   // Send message to parent window
   const sendMessage = useCallback(
     (message: FormEmbedMessage) => {
-      if (typeof window === 'undefined' || !window.opener) {
-        // If no opener, we're not in a popup - log for debugging
-        console.log('[FormEmbed] Message (no opener):', message);
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      // In modal mode, send to parent (iframe parent)
+      // In popup mode, send to opener
+      const targetWindow = isModalMode ? window.parent : window.opener;
+      
+      if (!targetWindow) {
+        // If no target, we're not in a popup or iframe - log for debugging
+        console.log('[FormEmbed] Message (no target window):', message);
         return;
       }
 
@@ -55,7 +66,7 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
       if (returnOrigin) {
         const targetOrigin = returnOrigin === '*' ? '*' : returnOrigin;
         try {
-          window.opener.postMessage(message, targetOrigin);
+          targetWindow.postMessage(message, targetOrigin);
         } catch (error) {
           console.error('[FormEmbed] Failed to send message:', error);
         }
@@ -63,13 +74,13 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
         // Send to any origin (less secure, but allows flexibility)
         // In production, this should be more restrictive
         try {
-          window.opener.postMessage(message, '*');
+          targetWindow.postMessage(message, '*');
         } catch (error) {
           console.error('[FormEmbed] Failed to send message:', error);
         }
       }
     },
-    [returnOrigin]
+    [returnOrigin, isModalMode]
   );
 
   // Notify parent that form is ready
@@ -100,27 +111,18 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
     setIsReady(true);
   }, [schemaId, mode, entityId, sendMessage]);
 
-  // Listen for messages from parent window
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      // Validate origin if allowedOrigins is specified
-      if (allowedOrigins && allowedOrigins.length > 0) {
-        if (!validateMessageOrigin(event, allowedOrigins)) {
-          console.warn('[FormEmbed] Message from unauthorized origin:', event.origin);
-          return;
-        }
-      }
+  // Handle form close (defined before useEffect that uses it)
+  const handleClose = useCallback(() => {
+    const closedMessage = createFormEmbedMessage<FormClosedMessage>('form-closed', {
+      reason: 'user',
+    });
+    sendMessage(closedMessage);
 
-      // Handle messages from parent if needed
-      // For now, we only send messages, not receive them
-      console.log('[FormEmbed] Received message from parent:', event.data);
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, [allowedOrigins]);
+    // Close the popup (only if not in modal mode)
+    if (!isModalMode && typeof window !== 'undefined' && window.opener) {
+      window.close();
+    }
+  }, [sendMessage, isModalMode]);
 
   // Handle form submission success
   const handleSuccess = useCallback(
@@ -132,24 +134,36 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
       });
       sendMessage(submittedMessage);
 
-      // Close the popup after a short delay to allow message to be received
-      setTimeout(() => {
-        window.close();
-      }, 100);
+      // Close the popup after a short delay to allow message to be received (only if not in modal mode)
+      if (!isModalMode) {
+        setTimeout(() => {
+          if (typeof window !== 'undefined' && window.opener) {
+            window.close();
+          }
+        }, 100);
+      }
     },
-    [sendMessage, entityId]
+    [sendMessage, entityId, isModalMode]
   );
 
-  // Handle form close
-  const handleClose = useCallback(() => {
-    const closedMessage = createFormEmbedMessage<FormClosedMessage>('form-closed', {
-      reason: 'user',
-    });
-    sendMessage(closedMessage);
+  // Listen for messages from parent window (for modal mode close)
+  useEffect(() => {
+    if (!isModalMode) {
+      return;
+    }
 
-    // Close the popup
-    window.close();
-  }, [sendMessage]);
+    const handleMessage = (event: MessageEvent) => {
+      // Handle close message from parent modal
+      if (event.data && event.data.type === 'close-form') {
+        handleClose();
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [isModalMode, handleClose]);
 
   // Handle form errors
   const handleError = useCallback(
@@ -189,8 +203,14 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
     );
   }
 
+
+  // In modal mode, remove the full-screen background and hide duplicate headers/close buttons
+  const containerStyle = isModalMode 
+    ? { background: 'transparent', minHeight: 'auto' }
+    : {};
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div style={containerStyle} className={isModalMode ? '' : 'min-h-screen bg-gray-50 dark:bg-gray-900'}>
       <FormModal
         schemaId={schemaId}
         entityId={entityId}
@@ -199,6 +219,8 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
         onSuccess={handleSuccess}
         onClose={handleClose}
         size="xl"
+        hideDialogHeader={isModalMode}
+        hideCloseButton={isModalMode}
       />
     </div>
   );

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gradian Form Embed - Modal Version (No Popup, No Iframe)</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .controls {
+      padding: 30px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .control-group {
+      display: flex;
+      gap: 15px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #495057;
+      font-size: 0.9rem;
+    }
+
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #dee2e6;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      border: 1px solid #f5c6cb;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      border: 1px solid #c3e6cb;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    th {
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #e9ecef;
+      font-size: 0.9rem;
+    }
+
+    tbody tr:hover {
+      background: #f8f9fa;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6c757d;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+
+    .btn-edit {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-edit:hover {
+      background: #5568d3;
+    }
+
+    .info-box {
+      background: #e7f3ff;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .info-box strong {
+      color: #667eea;
+    }
+
+    .mode-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #dee2e6;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .mode-btn.active {
+      border-color: #667eea;
+      background: #667eea;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚀 Gradian Form Embed - Modal Version</h1>
+      <p>No popup, no iframe - embedded modal dialog</p>
+    </div>
+
+    <div class="controls">
+      <div class="info-box">
+        <strong>Base URL:</strong> <span id="baseUrlDisplay">Loading...</span>
+        <br>
+        <small>This version uses a modal dialog instead of a popup window</small>
+      </div>
+
+      <div class="control-group">
+        <div class="form-group">
+          <label for="baseUrl">Base URL</label>
+          <input 
+            type="text" 
+            id="baseUrl" 
+            placeholder="https://yourapp.com" 
+            value="http://localhost:3000"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="schemaSelect">Schema</label>
+          <select id="schemaSelect">
+            <option value="tags">Tags</option>
+            <option value="companies">Companies</option>
+            <option value="users">Users</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <button class="btn btn-primary" id="createBtn" onclick="handleCreate()">
+            ➕ Create New
+          </button>
+        </div>
+
+        <div class="form-group">
+          <button class="btn btn-secondary" id="refreshBtn" onclick="loadData()">
+            🔄 Refresh Data
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div id="message"></div>
+      <div id="loading" class="loading" style="display: none;">Loading data</div>
+      <div id="dataContainer"></div>
+    </div>
+  </div>
+
+  <!-- Load the Modal version of Gradian Form Embed Helper -->
+  <script src="/cdn/form-embed-helper-modal.min.js"></script>
+
+  <script>
+    // Configuration
+    let currentSchema = 'tags';
+    let baseUrl = 'http://localhost:3000';
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      const baseUrlInput = document.getElementById('baseUrl');
+      baseUrl = baseUrlInput.value || 'http://localhost:3000';
+      document.getElementById('baseUrlDisplay').textContent = baseUrl;
+
+      baseUrlInput.addEventListener('change', function() {
+        baseUrl = this.value || 'http://localhost:3000';
+        document.getElementById('baseUrlDisplay').textContent = baseUrl;
+        loadData();
+      });
+
+      document.getElementById('schemaSelect').addEventListener('change', function() {
+        currentSchema = this.value;
+        loadData();
+      });
+
+      loadData();
+
+      if (typeof GradianFormEmbedModal === 'undefined') {
+        showMessage('⚠️ Form embed modal helper not loaded. Make sure the script is available at /cdn/form-embed-helper-modal.min.js', 'error');
+      }
+    });
+
+    function showMessage(text, type = 'success') {
+      const messageDiv = document.getElementById('message');
+      messageDiv.className = type;
+      messageDiv.textContent = text;
+      messageDiv.style.display = 'block';
+
+      if (type === 'success') {
+        setTimeout(() => {
+          messageDiv.style.display = 'none';
+        }, 3000);
+      }
+    }
+
+    async function handleCreate() {
+      if (typeof GradianFormEmbedModal === 'undefined') {
+        showMessage('❌ Form embed modal helper not loaded. Please check the script path.', 'error');
+        return;
+      }
+
+      const schemaId = document.getElementById('schemaSelect').value;
+      const createBtn = document.getElementById('createBtn');
+      
+      createBtn.disabled = true;
+      createBtn.textContent = '⏳ Opening form...';
+
+      try {
+        const result = await GradianFormEmbedModal.createData(schemaId, {
+          baseUrl: baseUrl,
+        });
+
+        if (result.success) {
+          showMessage(`✅ ${schemaId} created successfully! ID: ${result.entityId}`, 'success');
+          setTimeout(() => {
+            loadData();
+          }, 500);
+        } else {
+          showMessage(`❌ Failed to create ${schemaId}: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        showMessage(`❌ Error: ${error.message}`, 'error');
+      } finally {
+        createBtn.disabled = false;
+        createBtn.textContent = '➕ Create New';
+      }
+    }
+
+    async function handleEdit(entityId) {
+      if (typeof GradianFormEmbedModal === 'undefined') {
+        showMessage('❌ Form embed modal helper not loaded.', 'error');
+        return;
+      }
+
+      const schemaId = document.getElementById('schemaSelect').value;
+
+      try {
+        const result = await GradianFormEmbedModal.editData(schemaId, entityId, {
+          baseUrl: baseUrl,
+        });
+
+        if (result.success) {
+          showMessage(`✅ ${schemaId} updated successfully!`, 'success');
+          setTimeout(() => {
+            loadData();
+          }, 500);
+        } else {
+          showMessage(`❌ Failed to update ${schemaId}: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        showMessage(`❌ Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function loadData() {
+      const schemaId = document.getElementById('schemaSelect').value;
+      const loadingDiv = document.getElementById('loading');
+      const dataContainer = document.getElementById('dataContainer');
+      const refreshBtn = document.getElementById('refreshBtn');
+
+      loadingDiv.style.display = 'block';
+      dataContainer.innerHTML = '';
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = '⏳ Loading...';
+
+      try {
+        const response = await fetch(`${baseUrl}/api/data/${schemaId}`);
+        const result = await response.json();
+
+        if (result.success && Array.isArray(result.data)) {
+          displayData(result.data, schemaId);
+        } else if (result.success && result.data) {
+          displayData([result.data], schemaId);
+        } else {
+          showMessage(`❌ Failed to load data: ${result.error || 'Unknown error'}`, 'error');
+          dataContainer.innerHTML = '<div class="empty-state">No data available</div>';
+        }
+      } catch (error) {
+        showMessage(`❌ Error loading data: ${error.message}`, 'error');
+        dataContainer.innerHTML = '<div class="empty-state">Failed to load data. Check your base URL and API endpoint.</div>';
+      } finally {
+        loadingDiv.style.display = 'none';
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = '🔄 Refresh Data';
+      }
+    }
+
+    function displayData(data, schemaId) {
+      const dataContainer = document.getElementById('dataContainer');
+
+      if (!data || data.length === 0) {
+        dataContainer.innerHTML = `
+          <div class="empty-state">
+            <h3>No ${schemaId} found</h3>
+            <p>Click "Create New" to add your first ${schemaId.slice(0, -1)}</p>
+          </div>
+        `;
+        return;
+      }
+
+      const allKeys = new Set();
+      data.forEach(item => {
+        Object.keys(item).forEach(key => {
+          if (!key.startsWith('_') && key !== 'password' && key !== 'token') {
+            allKeys.add(key);
+          }
+        });
+      });
+
+      const sortedKeys = Array.from(allKeys).sort((a, b) => {
+        if (a === 'id') return -1;
+        if (b === 'id') return 1;
+        if (a === 'name' || a === 'title') return -1;
+        if (b === 'name' || b === 'title') return 1;
+        return a.localeCompare(b);
+      });
+
+      const displayKeys = sortedKeys.slice(0, 10);
+
+      let tableHTML = `
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                ${displayKeys.map(key => `<th>${formatKey(key)}</th>`).join('')}
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      data.forEach(item => {
+        tableHTML += '<tr>';
+        displayKeys.forEach(key => {
+          const value = item[key];
+          tableHTML += `<td>${formatValue(value)}</td>`;
+        });
+        tableHTML += `
+          <td>
+            <button class="btn btn-sm btn-edit" onclick="handleEdit('${item.id}')">
+              ✏️ Edit
+            </button>
+          </td>
+        `;
+        tableHTML += '</tr>';
+      });
+
+      tableHTML += `
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top: 15px; color: #6c757d; font-size: 0.85rem;">
+          Showing ${data.length} ${data.length === 1 ? schemaId.slice(0, -1) : schemaId}
+        </div>
+      `;
+
+      dataContainer.innerHTML = tableHTML;
+    }
+
+    function formatKey(key) {
+      return key
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, str => str.toUpperCase())
+        .trim();
+    }
+
+    function formatValue(value) {
+      if (value === null || value === undefined) {
+        return '<span style="color: #adb5bd;">—</span>';
+      }
+
+      if (typeof value === 'boolean') {
+        return value 
+          ? '<span class="badge badge-success">Yes</span>' 
+          : '<span class="badge">No</span>';
+      }
+
+      if (typeof value === 'object') {
+        if (Array.isArray(value)) {
+          return value.length > 0 
+            ? `<span class="badge">${value.length} items</span>`
+            : '<span style="color: #adb5bd;">Empty</span>';
+        }
+        return '<span class="badge">Object</span>';
+      }
+
+      if (typeof value === 'string' && value.length > 50) {
+        return value.substring(0, 50) + '...';
+      }
+
+      return String(value);
+    }
+  </script>
+</body>
+</html>
+

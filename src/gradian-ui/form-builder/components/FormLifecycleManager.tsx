@@ -1221,7 +1221,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           
           {actionConfigs.length > 0 && !hideActions && (
             <div className="space-y-3 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10">
-              <div className="flex justify-end space-x-3">
+              <div className="flex justify-end space-x-3 py-1">
                 {actionConfigs.map((config) => {
                   if (config.type === 'submit') {
                     return (
