@@ -3,7 +3,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Trash2, Settings } from 'lucide-react';
+import { Trash2, Settings, Mail } from 'lucide-react';
 import { HealthService } from '../types';
 
 interface ServiceConfigDialogProps {
@@ -115,6 +115,41 @@ export function ServiceConfigDialog({
               </div>
             </div>
           </div>
+
+          {(service.emailTo && service.emailTo.length > 0) || (service.emailCC && service.emailCC.length > 0) ? (
+            <div className="p-4 border rounded-lg bg-blue-50/50 dark:bg-blue-950/10">
+              <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
+                <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                Email Notifications
+              </div>
+              <div className="space-y-2 text-sm">
+                {service.emailTo && service.emailTo.length > 0 && (
+                  <div>
+                    <span className="text-gray-600 dark:text-gray-400">To:</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {service.emailTo.map((email, index) => (
+                        <span key={index} className="text-gray-900 dark:text-gray-100 font-mono text-xs bg-white dark:bg-gray-800 px-2 py-0.5 rounded border">
+                          {email}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {service.emailCC && service.emailCC.length > 0 && (
+                  <div>
+                    <span className="text-gray-600 dark:text-gray-400">CC:</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {service.emailCC.map((email, index) => (
+                        <span key={index} className="text-gray-900 dark:text-gray-100 font-mono text-xs bg-white dark:bg-gray-800 px-2 py-0.5 rounded border">
+                          {email}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : null}
         </div>
       </DialogContent>
     </Dialog>

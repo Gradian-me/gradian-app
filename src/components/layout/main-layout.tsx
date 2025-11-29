@@ -505,7 +505,7 @@ export function MainLayout({
           initial={!hasMountedBefore ? { opacity: 0, y: 10 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="flex-1 overflow-y-auto p-2 md:p-4 lg:p-6 bg-gray-50 dark:bg-gray-900"
+          className="flex-1 overflow-y-auto p-2 md:p-4 lg:p-6 pb-12 bg-gray-50 dark:bg-gray-900"
           data-scroll-container="main-content"
         >
           <div className="max-w-9xl mx-auto w-full h-full">

@@ -20,6 +20,7 @@ export interface CountdownProps {
   showIcon?: boolean;
   size?: 'sm' | 'md' | 'lg';
   fieldLabel?: string;
+  countUp?: boolean; // If true, counts up from startDate to now instead of down to expireDate
 }
 
 export const Countdown: React.FC<CountdownProps> = ({
@@ -30,6 +31,7 @@ export const Countdown: React.FC<CountdownProps> = ({
   showIcon = true,
   size = 'md',
   fieldLabel,
+  countUp = false,
 }) => {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -47,29 +49,51 @@ export const Countdown: React.FC<CountdownProps> = ({
   useEffect(() => {
     const calculateTimeLeft = () => {
       const now = new Date();
-      const expiry = new Date(expireDate);
-      const difference = expiry.getTime() - now.getTime();
+      
+      if (countUp && startDate) {
+        // Count up mode: calculate time from startDate to now
+        const start = new Date(startDate);
+        const difference = now.getTime() - start.getTime();
 
-      if (difference <= 0) {
-        setIsExpired(true);
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
+        if (difference < 0) {
+          setIsExpired(false);
+          setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+          return;
+        }
+
+        setIsExpired(false);
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        setTimeLeft({ days, hours, minutes, seconds });
+      } else {
+        // Count down mode: calculate time from now to expireDate
+        const expiry = new Date(expireDate);
+        const difference = expiry.getTime() - now.getTime();
+
+        if (difference <= 0) {
+          setIsExpired(true);
+          setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+          return;
+        }
+
+        setIsExpired(false);
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        setTimeLeft({ days, hours, minutes, seconds });
       }
-
-      setIsExpired(false);
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-      setTimeLeft({ days, hours, minutes, seconds });
     };
 
     calculateTimeLeft();
     const interval = setInterval(calculateTimeLeft, 1000);
 
     return () => clearInterval(interval);
-  }, [expireDate]);
+  }, [expireDate, startDate, countUp]);
 
   if (!mounted) {
     return null;
@@ -81,7 +105,7 @@ export const Countdown: React.FC<CountdownProps> = ({
     lg: 'text-base'
   };
 
-  if (isExpired) {
+  if (isExpired && !countUp) {
     return (
       <div className={`flex flex-col gap-1 ${className}`}>
         <div className="flex items-center gap-2 text-red-600">
@@ -164,18 +188,33 @@ export const Countdown: React.FC<CountdownProps> = ({
         </div>
       </div>
       
-      {/* Expiration date display */}
-      <div className="flex items-end gap-1.5 text-gray-500">
-        <Calendar className="h-3 w-3" />
-        <span className={`${sizeClasses[size]}`}>
-          Expires: {formatDate(new Date(expireDate), { 
-            month: 'short', 
-            day: 'numeric', 
-            year: 'numeric',
-            ...(includeTime && { hour: '2-digit', minute: '2-digit' })
-          })}
-        </span>
-      </div>
+      {/* Expiration date display (only for count down) or start date display (for count up) */}
+      {!countUp && (
+        <div className="flex items-end gap-1.5 text-gray-500">
+          <Calendar className="h-3 w-3" />
+          <span className={`${sizeClasses[size]}`}>
+            Expires: {formatDate(new Date(expireDate), { 
+              month: 'short', 
+              day: 'numeric', 
+              year: 'numeric',
+              ...(includeTime && { hour: '2-digit', minute: '2-digit' })
+            })}
+          </span>
+        </div>
+      )}
+      {countUp && startDate && (
+        <div className="flex items-end gap-1.5 text-gray-500">
+          <Calendar className="h-3 w-3" />
+          <span className={`${sizeClasses[size]}`}>
+            Started: {formatDate(new Date(startDate), { 
+              month: 'short', 
+              day: 'numeric', 
+              year: 'numeric',
+              ...(includeTime && { hour: '2-digit', minute: '2-digit' })
+            })}
+          </span>
+        </div>
+      )}
     </div>
   );
 };

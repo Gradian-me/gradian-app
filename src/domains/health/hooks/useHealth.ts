@@ -1,7 +1,284 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { toast } from 'sonner';
 import { HealthService, ServiceHealthStatus, HealthCheckResponse } from '../types';
+import { Email } from '@/gradian-ui/communication';
+
+/**
+ * Update lastChecked timestamp in health.json
+ */
+const updateLastChecked = async (serviceId: string): Promise<void> => {
+  try {
+    const timestamp = new Date().toISOString();
+    await apiRequest('/api/data/health', {
+      method: 'PATCH',
+      body: {
+        serviceId,
+        field: 'lastChecked',
+        timestamp,
+      },
+    });
+  } catch (error) {
+    // Silently fail - don't interrupt health check flow
+    console.warn(`Failed to update lastChecked for ${serviceId}:`, error);
+  }
+};
+
+/**
+ * Update lastEmailSent timestamp in health.json
+ */
+export const updateLastEmailSent = async (serviceId: string): Promise<void> => {
+  try {
+    const timestamp = new Date().toISOString();
+    await apiRequest('/api/data/health', {
+      method: 'PATCH',
+      body: {
+        serviceId,
+        field: 'lastEmailSent',
+        timestamp,
+      },
+    });
+  } catch (error) {
+    // Silently fail - don't interrupt email sending flow
+    console.warn(`Failed to update lastEmailSent for ${serviceId}:`, error);
+  }
+};
+
+const FAILED_CYCLES_STORAGE_KEY = 'health-failed-cycles';
+
+interface FailedCycleData {
+  failedCycles: number;
+  firstFailureTime: string | null;
+}
+
+// Helper functions to manage failed cycles in localStorage
+const getFailedCyclesData = (serviceId: string): FailedCycleData => {
+  if (typeof window === 'undefined') {
+    return { failedCycles: 0, firstFailureTime: null };
+  }
+  try {
+    const stored = localStorage.getItem(FAILED_CYCLES_STORAGE_KEY);
+    if (stored) {
+      const data = JSON.parse(stored);
+      return data[serviceId] || { failedCycles: 0, firstFailureTime: null };
+    }
+  } catch (error) {
+    console.warn('Error reading failed cycles data:', error);
+  }
+  return { failedCycles: 0, firstFailureTime: null };
+};
+
+const updateFailedCyclesData = (serviceId: string, data: FailedCycleData): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    const stored = localStorage.getItem(FAILED_CYCLES_STORAGE_KEY);
+    const allData = stored ? JSON.parse(stored) : {};
+    allData[serviceId] = data;
+    localStorage.setItem(FAILED_CYCLES_STORAGE_KEY, JSON.stringify(allData));
+  } catch (error) {
+    console.warn('Error updating failed cycles data:', error);
+  }
+};
+
+const resetFailedCyclesData = (serviceId: string): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    const stored = localStorage.getItem(FAILED_CYCLES_STORAGE_KEY);
+    if (stored) {
+      const allData = JSON.parse(stored);
+      delete allData[serviceId];
+      localStorage.setItem(FAILED_CYCLES_STORAGE_KEY, JSON.stringify(allData));
+    }
+  } catch (error) {
+    console.warn('Error resetting failed cycles data:', error);
+  }
+};
+
+// Helper function to update failed cycles based on health status
+const updateFailedCycles = (serviceId: string, isUnhealthy: boolean): FailedCycleData => {
+  const currentData = getFailedCyclesData(serviceId);
+  
+  if (isUnhealthy) {
+    // Service is unhealthy - increment failed cycles
+    const now = new Date().toISOString();
+    const newData: FailedCycleData = {
+      failedCycles: currentData.failedCycles + 1,
+      firstFailureTime: currentData.firstFailureTime || now,
+    };
+    updateFailedCyclesData(serviceId, newData);
+    return newData;
+  } else {
+    // Service is healthy - reset failed cycles
+    resetFailedCyclesData(serviceId);
+    return { failedCycles: 0, firstFailureTime: null };
+  }
+};
+
+/**
+ * Send health alert email if threshold is reached
+ * Returns error message if email sending fails, null if successful or skipped
+ */
+const sendHealthAlertEmail = async (
+  service: HealthService,
+  healthStatus: ServiceHealthStatus,
+  failedCycles: number,
+  setHealthStatuses: Dispatch<SetStateAction<Record<string, ServiceHealthStatus>>>
+): Promise<string | null> => {
+  try {
+    // Fetch latest service data to get current lastEmailSent
+    let latestService = service;
+    try {
+      const response = await apiRequest<HealthService[] | { data?: HealthService[]; items?: HealthService[] }>('/api/data/health', {
+        method: 'GET',
+      });
+      if (response.success && response.data) {
+        const data = Array.isArray(response.data) 
+          ? response.data 
+          : ((response.data as any)?.data || (response.data as any)?.items || []);
+        const found = data.find((s: HealthService) => s.id === service.id);
+        if (found) {
+          latestService = found;
+        }
+      }
+    } catch (error) {
+      // If fetch fails, use the service passed in
+      console.warn('Failed to fetch latest service data, using provided service:', error);
+    }
+
+    // Check if email should be sent
+    const failCycleToSendEmail = latestService.failCycleToSendEmail ?? 3;
+    const emailTo = latestService.emailTo;
+    const emailCC = latestService.emailCC;
+
+    // Don't send if no email recipients configured
+    if (!emailTo || emailTo.length === 0) {
+      // Clear email error if no recipients configured
+      setHealthStatuses(prev => ({
+        ...prev,
+        [service.id]: {
+          ...(prev[service.id] || healthStatus),
+          emailError: null,
+        },
+      }));
+      return null;
+    }
+
+    // Don't send if failed cycles haven't reached threshold
+    if (failedCycles < failCycleToSendEmail) {
+      // Clear email error if threshold not reached
+      setHealthStatuses(prev => ({
+        ...prev,
+        [service.id]: {
+          ...(prev[service.id] || healthStatus),
+          emailError: null,
+        },
+      }));
+      return null;
+    }
+
+    // Check if we should send email (avoid sending on every check once threshold is reached)
+    // Only send if this is exactly the threshold, or if enough time has passed since last email
+    const emailIntervalMinutes = latestService.emailIntervalMinutes ?? 15;
+    const lastEmailSent = latestService.lastEmailSent;
+    if (lastEmailSent) {
+      const lastSentTime = new Date(lastEmailSent).getTime();
+      const intervalMs = emailIntervalMinutes * 60 * 1000;
+      const timeSinceLastEmail = Date.now() - lastSentTime;
+      
+      // If we sent an email recently and this isn't exactly the threshold, don't send again
+      if (timeSinceLastEmail < intervalMs && failedCycles > failCycleToSendEmail) {
+        // Clear email error if we're not sending (rate limited)
+        setHealthStatuses(prev => ({
+          ...prev,
+          [service.id]: {
+            ...(prev[service.id] || healthStatus),
+            emailError: null,
+          },
+        }));
+        return null;
+      }
+    }
+
+    // Prepare email template data
+    const errorMessage = healthStatus.error || 
+      (healthStatus.data?.status === 'unhealthy' ? 'Service is reporting as unhealthy' : 'Service health check failed');
+    
+    const checksDetails = healthStatus.data?.checks 
+      ? Object.entries(healthStatus.data.checks)
+          .filter(([_, check]) => check.status !== 'healthy')
+          .map(([name, check]) => `${name}: ${check.message || check.status}`)
+          .join('; ')
+      : errorMessage;
+
+    const healthDashboardUrl = typeof window !== 'undefined' 
+      ? `${window.location.origin}/builder/health`
+      : 'https://scm.cinnagen.com/health';
+
+    const templateData = {
+      serviceName: latestService.serviceTitle,
+      status: healthStatus.data?.status || 'unhealthy',
+      timestamp: healthStatus.data?.timestamp || new Date().toISOString(),
+      version: healthStatus.data?.version || 'unknown',
+      errorMessage: checksDetails,
+      healthDashboardUrl,
+      year: new Date().getFullYear().toString(),
+    };
+
+    // Send email using communication service
+    const emailResponse = await Email.sendEmail({
+      templateId: 'monitoring-error',
+      to: emailTo,
+      cc: emailCC,
+      templateData,
+    });
+
+    if (emailResponse.success) {
+      // Update lastEmailSent timestamp
+      await updateLastEmailSent(latestService.id);
+      console.log(`Health alert email sent for ${latestService.serviceTitle} after ${failedCycles} failed cycles`);
+      
+      // Clear email error on success
+      setHealthStatuses(prev => ({
+        ...prev,
+        [service.id]: {
+          ...(prev[service.id] || healthStatus),
+          emailError: null,
+        },
+      }));
+      
+      return null;
+    } else {
+      const errorMessage = emailResponse.message || 'Failed to send email alert';
+      console.error(`Failed to send health alert email for ${latestService.serviceTitle}:`, errorMessage);
+      
+      // Set email error in health status
+      setHealthStatuses(prev => ({
+        ...prev,
+        [service.id]: {
+          ...(prev[service.id] || healthStatus),
+          emailError: errorMessage,
+        },
+      }));
+      
+      return errorMessage;
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error sending email alert';
+    console.warn(`Error sending health alert email for ${service.serviceTitle}:`, error);
+    
+    // Set email error in health status
+    setHealthStatuses(prev => ({
+      ...prev,
+      [service.id]: {
+        ...(prev[service.id] || healthStatus),
+        emailError: errorMessage,
+      },
+    }));
+    
+    return errorMessage;
+  }
+};
 
 export interface UseHealthOptions {
   autoRefresh?: boolean;
@@ -73,9 +350,10 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
           : ((response.data as any)?.data || (response.data as any)?.items || []);
         setServices(data);
         
-        // Initialize health statuses
+        // Initialize health statuses and update with failed cycles data
         const initialStatuses: Record<string, ServiceHealthStatus> = {};
         data.forEach((service: HealthService) => {
+          const failedCyclesData = getFailedCyclesData(service.id);
           if (!healthStatuses[service.id]) {
             initialStatuses[service.id] = {
               service,
@@ -83,10 +361,26 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
               loading: false,
               error: null,
               lastChecked: null,
+              failedCycles: failedCyclesData.failedCycles,
+              firstFailureTime: failedCyclesData.firstFailureTime,
+            };
+          } else {
+            // Update existing status with failed cycles data
+            initialStatuses[service.id] = {
+              ...healthStatuses[service.id],
+              service, // Update service in case it changed
+              failedCycles: failedCyclesData.failedCycles,
+              firstFailureTime: failedCyclesData.firstFailureTime,
             };
           }
         });
-        setHealthStatuses(prev => ({ ...prev, ...initialStatuses }));
+        setHealthStatuses(prev => {
+          const updated = { ...prev };
+          Object.keys(initialStatuses).forEach(serviceId => {
+            updated[serviceId] = initialStatuses[serviceId];
+          });
+          return updated;
+        });
       } else {
         console.error('Failed to fetch health services:', response.error);
       }
@@ -170,16 +464,25 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
             },
             responseTime: 0,
           };
+          const failedCyclesData = updateFailedCycles(service.id, true);
+          const checkedAt = new Date().toISOString();
+          const newStatus: ServiceHealthStatus = {
+            ...(healthStatuses[service.id] || { service, data: null, loading: false, error: null, lastChecked: null }),
+            data: unhealthyData,
+            loading: false,
+            error: errorMsg,
+            lastChecked: checkedAt,
+            failedCycles: failedCyclesData.failedCycles,
+            firstFailureTime: failedCyclesData.firstFailureTime,
+          };
           setHealthStatuses(prev => ({
             ...prev,
-            [service.id]: {
-              ...prev[service.id],
-              data: unhealthyData,
-              loading: false,
-              error: errorMsg,
-              lastChecked: new Date().toISOString(),
-            },
+            [service.id]: newStatus,
           }));
+          // Update lastChecked in health.json
+          updateLastChecked(service.id);
+          // Send email alert if threshold is reached
+          sendHealthAlertEmail(service, newStatus, failedCyclesData.failedCycles, setHealthStatuses);
           if (showToast) {
             toast.error(`Health check failed for ${service.serviceTitle}: ${errorMsg}`);
           }
@@ -209,16 +512,25 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
             },
             responseTime: 0,
           };
+          const failedCyclesData = updateFailedCycles(service.id, true);
+          const checkedAt = new Date().toISOString();
+          const newStatus: ServiceHealthStatus = {
+            ...(healthStatuses[service.id] || { service, data: null, loading: false, error: null, lastChecked: null }),
+            data: unhealthyData,
+            loading: false,
+            error: errorMsg,
+            lastChecked: checkedAt,
+            failedCycles: failedCyclesData.failedCycles,
+            firstFailureTime: failedCyclesData.firstFailureTime,
+          };
           setHealthStatuses(prev => ({
             ...prev,
-            [service.id]: {
-              ...prev[service.id],
-              data: unhealthyData,
-              loading: false,
-              error: errorMsg,
-              lastChecked: new Date().toISOString(),
-            },
+            [service.id]: newStatus,
           }));
+          // Update lastChecked in health.json
+          updateLastChecked(service.id);
+          // Send email alert if threshold is reached
+          sendHealthAlertEmail(service, newStatus, failedCyclesData.failedCycles, setHealthStatuses);
           if (showToast) {
             toast.error(`Health check failed for ${service.serviceTitle}: ${errorMsg}`);
           }
@@ -231,16 +543,31 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
           data = result;
         }
         
+        // Determine if service is unhealthy (including degraded as unhealthy for tracking)
+        const isUnhealthy = data.status === 'unhealthy' || data.status === 'degraded';
+        const failedCyclesData = updateFailedCycles(service.id, isUnhealthy);
+        const checkedAt = new Date().toISOString();
+        
+        const newStatus: ServiceHealthStatus = {
+          ...(healthStatuses[service.id] || { service, data: null, loading: false, error: null, lastChecked: null }),
+          data,
+          loading: false,
+          error: null,
+          lastChecked: checkedAt,
+          failedCycles: failedCyclesData.failedCycles,
+          firstFailureTime: failedCyclesData.firstFailureTime,
+        };
+        
         setHealthStatuses(prev => ({
           ...prev,
-          [service.id]: {
-            ...prev[service.id],
-            data,
-            loading: false,
-            error: null,
-            lastChecked: new Date().toISOString(),
-          },
+          [service.id]: newStatus,
         }));
+        // Update lastChecked in health.json
+        updateLastChecked(service.id);
+        // Send email alert if threshold is reached and service is unhealthy
+        if (isUnhealthy) {
+          sendHealthAlertEmail(service, newStatus, failedCyclesData.failedCycles, setHealthStatuses);
+        }
       } catch (fetchError) {
         clearTimeout(timeoutId);
         
@@ -278,17 +605,28 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
           responseTime: 0,
         };
         
+        const failedCyclesData = updateFailedCycles(service.id, true);
+        const checkedAt = new Date().toISOString();
+        
+        const newStatus: ServiceHealthStatus = {
+          ...(healthStatuses[service.id] || { service, data: null, loading: false, error: null, lastChecked: null }),
+          data: unhealthyData,
+          loading: false,
+          error: errorMessage,
+          lastChecked: checkedAt,
+          failedCycles: failedCyclesData.failedCycles,
+          firstFailureTime: failedCyclesData.firstFailureTime,
+        };
+        
         // Set error state (don't throw)
         setHealthStatuses(prev => ({
           ...prev,
-          [service.id]: {
-            ...prev[service.id],
-            data: unhealthyData,
-            loading: false,
-            error: errorMessage,
-            lastChecked: new Date().toISOString(),
-          },
+          [service.id]: newStatus,
         }));
+        // Update lastChecked in health.json
+        updateLastChecked(service.id);
+        // Send email alert if threshold is reached
+        sendHealthAlertEmail(service, newStatus, failedCyclesData.failedCycles, setHealthStatuses);
         
         // Only show toast on manual refresh, not auto-refresh
         if (showToast) {
@@ -320,16 +658,27 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
         responseTime: 0,
       };
       
+      const failedCyclesData = updateFailedCycles(service.id, true);
+      const checkedAt = new Date().toISOString();
+      
+      const newStatus: ServiceHealthStatus = {
+        ...(healthStatuses[service.id] || { service, data: null, loading: false, error: null, lastChecked: null }),
+        data: unhealthyData,
+        loading: false,
+        error: errorMessage,
+        lastChecked: checkedAt,
+        failedCycles: failedCyclesData.failedCycles,
+        firstFailureTime: failedCyclesData.firstFailureTime,
+      };
+      
       setHealthStatuses(prev => ({
         ...prev,
-        [service.id]: {
-          ...prev[service.id],
-          data: unhealthyData,
-          loading: false,
-          error: errorMessage,
-          lastChecked: new Date().toISOString(),
-        },
+        [service.id]: newStatus,
       }));
+      // Update lastChecked in health.json
+      updateLastChecked(service.id);
+      // Send email alert if threshold is reached
+      sendHealthAlertEmail(service, newStatus, failedCyclesData.failedCycles, setHealthStatuses);
       
       if (showToast) {
         toast.error(`Health check failed for ${service.serviceTitle}: ${errorMessage}`);

@@ -30,6 +30,7 @@ import { useEmailTemplates } from './hooks/useEmailTemplates';
 import { DEFAULT_TEMPLATE_HTML, extractPlaceholders, renderWithValues, normalizeTemplateId } from './utils';
 import type { EmailTemplate, PlaceholderValues } from './types';
 import { Send } from 'lucide-react';
+import { Email } from '@/gradian-ui/communication';
 
 export default function EmailTemplateBuilderPage() {
   const {
@@ -55,12 +56,13 @@ export default function EmailTemplateBuilderPage() {
   const [testEmailTo, setTestEmailTo] = useState<string[]>([]);
   const [testEmailCc, setTestEmailCc] = useState<string[]>([]);
   const [testEmailBcc, setTestEmailBcc] = useState<string[]>([]);
-  const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [emailResponse, setEmailResponse] = useState<{ 
     message?: string; 
     messages?: Array<{ path?: string; message: string }>; 
     data?: Record<string, any>;
   } | null>(null);
+  
+  const { sendEmail: sendEmailRequest, loading: isSendingEmail } = Email.useSendEmail();
 
   useEffect(() => {
     setSelectedTemplateId((current) => {
@@ -278,53 +280,33 @@ export default function EmailTemplateBuilderPage() {
       return;
     }
 
-    setIsSendingEmail(true);
     try {
-      const emailPayload = {
+      const response = await sendEmailRequest({
         templateId: workingTemplate.id,
         to: testEmailTo,
         cc: testEmailCc.length > 0 ? testEmailCc : undefined,
         bcc: testEmailBcc.length > 0 ? testEmailBcc : undefined,
         templateData: placeholderValues,
-      };
-
-      const sendEmailUrl = process.env.NEXT_PUBLIC_URL_SEND_EMAIL || process.env.URL_SEND_EMAIL || '/api/email-templates/send';
-      
-      const response = await fetch(sendEmailUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(emailPayload),
       });
 
-      const responseData = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        setEmailResponse({
-          message: responseData.message || 'Failed to send email',
-          messages: responseData.messages,
-        });
-        return;
-      }
-
-      // Success response
-      const successMessage = responseData.message || responseData.success || 'Test email sent successfully!';
+      // Format response for MessageBox component
       setEmailResponse({
-        message: successMessage,
-        messages: responseData.messages,
+        message: response.message,
+        messages: response.messages,
+        data: response.data,
       });
-      
-      setTestEmailTo([]);
-      setTestEmailCc([]);
-      setTestEmailBcc([]);
+
+      // Clear email fields on success
+      if (response.success) {
+        setTestEmailTo([]);
+        setTestEmailCc([]);
+        setTestEmailBcc([]);
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to send test email.';
       setEmailResponse({
         message,
       });
-    } finally {
-      setIsSendingEmail(false);
     }
   };
 

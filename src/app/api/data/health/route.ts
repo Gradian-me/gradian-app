@@ -54,14 +54,20 @@ export async function GET(request: NextRequest) {
   try {
     const healthServices = await readHealthServices();
     
+    // Ensure default values for existing services
+    const servicesWithDefaults = healthServices.map((service: any) => ({
+      ...service,
+      failCycleToSendEmail: service.failCycleToSendEmail ?? 3,
+    }));
+    
     // Support search parameter
     const searchParams = request.nextUrl.searchParams;
     const search = searchParams.get('search');
     
-    let filteredServices = healthServices;
+    let filteredServices = servicesWithDefaults;
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredServices = healthServices.filter((service: any) =>
+      filteredServices = servicesWithDefaults.filter((service: any) =>
         service.serviceTitle?.toLowerCase().includes(searchLower) ||
         service.id?.toLowerCase().includes(searchLower)
       );
@@ -125,6 +131,7 @@ export async function POST(request: NextRequest) {
       healthyJsonPath: body.healthyJsonPath || 'status',
       isActive: body.isActive !== undefined ? body.isActive : true, // Default to active
       monitoringEnabled: body.monitoringEnabled !== undefined ? body.monitoringEnabled : true, // Default to enabled
+      failCycleToSendEmail: body.failCycleToSendEmail !== undefined ? body.failCycleToSendEmail : 3, // Default to 3
     };
     
     healthServices.push(newService);
@@ -204,6 +211,106 @@ export async function PUT(request: NextRequest) {
       {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to update health service'
+      },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * Helper function to update a specific field in a health service
+ */
+async function updateHealthServiceField(
+  serviceId: string,
+  field: 'lastChecked' | 'lastEmailSent',
+  value: string
+): Promise<{ success: boolean; data?: any; error?: string }> {
+  try {
+    const healthServices = await readHealthServices();
+    const index = healthServices.findIndex((s: any) => s.id === serviceId);
+    
+    if (index === -1) {
+      return {
+        success: false,
+        error: `Health service with id "${serviceId}" not found`
+      };
+    }
+    
+    // Update the field
+    healthServices[index] = {
+      ...healthServices[index],
+      [field]: value,
+    };
+    
+    // Ensure data file exists before writing
+    await ensureDataFile();
+    
+    // Write back to file
+    await writeFile(DATA_FILE, JSON.stringify(healthServices, null, 2), 'utf-8');
+    
+    return {
+      success: true,
+      data: healthServices[index]
+    };
+  } catch (error) {
+    console.error(`Error updating ${field} for health service:`, error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : `Failed to update ${field}`
+    };
+  }
+}
+
+/**
+ * PATCH - Update lastChecked or lastEmailSent timestamp for a service
+ */
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { serviceId, field, timestamp } = body;
+    
+    if (!serviceId || !field || !timestamp) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Missing required fields: serviceId, field (lastChecked or lastEmailSent), timestamp'
+        },
+        { status: 400 }
+      );
+    }
+    
+    if (field !== 'lastChecked' && field !== 'lastEmailSent') {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Field must be either "lastChecked" or "lastEmailSent"'
+        },
+        { status: 400 }
+      );
+    }
+    
+    const result = await updateHealthServiceField(serviceId, field, timestamp);
+    
+    if (!result.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: result.error
+        },
+        { status: result.error?.includes('not found') ? 404 : 500 }
+      );
+    }
+    
+    return NextResponse.json({
+      success: true,
+      data: result.data
+    });
+  } catch (error) {
+    console.error('Error in PATCH /api/data/health:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to update health service timestamp'
       },
       { status: 500 }
     );

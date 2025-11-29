@@ -29,3 +29,4 @@ export * as SharedComponents from './shared/components';
 export * as SharedDomain from './shared/domain';
 export * as SharedErrors from './shared/errors';
 export * as IndexedDbManager from './indexdb-manager';
+export * as Communication from './communication';

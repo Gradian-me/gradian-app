@@ -34,6 +34,7 @@ export const useHealthService = (): UseHealthServiceReturn => {
     healthyJsonPath: 'status',
     monitoringEnabled: true,
     isActive: true,
+    failCycleToSendEmail: 3,
   });
 
   const openNewServiceForm = useCallback(() => {
@@ -46,6 +47,10 @@ export const useHealthService = (): UseHealthServiceReturn => {
       healthyJsonPath: 'status',
       monitoringEnabled: true,
       isActive: true,
+      emailTo: [],
+      emailCC: [],
+      failCycleToSendEmail: 3,
+      emailIntervalMinutes: 15,
     });
     setEditingService(null);
     setShowServiceForm(true);
@@ -61,6 +66,10 @@ export const useHealthService = (): UseHealthServiceReturn => {
       healthyJsonPath: service.healthyJsonPath,
       monitoringEnabled: service.monitoringEnabled !== false,
       isActive: service.isActive !== false,
+      emailTo: service.emailTo || [],
+      emailCC: service.emailCC || [],
+      failCycleToSendEmail: service.failCycleToSendEmail ?? 3,
+      emailIntervalMinutes: service.emailIntervalMinutes ?? 15,
     });
     setEditingService(service);
     setShowServiceForm(true);
@@ -98,6 +107,10 @@ export const useHealthService = (): UseHealthServiceReturn => {
         healthyJsonPath: formData.healthyJsonPath || 'status',
         monitoringEnabled: formData.monitoringEnabled !== false,
         isActive: formData.isActive !== false,
+        emailTo: formData.emailTo && formData.emailTo.length > 0 ? formData.emailTo : undefined,
+        emailCC: formData.emailCC && formData.emailCC.length > 0 ? formData.emailCC : undefined,
+        failCycleToSendEmail: formData.failCycleToSendEmail ?? 3,
+        emailIntervalMinutes: formData.emailIntervalMinutes ?? 15,
       };
 
       const response = editingService

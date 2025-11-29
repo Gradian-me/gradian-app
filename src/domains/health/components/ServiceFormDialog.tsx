@@ -6,10 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { IconInput } from '@/gradian-ui/form-builder/form-elements';
+import { IconInput, TagInput, NumberInput } from '@/gradian-ui/form-builder/form-elements';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { Save } from 'lucide-react';
+import { Save, Mail } from 'lucide-react';
 import { HealthService } from '../types';
+import { Separator } from '@/components/ui/separator';
 
 interface ServiceFormDialogProps {
   isOpen: boolean;
@@ -34,14 +35,14 @@ export function ServiceFormDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{editingService ? 'Edit Service' : 'New Service'}</DialogTitle>
           <DialogDescription>
             {editingService ? 'Update the health service configuration' : 'Create a new health service to monitor'}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 mt-4">
+        <div className="space-y-4 mt-4 overflow-y-auto flex-1 pr-2">
           <div className="space-y-2">
             <Label htmlFor="service-id" className="required">
               Service ID
@@ -164,6 +165,93 @@ export function ServiceFormDialog({
                 checked={formData.isActive !== false}
                 onCheckedChange={(checked) => onFormDataChange({ ...formData, isActive: checked })}
               />
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Email Notifications Section */}
+          <div className="space-y-4 p-4 border rounded-lg bg-blue-50/50 dark:bg-blue-950/10">
+            <div className="flex items-center gap-2 mb-4">
+              <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <div>
+                <Label className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                  Email Notifications
+                </Label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  Configure email recipients for health alerts
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email-to">To</Label>
+                <TagInput
+                  config={{
+                    name: 'email-to',
+                    label: '',
+                    placeholder: 'Enter recipient email addresses...',
+                  }}
+                  value={formData.emailTo || []}
+                  onChange={(emails) => onFormDataChange({ ...formData, emailTo: emails })}
+                  validateEmail={true}
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Primary recipients for health alert emails
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email-cc">CC (Optional)</Label>
+                <TagInput
+                  config={{
+                    name: 'email-cc',
+                    label: '',
+                    placeholder: 'Enter CC email addresses...',
+                  }}
+                  value={formData.emailCC || []}
+                  onChange={(emails) => onFormDataChange({ ...formData, emailCC: emails })}
+                  validateEmail={true}
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Additional recipients to be copied on health alerts
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="fail-cycle-to-send-email">Failed Cycles to Send Email</Label>
+                <NumberInput
+                  config={{
+                    name: 'fail-cycle-to-send-email',
+                    label: '',
+                    placeholder: '3',
+                  }}
+                  value={formData.failCycleToSendEmail ?? 3}
+                  onChange={(value) => onFormDataChange({ ...formData, failCycleToSendEmail: value ? Number(value) : 3 })}
+                  min={1}
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Number of consecutive failed health checks before sending an email alert (default: 3)
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email-interval-minutes">Email Interval (Minutes)</Label>
+                <NumberInput
+                  config={{
+                    name: 'email-interval-minutes',
+                    label: '',
+                    placeholder: '15',
+                  }}
+                  value={formData.emailIntervalMinutes ?? 15}
+                  onChange={(value) => onFormDataChange({ ...formData, emailIntervalMinutes: value ? Number(value) : 15 })}
+                  min={1}
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Minimum minutes between email alerts for the same service (default: 15)
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -7,7 +7,8 @@
     "healthApi": "/api/health",
     "healthyJsonPath": "status",
     "monitoringEnabled": true,
-    "isActive": true
+    "isActive": true,
+    "lastChecked": "2025-11-29T14:57:56.054Z"
   },
   {
     "id": "gradian-auth",
@@ -17,7 +18,8 @@
     "healthApi": "https://auth.cinnagen.com/health",
     "healthyJsonPath": "status",
     "isActive": true,
-    "monitoringEnabled": true
+    "monitoringEnabled": true,
+    "lastChecked": "2025-11-29T14:57:56.659Z"
   },
   {
     "id": "gradian-genora",
@@ -27,7 +29,8 @@
     "healthApi": "https://genora.cinnagen.com/health",
     "healthyJsonPath": "status",
     "isActive": true,
-    "monitoringEnabled": true
+    "monitoringEnabled": true,
+    "lastChecked": "2025-11-29T14:57:56.661Z"
   },
   {
     "id": "gradian-genora-dev",
@@ -37,6 +40,13 @@
     "healthApi": "http://cg-gr-api-dev-1.cinnagen.com:3001/health",
     "healthyJsonPath": "status",
     "isActive": true,
-    "monitoringEnabled": true
+    "monitoringEnabled": true,
+    "emailTo": [
+      "abidim@cinnagen.com"
+    ],
+    "emailCC": [
+      "rezaeifardh@cinnagen.com"
+    ],
+    "lastChecked": "2025-11-29T14:57:58.388Z"
   }
 ]

@@ -17,6 +17,7 @@ import type { MetricItem } from '@/gradian-ui/analytics/indicators/metric-card/t
 import { getStatusColor, getStatusText, getStatusIcon } from '../utils';
 import { formatDateTimeWithFallback } from '@/gradian-ui/shared/utils/date-utils';
 import { cn } from '@/gradian-ui/shared/utils';
+import { Countdown } from '@/gradian-ui/form-builder/form-elements/components/Countdown';
 
 export type HealthCardViewMode = 'wide' | 'compact';
 
@@ -192,6 +193,31 @@ export function ServiceCardsList({
                       </div>
                     </div>
                   )}
+                  
+                  {/* Failed Cycles (Compact View) */}
+                  {!isMonitoringDisabled && (serviceStatus === 'unhealthy' || serviceStatus === 'degraded') && status?.failedCycles !== undefined && status.failedCycles > 0 && (
+                    <div className="mt-3 p-2 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertCircle className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400 shrink-0" />
+                        <span className="text-xs font-medium text-orange-800 dark:text-orange-200">
+                          Failed: <span className="font-bold">{status.failedCycles}</span>
+                        </span>
+                      </div>
+                      {status.firstFailureTime && (
+                        <div className="text-xs">
+                          <Countdown
+                            startDate={status.firstFailureTime}
+                            expireDate={new Date().toISOString()}
+                            countUp={true}
+                            includeTime={true}
+                            size="sm"
+                            showIcon={false}
+                            className="w-full"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -298,9 +324,54 @@ export function ServiceCardsList({
                     <div className="flex items-start gap-2">
                       <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-red-800 dark:text-red-200">Error</div>
+                        <div className="text-sm font-medium text-red-800 dark:text-red-200">Health Check Error</div>
                         <div className="text-xs text-red-600 dark:text-red-400 mt-1">{status.error}</div>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Email Error Display */}
+                {status?.emailError && (
+                  <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-yellow-800 dark:text-yellow-200">Email Alert Failed</div>
+                        <div className="text-xs text-yellow-700 dark:text-yellow-300 mt-1 break-words">{status.emailError}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Failed Cycles and Count-up Timer */}
+                {!isMonitoringDisabled && (serviceStatus === 'unhealthy' || serviceStatus === 'degraded') && status?.failedCycles !== undefined && status.failedCycles > 0 && (
+                  <div className="mb-4 p-3 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <AlertCircle className="h-4 w-4 text-orange-600 dark:text-orange-400 shrink-0" />
+                          <span className="text-sm font-medium text-orange-800 dark:text-orange-200">
+                            Failed Cycles: <span className="font-bold">{status.failedCycles}</span>
+                          </span>
+                        </div>
+                      </div>
+                      {status.firstFailureTime && (
+                        <div className="pt-2 border-t border-orange-200 dark:border-orange-800">
+                          <div className="text-xs font-medium text-orange-700 dark:text-orange-300 mb-2">
+                            Time Since First Failure:
+                          </div>
+                          <Countdown
+                            startDate={status.firstFailureTime}
+                            expireDate={new Date().toISOString()}
+                            countUp={true}
+                            includeTime={true}
+                            size="sm"
+                            showIcon={true}
+                            className="w-full"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
