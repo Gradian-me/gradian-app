@@ -255,7 +255,7 @@ export const GoToTop: React.FC<GoToTopProps> = ({
             className={cn(
               'h-10 w-10 rounded-full',
               'bg-white/90 backdrop-blur-sm',
-              'border-gray-300 hover:border-violet-400',
+              'border-gray-400 hover:border-violet-400',
               'shadow-md hover:shadow-lg',
               'text-gray-700 hover:text-violet-600',
               'transition-all duration-200',

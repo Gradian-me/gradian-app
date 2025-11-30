@@ -266,7 +266,7 @@ export default function BuilderPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-blue-50 dark:bg-violet-800/30 border border-blue-200 dark:border-violet-800 rounded-xl p-6 mb-12"
+          className="bg-blue-50 dark:bg-violet-800/30 border border-blue-200 dark:border-violet-800 rounded-xl p-6"
         >
           <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-200 mb-2 flex items-center gap-2">
             <Palette className="h-5 w-5" />

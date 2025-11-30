@@ -3,6 +3,7 @@ import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { TableColumn, ColumnWidthMap } from '../types';
 import { buildTableColumns } from '../utils';
 import { ForceIcon } from '@/gradian-ui/form-builder/form-elements/components/ForceIcon';
+import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 
 export interface UseRepeatingTableColumnsOptions {
   fields: any[];
@@ -10,6 +11,7 @@ export interface UseRepeatingTableColumnsOptions {
   columnWidths?: ColumnWidthMap;
   renderActionCell?: (row: any, itemId: string | number | undefined, index: number) => React.ReactNode;
   getRowId?: (row: any) => string | number | undefined;
+  showForceColumn?: boolean; // Whether to show the force column (default: true for backward compatibility)
 }
 
 export function useRepeatingTableColumns({
@@ -18,6 +20,7 @@ export function useRepeatingTableColumns({
   columnWidths,
   renderActionCell,
   getRowId,
+  showForceColumn = true, // Default to true for backward compatibility
 }: UseRepeatingTableColumnsOptions): TableColumn[] {
   const baseColumns = useMemo(() => {
     if (!schemaForColumns) {
@@ -46,33 +49,74 @@ export function useRepeatingTableColumns({
       },
     };
 
-    const forceColumn: TableColumn = {
-      id: 'force',
-      label: '',
-      accessor: 'isForce',
-      sortable: false,
-      align: 'center',
-      width: 40,
-      render: (_value: any, row: any) => {
-        return <ForceIcon isForce={row?.isForce === true} size="sm" forceReason={row?.forceReason} />;
-      },
-    };
-
     const existingActionIndex = baseColumns.findIndex((column) => column.id === 'actions');
     if (existingActionIndex !== -1) {
       const cloned = [...baseColumns];
       cloned[existingActionIndex] = viewColumn;
-      // Add force column after actions
-      const existingForceIndex = cloned.findIndex((column) => column.id === 'force');
-      if (existingForceIndex !== -1) {
-        cloned[existingForceIndex] = forceColumn;
-      } else {
-        cloned.splice(existingActionIndex + 1, 0, forceColumn);
+      
+      // Only add force column if showForceColumn is true
+      if (showForceColumn) {
+        const forceColumn: TableColumn = {
+          id: 'force',
+          label: '',
+          accessor: 'isForce',
+          sortable: false,
+          align: 'center',
+          width: 40,
+          headerRender: () => {
+            return (
+              <div className="flex items-center justify-center">
+                <IconRenderer
+                  iconName="OctagonAlert"
+                  className="h-4 w-4 text-pink-600 dark:text-pink-500"
+                />
+              </div>
+            );
+          },
+          render: (_value: any, row: any) => {
+            return <ForceIcon isForce={row?.isForce === true} size="sm" forceReason={row?.forceReason} />;
+          },
+        };
+        
+        // Add force column after actions
+        const existingForceIndex = cloned.findIndex((column) => column.id === 'force');
+        if (existingForceIndex !== -1) {
+          cloned[existingForceIndex] = forceColumn;
+        } else {
+          cloned.splice(existingActionIndex + 1, 0, forceColumn);
+        }
       }
+      
       return cloned;
     }
 
-    return [viewColumn, forceColumn, ...baseColumns];
+    // Only add force column if showForceColumn is true
+    if (showForceColumn) {
+      const forceColumn: TableColumn = {
+        id: 'force',
+        label: '',
+        accessor: 'isForce',
+        sortable: false,
+        align: 'center',
+        width: 40,
+        headerRender: () => {
+          return (
+            <div className="flex items-center justify-center">
+              <IconRenderer
+                iconName="OctagonAlert"
+                className="h-4 w-4 text-pink-600 dark:text-pink-500"
+              />
+            </div>
+          );
+        },
+        render: (_value: any, row: any) => {
+          return <ForceIcon isForce={row?.isForce === true} size="sm" forceReason={row?.forceReason} />;
+        },
+      };
+      return [viewColumn, forceColumn, ...baseColumns];
+    }
+
+    return [viewColumn, ...baseColumns];
   }, [baseColumns, getRowId, renderActionCell]);
 
   return columnsWithActions;

@@ -2,7 +2,7 @@ import { ColumnWidthConfig, ColumnWidthMap } from '../types';
 
 export const DEFAULT_COLUMN_WIDTHS: ColumnWidthMap = {
   text: { minWidth: 150, maxWidth: 400 },
-  textarea: { minWidth: 180, maxWidth: 500 },
+  textarea: { minWidth: 300, maxWidth: 800 },
   email: { minWidth: 200, maxWidth: 300 },
   url: { minWidth: 220, maxWidth: 350 },
   phone: { minWidth: 150, maxWidth: 200 },
@@ -38,13 +38,26 @@ export function resolveColumnWidth(
   columnWidths?: ColumnWidthMap
 ): ColumnWidthConfig {
   const widthConfig = columnWidths || DEFAULT_COLUMN_WIDTHS;
-  const fieldType = field?.type || 'default';
+  // Check both 'type' and 'component' properties to identify field type
+  const fieldType = field?.type || field?.component || 'default';
   let widthSettings = widthConfig[fieldType] || widthConfig.default || {};
+  
+  // Special handling for textarea: ensure wider width
+  if (fieldType === 'textarea' || field?.component === 'textarea') {
+    widthSettings = { minWidth: 300, maxWidth: 800, ...widthSettings };
+  }
 
   const normalizedFieldName = typeof field?.name === 'string' ? field.name.toLowerCase() : '';
 
+  // Handle address fields - if it's a textarea, use textarea width, otherwise use address width
   if (normalizedFieldName.includes('address') || field?.role === 'location') {
-    widthSettings = { maxWidth: 400, ...widthSettings };
+    // If it's a textarea component, don't override the textarea width settings
+    if (fieldType !== 'textarea' && field?.component !== 'textarea') {
+      widthSettings = { minWidth: 250, maxWidth: 500, ...widthSettings };
+    } else {
+      // For textarea address fields, ensure they get the full textarea width
+      widthSettings = { minWidth: 300, maxWidth: 800, ...widthSettings };
+    }
   } else if (['city', 'state', 'zipcode', 'zip'].includes(normalizedFieldName)) {
     widthSettings = { maxWidth: 200, ...widthSettings };
   } else if (field?.role === 'badge') {

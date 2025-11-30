@@ -1303,12 +1303,37 @@
           "color": "success"
         }
       ],
-      "url-parameters": [],
+      "url-parameters": [
+        {
+          "schema": "test",
+          "title": "test",
+          "dataType": [
+            {
+              "id": "string",
+              "label": "String"
+            }
+          ],
+          "description": "",
+          "isRequired": true
+        },
+        {
+          "schema": "test 2",
+          "title": "test 2",
+          "dataType": [
+            {
+              "id": "number",
+              "label": "Number"
+            }
+          ],
+          "description": "",
+          "isRequired": true
+        }
+      ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KANZNMEFM5H7211V450ZX2P8",
       "createdAt": "2025-11-22T14:32:13.019Z",
-      "updatedAt": "2025-11-22T14:32:13.020Z"
+      "updatedAt": "2025-11-30T14:36:40.131Z"
     },
     {
       "title": "Git Sync Environment Variables",
@@ -1521,8 +1546,8 @@
       ],
       "id": "lucide_icons_sync",
       "createdAt": "2025-11-17T18:00:00.000Z",
-      "updatedAt": "2025-11-26T09:47:15.032Z",
-      "lastSynced": "2025-11-26T09:47:15.032Z"
+      "updatedAt": "2025-11-30T15:34:55.748Z",
+      "lastSynced": "2025-11-30T15:34:55.748Z"
     },
     {
       "color": "#f59e0b",
@@ -1548,8 +1573,8 @@
       ],
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-11-26T09:47:21.210Z",
-      "lastSynced": "2025-11-26T09:47:21.210Z"
+      "updatedAt": "2025-11-30T15:42:41.443Z",
+      "lastSynced": "2025-11-30T15:42:41.443Z"
     }
   ],
   "databases": [
@@ -1994,6 +2019,16 @@
       "id": "01KBADRR9YM0HBJCKVZD0SQMXH",
       "createdAt": "2025-11-30T13:03:23.972Z",
       "updatedAt": "2025-11-30T13:03:23.973Z"
+    },
+    {
+      "color": "#0174ef",
+      "label": "test mosleh",
+      "icon": "User",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBAP4JMKYWDKTQQFDY12CXHY",
+      "createdAt": "2025-11-30T15:29:39.993Z",
+      "updatedAt": "2025-11-30T15:29:39.993Z"
     }
   ],
   "production-plan-items": [
@@ -2238,6 +2273,43 @@
       "createdAt": "2025-11-30T10:41:27.261Z",
       "updatedAt": "2025-11-30T10:43:02.996Z",
       "permissions": []
+    }
+  ],
+  "datawarehouse-objects": [
+    {
+      "dwObjectName": "DimEmployee",
+      "owner": [
+        {
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+          "label": "Mahyar Abidi"
+        }
+      ],
+      "server": [
+        {
+          "id": "01KA99R0VJ2GKBDNSHJDAH8T37",
+          "label": "Gradian ETL"
+        }
+      ],
+      "database": [
+        {
+          "id": "01KA99S0PGBRJEQ61ZS1XZ41PQ",
+          "label": "Gradian_DW"
+        }
+      ],
+      "backupPolicy": [
+        {
+          "id": "incremental",
+          "label": "Incremental Backup",
+          "icon": "PlusCircle",
+          "color": "info"
+        }
+      ],
+      "backupDescription": "test",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBANQ9MTB176V9VXDZ85PYW8",
+      "createdAt": "2025-11-30T15:22:24.803Z",
+      "updatedAt": "2025-11-30T15:22:24.803Z"
     }
   ]
 }

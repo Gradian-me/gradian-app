@@ -44,6 +44,8 @@ import { HierarchyView } from '@/gradian-ui/data-display/hierarchy/HierarchyView
 import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/PopupPicker';
 import { syncParentRelation } from '@/gradian-ui/shared/utils/parent-relation.util';
 import { getParentIdFromEntity } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
+import { RepeatingSectionDialog } from './RepeatingSectionDialog';
+import { Table2 } from 'lucide-react';
 
 interface DynamicPageRendererProps {
   schema: FormSchema;
@@ -104,8 +106,18 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   }, [schema.plural_name, schema.title, schema.name]);
   
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table' | 'hierarchy'>(
-    schema?.allowHierarchicalParent === true ? 'hierarchy' : 'grid'
+    schema?.allowHierarchicalParent === true ? 'hierarchy' : 'table'
   );
+
+  // Prevent hierarchy view if not enabled
+  const handleViewModeChange = useCallback((mode: 'grid' | 'list' | 'table' | 'hierarchy') => {
+    if (mode === 'hierarchy' && schema?.allowHierarchicalParent !== true) {
+      // If hierarchy is not enabled, switch to table view instead
+      setViewMode('table');
+      return;
+    }
+    setViewMode(mode);
+  }, [schema?.allowHierarchicalParent]);
   const [formError, setFormError] = useState<string | null>(null);
   const [isEditLoading, setIsEditLoading] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -125,6 +137,19 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const [hierarchyCollapseToken, setHierarchyCollapseToken] = useState(0);
   const [changeParentPickerOpen, setChangeParentPickerOpen] = useState(false);
   const [entityForParentChange, setEntityForParentChange] = useState<any | null>(null);
+  const [repeatingSectionDialog, setRepeatingSectionDialog] = useState<{
+    isOpen: boolean;
+    sectionId: string;
+    sectionTitle: string;
+    entityData: any;
+    entityId?: string;
+  }>({
+    isOpen: false,
+    sectionId: '',
+    sectionTitle: '',
+    entityData: null,
+    entityId: undefined,
+  });
   
   // State for companies data and grouping
   const [companies, setCompanies] = useState<any[]>([]);
@@ -483,17 +508,92 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     prevSearchRef.current = searchTermLocal;
   }, [searchTermLocal, viewMode]);
 
+  // Get repeating sections from schema
+  const repeatingSections = useMemo(() => {
+    return schema?.sections?.filter((section) => section.isRepeatingSection) || [];
+  }, [schema?.sections]);
+
+  // Get field IDs that belong to repeating sections (to exclude from main table)
+  const repeatingSectionFieldIds = useMemo(() => {
+    const fieldIds = new Set<string>();
+    repeatingSections.forEach((section) => {
+      const sectionFields = schema?.fields?.filter((field: any) => field.sectionId === section.id) || [];
+      sectionFields.forEach((field: any) => {
+        fieldIds.add(field.id);
+      });
+    });
+    return fieldIds;
+  }, [repeatingSections, schema?.fields]);
+
   // Build table columns from all schema fields
   const tableColumns = useMemo(() => {
     if (!schema?.fields || schema.fields.length === 0) {
       return [];
     }
 
-    // Get all fields from schema (excluding hidden fields)
-    const visibleFields = schema.fields.filter((field: any) => !field.hidden);
+    // Get all fields from schema (excluding hidden fields and repeating section fields)
+    const visibleFields = schema.fields.filter(
+      (field: any) => !field.hidden && !repeatingSectionFieldIds.has(field.id)
+    );
     
     // Build columns from fields
     const baseColumns = buildTableColumns(visibleFields, schema);
+    
+    // Add columns for repeating sections
+    const repeatingSectionColumns: TableColumn[] = repeatingSections.map((section) => {
+      // Check if this is a relation-based repeating section (connectToSchema)
+      const isRelationBased = !!(section.repeatingConfig?.targetSchema && section.repeatingConfig?.relationTypeId);
+      
+      return {
+        id: `repeating-section-${section.id}`,
+        label: section.title || section.id,
+        accessor: (row: any) => {
+          if (isRelationBased) {
+            // For relation-based sections, we can't get count from entity data
+            return null;
+          }
+          const sectionData = row[section.id];
+          return Array.isArray(sectionData) ? sectionData.length : 0;
+        },
+        sortable: !isRelationBased, // Disable sorting for relation-based sections
+        align: 'center',
+        width: 150,
+        render: (value: any, row: any) => {
+          // Only show count for non-relation-based sections
+          let itemCount: number | null = null;
+          if (!isRelationBased) {
+            const sectionData = row[section.id];
+            itemCount = Array.isArray(sectionData) ? sectionData.length : 0;
+          }
+          
+          return (
+            <div className="flex items-center justify-center gap-2">
+              <UIButton
+                variant="outline"
+                size="sm"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setRepeatingSectionDialog({
+                    isOpen: true,
+                    sectionId: section.id,
+                    sectionTitle: section.title || section.id,
+                    entityData: row,
+                    entityId: row.id,
+                  });
+                }}
+                className="h-8 px-3 hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition-all duration-200"
+                title={`View ${section.title || section.id}`}
+              >
+                <Table2 className="h-4 w-4" />
+                {itemCount !== null && (
+                  <span className="text-xs font-medium ml-1.5">{itemCount}</span>
+                )}
+              </UIButton>
+            </div>
+          );
+        },
+      } as TableColumn;
+    });
     
     // Add action column
     const actionColumn: TableColumn = {
@@ -550,8 +650,8 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       },
     };
 
-    return [actionColumn, ...baseColumns];
-  }, [schema, handleViewDetailPage, handleEditEntity, handleDeleteWithConfirmation, isEditLoading]);
+    return [actionColumn, ...baseColumns, ...repeatingSectionColumns];
+  }, [schema, repeatingSections, repeatingSectionFieldIds, handleViewDetailPage, handleEditEntity, handleDeleteWithConfirmation, isEditLoading]);
 
   // Create table config
   const tableConfig: TableConfig = useMemo(
@@ -773,14 +873,15 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           searchTerm={searchTermLocal}
           onSearchChange={setSearchTermLocal}
           viewMode={viewMode}
-          onViewModeChange={setViewMode}
+          onViewModeChange={handleViewModeChange}
           onAddNew={handleOpenCreateModal}
           onRefresh={handleManualRefresh}
           isRefreshing={isLoading || isManualRefresh}
           searchPlaceholder={`Search ${pluralName.toLowerCase()}...`}
           addButtonText={`Add ${singularName}`}
-        onExpandAllHierarchy={() => setHierarchyExpandToken((prev) => prev + 1)}
-        onCollapseAllHierarchy={() => setHierarchyCollapseToken((prev) => prev + 1)}
+          onExpandAllHierarchy={() => setHierarchyExpandToken((prev) => prev + 1)}
+          onCollapseAllHierarchy={() => setHierarchyCollapseToken((prev) => prev + 1)}
+          showHierarchy={schema?.allowHierarchicalParent === true}
         />
 
         {/* Entities List - Grouped by Company or Regular List */}
@@ -793,8 +894,10 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             onEdit={handleEditEntity}
             onDelete={handleDeleteWithConfirmation}
             onChangeParent={handleChangeParent}
+            onView={handleViewEntity}
             expandAllTrigger={hierarchyExpandToken}
             collapseAllTrigger={hierarchyCollapseToken}
+            isLoading={isLoading}
           />
         ) : groupedEntities ? (
           // Grouped view with accordion
@@ -1311,6 +1414,19 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       
       {/* Go to Top Button */}
       <GoToTop threshold={100} />
+
+      {/* Repeating Section Dialog */}
+      {repeatingSectionDialog.isOpen && (
+        <RepeatingSectionDialog
+          isOpen={repeatingSectionDialog.isOpen}
+          onClose={() => setRepeatingSectionDialog({ ...repeatingSectionDialog, isOpen: false })}
+          sectionId={repeatingSectionDialog.sectionId}
+          sectionTitle={repeatingSectionDialog.sectionTitle}
+          schema={schema}
+          entityData={repeatingSectionDialog.entityData}
+          entityId={repeatingSectionDialog.entityId}
+        />
+      )}
     </MainLayout>
   );
 }

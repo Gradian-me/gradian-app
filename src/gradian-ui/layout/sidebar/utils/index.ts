@@ -64,14 +64,27 @@ export const defaultNavigationItems: NavigationItem[] = [
 
 /**
  * Get initials from a name
+ * Maximum 3 characters: first two words + last word if more than 2 words
  */
 export const getInitials = (name: string): string => {
   if (!name) return '?';
-  const parts = name.split(' ');
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[1][0]).toUpperCase();
+  
+  const words = name.trim().split(/\s+/).filter(word => word.length > 0);
+  
+  if (words.length === 0) return '?';
+  
+  if (words.length === 1) {
+    // Single word: take first two characters
+    return words[0].substring(0, 2).toUpperCase();
   }
-  return name.substring(0, 2).toUpperCase();
+  
+  if (words.length === 2) {
+    // Two words: take first letter of each
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+  
+  // More than 2 words: first letter of first two words + first letter of last word
+  return (words[0][0] + words[1][0] + words[words.length - 1][0]).toUpperCase();
 };
 
 /**

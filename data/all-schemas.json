@@ -5390,5 +5390,130 @@
     "showInNavigation": true,
     "icon": "Lock",
     "isNotCompanyBased": true
+  },
+  {
+    "id": "datawarehouse-objects",
+    "description": "Manage data warehouse objects with their configurations and relationships.",
+    "singular_name": "Data Warehouse Object",
+    "plural_name": "Data Warehouse Objects",
+    "icon": "Database",
+    "fields": [
+      {
+        "id": "dw-object-name",
+        "name": "dwObjectName",
+        "label": "Data Warehouse Object Name",
+        "sectionId": "basic-info",
+        "type": "text",
+        "component": "text",
+        "required": true,
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "owner",
+        "name": "owner",
+        "label": "Owner",
+        "sectionId": "basic-info",
+        "type": "picker",
+        "component": "picker",
+        "targetSchema": "users",
+        "required": true,
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "server",
+        "name": "server",
+        "label": "Server",
+        "sectionId": "basic-info",
+        "type": "picker",
+        "component": "picker",
+        "targetSchema": "servers",
+        "required": true,
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "database",
+        "name": "database",
+        "label": "Database",
+        "sectionId": "basic-info",
+        "type": "picker",
+        "component": "picker",
+        "targetSchema": "databases",
+        "required": true,
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "backup-policy",
+        "name": "backupPolicy",
+        "label": "Backup Policy",
+        "sectionId": "advanced-settings",
+        "type": "select",
+        "component": "select",
+        "options": [
+          {
+            "id": "full",
+            "label": "Full Backup",
+            "icon": "CheckCircle",
+            "color": "success"
+          },
+          {
+            "id": "incremental",
+            "label": "Incremental Backup",
+            "icon": "PlusCircle",
+            "color": "info"
+          },
+          {
+            "id": "differential",
+            "label": "Differential Backup",
+            "icon": "Cloud",
+            "color": "warning"
+          },
+          {
+            "id": "none",
+            "label": "No Backup",
+            "icon": "XCircle",
+            "color": "destructive"
+          }
+        ],
+        "description": "Select the backup policy for the data warehouse object.",
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "backup-description",
+        "name": "backupDescription",
+        "label": "Backup Description",
+        "sectionId": "advanced-settings",
+        "type": "textarea",
+        "component": "textarea",
+        "description": "Provide additional details about the backup policy.",
+        "colSpan": 2,
+        "order": 6
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-info",
+        "title": "Basic Information",
+        "columns": 2,
+        "initialState": "expanded"
+      },
+      {
+        "id": "advanced-settings",
+        "title": "Advanced Settings",
+        "columns": 2,
+        "initialState": "collapsed"
+      }
+    ],
+    "showInNavigation": true,
+    "isSystemSchema": true
   }
 ]

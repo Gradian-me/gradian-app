@@ -183,11 +183,23 @@ export const formatFieldValue = (
     // Get fallback text from title field or field name
     const getInitials = (text: string): string => {
       if (!text) return '?';
-      const words = text.trim().split(/\s+/);
-      if (words.length >= 2) {
+      
+      const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+      
+      if (words.length === 0) return '?';
+      
+      if (words.length === 1) {
+        // Single word: take first two characters
+        return words[0].substring(0, 2).toUpperCase();
+      }
+      
+      if (words.length === 2) {
+        // Two words: take first letter of each
         return (words[0][0] + words[1][0]).toUpperCase();
       }
-      return text.substring(0, 2).toUpperCase();
+      
+      // More than 2 words: first letter of first two words + first letter of last word
+      return (words[0][0] + words[1][0] + words[words.length - 1][0]).toUpperCase();
     };
     
     const titleField = row ? (row.name || row.title || row.label || '') : '';

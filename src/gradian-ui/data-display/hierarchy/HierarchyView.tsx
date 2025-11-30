@@ -13,6 +13,8 @@ import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { cn } from '@/gradian-ui/shared/utils';
 import { HierarchyNode, buildHierarchyTree, getAncestorIds, getParentIdFromEntity } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
 import { HierarchyActionsMenu } from './HierarchyActionsMenu';
+import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export interface HierarchyViewProps {
   schema: FormSchema;
@@ -22,8 +24,10 @@ export interface HierarchyViewProps {
   onEdit: (entity: any) => void;
   onDelete: (entity: any) => void;
   onChangeParent?: (entity: any) => void;
+  onView?: (entity: any) => void; // Callback for viewing entity details (opens card dialog)
   expandAllTrigger?: number;
   collapseAllTrigger?: number;
+  isLoading?: boolean; // Loading state for skeleton display
 }
 
 const nodeVariants = {
@@ -44,6 +48,17 @@ const cardVariants = {
   }),
 };
 
+const cardHoverVariants = {
+  hover: {
+    scale: 1.01,
+    transition: { duration: 0.15, ease: 'easeOut' },
+  },
+  tap: {
+    scale: 0.995,
+    transition: { duration: 0.1 },
+  },
+};
+
 interface HierarchyNodeProps {
   node: HierarchyNode;
   depth: number;
@@ -53,6 +68,7 @@ interface HierarchyNodeProps {
   onEdit: (entity: any) => void;
   onDelete: (entity: any) => void;
   onChangeParent?: (entity: any) => void;
+  onView?: (entity: any) => void; // Callback for viewing entity details
   highlightQuery: string;
   index: number;
   schema: FormSchema;
@@ -68,6 +84,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
   onEdit,
   onDelete,
   onChangeParent,
+  onView,
   highlightQuery,
   index,
   schema,
@@ -99,18 +116,25 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
         custom={index}
         initial="hidden"
         animate="visible"
+        whileHover={cardHoverVariants.hover}
+        whileTap={cardHoverVariants.tap}
       >
         <Card
           className={cn(
             'border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/70 shadow-sm hover:shadow-md transition-all duration-200',
-            'flex items-center justify-between gap-2'
+            'flex items-center justify-between gap-2',
+            onView && 'cursor-pointer hover:border-violet-300 dark:hover:border-violet-600'
           )}
+          onClick={onView ? () => onView(entity) : undefined}
         >
-          <CardContent className="flex items-center gap-3 p-3">
+          <CardContent className="flex items-center gap-3 p-3 flex-1 min-w-0">
             <div className="flex items-center gap-2 min-w-0">
               <button
                 type="button"
-                onClick={() => onToggle(node.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggle(node.id);
+                }}
                 className={cn(
                   'h-6 w-6 flex items-center justify-center rounded-md border text-gray-500 dark:text-gray-400',
                   'border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/60',
@@ -148,7 +172,38 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
               </div>
             </div>
           </CardContent>
-          <div className="pr-2">
+          <div className="pr-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+            {/* View and Edit buttons - matching DynamicCardActionButtons list view style */}
+            {onView && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onView(entity);
+                }}
+                className="h-8 w-8 p-0 hover:bg-sky-50 hover:border-sky-300 hover:text-sky-700 transition-all duration-200"
+                title="View Details"
+              >
+                <IconRenderer iconName="Eye" className="h-4 w-4" />
+              </Button>
+            )}
+            {onEdit && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onEdit(entity);
+                }}
+                className="h-8 w-8 p-0 hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition-all duration-200"
+                title="Edit"
+              >
+                <IconRenderer iconName="Edit" className="h-4 w-4" />
+              </Button>
+            )}
             <HierarchyActionsMenu
               onAddChild={() => onAddChild(entity)}
               onEdit={() => onEdit(entity)}
@@ -182,6 +237,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onChangeParent={onChangeParent}
+                onView={onView}
                 highlightQuery={highlightQuery}
                 index={index + idx + 1}
                 schema={schema}
@@ -203,8 +259,10 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
   onEdit,
   onDelete,
   onChangeParent,
+  onView,
   expandAllTrigger,
   collapseAllTrigger,
+  isLoading = false,
 }) => {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
@@ -300,30 +358,71 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
     return roots;
   }, [roots, normalizedSearch, matchedIds]);
 
+  // Skeleton component for hierarchy cards
+  const HierarchySkeleton = ({ depth = 0, index = 0 }: { depth?: number; index?: number }) => {
+    // Show nested skeleton for some items to simulate hierarchy structure
+    const showNested = depth < 2 && index % 3 === 0;
+    
+    return (
+      <div className="space-y-1">
+        <Card className="border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/70 shadow-sm">
+          <CardContent className="flex items-center gap-3 p-3">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <Skeleton className="h-6 w-6 rounded-md" />
+              <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 pr-2">
+              <Skeleton className="h-8 w-8 rounded-md" />
+              <Skeleton className="h-8 w-8 rounded-md" />
+              <Skeleton className="h-8 w-8 rounded-md" />
+            </div>
+          </CardContent>
+        </Card>
+        {showNested && (
+          <div className="pl-6 border-l border-dashed border-gray-200 dark:border-gray-700">
+            <HierarchySkeleton depth={depth + 1} index={index} />
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-3">
       <div className="text-xs text-gray-500 dark:text-gray-400">
-        Hierarchy view • {items?.length || 0} item(s)
+        Hierarchy view • {isLoading ? 'Loading...' : `${items?.length || 0} item(s)`}
       </div>
 
       <div className="space-y-2">
-        {effectiveRoots.map((root, index) => (
-          <HierarchyNodeCard
-            key={root.id}
-            node={root}
-            depth={0}
-            isExpanded={expandedIds.has(root.id)}
-            onToggle={handleToggle}
-            onAddChild={onAddChild}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            onChangeParent={onChangeParent}
-            highlightQuery={normalizedSearch}
-            index={index}
-            schema={schema}
-            expandedIds={expandedIds}
-          />
-        ))}
+        {isLoading ? (
+          // Show skeleton loaders
+          Array.from({ length: 3 }).map((_, index) => (
+            <HierarchySkeleton key={`skeleton-${index}`} depth={0} index={index} />
+          ))
+        ) : (
+          effectiveRoots.map((root, index) => (
+            <HierarchyNodeCard
+              key={root.id}
+              node={root}
+              depth={0}
+              isExpanded={expandedIds.has(root.id)}
+              onToggle={handleToggle}
+              onAddChild={onAddChild}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onChangeParent={onChangeParent}
+              onView={onView}
+              highlightQuery={normalizedSearch}
+              index={index}
+              schema={schema}
+              expandedIds={expandedIds}
+            />
+          ))
+        )}
       </div>
     </div>
   );

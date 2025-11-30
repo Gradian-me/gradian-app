@@ -18,7 +18,7 @@ interface SyncEnvRequestBody {
 
 /**
  * POST /api/git/sync-env
- * Sync environment variables from .env file to GitLab CI/CD variables
+ * Sync environment variables from .env.prod file to GitLab CI/CD variables
  */
 export async function POST(request: NextRequest) {
   try {
@@ -50,8 +50,8 @@ export async function POST(request: NextRequest) {
 
     const replaceAll = requestBody.replaceAll ?? true; // Default to true: delete all existing variables before syncing
 
-    // Read .env file
-    const envFilePath = join(process.cwd(), '.env');
+    // Read .env.prod file
+    const envFilePath = join(process.cwd(), '.env.prod');
     let envFileContent: string;
 
     try {
@@ -60,13 +60,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: `Failed to read .env file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          error: `Failed to read .env.prod file: ${error instanceof Error ? error.message : 'Unknown error'}`,
         },
         { status: 404 }
       );
     }
 
-    // Parse .env file (includes parsing variable options from comments)
+    // Parse .env.prod file (includes parsing variable options from comments)
     const { envVars, varOptions } = parseEnvFile(envFileContent);
 
     // Exclude GitLab-specific variables from syncing

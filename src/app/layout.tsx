@@ -8,6 +8,9 @@ import { DialogProvider } from "@/gradian-ui/shared/contexts/DialogContext";
 export const metadata: Metadata = {
   title: "Gradian",
   description: "We help you trust you decision",
+  icons: {
+    icon: "/logo/favicon.ico",
+  },
 };
 
 export default function RootLayout({

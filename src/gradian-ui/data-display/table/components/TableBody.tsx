@@ -1,6 +1,7 @@
 // Table Body Component
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { TableColumn } from '../types';
 import { getCellValue } from '../utils';
 import { cn } from '../../../shared/utils';
@@ -121,8 +122,17 @@ export function TableBody<T = any>({
       {data.map((row, rowIndex) => {
         const isSelected = selectedRows.has(rowIndex);
         return (
-          <tr
+          <motion.tr
             key={rowIndex}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.2,
+              delay: Math.min(rowIndex * 0.02, 0.3),
+              ease: 'easeOut',
+            }}
+            whileHover={onRowClick ? { scale: 1.001, transition: { duration: 0.15 } } : undefined}
+            whileTap={onRowClick ? { scale: 0.998, transition: { duration: 0.1 } } : undefined}
             className={trClasses(rowIndex, isSelected)}
             onClick={() => handleRowClick(row, rowIndex)}
           >
@@ -222,7 +232,7 @@ export function TableBody<T = any>({
                 </td>
               );
             })}
-          </tr>
+          </motion.tr>
         );
       })}
     </tbody>

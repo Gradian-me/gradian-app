@@ -20,6 +20,7 @@ interface DynamicFilterPaneProps {
   className?: string;
   onExpandAllHierarchy?: () => void;
   onCollapseAllHierarchy?: () => void;
+  showHierarchy?: boolean; // Only show hierarchy view if enabled
 }
 
 export const DynamicFilterPane = ({
@@ -35,6 +36,7 @@ export const DynamicFilterPane = ({
   className = "",
   onExpandAllHierarchy,
   onCollapseAllHierarchy,
+  showHierarchy = false,
 }: DynamicFilterPaneProps) => {
   return (
     <motion.div
@@ -73,6 +75,7 @@ export const DynamicFilterPane = ({
             currentView={viewMode}
             onViewChange={onViewModeChange}
             className="h-full"
+            showHierarchy={showHierarchy}
           />
           {viewMode === 'hierarchy' && onExpandAllHierarchy && onCollapseAllHierarchy && (
             <HierarchyExpandCollapseControls

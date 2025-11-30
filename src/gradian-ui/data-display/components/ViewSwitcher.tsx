@@ -9,28 +9,32 @@ export interface ViewSwitcherProps {
   currentView: 'grid' | 'list' | 'table' | 'hierarchy';
   onViewChange: (view: 'grid' | 'list' | 'table' | 'hierarchy') => void;
   className?: string;
+  showHierarchy?: boolean; // Only show hierarchy view if enabled
 }
 
 export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
   currentView,
   onViewChange,
-  className
+  className,
+  showHierarchy = false,
 }) => {
   return (
     <div className={cn('flex items-center space-x-1', className)}>
-      <Button
-        variant={currentView === 'hierarchy' ? 'default' : 'ghost'}
-        size="sm"
-        onClick={() => onViewChange('hierarchy')}
-        className={cn(
-          'h-full w-10 p-0 rounded-md',
-          currentView === 'hierarchy'
-            ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-sm'
-            : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50'
-        )}
-      >
-        <ListTree className="h-4 w-4" />
-      </Button>
+      {showHierarchy && (
+        <Button
+          variant={currentView === 'hierarchy' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => onViewChange('hierarchy')}
+          className={cn(
+            'h-full w-10 p-0 rounded-md',
+            currentView === 'hierarchy'
+              ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-sm'
+              : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50'
+          )}
+        >
+          <ListTree className="h-4 w-4" />
+        </Button>
+      )}
       <Button
         variant={currentView === 'table' ? 'default' : 'ghost'}
         size="sm"

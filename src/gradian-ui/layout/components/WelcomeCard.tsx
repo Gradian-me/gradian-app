@@ -103,11 +103,24 @@ export interface WelcomeCardProps {
 }
 
 const getInitials = (name: string): string => {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  if (!name) return 'A';
+  
+  const words = name.trim().split(/\s+/).filter(word => word.length > 0);
+  
+  if (words.length === 0) return 'A';
+  
+  if (words.length === 1) {
+    // Single word: take first two characters
+    return words[0].substring(0, 2).toUpperCase();
   }
-  return name.substring(0, 2).toUpperCase();
+  
+  if (words.length === 2) {
+    // Two words: take first letter of each
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+  
+  // More than 2 words: first letter of first two words + first letter of last word
+  return (words[0][0] + words[1][0] + words[words.length - 1][0]).toUpperCase();
 };
 
 const getBadgeColorClasses = (color: TailwindColor = 'violet'): string => {
