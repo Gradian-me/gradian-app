@@ -34,6 +34,8 @@ import { ColumnMapConfig, extractItemsFromPayload, extractMetaFromPayload, mapRe
 import { useCompanyStore } from '@/stores/company.store';
 import { sortOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
 import { buildHierarchyTree, getAncestorIds, HierarchyNode } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
+import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
+import { Plus } from 'lucide-react';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 12, scale: 0.96 },
@@ -216,6 +218,7 @@ export interface PopupPickerProps {
   pageSize?: number; // Page size for paginated data sources
   sortType?: 'ASC' | 'DESC' | null; // Sort order for items (null = no sorting, default)
   sourceColumnRoles?: Array<{ column: string; role?: string }>; // Column to role mapping for sourceUrl items
+  showAddButton?: boolean; // If true, shows an "Add Item" button that opens the schema form
 }
 
 export const PopupPicker: React.FC<PopupPickerProps> = ({
@@ -238,9 +241,11 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   pageSize = 48,
   sortType = null,
   sourceColumnRoles,
+  showAddButton = true,
 }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   
   // Hardcoded config for schemas picker
   const SCHEMAS_PICKER_CONFIG = {
@@ -1058,6 +1063,61 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
+  const handleAddItemSuccess = async (createdEntity: any) => {
+    if (!createdEntity?.id) {
+      setIsAddModalOpen(false);
+      return;
+    }
+
+    const newItemId = String(createdEntity.id);
+    setIsAddModalOpen(false);
+    
+    // Add the created item to items and filteredItems immediately so it's available for selection
+    setItems((prev) => {
+      // Check if item already exists
+      const exists = prev.some(item => String(item.id) === newItemId);
+      if (exists) {
+        return prev;
+      }
+      // Add to beginning of list
+      return [createdEntity, ...prev];
+    });
+    
+    setFilteredItems((prev) => {
+      // Check if item already exists
+      const exists = prev.some(item => String(item.id) === newItemId);
+      if (exists) {
+        return prev;
+      }
+      // Add to beginning of list
+      return [createdEntity, ...prev];
+    });
+    
+    // Now select the item
+    if (allowMultiselect) {
+      // For multiselect, add to session selection and update pending selections
+      setSessionSelectedIds((prev) => new Set([...prev, newItemId]));
+      
+      // Build selection entry and add to pending selections
+      const selectionEntry = buildSelectionEntry(createdEntity, effectiveSchema, effectiveSourceColumnRoles);
+      setPendingSelections((prev) => {
+        const next = new Map(prev);
+        // Only add if it's not already in base selections
+        if (!baseSelectedIds.has(newItemId)) {
+          next.set(newItemId, { action: 'add', normalized: selectionEntry, raw: createdEntity });
+        }
+        return next;
+      });
+    } else {
+      // For single select, immediately commit the selection
+      void commitSingleSelection(createdEntity);
+    }
+    
+    // Refresh the picker data in the background to get the full item data
+    // This ensures the item has all its fields populated
+    void handleRefresh();
+  };
+
   const renderItemCard = (item: any, index: number) => {
     const isSelected = isItemSelected(item);
 
@@ -1523,6 +1583,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   };
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={(open) => {
       // Only close if explicitly set to false (not opening)
       if (!open) {
@@ -1588,6 +1649,23 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                     <ChevronsUp className="h-4 w-4" />
                   </Button>
                 </div>
+              )}
+              {showAddButton && schemaId && effectiveSchema && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsAddModalOpen(true);
+                  }}
+                  disabled={isSubmitting || isLoading}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add {effectiveSchema.singular_name || 'Item'}
+                </Button>
               )}
               {canViewList && (
                 <Button
@@ -1724,6 +1802,18 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Add Item Form Modal */}
+    {showAddButton && schemaId && effectiveSchema && isAddModalOpen && (
+      <FormModal
+        schemaId={schemaId}
+        mode="create"
+        getInitialSchema={(requestedId) => (requestedId === schemaId ? effectiveSchema : null)}
+        onClose={() => setIsAddModalOpen(false)}
+        onSuccess={handleAddItemSuccess}
+      />
+    )}
+    </>
   );
 };
 

@@ -3,6 +3,8 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
 import { readSchemaData, writeSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
+import { extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
+import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
 
 /**
  * Get the API URL for internal server-side calls
@@ -239,6 +241,40 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { id } = body;
     
+    // Extract authorization header from incoming request
+    let authHeader = request.headers.get('authorization');
+    let authToken: string | null = null;
+    
+    // Try to extract token from Authorization header
+    if (authHeader) {
+      authToken = extractTokenFromHeader(authHeader);
+      if (authToken) {
+        const headerPrefix = authToken.substring(0, 10);
+        const headerLength = authToken.length;
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Authorization header present: ${headerPrefix}... (length: ${headerLength})`);
+      }
+    }
+    
+    // If no token from header, try to extract from cookies
+    if (!authToken) {
+      const cookies = request.headers.get('cookie');
+      authToken = extractTokenFromCookies(cookies, AUTH_CONFIG.ACCESS_TOKEN_COOKIE);
+      if (authToken) {
+        const tokenPrefix = authToken.substring(0, 10);
+        const tokenLength = authToken.length;
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Authorization token extracted from cookie: ${tokenPrefix}... (length: ${tokenLength})`);
+        // Format as Bearer token
+        authHeader = `Bearer ${authToken}`;
+      } else {
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'No authorization token found in header or cookies');
+      }
+    } else {
+      // Ensure header is in Bearer format if it's just a token
+      if (!authHeader.toLowerCase().startsWith('bearer ')) {
+        authHeader = `Bearer ${authToken}`;
+      }
+    }
+    
     loggingCustom(LogType.INTEGRATION_LOG, 'info', `Starting integration sync for id: ${id}`);
     
     if (!id) {
@@ -359,6 +395,8 @@ export async function POST(request: NextRequest) {
           method: sourceMethod as any,
           headers: {
             'Content-Type': 'application/json',
+            // Pass authorization header to source route if present
+            ...(authHeader ? { 'Authorization': authHeader } : {}),
           },
         };
         
@@ -427,12 +465,33 @@ export async function POST(request: NextRequest) {
       const method = String(targetMethodValue || 'POST').toUpperCase();
       loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target method: ${method}`);
       const targetUrl = targetRoute;
+      
+      // Build headers for target route
+      const targetHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      // Pass authorization header to target route if present
+      if (authHeader) {
+        targetHeaders['Authorization'] = authHeader;
+        const headerPrefix = authHeader.substring(0, 10);
+        const headerLength = authHeader.length;
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Adding Authorization header to target route: ${headerPrefix}... (length: ${headerLength})`);
+      } else {
+        loggingCustom(LogType.INTEGRATION_LOG, 'warn', 'No Authorization header available to forward to target route');
+      }
+      
       const fetchOptions: RequestInit = {
         method: method as any,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: targetHeaders,
       };
+      
+      // Log all headers being sent (with masked authorization)
+      const loggedHeaders = { ...targetHeaders };
+      if (loggedHeaders['Authorization']) {
+        loggedHeaders['Authorization'] = `${authHeader?.substring(0, 10)}... (masked)`;
+      }
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target route headers: ${JSON.stringify(loggedHeaders)}`);
       
       // Include body for POST/PUT/PATCH requests when we have data
       if ((method === 'POST' || method === 'PUT' || method === 'PATCH') && dataToSend) {

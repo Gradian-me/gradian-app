@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TextInput, Textarea, IconInput, Switch } from '@/gradian-ui/form-builder/form-elements';
+import { TextInput, Textarea, IconInput, Switch, Select, PickerInput } from '@/gradian-ui/form-builder/form-elements';
 import { FormSchema } from '../types/form-schema';
 
 interface GeneralInfoTabProps {
@@ -122,6 +122,53 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
             placeholder="Enter status schema ID (optional)"
             disabled={readonly}
           />
+        </div>
+        <div className="border-t pt-4 mt-4">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Server Sync Options</h3>
+          <div className="space-y-4">
+            <div>
+              <PickerInput
+                config={{
+                  name: 'sync-to-databases',
+                  label: 'Sync To Servers',
+                  description: 'Select servers to sync this schema to',
+                  targetSchema: 'servers',
+                  metadata: {
+                    allowMultiselect: true,
+                  },
+                }}
+                value={schema.syncToDatabases || []}
+                onChange={(value) => {
+                  // Normalize value to array of IDs
+                  const normalizedValue = Array.isArray(value) 
+                    ? value.map((item: any) => {
+                        if (typeof item === 'string') return item;
+                        if (item?.id) return item.id;
+                        return item;
+                      })
+                    : [];
+                  onUpdate({ syncToDatabases: normalizedValue.length > 0 ? normalizedValue : undefined });
+                }}
+                disabled={readonly}
+              />
+            </div>
+            <div>
+              <Select
+                config={{
+                  name: 'sync-strategy',
+                  label: 'Sync Strategy',
+                  description: 'Choose how to sync the schema to databases',
+                }}
+                value={schema.syncStrategy || 'schema-only'}
+                onValueChange={(value) => onUpdate({ syncStrategy: value as 'schema-only' | 'schema-and-data' })}
+                options={[
+                  { value: 'schema-only', label: 'Sync Schema Only' },
+                  { value: 'schema-and-data', label: 'Sync Schema and Data' },
+                ]}
+                disabled={readonly}
+              />
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

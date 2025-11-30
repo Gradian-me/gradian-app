@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Layers, Loader2, ArrowLeft, Layout, FileText } from 'lucide-react';
+import { Settings, Layers, ArrowLeft, Layout, FileText } from 'lucide-react';
 import { FormSchema, FormField, FormSection } from '../types/form-schema';
 import { GeneralInfoTab } from './GeneralInfoTab';
 import { SectionsTab } from './SectionsTab';
@@ -18,6 +18,8 @@ import { Button } from '@/components/ui/button';
 import { SchemaNotFound } from './SchemaNotFound';
 import { FormAlert } from '@/components/ui/form-alert';
 import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 interface SchemaBuilderEditorProps {
   schemaId?: string;
@@ -298,8 +300,62 @@ export function SchemaBuilderEditor({
   if (loading) {
     return (
       <MainLayout title={title || 'Loading Schema...'} subtitle={subtitle} icon="PencilRuler">
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-violet-600" />
+        <div className="space-y-6">
+          {/* Action Buttons Skeleton */}
+          <div className="flex items-center justify-between gap-4">
+            <Skeleton className="h-9 w-24 rounded-md" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-9 w-20 rounded-md" />
+              <Skeleton className="h-9 w-20 rounded-md" />
+              <Skeleton className="h-9 w-24 rounded-md" />
+            </div>
+          </div>
+
+          {/* Tabs Skeleton */}
+          <div className="space-y-4">
+            <div className="grid w-full grid-cols-2 sm:grid-cols-4 gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-slate-800 dark:bg-slate-900/40">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-10 w-full rounded-lg" />
+              ))}
+            </div>
+
+            {/* Content Skeleton - General Info Tab */}
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-48 rounded-md" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Skeleton className="h-10 w-full rounded-md" />
+                <Skeleton className="h-20 w-full rounded-md" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Skeleton className="h-10 w-full rounded-md" />
+                  <Skeleton className="h-10 w-full rounded-md" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-md" />
+                <div className="grid grid-cols-2 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Skeleton key={i} className="h-10 w-full rounded-md" />
+                  ))}
+                </div>
+                <div className="border-t pt-4 mt-4">
+                  <Skeleton className="h-5 w-40 rounded-md mb-4" />
+                  <div className="grid grid-cols-2 gap-4">
+                    {[1, 2, 3, 4].map((i) => (
+                      <Skeleton key={i} className="h-10 w-full rounded-md" />
+                    ))}
+                  </div>
+                </div>
+                <Skeleton className="h-10 w-full rounded-md" />
+                <div className="border-t pt-4 mt-4">
+                  <Skeleton className="h-5 w-40 rounded-md mb-4" />
+                  <div className="space-y-4">
+                    <Skeleton className="h-20 w-full rounded-md" />
+                    <Skeleton className="h-10 w-full rounded-md" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </MainLayout>
     );

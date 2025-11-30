@@ -1054,6 +1054,48 @@
       "createdAt": "2025-11-19T15:39:03.349Z",
       "updatedAt": "2025-11-19T15:39:48.891Z",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+    },
+    {
+      "company": "CinnaGen",
+      "status": [
+        {
+          "id": "active",
+          "label": "Active",
+          "icon": "CheckCircle",
+          "color": "success"
+        }
+      ],
+      "username": "rezaeifardh",
+      "firstName": "Hossein",
+      "lastName": "Rezaeifard",
+      "email": "rezaeifardh@cinnagen.com",
+      "postTitle": "Backend Developer",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBAT78NRNB8KCD4Z625KH07A",
+      "createdAt": "2025-11-30T16:41:02.398Z",
+      "updatedAt": "2025-11-30T16:41:02.398Z"
+    },
+    {
+      "company": "CinnaGen",
+      "status": [
+        {
+          "id": "active",
+          "label": "Active",
+          "icon": "CheckCircle",
+          "color": "success"
+        }
+      ],
+      "username": "ghasemimas",
+      "firstName": "Masoud",
+      "lastName": "Mirghasemi",
+      "email": "ghasemimas@cinnagen.com",
+      "postTitle": "Backend Developer",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBATBCQBC07CE2227A1V45VQ",
+      "createdAt": "2025-11-30T16:43:17.622Z",
+      "updatedAt": "2025-11-30T16:43:17.622Z"
     }
   ],
   "purchaseOrders": [],
@@ -1123,62 +1165,167 @@
   ],
   "servers": [
     {
-      "color": "#4E79A7",
       "name": "Gradian Integration",
       "address": "https://octa.cinnagen.com/integration",
       "id": "01KA8QZJ9SAJ6Y2GR05K42BQYF",
       "createdAt": "2025-11-17T11:07:42.270Z",
-      "updatedAt": "2025-11-25T15:21:03.554Z",
+      "updatedAt": "2025-11-30T16:44:37.719Z",
       "url-repositories": [],
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "environment": [
+        {
+          "id": "production",
+          "label": "Production",
+          "icon": "Server",
+          "color": "success"
+        }
+      ],
+      "owners": [
+        {
+          "id": "01KBATBCQBC07CE2227A1V45VQ",
+          "label": "Masoud Mirghasemi"
+        }
+      ]
     },
     {
-      "color": "#4E79A7",
       "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/",
       "name": "CG-GR-API-DEV-1",
       "id": "01KA8TM7H68FPKTRNNNSPWWBKD",
       "createdAt": "2025-11-17T11:53:56.527Z",
-      "updatedAt": "2025-11-18T13:58:56.610Z",
-      "url-repositories": [
+      "updatedAt": "2025-11-30T16:44:26.042Z",
+      "url-repositories": [],
+      "color": "#4E79A7",
+      "environment": [
         {
-          "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
-          "label": "Schema Bulk Sync"
-        },
+          "id": "development",
+          "label": "Development",
+          "icon": "Code",
+          "color": "info"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "owners": [
         {
-          "id": "01KABM5QX5HRPWMPA1M7YK21WJ",
-          "label": "Schema Related Schemas Sync"
+          "id": "01KBAT78NRNB8KCD4Z625KH07A",
+          "label": "Hossein Rezaeifard"
         }
       ]
     },
     {
-      "color": "#4E79A7",
-      "name": "Gradian App",
+      "name": "Gradian App Dev",
       "address": "http://localhost:3000",
       "id": "01KA8VVZENR2AS7YWTAY4T6HM7",
       "createdAt": "2025-11-17T12:15:38.970Z",
-      "updatedAt": "2025-11-17T12:16:32.930Z",
-      "url-repositories": [
+      "updatedAt": "2025-11-30T16:44:18.232Z",
+      "url-repositories": [],
+      "color": "#4E79A7",
+      "environment": [
         {
-          "id": "01KA8VXHQFZR5TH0470163433K",
-          "label": "Schemas"
+          "id": "development",
+          "label": "Development",
+          "icon": "Code",
+          "color": "info"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "owners": [
+        {
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+          "label": "Mahyar Abidi"
+        }
+      ]
+    },
+    {
+      "name": "Gradian OCTA",
+      "address": "https://octa.cinnagen.com",
+      "environment": [
+        {
+          "id": "production",
+          "label": "Production",
+          "icon": "Server",
+          "color": "success"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBASP59XTTA4CNBNXMNNV7SC",
+      "createdAt": "2025-11-30T16:31:41.891Z",
+      "updatedAt": "2025-11-30T16:44:11.239Z",
+      "url-repositories": [],
+      "owners": [
+        {
+          "id": "01KBATBCQBC07CE2227A1V45VQ",
+          "label": "Masoud Mirghasemi"
         }
       ]
     },
     {
       "color": "#4E79A7",
-      "name": "Gradian ETL",
-      "address": "http://CG-BI-ETL",
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KA99R0VJ2GKBDNSHJDAH8T37",
-      "createdAt": "2025-11-17T16:18:09.403Z",
-      "updatedAt": "2025-11-17T16:18:45.553Z",
-      "databases": [
+      "name": "Gradian Genora",
+      "address": "https://octa.cinnagen.com/genora",
+      "environment": [
         {
-          "id": "01KA99S0PGBRJEQ61ZS1XZ41PQ",
-          "label": "Gradian_DW"
+          "id": "production",
+          "label": "Production",
+          "icon": "Server",
+          "color": "success"
         }
-      ]
+      ],
+      "owners": [],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBAT7P2B5NZYX26HVWYV28N1",
+      "createdAt": "2025-11-30T16:41:16.115Z",
+      "updatedAt": "2025-11-30T16:47:00.221Z"
+    },
+    {
+      "name": "Gradian Authentication",
+      "address": "https://octa.cinnagen.com/auth",
+      "environment": [
+        {
+          "id": "production",
+          "label": "Production",
+          "icon": "Server",
+          "color": "success"
+        }
+      ],
+      "owners": [
+        {
+          "id": "01KBATBCQBC07CE2227A1V45VQ",
+          "label": "Masoud Mirghasemi"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBATBKE9E23X1JT9KDHK95H6",
+      "createdAt": "2025-11-30T16:43:24.494Z",
+      "updatedAt": "2025-11-30T16:43:24.494Z"
+    },
+    {
+      "name": "Gradian Supply Chain",
+      "address": "https://scm.cinnagen.com",
+      "environment": [
+        {
+          "id": "production",
+          "label": "Production",
+          "icon": "Server",
+          "color": "success"
+        }
+      ],
+      "owners": [
+        {
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+          "label": "Mahyar Abidi"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBATF2D6ZEEGP61ASG5CSZC3",
+      "createdAt": "2025-11-30T16:45:18.122Z",
+      "updatedAt": "2025-11-30T16:45:18.122Z"
     }
   ],
   "url-repository": [
@@ -1349,6 +1496,15 @@
       "id": "01KASYNCENV001GITLABSYNC",
       "createdAt": "2025-11-23T15:00:59.000Z",
       "updatedAt": "2025-11-23T15:00:59.000Z"
+    },
+    {
+      "title": "Gradian Genora Schema",
+      "address": "https://octa.cinnagen.com/genora/api/schemas",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBATJ4GH09B0YETWF7W1SKM7",
+      "createdAt": "2025-11-30T16:46:58.586Z",
+      "updatedAt": "2025-11-30T16:46:58.586Z"
     }
   ],
   "integrations": [
@@ -1575,6 +1731,45 @@
       "createdAt": "2025-11-23T15:00:59.000Z",
       "updatedAt": "2025-11-30T15:42:41.443Z",
       "lastSynced": "2025-11-30T15:42:41.443Z"
+    },
+    {
+      "color": "#4E79A7",
+      "title": "Genora Schema Sync",
+      "description": "Genora Schema Sync with Gradian App Dev",
+      "icon": "Database",
+      "targetRoute": [
+        {
+          "id": "01KBATJ4GH09B0YETWF7W1SKM7",
+          "label": "Gradian Genora Schema",
+          "metadata": {
+            "address": "https://octa.cinnagen.com/genora/api/schemas"
+          }
+        }
+      ],
+      "targetMethod": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "Upload",
+          "color": "success"
+        }
+      ],
+      "sourceRoute": [
+        {
+          "id": "01KA8VXHQFZR5TH0470163433K",
+          "label": "Schemas",
+          "metadata": {
+            "address": "http://localhost:3000/api/schemas"
+          }
+        }
+      ],
+      "sourceDataPath": "data",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "genora_schema_sync",
+      "createdAt": "2025-11-30T16:48:01.239Z",
+      "updatedAt": "2025-11-30T16:57:51.045Z",
+      "lastSynced": "2025-11-30T16:57:51.045Z"
     }
   ],
   "databases": [

@@ -2662,7 +2662,8 @@
         "colSpan": 1,
         "fieldIds": [
           "server-name",
-          "server-address"
+          "server-address",
+          "server-owners"
         ]
       }
     ],
@@ -2709,33 +2710,70 @@
         "order": 3
       },
       {
-        "id": "server-avatar",
-        "name": "avatar",
-        "label": "Avatar",
+        "id": "server-environment",
+        "name": "environment",
+        "label": "Server Environment",
         "sectionId": "basic-information",
-        "component": "url",
-        "placeholder": "Enter avatar image URL",
+        "component": "select",
+        "placeholder": "Select server environment",
+        "role": "status",
         "required": false,
-        "role": "image",
-        "validation": {
-          "pattern": "^https?:\\/\\/.+\\.(jpg|jpeg|png|gif|webp|svg)$"
-        },
+        "options": [
+          {
+            "id": "development",
+            "label": "Development",
+            "icon": "Code",
+            "color": "info"
+          },
+          {
+            "id": "validation",
+            "label": "Validation",
+            "icon": "CheckCircle",
+            "color": "warning"
+          },
+          {
+            "id": "staging",
+            "label": "Staging",
+            "icon": "Server",
+            "color": "success"
+          },
+          {
+            "id": "production",
+            "label": "Production",
+            "icon": "Server",
+            "color": "success"
+          },
+          {
+            "id": "maintenance",
+            "label": "Maintenance",
+            "icon": "Server",
+            "color": "muted"
+          },
+          {
+            "id": "discontinued",
+            "label": "Discontinued",
+            "icon": "Server",
+            "color": "destructive"
+          }
+        ],
         "colSpan": 1,
-        "order": 4
+        "order": 6
       },
       {
-        "id": "server-color",
-        "name": "color",
-        "label": "Color",
+        "id": "server-owners",
+        "name": "owners",
+        "label": "Owners",
         "sectionId": "basic-information",
-        "component": "color-picker",
-        "placeholder": "#000000",
+        "component": "picker",
+        "placeholder": "Select owners",
+        "description": "Select users who own this server",
+        "targetSchema": "users",
         "required": false,
-        "validation": {
-          "pattern": "^#[0-9A-Fa-f]{6}$"
+        "metadata": {
+          "allowMultiselect": true
         },
         "colSpan": 1,
-        "order": 5
+        "order": 7
       }
     ],
     "sections": [
@@ -2782,8 +2820,8 @@
             "server-name",
             "server-address",
             "server-description",
-            "server-avatar",
-            "server-color"
+            "server-environment",
+            "server-owners"
           ]
         }
       ]
