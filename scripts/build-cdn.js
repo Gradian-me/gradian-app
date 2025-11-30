@@ -18,13 +18,21 @@ const watch = args.includes('--watch');
 const buildConfigs = [
   {
     name: 'Popup Version',
-    config: 'webpack.cdn.config.js',
+    config: 'scripts/webpack-cdn/webpack.cdn.config.js',
     output: 'form-embed-helper.min.js',
+    source: 'src/gradian-ui/form-builder/utils/form-embed-helper.cdn.js',
   },
   {
     name: 'Modal Version',
-    config: 'webpack.cdn.modal.config.js',
-    output: 'form-embed-helper-modal.min.js',
+    config: 'scripts/webpack-cdn/webpack.cdn.modal.config.js',
+    output: 'gradian-form-embed.min.js',
+    source: 'src/gradian-ui/form-builder/utils/gradian-form-embed.cdn.js',
+  },
+  {
+    name: 'Table Embed Helper',
+    config: 'scripts/webpack-cdn/webpack.cdn.table.config.js',
+    output: 'gradian-table-embed.min.js',
+    source: 'src/gradian-ui/data-display/table/utils/gradian-table-embed.cdn.js',
   },
 ];
 
@@ -47,10 +55,25 @@ const results = [];
 for (const buildConfig of buildConfigs) {
   const configPath = path.join(projectRoot, buildConfig.config);
   const outputFile = path.join(outputDir, buildConfig.output);
+  const sourceFile = buildConfig.source ? path.join(projectRoot, buildConfig.source) : null;
 
   console.log(`\n📦 Building ${buildConfig.name}...`);
   console.log(`   Config: ${buildConfig.config}`);
   console.log(`   Output: ${buildConfig.output}`);
+
+  // Check if source file exists
+  if (sourceFile && !fs.existsSync(sourceFile)) {
+    console.log(`   ⏭️  Skipping: Source file not found: ${buildConfig.source}`);
+    console.log(`   ℹ️  This build configuration will be skipped`);
+    results.push({
+      name: buildConfig.name,
+      file: buildConfig.output,
+      success: true, // Mark as success so it doesn't fail the build
+      skipped: true,
+      reason: `Source file not found: ${buildConfig.source}`,
+    });
+    continue;
+  }
 
   try {
     // Use quoted paths to handle spaces
@@ -131,8 +154,13 @@ if (!watch) {
   console.log('='.repeat(60));
   
   results.forEach(result => {
-    if (result.success) {
-      console.log(`✅ ${result.name}: ${result.file} (${result.size} KB)`);
+    if (result.skipped) {
+      console.log(`⏭️  ${result.name}: Skipped`);
+      if (result.reason) {
+        console.log(`   Reason: ${result.reason}`);
+      }
+    } else if (result.success) {
+      console.log(`✅ ${result.name}: ${result.file}${result.size ? ` (${result.size} KB)` : ''}`);
     } else {
       console.log(`❌ ${result.name}: Failed`);
       if (result.error) {
@@ -143,10 +171,18 @@ if (!watch) {
   
   console.log('='.repeat(60));
   
-  if (allSuccess) {
-    console.log('\n✅ All builds completed successfully!');
+  const successCount = results.filter(r => r.success && !r.skipped).length;
+  const skippedCount = results.filter(r => r.skipped).length;
+  const failedCount = results.filter(r => !r.success && !r.skipped).length;
+
+  if (failedCount === 0) {
+    if (skippedCount > 0) {
+      console.log(`\n✅ All available builds completed successfully! (${successCount} built, ${skippedCount} skipped)`);
+    } else {
+      console.log('\n✅ All builds completed successfully!');
+    }
   } else {
-    console.log('\n❌ Some builds failed. Check errors above.');
+    console.log(`\n❌ Some builds failed. (${successCount} succeeded, ${skippedCount} skipped, ${failedCount} failed)`);
     process.exit(1);
   }
 }

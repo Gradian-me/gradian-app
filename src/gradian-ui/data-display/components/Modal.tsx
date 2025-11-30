@@ -32,9 +32,9 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   const modalClasses = cn(
-    'border-none bg-white dark:bg-gray-900 shadow-xl overflow-hidden',
-    'rounded-none lg:rounded-2xl', // No rounded corners on mobile, rounded on desktop
-    'h-full w-full lg:max-w-5xl lg:max-h-[90vh]', // Full screen on mobile, auto on desktop
+    hideDialogHeader 
+      ? 'border-0 bg-white dark:bg-gray-900 shadow-none overflow-hidden rounded-none h-full w-full' // Full screen, no border, no rounded corners, no max constraints when header is hidden
+      : 'border-none bg-white dark:bg-gray-900 shadow-xl overflow-hidden rounded-none lg:rounded-2xl h-full w-full lg:max-w-5xl lg:max-h-[90vh]', // No rounded corners on mobile, rounded on desktop
     'mx-0', // No margin on mobile, margin on desktop
     'flex flex-col', // Add flex column layout
     className

@@ -3,11 +3,11 @@ const WebpackObfuscator = require('webpack-obfuscator');
 
 module.exports = {
   mode: 'production',
-  entry: './src/gradian-ui/form-builder/utils/form-embed-helper-modal.cdn.js',
+  entry: './src/gradian-ui/data-display/table/utils/gradian-table-embed.cdn.js',
   output: {
-    path: path.resolve(__dirname, 'public/cdn'),
-    filename: 'form-embed-helper-modal.min.js',
-    library: 'GradianFormEmbedModal',
+    path: path.resolve(__dirname, '../../public/cdn'),
+    filename: 'gradian-table-embed.min.js',
+    library: 'GradianTableEmbed',
     libraryTarget: 'umd',
     globalObject: 'this',
     clean: false, // Don't clean, keep other files

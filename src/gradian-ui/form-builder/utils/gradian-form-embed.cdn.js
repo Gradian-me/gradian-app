@@ -1,10 +1,10 @@
 /**
- * Gradian Form Embed Helper - Modal/Dialog Version (No Popup, No Iframe)
+ * Gradian Form Embed - Modal/Dialog Version (No Popup, No Iframe)
  * 
  * This version creates a modal dialog directly in the page instead of opening a popup.
  * 
  * Usage:
- * <script src="https://cdn.yourapp.com/form-embed-helper-modal.js"></script>
+ * <script src="https://cdn.yourapp.com/gradian-form-embed.min.js"></script>
  * <script>
  *   GradianFormEmbedModal.createData('tags', { 
  *     baseUrl: 'https://yourapp.com',
@@ -55,9 +55,10 @@
       border-radius: 12px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       z-index: 9999;
-      max-width: 90vw;
-      max-height: 90vh;
-      width: 900px;
+      max-width: 95vw;
+      max-height: 95vh;
+      width: 1200px;
+      height: 85vh;
       display: none;
       flex-direction: column;
       overflow: hidden;
@@ -156,6 +157,20 @@
       var resolveFn = modal.resolvePromise;
       var rejectFn = modal.rejectPromise;
       
+      // Only resolve if handlers still exist (not already resolved)
+      if (!resolveFn && !rejectFn) {
+        // Already resolved, just close the modal UI
+        overlay.style.opacity = '0';
+        modal.style.opacity = '0';
+        setTimeout(function() {
+          overlay.style.display = 'none';
+          modal.style.display = 'none';
+          body.innerHTML = '';
+          body.appendChild(loading);
+        }, 200);
+        return;
+      }
+      
       // Clear promise handlers immediately to prevent double resolution
       modal.resolvePromise = null;
       modal.rejectPromise = null;
@@ -163,13 +178,33 @@
       // Resolve promise synchronously before any async operations
       if (resolveFn) {
         try {
+          console.log('[Modal CDN] Resolving promise in closeModal');
           resolveFn({
             success: false,
             error: 'Form was closed without submission',
           });
+          console.log('[Modal CDN] Promise resolved successfully in closeModal');
         } catch (e) {
-          console.error('Error resolving promise:', e);
+          console.error('[Modal CDN] Error resolving promise in closeModal:', e);
+          // If resolve fails, try to reject instead
+          if (rejectFn) {
+            try {
+              rejectFn(new Error('Form was closed without submission'));
+            } catch (e2) {
+              console.error('[Modal CDN] Error rejecting promise in closeModal:', e2);
+            }
+          }
         }
+      } else if (rejectFn) {
+        // If no resolve function but we have reject, use that
+        try {
+          console.log('[Modal CDN] Rejecting promise in closeModal');
+          rejectFn(new Error('Form was closed without submission'));
+        } catch (e) {
+          console.error('[Modal CDN] Error rejecting promise in closeModal:', e);
+        }
+      } else {
+        console.warn('[Modal CDN] closeModal called but no promise handlers found');
       }
 
       // Send close message to iframe if it exists
@@ -270,7 +305,7 @@
       width: 100%;
       height: 100%;
       border: none;
-      min-height: 500px;
+      min-height: 600px;
     `;
     iframe.onload = function() {
       loading.style.display = 'none';
@@ -285,48 +320,85 @@
 
     // Listen for messages from iframe
     const handleMessage = function(event) {
-      if (event.origin !== new URL(baseUrl).origin) return;
+      // Log for debugging
+      console.log('[Modal CDN] Received message:', event.data, 'from origin:', event.origin);
+      
+      if (event.origin !== new URL(baseUrl).origin) {
+        console.log('[Modal CDN] Origin mismatch, ignoring message');
+        return;
+      }
 
       const message = event.data;
-      if (!message || typeof message !== 'object' || !message.type) return;
+      if (!message || typeof message !== 'object' || !message.type) {
+        console.log('[Modal CDN] Invalid message format, ignoring');
+        return;
+      }
 
-      // Remove listener and clear promise handlers
+      // Get promise handlers BEFORE clearing them
+      var resolveFn = modal.resolvePromise;
+      var rejectFn = modal.rejectPromise;
+
+      console.log('[Modal CDN] Message type:', message.type, 'Has handlers:', !!resolveFn, !!rejectFn);
+
+      // Only process if we still have promise handlers (not already resolved by manual close)
+      if (!resolveFn && !rejectFn) {
+        console.log('[Modal CDN] Promise already resolved, just ensuring modal is closed');
+        // Promise already resolved/rejected, just handle the message without resolving
+        if (message.type === 'form-closed' || message.type === 'form-submitted') {
+          // Modal should already be closed, but ensure it's closed
+          if (modal.style.display !== 'none') {
+            modal.closeModal();
+          }
+        }
+        return;
+      }
+
+      // Remove listener and clear promise handlers to prevent double resolution
       window.removeEventListener('message', handleMessage);
       modal.resolvePromise = null;
       modal.rejectPromise = null;
 
       if (message.type === 'form-submitted') {
+        // Close modal first
         modal.closeModal();
         
+        // Then resolve promise
         if (message.payload && message.payload.success) {
-          resolve({
+          if (resolveFn) {
+            resolveFn({
             success: true,
             data: message.payload.data,
             entityId: message.payload.entityId,
           });
+          }
         } else {
-          resolve({
+          if (resolveFn) {
+            resolveFn({
             success: false,
             error: message.payload && message.payload.error ? message.payload.error : 'Form submission failed',
           });
+          }
         }
       } else if (message.type === 'form-closed') {
-        // Only resolve if promise handlers still exist (not already resolved by manual close)
-        if (modal.resolvePromise) {
-          modal.resolvePromise = null;
-          modal.rejectPromise = null;
-          modal.closeModal();
-          resolve({
+        // Resolve the promise first
+        if (resolveFn) {
+          try {
+            resolveFn({
             success: false,
             error: 'Form was closed without submission',
           });
-        } else {
-          // Promise already resolved by manual close, just close the modal
-          modal.closeModal();
+          } catch (e) {
+            console.error('Error resolving promise on form-closed:', e);
+          }
         }
+        
+        // Close the modal (handlers are already cleared, so it won't resolve again)
+          modal.closeModal();
       } else if (message.type === 'form-error') {
         modal.closeModal();
-        reject(new Error(message.payload && message.payload.error ? message.payload.error : 'Unknown error'));
+        if (rejectFn) {
+          rejectFn(new Error(message.payload && message.payload.error ? message.payload.error : 'Unknown error'));
+        }
       }
     };
 
