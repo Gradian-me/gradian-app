@@ -6,7 +6,7 @@ import { QueryProvider } from "@/components/providers/query-provider";
 import { DialogProvider } from "@/gradian-ui/shared/contexts/DialogContext";
 
 export const metadata: Metadata = {
-  title: "Gradian App",
+  title: "Gradian",
   description: "We help you trust you decision",
 };
 

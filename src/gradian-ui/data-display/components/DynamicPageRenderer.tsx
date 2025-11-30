@@ -96,7 +96,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
 
     const previousTitle = document.title;
     const schemaTitle = schema.plural_name || schema.title || schema.name || 'Listing';
-    document.title = `${schemaTitle} | Gradian App`;
+    document.title = `${schemaTitle} | Gradian`;
 
     return () => {
       document.title = previousTitle;

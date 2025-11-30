@@ -80,7 +80,7 @@ export async function generateMetadata({ params }: PageProps) {
   }
 
   return {
-    title: `${schema.singular_name || 'Entity'} Details | Gradian App`,
+    title: `${schema.singular_name || 'Entity'} Details | Gradian`,
     description: `View details for ${schema.singular_name?.toLowerCase() || 'entity'}`,
   };
 }

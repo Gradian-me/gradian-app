@@ -113,7 +113,7 @@ export function MainLayout({
   const prevSidebarWidthRef = useRef<number | null>(sidebarWidth);
   const { selectedCompany } = useCompanyStore();
   const { closeAllDialogs, hasOpenDialogs, registerDialog, unregisterDialog } = useDialogContext();
-  const pageTitle = title ? `${title} | Gradian App` : 'Gradian App';
+  const pageTitle = title ? `${title} | Gradian` : 'Gradian';
 
   useEffect(() => {
     if (typeof document === 'undefined') return;

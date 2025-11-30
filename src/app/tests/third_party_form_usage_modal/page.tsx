@@ -323,7 +323,7 @@ export default function ThirdPartyFormUsageModalPage() {
             tableActions: ['edit', 'delete'],
             onEdit: handleEdit,
             onDelete: handleDelete,
-          });
+    });
         }
       } else {
         showMessage(`Failed to delete ${schemaId}: ${result.error || 'Unknown error'}`, 'error');
@@ -466,7 +466,7 @@ export default function ThirdPartyFormUsageModalPage() {
               <br />
                 <small className="text-blue-600 dark:text-blue-500">
                   Scripts: {scriptLoaded ? '✅ Form' : '⏳ Form'} | {tableScriptLoaded ? '✅ Table' : '⏳ Table'}
-                </small>
+              </small>
             </p>
           </div>
 
@@ -547,8 +547,8 @@ export default function ThirdPartyFormUsageModalPage() {
                 <p className="text-sm">
                   Please ensure <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">gradian-table-embed.min.js</code> is loaded from the CDN.
                 </p>
-              </div>
-            )}
+            </div>
+          )}
         </div>
       </div>
     </div>

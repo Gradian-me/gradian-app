@@ -2,7 +2,7 @@ import { BusinessRuleWrapper } from '@/domains/business-rule-engine/components/B
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Business Rules Builder | Gradian App',
+  title: 'Business Rules Builder | Gradian',
   description: 'Create and manage business rules for your application',
 };
 

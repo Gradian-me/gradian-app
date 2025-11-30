@@ -568,8 +568,8 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     const schemaTitle = schema?.plural_name || schema?.title || schema?.name || 'Schema';
     const dynamicTitle = headerInfo.title || headerInfo.subtitle || headerInfo.code || data?.name || '';
     const fullTitle = dynamicTitle
-      ? `${schemaTitle} - ${dynamicTitle} | Gradian App`
-      : `${schemaTitle} | Gradian App`;
+      ? `${schemaTitle} - ${dynamicTitle} | Gradian`
+      : `${schemaTitle} | Gradian`;
 
     document.title = fullTitle;
 

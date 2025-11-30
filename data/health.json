@@ -8,7 +8,7 @@
     "healthyJsonPath": "status",
     "monitoringEnabled": true,
     "isActive": true,
-    "lastChecked": "2025-11-29T16:00:00.610Z"
+    "lastChecked": "2025-11-30T07:58:47.132Z"
   },
   {
     "id": "gradian-auth",
@@ -19,7 +19,7 @@
     "healthyJsonPath": "status",
     "isActive": true,
     "monitoringEnabled": true,
-    "lastChecked": "2025-11-29T16:00:00.896Z"
+    "lastChecked": "2025-11-30T07:58:47.139Z"
   },
   {
     "id": "gradian-genora",
@@ -30,7 +30,7 @@
     "healthyJsonPath": "status",
     "isActive": true,
     "monitoringEnabled": true,
-    "lastChecked": "2025-11-29T16:00:00.945Z"
+    "lastChecked": "2025-11-30T07:58:47.142Z"
   },
   {
     "id": "gradian-genora-dev",
@@ -47,6 +47,6 @@
     "emailCC": [
       "rezaeifardh@cinnagen.com"
     ],
-    "lastChecked": "2025-11-29T16:00:02.794Z"
+    "lastChecked": "2025-11-30T07:58:47.144Z"
   }
 ]

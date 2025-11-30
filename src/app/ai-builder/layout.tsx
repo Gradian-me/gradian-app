@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'AI Builder | Gradian App',
+  title: 'AI Builder | Gradian',
   description: 'Transform your ideas into reality with the power of AI. Create schemas, applications, and more using intelligent AI agents.',
 };
 

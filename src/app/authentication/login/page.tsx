@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    document.title = 'Login | Gradian App';
+    document.title = 'Login | Gradian';
 
     ensureFingerprintCookie()
       .then((value) => setFingerprint(value))

@@ -30,7 +30,7 @@ function ResetPasswordContent() {
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    document.title = 'Reset Password | Gradian App';
+    document.title = 'Reset Password | Gradian';
   }, []);
 
   useEffect(() => {

@@ -24,7 +24,7 @@ export default function ChangePasswordPage() {
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.title = 'Change Password | Gradian App';
+      document.title = 'Change Password | Gradian';
     }
   }, []);
 

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import React from 'react';
 
 export const metadata: Metadata = {
-  title: 'Builder | Gradian App',
+  title: 'Builder | Gradian',
   description: 'Configure schemas, integrations, and other builders for your application',
 };
 

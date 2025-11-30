@@ -121,7 +121,7 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.title = 'Sign Up | Gradian App';
+      document.title = 'Sign Up | Gradian';
     }
   }, []);
 
