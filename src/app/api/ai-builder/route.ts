@@ -234,8 +234,25 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('LLM API error:', errorText);
+      
+      // Try to parse error response and extract the message
+      let errorMessage = `AI API request failed: ${response.statusText}`;
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData?.error?.message) {
+          errorMessage = errorData.error.message;
+        } else if (errorData?.message) {
+          errorMessage = errorData.message;
+        } else if (typeof errorData?.error === 'string') {
+          errorMessage = errorData.error;
+        }
+      } catch (parseError) {
+        // If parsing fails, use the generic message
+        // errorMessage already set above
+      }
+      
       return NextResponse.json(
-        { success: false, error: `AI API request failed: ${response.statusText}` },
+        { success: false, error: errorMessage },
         { status: response.status }
       );
     }

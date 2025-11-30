@@ -2214,7 +2214,8 @@
         "colSpan": 1,
         "fieldIds": [
           "user-role-name",
-          "user-role-color"
+          "user-role-color",
+          "user-role-type"
         ]
       }
     ],
@@ -2247,13 +2248,66 @@
         },
         "colSpan": 1,
         "order": 2
+      },
+      {
+        "id": "user-role-type",
+        "name": "type",
+        "label": "User Role Type",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select user role type",
+        "role": "status",
+        "options": [
+          {
+            "id": "SYSTEM_ADMINISTRATOR",
+            "label": "System Administrator",
+            "icon": "Shield",
+            "color": "destructive"
+          },
+          {
+            "id": "BUSINESS_ADMINISTRATOR",
+            "label": "Business Administrator",
+            "icon": "Briefcase",
+            "color": "warning"
+          },
+          {
+            "id": "GENERAL_ROLE",
+            "label": "General Role",
+            "icon": "User",
+            "color": "default"
+          },
+          {
+            "id": "SUBSIDIARY_COMPANY",
+            "label": "Subsidiary Company",
+            "icon": "Building",
+            "color": "default"
+          },
+          {
+            "id": "VENDOR",
+            "label": "Vendor",
+            "icon": "ShoppingBasket",
+            "color": "success"
+          },
+          {
+            "id": "CUSTOMER",
+            "label": "Customer",
+            "icon": "User",
+            "color": "default"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "defaultValue": "GENERAL_ROLE",
+        "colSpan": 1,
+        "order": 3
       }
     ],
     "sections": [
       {
         "id": "basic-information",
         "title": "Basic Information",
-        "description": "User role name and color",
+        "description": "User role name, color, and type",
         "initialState": "expanded",
         "columns": 2
       },
@@ -2271,6 +2325,23 @@
           "isUnique": true,
           "fieldRelationType": "connectToSchema"
         }
+      },
+      {
+        "id": "access-policies",
+        "title": "Access Policies",
+        "description": "Select access policies for this user role",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "initialState": "expanded",
+        "repeatingConfig": {
+          "minItems": 0,
+          "targetSchema": "app-access-policies",
+          "relationTypeId": "HAS_ACCESS_POLICY",
+          "deleteType": "relationOnly",
+          "addType": "canSelectFromData",
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
+        }
       }
     ],
     "detailPageMetadata": {
@@ -2282,13 +2353,15 @@
           "colSpan": 2,
           "fieldIds": [
             "user-role-name",
-            "user-role-color"
+            "user-role-color",
+            "user-role-type"
           ]
         }
       ]
     },
     "showInNavigation": false,
-    "icon": "UserCircle"
+    "icon": "UserCircle",
+    "allowDataInactive": true
   },
   {
     "id": "business-areas",
@@ -2345,7 +2418,8 @@
           "required": true
         },
         "colSpan": 1,
-        "order": 2
+        "order": 2,
+        "role": "icon"
       },
       {
         "id": "business-area-color",
@@ -5013,5 +5087,308 @@
         "initialState": "collapsed"
       }
     ]
+  },
+  {
+    "id": "app-permissions",
+    "description": "Define and manage application permissions for resources and actions",
+    "singular_name": "App Permission",
+    "plural_name": "App Permissions",
+    "isSystemSchema": true,
+    "cardMetadata": [],
+    "fields": [
+      {
+        "id": "resource-type",
+        "name": "resourceType",
+        "label": "Resource Type",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select resource type",
+        "role": "status",
+        "validation": {
+          "required": true
+        },
+        "options": [
+          {
+            "id": "BUSINESS_AREA",
+            "label": "Business Area",
+            "icon": "Folder",
+            "color": "info"
+          },
+          {
+            "id": "APPLICATION",
+            "label": "Application",
+            "icon": "AppWindow",
+            "color": "info"
+          },
+          {
+            "id": "SCHEMA",
+            "label": "Schema",
+            "icon": "Database",
+            "color": "warning"
+          },
+          {
+            "id": "SECTION",
+            "label": "Section",
+            "icon": "Layout",
+            "color": "default"
+          },
+          {
+            "id": "FIELD",
+            "label": "Field",
+            "icon": "FileText",
+            "color": "muted"
+          },
+          {
+            "id": "URL_REPOSITORY",
+            "label": "URL Repository",
+            "icon": "Link",
+            "color": "success"
+          }
+        ],
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "resource",
+        "name": "resource",
+        "label": "Resource",
+        "sectionId": "basic-information",
+        "component": "picker",
+        "placeholder": "Click to select resource",
+        "description": "Select resource from /api/schemas",
+        "targetSchema": "schemas",
+        "allowMultiselect": true,
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "title"
+      },
+      {
+        "id": "action-types",
+        "name": "actionTypes",
+        "label": "Action Types",
+        "sectionId": "basic-information",
+        "component": "picker",
+        "placeholder": "Select action types",
+        "allowMultiselect": true,
+        "validation": {
+          "required": true
+        },
+        "options": [
+          {
+            "id": "CREATE",
+            "label": "Create",
+            "icon": "Plus",
+            "color": "success"
+          },
+          {
+            "id": "VIEW",
+            "label": "View",
+            "icon": "Eye",
+            "color": "info"
+          },
+          {
+            "id": "EDIT",
+            "label": "Edit",
+            "icon": "Edit",
+            "color": "warning"
+          },
+          {
+            "id": "DELETE",
+            "label": "Delete",
+            "icon": "Trash2",
+            "color": "destructive"
+          }
+        ],
+        "colSpan": 1,
+        "order": 3,
+        "role": "subtitle"
+      },
+      {
+        "id": "permission-type",
+        "name": "permissionType",
+        "label": "Permission Type",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select permission type",
+        "role": "status",
+        "validation": {
+          "required": true
+        },
+        "options": [
+          {
+            "id": "ALLOW",
+            "label": "Allow",
+            "icon": "CheckCircle",
+            "color": "success"
+          },
+          {
+            "id": "DENY",
+            "label": "Deny",
+            "icon": "XCircle",
+            "color": "destructive"
+          }
+        ],
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter permission description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 5
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Permission Information",
+        "description": "Define resource permissions and actions",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "permission-overview",
+          "title": "Permission Overview",
+          "description": "Permission configuration details",
+          "colSpan": 2,
+          "fieldIds": [
+            "resource-type",
+            "resource",
+            "actions",
+            "permission-type",
+            "description"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "Shield",
+    "isNotCompanyBased": true
+  },
+  {
+    "id": "app-access-policies",
+    "description": "Define and manage access policies with associated permissions",
+    "singular_name": "Application Access Policy",
+    "plural_name": "Application Access Policies",
+    "isSystemSchema": true,
+    "cardMetadata": [],
+    "fields": [
+      {
+        "id": "title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter access policy title",
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "access-policy-type",
+        "name": "accessPolicyType",
+        "label": "Access Policy Type",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select access policy type",
+        "role": "status",
+        "validation": {
+          "required": true
+        },
+        "options": [
+          {
+            "id": "ADMIN",
+            "label": "Admin",
+            "icon": "Shield",
+            "color": "violet"
+          },
+          {
+            "id": "ALL_ACTIONS",
+            "label": "All Actions",
+            "icon": "CheckCircle",
+            "color": "success"
+          },
+          {
+            "id": "CONTRIBUTOR",
+            "label": "Contributor",
+            "icon": "Edit",
+            "color": "warning"
+          },
+          {
+            "id": "READER",
+            "label": "Reader",
+            "icon": "Eye",
+            "color": "info"
+          },
+          {
+            "id": "NO_ACCESS",
+            "label": "No Access",
+            "icon": "XCircle",
+            "color": "destructive"
+          }
+        ],
+        "colSpan": 1,
+        "order": 2
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Policy Information",
+        "description": "Basic access policy details",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "permissions",
+        "title": "Permissions",
+        "description": "Select permissions for this access policy",
+        "isRepeatingSection": true,
+        "initialState": "expanded",
+        "columns": 2,
+        "repeatingConfig": {
+          "minItems": 0,
+          "targetSchema": "app-permissions",
+          "relationTypeId": "HAS_APP_PERMISSION",
+          "deleteType": "relationOnly",
+          "addType": "canSelectFromData",
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
+        }
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "policy-overview",
+          "title": "Policy Overview",
+          "description": "Access policy configuration details",
+          "colSpan": 2,
+          "fieldIds": [
+            "title",
+            "access-policy-type"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "Lock",
+    "isNotCompanyBased": true
   }
 ]

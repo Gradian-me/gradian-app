@@ -390,10 +390,16 @@ export async function POST(request: NextRequest) {
         }
         loggingCustom(LogType.INTEGRATION_LOG, 'info', `Data extracted successfully from path: ${sourceDataPath}`);
         
-        // Wrap extracted data in an object with targetDataPath key (default: "data")
-        const targetDataPath = integration.targetDataPath || 'data';
-        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Wrapping data with targetDataPath: ${targetDataPath}`);
-        dataToSend = { [targetDataPath]: extractedData };
+        // If targetDataPath is empty, post data directly without wrapping
+        const targetDataPath = integration.targetDataPath?.trim();
+        if (!targetDataPath || targetDataPath === '') {
+          loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Target Data Path is empty, posting data directly without wrapping');
+          dataToSend = extractedData;
+        } else {
+          // Wrap extracted data in an object with targetDataPath key
+          loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Wrapping data with targetDataPath: ${targetDataPath}`);
+          dataToSend = { [targetDataPath]: extractedData };
+        }
         loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Data to send size: ${JSON.stringify(dataToSend).length} characters`);
       }
       
@@ -470,6 +476,9 @@ export async function POST(request: NextRequest) {
                 loggingCustom(LogType.INTEGRATION_LOG, 'warn', `Failed to parse error response: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
               }
               
+              // Extract error message from response (check message, error, or messages)
+              const errorMessage = errorResponseData?.message || errorResponseData?.error || null;
+              
               // If we have messages in the error response, include them and return
               if (errorResponseData?.messages && Array.isArray(errorResponseData.messages) && errorResponseData.messages.length > 0) {
                 loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target response contains ${errorResponseData.messages.length} message(s) in error response`);
@@ -487,8 +496,18 @@ export async function POST(request: NextRequest) {
                 
                 return NextResponse.json({
                   success: false,
-                  error: errorResponseData.error || `Target route failed: ${targetResponse.statusText}`,
+                  error: errorMessage || `Target route failed: ${targetResponse.statusText}`,
                   messages: transformedMessages,
+                  statusCode: targetResponse.status
+                }, { status: targetResponse.status });
+              }
+              
+              // If we have a single message field, use it in the error
+              if (errorMessage) {
+                loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target response contains error message: ${errorMessage}`);
+                return NextResponse.json({
+                  success: false,
+                  error: errorMessage,
                   statusCode: targetResponse.status
                 }, { status: targetResponse.status });
               }
@@ -565,6 +584,9 @@ export async function POST(request: NextRequest) {
                 loggingCustom(LogType.INTEGRATION_LOG, 'warn', `Failed to parse error response: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
               }
               
+              // Extract error message from response (check message, error, or messages)
+              const errorMessage = errorResponseData?.message || errorResponseData?.error || null;
+              
               // If we have messages in the error response, include them and return
               if (errorResponseData?.messages && Array.isArray(errorResponseData.messages) && errorResponseData.messages.length > 0) {
                 loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target response contains ${errorResponseData.messages.length} message(s) in error response`);
@@ -582,8 +604,18 @@ export async function POST(request: NextRequest) {
                 
                 return NextResponse.json({
                   success: false,
-                  error: errorResponseData.error || `Target route failed: ${targetResponse.statusText}`,
+                  error: errorMessage || `Target route failed: ${targetResponse.statusText}`,
                   messages: transformedMessages,
+                  statusCode: targetResponse.status
+                }, { status: targetResponse.status });
+              }
+              
+              // If we have a single message field, use it in the error
+              if (errorMessage) {
+                loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target response contains error message: ${errorMessage}`);
+                return NextResponse.json({
+                  success: false,
+                  error: errorMessage,
                   statusCode: targetResponse.status
                 }, { status: targetResponse.status });
               }
@@ -656,6 +688,9 @@ export async function POST(request: NextRequest) {
           loggingCustom(LogType.INTEGRATION_LOG, 'warn', `Failed to parse error response: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
         }
         
+        // Extract error message from response (check message, error, or messages)
+        const errorMessage = errorResponseData?.message || errorResponseData?.error || null;
+        
         // If we have messages in the error response, include them and return
         if (errorResponseData?.messages && Array.isArray(errorResponseData.messages) && errorResponseData.messages.length > 0) {
           loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target response contains ${errorResponseData.messages.length} message(s) in error response`);
@@ -673,8 +708,18 @@ export async function POST(request: NextRequest) {
           
           return NextResponse.json({
             success: false,
-            error: errorResponseData.error || `Target route failed: ${targetResponse.statusText}`,
+            error: errorMessage || `Target route failed: ${targetResponse.statusText}`,
             messages: transformedMessages,
+            statusCode: targetResponse.status
+          }, { status: targetResponse.status });
+        }
+        
+        // If we have a single message field, use it in the error
+        if (errorMessage) {
+          loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target response contains error message: ${errorMessage}`);
+          return NextResponse.json({
+            success: false,
+            error: errorMessage,
             statusCode: targetResponse.status
           }, { status: targetResponse.status });
         }

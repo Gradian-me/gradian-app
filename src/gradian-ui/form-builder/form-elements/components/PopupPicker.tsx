@@ -75,7 +75,37 @@ const buildIdsKey = (ids?: Array<string | number>): string => {
   return normalized.slice().sort().join('|');
 };
 
-const buildSelectionEntry = (item: any, schema?: FormSchema | null): NormalizedOption => {
+// Helper function to get value by role from sourceColumnRoles
+const getValueByRoleFromSourceColumns = (
+  item: any,
+  role: string,
+  sourceColumnRoles?: Array<{ column: string; role?: string }>
+): any => {
+  if (!sourceColumnRoles || !item) {
+    return undefined;
+  }
+
+  const roleMapping = sourceColumnRoles.find(mapping => mapping.role === role);
+  if (roleMapping && item[roleMapping.column] !== undefined) {
+    return item[roleMapping.column];
+  }
+
+  // If no explicit role mapping, try to find by column name matching common patterns
+  if (role === 'title') {
+    const titleColumn = sourceColumnRoles.find(m => m.column === 'singular_name' || m.column === 'name' || m.column === 'title');
+    if (titleColumn && item[titleColumn.column] !== undefined) {
+      return item[titleColumn.column];
+    }
+  }
+
+  return undefined;
+};
+
+const buildSelectionEntry = (
+  item: any,
+  schema?: FormSchema | null,
+  sourceColumnRoles?: Array<{ column: string; role?: string }>
+): NormalizedOption => {
   if (!item) {
     return {
       id: '',
@@ -108,7 +138,28 @@ const buildSelectionEntry = (item: any, schema?: FormSchema | null): NormalizedO
   };
 
   if (!schema) {
-    const fallbackLabel = item.name || item.title || baseId;
+    // Use sourceColumnRoles if available
+    if (sourceColumnRoles) {
+      const title = getValueByRoleFromSourceColumns(item, 'title', sourceColumnRoles) || 
+                    item.label || item.name || item.title || item.singular_name || baseId;
+      const description = getValueByRoleFromSourceColumns(item, 'description', sourceColumnRoles) || 
+                          item.description;
+      const icon = getValueByRoleFromSourceColumns(item, 'icon', sourceColumnRoles) || item.icon;
+      const color = getValueByRoleFromSourceColumns(item, 'color', sourceColumnRoles) || 
+                    getValueByRoleFromSourceColumns(item, 'status', sourceColumnRoles) || 
+                    item.color;
+
+      return {
+        id: baseId,
+        label: title || baseId,
+        icon,
+        color,
+        description,
+        metadata: description ? { description } : undefined,
+      };
+    }
+
+    const fallbackLabel = item.label || item.name || item.title || item.singular_name || baseId;
     return {
       id: baseId,
       label: fallbackLabel || baseId,
@@ -161,9 +212,10 @@ export interface PopupPickerProps {
   viewListUrl?: string; // Custom URL for the list page (defaults to /page/{schemaId})
   allowMultiselect?: boolean; // Enables multi-select mode with confirm button
   columnMap?: ColumnMapConfig; // Optional mapping for request/response and item fields
-  staticItems?: any[]; // Optional static dataset (skips API calls when provided)
+  staticItems?: any[]; // Optional dataset (skips API calls when provided)
   pageSize?: number; // Page size for paginated data sources
   sortType?: 'ASC' | 'DESC' | null; // Sort order for items (null = no sorting, default)
+  sourceColumnRoles?: Array<{ column: string; role?: string }>; // Column to role mapping for sourceUrl items
 }
 
 export const PopupPicker: React.FC<PopupPickerProps> = ({
@@ -185,9 +237,26 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   staticItems,
   pageSize = 48,
   sortType = null,
+  sourceColumnRoles,
 }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  
+  // Hardcoded config for schemas picker
+  const SCHEMAS_PICKER_CONFIG = {
+    sourceUrl: '/api/schemas?summary=true',
+    sourceColumnRoles: [
+      { column: 'singular_name', role: 'title' },
+      { column: 'description', role: 'description' },
+      { column: 'icon', role: 'icon' },
+      { column: 'color', role: 'color' },
+    ],
+  };
+
+  // Override sourceUrl and sourceColumnRoles when schemaId is "schemas"
+  const effectiveSourceUrl = schemaId === 'schemas' ? SCHEMAS_PICKER_CONFIG.sourceUrl : sourceUrl;
+  const effectiveSourceColumnRoles = schemaId === 'schemas' ? SCHEMAS_PICKER_CONFIG.sourceColumnRoles : sourceColumnRoles;
+
   const [schema, setSchema] = useState<FormSchema | null>(providedSchema || null);
   const [items, setItems] = useState<any[]>([]);
   const [filteredItems, setFilteredItems] = useState<any[]>([]);
@@ -207,7 +276,13 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   });
   const selectedCompany = useCompanyStore((state) => state.selectedCompany);
   const activeCompanyId = selectedCompany && selectedCompany.id !== -1 ? String(selectedCompany.id) : null;
-  const effectiveSchema = useMemo(() => schema ?? providedSchema ?? null, [schema, providedSchema]);
+  // When using hardcoded schemas config, don't use schema-based logic
+  const effectiveSchema = useMemo(() => {
+    if (schemaId === 'schemas' && effectiveSourceUrl) {
+      return null;
+    }
+    return schema ?? providedSchema ?? null;
+  }, [schema, providedSchema, schemaId, effectiveSourceUrl]);
   const isHierarchical = Boolean(effectiveSchema?.allowHierarchicalParent);
   const shouldFilterByCompany = useMemo(() => {
     if (effectiveSchema) {
@@ -230,7 +305,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   const baseSelectedIds = baseSelectedIdsRef.current;
   const listContainerRef = useRef<HTMLDivElement>(null);
   const loadMoreTriggerRef = useRef<HTMLDivElement>(null);
-  const supportsPagination = Boolean((sourceUrl || schemaId) && !staticItems);
+  const supportsPagination = Boolean((effectiveSourceUrl || schemaId) && !staticItems);
   const includeKey = useMemo(() => (includeIds && includeIds.length > 0 ? includeIds.slice().sort().join(',') : ''), [includeIds]);
   const excludeKey = useMemo(() => (excludeIds && excludeIds.length > 0 ? excludeIds.slice().sort().join(',') : ''), [excludeIds]);
   const lastQueryKeyRef = useRef<string>('__init__');
@@ -250,9 +325,15 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   const prevSelectedIdsKeyRef = useRef<string>('');
   const prevCompanyKeyRef = useRef<string>('');
 
-  // Fetch schema if not provided
+  // Fetch schema if not provided (skip if using effectiveSourceUrl for schemas)
   useEffect(() => {
-    if (!staticItems && !sourceUrl && !providedSchema && schemaId && isOpen) {
+    // Don't fetch schema if we're using the hardcoded schemas config
+    if (schemaId === 'schemas' && effectiveSourceUrl) {
+      setSchema(null);
+      return;
+    }
+    
+    if (!staticItems && !effectiveSourceUrl && !providedSchema && schemaId && isOpen) {
       const fetchSchema = async () => {
         try {
           const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);
@@ -268,7 +349,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     } else if (providedSchema) {
       setSchema(providedSchema);
     }
-  }, [schemaId, providedSchema, isOpen, queryClient]);
+  }, [schemaId, providedSchema, isOpen, queryClient, effectiveSourceUrl]);
 
   // Reset state when modal closes
   useEffect(() => {
@@ -296,7 +377,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
   const buildSourceRequestUrl = useCallback(
     (pageToLoad: number, forceRefresh = false) => {
-      if (!sourceUrl) {
+      if (!effectiveSourceUrl) {
         return '';
       }
       const paramRecord: Record<string, string> = {
@@ -326,15 +407,15 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       // Always use relative URLs so requests go through Next.js API routes
       // The API routes will check isDemoModeEnabled() and proxy to backend if needed
       // This centralizes the proxying logic in the API routes
-      const separator = sourceUrl.includes('?') ? '&' : '?';
-      return `${sourceUrl}${queryString ? `${separator}${queryString}` : ''}`;
+      const separator = effectiveSourceUrl.includes('?') ? '&' : '?';
+      return `${effectiveSourceUrl}${queryString ? `${separator}${queryString}` : ''}`;
     },
-    [sourceUrl, effectivePageSize, searchQuery, includeIds, excludeIds, columnMap, companyQueryParam]
+    [effectiveSourceUrl, effectivePageSize, searchQuery, includeIds, excludeIds, columnMap, companyQueryParam]
   );
 
   const fetchSourceItems = useCallback(
     async (pageToLoad = 1, append = false, forceRefresh = false) => {
-      if (!sourceUrl) {
+      if (!effectiveSourceUrl) {
         return;
       }
       if (shouldFilterByCompany && !companyQueryParam) {
@@ -400,7 +481,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         }
       }
     },
-    [buildSourceRequestUrl, effectivePageSize, sourceUrl, columnMap, shouldFilterByCompany, companyQueryParam, sortType]
+    [buildSourceRequestUrl, effectivePageSize, effectiveSourceUrl, columnMap, shouldFilterByCompany, companyQueryParam, sortType]
   );
 
   const fetchSchemaItems = useCallback(
@@ -499,7 +580,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
   const loadItems = useCallback(
     async (pageToLoad = 1, append = false) => {
-      if (sourceUrl) {
+      if (effectiveSourceUrl) {
         await fetchSourceItems(pageToLoad, append);
         return;
       }
@@ -561,7 +642,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         setIsLoading(false);
       }
     },
-    [sourceUrl, fetchSourceItems, fetchSchemaItems, supportsPagination, schemaId, staticItems, includeIds, excludeIds, shouldFilterByCompany, companyQueryParam, sortType]
+    [effectiveSourceUrl, fetchSourceItems, fetchSchemaItems, supportsPagination, schemaId, staticItems, includeIds, excludeIds, shouldFilterByCompany, companyQueryParam, sortType]
   );
 
   // Keep items in sync when static dataset changes or when modal opens
@@ -632,7 +713,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     void loadItems();
     // Note: excludeIds and includeIds are intentionally not in dependencies
     // We compare them inside the effect using refs to avoid infinite loops
-  }, [schemaId, isOpen, staticItems, sourceUrl, loadItems, companyKey]);
+  }, [schemaId, isOpen, staticItems, effectiveSourceUrl, loadItems, companyKey]);
   const handleRefresh = async (event?: React.MouseEvent<HTMLButtonElement>) => {
     event?.preventDefault();
     event?.stopPropagation();
@@ -655,7 +736,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       setPageMeta((prev) => ({ ...prev, page: 1, hasMore: true, totalItems: 0 }));
       
       // Directly call the appropriate fetch function with forceRefresh flag
-      if (sourceUrl) {
+      if (effectiveSourceUrl) {
         await fetchSourceItems(1, false, true);
       } else if (schemaId) {
         await fetchSchemaItems(1, false, true);
@@ -743,20 +824,31 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
     const query = searchQuery.toLowerCase();
     const filtered = items.filter((item) => {
-      if (!schema) {
-        const title = item.name || item.title || '';
+      if (!effectiveSchema) {
+        if (effectiveSourceColumnRoles) {
+          const title = getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) ||
+                        item.name || item.title || item.singular_name || '';
+          const subtitle = getValueByRoleFromSourceColumns(item, 'subtitle', effectiveSourceColumnRoles) ||
+                           item.email || item.subtitle || '';
+          const description = getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles) ||
+                              item.description || '';
+          return title.toLowerCase().includes(query) ||
+                 subtitle.toLowerCase().includes(query) ||
+                 description.toLowerCase().includes(query);
+        }
+        const title = item.name || item.title || item.singular_name || '';
         const subtitle = item.email || item.subtitle || '';
         return title.toLowerCase().includes(query) || subtitle.toLowerCase().includes(query);
       }
 
-      const title = getValueByRole(schema, item, 'title') || item.name || '';
-      const subtitle = getSingleValueByRole(schema, item, 'subtitle', item.email) || item.email || '';
+      const title = getValueByRole(effectiveSchema, item, 'title') || item.name || '';
+      const subtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
       return title.toLowerCase().includes(query) || subtitle.toLowerCase().includes(query);
     });
 
     const sortedFiltered = sortOptions(filtered, sortType);
     setFilteredItems(sortedFiltered);
-  }, [supportsPagination, searchQuery, items, schema, sortType]);
+  }, [supportsPagination, searchQuery, items, effectiveSchema, sortType, effectiveSourceColumnRoles]);
 
   useEffect(() => {
     if (!supportsPagination || !isOpen) {
@@ -791,7 +883,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       if (item.id) {
         setSessionSelectedIds((prev) => new Set([...prev, String(item.id)]));
       }
-      const selectionEntry = buildSelectionEntry(item, schema);
+      const selectionEntry = buildSelectionEntry(item, effectiveSchema, effectiveSourceColumnRoles);
       await onSelect([selectionEntry], [item]);
       onClose();
     } catch (error) {
@@ -830,7 +922,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     setPendingSelections((prev) => {
       const next = new Map(prev);
       const existing = next.get(itemId);
-      const selectionEntry = buildSelectionEntry(item, schema);
+      const selectionEntry = buildSelectionEntry(item, effectiveSchema, effectiveSourceColumnRoles);
       const isBaseSelection = baseSelectedIds.has(itemId);
 
       if (nextSelected) {
@@ -871,7 +963,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const match = items.find((candidate) => String(candidate?.id ?? '') === id);
     if (match) {
       return {
-        normalized: buildSelectionEntry(match, schema),
+        normalized: buildSelectionEntry(match, schema, effectiveSourceColumnRoles),
         raw: match,
       };
     }
@@ -984,10 +1076,19 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
     const highlightQuery = searchQuery.trim();
 
-    if (!schema) {
-      // Fallback rendering
-      const displayName = item.name || item.title || item.id || `Item ${index + 1}`;
-      const iconName = item.icon || item.name || item.title;
+    if (!effectiveSchema) {
+      // Fallback rendering with sourceColumnRoles support
+      const displayName = effectiveSourceColumnRoles
+        ? getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) || 
+          item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
+        : item.name || item.title || item.id || `Item ${index + 1}`;
+      const iconName = effectiveSourceColumnRoles
+        ? getValueByRoleFromSourceColumns(item, 'icon', effectiveSourceColumnRoles) || item.icon
+        : item.icon || item.name || item.title;
+      const description = effectiveSourceColumnRoles
+        ? getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles)
+        : undefined;
+      
       return (
         <motion.div key={item.id || index} {...motionProps}>
           <div
@@ -1007,14 +1108,21 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   <IconRenderer iconName={iconName} className="h-5 w-5" />
                 </div>
               )}
-            <div
-              className={cn(
-                "font-medium text-sm",
-                isSelected ? "text-violet-900 dark:text-violet-100" : "text-gray-900 dark:text-gray-100"
-              )}
-            >
-              {renderHighlightedText(displayName, highlightQuery)}
+            <div className="flex-1 min-w-0">
+              <div
+                className={cn(
+                  "font-medium text-sm",
+                  isSelected ? "text-violet-900 dark:text-violet-100" : "text-gray-900 dark:text-gray-100"
+                )}
+              >
+                {renderHighlightedText(displayName, highlightQuery)}
               </div>
+              {description && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                  {renderHighlightedText(description, highlightQuery)}
+                </p>
+              )}
+            </div>
             </div>
           </div>
         </motion.div>
@@ -1022,11 +1130,11 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     }
 
     // Extract data using schema roles
-    const title = getValueByRole(schema, item, 'title') || item.name || `Item ${index + 1}`;
-    const subtitle = getSingleValueByRole(schema, item, 'subtitle', item.email) || item.email || '';
-    const avatarField = getSingleValueByRole(schema, item, 'avatar', item.name) || item.name || '?';
+    const title = getValueByRole(effectiveSchema, item, 'title') || item.name || `Item ${index + 1}`;
+    const subtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
+    const avatarField = getSingleValueByRole(effectiveSchema, item, 'avatar', item.name) || item.name || '?';
     // Get badge fields
-    const badgeFields = getFieldsByRole(schema, 'badge');
+    const badgeFields = getFieldsByRole(effectiveSchema, 'badge');
     const allOptions = new Map<string, NormalizedOption>();
     let combinedBadgeField: any = null;
 
@@ -1050,10 +1158,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     }
 
     // Find status field options
-    const statusFieldDef = schema.fields?.find(f => f.role === 'status');
-    const ratingFieldDef = schema.fields?.find(f => f.role === 'rating');
-    const hasCodeField = schema.fields?.some(f => f.role === 'code') || false;
-    const codeField = getSingleValueByRole(schema, item, 'code');
+    const statusFieldDef = effectiveSchema?.fields?.find(f => f.role === 'status');
+    const ratingFieldDef = effectiveSchema?.fields?.find(f => f.role === 'rating');
+    const hasCodeField = effectiveSchema?.fields?.some(f => f.role === 'code') || false;
+    const codeField = getSingleValueByRole(effectiveSchema, item, 'code');
     const statusFieldValue = statusFieldDef ? getFieldValue(statusFieldDef, item) : null;
     const ratingFieldValue = ratingFieldDef ? getFieldValue(ratingFieldDef, item) : null;
     const statusFieldNode = statusFieldDef ? formatFieldValue(statusFieldDef, statusFieldValue, item) : null;
@@ -1173,13 +1281,19 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     hierarchyNodeMap.forEach((node) => {
       const data = node.entity;
       const candidateFields: any[] = [];
-      if (schema) {
+      if (effectiveSchema) {
         candidateFields.push(
-          getValueByRole(schema, data, 'title'),
-          getSingleValueByRole(schema, data, 'subtitle', data.email)
+          getValueByRole(effectiveSchema, data, 'title'),
+          getSingleValueByRole(effectiveSchema, data, 'subtitle', data.email)
+        );
+      } else if (effectiveSourceColumnRoles) {
+        candidateFields.push(
+          getValueByRoleFromSourceColumns(data, 'title', effectiveSourceColumnRoles),
+          getValueByRoleFromSourceColumns(data, 'subtitle', effectiveSourceColumnRoles),
+          getValueByRoleFromSourceColumns(data, 'description', effectiveSourceColumnRoles)
         );
       }
-      candidateFields.push(data.name, data.title, data.email, data.description);
+      candidateFields.push(data.name, data.title, data.singular_name, data.email, data.description);
 
       if (
         candidateFields.some(
@@ -1202,7 +1316,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         return merged;
       });
     }
-  }, [isHierarchical, searchQuery, hierarchyNodeMap, schema]);
+  }, [isHierarchical, searchQuery, hierarchyNodeMap, effectiveSchema, effectiveSourceColumnRoles]);
 
   // When search is cleared in hierarchical mode, collapse all
   useEffect(() => {
@@ -1217,7 +1331,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const isSelected = isItemSelected(item);
     const highlightQuery = searchQuery.trim();
 
-    const baseCardClasses = 'relative p-3 rounded-xl border cursor-pointer transition-all duration-200 group';
+    const baseCardClasses = 'relative h-full p-3 rounded-xl border cursor-pointer transition-all duration-200 group';
     const selectedCardClasses =
       'border-violet-500 dark:border-violet-400 bg-gradient-to-br from-gray-100 via-white to-violet-100 dark:from-gray-900 dark:via-gray-800 dark:to-violet-900 shadow-lg ring-1 ring-violet-200 dark:ring-violet-800';
     const defaultCardClasses =
@@ -1235,9 +1349,19 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const hasChildren = node.children.length > 0;
     const isExpanded = expandedIds.has(node.id);
 
-    if (!schema) {
-      const displayName = item.name || item.title || item.id || `Item ${index + 1}`;
-      const iconName = item.icon || item.name || item.title;
+    if (!effectiveSchema) {
+      // Fallback rendering with sourceColumnRoles support
+      const displayName = effectiveSourceColumnRoles
+        ? getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) || 
+          item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
+        : item.name || item.title || item.id || `Item ${index + 1}`;
+      const iconName = effectiveSourceColumnRoles
+        ? getValueByRoleFromSourceColumns(item, 'icon', effectiveSourceColumnRoles) || item.icon
+        : item.icon || item.name || item.title;
+      const description = effectiveSourceColumnRoles
+        ? getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles)
+        : undefined;
+      
       return (
         <motion.div key={item.id || index} {...motionProps} style={{ marginLeft: depth * 16 }}>
           <div
@@ -1277,13 +1401,20 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   <IconRenderer iconName={iconName} className="h-5 w-5" />
                 </div>
               )}
-              <div
-                className={cn(
-                  'font-medium text-sm',
-                  isSelected ? 'text-violet-900 dark:text-violet-100' : 'text-gray-900 dark:text-gray-100'
+              <div className="flex-1 min-w-0">
+                <div
+                  className={cn(
+                    'font-medium text-sm',
+                    isSelected ? 'text-violet-900 dark:text-violet-100' : 'text-gray-900 dark:text-gray-100'
+                  )}
+                >
+                  {renderHighlightedText(displayName, highlightQuery)}
+                </div>
+                {description && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                    {renderHighlightedText(description, highlightQuery)}
+                  </p>
                 )}
-              >
-                {renderHighlightedText(displayName, highlightQuery)}
               </div>
             </div>
           </div>
@@ -1292,12 +1423,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     }
 
     // Schema-aware rendering
-    const title = getValueByRole(schema, item, 'title') || item.name || `Item ${index + 1}`;
-    const subtitle = getSingleValueByRole(schema, item, 'subtitle', item.email) || item.email || '';
-    const avatarField = getSingleValueByRole(schema, item, 'avatar', item.name) || item.name || '?';
+    const title = getValueByRole(effectiveSchema, item, 'title') || item.name || `Item ${index + 1}`;
+    const subtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
+    const avatarField = getSingleValueByRole(effectiveSchema, item, 'avatar', item.name) || item.name || '?';
 
-    const hasCodeField = schema.fields?.some((f) => f.role === 'code') || false;
-    const codeField = getSingleValueByRole(schema, item, 'code');
+    const hasCodeField = effectiveSchema?.fields?.some((f) => f.role === 'code') || false;
+    const codeField = getSingleValueByRole(effectiveSchema, item, 'code');
 
     return (
       <div key={item.id || index} className="space-y-1" style={{ marginLeft: depth * 16 }}>

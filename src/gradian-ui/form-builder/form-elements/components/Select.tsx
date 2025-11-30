@@ -135,6 +135,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
+  const isClickingPanelRef = useRef(false);
 
   const normalizedValueArray = useMemo(
     () => normalizeOptionArray(value),
@@ -194,6 +195,11 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
     const handleClickOutside = (event: MouseEvent) => {
       if (!containerRef.current) return;
+      // If we're clicking inside the panel, don't close
+      if (isClickingPanelRef.current) {
+        isClickingPanelRef.current = false;
+        return;
+      }
       const target = event.target as Node;
       // Check if click is outside both the trigger container and the portaled panel
       const isOutsideTrigger = !containerRef.current.contains(target);
@@ -269,7 +275,10 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
     const triggerRect = triggerEl.getBoundingClientRect();
     const panelEl = panelRef.current;
-    const panelHeight = panelEl?.offsetHeight ?? 0;
+    // Use actual panel height if available, otherwise estimate based on options
+    const estimatedOptionHeight = size === 'sm' ? 34 : size === 'lg' ? 46 : 40;
+    const estimatedPanelHeight = Math.min(validOptions.length * estimatedOptionHeight, 360);
+    const panelHeight = panelEl?.offsetHeight ?? estimatedPanelHeight;
     const viewportHeight = window.innerHeight;
     const spacing = 12;
 
@@ -305,7 +314,17 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     setPanelMaxHeight(maxHeight);
     setPanelOffset(offset);
     setPanelPosition({ left, top, width });
-  }, [allowMultiselect, disabled, isDropdownOpen]);
+  }, [allowMultiselect, disabled, isDropdownOpen, size, validOptions]);
+
+  // Calculate panel position immediately when dropdown opens
+  useEffect(() => {
+    if (isDropdownOpen && allowMultiselect) {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        updatePanelPosition();
+      });
+    }
+  }, [isDropdownOpen, allowMultiselect, updatePanelPosition]);
 
   useLayoutEffect(() => {
     if (isDropdownOpen) {
@@ -378,17 +397,15 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const validOptionsCount = validOptions.length;
 
   useEffect(() => {
-    if (!allowMultiselect) {
+    // Always show chevron in multiselect mode to indicate dropdown can be opened
+    if (allowMultiselect) {
       setShouldShowMultiChevron(true);
       return;
     }
 
-    const estimatedOptionHeight = size === 'sm' ? 34 : size === 'lg' ? 46 : 40;
-    const maxVisibleWithoutScroll = Math.max(1, Math.floor(panelMaxHeight / estimatedOptionHeight));
-    const needsScroll = validOptionsCount > maxVisibleWithoutScroll;
-
-    setShouldShowMultiChevron(needsScroll);
-  }, [allowMultiselect, panelMaxHeight, size, validOptionsCount]);
+    // For single select, show chevron by default
+    setShouldShowMultiChevron(true);
+  }, [allowMultiselect]);
 
   const arraysMatch = useCallback(
     (a: string[], b: string[]) => {
@@ -688,6 +705,43 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
               className={triggerClasses}
               onClick={(e) => {
                 e.stopPropagation();
+                const willOpen = !isDropdownOpen;
+                if (willOpen && containerRef.current) {
+                  // Calculate position immediately using trigger element
+                  const triggerEl = containerRef.current;
+                  const triggerRect = triggerEl.getBoundingClientRect();
+                  const viewportHeight = window.innerHeight;
+                  const spacing = 12;
+                  
+                  const dialogEl = triggerEl.closest('[role="dialog"]');
+                  const dialogRect = dialogEl?.getBoundingClientRect();
+                  const boundaryTop = dialogRect ? dialogRect.top + spacing : spacing;
+                  const boundaryBottom = dialogRect ? dialogRect.bottom - spacing : viewportHeight - spacing;
+                  
+                  const spaceBelow = boundaryBottom - triggerRect.bottom;
+                  const estimatedOptionHeight = size === 'sm' ? 34 : size === 'lg' ? 46 : 40;
+                  const estimatedPanelHeight = Math.min(validOptions.length * estimatedOptionHeight, 360);
+                  
+                  let placement: 'bottom' | 'top' = 'bottom';
+                  if (spaceBelow < 160) {
+                    placement = 'top';
+                  }
+                  
+                  const safeSpace = Math.max(80, spaceBelow);
+                  const maxHeight = Math.max(120, Math.min(Math.floor(safeSpace), 360));
+                  const offset = Math.max(6, Math.min(12, Math.floor(Math.min(safeSpace / 6, 12))));
+                  
+                  const left = triggerRect.left;
+                  const top = placement === 'bottom' 
+                    ? triggerRect.bottom + offset
+                    : triggerRect.top - offset;
+                  const width = triggerRect.width;
+                  
+                  setPanelPlacement(placement);
+                  setPanelMaxHeight(maxHeight);
+                  setPanelOffset(offset);
+                  setPanelPosition({ left, top, width });
+                }
                 setIsDropdownOpen((prev) => {
                   const next = !prev;
                   onOpenChange?.(next);
@@ -698,14 +752,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
               <div className="flex flex-1 flex-wrap gap-1">
                 {renderMultiTriggerContent()}
               </div>
-              {shouldShowMultiChevron && (
-                <ChevronDown
-                  className={cn(
-                    'ml-2 h-4 w-4 text-gray-600 dark:text-gray-300 opacity-70 transition-transform shrink-0',
-                    isDropdownOpen && 'rotate-180'
-                  )}
-                />
-              )}
+              <ChevronDown className="h-4 w-4 text-gray-600 dark:text-gray-300 opacity-70 shrink-0" />
             </button>
             {isDropdownOpen && panelPosition && typeof document !== 'undefined' && createPortal(
               <div
@@ -720,9 +767,11 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
+                  isClickingPanelRef.current = true;
                 }}
                 onMouseDown={(e) => {
                   e.stopPropagation();
+                  isClickingPanelRef.current = true;
                 }}
               >
                 <div className="max-h-full overflow-y-auto py-1">
@@ -747,10 +796,13 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                             onClick={(event) => {
                               event.preventDefault();
                               event.stopPropagation();
+                              isClickingPanelRef.current = true;
                               toggleOption(option);
                             }}
                             onMouseDown={(event) => {
+                              event.preventDefault();
                               event.stopPropagation();
+                              isClickingPanelRef.current = true;
                             }}
                           >
                             <span

@@ -1,6 +1,8 @@
 // Unified Form Schema Types
 // This is the single source of truth for all form schema types
 
+import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
+
 export interface FormField {
   id: string;
   name: string;
@@ -36,6 +38,11 @@ export interface FormField {
   source?: string; // Data path for nested values (e.g., "user.profile.name")
   compute?: (data: any) => any; // Function to compute field value from data
   targetSchema?: string; // Target schema ID for picker component (popup picker to another schema)
+  sourceUrl?: string; // Source URL for picker component (alternative to targetSchema, fetches data from API endpoint)
+  sourceColumnRoles?: Array<{ column: string; role?: string }>; // Column to role mapping for sourceUrl items (e.g., [{ column: "singular_name", role: "title" }, { column: "description", role: "description" }])
+  columnMap?: ColumnMapConfig; // Optional mapping for request/response and item fields when using sourceUrl
+  pageSize?: number; // Page size for paginated data sources (default: 48)
+  sortType?: 'ASC' | 'DESC' | null; // Sort order for items (null = no sorting, default)
   metadata?: {
     allowMultiselect?: boolean;
     [key: string]: any;

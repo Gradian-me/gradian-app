@@ -250,33 +250,43 @@
     "updatedAt": "2025-11-22T14:32:13.083Z"
   },
   {
-    "sourceSchema": "vendors",
-    "sourceId": "01K9PG000000000000000000001",
-    "targetSchema": "contacts",
-    "targetId": "01KAR3EADG1YK5TNS947582TJQ",
-    "relationTypeId": "HAS_CONTACT",
-    "id": "01KAR3EAJ22NH3V8NJVVCDK5XW",
-    "createdAt": "2025-11-23T10:16:36.674Z",
-    "updatedAt": "2025-11-23T10:16:36.674Z"
+    "sourceSchema": "business-areas",
+    "sourceId": "01KBA3HVK0QBJ28FYBJP5FYQD0",
+    "targetSchema": "applications",
+    "targetId": "01KBA3JQKBGFABD2PZXJYP0KBZ",
+    "relationTypeId": "HAS_ADDRESS",
+    "id": "01KBA3M74SVF2CBPFMSEV324T7",
+    "createdAt": "2025-11-30T10:06:09.560Z",
+    "updatedAt": "2025-11-30T10:06:09.560Z"
+  },
+  {
+    "sourceSchema": "app-access-policies",
+    "sourceId": "01KBA5MV6M0A74BHVCJFQMHK6S",
+    "targetSchema": "app-permissions",
+    "targetId": "01KBA5QDGEEJSJMJFSVABJGD70",
+    "relationTypeId": "HAS_APP_PERMISSION",
+    "id": "01KBA5QDPQHFW2AHBVD85VAT3Z",
+    "createdAt": "2025-11-30T10:42:51.735Z",
+    "updatedAt": "2025-11-30T10:42:51.735Z"
   },
   {
     "sourceSchema": "user-roles",
-    "sourceId": "01KAKR8W9BWJXHEV2BZ80Q07P0",
-    "targetSchema": "user-roles",
-    "targetId": "01KB72KXGVX9ZNFTPEA6BHM8E8",
-    "relationTypeId": "IS_PARENT_OF",
-    "id": "01KB72THKAKF9YQ9J60FFY3F4H",
-    "createdAt": "2025-11-29T05:54:25.001Z",
-    "updatedAt": "2025-11-29T05:54:25.001Z"
+    "sourceId": "01KB9Y5NKY5ZZS6BFYPC8684E9",
+    "targetSchema": "app-access-policies",
+    "targetId": "01KBA5MV6M0A74BHVCJFQMHK6S",
+    "relationTypeId": "HAS_ACCESS_POLICY",
+    "id": "01KBA5Z9GHFGYQNWNWXKN3YWKB",
+    "createdAt": "2025-11-30T10:47:09.584Z",
+    "updatedAt": "2025-11-30T10:47:09.584Z"
   },
   {
     "sourceSchema": "user-roles",
-    "sourceId": "01KB74PCQPGFPPG4JS9GWAZET0",
-    "targetSchema": "user-roles",
-    "targetId": "01KB74HT51NKX7HJZZ0FXMWR2M",
-    "relationTypeId": "IS_PARENT_OF",
-    "id": "01KB758E0X4SGPCFS5AF1N3ZEE",
-    "createdAt": "2025-11-29T06:36:57.244Z",
-    "updatedAt": "2025-11-29T06:36:57.244Z"
+    "sourceId": "01KB9Y5NKY5ZZS6BFYPC8684E9",
+    "targetSchema": "users",
+    "targetId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "relationTypeId": "HAS_MEMBER",
+    "id": "01KBA5ZXW0Z1XSXGQHQSP7Q7B5",
+    "createdAt": "2025-11-30T10:47:30.432Z",
+    "updatedAt": "2025-11-30T10:47:30.432Z"
   }
 ]

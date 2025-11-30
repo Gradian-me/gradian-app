@@ -35,7 +35,7 @@
       "rating": 4,
       "id": "01K8QVCWS0ZSTMSVD5C6K7A806",
       "createdAt": "2025-10-29T11:24:37.540Z",
-      "updatedAt": "2025-11-23T12:43:00.527Z",
+      "updatedAt": "2025-11-30T13:07:04.380Z",
       "performanceMetrics": [
         {
           "id": "onTimeDelivery",
@@ -105,8 +105,7 @@
       "certifications": [
         "iso9001",
         "fda",
-        "reach",
-        "iso14001"
+        "ce"
       ],
       "section-1762088953746": [],
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -875,43 +874,138 @@
   ],
   "user-roles": [
     {
-      "color": "#4E79A7",
-      "name": "test 2",
+      "parent": "undefined",
+      "type": [
+        {
+          "id": "SYSTEM_ADMINISTRATOR",
+          "label": "System Administrator",
+          "icon": "Shield",
+          "color": "destructive"
+        }
+      ],
+      "color": "#ff5c7c",
+      "name": "System Administrators",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KAKR8W9BWJXHEV2BZ80Q07P0",
-      "createdAt": "2025-11-21T17:44:26.171Z",
-      "updatedAt": "2025-11-29T05:56:41.407Z"
-    },
-    {
-      "parent": "01KAKR8W9BWJXHEV2BZ80Q07P0",
-      "color": "#4E79A7",
-      "name": "test",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KB72KXGVX9ZNFTPEA6BHM8E8",
-      "createdAt": "2025-11-29T05:50:47.851Z",
-      "updatedAt": "2025-11-29T05:54:24.604Z"
-    },
-    {
-      "parent": "01KB74PCQPGFPPG4JS9GWAZET0",
-      "color": "#4E79A7",
-      "name": "test 3",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KB74HT51NKX7HJZZ0FXMWR2M",
-      "createdAt": "2025-11-29T06:24:36.587Z",
-      "updatedAt": "2025-11-29T06:36:24.921Z"
+      "id": "01KB9Y0NBAS53JY4VRB9H1FN33",
+      "createdAt": "2025-11-30T08:28:05.874Z",
+      "updatedAt": "2025-11-30T08:28:05.874Z"
     },
     {
       "parent": "undefined",
-      "color": "#4E79A7",
-      "name": "test 5",
+      "type": [
+        {
+          "id": "BUSINESS_ADMINISTRATOR",
+          "label": "Business Administrator",
+          "icon": "Briefcase",
+          "color": "warning"
+        }
+      ],
+      "color": "#fee68e",
+      "name": "Business Administrators",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KB74PCQPGFPPG4JS9GWAZET0",
-      "createdAt": "2025-11-29T06:27:06.120Z",
-      "updatedAt": "2025-11-29T06:27:06.129Z"
+      "id": "01KB9Y1HDTQCBR2CF8MHWSYRJG",
+      "createdAt": "2025-11-30T08:28:34.619Z",
+      "updatedAt": "2025-11-30T08:28:34.619Z"
+    },
+    {
+      "parent": "undefined",
+      "type": "GENERAL_ROLE",
+      "color": "#dcd6fd",
+      "name": "Our Users",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB9Y24BEVCHQXMRSZXPDGARY",
+      "createdAt": "2025-11-30T08:28:54.008Z",
+      "updatedAt": "2025-11-30T08:33:46.313Z"
+    },
+    {
+      "parent": "01KB9Y24BEVCHQXMRSZXPDGARY",
+      "type": "GENERAL_ROLE",
+      "color": "#dcd6fd",
+      "name": "Supply Chain Deputy",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB9Y4R56A3F9W2NH7KYBDQ98",
+      "createdAt": "2025-11-30T08:30:19.815Z",
+      "updatedAt": "2025-11-30T08:30:19.815Z"
+    },
+    {
+      "parent": "01KB9Y4R56A3F9W2NH7KYBDQ98",
+      "type": "GENERAL_ROLE",
+      "color": "#4E79A7",
+      "name": "Supply Chain Supervisor",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB9Y5NKY5ZZS6BFYPC8684E9",
+      "createdAt": "2025-11-30T08:30:49.982Z",
+      "updatedAt": "2025-11-30T08:30:49.983Z"
+    },
+    {
+      "parent": "01KB9Y5NKY5ZZS6BFYPC8684E9",
+      "type": "GENERAL_ROLE",
+      "color": "#4E79A7",
+      "name": "Supply Chain Expert",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB9Y679HCAP3EZY1PF2NRTSR",
+      "createdAt": "2025-11-30T08:31:08.082Z",
+      "updatedAt": "2025-11-30T08:31:08.082Z"
+    },
+    {
+      "parent": "undefined",
+      "type": [
+        {
+          "id": "VENDOR",
+          "label": "Vendor",
+          "icon": "ShoppingBasket",
+          "color": "success"
+        }
+      ],
+      "color": "#aaf2d2",
+      "name": "Vendors",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB9YC60QXPW8XNMTE151YCY0",
+      "createdAt": "2025-11-30T08:34:23.383Z",
+      "updatedAt": "2025-11-30T08:34:23.383Z"
+    },
+    {
+      "parent": "undefined",
+      "type": [
+        {
+          "id": "SUBSIDIARY_COMPANY",
+          "label": "Subsidiary Company",
+          "icon": "Building",
+          "color": "default"
+        }
+      ],
+      "color": "#dcd6fd",
+      "name": "Subsidiary Companies",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB9YD2CQMX3Y7XR4V4H2CANM",
+      "createdAt": "2025-11-30T08:34:52.439Z",
+      "updatedAt": "2025-11-30T08:34:52.439Z"
+    },
+    {
+      "parent": "undefined",
+      "type": [
+        {
+          "id": "CUSTOMER",
+          "label": "Customer",
+          "icon": "User",
+          "color": "default"
+        }
+      ],
+      "color": "#dcd6fd",
+      "name": "Customers",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KB9YDFQ30N3GMGZZTEDX2XN2",
+      "createdAt": "2025-11-30T08:35:06.084Z",
+      "updatedAt": "2025-11-30T08:35:06.084Z"
     }
   ],
   "users": [
@@ -1002,9 +1096,31 @@
       ]
     }
   ],
-  "applications": [],
+  "applications": [
+    {
+      "name": "Vendor Management",
+      "icon": "CircleUser",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBA3JQKBGFABD2PZXJYP0KBZ",
+      "createdAt": "2025-11-30T10:05:20.885Z",
+      "updatedAt": "2025-11-30T10:05:20.885Z"
+    }
+  ],
   "production-actuals": [],
-  "business-areas": [],
+  "business-areas": [
+    {
+      "color": "#4E79A7",
+      "title": "Supply Chain Management",
+      "icon": "ShoppingBasket",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBA3HVK0QBJ28FYBJP5FYQD0",
+      "createdAt": "2025-11-30T10:04:52.204Z",
+      "updatedAt": "2025-11-30T10:06:13.885Z",
+      "applications": []
+    }
+  ],
   "servers": [
     {
       "color": "#4E79A7",
@@ -1252,11 +1368,12 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-23T16:33:51.303Z",
-      "targetDataPath": "data",
+      "updatedAt": "2025-11-30T11:22:42.044Z",
+      "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-11-23T16:33:51.217Z",
-      "incomplete": false
+      "lastSynced": "2025-11-30T11:22:42.044Z",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "color": "#2e84e0",
@@ -1283,8 +1400,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-11-23T16:33:53.951Z",
-      "lastSynced": "2025-11-23T16:33:53.921Z"
+      "updatedAt": "2025-11-30T11:22:47.125Z",
+      "lastSynced": "2025-11-30T11:22:47.125Z"
     },
     {
       "color": "#4E79A7",
@@ -1330,9 +1447,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-11-23T16:34:01.794Z",
+      "updatedAt": "2025-11-30T11:20:02.412Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-11-23T16:34:01.623Z"
+      "lastSynced": "2025-11-30T11:20:02.412Z"
     },
     {
       "color": "#00d1ae",
@@ -1867,6 +1984,16 @@
       "id": "01KB9SSW4XR85Z4ARW4KKS4E2X",
       "createdAt": "2025-11-30T07:14:29.176Z",
       "updatedAt": "2025-11-30T07:14:29.179Z"
+    },
+    {
+      "color": "#4E79A7",
+      "label": "حواس پرت",
+      "icon": "BookUser",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBADRR9YM0HBJCKVZD0SQMXH",
+      "createdAt": "2025-11-30T13:03:23.972Z",
+      "updatedAt": "2025-11-30T13:03:23.973Z"
     }
   ],
   "production-plan-items": [
@@ -2016,5 +2143,101 @@
       ]
     }
   ],
-  "pharmaceutical-deviation-management-system": []
+  "pharmaceutical-deviation-management-system": [],
+  "app-permissions": [
+    {
+      "resourceType": [
+        {
+          "id": "SCHEMA",
+          "label": "Schema",
+          "icon": "Database",
+          "color": "warning"
+        }
+      ],
+      "resource": [
+        {
+          "id": "vendors",
+          "label": "Vendor",
+          "icon": "User",
+          "description": "Add a new vendor to your supply chain management system",
+          "metadata": {
+            "description": "Add a new vendor to your supply chain management system"
+          }
+        }
+      ],
+      "action-types": [
+        {
+          "id": "CREATE",
+          "label": "Create",
+          "icon": "Plus",
+          "color": "success"
+        },
+        {
+          "id": "VIEW",
+          "label": "View",
+          "icon": "Eye",
+          "color": "info"
+        },
+        {
+          "id": "EDIT",
+          "label": "Edit",
+          "icon": "Edit",
+          "color": "warning"
+        },
+        {
+          "id": "DELETE",
+          "label": "Delete",
+          "icon": "Trash2",
+          "color": "destructive"
+        }
+      ],
+      "permissionType": [
+        {
+          "id": "ALLOW",
+          "label": "Allow",
+          "icon": "CheckCircle",
+          "color": "success"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBA5QDGEEJSJMJFSVABJGD70",
+      "createdAt": "2025-11-30T10:42:51.551Z",
+      "updatedAt": "2025-11-30T11:16:21.230Z",
+      "actionTypes": [
+        {
+          "id": "EDIT",
+          "label": "Edit",
+          "icon": "Edit",
+          "color": "warning"
+        },
+        {
+          "id": "VIEW",
+          "label": "View",
+          "icon": "Eye",
+          "color": "info"
+        }
+      ]
+    }
+  ],
+  "access-policies": [],
+  "app-access-policies": [
+    {
+      "title": "Vendor Management",
+      "accessPolicyType": [
+        {
+          "id": "ALL_ACTIONS",
+          "label": "All Actions",
+          "icon": "CheckCircle",
+          "color": "success"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBA5MV6M0A74BHVCJFQMHK6S",
+      "createdAt": "2025-11-30T10:41:27.261Z",
+      "updatedAt": "2025-11-30T10:43:02.996Z",
+      "permissions": []
+    }
+  ]
 }

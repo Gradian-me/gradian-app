@@ -792,5 +792,75 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBAFNJP561EA0YPK0TCBMMPS",
+    "timestamp": "2025-11-30T13:36:37.062Z",
+    "version": "1.06.000",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Improved error handling in API responses for better debugging",
+        "priority": "High",
+        "affectedDomains": [
+          "api",
+          "error-handling"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Revised health check timestamps for accuracy and added new access policies and permissions schemas",
+        "priority": "High",
+        "affectedDomains": [
+          "health",
+          "permissions",
+          "schemas"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined form components for better integration with new data structures",
+        "priority": "High",
+        "affectedDomains": [
+          "forms",
+          "components"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KBAFP4QCPAS3ESQXV4T5MXQH",
+    "timestamp": "2025-11-30T13:36:55.532Z",
+    "version": "1.07.000",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Improved error handling in API responses for better debugging",
+        "priority": "High",
+        "affectedDomains": [
+          "api",
+          "error-handling"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Revised health check timestamps for accuracy and added new access policies and permissions schemas",
+        "priority": "High",
+        "affectedDomains": [
+          "health",
+          "permissions",
+          "schemas"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined form components for better integration with new data structures",
+        "priority": "High",
+        "affectedDomains": [
+          "forms",
+          "components"
+        ]
+      }
+    ]
   }
 ]
