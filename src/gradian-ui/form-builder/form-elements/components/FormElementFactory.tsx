@@ -37,6 +37,7 @@ import { NameInput } from './NameInput';
 import { ListInput } from './ListInput';
 import { TagInput } from './TagInput';
 import { LanguageSelector } from './LanguageSelector';
+import { ImageViewer } from './ImageViewer';
 
 // Support both config-based and field-based interfaces
 export interface FormElementFactoryProps extends Omit<FormElementProps, 'config' | 'touched'> {
@@ -334,6 +335,23 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     
     case 'image-text':
       return <ImageText config={config} value={restProps.value} {...commonProps} />;
+    
+    case 'image-viewer':
+      return (
+        <ImageViewer
+          config={config}
+          value={restProps.value}
+          sourceUrl={config?.sourceUrl || restProps.value?.url || restProps.value?.sourceUrl}
+          content={config?.content || restProps.value?.b64_json || restProps.value?.content}
+          alt={config?.alt || config?.imageAlt}
+          width={config?.width || 512}
+          height={config?.height || 512}
+          className={restProps.className}
+          objectFit={config?.objectFit || 'contain'}
+          priority={config?.priority || false}
+          quality={config?.quality || 90}
+        />
+      );
     
     case 'button':
       return (

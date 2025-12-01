@@ -56,7 +56,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
     <SidebarNavigation
       items={items}
       isCollapsed={isCollapsed}
-      isMobile={isMobile}
+      isMobile={isMobile ?? false}
       navigationSchemas={navigationSchemas}
     />
   );

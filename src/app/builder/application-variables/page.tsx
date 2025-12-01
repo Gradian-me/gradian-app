@@ -39,6 +39,7 @@ interface ApplicationVariablesData {
   };
   SCHEMA_SUMMARY_EXCLUDED_KEYS: string[];
   DEMO_MODE?: boolean;
+  AD_MODE?: boolean;
   AI_CONFIG?: {
     LLM_API_URL?: string;
   };

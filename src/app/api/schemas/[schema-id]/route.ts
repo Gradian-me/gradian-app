@@ -368,7 +368,7 @@ export async function DELETE(
 
     try {
       // Clear schema-registry cache
-      const { clearSchemaRegistryCache } = await import('@/gradian-ui/schema-manager/utils/schema-registry.server');
+      const { clearSchemaCache: clearSchemaRegistryCache } = await import('@/gradian-ui/schema-manager/utils/schema-registry.server');
       clearSchemaRegistryCache();
     } catch (error) {
       console.warn('Could not clear schema-registry cache:', error);

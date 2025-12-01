@@ -383,5 +383,94 @@
     "description": "Transcribe audio recordings to text using advanced speech recognition",
     "requiredOutputFormat": "string",
     "model": "gpt-4o-mini-transcribe"
+  },
+  {
+    "id": "image-generator",
+    "label": "Image Generator",
+    "icon": "Image",
+    "description": "Generate images from text descriptions using AI",
+    "requiredOutputFormat": "json",
+    "model": "wan2.2-t2i-flash",
+    "loadingTextSwitches": ["Analyzing your prompt...", "Generating your image...", "Refining details...", "Finalizing the image..."],
+    "renderComponents": [
+      {
+        "id": "user-prompt",
+        "name": "userPrompt",
+        "label": "Image Description",
+        "sectionId": "basic-info",
+        "component": "textarea",
+        "placeholder": "Describe the image you want to generate... Be creative and detailed!",
+        "validation": {
+          "required": true,
+          "minLength": 10
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "image-size",
+        "name": "imageSize",
+        "label": "Image Size",
+        "sectionId": "basic-info",
+        "component": "select",
+        "options": [
+          {
+            "id": "1024x1024",
+            "label": "1024x1024 (Square)",
+            "icon": "Square",
+            "color": "default"
+          },
+          {
+            "id": "1024x1792",
+            "label": "1024x1792 (Portrait)",
+            "icon": "RectangleVertical",
+            "color": "default"
+          },
+          {
+            "id": "1792x1024",
+            "label": "1792x1024 (Landscape)",
+            "icon": "RectangleHorizontal",
+            "color": "default"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "response-format",
+        "name": "responseFormat",
+        "label": "Response Format",
+        "sectionId": "basic-info",
+        "component": "select",
+        "options": [
+          {
+            "id": "url",
+            "label": "URL",
+            "icon": "Link",
+            "color": "default"
+          },
+          {
+            "id": "b64_json",
+            "label": "Base64",
+            "icon": "Code",
+            "color": "default"
+          }
+        ],
+        "defaultValue": "url",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 3
+      }
+    ],
+    "nextAction": {
+      "label": "View Image",
+      "icon": "Eye",
+      "route": "/api/image/generate"
+    }
   }
 ]
