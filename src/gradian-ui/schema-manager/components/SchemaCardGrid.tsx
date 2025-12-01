@@ -113,9 +113,32 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => onView(schema)}
+                onClick={(e) => {
+                  // Handle Ctrl/Cmd+click to open in new tab
+                  if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    window.open(`/page/${schema.id}`, '_blank');
+                    return;
+                  }
+                  // Regular click
+                  onView(schema);
+                }}
+                onMouseDown={(e) => {
+                  // Handle middle-click (button 1)
+                  if (e.button === 1) {
+                    e.preventDefault();
+                    window.open(`/page/${schema.id}`, '_blank');
+                  }
+                }}
+                onAuxClick={(e) => {
+                  // Handle middle-click (auxiliary click)
+                  if (e.button === 1) {
+                    e.preventDefault();
+                    window.open(`/page/${schema.id}`, '_blank');
+                  }
+                }}
                 className="h-7 w-7 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:text-violet-200 dark:hover:bg-violet-500/10"
-                title="View List"
+                title="View List (Ctrl+Click or Middle-Click to open in new tab)"
               >
                 <LayoutList className="h-3.5 w-3.5" />
               </Button>

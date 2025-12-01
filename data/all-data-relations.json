@@ -181,16 +181,6 @@
   },
   {
     "sourceSchema": "servers",
-    "sourceId": "01KA99R0VJ2GKBDNSHJDAH8T37",
-    "targetSchema": "databases",
-    "targetId": "01KA99S0PGBRJEQ61ZS1XZ41PQ",
-    "relationTypeId": "HAS_DATABASE",
-    "id": "01KA99S0R5KR6ZER5GVC73GR52",
-    "createdAt": "2025-11-17T16:18:42.053Z",
-    "updatedAt": "2025-11-17T16:18:42.053Z"
-  },
-  {
-    "sourceSchema": "servers",
     "sourceId": "01KA8TM7H68FPKTRNNNSPWWBKD",
     "targetSchema": "url-repository",
     "targetId": "01KABM5QX5HRPWMPA1M7YK21WJ",
@@ -198,26 +188,6 @@
     "id": "01KABM5QZEE4T31FMCYS2G17Q8",
     "createdAt": "2025-11-18T13:58:53.677Z",
     "updatedAt": "2025-11-18T13:58:53.677Z"
-  },
-  {
-    "sourceSchema": "production-plans",
-    "sourceId": "01KAE3F9YZVBY6R1K0NNCT62ZJ",
-    "targetSchema": "production-plan-items",
-    "targetId": "01KAE3GMR90MBXAH2866JMVQBN",
-    "relationTypeId": "HAS_PRODUCTION_PLAN_ITEM",
-    "id": "01KAE3GMTXBQD0JDH7GVSMXKSR",
-    "createdAt": "2025-11-19T13:05:28.412Z",
-    "updatedAt": "2025-11-19T13:05:28.412Z"
-  },
-  {
-    "sourceSchema": "production-plans",
-    "sourceId": "01KAE3F9YZVBY6R1K0NNCT62ZJ",
-    "targetSchema": "production-plan-items",
-    "targetId": "01KAE3HG1DWRTPAYMT0FRFZE64",
-    "relationTypeId": "HAS_PRODUCTION_PLAN_ITEM",
-    "id": "01KAE3HG41PPAF7TX05PPPW63W",
-    "createdAt": "2025-11-19T13:05:56.353Z",
-    "updatedAt": "2025-11-19T13:05:56.353Z"
   },
   {
     "sourceSchema": "mcp-tools",
@@ -288,36 +258,6 @@
     "id": "01KBA5ZXW0Z1XSXGQHQSP7Q7B5",
     "createdAt": "2025-11-30T10:47:30.432Z",
     "updatedAt": "2025-11-30T10:47:30.432Z"
-  },
-  {
-    "sourceSchema": "servers",
-    "sourceId": "01KBASP59XTTA4CNBNXMNNV7SC",
-    "targetSchema": "url-repository",
-    "targetId": "01KBASQVNVZ5TN31J9TGFC40DD",
-    "relationTypeId": "HAS_URL",
-    "id": "01KBASQVQQGPENDYFJHTPGNFJX",
-    "createdAt": "2025-11-30T16:32:37.623Z",
-    "updatedAt": "2025-11-30T16:32:37.623Z"
-  },
-  {
-    "sourceSchema": "servers",
-    "sourceId": "01KBASP59XTTA4CNBNXMNNV7SC",
-    "targetSchema": "url-repository",
-    "targetId": "01KBASRJW2PZB4YFYA9HC6XJCF",
-    "relationTypeId": "HAS_URL",
-    "id": "01KBASRJYR406PPHJKQTDH0QQY",
-    "createdAt": "2025-11-30T16:33:01.400Z",
-    "updatedAt": "2025-11-30T16:33:01.400Z"
-  },
-  {
-    "sourceSchema": "servers",
-    "sourceId": "01KBASP59XTTA4CNBNXMNNV7SC",
-    "targetSchema": "url-repository",
-    "targetId": "01KBASSJVBJAE1FX0ERTV8WZFX",
-    "relationTypeId": "HAS_URL",
-    "id": "01KBASSJX3WEEXB5TC095A7TAV",
-    "createdAt": "2025-11-30T16:33:34.115Z",
-    "updatedAt": "2025-11-30T16:33:34.115Z"
   },
   {
     "sourceSchema": "servers",

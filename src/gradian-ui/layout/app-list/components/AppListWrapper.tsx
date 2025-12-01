@@ -203,7 +203,13 @@ export function AppListWrapper() {
   const apps = useMemo(
     () =>
       (schemas || [])
-        .filter((schema) => schema.showInNavigation !== false && !schema.inactive)
+        .filter(
+          (schema) =>
+            schema.showInNavigation !== false &&
+            !schema.inactive &&
+            // Do not show system schemas in Apps list
+            !schema.isSystemSchema
+        )
         .sort((a, b) => {
           const aName = a.plural_name || a.singular_name || a.id || '';
           const bName = b.plural_name || b.singular_name || b.id || '';

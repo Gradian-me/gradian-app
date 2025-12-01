@@ -1,67 +1,70 @@
 // Sidebar Utilities
 
-import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
-  ShoppingCart, 
-  Receipt, 
-  Truck, 
-  Calendar, 
-  BarChart3, 
-  Database, 
-  Settings,
-  Bell,
-  User,
-  Folder,
-  LucideIcon,
+import {
+  LayoutDashboard,
+  Calendar,
+  BarChart3,
+  Database,
   PencilRuler,
   Sparkles,
   Share2,
+  type LucideIcon,
 } from 'lucide-react';
 import { NavigationItem } from '../types';
+import { AD_MODE } from '@/gradian-ui/shared/constants/application-variables';
 
 /**
- * Default navigation items for the sidebar
+ * Map menu icon string from menu-items schema to Lucide icon component
  */
-export const defaultNavigationItems: NavigationItem[] = [
-  {
-    name: 'Dashboard',
-    href: '/',
-    icon: LayoutDashboard,
-  },
-  {
-    name: 'Tender Calendar',
-    href: '/calendar',
-    icon: Calendar,
-  },
-  {
-    name: 'Analytics',
-    href: '/analytics',
-    icon: BarChart3,
-  },
-  {
-    name: 'Integrations',
-    href: '/integrations',
-    icon: Database,
-  },
-  {
-    name: 'Graph Designer',
-    href: '/builder/graphs',
-    icon: Share2,
-  },
-  {
-    name: 'Builder',
-    href: '/builder',
-    icon: PencilRuler,
-  },
-  {
-    name: 'AI Builder',
-    href: '/ai-builder',
-    icon: Sparkles,
-  }
-];
+const iconMap: Record<string, LucideIcon> = {
+  LayoutDashboard,
+  Calendar,
+  BarChart3,
+  Database,
+  PencilRuler,
+  Sparkles,
+  Share2,
+};
 
+/**
+ * Transform menu-items API data into sidebar NavigationItem[]
+ * - Applies AD_MODE filter: if AD_MODE is true, hide items where hideInAD is true.
+ * - Applies company filter: if companyId is set, only show items that either have no companies
+ *   or include the selected company in their companies field.
+ */
+export function mapMenuItemsToNavigationItems(
+  menuItems: any[],
+  companyId?: string | number | null
+): NavigationItem[] {
+  if (!Array.isArray(menuItems)) return [];
+
+  return menuItems
+    .filter((item) => {
+      if (!AD_MODE) return true;
+      return !item.hideInAD;
+    })
+    .filter((item) => {
+      if (companyId === null || companyId === undefined) return true;
+      const companies = item.companies;
+      if (!companies || !Array.isArray(companies) || companies.length === 0) {
+        // No company restriction, visible for all
+        return true;
+      }
+      // companies is expected to be an array of picker values { id, label, ... }
+      return companies.some((c: any) => String(c?.id) === String(companyId));
+    })
+    .map<NavigationItem>((item) => {
+      const iconName: string | undefined = item.menuIcon;
+      const Icon = iconName && iconMap[iconName] ? iconMap[iconName] : LayoutDashboard;
+
+      return {
+        id: item.id,
+        name: item.menuTitle ?? 'Menu Item',
+        href: item.menuUrl ?? '/',
+        icon: Icon,
+      };
+    });
+}
 /**
  * Get initials from a name
  * Maximum 3 characters: first two words + last word if more than 2 words

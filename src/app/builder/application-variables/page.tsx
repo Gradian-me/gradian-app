@@ -295,6 +295,18 @@ export default function ApplicationVariablesPage() {
                     onCheckedChange={(checked) => setData((prev) => ({ ...prev, DEMO_MODE: checked }))}
                   />
                 </div>
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">AD Mode</Label>
+                    <p className="text-sm text-gray-500">
+                      When enabled, the application will use Active Directory–specific behavior (e.g., login and integration modes).
+                    </p>
+                  </div>
+                  <Switch
+                    checked={data.AD_MODE ?? false}
+                    onCheckedChange={(checked) => setData((prev) => ({ ...prev, AD_MODE: checked }))}
+                  />
+                </div>
               </CardContent>
             </Card>
           </FormTabsContent>

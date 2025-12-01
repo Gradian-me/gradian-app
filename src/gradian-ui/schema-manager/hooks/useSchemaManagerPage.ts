@@ -130,8 +130,14 @@ export const useSchemaManagerPage = () => {
 
   const invalidateSchemaQueryCaches = useCallback(async () => {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: SCHEMAS_SUMMARY_QUERY_KEY }),
-      queryClient.invalidateQueries({ queryKey: SCHEMAS_QUERY_KEY }),
+      queryClient.invalidateQueries({ 
+        queryKey: SCHEMAS_SUMMARY_QUERY_KEY,
+        refetchType: 'active', // Force refetch of active queries
+      }),
+      queryClient.invalidateQueries({ 
+        queryKey: SCHEMAS_QUERY_KEY,
+        refetchType: 'active', // Force refetch of active queries
+      }),
     ]);
   }, [queryClient]);
 
@@ -173,28 +179,73 @@ export const useSchemaManagerPage = () => {
     setDeleteDialog({ open: false, schema: null });
   }, []);
 
-  const handleDelete = useCallback(async () => {
+  const handleDelete = useCallback(async (hardDelete: boolean = false) => {
     if (!deleteDialog.schema) {
       return false;
     }
 
     try {
-      const updatedSchema = { ...deleteDialog.schema, inactive: true };
-      const { id: _schemaId, ...payload } = updatedSchema;
-      
-      const response = await fetch(`${config.schemaApi.basePath}/${deleteDialog.schema.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+      let response: Response;
+      let result: any;
 
-      const result = await response.json();
+      if (hardDelete) {
+        // Hard delete: DELETE the schema and all its data
+        response = await fetch(`${config.schemaApi.basePath}/${deleteDialog.schema.id}?hardDelete=true`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        result = await response.json();
+      } else {
+        // Soft delete: Set schema as inactive
+        const updatedSchema = { ...deleteDialog.schema, inactive: true };
+        const { id: _schemaId, ...payload } = updatedSchema;
+        
+        response = await fetch(`${config.schemaApi.basePath}/${deleteDialog.schema.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+        result = await response.json();
+      }
 
       if (result.success) {
-        // Invalidate schemas cache to refetch updated data
-        await invalidateSchemaQueryCaches();
+        // Call clear cache route to clear all caches
+        try {
+          await fetch('/api/schemas/clear-cache', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }).catch((error) => {
+            console.warn('Failed to call clear-cache route:', error);
+          });
+        } catch (error) {
+          console.warn('Error calling clear-cache route:', error);
+        }
+
+        // Clear IndexedDB schema cache first
+        try {
+          await clearSchemaCache(undefined, SCHEMA_SUMMARY_CACHE_KEY);
+        } catch (error) {
+          console.warn('Failed to clear IndexedDB schema cache:', error);
+        }
+        
+        // Reset queries to force a fresh fetch (removes cached data and refetches)
+        await Promise.all([
+          queryClient.resetQueries({ queryKey: SCHEMAS_SUMMARY_QUERY_KEY }),
+          queryClient.resetQueries({ queryKey: SCHEMAS_QUERY_KEY }),
+        ]);
+        
+        // Wait a brief moment for cache clearing to complete
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Force refetch the schema list
+        await refetchSchemas();
+        
         // Show success message if available
         if (result.messages) {
           const transformedMessages = transformMessages(result.messages);
@@ -229,21 +280,21 @@ export const useSchemaManagerPage = () => {
       } else {
         setMessages({
           success: false,
-          message: result.error || 'Failed to set schema inactive',
+          message: result.error || (hardDelete ? 'Failed to delete schema' : 'Failed to set schema inactive'),
         });
       }
-      console.error('Failed to set schema inactive:', result);
+      console.error(hardDelete ? 'Failed to delete schema:' : 'Failed to set schema inactive:', result);
       return false;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error setting schema inactive';
+      const errorMessage = error instanceof Error ? error.message : (hardDelete ? 'Error deleting schema' : 'Error setting schema inactive');
       setMessages({
         success: false,
         message: errorMessage,
       });
-      console.error('Error setting schema inactive:', error);
+      console.error(hardDelete ? 'Error deleting schema:' : 'Error setting schema inactive:', error);
       return false;
     }
-  }, [closeDeleteDialog, deleteDialog.schema, invalidateSchemaQueryCaches]);
+  }, [closeDeleteDialog, deleteDialog.schema, invalidateSchemaQueryCaches, refetchSchemas]);
 
   const handleCreate = useCallback(async (payload: CreateSchemaPayload): Promise<SchemaCreateResult> => {
     const { schemaId, singularName, pluralName, description, showInNavigation, isSystemSchema, isNotCompanyBased, allowDataInactive, allowDataForce, allowDataHardDelete, statusId } = payload;

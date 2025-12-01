@@ -10,7 +10,7 @@ import { SchemaCardGrid, SchemaCardSkeletonGrid } from './SchemaCardGrid';
 import { SchemaListView } from './SchemaListView';
 import { SchemaTableView } from './SchemaTableView';
 import { CreateSchemaDialog } from './CreateSchemaDialog';
-import { ConfirmationMessage } from '@/gradian-ui/form-builder';
+import { SchemaDeleteConfirmDialog } from './SchemaDeleteConfirmDialog';
 import {
   SearchInput,
   Switch,
@@ -284,33 +284,15 @@ export function SchemaManagerWrapper() {
         onSubmit={handleCreateSchema}
       />
 
-      <ConfirmationMessage
+      <SchemaDeleteConfirmDialog
         isOpen={deleteDialog.open}
         onOpenChange={(open) => {
           if (!open) {
             closeDeleteDialog();
           }
         }}
-        title="Set Schema Inactive"
-        message={
-          <>
-            Are you sure you want to set "{deleteDialog.schema?.plural_name}" as inactive? It will be hidden from the schema list but can be reactivated later.
-          </>
-        }
-        variant="destructive"
-        buttons={[
-          {
-            label: 'Cancel',
-            variant: 'outline',
-            action: () => closeDeleteDialog(),
-          },
-          {
-            label: 'Delete',
-            variant: 'destructive',
-            icon: 'Trash2',
-            action: handleDelete,
-          },
-        ]}
+        schemaName={deleteDialog.schema?.plural_name || deleteDialog.schema?.singular_name || deleteDialog.schema?.id || 'this schema'}
+        onConfirm={handleDelete}
       />
     </MainLayout>
   );

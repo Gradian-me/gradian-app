@@ -1102,42 +1102,6 @@
   "tenders": [],
   "shipments": [],
   "invoices": [],
-  "production-plans": [
-    {
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "product": [
-        {
-          "id": "monoclonal-antibody",
-          "label": "Monoclonal Antibody"
-        }
-      ],
-      "year": [
-        {
-          "id": "1404",
-          "label": "1404"
-        }
-      ],
-      "id": "01KAE3F9YZVBY6R1K0NNCT62ZJ",
-      "createdAt": "2025-11-19T13:04:44.527Z",
-      "updatedAt": "2025-11-19T13:57:51.558Z",
-      "production-plan-items": [
-        {
-          "id": "01KAE3GMR90MBXAH2866JMVQBN",
-          "label": "01KAE3GMR90MBXAH2866JMVQBN"
-        },
-        {
-          "id": "01KAE3HG1DWRTPAYMT0FRFZE64",
-          "label": "01KAE3HG1DWRTPAYMT0FRFZE64"
-        }
-      ],
-      "company": [
-        {
-          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": "AryoGen"
-        }
-      ]
-    }
-  ],
   "applications": [
     {
       "name": "Vendor Management",
@@ -1549,10 +1513,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-30T11:22:42.044Z",
+      "updatedAt": "2025-12-01T10:41:33.759Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-11-30T11:22:42.044Z",
+      "lastSynced": "2025-12-01T10:41:33.759Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
@@ -1581,8 +1545,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-11-30T11:22:47.125Z",
-      "lastSynced": "2025-11-30T11:22:47.125Z"
+      "updatedAt": "2025-12-01T10:41:36.671Z",
+      "lastSynced": "2025-12-01T10:41:36.671Z"
     },
     {
       "color": "#4E79A7",
@@ -1628,9 +1592,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-11-30T11:20:02.412Z",
+      "updatedAt": "2025-12-01T10:44:39.977Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-11-30T11:20:02.412Z"
+      "lastSynced": "2025-12-01T10:44:39.977Z"
     },
     {
       "color": "#00d1ae",
@@ -2226,46 +2190,6 @@
       "updatedAt": "2025-11-30T15:29:39.993Z"
     }
   ],
-  "production-plan-items": [
-    {
-      "batchNumber": "B029AG",
-      "batchSizeQuantity": 12000,
-      "productionStartDate": "2025-11-20",
-      "productionEndDate": "2025-11-21",
-      "plannedReleaseDate": "2025-11-27",
-      "status": [
-        {
-          "id": "ready-for-release",
-          "label": "Ready for Release",
-          "icon": "Package",
-          "color": "warning"
-        }
-      ],
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KAE3GMR90MBXAH2866JMVQBN",
-      "createdAt": "2025-11-19T13:05:28.339Z",
-      "updatedAt": "2025-11-19T13:05:28.339Z"
-    },
-    {
-      "batchNumber": "A051ZW",
-      "batchSizeQuantity": 11000,
-      "productionStartDate": "2025-11-12",
-      "productionEndDate": "2025-11-27",
-      "plannedReleaseDate": "2025-11-20",
-      "status": [
-        {
-          "id": "ready-for-release",
-          "label": "Ready for Release",
-          "icon": "Package",
-          "color": "warning"
-        }
-      ],
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KAE3HG1DWRTPAYMT0FRFZE64",
-      "createdAt": "2025-11-19T13:05:56.285Z",
-      "updatedAt": "2025-11-19T13:05:56.285Z"
-    }
-  ],
   "mcp-tools": [
     {
       "title": "Weather Tool",
@@ -2348,32 +2272,6 @@
       ]
     }
   ],
-  "deviations": [
-    {
-      "number": 12,
-      "deviationTitle": [
-        "asdsa",
-        "asdasd"
-      ],
-      "description": "tss",
-      "isForce": true,
-      "forceReason": "test",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KAZDVZS58E50MPV5KK2NEB6A",
-      "createdAt": "2025-11-26T06:33:31.189Z",
-      "updatedAt": "2025-11-26T06:34:59.558Z",
-      "responsible": null,
-      "dueDate": null,
-      "follow-ups": [
-        {
-          "responsible": "",
-          "dueDate": "2025-11-27"
-        }
-      ]
-    }
-  ],
-  "pharmaceutical-deviation-management-system": [],
   "app-permissions": [
     {
       "resourceType": [
@@ -2505,6 +2403,94 @@
       "id": "01KBANQ9MTB176V9VXDZ85PYW8",
       "createdAt": "2025-11-30T15:22:24.803Z",
       "updatedAt": "2025-11-30T15:22:24.803Z"
+    }
+  ],
+  "menu-items": [
+    {
+      "menuTitle": "Dashboard",
+      "menuIcon": "LayoutDashboard",
+      "hideInAD": false,
+      "description": "Main application dashboard",
+      "menuUrl": "/",
+      "openInNewTab": false,
+      "id": "01KBSIDASHBOARD0000000000000",
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z"
+    },
+    {
+      "menuTitle": "Tender Calendar",
+      "menuIcon": "Calendar",
+      "hideInAD": true,
+      "description": "View tender deadlines and events",
+      "menuUrl": "/calendar",
+      "openInNewTab": false,
+      "id": "01KBSITENDERCALENDAR00000000",
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T11:01:55.621Z",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+    },
+    {
+      "menuTitle": "Analytics",
+      "menuIcon": "BarChart3",
+      "hideInAD": false,
+      "description": "Analytics and KPIs",
+      "menuUrl": "/analytics",
+      "openInNewTab": false,
+      "id": "01KBSIANALYTICS0000000000000",
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z"
+    },
+    {
+      "menuTitle": "Integrations",
+      "menuIcon": "Database",
+      "hideInAD": false,
+      "description": "Manage integrations and servers",
+      "menuUrl": "/integrations",
+      "openInNewTab": false,
+      "id": "01KBSIINTEGRATIONS0000000000",
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T11:13:24.692Z",
+      "companies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "incomplete": false
+    },
+    {
+      "menuTitle": "Graph Designer",
+      "menuIcon": "Share2",
+      "hideInAD": false,
+      "description": "Design and explore graphs",
+      "menuUrl": "/builder/graphs",
+      "openInNewTab": false,
+      "id": "01KBSIGRAPHDESIGNER000000000",
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z"
+    },
+    {
+      "menuTitle": "Builder",
+      "menuIcon": "PencilRuler",
+      "hideInAD": false,
+      "description": "Form and schema builder",
+      "menuUrl": "/builder",
+      "openInNewTab": false,
+      "id": "01KBSIBUILDER000000000000000",
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z"
+    },
+    {
+      "menuTitle": "AI Builder",
+      "menuIcon": "Sparkles",
+      "hideInAD": false,
+      "description": "AI-assisted builder",
+      "menuUrl": "/ai-builder",
+      "openInNewTab": false,
+      "id": "01KBSIAIBUILDER0000000000000",
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z"
     }
   ]
 }

@@ -4,20 +4,19 @@ import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../../../shared/utils';
 import { SidebarProps } from '../types';
-import { defaultNavigationItems } from '../utils';
 import { defaultSidebarConfig } from '../configs';
 import { SidebarHeader } from './SidebarHeader';
 import { CompanySelector } from '@/components/layout/CompanySelector';
-import { SidebarNavigation } from './SidebarNavigation';
 import { UserProfileSelector } from '@/components/layout/UserProfileSelector';
 import { ModeToggle } from '../../mode-toggle/components/ModeToggle';
+import { SidebarNavigationMenu } from './SidebarNavigationMenu';
 
 export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed,
   onToggle,
   isMobile = false,
   config = defaultSidebarConfig,
-  navigationItems = defaultNavigationItems,
+  navigationItems: _navigationItems,
   user: _user,
   company,
   className,
@@ -32,7 +31,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   }, [width]);
 
   const shouldAnimate = prevWidthRef.current !== width;
-
   const showUserControls = (!isCollapsed || isMobile);
 
   return (
@@ -66,8 +64,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Navigation */}
       <div className="flex-1 min-h-0 overflow-hidden">
-        <SidebarNavigation
-          items={navigationItems}
+        <SidebarNavigationMenu
           isCollapsed={isCollapsed}
           isMobile={isMobile}
           navigationSchemas={navigationSchemas}

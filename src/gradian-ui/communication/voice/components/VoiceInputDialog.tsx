@@ -15,12 +15,21 @@ import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Sparkles, Play, Pause, RotateCcw, Circle, ArrowUp, Square, AudioLines } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
-import { useVoiceVisualizer, VoiceVisualizer } from "react-voice-visualizer";
+import dynamic from "next/dynamic";
+import { useVoiceVisualizer } from "react-voice-visualizer";
 import { RecordingTimer } from "./RecordingTimer";
 import { LanguageSelector } from "@/gradian-ui/form-builder/form-elements/components/LanguageSelector";
 import { CopyContent } from "@/gradian-ui/form-builder/form-elements/components/CopyContent";
 import { ButtonMinimal } from "@/gradian-ui/form-builder/form-elements/components/ButtonMinimal";
 import { MetricCard } from "@/gradian-ui/analytics/indicators/metric-card";
+
+const VoiceVisualizer = dynamic(
+  () =>
+    import("react-voice-visualizer").then(
+      (mod) => mod.VoiceVisualizer
+    ) as Promise<React.ComponentType<any>>,
+  { ssr: false }
+);
 
 interface VoiceInputDialogProps {
   isOpen: boolean;

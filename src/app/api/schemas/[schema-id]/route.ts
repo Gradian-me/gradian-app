@@ -265,13 +265,17 @@ export async function PUT(
 
 /**
  * DELETE - Delete a specific schema by ID
- * Example: DELETE /api/schemas/vendors - deletes the vendors schema
+ * Example: 
+ * - DELETE /api/schemas/vendors - soft delete (sets inactive)
+ * - DELETE /api/schemas/vendors?hardDelete=true - hard delete (removes schema, data, and relations)
  */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ 'schema-id': string }> }
 ) {
   const { 'schema-id': schemaId } = await params;
+  const searchParams = request.nextUrl.searchParams;
+  const hardDelete = searchParams.get('hardDelete') === 'true';
 
   if (!schemaId) {
     return NextResponse.json(
@@ -281,7 +285,7 @@ export async function DELETE(
   }
 
   if (!isDemoModeEnabled()) {
-    return proxySchemaRequest(request, `/api/schemas/${schemaId}`, {
+    return proxySchemaRequest(request, `/api/schemas/${schemaId}${hardDelete ? '?hardDelete=true' : ''}`, {
       method: 'DELETE',
     });
   }
@@ -307,8 +311,41 @@ export async function DELETE(
       );
     }
 
-    // Remove the schema
-    const deletedSchema = schemas.splice(schemaIndex, 1)[0];
+    const deletedSchema = schemas[schemaIndex];
+
+    if (hardDelete) {
+      // Hard delete: Remove schema, all its data, and all relations
+      const { readAllData, writeAllData } = await import('@/gradian-ui/shared/domain/utils/data-storage.util');
+      const { readAllRelations, writeAllRelations } = await import('@/gradian-ui/shared/domain/utils/relations-storage.util');
+
+      // 1. Delete all data for this schema
+      try {
+        const allData = readAllData();
+        if (allData[schemaId]) {
+          delete allData[schemaId];
+          writeAllData(allData);
+        }
+      } catch (dataError) {
+        console.warn(`Failed to delete data for schema ${schemaId}:`, dataError);
+      }
+
+      // 2. Delete all relations involving this schema (as source or target)
+      try {
+        const allRelations = readAllRelations();
+        const filteredRelations = allRelations.filter(
+          (r: any) => r.sourceSchema !== schemaId && r.targetSchema !== schemaId
+        );
+        writeAllRelations(filteredRelations);
+      } catch (relationError) {
+        console.warn(`Failed to delete relations for schema ${schemaId}:`, relationError);
+      }
+
+      // 3. Remove the schema itself
+      schemas.splice(schemaIndex, 1);
+    } else {
+      // Soft delete: Just set inactive (this shouldn't happen via DELETE, but handle it)
+      schemas[schemaIndex] = { ...deletedSchema, inactive: true };
+    }
 
     // Write back to file
     const dataPath = path.join(process.cwd(), 'data', 'all-schemas.json');
@@ -320,10 +357,37 @@ export async function DELETE(
     cachedFileMtime = null;
     clearSharedSchemaCache('schemas');
 
+    // Clear all schema-related caches directly
+    try {
+      // Clear schema-loader cache
+      const { clearSchemaCache: clearSchemaLoaderCache } = await import('@/gradian-ui/schema-manager/utils/schema-loader');
+      clearSchemaLoaderCache();
+    } catch (error) {
+      console.warn('Could not clear schema-loader cache:', error);
+    }
+
+    try {
+      // Clear schema-registry cache
+      const { clearSchemaRegistryCache } = await import('@/gradian-ui/schema-manager/utils/schema-registry.server');
+      clearSchemaRegistryCache();
+    } catch (error) {
+      console.warn('Could not clear schema-registry cache:', error);
+    }
+
+    try {
+      // Clear companies-loader cache (in case schema was companies-related)
+      const { clearCompaniesCache } = await import('@/gradian-ui/shared/utils/companies-loader');
+      clearCompaniesCache();
+    } catch (error) {
+      console.warn('Could not clear companies-loader cache:', error);
+    }
+
     return NextResponse.json({
       success: true,
       data: deletedSchema,
-      message: `Schema "${schemaId}" deleted successfully`
+      message: hardDelete 
+        ? `Schema "${schemaId}" and all its data have been permanently deleted`
+        : `Schema "${schemaId}" deleted successfully`
     });
   } catch (error) {
     console.error('Error deleting schema:', error);

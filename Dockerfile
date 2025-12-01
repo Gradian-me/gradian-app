@@ -66,11 +66,11 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
 # Using --chown to set ownership during copy (more efficient)
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# Copy standalone output (includes server.js and minimal node_modules)
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-
-# Copy static files
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Copy full Next.js build output (.next) and node_modules for non-standalone runtime
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/package*.json ./
+COPY --from=builder --chown=nextjs:nodejs /app/next.config.* ./
 
 # Copy data directory (contains JSON files used at runtime)
 COPY --from=builder --chown=nextjs:nodejs /app/data ./data
@@ -88,6 +88,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 # Use tini as entrypoint for proper signal handling (PID 1)
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
-# Start the Next.js server
-CMD ["node", "server.js"]
+# Start the Next.js server using the standard `next start` script
+CMD ["npm", "start"]
 

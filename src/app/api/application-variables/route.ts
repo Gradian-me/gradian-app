@@ -54,6 +54,7 @@ async function ensureApplicationVariablesFile(): Promise<void> {
         'detailPageMetadata'
       ],
       DEMO_MODE: true,
+      AD_MODE: false,
       AI_CONFIG: {
         LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions'
       }
@@ -130,6 +131,7 @@ export async function PUT(request: NextRequest) {
         SCHEMA_SUMMARY_EXCLUDED_KEYS: body.SCHEMA_SUMMARY_EXCLUDED_KEYS
       }),
       ...(body.DEMO_MODE !== undefined && { DEMO_MODE: body.DEMO_MODE }),
+      ...(body.AD_MODE !== undefined && { AD_MODE: body.AD_MODE }),
       ...(body.AI_CONFIG && {
         AI_CONFIG: {
           ...currentData.AI_CONFIG,
