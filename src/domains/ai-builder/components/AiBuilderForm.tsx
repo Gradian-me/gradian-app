@@ -256,6 +256,12 @@ export function AiBuilderForm({
         formattedValue = String(fieldValue);
       }
       
+      // For userPrompt field, strip any existing "User Prompt:" prefix to avoid duplication
+      if ((field.name === 'userPrompt' || field.id === 'user-prompt') && formattedValue) {
+        // Remove "User Prompt:" prefix if it exists (case insensitive, with optional whitespace)
+        formattedValue = formattedValue.replace(/^User\s+Prompt:\s*/i, '').trim();
+      }
+      
       // Use field name for LLM prompt (standard field config)
       // Format name: convert camelCase to Title Case (e.g., "userPrompt" -> "User Prompt")
       const formatFieldName = (name: string): string => {
@@ -291,8 +297,14 @@ export function AiBuilderForm({
     // Initialize all fields with their defaultValues or empty values
     fields.forEach((field) => {
       if (field.name === 'userPrompt' || field.id === 'user-prompt') {
-        // Use current userPrompt value for prompt field
-        initialValues[field.name] = userPrompt;
+        // Use current userPrompt value for prompt field, but strip any existing "User Prompt:" prefix
+        // to avoid duplication when building the concatenated prompt
+        let promptValue = userPrompt || '';
+        if (promptValue) {
+          // Remove "User Prompt:" prefix if it exists (case insensitive, with optional whitespace)
+          promptValue = promptValue.replace(/^User\s+Prompt:\s*/i, '').trim();
+        }
+        initialValues[field.name] = promptValue;
       } else {
         // Use defaultValue or empty value for other fields
         initialValues[field.name] = field.defaultValue ?? '';

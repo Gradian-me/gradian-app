@@ -114,8 +114,15 @@ const textColorClasses: Record<string, string> = {
 const formatValue = (metric: MetricItem): string => {
   const { value, format, precision = 0, prefix } = metric;
   
+  // Convert string to number if needed
+  let numValue: number;
   if (typeof value === 'string') {
-    return value;
+    numValue = parseFloat(value);
+    if (isNaN(numValue)) {
+      return value; // Return original string if not a valid number
+    }
+  } else {
+    numValue = value;
   }
   
   // Options for toLocaleString to always include thousand separators
@@ -128,24 +135,24 @@ const formatValue = (metric: MetricItem): string => {
   switch (format) {
     case 'currency':
       // Use toLocaleString with currency formatting
-      return `${prefix || '$'}${value.toLocaleString('en-US', numberFormatOptions)}`;
+      return `${prefix || '$'}${numValue.toLocaleString('en-US', numberFormatOptions)}`;
     case 'percentage':
       // For percentage, format the number with separators, then add %
-      return `${value.toLocaleString('en-US', numberFormatOptions)}%`;
+      return `${numValue.toLocaleString('en-US', numberFormatOptions)}%`;
     case 'number':
-      return value.toLocaleString('en-US', numberFormatOptions);
+      return numValue.toLocaleString('en-US', numberFormatOptions);
     case 'custom':
       return String(value);
     default:
       // Default case: always use thousand separators
-      return value.toLocaleString('en-US', numberFormatOptions);
+      return numValue.toLocaleString('en-US', numberFormatOptions);
   }
 };
 
 export const MetricCard: React.FC<MetricCardProps> = ({
   metrics,
   footer,
-  gradient = 'violet',
+  gradient = 'indigo',
   showPattern = true,
   layout = 'grid',
   columns,
@@ -165,8 +172,8 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     4: 'grid-cols-2 md:grid-cols-4',
   };
 
-  const gradientClass = gradientClasses[gradient] || gradientClasses['violet'];
-  const borderClass = gradientClass.split(' ').find(cls => cls.startsWith('border-')) || 'border-violet-200/50 dark:border-violet-800/50';
+  const gradientClass = gradientClasses[gradient] || gradientClasses['indigo'];
+  const borderClass = gradientClass.split(' ').find(cls => cls.startsWith('border-')) || 'border-indigo-200/50 dark:border-indigo-800/50';
 
   return (
     <div

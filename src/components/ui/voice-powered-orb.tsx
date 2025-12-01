@@ -525,7 +525,8 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
 
     return () => {
       isMountedRef.current = false;
-      // Don't stop microphone here as it will be handled by the main cleanup
+      // Stop microphone on unmount to ensure cleanup
+      stopMicrophone();
     };
   }, [enableVoiceControl]);
 

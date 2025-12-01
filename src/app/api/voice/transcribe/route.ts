@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import fs from 'fs';
 import path from 'path';
 
@@ -28,15 +30,19 @@ export async function POST(request: NextRequest) {
     const language = formData.get('language') as string | null;
 
     if (!file) {
+      loggingCustom(LogType.REQUEST_RESPONSE, 'error', 'Transcription request failed: No audio file provided');
       return NextResponse.json(
         { success: false, error: 'No audio file provided' },
         { status: 400 }
       );
     }
 
+    loggingCustom(LogType.REQUEST_RESPONSE, 'info', `Transcription request received - File: ${file.name}, Size: ${file.size} bytes, Type: ${file.type}, Language: ${language || 'not specified'}`);
+
     // Get API key from environment
     const apiKey = process.env.LLM_API_KEY || process.env.AVALAI_API_KEY;
     if (!apiKey) {
+      loggingCustom(LogType.REQUEST_RESPONSE, 'error', 'Transcription request failed: API key not configured');
       return NextResponse.json(
         { success: false, error: 'API key not configured' },
         { status: 500 }
@@ -55,6 +61,8 @@ export async function POST(request: NextRequest) {
     const vars = await loadApplicationVariables();
     const transcribeUrl = vars.AI_CONFIG?.LLM_TRANSCRIBE_URL || 'https://api.avalai.ir/v1/audio/transcriptions';
 
+    loggingCustom(LogType.REQUEST_RESPONSE, 'info', `Transcription API call - URL: ${transcribeUrl}, Model: ${model}, Response Format: ${response_format}`);
+
     // Create FormData for the transcription API
     const transcriptionFormData = new FormData();
     transcriptionFormData.append('file', file);
@@ -68,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     if (response_format) {
       transcriptionFormData.append('response_format', response_format);
-      console.log('Setting response_format to:', response_format);
+      loggingCustom(LogType.REQUEST_RESPONSE, 'debug', `Setting response_format to: ${response_format}`);
     }
     
     // Add language parameter if provided
@@ -106,7 +114,7 @@ export async function POST(request: NextRequest) {
         const errorText = await response.text();
         errorMessage = errorText || `HTTP ${response.status}: ${response.statusText}`;
       }
-      console.error('Transcription API error:', errorMessage);
+      loggingCustom(LogType.REQUEST_RESPONSE, 'error', `Transcription API error - Status: ${response.status}, Error: ${errorMessage}`);
       return NextResponse.json(
         { success: false, error: errorMessage },
         { status: response.status }
@@ -195,16 +203,19 @@ export async function POST(request: NextRequest) {
           }
         }
 
+        const finalTranscription = transcription.trim();
+        loggingCustom(LogType.REQUEST_RESPONSE, 'info', `Transcription success (streaming) - Length: ${finalTranscription.length} characters`);
         return NextResponse.json({
           success: true,
-          transcription: transcription.trim(),
+          transcription: finalTranscription,
         });
       } catch (streamError) {
-        console.error('Stream processing error:', streamError);
+        const errorMsg = streamError instanceof Error ? streamError.message : 'Failed to process stream';
+        loggingCustom(LogType.REQUEST_RESPONSE, 'error', `Stream processing error: ${errorMsg}`);
         return NextResponse.json(
           { 
             success: false, 
-            error: streamError instanceof Error ? streamError.message : 'Failed to process stream' 
+            error: errorMsg
           },
           { status: 500 }
         );
@@ -215,22 +226,25 @@ export async function POST(request: NextRequest) {
       // Handle non-streaming response
       const result = await response.json();
       
+      // Log the full JSON response first
+      loggingCustom(LogType.REQUEST_RESPONSE, 'info', `Transcription API response JSON:\n${JSON.stringify(result, null, 2)}`);
+      
       // Log the response structure for debugging
-      console.log('Requested response_format:', response_format);
-      console.log('Response structure:', {
+      loggingCustom(LogType.REQUEST_RESPONSE, 'debug', `Requested response_format: ${response_format}`);
+      loggingCustom(LogType.REQUEST_RESPONSE, 'debug', `Response structure: ${JSON.stringify({
         hasText: !!result.text,
         hasTask: !!result.task,
         hasLanguage: !!result.language,
         hasDuration: !!result.duration,
         hasSegments: !!result.segments,
         keys: Object.keys(result)
-      });
+      })}`);
       
       // Check if we got verbose_json format (has task, language, duration fields)
       const isVerboseJson = result.task !== undefined && result.language !== undefined && result.duration !== undefined;
       
       if (response_format === 'verbose_json' && !isVerboseJson) {
-        console.warn('Requested verbose_json but received standard json format. API may not support verbose_json.');
+        loggingCustom(LogType.REQUEST_RESPONSE, 'warn', 'Requested verbose_json but received standard json format. API may not support verbose_json.');
       }
       
       // Extract text from response
@@ -238,10 +252,20 @@ export async function POST(request: NextRequest) {
       // For json: { text: "..." }
       const transcription = result.text || result.transcription || JSON.stringify(result);
 
+      // Log successful transcription response
+      loggingCustom(LogType.REQUEST_RESPONSE, 'info', `Transcription success (non-streaming) - Length: ${transcription.length} characters${isVerboseJson ? `, Language: ${result.language}, Duration: ${result.duration}s` : ''}`);
+
       // Return response with metadata if verbose_json format was received
       return NextResponse.json({
         success: true,
         transcription,
+        // Include usage and cost information if available
+        ...(result.usage && {
+          usage: result.usage,
+        }),
+        ...(result.estimated_cost && {
+          estimated_cost: result.estimated_cost,
+        }),
         // Include additional metadata if verbose_json format was received
         ...(isVerboseJson && {
           metadata: {
@@ -255,11 +279,12 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error('Transcription error:', error);
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
+    loggingCustom(LogType.REQUEST_RESPONSE, 'error', `Transcription error: ${errorMsg}`);
     return NextResponse.json(
       { 
         success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+        error: errorMsg
       },
       { status: 500 }
     );

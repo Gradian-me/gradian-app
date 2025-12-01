@@ -12,7 +12,7 @@ import {
 import { VoicePoweredOrb } from "@/components/ui/voice-powered-orb";
 import { TextSwitcher } from "@/components/ui/text-switcher";
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff, Sparkles, Play, Pause, RotateCcw } from "lucide-react";
+import { Mic, MicOff, Sparkles, Play, Pause, RotateCcw, Circle, ArrowUp, Square, AudioLines } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
 import { useVoiceVisualizer, VoiceVisualizer } from "react-voice-visualizer";
@@ -20,6 +20,7 @@ import { RecordingTimer } from "./RecordingTimer";
 import { LanguageSelector } from "@/gradian-ui/form-builder/form-elements/components/LanguageSelector";
 import { CopyContent } from "@/gradian-ui/form-builder/form-elements/components/CopyContent";
 import { ButtonMinimal } from "@/gradian-ui/form-builder/form-elements/components/ButtonMinimal";
+import { MetricCard } from "@/gradian-ui/analytics/indicators/metric-card";
 
 interface VoiceInputDialogProps {
   isOpen: boolean;
@@ -42,6 +43,9 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcriptionError, setTranscriptionError] = useState<string | null>(null);
   const [outputLanguage, setOutputLanguage] = useState<string>('fa');
+  const [isBlobLoaded, setIsBlobLoaded] = useState(false);
+  const [tokenUsage, setTokenUsage] = useState<{ usage?: any; estimated_cost?: any } | null>(null);
+  const [shouldAutoTranscribe, setShouldAutoTranscribe] = useState(false);
   
   const {
     isRecording,
@@ -69,15 +73,32 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   useEffect(() => {
     // Only load if we have a new blob (different reference)
     if (recordedBlob && recordedBlob !== loadedBlobRef.current) {
+      setIsBlobLoaded(false);
       try {
-        setPreloadedAudioBlob(recordedBlob);
+        // Convert blob to File if needed, or use blob directly
+        // The visualizer might need a File object with a name
+        const audioFile = recordedBlob instanceof File 
+          ? recordedBlob 
+          : new File([recordedBlob], 'recording.webm', { type: recordedBlob.type || 'audio/webm' });
+        
+        // Set the blob/file in the visualizer
+        setPreloadedAudioBlob(audioFile);
         loadedBlobRef.current = recordedBlob;
+        
+        // Give the visualizer a moment to process the audio
+        setTimeout(() => {
+          setIsBlobLoaded(true);
+        }, 100);
+        
+        console.log('Audio blob loaded into visualizer:', recordedBlob.size, 'bytes', 'type:', recordedBlob.type);
       } catch (error) {
         console.warn('Failed to set preloaded audio blob:', error);
+        setIsBlobLoaded(false);
       }
     } else if (!recordedBlob) {
       // Clear the ref when blob is cleared
       loadedBlobRef.current = null;
+      setIsBlobLoaded(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recordedBlob]); // Only depend on recordedBlob, setPreloadedAudioBlob is stable
@@ -85,24 +106,32 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   // Cleanup when dialog closes and reset when it opens
   useEffect(() => {
     if (!isOpen) {
-      // Immediately stop all microphone tracks to release the microphone
-      // This must happen first to prevent the browser from showing the microphone icon
-      clearRecording();
-      
-      // Also stop recording if it's still active
+      // Stop recording first if it's still active
       if (isRecording) {
         stopRecording();
       }
       
+      // Immediately stop all microphone tracks to release the microphone
+      // This must happen to prevent the browser from showing the microphone icon
+      clearRecording();
+      
+      // Note: VoicePoweredOrb will automatically stop its microphone when enableVoiceControl becomes false
+      // The enableVoiceControl prop is set to (isRecording && isOpen), so when isOpen becomes false,
+      // VoicePoweredOrb's useEffect will trigger and call stopMicrophone()
+      
       // Clear transcription and errors when dialog closes
       setTranscription(null);
       setTranscriptionError(null);
+      setTokenUsage(null);
+      setShouldAutoTranscribe(false);
       // Reset the loaded blob ref
       loadedBlobRef.current = null;
     } else {
       // Clear transcription when dialog opens to ensure fresh state
       setTranscription(null);
       setTranscriptionError(null);
+      setTokenUsage(null);
+      setShouldAutoTranscribe(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]); // Only depend on isOpen to avoid infinite loops
@@ -119,6 +148,18 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run on unmount
 
+  // Auto-transcribe when blob is ready after stop-and-transcribe
+  useEffect(() => {
+    if (shouldAutoTranscribe && recordedBlob && !isRecording) {
+      setShouldAutoTranscribe(false);
+      // Small delay to ensure blob is fully processed
+      setTimeout(() => {
+        handleTranscribe();
+      }, 200);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldAutoTranscribe, recordedBlob, isRecording]);
+
   const handleStartRecording = async () => {
     await startRecording();
   };
@@ -127,9 +168,28 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
     stopRecording();
   };
 
+  const handleStopAndTranscribe = () => {
+    // Set flag to auto-transcribe when blob is ready
+    setShouldAutoTranscribe(true);
+    // Stop recording
+    stopRecording();
+  };
+
+  // Auto-transcribe when blob is ready after stop-and-transcribe
+  useEffect(() => {
+    if (shouldAutoTranscribe && recordedBlob && !isRecording) {
+      setShouldAutoTranscribe(false);
+      // Small delay to ensure blob is fully processed
+      setTimeout(() => {
+        handleTranscribe();
+      }, 200);
+    }
+  }, [shouldAutoTranscribe, recordedBlob, isRecording]);
+
   const handleClear = () => {
     setTranscription(null);
     setTranscriptionError(null);
+    setTokenUsage(null);
     clearRecording();
     if (clearCanvas) {
       clearCanvas();
@@ -166,9 +226,16 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
 
       if (data.success && data.transcription) {
         setTranscription(data.transcription);
-        if (onTranscript) {
-          onTranscript(data.transcription);
+        // Store usage and cost information if available
+        if (data.usage || data.estimated_cost) {
+          setTokenUsage({
+            usage: data.usage,
+            estimated_cost: data.estimated_cost,
+          });
+        } else {
+          setTokenUsage(null);
         }
+        // Don't call onTranscript here - only apply when user clicks Apply button
       } else {
         throw new Error(data.error || 'No transcription received');
       }
@@ -183,24 +250,35 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   };
 
   const handleApply = () => {
-    if (transcription && onApply) {
-      onApply(transcription);
+    if (transcription) {
+      // Call onApply if provided (for applying to text field)
+      if (onApply) {
+        onApply(transcription);
+      }
+      // Also call onTranscript if provided (for backward compatibility)
+      if (onTranscript) {
+        onTranscript(transcription);
+      }
       onOpenChange(false);
     }
   };
 
   const handleClose = () => {
-    // Immediately stop all tracks to release the microphone
-    // This must happen first to prevent the browser from showing the microphone icon
-    clearRecording();
-    
-    // Also stop recording if it's still active
+    // Stop recording first if it's still active
     if (isRecording) {
       stopRecording();
     }
     
+    // Immediately stop all tracks to release the microphone
+    // This must happen to prevent the browser from showing the microphone icon
+    clearRecording();
+    
+    // Clear state immediately
     setTranscription(null);
     setTranscriptionError(null);
+    setTokenUsage(null);
+    
+    // Close dialog - this will trigger the useEffect cleanup which ensures VoicePoweredOrb stops
     onOpenChange(false);
   };
 
@@ -208,13 +286,13 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         className={cn(
-          "w-[80vw] max-w-2xl sm:max-w-3xl p-6 overflow-hidden max-h-[90vh] flex flex-col",
+          "w-[80vw] max-w-2xl sm:max-w-3xl p-2 overflow-hidden max-h-[90vh] flex flex-col",
           className
         )}
         hideCloseButton={false}
       >
         <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
-          <DialogTitle>Voice Input</DialogTitle>
+          <DialogTitle className="flex items-center gap-2"><AudioLines className="h-5 w-5 text-violet-500" /> Voice Input</DialogTitle>
           <DialogDescription>
             Speak to see the orb respond to your voice. Click the button to start recording.
           </DialogDescription>
@@ -243,11 +321,11 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
           )}
 
           {/* Voice Visualizer - Show when recording exists */}
-          {recordedBlob && !isRecording && (
-            <div className="w-full">
+          {recordedBlob && !isRecording && loadedBlobRef.current && isBlobLoaded && (
+            <div className="w-full" key={loadedBlobRef.current.size}>
               <VoiceVisualizer
                 controls={recorderControls}
-                height={200}
+                height={180}
                 width="100%"
                 backgroundColor="transparent"
                 mainBarColor="#8b5cf6"
@@ -291,33 +369,64 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
           )}
 
           {/* Control Buttons */}
-          <div className="flex items-center justify-between w-full gap-3">
+          <div className="flex items-center justify-center w-full gap-3">
             {!recordedBlob ? (
               // Recording Controls - Centered
-              <div className="w-full flex justify-center">
-                <Button
-                  onClick={isRecording ? handleStopRecording : handleStartRecording}
-                  variant={isRecording ? "default" : "default"}
-                  size="lg"
-                  className="px-8 py-3 min-w-[200px]"
-                  disabled={!!error}
-                >
-                  {isRecording ? (
-                    <>
-                      <MicOff className="w-5 h-5 mr-3" />
-                      Stop Recording
-                    </>
-                  ) : (
-                    <>
-                      <Mic className="w-5 h-5 mr-3" />
-                      Start Recording
-                    </>
-                  )}
-                </Button>
+              <div className="flex items-center gap-3">
+                {!isRecording ? (
+                  // Start Recording - Red Circle Button
+                  <button
+                    onClick={handleStartRecording}
+                    disabled={!!error}
+                    className={cn(
+                      "h-16 w-16 rounded-full bg-red-500 hover:bg-red-600",
+                      "dark:bg-red-600 dark:hover:bg-red-700",
+                      "flex items-center justify-center",
+                      "transition-colors shadow-lg",
+                      "disabled:opacity-50 disabled:cursor-not-allowed",
+                      "focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                    )}
+                    title="Start Recording"
+                  >
+                    <Circle className="h-8 w-8 text-white fill-white" />
+                  </button>
+                ) : (
+                  // Stop Recording and Send Buttons
+                  <>
+                    {/* Stop Recording - Square Button */}
+                    <button
+                      onClick={handleStopRecording}
+                      className={cn(
+                        "h-16 w-16 rounded-full bg-gray-200 hover:bg-gray-300",
+                        "dark:bg-gray-700 dark:hover:bg-gray-600",
+                        "flex items-center justify-center",
+                        "transition-colors shadow-lg",
+                        "focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                      )}
+                      title="Stop Recording"
+                    >
+                      <Square className="h-8 w-8 text-gray-600 dark:text-gray-300 fill-gray-600 dark:fill-gray-300" />
+                    </button>
+                    {/* Send/Transcribe - Arrow Up Button */}
+                    <button
+                      onClick={handleStopAndTranscribe}
+                      className={cn(
+                        "h-16 w-16 rounded-full bg-violet-500 hover:bg-violet-600",
+                        "dark:bg-violet-600 dark:hover:bg-violet-700",
+                        "flex items-center justify-center",
+                        "transition-colors shadow-lg",
+                        "focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                      )}
+                      title="Stop and Transcribe"
+                    >
+                      <ArrowUp className="h-8 w-8 text-white" />
+                    </button>
+                  </>
+                )}
               </div>
             ) : (
               // Playback Controls
-              <>
+              <div className="flex items-center justify-between w-full gap-3">
                 <div className="flex items-center gap-3 px-4 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                   <ButtonMinimal
                     icon={isPausedRecordedAudio ? Play : Pause}
@@ -367,7 +476,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                     )}
                   </Button>
                 </div>
-              </>
+              </div>
             )}
           </div>
 
@@ -399,14 +508,50 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
             </div>
           )}
 
+          {/* MetricCard for Token Usage and Cost */}
+          {tokenUsage && transcription && (
+            <div className="w-full mt-4">
+              <MetricCard
+                metrics={[
+                  {
+                    id: 'tokens',
+                    label: 'Tokens',
+                    value: tokenUsage.usage?.total_tokens || 0,
+                    format: 'number' as const,
+                    icon: 'Hash',
+                    iconColor: 'cyan' as const,
+                  },
+                  {
+                    id: 'cost',
+                    label: 'Cost',
+                    value: tokenUsage.estimated_cost?.unit || 0,
+                    format: 'number' as const,
+                    precision: 7,
+                    unit: '$',
+                    icon: 'DollarSign',
+                    iconColor: 'pink' as const,
+                  },
+                ]}
+                gradient="indigo"
+                layout="grid"
+                columns={2}
+              />
+            </div>
+          )}
+
           {/* Instructions */}
           <p className="text-muted-foreground text-center max-w-md text-sm">
             {isRecording
               ? "Speak clearly into your microphone."
               : recordedBlob
               ? "You can start over or transcribe the recording."
-              : "Click the button above to start recording. \
-              Make sure your microphone access is granted."}
+              : (
+                  <>
+                    Click the button above to start recording.
+                    <br />
+                    Make sure your microphone access is granted.
+                  </>
+                )}
           </p>
         </div>
 

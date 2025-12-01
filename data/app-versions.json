@@ -948,5 +948,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBC715VNDSV8KYMRMPQ6SWQ3",
+    "timestamp": "2025-12-01T09:13:45.000Z",
+    "version": "1.08.002",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Improved logging in voice transcription API for better error tracking and response handling",
+        "priority": "Medium",
+        "affectedDomains": [
+          "voice",
+          "api",
+          "logging"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated VoiceInputDialog to enhance user experience with clearer state management and added token usage metrics display",
+        "priority": "Medium",
+        "affectedDomains": [
+          "voice",
+          "ui",
+          "analytics"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Adjusted styles in ProfessionalWritingModal and MetricCard for improved UI consistency",
+        "priority": "LOW",
+        "affectedDomains": [
+          "ui",
+          "professional-writing",
+          "analytics"
+        ]
+      }
+    ]
   }
 ]

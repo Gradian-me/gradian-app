@@ -47,18 +47,24 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       mediaRecorderRef.current = mediaRecorder;
 
       mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
+        if (event.data && event.data.size > 0) {
           chunksRef.current.push(event.data);
         }
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: mediaRecorder.mimeType });
-        setRecordedBlob(blob);
+        // Only create blob if we have chunks
+        if (chunksRef.current.length > 0) {
+          const blob = new Blob(chunksRef.current, { type: mediaRecorder.mimeType });
+          setRecordedBlob(blob);
+          
+          // Create object URL for playback
+          const url = URL.createObjectURL(blob);
+          setAudioUrl(url);
+        }
         
-        // Create object URL for playback
-        const url = URL.createObjectURL(blob);
-        setAudioUrl(url);
+        // Ensure isRecording is false after stopping
+        setIsRecording(false);
 
         // Tracks are already stopped in stopRecording, but ensure cleanup here too
         if (streamRef.current) {
@@ -76,8 +82,9 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
         setError('Recording error occurred');
       };
 
-      // Start recording without timeslice for continuous recording
-      mediaRecorder.start();
+      // Start recording with timeslice to ensure data is collected periodically
+      // Using 1000ms (1 second) timeslice for reliable data collection
+      mediaRecorder.start(1000);
       setIsRecording(true);
     } catch (err) {
       console.error('Error starting recording:', err);
@@ -104,11 +111,16 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive' && isRecording) {
       try {
-        // Stop the MediaRecorder first
+        // Request any remaining data before stopping
         if (mediaRecorderRef.current.state === 'recording') {
+          // Request final data chunk
+          mediaRecorderRef.current.requestData();
+          // Stop the MediaRecorder - onstop callback will set isRecording to false and create blob
           mediaRecorderRef.current.stop();
+        } else {
+          // If already stopped or pausing, just set isRecording to false
+          setIsRecording(false);
         }
-        setIsRecording(false);
         // Don't stop tracks immediately - let MediaRecorder finish properly
         // Tracks will be stopped in the onstop callback
       } catch (error) {
@@ -117,6 +129,9 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
         // If stopping fails, stop tracks anyway
         stopAllTracks();
       }
+    } else if (!isRecording) {
+      // If not recording, ensure state is correct
+      setIsRecording(false);
     }
   }, [isRecording, stopAllTracks]);
 

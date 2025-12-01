@@ -90,7 +90,7 @@ export function ProfessionalWritingModal({
           value: tokenUsage.total_tokens,
           format: 'number' as const,
           icon: 'Hash',
-          iconColor: 'violet' as const,
+          iconColor: 'cyan' as const,
         },
         {
           id: 'cost',
@@ -99,14 +99,14 @@ export function ProfessionalWritingModal({
           format: 'currency' as const,
           precision: 6,
           icon: 'DollarSign',
-          iconColor: 'green' as const,
+          iconColor: 'pink' as const,
         },
       ]
     : [];
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[80vw] max-w-2xl sm:max-w-3xl p-6 overflow-hidden max-h-[90vh] flex flex-col">
+      <DialogContent className="w-[80vw] max-w-2xl sm:max-w-3xl p-2 overflow-hidden max-h-[90vh] flex flex-col">
         <DialogHeader className="p-2 flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-violet-500" />
@@ -245,7 +245,7 @@ export function ProfessionalWritingModal({
             <div className="w-full mt-4">
               <MetricCard
                 metrics={metrics}
-                gradient="violet"
+                gradient="indigo"
                 layout="grid"
                 columns={2}
               />
