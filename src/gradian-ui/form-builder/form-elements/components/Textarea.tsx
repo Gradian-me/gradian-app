@@ -209,7 +209,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
               onChange?.(text);
               setIsVoiceDialogOpen(false);
             }}
-            loadingTextSwitches={loadingTextSwitches}
+            loadingTextSwitches={[]}
           />
         )}
       </div>
