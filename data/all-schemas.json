@@ -1228,7 +1228,8 @@
     "icon": "Contact",
     "showInNavigation": true,
     "isSystemSchema": true,
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "canSelectMultiCompanies": true
   },
   {
     "id": "companies",
@@ -2583,41 +2584,6 @@
         "required": false,
         "colSpan": 1,
         "order": 6
-      },
-      {
-        "id": "user-status",
-        "name": "status",
-        "label": "Status",
-        "sectionId": "basic-information",
-        "component": "select",
-        "placeholder": "Select status",
-        "role": "status",
-        "options": [
-          {
-            "id": "active",
-            "label": "Active",
-            "icon": "CheckCircle",
-            "color": "success"
-          },
-          {
-            "id": "pending",
-            "label": "Pending",
-            "icon": "Clock",
-            "color": "warning"
-          },
-          {
-            "id": "inactive",
-            "label": "Inactive",
-            "icon": "Slash",
-            "color": "muted"
-          }
-        ],
-        "validation": {
-          "required": true
-        },
-        "defaultValue": "pending",
-        "colSpan": 1,
-        "order": 7
       }
     ],
     "sections": [
@@ -2650,7 +2616,13 @@
     },
     "showInNavigation": false,
     "icon": "Users",
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "statusGroup": [
+      {
+        "id": "01KBCXZ2KX7N336B5GDGKEKNRC",
+        "label": "User Status"
+      }
+    ]
   },
   {
     "id": "servers",
@@ -3724,6 +3696,163 @@
     "icon": "Tag",
     "isNotCompanyBased": true,
     "isSystemSchema": true
+  },
+  {
+    "id": "status-items",
+    "description": "Define reusable status items with label, icon, color, and inactive handling",
+    "singular_name": "Status Item",
+    "plural_name": "Status Items",
+    "cardMetadata": [
+      {
+        "id": "status-item-info",
+        "title": "Status Item Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "status-item-label",
+          "status-item-icon",
+          "status-item-color"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "status-item-label",
+        "name": "label",
+        "label": "Label",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter status label",
+        "description": "Human readable label shown in UI",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "title"
+      },
+      {
+        "id": "status-item-icon",
+        "name": "icon",
+        "label": "Icon",
+        "sectionId": "basic-information",
+        "component": "icon",
+        "placeholder": "Enter Lucide Icon name (e.g., CheckCircle)",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "icon"
+      },
+      {
+        "id": "status-item-color",
+        "name": "color",
+        "label": "Color",
+        "sectionId": "basic-information",
+        "component": "color-picker",
+        "placeholder": "Select color",
+        "description": "Choose a color from the Tailwind palette for this status.",
+        "colSpan": 1,
+        "order": 3
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Status item label, icon and color",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "status-item-overview",
+          "title": "Status Item Overview",
+          "description": "Basic status item information",
+          "colSpan": 2,
+          "fieldIds": [
+            "status-item-label",
+            "status-item-icon",
+            "status-item-color"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "CircleDot",
+    "allowDataInactive": true,
+    "isNotCompanyBased": true,
+    "isSystemSchema": true
+  },
+  {
+    "id": "status-groups",
+    "description": "Group status items into reusable status groups, optionally scoped to companies",
+    "singular_name": "Status Group",
+    "plural_name": "Status Groups",
+    "cardMetadata": [
+      {
+        "id": "status-group-info",
+        "title": "Status Group Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "status-group-title",
+          "status-group-description"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "status-group-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter status group title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "title"
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Status group title, description and company scope",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "status-items-section",
+        "title": "Status Items",
+        "description": "Status items that belong to this group",
+        "initialState": "expanded",
+        "columns": 1,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "connectToSchema",
+          "minItems": 1,
+          "maxItems": 0,
+          "itemTitle": null,
+          "targetSchema": "status-items",
+          "relationTypeId": "HAS_STATUS_ITEM",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": true
+        }
+      }
+    ],
+    "showInNavigation": true,
+    "icon": "Layers",
+    "isNotCompanyBased": false,
+    "isSystemSchema": true,
+    "canSelectMultiCompanies": true
   },
   {
     "id": "logical-operators",

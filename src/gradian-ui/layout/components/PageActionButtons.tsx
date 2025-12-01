@@ -9,8 +9,14 @@ import { URL_HOME } from '@/gradian-ui/shared/constants/application-variables';
 import { Home, QrCode } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { QRCodeDialog } from './QRCodeDialog';
+import dynamic from 'next/dynamic';
 import { ShareButton } from './ShareButton';
+
+// Dynamically import QRCodeDialog to avoid SSR issues with HTMLCanvasElement
+const QRCodeDialog = dynamic(
+  () => import('./QRCodeDialog').then(mod => ({ default: mod.QRCodeDialog })),
+  { ssr: false }
+);
 
 export interface PageActionButtonsProps {
   value?: string;

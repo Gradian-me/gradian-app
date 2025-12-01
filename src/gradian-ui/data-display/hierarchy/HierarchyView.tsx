@@ -15,6 +15,7 @@ import { HierarchyNode, buildHierarchyTree, getAncestorIds, getParentIdFromEntit
 import { HierarchyActionsMenu } from './HierarchyActionsMenu';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatFieldValue } from '../table/utils/field-formatters';
 
 export interface HierarchyViewProps {
   schema: FormSchema;
@@ -36,25 +37,25 @@ const nodeVariants = {
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 8, scale: 0.98 },
+  hidden: { opacity: 0, y: 6, scale: 0.99 },
   visible: (index: number) => ({
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      duration: 0.22,
-      delay: Math.min(index * 0.02, 0.18),
+      duration: 0.18,
+      delay: Math.min(index * 0.015, 0.12),
     },
   }),
 };
 
 const cardHoverVariants = {
   hover: {
-    scale: 1.01,
+    scale: 1.003,
     transition: { duration: 0.15 },
   },
   tap: {
-    scale: 0.995,
+    scale: 0.997,
     transition: { duration: 0.1 },
   },
 };
@@ -107,6 +108,11 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
 
   const hasChildren = node.children.length > 0;
   const hasParent = Boolean(getParentIdFromEntity(entity));
+  
+  // Get status field definition and value
+  const statusFieldDef = schema?.fields?.find(field => field.role === 'status');
+  const hasStatusField = Boolean(statusFieldDef);
+  const statusValue = statusFieldDef ? entity?.[statusFieldDef.name] : entity?.status;
 
   return (
     <div className="space-y-1">
@@ -123,7 +129,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
           className={cn(
             'border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/70 shadow-sm hover:shadow-md transition-all duration-200',
             'flex items-center justify-between gap-2',
-            onView && 'cursor-pointer hover:border-violet-300 dark:hover:border-violet-600'
+            onView && 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800'
           )}
           onClick={onView ? () => onView(entity) : undefined}
         >
@@ -160,12 +166,23 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
               >
                 {getInitials(avatarField)}
               </Avatar>
-              <div className="min-w-0">
-                <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                  {renderHighlightedText(String(title), highlightQuery)}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                    {renderHighlightedText(String(title), highlightQuery)}
+                  </div>
+                  {hasStatusField && statusFieldDef && statusValue && (
+                    <div className="shrink-0">
+                      {formatFieldValue(
+                        statusFieldDef,
+                        statusValue,
+                        entity
+                      )}
+                    </div>
+                  )}
                 </div>
                 {subtitle && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                     {renderHighlightedText(String(subtitle), highlightQuery)}
                   </div>
                 )}

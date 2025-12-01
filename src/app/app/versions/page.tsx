@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Grid3X3, List, RefreshCw, GitBranch, Filter } from 'lucide-react';
 import { MainLayout } from '@/components/layout/main-layout';
@@ -31,6 +31,11 @@ export default function VersionsPage() {
   } = useVersions();
 
   const [refreshing, setRefreshing] = React.useState(false);
+
+  // Set document title
+  useEffect(() => {
+    document.title = 'App Versions | Gradian';
+  }, []);
 
   // Get unique domains from all versions
   const allDomains = useMemo(() => {

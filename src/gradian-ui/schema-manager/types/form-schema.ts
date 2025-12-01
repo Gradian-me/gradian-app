@@ -326,12 +326,23 @@ export interface FormSchema {
   showInNavigation?: boolean;
   isSystemSchema?: boolean;
   isNotCompanyBased?: boolean;
+  /**
+   * When true, shows a multi-company selector in the System Section so
+   * records of this schema can be linked to multiple companies.
+   * Selected companies are stored in the `related-companies` field of data.
+   */
+  canSelectMultiCompanies?: boolean;
   inactive?: boolean;
   allowDataInactive?: boolean;
   allowDataForce?: boolean;
   allowDataHardDelete?: boolean;
   allowHierarchicalParent?: boolean;
-  statusId?: string;
+  /**
+   * Optional status group configuration for this schema.
+   * When set, forms can show a status selector based on related status items.
+   * Stored as an array of selection objects (first item is the primary group).
+   */
+  statusGroup?: any[];
   syncToDatabases?: string[]; // Array of database IDs to sync this schema to
   syncStrategy?: 'schema-only' | 'schema-and-data'; // Sync strategy: schema only or schema and data
   fields: FormField[]; // All fields at schema level, each with a sectionId

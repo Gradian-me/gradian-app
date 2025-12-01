@@ -27,6 +27,7 @@ interface GroupedRelationData {
  * - id: Entity ID (required)
  * - direction: 'source' | 'target' | 'both' (optional, default: 'both')
  * - otherSchema: Filter by specific target/source schema (optional)
+ * - relationTypeId: Filter by specific relation type (optional)
  */
 export async function GET(request: NextRequest) {
   const targetPath = `/api/data/all-relations${request.nextUrl.search}`;
@@ -42,6 +43,7 @@ export async function GET(request: NextRequest) {
     const id = searchParams.get('id');
     const direction = searchParams.get('direction') as 'source' | 'target' | 'both' | null;
     const otherSchema = searchParams.get('otherSchema');
+    const relationTypeId = searchParams.get('relationTypeId');
 
     // Validate required parameters
     if (!schema || !id) {
@@ -92,6 +94,11 @@ export async function GET(request: NextRequest) {
         // Fallback for relations without direction
         return r.targetSchema === otherSchema;
       });
+    }
+
+    // Filter by relationTypeId if provided
+    if (relationTypeId) {
+      filteredRelations = filteredRelations.filter(r => r.relationTypeId === relationTypeId);
     }
 
     // Read all data

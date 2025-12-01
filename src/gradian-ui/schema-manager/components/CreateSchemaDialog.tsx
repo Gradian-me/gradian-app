@@ -36,7 +36,6 @@ const INITIAL_FORM_STATE: CreateSchemaPayload = {
   allowDataInactive: false,
   allowDataForce: false,
   allowDataHardDelete: false,
-  statusId: '',
 };
 
 export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchemaDialogProps) {
@@ -264,14 +263,6 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
                 config={{ name: 'allowDataHardDelete', label: 'Allow Data Hard Delete' }}
                 value={formState.allowDataHardDelete || false}
                 onChange={handleSwitchChange('allowDataHardDelete')}
-              />
-            </div>
-            <div className="mt-4">
-              <TextInput
-                config={{ name: 'statusId', label: 'Status ID' }}
-                value={formState.statusId || ''}
-                onChange={(value) => setFormState(prev => ({ ...prev, statusId: value || undefined }))}
-                placeholder="Enter status schema ID (optional)"
               />
             </div>
           </div>

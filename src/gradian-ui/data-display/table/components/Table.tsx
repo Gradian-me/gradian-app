@@ -55,13 +55,18 @@ export function Table<T = any>({
     return <TableLoadingState />;
   }
 
-  if (processedData.length === 0) {
+  if (processedData.length === 0 && !config.hideEmptyState) {
     return (
       <TableEmptyState
         message={config.emptyState?.message || 'No data available'}
         icon={config.emptyState?.icon}
       />
     );
+  }
+
+  // If hideEmptyState is true and there's no data, return null to let parent handle empty state
+  if (processedData.length === 0 && config.hideEmptyState) {
+    return null;
   }
 
   return (

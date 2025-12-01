@@ -675,11 +675,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       selection: {
         enabled: false,
       },
-      emptyState: {
-        message: searchTermLocal
-          ? `No ${pluralName.toLowerCase()} found matching your search.`
-          : `No ${pluralName.toLowerCase()} found`,
-      },
+      hideEmptyState: true, // Hide table's empty state - DynamicPageRenderer handles it below
       loading: isLoading,
       striped: true,
       hoverable: true,
@@ -945,6 +941,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                           isLoading={isLoading}
                           onRowClick={handleTableRowClick}
                           highlightQuery={debouncedSearchTerm}
+                          schema={schema}
                         />
                       </div>
                     ) : (
@@ -1013,8 +1010,9 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                         disableAnimation={false}
                         index={0}
                         isLoading={isLoading}
-                      onRowClick={handleTableRowClick}
-                      highlightQuery={debouncedSearchTerm}
+                        onRowClick={handleTableRowClick}
+                        highlightQuery={debouncedSearchTerm}
+                        schema={schema}
                       />
                     </div>
                   ) : (
@@ -1069,6 +1067,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               isLoading={isLoading}
               onRowClick={handleTableRowClick}
               highlightQuery={debouncedSearchTerm}
+              schema={schema}
             />
           </div>
         ) : (
@@ -1173,10 +1172,12 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           schemaId={schema.id}
           mode="create"
           getInitialSchema={(requestedId) => (requestedId === schema.id ? schema : null)}
-          initialValues={
-            fixedParentForCreate && (schema as any).allowHierarchicalParent
-              ? {
-                  parent: [
+          initialValues={(() => {
+            const base: Record<string, any> = {};
+
+            // Pre-fill parent for hierarchical schemas when creating from a parent item
+            if (fixedParentForCreate && (schema as any).allowHierarchicalParent) {
+              base.parent = [
                     {
                       id: String(fixedParentForCreate.id),
                       label:
@@ -1185,14 +1186,40 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                         fixedParentForCreate.title ||
                         String(fixedParentForCreate.id),
                       icon:
-                        getSingleValueByRole(schema, fixedParentForCreate, 'icon', fixedParentForCreate.icon) ||
-                        undefined,
+                    getSingleValueByRole(
+                      schema,
+                      fixedParentForCreate,
+                      'icon',
+                      (fixedParentForCreate as any).icon
+                    ) || undefined,
                     },
-                  ],
-                  __parentLocked: true,
-                }
-              : undefined
-          }
+              ];
+              base.__parentLocked = true;
+            }
+
+            // Pre-fill related-companies for company-based schemas that support multi-company
+            const isCompanyBased = schema?.isNotCompanyBased !== true;
+            if (
+              schema?.canSelectMultiCompanies &&
+              isCompanyBased &&
+              selectedCompany &&
+              selectedCompany.id !== -1
+            ) {
+              base['related-companies'] = [
+                {
+                  id: String(selectedCompany.id),
+                  label:
+                    (selectedCompany as any).name ||
+                    (selectedCompany as any).title ||
+                    (selectedCompany as any).abbreviation ||
+                    String(selectedCompany.id),
+                  // We don't have a consistent icon field; leave undefined so PickerInput falls back gracefully
+                },
+              ];
+            }
+
+            return Object.keys(base).length > 0 ? base : undefined;
+          })()}
           enrichData={(formData) => {
             // Email validation function
             const isValidEmail = (email: string) => {

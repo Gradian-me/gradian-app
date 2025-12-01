@@ -230,6 +230,7 @@ export interface OTPInputProps extends Omit<FormElementProps, 'config'> {
 export interface BadgeProps extends BaseComponentProps {
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline' | 'cyan';
   size?: 'sm' | 'md' | 'lg';
+  color?: string; // Tailwind color name for pastel styling (e.g., 'violet', 'emerald', 'yellow')
   children: React.ReactNode;
 }
 

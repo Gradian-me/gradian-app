@@ -268,5 +268,45 @@
     "id": "01KBATJ4KZ0CNSFPESFYHQ1DS5",
     "createdAt": "2025-11-30T16:46:58.687Z",
     "updatedAt": "2025-11-30T16:46:58.687Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBCXZ2KX7N336B5GDGKEKNRC",
+    "targetSchema": "status-items",
+    "targetId": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBCZAZSK4ZFA14HMRXPH1W6M",
+    "createdAt": "2025-12-01T12:48:56.115Z",
+    "updatedAt": "2025-12-01T12:48:56.115Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBCXZ2KX7N336B5GDGKEKNRC",
+    "targetSchema": "status-items",
+    "targetId": "01KBCZZ31X6X01VNJ045CWYSB8",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBCZZ34RF792V756EP3NVWKG",
+    "createdAt": "2025-12-01T12:59:54.904Z",
+    "updatedAt": "2025-12-01T12:59:54.904Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBCXZ2KX7N336B5GDGKEKNRC",
+    "targetSchema": "status-items",
+    "targetId": "01KBD00R5N3YSWBKBT67M175VE",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBD00R7Z22E5Y0QD24YF3MWS",
+    "createdAt": "2025-12-01T13:00:49.279Z",
+    "updatedAt": "2025-12-01T13:00:49.279Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBCXZ2KX7N336B5GDGKEKNRC",
+    "targetSchema": "status-items",
+    "targetId": "01KBD88RER2XSHV9KH96W3FATF",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBD894VYHMADJS96FX9Q4B7W",
+    "createdAt": "2025-12-01T15:25:12.958Z",
+    "updatedAt": "2025-12-01T15:25:12.958Z"
   }
 ]

@@ -38,22 +38,22 @@ import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
 import { Plus } from 'lucide-react';
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 12, scale: 0.96 },
+  hidden: { opacity: 0, y: 8, scale: 0.99 },
   visible: (index: number) => ({
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      duration: 0.28,
-      delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX),
+      duration: 0.22,
+      delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP * 0.7, UI_PARAMS.CARD_INDEX_DELAY.MAX * 0.7),
     },
   }),
   exit: {
     opacity: 0,
-    y: -10,
-    scale: 0.96,
+    y: -8,
+    scale: 0.99,
     transition: {
-      duration: 0.2,
+      duration: 0.18,
     },
   },
 };
@@ -315,6 +315,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   const excludeKey = useMemo(() => (excludeIds && excludeIds.length > 0 ? excludeIds.slice().sort().join(',') : ''), [excludeIds]);
   const lastQueryKeyRef = useRef<string>('__init__');
   const hasInitialLoadRef = useRef<boolean>(false);
+  const isRefreshingRef = useRef<boolean>(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -668,6 +669,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       hasInitialLoadRef.current = false;
       return;
     }
+    // Don't run if we're currently refreshing (handleRefresh will handle the fetch)
+    if (isRefreshingRef.current) {
+      return;
+    }
     if (hasInitialLoadRef.current) {
       return;
     }
@@ -728,6 +733,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       setFilteredItems(sortedStaticItems);
       return;
     }
+    
+    // Set refreshing flag to prevent useEffect from triggering duplicate requests
+    isRefreshingRef.current = true;
+    
     // Clear items to show loading state
     setItems([]);
     setFilteredItems([]);
@@ -736,31 +745,32 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     // Reset query key to ensure reload happens (before setting loading state)
     lastQueryKeyRef.current = '';
     
-    if (supportsPagination) {
-      // Reset pagination state
-      setPageMeta((prev) => ({ ...prev, page: 1, hasMore: true, totalItems: 0 }));
-      
-      // Directly call the appropriate fetch function with forceRefresh flag
-      if (effectiveSourceUrl) {
-        await fetchSourceItems(1, false, true);
-      } else if (schemaId) {
-        await fetchSchemaItems(1, false, true);
-      }
-    } else {
-      // For non-paginated sources, we need to add cache-busting to loadItems
-      // Build query params with cache-busting
-      const queryParams = new URLSearchParams();
-      if (includeIds && includeIds.length > 0) {
-        queryParams.append('includeIds', includeIds.join(','));
-      }
-      if (excludeIds && excludeIds.length > 0) {
-        queryParams.append('excludeIds', excludeIds.join(','));
-      }
-      if (companyQueryParam) {
-        queryParams.append('companyIds', companyQueryParam);
-      }
-      queryParams.append('_t', Date.now().toString()); // Cache-busting
-      
+    try {
+      if (supportsPagination) {
+        // Reset pagination state
+        setPageMeta((prev) => ({ ...prev, page: 1, hasMore: true, totalItems: 0 }));
+        
+        // Directly call the appropriate fetch function with forceRefresh flag
+        if (effectiveSourceUrl) {
+          await fetchSourceItems(1, false, true);
+        } else if (schemaId) {
+          await fetchSchemaItems(1, false, true);
+        }
+      } else {
+        // For non-paginated sources, we need to add cache-busting to loadItems
+        // Build query params with cache-busting
+        const queryParams = new URLSearchParams();
+        if (includeIds && includeIds.length > 0) {
+          queryParams.append('includeIds', includeIds.join(','));
+        }
+        if (excludeIds && excludeIds.length > 0) {
+          queryParams.append('excludeIds', excludeIds.join(','));
+        }
+        if (companyQueryParam) {
+          queryParams.append('companyIds', companyQueryParam);
+        }
+        queryParams.append('_t', Date.now().toString()); // Cache-busting
+        
         const queryString = queryParams.toString();
         const relativeUrl = `/api/data/${schemaId}${queryString ? `?${queryString}` : ''}`;
         
@@ -771,19 +781,23 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           // The API routes will check isDemoModeEnabled() and proxy to backend if needed
           const response = await apiRequest<any[]>(relativeUrl);
 
-        if (response.success && response.data) {
-          const itemsArray = Array.isArray(response.data) ? response.data : [];
-          const sortedArray = sortOptions(itemsArray, sortType);
-          setItems(sortedArray);
-          setFilteredItems(sortedArray);
-        } else {
-          setError(response.error || 'Failed to fetch items');
+          if (response.success && response.data) {
+            const itemsArray = Array.isArray(response.data) ? response.data : [];
+            const sortedArray = sortOptions(itemsArray, sortType);
+            setItems(sortedArray);
+            setFilteredItems(sortedArray);
+          } else {
+            setError(response.error || 'Failed to fetch items');
+          }
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Failed to fetch items');
+        } finally {
+          setIsLoading(false);
         }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch items');
-      } finally {
-        setIsLoading(false);
       }
+    } finally {
+      // Clear refreshing flag after fetch completes
+      isRefreshingRef.current = false;
     }
   };
 
@@ -1123,7 +1137,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
     const baseCardClasses = "relative p-3 rounded-xl border cursor-pointer transition-all duration-200 group";
     const selectedCardClasses = "border-violet-500 dark:border-violet-400 bg-gradient-to-br from-gray-100 via-white to-violet-100 dark:from-gray-900 dark:via-gray-800 dark:to-violet-900 shadow-lg ring-1 ring-violet-200 dark:ring-violet-800";
-    const defaultCardClasses = "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-violet-300 hover:shadow-md";
+    const defaultCardClasses = "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-700/50";
 
     const motionProps = {
       layout: true,
@@ -1246,7 +1260,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 "border shrink-0 transition-colors",
                 isSelected
                   ? "border-violet-400"
-                  : "border-gray-200 group-hover:border-violet-300"
+                  : "border-gray-200"
               )}
             >
               {getInitials(avatarField)}
@@ -1395,7 +1409,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const selectedCardClasses =
       'border-violet-500 dark:border-violet-400 bg-gradient-to-br from-gray-100 via-white to-violet-100 dark:from-gray-900 dark:via-gray-800 dark:to-violet-900 shadow-lg ring-1 ring-violet-200 dark:ring-violet-800';
     const defaultCardClasses =
-      'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-violet-300 hover:shadow-md';
+      'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-700/50';
 
     const motionProps = {
       layout: true,
@@ -1527,7 +1541,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 variant="primary"
                 className={cn(
                   'border shrink-0 transition-colors',
-                  isSelected ? 'border-violet-400' : 'border-gray-200 group-hover:border-violet-300'
+                  isSelected ? 'border-violet-400' : 'border-gray-200'
                 )}
               >
                 {getInitials(avatarField)}

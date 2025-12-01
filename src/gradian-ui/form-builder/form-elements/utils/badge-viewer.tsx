@@ -5,8 +5,9 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Badge } from '../../../../components/ui/badge';
+import { Badge as RadixBadge } from '../../../../components/ui/badge';
 import type { BadgeProps } from '../../../../components/ui/badge';
+import { Badge } from '../components/Badge';
 import { cn } from '../../../../lib/utils';
 import { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 import { findBadgeOption, getBadgeMetadata, BadgeOption } from './badge-utils';
@@ -72,6 +73,11 @@ export interface BadgeRendererProps {
    * Optional function to determine if a specific badge item is clickable
    */
   isItemClickable?: (item: BadgeItem) => boolean;
+
+  /**
+   * Whether this is for related companies (uses custom Badge with violet color and building icon)
+   */
+  isRelatedCompanies?: boolean;
 }
 
 /**
@@ -88,6 +94,7 @@ export const BadgeRenderer: React.FC<BadgeRendererProps> = ({
   enforceVariant = false,
   onBadgeClick,
   isItemClickable,
+  isRelatedCompanies = false,
 }) => {
   // Early return if no items
   if (!items || items.length === 0) {
@@ -203,6 +210,59 @@ const getBadgePresentation = (color?: string) => {
           id: itemId,
           label: itemLabel,
         };
+    
+    // For related companies, use custom Badge with violet color and building icon
+    if (isRelatedCompanies) {
+      const badgeContent = (
+        <span className="inline-flex items-center gap-1.5">
+          <IconRenderer iconName="Building" className="h-3 w-3" />
+          <span>{itemLabel}</span>
+        </span>
+      );
+      
+      const clickable =
+        Boolean(onBadgeClick) &&
+        (typeof isItemClickable === 'function' ? isItemClickable(badgeObject) : true);
+
+      const handleItemClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (!clickable) return;
+        event.stopPropagation();
+        onBadgeClick?.(badgeObject, event);
+      };
+
+      return (
+        <motion.div
+          key={itemId}
+          className={cn("shrink-0", clickable && "cursor-pointer")}
+          initial={{ opacity: 0, scale: 0.8, y: 5 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ 
+            duration: 0.3, 
+            delay: idx * 0.05,
+            ease: [0.25, 0.46, 0.45, 0.94]
+          }}
+          whileHover={
+            clickable
+              ? {
+                  scale: 1.05,
+                  transition: { duration: 0.1, ease: "easeOut" },
+                }
+              : undefined
+          }
+          onClick={clickable ? handleItemClick : undefined}
+        >
+          <Badge 
+            color="violet"
+            size="sm"
+            className="inline-flex items-center gap-1.5"
+          >
+            {badgeContent}
+          </Badge>
+        </motion.div>
+      );
+    }
+    
+    // Default rendering for non-related-companies badges
     const badgeContent = renderBadge ? renderBadge(item, idx) : (
       <span className="inline-flex items-center gap-1.5">
         {itemIcon && <span className="flex items-center">{itemIcon}</span>}
@@ -246,13 +306,13 @@ const getBadgePresentation = (color?: string) => {
           }
           onClick={clickable ? handleItemClick : undefined}
         >
-          <Badge 
+          <RadixBadge 
             variant={enforceVariant ? badgeVariant : (badgePresentation.variant as any) ?? (itemColor ? undefined : badgeVariant)} 
             className={badgeClasses}
             style={enforceVariant ? undefined : badgePresentation.style}
           >
             {badgeContent}
-          </Badge>
+          </RadixBadge>
         </motion.div>
       );
   };
@@ -261,10 +321,14 @@ const getBadgePresentation = (color?: string) => {
   const renderMoreIndicator = () => {
     if (!hasMoreBadges) return null;
     
-    const moreBadge = (
-      <Badge variant={badgeVariant} className="text-[0.625rem] px-2 py-0 h-fit whitespace-nowrap">
+    const moreBadge = isRelatedCompanies ? (
+      <Badge color="violet" size="sm" className="text-[0.625rem] px-2 py-0 h-fit whitespace-nowrap">
         +{extraBadgesCount}
       </Badge>
+    ) : (
+      <RadixBadge variant={badgeVariant} className="text-[0.625rem] px-2 py-0 h-fit whitespace-nowrap">
+        +{extraBadgesCount}
+      </RadixBadge>
     );
     
       return (
@@ -449,6 +513,12 @@ export const BadgeViewer: React.FC<BadgeViewerProps> = ({
   // Use field's maxDisplay or provided maxBadges
   const maxDisplay = maxBadges ?? (field as any).maxDisplay ?? 5;
 
+  // Check if this is for related companies
+  const isRelatedCompanies = 
+    field.name === 'related-companies' || 
+    field.id === 'related-companies' ||
+    (field.targetSchema === 'companies' && field.role === 'badge');
+
   return (
     <BadgeRenderer
       items={badgeItems}
@@ -461,6 +531,7 @@ export const BadgeViewer: React.FC<BadgeViewerProps> = ({
       }}
       enforceVariant={enforceVariant}
       isItemClickable={isItemClickable}
+      isRelatedCompanies={isRelatedCompanies}
     />
   );
 };

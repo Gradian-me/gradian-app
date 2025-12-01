@@ -9,7 +9,6 @@ import { KPIList } from '@/gradian-ui/analytics/indicators/kpi-list';
 import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import {
@@ -35,7 +34,7 @@ import { useUserStore } from '@/stores/user.store';
 import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { useDashboard } from '../hooks/useDashboard';
-import { LoadingSpinner, WelcomeCard } from '@/gradian-ui/layout/components';
+import { LoadingSpinner, UserWelcome } from '@/gradian-ui/layout/components';
 
 export function DashboardPage() {
   const user = useUserStore((state) => state.user);
@@ -112,63 +111,16 @@ export function DashboardPage() {
   return (
     <MainLayout title="Dashboard" subtitle={subtitle} icon="LayoutDashboard">
       <div className="space-y-6">
-        {/* Welcome Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="mb-12"
-        >
-          <WelcomeCard
-            userName={userDisplayName}
-            avatar={user?.avatar}
-            initials={userInitials}
-            subtitle="Here's what's happening with your business today."
-            badges={[
-              {
-                label: '🚀 3 New Vendors This Week',
-                color: 'violet',
-              },
-              {
-                label: '📈 15% Cost Savings',
-                color: 'emerald',
-              },
-              {
-                label: '⚡ 98% On-Time Delivery',
-                color: 'indigo',
-              },
-            ]}
-            gradient="violet"
-            showPattern={true}
-          />
-        </motion.div>
-
-        {/* Error Display */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-red-800 dark:text-red-300">
-                  <Shield className="h-4 w-4" />
-                  <span className="font-medium">Error:</span>
-                  <span>{error}</span>
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={clearError}
-                  className="mt-2"
-                >
-                  Dismiss
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
+        <UserWelcome
+          userName={userDisplayName}
+          avatar={user?.avatar}
+          initials={userInitials}
+          welcomeSubtitle="Here's what's happening with your business today."
+          welcomeGradient="violet"
+          welcomeShowPattern={true}
+          errorMessage={error || null}
+          onClearError={clearError}
+        />
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

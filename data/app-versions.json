@@ -1055,5 +1055,60 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBD0XENHANCESCROLLXYZ002",
+    "timestamp": "2025-12-01T16:34:18.000Z",
+    "version": "1.10.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Add Dynamic Status Group and Multi Related Companies to Schemas",
+        "priority": "High",
+        "affectedDomains": [
+          "schema-manager",
+          "form-builder",
+          "data-management"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced multiple status items and relations in all-data.json and all-data-relations.json for enhanced status group functionality",
+        "priority": "High",
+        "affectedDomains": [
+          "data-management",
+          "status-groups",
+          "status-items"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated schema management to support multi-company selection in GeneralInfoTab and CreateSchemaDialog",
+        "priority": "High",
+        "affectedDomains": [
+          "schema-manager",
+          "ui",
+          "companies"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved form validation to ensure related companies and status fields are required where applicable",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "validation"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Enhanced dynamic form context management for better state synchronization",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "state-management"
+        ]
+      }
+    ]
   }
 ]

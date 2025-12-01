@@ -53,6 +53,7 @@ export interface TableConfig<T = any> {
     message?: string;
     icon?: React.ReactNode;
   };
+  hideEmptyState?: boolean; // If true, don't render empty state (useful when parent component handles it)
   loading?: boolean;
   className?: string;
   stickyHeader?: boolean;

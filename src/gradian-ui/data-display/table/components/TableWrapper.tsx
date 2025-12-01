@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { LoadingSkeleton } from '@/gradian-ui/layout/components';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table } from './Table';
 import { TableAggregations, AggregationConfig } from './TableAggregations';
 import { TableCardView } from '../../components/TableCardView';
 import { TableColumn, TableConfig } from '../types';
+import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { BadgeViewer } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
+import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
+import { formatFieldValue } from '../utils/field-formatters';
 
 export interface TableWrapperProps<T = any> {
   tableConfig: TableConfig<T>;
@@ -22,6 +26,7 @@ export interface TableWrapperProps<T = any> {
   skeletonCardCount?: number;
   onRowClick?: (row: T, index: number) => void;
   highlightQuery?: string;
+  schema?: FormSchema;
 }
 
 export function TableWrapper<T = any>({
@@ -40,10 +45,111 @@ export function TableWrapper<T = any>({
   skeletonCardCount,
   onRowClick,
   highlightQuery,
+  schema,
 }: TableWrapperProps<T>) {
+  // Add dynamic columns for related-companies and status if schema supports them
+  const enhancedColumns = useMemo(() => {
+    const additionalColumns: TableColumn<T>[] = [];
+
+    // Add related-companies column if schema has canSelectMultiCompanies
+    if (schema?.canSelectMultiCompanies) {
+      additionalColumns.push({
+        id: 'related-companies',
+        label: 'Related Companies',
+        accessor: (row: T) => (row as any)['related-companies'],
+        sortable: false,
+        align: 'left',
+        maxWidth: 300,
+        allowWrap: true,
+        render: (value: any) => {
+          if (!value || (Array.isArray(value) && value.length === 0)) {
+            return <span className="text-gray-400 dark:text-gray-500 text-sm">—</span>;
+          }
+          const normalized = normalizeOptionArray(value);
+          return (
+            <BadgeViewer
+              field={{
+                id: 'related-companies',
+                name: 'related-companies',
+                component: 'picker',
+                targetSchema: 'companies',
+              } as any}
+              value={normalized}
+              badgeVariant="outline"
+              enforceVariant={false}
+              animate={true}
+              maxBadges={3}
+            />
+          );
+        },
+      });
+    }
+
+    // Add status column if schema has statusGroup
+    if (schema?.statusGroup && Array.isArray(schema.statusGroup) && schema.statusGroup.length > 0) {
+      // Find the status field in schema to pass to formatter
+      const statusField = schema.fields?.find((f: any) => f.name === 'status' || f.role === 'status');
+      
+      additionalColumns.push({
+        id: 'status',
+        label: 'Status',
+        accessor: (row: T) => (row as any)['status'],
+        sortable: false,
+        align: 'left',
+        maxWidth: 200,
+        allowWrap: true,
+        render: (value: any, row: T) => {
+          if (!value || (Array.isArray(value) && value.length === 0)) {
+            return <span className="text-gray-400 dark:text-gray-500 text-sm">—</span>;
+          }
+          // Use formatFieldValue to render status with pastel badge styling
+          return formatFieldValue(
+            statusField || { id: 'status', name: 'status', role: 'status' },
+            value,
+            row
+          );
+        },
+      });
+    }
+
+    // Find actions and force column indices to insert after them at the start
+    const actionsColumnIndex = columns.findIndex((col) => col.id === 'actions');
+    const forceColumnIndex = columns.findIndex((col) => col.id === 'force');
+    
+    if (additionalColumns.length > 0) {
+      const newColumns = [...columns];
+      
+      // Determine insertion point: after force if it exists, otherwise after actions if it exists, otherwise at start
+      let insertIndex = 0;
+      
+      if (forceColumnIndex !== -1) {
+        // Insert after force column
+        insertIndex = forceColumnIndex + 1;
+      } else if (actionsColumnIndex !== -1) {
+        // Insert after actions column
+        insertIndex = actionsColumnIndex + 1;
+      } else {
+        // Insert at the start
+        insertIndex = 0;
+      }
+      
+      newColumns.splice(insertIndex, 0, ...additionalColumns);
+      return newColumns;
+    }
+
+    // If no additional columns, return as is
+    return columns;
+  }, [columns, schema]);
+
+  // Update tableConfig with enhanced columns
+  const enhancedTableConfig = useMemo(() => ({
+    ...tableConfig,
+    columns: enhancedColumns,
+  }), [tableConfig, enhancedColumns]);
+
   const effectiveColumnCount = Math.max(
     1,
-    tableConfig.columns?.length || columns.length || 4
+    enhancedTableConfig.columns?.length || enhancedColumns.length || 4
   );
 
   const effectiveRowCount = skeletonRowCount || 2;
@@ -70,7 +176,7 @@ export function TableWrapper<T = any>({
         <>
           <TableCardView
             data={data}
-            columns={columns}
+            columns={enhancedColumns}
             cardColumns={cardColumns}
             disableAnimation={disableAnimation}
             index={index}
@@ -78,7 +184,7 @@ export function TableWrapper<T = any>({
           {aggregations.length > 0 && (
             <TableAggregations
               data={data}
-              columns={columns}
+              columns={enhancedColumns}
               aggregations={aggregations}
               alignment={aggregationAlignment}
               gridColumns={aggregationColumns}
@@ -88,12 +194,12 @@ export function TableWrapper<T = any>({
       ) : (
         <>
           <div className="mx-0 min-w-0">
-            <Table config={tableConfig} onRowClick={onRowClick} highlightQuery={highlightQuery} />
+            <Table config={enhancedTableConfig} onRowClick={onRowClick} highlightQuery={highlightQuery} />
           </div>
           {aggregations.length > 0 && (
             <TableAggregations
               data={data}
-              columns={columns}
+              columns={enhancedColumns}
               aggregations={aggregations}
               alignment={aggregationAlignment}
               gridColumns={aggregationColumns}

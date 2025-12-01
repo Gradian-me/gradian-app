@@ -17,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Avatar } from '@/gradian-ui/form-builder/form-elements/components/Avatar';
 import { ForceIcon } from '@/gradian-ui/form-builder/form-elements/components/ForceIcon';
 import { toast } from 'sonner';
+import { cn } from '@/gradian-ui/shared/utils';
 
 export const getFieldValue = (field: any, row: any): any => {
   if (!field || !row) return null;
@@ -44,17 +45,56 @@ export const formatRelationType = (value: string | null | undefined): string | n
   return cleaned.replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
+// Helper to check if record is inactive
+const isRecordInactive = (row?: any): boolean => {
+  if (!row) return false;
+  
+  // Check inactive field
+  if (row.inactive === true) return true;
+  
+  // Check status field for inactive status
+  const status = row.status;
+  if (status) {
+    if (Array.isArray(status) && status.length > 0) {
+      const statusItem = status[0];
+      const statusLabel = statusItem?.label || statusItem?.id || '';
+      if (typeof statusLabel === 'string' && statusLabel.toLowerCase() === 'inactive') {
+        return true;
+      }
+    } else if (typeof status === 'string' && status.toLowerCase() === 'inactive') {
+      return true;
+    }
+  }
+  
+  return false;
+};
+
 // Helper to wrap content with ForceIcon if isForce is true and field is title role
+// Also applies strike-through if record is inactive and bold styling for title
 const wrapWithForceIcon = (content: React.ReactNode, isForce: boolean, field?: any, row?: any): React.ReactNode => {
+  const isInactive = isRecordInactive(row);
+  const isTitle = field?.role === 'title';
+  
+  // Apply bold styling to title fields
+  let wrappedContent = isTitle ? (
+    <span className="font-semibold">{content}</span>
+  ) : content;
+  
+  // Apply strike-through to title if inactive
+  wrappedContent = isInactive && isTitle ? (
+    <span className="line-through">{wrappedContent}</span>
+  ) : wrappedContent;
+  
   // Only show ForceIcon for title role fields
-  if (!isForce || field?.role !== 'title') return content;
+  if (!isForce || !isTitle) return wrappedContent;
+  
   // Get title from row data
   const titleValue = row ? getFieldValue(field, row) : undefined;
   const title = titleValue ? String(titleValue).trim() : undefined;
   return (
     <span className="inline-flex items-center gap-1.5">
       <ForceIcon isForce={isForce} size="md" forceReason={row?.forceReason} title={title} />
-      {content}
+      {wrappedContent}
     </span>
   );
 };
@@ -67,18 +107,23 @@ export const formatFieldValue = (
 ): React.ReactNode => {
   // Check if row has isForce flag - only show for title role fields
   const isForce = showForceIcon && row?.isForce === true && field?.role === 'title';
+  const isInactive = isRecordInactive(row);
+  const isTitle = field?.role === 'title';
   
   if (value === null || value === undefined || value === '') {
     // Still show ForceIcon even if value is empty (only for title role)
-    if (isForce && field?.role === 'title') {
+    if (isForce && isTitle) {
+      const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
+      const inactiveContent = isInactive ? <span className="line-through">{emptyContent}</span> : emptyContent;
       return (
         <span className="inline-flex items-center gap-1.5">
           <ForceIcon isForce={isForce} size="md" forceReason={row?.forceReason} />
-          <span className="text-gray-400">—</span>
+          {inactiveContent}
         </span>
       );
     }
-    return <span className="text-gray-400">—</span>;
+    const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
+    return isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
   }
 
   const normalizedOptions = normalizeOptionArray(value);
@@ -92,12 +137,14 @@ export const formatFieldValue = (
     if (pickerDisplay) {
       return wrapWithForceIcon(<span>{pickerDisplay}</span>, isForce, field, row);
     }
-    return isForce && field?.role === 'title' ? (
+    const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
+    const inactiveContent = isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
+    return isForce && isTitle ? (
       <span className="inline-flex items-center gap-1.5">
         <ForceIcon isForce={isForce} size="md" forceReason={row?.forceReason} />
-        <span className="text-gray-400">—</span>
+        {inactiveContent}
       </span>
-    ) : <span className="text-gray-400">—</span>;
+    ) : inactiveContent;
   }
 
   const displayType = field?.component || 'text';
@@ -114,20 +161,66 @@ export const formatFieldValue = (
     );
   }
 
-  // Handle color fields - show colored circle with color code on hover, copy on click
+  // Handle color fields - show colored circle with color name on hover, copy on click
   if (displayType === 'color-picker' || componentType === 'color-picker' || componentType === 'color') {
     const colorValue = String(value).trim();
-    // Validate hex color format
+    
+    // Tailwind color name to hex mapping (using Tailwind 500 shade)
+    const tailwindColorMap: Record<string, string> = {
+      slate: '#64748b',
+      gray: '#6b7280',
+      zinc: '#71717a',
+      neutral: '#737373',
+      stone: '#78716c',
+      red: '#ef4444',
+      orange: '#f97316',
+      amber: '#f59e0b',
+      yellow: '#eab308',
+      lime: '#84cc16',
+      green: '#22c55e',
+      emerald: '#10b981',
+      teal: '#14b8a6',
+      cyan: '#06b6d4',
+      sky: '#0ea5e9',
+      blue: '#3b82f6',
+      indigo: '#6366f1',
+      violet: '#8b5cf6',
+      purple: '#a855f7',
+      fuchsia: '#d946ef',
+      pink: '#ec4899',
+      rose: '#f43f5e',
+    };
+    
+    // Check if it's a hex color
     const isValidHex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(colorValue);
-    const displayColor = isValidHex ? colorValue : '#808080'; // Default gray if invalid
+    // Check if it's a Tailwind color name
+    const isTailwindColor = tailwindColorMap[colorValue.toLowerCase()];
+    
+    // Determine display color and label
+    let displayColor: string;
+    let displayLabel: string;
+    
+    if (isValidHex) {
+      // Hex color format
+      displayColor = colorValue;
+      displayLabel = colorValue;
+    } else if (isTailwindColor) {
+      // Tailwind color name
+      displayColor = isTailwindColor;
+      displayLabel = colorValue.charAt(0).toUpperCase() + colorValue.slice(1);
+    } else {
+      // Invalid or unknown - use gray default
+      displayColor = '#808080';
+      displayLabel = colorValue || 'Unknown';
+    }
     
     const handleCopyColor = async (e: React.MouseEvent) => {
       e.stopPropagation();
       try {
         await navigator.clipboard.writeText(colorValue);
-        toast.success(`Color code ${colorValue} copied to clipboard`);
+        toast.success(`Color "${displayLabel}" copied to clipboard`);
       } catch (err) {
-        toast.error('Failed to copy color code');
+        toast.error('Failed to copy color');
       }
     };
     
@@ -139,11 +232,11 @@ export const formatFieldValue = (
               className="w-5 h-5 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm cursor-pointer hover:scale-110 transition-transform duration-200"
               style={{ backgroundColor: displayColor }}
               onClick={handleCopyColor}
-              title={`Click to copy ${colorValue}`}
+              title={`Click to copy ${displayLabel}`}
             />
           </TooltipTrigger>
           <TooltipContent>
-            <p className="font-mono text-sm">{colorValue}</p>
+            <p className="font-mono text-sm">{displayLabel}</p>
             <p className="text-xs text-gray-500 mt-1">Click to copy</p>
           </TooltipContent>
         </Tooltip>
@@ -242,19 +335,29 @@ export const formatFieldValue = (
       Array.isArray(value) ? value[0] : value
     );
     const badgeConfig = getBadgeConfig(statusValue, statusOptions);
-    const badgeColor = primaryOption?.color ?? field.roleColor ?? badgeConfig.color;
-    const badgeIcon = primaryOption?.icon ?? badgeConfig.icon;
-    const badgeLabel = primaryOption?.label ?? badgeConfig.label;
-    return (
+    // Get color from normalized option (which may have color from status items)
+    const badgeColor = primaryOption?.color || primaryOption?.normalized?.color || field.roleColor || badgeConfig.color;
+    const badgeIcon = primaryOption?.icon || primaryOption?.normalized?.icon || badgeConfig.icon;
+    const badgeLabel = primaryOption?.label || primaryOption?.normalized?.label || badgeConfig.label;
+    
+    // Check if badgeColor is a Tailwind color name (not a badge variant)
+    const isTailwindColor = badgeColor && !['default', 'primary', 'secondary', 'success', 'warning', 'danger', 'outline', 'cyan'].includes(badgeColor);
+    
+    return wrapWithForceIcon(
       <div className="inline-flex items-center whitespace-nowrap">
         <Badge
-          variant={mapBadgeColorToVariant(badgeColor)}
-          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] leading-tight w-auto whitespace-nowrap"
+          variant={isTailwindColor ? undefined : (mapBadgeColorToVariant(badgeColor) as any)}
+          color={isTailwindColor ? badgeColor : undefined}
+          size="sm"
+          className="inline-flex items-center gap-1.5"
         >
-          {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-2.5 w-2.5" />}
+          {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
           <span>{badgeLabel}</span>
         </Badge>
-      </div>
+      </div>,
+      isForce,
+      field,
+      row
     );
   }
 

@@ -18,7 +18,7 @@ export function NeonOrbs({
   }, [])
 
   return (
-    <div className="absolute inset-4 rounded-3xl overflow-hidden w-full h-full flex items-center justify-center bg-slate-100 dark:bg-[#050a18] transition-colors duration-500">
+    <div className="absolute inset-4 rounded-3xl overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-[#050a18] transition-colors duration-500">
       {/* Top-left orb */}
       <div
         className={`absolute transition-all duration-1000 ease-out ${

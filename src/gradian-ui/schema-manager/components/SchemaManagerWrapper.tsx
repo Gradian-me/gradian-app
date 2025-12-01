@@ -1,7 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { ArrowLeft, Plus, RefreshCw, Settings, Building2, FileText } from 'lucide-react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ import { FormSchema } from '../types';
 
 export function SchemaManagerWrapper() {
   const router = useRouter();
+  const [isClearingCache, setIsClearingCache] = useState(false);
   const {
     loading,
     refreshing,
@@ -59,6 +61,48 @@ export function SchemaManagerWrapper() {
 
   const handleViewSchema = (schema: FormSchema) => router.push(`/page/${schema.id}`);
   const handleEditSchema = (schema: FormSchema) => router.push(`/builder/schemas/${schema.id}`);
+
+  const handleClearCache = async () => {
+    setIsClearingCache(true);
+
+    const toastId = toast.loading('Clearing schema cache...');
+
+    try {
+      const response = await fetch('/api/schemas/clear-cache', {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const reactQueryKeys: string[] = Array.isArray(data.reactQueryKeys) && data.reactQueryKeys.length > 0
+          ? data.reactQueryKeys
+          : ['schemas', 'companies'];
+        // Clear React Query caches client-side
+        if (typeof window !== 'undefined' && data.clearReactQueryCache) {
+          // Dispatch event to clear React Query caches
+          window.dispatchEvent(new CustomEvent('react-query-cache-clear', { 
+            detail: { queryKeys: reactQueryKeys } 
+          }));
+          
+          // Also trigger storage event for other tabs
+          window.localStorage.setItem('react-query-cache-cleared', JSON.stringify(reactQueryKeys));
+          window.localStorage.removeItem('react-query-cache-cleared');
+        }
+        
+        toast.success('Cache cleared successfully!', { id: toastId });
+      } else {
+        toast.error(data.error || 'Failed to clear cache', { id: toastId });
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to clear cache',
+        { id: toastId }
+      );
+    } finally {
+      setIsClearingCache(false);
+    }
+  };
 
   const handleCreateSchema = async (payload: Parameters<typeof handleCreate>[0]) => {
     const result = await handleCreate(payload);
@@ -114,10 +158,31 @@ export function SchemaManagerWrapper() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Builder
           </Button>
-          <Button onClick={openCreateDialog}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Schema
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClearCache}
+              disabled={isClearingCache}
+              className="whitespace-nowrap"
+            >
+              {isClearingCache ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Clearing...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Clear Cache
+                </>
+              )}
+            </Button>
+            <Button size="sm" onClick={openCreateDialog}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Schema
+            </Button>
+          </div>
         </div>
 
         <FormTabs

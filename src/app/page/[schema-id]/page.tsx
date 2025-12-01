@@ -1,10 +1,12 @@
 // Dynamic Page Route
 // Renders any entity page based on schema ID
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { DynamicEntityPageClient } from './DynamicEntityPageClient';
 import { getAllSchemasArray, getAvailableSchemaIds } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { checkSchemaAccess } from '@/gradian-ui/shared/utils/access-control';
+import { getCurrentUser } from '@/gradian-ui/shared/utils/server-auth.util';
 
 // Set revalidate to 0 to force dynamic rendering
 // This ensures schema changes are reflected immediately when cache is cleared
@@ -51,6 +53,21 @@ export default async function DynamicEntityPage({ params }: PageProps) {
 
   if (!schema) {
     notFound();
+  }
+
+  // Check access permissions
+  const user = await getCurrentUser();
+  const accessCheck = checkSchemaAccess(schema, user);
+  
+  if (!accessCheck.hasAccess) {
+    // Redirect to forbidden page with access check details in URL params
+    const params = new URLSearchParams();
+    if (accessCheck.reason) params.set('reason', accessCheck.reason);
+    if (accessCheck.code) params.set('code', accessCheck.code);
+    if (accessCheck.requiredRole) params.set('requiredRole', accessCheck.requiredRole);
+    
+    const queryString = params.toString();
+    redirect(`/page/${schemaId}/forbidden${queryString ? `?${queryString}` : ''}`);
   }
 
   // Serialize schema to make it safe for Client Component (removes RegExp objects)

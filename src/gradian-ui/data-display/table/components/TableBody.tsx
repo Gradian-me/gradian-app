@@ -131,8 +131,6 @@ export function TableBody<T = any>({
               delay: Math.min(rowIndex * 0.02, 0.3),
               ease: 'easeOut',
             }}
-            whileHover={onRowClick ? { scale: 1.001, transition: { duration: 0.15 } } : undefined}
-            whileTap={onRowClick ? { scale: 0.998, transition: { duration: 0.1 } } : undefined}
             className={trClasses(rowIndex, isSelected)}
             onClick={() => handleRowClick(row, rowIndex)}
           >

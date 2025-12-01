@@ -22,6 +22,7 @@ import type { BadgeItem } from '../../form-builder/form-elements/utils/badge-vie
 import { useRouter } from 'next/navigation';
 import { getDisplayStrings, getPrimaryDisplayString, hasDisplayValue } from '../utils/value-display';
 import { renderHighlightedText } from '../../shared/utils/highlighter';
+import { formatFieldValue } from '../table/utils/field-formatters';
 
 export interface DynamicCardRendererProps {
   schema: FormSchema;
@@ -81,10 +82,13 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   const statusFieldArray = statusRoleValues.length > 0 ? statusRoleValues : [];
   const rawStatusValueFromField = statusFieldDef ? data?.[statusFieldDef.name] : undefined;
   const statusOptions = findStatusFieldOptions();
+  
+  // Check if schema has statusGroup configured (new status system)
+  const hasStatusGroup = Array.isArray(schema?.statusGroup) && schema.statusGroup.length > 0;
 
   // Check if rating, status, duedate, code, avatar, and icon fields exist in schema
   const hasRatingField = schema?.fields?.some(field => field.role === 'rating') || false;
-  const hasStatusField = schema?.fields?.some(field => field.role === 'status') || false;
+  const hasStatusField = schema?.fields?.some(field => field.role === 'status') || false || hasStatusGroup;
   const hasDuedateField = schema?.fields?.some(field => field.role === 'duedate') || false;
   const duedateFieldLabel = schema?.fields?.find(field => field.role === 'duedate')?.label || 'Due Date';
   const hasCodeField = schema?.fields?.some(field => field.role === 'code') || false;
@@ -394,7 +398,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
         className={cn(
           "h-full bg-white dark:bg-gray-800 rounded-2xl overflow-hidden",
           !className?.includes('border-none') && "border border-gray-200 dark:border-gray-700",
-          !disableAnimation && "transition-all duration-200 hover:shadow-sm hover:border-gray-400",
+          !disableAnimation && "transition-all duration-200 hover:shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700/50",
           className?.includes('border-none') ? "focus-within:ring-0" : "focus-within:ring-2 focus-within:ring-violet-400 focus-within:ring-offset-0 focus-within:rounded-xl"
         )}
         onKeyDown={(e: KeyboardEvent) => {
@@ -526,17 +530,23 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       </motion.div>
                     )}
                     {/* Status */}
-                    {hasStatusField && cardConfig.statusMetadata.label && (
+                    {hasStatusField && (statusFieldDef || hasStatusGroup) && (
                       <motion.div
                         initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
                         animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
                         transition={disableAnimation ? {} : { duration: 0.2 }}
                         whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05, transition: { duration: 0.1, delay: 0 } }}
                       >
-                        <Badge variant={cardConfig.statusMetadata.color as BadgeProps['variant']} className="flex items-center gap-1 px-1 py-0.5 shadow-sm">
-                          {cardConfig.statusMetadata.icon && <IconRenderer iconName={cardConfig.statusMetadata.icon} className="h-3 w-3" />}
-                          <span className="text-[0.625rem]">{cardConfig.statusMetadata.label}</span>
-                        </Badge>
+                        {formatFieldValue(
+                          statusFieldDef || {
+                            id: 'status',
+                            name: 'status',
+                            role: 'status',
+                            component: 'picker',
+                          },
+                          rawStatusValueFromField || data?.status,
+                          data
+                        )}
                       </motion.div>
                     )}
                   </div>
@@ -871,7 +881,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         />
                       </motion.div>
                     )}
-                    {hasStatusField && (
+                    {hasStatusField && (statusFieldDef || hasStatusGroup) && (
                       <motion.div
                         initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
                         animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
@@ -881,15 +891,16 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                           transition: { type: "spring", stiffness: 300, damping: 30 }
                         }}
                       >
-                        <Badge
-                          variant={(cardConfig.statusMetadata.color as BadgeProps['variant']) ?? 'outline'}
-                          className="flex items-center gap-1 px-1 py-0.5 shadow-sm"
-                        >
-                          {cardConfig.statusMetadata.icon && (
-                            <IconRenderer iconName={cardConfig.statusMetadata.icon} className="h-3 w-3" />
-                          )}
-                          <span className="text-xs">{cardConfig.statusMetadata.label ?? cardConfig.statusField}</span>
-                        </Badge>
+                        {formatFieldValue(
+                          statusFieldDef || {
+                            id: 'status',
+                            name: 'status',
+                            role: 'status',
+                            component: 'picker',
+                          },
+                          rawStatusValueFromField || data?.status,
+                          data
+                        )}
                       </motion.div>
                     )}
                   </div>

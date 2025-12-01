@@ -20,6 +20,10 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { useSchemas } from '@/gradian-ui/schema-manager/hooks/use-schemas';
 import { FormSchema } from '@/gradian-ui/schema-manager/types';
+import { UserWelcome } from '@/gradian-ui/layout/components/UserWelcome';
+import { useUserStore } from '@/stores/user.store';
+import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 type AppViewMode = 'grid' | 'list';
 
@@ -194,11 +198,27 @@ const AppListItem: React.FC<AppListItemProps> = ({
 
 export function AppListWrapper() {
   const router = useRouter();
+  const user = useUserStore((state) => state.user);
+  const language = useLanguageStore((state) => state.language || 'en');
   const { schemas, isLoading, refetch } = useSchemas({ summary: true });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<AppViewMode>('grid');
   const [refreshing, setRefreshing] = useState(false);
+
+  // Get user display info for UserWelcome
+  const userFirstName = user ? resolveLocalizedField(user.name, language, 'en') : '';
+  const userDisplayName = userFirstName || user?.email || 'there';
+  const userInitials = (() => {
+    const source = userDisplayName?.trim() || 'GR';
+    return source
+      .split(' ')
+      .map((word) => word[0])
+      .filter(Boolean)
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  })();
 
   const apps = useMemo(
     () =>
@@ -259,12 +279,36 @@ export function AppListWrapper() {
             Launch your data-driven experiences
           </span>
           <span className="hidden text-gray-500 dark:text-gray-400 sm:inline">
-            — browse, search, and open any app powered by your schemas.
+            — browse, search, and open any app.
           </span>
         </span>
       }
     >
       <div className="space-y-6">
+        {/* User Welcome Section */}
+        <UserWelcome
+          userName={userDisplayName}
+          avatar={user?.avatar}
+          initials={userInitials}
+          welcomeSubtitle="Browse and launch your business applications."
+          welcomeBadges={[
+            {
+              label: `📱 ${apps.length} App${apps.length === 1 ? '' : 's'} Available for you`,
+              color: 'violet',
+            },
+            {
+              label: '🚀 Launch in One Click',
+              color: 'emerald',
+            },
+            {
+              label: '⚡ Real-time Analytics',
+              color: 'indigo',
+            },
+          ]}
+          welcomeGradient="violet"
+          welcomeShowPattern={true}
+        />
+
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

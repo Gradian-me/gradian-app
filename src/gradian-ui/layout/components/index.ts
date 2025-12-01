@@ -7,4 +7,6 @@ export * from './LoadingSkeleton';
 export * from './LoadingSpinner';
 export { WelcomeCard } from './WelcomeCard';
 export type { WelcomeCardProps, WelcomeBadge } from './WelcomeCard';
+export { UserWelcome } from './UserWelcome';
+export type { UserWelcomeProps } from './UserWelcome';
 

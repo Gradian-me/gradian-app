@@ -110,11 +110,22 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
     [isRelationBased, section, schema.id]
   );
 
+  const handleEditDetails = useCallback(
+    (itemId: string | number) => {
+      const navigationSchemaId =
+        isRelationBased && section?.repeatingConfig?.targetSchema
+          ? section.repeatingConfig.targetSchema
+          : schema.id;
+      window.open(`/page/${navigationSchemaId}/${itemId}?showBack=true&mode=edit`, '_blank');
+    },
+    [isRelationBased, section, schema.id]
+  );
+
   const actionCellRenderer = useCallback(
     (_row: any, itemId: string | number | undefined) => {
       if (!itemId) return null;
       return (
-        <div className="flex items-center justify-center gap-1">
+        <div className="flex items-center justify-center gap-1.5">
           <UIButton
             variant="outline"
             size="sm"
@@ -127,10 +138,22 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
           >
             <IconRenderer iconName="Eye" className="h-4 w-4" />
           </UIButton>
+          <UIButton
+            variant="outline"
+            size="sm"
+            onClick={(event) => {
+              event.stopPropagation();
+              handleEditDetails(itemId);
+            }}
+            className="h-8 w-8 p-0 hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition-all duration-200"
+            title="Edit"
+          >
+            <IconRenderer iconName="Edit" className="h-4 w-4" />
+          </UIButton>
         </div>
       );
     },
-    [handleViewDetails]
+    [handleViewDetails, handleEditDetails]
   );
 
   const columns = useRepeatingTableColumns({

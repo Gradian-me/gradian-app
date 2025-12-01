@@ -19,6 +19,8 @@ import { ChevronsDown, ChevronsUp } from 'lucide-react';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
 import { ulid } from 'ulid';
 import { GoToTopForm } from '../form-elements/go-to-top-form';
+import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
+import { useUserStore } from '@/stores/user.store';
 import { getFieldTabIndexMap } from '../form-elements/utils/field-resolver';
 import { getActionConfig, getSingularName, isEditMode } from '../utils/action-config';
 import { AccordionFormSection } from './AccordionFormSection';
@@ -521,6 +523,33 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         });
       }
     });
+
+    // Custom validation: related-companies is required for company-based schemas
+    if (schema.canSelectMultiCompanies && schema.isNotCompanyBased !== true) {
+      const relatedCompanies = state.values['related-companies'];
+      const hasRelated =
+        Array.isArray(relatedCompanies) ? relatedCompanies.length > 0 : Boolean(relatedCompanies);
+
+      if (!hasRelated) {
+        const errorMessage = 'Please select at least one related company.';
+        newErrors['related-companies'] = errorMessage;
+        isValid = false;
+      }
+    }
+
+    // Custom validation: status is required when statusGroup is configured
+    const hasStatusGroup = Array.isArray(schema.statusGroup) && schema.statusGroup.length > 0;
+    if (hasStatusGroup) {
+      const status = state.values['status'];
+      const hasStatus =
+        Array.isArray(status) ? status.length > 0 : Boolean(status);
+
+      if (!hasStatus) {
+        const errorMessage = 'Status is required.';
+        newErrors['status'] = errorMessage;
+        isValid = false;
+      }
+    }
     
     // Update errors in state immediately and mark fields as touched
     Object.entries(newErrors).forEach(([fieldName, error]) => {
@@ -768,6 +797,27 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   
   // Trigger to refresh relation-based sections (increments when relations are created)
   const [refreshRelationsTrigger, setRefreshRelationsTrigger] = React.useState(0);
+
+  // Dynamic form context (Zustand) - expose formSchema, formData, and userData
+  const setFormSchemaInContext = useDynamicFormContextStore((s) => s.setFormSchema);
+  const setFormDataInContext = useDynamicFormContextStore((s) => s.setFormData);
+  const setUserDataInContext = useDynamicFormContextStore((s) => s.setUserData);
+  const resetDynamicContext = useDynamicFormContextStore((s) => s.reset);
+  const currentUser = useUserStore((s) => s.user);
+
+  useEffect(() => {
+    // Initialize dynamic form context when schema changes
+    setFormSchemaInContext(schema);
+    setUserDataInContext(currentUser ?? null);
+    return () => {
+      resetDynamicContext();
+    };
+  }, [schema, currentUser, setFormSchemaInContext, setUserDataInContext, resetDynamicContext]);
+
+  useEffect(() => {
+    // Keep form data in sync with Zustand context
+    setFormDataInContext(state.values);
+  }, [state.values, setFormDataInContext]);
 
   const addRepeatingItem = useCallback((sectionId: string) => {
     const section = schema.sections.find(s => s.id === sectionId);
@@ -1317,6 +1367,8 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             <FormSystemSection
               schema={schema}
               values={state.values}
+              errors={state.errors}
+              touched={state.touched}
               onChange={setValue}
               onBlur={(fieldName: string) => setTouched(fieldName, true)}
               disabled={disabled}

@@ -2,11 +2,13 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FileQuestion, ArrowLeft, Home, RefreshCw, Loader2 } from 'lucide-react';
+import { ShieldX, ArrowLeft, Home, RefreshCw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-interface SchemaNotFoundProps {
+import { AccessCheckResult } from '@/gradian-ui/shared/utils/access-control';
+
+interface AccessDeniedProps {
   title?: string;
   description?: string;
   helperText?: string;
@@ -16,19 +18,27 @@ interface SchemaNotFoundProps {
   showHomeButton?: boolean;
   onRefresh?: () => void | Promise<void>;
   refreshing?: boolean;
+  accessCheck?: AccessCheckResult;
 }
 
-export function SchemaNotFound({
-  title = 'Schema Not Found',
-  description = "The schema you're looking for doesn't exist or hasn't been configured yet.",
-  helperText = 'Need this page? Contact your system administrator to configure the schema for this entity.',
+export function AccessDenied({
+  title = 'Access Denied',
+  description = "You don't have permission to access this resource.",
+  helperText = 'If you believe you should have access, please contact your system administrator.',
   onGoBack,
   showGoBackButton = true,
   homeHref = '/apps',
   showHomeButton = true,
   onRefresh,
   refreshing = false,
-}: SchemaNotFoundProps) {
+  accessCheck,
+}: AccessDeniedProps) {
+  // Use accessCheck to enhance the message if provided
+  const finalTitle = accessCheck?.code === 'UNAUTHORIZED' ? 'Authentication Required' : title;
+  const finalDescription = accessCheck?.reason || description;
+  const finalHelperText = accessCheck?.requiredRole 
+    ? `This resource requires the "${accessCheck.requiredRole}" role. ${helperText}`
+    : helperText;
   const handleGoBack = () => {
     if (onGoBack) {
       onGoBack();
@@ -53,9 +63,9 @@ export function SchemaNotFound({
               transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-violet-100 rounded-full blur-md opacity-50" />
-              <div className="relative bg-linear-to-br from-violet-50 to-violet-50 p-8 rounded-full w-32 h-32 flex items-center justify-center">
-                <FileQuestion className="h-16 w-16 text-violet-600" strokeWidth={1.5} />
+              <div className="absolute inset-0 bg-red-100 rounded-full blur-md opacity-50" />
+              <div className="relative bg-linear-to-br from-red-50 to-red-50 p-8 rounded-full w-32 h-32 flex items-center justify-center">
+                <ShieldX className="h-16 w-16 text-red-600" strokeWidth={1.5} />
               </div>
             </motion.div>
 
@@ -66,7 +76,7 @@ export function SchemaNotFound({
                 transition={{ delay: 0.3 }}
                 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100"
               >
-                {title}
+                {finalTitle}
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0 }}
@@ -74,7 +84,7 @@ export function SchemaNotFound({
                 transition={{ delay: 0.4 }}
                 className="text-lg text-gray-600 dark:text-gray-300 max-w-md"
               >
-                {description}
+                {finalDescription}
               </motion.p>
             </div>
 
@@ -82,10 +92,10 @@ export function SchemaNotFound({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md"
+              className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md"
             >
-              <p className="text-sm text-blue-800">
-                <strong>Need this page?</strong> {helperText}
+              <p className="text-sm text-red-800">
+                <strong>Need access?</strong> {finalHelperText}
               </p>
             </motion.div>
 
@@ -138,7 +148,11 @@ export function SchemaNotFound({
               transition={{ delay: 0.7 }}
               className="pt-8 border-t border-gray-200 w-full"
             >
-              <p className="text-xs text-gray-500 dark:text-gray-300">Error Code: 404 | Schema Not Found</p>
+              <p className="text-xs text-gray-500 dark:text-gray-300">
+                Error Code: 403 | {accessCheck?.code || 'Access Denied'}
+                {accessCheck?.schemaId && ` | Schema: ${accessCheck.schemaId}`}
+                {accessCheck?.dataId && ` | Data: ${accessCheck.dataId}`}
+              </p>
             </motion.div>
           </div>
         </Card>
@@ -146,3 +160,4 @@ export function SchemaNotFound({
     </div>
   );
 }
+

@@ -45,11 +45,13 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   const [targetSchema, setTargetSchema] = useState<FormSchema | null>(null);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [isLoadingSchema, setIsLoadingSchema] = useState(false);
+  const [lastValidSelection, setLastValidSelection] = useState<NormalizedOption[] | null>(null);
   const queryClient = useQueryClient();
 
   // Get targetSchema or sourceUrl from config
-  const targetSchemaId = (config as any).targetSchema;
-  const sourceUrl = (config as any).sourceUrl;
+  // Memoize these to prevent unnecessary re-renders when config object reference changes
+  const targetSchemaId = useMemo(() => (config as any).targetSchema, [(config as any).targetSchema]);
+  const sourceUrl = useMemo(() => (config as any).sourceUrl, [(config as any).sourceUrl]);
   const fieldOptions = (config as any).options; // Static options from field config
   const allowMultiselect = Boolean(
     (config as any)?.metadata?.allowMultiselect ??
@@ -67,9 +69,21 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     }
     return undefined;
   }, [fieldOptions, targetSchemaId, sourceUrl]);
+  // Ensure value is always an array to maintain controlled component state
+  const normalizedValue = useMemo(() => {
+    if (value === null || value === undefined) {
+      return [];
+    }
+    if (Array.isArray(value)) {
+      return value;
+    }
+    // If single value, wrap in array
+    return [value];
+  }, [value]);
+
   const normalizedSelection = useMemo(
-    () => normalizeOptionArray(value),
-    [value]
+    () => normalizeOptionArray(normalizedValue),
+    [normalizedValue]
   );
   const selectedIdsForPicker = useMemo(
     () =>
@@ -108,8 +122,19 @@ export const PickerInput: React.FC<PickerInputProps> = ({
         // Skip fetching if using sourceUrl instead of targetSchema
         if (sourceUrl || !targetSchemaId || !targetSchema) {
           if (sourceUrl && primaryValue) {
-            // For sourceUrl, just use the value as-is
-            if (typeof primaryValue === 'object') {
+            // For sourceUrl, use the normalized option which has label/icon/color
+            if (typeof primaryValue === 'object' && primaryValue.id) {
+              // If it's a normalized option (has id, label, icon, color), use it directly
+              setSelectedItem({
+                id: primaryValue.id,
+                label: primaryValue.label,
+                name: primaryValue.label || primaryValue.name || primaryValue.title,
+                title: primaryValue.label || primaryValue.title,
+                icon: primaryValue.icon,
+                color: primaryValue.color,
+              });
+            } else if (typeof primaryValue === 'object') {
+              // Fallback for other object formats
               setSelectedItem(primaryValue);
             } else {
               const resolvedId = extractFirstId(primaryValue);
@@ -157,40 +182,83 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       }
     };
 
-    if (value === null || value === undefined || value === '') {
+    if (normalizedValue.length === 0) {
       setSelectedItem(null);
       return;
     }
 
-    const primaryValue = normalizedSelection[0] ?? value;
+    const primaryValue = normalizedSelection[0] ?? normalizedValue[0];
     fetchSelectedItem(primaryValue);
-  }, [value, normalizedSelection, targetSchemaId, targetSchema, sourceUrl]);
+    // Note: sourceUrl is intentionally NOT in dependencies - we only want to re-fetch when value changes,
+    // not when sourceUrl changes. sourceUrl is just configuration, not a trigger for re-fetching.
+  }, [normalizedValue, normalizedSelection, targetSchemaId, targetSchema]);
 
-  const handleSelect = (selectedOptions: NormalizedOption[], rawItems: any[]) => {
+  const handleSelect = async (selectedOptions: NormalizedOption[], rawItems: any[]) => {
+    // Guard against empty selections - only process if we have valid options
+    // For single select, empty array should only come from explicit clear action
     if (!selectedOptions || selectedOptions.length === 0) {
+      // For single select, don't clear on empty - this prevents accidental clearing
+      // Only clear if explicitly requested (via handleClear)
+      if (!allowMultiselect) {
+        // Single select: ignore empty selections, preserve current value
+        // If we have a last valid selection, restore it
+        if (lastValidSelection && lastValidSelection.length > 0) {
+          console.warn('[PickerInput] Ignoring empty selection for single-select, preserving last valid selection');
+        }
+        setIsPickerOpen(false);
+        return;
+      }
+      // Multiselect: allow clearing
+      onChange?.([]);
+      setSelectedItem(null);
+      setLastValidSelection(null);
+      setIsPickerOpen(false);
       return;
     }
 
+    // Store valid selection before calling onChange to prevent race conditions
+    setLastValidSelection(selectedOptions);
+    // Call onChange with the valid selection
     onChange?.(selectedOptions);
 
-    const primaryRawItem = rawItems?.[0];
-    if (primaryRawItem) {
-      setSelectedItem(primaryRawItem);
-    } else {
+    // For sourceUrl, use the normalized option which has label/icon/color from columnMap
+    // For targetSchema, prefer rawItems which has full schema data
+    if (sourceUrl) {
       const primaryOption = selectedOptions[0];
-      setSelectedItem({
-        id: primaryOption.id,
-        name: primaryOption.label,
-        title: primaryOption.label,
-      });
+      if (primaryOption) {
+        setSelectedItem({
+          id: primaryOption.id,
+          label: primaryOption.label,
+          name: primaryOption.label,
+          title: primaryOption.label,
+          icon: primaryOption.icon,
+          color: primaryOption.color,
+        });
+      }
+    } else {
+      const primaryRawItem = rawItems?.[0];
+      if (primaryRawItem) {
+        setSelectedItem(primaryRawItem);
+      } else {
+        const primaryOption = selectedOptions[0];
+        setSelectedItem({
+          id: primaryOption.id,
+          name: primaryOption.label,
+          title: primaryOption.label,
+        });
+      }
     }
 
     setIsPickerOpen(false);
   };
 
   const handleClear = () => {
+    // Clear the selection
     onChange?.([]);
     setSelectedItem(null);
+    setLastValidSelection(null);
+    // Ensure picker can be reopened after clearing
+    setIsPickerOpen(false);
   };
 
   const handleRemoveItem = (itemId: string) => {
@@ -201,10 +269,22 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     // Update selectedItem if we removed the primary item
     if (updatedSelection.length === 0) {
       setSelectedItem(null);
+      setLastValidSelection(null);
     } else if (updatedSelection.length > 0 && String(normalizedSelection[0]?.id) === String(itemId)) {
       // If we removed the first item, update selectedItem to the new first item
       const newPrimary = updatedSelection[0];
-      if (newPrimary && targetSchema) {
+      
+      // For sourceUrl, use the normalized option directly
+      if (sourceUrl && newPrimary) {
+        setSelectedItem({
+          id: newPrimary.id,
+          label: newPrimary.label,
+          name: newPrimary.label,
+          title: newPrimary.label,
+          icon: newPrimary.icon,
+          color: newPrimary.color,
+        });
+      } else if (newPrimary && targetSchema) {
         // Try to fetch the new primary item if we have a schema
         const fetchNewPrimary = async () => {
           try {
@@ -381,7 +461,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
               <Search className="h-4 w-4" />
             </Button>
           </div>
-          {selectedItem && !disabled && !allowMultiselect && (
+          {selectedItem && !disabled && !allowMultiselect && normalizedSelection.length > 0 && (
             <Button
               type="button"
               variant="ghost"

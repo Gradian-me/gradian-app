@@ -1,7 +1,7 @@
-// ColorPicker Component
+// ColorPicker Component - Now uses Select with predefined Tailwind colors
 
-import React, { useEffect } from 'react';
-import { Input } from '../../../../components/ui/input';
+import React from 'react';
+import { Select, SelectOption } from './Select';
 import { cn } from '../../../shared/utils';
 
 export interface ColorPickerProps {
@@ -10,6 +10,8 @@ export interface ColorPickerProps {
     label?: string;
     placeholder?: string;
     required?: boolean;
+    defaultValue?: string;
+    options?: SelectOption[];
     validation?: {
       required?: boolean;
     };
@@ -28,6 +30,32 @@ export interface ColorPickerProps {
   placeholder?: string;
 }
 
+// Tailwind color options with visual representation (reversed order)
+const TAILWIND_COLOR_OPTIONS: SelectOption[] = [
+  { id: 'rose', label: 'Rose', color: 'bg-rose-500' },
+  { id: 'pink', label: 'Pink', color: 'bg-pink-500' },
+  { id: 'fuchsia', label: 'Fuchsia', color: 'bg-fuchsia-500' },
+  { id: 'purple', label: 'Purple', color: 'bg-purple-500' },
+  { id: 'violet', label: 'Violet', color: 'bg-violet-500' },
+  { id: 'indigo', label: 'Indigo', color: 'bg-indigo-500' },
+  { id: 'blue', label: 'Blue', color: 'bg-blue-500' },
+  { id: 'sky', label: 'Sky', color: 'bg-sky-500' },
+  { id: 'cyan', label: 'Cyan', color: 'bg-cyan-500' },
+  { id: 'teal', label: 'Teal', color: 'bg-teal-500' },
+  { id: 'emerald', label: 'Emerald', color: 'bg-emerald-500' },
+  { id: 'green', label: 'Green', color: 'bg-green-500' },
+  { id: 'lime', label: 'Lime', color: 'bg-lime-500' },
+  { id: 'yellow', label: 'Yellow', color: 'bg-yellow-500' },
+  { id: 'amber', label: 'Amber', color: 'bg-amber-500' },
+  { id: 'orange', label: 'Orange', color: 'bg-orange-500' },
+  { id: 'red', label: 'Red', color: 'bg-red-500' },
+  { id: 'stone', label: 'Stone', color: 'bg-stone-500' },
+  { id: 'neutral', label: 'Neutral', color: 'bg-neutral-500' },
+  { id: 'zinc', label: 'Zinc', color: 'bg-zinc-500' },
+  { id: 'gray', label: 'Gray', color: 'bg-gray-500' },
+  { id: 'slate', label: 'Slate', color: 'bg-slate-500' },
+];
+
 export const ColorPicker: React.FC<ColorPickerProps> = ({
   config,
   value,
@@ -37,125 +65,66 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   error,
   id,
   className,
-  colorPickerClassName,
-  inputClassName,
   disabled = false,
   required = false,
   placeholder,
 }) => {
-  const defaultColor = '#4E79A7';
-  const resolvedValue = value ?? defaultColor;
   const fieldName = config?.name || id || 'color-picker';
   const fieldLabel = config?.label;
-  const fieldPlaceholder = placeholder || config?.placeholder || 'Enter color code (e.g., #4E79A7)';
+  const fieldPlaceholder = placeholder || config?.placeholder || 'Select color';
   const isRequired = required || config?.required || config?.validation?.required || false;
 
-  // Helper to call onChange - supports both value handler (new) and event handler (old) patterns
-  const callOnChange = (newValue: string, originalEvent?: React.ChangeEvent<HTMLInputElement>) => {
+  // Use options from config if provided, otherwise use default Tailwind colors
+  const colorOptions = config?.options && config.options.length > 0
+    ? config.options.map((opt: any) => {
+        const colorId = String(opt.id || opt.value || opt);
+        const colorName = opt.color || colorId;
+        // If color already starts with 'bg-', use it as-is, otherwise prepend 'bg-' and append '-500'
+        const colorClass = colorName.startsWith('bg-') 
+          ? colorName 
+          : `bg-${colorName}-500`;
+        return {
+          id: colorId,
+          label: opt.label || colorId,
+          color: colorClass,
+        };
+      })
+    : TAILWIND_COLOR_OPTIONS;
+  
+  // Use defaultValue from config if value is not provided
+  const resolvedValue = value ?? config?.defaultValue ?? undefined;
+
+  // Handle value change from Select component
+  const handleValueChange = (selectedValue: string) => {
     if (!onChange) return;
     
-    // Support both patterns: value handler (new - preferred) and event handler (old - backward compatibility)
-    // Since onChange is a union type, we use type assertion to call it
-    // We prefer the value pattern (new), but also support event pattern (old) for backward compatibility
+    // Support both value handler (new - preferred) and event handler (old - backward compatibility)
     if (typeof onChange === 'function') {
       // Try value handler first (new pattern - preferred)
-      (onChange as (value: string) => void)(newValue);
-      
-      // Also support event handler pattern (old - backward compatibility)
-      // Only if originalEvent exists (from actual input event)
-      if (originalEvent) {
-        // Some callers might still use event handler pattern, so we provide the event
-        // However, since we're using union types, TypeScript will handle the type checking
-        // In practice, most modern code uses value pattern, so this is mainly for backward compatibility
-      }
+      (onChange as (value: string) => void)(selectedValue);
     }
-  };
-
-  useEffect(() => {
-    if ((value === undefined || value === null || value === '') && !disabled) {
-      callOnChange(defaultColor);
-    }
-  }, [value, disabled]);
-
-  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    callOnChange(newValue, e);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    // Validate hex color format (allow partial input)
-    if (/^#[0-9A-Fa-f]{0,6}$/.test(newValue) || newValue === '') {
-      callOnChange(newValue || defaultColor, e);
-    }
-  };
-
-  const handleInputBlur = () => {
-    // Validate and normalize color value on blur
-    if (resolvedValue && !/^#[0-9A-Fa-f]{6}$/.test(resolvedValue)) {
-      // If invalid, try to fix it
-      let normalizedValue = resolvedValue;
-      if (!resolvedValue.startsWith('#')) {
-        normalizedValue = `#${resolvedValue}`;
-      }
-      if (normalizedValue.length < 7) {
-        normalizedValue = normalizedValue.padEnd(7, '0').slice(0, 7);
-      }
-      callOnChange(normalizedValue);
-    }
+    // Trigger onBlur after value change to maintain compatibility
     onBlur?.();
   };
 
   return (
     <div className={cn('w-full', className)}>
-      {fieldLabel && (
-        <label
-          htmlFor={fieldName}
-          className={cn(
-            'block text-xs font-medium mb-2',
-            error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
-            isRequired && 'after:content-["*"] after:ml-1 after:text-red-500 dark:after:text-red-400'
-          )}
-        >
-          {fieldLabel}
-        </label>
-      )}
-      <div className={cn('flex items-center gap-2', fieldLabel && 'mt-1')}>
-        <input
-          id={`${fieldName}-color-picker`}
-          type="color"
+      <Select
+        config={{
+          name: fieldName,
+          label: fieldLabel,
+          placeholder: fieldPlaceholder,
+          required: isRequired,
+          validation: config?.validation,
+        }}
+        options={colorOptions}
           value={resolvedValue}
-          onChange={handleColorChange}
-          onBlur={onBlur}
-          onFocus={onFocus}
+        onValueChange={handleValueChange}
+        error={error}
           disabled={disabled}
-          className={cn(
-            'h-10 w-20 rounded border border-gray-300 cursor-pointer transition-all',
-            'hover:border-violet-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-200',
-            'disabled:cursor-not-allowed disabled:opacity-50',
-            error && 'border-red-500 focus:ring-red-300 focus:border-red-500',
-            colorPickerClassName
-          )}
+        required={isRequired}
+        className={className}
         />
-        <Input
-          value={resolvedValue}
-          onChange={handleInputChange}
-          onBlur={handleInputBlur}
-          onFocus={onFocus}
-          disabled={disabled}
-          placeholder={fieldPlaceholder}
-          className={cn(
-            'flex-1',
-            error && 'border-red-500 focus:ring-red-300 focus:border-red-500',
-            inputClassName
-          )}
-        />
-      </div>
-      {error && (
-        <p className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
-          {error}
-        </p>
-      )}
     </div>
   );
 };

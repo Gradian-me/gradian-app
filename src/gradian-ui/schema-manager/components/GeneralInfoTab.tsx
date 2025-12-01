@@ -79,6 +79,16 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
             disabled={readonly}
           />
           <Switch
+            config={{
+              name: 'can-select-multi-companies',
+              label: 'Can Select Multi Companies',
+              description: 'Allow linking records of this schema to multiple companies in System Section',
+            }}
+            value={schema.canSelectMultiCompanies || false}
+            onChange={(checked: boolean) => onUpdate({ canSelectMultiCompanies: checked })}
+            disabled={readonly}
+          />
+          <Switch
             config={{ name: 'inactive-schema', label: 'Inactive' }}
             value={schema.inactive || false}
             onChange={(checked: boolean) => onUpdate({ inactive: checked })}
@@ -115,11 +125,20 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
           </div>
         </div>
         <div>
-          <TextInput
-            config={{ name: 'status-id', label: 'Status ID' }}
-            value={schema.statusId || ''}
-            onChange={(value) => onUpdate({ statusId: value || undefined })}
-            placeholder="Enter status schema ID (optional)"
+          <PickerInput
+            config={{
+              name: 'status-group',
+              label: 'Status Group',
+              description: 'Select a status group to enable status selection for this schema.',
+              targetSchema: 'status-groups',
+              metadata: {
+                allowMultiselect: false,
+              },
+            }}
+            value={schema.statusGroup || []}
+            onChange={(selections) => {
+              onUpdate({ statusGroup: selections && selections.length > 0 ? selections : undefined });
+            }}
             disabled={readonly}
           />
         </div>
