@@ -1607,7 +1607,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               <DialogTitle>{title || `Select ${schemaName}`}</DialogTitle>
               {description && <DialogDescription>{description}</DialogDescription>}
             </div>
-            <div className="flex items-center gap-2 me-6">
+            <div className="flex items-center gap-2 me-8">
               <Button
                 type="button"
                 variant="ghost"
@@ -1616,7 +1616,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 disabled={isLoading || isSubmitting}
                 aria-label="Refresh items"
               >
-                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-violet-600' : ''}`} />
+                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-violet-600 dark:text-violet-300' : ''}`} />
               </Button>
               {isHierarchical && (
                 <div className="flex items-center gap-1">
@@ -1758,7 +1758,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         <div className="flex justify-end items-center gap-2 pt-4 border-t">
           <Button 
             type="button"
-            variant="ghost" 
+            variant="outline" 
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();

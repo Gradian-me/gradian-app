@@ -75,6 +75,8 @@ export interface TextareaProps extends FormElementProps {
   maxLength?: number;
   canCopy?: boolean;
   aiAgentId?: string;
+  enableVoiceInput?: boolean;
+  loadingTextSwitches?: string | string[];
 }
 
 export interface CheckboxProps extends FormElementProps {
@@ -163,7 +165,7 @@ export interface FileInputProps extends FormElementProps {
 }
 
 export interface FormElementConfig extends FormFieldConfig {
-  component: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'file' | 'picker' | 'toggle' | 'toggle-group';
+  component: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'file' | 'picker' | 'toggle' | 'toggle-group' | 'language-selector';
   required?: boolean;
   metadata?: {
     allowMultiselect?: boolean;

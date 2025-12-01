@@ -36,6 +36,7 @@ import { OTPInput } from './OTPInput';
 import { NameInput } from './NameInput';
 import { ListInput } from './ListInput';
 import { TagInput } from './TagInput';
+import { LanguageSelector } from './LanguageSelector';
 
 // Support both config-based and field-based interfaces
 export interface FormElementFactoryProps extends Omit<FormElementProps, 'config' | 'touched'> {
@@ -108,11 +109,17 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   // Extract canCopy from config or restProps if it exists
   const canCopy = Boolean((config as any)?.canCopy ?? (restProps as any)?.canCopy ?? false);
   
+  // Extract enableVoiceInput from config or restProps if it exists
+  const enableVoiceInput = Boolean((config as any)?.enableVoiceInput ?? (restProps as any)?.enableVoiceInput ?? false);
+  
+  // Extract loadingTextSwitches from restProps if it exists
+  const loadingTextSwitches = (restProps as any)?.loadingTextSwitches;
+  
   // Extract tabIndex from props or restProps
   const tabIndex = props.tabIndex ?? (restProps as any)?.tabIndex;
   
-  // Remove canCopy and tabIndex from restProps to avoid conflicts when we explicitly pass them
-  const { canCopy: _, tabIndex: __, ...restPropsWithoutCanCopy } = restProps;
+  // Remove canCopy, enableVoiceInput, loadingTextSwitches, and tabIndex from restProps to avoid conflicts when we explicitly pass them
+  const { canCopy: _, enableVoiceInput: __, loadingTextSwitches: ___, tabIndex: ____, ...restPropsWithoutCanCopy } = restProps;
 
   // Common props to pass to all form elements
   const commonProps = {
@@ -215,7 +222,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       );
     
     case 'textarea':
-      return <Textarea config={config} {...commonProps} canCopy={canCopy} />;
+      return <Textarea config={config} {...commonProps} canCopy={canCopy} enableVoiceInput={enableVoiceInput} loadingTextSwitches={loadingTextSwitches} />;
     
     case 'checkbox':
       return <Checkbox config={config} {...commonProps} />;
@@ -438,6 +445,23 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           {...commonProps}
           validateEmail={(config as any)?.validateEmail ?? false}
           maxTags={(config as any)?.maxTags}
+        />
+      );
+    
+    case 'language-selector':
+      return (
+        <LanguageSelector
+          config={config}
+          value={restProps.value}
+          onChange={restProps.onChange}
+          onBlur={restProps.onBlur}
+          onFocus={restProps.onFocus}
+          error={restProps.error}
+          disabled={restProps.disabled}
+          required={restProps.required}
+          className={restProps.className}
+          placeholder={(config as any)?.placeholder}
+          defaultLanguage={(config as any)?.defaultLanguage}
         />
       );
     

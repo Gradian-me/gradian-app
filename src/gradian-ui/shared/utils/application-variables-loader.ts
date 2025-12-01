@@ -47,6 +47,7 @@ const getDefaultData = (): ApplicationVariablesData => ({
   DEMO_MODE: true,
   AI_CONFIG: {
     LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions',
+    LLM_TRANSCRIBE_URL: 'https://api.avalai.ir/v1/audio/transcriptions',
   },
 });
 
@@ -72,6 +73,7 @@ interface ApplicationVariablesData {
   DEMO_MODE: boolean;
   AI_CONFIG?: {
     LLM_API_URL?: string;
+    LLM_TRANSCRIBE_URL?: string;
   };
 }
 

@@ -270,7 +270,9 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // Ensure header is in Bearer format if it's just a token
-      if (!authHeader.toLowerCase().startsWith('bearer ')) {
+      if (authHeader && !authHeader.toLowerCase().startsWith('bearer ')) {
+        authHeader = `Bearer ${authToken}`;
+      } else if (!authHeader && authToken) {
         authHeader = `Bearer ${authToken}`;
       }
     }

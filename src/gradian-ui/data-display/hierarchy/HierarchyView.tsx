@@ -51,7 +51,7 @@ const cardVariants = {
 const cardHoverVariants = {
   hover: {
     scale: 1.01,
-    transition: { duration: 0.15, ease: 'easeOut' },
+    transition: { duration: 0.15, ease: [0.42, 0, 0.58, 1] },
   },
   tap: {
     scale: 0.995,

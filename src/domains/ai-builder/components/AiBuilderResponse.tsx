@@ -9,11 +9,13 @@ import React, { useMemo, useRef, useEffect } from 'react';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { Loader2, Timer } from 'lucide-react';
+import { Loader2, Sparkles, Timer } from 'lucide-react';
 import { MetricCard } from '@/gradian-ui/analytics';
 import { ResponseCardViewer } from './ResponseCardViewer';
 import { ResponseAnnotationViewer } from './ResponseAnnotationViewer';
 import { TableWrapper } from '@/gradian-ui/data-display/table/components/TableWrapper';
+import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
+import { cn } from '@/gradian-ui/shared/utils';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
 import type { AiAgent, TokenUsage, SchemaAnnotation, AnnotationItem } from '../types';
 
@@ -80,12 +82,12 @@ function generateColumnsFromData(data: any[]): TableColumn[] {
 function parseTableData(response: string): { data: any[]; isValid: boolean } {
   try {
     const parsed = JSON.parse(response);
-    
+
     // If it's already an array, return it
     if (Array.isArray(parsed)) {
       return { data: parsed, isValid: true };
     }
-    
+
     // If it's an object with a single array property, extract that
     if (typeof parsed === 'object' && parsed !== null) {
       const keys = Object.keys(parsed);
@@ -95,7 +97,7 @@ function parseTableData(response: string): { data: any[]; isValid: boolean } {
       // If it's an object, wrap it in an array
       return { data: [parsed], isValid: true };
     }
-    
+
     return { data: [], isValid: false };
   } catch {
     return { data: [], isValid: false };
@@ -130,7 +132,7 @@ export function AiBuilderResponse({
           const element = headingRef.current;
           const elementPosition = element.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.pageYOffset - 20; // 20px offset from top
-          
+
           // Use smooth scroll with requestAnimationFrame for better performance
           window.scrollTo({
             top: offsetPosition,
@@ -192,7 +194,7 @@ export function AiBuilderResponse({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 
+        <h2
           ref={headingRef}
           className="text-xl font-semibold text-gray-900 dark:text-gray-100"
         >
@@ -213,9 +215,9 @@ export function AiBuilderResponse({
             ) : (
               <>
                 {agent.nextAction.icon && (
-                  <IconRenderer 
-                    iconName={agent.nextAction.icon} 
-                    className="mr-2 h-4 w-4" 
+                  <IconRenderer
+                    iconName={agent.nextAction.icon}
+                    className="mr-2 h-4 w-4"
                   />
                 )}
                 {agent.nextAction.label}
@@ -228,6 +230,7 @@ export function AiBuilderResponse({
       {/* Token Usage & Pricing - MetricCard */}
       {tokenUsage && (
         <MetricCard
+          gradient="indigo"
           metrics={[
             {
               id: 'total-tokens',
@@ -235,7 +238,7 @@ export function AiBuilderResponse({
               value: tokenUsage.total_tokens,
               unit: 'tokens',
               icon: 'Hash',
-              iconColor: 'violet',
+              iconColor: 'cyan',
               format: 'number',
             },
             {
@@ -244,7 +247,7 @@ export function AiBuilderResponse({
               value: tokenUsage.pricing?.total_cost || 0,
               prefix: '$',
               icon: 'Coins',
-              iconColor: 'emerald',
+              iconColor: 'pink',
               format: 'currency',
               precision: 4,
             },
@@ -254,7 +257,7 @@ export function AiBuilderResponse({
               value: duration < 1000 ? duration : duration / 1000,
               unit: duration < 1000 ? 'ms' : 's',
               icon: 'Timer',
-              iconColor: 'blue' as const,
+              iconColor: 'emerald' as const,
               format: 'number' as const,
               precision: duration < 1000 ? 0 : 2,
             }] : []),
@@ -308,6 +311,34 @@ export function AiBuilderResponse({
               />
             </div>
           </details>
+        </div>
+      ) : agent?.requiredOutputFormat === 'string' ? (
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center">
+            <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-2" />
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                AI Generated Content
+              </h3>
+            </div>
+            <CopyContent content={response} />
+          </div>
+          <textarea
+            readOnly
+            value={response}
+            className={cn(
+              'w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100',
+              'font-mono text-sm leading-6 p-4',
+              'border-0 outline-none resize-none',
+              'focus:ring-0 focus:outline-none',
+              'overflow-auto min-h-[200px]'
+            )}
+            dir="auto"
+            style={{
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+            }}
+          />
         </div>
       ) : (
         <CodeViewer

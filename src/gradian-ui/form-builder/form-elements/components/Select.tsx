@@ -246,7 +246,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     () =>
       normalizedValueArray
         .map((opt) => opt.id)
-        .filter((id): id is string => Boolean(id)),
+        .filter((id): id is string => Boolean(id))
+        .map((id) => String(id)),
     [normalizedValueArray]
   );
 
@@ -374,14 +375,19 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     }
 
     const idsFromValue: string[] = normalizedValueIdsKey
-      ? JSON.parse(normalizedValueIdsKey)
+      ? JSON.parse(normalizedValueIdsKey).map((id: any) => String(id))
       : [];
 
     setMultiSelectionIds((prev) => {
-      if (prev.length === idsFromValue.length) {
+      // Use Set-based comparison for order-independent comparison
+      const prevSet = new Set(prev.map((id) => String(id)));
+      const valueSet = new Set(idsFromValue.map((id) => String(id)));
+      
+      // Check if sets are equal (same items, order-independent)
+      if (prevSet.size === valueSet.size) {
         let isEqual = true;
-        for (let i = 0; i < prev.length; i += 1) {
-          if (prev[i] !== idsFromValue[i]) {
+        for (const id of prevSet) {
+          if (!valueSet.has(id)) {
             isEqual = false;
             break;
           }
@@ -390,6 +396,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
           return prev;
         }
       }
+      // Only update if the incoming value is actually different
       return idsFromValue;
     });
   }, [allowMultiselect, normalizedValueIdsKey]);
@@ -683,15 +690,17 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       const toggleOption = (option: NormalizedOption) => {
         if (disabled) return;
         const optionId = option.id;
-        if (!optionId) {
+        // Ensure optionId is a valid string (not empty, null, or undefined)
+        if (!optionId || String(optionId).trim() === '') {
           return;
         }
 
+        const optionIdString = String(optionId);
         setMultiSelectionIds((prev) => {
-          const alreadySelected = prev.includes(optionId);
+          const alreadySelected = prev.includes(optionIdString);
           const next = alreadySelected
-            ? prev.filter((id) => id !== optionId)
-            : [...prev, optionId];
+            ? prev.filter((id) => id !== optionIdString)
+            : [...prev, optionIdString];
           return next;
         });
       };
@@ -781,8 +790,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                     </div>
                   ) : (
                     validOptions.map((option, index) => {
-                      const optionId = option.id ?? '';
-                      const isSelected = multiSelectionSet.has(optionId);
+                      const optionId = option.id ? String(option.id) : '';
+                      const isSelected = optionId !== '' && multiSelectionSet.has(optionId);
                       return (
                         <motion.div
                           key={optionId}

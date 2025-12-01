@@ -15,21 +15,13 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select } from '@/gradian-ui/form-builder/form-elements/components/Select';
 import { Textarea } from '@/gradian-ui/form-builder/form-elements/components/Textarea';
+import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
 import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card';
-import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { useProfessionalWriting } from '../hooks/useProfessionalWriting';
 import type { WritingStyle } from '../types';
-import { SUPPORTED_LANGUAGES as LANGUAGES } from '../types';
 import { Loader2, Sparkles, ArrowUp } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface ProfessionalWritingModalProps {
   isOpen: boolean;
@@ -114,8 +106,8 @@ export function ProfessionalWritingModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full h-full lg:max-w-3xl lg:max-h-[90vh] flex flex-col rounded-2xl p-0 [&>button]:z-20">
-        <DialogHeader className="shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 pt-6 pb-4 pr-12">
+      <DialogContent className="w-[80vw] max-w-2xl sm:max-w-3xl p-6 overflow-hidden max-h-[90vh] flex flex-col">
+        <DialogHeader className="p-2 flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-violet-500" />
             Professional Writing Assistant
@@ -125,13 +117,14 @@ export function ProfessionalWritingModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4 px-6 overflow-y-auto flex-1 min-h-0">
+        <div className="flex flex-col items-center space-y-6 px-6 pb-6 overflow-y-auto flex-1 min-h-0">
           {/* Style Selector */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Writing Style
-            </label>
+          <div className="w-full">
             <Select
+              config={{
+                name: 'writing-style',
+                label: 'Writing Style',
+              }}
               value={writingStyle}
               onValueChange={(value) => {
                 setWritingStyle(value as WritingStyle);
@@ -140,48 +133,35 @@ export function ProfessionalWritingModal({
                 }
                 clearResponse();
               }}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="professional">Professional</SelectItem>
-                <SelectItem value="casual">Casual</SelectItem>
-                <SelectItem value="translate">Translate</SelectItem>
-                <SelectItem value="extended">Extended</SelectItem>
-              </SelectContent>
-            </Select>
+              options={[
+                { id: 'professional', value: 'professional', label: 'Professional' },
+                { id: 'casual', value: 'casual', label: 'Casual' },
+                { id: 'translate', value: 'translate', label: 'Translate' },
+                { id: 'extended', value: 'extended', label: 'Extended' },
+              ]}
+            />
           </div>
 
           {/* Language Selector (conditional) */}
           {writingStyle === 'translate' && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Target Language
-              </label>
-              <Select
+            <div className="w-full">
+              <LanguageSelector
+                config={{
+                  name: 'target-language',
+                  label: 'Target Language',
+                  placeholder: 'Select a language',
+                }}
                 value={targetLanguage}
-                onValueChange={(value) => {
+                onChange={(value) => {
                   setTargetLanguage(value);
                   clearResponse();
                 }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a language" />
-                </SelectTrigger>
-                <SelectContent>
-                  {LANGUAGES.map((lang) => (
-                    <SelectItem key={lang.code} value={lang.code}>
-                      {lang.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </div>
           )}
 
           {/* Input Textarea */}
-          <div className="space-y-2">
+          <div className="w-full">
             <Textarea
               config={{
                 name: 'input-text',
@@ -195,6 +175,7 @@ export function ProfessionalWritingModal({
               }}
               rows={6}
               resize="none"
+              canCopy={true}
             />
           </div>
 
@@ -219,25 +200,25 @@ export function ProfessionalWritingModal({
 
           {/* Error Message */}
           {error && (
-            <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20 p-3">
+            <div className="w-full p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
               <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
             </div>
           )}
 
           {/* Output Textarea */}
           {enhancedText && (
-            <div className="space-y-2">
+            <div className="w-full space-y-2">
               <Textarea
                 config={{
                   name: 'enhanced-text',
                   label: 'Enhanced Text',
                 }}
                 value={enhancedText}
-                disabled={true}
+                onChange={() => {}}
                 rows={6}
                 resize="none"
                 canCopy={true}
-                className="bg-gray-50 dark:bg-gray-800"
+                disabled={true}
               />
               <div className="flex justify-end mt-2">
                 <Button
@@ -261,7 +242,7 @@ export function ProfessionalWritingModal({
 
           {/* MetricCard for Token Usage */}
           {tokenUsage && metrics.length > 0 && (
-            <div className="mt-4">
+            <div className="w-full mt-4">
               <MetricCard
                 metrics={metrics}
                 gradient="violet"
@@ -270,9 +251,10 @@ export function ProfessionalWritingModal({
               />
             </div>
           )}
+
         </div>
 
-        <DialogFooter className="shrink-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-4 mt-auto">
+        <DialogFooter className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 p-2 mt-auto">
           <Button
             variant="outline"
             onClick={handleCancel}

@@ -14,6 +14,7 @@ import { cn, validateField } from '@/gradian-ui/shared/utils';
 import { Sparkles, Loader2, Square, History, RotateCcw } from 'lucide-react';
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { PromptPreviewSheet } from './PromptPreviewSheet';
+import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import type { AiAgent } from '../types';
 import { useBusinessRuleEffects, getFieldEffects } from '@/domains/business-rule-engine';
 import type { BusinessRuleWithEffects, BusinessRuleEffectsMap } from '@/domains/business-rule-engine';
@@ -31,6 +32,7 @@ interface FieldItemProps {
   handleFieldFocus: (fieldName: string) => void;
   ruleEffects?: BusinessRuleEffectsMap;
   agentBusinessRules?: BusinessRuleWithEffects[] | undefined;
+  selectedAgent?: AiAgent | null;
 }
 
 const FieldItem: React.FC<FieldItemProps> = memo(({
@@ -45,6 +47,7 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
   handleFieldFocus,
   ruleEffects,
   agentBusinessRules,
+  selectedAgent,
 }) => {
   // Get business rule effects (push-based model)
   let fieldEffects;
@@ -97,6 +100,12 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
   // Merge disabled state: business rule OR existing disabled flags
   const isDisabled = fieldEffects.isDisabled || isLoading || disabled;
 
+  // Check if we should show CopyContent in the label row
+  const shouldShowCopyInLabel = field.component === 'textarea' && 
+    selectedAgent?.requiredOutputFormat === 'string' && 
+    fieldValue && 
+    String(fieldValue).trim();
+
   return (
     <div 
       className={cn('relative space-y-2', colSpanClass)}
@@ -104,14 +113,23 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
         gridColumn: colSpan === 2 ? 'span 2 / span 2' : 'span 1 / span 1'
       }}
     >
-      {field.label && (
-        <label
-          htmlFor={field.id || field.name}
-          className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide mb-2 block"
-        >
-          {field.label}
-          {isRequired && <span className="text-red-500 ml-1">*</span>}
-        </label>
+      {(field.label || shouldShowCopyInLabel) && (
+        <div className="flex items-center justify-between mb-2">
+          {field.label ? (
+            <label
+              htmlFor={field.id || field.name}
+              className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide"
+            >
+              {field.label}
+              {isRequired && <span className="text-red-500 ml-1">*</span>}
+            </label>
+          ) : (
+            <div></div>
+          )}
+          {shouldShowCopyInLabel && (
+            <CopyContent content={String(fieldValue)} />
+          )}
+        </div>
       )}
       <FormElementFactory
         config={{
@@ -128,6 +146,11 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
         required={isRequired}
         className={customClassName}
         {...(field.aiAgentId ? { aiAgentId: field.aiAgentId } : {})}
+        {...(field.component === 'textarea' ? { 
+          enableVoiceInput: true,
+          loadingTextSwitches: selectedAgent?.loadingTextSwitches,
+          canCopy: false // Disable canCopy in Textarea since we're showing it in the label row
+        } : {})}
       />
     </div>
   );
@@ -446,26 +469,60 @@ export function AiBuilderForm({
 
   // Auto-resize textarea with max 8 lines (for textarea fields)
   useEffect(() => {
+    const resizeTextarea = () => {
+      const promptField = formFields.find(
+        (field) => (field.name === 'userPrompt' || field.id === 'user-prompt') && field.component === 'textarea'
+      );
+      if (promptField) {
+        // Try both id and name as the element ID
+        const textareaId = promptField.id || promptField.name;
+        const textarea = document.getElementById(textareaId) as HTMLTextAreaElement;
+        
+        if (textarea) {
+          // Reset height to auto to get accurate scrollHeight
+          textarea.style.height = 'auto';
+          const scrollHeight = textarea.scrollHeight;
+          const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 24;
+          const maxHeight = lineHeight * 8; // 8 lines max
+          
+          if (scrollHeight <= maxHeight) {
+            textarea.style.height = `${scrollHeight}px`;
+            textarea.style.overflowY = 'hidden';
+          } else {
+            textarea.style.height = `${maxHeight}px`;
+            textarea.style.overflowY = 'auto';
+          }
+        }
+      }
+    };
+
+    // Use setTimeout to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      resizeTextarea();
+    }, 0);
+
+    // Also add event listener for input changes
     const promptField = formFields.find(
       (field) => (field.name === 'userPrompt' || field.id === 'user-prompt') && field.component === 'textarea'
     );
     if (promptField) {
-      const textarea = document.getElementById(promptField.id || promptField.name) as HTMLTextAreaElement;
+      const textareaId = promptField.id || promptField.name;
+      const textarea = document.getElementById(textareaId) as HTMLTextAreaElement;
+      
       if (textarea) {
-        textarea.style.height = 'auto';
-        const scrollHeight = textarea.scrollHeight;
-        const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 24;
-        const maxHeight = lineHeight * 8; // 8 lines max
+        const handleInput = () => resizeTextarea();
+        textarea.addEventListener('input', handleInput);
         
-        if (scrollHeight <= maxHeight) {
-          textarea.style.height = `${scrollHeight}px`;
-          textarea.style.overflowY = 'hidden';
-        } else {
-          textarea.style.height = `${maxHeight}px`;
-          textarea.style.overflowY = 'auto';
-        }
+        return () => {
+          clearTimeout(timeoutId);
+          textarea.removeEventListener('input', handleInput);
+        };
       }
     }
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [formValues, formFields]);
 
   // Find the prompt field and agent select field
@@ -610,6 +667,7 @@ export function AiBuilderForm({
                   handleFieldFocus={handleFieldFocus}
                   ruleEffects={ruleEffects}
                   agentBusinessRules={agentBusinessRules}
+                  selectedAgent={selectedAgent}
                 />
               );
             })}

@@ -12,6 +12,7 @@ export interface AiAgent {
   requiredOutputFormat: 'json' | 'string' | 'table';
   model?: string;
   systemPrompt?: string;
+  loadingTextSwitches?: string | string[];
   renderComponents?: Array<Partial<FormField> & {
     id: string;
     name: string;

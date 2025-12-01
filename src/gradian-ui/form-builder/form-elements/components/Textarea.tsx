@@ -6,6 +6,8 @@ import { cn, validateField } from '../../../shared/utils';
 import { CopyContent } from './CopyContent';
 import { ProfessionalWritingModal } from '@/domains/professional-writing';
 import { IconRenderer } from '../../../shared/utils/icon-renderer';
+import { VoiceInputDialog } from '@/gradian-ui/communication/voice/components/VoiceInputDialog';
+import { Mic } from 'lucide-react';
 
 export const Textarea = forwardRef<FormElementRef, TextareaProps>(
   (
@@ -26,12 +28,15 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       touched,
       canCopy = false,
       aiAgentId,
+      enableVoiceInput = false,
+      loadingTextSwitches,
       ...props
     },
     ref
   ) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isVoiceDialogOpen, setIsVoiceDialogOpen] = useState(false);
 
     useImperativeHandle(ref, () => ({
       focus: () => textareaRef.current?.focus(),
@@ -70,6 +75,12 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       setIsModalOpen(false);
     };
 
+    const handleVoiceInputClick = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsVoiceDialogOpen(true);
+    };
+
     const textareaClasses = cn(
       'w-full direction-auto px-3 py-2 border rounded-lg border-gray-300 bg-white text-sm text-gray-900 ring-offset-background placeholder:text-gray-400 transition-colors',
       'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-violet-300 focus-visible:ring-offset-1 focus-visible:border-violet-400',
@@ -82,23 +93,33 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       resize === 'horizontal' && 'resize-x',
       resize === 'vertical' && 'resize-y',
       resize === 'both' && 'resize',
-      (canCopy || aiAgentId) && 'pr-10',
+      aiAgentId && 'pr-10',
+      enableVoiceInput && 'pb-10',
       className
     );
 
     return (
       <div className="w-full">
-        {config.label && (
-          <label
-            htmlFor={config.name}
-            className={cn(
-              'block text-xs font-medium mb-1',
-              error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
-              required && 'after:content-["*"] after:ml-1 after:text-red-500 dark:after:text-red-400'
+        {(config.label || (canCopy && value)) && (
+          <div className="flex items-center justify-between mb-1">
+            {config.label ? (
+              <label
+                htmlFor={config.name}
+                className={cn(
+                  'block text-xs font-medium',
+                  error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
+                  required && 'after:content-["*"] after:ml-1 after:text-red-500 dark:after:text-red-400'
+                )}
+              >
+                {config.label}
+              </label>
+            ) : (
+              <div></div>
             )}
-          >
-            {config.label}
-          </label>
+            {canCopy && value && (
+              <CopyContent content={value} />
+            )}
+          </div>
         )}
         <div className="relative">
         <textarea
@@ -120,10 +141,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
           dir="auto"
           {...props}
         />
-          <div className="absolute right-1 top-2 flex items-center gap-1">
-            {canCopy && value && (
-              <CopyContent content={value} />
-            )}
+          <div className="absolute right-3 top-2 flex items-center gap-1">
             {aiAgentId && value && value.trim() && (
               <button
                 type="button"
@@ -142,6 +160,25 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
               </button>
             )}
           </div>
+          {enableVoiceInput && (
+            <div className="absolute right-3 bottom-2 flex items-center gap-1">
+              <button
+                type="button"
+                onClick={handleVoiceInputClick}
+                disabled={disabled}
+                className={cn(
+                  'p-1.5 rounded-md transition-colors',
+                  'hover:bg-violet-100 dark:hover:bg-violet-900/30',
+                  'text-violet-600 dark:text-violet-400',
+                  'disabled:opacity-50 disabled:cursor-not-allowed',
+                  'focus:outline-none focus:ring-2 focus:ring-violet-300 dark:focus:ring-violet-700'
+                )}
+                title="Voice Input"
+              >
+                <Mic className="h-4 w-4" />
+              </button>
+            </div>
+          )}
         </div>
         {error && (
           <p className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
@@ -159,6 +196,20 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
             onOpenChange={setIsModalOpen}
             initialText={value || ''}
             onApply={handleApplyEnhancedText}
+          />
+        )}
+        {enableVoiceInput && (
+          <VoiceInputDialog
+            isOpen={isVoiceDialogOpen}
+            onOpenChange={setIsVoiceDialogOpen}
+            onTranscript={(text) => {
+              onChange?.(text);
+            }}
+            onApply={(text) => {
+              onChange?.(text);
+              setIsVoiceDialogOpen(false);
+            }}
+            loadingTextSwitches={loadingTextSwitches}
           />
         )}
       </div>

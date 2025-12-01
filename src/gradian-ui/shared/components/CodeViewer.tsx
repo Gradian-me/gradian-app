@@ -206,6 +206,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
               'focus:ring-0 focus:outline-none',
               'overflow-auto'
             )}
+            dir="auto"
             style={{
               fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
               whiteSpace: 'pre',
@@ -236,7 +237,8 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
                     padding: '1rem',
                     fontSize: '0.875rem',
                     lineHeight: '1.5rem',
-                    borderRadius: 0
+                    borderRadius: 0,
+                    backgroundColor: '#0E1424'
                   }}
                   codeTagProps={{
                     style: {

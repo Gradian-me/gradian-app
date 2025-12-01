@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Skeleton } from '@/components/ui/skeleton';
+import { VoicePoweredOrb } from '@/components/ui/voice-powered-orb';
+import { TextSwitcher } from '@/components/ui/text-switcher';
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { Modal } from '@/gradian-ui/data-display/components/Modal';
 import { SchemaFormWrapper } from '@/gradian-ui/form-builder/components/FormLifecycleManager';
@@ -429,22 +432,32 @@ export default function AiBuilderPage() {
 
         <MessageDisplay error={error} successMessage={successMessage} />
 
-        {aiResponse && selectedAgent && (
-          <AiBuilderResponse
-            response={aiResponse}
-            agent={selectedAgent}
-            tokenUsage={tokenUsage}
-            duration={duration}
-            isApproving={isApproving}
-            isLoading={isLoading}
-            onApprove={handleApprove}
-            onCardClick={handleCardClick}
-            annotations={annotationsArray}
-            onAnnotationsChange={handleAnnotationChange}
-            onRemoveSchema={handleRemoveSchema}
-            onApplyAnnotations={handleApplyAnnotations}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {aiResponse && selectedAgent ? (
+            <motion.div
+              key="ai-response"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+              <AiBuilderResponse
+                response={aiResponse}
+                agent={selectedAgent}
+                tokenUsage={tokenUsage}
+                duration={duration}
+                isApproving={isApproving}
+                isLoading={isLoading}
+                onApprove={handleApprove}
+                onCardClick={handleCardClick}
+                annotations={annotationsArray}
+                onAnnotationsChange={handleAnnotationChange}
+                onRemoveSchema={handleRemoveSchema}
+                onApplyAnnotations={handleApplyAnnotations}
+              />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
 
         {/* Preview Form Modal with Annotations */}
         {previewSchema && (
@@ -512,6 +525,37 @@ export default function AiBuilderPage() {
           ]}
         />
       </div>
+
+      {/* Loading Indicator - Voice Powered Orb (outside container, at bottom) */}
+      {/* Show only while loading and no response yet */}
+      <AnimatePresence>
+        {isLoading && !aiResponse && (
+          <motion.div
+            key="loading-orb"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="w-full h-96 relative rounded-xl overflow-hidden mt-6"
+          >
+            <VoicePoweredOrb
+              enableVoiceControl={false}
+              className="rounded-xl overflow-hidden"
+            />
+            {selectedAgent?.loadingTextSwitches && (
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <TextSwitcher
+                  texts={selectedAgent.loadingTextSwitches}
+                  className="text-gray-900 dark:text-white font-medium text-sm md:text-base px-4 py-2"
+                  switchInterval={3000}
+                  transitionDuration={0.5}
+                  shimmerDuration={1}
+                />
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </MainLayout>
   );
 }

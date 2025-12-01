@@ -102,7 +102,7 @@ export default function QRGeneratePage() {
             />
 
             <div>
-              <label className="block text-xs font-medium mb-1 text-gray-700 dark:text-gray-300">
+              <label className="block text-xs font-medium mb-2 text-gray-700 dark:text-gray-300">
                 Eye Color
               </label>
               <input
@@ -114,7 +114,7 @@ export default function QRGeneratePage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1 text-gray-700 dark:text-gray-300">
+              <label className="block text-xs font-medium mb-2 text-gray-700 dark:text-gray-300">
                 Body Color
               </label>
               <input
@@ -126,7 +126,7 @@ export default function QRGeneratePage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1 text-gray-700 dark:text-gray-300">
+              <label className="block text-xs font-medium mb-2 text-gray-700 dark:text-gray-300">
                 Padding
               </label>
               <input
@@ -140,7 +140,7 @@ export default function QRGeneratePage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium mb-1 text-gray-700 dark:text-gray-300">
+              <label className="block text-xs font-medium mb-2 text-gray-700 dark:text-gray-300">
                 Margin
               </label>
               <input

@@ -862,5 +862,48 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBBK9D5VT1FM2HP49EWTR78D",
+    "timestamp": "2025-11-30T23:59:06.942Z",
+    "version": "1.08.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "AI Voice Transcription in AI Builder",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "voice"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved AI agent configurations with loading text switches for better user feedback",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined form components and enhanced layout for improved user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Revised health check timestamps for accuracy and added new voice transcription capabilities in application variables",
+        "priority": "Medium",
+        "affectedDomains": [
+          "health-check",
+          "application-variables"
+        ]
+      }
+    ]
   }
 ]

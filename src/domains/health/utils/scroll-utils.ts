@@ -12,7 +12,7 @@ export { scrollToElement, scrollToSelector };
  */
 export const scrollToService = (serviceId: string): void => {
   scrollToElement(`service-card-${serviceId}`, {
-    highlightClasses: ['ring-2', 'ring-red-500', 'ring-offset-2'],
+    highlightClasses: ['ring-2', 'ring-red-500', 'ring-offset-2', 'rounded-xl'],
     highlightDuration: 2000,
   });
 };
