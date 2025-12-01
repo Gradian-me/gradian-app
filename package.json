@@ -6,6 +6,7 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
+    "start:standalone": "node .next/standalone/server.js",
     "lint": "eslint",
     "build:cdn": "node scripts/build-cdn.js",
     "build:cdn:watch": "node scripts/build-cdn.js --watch",

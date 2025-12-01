@@ -307,7 +307,7 @@ export const GoToTop: React.FC<GoToTopProps> = ({
               progress={scrollProgress}
               size={46}
               strokeWidth={4}
-              color={['#A78BFA']}
+              color={['#A200FF']}
               showLabel={false}
               className="pointer-events-none"
             />

@@ -5553,5 +5553,131 @@
     ],
     "showInNavigation": true,
     "isSystemSchema": true
+  },
+  {
+    "id": "menu-items",
+    "description": "Define and manage application menu items",
+    "singular_name": "Menu Item",
+    "plural_name": "Menu Items",
+    "cardMetadata": [
+      {
+        "id": "menu-item-info",
+        "title": "Menu Item Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "menu-title",
+          "menu-icon",
+          "menu-url"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "menu-title",
+        "name": "menuTitle",
+        "label": "Menu Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter menu title",
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "menu-icon",
+        "name": "menuIcon",
+        "label": "Menu Icon",
+        "sectionId": "basic-information",
+        "component": "icon",
+        "placeholder": "Enter Lucide icon name (e.g., Menu)",
+        "role": "icon",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "hide-in-ad",
+        "name": "hideInAD",
+        "label": "Hide in AD",
+        "sectionId": "basic-information",
+        "component": "switch",
+        "required": false,
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "menu-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter menu description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "menu-url",
+        "name": "menuUrl",
+        "label": "Menu URL",
+        "sectionId": "basic-information",
+        "component": "url",
+        "placeholder": "Enter menu URL",
+        "validation": {
+          "required": true,
+          "pattern": "^https?:\\/\\/.+"
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "open-in-new-tab",
+        "name": "openInNewTab",
+        "label": "Open in New Tab",
+        "sectionId": "basic-information",
+        "component": "switch",
+        "required": false,
+        "colSpan": 1,
+        "order": 6
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Menu Item Information",
+        "description": "Basic menu item details",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "menu-item-overview",
+          "title": "Menu Item Overview",
+          "description": "Basic menu item information",
+          "colSpan": 2,
+          "fieldIds": [
+            "menu-title",
+            "menu-icon",
+            "menu-url",
+            "hide-in-ad",
+            "open-in-new-tab",
+            "menu-description"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "Menu",
+    "allowDataInactive": true,
+    "allowHierarchicalParent": true
   }
 ]

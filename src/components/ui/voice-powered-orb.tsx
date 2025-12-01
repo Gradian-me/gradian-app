@@ -328,8 +328,8 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
         container.removeChild(container.firstChild);
       }
 
-      // Ensure canvas is HTMLCanvasElement (not OffscreenCanvas)
-      if (glContext.canvas instanceof HTMLCanvasElement) {
+      // Ensure canvas is HTMLCanvasElement (not OffscreenCanvas). Guard for SSR where HTMLCanvasElement is undefined.
+      if (typeof HTMLCanvasElement !== "undefined" && glContext.canvas instanceof HTMLCanvasElement) {
         container.appendChild(glContext.canvas);
       }
 
@@ -368,7 +368,7 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
         if (width === 0 || height === 0) return;
 
         rendererInstance.setSize(width * dpr, height * dpr);
-        if (glContext.canvas instanceof HTMLCanvasElement) {
+        if (typeof HTMLCanvasElement !== "undefined" && glContext.canvas instanceof HTMLCanvasElement) {
           glContext.canvas.style.width = width + "px";
           glContext.canvas.style.height = height + "px";
         }
@@ -468,7 +468,12 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
         window.removeEventListener("resize", resize);
 
         // Clean up canvas safely
-        if (container && glContext && glContext.canvas instanceof HTMLCanvasElement) {
+        if (
+          container &&
+          glContext &&
+          typeof HTMLCanvasElement !== "undefined" &&
+          glContext.canvas instanceof HTMLCanvasElement
+        ) {
           try {
             if (container.contains(glContext.canvas)) {
               container.removeChild(glContext.canvas);
