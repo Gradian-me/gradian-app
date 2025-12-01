@@ -905,5 +905,48 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBC2K7QM1EKQNJ8JFJWS81QX",
+    "timestamp": "2025-12-01T04:26:16.402Z",
+    "version": "1.08.001",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "Improved TextSwitcher component to handle empty texts array gracefully",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "components"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Enhanced VoiceInputDialog to ensure immediate release of microphone tracks and improved handling of recording states",
+        "priority": "Medium",
+        "affectedDomains": [
+          "voice",
+          "communication"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined useAudioRecorder hook for better error handling and resource management",
+        "priority": "Medium",
+        "affectedDomains": [
+          "voice",
+          "hooks"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Cleared loading text switches in Textarea component for improved voice dialog state management",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "voice"
+        ]
+      }
+    ]
   }
 ]

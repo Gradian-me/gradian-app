@@ -121,11 +121,17 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
   }, [isRecording, stopAllTracks]);
 
   const clearRecording = useCallback(() => {
-    // Stop any active recording and tracks
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
+    // Stop any active recording and tracks immediately
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (error) {
+        console.warn('Error stopping MediaRecorder:', error);
+      }
     }
+    setIsRecording(false);
+    
+    // Stop all tracks immediately to release microphone
     stopAllTracks();
     
     // Revoke object URL to free memory
@@ -137,7 +143,8 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     setAudioUrl(null);
     setError(null);
     chunksRef.current = [];
-  }, [audioUrl, isRecording, stopAllTracks]);
+    mediaRecorderRef.current = null;
+  }, [audioUrl, stopAllTracks]);
 
   return {
     isRecording,

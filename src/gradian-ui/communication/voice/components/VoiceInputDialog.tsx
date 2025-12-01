@@ -85,11 +85,15 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   // Cleanup when dialog closes and reset when it opens
   useEffect(() => {
     if (!isOpen) {
-      // Ensure microphone is stopped when dialog closes
+      // Immediately stop all microphone tracks to release the microphone
+      // This must happen first to prevent the browser from showing the microphone icon
+      clearRecording();
+      
+      // Also stop recording if it's still active
       if (isRecording) {
         stopRecording();
       }
-      clearRecording();
+      
       // Clear transcription and errors when dialog closes
       setTranscription(null);
       setTranscriptionError(null);
@@ -186,12 +190,15 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   };
 
   const handleClose = () => {
-    // Stop recording first to ensure microphone is released
+    // Immediately stop all tracks to release the microphone
+    // This must happen first to prevent the browser from showing the microphone icon
+    clearRecording();
+    
+    // Also stop recording if it's still active
     if (isRecording) {
       stopRecording();
     }
-    // Clear recording to stop any tracks
-    clearRecording();
+    
     setTranscription(null);
     setTranscriptionError(null);
     onOpenChange(false);
@@ -215,10 +222,10 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
 
         <div className="flex flex-col items-center space-y-6 px-6 pb-6 overflow-y-auto flex-1 min-h-0">
           {/* Orb Container - Show when not recording and no recording exists, or during recording */}
-          {!recordedBlob && (
+          {!recordedBlob && isOpen && (
             <div className="w-full h-96 relative rounded-xl overflow-hidden">
               <VoicePoweredOrb
-                enableVoiceControl={isRecording}
+                enableVoiceControl={isRecording && isOpen}
                 className="rounded-xl overflow-hidden"
               />
               {loadingTextSwitches && (isRecording || isTranscribing) && (

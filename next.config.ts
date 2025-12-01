@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
   experimental: {
     // Optimize package imports - reduces bundle size and improves build speed
     optimizePackageImports: [
+      // Radix UI components
       '@radix-ui/react-accordion',
       '@radix-ui/react-alert-dialog',
       '@radix-ui/react-avatar',
@@ -27,8 +28,24 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-tabs',
       '@radix-ui/react-toast',
       '@radix-ui/react-tooltip',
+      // Icons and utilities
       'lucide-react',
       'date-fns',
+      // Data fetching and state management
+      '@tanstack/react-query',
+      '@tanstack/react-table',
+      // Animation library
+      'framer-motion',
+      // Form handling
+      'react-hook-form',
+      // Charts
+      'recharts',
+      'echarts',
+      'echarts-for-react',
+      // Date picker
+      'react-day-picker',
+      // Syntax highlighting
+      'react-syntax-highlighter',
     ],
   },
   webpack: (config, { dev, isServer }) => {

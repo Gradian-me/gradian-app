@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.08.000",
+  "version": "1.08.001",
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
