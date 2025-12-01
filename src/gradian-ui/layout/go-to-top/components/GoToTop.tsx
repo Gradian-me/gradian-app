@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronUp } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { cn } from '../../../shared/utils';
+import { CircularProgress } from '@/gradian-ui/analytics/indicators/kpi-list/components/CircularProgress';
 
 export interface GoToTopProps {
   /**
@@ -50,7 +51,9 @@ export const GoToTop: React.FC<GoToTopProps> = ({
   scrollContainerSelector
 }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const scrollContainerRef = useRef<HTMLElement | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -104,17 +107,39 @@ export const GoToTop: React.FC<GoToTopProps> = ({
       return null;
     };
 
-    const getScrollPosition = (): number => {
+    const getScrollInfo = (): { position: number; max: number } => {
       if (scrollContainerRef.current) {
-        return scrollContainerRef.current.scrollTop;
+        const container = scrollContainerRef.current;
+        const max = Math.max(container.scrollHeight - container.clientHeight, 0);
+        return { position: container.scrollTop, max };
       }
-      return window.pageYOffset || document.documentElement.scrollTop || window.scrollY || 0;
+
+      const doc = document.documentElement;
+      const body = document.body;
+      const scrollTop = window.pageYOffset || doc.scrollTop || body.scrollTop || 0;
+      const scrollHeight = Math.max(
+        body.scrollHeight,
+        doc.scrollHeight,
+        body.offsetHeight,
+        doc.offsetHeight,
+        body.clientHeight,
+        doc.clientHeight
+      );
+      const max = Math.max(scrollHeight - window.innerHeight, 0);
+      return { position: scrollTop, max };
     };
 
-    const toggleVisibility = () => {
+    const updateVisibilityAndProgress = () => {
       if (!mounted) return;
-      const scrollPosition = getScrollPosition();
-      setIsVisible(scrollPosition > threshold);
+      const { position, max } = getScrollInfo();
+      setIsVisible(position > threshold);
+
+      if (max > 0) {
+        const pct = Math.min(100, Math.max(0, (position / max) * 100));
+        setScrollProgress(pct);
+      } else {
+        setScrollProgress(0);
+      }
     };
 
     const setupScrollListener = () => {
@@ -128,24 +153,23 @@ export const GoToTop: React.FC<GoToTopProps> = ({
 
       // Store references for cleanup
       const containerToListen = scrollContainerRef.current;
-      const shouldListenToWindow = !containerToListen || scrollContainerSelector;
 
       // Listen to container scroll if found
       if (containerToListen) {
-        containerToListen.addEventListener('scroll', toggleVisibility, { passive: true });
+        containerToListen.addEventListener('scroll', updateVisibilityAndProgress, { passive: true });
       }
       
       // Also listen to window (as fallback or primary if no container)
-      window.addEventListener('scroll', toggleVisibility, { passive: true });
+      window.addEventListener('scroll', updateVisibilityAndProgress, { passive: true });
       
       // Initial check
-      toggleVisibility();
+      updateVisibilityAndProgress();
 
       return () => {
         if (containerToListen) {
-          containerToListen.removeEventListener('scroll', toggleVisibility);
+          containerToListen.removeEventListener('scroll', updateVisibilityAndProgress);
         }
-        window.removeEventListener('scroll', toggleVisibility);
+        window.removeEventListener('scroll', updateVisibilityAndProgress);
       };
     };
 
@@ -206,21 +230,54 @@ export const GoToTop: React.FC<GoToTopProps> = ({
       if (cleanupFn) {
         cleanupFn();
       }
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
     };
   }, [threshold, scrollContainerSelector]);
 
   const scrollToTop = useCallback(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    } else {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+    const container = scrollContainerRef.current;
+
+    // Cancel any ongoing animation
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
     }
+
+    const start =
+      container && typeof container.scrollTop === 'number'
+        ? container.scrollTop
+        : (window.pageYOffset ||
+            document.documentElement.scrollTop ||
+            window.scrollY ||
+            0);
+    const duration = 800; // ms
+    const startTime = performance.now();
+
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const frame = (now: number) => {
+      const elapsed = now - startTime;
+      const t = Math.min(1, elapsed / duration);
+      const eased = easeOutCubic(t);
+      const next = start * (1 - eased);
+
+      if (container) {
+        container.scrollTop = next;
+      } else {
+        window.scrollTo(0, next);
+      }
+
+      if (t < 1) {
+        animationFrameRef.current = requestAnimationFrame(frame);
+      } else {
+        animationFrameRef.current = null;
+      }
+    };
+
+    animationFrameRef.current = requestAnimationFrame(frame);
   }, []);
 
   const positionClasses = {
@@ -242,30 +299,39 @@ export const GoToTop: React.FC<GoToTopProps> = ({
             duration: 0.3,
             ease: [0.25, 0.46, 0.45, 0.94]
           }}
-          className={cn(
-            'fixed z-50',
-            positionClasses[position],
-            className
-          )}
+          className={cn('fixed z-50', positionClasses[position], className)}
         >
-          <Button
-            onClick={scrollToTop}
-            size="icon"
-            variant="outline"
-            className={cn(
-              'h-10 w-10 rounded-full',
-              'bg-white/90 backdrop-blur-sm',
-              'border-gray-400 hover:border-violet-400',
-              'shadow-md hover:shadow-lg',
-              'text-gray-700 hover:text-violet-600',
-              'transition-all duration-200',
-              'hover:scale-105 active:scale-95',
-              'hover:bg-white'
-            )}
-            aria-label="Scroll to top"
-          >
-            <ChevronUp className="h-4 w-4" />
-          </Button>
+          <div className="relative flex items-center justify-center">
+            {/* Circular scroll progress border */}
+            <CircularProgress
+              progress={scrollProgress}
+              size={46}
+              strokeWidth={4}
+              color={['#A78BFA']}
+              showLabel={false}
+              className="pointer-events-none"
+            />
+            {/* Center button */}
+            <Button
+              onClick={scrollToTop}
+              size="icon"
+              variant="outline"
+              className={cn(
+                'absolute h-9 w-9 rounded-full',
+                'bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm',
+                'border border-gray-400/80 dark:border-gray-500/80',
+                'shadow-md hover:shadow-lg',
+                'text-gray-700 dark:text-gray-200',
+                'hover:text-violet-500 dark:hover:text-violet-300',
+                'transition-all duration-200',
+                'hover:scale-105 active:scale-95',
+                'hover:bg-white dark:hover:bg-gray-900'
+              )}
+              aria-label="Scroll to top"
+            >
+              <ChevronUp className="h-4 w-4" />
+            </Button>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

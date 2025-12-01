@@ -68,6 +68,13 @@ export interface CircularProgressProps {
   color?: string | string[]; // Tailwind color name, hex, or array for timer
   className?: string;
   colorsTime?: [number, number, ...number[]]; // For timer mode with color transitions
+  /**
+   * Whether to show the default label inside the circle
+   * - Timer mode: remaining seconds
+   * - Progress mode: percentage
+   * @default true
+   */
+  showLabel?: boolean;
 }
 
 export function CircularProgress({
@@ -83,6 +90,7 @@ export function CircularProgress({
   color,
   className,
   colorsTime,
+  showLabel = true,
 }: CircularProgressProps) {
   const colorHex: ColorFormat = getColorHex(Array.isArray(color) ? color[0] : color);
   
@@ -121,11 +129,13 @@ export function CircularProgress({
             return { shouldRepeat: true, delay: 0 };
           }}
         >
-          {({ remainingTime }) => (
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-200">
-              {remainingTime}s
-            </span>
-          )}
+          {({ remainingTime }) =>
+            showLabel ? (
+              <span className="text-xs font-semibold text-gray-700 dark:text-gray-200">
+                {remainingTime}s
+              </span>
+            ) : null
+          }
         </CountdownCircleTimer>
       </div>
     );
@@ -149,6 +159,7 @@ export function CircularProgress({
     return (
       <div className={cn('relative flex items-center justify-center', className)}>
         <CountdownCircleTimer
+          key={Math.round(clampedProgress)} // re-mount to reflect updated progress
           isPlaying={false}
           duration={100}
           initialRemainingTime={remainingForDisplay}
@@ -157,11 +168,13 @@ export function CircularProgress({
           colors="#E5E7EB" // Grey for the "remaining" (empty) part
           trailColor={colorHex} // Progress color for the "elapsed" (filled) part
         >
-          {() => (
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-200">
-              {Math.round(clampedProgress)}%
-            </span>
-          )}
+          {() =>
+            showLabel ? (
+              <span className="text-xs font-semibold text-gray-700 dark:text-gray-200">
+                {Math.round(clampedProgress)}%
+              </span>
+            ) : null
+          }
         </CountdownCircleTimer>
       </div>
     );

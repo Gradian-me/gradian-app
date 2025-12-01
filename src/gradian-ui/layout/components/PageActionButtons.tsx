@@ -20,6 +20,12 @@ export interface PageActionButtonsProps {
   showDownload?: boolean;
   showGoToUrl?: boolean;
   showHome?: boolean;
+  /**
+   * Layout variant:
+   * - "default": full-width bar with left/right sections
+   * - "inline": compact inline actions (for headers/toolbars)
+   */
+  layout?: 'default' | 'inline';
 }
 
 export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
@@ -30,6 +36,7 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
   showDownload = true,
   showGoToUrl = true,
   showHome = true,
+  layout = 'default',
 }) => {
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
   const [currentValue, setCurrentValue] = useState<string>('');
@@ -46,10 +53,19 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
   }, [value, pathname]);
 
 
+  const isInline = layout === 'inline';
+
   return (
-    <div className={cn('flex items-center justify-between w-full', className)}>
-      {/* Left side - Home button */}
-      {showHome && (
+    <div
+      className={cn(
+        isInline
+          ? 'flex items-center gap-2 w-auto'
+          : 'flex items-center justify-between w-full',
+        className,
+      )}
+    >
+      {/* Left side - Home button (only in default layout) */}
+      {!isInline && showHome && (
         <Button
           onClick={() => router.push(URL_HOME)}
           variant="outline"
@@ -61,14 +77,18 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
         </Button>
       )}
 
-      {/* Right side - Action buttons */}
-      <div className="flex items-center gap-2">
+      {/* Right side / inline actions */}
+      <div className={cn('flex items-center gap-2', isInline && 'justify-end')}>
         {showQRCode && (
           <Button
             onClick={() => setIsQRDialogOpen(true)}
             variant="outline"
-            size="sm"
-            className="h-10 w-10 p-0 rounded-lg"
+            size={isInline ? 'icon' : 'sm'}
+            className={cn(
+              isInline
+                ? 'h-11 w-11 p-0 rounded-xl'
+                : 'h-10 w-10 p-0 rounded-lg',
+            )}
             title="Show QR Code"
           >
             <QrCode className="h-4 w-4" />
@@ -81,8 +101,12 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
             title="Share this page"
             text="Check out this page"
             variant="outline"
-            size="md"
-            className="rounded-lg"
+            size={isInline ? 'sm' : 'md'}
+            className={cn(
+              isInline
+                ? 'h-11 w-11 p-0 rounded-xl flex items-center justify-center'
+                : 'rounded-lg',
+            )}
           />
         )}
       </div>

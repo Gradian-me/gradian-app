@@ -24,7 +24,41 @@ export const CopyContent: React.FC<CopyContentProps> = ({
   const handleCopy = async () => {
     try {
       const textToCopy = String(content);
-      await navigator.clipboard.writeText(textToCopy);
+
+      // Prefer modern clipboard API when available and in a secure context.
+      // Note: navigator.clipboard only works on HTTPS or localhost. For HTTP + IP
+      // (e.g. http://172.24.0.109:3000), we fall back to a classic execCommand-based copy.
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(textToCopy);
+      } else {
+        // Fallback for non-secure contexts / older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = textToCopy;
+
+        // Avoid scrolling to bottom
+        textArea.style.position = 'fixed';
+        textArea.style.top = '0';
+        textArea.style.left = '0';
+        textArea.style.width = '1px';
+        textArea.style.height = '1px';
+        textArea.style.padding = '0';
+        textArea.style.border = 'none';
+        textArea.style.outline = 'none';
+        textArea.style.boxShadow = 'none';
+        textArea.style.background = 'transparent';
+
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+
+        if (!successful) {
+          throw new Error('Fallback copy command was unsuccessful');
+        }
+      }
+
       setCopied(true);
       toast.success('Copied to clipboard');
       

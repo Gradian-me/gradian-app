@@ -11,6 +11,7 @@ import {
   extractFilename,
   generateMarkdownMetadata
 } from '@/gradian-ui/data-display/markdown/utils/pathResolver';
+import { PageActionButtons } from '@/gradian-ui/layout/components/PageActionButtons';
 import { MarkdownPageClient } from './MarkdownPageClient';
 
 interface PageProps {
@@ -60,10 +61,14 @@ export default async function MarkdownRenderPage({ params, searchParams }: PageP
                   {title}
                 </h1>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Documentation
-                </div>
+              <div className="flex items-center gap-3">
+                <PageActionButtons 
+                  showHome={false} 
+                  showDownload={false} 
+                  showGoToUrl={false}
+                  layout="inline"
+                  className="w-auto"
+                />
                 <ModeToggle />
               </div>
             </div>
@@ -77,8 +82,8 @@ export default async function MarkdownRenderPage({ params, searchParams }: PageP
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
             <MarkdownPageClient
               content={fileContents}
-              stickyHeadings={['#', '##']}
-              navigationHeadingLevels={[2]}
+              stickyHeadings={['##']}
+              navigationHeadingLevels={[1, 2]}
             />
           </div>
         </div>

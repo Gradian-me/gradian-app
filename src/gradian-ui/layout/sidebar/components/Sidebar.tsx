@@ -65,12 +65,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* Navigation */}
-      <SidebarNavigation
-        items={navigationItems}
-        isCollapsed={isCollapsed}
-        isMobile={isMobile}
-        navigationSchemas={navigationSchemas}
-      />
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <SidebarNavigation
+          items={navigationItems}
+          isCollapsed={isCollapsed}
+          isMobile={isMobile}
+          navigationSchemas={navigationSchemas}
+        />
+      </div>
 
       {/* User Profile / Mode Toggle */}
       {showUserControls && (

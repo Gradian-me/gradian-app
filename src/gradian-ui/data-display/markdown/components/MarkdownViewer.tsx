@@ -21,7 +21,7 @@ export function MarkdownViewer({
   navigationHeadingLevels = [],
   onNavigationData
 }: MarkdownViewerProps) {
-  const [showRaw, setShowRaw] = useState(false);
+  const [viewMode, setViewMode] = useState<'preview' | 'raw'>('preview');
   const [headings, setHeadings] = useState<Array<{ id: string; text: string; level: number }>>([]);
   
   // Extract headings for navigation using remark parser
@@ -104,10 +104,10 @@ export function MarkdownViewer({
   return (
     <div className="space-y-4">
       {showToggle && (
-        <MarkdownToolbox showRaw={showRaw} onToggleRaw={setShowRaw} />
+        <MarkdownToolbox viewMode={viewMode} onViewModeChange={setViewMode} />
       )}
 
-      {showRaw ? (
+      {viewMode === 'raw' ? (
         <div className="my-4">
           <CodeViewer
             code={content}

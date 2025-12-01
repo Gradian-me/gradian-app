@@ -985,5 +985,75 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBCG0XENHANCESCROLLXYZ001",
+    "timestamp": "2025-12-01T12:00:00.000Z",
+    "version": "1.08.003",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Added PageActionButtons component for improved navigation and action handling in Markdown render pages",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout",
+          "markdown-viewer",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Adjusted MarkdownNavigation to utilize ScrollArea for better scrolling experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "markdown-viewer",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Enhanced CircularProgress component to conditionally display labels based on props",
+        "priority": "Medium",
+        "affectedDomains": [
+          "analytics",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Revised MarkdownToolbox to use ToggleGroup for view mode selection",
+        "priority": "Medium",
+        "affectedDomains": [
+          "markdown-viewer",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved useMarkdownScrollSpy to synchronize URL hash with active headings",
+        "priority": "Medium",
+        "affectedDomains": [
+          "markdown-viewer"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Enhanced GoToTop component with scroll progress indicator and smoother scrolling behavior",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated Sidebar and SidebarNavigation components for better layout management",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

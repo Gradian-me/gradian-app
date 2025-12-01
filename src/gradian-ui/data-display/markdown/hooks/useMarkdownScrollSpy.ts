@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export interface Heading {
   id: string;
@@ -9,10 +9,22 @@ export interface Heading {
 }
 
 /**
- * Hook to track which heading is currently active based on scroll position
+ * Hook to track which heading is currently active based on URL hash (ID)
+ * Updates hash when scrolling to keep URL in sync with visible heading
  */
 export function useMarkdownScrollSpy(headings: Heading[]) {
   const [activeHeadingId, setActiveHeadingId] = useState<string | undefined>();
+  const isUpdatingHashRef = useRef(false);
+
+  // Get initial hash from URL
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.slice(1); // Remove #
+      if (hash && headings.some(h => h.id === hash)) {
+        setActiveHeadingId(hash);
+      }
+    }
+  }, [headings]);
 
   useEffect(() => {
     if (headings.length === 0) return;
@@ -56,48 +68,11 @@ export function useMarkdownScrollSpy(headings: Heading[]) {
     function setupObserver(headingElements: Array<{ id: string; element: HTMLElement }>): () => void {
       if (headingElements.length === 0) return () => {};
 
-      const observerOptions = {
-        root: null,
-        rootMargin: '-100px 0px -80% 0px', // Trigger when heading is near top
-        threshold: [0, 0.25, 0.5, 0.75, 1]
-      };
+      const headerOffset = 100; // Account for sticky header
+      const threshold = headerOffset + 20; // Threshold for "active" heading
 
-      const observerCallback = (entries: IntersectionObserverEntry[]) => {
-        // Find all intersecting entries that are above the threshold (100px for header)
-        const intersecting = entries
-          .filter(entry => {
-            const top = entry.boundingClientRect.top;
-            return entry.isIntersecting && top >= 0 && top <= 150;
-          })
-          .sort((a, b) => {
-            // Sort by position from top (closest to top first)
-            return a.boundingClientRect.top - b.boundingClientRect.top;
-          });
-
-        if (intersecting.length > 0) {
-          // Use the first (topmost) intersecting heading by ID
-          const activeId = intersecting[0].target.id;
-          if (activeId) {
-            setActiveHeadingId(activeId);
-          }
-        }
-      };
-
-      const observer = new IntersectionObserver(observerCallback, observerOptions);
-
-      // Observe all headings
-      headingElements.forEach(({ element }) => {
-        if (element) {
-          observer.observe(element);
-        }
-      });
-
-      // Also listen to scroll events for better accuracy - ID-based detection
-      const handleScroll = () => {
-        const headerOffset = 100; // Account for sticky header
-        const threshold = headerOffset + 50; // Threshold for "active" heading
-        
-        // Find the heading that's currently at or just above the viewport top
+      // Find the currently visible heading based on scroll position
+      const findActiveHeading = (): string | undefined => {
         let activeId: string | undefined;
         let bestHeading: { id: string; element: HTMLElement } | null = null;
         let bestPosition = -Infinity;
@@ -116,7 +91,7 @@ export function useMarkdownScrollSpy(headings: Heading[]) {
           }
         }
         
-        // If we found a heading, use it; otherwise, check if we're past all headings
+        // If we found a heading, use it
         if (bestHeading) {
           activeId = bestHeading.id;
         } else if (headingElements.length > 0) {
@@ -134,25 +109,84 @@ export function useMarkdownScrollSpy(headings: Heading[]) {
           }
         }
         
-        if (activeId) {
-          setActiveHeadingId(activeId);
+        return activeId;
+      };
+
+      // Update hash and active state
+      const updateActiveHeading = (id: string | undefined) => {
+        if (id && id !== activeHeadingId) {
+          setActiveHeadingId(id);
+          
+          // Update URL hash if it's different (but don't trigger hashchange event)
+          if (!isUpdatingHashRef.current && window.location.hash.slice(1) !== id) {
+            isUpdatingHashRef.current = true;
+            window.history.replaceState(null, '', `#${id}`);
+            setTimeout(() => {
+              isUpdatingHashRef.current = false;
+            }, 100);
+          }
+        } else if (!id && activeHeadingId) {
+          setActiveHeadingId(undefined);
         }
       };
 
+      // Listen to scroll events to detect visible heading
+      let scrollTimeout: NodeJS.Timeout;
+      const handleScroll = () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          if (!isUpdatingHashRef.current) {
+            const activeId = findActiveHeading();
+            updateActiveHeading(activeId);
+          }
+        }, 50); // Debounce scroll events
+      };
+
+      // Listen to hash changes in URL (from navigation clicks or browser back/forward)
+      const handleHashChange = () => {
+        if (!isUpdatingHashRef.current) {
+          const hash = window.location.hash.slice(1); // Remove #
+          if (hash && headingElements.some(h => h.id === hash)) {
+            setActiveHeadingId(hash);
+          } else if (!hash) {
+            setActiveHeadingId(undefined);
+          }
+        }
+      };
+
+      // Listen to popstate for browser back/forward
+      const handlePopState = () => {
+        handleHashChange();
+      };
+
+      // Initial check
+      const initialHash = window.location.hash.slice(1);
+      if (initialHash && headingElements.some(h => h.id === initialHash)) {
+        setActiveHeadingId(initialHash);
+      } else {
+        // No hash in URL, find the visible heading
+        setTimeout(() => {
+          const activeId = findActiveHeading();
+          updateActiveHeading(activeId);
+        }, 100);
+      }
+
       window.addEventListener('scroll', handleScroll, { passive: true });
-      // Wait for DOM to be ready
-      setTimeout(handleScroll, 100);
+      window.addEventListener('hashchange', handleHashChange);
+      window.addEventListener('popstate', handlePopState);
 
       return () => {
-        observer.disconnect();
+        clearTimeout(scrollTimeout);
         window.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('hashchange', handleHashChange);
+        window.removeEventListener('popstate', handlePopState);
       };
     }
     
     return () => {
       cleanup?.();
     };
-  }, [headings]);
+  }, [headings, activeHeadingId]);
 
   return activeHeadingId;
 }

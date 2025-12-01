@@ -35,8 +35,8 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   }, []);
 
   return (
-    <ScrollArea className={cn("flex-1 px-4", className)}>
-      <nav className="space-y-3 pt-2">
+    <ScrollArea className={cn("h-full px-4", className)}>
+      <nav className="space-y-3 pt-2 pb-4">
         {items.map((item, index) => {
           const isActive = isActiveNavigationItem(item, currentPath);
           const Icon = item.icon;
