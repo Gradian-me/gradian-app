@@ -30,6 +30,7 @@ export const MessageBoxContainer: React.FC<MessageBoxContainerProps> = ({
   // Extract messages from response
   const messages = response.messages || [];
   const message = response.message;
+  const statusCode = response.statusCode;
 
   // If no messages found, don't render
   if (!messages.length && !message) {
@@ -40,6 +41,7 @@ export const MessageBoxContainer: React.FC<MessageBoxContainerProps> = ({
     <MessageBox
       messages={messages}
       message={message}
+      statusCode={statusCode}
       variant={variant}
       dismissible={dismissible}
       className={className}

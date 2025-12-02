@@ -8,7 +8,7 @@ import { BaseController } from '@/gradian-ui/shared/domain/controllers/base.cont
 import { BaseEntity } from '@/gradian-ui/shared/domain/types/base.types';
 import { isValidSchemaId, getSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
 import { loadAllCompanies, clearCompaniesCache } from '@/gradian-ui/shared/utils/companies-loader';
-import { isDemoModeEnabled, proxyDataRequest } from '../utils';
+import { isDemoModeEnabled, proxyDataRequest, enrichWithUsers, enrichEntitiesWithUsers } from '../utils';
 
 /**
  * Create controller instance for the given schema
@@ -104,7 +104,28 @@ export async function GET(
     }
 
     const controller = await createController(schemaId);
-    return await controller.getAll(request);
+    const response = await controller.getAll(request);
+    
+    // Enrich response with user objects in demo mode
+    if (isDemoModeEnabled()) {
+      try {
+        const responseData = await response.json();
+        if (responseData && responseData.success && responseData.data) {
+          if (Array.isArray(responseData.data)) {
+            responseData.data = await enrichEntitiesWithUsers(responseData.data);
+          } else if (typeof responseData.data === 'object') {
+            responseData.data = await enrichWithUsers(responseData.data);
+          }
+        }
+        return NextResponse.json(responseData, { status: response.status });
+      } catch (error) {
+        // If JSON parsing fails, return original response
+        console.warn('[GET /api/data] Failed to enrich response:', error);
+        return response;
+      }
+    }
+    
+    return response;
   } catch (error) {
     return NextResponse.json(
       { 
@@ -191,6 +212,21 @@ export async function POST(
       clearCompaniesCache();
     }
     
+    // Enrich response with user objects in demo mode
+    if (isDemoModeEnabled()) {
+      try {
+        const responseData = await response.json();
+        if (responseData && responseData.success && responseData.data && typeof responseData.data === 'object') {
+          responseData.data = await enrichWithUsers(responseData.data);
+        }
+        return NextResponse.json(responseData, { status: response.status });
+      } catch (error) {
+        // If JSON parsing fails, return original response
+        console.warn('[POST /api/data] Failed to enrich response:', error);
+        return response;
+      }
+    }
+    
     return response;
     }
 
@@ -274,10 +310,15 @@ export async function POST(
 
     // If some succeeded and some failed, return partial success
     if (errors.length > 0) {
+      // Enrich entities with user objects in demo mode
+      const enrichedEntities = isDemoModeEnabled() 
+        ? await enrichEntitiesWithUsers(createdEntities)
+        : createdEntities;
+      
       return NextResponse.json(
         { 
           success: true,
-          data: createdEntities,
+          data: enrichedEntities,
           message: `Created ${createdEntities.length} of ${entitiesToCreate.length} entity(ies)`,
           errors: errors.length > 0 ? errors : undefined,
           partial: true
@@ -294,9 +335,14 @@ export async function POST(
 
     const message = `${createdEntities.length} entities created successfully`;
 
+    // Enrich entities with user objects in demo mode
+    const enrichedEntities = isDemoModeEnabled() 
+      ? await enrichEntitiesWithUsers(createdEntities)
+      : createdEntities;
+
     return NextResponse.json({
       success: true,
-      data: createdEntities,
+      data: enrichedEntities,
       message
     }, { status: 201 });
   } catch (error) {

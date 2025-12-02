@@ -1198,5 +1198,49 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBDH0XENHANCESCROLLXYZ004",
+    "timestamp": "2025-12-02T18:41:51.000Z",
+    "version": "1.10.002",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Improved user experience by enriching entities with user objects for createdBy and updatedBy fields in demo mode",
+        "priority": "Medium",
+        "affectedDomains": [
+          "entities",
+          "user-management",
+          "demo-mode"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated API routes to utilize new enrichment functions for user data",
+        "priority": "Medium",
+        "affectedDomains": [
+          "api",
+          "user-management"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Adjusted schema management to include new properties and enhance overall structure",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-management"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Corrected type definitions and improved error handling in various components",
+        "priority": "Medium",
+        "affectedDomains": [
+          "types",
+          "error-handling",
+          "components"
+        ]
+      }
+    ]
   }
 ]

@@ -8,25 +8,102 @@ import { formatCreatedLabel, formatRelativeTime, formatFullDate } from '@/gradia
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/gradian-ui/shared/utils';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getInitials } from '../utils';
+
+// User object type (can be enriched with full user data in demo mode)
+type UserValue = 
+  | string 
+  | { id: string; label?: string }
+  | { 
+      id: string; 
+      firstName?: string; 
+      lastName?: string; 
+      avatarUrl?: string;
+      username?: string;
+      email?: string;
+      [key: string]: any;
+    }
+  | null 
+  | undefined;
 
 export interface EntityMetadataProps {
   createdAt?: string | Date | null;
-  createdBy?: string | { id: string; label: string } | null;
+  createdBy?: UserValue;
   updatedAt?: string | Date | null;
-  updatedBy?: string | { id: string; label: string } | null;
+  updatedBy?: UserValue;
   variant?: 'compact' | 'detailed' | 'minimal';
   className?: string;
   showLabels?: boolean;
 }
 
 /**
- * Formats a user value (can be string or object with id/label)
+ * Formats a user value to display name
  */
-const formatUser = (user: string | { id: string; label: string } | null | undefined): string | null => {
+const formatUserName = (user: UserValue): string | null => {
   if (!user) return null;
   if (typeof user === 'string') return user;
-  if (user.label) return user.label;
+  
+  // Check if it's a full user object with firstName/lastName
+  if (typeof user === 'object' && 'firstName' in user) {
+    const firstName = user.firstName || '';
+    const lastName = ('lastName' in user ? user.lastName : '') || '';
+    if (firstName || lastName) {
+      return `${firstName} ${lastName}`.trim();
+    }
+    // Fallback to other fields - check if property exists before accessing
+    if ('username' in user && user.username) return String(user.username);
+    if ('email' in user && user.email) return String(user.email);
+    if ('label' in user && user.label) return String(user.label);
+  }
+  
+  // Check if it's a simple object with label
+  if (typeof user === 'object' && 'label' in user) {
+    return user.label || null;
+  }
+  
   return null;
+};
+
+/**
+ * Gets avatar URL from user object
+ */
+const getUserAvatarUrl = (user: UserValue): string | null => {
+  if (!user || typeof user !== 'object') return null;
+  if ('avatarUrl' in user && user.avatarUrl) {
+    return String(user.avatarUrl);
+  }
+  return null;
+};
+
+/**
+ * Gets initials from user object
+ */
+const getUserInitials = (user: UserValue): string => {
+  if (!user) return '?';
+  
+  if (typeof user === 'string') {
+    return getInitials(user);
+  }
+  
+  if (typeof user === 'object') {
+    // Try firstName + lastName
+    if ('firstName' in user || 'lastName' in user) {
+      const firstName = ('firstName' in user ? user.firstName : '') || '';
+      const lastName = ('lastName' in user ? user.lastName : '') || '';
+      if (firstName || lastName) {
+        return getInitials(`${firstName} ${lastName}`.trim());
+      }
+    }
+    
+    // Fallback to other fields - check if property exists before accessing
+    if ('username' in user && user.username) return getInitials(String(user.username));
+    if ('email' in user && user.email) return getInitials(String(user.email));
+    if ('label' in user && user.label) return getInitials(String(user.label));
+    if ('name' in user && user.name) return getInitials(String(user.name));
+  }
+  
+  return '?';
 };
 
 export const EntityMetadata: React.FC<EntityMetadataProps> = ({
@@ -45,10 +122,14 @@ export const EntityMetadata: React.FC<EntityMetadataProps> = ({
   if (!hasAnyMetadata) return null;
 
   const createdLabel = createdAt ? formatCreatedLabel(createdAt) : null;
-  const createdByLabel = formatUser(createdBy);
+  const createdByName = formatUserName(createdBy);
+  const createdByAvatarUrl = getUserAvatarUrl(createdBy);
+  const createdByInitials = getUserInitials(createdBy);
   const updatedLabel = updatedAt ? formatRelativeTime(updatedAt, { addSuffix: true }) : null;
   const updatedFullDate = updatedAt ? formatFullDate(updatedAt) : null;
-  const updatedByLabel = formatUser(updatedBy);
+  const updatedByName = formatUserName(updatedBy);
+  const updatedByAvatarUrl = getUserAvatarUrl(updatedBy);
+  const updatedByInitials = getUserInitials(updatedBy);
 
   if (variant === 'minimal') {
     return (
@@ -57,9 +138,22 @@ export const EntityMetadata: React.FC<EntityMetadataProps> = ({
           {hasCreated && createdLabel && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <IconRenderer iconName="PlusCircle" className="h-3 w-3" />
                   <span>{createdLabel.display}</span>
+                  {createdByName && (
+                    <div className="flex items-center gap-1.5">
+                      <Avatar className="h-4 w-4">
+                        {createdByAvatarUrl && (
+                          <AvatarImage src={createdByAvatarUrl} alt={createdByName} />
+                        )}
+                        <AvatarFallback className="text-[0.625rem]">
+                          {createdByInitials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{createdByName}</span>
+                    </div>
+                  )}
                 </div>
               </TooltipTrigger>
               <TooltipContent
@@ -71,7 +165,7 @@ export const EntityMetadata: React.FC<EntityMetadataProps> = ({
               >
                 <span>
                   Created {createdLabel.title}
-                  {createdByLabel ? ` by ${createdByLabel}` : ''}
+                  {createdByName ? ` by ${createdByName}` : ''}
                 </span>
               </TooltipContent>
             </Tooltip>
@@ -79,9 +173,22 @@ export const EntityMetadata: React.FC<EntityMetadataProps> = ({
           {hasUpdated && updatedLabel && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <IconRenderer iconName="Edit" className="h-3 w-3" />
                   <span>{updatedLabel}</span>
+                  {updatedByName && (
+                    <div className="flex items-center gap-1.5">
+                      <Avatar className="h-4 w-4">
+                        {updatedByAvatarUrl && (
+                          <AvatarImage src={updatedByAvatarUrl} alt={updatedByName} />
+                        )}
+                        <AvatarFallback className="text-[0.625rem]">
+                          {updatedByInitials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{updatedByName}</span>
+                    </div>
+                  )}
                 </div>
               </TooltipTrigger>
               <TooltipContent
@@ -93,7 +200,7 @@ export const EntityMetadata: React.FC<EntityMetadataProps> = ({
               >
                 <span>
                   Updated {updatedFullDate}
-                  {updatedByLabel ? ` by ${updatedByLabel}` : ''}
+                  {updatedByName ? ` by ${updatedByName}` : ''}
                 </span>
               </TooltipContent>
             </Tooltip>
@@ -130,12 +237,22 @@ export const EntityMetadata: React.FC<EntityMetadataProps> = ({
                 >
                   <span>
                     Created {createdLabel?.title}
-                    {createdByLabel ? ` by ${createdByLabel}` : ''}
+                    {createdByName ? ` by ${createdByName}` : ''}
                   </span>
                 </TooltipContent>
               </Tooltip>
-              {createdByLabel && (
-                <span className="text-gray-400 dark:text-gray-500 truncate">by {createdByLabel}</span>
+              {createdByName && (
+                <div className="flex items-center gap-1.5 text-gray-400 dark:text-gray-500 truncate">
+                  <Avatar className="h-4 w-4">
+                    {createdByAvatarUrl && (
+                      <AvatarImage src={createdByAvatarUrl} alt={createdByName} />
+                    )}
+                    <AvatarFallback className="text-[0.625rem]">
+                      {createdByInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span>by {createdByName}</span>
+                </div>
               )}
             </div>
           )}
@@ -162,12 +279,22 @@ export const EntityMetadata: React.FC<EntityMetadataProps> = ({
                 >
                   <span>
                     Updated {updatedFullDate}
-                    {updatedByLabel ? ` by ${updatedByLabel}` : ''}
+                    {updatedByName ? ` by ${updatedByName}` : ''}
                   </span>
                 </TooltipContent>
               </Tooltip>
-              {updatedByLabel && (
-                <span className="text-gray-400 dark:text-gray-500 truncate">by {updatedByLabel}</span>
+              {updatedByName && (
+                <div className="flex items-center gap-1.5 text-gray-400 dark:text-gray-500 truncate">
+                  <Avatar className="h-4 w-4">
+                    {updatedByAvatarUrl && (
+                      <AvatarImage src={updatedByAvatarUrl} alt={updatedByName} />
+                    )}
+                    <AvatarFallback className="text-[0.625rem]">
+                      {updatedByInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span>by {updatedByName}</span>
+                </div>
               )}
             </div>
           )}
@@ -188,8 +315,18 @@ export const EntityMetadata: React.FC<EntityMetadataProps> = ({
                 <span className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                   {createdLabel.display}
                 </span>
-                {showLabels && createdByLabel && (
-                  <span className="text-gray-400 dark:text-gray-500">by {createdByLabel}</span>
+                {createdByName && (
+                  <div className="flex items-center gap-1.5 text-gray-400 dark:text-gray-500">
+                    <Avatar className="h-4 w-4">
+                      {createdByAvatarUrl && (
+                        <AvatarImage src={createdByAvatarUrl} alt={createdByName} />
+                      )}
+                      <AvatarFallback className="text-[0.625rem]">
+                        {createdByInitials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span>{createdByName}</span>
+                  </div>
                 )}
               </div>
             </TooltipTrigger>
@@ -202,7 +339,7 @@ export const EntityMetadata: React.FC<EntityMetadataProps> = ({
             >
               <span>
                 Created {createdLabel.title}
-                {createdByLabel ? ` by ${createdByLabel}` : ''}
+                {createdByName ? ` by ${createdByName}` : ''}
               </span>
             </TooltipContent>
           </Tooltip>
@@ -215,8 +352,18 @@ export const EntityMetadata: React.FC<EntityMetadataProps> = ({
                 <span className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                   {updatedLabel}
                 </span>
-                {showLabels && updatedByLabel && (
-                  <span className="text-gray-400 dark:text-gray-500">by {updatedByLabel}</span>
+                {updatedByName && (
+                  <div className="flex items-center gap-1.5 text-gray-400 dark:text-gray-500">
+                    <Avatar className="h-4 w-4">
+                      {updatedByAvatarUrl && (
+                        <AvatarImage src={updatedByAvatarUrl} alt={updatedByName} />
+                      )}
+                      <AvatarFallback className="text-[0.625rem]">
+                        {updatedByInitials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span>{updatedByName}</span>
+                  </div>
                 )}
               </div>
             </TooltipTrigger>
@@ -229,7 +376,7 @@ export const EntityMetadata: React.FC<EntityMetadataProps> = ({
             >
               <span>
                 Updated {updatedFullDate}
-                {updatedByLabel ? ` by ${updatedByLabel}` : ''}
+                {updatedByName ? ` by ${updatedByName}` : ''}
               </span>
             </TooltipContent>
           </Tooltip>

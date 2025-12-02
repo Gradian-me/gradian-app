@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import { X, AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import { MessageBoxProps } from '../types';
 import { useLanguageStore } from '@/stores/language.store';
 
@@ -36,6 +37,7 @@ const getLocalizedMessage = (
 export const MessageBox: React.FC<MessageBoxProps> = ({
   messages = [],
   message,
+  statusCode,
   className,
   variant = 'default',
   dismissible = false,
@@ -109,7 +111,17 @@ export const MessageBox: React.FC<MessageBoxProps> = ({
                   {msg.path}
                 </div>
               )}
-              <div className="text-sm">{msg.text}</div>
+              <div className="text-sm">
+                {statusCode !== undefined && index === 0 && (
+                  <Badge 
+                    variant={statusCode >= 200 && statusCode < 300 ? 'success' : statusCode >= 400 ? 'destructive' : 'default'}
+                    className="text-xs shrink-0 me-2"
+                  >
+                    {statusCode}
+                  </Badge>
+                )}
+                {msg.text}
+              </div>
             </div>
           ))}
         </div>

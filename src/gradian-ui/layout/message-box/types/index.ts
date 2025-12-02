@@ -21,6 +21,7 @@ export interface MessagesResponse {
 export interface MessageBoxProps {
   messages?: Message[];
   message?: string | Record<string, string>;
+  statusCode?: number;
   className?: string;
   variant?: 'default' | 'error' | 'warning' | 'success' | 'info';
   dismissible?: boolean;

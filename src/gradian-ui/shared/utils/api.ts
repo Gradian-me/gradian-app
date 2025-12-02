@@ -136,14 +136,22 @@ const isConnectionError = (error: any, statusCode?: number): boolean => {
 
 /**
  * Shows a connection error toast notification (only on client side)
+ * @param serverName - Optional server/integration name to include in the error message
+ * @param suppress - If true, don't show the toast (useful when caller will show a more specific toast)
  */
-const showConnectionErrorToast = (): void => {
-  if (isBrowserEnvironment()) {
-    toast.error('Connection is out', {
-      description: 'Unable to connect to the server. Please check your connection and try again.',
-      duration: 5000,
-    });
+const showConnectionErrorToast = (serverName?: string, suppress: boolean = false): void => {
+  if (suppress || !isBrowserEnvironment()) {
+    return;
   }
+  
+  const description = serverName 
+    ? `Unable to connect to the server "${serverName}". Please check your connection and try again.`
+    : 'Unable to connect to the server. Please check your connection and try again.';
+  
+  toast.error('Connection is out', {
+    description,
+    duration: 5000,
+  });
 };
 
 function normalizeEndpointWithParams(endpoint: string, params?: Record<string, any>): string {
@@ -221,8 +229,10 @@ export class ApiClient {
       if (!response.ok) {
         const errorMessage = data.error || data.message || '';
         // Check if it's a connection error (502 Bad Gateway or error message indicates connection issue)
+        // Suppress generic toast for integration sync - it will show a specific toast with domain
+        const suppressToast = endpoint.includes('/api/integrations/sync');
         if (isConnectionError(null, response.status) || isConnectionError({ message: errorMessage })) {
-          showConnectionErrorToast();
+          showConnectionErrorToast(undefined, suppressToast);
         }
         
         // Return error response with status code, preserving messages if present
@@ -239,8 +249,10 @@ export class ApiClient {
       return responseWithStatus;
     } catch (error) {
       // Check if it's a connection/timeout error
+      // Suppress generic toast for integration sync - it will show a specific toast with domain
+      const suppressToast = endpoint.includes('/api/integrations/sync');
       if (isConnectionError(error)) {
-        showConnectionErrorToast();
+        showConnectionErrorToast(undefined, suppressToast);
       }
       
       // If it's a network error, we don't have a status code
@@ -413,18 +425,22 @@ export async function apiRequest<T>(
     }
 
     // Check for connection errors in the response
+    // Suppress generic toast for integration sync - it will show a specific toast with domain
+    const suppressToast = endpoint.includes('/api/integrations/sync');
     if (!response.success) {
       const errorMessage = response.error || '';
       if (isConnectionError(null, response.statusCode) || isConnectionError({ message: errorMessage })) {
-        showConnectionErrorToast();
+        showConnectionErrorToast(undefined, suppressToast);
       }
     }
 
     return response;
   } catch (error) {
     // Check if it's a connection/timeout error
+    // Suppress generic toast for integration sync - it will show a specific toast with domain
+    const suppressToast = endpoint.includes('/api/integrations/sync');
     if (isConnectionError(error)) {
-      showConnectionErrorToast();
+      showConnectionErrorToast(undefined, suppressToast);
     }
     
     return {

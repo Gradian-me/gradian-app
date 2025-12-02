@@ -174,25 +174,88 @@ export function useAiBuilder(): UseAiBuilderReturn {
     setAiResponse('');
 
     try {
-      const response = await fetch('/api/ai-builder', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userPrompt: request.userPrompt.trim(),
-          agentId: request.agentId,
-          previousAiResponse: request.previousAiResponse,
-          previousUserPrompt: request.previousUserPrompt,
-          annotations: request.annotations,
-        }),
-        signal: abortController.signal,
-      });
+      let response: Response;
+      try {
+        response = await fetch('/api/ai-builder', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userPrompt: request.userPrompt.trim(),
+            agentId: request.agentId,
+            previousAiResponse: request.previousAiResponse,
+            previousUserPrompt: request.previousUserPrompt,
+            annotations: request.annotations,
+          }),
+          signal: abortController.signal,
+        });
+      } catch (fetchError) {
+        // Handle network errors, CORS errors, etc.
+        const errorMessage = fetchError instanceof Error ? fetchError.message : 'Unknown fetch error';
+        const isNetworkError = 
+          errorMessage.includes('fetch failed') ||
+          errorMessage.includes('Failed to fetch') ||
+          errorMessage.includes('NetworkError') ||
+          errorMessage.includes('Network request failed') ||
+          errorMessage.includes('ERR_NETWORK') ||
+          errorMessage.includes('ERR_CONNECTION_REFUSED') ||
+          errorMessage.includes('ERR_CONNECTION_RESET') ||
+          errorMessage.includes('ERR_INTERNET_DISCONNECTED');
+        
+        const isCorsError = 
+          errorMessage.includes('CORS') ||
+          errorMessage.includes('Cross-Origin') ||
+          errorMessage.includes('Access-Control');
+        
+        let detailedError = 'Failed to connect to the AI builder service.';
+        
+        if (isNetworkError) {
+          detailedError = `Network Error: Unable to reach the server. This could be due to:\n\n• Server is down or unreachable\n• Network connectivity issues\n• Firewall or proxy blocking the request\n• SSL/TLS certificate problems\n\nError details: ${errorMessage}`;
+        } else if (isCorsError) {
+          detailedError = `CORS Error: Cross-origin request blocked. This usually indicates a server configuration issue.\n\nError details: ${errorMessage}`;
+        } else {
+          detailedError = `Connection Error: ${errorMessage}\n\nThis could be due to:\n• Server configuration issues\n• Network connectivity problems\n• Request timeout\n• SSL/TLS certificate issues`;
+        }
+        
+        throw new Error(detailedError);
+      }
 
-      const data = await response.json();
+      // Check if response is ok before trying to parse JSON
+      if (!response.ok) {
+        let errorText = '';
+        let errorData: any = null;
+        
+        try {
+          errorText = await response.text();
+          // Try to parse as JSON
+          try {
+            errorData = JSON.parse(errorText);
+          } catch {
+            // If not JSON, use the text as error message
+          }
+        } catch (parseError) {
+          // If we can't read the response, use status text
+          errorText = response.statusText || 'Unknown error';
+        }
+        
+        const errorMessage = errorData?.error || errorText || `HTTP ${response.status}: ${response.statusText}`;
+        const detailedError = `Server Error (${response.status}): ${errorMessage}\n\nPossible causes:\n• API endpoint is not available\n• Server is experiencing issues\n• Request format is invalid\n• Authentication/authorization failed`;
+        
+        throw new Error(detailedError);
+      }
 
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to get AI response');
+      let data: any;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        throw new Error(`Invalid response format: The server returned non-JSON data. This could indicate a server error or misconfiguration.\n\nError: ${jsonError instanceof Error ? jsonError.message : 'Unknown JSON parse error'}`);
+      }
+
+      if (!data.success) {
+        const errorMessage = data.error || 'Failed to get AI response';
+        const detailedError = `AI Builder Error: ${errorMessage}\n\nThis could be due to:\n• AI service is unavailable\n• Invalid request parameters\n• Rate limiting or quota exceeded\n• Model configuration issues`;
+        throw new Error(detailedError);
       }
 
       const builderResponse: AiBuilderResponseData = data.data;
@@ -234,10 +297,20 @@ export function useAiBuilder(): UseAiBuilderReturn {
         setError(null);
         setAiResponse('');
       } else {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        // Preserve detailed error message
+        const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+        setError(errorMessage);
         setAiResponse('');
         setTokenUsage(null);
         setDuration(null);
+        
+        // Log detailed error for debugging
+        console.error('AI Builder Error:', {
+          error: err,
+          message: errorMessage,
+          agentId: request.agentId,
+          userPrompt: request.userPrompt.substring(0, 100) + '...',
+        });
       }
     } finally {
       setIsLoading(false);

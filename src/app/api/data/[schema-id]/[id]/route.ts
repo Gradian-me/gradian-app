@@ -8,7 +8,7 @@ import { BaseController } from '@/gradian-ui/shared/domain/controllers/base.cont
 import { BaseEntity } from '@/gradian-ui/shared/domain/types/base.types';
 import { isValidSchemaId, getSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
 import { clearCompaniesCache } from '@/gradian-ui/shared/utils/companies-loader';
-import { isDemoModeEnabled, proxyDataRequest } from '../../utils';
+import { isDemoModeEnabled, proxyDataRequest, enrichWithUsers } from '../../utils';
 
 /**
  * Create controller instance for the given schema
@@ -51,7 +51,24 @@ export async function GET(
     }
 
     const controller = await createController(schemaId);
-    return await controller.getById(id);
+    const response = await controller.getById(id);
+    
+    // Enrich response with user objects in demo mode
+    if (isDemoModeEnabled()) {
+      try {
+        const responseData = await response.json();
+        if (responseData && responseData.success && responseData.data && typeof responseData.data === 'object') {
+          responseData.data = await enrichWithUsers(responseData.data);
+        }
+        return NextResponse.json(responseData, { status: response.status });
+      } catch (error) {
+        // If JSON parsing fails, return original response
+        console.warn('[GET /api/data/:id] Failed to enrich response:', error);
+        return response;
+      }
+    }
+    
+    return response;
   } catch (error) {
     return NextResponse.json(
       { 
@@ -98,6 +115,21 @@ export async function PUT(
     // Clear companies cache if a company was updated
     if (schemaId === 'companies') {
       clearCompaniesCache();
+    }
+    
+    // Enrich response with user objects in demo mode
+    if (isDemoModeEnabled()) {
+      try {
+        const responseData = await response.json();
+        if (responseData && responseData.success && responseData.data && typeof responseData.data === 'object') {
+          responseData.data = await enrichWithUsers(responseData.data);
+        }
+        return NextResponse.json(responseData, { status: response.status });
+      } catch (error) {
+        // If JSON parsing fails, return original response
+        console.warn('[PUT /api/data/:id] Failed to enrich response:', error);
+        return response;
+      }
     }
     
     return response;

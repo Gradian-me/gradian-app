@@ -73,6 +73,67 @@ export const isDemoModeEnabled = (): boolean => {
   return DEMO_MODE;
 };
 
+/**
+ * Enrich entity with user objects for createdBy and updatedBy fields
+ * Only in demo mode - replaces user IDs with full user objects (excluding password)
+ * This function should only be called on the server side
+ */
+export async function enrichWithUsers(entity: any): Promise<any> {
+  if (!isDemoModeEnabled() || typeof window !== 'undefined') {
+    return entity;
+  }
+
+  try {
+    const { readSchemaData } = await import('@/gradian-ui/shared/domain/utils/data-storage.util');
+    const users = readSchemaData<any>('users');
+    
+    // Create a map of user IDs to user objects (excluding password)
+    const userMap = new Map<string, any>();
+    users.forEach((user: any) => {
+      if (user && user.id) {
+        const { password, hashType, ...userWithoutPassword } = user;
+        userMap.set(user.id, userWithoutPassword);
+      }
+    });
+
+    const enriched = { ...entity };
+
+    // Replace createdBy ID with user object if it exists
+    if (enriched.createdBy && typeof enriched.createdBy === 'string') {
+      const user = userMap.get(enriched.createdBy);
+      if (user) {
+        enriched.createdBy = user;
+      }
+    }
+
+    // Replace updatedBy ID with user object if it exists
+    if (enriched.updatedBy && typeof enriched.updatedBy === 'string') {
+      const user = userMap.get(enriched.updatedBy);
+      if (user) {
+        enriched.updatedBy = user;
+      }
+    }
+
+    return enriched;
+  } catch (error) {
+    // If enrichment fails, return original entity
+    console.warn('[enrichWithUsers] Failed to enrich entity:', error);
+    return entity;
+  }
+}
+
+/**
+ * Enrich array of entities with user objects
+ */
+export async function enrichEntitiesWithUsers(entities: any[]): Promise<any[]> {
+  if (!isDemoModeEnabled() || typeof window !== 'undefined' || !Array.isArray(entities)) {
+    return entities;
+  }
+
+  const enriched = await Promise.all(entities.map(entity => enrichWithUsers(entity)));
+  return enriched;
+}
+
 const getPathWithoutQuery = (targetPath: string): string => {
   const queryIndex = targetPath.indexOf('?');
   if (queryIndex === -1) {

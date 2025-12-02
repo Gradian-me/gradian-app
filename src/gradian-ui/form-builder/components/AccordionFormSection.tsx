@@ -18,7 +18,7 @@ import { FormModal } from './FormModal';
 import { Avatar, Rating, PopupPicker, ConfirmationMessage, AddButtonFull, CodeBadge, Badge } from '../form-elements';
 import { Skeleton } from '../../../components/ui/skeleton';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { getInitials, getBadgeConfig } from '../../data-display/utils';
+import { getInitials, getBadgeConfig, mapBadgeColorToVariant } from '../../data-display/utils';
 import { NormalizedOption } from '../form-elements/utils/option-normalizer';
 import { BadgeViewer } from '../form-elements/utils/badge-viewer';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
@@ -857,7 +857,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             {hasStatusField && statusField && (() => {
               const badgeConfig = getBadgeConfig(statusField, statusOptions);
               return (
-                <Badge variant={badgeConfig.color} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                <Badge variant={mapBadgeColorToVariant(badgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
                   {badgeConfig.icon && <IconRenderer iconName={badgeConfig.icon} className="h-3 w-3" />}
                   <span>{badgeConfig.label}</span>
                 </Badge>

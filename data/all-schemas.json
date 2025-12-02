@@ -2672,6 +2672,19 @@
         "order": 3
       },
       {
+        "id": "server-audience-id",
+        "name": "audienceId",
+        "label": "Audience ID",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter audience ID (UUID)",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
         "id": "server-environment",
         "name": "environment",
         "label": "Server Environment",
@@ -2782,6 +2795,7 @@
             "server-name",
             "server-address",
             "server-description",
+            "server-audience-id",
             "server-environment",
             "server-owners"
           ]
@@ -2910,6 +2924,16 @@
         "order": 5
       },
       {
+        "id": "url-enable-system-token",
+        "name": "enableSystemToken",
+        "label": "Enable System Token",
+        "sectionId": "basic-information",
+        "component": "switch",
+        "required": false,
+        "colSpan": 1,
+        "order": 6
+      },
+      {
         "id": "url-param-schema",
         "name": "schema",
         "label": "Parameter Name",
@@ -3023,7 +3047,8 @@
             "url-title",
             "url-address",
             "url-description",
-            "url-methods"
+            "url-methods",
+            "url-enable-system-token"
           ]
         },
         {
@@ -3122,6 +3147,44 @@
         "role": "color",
         "colSpan": 1,
         "order": 5
+      },
+      {
+        "id": "integration-category",
+        "name": "category",
+        "label": "Integration Category",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select category",
+        "description": "Category classification for the integration",
+        "options": [
+          {
+            "id": "development-integration",
+            "label": "Development Integration",
+            "icon": "Code",
+            "color": "blue"
+          },
+          {
+            "id": "production-integration",
+            "label": "Production Integration",
+            "icon": "Rocket",
+            "color": "emerald"
+          },
+          {
+            "id": "infrastructure-integration",
+            "label": "Infrastructure Integration",
+            "icon": "Server",
+            "color": "purple"
+          },
+          {
+            "id": "other-integration",
+            "label": "Other Integration",
+            "icon": "MoreHorizontal",
+            "color": "gray"
+          }
+        ],
+        "required": false,
+        "colSpan": 1,
+        "order": 6
       },
       {
         "id": "integration-target-route",

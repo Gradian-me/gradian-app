@@ -15,7 +15,6 @@ import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { cn, validateField as validateFieldUtil } from '@/gradian-ui/shared/utils';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { ChevronsDown, ChevronsUp } from 'lucide-react';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
 import { ulid } from 'ulid';
 import { GoToTopForm } from '../form-elements/go-to-top-form';
@@ -26,6 +25,7 @@ import { getActionConfig, getSingularName, isEditMode } from '../utils/action-co
 import { AccordionFormSection } from './AccordionFormSection';
 import { FormModal } from './FormModal';
 import { FormSystemSection } from './FormSystemSection';
+import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 
 // Form Context
 const FormContext = createContext<FormContextType | null>(null);
@@ -1337,29 +1337,16 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           
           {/* Collapse/Expand All Buttons */}
           {schema.sections.length > 0 && schema.isCollapsibleSections !== false && !hideCollapseExpandButtons && (
-            <div className="flex justify-end gap-2 mb-4">
-              <Button
-                type="button"
+            <div className="flex justify-end mb-4">
+              <ExpandCollapseControls
+                onExpandAll={expandAll}
+                onCollapseAll={collapseAll}
+                expandDisabled={allExpanded || disabled}
+                collapseDisabled={allCollapsed || disabled}
                 variant="outline"
                 size="sm"
-                onClick={collapseAll}
-                disabled={allCollapsed || disabled}
-                className="flex items-center gap-2"
-              >
-                <ChevronsUp className="h-4 w-4" />
-                <span className="hidden md:inline">Collapse All</span>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={expandAll}
-                disabled={allExpanded || disabled}
-                className="flex items-center gap-2"
-              >
-                <ChevronsDown className="h-4 w-4" />
-                <span className="hidden md:inline">Expand All</span>
-              </Button>
+                showLabels={true}
+              />
             </div>
           )}
           

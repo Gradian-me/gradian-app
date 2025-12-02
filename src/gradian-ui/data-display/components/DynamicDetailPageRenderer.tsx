@@ -30,6 +30,7 @@ import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { RepeatingTableRendererConfig } from '@/gradian-ui/schema-manager/types/form-schema';
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';
 import { toast } from 'sonner';
+import { EntityMetadata } from './EntityMetadata';
 
 export interface DynamicDetailPageRendererProps {
   schema: FormSchema;
@@ -1049,6 +1050,21 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       {headerInfo.subtitle}
                     </motion.p>
                   )}
+                  {/* Entity Metadata */}
+                  <motion.div
+                    className="mt-2"
+                    initial={disableAnimation ? false : { opacity: 0, y: 5 }}
+                    animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+                    transition={disableAnimation ? {} : { duration: 0.3, delay: 0.1 }}
+                  >
+                    <EntityMetadata
+                      createdAt={data?.createdAt}
+                      createdBy={data?.createdBy}
+                      updatedAt={data?.updatedAt}
+                      updatedBy={data?.updatedBy}
+                      variant="compact"
+                    />
+                  </motion.div>
                 </div>
               </div>
               <div className="flex items-center space-x-2 flex-row flex-wrap">

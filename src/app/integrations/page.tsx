@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,21 +10,28 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SyncButton } from '@/gradian-ui/form-builder/form-elements';
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { extractDomainFromRoute } from '@/gradian-ui/shared/utils/url-utils';
 import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { 
   CheckCircle, 
   AlertCircle, 
   Clock,
   Settings,
-  Download,
-  Upload,
   Activity,
   Plus,
   RefreshCw,
-  HeartPulse
+  HeartPulse,
+  Trash2,
+  Search
 } from 'lucide-react';
+import { SearchInput } from '@/gradian-ui/form-builder/form-elements';
+import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
+import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 
 // Helper to get icon background and text color classes from Tailwind color name
 const getIconColorClasses = (color: string): { bg: string; text: string } => {
@@ -98,6 +105,7 @@ interface Integration {
   sourceRoute?: string;
   sourceMethod?: 'GET' | 'POST';
   sourceDataPath?: string;
+  category?: string | { label?: string; value?: string; id?: string } | Array<{ label?: string; value?: string; id?: string }>;
 }
 
 interface EmailTemplateSyncResponse {
@@ -117,36 +125,83 @@ export default function IntegrationsPage() {
   const [syncResponse, setSyncResponse] = useState<Record<string, EmailTemplateSyncResponse | string | null>>({});
   const [syncMessages, setSyncMessages] = useState<Record<string, any>>({});
   const [syncResponseStatus, setSyncResponseStatus] = useState<Record<string, boolean | null>>({});
+  const [syncStatusCode, setSyncStatusCode] = useState<Record<string, number | undefined>>({});
   const [formModalSchemaId, setFormModalSchemaId] = useState<string | undefined>(undefined);
   const [formModalEntityId, setFormModalEntityId] = useState<string | undefined>(undefined);
   const [formModalMode, setFormModalMode] = useState<'create' | 'edit'>('create');
+  const [isClearingCache, setIsClearingCache] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+
+  const fetchIntegrations = async () => {
+    try {
+      const response = await apiRequest<Integration[] | { data?: Integration[]; items?: Integration[] }>('/api/data/integrations', {
+        method: 'GET',
+      });
+      
+      if (response.success && response.data) {
+        // Handle both array response and wrapped response
+        const data = Array.isArray(response.data) 
+          ? response.data 
+          : ((response.data as any)?.data || (response.data as any)?.items || []);
+        setIntegrations(data);
+      } else {
+        console.error('Failed to fetch integrations:', response.error);
+      }
+    } catch (error) {
+      console.error('Error fetching integrations:', error);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchIntegrations = async () => {
-      try {
-        const response = await apiRequest<Integration[] | { data?: Integration[]; items?: Integration[] }>('/api/data/integrations', {
-          method: 'GET',
-        });
-        
-        if (response.success && response.data) {
-          // Handle both array response and wrapped response
-          const data = Array.isArray(response.data) 
-            ? response.data 
-            : ((response.data as any)?.data || (response.data as any)?.items || []);
-          setIntegrations(data);
-        } else {
-          console.error('Failed to fetch integrations:', response.error);
-        }
-      } catch (error) {
-        console.error('Error fetching integrations:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchIntegrations();
   }, []);
 
+  const handleClearCache = async () => {
+    setIsClearingCache(true);
+
+    const toastId = toast.loading('Clearing cache...');
+
+    try {
+      const response = await fetch('/api/schemas/clear-cache', {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const reactQueryKeys: string[] = Array.isArray(data.reactQueryKeys) && data.reactQueryKeys.length > 0
+          ? data.reactQueryKeys
+          : ['schemas', 'companies'];
+        // Clear React Query caches client-side
+        if (typeof window !== 'undefined' && data.clearReactQueryCache) {
+          // Dispatch event to clear React Query caches
+          window.dispatchEvent(new CustomEvent('react-query-cache-clear', { 
+            detail: { queryKeys: reactQueryKeys } 
+          }));
+          
+          // Also trigger storage event for other tabs
+          window.localStorage.setItem('react-query-cache-cleared', JSON.stringify(reactQueryKeys));
+          window.localStorage.removeItem('react-query-cache-cleared');
+        }
+        
+        toast.success('Cache cleared successfully!', { id: toastId });
+      } else {
+        toast.error(data.error || 'Failed to clear cache', { id: toastId });
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to clear cache',
+        { id: toastId }
+      );
+    } finally {
+      setIsClearingCache(false);
+    }
+  };
 
   const getStatusColor = (lastSynced: string) => {
     if (!lastSynced) return 'default';
@@ -175,18 +230,6 @@ export default function IntegrationsPage() {
     return 'Disconnected';
   };
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'Never';
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    }).format(date);
-  };
 
   const handleSync = async (integration: Integration) => {
     // Add to syncing set
@@ -194,6 +237,7 @@ export default function IntegrationsPage() {
     setSyncResponse(prev => ({ ...prev, [integration.id]: null }));
     setSyncMessages(prev => ({ ...prev, [integration.id]: null }));
     setSyncResponseStatus(prev => ({ ...prev, [integration.id]: null }));
+    setSyncStatusCode(prev => ({ ...prev, [integration.id]: undefined }));
 
     try {
       const response = await apiRequest<EmailTemplateSyncResponse>('/api/integrations/sync', {
@@ -203,10 +247,36 @@ export default function IntegrationsPage() {
         },
       });
 
+      // Store status code
+      if (response.statusCode !== undefined) {
+        setSyncStatusCode(prev => ({ ...prev, [integration.id]: response.statusCode }));
+      }
+
       // Check if response has success: false
       if (response.success === false) {
         // Mark this response as failed
         setSyncResponseStatus(prev => ({ ...prev, [integration.id]: false }));
+        
+        // Check if it's a connection error (502 Bad Gateway or connection-related error message)
+        const isConnectionErr = response.statusCode === 502 || 
+          (response.error && (
+            response.error.toLowerCase().includes('fetch failed') ||
+            response.error.toLowerCase().includes('connection') ||
+            response.error.toLowerCase().includes('timeout') ||
+            response.error.toLowerCase().includes('failed to fetch')
+          ));
+        
+        if (isConnectionErr) {
+          // Extract domain from targetRoute or sourceRoute
+          const domain = extractDomainFromRoute(integration.targetRoute) || extractDomainFromRoute(integration.sourceRoute);
+          const serverName = domain || integration.title || integration.id;
+          
+          toast.error('Connection is out', {
+            description: `Unable to connect to the server "${serverName}". Please check your connection and try again.`,
+            duration: 5000,
+          });
+        }
+        
         // Build error message with summary if available
         let errorMessage = response.error || 'Sync failed';
         const summaryMessages: Array<{ path?: string; message: string }> = [];
@@ -274,7 +344,8 @@ export default function IntegrationsPage() {
           ...prev, 
           [integration.id]: {
             messages: allMessages.length > 0 ? allMessages : undefined,
-            message: errorMessage
+            message: errorMessage,
+            statusCode: response.statusCode
           }
         }));
         
@@ -289,7 +360,8 @@ export default function IntegrationsPage() {
           ...prev, 
           [integration.id]: {
             messages: response.messages,
-            message: response.message
+            message: response.message,
+            statusCode: response.statusCode
           }
         }));
       }
@@ -319,7 +391,8 @@ export default function IntegrationsPage() {
           setSyncMessages(prev => ({ 
             ...prev, 
             [integration.id]: {
-              message: errorMessage
+              message: errorMessage,
+              statusCode: response.statusCode
             }
           }));
         }
@@ -327,6 +400,27 @@ export default function IntegrationsPage() {
     } catch (error) {
       console.error('Sync error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Sync failed';
+      
+      // Check if it's a connection error
+      const isConnectionErr = error instanceof Error && (
+        error.message.toLowerCase().includes('fetch failed') ||
+        error.message.toLowerCase().includes('connection') ||
+        error.message.toLowerCase().includes('timeout') ||
+        error.message.toLowerCase().includes('failed to fetch') ||
+        error.name === 'TypeError'
+      );
+      
+      if (isConnectionErr) {
+        // Extract domain from targetRoute or sourceRoute
+        const domain = extractDomainFromRoute(integration.targetRoute) || extractDomainFromRoute(integration.sourceRoute);
+        const serverName = domain || integration.title || integration.id;
+        
+        toast.error('Connection is out', {
+          description: `Unable to connect to the server "${serverName}". Please check your connection and try again.`,
+          duration: 5000,
+        });
+      }
+      
       setSyncResponse(prev => ({ ...prev, [integration.id]: errorMessage }));
     } finally {
       // Remove from syncing set
@@ -387,6 +481,160 @@ export default function IntegrationsPage() {
     </Card>
   );
 
+  // Filter integrations based on search query
+  const filteredIntegrations = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return integrations;
+    }
+    
+    const query = searchQuery.toLowerCase();
+    return integrations.filter(integration => 
+      integration.title?.toLowerCase().includes(query) ||
+      integration.description?.toLowerCase().includes(query) ||
+      integration.id?.toLowerCase().includes(query) ||
+      (integration as any).name?.toLowerCase().includes(query)
+    );
+  }, [integrations, searchQuery]);
+
+  // Group integrations by category
+  const groupedIntegrations = useMemo(() => {
+    const groups: Record<string, Integration[]> = {};
+    
+    filteredIntegrations.forEach(integration => {
+      // Handle category as array, object (from picker), or string
+      let categoryKey = 'other-integration';
+      if (integration.category) {
+        if (Array.isArray(integration.category)) {
+          // Category is an array - get first item
+          const firstItem = integration.category[0];
+          if (firstItem) {
+            categoryKey = firstItem.value || firstItem.id || 'other-integration';
+          }
+        } else if (typeof integration.category === 'object' && integration.category !== null) {
+          // Category is a single object
+          categoryKey = (integration.category as any).value || (integration.category as any).id || 'other-integration';
+        } else {
+          // Category is a string
+          categoryKey = integration.category;
+        }
+      }
+      
+      if (!groups[categoryKey]) {
+        groups[categoryKey] = [];
+      }
+      groups[categoryKey].push(integration);
+    });
+    
+    return groups;
+  }, [filteredIntegrations]);
+
+  // Get category display name
+  const getCategoryDisplayName = (categoryKey: string, integration?: Integration): string => {
+    // If we have an integration, try to get the label from its category
+    if (integration?.category) {
+      if (Array.isArray(integration.category)) {
+        // Category is an array - get label from first item
+        const firstItem = integration.category[0];
+        if (firstItem?.label) {
+          return firstItem.label;
+        }
+      } else if (typeof integration.category === 'object' && integration.category !== null) {
+        // Category is a single object
+        const categoryObj = integration.category as any;
+        if (categoryObj.label) {
+          return categoryObj.label;
+        }
+      }
+    }
+    
+    // Fallback to mapping
+    const categoryMap: Record<string, string> = {
+      'development-integration': 'Development Integration',
+      'production-integration': 'Production Integration',
+      'infrastructure-integration': 'Infrastructure Integration',
+      'other-integration': 'Other Integration',
+    };
+    return categoryMap[categoryKey] || categoryKey;
+  };
+
+  // Get category icon and color
+  const getCategoryIconAndColor = (categoryKey: string, integration?: Integration): { icon?: string; color?: string } => {
+    // If we have an integration, try to get icon and color from its category
+    if (integration?.category) {
+      if (Array.isArray(integration.category)) {
+        // Category is an array - get icon and color from first item
+        const firstItem = integration.category[0];
+        if (firstItem) {
+          return {
+            icon: firstItem.icon,
+            color: firstItem.color,
+          };
+        }
+      } else if (typeof integration.category === 'object' && integration.category !== null) {
+        // Category is a single object
+        const categoryObj = integration.category as any;
+        return {
+          icon: categoryObj.icon,
+          color: categoryObj.color,
+        };
+      }
+    }
+    
+    // Fallback to mapping based on category key
+    const categoryMap: Record<string, { icon: string; color: string }> = {
+      'development-integration': { icon: 'Code', color: 'blue' },
+      'production-integration': { icon: 'Rocket', color: 'emerald' },
+      'infrastructure-integration': { icon: 'Server', color: 'purple' },
+      'other-integration': { icon: 'MoreHorizontal', color: 'gray' },
+    };
+    return categoryMap[categoryKey] || {};
+  };
+
+  // Sort categories in a specific order
+  const sortedCategories = useMemo(() => {
+    const order = ['development-integration', 'production-integration', 'infrastructure-integration', 'other-integration'];
+    const categories = Object.keys(groupedIntegrations);
+    
+    // Sort: first by predefined order, then alphabetically for any extras
+    return categories.sort((a, b) => {
+      const aIndex = order.indexOf(a);
+      const bIndex = order.indexOf(b);
+      
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+      if (aIndex !== -1) return -1;
+      if (bIndex !== -1) return 1;
+      return a.localeCompare(b);
+    });
+  }, [groupedIntegrations]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    setLoading(true);
+    await fetchIntegrations();
+  };
+
+  // Initialize expanded categories to all categories when they change
+  useEffect(() => {
+    if (sortedCategories.length > 0 && expandedCategories.length === 0) {
+      setExpandedCategories([...sortedCategories]);
+    }
+  }, [sortedCategories, expandedCategories.length]);
+
+  const handleExpandAll = useCallback(() => {
+    if (sortedCategories.length > 0) {
+      // Create a new array to ensure state update
+      const allCategories = [...sortedCategories];
+      console.log('[Integrations] Expanding all categories:', allCategories);
+      setExpandedCategories(allCategories);
+    }
+  }, [sortedCategories]);
+
+  const handleCollapseAll = useCallback(() => {
+    // Create a new empty array to ensure state update
+    console.log('[Integrations] Collapsing all categories');
+    setExpandedCategories([]);
+  }, []);
+
   const connectedCount = integrations.filter(i => i.lastSynced && new Date(i.lastSynced).getTime() > Date.now() - 24 * 60 * 60 * 1000).length;
   const errorCount = integrations.filter(i => i.lastSynced && (Date.now() - new Date(i.lastSynced).getTime()) / (1000 * 60 * 60 * 24) > 7).length;
 
@@ -428,6 +676,54 @@ export default function IntegrationsPage() {
               <span className="sm:hidden">Add</span>
             </Button>
           </div>
+        </motion.div>
+
+        {/* Integration Tools */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-gray-800 dark:text-gray-200">Integration Tools</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
+                  <Activity className="h-6 w-6" />
+                  <span>View Logs</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex flex-col items-center justify-center space-y-2"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (typeof window !== 'undefined') {
+                      router.push('/builder/health');
+                    }
+                  }}
+                >
+                  <HeartPulse className="h-6 w-6" />
+                  <span>Health Monitor</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex flex-col items-center justify-center space-y-2"
+                  onClick={handleClearCache}
+                  disabled={isClearingCache}
+                >
+                  {isClearingCache ? (
+                    <RefreshCw className="h-6 w-6 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-6 w-6" />
+                  )}
+                  <span>Clear Cache</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </motion.div>
 
         {/* Integration Stats */}
@@ -524,38 +820,122 @@ export default function IntegrationsPage() {
           )}
         </div>
 
+        {/* Search and Refresh */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+          className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center"
+        >
+          <div className="flex-1">
+            <SearchInput
+              config={{ name: 'search-integrations', placeholder: 'Search integrations by name, description, or ID...' } as any}
+              value={searchQuery}
+              onChange={setSearchQuery}
+              onClear={() => setSearchQuery('')}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <ExpandCollapseControls
+              onExpandAll={handleExpandAll}
+              onCollapseAll={handleCollapseAll}
+              variant="outline"
+              size="icon"
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleRefresh}
+              disabled={isRefreshing || loading}
+              className="h-10 w-10"
+              title="Refresh"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
+        </motion.div>
+
         {/* Integration List */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.5 }}
-          className="space-y-4"
         >
           {loading ? (
-            <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <IntegrationCardSkeleton />
               <IntegrationCardSkeleton />
-            </>
-          ) : integrations.length === 0 ? (
+            </div>
+          ) : filteredIntegrations.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center">
-                <p className="text-gray-500 dark:text-gray-400 mb-4">No integrations found.</p>
-                <Button onClick={() => router.push('/integrations/configure')}>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">
+                  {searchQuery ? `No integrations found matching "${searchQuery}".` : 'No integrations found.'}
+                </p>
+                <Button onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (typeof window !== 'undefined') {
+                    router.push('/integrations/configure');
+                  }
+                }}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Your First Integration
                 </Button>
               </CardContent>
             </Card>
           ) : (
-            integrations.map((integration, index) => (
-            <motion.div
-              key={integration.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
+            <Accordion 
+              type="multiple" 
+              value={expandedCategories}
+              onValueChange={(value) => {
+                console.log('[Integrations] Accordion value changed:', value);
+                setExpandedCategories(value);
+              }}
+              className="space-y-4"
             >
+              {sortedCategories.map((category) => {
+                const categoryIntegrations = groupedIntegrations[category];
+                // Get display name from first integration in the group (they should all have the same category)
+                const displayName = categoryIntegrations.length > 0 
+                  ? getCategoryDisplayName(category, categoryIntegrations[0])
+                  : getCategoryDisplayName(category);
+                // Get icon and color from first integration in the group
+                const { icon: categoryIcon, color: categoryColor } = categoryIntegrations.length > 0
+                  ? getCategoryIconAndColor(category, categoryIntegrations[0])
+                  : getCategoryIconAndColor(category);
+                
+                // Get icon color classes
+                const iconColors = categoryColor ? getIconColorClasses(categoryColor) : getIconColorClasses('violet');
+                
+                return (
+                  <AccordionItem key={category} value={category} className="border border-gray-200 dark:border-gray-800 rounded-xl px-4 bg-white dark:bg-gray-900/50">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <div className="flex items-center gap-3">
+                        {categoryIcon && (
+                          <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${iconColors.bg}`}>
+                            <IconRenderer iconName={categoryIcon} className={`h-4 w-4 ${iconColors.text}`} />
+                          </div>
+                        )}
+                        <span className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                          {displayName}
+                        </span>
+                        <Badge variant="outline" className="text-xs">
+                          {categoryIntegrations.length}
+                        </Badge>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                        {categoryIntegrations.map((integration, index) => (
+                          <motion.div
+                            key={integration.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
+                          >
               <Card className="hover:shadow-lg transition-shadow duration-200">
-                <CardContent className="p-4 sm:p-6">
+                <CardContent className="p-4 h-full">
                   <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                     <div className="flex-1 min-w-0 w-full">
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
@@ -567,48 +947,53 @@ export default function IntegrationsPage() {
                             </div>
                           );
                         })()}
-                        <h3 className="text-base sm:text-lg font-semibold truncate min-w-0 flex-1">{integration.title}</h3>
-                        <div className="flex flex-wrap items-center gap-2 min-w-0">
-                          <Badge variant="outline" className="text-xs shrink-0 whitespace-nowrap">
-                            {integration.id}
-                          </Badge>
-                          <Badge variant={getStatusColor(integration.lastSynced)} className="flex items-center space-x-1 shrink-0 whitespace-nowrap">
-                            {getStatusIcon(integration.lastSynced)}
-                            <span>{getStatusText(integration.lastSynced)}</span>
-                          </Badge>
-                        </div>
+                        <h3 className="text-base sm:text-lg font-semibold truncate min-w-0 flex-1">
+                          {renderHighlightedText(integration.title || '', searchQuery)}
+                        </h3>
                       </div>
                       
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-3 sm:mb-4 line-clamp-2">{integration.description}</p>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-3 sm:mb-4 line-clamp-2">
+                        {renderHighlightedText(integration.description || '', searchQuery)}
+                      </p>
                       
                       <div className="text-xs sm:text-sm">
-                        <div>
-                          <span className="text-gray-500 dark:text-gray-400">Last Sync: <span className="font-medium text-gray-900 dark:text-gray-100">{formatDate(integration.lastSynced)}</span></span>
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                          <span className="text-gray-500 dark:text-gray-400"><span className="font-medium text-gray-900 dark:text-gray-100">{integration.lastSynced ? formatRelativeTime(integration.lastSynced) : 'Never'}</span></span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="flex flex-row items-end space-x-2 w-full sm:w-auto shrink-0">
-                      <SyncButton
-                        onClick={() => handleSync(integration)}
-                        syncing={syncing.has(integration.id)}
-                        label="Sync"
-                        className="flex-1 sm:flex-none"
-                      />
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          setFormModalEntityId(integration.id);
-                          setFormModalMode('edit');
-                          setFormModalSchemaId('integrations');
-                        }}
-                        className="flex-1 sm:flex-none"
-                      >
-                        <Settings className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">Configure</span>
-                        <span className="sm:hidden">Config</span>
-                      </Button>
+                    <div className="flex flex-col items-end space-y-2 w-full sm:w-auto shrink-0">
+                      <Badge variant={getStatusColor(integration.lastSynced)} className="flex items-center space-x-1 shrink-0 whitespace-nowrap">
+                        {getStatusIcon(integration.lastSynced)}
+                        <span>{getStatusText(integration.lastSynced)}</span>
+                      </Badge>
+                      <div className="flex flex-row items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleSync(integration)}
+                          disabled={syncing.has(integration.id)}
+                          className="h-9 w-9"
+                          title="Sync"
+                        >
+                          <RefreshCw className={`h-4 w-4 ${syncing.has(integration.id) ? 'animate-spin' : ''}`} />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="icon"
+                          onClick={() => {
+                            setFormModalEntityId(integration.id);
+                            setFormModalMode('edit');
+                            setFormModalSchemaId('integrations');
+                          }}
+                          className="h-9 w-9"
+                          title="Configure"
+                        >
+                          <Settings className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
 
@@ -627,6 +1012,7 @@ export default function IntegrationsPage() {
                           setSyncMessages(prev => ({ ...prev, [integration.id]: null }));
                           setSyncResponse(prev => ({ ...prev, [integration.id]: null }));
                           setSyncResponseStatus(prev => ({ ...prev, [integration.id]: null }));
+                          setSyncStatusCode(prev => ({ ...prev, [integration.id]: undefined }));
                         }}
                       />
                     </div>
@@ -673,46 +1059,15 @@ export default function IntegrationsPage() {
                   )}
                 </CardContent>
               </Card>
-            </motion.div>
-            ))
+                          </motion.div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
           )}
-        </motion.div>
-
-        {/* Integration Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.9 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-gray-800 dark:text-gray-200">Integration Tools</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
-                  <Download className="h-6 w-6" />
-                  <span>Export Data</span>
-                </Button>
-                <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
-                  <Upload className="h-6 w-6" />
-                  <span>Import Data</span>
-                </Button>
-                <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
-                  <Activity className="h-6 w-6" />
-                  <span>View Logs</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex flex-col items-center justify-center space-y-2"
-                  onClick={() => router.push('/builder/health')}
-                >
-                  <HeartPulse className="h-6 w-6" />
-                  <span>Health Monitor</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </motion.div>
 
 

@@ -14,7 +14,7 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, ChevronRight, ChevronsDown, ChevronsUp, List, Loader2, RefreshCw } from 'lucide-react';
+import { ChevronDown, ChevronRight, List, Loader2, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -36,6 +36,7 @@ import { sortOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
 import { buildHierarchyTree, getAncestorIds, HierarchyNode } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
 import { Plus } from 'lucide-react';
+import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 8, scale: 0.99 },
@@ -1633,36 +1634,14 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-violet-600 dark:text-violet-300' : ''}`} />
               </Button>
               {isHierarchical && (
-                <div className="flex items-center gap-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleHierarchyExpandAll();
-                    }}
-                    disabled={isLoading || isSubmitting}
-                    aria-label="Expand all"
-                  >
-                    <ChevronsDown className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleHierarchyCollapseAll();
-                    }}
-                    disabled={isLoading || isSubmitting}
-                    aria-label="Collapse all"
-                  >
-                    <ChevronsUp className="h-4 w-4" />
-                  </Button>
-                </div>
+                <ExpandCollapseControls
+                  onExpandAll={handleHierarchyExpandAll}
+                  onCollapseAll={handleHierarchyCollapseAll}
+                  expandDisabled={isLoading || isSubmitting}
+                  collapseDisabled={isLoading || isSubmitting}
+                  variant="ghost"
+                  size="icon"
+                />
               )}
               {showAddButton && schemaId && effectiveSchema && (
                 <Button

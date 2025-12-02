@@ -15,7 +15,6 @@ import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Spinner } from '@/components/ui/spinner';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Button as UIButton } from '@/components/ui/button';
 import { Button } from '@/gradian-ui/form-builder/form-elements';
 import { DynamicCardRenderer } from './DynamicCardRenderer';
 import { DynamicCardDialog } from './DynamicCardDialog';
@@ -49,6 +48,8 @@ import { Table2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { EntityMetadata } from './EntityMetadata';
 import { formatCreatedLabel, formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/date-utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getInitials } from '../utils';
 
 interface DynamicPageRendererProps {
   schema: FormSchema;
@@ -571,11 +572,10 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           
           return (
             <div className="flex items-center justify-center gap-2">
-              <UIButton
+              <Button
                 variant="outline"
                 size="sm"
-                onClick={(event) => {
-                  event.stopPropagation();
+                onClick={() => {
                   setRepeatingSectionDialog({
                     isOpen: true,
                     sectionId: section.id,
@@ -585,13 +585,12 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   });
                 }}
                 className="h-8 px-3 hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition-all duration-200"
-                title={`View ${section.title || section.id}`}
               >
                 <Table2 className="h-4 w-4" />
                 {itemCount !== null && (
                   <span className="text-xs font-medium ml-1.5">{itemCount}</span>
                 )}
-              </UIButton>
+              </Button>
             </div>
           );
         },
@@ -609,48 +608,84 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       render: (value: any, row: any) => {
         return (
           <div className="flex items-center justify-center gap-1">
-            <UIButton
+            <Button
               variant="outline"
               size="sm"
-              onClick={(event) => {
-                event.stopPropagation();
+              onClick={() => {
                 handleViewDetailPage(row);
               }}
               className="h-8 w-8 p-0 hover:bg-sky-50 hover:border-sky-300 hover:text-sky-700 transition-all duration-200"
-              title="View Details"
             >
               <IconRenderer iconName="Eye" className="h-4 w-4" />
-            </UIButton>
-            <UIButton
+            </Button>
+            <Button
               variant="outline"
               size="sm"
-              onClick={(event) => {
-                event.stopPropagation();
+              onClick={() => {
                 if (!isEditLoading[row.id]) {
                   handleEditEntity(row);
                 }
               }}
               className="h-8 w-8 p-0 hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition-all duration-200"
               disabled={isEditLoading[row.id]}
-              title="Edit"
             >
               <IconRenderer iconName="Edit" className="h-4 w-4" />
-            </UIButton>
-            <UIButton
+            </Button>
+            <Button
               variant="outline"
               size="sm"
-              onClick={(event) => {
-                event.stopPropagation();
+              onClick={() => {
                 handleDeleteWithConfirmation(row);
               }}
               className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-all duration-200"
-              title="Delete"
             >
               <IconRenderer iconName="Trash2" className="h-4 w-4" />
-            </UIButton>
+            </Button>
           </div>
         );
       },
+    };
+
+    // Helper functions to extract user info
+    const getUserName = (user: any): string | null => {
+      if (!user) return null;
+      if (typeof user === 'string') return user;
+      if (typeof user === 'object') {
+        const firstName = user.firstName || '';
+        const lastName = user.lastName || '';
+        if (firstName || lastName) {
+          return `${firstName} ${lastName}`.trim();
+        }
+        if (user.username) return user.username;
+        if (user.email) return user.email;
+        if (user.label) return user.label;
+      }
+      return null;
+    };
+
+    const getUserAvatarUrl = (user: any): string | null => {
+      if (!user || typeof user !== 'object') return null;
+      if (user.avatarUrl) return String(user.avatarUrl);
+      return null;
+    };
+
+    const getUserInitials = (user: any): string => {
+      if (!user) return '?';
+      if (typeof user === 'string') {
+        return getInitials(user);
+      }
+      if (typeof user === 'object') {
+        const firstName = user.firstName || '';
+        const lastName = user.lastName || '';
+        if (firstName || lastName) {
+          return getInitials(`${firstName} ${lastName}`.trim());
+        }
+        if (user.username) return getInitials(user.username);
+        if (user.email) return getInitials(user.email);
+        if (user.label) return getInitials(user.label);
+        if (user.name) return getInitials(user.name);
+      }
+      return '?';
     };
 
     // Add metadata columns (Created/Updated) at the end
@@ -661,18 +696,18 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         accessor: (row: any) => row.createdAt,
         sortable: true,
         align: 'left',
-        width: 180,
+        width: 200,
         render: (value: any, row: any) => {
           if (!value) return <span className="text-gray-400 dark:text-gray-600 text-xs">—</span>;
           const createdLabel = formatCreatedLabel(value);
           const createdBy = row.createdBy;
-          const createdByLabel = typeof createdBy === 'string' 
-            ? createdBy 
-            : (createdBy?.label || null);
+          const createdByName = getUserName(createdBy);
+          const createdByAvatarUrl = getUserAvatarUrl(createdBy);
+          const createdByInitials = getUserInitials(createdBy);
           
           return (
             <TooltipProvider>
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-1">
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
@@ -689,14 +724,22 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   >
                     <span>
                       Created {createdLabel.title}
-                      {createdByLabel ? ` by ${createdByLabel}` : ''}
+                      {createdByName ? ` by ${createdByName}` : ''}
                     </span>
                   </TooltipContent>
                 </Tooltip>
-                {createdByLabel && (
-                  <span className="text-xs text-gray-400 dark:text-gray-500 pl-4.5 truncate">
-                    by {createdByLabel}
-                  </span>
+                {createdByName && (
+                  <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 pl-4.5">
+                    <Avatar className="h-4 w-4">
+                      {createdByAvatarUrl && (
+                        <AvatarImage src={createdByAvatarUrl} alt={createdByName} />
+                      )}
+                      <AvatarFallback className="text-[0.625rem]">
+                        {createdByInitials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="truncate">{createdByName}</span>
+                  </div>
                 )}
               </div>
             </TooltipProvider>
@@ -709,19 +752,19 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         accessor: (row: any) => row.updatedAt,
         sortable: true,
         align: 'left',
-        width: 180,
+        width: 200,
         render: (value: any, row: any) => {
           if (!value) return <span className="text-gray-400 dark:text-gray-600 text-xs">—</span>;
           const updatedLabel = formatRelativeTime(value, { addSuffix: true });
           const updatedFullDate = formatFullDate(value);
           const updatedBy = row.updatedBy;
-          const updatedByLabel = typeof updatedBy === 'string' 
-            ? updatedBy 
-            : (updatedBy?.label || null);
+          const updatedByName = getUserName(updatedBy);
+          const updatedByAvatarUrl = getUserAvatarUrl(updatedBy);
+          const updatedByInitials = getUserInitials(updatedBy);
           
           return (
             <TooltipProvider>
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-1">
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
@@ -738,14 +781,22 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   >
                     <span>
                       Updated {updatedFullDate}
-                      {updatedByLabel ? ` by ${updatedByLabel}` : ''}
+                      {updatedByName ? ` by ${updatedByName}` : ''}
                     </span>
                   </TooltipContent>
                 </Tooltip>
-                {updatedByLabel && (
-                  <span className="text-xs text-gray-400 dark:text-gray-500 pl-4.5 truncate">
-                    by {updatedByLabel}
-                  </span>
+                {updatedByName && (
+                  <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 pl-4.5">
+                    <Avatar className="h-4 w-4">
+                      {updatedByAvatarUrl && (
+                        <AvatarImage src={updatedByAvatarUrl} alt={updatedByName} />
+                      )}
+                      <AvatarFallback className="text-[0.625rem]">
+                        {updatedByInitials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="truncate">{updatedByName}</span>
+                  </div>
                 )}
               </div>
             </TooltipProvider>
@@ -932,26 +983,33 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                 }
               };
 
-              // Map QuickAction variants to UI Button variants (matches builder page style)
-              // UI Button supports: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
+              // Map QuickAction variants to form-builder Button variants
+              // Form-builder Button supports: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline' | 'ghost' | 'link'
               const buttonVariant = (() => {
                 const variant = action.variant;
                 
-                // Direct mapping - UI Button already supports these variants
-                if (variant === 'outline' || variant === 'default' || variant === 'destructive' || 
-                    variant === 'secondary' || variant === 'ghost' || variant === 'link') {
-                  return variant as 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+                // Map 'destructive' to 'danger' (form-builder Button uses 'danger')
+                if (variant === 'destructive') {
+                  return 'danger' as const;
                 }
-                // Map 'gradient' to 'default' (UI Button doesn't support gradient)
+                
+                // Direct mapping for supported variants
+                if (variant === 'outline' || variant === 'default' || variant === 'secondary' || 
+                    variant === 'ghost' || variant === 'link') {
+                  return variant as 'default' | 'secondary' | 'outline' | 'ghost' | 'link';
+                }
+                
+                // Map 'gradient' to 'default' (form-builder Button doesn't support gradient)
                 if (variant === 'gradient') {
                   return 'default' as const;
                 }
+                
                 // Default to 'outline' if variant is undefined or unknown
                 return 'outline' as const;
               })();
 
               return (
-                <UIButton
+                <Button
                   key={action.id}
                   variant={buttonVariant}
                   size="sm"
@@ -962,7 +1020,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                     <IconRenderer iconName={action.icon} className="h-4 w-4 mr-2" />
                   )}
                   {action.label}
-                </UIButton>
+                </Button>
               );
             })}
           </div>
@@ -1247,10 +1305,10 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   : `Get started by adding your first ${singularName.toLowerCase()}.`
               }
               action={
-                <UIButton onClick={handleOpenCreateModal}>
+                <Button onClick={handleOpenCreateModal}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add {singularName}
-                </UIButton>
+                </Button>
               }
             />
           </motion.div>

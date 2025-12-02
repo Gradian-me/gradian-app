@@ -5,8 +5,9 @@
 
 'use client';
 
-import React from 'react';
-import { XCircle, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { XCircle, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface MessageDisplayProps {
   error: string | null;
@@ -14,6 +15,14 @@ interface MessageDisplayProps {
 }
 
 export function MessageDisplay({ error, successMessage }: MessageDisplayProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Check if error has multiple lines (detailed error)
+  const hasDetails = error && error.includes('\n');
+  const errorLines = error ? error.split('\n') : [];
+  const mainError = errorLines[0] || error;
+  const errorDetails = hasDetails ? errorLines.slice(1).join('\n') : null;
+
   return (
     <>
       {/* Error Message - Modern Style */}
@@ -24,11 +33,41 @@ export function MessageDisplay({ error, successMessage }: MessageDisplayProps) {
               <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/50 mr-3 shrink-0">
                 <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-semibold text-red-800 dark:text-red-300 uppercase tracking-wide">
                   Error
                 </h3>
-                <p className="mt-1 text-sm text-red-700 dark:text-red-400">{error}</p>
+                <p className="mt-1 text-sm text-red-700 dark:text-red-400 break-words">{mainError}</p>
+                {errorDetails && (
+                  <div className="mt-3">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsExpanded(!isExpanded)}
+                      className="h-7 px-2 text-xs text-red-700 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/50"
+                    >
+                      {isExpanded ? (
+                        <>
+                          <ChevronUp className="h-3 w-3 mr-1" />
+                          Hide Details
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="h-3 w-3 mr-1" />
+                          Show Details
+                        </>
+                      )}
+                    </Button>
+                    {isExpanded && (
+                      <div className="mt-2 p-3 rounded-lg bg-red-100/50 dark:bg-red-900/30 border border-red-200/50 dark:border-red-800/30">
+                        <pre className="text-xs text-red-800 dark:text-red-300 whitespace-pre-wrap break-words font-mono">
+                          {errorDetails}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

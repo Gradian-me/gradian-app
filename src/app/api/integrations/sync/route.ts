@@ -5,6 +5,8 @@ import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-
 import { readSchemaData, writeSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
 import { extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
 import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
+// system-token.util is server-only - import directly
+import { getSystemTokenForTargetRoute } from '@/gradian-ui/shared/utils/system-token.util';
 
 /**
  * Get the API URL for internal server-side calls
@@ -473,11 +475,25 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       };
       
+      // Check if system token should be used instead of client JWT
+      let finalAuthHeader: string | null = null;
+      const systemToken = await getSystemTokenForTargetRoute(integration.targetRoute);
+      
+      if (systemToken) {
+        // Use system token instead of client JWT
+        finalAuthHeader = systemToken;
+        loggingCustom(LogType.INTEGRATION_LOG, 'info', 'Using system token for target route authorization');
+      } else if (authHeader) {
+        // Fall back to client JWT if system token is not available
+        finalAuthHeader = authHeader;
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Using client JWT for target route authorization');
+      }
+      
       // Pass authorization header to target route if present
-      if (authHeader) {
-        targetHeaders['Authorization'] = authHeader;
-        const headerPrefix = authHeader.substring(0, 10);
-        const headerLength = authHeader.length;
+      if (finalAuthHeader) {
+        targetHeaders['Authorization'] = finalAuthHeader;
+        const headerPrefix = finalAuthHeader.substring(0, 10);
+        const headerLength = finalAuthHeader.length;
         loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Adding Authorization header to target route: ${headerPrefix}... (length: ${headerLength})`);
       } else {
         loggingCustom(LogType.INTEGRATION_LOG, 'warn', 'No Authorization header available to forward to target route');
@@ -491,7 +507,7 @@ export async function POST(request: NextRequest) {
       // Log all headers being sent (with masked authorization)
       const loggedHeaders = { ...targetHeaders };
       if (loggedHeaders['Authorization']) {
-        loggedHeaders['Authorization'] = `${authHeader?.substring(0, 10)}... (masked)`;
+        loggedHeaders['Authorization'] = `${finalAuthHeader?.substring(0, 10)}... (masked)`;
       }
       loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target route headers: ${JSON.stringify(loggedHeaders)}`);
       

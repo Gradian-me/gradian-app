@@ -1425,9 +1425,11 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBAT7P2B5NZYX26HVWYV28N1",
       "createdAt": "2025-11-30T16:41:16.115Z",
-      "updatedAt": "2025-11-30T16:47:00.221Z",
+      "updatedAt": "2025-12-02T13:42:12.426Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "audienceId": "01KANTJN9VP30XGJY4FQTCTK7D",
+      "url-repositories": []
     },
     {
       "name": "Gradian Authentication",
@@ -1674,9 +1676,10 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBATJ4GH09B0YETWF7W1SKM7",
       "createdAt": "2025-11-30T16:46:58.586Z",
-      "updatedAt": "2025-11-30T16:46:58.586Z",
+      "updatedAt": "2025-12-02T13:42:41.109Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "enableSystemToken": true
     }
   ],
   "integrations": [
@@ -1721,14 +1724,22 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-01T10:41:33.759Z",
+      "updatedAt": "2025-12-02T14:59:18.287Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
       "lastSynced": "2025-12-01T10:41:33.759Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "category": [
+        {
+          "id": "development-integration",
+          "label": "Development Integration",
+          "icon": "Code",
+          "color": "blue"
+        }
+      ]
     },
     {
       "color": "blue",
@@ -1755,10 +1766,20 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-01T10:41:36.671Z",
+      "updatedAt": "2025-12-02T15:01:31.425Z",
       "lastSynced": "2025-12-01T10:41:36.671Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "category": [
+        {
+          "id": "development-integration",
+          "label": "Development Integration",
+          "icon": "Code",
+          "color": "blue"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "color": "blue",
@@ -1804,11 +1825,19 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-01T10:44:39.977Z",
+      "updatedAt": "2025-12-02T15:01:45.599Z",
       "targetDataPath": "data",
       "lastSynced": "2025-12-01T10:44:39.977Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "category": [
+        {
+          "id": "development-integration",
+          "label": "Development Integration",
+          "icon": "Code",
+          "color": "blue"
+        }
+      ]
     },
     {
       "color": "teal",
@@ -1835,11 +1864,19 @@
       ],
       "id": "email_template_sync",
       "createdAt": "2025-11-17T12:05:23.829Z",
-      "updatedAt": "2025-11-25T15:21:48.768Z",
+      "updatedAt": "2025-12-02T15:02:02.921Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "category": [
+        {
+          "id": "infrastructure-integration",
+          "label": "Infrastructure Integration",
+          "icon": "Server",
+          "color": "purple"
+        }
+      ]
     },
     {
       "color": "violet",
@@ -1882,10 +1919,20 @@
       ],
       "id": "lucide_icons_sync",
       "createdAt": "2025-11-17T18:00:00.000Z",
-      "updatedAt": "2025-11-30T15:34:55.748Z",
-      "lastSynced": "2025-11-30T15:34:55.748Z",
+      "updatedAt": "2025-12-02T15:02:32.325Z",
+      "lastSynced": "2025-12-02T14:41:55.872Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "category": [
+        {
+          "id": "other-integration",
+          "label": "Other Integration",
+          "icon": "MoreHorizontal",
+          "color": "gray"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "color": "amber",
@@ -1911,10 +1958,20 @@
       ],
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-11-30T15:42:41.443Z",
-      "lastSynced": "2025-11-30T15:42:41.443Z",
+      "updatedAt": "2025-12-02T15:02:44.023Z",
+      "lastSynced": "2025-12-02T14:42:06.804Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "category": [
+        {
+          "id": "infrastructure-integration",
+          "label": "Infrastructure Integration",
+          "icon": "Server",
+          "color": "purple"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "color": "blue",
@@ -1952,10 +2009,18 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-02T10:39:58.243Z",
+      "updatedAt": "2025-12-02T15:02:49.873Z",
       "lastSynced": "2025-12-02T10:39:58.243Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "category": [
+        {
+          "id": "production-integration",
+          "label": "Production Integration",
+          "icon": "Rocket",
+          "color": "emerald"
+        }
+      ]
     }
   ],
   "databases": [
@@ -2754,6 +2819,19 @@
       "menuUrl": "/builder/graphs",
       "openInNewTab": false,
       "id": "01KBSIGRAPHDESIGNER000000000",
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "menuTitle": "Schema Builder",
+      "menuIcon": "FileCode",
+      "hideInAD": false,
+      "description": "Build and manage schemas",
+      "menuUrl": "/builder/schemas",
+      "openInNewTab": false,
+      "id": "01KBSISCHEMABUILDER000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
       "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
