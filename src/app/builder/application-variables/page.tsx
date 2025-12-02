@@ -284,7 +284,7 @@ export default function ApplicationVariablesPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
                   <div className="space-y-0.5">
                     <Label className="text-base">Demo Mode</Label>
                     <p className="text-sm text-gray-500">
@@ -296,7 +296,7 @@ export default function ApplicationVariablesPage() {
                     onCheckedChange={(checked) => setData((prev) => ({ ...prev, DEMO_MODE: checked }))}
                   />
                 </div>
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
                   <div className="space-y-0.5">
                     <Label className="text-base">AD Mode</Label>
                     <p className="text-sm text-gray-500">
@@ -325,7 +325,7 @@ export default function ApplicationVariablesPage() {
                 {Object.values(LogType).map((logType) => (
                   <div
                     key={logType}
-                    className="flex items-center justify-between p-4 border rounded-lg"
+                    className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
                   >
                     <div className="space-y-0.5">
                       <Label className="text-base">{logType}</Label>
@@ -493,7 +493,7 @@ export default function ApplicationVariablesPage() {
                   <Label className="text-base font-semibold mb-4 block">
                     Card Index Delay
                   </Label>
-                  <div className="space-y-4 pl-4 border-l-2">
+                  <div className="space-y-4 pl-4 border-s-2 border-violet-200 dark:border-violet-800">
                     <div className="space-y-2">
                       <Label htmlFor="step-delay">Step Delay (seconds)</Label>
                       <Input

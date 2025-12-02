@@ -26,6 +26,66 @@ import {
 import { motion } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 
+// Helper to get icon background and text color classes from Tailwind color name
+const getIconColorClasses = (color: string): { bg: string; text: string } => {
+  const colorMap: Record<string, { bg: string; text: string }> = {
+    violet: {
+      bg: 'bg-violet-50 dark:bg-violet-500/15',
+      text: 'text-violet-700 dark:text-violet-100',
+    },
+    emerald: {
+      bg: 'bg-emerald-50 dark:bg-emerald-500/15',
+      text: 'text-emerald-700 dark:text-emerald-100',
+    },
+    indigo: {
+      bg: 'bg-indigo-50 dark:bg-indigo-500/15',
+      text: 'text-indigo-700 dark:text-indigo-100',
+    },
+    blue: {
+      bg: 'bg-blue-50 dark:bg-blue-500/15',
+      text: 'text-blue-700 dark:text-blue-100',
+    },
+    green: {
+      bg: 'bg-green-50 dark:bg-green-500/15',
+      text: 'text-green-700 dark:text-green-100',
+    },
+    red: {
+      bg: 'bg-red-50 dark:bg-red-500/15',
+      text: 'text-red-700 dark:text-red-100',
+    },
+    orange: {
+      bg: 'bg-orange-50 dark:bg-orange-500/15',
+      text: 'text-orange-700 dark:text-orange-100',
+    },
+    amber: {
+      bg: 'bg-amber-50 dark:bg-amber-500/15',
+      text: 'text-amber-700 dark:text-amber-100',
+    },
+    yellow: {
+      bg: 'bg-yellow-50 dark:bg-yellow-500/15',
+      text: 'text-yellow-700 dark:text-yellow-100',
+    },
+    pink: {
+      bg: 'bg-pink-50 dark:bg-pink-500/15',
+      text: 'text-pink-700 dark:text-pink-100',
+    },
+    purple: {
+      bg: 'bg-purple-50 dark:bg-purple-500/15',
+      text: 'text-purple-700 dark:text-purple-100',
+    },
+    teal: {
+      bg: 'bg-teal-50 dark:bg-teal-500/15',
+      text: 'text-teal-700 dark:text-teal-100',
+    },
+    cyan: {
+      bg: 'bg-cyan-50 dark:bg-cyan-500/15',
+      text: 'text-cyan-700 dark:text-cyan-100',
+    },
+  };
+  
+  return colorMap[color.toLowerCase()] || colorMap.violet;
+};
+
 interface Integration {
   id: string;
   title: string;
@@ -499,12 +559,14 @@ export default function IntegrationsPage() {
                   <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                     <div className="flex-1 min-w-0 w-full">
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                        <div 
-                          className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: `${integration.color}20`, color: integration.color }}
-                        >
-                          <IconRenderer iconName={integration.icon} className="h-6 w-6" />
-                        </div>
+                        {(() => {
+                          const iconColors = getIconColorClasses(integration.color);
+                          return (
+                            <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${iconColors.bg}`}>
+                              <IconRenderer iconName={integration.icon} className={`h-6 w-6 ${iconColors.text}`} />
+                            </div>
+                          );
+                        })()}
                         <h3 className="text-base sm:text-lg font-semibold truncate min-w-0 flex-1">{integration.title}</h3>
                         <div className="flex flex-wrap items-center gap-2 min-w-0">
                           <Badge variant="outline" className="text-xs shrink-0 whitespace-nowrap">

@@ -2858,5 +2858,62 @@
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
+  ],
+  "tenants": [
+    {
+      "name": "scm",
+      "title": "Supply Chain Management",
+      "dbname": "gradian_scm",
+      "domain": "https://scm.cinnagen.com",
+      "related-companies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+      "createdAt": "2025-12-02T10:57:07.958Z",
+      "updatedAt": "2025-12-02T10:57:07.958Z"
+    },
+    {
+      "related-companies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "name": "aryogen",
+      "title": "AryoGen",
+      "domain": "https://aryogen.cinnagen.com",
+      "dbname": "gradian_aryogen",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBFBD109G6CYRT7RA04TMMXC",
+      "createdAt": "2025-12-02T10:58:14.677Z",
+      "updatedAt": "2025-12-02T10:58:14.677Z"
+    },
+    {
+      "related-companies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "name": "dev",
+      "title": "Development Environment",
+      "domain": "http://cg-gr-api-dev-1.cinnagen.com",
+      "dbname": "gradian_genora",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBFBGV9151FQN481NB2CT4MX",
+      "createdAt": "2025-12-02T11:00:19.878Z",
+      "updatedAt": "2025-12-02T11:00:19.878Z"
+    }
   ]
 }

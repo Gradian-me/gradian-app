@@ -3218,17 +3218,6 @@
         "order": 6
       },
       {
-        "id": "integration-last-synced",
-        "name": "lastSynced",
-        "label": "Last Synced",
-        "sectionId": "basic-information",
-        "component": "datetime",
-        "required": false,
-        "readonly": true,
-        "colSpan": 2,
-        "order": 11
-      },
-      {
         "id": "field-1763386431784",
         "name": "targetDataPath",
         "label": "Target Data Path",
@@ -5076,14 +5065,14 @@
         "name": "name",
         "label": "Name",
         "sectionId": "basic-information",
-        "component": "text",
+        "component": "name",
         "placeholder": "Enter tenant name",
         "role": "title",
         "validation": {
           "required": true,
           "minLength": 2
         },
-        "colSpan": 2,
+        "colSpan": 1,
         "order": 1
       },
       {
@@ -5094,7 +5083,7 @@
         "component": "text",
         "placeholder": "Enter tenant title",
         "required": false,
-        "colSpan": 2,
+        "colSpan": 1,
         "order": 2
       },
       {
@@ -5103,12 +5092,11 @@
         "label": "Domain",
         "sectionId": "basic-information",
         "component": "text",
-        "placeholder": "Enter domain (e.g., example.com)",
+        "placeholder": "Enter domain (e.g., app.example.com)",
         "validation": {
-          "required": true,
-          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\\.[a-zA-Z]{2,}$"
+          "required": true
         },
-        "colSpan": 2,
+        "colSpan": 1,
         "order": 3
       },
       {
@@ -5122,18 +5110,8 @@
           "required": true,
           "minLength": 1
         },
-        "colSpan": 2,
-        "order": 4
-      },
-      {
-        "id": "tenant-inactive",
-        "name": "inactive",
-        "label": "Inactive",
-        "sectionId": "basic-information",
-        "component": "switch",
-        "required": false,
         "colSpan": 1,
-        "order": 5
+        "order": 4
       }
     ],
     "sections": [
@@ -5165,6 +5143,8 @@
     "showInNavigation": false,
     "icon": "Building2",
     "allowDataInactive": true,
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "canSelectMultiCompanies": true,
+    "isSystemSchema": true
   }
 ]

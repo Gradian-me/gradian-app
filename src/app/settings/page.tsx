@@ -377,7 +377,7 @@ export default function SettingsPage() {
                                     {/* Communication Channels */}
                   <div className="space-y-4">
                     <Label className="text-base font-semibold">Communication Channels</Label>
-                    <div className="space-y-4 pl-4 border-l-2 border-gray-200 mt-4">
+                    <div className="space-y-4 pl-4 border-s-2 border-violet-200 dark:border-violet-800 mt-4">
                        <Switch
                          config={{
                            name: 'emailNotifications',
@@ -408,7 +408,7 @@ export default function SettingsPage() {
                                     {/* Business Updates */}
                   <div className="space-y-4">
                     <Label className="text-base font-semibold">Business Updates</Label>
-                    <div className="space-y-4 pl-4 border-l-2 border-gray-200 mt-4">
+                    <div className="space-y-4 pl-4 border-s-2 border-violet-200 dark:border-violet-800mt-4">
                        <Switch
                          config={{
                            name: 'tenderUpdates',
@@ -439,7 +439,7 @@ export default function SettingsPage() {
                                     {/* System Notifications */}
                   <div className="space-y-4">
                     <Label className="text-base font-semibold">System Notifications</Label>
-                    <div className="space-y-4 pl-4 border-l-2 border-gray-200 mt-4">
+                    <div className="space-y-4 pl-4 border-s-2 border-violet-200 dark:border-violet-800 mt-4">
                        <Switch
                          config={{
                            name: 'systemAlerts',
