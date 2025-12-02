@@ -1063,6 +1063,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       updatedAt={data?.updatedAt}
                       updatedBy={data?.updatedBy}
                       variant="compact"
+                      avatarType="user"
                     />
                   </motion.div>
                 </div>

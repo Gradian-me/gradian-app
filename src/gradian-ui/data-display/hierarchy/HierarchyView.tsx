@@ -4,7 +4,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { DynamicActionButtons } from '../components/DynamicActionButtons';
 import { Avatar } from '@/gradian-ui/form-builder/form-elements';
 import { getInitials } from '@/gradian-ui/data-display/utils';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -195,43 +195,26 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                     updatedAt={entity.updatedAt}
                     updatedBy={entity.updatedBy}
                     variant="minimal"
+                    avatarType="user"
                   />
                 </div>
               </div>
             </div>
           </CardContent>
           <div className="pr-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-            {/* View and Edit buttons - matching DynamicCardActionButtons list view style */}
-            {onView && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  onView(entity);
-                }}
-                className="h-8 w-8 p-0 hover:bg-sky-50 hover:border-sky-300 hover:text-sky-700 transition-all duration-200"
-                title="View Details"
-              >
-                <IconRenderer iconName="Eye" className="h-4 w-4" />
-              </Button>
-            )}
-            {onEdit && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  onEdit(entity);
-                }}
-                className="h-8 w-8 p-0 hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition-all duration-200"
-                title="Edit"
-              >
-                <IconRenderer iconName="Edit" className="h-4 w-4" />
-              </Button>
-            )}
+            <DynamicActionButtons
+              variant="minimal"
+              actions={[
+                ...(onView ? [{
+                  type: 'view' as const,
+                  onClick: () => onView(entity),
+                }] : []),
+                ...(onEdit ? [{
+                  type: 'edit' as const,
+                  onClick: () => onEdit(entity),
+                }] : []),
+              ]}
+            />
             <HierarchyActionsMenu
               onAddChild={() => onAddChild(entity)}
               onEdit={() => onEdit(entity)}

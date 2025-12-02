@@ -27,8 +27,8 @@ export const CardWrapper: React.FC<CardWrapperProps> = ({
     styling.shadow === 'sm' && 'shadow-sm',
     styling.shadow === 'md' && 'shadow-md',
     styling.shadow === 'lg' && 'shadow-lg',
-    behavior.hoverable && 'hover:shadow-md transition-all duration-300',
-    behavior.clickable && 'cursor-pointer hover:scale-[1.01] transition-all duration-300', // Reduced scale
+    behavior.hoverable && 'hover:shadow-md transition-all duration-100',
+    behavior.clickable && 'cursor-pointer hover:scale-[1.01] transition-all duration-100', // Fast scale
     className
   );
 

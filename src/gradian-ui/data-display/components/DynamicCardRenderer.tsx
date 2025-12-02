@@ -14,7 +14,7 @@ import { CardWrapper } from '@/gradian-ui/data-display/card/components/CardWrapp
 import { getArrayValuesByRole, getBadgeConfig, getInitials, getSingleValueByRole, getValueByRole, renderCardSection } from '../utils';
 import { BadgeViewer, BadgeRenderer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { getFieldsByRole } from '../../form-builder/form-elements/utils/field-resolver';
-import { DynamicCardActionButtons } from './DynamicCardActionButtons';
+import { DynamicActionButtons } from './DynamicActionButtons';
 import { DynamicMetricRenderer } from './DynamicMetricRenderer';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { CopyContent } from '../../form-builder/form-elements/components/CopyContent';
@@ -456,7 +456,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
 
 
   const cardClasses = cn(
-    'group cursor-pointer transition-all duration-300 h-full',
+    'group cursor-pointer transition-all duration-100 h-full',
     viewMode === 'list' && 'w-full',
     className
   );
@@ -498,9 +498,11 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
           // In dialog mode, clicking the card itself should not trigger view navigation
           return;
         }
-        // Only open dialog if click is not on action buttons or tooltip triggers
+        // Only open dialog if click is not on action buttons, tooltip triggers, or avatar user dialogs
         const target = e.target as HTMLElement;
-        if (!target.closest('[data-action-button]') && !target.closest('[data-tooltip-trigger]')) {
+        if (!target.closest('[data-action-button]') && 
+            !target.closest('[data-tooltip-trigger]') &&
+            !target.closest('[data-avatar-user]')) {
           e.preventDefault();
           e.stopPropagation();
           if (onView) onView(data);
@@ -518,7 +520,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
         className={cn(
           "h-full bg-white dark:bg-gray-800 rounded-2xl overflow-hidden",
           !className?.includes('border-none') && "border border-gray-200 dark:border-gray-700",
-          !disableAnimation && "transition-all duration-200 hover:shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700/50",
+          !disableAnimation && "transition-all duration-100 hover:shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700/50",
           className?.includes('border-none') ? "focus-within:ring-0" : "focus-within:ring-2 focus-within:ring-violet-400 focus-within:ring-offset-0 focus-within:rounded-xl"
         )}
         onKeyDown={(e: KeyboardEvent) => {
@@ -795,6 +797,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   updatedAt={data.updatedAt}
                   updatedBy={data.updatedBy}
                   variant="compact"
+                  avatarType="user"
                 />
               </motion.div>
 
@@ -856,7 +859,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   >
                     <Avatar
                       className={cn(
-                        'h-10 w-10 rounded-full border shadow-sm flex items-center justify-center font-semibold',
+                        'h-14 w-14 rounded-full border shadow-sm flex items-center justify-center font-semibold',
                         avatarColor.bg,
                         avatarColor.text,
                         avatarColor.border,
@@ -864,7 +867,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     >
                       <AvatarFallback
                         className={cn(
-                          'h-10 w-10 rounded-full flex items-center justify-center',
+                          'h-14 w-14 rounded-full flex items-center justify-center',
                           avatarColor.bg,
                           avatarColor.text,
                         )}
@@ -992,6 +995,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       updatedAt={data.updatedAt}
                       updatedBy={data.updatedBy}
                       variant="compact"
+                      avatarType="user"
                     />
                   </motion.div>
                   <div
@@ -1098,29 +1102,47 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
               )}
 
               {/* Action Buttons for List View */}
-              <DynamicCardActionButtons
-                viewMode="list"
-                showView={!!onViewDetail || !!showView}
-                showEdit={!!showEdit}
-                showDelete={!!showDelete}
-                onView={onViewDetail ? () => onViewDetail(data) : (onView ? () => onView(data) : undefined)}
-                onEdit={onEdit ? () => onEdit(data) : undefined}
-                onDelete={onDelete ? () => onDelete(data) : undefined}
+              <DynamicActionButtons
+                variant="minimal"
+                actions={[
+                  ...(onViewDetail || onView ? [{
+                    type: 'view' as const,
+                    onClick: onViewDetail ? () => onViewDetail(data) : () => onView?.(data),
+                  }] : []),
+                  ...(onEdit ? [{
+                    type: 'edit' as const,
+                    onClick: () => onEdit(data),
+                  }] : []),
+                  ...(onDelete ? [{
+                    type: 'delete' as const,
+                    onClick: () => onDelete(data),
+                  }] : []),
+                ]}
               />
             </div>
           )}
 
           {/* Action Buttons - Only for Grid View */}
           {viewMode === 'grid' && (
-            <DynamicCardActionButtons
-              viewMode="grid"
-              showView={!!onViewDetail || !!showView}
-              showEdit={!!showEdit}
-              showDelete={!!showDelete}
-              onView={onViewDetail ? () => onViewDetail(data) : (onView ? () => onView(data) : undefined)}
-              onEdit={onEdit ? () => onEdit(data) : undefined}
-              onDelete={onDelete ? () => onDelete(data) : undefined}
-            />
+            <div className="mt-auto pt-4">
+              <DynamicActionButtons
+                variant="expanded"
+                actions={[
+                  ...(onViewDetail || onView ? [{
+                    type: 'view' as const,
+                    onClick: onViewDetail ? () => onViewDetail(data) : () => onView?.(data),
+                  }] : []),
+                  ...(onEdit ? [{
+                    type: 'edit' as const,
+                    onClick: () => onEdit(data),
+                  }] : []),
+                  ...(onDelete ? [{
+                    type: 'delete' as const,
+                    onClick: () => onDelete(data),
+                  }] : []),
+                ]}
+              />
+            </div>
           )}
         </CardContent>
       </CardWrapper>

@@ -16,7 +16,7 @@ import {
 import { CardWrapper, CardHeader, CardTitle, CardContent } from '../card/components/CardWrapper';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '../../shared/utils';
-import { Button } from '../../../components/ui/button';
+import { DynamicActionButtons } from './DynamicActionButtons';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Badge } from '../../form-builder/form-elements/components/Badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -104,19 +104,15 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
     (_row: any, itemId: string | number | undefined) => {
       if (!itemId) return null;
       return (
-        <div className="flex items-center justify-center">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(event) => {
-              event.stopPropagation();
-              handleViewDetails(itemId);
-            }}
-            className="h-8 w-8 p-0 hover:bg-sky-50 hover:border-sky-300 hover:text-sky-700 transition-all duration-200"
-          >
-            <IconRenderer iconName="Eye" className="h-4 w-4" />
-          </Button>
-        </div>
+        <DynamicActionButtons
+          variant="minimal"
+          actions={[
+            {
+              type: 'view',
+              onClick: () => handleViewDetails(itemId),
+            },
+          ]}
+        />
       );
     },
     [handleViewDetails]

@@ -16,6 +16,7 @@ import { MainLayout } from '@/components/layout/main-layout';
 import { Spinner } from '@/components/ui/spinner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/gradian-ui/form-builder/form-elements';
+import { DynamicActionButtons } from './DynamicActionButtons';
 import { DynamicCardRenderer } from './DynamicCardRenderer';
 import { DynamicCardDialog } from './DynamicCardDialog';
 import { EmptyState } from './EmptyState';
@@ -47,6 +48,7 @@ import { RepeatingSectionDialog } from './RepeatingSectionDialog';
 import { Table2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { EntityMetadata } from './EntityMetadata';
+import { normalizeCreateUpdateDates } from './CreateUpdateDetail';
 import { formatCreatedLabel, formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/date-utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '../utils';
@@ -607,41 +609,28 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       width: 120,
       render: (value: any, row: any) => {
         return (
-          <div className="flex items-center justify-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                handleViewDetailPage(row);
-              }}
-              className="h-8 w-8 p-0 hover:bg-sky-50 hover:border-sky-300 hover:text-sky-700 transition-all duration-200"
-            >
-              <IconRenderer iconName="Eye" className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                if (!isEditLoading[row.id]) {
-                  handleEditEntity(row);
-                }
-              }}
-              className="h-8 w-8 p-0 hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition-all duration-200"
-              disabled={isEditLoading[row.id]}
-            >
-              <IconRenderer iconName="Edit" className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                handleDeleteWithConfirmation(row);
-              }}
-              className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-all duration-200"
-            >
-              <IconRenderer iconName="Trash2" className="h-4 w-4" />
-            </Button>
-          </div>
+          <DynamicActionButtons
+            variant="minimal"
+            actions={[
+              {
+                type: 'view',
+                onClick: () => handleViewDetailPage(row),
+              },
+              {
+                type: 'edit',
+                onClick: () => {
+                  if (!isEditLoading[row.id]) {
+                    handleEditEntity(row);
+                  }
+                },
+                disabled: isEditLoading[row.id],
+              },
+              {
+                type: 'delete',
+                onClick: () => handleDeleteWithConfirmation(row),
+              },
+            ]}
+          />
         );
       },
     };
@@ -749,14 +738,29 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       {
         id: 'updatedAt',
         label: 'Updated',
-        accessor: (row: any) => row.updatedAt,
+        accessor: (row: any) => {
+          // Normalize dates - if createdAt and updatedAt are the same, return null for updatedAt
+          const normalized = normalizeCreateUpdateDates({
+            createdAt: row.createdAt,
+            updatedAt: row.updatedAt,
+          });
+          return normalized.updatedAt;
+        },
         sortable: true,
         align: 'left',
         width: 200,
         render: (value: any, row: any) => {
-          if (!value) return <span className="text-gray-400 dark:text-gray-600 text-xs">—</span>;
-          const updatedLabel = formatRelativeTime(value, { addSuffix: true });
-          const updatedFullDate = formatFullDate(value);
+          // Normalize dates - if createdAt and updatedAt are the same, don't show updatedAt
+          const normalized = normalizeCreateUpdateDates({
+            createdAt: row.createdAt,
+            updatedAt: row.updatedAt,
+          });
+          
+          // If updatedAt is null (because it's the same as createdAt), show dash
+          if (!normalized.updatedAt) return <span className="text-gray-400 dark:text-gray-600 text-xs">—</span>;
+          
+          const updatedLabel = formatRelativeTime(normalized.updatedAt, { addSuffix: true });
+          const updatedFullDate = formatFullDate(normalized.updatedAt);
           const updatedBy = row.updatedBy;
           const updatedByName = getUserName(updatedBy);
           const updatedByAvatarUrl = getUserAvatarUrl(updatedBy);
@@ -1240,13 +1244,13 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               viewMode === 'grid' ? (
                 <LoadingSkeleton
                   variant="card"
-                  count={8}
+                  count={6}
                   columns={{ default: 1, sm: 2, md: 2, lg: 3, xl: 4 }}
                   gap={4}
                   className="col-span-full"
                 />
               ) : (
-                <LoadingSkeleton variant="card" count={8} gap={4} />
+                <LoadingSkeleton variant="list" count={6} />
               )
             ) : (
               filteredEntities.map((entity: any, index: number) => (

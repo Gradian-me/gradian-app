@@ -29,12 +29,15 @@ export { DynamicList } from './components/DynamicList';
 // BadgeRenderer is now exported from form-builder/form-elements/utils/badge-viewer
 export { DynamicMetricRenderer } from './components/DynamicMetricRenderer';
 export { DynamicCardDialog } from './components/DynamicCardDialog';
-export { DynamicCardActionButtons } from './components/DynamicCardActionButtons';
+export { DynamicActionButtons } from './components/DynamicActionButtons';
+export type { DynamicActionButtonsProps, ActionConfig, ActionType } from './components/DynamicActionButtons';
 export { DynamicInfoCard } from './components/DynamicInfoCard';
 export { ComponentRenderer } from './components/ComponentRenderer';
 export { DynamicDetailPageRenderer } from './components/DynamicDetailPageRenderer';
 export { DynamicRepeatingTableViewer } from './components/DynamicRepeatingTableViewer';
 export { DynamicPageRenderer } from './components/DynamicPageRenderer';
+export { AvatarUser } from './components/AvatarUser';
+export type { AvatarUserProps, UserData } from './components/AvatarUser';
 
 // Table Components
 export * from './table';

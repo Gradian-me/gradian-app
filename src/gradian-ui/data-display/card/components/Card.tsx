@@ -48,8 +48,8 @@ export const Card: React.FC<CardProps> = ({
     styling.shadow === 'lg' && 'shadow-lg',
     styling.shadow === 'xl' && 'shadow-xl',
     // Behavior styles
-    behavior.clickable && 'cursor-pointer hover:shadow-md hover:scale-[1.01] transition-all duration-200',
-    behavior.hoverable && 'hover:shadow-md transition-shadow duration-200',
+    behavior.clickable && 'cursor-pointer hover:shadow-md hover:scale-[1.01] transition-all duration-100',
+    behavior.hoverable && 'hover:shadow-md transition-shadow duration-100',
     // Layout styles
     layout.direction === 'horizontal' && 'flex flex-row',
     layout.direction === 'vertical' && 'flex flex-col',
