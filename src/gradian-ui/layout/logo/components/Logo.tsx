@@ -13,7 +13,7 @@ export interface LogoProps {
    * - 'light': Force light mode logo
    * - 'white': White logo variant
    */
-  variant?: 'auto' | 'dark' | 'light' | 'white';
+  variant?: 'auto' | 'dark' | 'light' | 'white' | 'icon';
   /**
    * Width of the logo
    * @default 120
@@ -63,6 +63,10 @@ export function Logo({
     if (variant === 'light') {
       return '/logo/Gradian-Logo-lightmode-min.png';
     }
+
+    if (variant === 'icon') {
+      return '/logo/Gradian_Logo_Icon.png';
+    }
     
     // Auto mode: use theme
     if (!mounted) {
@@ -82,7 +86,7 @@ export function Logo({
       alt={alt}
       width={width}
       height={height}
-      className={cn('object-contain', className)}
+      className={cn('object-contain m-0', className)}
       priority
     />
   );

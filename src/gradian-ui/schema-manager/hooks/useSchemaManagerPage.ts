@@ -234,11 +234,8 @@ export const useSchemaManagerPage = () => {
           console.warn('Failed to clear IndexedDB schema cache:', error);
         }
         
-        // Reset queries to force a fresh fetch (removes cached data and refetches)
-        await Promise.all([
-          queryClient.resetQueries({ queryKey: SCHEMAS_SUMMARY_QUERY_KEY }),
-          queryClient.resetQueries({ queryKey: SCHEMAS_QUERY_KEY }),
-        ]);
+        // Invalidate and refetch queries to ensure fresh data
+        await invalidateSchemaQueryCaches();
         
         // Wait a brief moment for cache clearing to complete
         await new Promise(resolve => setTimeout(resolve, 100));

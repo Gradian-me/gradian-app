@@ -91,11 +91,11 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
           <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
         </DialogHeader>
         
-        <div className="mt-4">
+        <div className="mt-2">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.25 }}
           >
             <DynamicCardRenderer
               schema={schema}
@@ -110,6 +110,7 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
               onDelete={onDelete}
               className="shadow-none border-none"
               disableAnimation={true} // Disable card animation in dialog
+              isInDialog={true}
             />
           </motion.div>
         </div>

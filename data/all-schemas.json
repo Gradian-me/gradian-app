@@ -1060,7 +1060,7 @@
             "title": "On-Time Delivery",
             "format": "percentage",
             "precision": 1,
-            "color": "#10B981",
+            "color": "emerald",
             "trend": {
               "enabled": true,
               "period": "month",
@@ -1080,7 +1080,7 @@
             "title": "Quality Score",
             "format": "percentage",
             "precision": 1,
-            "color": "#3B82F6",
+            "color": "blue",
             "trend": {
               "enabled": true,
               "period": "month",
@@ -1100,7 +1100,7 @@
             "title": "Total Orders",
             "format": "number",
             "precision": 0,
-            "color": "#F59E0B",
+            "color": "amber",
             "trend": {
               "enabled": true,
               "period": "month",
@@ -1120,7 +1120,7 @@
             "title": "Total Value",
             "format": "currency",
             "precision": 0,
-            "color": "#8B5CF6",
+            "color": "violet",
             "trend": {
               "enabled": true,
               "period": "month",
@@ -1507,11 +1507,11 @@
         "label": "Color",
         "sectionId": "visual-style",
         "component": "color-picker",
-        "placeholder": "#000000",
+        "placeholder": "Select color",
         "validation": {
-          "required": true,
-          "pattern": "^#[0-9A-Fa-f]{6}$"
+          "required": true
         },
+        "role": "color",
         "colSpan": 1,
         "order": 1
       },
@@ -2244,11 +2244,11 @@
         "label": "User Role Color",
         "sectionId": "basic-information",
         "component": "color-picker",
-        "placeholder": "#000000",
+        "placeholder": "Select color",
         "validation": {
-          "required": true,
-          "pattern": "^#[0-9A-Fa-f]{6}$"
+          "required": true
         },
+        "role": "color",
         "colSpan": 1,
         "order": 2
       },
@@ -2382,18 +2382,7 @@
         "targetUrl": "/builder/schemas"
       }
     ],
-    "cardMetadata": [
-      {
-        "id": "business-area-info",
-        "title": "Business Area Information",
-        "colSpan": 1,
-        "fieldIds": [
-          "business-area-title",
-          "business-area-icon",
-          "business-area-color"
-        ]
-      }
-    ],
+    "cardMetadata": [],
     "fields": [
       {
         "id": "business-area-title",
@@ -2430,11 +2419,10 @@
         "label": "Color",
         "sectionId": "basic-information",
         "component": "color-picker",
-        "placeholder": "#000000",
         "validation": {
-          "required": true,
-          "pattern": "^#[0-9A-Fa-f]{6}$"
+          "required": true
         },
+        "role": "color",
         "colSpan": 1,
         "order": 3
       }
@@ -3131,6 +3119,7 @@
         "sectionId": "basic-information",
         "component": "color-picker",
         "required": false,
+        "role": "color",
         "colSpan": 1,
         "order": 5
       },
@@ -3646,11 +3635,11 @@
         "label": "Color",
         "sectionId": "basic-information",
         "component": "color-picker",
-        "placeholder": "#000000",
+        "placeholder": "Select color",
         "validation": {
-          "required": true,
-          "pattern": "^#[0-9A-Fa-f]{6}$"
+          "required": true
         },
+        "role": "color",
         "colSpan": 1,
         "order": 3
       },
@@ -3753,6 +3742,7 @@
         "component": "color-picker",
         "placeholder": "Select color",
         "description": "Choose a color from the Tailwind palette for this status.",
+        "role": "color",
         "colSpan": 1,
         "order": 3
       }
@@ -3907,11 +3897,9 @@
         "label": "Color",
         "sectionId": "basic-information",
         "component": "color-picker",
-        "placeholder": "#000000",
+        "placeholder": "Select color",
         "required": false,
-        "validation": {
-          "pattern": "^#[0-9A-Fa-f]{6}$"
-        },
+        "role": "color",
         "colSpan": 1,
         "order": 3
       },
@@ -4027,11 +4015,9 @@
         "label": "Color",
         "sectionId": "basic-information",
         "component": "color-picker",
-        "placeholder": "#000000",
+        "placeholder": "Select color",
         "required": false,
-        "validation": {
-          "pattern": "^#[0-9A-Fa-f]{6}$"
-        },
+        "role": "color",
         "colSpan": 1,
         "order": 3
       },
@@ -4923,131 +4909,6 @@
     "isNotCompanyBased": true
   },
   {
-    "id": "datawarehouse-objects",
-    "description": "Manage data warehouse objects with their configurations and relationships.",
-    "singular_name": "Data Warehouse Object",
-    "plural_name": "Data Warehouse Objects",
-    "icon": "Database",
-    "fields": [
-      {
-        "id": "dw-object-name",
-        "name": "dwObjectName",
-        "label": "Data Warehouse Object Name",
-        "sectionId": "basic-info",
-        "type": "text",
-        "component": "text",
-        "required": true,
-        "role": "title",
-        "validation": {
-          "required": true,
-          "minLength": 2
-        },
-        "colSpan": 2,
-        "order": 1
-      },
-      {
-        "id": "owner",
-        "name": "owner",
-        "label": "Owner",
-        "sectionId": "basic-info",
-        "type": "picker",
-        "component": "picker",
-        "targetSchema": "users",
-        "required": true,
-        "colSpan": 1,
-        "order": 2
-      },
-      {
-        "id": "server",
-        "name": "server",
-        "label": "Server",
-        "sectionId": "basic-info",
-        "type": "picker",
-        "component": "picker",
-        "targetSchema": "servers",
-        "required": true,
-        "colSpan": 1,
-        "order": 3
-      },
-      {
-        "id": "database",
-        "name": "database",
-        "label": "Database",
-        "sectionId": "basic-info",
-        "type": "picker",
-        "component": "picker",
-        "targetSchema": "databases",
-        "required": true,
-        "colSpan": 1,
-        "order": 4
-      },
-      {
-        "id": "backup-policy",
-        "name": "backupPolicy",
-        "label": "Backup Policy",
-        "sectionId": "advanced-settings",
-        "type": "select",
-        "component": "select",
-        "options": [
-          {
-            "id": "full",
-            "label": "Full Backup",
-            "icon": "CheckCircle",
-            "color": "success"
-          },
-          {
-            "id": "incremental",
-            "label": "Incremental Backup",
-            "icon": "PlusCircle",
-            "color": "info"
-          },
-          {
-            "id": "differential",
-            "label": "Differential Backup",
-            "icon": "Cloud",
-            "color": "warning"
-          },
-          {
-            "id": "none",
-            "label": "No Backup",
-            "icon": "XCircle",
-            "color": "destructive"
-          }
-        ],
-        "description": "Select the backup policy for the data warehouse object.",
-        "colSpan": 1,
-        "order": 5
-      },
-      {
-        "id": "backup-description",
-        "name": "backupDescription",
-        "label": "Backup Description",
-        "sectionId": "advanced-settings",
-        "type": "textarea",
-        "component": "textarea",
-        "description": "Provide additional details about the backup policy.",
-        "colSpan": 2,
-        "order": 6
-      }
-    ],
-    "sections": [
-      {
-        "id": "basic-info",
-        "title": "Basic Information",
-        "columns": 2,
-        "initialState": "expanded"
-      },
-      {
-        "id": "advanced-settings",
-        "title": "Advanced Settings",
-        "columns": 2,
-        "initialState": "collapsed"
-      }
-    ],
-    "showInNavigation": true,
-    "isSystemSchema": true
-  },
-  {
     "id": "menu-items",
     "description": "Define and manage application menu items",
     "singular_name": "Menu Item",
@@ -5190,5 +5051,120 @@
     "allowHierarchicalParent": true,
     "isNotCompanyBased": true,
     "isSystemSchema": true
+  },
+  {
+    "id": "tenants",
+    "description": "Manage tenant information including name, title, domain, and database configuration",
+    "singular_name": "Tenant",
+    "plural_name": "Tenants",
+    "cardMetadata": [
+      {
+        "id": "tenant-info",
+        "title": "Tenant Information",
+        "colSpan": 2,
+        "fieldIds": [
+          "tenant-name",
+          "tenant-title",
+          "tenant-domain",
+          "tenant-dbname"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "tenant-name",
+        "name": "name",
+        "label": "Name",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter tenant name",
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "tenant-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter tenant title",
+        "required": false,
+        "colSpan": 2,
+        "order": 2
+      },
+      {
+        "id": "tenant-domain",
+        "name": "domain",
+        "label": "Domain",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter domain (e.g., example.com)",
+        "validation": {
+          "required": true,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\\.[a-zA-Z]{2,}$"
+        },
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "tenant-dbname",
+        "name": "dbname",
+        "label": "Database Name",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter database name",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "tenant-inactive",
+        "name": "inactive",
+        "label": "Inactive",
+        "sectionId": "basic-information",
+        "component": "switch",
+        "required": false,
+        "colSpan": 1,
+        "order": 5
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Tenant Information",
+        "description": "Basic tenant details and configuration",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "tenant-overview",
+          "title": "Tenant Overview",
+          "description": "Basic tenant information",
+          "colSpan": 2,
+          "fieldIds": [
+            "tenant-name",
+            "tenant-title",
+            "tenant-domain",
+            "tenant-dbname",
+            "tenant-inactive"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": false,
+    "icon": "Building2",
+    "allowDataInactive": true,
+    "isNotCompanyBased": true
   }
 ]

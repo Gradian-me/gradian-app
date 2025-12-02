@@ -390,7 +390,7 @@
     "icon": "Image",
     "description": "Generate images from text descriptions using AI",
     "requiredOutputFormat": "json",
-    "model": "wan2.2-t2i-flash",
+    "model": "flux-1.1-pro",
     "loadingTextSwitches": ["Analyzing your prompt...", "Generating your image...", "Refining details...", "Finalizing the image..."],
     "renderComponents": [
       {

@@ -8,7 +8,7 @@ import { SidebarConfig } from '../types';
 export const defaultSidebarConfig: SidebarConfig = {
   brand: {
     title: 'Gradian',
-    subtitle: 'Trust Your Decision',
+    subtitle: 'Trust Your Decisions',
   },
   styling: {
     variant: 'default',

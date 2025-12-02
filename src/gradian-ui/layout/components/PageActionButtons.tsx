@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/gradian-ui/shared/utils';
 import { URL_HOME } from '@/gradian-ui/shared/constants/application-variables';
 import { Home, QrCode } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ShareButton } from './ShareButton';
@@ -47,7 +48,6 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
   const [currentValue, setCurrentValue] = useState<string>('');
   const pathname = usePathname();
-  const router = useRouter();
 
   useEffect(() => {
     // Use provided value or current URL
@@ -73,13 +73,15 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
       {/* Left side - Home button (only in default layout) */}
       {!isInline && showHome && (
         <Button
-          onClick={() => router.push(URL_HOME)}
+          asChild
           variant="outline"
           size="sm"
           className="h-10 w-10 p-0 rounded-lg"
           title="Go to Apps"
         >
-          <Home className="h-4 w-4" />
+          <Link href={URL_HOME} aria-label="Go to Apps">
+            <Home className="h-4 w-4" />
+          </Link>
         </Button>
       )}
 

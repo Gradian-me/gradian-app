@@ -337,7 +337,7 @@ export function SchemaBuilderEditor({
                     <Skeleton key={i} className="h-10 w-full rounded-md" />
                   ))}
                 </div>
-                <div className="border-t pt-4 mt-4">
+                <div className="border-t pt-4 mt-4 border-gray-200 dark:border-gray-700">
                   <Skeleton className="h-5 w-40 rounded-md mb-4" />
                   <div className="grid grid-cols-2 gap-4">
                     {[1, 2, 3, 4].map((i) => (
@@ -346,7 +346,7 @@ export function SchemaBuilderEditor({
                   </div>
                 </div>
                 <Skeleton className="h-10 w-full rounded-md" />
-                <div className="border-t pt-4 mt-4">
+                <div className="border-t pt-4 mt-4 border-gray-200 dark:border-gray-700">
                   <Skeleton className="h-5 w-40 rounded-md mb-4" />
                   <div className="space-y-4">
                     <Skeleton className="h-20 w-full rounded-md" />

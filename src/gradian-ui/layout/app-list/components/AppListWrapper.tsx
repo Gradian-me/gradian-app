@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AppWindow, Grid3X3, List, RefreshCw, Sparkles } from 'lucide-react';
@@ -24,6 +24,8 @@ import { UserWelcome } from '@/gradian-ui/layout/components/UserWelcome';
 import { useUserStore } from '@/stores/user.store';
 import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
+import { cn } from '@/gradian-ui/shared/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type AppViewMode = 'grid' | 'list';
 
@@ -196,11 +198,88 @@ const AppListItem: React.FC<AppListItemProps> = ({
   );
 };
 
+// Skeleton component for grid view
+const AppCardSkeleton: React.FC<{ index: number }> = ({ index }) => {
+  const animationDelay = Math.min(
+    index * UI_PARAMS.CARD_INDEX_DELAY.STEP,
+    UI_PARAMS.CARD_INDEX_DELAY.MAX,
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.985 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.18, delay: animationDelay, ease: 'easeOut' }}
+    >
+      <Card className="group relative flex h-full flex-col overflow-hidden border border-violet-100/70 bg-gradient-to-br from-violet-50/70 via-white to-indigo-50/60 shadow-sm dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40">
+        <CardHeader className="relative z-10 flex-1 space-y-2 px-4 pb-2 pt-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="mb-1.5 flex items-center gap-2">
+                <Skeleton className="h-5 w-5 rounded shrink-0" />
+                <Skeleton className="h-5 w-32" />
+              </div>
+              <div className="space-y-1.5 mt-2">
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-3/4" />
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="relative z-10 flex items-center justify-between gap-3 px-4 pb-4 pt-0">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-5 w-12 rounded-full" />
+          </div>
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
+
+// Skeleton component for list view
+const AppListSkeleton: React.FC<{ index: number }> = ({ index }) => {
+  const animationDelay = Math.min(
+    index * UI_PARAMS.CARD_INDEX_DELAY.STEP,
+    UI_PARAMS.CARD_INDEX_DELAY.MAX,
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20, scale: 0.99 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      transition={{ duration: 0.18, delay: animationDelay, ease: 'easeOut' }}
+      className="group relative flex items-center justify-between gap-3 overflow-hidden rounded-xl border border-violet-100/70 bg-gradient-to-r from-violet-50/70 via-white to-indigo-50/60 p-4 shadow-sm dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40"
+    >
+      <div className="relative z-10 flex flex-1 items-center gap-3">
+        <Skeleton className="h-8 w-8 rounded shrink-0" />
+        <div className="min-w-0 flex-1">
+          <div className="mb-1 flex items-center gap-2">
+            <Skeleton className="h-4 w-40" />
+          </div>
+          <Skeleton className="h-3 w-64 mt-1" />
+        </div>
+      </div>
+      <Skeleton className="relative z-10 h-8 w-8 rounded-full" />
+    </motion.div>
+  );
+};
+
 export function AppListWrapper() {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const language = useLanguageStore((state) => state.language || 'en');
-  const { schemas, isLoading, refetch } = useSchemas({ summary: true });
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Ensure component is mounted before enabling the query
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const { schemas, isLoading, refetch } = useSchemas({ 
+    summary: true,
+    enabled: isMounted 
+  });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<AppViewMode>('grid');
@@ -259,11 +338,14 @@ export function AppListWrapper() {
   };
 
   const handleRefresh = async () => {
+    if (!isMounted) return;
     try {
       setRefreshing(true);
       await refetch();
     } finally {
-      setRefreshing(false);
+      if (isMounted) {
+        setRefreshing(false);
+      }
     }
   };
 
@@ -328,83 +410,90 @@ export function AppListWrapper() {
               </p>
             </div>
           </div>
-          <div className="flex flex-col gap-2 sm:w-[360px] sm:flex-none">
-            <SearchInput
-              config={{ name: 'search', placeholder: 'Search apps by name or ID...' }}
-              value={searchQuery}
-              onChange={setSearchQuery}
-              onClear={() => setSearchQuery('')}
-              className="[&_input]:h-9"
-            />
-            <div className="flex items-center justify-end gap-2">
-              <div className="inline-flex items-center gap-1 rounded-full bg-gray-100/80 p-1 shadow-inner dark:bg-gray-900/80">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('grid')}
-                  className="relative inline-flex h-7 w-7 items-center justify-center rounded-full text-gray-500 transition-colors hover:text-violet-600 dark:text-gray-400 dark:hover:text-violet-300"
-                  aria-label="Grid view"
-                >
-                  {viewMode === 'grid' && (
-                    <motion.span
-                      layoutId="apps-view-pill"
-                      className="absolute inset-0 rounded-full bg-white shadow-sm dark:bg-gray-800"
-                      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                    />
-                  )}
-                  <Grid3X3 className="relative h-3.5 w-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('list')}
-                  className="relative inline-flex h-7 w-7 items-center justify-center rounded-full text-gray-500 transition-colors hover:text-violet-600 dark:text-gray-400 dark:hover:text-violet-300"
-                  aria-label="List view"
-                >
-                  {viewMode === 'list' && (
-                    <motion.span
-                      layoutId="apps-view-pill"
-                      className="absolute inset-0 rounded-full bg-white shadow-sm dark:bg-gray-800"
-                      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                    />
-                  )}
-                  <List className="relative h-3.5 w-3.5" />
-                </button>
-              </div>
+          <div className="flex flex-row items-center gap-2">
+            <div className="flex-1 min-w-0">
+              <SearchInput
+                config={{ name: 'search', placeholder: 'Search Apps ...' }}
+                value={searchQuery}
+                onChange={setSearchQuery}
+                onClear={() => setSearchQuery('')}
+                className="[&_input]:h-9"
+              />
+            </div>
+            <div className="flex items-center space-x-1 shrink-0 border border-gray-300 dark:border-gray-500 rounded-md h-9">
               <Button
-                variant="outline"
-                size="icon"
-                onClick={handleRefresh}
-                disabled={isLoading || refreshing}
-                className="h-8 w-8 shrink-0"
-                title="Refresh apps"
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className={cn(
+                  'h-full w-10 p-0 rounded-md',
+                  viewMode === 'list'
+                    ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-sm'
+                    : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50'
+                )}
+                aria-label="List view"
               >
-                <RefreshCw
-                  className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`}
-                />
+                <List className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className={cn(
+                  'h-full w-10 p-0 rounded-md',
+                  viewMode === 'grid'
+                    ? 'bg-violet-500 hover:bg-violet-600 text-white shadow-sm'
+                    : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50'
+                )}
+                aria-label="Grid view"
+              >
+                <Grid3X3 className="h-4 w-4" />
               </Button>
             </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleRefresh}
+              disabled={isLoading || refreshing}
+              className="h-9 w-9 shrink-0"
+              title="Refresh apps"
+            >
+              <RefreshCw
+                className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`}
+              />
+            </Button>
           </div>
         </motion.div>
 
         <AnimatePresence mode="wait">
           {isLoading ? (
-            <motion.div
-              key="apps-loading"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
-            >
-              {Array.from({ length: 6 }).map((_, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25, delay: index * 0.04, ease: 'easeOut' }}
-                  className="h-32 animate-pulse rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900"
-                />
-              ))}
-            </motion.div>
+            viewMode === 'grid' ? (
+              <motion.div
+                key="apps-loading-grid"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+              >
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <AppCardSkeleton key={index} index={index} />
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="apps-loading-list"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="space-y-3"
+              >
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <AppListSkeleton key={index} index={index} />
+                ))}
+              </motion.div>
+            )
           ) : hasApps ? (
             viewMode === 'grid' ? (
               <motion.div

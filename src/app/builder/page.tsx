@@ -40,6 +40,69 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; style?: 
   HeartPulse,
 };
 
+// Helper to get icon background and text color classes from Tailwind color name
+const getIconColorClasses = (color: string): { bg: string; text: string; solid: string } => {
+  const colorMap: Record<string, { bg: string; text: string; solid: string }> = {
+    violet: {
+      bg: 'bg-violet-50 dark:bg-violet-500/15',
+      text: 'text-violet-700 dark:text-violet-100',
+      solid: 'bg-violet-500',
+    },
+    emerald: {
+      bg: 'bg-emerald-50 dark:bg-emerald-500/15',
+      text: 'text-emerald-700 dark:text-emerald-100',
+      solid: 'bg-emerald-500',
+    },
+    indigo: {
+      bg: 'bg-indigo-50 dark:bg-indigo-500/15',
+      text: 'text-indigo-700 dark:text-indigo-100',
+      solid: 'bg-indigo-500',
+    },
+    blue: {
+      bg: 'bg-blue-50 dark:bg-blue-500/15',
+      text: 'text-blue-700 dark:text-blue-100',
+      solid: 'bg-blue-500',
+    },
+    green: {
+      bg: 'bg-green-50 dark:bg-green-500/15',
+      text: 'text-green-700 dark:text-green-100',
+      solid: 'bg-green-500',
+    },
+    red: {
+      bg: 'bg-red-50 dark:bg-red-500/15',
+      text: 'text-red-700 dark:text-red-100',
+      solid: 'bg-red-500',
+    },
+    orange: {
+      bg: 'bg-orange-50 dark:bg-orange-500/15',
+      text: 'text-orange-700 dark:text-orange-100',
+      solid: 'bg-orange-500',
+    },
+    amber: {
+      bg: 'bg-amber-50 dark:bg-amber-500/15',
+      text: 'text-amber-700 dark:text-amber-100',
+      solid: 'bg-amber-500',
+    },
+    yellow: {
+      bg: 'bg-yellow-50 dark:bg-yellow-500/15',
+      text: 'text-yellow-700 dark:text-yellow-100',
+      solid: 'bg-yellow-500',
+    },
+    pink: {
+      bg: 'bg-pink-50 dark:bg-pink-500/15',
+      text: 'text-pink-700 dark:text-pink-100',
+      solid: 'bg-pink-500',
+    },
+    purple: {
+      bg: 'bg-purple-50 dark:bg-purple-500/15',
+      text: 'text-purple-700 dark:text-purple-100',
+      solid: 'bg-purple-500',
+    },
+  };
+  
+  return colorMap[color.toLowerCase()] || colorMap.violet;
+};
+
 interface BuilderOption {
   id: string;
   title: string;
@@ -189,15 +252,14 @@ export default function BuilderPage() {
                   <CardHeader className="pb-3 pt-4 px-4">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2.5">
-                        <div 
-                          className="p-2 rounded-md"
-                          style={{ backgroundColor: `${option.color}10` }}
-                        >
-                          <Icon 
-                            className="h-5 w-5" 
-                            style={{ color: option.color }}
-                          />
-                        </div>
+                        {(() => {
+                          const iconColors = getIconColorClasses(option.color);
+                          return (
+                            <div className={`p-2 rounded-md ${iconColors.bg}`}>
+                              <Icon className={`h-5 w-5 ${iconColors.text}`} />
+                            </div>
+                          );
+                        })()}
                         <CardTitle className="text-lg font-semibold">{option.title}</CardTitle>
                       </div>
                       <ArrowRight 
@@ -213,18 +275,20 @@ export default function BuilderPage() {
                     <Label className="text-xs text-gray-600 dark:text-gray-400 font-medium">Features</Label>
                     {option.features && option.features.length > 0 && (
                       <div className="space-y-1.5 mb-3">
-                        {option.features.map((feature, idx) => (
-                          <div 
-                            key={idx}
-                            className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5"
-                          >
+                        {option.features.map((feature, idx) => {
+                          const iconColors = getIconColorClasses(option.color);
+                          return (
                             <div 
-                              className="w-1 h-1 rounded-full shrink-0"
-                              style={{ backgroundColor: option.color }}
-                            />
-                            <span>{feature}</span>
-                          </div>
-                        ))}
+                              key={idx}
+                              className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5"
+                            >
+                              <div 
+                                className={`w-1.5 h-1.5 rounded-full shrink-0 ${iconColors.solid}`}
+                              />
+                              <span>{feature}</span>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                     

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, LockIcon, UserIcon } from 'lucide-react';
 import { AuthenticationLayout, GlassInputWrapper } from '@/components/authentication';
+import { ModeToggle } from '@/gradian-ui/layout';
 
 interface SignInPageProps {
   title?: React.ReactNode;
@@ -55,6 +56,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
       showTestimonials={showTestimonials}
       neonOrbsTitle={neonOrbsTitle}
       neonOrbsSubtitle={neonOrbsSubtitle}
+      showModeToggle={false}
     >
       <div className="w-full max-w-md">
         <div className="flex flex-col gap-6">
@@ -104,11 +106,19 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             </div>
 
             <div className="animate-element animate-delay-500 flex items-center justify-between text-sm">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" name="rememberMe" className="custom-checkbox" />
-                <span className="text-foreground/90">Keep me signed in</span>
-              </label>
-              <a href="#" onClick={(e) => { e.preventDefault(); onResetPassword?.(); }} className="hover:underline text-violet-400 transition-colors">Reset password</a>
+              <div className="flex items-center">
+                <ModeToggle />
+              </div>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onResetPassword?.();
+                }}
+                className="hover:underline text-violet-400 transition-colors"
+              >
+                Reset password
+              </a>
             </div>
 
             <button 

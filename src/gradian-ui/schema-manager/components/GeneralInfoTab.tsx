@@ -95,7 +95,7 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
             disabled={readonly}
           />
         </div>
-        <div className="border-t pt-4 mt-4">
+        <div className="border-t pt-4 mt-4 border-gray-200 dark:border-gray-700">
           <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Data Management Options</h3>
           <div className="grid grid-cols-2 gap-4">
             <Switch
@@ -142,7 +142,7 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
             disabled={readonly}
           />
         </div>
-        <div className="border-t pt-4 mt-4">
+        <div className="border-t pt-4 mt-4 border-gray-200 dark:border-gray-700">
           <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Server Sync Options</h3>
           <div className="space-y-4">
             <div>

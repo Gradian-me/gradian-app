@@ -178,7 +178,7 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
       )}
 
       <div className="relative">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6 mb-6">
+        <div className="flex flex-row flex-nowrap gap-4 items-center sm:gap-6 mb-6">
           <Avatar className="h-20 w-20 border-4 border-violet-100 dark:border-violet-500/40 shadow-lg">
             {avatar ? (
               <AvatarImage src={avatar} alt={userName} />
@@ -188,11 +188,11 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
             </AvatarFallback>
           </Avatar>
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
               {displayTitle}
             </h2>
             {subtitle && (
-              <p className="text-lg text-gray-600 dark:text-gray-400">
+              <p className="text-md md:text-lg text-gray-600 dark:text-gray-400">
                 {subtitle}
               </p>
             )}

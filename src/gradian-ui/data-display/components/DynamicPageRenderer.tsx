@@ -46,6 +46,9 @@ import { syncParentRelation } from '@/gradian-ui/shared/utils/parent-relation.ut
 import { getParentIdFromEntity } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
 import { RepeatingSectionDialog } from './RepeatingSectionDialog';
 import { Table2 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { EntityMetadata } from './EntityMetadata';
+import { formatCreatedLabel, formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/date-utils';
 
 interface DynamicPageRendererProps {
   schema: FormSchema;
@@ -650,7 +653,108 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       },
     };
 
-    return [actionColumn, ...baseColumns, ...repeatingSectionColumns];
+    // Add metadata columns (Created/Updated) at the end
+    const metadataColumns: TableColumn[] = [
+      {
+        id: 'createdAt',
+        label: 'Created',
+        accessor: (row: any) => row.createdAt,
+        sortable: true,
+        align: 'left',
+        width: 180,
+        render: (value: any, row: any) => {
+          if (!value) return <span className="text-gray-400 dark:text-gray-600 text-xs">—</span>;
+          const createdLabel = formatCreatedLabel(value);
+          const createdBy = row.createdBy;
+          const createdByLabel = typeof createdBy === 'string' 
+            ? createdBy 
+            : (createdBy?.label || null);
+          
+          return (
+            <TooltipProvider>
+              <div className="flex flex-col gap-0.5">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                      <IconRenderer iconName="PlusCircle" className="h-3 w-3" />
+                      <span>{createdLabel.display}</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="bottom"
+                    sideOffset={8}
+                    className="z-[100]"
+                    avoidCollisions={true}
+                    collisionPadding={8}
+                  >
+                    <span>
+                      Created {createdLabel.title}
+                      {createdByLabel ? ` by ${createdByLabel}` : ''}
+                    </span>
+                  </TooltipContent>
+                </Tooltip>
+                {createdByLabel && (
+                  <span className="text-xs text-gray-400 dark:text-gray-500 pl-4.5 truncate">
+                    by {createdByLabel}
+                  </span>
+                )}
+              </div>
+            </TooltipProvider>
+          );
+        },
+      },
+      {
+        id: 'updatedAt',
+        label: 'Updated',
+        accessor: (row: any) => row.updatedAt,
+        sortable: true,
+        align: 'left',
+        width: 180,
+        render: (value: any, row: any) => {
+          if (!value) return <span className="text-gray-400 dark:text-gray-600 text-xs">—</span>;
+          const updatedLabel = formatRelativeTime(value, { addSuffix: true });
+          const updatedFullDate = formatFullDate(value);
+          const updatedBy = row.updatedBy;
+          const updatedByLabel = typeof updatedBy === 'string' 
+            ? updatedBy 
+            : (updatedBy?.label || null);
+          
+          return (
+            <TooltipProvider>
+              <div className="flex flex-col gap-0.5">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                      <IconRenderer iconName="Edit" className="h-3 w-3" />
+                      <span>{updatedLabel}</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="bottom"
+                    sideOffset={8}
+                    className="z-[100]"
+                    avoidCollisions={true}
+                    collisionPadding={8}
+                  >
+                    <span>
+                      Updated {updatedFullDate}
+                      {updatedByLabel ? ` by ${updatedByLabel}` : ''}
+                    </span>
+                  </TooltipContent>
+                </Tooltip>
+                {updatedByLabel && (
+                  <span className="text-xs text-gray-400 dark:text-gray-500 pl-4.5 truncate">
+                    by {updatedByLabel}
+                  </span>
+                )}
+              </div>
+            </TooltipProvider>
+          );
+        },
+      },
+    ];
+
+    return [actionColumn, ...baseColumns, ...repeatingSectionColumns, ...metadataColumns];
   }, [schema, repeatingSections, repeatingSectionFieldIds, handleViewDetailPage, handleEditEntity, handleDeleteWithConfirmation, isEditLoading]);
 
   // Create table config

@@ -15,8 +15,7 @@ import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { DataRelation, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { FormModal } from './FormModal';
-import { Avatar, Rating, PopupPicker, ConfirmationMessage, AddButtonFull, CodeBadge } from '../form-elements';
-import { Badge } from '@/components/ui/badge';
+import { Avatar, Rating, PopupPicker, ConfirmationMessage, AddButtonFull, CodeBadge, Badge } from '../form-elements';
 import { Skeleton } from '../../../components/ui/skeleton';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { getInitials, getBadgeConfig } from '../../data-display/utils';
@@ -117,6 +116,15 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   
   // Get addType from config (default: 'addOnly')
   const addType = section.repeatingConfig?.addType || 'addOnly';
+  
+  // Helper function to format relation type ID (e.g., HAS_APPLICATION -> Has Application)
+  const formatRelationTypeId = (relationTypeId: string | undefined): string | null => {
+    if (!relationTypeId) return null;
+    const cleaned = relationTypeId.replace(/_/g, ' ').toLowerCase();
+    return cleaned.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+  
+  const formattedRelationType = formatRelationTypeId(relationTypeId);
   
   // Fetch target schema
   useEffect(() => {
@@ -968,9 +976,20 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   )}
                 </div>
               </div>
+              <div className="flex items-center gap-2 flex-wrap mt-1">
               {description && (
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{description}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{description}</p>
               )}
+                {formattedRelationType && (
+                  <Badge
+                    variant="outline"
+                    size="sm"
+                    className="text-xs font-normal bg-gray-50/50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400"
+                  >
+                    {formattedRelationType}
+                  </Badge>
+                )}
+              </div>
             </CardHeader>
             
             {isCollapsible ? (

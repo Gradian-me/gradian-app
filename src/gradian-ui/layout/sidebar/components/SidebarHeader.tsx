@@ -6,6 +6,7 @@ import { PanelRightOpen, PanelLeftOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SidebarHeaderProps } from '../types';
 import { cn } from '../../../shared/utils';
+import { Logo } from '../../logo/components/Logo';
 
 export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   brand,
@@ -14,34 +15,47 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   onToggle,
   className,
 }) => {
-  const displayTitle = brand?.title || 'Gradia App';
-  const displaySubtitle = brand?.subtitle || 'Trust Your Decision';
+  const displaySubtitle = brand?.subtitle || 'Trust Your Decisions';
 
   return (
-    <div className={cn("flex items-center justify-between p-6 border-b border-gray-700", className)}>
+    <div className={cn("flex items-center justify-center p-2 border-b border-gray-700", className)}>
       <AnimatePresence mode="wait">
-        {(!isCollapsed || isMobile) && (
+        {isCollapsed && !isMobile ? (
+          <motion.div
+            key="collapsed"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+
+          </motion.div>
+        ) : (
           <motion.div
             key="expanded"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="flex items-center space-x-3"
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="flex items-center space-x-3 w-full"
           >
-            <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">{displayTitle[0]}</span>
-            </div>
-            <div>
-              <h1 className="font-bold text-xl text-white whitespace-nowrap truncate">{displayTitle}</h1>
+            <div className="flex flex-col items-start space-x-3 w-full">
+              <Logo
+                variant="white"
+                width={120}
+                height={40}
+                className="h-8 w-auto"
+              />
               {displaySubtitle && (
-                <p className="text-xs text-gray-400 whitespace-nowrap truncate">{displaySubtitle}</p>
+                <div className="w-full text-start">
+                  <p className="text-xs text-gray-400 whitespace-nowrap truncate">{displaySubtitle}</p>
+                </div>
               )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       <Button
         variant="ghost"
         size="icon"
@@ -54,7 +68,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
           isCollapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelRightOpen className="h-5 w-5" />
         )}
       </Button>
-    </div>
+    </div >
   );
 };
 

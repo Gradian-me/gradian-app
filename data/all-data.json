@@ -110,7 +110,9 @@
       "section-1762088953746": [],
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "contacts": [],
-      "incomplete": false
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Mana Pharma",
@@ -197,7 +199,9 @@
           "label": "Canada"
         }
       ],
-      "incomplete": false
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Ottana Pharmed",
@@ -291,7 +295,9 @@
       ],
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "contacts": [],
-      "incomplete": false
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Pharmagona",
@@ -378,7 +384,9 @@
         }
       ],
       "incomplete": false,
-      "contacts": []
+      "contacts": [],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "inquiries": [
@@ -402,7 +410,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "inquiry-vendors": [],
       "incomplete": false,
-      "contacts": []
+      "contacts": [],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "number": "AGN-2025-12",
@@ -444,7 +454,9 @@
           "id": "01K971VS40NX1XM4PYVPBD59GR",
           "label": "Sodium Bi Carbonate"
         }
-      ]
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "contacts": [
@@ -480,7 +492,9 @@
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
           "label": "AryoGen"
         }
-      ]
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Arash",
@@ -510,7 +524,9 @@
           "label": "CinnaGen"
         }
       ],
-      "incomplete": false
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Masoud",
@@ -535,7 +551,9 @@
         }
       ],
       "status": "ACTIVE",
-      "rating": 5
+      "rating": 5,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Mahyar",
@@ -547,7 +565,9 @@
       "id": "01K94Q1ZE6M64MSHAXJARG7F8G",
       "createdAt": "2025-11-03T11:18:53.135Z",
       "updatedAt": "2025-11-04T06:56:08.325Z",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Ghader",
@@ -570,7 +590,9 @@
         }
       ],
       "status": "ACTIVE",
-      "rating": 5
+      "rating": 5,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Bahareh",
@@ -580,7 +602,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KAR3EADG1YK5TNS947582TJQ",
       "createdAt": "2025-11-23T10:16:36.544Z",
-      "updatedAt": "2025-11-23T10:16:36.544Z"
+      "updatedAt": "2025-11-23T10:16:36.544Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "companies": [
@@ -595,7 +619,9 @@
       "nationalId": "",
       "id": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdAt": "2025-11-03T12:30:16.678Z",
-      "updatedAt": "2025-11-03T12:44:20.602Z"
+      "updatedAt": "2025-11-03T12:44:20.602Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "AryoGen",
@@ -608,7 +634,9 @@
       "nationalId": "",
       "id": "01K94V8K0RJS7D9K43F2VBTSVG",
       "createdAt": "2025-11-03T12:32:24.097Z",
-      "updatedAt": "2025-11-03T12:32:24.097Z"
+      "updatedAt": "2025-11-03T12:32:24.097Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "NanoAlvand",
@@ -616,7 +644,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB85MPFBMS4GQ6KGA0EGJNGA",
       "createdAt": "2025-11-29T16:02:53.548Z",
-      "updatedAt": "2025-11-29T16:02:53.548Z"
+      "updatedAt": "2025-11-29T16:02:53.548Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Arvand Pharmed",
@@ -624,7 +654,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9VFNMVC92XF1JRND69S4Z9",
       "createdAt": "2025-11-30T07:43:51.973Z",
-      "updatedAt": "2025-11-30T07:43:51.974Z"
+      "updatedAt": "2025-11-30T07:43:51.974Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "relation-types": [
@@ -632,61 +664,77 @@
       "id": "HAS_INQUIRY_ITEM",
       "label": "Has Inquiry Item",
       "description": "An inquiry contains one or more inquiry items.",
-      "color": "#1d77d7",
-      "icon": "ShoppingBasket"
+      "color": "blue",
+      "icon": "ShoppingBasket",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "HAS_CONTACT",
       "label": "Has Contact",
       "description": "",
-      "color": "#228d0c",
-      "icon": "Contact"
+      "color": "green",
+      "icon": "Contact",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "HAS_ADDRESS",
       "label": "Has Address",
       "description": "Defines the addresses of entities",
-      "color": "#ff9500",
-      "icon": "MapPinHouse"
+      "color": "orange",
+      "icon": "MapPinHouse",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "Has Database",
       "icon": "Database",
       "id": "HAS_DATABASE",
       "createdAt": "2025-11-17T11:37:15.874Z",
-      "updatedAt": "2025-11-17T11:37:15.874Z"
+      "updatedAt": "2025-11-17T11:37:15.874Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "Has URL Address",
       "icon": "Link",
       "id": "HAS_URL",
       "createdAt": "2025-11-17T11:37:46.536Z",
-      "updatedAt": "2025-11-17T11:37:46.536Z"
+      "updatedAt": "2025-11-17T11:37:46.536Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "Has Member",
       "icon": "ListTree",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "HAS_MEMBER",
       "createdAt": "2025-11-21T06:27:24.490Z",
-      "updatedAt": "2025-11-21T07:01:29.013Z"
+      "updatedAt": "2025-11-21T07:01:29.013Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "Is Parent Of",
       "description": "Defines parent-child hierarchy between records of the same schema",
       "icon": "ListTree",
-      "id": "IS_PARENT_OF"
+      "id": "IS_PARENT_OF",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "Has Status Item",
       "description": "A status group contains one or more status items.",
       "icon": "ListTree",
-      "id": "HAS_STATUS_ITEM"
+      "id": "HAS_STATUS_ITEM",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "inquiry-vendors": [
@@ -699,7 +747,9 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K971W83WWA4QCVFNAZSF5N11",
       "createdAt": "2025-11-04T09:06:28.611Z",
-      "updatedAt": "2025-11-04T09:06:28.611Z"
+      "updatedAt": "2025-11-04T09:06:28.611Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "vendorId": {
@@ -710,7 +760,9 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K971WG76Y655JPYJDAJTTVV3",
       "createdAt": "2025-11-04T09:06:36.914Z",
-      "updatedAt": "2025-11-04T09:06:36.914Z"
+      "updatedAt": "2025-11-04T09:06:36.914Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "vendorId": {
@@ -721,7 +773,9 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K971WTDXH1GAJ33MG2FYSVYG",
       "createdAt": "2025-11-04T09:06:47.363Z",
-      "updatedAt": "2025-11-04T09:06:47.363Z"
+      "updatedAt": "2025-11-04T09:06:47.363Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "vendorId": {
@@ -732,7 +786,9 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K97208RABW053BGN3A6W05FD",
       "createdAt": "2025-11-04T09:08:40.337Z",
-      "updatedAt": "2025-11-04T12:57:29.563Z"
+      "updatedAt": "2025-11-04T12:57:29.563Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "vendorId": {
@@ -743,7 +799,9 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K9720G4M9G75V3YWB9PGKBTM",
       "createdAt": "2025-11-04T09:08:47.900Z",
-      "updatedAt": "2025-11-04T09:08:47.900Z"
+      "updatedAt": "2025-11-04T09:08:47.900Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "vendorId": {
@@ -754,7 +812,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01K97F0QV3S1JH1R8NJ1XWEPEG",
       "createdAt": "2025-11-04T12:56:07.272Z",
-      "updatedAt": "2025-11-07T22:11:31.588Z"
+      "updatedAt": "2025-11-07T22:11:31.588Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "inquiry-items": [
@@ -769,7 +829,9 @@
       "id": "01K96E06Z9H5G8FKH5QY0538JB",
       "createdAt": "2025-11-04T03:19:07.006Z",
       "updatedAt": "2025-11-19T08:55:28.123Z",
-      "description": "Test Description of Himedia Feed Alpha"
+      "description": "Test Description of Himedia Feed Alpha",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "partCode": "5073",
@@ -781,7 +843,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01K96WRHRE30636NDY6QVJT5AR",
       "createdAt": "2025-11-04T07:37:04.546Z",
-      "updatedAt": "2025-11-04T07:37:04.546Z"
+      "updatedAt": "2025-11-04T07:37:04.546Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "partCode": "6098",
@@ -793,7 +857,9 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K971TX4B7S8YBED0NEDH79TN",
       "createdAt": "2025-11-04T09:05:44.595Z",
-      "updatedAt": "2025-11-04T09:05:44.595Z"
+      "updatedAt": "2025-11-04T09:05:44.595Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "partCode": "6091",
@@ -805,7 +871,9 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K971VS40NX1XM4PYVPBD59GR",
       "createdAt": "2025-11-04T09:06:13.257Z",
-      "updatedAt": "2025-11-04T09:06:13.257Z"
+      "updatedAt": "2025-11-04T09:06:13.257Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "quotations": [
@@ -866,7 +934,9 @@
       "incomplete": false,
       "inactive": true,
       "isForce": true,
-      "forceReason": "test"
+      "forceReason": "test",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "quotation-items": [
@@ -881,7 +951,9 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K9725HNMEAFXGB98SCER6JVK",
       "createdAt": "2025-11-04T09:11:33.307Z",
-      "updatedAt": "2025-11-04T11:26:57.093Z"
+      "updatedAt": "2025-11-04T11:26:57.093Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "inquiryItemId": {
@@ -894,12 +966,13 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K9726N9T00JAG6QC7ZWMX650",
       "createdAt": "2025-11-04T09:12:09.794Z",
-      "updatedAt": "2025-11-04T11:27:12.239Z"
+      "updatedAt": "2025-11-04T11:27:12.239Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "user-roles": [
     {
-      "parent": "undefined",
       "type": [
         {
           "id": "SYSTEM_ADMINISTRATOR",
@@ -908,16 +981,17 @@
           "color": "destructive"
         }
       ],
-      "color": "#ff5c7c",
+      "color": "rose",
       "name": "System Administrators",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9Y0NBAS53JY4VRB9H1FN33",
       "createdAt": "2025-11-30T08:28:05.874Z",
-      "updatedAt": "2025-11-30T08:28:05.874Z"
+      "updatedAt": "2025-11-30T08:28:05.874Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "parent": "undefined",
       "type": [
         {
           "id": "BUSINESS_ADMINISTRATOR",
@@ -926,60 +1000,68 @@
           "color": "warning"
         }
       ],
-      "color": "#fee68e",
+      "color": "amber",
       "name": "Business Administrators",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9Y1HDTQCBR2CF8MHWSYRJG",
       "createdAt": "2025-11-30T08:28:34.619Z",
-      "updatedAt": "2025-11-30T08:28:34.619Z"
+      "updatedAt": "2025-11-30T08:28:34.619Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "parent": "undefined",
       "type": "GENERAL_ROLE",
-      "color": "#dcd6fd",
+      "color": "indigo",
       "name": "Our Users",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9Y24BEVCHQXMRSZXPDGARY",
       "createdAt": "2025-11-30T08:28:54.008Z",
-      "updatedAt": "2025-11-30T08:33:46.313Z"
+      "updatedAt": "2025-11-30T08:33:46.313Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "parent": "01KB9Y24BEVCHQXMRSZXPDGARY",
       "type": "GENERAL_ROLE",
-      "color": "#dcd6fd",
+      "color": "indigo",
       "name": "Supply Chain Deputy",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9Y4R56A3F9W2NH7KYBDQ98",
       "createdAt": "2025-11-30T08:30:19.815Z",
-      "updatedAt": "2025-11-30T08:30:19.815Z"
+      "updatedAt": "2025-11-30T08:30:19.815Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "parent": "01KB9Y4R56A3F9W2NH7KYBDQ98",
       "type": "GENERAL_ROLE",
-      "color": "#4E79A7",
+      "color": "blue",
       "name": "Supply Chain Supervisor",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9Y5NKY5ZZS6BFYPC8684E9",
       "createdAt": "2025-11-30T08:30:49.982Z",
-      "updatedAt": "2025-11-30T08:30:49.983Z"
+      "updatedAt": "2025-11-30T08:30:49.983Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "parent": "01KB9Y5NKY5ZZS6BFYPC8684E9",
       "type": "GENERAL_ROLE",
-      "color": "#4E79A7",
+      "color": "blue",
       "name": "Supply Chain Expert",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9Y679HCAP3EZY1PF2NRTSR",
       "createdAt": "2025-11-30T08:31:08.082Z",
-      "updatedAt": "2025-11-30T08:31:08.082Z"
+      "updatedAt": "2025-11-30T08:31:08.082Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "parent": "undefined",
       "type": [
         {
           "id": "VENDOR",
@@ -988,16 +1070,17 @@
           "color": "success"
         }
       ],
-      "color": "#aaf2d2",
+      "color": "emerald",
       "name": "Vendors",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9YC60QXPW8XNMTE151YCY0",
       "createdAt": "2025-11-30T08:34:23.383Z",
-      "updatedAt": "2025-11-30T08:34:23.383Z"
+      "updatedAt": "2025-11-30T08:34:23.383Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "parent": "undefined",
       "type": [
         {
           "id": "SUBSIDIARY_COMPANY",
@@ -1006,16 +1089,17 @@
           "color": "default"
         }
       ],
-      "color": "#dcd6fd",
+      "color": "indigo",
       "name": "Subsidiary Companies",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9YD2CQMX3Y7XR4V4H2CANM",
       "createdAt": "2025-11-30T08:34:52.439Z",
-      "updatedAt": "2025-11-30T08:34:52.439Z"
+      "updatedAt": "2025-11-30T08:34:52.439Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "parent": "undefined",
       "type": [
         {
           "id": "CUSTOMER",
@@ -1024,16 +1108,41 @@
           "color": "default"
         }
       ],
-      "color": "#dcd6fd",
+      "color": "indigo",
       "name": "Customers",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9YDFQ30N3GMGZZTEDX2XN2",
       "createdAt": "2025-11-30T08:35:06.084Z",
-      "updatedAt": "2025-11-30T08:35:06.084Z"
+      "updatedAt": "2025-11-30T08:35:06.084Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "users": [
+    {
+      "company": "Gradian",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "username": "gradian",
+      "firstName": "Gradian",
+      "lastName": "Administrator",
+      "email": "admin@gradian.me",
+      "postTitle": "Admin",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-01-01T10:10:10.000Z",
+      "updatedAt": "2025-01-01T10:10:10.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
     {
       "username": "abidim",
       "name": "Mahyar",
@@ -1059,7 +1168,9 @@
           "color": "emerald"
         }
       ],
-      "incomplete": false
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "company": "CinnaGen",
@@ -1080,7 +1191,9 @@
           "color": "yellow"
         }
       ],
-      "incomplete": false
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "company": "CinnaGen",
@@ -1101,7 +1214,9 @@
           "icon": "CheckCheck",
           "color": "emerald"
         }
-      ]
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "company": "CinnaGen",
@@ -1122,7 +1237,9 @@
           "icon": "CheckCheck",
           "color": "emerald"
         }
-      ]
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "purchaseOrders": [],
@@ -1137,21 +1254,51 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBA3JQKBGFABD2PZXJYP0KBZ",
       "createdAt": "2025-11-30T10:05:20.885Z",
-      "updatedAt": "2025-11-30T10:05:20.885Z"
+      "updatedAt": "2025-11-30T10:05:20.885Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "production-actuals": [],
   "business-areas": [
     {
-      "color": "#4E79A7",
+      "color": "blue",
+      "title": "Application Management",
+      "icon": "Layers",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBF10ST7BK6RX221Q9DXCBS0",
+      "createdAt": "2025-12-02T11:26:38.000Z",
+      "updatedAt": "2025-12-02T11:26:38.000Z",
+      "applications": [],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "color": "amber",
+      "title": "AI Builder",
+      "icon": "Brain",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBF113MGJ87A0J3254XSMHAT",
+      "createdAt": "2025-12-02T11:26:38.000Z",
+      "updatedAt": "2025-12-02T09:07:48.679Z",
+      "applications": [],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "color": "blue",
       "title": "Supply Chain Management",
       "icon": "ShoppingBasket",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBA3HVK0QBJ28FYBJP5FYQD0",
-      "createdAt": "2025-11-30T10:04:52.204Z",
-      "updatedAt": "2025-11-30T10:06:13.885Z",
-      "applications": []
+      "createdAt": "2025-12-02T11:27:38.000Z",
+      "updatedAt": "2025-12-02T11:27:38.000Z",
+      "applications": [],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "servers": [
@@ -1177,7 +1324,9 @@
           "id": "01KBATBCQBC07CE2227A1V45VQ",
           "label": "Masoud Mirghasemi"
         }
-      ]
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/",
@@ -1186,7 +1335,7 @@
       "createdAt": "2025-11-17T11:53:56.527Z",
       "updatedAt": "2025-11-30T16:44:26.042Z",
       "url-repositories": [],
-      "color": "#4E79A7",
+      "color": "blue",
       "environment": [
         {
           "id": "development",
@@ -1202,7 +1351,9 @@
           "id": "01KBAT78NRNB8KCD4Z625KH07A",
           "label": "Hossein Rezaeifard"
         }
-      ]
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Gradian App Dev",
@@ -1211,7 +1362,7 @@
       "createdAt": "2025-11-17T12:15:38.970Z",
       "updatedAt": "2025-11-30T16:44:18.232Z",
       "url-repositories": [],
-      "color": "#4E79A7",
+      "color": "blue",
       "environment": [
         {
           "id": "development",
@@ -1227,7 +1378,9 @@
           "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
           "label": "Mahyar Abidi"
         }
-      ]
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Gradian OCTA",
@@ -1251,10 +1404,12 @@
           "id": "01KBATBCQBC07CE2227A1V45VQ",
           "label": "Masoud Mirghasemi"
         }
-      ]
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "name": "Gradian Genora",
       "address": "https://octa.cinnagen.com/genora",
       "environment": [
@@ -1270,7 +1425,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBAT7P2B5NZYX26HVWYV28N1",
       "createdAt": "2025-11-30T16:41:16.115Z",
-      "updatedAt": "2025-11-30T16:47:00.221Z"
+      "updatedAt": "2025-11-30T16:47:00.221Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Gradian Authentication",
@@ -1293,7 +1450,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBATBKE9E23X1JT9KDHK95H6",
       "createdAt": "2025-11-30T16:43:24.494Z",
-      "updatedAt": "2025-11-30T16:43:24.494Z"
+      "updatedAt": "2025-11-30T16:43:24.494Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Gradian Supply Chain",
@@ -1316,7 +1475,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBATF2D6ZEEGP61ASG5CSZC3",
       "createdAt": "2025-11-30T16:45:18.122Z",
-      "updatedAt": "2025-11-30T16:45:18.122Z"
+      "updatedAt": "2025-11-30T16:45:18.122Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "url-repository": [
@@ -1335,7 +1496,9 @@
       "createdAt": "2025-11-17T11:45:23.067Z",
       "updatedAt": "2025-11-25T15:20:44.099Z",
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas",
@@ -1351,7 +1514,9 @@
       "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
       "createdAt": "2025-11-17T11:54:59.460Z",
       "updatedAt": "2025-11-23T07:30:21.432Z",
-      "incomplete": false
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "title": "Schemas",
@@ -1366,7 +1531,9 @@
       ],
       "id": "01KA8VXHQFZR5TH0470163433K",
       "createdAt": "2025-11-17T12:16:30.459Z",
-      "updatedAt": "2025-11-17T12:16:30.460Z"
+      "updatedAt": "2025-11-17T12:16:30.460Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "title": "Lucide Icons",
@@ -1381,7 +1548,9 @@
       ],
       "id": "01KA9LUCIDEICONS001",
       "createdAt": "2025-11-17T18:00:00.000Z",
-      "updatedAt": "2025-11-17T18:00:00.000Z"
+      "updatedAt": "2025-11-17T18:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "title": "Lucide Icons Sync",
@@ -1396,7 +1565,9 @@
       ],
       "id": "01KA9LUCIDEICONSYNC001",
       "createdAt": "2025-11-17T18:00:00.000Z",
-      "updatedAt": "2025-11-17T18:00:00.000Z"
+      "updatedAt": "2025-11-17T18:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/relations/generate",
@@ -1411,7 +1582,9 @@
       ],
       "id": "01KABM5QX5HRPWMPA1M7YK21WJ",
       "createdAt": "2025-11-18T13:58:53.618Z",
-      "updatedAt": "2025-11-18T13:58:53.618Z"
+      "updatedAt": "2025-11-18T13:58:53.618Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "title": "Graph API",
@@ -1428,7 +1601,9 @@
       "createdAt": "2025-11-22T14:19:24.000Z",
       "updatedAt": "2025-11-22T15:56:39.570Z",
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "title": "Backend Graph API",
@@ -1471,7 +1646,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KANZNMEFM5H7211V450ZX2P8",
       "createdAt": "2025-11-22T14:32:13.019Z",
-      "updatedAt": "2025-11-30T14:36:40.131Z"
+      "updatedAt": "2025-11-30T14:36:40.131Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "title": "Git Sync Environment Variables",
@@ -1486,7 +1663,9 @@
       ],
       "id": "01KASYNCENV001GITLABSYNC",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-11-23T15:00:59.000Z"
+      "updatedAt": "2025-11-23T15:00:59.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "title": "Gradian Genora Schema",
@@ -1495,12 +1674,14 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBATJ4GH09B0YETWF7W1SKM7",
       "createdAt": "2025-11-30T16:46:58.586Z",
-      "updatedAt": "2025-11-30T16:46:58.586Z"
+      "updatedAt": "2025-11-30T16:46:58.586Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "integrations": [
     {
-      "color": "#930ec4",
+      "color": "purple",
       "title": "Schemas Sync",
       "description": "This Syncs Schema From App to DB",
       "icon": "LucidePencilRuler",
@@ -1545,10 +1726,12 @@
       "sourceDataPath": "data",
       "lastSynced": "2025-12-01T10:41:33.759Z",
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#2e84e0",
+      "color": "blue",
       "title": "Schema Related Schemas Sync",
       "description": "Schema Related Schemas Sync",
       "icon": "FolderTree",
@@ -1573,10 +1756,12 @@
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
       "updatedAt": "2025-12-01T10:41:36.671Z",
-      "lastSynced": "2025-12-01T10:41:36.671Z"
+      "lastSynced": "2025-12-01T10:41:36.671Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "title": "Graph Data Sync",
       "description": "Graph Data Sync",
       "icon": "GitGraph",
@@ -1621,10 +1806,12 @@
       "createdAt": "2025-11-22T14:38:40.167Z",
       "updatedAt": "2025-12-01T10:44:39.977Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-01T10:44:39.977Z"
+      "lastSynced": "2025-12-01T10:44:39.977Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#00d1ae",
+      "color": "teal",
       "title": "Email Template Sync",
       "description": "Email template cache synchronization and management",
       "icon": "Mail",
@@ -1650,10 +1837,12 @@
       "createdAt": "2025-11-17T12:05:23.829Z",
       "updatedAt": "2025-11-25T15:21:48.768Z",
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#8b5cf6",
+      "color": "violet",
       "title": "Lucide Icons Sync",
       "description": "Synchronize Lucide icon library from external source",
       "icon": "Palette",
@@ -1694,10 +1883,12 @@
       "id": "lucide_icons_sync",
       "createdAt": "2025-11-17T18:00:00.000Z",
       "updatedAt": "2025-11-30T15:34:55.748Z",
-      "lastSynced": "2025-11-30T15:34:55.748Z"
+      "lastSynced": "2025-11-30T15:34:55.748Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#f59e0b",
+      "color": "amber",
       "title": "Git Sync Environment Variables",
       "description": "Sync environment variables from .env file to GitLab CI/CD variables",
       "icon": "GitBranch",
@@ -1721,10 +1912,12 @@
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
       "updatedAt": "2025-11-30T15:42:41.443Z",
-      "lastSynced": "2025-11-30T15:42:41.443Z"
+      "lastSynced": "2025-11-30T15:42:41.443Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "title": "Genora Schema Sync",
       "description": "Genora Schema Sync with Gradian App Dev",
       "icon": "Database",
@@ -1759,8 +1952,10 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-11-30T16:57:51.045Z",
-      "lastSynced": "2025-11-30T16:57:51.045Z"
+      "updatedAt": "2025-12-02T10:39:58.243Z",
+      "lastSynced": "2025-12-02T10:39:58.243Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "databases": [
@@ -1793,7 +1988,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KA99S0PGBRJEQ61ZS1XZ41PQ",
       "createdAt": "2025-11-17T16:18:42.004Z",
-      "updatedAt": "2025-11-17T16:18:42.004Z"
+      "updatedAt": "2025-11-17T16:18:42.004Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "logical-operators": [
@@ -1802,130 +1999,156 @@
       "name": "eq",
       "title": "Equals",
       "symbol": "Equal",
-      "color": "#4E79A7",
+      "color": "blue",
       "sqlEquivalent": "=",
       "cypherEquivalent": "=",
-      "updatedAt": "2025-11-19T07:36:52.939Z"
+      "updatedAt": "2025-11-19T07:36:52.939Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "logical-operator-neq",
       "name": "neq",
       "title": "Not Equals",
       "symbol": "EqualNot",
-      "color": "#E4572E",
+      "color": "orange",
       "sqlEquivalent": "<>",
       "cypherEquivalent": "<>",
-      "updatedAt": "2025-11-19T07:44:18.316Z"
+      "updatedAt": "2025-11-19T07:44:18.316Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "logical-operator-gt",
       "name": "gt",
       "title": "Greater Than",
       "symbol": "ChevronRight",
-      "color": "#F58518",
+      "color": "orange",
       "sqlEquivalent": ">",
       "cypherEquivalent": ">",
-      "updatedAt": "2025-11-19T07:38:40.164Z"
+      "updatedAt": "2025-11-19T07:38:40.164Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "logical-operator-gte",
       "name": "gte",
       "title": "Greater Than or Equal",
       "symbol": "ChevronLast",
-      "color": "#FF9DA7",
+      "color": "rose",
       "sqlEquivalent": ">=",
       "cypherEquivalent": ">=",
-      "updatedAt": "2025-11-19T07:38:19.329Z"
+      "updatedAt": "2025-11-19T07:38:19.329Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "logical-operator-lt",
       "name": "lt",
       "title": "Less Than",
       "symbol": "ChevronLeft",
-      "color": "#54A24B",
+      "color": "green",
       "sqlEquivalent": "<",
       "cypherEquivalent": "<",
-      "updatedAt": "2025-11-19T07:39:21.171Z"
+      "updatedAt": "2025-11-19T07:39:21.171Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "logical-operator-lte",
       "name": "lte",
       "title": "Less Than or Equal",
       "symbol": "ChevronFirst",
-      "color": "#72B7B2",
+      "color": "teal",
       "sqlEquivalent": "<=",
       "cypherEquivalent": "<=",
-      "updatedAt": "2025-11-19T07:38:58.693Z"
+      "updatedAt": "2025-11-19T07:38:58.693Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "logical-operator-in",
       "name": "in",
       "title": "In Array",
       "symbol": "LucideListCheck",
-      "color": "#4C78A8",
+      "color": "blue",
       "sqlEquivalent": "IN",
       "cypherEquivalent": "IN",
-      "updatedAt": "2025-11-19T07:47:20.955Z"
+      "updatedAt": "2025-11-19T07:47:20.955Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "logical-operator-not-in",
       "name": "not_in",
       "title": "Not In Array",
       "symbol": "ListX",
-      "color": "#B279A2",
+      "color": "purple",
       "sqlEquivalent": "NOT IN",
       "cypherEquivalent": "NOT IN",
-      "updatedAt": "2025-11-19T07:46:53.849Z"
+      "updatedAt": "2025-11-19T07:46:53.849Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "logical-operator-contains",
       "name": "contains",
       "title": "Contains",
       "symbol": "Search",
-      "color": "#9D755D",
+      "color": "stone",
       "sqlEquivalent": "LIKE %...%",
       "cypherEquivalent": "CONTAINS",
-      "updatedAt": "2025-11-19T07:49:27.068Z"
+      "updatedAt": "2025-11-19T07:49:27.068Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "logical-operator-starts-with",
       "name": "starts_with",
       "title": "Starts With",
       "symbol": "ArrowRightFromLine",
-      "color": "#BAB0AC",
+      "color": "neutral",
       "sqlEquivalent": "LIKE ...%",
       "cypherEquivalent": "STARTS WITH",
-      "updatedAt": "2025-11-19T07:49:14.259Z"
+      "updatedAt": "2025-11-19T07:49:14.259Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "logical-operator-ends-with",
       "name": "ends_with",
       "title": "Ends With",
       "symbol": "ArrowLeftFromLine",
-      "color": "#FF7F0E",
+      "color": "orange",
       "sqlEquivalent": "LIKE %...",
       "cypherEquivalent": "ENDS WITH",
-      "updatedAt": "2025-11-19T07:49:19.840Z"
+      "updatedAt": "2025-11-19T07:49:19.840Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "logical-operator-is-blank",
       "name": "is_blank",
       "title": "Is Blank",
       "symbol": "CircleOff",
-      "color": "#AF7AA1",
+      "color": "purple",
       "sqlEquivalent": "IS NULL OR = ''",
       "cypherEquivalent": "IS NULL OR = ''",
-      "updatedAt": "2025-11-19T07:45:11.901Z"
+      "updatedAt": "2025-11-19T07:45:11.901Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "logical-operator-is-not-blank",
       "name": "is_not_blank",
       "title": "Is Not Blank",
       "symbol": "CircleCheck",
-      "color": "#9effec",
+      "color": "cyan",
       "sqlEquivalent": "IS NOT NULL AND <> ''",
       "cypherEquivalent": "IS NOT NULL AND <> ''",
-      "updatedAt": "2025-11-19T07:45:52.249Z"
+      "updatedAt": "2025-11-19T07:45:52.249Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "aggregation-types": [
@@ -1934,287 +2157,343 @@
       "name": "sum",
       "title": "Sum",
       "symbol": "Sigma",
-      "color": "#4E79A7",
+      "color": "blue",
       "sqlEquivalent": "SUM",
       "description": "Calculates the sum of all values in a column",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "updatedAt": "2025-11-19T08:21:27.547Z"
+      "updatedAt": "2025-11-19T08:21:27.547Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "aggregation-type-avg",
       "name": "avg",
       "title": "Average",
       "symbol": "LucideAlignVerticalJustifyCenter",
-      "color": "#F58518",
+      "color": "orange",
       "sqlEquivalent": "AVG",
       "description": "Calculates the average (mean) of all values in a column",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "updatedAt": "2025-11-19T08:23:06.292Z"
+      "updatedAt": "2025-11-19T08:23:06.292Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "aggregation-type-min",
       "name": "min",
       "title": "Minimum",
       "symbol": "SortAsc",
-      "color": "#54A24B",
+      "color": "green",
       "sqlEquivalent": "MIN",
       "description": "Returns the minimum value from a column",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "updatedAt": "2025-11-19T08:25:52.030Z"
+      "updatedAt": "2025-11-19T08:25:52.030Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "aggregation-type-max",
       "name": "max",
       "title": "Maximum",
       "symbol": "SortDesc",
-      "color": "#E4572E",
+      "color": "orange",
       "sqlEquivalent": "MAX",
       "description": "Returns the maximum value from a column",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "updatedAt": "2025-11-19T08:25:33.667Z"
+      "updatedAt": "2025-11-19T08:25:33.667Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "aggregation-type-first",
       "name": "first",
       "title": "First",
       "symbol": "ListStart",
-      "color": "#72B7B2",
+      "color": "teal",
       "sqlEquivalent": "FIRST_VALUE",
       "description": "Returns the first value from a column",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "updatedAt": "2025-11-19T08:25:10.472Z"
+      "updatedAt": "2025-11-19T08:25:10.472Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "aggregation-type-last",
       "name": "last",
       "title": "Last",
       "symbol": "ListEnd",
-      "color": "#B279A2",
+      "color": "purple",
       "sqlEquivalent": "LAST_VALUE",
       "description": "Returns the last value from a column",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "updatedAt": "2025-11-19T08:24:51.112Z"
+      "updatedAt": "2025-11-19T08:24:51.112Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "aggregation-type-count",
       "name": "count",
       "title": "Count",
       "symbol": "CircleGauge",
-      "color": "#4C78A8",
+      "color": "blue",
       "sqlEquivalent": "COUNT",
       "description": "Counts the number of rows in a column",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "updatedAt": "2025-11-19T08:27:24.757Z"
+      "updatedAt": "2025-11-19T08:27:24.757Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "aggregation-type-countdistinct",
       "name": "countdistinct",
       "title": "Count Distinct",
       "symbol": "CircleSlash",
-      "color": "#9D755D",
+      "color": "stone",
       "sqlEquivalent": "COUNT(DISTINCT)",
       "description": "Counts the number of unique values in a column",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "updatedAt": "2025-11-19T08:27:48.390Z"
+      "updatedAt": "2025-11-19T08:27:48.390Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "id": "aggregation-type-stdev",
       "name": "stdev",
       "title": "Standard Deviation",
       "symbol": "AlignVerticalSpaceBetween",
-      "color": "#FF7F0E",
+      "color": "orange",
       "sqlEquivalent": "STDEV",
       "description": "Calculates the standard deviation of values in a column",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "updatedAt": "2025-11-19T08:28:45.851Z"
+      "updatedAt": "2025-11-19T08:28:45.851Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "tags": [
     {
-      "color": "#13aac9",
+      "color": "cyan",
       "label": "MRP",
       "icon": "ShoppingBasket",
       "id": "01KAE9PZYDK8XYP0PNDHX0HGFN",
       "createdAt": "2025-11-19T14:53:47.878Z",
-      "updatedAt": "2025-11-19T14:53:47.878Z"
+      "updatedAt": "2025-11-19T14:53:47.878Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#80f4be",
+      "color": "emerald",
       "label": "eQMS",
       "icon": "Verified",
       "id": "01KAE9R3R8XZ41613Y9AS2BXC1",
       "createdAt": "2025-11-19T14:54:24.545Z",
-      "updatedAt": "2025-11-19T14:54:24.545Z"
+      "updatedAt": "2025-11-19T14:54:24.545Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#1d72cd",
+      "color": "blue",
       "label": "General",
       "icon": "Airplay",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB5X4QCVD4RE23PHN68X4D2J",
       "createdAt": "2025-11-28T18:55:52.754Z",
-      "updatedAt": "2025-11-28T18:55:52.756Z"
+      "updatedAt": "2025-11-28T18:55:52.756Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "General 2",
       "icon": "Accessibility",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB5XRZF85N7Q3RR04P6A22AG",
       "createdAt": "2025-11-28T19:06:56.373Z",
-      "updatedAt": "2025-11-28T19:07:08.270Z"
+      "updatedAt": "2025-11-28T19:07:08.270Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "General 3",
       "icon": "User",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB5YSTGPEVPW4KXPFXCMPRPJ",
       "createdAt": "2025-11-28T19:24:52.655Z",
-      "updatedAt": "2025-11-28T19:24:52.658Z"
+      "updatedAt": "2025-11-28T19:24:52.658Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "gen 3",
       "icon": "Mail",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB5Z6223WG8NGKJJ7MNSF8PN",
       "createdAt": "2025-11-28T19:31:33.580Z",
-      "updatedAt": "2025-11-28T19:31:33.581Z"
+      "updatedAt": "2025-11-28T19:31:33.581Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "gen 4",
       "icon": "User",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB5ZHBVDJ4DJP8C0DQMHAZQJ",
       "createdAt": "2025-11-28T19:37:44.048Z",
-      "updatedAt": "2025-11-28T19:37:44.048Z"
+      "updatedAt": "2025-11-28T19:37:44.048Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "gen 5",
       "icon": "Mail",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB60HCRFAV96EC248HS2X1XS",
       "createdAt": "2025-11-28T19:55:13.569Z",
-      "updatedAt": "2025-11-28T19:55:13.571Z"
+      "updatedAt": "2025-11-28T19:55:13.571Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "tag 6",
       "icon": "Mail",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB60T6SJK43M31SB2S0QCE1D",
       "createdAt": "2025-11-28T20:00:02.373Z",
-      "updatedAt": "2025-11-28T20:01:14.928Z"
+      "updatedAt": "2025-11-28T20:01:14.928Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "gen 7",
       "icon": "Mail",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB6140Y9P71HR41KQE5MWFTZ",
       "createdAt": "2025-11-28T20:05:24.107Z",
-      "updatedAt": "2025-11-28T20:05:24.107Z"
+      "updatedAt": "2025-11-28T20:05:24.107Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "gen 8",
       "icon": "Mail",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB61FF21M6P6NQFRESYPX0P2",
       "createdAt": "2025-11-28T20:11:38.964Z",
-      "updatedAt": "2025-11-28T20:11:38.966Z"
+      "updatedAt": "2025-11-28T20:11:38.966Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "gen 8",
       "icon": "Settings",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB61QM4S3MY78XHX8GCPPCNP",
       "createdAt": "2025-11-28T20:16:06.307Z",
-      "updatedAt": "2025-11-28T20:16:06.309Z"
+      "updatedAt": "2025-11-28T20:16:06.309Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "test third party",
       "icon": "AirVent",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB85GZHATRGK362Q8Q8N8HFA",
       "createdAt": "2025-11-29T16:00:51.761Z",
-      "updatedAt": "2025-11-29T16:00:51.761Z"
+      "updatedAt": "2025-11-29T16:00:51.761Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "SSS",
       "icon": "AlignEndHorizontal",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB86DSY1N54J6CZZNJEP0YB7",
       "createdAt": "2025-11-29T16:16:36.292Z",
-      "updatedAt": "2025-11-29T16:16:36.292Z"
+      "updatedAt": "2025-11-29T16:16:36.292Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "zzzz",
       "icon": "AArrowUp",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB86F53Z71P99PMGRV1CGSVP",
       "createdAt": "2025-11-29T16:17:20.512Z",
-      "updatedAt": "2025-11-29T17:07:56.758Z"
+      "updatedAt": "2025-11-29T17:07:56.758Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "test tag xxx",
       "icon": "ArrowDownNarrowWide",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB88W95EBE3EQY3XGWNSWYR1",
       "createdAt": "2025-11-29T16:59:27.800Z",
-      "updatedAt": "2025-11-29T16:59:27.802Z"
+      "updatedAt": "2025-11-29T16:59:27.802Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "Tag Masoud",
       "icon": "AlertTriangle",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9SSW4XR85Z4ARW4KKS4E2X",
       "createdAt": "2025-11-30T07:14:29.176Z",
-      "updatedAt": "2025-11-30T07:14:29.179Z"
+      "updatedAt": "2025-11-30T07:14:29.179Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#4E79A7",
+      "color": "blue",
       "label": "حواس پرت",
       "icon": "BookUser",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBADRR9YM0HBJCKVZD0SQMXH",
       "createdAt": "2025-11-30T13:03:23.972Z",
-      "updatedAt": "2025-11-30T13:03:23.973Z"
+      "updatedAt": "2025-11-30T13:03:23.973Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "color": "#0174ef",
+      "color": "blue",
       "label": "test mosleh",
       "icon": "User",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBAP4JMKYWDKTQQFDY12CXHY",
       "createdAt": "2025-11-30T15:29:39.993Z",
-      "updatedAt": "2025-11-30T15:29:39.993Z"
+      "updatedAt": "2025-11-30T15:29:39.993Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "mcp-tools": [
@@ -2250,7 +2529,9 @@
             "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas"
           }
         }
-      ]
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "mcp-examples": [
@@ -2272,7 +2553,9 @@
       ],
       "id": "01KAE92V7SR58K6G2V0NY5K8JX",
       "createdAt": "2025-11-19T14:42:47.704Z",
-      "updatedAt": "2025-11-19T14:42:47.704Z"
+      "updatedAt": "2025-11-19T14:42:47.704Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "ai-agents": [
@@ -2296,7 +2579,9 @@
           "id": "01KAE8W40RKM03W8QNJQ61R08J",
           "label": "Weather Tool"
         }
-      ]
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "app-permissions": [
@@ -2372,7 +2657,9 @@
           "icon": "Eye",
           "color": "info"
         }
-      ]
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "access-policies": [],
@@ -2392,44 +2679,9 @@
       "id": "01KBA5MV6M0A74BHVCJFQMHK6S",
       "createdAt": "2025-11-30T10:41:27.261Z",
       "updatedAt": "2025-11-30T10:43:02.996Z",
-      "permissions": []
-    }
-  ],
-  "datawarehouse-objects": [
-    {
-      "dwObjectName": "DimEmployee",
-      "owner": [
-        {
-          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-          "label": "Mahyar Abidi"
-        }
-      ],
-      "server": [
-        {
-          "id": "01KA99R0VJ2GKBDNSHJDAH8T37",
-          "label": "Gradian ETL"
-        }
-      ],
-      "database": [
-        {
-          "id": "01KA99S0PGBRJEQ61ZS1XZ41PQ",
-          "label": "Gradian_DW"
-        }
-      ],
-      "backupPolicy": [
-        {
-          "id": "incremental",
-          "label": "Incremental Backup",
-          "icon": "PlusCircle",
-          "color": "info"
-        }
-      ],
-      "backupDescription": "test",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KBANQ9MTB176V9VXDZ85PYW8",
-      "createdAt": "2025-11-30T15:22:24.803Z",
-      "updatedAt": "2025-11-30T15:22:24.803Z"
+      "permissions": [],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "menu-items": [
@@ -2442,7 +2694,9 @@
       "openInNewTab": false,
       "id": "01KBSIDASHBOARD0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z"
+      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "menuTitle": "Tender Calendar",
@@ -2455,7 +2709,9 @@
       "createdAt": "2025-12-01T00:00:00.000Z",
       "updatedAt": "2025-12-01T11:01:55.621Z",
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "menuTitle": "Analytics",
@@ -2466,7 +2722,9 @@
       "openInNewTab": false,
       "id": "01KBSIANALYTICS0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z"
+      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "menuTitle": "Integrations",
@@ -2484,7 +2742,9 @@
           "label": "CinnaGen"
         }
       ],
-      "incomplete": false
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "menuTitle": "Graph Designer",
@@ -2495,7 +2755,9 @@
       "openInNewTab": false,
       "id": "01KBSIGRAPHDESIGNER000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z"
+      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "menuTitle": "Builder",
@@ -2506,7 +2768,9 @@
       "openInNewTab": false,
       "id": "01KBSIBUILDER000000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z"
+      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "menuTitle": "AI Builder",
@@ -2517,7 +2781,9 @@
       "openInNewTab": false,
       "id": "01KBSIAIBUILDER0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z"
+      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "status-groups": [
@@ -2538,7 +2804,9 @@
       "id": "01KBCXZ2KX7N336B5GDGKEKNRC",
       "createdAt": "2025-12-01T12:24:57.230Z",
       "updatedAt": "2025-12-01T15:25:19.614Z",
-      "status-items-section": []
+      "status-items-section": [],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "status-items": [
@@ -2550,7 +2818,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
       "createdAt": "2025-12-01T12:48:56.049Z",
-      "updatedAt": "2025-12-01T12:48:56.049Z"
+      "updatedAt": "2025-12-01T12:48:56.049Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "label": "Pending",
@@ -2560,7 +2830,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBCZZ31X6X01VNJ045CWYSB8",
       "createdAt": "2025-12-01T12:59:54.822Z",
-      "updatedAt": "2025-12-01T12:59:54.822Z"
+      "updatedAt": "2025-12-01T12:59:54.822Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "label": "Forbidden",
@@ -2570,7 +2842,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBD00R5N3YSWBKBT67M175VE",
       "createdAt": "2025-12-01T13:00:49.210Z",
-      "updatedAt": "2025-12-01T13:00:49.210Z"
+      "updatedAt": "2025-12-01T13:00:49.210Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "label": "Inactive",
@@ -2580,7 +2854,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBD88RER2XSHV9KH96W3FATF",
       "createdAt": "2025-12-01T15:25:00.263Z",
-      "updatedAt": "2025-12-01T15:25:00.263Z"
+      "updatedAt": "2025-12-01T15:25:00.263Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ]
 }

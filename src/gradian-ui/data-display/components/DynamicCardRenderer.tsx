@@ -5,7 +5,8 @@ import React, { KeyboardEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import type { BadgeProps } from '@/components/ui/badge';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { Avatar, Rating, Countdown, CodeBadge, ForceIcon } from '@/gradian-ui/form-builder/form-elements';
+import { Rating, Countdown, CodeBadge, ForceIcon } from '@/gradian-ui/form-builder/form-elements';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { CardSection, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '@/gradian-ui/shared/utils';
 import { CardContent } from '@/gradian-ui/data-display/card/components/CardContent';
@@ -23,6 +24,7 @@ import { useRouter } from 'next/navigation';
 import { getDisplayStrings, getPrimaryDisplayString, hasDisplayValue } from '../utils/value-display';
 import { renderHighlightedText } from '../../shared/utils/highlighter';
 import { formatFieldValue } from '../table/utils/field-formatters';
+import { EntityMetadata } from './EntityMetadata';
 
 export interface DynamicCardRendererProps {
   schema: FormSchema;
@@ -38,6 +40,10 @@ export interface DynamicCardRendererProps {
   maxMetrics?: number;
   disableAnimation?: boolean;
   highlightQuery?: string;
+  /**
+   * When true, the card is rendered inside a dialog and should not behave like a clickable/focusable card.
+   */
+  isInDialog?: boolean;
 }
 
 export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
@@ -53,7 +59,8 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   maxBadges = 2,
   maxMetrics = 3,
   disableAnimation = false,
-  highlightQuery = ''
+  highlightQuery = '',
+  isInDialog = false,
 }) => {
   const router = useRouter();
   const normalizedHighlightQuery = highlightQuery.trim();
@@ -314,6 +321,112 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     getPrimaryDisplayString(iconFieldValue) ??
     (typeof iconFieldValue === 'string' ? iconFieldValue : '');
 
+  // Resolve Tailwind color id from schema role or raw data
+  const rawColorValue =
+    getSingleValueByRole(schema, data, 'color') ??
+    data.color ??
+    null;
+
+  const resolvedColorId = typeof rawColorValue === 'string'
+    ? rawColorValue.toLowerCase()
+    : undefined;
+
+  // Map Tailwind color id to avatar/background/text/border classes
+  const getAvatarColorClasses = (color?: string) => {
+    const colorMap: Record<string, { bg: string; text: string; border: string }> = {
+      violet: {
+        bg: 'bg-violet-50 dark:bg-violet-500/15',
+        text: 'text-violet-700 dark:text-violet-100',
+        border: 'border-violet-100 dark:border-violet-500/40',
+      },
+      emerald: {
+        bg: 'bg-emerald-50 dark:bg-emerald-500/15',
+        text: 'text-emerald-700 dark:text-emerald-100',
+        border: 'border-emerald-100 dark:border-emerald-500/40',
+      },
+      indigo: {
+        bg: 'bg-indigo-50 dark:bg-indigo-500/15',
+        text: 'text-indigo-700 dark:text-indigo-100',
+        border: 'border-indigo-100 dark:border-indigo-500/40',
+      },
+      blue: {
+        bg: 'bg-blue-50 dark:bg-blue-500/15',
+        text: 'text-blue-700 dark:text-blue-100',
+        border: 'border-blue-100 dark:border-blue-500/40',
+      },
+      green: {
+        bg: 'bg-green-50 dark:bg-green-500/15',
+        text: 'text-green-700 dark:text-green-100',
+        border: 'border-green-100 dark:border-green-500/40',
+      },
+      red: {
+        bg: 'bg-red-50 dark:bg-red-500/15',
+        text: 'text-red-700 dark:text-red-100',
+        border: 'border-red-100 dark:border-red-500/40',
+      },
+      orange: {
+        bg: 'bg-orange-50 dark:bg-orange-500/15',
+        text: 'text-orange-700 dark:text-orange-100',
+        border: 'border-orange-100 dark:border-orange-500/40',
+      },
+      amber: {
+        bg: 'bg-amber-50 dark:bg-amber-500/15',
+        text: 'text-amber-700 dark:text-amber-100',
+        border: 'border-amber-100 dark:border-amber-500/40',
+      },
+      yellow: {
+        bg: 'bg-yellow-50 dark:bg-yellow-500/15',
+        text: 'text-yellow-700 dark:text-yellow-100',
+        border: 'border-yellow-100 dark:border-yellow-500/40',
+      },
+      pink: {
+        bg: 'bg-pink-50 dark:bg-pink-500/15',
+        text: 'text-pink-700 dark:text-pink-100',
+        border: 'border-pink-100 dark:border-pink-500/40',
+      },
+      purple: {
+        bg: 'bg-purple-50 dark:bg-purple-500/15',
+        text: 'text-purple-700 dark:text-purple-100',
+        border: 'border-purple-100 dark:border-purple-500/40',
+      },
+      teal: {
+        bg: 'bg-teal-50 dark:bg-teal-500/15',
+        text: 'text-teal-700 dark:text-teal-100',
+        border: 'border-teal-100 dark:border-teal-500/40',
+      },
+      cyan: {
+        bg: 'bg-cyan-50 dark:bg-cyan-500/15',
+        text: 'text-cyan-700 dark:text-cyan-100',
+        border: 'border-cyan-100 dark:border-cyan-500/40',
+      },
+      stone: {
+        bg: 'bg-stone-50 dark:bg-stone-500/15',
+        text: 'text-stone-700 dark:text-stone-100',
+        border: 'border-stone-100 dark:border-stone-500/40',
+      },
+      neutral: {
+        bg: 'bg-neutral-50 dark:bg-neutral-500/15',
+        text: 'text-neutral-700 dark:text-neutral-100',
+        border: 'border-neutral-100 dark:border-neutral-500/40',
+      },
+      gray: {
+        bg: 'bg-gray-50 dark:bg-gray-500/15',
+        text: 'text-gray-700 dark:text-gray-100',
+        border: 'border-gray-100 dark:border-gray-500/40',
+      },
+      slate: {
+        bg: 'bg-slate-50 dark:bg-slate-500/15',
+        text: 'text-slate-700 dark:text-slate-100',
+        border: 'border-slate-100 dark:border-slate-500/40',
+      },
+    };
+
+    const key = color && colorMap[color] ? color : 'violet';
+    return colorMap[key];
+  };
+
+  const avatarColor = getAvatarColorClasses(resolvedColorId);
+
   // Check if entity is incomplete
   const isIncomplete = data.incomplete === true;
 
@@ -374,10 +487,17 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
         scale: 0.995,
         transition: { duration: 0.1 }
       }}
-      className={cardClasses}
-      role="button"
-      tabIndex={0}
+      className={cn(
+        cardClasses,
+        isInDialog && 'focus:outline-none focus-visible:outline-none'
+      )}
+      role={isInDialog ? undefined : 'button'}
+      tabIndex={isInDialog ? -1 : 0}
       onClick={(e) => {
+        if (isInDialog) {
+          // In dialog mode, clicking the card itself should not trigger view navigation
+          return;
+        }
         // Only open dialog if click is not on action buttons or tooltip triggers
         const target = e.target as HTMLElement;
         if (!target.closest('[data-action-button]') && !target.closest('[data-tooltip-trigger]')) {
@@ -402,6 +522,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
           className?.includes('border-none') ? "focus-within:ring-0" : "focus-within:ring-2 focus-within:ring-violet-400 focus-within:ring-offset-0 focus-within:rounded-xl"
         )}
         onKeyDown={(e: KeyboardEvent) => {
+          if (isInDialog) return;
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             e.stopPropagation();
@@ -423,12 +544,22 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       whileHover={disableAnimation ? undefined : { scale: 1.01, transition: { type: "spring", stiffness: 300, damping: 30 } }}
                     >
                       <Avatar
-                        fallback={getInitials(cardConfig.avatarField)}
-                        size="lg"
-                        variant="primary"
-                        className="border border-gray-100 dark:border-gray-700"
+                        className={cn(
+                          'h-12 w-12 rounded-full border shadow-sm flex items-center justify-center font-semibold',
+                          avatarColor.bg,
+                          avatarColor.text,
+                          avatarColor.border,
+                        )}
                       >
-                        {getInitials(cardConfig.avatarField)}
+                        <AvatarFallback
+                          className={cn(
+                            'h-12 w-12 rounded-full flex items-center justify-center',
+                            avatarColor.bg,
+                            avatarColor.text,
+                          )}
+                        >
+                          {getInitials(cardConfig.avatarField)}
+                        </AvatarFallback>
                       </Avatar>
                     </motion.div>
                   ) : shouldShowIconAvatar ? (
@@ -438,10 +569,19 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       transition={disableAnimation ? {} : { duration: 0.3 }}
                       whileHover={disableAnimation ? undefined : { scale: 1.01, transition: { type: "spring", stiffness: 300, damping: 30 } }}
                     >
-                      <div className="h-12 w-12 rounded-full border border-gray-100 dark:border-gray-700 bg-violet-50 dark:bg-gray-800 flex items-center justify-center">
+                      <div
+                        className={cn(
+                          'h-12 w-12 rounded-full flex items-center justify-center shadow-sm',
+                          avatarColor.bg,
+                          avatarColor.border,
+                        )}
+                      >
                         <IconRenderer
                           iconName={normalizedIconValue}
-                          className="h-5 w-5 text-violet-600 dark:text-violet-300"
+                          className={cn(
+                            'h-5 w-5',
+                            avatarColor.text,
+                          )}
                         />
                       </div>
                     </motion.div>
@@ -642,6 +782,22 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                 <div className="w-full border-t border-gray-100 dark:border-gray-800 mb-3"></div>
               )}
 
+              {/* Entity Metadata */}
+              <motion.div
+                initial={disableAnimation ? false : { opacity: 0, y: 5 }}
+                animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+                transition={disableAnimation ? {} : { duration: 0.3 }}
+                className="w-full mb-3 pt-2 border-t border-gray-100 dark:border-gray-800"
+              >
+                <EntityMetadata
+                  createdAt={data.createdAt}
+                  createdBy={data.createdBy}
+                  updatedAt={data.updatedAt}
+                  updatedBy={data.updatedBy}
+                  variant="compact"
+                />
+              </motion.div>
+
               {/* Due Date Countdown */}
               {hasDuedateField && cardConfig.duedateField && (
                 <motion.div
@@ -699,12 +855,22 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     whileHover={disableAnimation ? undefined : { scale: 1.01, transition: { type: "spring", stiffness: 300, damping: 30 } }}
                   >
                     <Avatar
-                      fallback={getInitials(cardConfig.avatarField)}
-                      size="md"
-                      variant="primary"
-                      className="border border-gray-100 dark:border-gray-700"
+                      className={cn(
+                        'h-10 w-10 rounded-full border shadow-sm flex items-center justify-center font-semibold',
+                        avatarColor.bg,
+                        avatarColor.text,
+                        avatarColor.border,
+                      )}
                     >
-                      {getInitials(cardConfig.avatarField)}
+                      <AvatarFallback
+                        className={cn(
+                          'h-10 w-10 rounded-full flex items-center justify-center',
+                          avatarColor.bg,
+                          avatarColor.text,
+                        )}
+                      >
+                        {getInitials(cardConfig.avatarField)}
+                      </AvatarFallback>
                     </Avatar>
                   </motion.div>
                 ) : shouldShowIconAvatar ? (
@@ -714,10 +880,19 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     transition={disableAnimation ? {} : { duration: 0.3 }}
                     whileHover={disableAnimation ? undefined : { scale: 1.01, transition: { type: "spring", stiffness: 300, damping: 30 } }}
                   >
-                    <div className="h-10 w-10 rounded-full border border-gray-100 dark:border-gray-700 bg-violet-50 dark:bg-gray-800 flex items-center justify-center">
+                    <div
+                      className={cn(
+                        "h-10 w-10 rounded-full flex items-center justify-center shadow-sm",
+                        avatarColor.bg,
+                        avatarColor.border,
+                      )}
+                    >
                       <IconRenderer
                         iconName={normalizedIconValue}
-                        className="h-4 w-4 text-violet-600 dark:text-violet-300"
+                        className={cn(
+                          "h-4 w-4",
+                          avatarColor.text,
+                        )}
                       />
                     </div>
                   </motion.div>
@@ -804,6 +979,21 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       </p>
                     </motion.div>
                   )}
+                  {/* Entity Metadata */}
+                  <motion.div
+                    initial={disableAnimation ? false : { opacity: 0, x: 5 }}
+                    animate={disableAnimation ? false : { opacity: 1, x: 0 }}
+                    transition={disableAnimation ? {} : { duration: 0.3 }}
+                    className="mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800"
+                  >
+                    <EntityMetadata
+                      createdAt={data.createdAt}
+                      createdBy={data.createdBy}
+                      updatedAt={data.updatedAt}
+                      updatedBy={data.updatedBy}
+                      variant="compact"
+                    />
+                  </motion.div>
                   <div
                     className="mt-1"
                     onClick={(e) => e.stopPropagation()}

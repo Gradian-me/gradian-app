@@ -124,6 +124,20 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
     return entities.find(entity => entity.id === id) || null;
   }
 
+  /**
+   * Clean up data by removing undefined, null, or string "undefined" values
+   */
+  private cleanData(data: Record<string, any>): Record<string, any> {
+    const cleaned: Record<string, any> = {};
+    for (const [key, value] of Object.entries(data)) {
+      // Skip undefined, null, or the string "undefined"
+      if (value !== undefined && value !== null && value !== 'undefined') {
+        cleaned[key] = value;
+      }
+    }
+    return cleaned;
+  }
+
   async create(data: Omit<T, 'id' | 'createdAt' | 'updatedAt'>): Promise<T> {
     const entities = readSchemaData<T>(this.schemaId);
     
@@ -138,6 +152,9 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
       this.schemaId,
       processedData
     );
+    
+    // Clean up undefined/null/"undefined" values before saving
+    processedData = this.cleanData(processedData);
     
     // Check if an ID is provided in the data (for schemas like relation-types that allow custom IDs)
     let entityId: string;
@@ -230,6 +247,9 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
       delete processedData._passwordHashFailed;
       delete processedData._passwordHashError;
     }
+
+    // Clean up undefined/null/"undefined" values before saving
+    processedData = this.cleanData(processedData);
 
     const updatedEntity: T = {
       ...entities[index],

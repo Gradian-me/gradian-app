@@ -246,7 +246,7 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
               onChange={handleSwitchChange('isNotCompanyBased')}
             />
           </div>
-          <div className="border-t pt-4 mt-4">
+          <div className="border-t pt-4 mt-4 border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Data Management Options</h3>
             <div className="grid grid-cols-2 gap-4">
               <FormSwitch

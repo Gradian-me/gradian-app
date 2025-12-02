@@ -5,7 +5,7 @@
     "description": "Create and manage dynamic form schemas for entities like inquiries, vendors, and purchase orders",
     "icon": "FileText",
     "href": "/builder/schemas",
-    "color": "#8B5CF6",
+    "color": "violet",
     "features": [
       "Define fields and sections",
       "Configure validation rules",
@@ -20,7 +20,7 @@
     "description": "Design and manage data relationship graphs with visual node connections and edge configurations",
     "icon": "Share2",
     "href": "/builder/graphs",
-    "color": "#10B981",
+    "color": "emerald",
     "features": [
       "Visual graph editor",
       "Node and edge management",
@@ -36,7 +36,7 @@
     "description": "Design branded transactional messages, set placeholders, and preview personalized content",
     "icon": "Mail",
     "href": "/builder/email-templates",
-    "color": "#EC4899",
+    "color": "pink",
     "features": [
       "Visual preview renderer",
       "Dynamic placeholder inputs",
@@ -51,7 +51,7 @@
     "description": "Configure application-wide constants including logging, authentication, UI parameters, and schema settings",
     "icon": "Settings",
     "href": "/builder/application-variables",
-    "color": "#6366F1",
+    "color": "indigo",
     "features": [
       "Configure logging flags",
       "Manage authentication settings",
@@ -66,7 +66,7 @@
     "description": "Create and manage business rule conditions with logical operators, property comparisons, and nested groups",
     "icon": "Code",
     "href": "/builder/business-rules",
-    "color": "#F59E0B",
+    "color": "amber",
     "features": [
       "Visual condition builder",
       "Property and operator selection",
@@ -83,7 +83,7 @@
     "description": "Monitor the health and status of all services with real-time status tracking and automated health checks",
     "icon": "HeartPulse",
     "href": "/builder/health",
-    "color": "#EF4444",
+    "color": "red",
     "features": [
       "Service health status tracking",
       "Automated health checks",
@@ -101,7 +101,7 @@
     "description": "Track and manage application versions with change logs, priorities, and affected domains",
     "icon": "GitBranch",
     "href": "/app/versions",
-    "color": "#3B82F6",
+    "color": "blue",
     "features": [
       "Version tracking and history",
       "Change log management",
@@ -119,7 +119,7 @@
     "description": "Generate custom QR codes with various styles, colors, and configurations",
     "icon": "QrCode",
     "href": "/qr/generate",
-    "color": "#7f22fe",
+    "color": "violet",
     "features": [
       "Custom QR code content (text, URLs, etc.)",
       "Multiple style variants (gravity, rounded, dots, etc.)",

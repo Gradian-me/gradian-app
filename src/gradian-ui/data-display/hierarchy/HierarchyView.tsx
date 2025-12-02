@@ -16,6 +16,7 @@ import { HierarchyActionsMenu } from './HierarchyActionsMenu';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatFieldValue } from '../table/utils/field-formatters';
+import { EntityMetadata } from '../components/EntityMetadata';
 
 export interface HierarchyViewProps {
   schema: FormSchema;
@@ -186,6 +187,16 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                     {renderHighlightedText(String(subtitle), highlightQuery)}
                   </div>
                 )}
+                {/* Entity Metadata */}
+                <div className="mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800">
+                  <EntityMetadata
+                    createdAt={entity.createdAt}
+                    createdBy={entity.createdBy}
+                    updatedAt={entity.updatedAt}
+                    updatedBy={entity.updatedBy}
+                    variant="minimal"
+                  />
+                </div>
               </div>
             </div>
           </CardContent>
