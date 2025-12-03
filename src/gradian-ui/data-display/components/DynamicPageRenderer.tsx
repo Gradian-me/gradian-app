@@ -40,6 +40,7 @@ import { debounce } from '@/gradian-ui/shared/utils';
 import { toast } from 'sonner';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { TableWrapper, TableConfig, buildTableColumns, TableColumn } from '@/gradian-ui/data-display/table';
+import { DynamicPagination } from './DynamicPagination';
 import { HierarchyView } from '@/gradian-ui/data-display/hierarchy/HierarchyView';
 import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/PopupPicker';
 import { syncParentRelation } from '@/gradian-ui/shared/utils/parent-relation.util';
@@ -165,6 +166,10 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
   const [companySchema, setCompanySchema] = useState<FormSchema | null>(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState<number | 'all'>(10);
+
   // Use the dynamic entity hook for entity management
   const {
     entities,
@@ -174,6 +179,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     selectedEntity,
     currentFilters,
     formState,
+    paginationMeta,
     fetchEntities,
     fetchEntityById,
     createEntity,
@@ -185,6 +191,26 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     handleFilterChange,
     handleDeleteEntity,
   } = useDynamicEntity(schema);
+
+  // Reset to page 1 when filters change (but not when pagination changes)
+  const prevFiltersRef = useRef<string>('');
+  useEffect(() => {
+    const filtersKey = JSON.stringify(currentFilters);
+    if (prevFiltersRef.current !== filtersKey && prevFiltersRef.current !== '') {
+      setCurrentPage(1);
+    }
+    prevFiltersRef.current = filtersKey;
+  }, [currentFilters]);
+
+  // Pagination handlers
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+  }, []);
+
+  const handlePageSizeChange = useCallback((newPageSize: number | 'all') => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when page size changes
+  }, []);
 
   // Get selected company from store (needed for grouping logic)
   const { selectedCompany } = useCompanyStore();
@@ -373,10 +399,10 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       // Refresh entities to show updated hierarchy with current filters and cache disabled
       const filters = buildFilters();
       if (filters) {
-        await fetchEntities(filters, { disableCache: true });
+        await fetchEntities(filters, { disableCache: true, page: currentPage, limit: pageSize });
       } else {
         // Fallback: refresh without filters if buildFilters returns null
-        await fetchEntities(undefined, { disableCache: true });
+        await fetchEntities(undefined, { disableCache: true, page: currentPage, limit: pageSize });
       }
 
       toast.success('Parent updated successfully');
@@ -402,7 +428,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     const toastId = toast.loading(`Refreshing ${pluralName.toLowerCase()}...`);
     setIsManualRefresh(true);
     try {
-      const result = await fetchEntities(filters, { disableCache: true });
+      const result = await fetchEntities(filters, { disableCache: true, page: currentPage, limit: pageSize });
       if (result && result.success === false) {
         throw new Error(result.error || 'Failed to refresh data');
       }
@@ -413,7 +439,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     } finally {
       setIsManualRefresh(false);
     }
-  }, [buildFilters, fetchEntities, pluralName]);
+  }, [buildFilters, fetchEntities, pluralName, currentPage, pageSize]);
 
   // Confirm and execute delete
   const confirmDelete = useCallback(async () => {
@@ -425,7 +451,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       // Refresh entities after deletion with current filters
       const filters = buildFilters();
       if (filters) {
-        fetchEntities(filters, { disableCache: true });
+        fetchEntities(filters, { disableCache: true, page: currentPage, limit: pageSize });
       }
     } catch (error) {
       console.error('Error deleting entity:', error);
@@ -434,23 +460,33 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   }, [deleteConfirmDialog.entity, handleDeleteEntity, fetchEntities, buildFilters]);
 
   const lastFiltersRef = useRef<string>('');
+  const lastPageRef = useRef<number>(1);
+  const lastPageSizeRef = useRef<number | 'all'>(10);
 
-  // Fetch whenever derived filters change (includes initial mount and company/filter updates)
+  // Fetch whenever derived filters or pagination change (includes initial mount and company/filter updates)
   useEffect(() => {
     const filters = buildFilters();
     if (!filters) {
       return;
     }
     const filtersKey = JSON.stringify(filters);
+    const pageChanged = lastPageRef.current !== currentPage;
+    const pageSizeChanged = lastPageSizeRef.current !== pageSize;
+    const filtersChanged = lastFiltersRef.current !== filtersKey;
 
-    if (lastFiltersRef.current === filtersKey) {
+    // Only skip if nothing changed
+    if (!pageChanged && !pageSizeChanged && !filtersChanged) {
       return;
     }
 
+    // Update refs
     lastFiltersRef.current = filtersKey;
+    lastPageRef.current = currentPage;
+    lastPageSizeRef.current = pageSize;
+
     setFilters(filters);
-    fetchEntities(filters);
-  }, [buildFilters, fetchEntities, setFilters]);
+    fetchEntities(filters, { page: currentPage, limit: pageSize });
+  }, [buildFilters, fetchEntities, setFilters, currentPage, pageSize]);
 
   // Handle edit entity - set entity ID to trigger FormModal
   const handleEditEntity = useCallback(async (entity: any) => {
@@ -827,10 +863,10 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       columns: tableColumns,
       data: filteredEntities,
       pagination: {
-        enabled: filteredEntities.length > 10,
+        enabled: false, // Disabled - pagination is shown in page header
         pageSize: 10,
         showPageSizeSelector: true,
-        pageSizeOptions: [5, 10, 25, 50],
+        pageSizeOptions: [10, 25, 50, 100, 'all'],
         alwaysShow: false,
       },
       sorting: {
@@ -1065,6 +1101,22 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             </div>
           }
         />
+
+        {/* Pagination - Show for all views when we have pagination metadata or "all" is selected */}
+        {(paginationMeta || pageSize === 'all') && (
+          <div className="mb-4 border-b border-gray-200 dark:border-gray-700">
+            <DynamicPagination
+              currentPage={currentPage}
+              totalPages={paginationMeta?.totalPages || 1}
+              totalItems={paginationMeta?.totalItems || filteredEntities.length}
+              pageSize={pageSize}
+              pageSizeOptions={[10, 25, 50, 100, 'all']}
+              showPageSizeSelector={true}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
+          </div>
+        )}
 
         {/* Entities List - Grouped by Company or Regular List */}
         {viewMode === 'hierarchy' ? (
@@ -1475,18 +1527,22 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           }}
           onSuccess={async () => {
             // Refresh entities list after successful creation with current filters
+            // Reset to page 1 and use current page size
+            setCurrentPage(1);
             const filters = buildFilters();
             if (filters) {
-              await fetchEntities(filters, { disableCache: true });
+              await fetchEntities(filters, { disableCache: true, page: 1, limit: pageSize });
             }
             setFixedParentForCreate(null);
             setCreateModalOpen(false);
           }}
           onIncompleteSave={async () => {
             // Refresh entities list when form is saved as incomplete (without closing modal)
+            // Reset to page 1 and use current page size
+            setCurrentPage(1);
             const filters = buildFilters();
             if (filters) {
-              await fetchEntities(filters, { disableCache: true });
+              await fetchEntities(filters, { disableCache: true, page: 1, limit: pageSize });
             }
           }}
           onClose={() => {

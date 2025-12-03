@@ -69,7 +69,7 @@ export function useTable<T = any>({ config, onStateChange }: UseTableOptions<T>)
   );
 
   const setPageSize = useCallback(
-    (pageSize: number) => {
+    (pageSize: number | 'all') => {
       updateState({ pageSize, page: 1 });
     },
     [updateState]

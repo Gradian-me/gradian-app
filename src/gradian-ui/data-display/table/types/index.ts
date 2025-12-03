@@ -26,9 +26,9 @@ export interface TableConfig<T = any> {
   data: T[];
   pagination?: {
     enabled: boolean;
-    pageSize?: number;
+    pageSize?: number | 'all';
     showPageSizeSelector?: boolean;
-    pageSizeOptions?: number[];
+    pageSizeOptions?: (number | 'all')[];
     alwaysShow?: boolean; // If true, always show pagination even with one page (default: false)
   };
   sorting?: {
@@ -73,7 +73,7 @@ export interface TableProps<T = any> {
 
 export interface TableState {
   page: number;
-  pageSize: number;
+  pageSize: number | 'all';
   sortBy: string | null;
   sortDirection: 'asc' | 'desc';
   selectedRows: Set<number>;

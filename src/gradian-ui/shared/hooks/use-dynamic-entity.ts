@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { apiRequest } from '../utils/api';
 import { useCompanyStore } from '@/stores/company.store';
+import { PaginationMeta } from '../utils/pagination-utils';
 
 interface EntityFilters {
   search?: string;
@@ -43,12 +44,20 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentFilters, setCurrentFilters] = useState<EntityFilters>({});
   const [formValues, setFormValues] = useState<any>({});
+  const [paginationMeta, setPaginationMeta] = useState<PaginationMeta | null>(null);
 
   // Use the new dynamic API route
   const apiEndpoint = `/api/data/${schema.id}`;
 
   // Fetch all entities
-  const fetchEntities = useCallback(async (filters?: EntityFilters, options?: { disableCache?: boolean }) => {
+  const fetchEntities = useCallback(async (
+    filters?: EntityFilters, 
+    options?: { 
+      disableCache?: boolean;
+      page?: number;
+      limit?: number | 'all';
+    }
+  ) => {
     setIsLoading(true);
     setError(null);
     
@@ -67,6 +76,14 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
         queryParams.append('companyId', filters.companyId);
       }
       
+      // Add pagination parameters (skip if limit is 'all')
+      if (options?.page !== undefined && options?.limit !== 'all') {
+        queryParams.append('page', String(options.page));
+      }
+      if (options?.limit !== undefined && options?.limit !== 'all') {
+        queryParams.append('limit', String(options.limit));
+      }
+      
       const url = queryParams.toString() 
         ? `${apiEndpoint}?${queryParams.toString()}`
         : apiEndpoint;
@@ -77,7 +94,13 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
       
       if (response.success && response.data) {
         setEntities(response.data);
-        return { success: true as const };
+        // Extract pagination metadata from response if available
+        if (response.meta && typeof response.meta === 'object') {
+          setPaginationMeta(response.meta as PaginationMeta);
+        } else {
+          setPaginationMeta(null);
+        }
+        return { success: true as const, meta: response.meta as PaginationMeta | undefined };
       } else {
         const errorMessage = response.error || 'Failed to fetch entities';
         setError(errorMessage);
@@ -272,6 +295,7 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
     modalTitle,
     currentFilters,
     formState,
+    paginationMeta,
     fetchEntities,
     fetchEntityById,
     createEntity,

@@ -10,7 +10,7 @@ import { TableLoadingState } from './TableLoadingState';
 import { TableEmptyState } from './TableEmptyState';
 import { TableHeader } from './TableHeader';
 import { TableBody } from './TableBody';
-import { TablePagination } from './TablePagination';
+import { DynamicPagination } from '../../components/DynamicPagination';
 
 export function Table<T = any>({
   config,
@@ -99,13 +99,13 @@ export function Table<T = any>({
         />
       </table>
 
-      {config.pagination?.enabled && (config.pagination.alwaysShow || totalPages > 1) && (
-        <TablePagination
+      {config.pagination?.enabled && (config.pagination.alwaysShow || totalPages > 1 || state.pageSize === 'all') && (
+        <DynamicPagination
           currentPage={state.page}
           totalPages={totalPages}
           totalItems={totalItems}
           pageSize={state.pageSize}
-          pageSizeOptions={config.pagination.pageSizeOptions || [10, 25, 50, 100]}
+          pageSizeOptions={config.pagination.pageSizeOptions || [10, 25, 50, 100, 'all']}
           showPageSizeSelector={config.pagination.showPageSizeSelector}
           onPageChange={goToPage}
           onPageSizeChange={setPageSize}

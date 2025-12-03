@@ -7,6 +7,7 @@ import { BaseEntity, FilterParams } from '../types/base.types';
 import { handleDomainError } from '../errors/domain.errors';
 import { parsePaginationParams, paginateArray, buildPaginationMeta } from '@/gradian-ui/shared/utils/pagination-utils';
 import { parseSortArray, multiSort } from '@/gradian-ui/shared/utils/sort-utils';
+import { isDemoModeEnabled } from '@/app/api/data/utils';
 
 export class BaseController<T extends BaseEntity> {
   constructor(
@@ -110,6 +111,12 @@ export class BaseController<T extends BaseEntity> {
           processedData = multiSort(processedData, [{
             column: sortBy,
             isAscending: sortOrder === 'asc'
+          }]);
+        } else if (isDemoModeEnabled()) {
+          // Default sorting by updatedAt descending in demo mode when no sort is specified
+          processedData = multiSort(processedData, [{
+            column: 'updatedAt',
+            isAscending: false
           }]);
         }
       }

@@ -95,6 +95,11 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
                 >
                   {schema.plural_name}
                 </CardTitle>
+                {schema.showInNavigation && (
+                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
+                    Nav
+                  </Badge>
+                )}
                 {isInactive && (
                   <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-gray-300 text-gray-600">
                     Inactive

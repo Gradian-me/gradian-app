@@ -47,7 +47,7 @@ export const DynamicFilterPane = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`flex flex-col gap-2 sm:gap-3 lg:flex-row lg:items-center lg:justify-between mb-4 sm:mb-6 ${className}`}
+      className={`flex flex-col gap-2 sm:gap-3 lg:flex-row lg:items-center lg:justify-between mb-2 ${className}`}
     >
       <div className="flex-1 w-full">
         <SearchBar

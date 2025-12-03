@@ -127,9 +127,18 @@ export function filterData<T>(
 export function paginateData<T>(
   data: T[],
   page: number,
-  pageSize: number
+  pageSize: number | 'all'
 ): { paginatedData: T[]; totalPages: number; totalItems: number } {
   const totalItems = data.length;
+  
+  if (pageSize === 'all') {
+    return {
+      paginatedData: data,
+      totalPages: 1,
+      totalItems,
+    };
+  }
+  
   const totalPages = Math.ceil(totalItems / pageSize);
   const startIndex = (page - 1) * pageSize;
   const endIndex = startIndex + pageSize;
@@ -146,7 +155,7 @@ export function processTableData<T>(
   config: TableConfig<T>,
   state: {
     page: number;
-    pageSize: number;
+    pageSize: number | 'all';
     sortBy: string | null;
     sortDirection: 'asc' | 'desc';
     globalFilter: string;

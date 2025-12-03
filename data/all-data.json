@@ -1767,10 +1767,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-03T14:08:50.896Z",
+      "updatedAt": "2025-12-03T15:27:30.814Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-12-03T14:08:50.896Z",
+      "lastSynced": "2025-12-03T15:27:30.814Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1783,7 +1783,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 26 schemas: 26 succeeded, 0 failed (26 created, 0 updated)"
+      "lastSyncMessage": "Processed 26 schemas: 26 succeeded, 0 failed (0 created, 26 updated)"
     },
     {
       "color": "blue",
@@ -1810,8 +1810,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-03T14:09:05.744Z",
-      "lastSynced": "2025-12-03T14:09:05.744Z",
+      "updatedAt": "2025-12-03T15:27:42.683Z",
+      "lastSynced": "2025-12-03T15:27:42.683Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1870,9 +1870,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-03T14:09:44.646Z",
+      "updatedAt": "2025-12-03T15:28:02.433Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-03T14:09:44.646Z",
+      "lastSynced": "2025-12-03T15:28:02.433Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1883,7 +1883,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 144, nodes updated: 5, edges created: 37, nodes failed: 0, edges failed: 0.",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 149, edges created: 37, nodes failed: 0, edges failed: 0.",
       "isTenantBased": false
     },
     {
@@ -2608,6 +2608,46 @@
       "updatedAt": "2025-11-30T15:29:39.993Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "test pagination",
+      "icon": "Folder",
+      "color": "fuchsia",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBJD8RZS16HXDW68F1JZB9KJ",
+      "createdAt": "2025-12-03T15:28:35.834Z",
+      "updatedAt": "2025-12-03T15:28:35.834Z"
+    },
+    {
+      "label": "tete",
+      "icon": "Mail",
+      "color": "pink",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBJFXT81MDSR3W8VRJSVWAVS",
+      "createdAt": "2025-12-03T16:15:02.428Z",
+      "updatedAt": "2025-12-03T16:15:02.429Z"
+    },
+    {
+      "label": "tasdasda",
+      "icon": "LucidePencilRuler",
+      "color": "fuchsia",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBJGHV4YJ2EHDR8KE5988BFN",
+      "createdAt": "2025-12-03T16:25:58.698Z",
+      "updatedAt": "2025-12-03T16:25:58.704Z"
+    },
+    {
+      "label": "fasfasf",
+      "icon": "GitGraph",
+      "color": "pink",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBJGSAYCB3JHQG3RR5WKGJJP",
+      "createdAt": "2025-12-03T16:30:04.244Z",
+      "updatedAt": "2025-12-03T16:30:04.244Z"
     }
   ],
   "app-permissions": [
