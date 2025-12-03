@@ -14,10 +14,11 @@ import {
   ImageDown,
   RotateCcw,
   RefreshCw,
-  ArrowDown,
-  ArrowRight,
+  Waypoints,
   Network,
-  TreePine,
+  Share2,
+  Workflow,
+  ChartNetwork,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -26,10 +27,11 @@ import type { GraphLayout } from '../types';
 
 // Layout configuration with icons and display names
 const LAYOUT_CONFIG: Record<GraphLayout, { name: string; icon: React.ComponentType<{ className?: string }> }> = {
-  dagre: { name: 'Top-Down', icon: ArrowDown },
-  'dagre-lr': { name: 'Left-Right', icon: ArrowRight },
-  cose: { name: 'Force-Directed', icon: Network },
-  breadthfirst: { name: 'Breadth-First', icon: TreePine },
+  dagre: { name: 'Top-Down', icon: Network },
+  'dagre-lr': { name: 'Left-Right', icon: Share2 },
+  cose: { name: 'Force-Directed', icon: Waypoints },
+  breadthfirst: { name: 'Chart Network', icon: ChartNetwork },
+  'bpmn': { name: 'BPMN', icon: Workflow },
 };
 
 interface GraphToolbarProps {

@@ -2,7 +2,7 @@ import type { Core, ElementDefinition } from 'cytoscape';
 import type { GraphEdgeData, GraphLayout, GraphNodeData } from '../types';
 import { LAYOUTS } from './layouts';
 import { getNodeType, nodeDataToCytoscapeData, getIncompleteValue } from './node-data-extractor';
-import { updateNodeStyles, updateStylesAfterLayout } from './cytoscape-styles';
+import { updateNodeStyles, updateStylesAfterLayout, updateEdgeCurveStyle } from './cytoscape-styles';
 
 /**
  * Schema information for node type resolution
@@ -128,6 +128,9 @@ export function syncCytoscapeGraph(config: CytoscapeSyncConfig): void {
       easing: 'ease-out',
     });
   }
+
+  // Update edge curve-style based on layout
+  updateEdgeCurveStyle(cy, layout);
 
   // Run layout with smooth animation
   const layoutOptions = {

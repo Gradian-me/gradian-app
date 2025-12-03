@@ -52,6 +52,8 @@ import { normalizeCreateUpdateDates } from './CreateUpdateDetail';
 import { formatCreatedLabel, formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/date-utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '../utils';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface DynamicPageRendererProps {
   schema: FormSchema;
@@ -156,6 +158,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     entityData: null,
     entityId: undefined,
   });
+  const [showMetadataColumns, setShowMetadataColumns] = useState(false);
   
   // State for companies data and grouping
   const [companies, setCompanies] = useState<any[]>([]);
@@ -809,8 +812,13 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       },
     ];
 
-    return [actionColumn, ...baseColumns, ...repeatingSectionColumns, ...metadataColumns];
-  }, [schema, repeatingSections, repeatingSectionFieldIds, handleViewDetailPage, handleEditEntity, handleDeleteWithConfirmation, isEditLoading]);
+    // Conditionally include metadata columns based on showMetadataColumns state
+    const finalColumns = showMetadataColumns 
+      ? [actionColumn, ...baseColumns, ...repeatingSectionColumns, ...metadataColumns]
+      : [actionColumn, ...baseColumns, ...repeatingSectionColumns];
+    
+    return finalColumns;
+  }, [schema, repeatingSections, repeatingSectionFieldIds, handleViewDetailPage, handleEditEntity, handleDeleteWithConfirmation, isEditLoading, showMetadataColumns]);
 
   // Create table config
   const tableConfig: TableConfig = useMemo(
@@ -1044,6 +1052,18 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           onExpandAllHierarchy={() => setHierarchyExpandToken((prev) => prev + 1)}
           onCollapseAllHierarchy={() => setHierarchyCollapseToken((prev) => prev + 1)}
           showHierarchy={schema?.allowHierarchicalParent === true}
+          customActions={
+            <div className="flex items-center gap-2 px-2">
+              <Label htmlFor="metadata-toggle" className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer whitespace-nowrap">
+                User Details
+              </Label>
+              <Switch
+                id="metadata-toggle"
+                checked={showMetadataColumns}
+                onCheckedChange={setShowMetadataColumns}
+              />
+            </div>
+          }
         />
 
         {/* Entities List - Grouped by Company or Regular List */}
@@ -1458,6 +1478,13 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             setFixedParentForCreate(null);
             setCreateModalOpen(false);
           }}
+          onIncompleteSave={async () => {
+            // Refresh entities list when form is saved as incomplete (without closing modal)
+            const filters = buildFilters();
+            if (filters) {
+              await fetchEntities(filters, { disableCache: true });
+            }
+          }}
           onClose={() => {
             setFixedParentForCreate(null);
             setCreateModalOpen(false);
@@ -1577,6 +1604,13 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               await fetchEntities(filters, { disableCache: true });
             }
             setEditEntityId(null);
+          }}
+          onIncompleteSave={async () => {
+            // Refresh entities list when form is saved as incomplete (without closing modal)
+            const filters = buildFilters();
+            if (filters) {
+              await fetchEntities(filters, { disableCache: true });
+            }
           }}
           onClose={() => {
             setEditEntityId(null);

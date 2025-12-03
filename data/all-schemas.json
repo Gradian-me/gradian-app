@@ -2472,8 +2472,6 @@
         "colSpan": 2,
         "fieldIds": [
           "username",
-          "first-name",
-          "last-name",
           "email",
           "post-title",
           "company"

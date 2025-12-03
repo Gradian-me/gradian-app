@@ -30,6 +30,14 @@ export {
   getInitials,
   getAvatarContent,
 } from '../../form-builder/form-elements/utils/avatar-utils';
+export {
+  AVATAR_COLOR_MAP,
+  getAvatarColorClasses,
+  resolveAvatarData,
+  RoleBasedAvatar,
+  type ResolvedAvatarData,
+  type RoleBasedAvatarProps,
+} from './avatar-utils';
 
 export { extractLabels } from '../../form-builder/form-elements/utils/option-normalizer';
 

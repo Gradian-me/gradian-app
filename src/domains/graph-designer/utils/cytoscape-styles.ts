@@ -1,4 +1,5 @@
 import type { Core } from 'cytoscape';
+import type { GraphLayout } from '../types';
 
 /**
  * Forces a style recalculation for all nodes in the graph
@@ -12,6 +13,17 @@ export function updateNodeStyles(cy: Core): void {
   cy.nodes().forEach((node) => {
     node.style();
   });
+}
+
+/**
+ * Updates edge curve-style based on the selected layout
+ * Sets 'round-taxi' for the bpmn layout, 'bezier' for all others
+ */
+export function updateEdgeCurveStyle(cy: Core, layout: GraphLayout): void {
+  const curveStyle = layout === 'bpmn' ? 'round-taxi' : 'bezier';
+  
+  // Update curve-style for all edges
+  cy.edges().style('curve-style', curveStyle);
 }
 
 /**

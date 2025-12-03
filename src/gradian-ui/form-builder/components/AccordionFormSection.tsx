@@ -15,15 +15,17 @@ import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { DataRelation, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { FormModal } from './FormModal';
-import { Avatar, Rating, PopupPicker, ConfirmationMessage, AddButtonFull, CodeBadge, Badge } from '../form-elements';
+import { Rating, PopupPicker, ConfirmationMessage, AddButtonFull, CodeBadge, Badge } from '../form-elements';
 import { Skeleton } from '../../../components/ui/skeleton';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { getInitials, getBadgeConfig, mapBadgeColorToVariant } from '../../data-display/utils';
+import { getPrimaryDisplayString } from '../../data-display/utils/value-display';
 import { NormalizedOption } from '../form-elements/utils/option-normalizer';
 import { BadgeViewer } from '../form-elements/utils/badge-viewer';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 const fieldVariants = {
   hidden: { opacity: 0, y: 12 },
   visible: (index: number) => ({
@@ -711,6 +713,129 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     const statusField = getSingleValueByRole(targetSchemaData, entity, 'status') || entity.status || '';
     const ratingField = getSingleValueByRole(targetSchemaData, entity, 'rating') || entity.rating || 0;
     
+    // Check if avatar and icon fields exist
+    const hasAvatarField = targetSchemaData?.fields?.some(field => field.role === 'avatar') || false;
+    const hasIconField = targetSchemaData?.fields?.some(field => field.role === 'icon') || false;
+    
+    // Get icon field value
+    const iconFieldValue =
+      getSingleValueByRole(targetSchemaData, entity, 'icon') ??
+      entity?.icon ??
+      '';
+    
+    const normalizedIconValue =
+      getPrimaryDisplayString(iconFieldValue) ??
+      (typeof iconFieldValue === 'string' ? iconFieldValue : '');
+    
+    // Resolve Tailwind color id from schema role or raw data
+    const rawColorValue =
+      getSingleValueByRole(targetSchemaData, entity, 'color') ??
+      entity.color ??
+      null;
+    
+    const resolvedColorId = typeof rawColorValue === 'string'
+      ? rawColorValue.toLowerCase()
+      : undefined;
+    
+    // Map Tailwind color id to avatar/background/text/border classes
+    const getAvatarColorClasses = (color?: string) => {
+      const colorMap: Record<string, { bg: string; text: string; border: string }> = {
+        violet: {
+          bg: 'bg-violet-50 dark:bg-violet-500/15',
+          text: 'text-violet-700 dark:text-violet-100',
+          border: 'border-violet-100 dark:border-violet-500/40',
+        },
+        emerald: {
+          bg: 'bg-emerald-50 dark:bg-emerald-500/15',
+          text: 'text-emerald-700 dark:text-emerald-100',
+          border: 'border-emerald-100 dark:border-emerald-500/40',
+        },
+        indigo: {
+          bg: 'bg-indigo-50 dark:bg-indigo-500/15',
+          text: 'text-indigo-700 dark:text-indigo-100',
+          border: 'border-indigo-100 dark:border-indigo-500/40',
+        },
+        blue: {
+          bg: 'bg-blue-50 dark:bg-blue-500/15',
+          text: 'text-blue-700 dark:text-blue-100',
+          border: 'border-blue-100 dark:border-blue-500/40',
+        },
+        green: {
+          bg: 'bg-green-50 dark:bg-green-500/15',
+          text: 'text-green-700 dark:text-green-100',
+          border: 'border-green-100 dark:border-green-500/40',
+        },
+        red: {
+          bg: 'bg-red-50 dark:bg-red-500/15',
+          text: 'text-red-700 dark:text-red-100',
+          border: 'border-red-100 dark:border-red-500/40',
+        },
+        orange: {
+          bg: 'bg-orange-50 dark:bg-orange-500/15',
+          text: 'text-orange-700 dark:text-orange-100',
+          border: 'border-orange-100 dark:border-orange-500/40',
+        },
+        amber: {
+          bg: 'bg-amber-50 dark:bg-amber-500/15',
+          text: 'text-amber-700 dark:text-amber-100',
+          border: 'border-amber-100 dark:border-amber-500/40',
+        },
+        yellow: {
+          bg: 'bg-yellow-50 dark:bg-yellow-500/15',
+          text: 'text-yellow-700 dark:text-yellow-100',
+          border: 'border-yellow-100 dark:border-yellow-500/40',
+        },
+        pink: {
+          bg: 'bg-pink-50 dark:bg-pink-500/15',
+          text: 'text-pink-700 dark:text-pink-100',
+          border: 'border-pink-100 dark:border-pink-500/40',
+        },
+        purple: {
+          bg: 'bg-purple-50 dark:bg-purple-500/15',
+          text: 'text-purple-700 dark:text-purple-100',
+          border: 'border-purple-100 dark:border-purple-500/40',
+        },
+        teal: {
+          bg: 'bg-teal-50 dark:bg-teal-500/15',
+          text: 'text-teal-700 dark:text-teal-100',
+          border: 'border-teal-100 dark:border-teal-500/40',
+        },
+        cyan: {
+          bg: 'bg-cyan-50 dark:bg-cyan-500/15',
+          text: 'text-cyan-700 dark:text-cyan-100',
+          border: 'border-cyan-100 dark:border-cyan-500/40',
+        },
+        stone: {
+          bg: 'bg-stone-50 dark:bg-stone-500/15',
+          text: 'text-stone-700 dark:text-stone-100',
+          border: 'border-stone-100 dark:border-stone-500/40',
+        },
+        neutral: {
+          bg: 'bg-neutral-50 dark:bg-neutral-500/15',
+          text: 'text-neutral-700 dark:text-neutral-100',
+          border: 'border-neutral-100 dark:border-neutral-500/40',
+        },
+        gray: {
+          bg: 'bg-gray-50 dark:bg-gray-500/15',
+          text: 'text-gray-700 dark:text-gray-100',
+          border: 'border-gray-100 dark:border-gray-500/40',
+        },
+        slate: {
+          bg: 'bg-slate-50 dark:bg-slate-500/15',
+          text: 'text-slate-700 dark:text-slate-100',
+          border: 'border-slate-100 dark:border-slate-500/40',
+        },
+      };
+      
+      const key = color && colorMap[color] ? color : 'violet';
+      return colorMap[key];
+    };
+    
+    const avatarColor = getAvatarColorClasses(resolvedColorId);
+    
+    const shouldShowAvatar = hasAvatarField && Boolean(avatarField);
+    const shouldShowIconAvatar = !shouldShowAvatar && hasIconField && Boolean(normalizedIconValue);
+    
     // Check if description role exists in schema OR if any field label contains "description"
     const hasDescriptionRole = targetSchemaData?.fields?.some(field => 
       field.role === 'description' || 
@@ -792,14 +917,61 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       <div className="flex items-start justify-between gap-3 w-full">
         {/* Left side: Avatar, Title, Subtitle */}
         <div className="flex items-start gap-3 flex-1 min-w-0">
+          {shouldShowAvatar ? (
           <Avatar
-            fallback={getInitials(avatarField)}
-            size="md"
-            variant="primary"
-            className="border border-gray-200 dark:border-gray-700 shrink-0"
+              className={cn(
+                'h-10 w-10 rounded-full border shadow-sm flex items-center justify-center font-semibold shrink-0',
+                avatarColor.bg,
+                avatarColor.text,
+                avatarColor.border,
+              )}
+            >
+              <AvatarFallback
+                className={cn(
+                  'h-10 w-10 rounded-full flex items-center justify-center',
+                  avatarColor.bg,
+                  avatarColor.text,
+                )}
           >
             {getInitials(avatarField)}
+              </AvatarFallback>
           </Avatar>
+          ) : shouldShowIconAvatar ? (
+            <div
+              className={cn(
+                'h-10 w-10 rounded-full flex items-center justify-center shadow-sm border shrink-0',
+                avatarColor.bg,
+                avatarColor.border,
+              )}
+            >
+              <IconRenderer
+                iconName={normalizedIconValue}
+                className={cn(
+                  'h-5 w-5',
+                  avatarColor.text,
+                )}
+              />
+            </div>
+          ) : (
+            <Avatar
+              className={cn(
+                'h-10 w-10 rounded-full border shadow-sm flex items-center justify-center font-semibold shrink-0',
+                avatarColor.bg,
+                avatarColor.text,
+                avatarColor.border,
+              )}
+            >
+              <AvatarFallback
+                className={cn(
+                  'h-10 w-10 rounded-full flex items-center justify-center',
+                  avatarColor.bg,
+                  avatarColor.text,
+                )}
+              >
+                {getInitials(avatarField)}
+              </AvatarFallback>
+            </Avatar>
+          )}
           
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">

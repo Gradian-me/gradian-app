@@ -44,6 +44,16 @@ export const LAYOUTS: Record<GraphLayout, cytoscape.LayoutOptions> = {
     animationDuration: 800,
     animationEasing: 'ease-out',
   },
+  'bpmn': {
+    name: 'dagre',
+    rankDir: 'LR',
+    nodeSep: 40,
+    rankSep: 80,
+    edgeSep: 20,
+    animate: true,
+    animationDuration: 800,
+    animationEasing: 'ease-out',
+  } as any,
 };
 
 

@@ -122,7 +122,8 @@ type FormAction =
   | { type: 'VALIDATE_FIELD'; fieldName: string; schema: FormSchema }
   | { type: 'VALIDATE_FORM'; schema: FormSchema }
   | { type: 'ADD_REPEATING_ITEM'; sectionId: string; defaultValue: any }
-  | { type: 'REMOVE_REPEATING_ITEM'; sectionId: string; index: number };
+  | { type: 'REMOVE_REPEATING_ITEM'; sectionId: string; index: number }
+  | { type: 'UPDATE_ENTITY_AFTER_SAVE'; entityData: Record<string, any> };
 
 const formReducer = (state: FormState, action: FormAction): FormState => {
   switch (action.type) {
@@ -318,6 +319,19 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
       };
     }
     
+    case 'UPDATE_ENTITY_AFTER_SAVE': {
+      // Update entity data (especially ID) after save without marking as dirty
+      // This allows the form to update when saved as incomplete
+      return {
+        ...state,
+        values: {
+          ...state.values,
+          ...action.entityData,
+        },
+        // Don't mark as dirty - this is just updating to reflect saved state
+      };
+    }
+    
     default:
       return state;
   }
@@ -404,10 +418,21 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         setHasSubmitted(false); // Reset on new form
       }
     } else if (prevInitialValuesRef.current !== currentInitialValues) {
+      // If form is dirty but initialValues changed (e.g., after incomplete save),
+      // update the entity ID and other key fields to allow adding items
+      const prevValues = JSON.parse(prevInitialValuesRef.current || '{}');
+      const newId = initialValues?.id;
+      const prevId = prevValues?.id;
+      
+      // If ID changed (e.g., from undefined to a value after incomplete save), update it
+      if (newId && newId !== prevId && state.values?.id !== newId) {
+        dispatch({ type: 'UPDATE_ENTITY_AFTER_SAVE', entityData: { id: newId, ...initialValues } });
+      }
+      
       // Update the ref even if we don't reset (to prevent future false positives)
       prevInitialValuesRef.current = currentInitialValues;
     }
-  }, [initialValues, schema, state.dirty]);
+  }, [initialValues, schema, state.dirty, state.values?.id]);
 
   // Update expanded sections when schema sections change
   const sectionIds = useMemo(() => schema.sections.map(s => s.id).join(','), [schema.sections]);

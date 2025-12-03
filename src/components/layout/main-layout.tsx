@@ -39,6 +39,7 @@ interface MainLayoutProps {
   editSchemaPath?: string;
   isAdmin?: boolean;
   navigationSchemas?: FormSchema[];
+  customHeaderActions?: React.ReactNode;
 }
 
 const DESKTOP_BREAKPOINT = 768;
@@ -78,6 +79,7 @@ export function MainLayout({
   editSchemaPath,
   isAdmin = false,
   navigationSchemas,
+  customHeaderActions,
 }: MainLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -378,6 +380,11 @@ export function MainLayout({
 
   const headerActionsContent = (
     <div className="flex items-center gap-2">
+      {customHeaderActions && (
+        <div className="hidden lg:flex items-center">
+          {customHeaderActions}
+        </div>
+      )}
       <div className="hidden lg:flex items-center space-x-4">
         <DemoModeBadge />
         <CompanySelector />
@@ -386,6 +393,11 @@ export function MainLayout({
         <UserProfileSelector theme={profileTheme} />
       </div>
       <div className="flex lg:hidden items-center space-x-2">
+        {customHeaderActions && (
+          <div className="flex items-center mr-2">
+            {customHeaderActions}
+          </div>
+        )}
         <DemoModeBadge />
         <Button
           variant="ghost"

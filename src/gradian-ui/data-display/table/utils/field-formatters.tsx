@@ -341,7 +341,7 @@ export const formatFieldValue = (
     const badgeLabel = primaryOption?.label || primaryOption?.normalized?.label || badgeConfig.label;
     
     // Check if badgeColor is a Tailwind color name (not a badge variant)
-    const isTailwindColor = badgeColor && !['default', 'primary', 'secondary', 'success', 'warning', 'danger', 'outline', 'cyan'].includes(badgeColor);
+    const isTailwindColor = badgeColor && !['default', 'primary', 'secondary', 'success', 'warning', 'danger', 'outline'].includes(badgeColor);
     
     return wrapWithForceIcon(
       <div className="inline-flex items-center whitespace-nowrap">

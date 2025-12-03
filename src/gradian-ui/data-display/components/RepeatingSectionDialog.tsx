@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,7 @@ import { Button as UIButton } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 import { getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { cn } from '@/gradian-ui/shared/utils';
+import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
 
 interface RepeatingSectionDialogProps {
   isOpen: boolean;
@@ -84,6 +85,9 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
 
   const schemaForColumns = isRelationBased ? targetSchemaData : schema;
   const isLoading = isLoadingRelations || (isRelationBased && isLoadingTargetSchema);
+  
+  // State for edit modal
+  const [editEntityId, setEditEntityId] = useState<string | null>(null);
 
   // Get parent entity title using getValueByRole
   const parentTitle = useMemo(() => {
@@ -112,13 +116,9 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
 
   const handleEditDetails = useCallback(
     (itemId: string | number) => {
-      const navigationSchemaId =
-        isRelationBased && section?.repeatingConfig?.targetSchema
-          ? section.repeatingConfig.targetSchema
-          : schema.id;
-      window.open(`/page/${navigationSchemaId}/${itemId}?showBack=true&mode=edit`, '_blank');
+      setEditEntityId(String(itemId));
     },
-    [isRelationBased, section, schema.id]
+    []
   );
 
   const actionCellRenderer = useCallback(
@@ -197,56 +197,100 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
     [columns, sectionData, sectionId, isLoading]
   );
 
+  const targetSchemaId = isRelationBased && section?.repeatingConfig?.targetSchema
+    ? section.repeatingConfig.targetSchema
+    : schema.id;
+
+  // Prevent clicks inside dialog from propagating to parent elements
+  const stopPropagation = useCallback((e: React.MouseEvent | React.PointerEvent) => {
+    e.stopPropagation();
+  }, []);
+
+  // Prevent row clicks from propagating - just consume the event
+  const handleTableRowClick = useCallback((row: any, index: number) => {
+    // Do nothing - just prevent event from propagating to parent
+  }, []);
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="min-w-2xl min-h-[50vh] max-w-7xl max-h-[85vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="flex flex-col min-w-0">
-                <DialogTitle className="text-xl font-semibold truncate">{sectionTitle}</DialogTitle>
-                {parentTitle && (
-                  <p className="text-sm font-semibold text-violet-700 dark:text-violet-300 mt-1 truncate">
-                    {schema.singular_name}: {parentTitle}
-                  </p>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent 
+          className="min-w-2xl min-h-[50vh] max-w-7xl max-h-[85vh] overflow-hidden flex flex-col"
+          onClick={stopPropagation}
+          onMouseDown={stopPropagation}
+          onPointerDown={stopPropagation}
+        >
+            <DialogHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 flex-1 min-w-0 justify-between pe-2">
+                <div className="flex flex-col min-w-0">
+                  <DialogTitle className="text-xl font-semibold truncate">{sectionTitle}</DialogTitle>
+                  {parentTitle && (
+                    <p className="text-sm font-semibold text-violet-700 dark:text-violet-300 mt-1 truncate">
+                      {schema.singular_name}: {parentTitle}
+                    </p>
+                  )}
+                </div>
+                {isLoading ? (
+                  <Badge variant="secondary" className="animate-pulse shrink-0">
+                    Loading...
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="shrink-0">
+                    {sectionData.length} {sectionData.length === 1 ? 'item' : 'items'}
+                  </Badge>
                 )}
               </div>
-              {isLoading ? (
-                <Badge variant="secondary" className="animate-pulse shrink-0">
-                  Loading...
-                </Badge>
-              ) : (
-                <Badge variant="secondary" className="shrink-0">
-                  {sectionData.length} {sectionData.length === 1 ? 'item' : 'items'}
-                </Badge>
-              )}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleRefreshClick}
+                disabled={isLoading}
+                className="text-gray-400 hover:text-violet-600 hover:bg-violet-50 transition-colors duration-200 p-1.5 shrink-0"
+                aria-label="Refresh table"
+              >
+                <RefreshCw className={cn('h-4 w-4', isLoading && 'animate-spin text-violet-600')} />
+              </Button>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={handleRefreshClick}
-              disabled={isLoading}
-              className="text-gray-400 hover:text-violet-600 hover:bg-violet-50 transition-colors duration-200 p-1.5 shrink-0"
-              aria-label="Refresh table"
-            >
-              <RefreshCw className={cn('h-4 w-4', isLoading && 'animate-spin text-violet-600')} />
-            </Button>
-          </div>
-        </DialogHeader>
-        <div className="flex-1 overflow-auto mt-4">
-          <TableWrapper
-            tableConfig={tableConfig}
-            columns={columns}
-            data={sectionData}
-            showCards={false}
-            disableAnimation={false}
-            index={0}
-            isLoading={isLoading}
-          />
-        </div>
-      </DialogContent>
-    </Dialog>
+          </DialogHeader>
+          <div 
+            className="flex-1 overflow-auto mt-4" 
+            onClick={stopPropagation}
+            onMouseDown={stopPropagation}
+          >
+              <TableWrapper
+                tableConfig={tableConfig}
+                columns={columns}
+                data={sectionData}
+                showCards={false}
+                disableAnimation={false}
+                index={0}
+                isLoading={isLoading}
+                onRowClick={handleTableRowClick}
+                schema={schemaForColumns || undefined}
+              />
+            </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Edit Modal - rendered outside to avoid nested dialogs */}
+      {editEntityId && targetSchemaId && (
+        <FormModal
+          schemaId={targetSchemaId}
+          mode="edit"
+          entityId={editEntityId}
+          onSuccess={() => {
+            setEditEntityId(null);
+            // Refresh the table data
+            refresh();
+          }}
+          onClose={() => {
+            setEditEntityId(null);
+          }}
+        />
+      )}
+    </>
   );
 };
 

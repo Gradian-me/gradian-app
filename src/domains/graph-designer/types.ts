@@ -1,6 +1,6 @@
 import type { FormSchema } from '@/gradian-ui/schema-manager/types';
 
-export type GraphLayout = 'dagre' | 'dagre-lr' | 'cose' | 'breadthfirst';
+export type GraphLayout = 'dagre' | 'dagre-lr' | 'cose' | 'breadthfirst' | 'bpmn';
 
 export interface GraphNodeData {
   id: string;

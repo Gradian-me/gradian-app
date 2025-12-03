@@ -77,7 +77,7 @@ export function TableBody<T = any>({
 
   const tdClasses = (column: TableColumn<T>, rowIndex: number, isSelected: boolean) =>
     cn(
-      'px-4 py-3 text-xs text-gray-900 dark:text-gray-200',
+      'p-3 text-xs text-gray-900 dark:text-gray-200',
       // Use better word breaking for columns with maxWidth - break on words, not characters
       column.maxWidth && 'wrap-break-word',
       column.align === 'center' && 'text-center',

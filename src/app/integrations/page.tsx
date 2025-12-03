@@ -105,7 +105,7 @@ interface Integration {
   sourceRoute?: string;
   sourceMethod?: 'GET' | 'POST';
   sourceDataPath?: string;
-  category?: string | { label?: string; value?: string; id?: string } | Array<{ label?: string; value?: string; id?: string }>;
+  category?: string | { label?: string; value?: string; id?: string; icon?: string; color?: string } | Array<{ label?: string; value?: string; id?: string; icon?: string; color?: string }>;
 }
 
 interface EmailTemplateSyncResponse {

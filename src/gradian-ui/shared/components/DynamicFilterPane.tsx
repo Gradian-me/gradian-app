@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/gradian-ui/data-display/components/SearchBar';
 import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
 import { HierarchyExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface DynamicFilterPaneProps {
   searchTerm: string;
@@ -21,6 +23,7 @@ interface DynamicFilterPaneProps {
   onExpandAllHierarchy?: () => void;
   onCollapseAllHierarchy?: () => void;
   showHierarchy?: boolean; // Only show hierarchy view if enabled
+  customActions?: React.ReactNode; // Custom actions/content to display in the filter pane
 }
 
 export const DynamicFilterPane = ({
@@ -37,6 +40,7 @@ export const DynamicFilterPane = ({
   onExpandAllHierarchy,
   onCollapseAllHierarchy,
   showHierarchy = false,
+  customActions,
 }: DynamicFilterPaneProps) => {
   return (
     <motion.div
@@ -84,6 +88,11 @@ export const DynamicFilterPane = ({
             />
           )}
         </div>
+        {customActions && (
+          <div className="flex items-center border-l border-gray-300 dark:border-gray-500 pl-2">
+            {customActions}
+          </div>
+        )}
         <Button 
           variant="default" 
           size="sm" 

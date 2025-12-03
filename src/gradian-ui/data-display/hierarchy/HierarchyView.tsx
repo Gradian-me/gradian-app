@@ -5,8 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { DynamicActionButtons } from '../components/DynamicActionButtons';
-import { Avatar } from '@/gradian-ui/form-builder/form-elements';
-import { getInitials } from '@/gradian-ui/data-display/utils';
+import { RoleBasedAvatar } from '@/gradian-ui/data-display/utils';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { getSingleValueByRole, getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
@@ -102,10 +101,6 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
     getSingleValueByRole(schema, entity, 'subtitle', entity.email) ||
     entity.email ||
     '';
-  const avatarField =
-    getSingleValueByRole(schema, entity, 'avatar', entity.name) ||
-    entity.name ||
-    title;
 
   const hasChildren = node.children.length > 0;
   const hasParent = Boolean(getParentIdFromEntity(entity));
@@ -159,14 +154,15 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                   <span className="h-1 w-1 rounded-full bg-gray-400" />
                 )}
               </button>
-              <Avatar
-                fallback={getInitials(avatarField)}
+              <RoleBasedAvatar
+                schema={schema}
+                data={entity}
                 size="sm"
-                variant="primary"
-                className="shrink-0 border border-violet-200 dark:border-violet-500/80"
-              >
-                {getInitials(avatarField)}
-              </Avatar>
+                showBorder={true}
+                showShadow={false}
+                defaultColor="violet"
+                className="shrink-0"
+              />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">

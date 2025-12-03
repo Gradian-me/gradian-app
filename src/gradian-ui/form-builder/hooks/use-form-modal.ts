@@ -59,6 +59,11 @@ export interface UseFormModalOptions {
   onSuccess?: (data: any) => void;
   
   /**
+   * Optional callback when form is saved as incomplete (to refresh lists without closing modal)
+   */
+  onIncompleteSave?: (data: any) => void;
+  
+  /**
    * Optional callback when modal is closed
    */
   onClose?: () => void;
@@ -187,7 +192,7 @@ export interface UseFormModalReturn {
 export function useFormModal(
   options: UseFormModalOptions = {}
 ): UseFormModalReturn {
-  const { enrichData, onSuccess, onClose, getInitialSchema, getInitialEntityData } = options;
+  const { enrichData, onSuccess, onIncompleteSave, onClose, getInitialSchema, getInitialEntityData } = options;
   const { getCompanyId } = useCompanyStore();
   const queryClient = useQueryClient();
   const [targetSchema, setTargetSchema] = useState<FormBuilderSchema | null>(null);
@@ -412,9 +417,17 @@ export function useFormModal(
             setEntityId(result.data.id);
             setMode('edit'); // Switch to edit mode so user can continue
             setEntityData(result.data); // Update entity data with the saved incomplete entity
+            // Call onIncompleteSave to refresh the list without closing modal
+            if (onIncompleteSave) {
+              onIncompleteSave(result.data);
+            }
           } else if (mode === 'edit' && result.data) {
             // Update entity data when editing incomplete form
             setEntityData(result.data);
+            // Call onIncompleteSave to refresh the list without closing modal
+            if (onIncompleteSave) {
+              onIncompleteSave(result.data);
+            }
           }
           // IMPORTANT: Do NOT call closeFormModal() - keep form open
           // IMPORTANT: Do NOT call onSuccess() when incomplete - it might close the modal

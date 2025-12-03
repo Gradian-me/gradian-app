@@ -4,8 +4,8 @@
  */
 export const mapBadgeColorToVariant = (
   color: string
-): 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline' | 'cyan' => {
-  const colorMap: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline' | 'cyan'> = {
+): 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline' => {
+  const colorMap: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline'> = {
     'default': 'default',
     'secondary': 'secondary',
     'outline': 'outline',

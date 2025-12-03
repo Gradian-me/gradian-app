@@ -228,9 +228,9 @@ export interface OTPInputProps extends Omit<FormElementProps, 'config'> {
 
 // Badge Component Types
 export interface BadgeProps extends BaseComponentProps {
-  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline' | 'cyan';
+  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline';
   size?: 'sm' | 'md' | 'lg';
-  color?: string; // Tailwind color name for pastel styling (e.g., 'violet', 'emerald', 'yellow')
+  color?: string; // Tailwind color name for pastel styling (e.g., 'violet', 'emerald', 'yellow', 'cyan')
   children: React.ReactNode;
 }
 

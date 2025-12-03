@@ -155,6 +155,7 @@ export const FormModal: React.FC<FormModalProps> = ({
   showLoadingSpinner = true,
   enrichData,
   onSuccess,
+  onIncompleteSave,
   onClose,
   getInitialSchema,
   getInitialEntityData,
@@ -181,6 +182,7 @@ export const FormModal: React.FC<FormModalProps> = ({
   } = useFormModal({
     enrichData,
     onSuccess,
+    onIncompleteSave,
     onClose,
     getInitialSchema,
     getInitialEntityData,
@@ -249,9 +251,17 @@ export const FormModal: React.FC<FormModalProps> = ({
   }, [title, isEdit, schemaIconName, defaultTitle]);
   
   // Memoize initialValues to prevent unnecessary form resets
+  // Include entityId in dependencies to ensure update when entity is saved as incomplete
   const memoizedInitialValues = React.useMemo(() => {
-    return isEdit && entityData ? entityData : {};
-  }, [isEdit, entityData]);
+    if (isEdit && entityData) {
+      return entityData;
+    }
+    // Merge initialValues with entityData if entityData has ID (for incomplete saves)
+    if (entityData?.id && initialValues) {
+      return { ...initialValues, ...entityData };
+    }
+    return initialValues || {};
+  }, [isEdit, entityData, entityId]);
     
   const modalDescription = description || (isEdit
     ? `Update ${(targetSchema?.name || 'item').toLowerCase()} information`
@@ -308,16 +318,12 @@ export const FormModal: React.FC<FormModalProps> = ({
       {/* Form */}
       {targetSchema && !isLoading && (
         <SchemaFormWrapper
-          key={isEdit && entityId ? `edit-${entityId}` : `create-${targetSchema.id}`}
+          key={entityId ? `edit-${entityId}-${targetSchema.id}` : `create-${targetSchema.id}`}
           schema={targetSchema}
           onSubmit={handleSubmit}
           onReset={() => {}}
           onCancel={closeFormModal}
-          initialValues={
-            isEdit && entityData
-              ? memoizedInitialValues
-              : initialValues || memoizedInitialValues
-          }
+          initialValues={memoizedInitialValues}
           error={formError || undefined}
           message={formMessage}
           errorStatusCode={formErrorStatusCode}

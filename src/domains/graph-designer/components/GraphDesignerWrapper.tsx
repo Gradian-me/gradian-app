@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ulid } from 'ulid';
 import { toast } from 'sonner';
@@ -60,6 +60,8 @@ export function GraphDesignerWrapper() {
 
   const canvasHandleRef = useRef<GraphCanvasHandle | null>(null);
   const formJustSavedRef = useRef(false);
+  const prevNodesIdsRef = useRef<string>(JSON.stringify(nodes.map(n => n.id).sort()));
+  const prevEdgesIdsRef = useRef<string>(JSON.stringify(edges.map(e => e.id).sort()));
 
   // Custom hooks
   const { handleSave } = useGraphActions(graph);
@@ -107,6 +109,32 @@ export function GraphDesignerWrapper() {
       canvasHandleRef.current.runLayout(layout);
     }
   };
+
+  // Re-apply layout after nodes or edges are added/changed
+  useEffect(() => {
+    const currentNodesIds = JSON.stringify(nodes.map(n => n.id).sort());
+    const currentEdgesIds = JSON.stringify(edges.map(e => e.id).sort());
+    
+    const nodesChanged = prevNodesIdsRef.current !== currentNodesIds;
+    const edgesChanged = prevEdgesIdsRef.current !== currentEdgesIds;
+    
+    // Update refs
+    prevNodesIdsRef.current = currentNodesIds;
+    prevEdgesIdsRef.current = currentEdgesIds;
+    
+    // If nodes or edges changed, trigger layout refresh after sync completes
+    if ((nodesChanged || edgesChanged) && canvasHandleRef.current) {
+      // Use requestAnimationFrame to ensure layout runs after the sync cycle completes
+      // Double RAF ensures it runs after all React updates and Cytoscape sync
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (canvasHandleRef.current) {
+            canvasHandleRef.current.runLayout(layout);
+          }
+        });
+      });
+    }
+  }, [nodes, edges, layout]);
 
   const handleGroupSelection = () => {
     if (!selectedNodeIds || selectedNodeIds.size < 2 || !graph) return;

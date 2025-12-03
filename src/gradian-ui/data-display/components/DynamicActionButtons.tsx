@@ -101,7 +101,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
               onClick={() => handleClick(action)}
               disabled={action.disabled}
               className={cn(
-                'flex-1 transition-all duration-200 text-xs bg-gray-100 dark:bg-gray-700',
+                'flex-1 transition-all duration-200 text-xs bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600',
                 config.hoverClass
               )}
               data-action-button
@@ -132,7 +132,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
             onClick={() => handleClick(action)}
             disabled={action.disabled}
             className={cn(
-              'h-8 w-8 p-0 transition-all duration-200 bg-gray-100 dark:bg-gray-700',
+              'h-8 w-8 p-0 transition-all duration-200 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600',
               config.hoverClass
             )}
             data-action-button

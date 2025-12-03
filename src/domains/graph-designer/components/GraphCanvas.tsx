@@ -12,7 +12,7 @@ import edgehandles from 'cytoscape-edgehandles';
 import type { GraphEdgeData, GraphLayout, GraphNodeData } from '../types';
 import { LAYOUTS } from '../utils/layouts';
 import { syncCytoscapeGraph } from '../utils/cytoscape-sync';
-import { updateStylesAfterLayout } from '../utils/cytoscape-styles';
+import { updateStylesAfterLayout, updateEdgeCurveStyle } from '../utils/cytoscape-styles';
 import { initializeCytoscape } from '../utils/cytoscape-initialization';
 import { manageEdgehandles, cleanupEdgehandles } from '../utils/edgehandles-manager';
 import { manageNodeSelection } from '../utils/cytoscape-selection';
@@ -104,6 +104,9 @@ export function GraphCanvas(props: GraphCanvasProps) {
       onReady({
         getInstance: () => cyRef.current,
         runLayout: (l: GraphLayout) => {
+          // Update edge curve-style based on layout
+          updateEdgeCurveStyle(initResult.cy, l);
+          
           const layoutOptions = {
             ...LAYOUTS[l],
             animate: true,
