@@ -47,7 +47,7 @@ import { getParentIdFromEntity } from '@/gradian-ui/schema-manager/utils/hierarc
 import { RepeatingSectionDialog } from './RepeatingSectionDialog';
 import { Table2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
-import { EntityMetadata } from './EntityMetadata';
+import { EntityMetadata } from './CreateUpdateDetail';
 import { normalizeCreateUpdateDates } from './CreateUpdateDetail';
 import { formatCreatedLabel, formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/date-utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -619,9 +619,9 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               {
                 type: 'edit',
                 onClick: () => {
-                  if (!isEditLoading[row.id]) {
-                    handleEditEntity(row);
-                  }
+                if (!isEditLoading[row.id]) {
+                  handleEditEntity(row);
+                }
                 },
                 disabled: isEditLoading[row.id],
               },
@@ -718,7 +718,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   </TooltipContent>
                 </Tooltip>
                 {createdByName && (
-                  <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 pl-4.5">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 pl-4.5">
                     <Avatar className="h-4 w-4">
                       {createdByAvatarUrl && (
                         <AvatarImage src={createdByAvatarUrl} alt={createdByName} />
@@ -790,7 +790,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   </TooltipContent>
                 </Tooltip>
                 {updatedByName && (
-                  <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 pl-4.5">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 pl-4.5">
                     <Avatar className="h-4 w-4">
                       {updatedByAvatarUrl && (
                         <AvatarImage src={updatedByAvatarUrl} alt={updatedByName} />

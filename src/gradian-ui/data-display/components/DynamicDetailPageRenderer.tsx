@@ -30,7 +30,7 @@ import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { RepeatingTableRendererConfig } from '@/gradian-ui/schema-manager/types/form-schema';
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';
 import { toast } from 'sonner';
-import { EntityMetadata } from './EntityMetadata';
+import { EntityMetadata } from './CreateUpdateDetail';
 
 export interface DynamicDetailPageRendererProps {
   schema: FormSchema;

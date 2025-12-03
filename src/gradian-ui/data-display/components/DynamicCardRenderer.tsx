@@ -24,7 +24,7 @@ import { useRouter } from 'next/navigation';
 import { getDisplayStrings, getPrimaryDisplayString, hasDisplayValue } from '../utils/value-display';
 import { renderHighlightedText } from '../../shared/utils/highlighter';
 import { formatFieldValue } from '../table/utils/field-formatters';
-import { EntityMetadata } from './EntityMetadata';
+import { EntityMetadata } from './CreateUpdateDetail';
 
 export interface DynamicCardRendererProps {
   schema: FormSchema;
@@ -789,7 +789,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                 initial={disableAnimation ? false : { opacity: 0, y: 5 }}
                 animate={disableAnimation ? false : { opacity: 1, y: 0 }}
                 transition={disableAnimation ? {} : { duration: 0.3 }}
-                className="w-full mb-3 pt-2 border-t border-gray-100 dark:border-gray-800"
+                className="w-full mb-3 pt-2 border-t border-gray-200 dark:border-gray-600"
               >
                 <EntityMetadata
                   createdAt={data.createdAt}

@@ -16,7 +16,7 @@ import { HierarchyActionsMenu } from './HierarchyActionsMenu';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatFieldValue } from '../table/utils/field-formatters';
-import { EntityMetadata } from '../components/EntityMetadata';
+import { EntityMetadata } from '../components/CreateUpdateDetail';
 
 export interface HierarchyViewProps {
   schema: FormSchema;

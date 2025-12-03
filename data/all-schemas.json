@@ -2125,17 +2125,7 @@
         "targetUrl": "/builder/schemas"
       }
     ],
-    "cardMetadata": [
-      {
-        "id": "application-info",
-        "title": "Application Information",
-        "colSpan": 1,
-        "fieldIds": [
-          "application-name",
-          "application-icon"
-        ]
-      }
-    ],
+    "cardMetadata": [],
     "fields": [
       {
         "id": "application-name",
@@ -2163,7 +2153,8 @@
           "required": true
         },
         "colSpan": 1,
-        "order": 2
+        "order": 2,
+        "role": "icon"
       }
     ],
     "sections": [

@@ -1639,8 +1639,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   onCollapseAll={handleHierarchyCollapseAll}
                   expandDisabled={isLoading || isSubmitting}
                   collapseDisabled={isLoading || isSubmitting}
-                  variant="ghost"
-                  size="icon"
+                    variant="ghost"
+                    size="icon"
                 />
               )}
               {showAddButton && schemaId && effectiveSchema && (

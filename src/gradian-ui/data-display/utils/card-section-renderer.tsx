@@ -26,7 +26,7 @@ export const renderCardSection = ({ section, schema, data, maxMetrics = 3, onBad
 
   return (
     <div className="space-y-2 mb-1">
-      <div className="text-gray-500 dark:text-gray-300 font-medium border-b border-gray-200 dark:border-gray-800 pb-1 mb-2">
+      <div className="text-gray-500 dark:text-gray-300 font-medium border-b border-gray-200 dark:border-gray-600 pb-1 mb-2">
         {section?.title || section?.id}
       </div>
       <div className="space-y-2">

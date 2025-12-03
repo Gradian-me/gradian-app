@@ -67,8 +67,8 @@ export function TableBody<T = any>({
   const trClasses = (index: number, isSelected: boolean) =>
     cn(
       'transition-colors',
-      striped && index % 2 === 1 && 'bg-gray-100 dark:bg-gray-700',
-      striped && index % 2 === 0 && 'bg-white dark:bg-gray-800',
+      striped && index % 2 === 1 && 'bg-gray-50 dark:bg-gray-800',
+      striped && index % 2 === 0 && 'bg-white dark:bg-gray-900',
       hoverable && 'hover:bg-gray-200 dark:hover:bg-gray-600',
       hoverable && onRowClick && 'cursor-pointer',
       isSelected && 'bg-blue-50',

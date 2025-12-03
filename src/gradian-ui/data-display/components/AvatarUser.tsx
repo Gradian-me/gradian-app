@@ -112,7 +112,7 @@ export const AvatarUser: React.FC<AvatarUserProps> = ({
 
   // Default avatar component
   const DefaultAvatar = (
-    <Avatar className={cn(sizeClasses[size], className)}>
+    <Avatar className={cn(sizeClasses[size], className, 'border border-gray-100 dark:border-gray-600')}>
       {avatarUrl && (
         <AvatarImage src={avatarUrl} alt={displayName} />
       )}
@@ -175,9 +175,9 @@ export const AvatarUser: React.FC<AvatarUserProps> = ({
               />
             </div>
 
-            <div className="relative p-6">
+            <div className="relative">
               {/* Avatar Section */}
-              <div className="flex flex-col items-center mb-6">
+              <div className="flex flex-col items-center mb-6 pt-6 px-6">
                 <Avatar className={cn(
                   dialogSizeClasses.lg,
                   'border-4 border-white dark:border-gray-800 shadow-lg'
@@ -203,7 +203,7 @@ export const AvatarUser: React.FC<AvatarUserProps> = ({
               </div>
 
               {/* User Details */}
-              <div className="space-y-3">
+              <div className="space-y-3 px-6 pb-6">
                 {email && (
                   <div className="flex items-center justify-between bg-white/60 dark:bg-gray-800/40 rounded-lg border border-violet-100 dark:border-violet-800/50">
                     <div className="flex items-center gap-3 flex-1 min-w-0 p-3">

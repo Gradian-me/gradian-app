@@ -177,19 +177,19 @@ export function useAiBuilder(): UseAiBuilderReturn {
       let response: Response;
       try {
         response = await fetch('/api/ai-builder', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userPrompt: request.userPrompt.trim(),
-            agentId: request.agentId,
-            previousAiResponse: request.previousAiResponse,
-            previousUserPrompt: request.previousUserPrompt,
-            annotations: request.annotations,
-          }),
-          signal: abortController.signal,
-        });
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userPrompt: request.userPrompt.trim(),
+          agentId: request.agentId,
+          previousAiResponse: request.previousAiResponse,
+          previousUserPrompt: request.previousUserPrompt,
+          annotations: request.annotations,
+        }),
+        signal: abortController.signal,
+      });
       } catch (fetchError) {
         // Handle network errors, CORS errors, etc.
         const errorMessage = fetchError instanceof Error ? fetchError.message : 'Unknown fetch error';

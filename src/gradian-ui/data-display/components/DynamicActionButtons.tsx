@@ -53,17 +53,17 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
       view: {
         icon: 'Eye',
         label: 'View',
-        hoverClass: 'hover:bg-sky-50 hover:border-sky-300 hover:text-sky-700',
+        hoverClass: 'hover:bg-sky-50 hover:border-sky-300 hover:text-sky-400',
       },
       edit: {
         icon: 'Edit',
         label: 'Edit',
-        hoverClass: 'hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700',
+        hoverClass: 'hover:bg-violet-50 hover:border-violet-300 hover:text-violet-400',
       },
       delete: {
         icon: 'Trash2',
         label: 'Delete',
-        hoverClass: 'hover:bg-red-50 hover:border-red-300 hover:text-red-700',
+        hoverClass: 'hover:bg-red-50 hover:border-red-300 hover:text-red-400',
       },
     };
     return configs[type];
@@ -101,7 +101,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
               onClick={() => handleClick(action)}
               disabled={action.disabled}
               className={cn(
-                'flex-1 transition-all duration-200 text-xs bg-white dark:bg-gray-800',
+                'flex-1 transition-all duration-200 text-xs bg-gray-100 dark:bg-gray-700',
                 config.hoverClass
               )}
               data-action-button
@@ -132,7 +132,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
             onClick={() => handleClick(action)}
             disabled={action.disabled}
             className={cn(
-              'h-8 w-8 p-0 transition-all duration-200 bg-white dark:bg-gray-800',
+              'h-8 w-8 p-0 transition-all duration-200 bg-gray-100 dark:bg-gray-700',
               config.hoverClass
             )}
             data-action-button
