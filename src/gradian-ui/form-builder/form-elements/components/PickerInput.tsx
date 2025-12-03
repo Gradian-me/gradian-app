@@ -313,6 +313,12 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   };
 
   const getDisplayValue = () => {
+    // Always return a string, never undefined or the string "undefined"
+    const safeReturn = (value: string | undefined | null): string => {
+      if (!value || value === 'undefined' || value === 'null') return '';
+      return String(value);
+    };
+
     if (allowMultiselect) {
       if (normalizedSelection.length === 0) {
         return '';
@@ -326,10 +332,22 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     if (sourceUrl) {
       const fallbackOption = normalizedSelection[0];
       if (fallbackOption) {
-        return fallbackOption.label ?? fallbackOption.id ?? '';
+        const label = fallbackOption.label;
+        const id = fallbackOption.id;
+        // Ensure we never return undefined - convert to empty string
+        if (label && label !== 'undefined') return label;
+        if (id && id !== 'undefined') return id;
+        return '';
       }
       if (selectedItem) {
-        return selectedItem.name || selectedItem.title || selectedItem.id || '';
+        const name = selectedItem.name;
+        const title = selectedItem.title;
+        const itemId = selectedItem.id;
+        // Ensure we never return undefined - convert to empty string
+        if (name && name !== 'undefined') return name;
+        if (title && title !== 'undefined') return title;
+        if (itemId && itemId !== 'undefined') return String(itemId);
+        return '';
       }
       return '';
     }
@@ -337,7 +355,12 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     if (!selectedItem || !targetSchema) {
       const fallbackOption = normalizedSelection[0];
       if (fallbackOption) {
-        return fallbackOption.label ?? fallbackOption.id ?? '';
+        const label = fallbackOption.label;
+        const id = fallbackOption.id;
+        // Ensure we never return undefined - convert to empty string
+        if (label && label !== 'undefined') return label;
+        if (id && id !== 'undefined') return id;
+        return '';
       }
       return '';
     }
@@ -346,6 +369,8 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     const title = getValueByRole(targetSchema, selectedItem, 'title') || selectedItem.name || selectedItem.title || '';
     const subtitle = getSingleValueByRole(targetSchema, selectedItem, 'subtitle') || selectedItem.email || '';
     
+    // Ensure we always return a string, never undefined
+    if (!title) return '';
     return subtitle ? `${title} (${subtitle})` : title;
   };
 
@@ -436,7 +461,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
               id={fieldName}
               name={fieldName}
               type="text"
-              value={getDisplayValue()}
+              value={getDisplayValue() || ''}
               placeholder={fieldPlaceholder}
               readOnly
               onClick={() => !disabled && setIsPickerOpen(true)}

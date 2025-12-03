@@ -2256,37 +2256,37 @@
             "id": "SYSTEM_ADMINISTRATOR",
             "label": "System Administrator",
             "icon": "Shield",
-            "color": "destructive"
+            "color": "red"
           },
           {
             "id": "BUSINESS_ADMINISTRATOR",
             "label": "Business Administrator",
             "icon": "Briefcase",
-            "color": "warning"
+            "color": "amber"
           },
           {
             "id": "GENERAL_ROLE",
             "label": "General Role",
             "icon": "User",
-            "color": "default"
+            "color": "slate"
           },
           {
             "id": "SUBSIDIARY_COMPANY",
             "label": "Subsidiary Company",
             "icon": "Building",
-            "color": "default"
+            "color": "slate"
           },
           {
             "id": "VENDOR",
             "label": "Vendor",
             "icon": "ShoppingBasket",
-            "color": "success"
+            "color": "emerald"
           },
           {
             "id": "CUSTOMER",
             "label": "Customer",
             "icon": "User",
-            "color": "default"
+            "color": "slate"
           }
         ],
         "validation": {
@@ -3732,18 +3732,7 @@
     "description": "Define reusable status items with label, icon, color, and inactive handling",
     "singular_name": "Status Item",
     "plural_name": "Status Items",
-    "cardMetadata": [
-      {
-        "id": "status-item-info",
-        "title": "Status Item Information",
-        "colSpan": 1,
-        "fieldIds": [
-          "status-item-label",
-          "status-item-icon",
-          "status-item-color"
-        ]
-      }
-    ],
+    "cardMetadata": [],
     "fields": [
       {
         "id": "status-item-label",

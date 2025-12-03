@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 import React from 'react';
-import { ArrowLeft, Edit, RefreshCw, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, RefreshCw, Trash2, LayoutList } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
 import { Badge } from '../../../components/ui/badge';
@@ -26,6 +26,7 @@ import { CopyContent } from '../../form-builder/form-elements/components/CopyCon
 import { FormModal } from '../../form-builder';
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Skeleton } from '../../../components/ui/skeleton';
+import Link from 'next/link';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { RepeatingTableRendererConfig } from '@/gradian-ui/schema-manager/types/form-schema';
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';
@@ -611,6 +612,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                 {/* Action buttons skeleton */}
                 {showActions && (
                   <div className="flex items-center space-x-2">
+                    <Skeleton className="h-10 w-24" />
                     <Skeleton className="h-10 w-20" />
                     <Skeleton className="h-10 w-20" />
                   </div>
@@ -970,8 +972,16 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                 </Button>
               )}
 
-              {showActions && (onEdit || onDelete || onRefreshData) && (
+              {showActions && (onEdit || onDelete || onRefreshData || schema?.id) && (
                 <div className="flex items-center space-x-2">
+                  {schema?.id && (
+                    <Button variant="outline" asChild className="px-4 py-2 gap-2">
+                      <Link href={`/page/${schema.id}`}>
+                        <LayoutList className="h-4 w-4" />
+                        <span className="hidden md:block">View List</span>
+                      </Link>
+                    </Button>
+                  )}
                   {onRefreshData && (
                     <Button
                       variant="outline"

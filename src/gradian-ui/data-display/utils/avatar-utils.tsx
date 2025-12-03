@@ -97,6 +97,31 @@ export const AVATAR_COLOR_MAP: Record<string, { bg: string; text: string; border
     text: 'text-slate-700 dark:text-slate-100',
     border: 'border-slate-100 dark:border-slate-500/40',
   },
+  rose: {
+    bg: 'bg-rose-50 dark:bg-rose-500/15',
+    text: 'text-rose-700 dark:text-rose-100',
+    border: 'border-rose-100 dark:border-rose-500/40',
+  },
+  fuchsia: {
+    bg: 'bg-fuchsia-50 dark:bg-fuchsia-500/15',
+    text: 'text-fuchsia-700 dark:text-fuchsia-100',
+    border: 'border-fuchsia-100 dark:border-fuchsia-500/40',
+  },
+  lime: {
+    bg: 'bg-lime-50 dark:bg-lime-500/15',
+    text: 'text-lime-700 dark:text-lime-100',
+    border: 'border-lime-100 dark:border-lime-500/40',
+  },
+  sky: {
+    bg: 'bg-sky-50 dark:bg-sky-500/15',
+    text: 'text-sky-700 dark:text-sky-100',
+    border: 'border-sky-100 dark:border-sky-500/40',
+  },
+  zinc: {
+    bg: 'bg-zinc-50 dark:bg-zinc-500/15',
+    text: 'text-zinc-700 dark:text-zinc-100',
+    border: 'border-zinc-100 dark:border-zinc-500/40',
+  },
 };
 
 /**

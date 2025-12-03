@@ -166,7 +166,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
                   targetSchema: schema.id,
                   description: `Choose a parent ${schema.singular_name || 'item'} for hierarchical view`,
                 }}
-                value={values.parent}
+                value={values.parent === undefined ? null : values.parent}
                 onChange={(selections) => {
                   let nextValue: any = null;
                   if (selections && Array.isArray(selections) && selections.length > 0) {

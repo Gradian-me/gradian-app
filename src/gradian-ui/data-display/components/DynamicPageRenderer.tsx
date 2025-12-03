@@ -1080,6 +1080,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             expandAllTrigger={hierarchyExpandToken}
             collapseAllTrigger={hierarchyCollapseToken}
             isLoading={isLoading}
+            showUserDetails={showMetadataColumns}
           />
         ) : groupedEntities ? (
           // Grouped view with accordion
@@ -1160,6 +1161,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                             onDelete={handleDeleteWithConfirmation}
                             className={isEditLoading[entity.id] ? "opacity-70" : ""}
                             highlightQuery={debouncedSearchTerm}
+                            showUserDetails={showMetadataColumns}
                           />
                         </div>
                       ))}
@@ -1231,6 +1233,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                           onDelete={handleDeleteWithConfirmation}
                           className={isEditLoading[entity.id] ? "opacity-70" : ""}
                           highlightQuery={debouncedSearchTerm}
+                          showUserDetails={showMetadataColumns}
                         />
                       </div>
                     ))}
@@ -1300,7 +1303,8 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                     }}
                     onDelete={handleDeleteWithConfirmation}
                     className={isEditLoading[entity.id] ? "opacity-70" : ""}
-                  highlightQuery={debouncedSearchTerm}
+                    highlightQuery={debouncedSearchTerm}
+                    showUserDetails={showMetadataColumns}
                   />
                 </div>
               ))
@@ -1362,6 +1366,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             const base: Record<string, any> = {};
 
             // Pre-fill parent for hierarchical schemas when creating from a parent item
+            // Note: Parent is pre-filled but not locked, allowing users to change it if needed
             if (fixedParentForCreate && (schema as any).allowHierarchicalParent) {
               base.parent = [
                     {
@@ -1380,7 +1385,6 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                     ) || undefined,
                     },
               ];
-              base.__parentLocked = true;
             }
 
             // Pre-fill related-companies for company-based schemas that support multi-company

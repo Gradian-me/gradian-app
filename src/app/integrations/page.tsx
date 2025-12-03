@@ -133,6 +133,7 @@ export default function IntegrationsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  const [hasInitializedExpanded, setHasInitializedExpanded] = useState(false);
 
   const fetchIntegrations = async () => {
     try {
@@ -440,7 +441,7 @@ export default function IntegrationsPage() {
 
   // Skeleton component for integration cards
   const IntegrationCardSkeleton = () => (
-    <Card className="hover:shadow-lg transition-shadow duration-200">
+    <Card className="bg-gray-100 dark:bg-gray-800 hover:shadow-lg transition-shadow duration-200">
       <CardContent className="p-6">
         <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
           <div className="flex-1 min-w-0 w-full sm:w-auto">
@@ -613,12 +614,13 @@ export default function IntegrationsPage() {
     await fetchIntegrations();
   };
 
-  // Initialize expanded categories to all categories when they change
+  // Initialize expanded categories to all categories only once on initial load
   useEffect(() => {
-    if (sortedCategories.length > 0 && expandedCategories.length === 0) {
+    if (!hasInitializedExpanded && sortedCategories.length > 0) {
       setExpandedCategories([...sortedCategories]);
+      setHasInitializedExpanded(true);
     }
-  }, [sortedCategories, expandedCategories.length]);
+  }, [sortedCategories, hasInitializedExpanded]);
 
   const handleExpandAll = useCallback(() => {
     if (sortedCategories.length > 0) {

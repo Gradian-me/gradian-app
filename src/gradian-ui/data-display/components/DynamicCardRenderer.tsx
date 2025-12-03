@@ -43,6 +43,10 @@ export interface DynamicCardRendererProps {
    * When true, the card is rendered inside a dialog and should not behave like a clickable/focusable card.
    */
   isInDialog?: boolean;
+  /**
+   * When true, shows user details (created/updated metadata)
+   */
+  showUserDetails?: boolean;
 }
 
 export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
@@ -60,6 +64,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   disableAnimation = false,
   highlightQuery = '',
   isInDialog = false,
+  showUserDetails = false,
 }) => {
   const router = useRouter();
   const normalizedHighlightQuery = highlightQuery.trim();
@@ -635,21 +640,23 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
               )}
 
               {/* Entity Metadata */}
-              <motion.div
-                initial={disableAnimation ? false : { opacity: 0, y: 5 }}
-                animate={disableAnimation ? false : { opacity: 1, y: 0 }}
-                transition={disableAnimation ? {} : { duration: 0.3 }}
-                className="w-full mb-3 pt-2 border-t border-gray-200 dark:border-gray-600"
-              >
-                <EntityMetadata
-                  createdAt={data.createdAt}
-                  createdBy={data.createdBy}
-                  updatedAt={data.updatedAt}
-                  updatedBy={data.updatedBy}
-                  variant="compact"
-                  avatarType="user"
-                />
-              </motion.div>
+              {showUserDetails && (
+                <motion.div
+                  initial={disableAnimation ? false : { opacity: 0, y: 5 }}
+                  animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+                  transition={disableAnimation ? {} : { duration: 0.3 }}
+                  className="w-full mb-3 pt-2 border-t border-gray-200 dark:border-gray-600"
+                >
+                  <EntityMetadata
+                    createdAt={data.createdAt}
+                    createdBy={data.createdBy}
+                    updatedAt={data.updatedAt}
+                    updatedBy={data.updatedBy}
+                    variant="compact"
+                    avatarType="user"
+                  />
+                </motion.div>
+              )}
 
               {/* Due Date Countdown */}
               {hasDuedateField && cardConfig.duedateField && (
@@ -799,21 +806,23 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     </motion.div>
                   )}
                   {/* Entity Metadata */}
-                  <motion.div
-                    initial={disableAnimation ? false : { opacity: 0, x: 5 }}
-                    animate={disableAnimation ? false : { opacity: 1, x: 0 }}
-                    transition={disableAnimation ? {} : { duration: 0.3 }}
-                    className="mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800"
-                  >
-                    <EntityMetadata
-                      createdAt={data.createdAt}
-                      createdBy={data.createdBy}
-                      updatedAt={data.updatedAt}
-                      updatedBy={data.updatedBy}
-                      variant="compact"
-                      avatarType="user"
-                    />
-                  </motion.div>
+                  {showUserDetails && (
+                    <motion.div
+                      initial={disableAnimation ? false : { opacity: 0, x: 5 }}
+                      animate={disableAnimation ? false : { opacity: 1, x: 0 }}
+                      transition={disableAnimation ? {} : { duration: 0.3 }}
+                      className="mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800"
+                    >
+                      <EntityMetadata
+                        createdAt={data.createdAt}
+                        createdBy={data.createdBy}
+                        updatedAt={data.updatedAt}
+                        updatedBy={data.updatedBy}
+                        variant="compact"
+                        avatarType="user"
+                      />
+                    </motion.div>
+                  )}
                   <div
                     className="mt-1"
                     onClick={(e) => e.stopPropagation()}

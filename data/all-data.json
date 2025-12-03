@@ -978,7 +978,7 @@
           "id": "SYSTEM_ADMINISTRATOR",
           "label": "System Administrator",
           "icon": "Shield",
-          "color": "destructive"
+          "color": "red"
         }
       ],
       "color": "rose",
@@ -997,7 +997,7 @@
           "id": "BUSINESS_ADMINISTRATOR",
           "label": "Business Administrator",
           "icon": "Briefcase",
-          "color": "warning"
+          "color": "amber"
         }
       ],
       "color": "amber",
@@ -1067,7 +1067,7 @@
           "id": "VENDOR",
           "label": "Vendor",
           "icon": "ShoppingBasket",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "color": "emerald",
@@ -1114,7 +1114,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9YDFQ30N3GMGZZTEDX2XN2",
       "createdAt": "2025-11-30T08:35:06.084Z",
-      "updatedAt": "2025-11-30T08:35:06.084Z",
+      "updatedAt": "2025-12-03T07:54:31.706Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
@@ -2894,11 +2894,12 @@
         }
       ],
       "title": "Progress Status",
-      "incomplete": true,
+      "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBHD90EMZKAT502KNVVDQZC7",
       "createdAt": "2025-12-03T06:09:29.057Z",
-      "updatedAt": "2025-12-03T06:09:29.058Z"
+      "updatedAt": "2025-12-03T07:18:35.701Z",
+      "status-items-section": []
     },
     {
       "related-companies": [
@@ -2984,6 +2985,66 @@
       "id": "01KBHDWYYB2TZT92CM9MJEMK3B",
       "createdAt": "2025-12-03T06:20:22.867Z",
       "updatedAt": "2025-12-03T06:20:22.867Z"
+    },
+    {
+      "label": "Not Started",
+      "color": "blue",
+      "icon": "ClockFading",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBHGRPA3CWWXY3YXJPB6667Q",
+      "createdAt": "2025-12-03T07:10:28.682Z",
+      "updatedAt": "2025-12-03T07:21:00.531Z"
+    },
+    {
+      "label": "In Progress",
+      "icon": "LucideClock8",
+      "color": "amber",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBHGVA9789N2GWB9XKT6RQ06",
+      "createdAt": "2025-12-03T07:11:54.776Z",
+      "updatedAt": "2025-12-03T07:11:54.776Z"
+    },
+    {
+      "label": "Completed",
+      "icon": "CircleCheckBig",
+      "color": "emerald",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBHGZWFD2YC1F0QWGFS8F37Z",
+      "createdAt": "2025-12-03T07:14:24.370Z",
+      "updatedAt": "2025-12-03T07:14:24.370Z"
+    },
+    {
+      "label": "Cancelled",
+      "icon": "Ban",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBHH1R4BYJABP7B03NPJNY2K",
+      "createdAt": "2025-12-03T07:15:25.464Z",
+      "updatedAt": "2025-12-03T07:17:00.886Z",
+      "color": "slate"
+    },
+    {
+      "label": "Pending",
+      "icon": "GitBranch",
+      "color": "orange",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBHH3HNFG1P7E4GTJGE3B19W",
+      "createdAt": "2025-12-03T07:16:24.379Z",
+      "updatedAt": "2025-12-03T07:16:24.379Z"
+    },
+    {
+      "label": "Hold",
+      "icon": "CircleStop",
+      "color": "stone",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBHH7BZ83ZVRY03177ECHBWV",
+      "createdAt": "2025-12-03T07:18:29.621Z",
+      "updatedAt": "2025-12-03T07:18:29.621Z"
     }
   ],
   "tenants": [

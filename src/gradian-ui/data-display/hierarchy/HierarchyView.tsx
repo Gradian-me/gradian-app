@@ -29,6 +29,7 @@ export interface HierarchyViewProps {
   expandAllTrigger?: number;
   collapseAllTrigger?: number;
   isLoading?: boolean; // Loading state for skeleton display
+  showUserDetails?: boolean; // When true, shows user details (created/updated metadata)
 }
 
 const nodeVariants = {
@@ -74,6 +75,7 @@ interface HierarchyNodeProps {
   index: number;
   schema: FormSchema;
   expandedIds: Set<string>;
+  showUserDetails?: boolean; // When true, shows user details (created/updated metadata)
 }
 
 const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
@@ -90,6 +92,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
   index,
   schema,
   expandedIds,
+  showUserDetails = false,
 }) => {
   const entity = node.entity;
   const title =
@@ -184,16 +187,18 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                   </div>
                 )}
                 {/* Entity Metadata */}
-                <div className="mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800">
-                  <EntityMetadata
-                    createdAt={entity.createdAt}
-                    createdBy={entity.createdBy}
-                    updatedAt={entity.updatedAt}
-                    updatedBy={entity.updatedBy}
-                    variant="minimal"
-                    avatarType="user"
-                  />
-                </div>
+                {showUserDetails && (
+                  <div className="mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800">
+                    <EntityMetadata
+                      createdAt={entity.createdAt}
+                      createdBy={entity.createdBy}
+                      updatedAt={entity.updatedAt}
+                      updatedBy={entity.updatedBy}
+                      variant="minimal"
+                      avatarType="user"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
@@ -249,6 +254,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                 index={index + idx + 1}
                 schema={schema}
                 expandedIds={expandedIds}
+                showUserDetails={showUserDetails}
               />
             ))}
           </motion.div>
@@ -270,6 +276,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
   expandAllTrigger,
   collapseAllTrigger,
   isLoading = false,
+  showUserDetails = false,
 }) => {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
@@ -427,6 +434,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
               index={index}
               schema={schema}
               expandedIds={expandedIds}
+              showUserDetails={showUserDetails}
             />
           ))
         )}

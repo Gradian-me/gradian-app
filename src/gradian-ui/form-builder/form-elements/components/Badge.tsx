@@ -28,6 +28,8 @@ const getPastelBadgeClasses = (color: string): string => {
     rose: 'bg-rose-50 text-rose-700 border border-rose-100 dark:bg-rose-500/15 dark:text-rose-100 dark:border-rose-500/40 hover:bg-rose-100 dark:hover:bg-rose-500/25 transition-colors',
     fuchsia: 'bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-100 dark:bg-fuchsia-500/15 dark:text-fuchsia-100 dark:border-fuchsia-500/40 hover:bg-fuchsia-100 dark:hover:bg-fuchsia-500/25 transition-colors',
     lime: 'bg-lime-50 text-lime-700 border border-lime-100 dark:bg-lime-500/15 dark:text-lime-100 dark:border-lime-500/40 hover:bg-lime-100 dark:hover:bg-lime-500/25 transition-colors',
+    stone: 'bg-stone-50 text-stone-700 border border-stone-100 dark:bg-stone-500/15 dark:text-stone-100 dark:border-stone-500/40 hover:bg-stone-100 dark:hover:bg-stone-500/25 transition-colors',
+    neutral: 'bg-neutral-50 text-neutral-700 border border-neutral-100 dark:bg-neutral-500/15 dark:text-neutral-100 dark:border-neutral-500/40 hover:bg-neutral-100 dark:hover:bg-neutral-500/25 transition-colors',
   };
 
   return colorMap[color.toLowerCase()] || colorMap.gray;

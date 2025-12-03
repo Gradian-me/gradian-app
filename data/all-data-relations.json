@@ -328,5 +328,65 @@
     "id": "01KBHDWZ2T6WQJN0VZQ9SDKTNS",
     "createdAt": "2025-12-03T06:20:23.002Z",
     "updatedAt": "2025-12-03T06:20:23.002Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBHD90EMZKAT502KNVVDQZC7",
+    "targetSchema": "status-items",
+    "targetId": "01KBHGRPA3CWWXY3YXJPB6667Q",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBHGRY38YYYCH9GDQPP5WBSW",
+    "createdAt": "2025-12-03T07:10:36.647Z",
+    "updatedAt": "2025-12-03T07:10:36.647Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBHD90EMZKAT502KNVVDQZC7",
+    "targetSchema": "status-items",
+    "targetId": "01KBHGVA9789N2GWB9XKT6RQ06",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBHGVB7SBZ536N8SX62E9HKV",
+    "createdAt": "2025-12-03T07:11:55.641Z",
+    "updatedAt": "2025-12-03T07:11:55.641Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBHD90EMZKAT502KNVVDQZC7",
+    "targetSchema": "status-items",
+    "targetId": "01KBHGZWFD2YC1F0QWGFS8F37Z",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBHH03H86RJC7VEEVCWW73TV",
+    "createdAt": "2025-12-03T07:14:31.591Z",
+    "updatedAt": "2025-12-03T07:14:31.591Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBHD90EMZKAT502KNVVDQZC7",
+    "targetSchema": "status-items",
+    "targetId": "01KBHH1R4BYJABP7B03NPJNY2K",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBHH1R8KG66CC1RPZ1RJ7MXK",
+    "createdAt": "2025-12-03T07:15:25.587Z",
+    "updatedAt": "2025-12-03T07:15:25.587Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBHD90EMZKAT502KNVVDQZC7",
+    "targetSchema": "status-items",
+    "targetId": "01KBHH3HNFG1P7E4GTJGE3B19W",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBHH3HSD5VNRFVM7CFVG6SWR",
+    "createdAt": "2025-12-03T07:16:24.493Z",
+    "updatedAt": "2025-12-03T07:16:24.493Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBHD90EMZKAT502KNVVDQZC7",
+    "targetSchema": "status-items",
+    "targetId": "01KBHH7BZ83ZVRY03177ECHBWV",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBHH7C1QGMS54XPVZBEWYTGB",
+    "createdAt": "2025-12-03T07:18:29.687Z",
+    "updatedAt": "2025-12-03T07:18:29.687Z"
   }
 ]
