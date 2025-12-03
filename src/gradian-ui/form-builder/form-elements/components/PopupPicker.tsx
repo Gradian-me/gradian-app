@@ -37,6 +37,7 @@ import { buildHierarchyTree, getAncestorIds, HierarchyNode } from '@/gradian-ui/
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
 import { Plus } from 'lucide-react';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
+import { fetchOptionsFromSchemaOrUrl } from '../utils/fetch-options-utils';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 8, scale: 0.99 },
@@ -382,43 +383,6 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     setPendingSelections(new Map());
   }, [selectedIds]);
 
-  const buildSourceRequestUrl = useCallback(
-    (pageToLoad: number, forceRefresh = false) => {
-      if (!effectiveSourceUrl) {
-        return '';
-      }
-      const paramRecord: Record<string, string> = {
-        page: pageToLoad.toString(),
-        limit: effectivePageSize.toString(),
-      };
-      const trimmedSearch = searchQuery.trim();
-      if (trimmedSearch) {
-        paramRecord.search = trimmedSearch;
-      }
-      if (includeIds && includeIds.length > 0) {
-        paramRecord.includeIds = includeIds.join(',');
-      }
-      if (excludeIds && excludeIds.length > 0) {
-        paramRecord.excludeIds = excludeIds.join(',');
-      }
-      if (companyQueryParam) {
-        paramRecord.companyIds = companyQueryParam;
-      }
-      // Add cache-busting parameter for refresh
-      if (forceRefresh) {
-        paramRecord._t = Date.now().toString();
-      }
-      const params = mapRequestParams(paramRecord, columnMap);
-      const queryString = params.toString();
-      
-      // Always use relative URLs so requests go through Next.js API routes
-      // The API routes will check isDemoModeEnabled() and proxy to backend if needed
-      // This centralizes the proxying logic in the API routes
-      const separator = effectiveSourceUrl.includes('?') ? '&' : '?';
-      return `${effectiveSourceUrl}${queryString ? `${separator}${queryString}` : ''}`;
-    },
-    [effectiveSourceUrl, effectivePageSize, searchQuery, includeIds, excludeIds, columnMap, companyQueryParam]
-  );
 
   const fetchSourceItems = useCallback(
     async (pageToLoad = 1, append = false, forceRefresh = false) => {
@@ -440,27 +404,48 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         setIsFetchingMore(true);
       }
       try {
-        const requestUrl = buildSourceRequestUrl(pageToLoad, forceRefresh);
-        const response = await fetch(requestUrl, { cache: 'no-store' });
-        if (!response.ok) {
-          throw new Error(`Failed to fetch items (${response.status})`);
+        const queryParams: Record<string, string> = {
+          page: pageToLoad.toString(),
+          limit: effectivePageSize.toString(),
+        };
+        const trimmedSearch = searchQuery.trim();
+        if (trimmedSearch) {
+          queryParams.search = trimmedSearch;
         }
-        const payload = await response.json();
-        const dataArray = extractItemsFromPayload(payload, columnMap);
-        const sortedArray = sortOptions(dataArray, sortType);
-        setItems((prev) => (append ? [...prev, ...sortedArray] : sortedArray));
-        setFilteredItems((prev) => (append ? [...prev, ...sortedArray] : sortedArray));
+        if (includeIds && includeIds.length > 0) {
+          queryParams.includeIds = includeIds.join(',');
+        }
+        if (excludeIds && excludeIds.length > 0) {
+          queryParams.excludeIds = excludeIds.join(',');
+        }
+        if (companyQueryParam) {
+          queryParams.companyIds = companyQueryParam;
+        }
+        // Add cache-busting parameter for refresh
+        if (forceRefresh) {
+          queryParams._t = Date.now().toString();
+        }
+
+        // Use shared utility function
+        const result = await fetchOptionsFromSchemaOrUrl({
+          sourceUrl: effectiveSourceUrl,
+          queryParams,
+          columnMap,
+          sortType,
+          companyId: companyQueryParam,
+          filterByCompany: shouldFilterByCompany,
+        });
+
+        const dataArray = result.data;
+        setItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
+        setFilteredItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
+        
         setPageMeta((prev) => {
-          const mappedMeta = extractMetaFromPayload(payload, columnMap, {
-            page: pageToLoad,
-            limit: effectivePageSize,
-            totalItems: append ? (prev.totalItems || prev.page * prev.limit) + dataArray.length : dataArray.length,
-            hasMore: undefined,
-          });
-          const nextLimit = mappedMeta.limit ?? effectivePageSize;
-          const nextPage = mappedMeta.page ?? pageToLoad;
-          const nextTotal = mappedMeta.totalItems ?? (append ? (prev.totalItems || prev.page * prev.limit) + dataArray.length : dataArray.length);
-          const derivedHasMore = typeof mappedMeta.hasMore === 'boolean' ? mappedMeta.hasMore : nextPage * nextLimit < nextTotal;
+          const meta = result.meta;
+          const nextLimit = meta?.limit ?? effectivePageSize;
+          const nextPage = meta?.page ?? pageToLoad;
+          const nextTotal = meta?.totalItems ?? (append ? (prev.totalItems || prev.page * prev.limit) + dataArray.length : dataArray.length);
+          const derivedHasMore = typeof meta?.hasMore === 'boolean' ? meta.hasMore : nextPage * nextLimit < nextTotal;
           return {
             page: nextPage,
             limit: nextLimit,
@@ -488,7 +473,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         }
       }
     },
-    [buildSourceRequestUrl, effectivePageSize, effectiveSourceUrl, columnMap, shouldFilterByCompany, companyQueryParam, sortType]
+    [effectiveSourceUrl, effectivePageSize, searchQuery, includeIds, excludeIds, columnMap, shouldFilterByCompany, companyQueryParam, sortType]
   );
 
   const fetchSchemaItems = useCallback(
@@ -511,43 +496,40 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         setIsFetchingMore(true);
       }
       try {
-        const params: Record<string, string> = {
+        const queryParams: Record<string, string> = {
           page: pageToLoad.toString(),
           limit: effectivePageSize.toString(),
         };
         const trimmedSearch = searchQuery.trim();
         if (trimmedSearch) {
-          params.search = trimmedSearch;
+          queryParams.search = trimmedSearch;
         }
         if (includeIds && includeIds.length > 0) {
-          params.includeIds = includeIds.join(',');
+          queryParams.includeIds = includeIds.join(',');
         }
         if (excludeIds && excludeIds.length > 0) {
-          params.excludeIds = excludeIds.join(',');
-        }
-        if (companyQueryParam) {
-          params.companyIds = companyQueryParam;
+          queryParams.excludeIds = excludeIds.join(',');
         }
         // Add cache-busting parameter for refresh
         if (forceRefresh) {
-          params._t = Date.now().toString();
+          queryParams._t = Date.now().toString();
         }
 
-        // Always use apiRequest which goes through Next.js API routes
-        // The API routes will check isDemoModeEnabled() and proxy to backend if needed
-        const response = await apiRequest<any>(`/api/data/${schemaId}`, { params });
+        // Use shared utility function
+        const result = await fetchOptionsFromSchemaOrUrl({
+          schemaId,
+          queryParams,
+          sortType,
+          companyId: companyQueryParam,
+          filterByCompany: shouldFilterByCompany,
+        });
 
-        if (!response.success || !Array.isArray(response.data)) {
-          throw new Error(response.error || 'Failed to fetch items');
-        }
-
-        const dataArray = response.data;
-        const sortedArray = sortOptions(dataArray, sortType);
-        setItems((prev) => (append ? [...prev, ...sortedArray] : sortedArray));
-        setFilteredItems((prev) => (append ? [...prev, ...sortedArray] : sortedArray));
+        const dataArray = result.data;
+        setItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
+        setFilteredItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
 
         setPageMeta((prev) => {
-          const meta = (response as { meta?: { page?: number; limit?: number; totalItems?: number; hasMore?: boolean } }).meta;
+          const meta = result.meta;
           const nextLimit = meta?.limit ?? effectivePageSize;
           const nextPage = meta?.page ?? pageToLoad;
           const nextTotal =
@@ -1153,6 +1135,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
     if (!effectiveSchema) {
       // Fallback rendering with sourceColumnRoles support
+      // Use role-based title from schema (concatenates all fields with role "title")
       const displayName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) || 
           item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
@@ -1426,6 +1409,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
     if (!effectiveSchema) {
       // Fallback rendering with sourceColumnRoles support
+      // Use role-based title from schema (concatenates all fields with role "title")
       const displayName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) || 
           item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`

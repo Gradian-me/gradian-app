@@ -13,6 +13,7 @@ import { motion } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { LoadingSpinner } from '@/gradian-ui/layout/components';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { useTenantStore } from '@/stores/tenant.store';
 
 interface Integration {
   id: string;
@@ -42,6 +43,7 @@ function SyncIntegrationPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const integrationId = searchParams.get('id');
+  const { selectedTenant } = useTenantStore();
 
   const [integration, setIntegration] = useState<Integration | null>(null);
   const [loading, setLoading] = useState(true);
@@ -128,6 +130,7 @@ function SyncIntegrationPageContent() {
         method: 'POST',
         body: {
           id: integration.id,
+          tenantId: selectedTenant ? selectedTenant.id : undefined,
         },
       });
 

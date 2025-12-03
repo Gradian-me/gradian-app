@@ -51,3 +51,4 @@ export * from './components/LanguageSelector';
 export * from './components/ForceIcon';
 export * from './components/QRCodeCanvas';
 export * from './hooks/useOptionsFromUrl';
+export * from './hooks/useOptionsFromSchemaOrUrl';

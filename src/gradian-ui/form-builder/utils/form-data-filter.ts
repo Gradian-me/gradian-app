@@ -105,8 +105,8 @@ export function filterFormDataForSubmission(
   const cleaned: FormData = {};
 
   // Metadata fields that should always be preserved (not in schema but needed for backend)
-  // System section fields: inactive, isForce, forceReason, parent (hierarchical), related-companies (multi-company link), status (status from status group)
-  const metadataFields = new Set(['incomplete', 'sections', 'inactive', 'isForce', 'forceReason', 'parent', 'related-companies', 'status']);
+  // System section fields: inactive, isForce, forceReason, parent (hierarchical), related-companies (multi-company link), status (status from status group), assignedTo, dueDate
+  const metadataFields = new Set(['incomplete', 'sections', 'inactive', 'isForce', 'forceReason', 'parent', 'related-companies', 'status', 'assignedTo', 'dueDate']);
 
   Object.keys(formData).forEach(key => {
     const value = formData[key];
@@ -122,7 +122,7 @@ export function filterFormDataForSubmission(
       return;
     }
 
-    // Preserve metadata fields (like incomplete flag), with special handling for parent
+    // Preserve metadata fields (like incomplete flag), with special handling for parent and assignedTo
     if (metadataFields.has(key)) {
       if (key === 'parent') {
         // Normalize parent to a single ID (not array of objects) so latest parent data is always resolved dynamically
@@ -138,6 +138,17 @@ export function filterFormDataForSubmission(
           parentId = String((value as any).id);
         }
         cleaned[key] = parentId ?? null;
+      } else if (key === 'assignedTo') {
+        // Normalize assignedTo - PickerInput returns array of NormalizedOption objects
+        // Store as array of selection objects (preserve full normalized option for metadata)
+        if (Array.isArray(value) && value.length > 0) {
+          cleaned[key] = value; // Keep as array of normalized options
+        } else if (value && typeof value === 'object' && (value as any).id) {
+          // Single object, wrap in array
+          cleaned[key] = [value];
+        } else {
+          cleaned[key] = null;
+        }
       } else {
         cleaned[key] = value;
       }

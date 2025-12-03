@@ -406,13 +406,28 @@
       "inquiry-items": [],
       "id": "01K945BGN1YV7RG3XKG169CGS1",
       "createdAt": "2025-11-03T06:09:31.312Z",
-      "updatedAt": "2025-11-26T06:38:08.502Z",
+      "updatedAt": "2025-12-03T12:10:54.287Z",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "inquiry-vendors": [],
       "incomplete": false,
       "contacts": [],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBHH3HNFG1P7E4GTJGE3B19W",
+          "label": "Pending",
+          "icon": "GitBranch",
+          "color": "orange"
+        }
+      ],
+      "assignedTo": [
+        {
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+          "label": "Mahyar Abidi"
+        }
+      ],
+      "dueDate": "2025-12-11"
     },
     {
       "number": "AGN-2025-12",
@@ -1752,10 +1767,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-03T11:28:14.096Z",
+      "updatedAt": "2025-12-03T14:08:50.896Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-12-03T11:28:14.096Z",
+      "lastSynced": "2025-12-03T14:08:50.896Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1768,7 +1783,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 29 schemas: 29 succeeded, 0 failed (0 created, 29 updated)"
+      "lastSyncMessage": "Processed 26 schemas: 26 succeeded, 0 failed (26 created, 0 updated)"
     },
     {
       "color": "blue",
@@ -1795,8 +1810,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-03T11:21:46.487Z",
-      "lastSynced": "2025-12-03T11:21:46.487Z",
+      "updatedAt": "2025-12-03T14:09:05.744Z",
+      "lastSynced": "2025-12-03T14:09:05.744Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1809,7 +1824,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Generated relations for 29 out of 29 schemas"
+      "lastSyncMessage": "Generated relations for 26 out of 26 schemas"
     },
     {
       "color": "blue",
@@ -1855,9 +1870,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-03T11:11:09.811Z",
+      "updatedAt": "2025-12-03T14:09:44.646Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-03T11:11:09.811Z",
+      "lastSynced": "2025-12-03T14:09:44.646Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1868,7 +1883,8 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 147, nodes updated: 5, edges created: 39, nodes failed: 0, edges failed: 0."
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 144, nodes updated: 5, edges created: 37, nodes failed: 0, edges failed: 0.",
+      "isTenantBased": false
     },
     {
       "color": "teal",
@@ -1989,8 +2005,8 @@
       ],
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-12-02T15:53:30.250Z",
-      "lastSynced": "2025-12-02T15:53:30.250Z",
+      "updatedAt": "2025-12-03T13:10:28.734Z",
+      "lastSynced": "2025-12-03T13:10:28.734Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2002,7 +2018,8 @@
         }
       ],
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "lastSyncMessage": "Replaced all variables: deleted 20, created 20"
     },
     {
       "color": "blue",
@@ -2040,7 +2057,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-02T15:02:49.873Z",
+      "updatedAt": "2025-12-03T12:51:12.732Z",
       "lastSynced": "2025-12-02T10:39:58.243Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2051,7 +2068,8 @@
           "icon": "Rocket",
           "color": "emerald"
         }
-      ]
+      ],
+      "isTenantBased": true
     }
   ],
   "databases": [
@@ -2592,94 +2610,6 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
-  "mcp-tools": [
-    {
-      "title": "Weather Tool",
-      "name": "weather_tool",
-      "protocol": [
-        {
-          "id": "Rest",
-          "label": "Rest"
-        }
-      ],
-      "method": [
-        {
-          "id": "GET",
-          "label": "GET"
-        }
-      ],
-      "retryPolicy": [
-        {
-          "id": "try-5-times-every-5-seconds",
-          "label": "Try 5 times every 5 seconds"
-        }
-      ],
-      "id": "01KAE8W40RKM03W8QNJQ61R08J",
-      "createdAt": "2025-11-19T14:39:07.325Z",
-      "updatedAt": "2025-11-19T14:39:49.712Z",
-      "url": [
-        {
-          "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
-          "label": "Schema Bulk Sync",
-          "metadata": {
-            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas"
-          }
-        }
-      ],
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    }
-  ],
-  "mcp-examples": [
-    {
-      "userPrompt": "Test User Prompt",
-      "bodyType": [
-        {
-          "id": "string",
-          "label": "String"
-        }
-      ],
-      "bodyExample": "What is the weather at tehran",
-      "responseExample": "{\"data\":\"27\"}",
-      "responseType": [
-        {
-          "id": "object",
-          "label": "Object"
-        }
-      ],
-      "id": "01KAE92V7SR58K6G2V0NY5K8JX",
-      "createdAt": "2025-11-19T14:42:47.704Z",
-      "updatedAt": "2025-11-19T14:42:47.704Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    }
-  ],
-  "ai-agents": [
-    {
-      "title": "MRP Agent",
-      "name": "mrp_agent",
-      "tags": [
-        {
-          "id": "01KAE9PZYDK8XYP0PNDHX0HGFN",
-          "label": "MRP",
-          "icon": "ShoppingBasket"
-        }
-      ],
-      "systemPrompt": "xxx",
-      "developerPrompt": "yyy",
-      "id": "01KAE9TE111735AEBZD5ZHT3E5",
-      "createdAt": "2025-11-19T14:55:40.631Z",
-      "updatedAt": "2025-11-19T14:56:55.289Z",
-      "mcp-tools": [
-        {
-          "id": "01KAE8W40RKM03W8QNJQ61R08J",
-          "label": "Weather Tool"
-        }
-      ],
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    }
-  ],
   "app-permissions": [
     {
       "resourceType": [
@@ -2857,7 +2787,7 @@
     },
     {
       "menuTitle": "Schema Builder",
-      "menuIcon": "FileCode",
+      "menuIcon": "PencilRuler",
       "hideInAD": false,
       "description": "Build and manage schemas",
       "menuUrl": "/builder/schemas",
@@ -2870,7 +2800,7 @@
     },
     {
       "menuTitle": "Builder",
-      "menuIcon": "PencilRuler",
+      "menuIcon": "FileCode",
       "hideInAD": false,
       "description": "Form and schema builder",
       "menuUrl": "/builder",

@@ -83,6 +83,12 @@ export const getFieldsByRole = (schema: FormSchema, role: string): any[] => {
         fields.push(field);
       }
     });
+    // Sort by order to ensure consistent concatenation order
+    fields.sort((a, b) => {
+      const orderA = a.order ?? 999;
+      const orderB = b.order ?? 999;
+      return orderA - orderB;
+    });
   }
   return fields;
 };

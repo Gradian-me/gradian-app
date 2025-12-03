@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +34,96 @@ import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { Select } from '@/gradian-ui/form-builder/form-elements';
+
+// Card-specific Tenant Selector Component (uses local state, not global store)
+interface CardTenantSelectorProps {
+  integrationId: string;
+  selectedTenant: { id: string | number; name: string; domain?: string; [key: string]: any } | null;
+  onTenantChange: (tenant: { id: string | number; name: string; domain?: string; [key: string]: any } | null) => void;
+}
+
+interface Tenant {
+  id: string | number;
+  name: string;
+  title?: string;
+  domain?: string;
+  [key: string]: any;
+}
+
+const CardTenantSelector: React.FC<CardTenantSelectorProps> = ({ integrationId, selectedTenant, onTenantChange }) => {
+  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTenants = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await apiRequest<Tenant[] | { data?: Tenant[]; items?: Tenant[] }>(
+          '/api/data/tenants',
+          { method: 'GET' }
+        );
+
+        if (response.success && response.data) {
+          const data = Array.isArray(response.data)
+            ? response.data
+            : ((response.data as any)?.data || (response.data as any)?.items || []);
+          setTenants(data);
+        } else {
+          setError(response.error || 'Failed to load tenants');
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load tenants';
+        setError(message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void fetchTenants();
+  }, []);
+
+  const options = useMemo(
+    () =>
+      tenants.map((tenant) => ({
+        id: String(tenant.id),
+        label: tenant.title || tenant.name || String(tenant.id),
+      })),
+    [tenants]
+  );
+
+  const currentValue = selectedTenant ? String(selectedTenant.id) : undefined;
+
+  const handleChange = (value: string) => {
+    const tenant = tenants.find((t) => String(t.id) === value) || null;
+    if (tenant) {
+      // Ensure domain is included in the tenant object
+      const fullTenant = {
+        ...tenant,
+        domain: tenant.domain || '',
+      };
+      onTenantChange(fullTenant);
+    } else {
+      onTenantChange(null);
+    }
+  };
+
+  return (
+    <div>
+      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Tenant</label>
+      <Select
+        options={options}
+        value={currentValue}
+        onValueChange={handleChange}
+        placeholder="Select tenant"
+        config={{ name: `tenant-${integrationId}`, label: 'Tenant' }}
+        error={error || undefined}
+      />
+    </div>
+  );
+};
 
 // Helper to get icon background and text color classes from Tailwind color name
 const getIconColorClasses = (color: string): { bg: string; text: string } => {
@@ -109,6 +199,7 @@ interface Integration {
   sourceMethod?: 'GET' | 'POST';
   sourceDataPath?: string;
   category?: string | { label?: string; value?: string; id?: string; icon?: string; color?: string } | Array<{ label?: string; value?: string; id?: string; icon?: string; color?: string }>;
+  isTenantBased?: boolean;
 }
 
 interface EmailTemplateSyncResponse {
@@ -123,6 +214,8 @@ interface EmailTemplateSyncResponse {
 export default function IntegrationsPage() {
   const router = useRouter();
   const [integrations, setIntegrations] = useState<Integration[]>([]);
+  // Store selected tenant per integration card (keyed by integration ID)
+  const [cardTenants, setCardTenants] = useState<Record<string, { id: string | number; name: string; domain?: string; [key: string]: any } | null>>({});
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState<Set<string>>(new Set());
   const [syncResponse, setSyncResponse] = useState<Record<string, EmailTemplateSyncResponse | string | null>>({});
@@ -137,6 +230,7 @@ export default function IntegrationsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   const [hasInitializedExpanded, setHasInitializedExpanded] = useState(false);
+
 
   const fetchIntegrations = async () => {
     try {
@@ -274,6 +368,12 @@ export default function IntegrationsPage() {
   };
 
   const handleSync = async (integration: Integration) => {
+    const cardTenant = cardTenants[integration.id];
+    if (integration.isTenantBased && !cardTenant) {
+      toast.error('Please select a tenant before syncing this integration.');
+      return;
+    }
+
     // Add to syncing set
     setSyncing(prev => new Set(prev).add(integration.id));
     setSyncResponse(prev => ({ ...prev, [integration.id]: null }));
@@ -286,6 +386,7 @@ export default function IntegrationsPage() {
         method: 'POST',
         body: {
           id: integration.id,
+          tenantId: cardTenant ? cardTenant.id : undefined,
         },
       });
 
@@ -874,6 +975,7 @@ export default function IntegrationsPage() {
           )}
         </div>
 
+
         {/* Search and Refresh */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1009,6 +1111,22 @@ export default function IntegrationsPage() {
                       <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-3 sm:mb-4 line-clamp-2">
                         {renderHighlightedText(integration.description || '', searchQuery)}
                       </p>
+                      
+                      {/* Tenant Selector for tenant-based integrations */}
+                      {integration.isTenantBased && (
+                        <div className="mb-3">
+                          <CardTenantSelector
+                            integrationId={integration.id}
+                            selectedTenant={cardTenants[integration.id]}
+                            onTenantChange={(tenant) => {
+                              setCardTenants(prev => ({
+                                ...prev,
+                                [integration.id]: tenant,
+                              }));
+                            }}
+                          />
+                        </div>
+                      )}
                       
                       <div className="text-xs sm:text-sm">
                         <div className="flex items-center gap-1.5">

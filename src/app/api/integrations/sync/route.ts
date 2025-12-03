@@ -79,6 +79,53 @@ function isServerDemoMode(): boolean {
   }
 }
 
+function resolveTenantDomainFromId(tenantId: string | number | undefined | null): string | null {
+  if (!tenantId) {
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `resolveTenantDomainFromId: No tenantId provided`);
+    return null;
+  }
+  try {
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `resolveTenantDomainFromId: Looking up tenant with ID: ${tenantId}`);
+    const tenants = readSchemaData<any>('tenants');
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `resolveTenantDomainFromId: Found ${tenants.length} tenants in data`);
+    const tenant = tenants.find(
+      (t: any) =>
+        String(t.id) === String(tenantId) ||
+        (t.name && String(t.name) === String(tenantId))
+    );
+    if (!tenant) {
+      loggingCustom(LogType.INTEGRATION_LOG, 'warn', `resolveTenantDomainFromId: Tenant not found for ID: ${tenantId}`);
+      return null;
+    }
+    if (!tenant.domain) {
+      loggingCustom(LogType.INTEGRATION_LOG, 'warn', `resolveTenantDomainFromId: Tenant found but has no domain field. Tenant: ${JSON.stringify({ id: tenant.id, name: tenant.name })}`);
+      return null;
+    }
+    const rawDomain: string = tenant.domain;
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `resolveTenantDomainFromId: Tenant domain (raw): ${rawDomain}`);
+    try {
+      if (rawDomain.startsWith('http://') || rawDomain.startsWith('https://')) {
+        const url = new URL(rawDomain);
+        const hostname = url.hostname;
+        loggingCustom(LogType.INTEGRATION_LOG, 'info', `resolveTenantDomainFromId: Extracted hostname from URL: ${hostname}`);
+        return hostname;
+      }
+    } catch (urlError) {
+      loggingCustom(LogType.INTEGRATION_LOG, 'warn', `resolveTenantDomainFromId: Failed to parse domain as URL, using as-is: ${rawDomain}`);
+      // Fallback to rawDomain if URL parsing fails
+    }
+    loggingCustom(LogType.INTEGRATION_LOG, 'info', `resolveTenantDomainFromId: Using domain as-is (not a URL): ${rawDomain}`);
+    return rawDomain;
+  } catch (error) {
+    loggingCustom(
+      LogType.INTEGRATION_LOG,
+      'error',
+      `Failed to resolve tenant domain: ${error instanceof Error ? error.message : String(error)}`
+    );
+    return null;
+  }
+}
+
 function findLocalIntegrationById(id: string): IntegrationEntity | null {
   try {
     const integrations = readSchemaData<IntegrationEntity>('integrations');
@@ -272,7 +319,8 @@ async function fetchIntegrationFromApi(id: string): Promise<IntegrationEntity | 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id } = body;
+    const { id, tenantId } = body;
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `POST /api/integrations/sync - Received request with id: ${id}, tenantId: ${tenantId || 'not provided'}`);
     
     // Extract authorization header from incoming request
     let authHeader = request.headers.get('authorization');
@@ -356,6 +404,18 @@ export async function POST(request: NextRequest) {
     }
     
     loggingCustom(LogType.INTEGRATION_LOG, 'info', `Integration found: ${integration.title || integration.name || id}`);
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Integration isTenantBased: ${integration.isTenantBased}, tenantId from request: ${tenantId}`);
+
+    const tenantDomainForHeader =
+      integration.isTenantBased === true ? resolveTenantDomainFromId(tenantId) : null;
+    
+    if (integration.isTenantBased) {
+      if (tenantDomainForHeader) {
+        loggingCustom(LogType.INTEGRATION_LOG, 'info', `Tenant-based integration: Using tenant domain for header: ${tenantDomainForHeader}`);
+      } else {
+        loggingCustom(LogType.INTEGRATION_LOG, 'warn', `Tenant-based integration but no tenant domain resolved. tenantId: ${tenantId}`);
+      }
+    }
     
     // Extract targetRoute - handle string, object, or array (from picker fields)
     loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Extracting targetRoute from integration');
@@ -432,8 +492,12 @@ export async function POST(request: NextRequest) {
             'Content-Type': 'application/json',
             // Pass authorization header to source route if present
             ...(authHeader ? { 'Authorization': authHeader } : {}),
+            // For tenant-based integrations, override tenant domain for source route as well
+            ...(tenantDomainForHeader ? { 'x-tenant-domain': tenantDomainForHeader } : {}),
           },
         };
+        
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Source route headers: ${JSON.stringify(sourceFetchOptions.headers)}`);
         
         // For POST source requests, we might need to send data
         // For now, GET is the default and most common for source routes
@@ -505,6 +569,24 @@ export async function POST(request: NextRequest) {
       const targetHeaders: Record<string, string> = {
         'Content-Type': 'application/json',
       };
+
+      if (tenantDomainForHeader) {
+        // Use lowercase key to match default header naming, and rely on HTTP case-insensitivity
+        targetHeaders['x-tenant-domain'] = tenantDomainForHeader;
+        loggingCustom(
+          LogType.INTEGRATION_LOG,
+          'info',
+          `Using tenant-based x-tenant-domain header for target route: ${tenantDomainForHeader}`
+        );
+      } else if (integration.isTenantBased) {
+        loggingCustom(
+          LogType.INTEGRATION_LOG,
+          'warn',
+          `Tenant-based integration but no tenant domain resolved. Headers will NOT include x-tenant-domain. tenantId: ${tenantId}`
+        );
+      }
+      
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target route headers: ${JSON.stringify(targetHeaders)}`);
       
       // Check if system token should be used instead of client JWT
       let finalAuthHeader: string | null = null;

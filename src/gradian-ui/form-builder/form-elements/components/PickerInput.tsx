@@ -365,7 +365,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       return '';
     }
 
-    // Try to get title field from schema
+    // Try to get title field from schema (uses role-based concatenation)
     const title = getValueByRole(targetSchema, selectedItem, 'title') || selectedItem.name || selectedItem.title || '';
     const subtitle = getSingleValueByRole(targetSchema, selectedItem, 'subtitle') || selectedItem.email || '';
     
@@ -391,7 +391,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       
       {/* Show badges for multiselect mode */}
       {allowMultiselect && normalizedSelection.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 p-2 min-h-[2.5rem] border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
+        <div className="flex flex-wrap items-center gap-2 p-2 min-h-10 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
           <div className="flex flex-wrap gap-2 flex-1">
             {normalizedSelection.map((option) => {
               const optionId = String(option.id || '');
@@ -453,40 +453,148 @@ export const PickerInput: React.FC<PickerInputProps> = ({
         </div>
       )}
       
-      {/* Show input for single select or when no items selected in multiselect */}
+      {/* Show badges or input for single select or when no items selected in multiselect */}
       {(!allowMultiselect || normalizedSelection.length === 0) && (
         <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Input
-              id={fieldName}
-              name={fieldName}
-              type="text"
-              value={getDisplayValue() || ''}
-              placeholder={fieldPlaceholder}
-              readOnly
-              onClick={() => !disabled && setIsPickerOpen(true)}
-              onFocus={onFocus}
-              onBlur={onBlur}
-              disabled={disabled}
-              className={cn(
-                'cursor-pointer',
-                error
-                  ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500'
-                  : ''
-              )}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => !disabled && setIsPickerOpen(true)}
-              disabled={disabled}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          </div>
-          {selectedItem && !disabled && !allowMultiselect && normalizedSelection.length > 0 && (
+          {/* Show badge if selected item has icon or color */}
+          {normalizedSelection.length > 0 && (normalizedSelection[0]?.icon || normalizedSelection[0]?.color) ? (
+            <div className="flex-1 flex items-center gap-2 p-2 min-h-10 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
+              <div className="flex-1">
+                {normalizedSelection.map((option) => {
+                  const optionId = String(option.id || '');
+                  const optionLabel = option.label || optionId;
+                  const optionIcon = option.icon;
+                  const optionColor = option.color;
+                  
+                  // Check if color is a valid badge variant
+                  const isValidBadgeVariant = (color?: string): boolean => {
+                    if (!color) return false;
+                    const validVariants = ['default', 'secondary', 'destructive', 'success', 'warning', 'info', 'outline', 'gradient', 'muted'];
+                    return validVariants.includes(color);
+                  };
+                  
+                  const isHexColor = (color: string): boolean => {
+                    return color.startsWith('#');
+                  };
+                  
+                  const isTailwindClasses = (color: string): boolean => {
+                    return color.includes('bg-') || 
+                           color.includes('text-') || 
+                           color.includes('border-') ||
+                           color.includes('rounded-') ||
+                           /^[a-z]+-[a-z0-9-]+/.test(color);
+                  };
+                  
+                  const iconEl = optionIcon ? (
+                    <IconRenderer iconName={optionIcon} className="h-3 w-3" />
+                  ) : null;
+                  
+                  let badgeContent: React.ReactNode;
+                  
+                  if (optionColor && isValidBadgeVariant(optionColor)) {
+                    badgeContent = (
+                      <Badge variant={optionColor as any} className="flex items-center gap-1.5 px-2 py-1">
+                        {iconEl}
+                        <span className="max-w-[200px] truncate">{optionLabel}</span>
+                      </Badge>
+                    );
+                  } else if (optionColor && isHexColor(optionColor)) {
+                    badgeContent = (
+                      <div 
+                        className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium"
+                        style={{ backgroundColor: optionColor, color: '#fff', border: 'none' }}
+                      >
+                        {iconEl}
+                        <span className="max-w-[200px] truncate">{optionLabel}</span>
+                      </div>
+                    );
+                  } else if (optionColor && isTailwindClasses(optionColor)) {
+                    const hasTextColor = optionColor.includes('text-');
+                    const defaultTextColor = hasTextColor ? '' : 'text-white';
+                    badgeContent = (
+                      <div className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium border ${defaultTextColor} ${optionColor}`}>
+                        {iconEl}
+                        <span className="max-w-[200px] truncate">{optionLabel}</span>
+                      </div>
+                    );
+                  } else {
+                    // Default badge with icon if no color
+                    badgeContent = (
+                      <Badge
+                        variant="outline"
+                        className="flex items-center gap-1.5 px-2 py-1 text-xs bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800"
+                      >
+                        {iconEl}
+                        <span className="max-w-[200px] truncate">{optionLabel}</span>
+                      </Badge>
+                    );
+                  }
+                  
+                  return (
+                    <div key={optionId} className="flex items-center gap-2 flex-1">
+                      {badgeContent}
+                      {!disabled && !allowMultiselect && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleClear}
+                          className="h-7 w-7 p-0 shrink-0"
+                          aria-label={`Clear ${optionLabel}`}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => !disabled && setIsPickerOpen(true)}
+                disabled={disabled}
+                className="h-7 w-7 p-0 shrink-0"
+                aria-label="Change selection"
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            /* Show regular input if no icon/color */
+            <div className="relative flex-1">
+              <Input
+                id={fieldName}
+                name={fieldName}
+                type="text"
+                value={getDisplayValue() || ''}
+                placeholder={fieldPlaceholder}
+                readOnly
+                onClick={() => !disabled && setIsPickerOpen(true)}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                disabled={disabled}
+                className={cn(
+                  'cursor-pointer',
+                  error
+                    ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500'
+                    : ''
+                )}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => !disabled && setIsPickerOpen(true)}
+                disabled={disabled}
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+          {selectedItem && !disabled && !allowMultiselect && normalizedSelection.length > 0 && !(normalizedSelection[0]?.icon || normalizedSelection[0]?.color) && (
             <Button
               type="button"
               variant="ghost"

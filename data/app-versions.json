@@ -1458,7 +1458,31 @@
         ]
       }
     ]
-  }
+  },
+  {
+    "id": "01KBJAEYWY8XVDJMY5R21SVA6N",
+    "timestamp": "2025-12-03T14:39:11.000Z",
+    "version": "1.10.008",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "Modified various data fields in all-data.json for improved tracking, including updated timestamps and added status fields",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "tracking"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved integration sync logic to handle tenant-based configurations and added tenant selection UI components for better user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "integrations",
+          "ui",
+          "tenant-management"
+        ]
+      }
     ]
   }
 ]

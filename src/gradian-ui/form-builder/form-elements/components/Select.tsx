@@ -20,6 +20,7 @@ import { extractFirstId, normalizeOptionArray, NormalizedOption } from '../utils
 import { BadgeViewer } from '../utils/badge-viewer';
 import { Check, ChevronDown } from 'lucide-react';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
+import { useOptionsFromSchemaOrUrl } from '../hooks/useOptionsFromSchemaOrUrl';
 import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
 
@@ -42,11 +43,18 @@ export interface SelectWithBadgesProps extends Omit<SelectProps, 'children'> {
   onNormalizedChange?: (selection: NormalizedOption[]) => void;
   onOpenChange?: (open: boolean) => void;
   /**
+   * Schema ID to fetch options from (e.g., 'users', 'companies')
+   * If provided, will fetch from /api/data/{schemaId}
+   * Takes precedence over options prop if provided
+   */
+  schemaId?: string;
+  /**
    * URL to fetch options from (overrides options prop if provided)
+   * If both schemaId and sourceUrl are provided, sourceUrl takes precedence
    */
   sourceUrl?: string;
   /**
-   * Query parameters to append to sourceUrl
+   * Query parameters to append to sourceUrl or schemaId request
    */
   queryParams?: Record<string, string | number | boolean | string[]>;
   /**
@@ -74,26 +82,29 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   onNormalizedChange,
   onOpenChange,
   disabled,
+  schemaId,
   sourceUrl,
   queryParams,
   transform,
   sortType = null,
   ...props
 }) => {
-  // Fetch options from URL if sourceUrl is provided
+  // Fetch options from schemaId or sourceUrl if provided
   const {
-    options: urlOptions,
+    options: fetchedOptions,
     isLoading: isLoadingOptions,
     error: optionsError,
-  } = useOptionsFromUrl({
+  } = useOptionsFromSchemaOrUrl({
+    schemaId,
     sourceUrl,
-    enabled: Boolean(sourceUrl),
+    enabled: Boolean(schemaId || sourceUrl),
     transform,
     queryParams,
+    sortType,
   });
 
-  // Use URL options if sourceUrl is provided, otherwise use provided options
-  const resolvedOptions = sourceUrl ? urlOptions : options;
+  // Use fetched options if schemaId or sourceUrl is provided, otherwise use provided options
+  const resolvedOptions = (schemaId || sourceUrl) ? fetchedOptions : options;
   const sizeClasses = {
     sm: 'h-8',
     md: 'h-10',
@@ -143,17 +154,19 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   );
 
   const normalizedOptions = useMemo(() => {
-    // If fetching from URL and still loading, return empty array
-    if (sourceUrl && isLoadingOptions) {
+    const isFetching = Boolean(schemaId || sourceUrl);
+    
+    // If fetching and still loading, return empty array
+    if (isFetching && isLoadingOptions) {
       return [] as NormalizedOption[];
     }
-    // If fetching from URL and has error, return empty array
-    if (sourceUrl && optionsError) {
+    // If fetching and has error, return empty array
+    if (isFetching && optionsError) {
       return [] as NormalizedOption[];
     }
-    // If fetching from URL and has options, sort them
-    if (sourceUrl && urlOptions.length > 0) {
-      return sortNormalizedOptions(urlOptions, sortType);
+    // If fetching and has options, they're already sorted by the hook
+    if (isFetching && fetchedOptions.length > 0) {
+      return fetchedOptions;
     }
     // If no resolved options, return empty array
     if (!resolvedOptions || resolvedOptions.length === 0) {
@@ -166,7 +179,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     }));
     // Sort options if sortType is specified
     return sortNormalizedOptions(normalized, sortType);
-  }, [resolvedOptions, sourceUrl, urlOptions, isLoadingOptions, optionsError, sortType]);
+  }, [resolvedOptions, schemaId, sourceUrl, fetchedOptions, isLoadingOptions, optionsError, sortType]);
 
   const normalizedOptionsLookup = useMemo(() => {
     const map = new Map<string, NormalizedOption>();
@@ -551,8 +564,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     );
   };
 
-  // Show loading state if fetching from URL
-  if (sourceUrl && isLoadingOptions) {
+  // Show loading state if fetching from schemaId or sourceUrl
+  if ((schemaId || sourceUrl) && isLoadingOptions) {
     return (
       <div className="w-full">
         {renderFieldLabel()}
@@ -565,8 +578,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     );
   }
 
-  // Show error state if fetching from URL failed
-  if (sourceUrl && optionsError) {
+  // Show error state if fetching from schemaId or sourceUrl failed
+  if ((schemaId || sourceUrl) && optionsError) {
     return (
       <div className="w-full">
         {renderFieldLabel()}

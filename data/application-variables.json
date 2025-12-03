@@ -46,7 +46,7 @@
     "fieldsCount",
     "sectionsCount"
   ],
-  "DEMO_MODE": true,
+  "DEMO_MODE": false,
   "LOGIN_LOCALLY": false,
   "AD_MODE": false,
   "AI_CONFIG": {

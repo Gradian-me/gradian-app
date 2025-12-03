@@ -7,6 +7,7 @@ import { DynamicCardRenderer } from './DynamicCardRenderer';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '../../shared/utils';
 import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
+import { CopyContent } from '../../form-builder/form-elements/components/CopyContent';
 
 export interface DynamicCardDialogProps {
   /**
@@ -87,7 +88,15 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} data-test-id="dynamic-card-dialog">
       <DialogContent className={cn("min-w-2xl min-h-[50vh] max-w-5xl max-h-[90vh] overflow-y-auto", className)} data-test-id="dynamic-card-dialog-content">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
+          <DialogTitle className="text-lg font-semibold flex items-center gap-2">
+            <span>{title}</span>
+            {data?.id && (
+              <>
+                <span className="text-base text-gray-500 dark:text-gray-400 font-normal font-mono">({data.id})</span>
+                <CopyContent content={String(data.id)} />
+              </>
+            )}
+          </DialogTitle>
         </DialogHeader>
         
         <div className="mt-2">
