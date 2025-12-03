@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '../../shared/utils';
 import { PickerInput } from '../form-elements/components/PickerInput';
+import { DateInput } from '../form-elements/components/DateInput';
 import { extractFromDynamicContext } from '../utils/dynamic-context-extractor';
 
 export interface FormSystemSectionProps {
@@ -35,6 +36,8 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
   const shouldShow =
     schema.allowDataInactive === true ||
     schema.allowDataForce === true ||
+    schema.allowDataAssignedTo === true ||
+    schema.allowDataDueDate === true ||
     schema.allowHierarchicalParent === true ||
     schema.canSelectMultiCompanies === true ||
     hasStatusGroup;
@@ -149,6 +152,90 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
             </div>
           )}
 
+          {(schema.allowDataAssignedTo || schema.allowDataDueDate || hasStatusGroup) && (
+            <div className="pt-2 border-t border-dashed border-gray-200 dark:border-gray-700">
+              <div className="grid grid-cols-3 gap-4">
+                {schema.allowDataAssignedTo && (
+                  <div className="space-y-2">
+                    <PickerInput
+                      config={{
+                        name: 'assignedTo',
+                        label: 'Assigned To',
+                        placeholder: 'Select user',
+                        targetSchema: 'users',
+                        metadata: {
+                          allowMultiselect: false,
+                        },
+                      }}
+                      value={Array.isArray(values.assignedTo) ? values.assignedTo : values.assignedTo ? [values.assignedTo] : []}
+                      error={errors?.assignedTo}
+                      touched={typeof touched?.assignedTo === 'boolean' ? touched.assignedTo : undefined}
+                      required={false}
+                      onChange={(selections) => {
+                        onChange('assignedTo', selections);
+                      }}
+                      onBlur={() => onBlur('assignedTo')}
+                      disabled={disabled}
+                      className="w-full"
+                    />
+                  </div>
+                )}
+
+                {schema.allowDataDueDate && (
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="system-due-date"
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      Due Date
+                    </Label>
+                    <DateInput
+                      config={{
+                        name: 'dueDate',
+                        label: undefined,
+                        placeholder: 'Select due date',
+                      }}
+                      value={values.dueDate || ''}
+                      onChange={(newValue) => onChange('dueDate', newValue)}
+                      onBlur={() => onBlur('dueDate')}
+                      disabled={disabled}
+                      className="w-full"
+                    />
+                  </div>
+                )}
+
+                {hasStatusGroup && (
+                  <div className="space-y-2">
+                    <PickerInput
+                      key={`status-picker-${statusSourceUrl}`} // Stable key based on sourceUrl to prevent remounting
+                      config={statusPickerConfig}
+                      value={Array.isArray(values.status) ? values.status : (values.status ? [values.status] : [])}
+                      error={errors?.status}
+                      touched={typeof touched?.status === 'boolean' ? touched.status : undefined}
+                      required={true}
+                      onChange={(selections) => {
+                        // Store full normalized selections so we keep label/icon metadata in data
+                        // For single select (status), prevent clearing only if it's required
+                        // For multi-select, allow clearing but ensure we can still select after clearing
+                        if (Array.isArray(selections)) {
+                          // Always allow the change - don't block clearing
+                          // The validation will handle required field checking
+                          onChange('status', selections);
+                        } else {
+                          // Handle non-array values (shouldn't happen, but be safe)
+                          onChange('status', selections);
+                        }
+                      }}
+                      onBlur={() => onBlur('status')}
+                      disabled={disabled}
+                      className="w-full"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {schema.allowHierarchicalParent && (
             <div className="space-y-2 pt-2 border-t border-dashed border-gray-200 dark:border-gray-700">
               <PickerInput
@@ -211,34 +298,6 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
             </div>
           )}
 
-          {hasStatusGroup && (
-            <div className="space-y-2 pt-2 border-t border-dashed border-gray-200 dark:border-gray-700">
-              <PickerInput
-                key={`status-picker-${statusSourceUrl}`} // Stable key based on sourceUrl to prevent remounting
-                config={statusPickerConfig}
-                value={Array.isArray(values.status) ? values.status : (values.status ? [values.status] : [])}
-                error={errors?.status}
-                touched={typeof touched?.status === 'boolean' ? touched.status : undefined}
-                required={true}
-                onChange={(selections) => {
-                  // Store full normalized selections so we keep label/icon metadata in data
-                  // For single select (status), prevent clearing only if it's required
-                  // For multi-select, allow clearing but ensure we can still select after clearing
-                  if (Array.isArray(selections)) {
-                    // Always allow the change - don't block clearing
-                    // The validation will handle required field checking
-                    onChange('status', selections);
-                  } else {
-                    // Handle non-array values (shouldn't happen, but be safe)
-                    onChange('status', selections);
-                  }
-                }}
-                onBlur={() => onBlur('status')}
-                disabled={disabled}
-                className="w-full"
-              />
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>

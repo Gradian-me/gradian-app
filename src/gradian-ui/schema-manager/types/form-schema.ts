@@ -336,6 +336,16 @@ export interface FormSchema {
   allowDataInactive?: boolean;
   allowDataForce?: boolean;
   allowDataHardDelete?: boolean;
+  /**
+   * When true, shows an "Assigned To" user selector in the System Section.
+   * Stored in data as `assignedTo` (typically an array of selection objects from users schema).
+   */
+  allowDataAssignedTo?: boolean;
+  /**
+   * When true, shows a "Due Date" date picker in the System Section.
+   * Stored in data as `dueDate` (ISO date string compatible with date input).
+   */
+  allowDataDueDate?: boolean;
   allowHierarchicalParent?: boolean;
   /**
    * Optional status group configuration for this schema.

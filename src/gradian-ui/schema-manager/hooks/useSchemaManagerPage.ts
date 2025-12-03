@@ -294,7 +294,20 @@ export const useSchemaManagerPage = () => {
   }, [closeDeleteDialog, deleteDialog.schema, invalidateSchemaQueryCaches, refetchSchemas]);
 
   const handleCreate = useCallback(async (payload: CreateSchemaPayload): Promise<SchemaCreateResult> => {
-    const { schemaId, singularName, pluralName, description, showInNavigation, isSystemSchema, isNotCompanyBased, allowDataInactive, allowDataForce, allowDataHardDelete } = payload;
+    const {
+      schemaId,
+      singularName,
+      pluralName,
+      description,
+      showInNavigation,
+      isSystemSchema,
+      isNotCompanyBased,
+      allowDataInactive,
+      allowDataForce,
+      allowDataHardDelete,
+      allowDataAssignedTo,
+      allowDataDueDate,
+    } = payload;
 
     if (!schemaId || !singularName || !pluralName) {
       return { success: false, error: 'Schema ID, Singular Name, and Plural Name are required' };
@@ -315,6 +328,8 @@ export const useSchemaManagerPage = () => {
         allowDataInactive,
         allowDataForce,
         allowDataHardDelete,
+        allowDataAssignedTo,
+        allowDataDueDate,
         fields: [],
         sections: [],
       };

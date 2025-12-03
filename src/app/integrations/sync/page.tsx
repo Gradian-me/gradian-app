@@ -7,11 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SyncButton } from '@/gradian-ui/form-builder/form-elements';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
-import { ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, AlertCircle, MessageCircle } from 'lucide-react';
 import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { motion } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { LoadingSpinner } from '@/gradian-ui/layout/components';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 interface Integration {
   id: string;
@@ -20,6 +21,7 @@ interface Integration {
   icon: string;
   color: string;
   lastSynced: string;
+  lastSyncMessage?: string;
   targetRoute: string;
   targetMethod?: 'GET' | 'POST';
   sourceRoute?: string;
@@ -278,7 +280,56 @@ function SyncIntegrationPageContent() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Last Synced</p>
-                  <p className="font-medium">{formatDate(integration.lastSynced)}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">{formatDate(integration.lastSynced)}</p>
+                    {integration.lastSyncMessage && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <MessageCircle className="h-4 w-4 text-blue-500 dark:text-blue-400 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent
+                            side="bottom"
+                            sideOffset={8}
+                            className="z-100 max-w-md"
+                            avoidCollisions={true}
+                            collisionPadding={8}
+                          >
+                            <div className="whitespace-pre-wrap text-xs">
+                              {(() => {
+                                if (!integration.lastSyncMessage) return '';
+                                try {
+                                  const parsed = JSON.parse(integration.lastSyncMessage);
+                                  if (Array.isArray(parsed)) {
+                                    return parsed.map((msg: any) => {
+                                      if (typeof msg === 'string') return msg;
+                                      if (msg.message) {
+                                        if (typeof msg.message === 'object') {
+                                          return msg.message.en || msg.message.message || JSON.stringify(msg.message);
+                                        }
+                                        return msg.message;
+                                      }
+                                      if (msg.en) return msg.en;
+                                      if (msg.path && msg.message) return `${msg.path}: ${msg.message}`;
+                                      return JSON.stringify(msg);
+                                    }).join('\n');
+                                  }
+                                  if (typeof parsed === 'object' && parsed !== null) {
+                                    if (parsed.message) return parsed.message;
+                                    if (parsed.en) return parsed.en;
+                                    return JSON.stringify(parsed);
+                                  }
+                                  return String(parsed);
+                                } catch {
+                                  return integration.lastSyncMessage;
+                                }
+                              })()}
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+                  </div>
                 </div>
               </div>
               {integration.sourceRoute && (

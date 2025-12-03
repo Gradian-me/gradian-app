@@ -413,7 +413,7 @@ export function AppListWrapper() {
           <div className="flex flex-row items-center gap-2">
             <div className="flex-1 min-w-0">
               <SearchInput
-                config={{ name: 'search', placeholder: 'Search Apps ...' }}
+                config={{ name: 'search', placeholder: 'Search Apps' }}
                 value={searchQuery}
                 onChange={setSearchQuery}
                 onClear={() => setSearchQuery('')}

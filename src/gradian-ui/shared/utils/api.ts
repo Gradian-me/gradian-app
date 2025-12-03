@@ -85,6 +85,23 @@ const headersToObject = (headers?: HeadersInit): Record<string, string> => {
   return { ...(headers as Record<string, string>) };
 };
 
+/**
+ * Extracts the domain from the current URL
+ * Returns the hostname (e.g., "cms.cinnagen.com" from "https://cms.cinnagen.com/api/integration")
+ */
+const getTenantDomain = (): string | undefined => {
+  if (!isBrowserEnvironment()) {
+    return undefined;
+  }
+  
+  try {
+    const hostname = window.location.hostname;
+    return hostname || undefined;
+  } catch {
+    return undefined;
+  }
+};
+
 const appendFingerprintHeader = (headers?: HeadersInit): HeadersInit => {
   const fingerprint = getFingerprintCookie();
   if (!fingerprint) {
@@ -93,6 +110,17 @@ const appendFingerprintHeader = (headers?: HeadersInit): HeadersInit => {
 
   const headerObject = headersToObject(headers);
   headerObject['x-fingerprint'] = fingerprint;
+  return headerObject;
+};
+
+const appendTenantDomainHeader = (headers?: HeadersInit): HeadersInit => {
+  const tenantDomain = getTenantDomain();
+  if (!tenantDomain) {
+    return headers ?? {};
+  }
+
+  const headerObject = headersToObject(headers);
+  headerObject['X-Tenant-Domain'] = tenantDomain;
   return headerObject;
 };
 
@@ -215,6 +243,7 @@ export class ApiClient {
     };
 
     requestConfig.headers = appendFingerprintHeader(requestConfig.headers);
+    requestConfig.headers = appendTenantDomainHeader(requestConfig.headers);
 
     try {
       const response = await fetch(url, requestConfig);

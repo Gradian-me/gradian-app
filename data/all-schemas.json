@@ -307,7 +307,16 @@
     "showInNavigation": true,
     "icon": "FileSearch",
     "isSystemSchema": false,
-    "isNotCompanyBased": false
+    "isNotCompanyBased": false,
+    "allowDataDueDate": true,
+    "allowDataAssignedTo": true,
+    "allowDataForce": true,
+    "statusGroup": [
+      {
+        "id": "01KBHD90EMZKAT502KNVVDQZC7",
+        "label": "Progress Status"
+      }
+    ]
   },
   {
     "id": "inquiry-items",
@@ -1396,7 +1405,6 @@
           "description": "Basic company information",
           "colSpan": 2,
           "fieldIds": [
-            "company-name",
             "company-logo",
             "company-country",
             "company-city"
@@ -2592,8 +2600,7 @@
             "last-name",
             "email",
             "post-title",
-            "company",
-            "user-status"
+            "company"
           ]
         }
       ]
@@ -3310,10 +3317,7 @@
           "fieldIds": [
             "integration-id",
             "integration-title",
-            "integration-description",
-            "integration-icon",
-            "integration-color",
-            "integration-last-synced"
+            "integration-description"
           ]
         },
         {
@@ -3712,22 +3716,6 @@
         "columns": 2
       }
     ],
-    "detailPageMetadata": {
-      "sections": [
-        {
-          "id": "tag-overview",
-          "title": "Tag Overview",
-          "description": "Basic tag information",
-          "colSpan": 2,
-          "fieldIds": [
-            "tag-label",
-            "tag-icon",
-            "tag-color",
-            "tag-use-cases"
-          ]
-        }
-      ]
-    },
     "showInNavigation": true,
     "icon": "Tag",
     "isNotCompanyBased": true,
@@ -3818,17 +3806,6 @@
     "description": "Group status items into reusable status groups, optionally scoped to companies",
     "singular_name": "Status Group",
     "plural_name": "Status Groups",
-    "cardMetadata": [
-      {
-        "id": "status-group-info",
-        "title": "Status Group Information",
-        "colSpan": 1,
-        "fieldIds": [
-          "status-group-title",
-          "status-group-description"
-        ]
-      }
-    ],
     "fields": [
       {
         "id": "status-group-title",
@@ -4809,23 +4786,6 @@
         "columns": 2
       }
     ],
-    "detailPageMetadata": {
-      "sections": [
-        {
-          "id": "permission-overview",
-          "title": "Permission Overview",
-          "description": "Permission configuration details",
-          "colSpan": 2,
-          "fieldIds": [
-            "resource-type",
-            "resource",
-            "actions",
-            "permission-type",
-            "description"
-          ]
-        }
-      ]
-    },
     "showInNavigation": true,
     "icon": "Shield",
     "isNotCompanyBased": true
@@ -5181,8 +5141,7 @@
             "tenant-name",
             "tenant-title",
             "tenant-domain",
-            "tenant-dbname",
-            "tenant-inactive"
+            "tenant-dbname"
           ]
         }
       ]

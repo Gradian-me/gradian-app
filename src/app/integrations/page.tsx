@@ -22,7 +22,8 @@ import {
   RefreshCw,
   HeartPulse,
   Trash2,
-  Search
+  Search,
+  MessageCircle
 } from 'lucide-react';
 import { SearchInput } from '@/gradian-ui/form-builder/form-elements';
 import { toast } from 'sonner';
@@ -32,6 +33,7 @@ import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 // Helper to get icon background and text color classes from Tailwind color name
 const getIconColorClasses = (color: string): { bg: string; text: string } => {
@@ -100,6 +102,7 @@ interface Integration {
   icon: string;
   color: string;
   lastSynced: string;
+  lastSyncMessage?: string;
   targetRoute: string;
   targetMethod?: 'GET' | 'POST';
   sourceRoute?: string;
@@ -231,6 +234,44 @@ export default function IntegrationsPage() {
     return 'Disconnected';
   };
 
+  // Format lastSyncMessage for display in tooltip
+  const formatSyncMessage = (message: string | undefined): string => {
+    if (!message) return '';
+    
+    try {
+      // Try to parse as JSON (could be array of messages or object)
+      const parsed = JSON.parse(message);
+      
+      // If it's an array of message objects
+      if (Array.isArray(parsed)) {
+        return parsed.map((msg: any) => {
+          if (typeof msg === 'string') return msg;
+          if (msg.message) {
+            // Handle nested message object
+            if (typeof msg.message === 'object') {
+              return msg.message.en || msg.message.message || JSON.stringify(msg.message);
+            }
+            return msg.message;
+          }
+          if (msg.en) return msg.en;
+          if (msg.path && msg.message) return `${msg.path}: ${msg.message}`;
+          return JSON.stringify(msg);
+        }).join('\n');
+      }
+      
+      // If it's an object with message field
+      if (typeof parsed === 'object' && parsed !== null) {
+        if (parsed.message) return parsed.message;
+        if (parsed.en) return parsed.en;
+        return JSON.stringify(parsed);
+      }
+      
+      return String(parsed);
+    } catch {
+      // If not JSON, return as-is
+      return message;
+    }
+  };
 
   const handleSync = async (integration: Integration) => {
     // Add to syncing set
@@ -804,10 +845,21 @@ export default function IntegrationsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.4 }}
               >
-                <Card>
-                  <CardContent className="p-4">
+                <Card className={syncing.size > 0 ? "relative overflow-visible" : ""}>
+                  {syncing.size > 0 && (
+                    <div className="absolute -inset-1 rounded-xl bg-yellow-300 opacity-20"></div>
+                  )}
+                  <CardContent className="p-4 relative">
                     <div className="flex items-center space-x-2">
-                      <Clock className="h-5 w-5 text-yellow-500 shrink-0" />
+                      <div className="relative">
+                        <Clock className={`h-5 w-5 text-yellow-500 shrink-0 ${syncing.size > 0 ? 'animate-pulse' : ''}`} />
+                        {syncing.size > 0 && (
+                          <span className="absolute top-0 right-0 flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                          </span>
+                        )}
+                      </div>
                       <div className="min-w-0">
                     <div className="text-2xl font-bold text-yellow-500">
                       {syncing.size}
@@ -962,6 +1014,26 @@ export default function IntegrationsPage() {
                         <div className="flex items-center gap-1.5">
                           <Clock className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
                           <span className="text-gray-500 dark:text-gray-400"><span className="font-medium text-gray-900 dark:text-gray-100">{integration.lastSynced ? formatRelativeTime(integration.lastSynced) : 'Never'}</span></span>
+                          {integration.lastSyncMessage && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <MessageCircle className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent
+                                  side="bottom"
+                                  sideOffset={8}
+                                  className="z-100 max-w-md"
+                                  avoidCollisions={true}
+                                  collisionPadding={8}
+                                >
+                                  <div className="whitespace-pre-wrap text-xs">
+                                    {formatSyncMessage(integration.lastSyncMessage)}
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
                         </div>
                       </div>
                     </div>

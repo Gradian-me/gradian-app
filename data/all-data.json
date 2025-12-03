@@ -1752,10 +1752,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-03T08:12:27.349Z",
+      "updatedAt": "2025-12-03T11:28:14.096Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-12-03T08:12:27.349Z",
+      "lastSynced": "2025-12-03T11:28:14.096Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1767,7 +1767,8 @@
           "icon": "Code",
           "color": "blue"
         }
-      ]
+      ],
+      "lastSyncMessage": "Processed 29 schemas: 29 succeeded, 0 failed (0 created, 29 updated)"
     },
     {
       "color": "blue",
@@ -1794,8 +1795,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-03T08:12:45.612Z",
-      "lastSynced": "2025-12-03T08:12:45.612Z",
+      "updatedAt": "2025-12-03T11:21:46.487Z",
+      "lastSynced": "2025-12-03T11:21:46.487Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1807,7 +1808,8 @@
         }
       ],
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "lastSyncMessage": "Generated relations for 29 out of 29 schemas"
     },
     {
       "color": "blue",
@@ -1853,9 +1855,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-03T08:13:11.512Z",
+      "updatedAt": "2025-12-03T11:11:09.811Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-03T08:13:11.512Z",
+      "lastSynced": "2025-12-03T11:11:09.811Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1865,7 +1867,8 @@
           "icon": "Code",
           "color": "blue"
         }
-      ]
+      ],
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 147, nodes updated: 5, edges created: 39, nodes failed: 0, edges failed: 0."
     },
     {
       "color": "teal",

@@ -36,6 +36,8 @@ const INITIAL_FORM_STATE: CreateSchemaPayload = {
   allowDataInactive: false,
   allowDataForce: false,
   allowDataHardDelete: false,
+  allowDataAssignedTo: false,
+  allowDataDueDate: false,
 };
 
 export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchemaDialogProps) {
@@ -99,7 +101,17 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
     setFormState(prev => ({ ...prev, schemaId: value }));
   };
 
-  const handleSwitchChange = (key: 'showInNavigation' | 'isSystemSchema' | 'isNotCompanyBased' | 'allowDataInactive' | 'allowDataForce' | 'allowDataHardDelete') => (checked: boolean) => {
+  const handleSwitchChange = (
+    key:
+      | 'showInNavigation'
+      | 'isSystemSchema'
+      | 'isNotCompanyBased'
+      | 'allowDataInactive'
+      | 'allowDataForce'
+      | 'allowDataHardDelete'
+      | 'allowDataAssignedTo'
+      | 'allowDataDueDate'
+  ) => (checked: boolean) => {
     setFormState(prev => ({
       ...prev,
       [key]: checked,
@@ -263,6 +275,16 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
                 config={{ name: 'allowDataHardDelete', label: 'Allow Data Hard Delete' }}
                 value={formState.allowDataHardDelete || false}
                 onChange={handleSwitchChange('allowDataHardDelete')}
+              />
+              <FormSwitch
+                config={{ name: 'allowDataAssignedTo', label: 'Allow Assigned To' }}
+                value={formState.allowDataAssignedTo || false}
+                onChange={handleSwitchChange('allowDataAssignedTo')}
+              />
+              <FormSwitch
+                config={{ name: 'allowDataDueDate', label: 'Allow Due Date' }}
+                value={formState.allowDataDueDate || false}
+                onChange={handleSwitchChange('allowDataDueDate')}
               />
             </div>
           </div>

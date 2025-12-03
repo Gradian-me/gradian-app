@@ -116,15 +116,46 @@ function saveLocalIntegration(updatedIntegration: IntegrationEntity): void {
   }
 }
 
+/**
+ * Format sync message for storage
+ * Extracts message from response (either message string or messages array)
+ */
+function formatSyncMessage(syncResponse: any): string | undefined {
+  if (!syncResponse) return undefined;
+  
+  // Prefer single message field if available
+  if (syncResponse.message) {
+    return typeof syncResponse.message === 'string' 
+      ? syncResponse.message 
+      : JSON.stringify(syncResponse.message);
+  }
+  
+  // Otherwise use messages array
+  if (syncResponse.messages && Array.isArray(syncResponse.messages) && syncResponse.messages.length > 0) {
+    return JSON.stringify(syncResponse.messages);
+  }
+  
+  // If there's a summary with message, use that
+  if (syncResponse.summary?.message) {
+    return typeof syncResponse.summary.message === 'string'
+      ? syncResponse.summary.message
+      : JSON.stringify(syncResponse.summary.message);
+  }
+  
+  return undefined;
+}
+
 async function updateIntegrationLastSyncedTimestamp(
   id: string,
   integration: IntegrationEntity,
-  useLocalData: boolean
+  useLocalData: boolean,
+  lastSyncMessage?: string
 ): Promise<IntegrationEntity> {
   const timestamp = new Date().toISOString();
   const updatedIntegration: IntegrationEntity = {
     ...integration,
     lastSynced: timestamp,
+    lastSyncMessage: lastSyncMessage,
     updatedAt: timestamp,
     id,
   };
@@ -594,7 +625,19 @@ export async function POST(request: NextRequest) {
             
             loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target route response: ${targetResponse.status} ${targetResponse.statusText}`);
             syncResponse = await targetResponse.json();
-            loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target response data: ${JSON.stringify(syncResponse).substring(0, 200)}...`);
+            // Log full response if it contains failures, otherwise truncate for readability
+            const responseString1 = JSON.stringify(syncResponse);
+            if (syncResponse?.summary?.failures && syncResponse.summary.failures.length > 0) {
+              loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target response data (full): ${responseString1}`);
+              loggingCustom(LogType.INTEGRATION_LOG, 'info', `Failures detected: ${JSON.stringify(syncResponse.summary.failures)}`);
+            } else {
+              const maxLogLength = 2000;
+              if (responseString1.length > maxLogLength) {
+                loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target response data (first ${maxLogLength} chars): ${responseString1.substring(0, maxLogLength)}...`);
+              } else {
+                loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target response data: ${responseString1}`);
+              }
+            }
             
             // Extract messages from target response if present
             let getResponseMessages1 = syncResponse?.messages || [];
@@ -614,7 +657,8 @@ export async function POST(request: NextRequest) {
             }
             
             if (integration) {
-              integration = await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData);
+              const syncMessage = formatSyncMessage(syncResponse);
+              integration = await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData, syncMessage);
             }
             
             loggingCustom(LogType.INTEGRATION_LOG, 'info', `Integration sync completed successfully for id: ${id}`);
@@ -679,6 +723,12 @@ export async function POST(request: NextRequest) {
                   return msg;
                 });
                 
+                // Save error message to integration before returning
+                if (integration) {
+                  const errorSyncMessage = formatSyncMessage({ messages: transformedMessages, message: errorMessage });
+                  await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData, errorSyncMessage);
+                }
+                
                 return NextResponse.json({
                   success: false,
                   error: errorMessage || `Target route failed: ${targetResponse.statusText}`,
@@ -690,6 +740,12 @@ export async function POST(request: NextRequest) {
               // If we have a single message field, use it in the error
               if (errorMessage) {
                 loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target response contains error message: ${errorMessage}`);
+                
+                // Save error message to integration before returning
+                if (integration) {
+                  await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData, errorMessage);
+                }
+                
                 return NextResponse.json({
                   success: false,
                   error: errorMessage,
@@ -702,7 +758,19 @@ export async function POST(request: NextRequest) {
             
             loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target route response: ${targetResponse.status} ${targetResponse.statusText}`);
             syncResponse = await targetResponse.json();
-            loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target response data: ${JSON.stringify(syncResponse).substring(0, 200)}...`);
+            // Log full response if it contains failures, otherwise truncate for readability
+            const responseString2 = JSON.stringify(syncResponse);
+            if (syncResponse?.summary?.failures && syncResponse.summary.failures.length > 0) {
+              loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target response data (full): ${responseString2}`);
+              loggingCustom(LogType.INTEGRATION_LOG, 'info', `Failures detected: ${JSON.stringify(syncResponse.summary.failures)}`);
+            } else {
+              const maxLogLength = 2000;
+              if (responseString2.length > maxLogLength) {
+                loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target response data (first ${maxLogLength} chars): ${responseString2.substring(0, maxLogLength)}...`);
+              } else {
+                loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target response data: ${responseString2}`);
+              }
+            }
             
             // Extract messages from target response if present
             let getResponseMessages2 = syncResponse?.messages || [];
@@ -722,7 +790,8 @@ export async function POST(request: NextRequest) {
             }
             
             if (integration) {
-              integration = await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData);
+              const syncMessage = formatSyncMessage(syncResponse);
+              integration = await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData, syncMessage);
             }
             
             loggingCustom(LogType.INTEGRATION_LOG, 'info', `Integration sync completed successfully for id: ${id}`);
@@ -783,6 +852,12 @@ export async function POST(request: NextRequest) {
             return msg;
           });
           
+          // Save error message to integration before returning
+          if (integration) {
+            const errorSyncMessage = formatSyncMessage({ messages: transformedMessages, message: errorMessage });
+            await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData, errorSyncMessage);
+          }
+          
           return NextResponse.json({
             success: false,
             error: errorMessage || `Target route failed: ${targetResponse.statusText}`,
@@ -794,6 +869,12 @@ export async function POST(request: NextRequest) {
         // If we have a single message field, use it in the error
         if (errorMessage) {
           loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target response contains error message: ${errorMessage}`);
+          
+          // Save error message to integration before returning
+          if (integration) {
+            await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData, errorMessage);
+          }
+          
           return NextResponse.json({
             success: false,
             error: errorMessage,
@@ -807,7 +888,19 @@ export async function POST(request: NextRequest) {
       
       loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target route response: ${targetResponse.status} ${targetResponse.statusText}`);
       syncResponse = await targetResponse.json();
-      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target response data: ${JSON.stringify(syncResponse).substring(0, 200)}...`);
+      // Log full response if it contains failures, otherwise truncate for readability
+      const responseString = JSON.stringify(syncResponse);
+      if (syncResponse?.summary?.failures && syncResponse.summary.failures.length > 0) {
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target response data (full): ${responseString}`);
+        loggingCustom(LogType.INTEGRATION_LOG, 'info', `Failures detected: ${JSON.stringify(syncResponse.summary.failures)}`);
+      } else {
+        const maxLogLength = 2000;
+        if (responseString.length > maxLogLength) {
+          loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target response data (first ${maxLogLength} chars): ${responseString.substring(0, maxLogLength)}...`);
+        } else {
+          loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target response data: ${responseString}`);
+        }
+      }
       
       // Extract messages from target response if present
       if (syncResponse?.messages && syncResponse.messages.length > 0) {
@@ -828,7 +921,8 @@ export async function POST(request: NextRequest) {
       }
       
       if (integration) {
-        integration = await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData);
+        const syncMessage = formatSyncMessage(syncResponse);
+        integration = await updateIntegrationLastSyncedTimestamp(id, integration, useLocalData, syncMessage);
       }
       
       loggingCustom(LogType.INTEGRATION_LOG, 'info', `Integration sync completed successfully for id: ${id}`);

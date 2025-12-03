@@ -117,6 +117,18 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
               disabled={readonly}
             />
             <Switch
+              config={{ name: 'allow-data-assigned-to', label: 'Allow Assigned To' }}
+              value={schema.allowDataAssignedTo || false}
+              onChange={(checked: boolean) => onUpdate({ allowDataAssignedTo: checked })}
+              disabled={readonly}
+            />
+            <Switch
+              config={{ name: 'allow-data-due-date', label: 'Allow Due Date' }}
+              value={schema.allowDataDueDate || false}
+              onChange={(checked: boolean) => onUpdate({ allowDataDueDate: checked })}
+              disabled={readonly}
+            />
+            <Switch
               config={{ name: 'allow-hierarchical-parent', label: 'Allow Hierarchical Parent' }}
               value={schema.allowHierarchicalParent || false}
               onChange={(checked: boolean) => onUpdate({ allowHierarchicalParent: checked })}
@@ -129,7 +141,7 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
             config={{
               name: 'status-group',
               label: 'Status Group',
-              description: 'Select a status group to enable status selection for this schema.',
+              description: 'Select a status group to enable selection on this schema.',
               targetSchema: 'status-groups',
               metadata: {
                 allowMultiselect: false,
