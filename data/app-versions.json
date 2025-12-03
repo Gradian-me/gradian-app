@@ -1415,7 +1415,50 @@
           "components",
           "form-builder"
         ]
+  },
+  {
+    "id": "01KBDH0XENHANCESCROLLXYZ009",
+    "timestamp": "2025-12-03T12:00:00.000Z",
+    "version": "1.10.007",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "Renamed targetSchema from \"url-repository\" to \"url-repositories\" across multiple files for consistency",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "data-management"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced LOGIN_LOCALLY flag in application variables for enhanced local login functionality",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "configuration"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated various UI components to improve styling and user experience, including color adjustments and skeleton loading states",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "components"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Modified page structure so the main page uses AppListWrapper instead of DashboardPage for better navigation",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout",
+          "routing"
+        ]
       }
+    ]
+  }
     ]
   }
 ]

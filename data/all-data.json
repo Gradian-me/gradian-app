@@ -29,7 +29,7 @@
           "id": "ACTIVE",
           "label": "Active",
           "icon": "CheckCircle",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "rating": 4,
@@ -399,7 +399,7 @@
           "id": "3",
           "label": "Approved",
           "icon": "CheckCircle",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "description": "Test Description",
@@ -423,7 +423,7 @@
           "id": "1",
           "label": "Submitted",
           "icon": "Send",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "description": "Buffers and Raw materials",
@@ -898,7 +898,7 @@
           "id": "CREDIT_CARD",
           "label": "Credit Card",
           "icon": "CreditCard",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "advancedPaymentAmount": 20000,
@@ -913,7 +913,7 @@
         {
           "id": "01K8QVCWS0ZSTMSVD5C6K7A806",
           "label": "Transfarma",
-          "color": "warning"
+          "color": "amber"
         }
       ],
       "currency": [
@@ -927,7 +927,7 @@
           "id": "ACCEPTED",
           "label": "Accepted",
           "icon": "CheckCircle",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "quotation-items": [],
@@ -1011,7 +1011,14 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "type": "GENERAL_ROLE",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "slate"
+        }
+      ],
       "color": "indigo",
       "name": "Our Users",
       "incomplete": false,
@@ -1024,7 +1031,14 @@
     },
     {
       "parent": "01KB9Y24BEVCHQXMRSZXPDGARY",
-      "type": "GENERAL_ROLE",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
       "color": "indigo",
       "name": "Supply Chain Deputy",
       "incomplete": false,
@@ -1037,7 +1051,14 @@
     },
     {
       "parent": "01KB9Y4R56A3F9W2NH7KYBDQ98",
-      "type": "GENERAL_ROLE",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "slate"
+        }
+      ],
       "color": "blue",
       "name": "Supply Chain Supervisor",
       "incomplete": false,
@@ -1050,7 +1071,14 @@
     },
     {
       "parent": "01KB9Y5NKY5ZZS6BFYPC8684E9",
-      "type": "GENERAL_ROLE",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "slate"
+        }
+      ],
       "color": "blue",
       "name": "Supply Chain Expert",
       "incomplete": false,
@@ -1086,7 +1114,7 @@
           "id": "SUBSIDIARY_COMPANY",
           "label": "Subsidiary Company",
           "icon": "Building",
-          "color": "default"
+          "color": "slate"
         }
       ],
       "color": "indigo",
@@ -1105,7 +1133,7 @@
           "id": "CUSTOMER",
           "label": "Customer",
           "icon": "User",
-          "color": "default"
+          "color": "slate"
         }
       ],
       "color": "indigo",
@@ -1316,7 +1344,7 @@
           "id": "production",
           "label": "Production",
           "icon": "Server",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "owners": [
@@ -1341,7 +1369,7 @@
           "id": "development",
           "label": "Development",
           "icon": "Code",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "incomplete": false,
@@ -1368,7 +1396,7 @@
           "id": "development",
           "label": "Development",
           "icon": "Code",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "incomplete": false,
@@ -1390,7 +1418,7 @@
           "id": "production",
           "label": "Production",
           "icon": "Server",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "incomplete": false,
@@ -1417,7 +1445,7 @@
           "id": "production",
           "label": "Production",
           "icon": "Server",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "owners": [],
@@ -1439,7 +1467,7 @@
           "id": "production",
           "label": "Production",
           "icon": "Server",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "owners": [
@@ -1464,7 +1492,7 @@
           "id": "production",
           "label": "Production",
           "icon": "Server",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "owners": [
@@ -1482,7 +1510,7 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
-  "url-repository": [
+  "url-repositories": [
     {
       "title": "Email Template Sync",
       "address": "https://octa.cinnagen.com/integration/notifications/cache/refresh",
@@ -1491,7 +1519,7 @@
           "id": "GET",
           "label": "GET",
           "icon": "ArrowRight",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
@@ -1509,7 +1537,7 @@
           "id": "POST",
           "label": "POST",
           "icon": "ArrowRight",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "title": "Schema Bulk Sync",
@@ -1528,7 +1556,7 @@
           "id": "GET",
           "label": "GET",
           "icon": "ArrowRight",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "id": "01KA8VXHQFZR5TH0470163433K",
@@ -1545,7 +1573,7 @@
           "id": "GET",
           "label": "GET",
           "icon": "ArrowRight",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "id": "01KA9LUCIDEICONS001",
@@ -1562,7 +1590,7 @@
           "id": "POST",
           "label": "POST",
           "icon": "ArrowRight",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "id": "01KA9LUCIDEICONSYNC001",
@@ -1579,7 +1607,7 @@
           "id": "POST",
           "label": "POST",
           "icon": "ArrowRight",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "id": "01KABM5QX5HRPWMPA1M7YK21WJ",
@@ -1596,7 +1624,7 @@
           "id": "GET",
           "label": "GET",
           "icon": "ArrowRight",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "id": "01KANYZDJKCA9FNEFE7ZEY0KSD",
@@ -1615,7 +1643,7 @@
           "id": "POST",
           "label": "POST",
           "icon": "ArrowRight",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "url-parameters": [
@@ -1660,7 +1688,7 @@
           "id": "POST",
           "label": "POST",
           "icon": "ArrowRight",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "id": "01KASYNCENV001GITLABSYNC",
@@ -1702,7 +1730,7 @@
           "id": "POST",
           "label": "POST",
           "icon": "Upload",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "sourceRoute": [
@@ -1719,15 +1747,15 @@
           "id": "GET",
           "label": "GET",
           "icon": "Download",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-02T14:59:18.287Z",
+      "updatedAt": "2025-12-03T08:12:27.349Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-12-01T10:41:33.759Z",
+      "lastSynced": "2025-12-03T08:12:27.349Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1760,14 +1788,14 @@
           "id": "POST",
           "label": "POST",
           "icon": "Upload",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-02T15:01:31.425Z",
-      "lastSynced": "2025-12-01T10:41:36.671Z",
+      "updatedAt": "2025-12-03T08:12:45.612Z",
+      "lastSynced": "2025-12-03T08:12:45.612Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1800,7 +1828,7 @@
           "id": "POST",
           "label": "POST",
           "icon": "Upload",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "sourceRoute": [
@@ -1817,7 +1845,7 @@
           "id": "GET",
           "label": "GET",
           "icon": "Download",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "sourceDataPath": "data",
@@ -1825,9 +1853,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-02T15:01:45.599Z",
+      "updatedAt": "2025-12-03T08:13:11.512Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-01T10:44:39.977Z",
+      "lastSynced": "2025-12-03T08:13:11.512Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1859,7 +1887,7 @@
           "id": "GET",
           "label": "GET",
           "icon": "Download",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "id": "email_template_sync",
@@ -1897,7 +1925,7 @@
           "id": "POST",
           "label": "POST",
           "icon": "Upload",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "sourceRoute": [
@@ -1914,7 +1942,7 @@
           "id": "GET",
           "label": "GET",
           "icon": "Download",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "id": "lucide_icons_sync",
@@ -1953,7 +1981,7 @@
           "id": "POST",
           "label": "POST",
           "icon": "Upload",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "id": "git_sync_env",
@@ -1992,7 +2020,7 @@
           "id": "POST",
           "label": "POST",
           "icon": "Upload",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "sourceRoute": [
@@ -2031,7 +2059,7 @@
           "id": "SQL_SERVER",
           "label": "SQL Server",
           "icon": "Server",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "timezone": [
@@ -2045,7 +2073,7 @@
           "id": "MANUAL",
           "label": "Manual Authentication",
           "icon": "Key",
-          "color": "warning"
+          "color": "amber"
         }
       ],
       "username": "biuser",
@@ -2656,7 +2684,7 @@
           "id": "SCHEMA",
           "label": "Schema",
           "icon": "Database",
-          "color": "warning"
+          "color": "amber"
         }
       ],
       "resource": [
@@ -2675,25 +2703,25 @@
           "id": "CREATE",
           "label": "Create",
           "icon": "Plus",
-          "color": "success"
+          "color": "emerald"
         },
         {
           "id": "VIEW",
           "label": "View",
           "icon": "Eye",
-          "color": "info"
+          "color": "sky"
         },
         {
           "id": "EDIT",
           "label": "Edit",
           "icon": "Edit",
-          "color": "warning"
+          "color": "amber"
         },
         {
           "id": "DELETE",
           "label": "Delete",
           "icon": "Trash2",
-          "color": "destructive"
+          "color": "red"
         }
       ],
       "permissionType": [
@@ -2701,7 +2729,7 @@
           "id": "ALLOW",
           "label": "Allow",
           "icon": "CheckCircle",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "incomplete": false,
@@ -2714,13 +2742,13 @@
           "id": "EDIT",
           "label": "Edit",
           "icon": "Edit",
-          "color": "warning"
+          "color": "amber"
         },
         {
           "id": "VIEW",
           "label": "View",
           "icon": "Eye",
-          "color": "info"
+          "color": "sky"
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2736,7 +2764,7 @@
           "id": "ALL_ACTIONS",
           "label": "All Actions",
           "icon": "CheckCircle",
-          "color": "success"
+          "color": "emerald"
         }
       ],
       "incomplete": false,
@@ -2755,7 +2783,7 @@
       "menuIcon": "LayoutDashboard",
       "hideInAD": false,
       "description": "Main application dashboard",
-      "menuUrl": "/",
+      "menuUrl": "/dashboard",
       "openInNewTab": false,
       "id": "01KBSIDASHBOARD0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",

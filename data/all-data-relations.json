@@ -152,7 +152,7 @@
   {
     "sourceSchema": "servers",
     "sourceId": "01KA8QZJ9SAJ6Y2GR05K42BQYF",
-    "targetSchema": "url-repository",
+    "targetSchema": "url-repositories",
     "targetId": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
     "relationTypeId": "HAS_URL",
     "id": "01KA8T4J5JXBQMGAMR4NTDSBS7",
@@ -162,7 +162,7 @@
   {
     "sourceSchema": "servers",
     "sourceId": "01KA8TM7H68FPKTRNNNSPWWBKD",
-    "targetSchema": "url-repository",
+    "targetSchema": "url-repositories",
     "targetId": "01KA8TP4ZVMWVCGK25KPDQDPW1",
     "relationTypeId": "HAS_URL",
     "id": "01KA8TP524YQEQ4ZJT4505NJ2T",
@@ -172,7 +172,7 @@
   {
     "sourceSchema": "servers",
     "sourceId": "01KA8VVZENR2AS7YWTAY4T6HM7",
-    "targetSchema": "url-repository",
+    "targetSchema": "url-repositories",
     "targetId": "01KA8VXHQFZR5TH0470163433K",
     "relationTypeId": "HAS_URL",
     "id": "01KA8VXHSPGS7HD1SZS2CHA1AW",
@@ -182,7 +182,7 @@
   {
     "sourceSchema": "servers",
     "sourceId": "01KA8TM7H68FPKTRNNNSPWWBKD",
-    "targetSchema": "url-repository",
+    "targetSchema": "url-repositories",
     "targetId": "01KABM5QX5HRPWMPA1M7YK21WJ",
     "relationTypeId": "HAS_URL",
     "id": "01KABM5QZEE4T31FMCYS2G17Q8",
@@ -212,7 +212,7 @@
   {
     "sourceSchema": "servers",
     "sourceId": "01KA8TM7H68FPKTRNNNSPWWBKD",
-    "targetSchema": "url-repository",
+    "targetSchema": "url-repositories",
     "targetId": "01KANZNMEFM5H7211V450ZX2P8",
     "relationTypeId": "HAS_URL",
     "id": "01KANZNMGVQSKVNPMN9B45M5EW",
@@ -262,7 +262,7 @@
   {
     "sourceSchema": "servers",
     "sourceId": "01KBAT7P2B5NZYX26HVWYV28N1",
-    "targetSchema": "url-repository",
+    "targetSchema": "url-repositories",
     "targetId": "01KBATJ4GH09B0YETWF7W1SKM7",
     "relationTypeId": "HAS_URL",
     "id": "01KBATJ4KZ0CNSFPESFYHQ1DS5",

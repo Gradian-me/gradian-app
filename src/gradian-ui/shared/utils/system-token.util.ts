@@ -72,7 +72,7 @@ function extractUrlRepositoryId(targetRoute: any): string | null {
  */
 async function fetchUrlRepositoryById(id: string): Promise<any | null> {
   try {
-    const url = getApiUrl(`/api/data/url-repository/${id}`);
+    const url = getApiUrl(`/api/data/url-repositories/${id}`);
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -111,7 +111,7 @@ async function fetchUrlRepositoryById(id: string): Promise<any | null> {
  */
 async function fetchUrlRepositoryByAddress(address: string): Promise<any | null> {
   try {
-    const url = getApiUrl('/api/data/url-repository');
+    const url = getApiUrl('/api/data/url-repositories');
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -160,7 +160,7 @@ async function fetchUrlRepositoryByAddress(address: string): Promise<any | null>
 async function getRelatedServers(urlRepositoryId: string): Promise<any[]> {
   try {
     const url = getApiUrl(
-      `/api/data/all-relations?schema=url-repository&direction=both&otherSchema=servers&id=${urlRepositoryId}`
+      `/api/data/all-relations?schema=url-repositories&direction=both&otherSchema=servers&id=${urlRepositoryId}`
     );
     const response = await fetch(url, {
       method: 'GET',

@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
-import { DashboardPage } from '@/domains/dashboard/components/DashboardPage';
+import { AppListWrapper } from '@/gradian-ui/layout/app-list';
 
 export const metadata: Metadata = {
-  title: 'Dashboard | Gradian',
-  description: 'Overview of your data and key metrics',
+  title: 'Apps | Gradian',
+  description: 'Browse and launch apps powered by your dynamic schemas.',
 };
 
-export default function Dashboard() {
-  return <DashboardPage />;
+export default function HomePage() {
+  return <AppListWrapper />;
 }

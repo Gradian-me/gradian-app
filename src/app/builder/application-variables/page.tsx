@@ -18,6 +18,7 @@ import {
 } from '@/gradian-ui/form-builder/form-elements';
 import { ArrowLeft, Save, RefreshCw } from 'lucide-react';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ApplicationVariablesData {
   LOG_CONFIG: Record<string, boolean>;
@@ -39,6 +40,7 @@ interface ApplicationVariablesData {
   };
   SCHEMA_SUMMARY_EXCLUDED_KEYS: string[];
   DEMO_MODE?: boolean;
+  LOGIN_LOCALLY?: boolean;
   AD_MODE?: boolean;
   AI_CONFIG?: {
     LLM_API_URL?: string;
@@ -205,8 +207,60 @@ export default function ApplicationVariablesPage() {
         subtitle="Configure application-wide constants and settings"
         icon="Settings"
       >
-        <div className="flex items-center justify-center py-20">
-          <div className="animate-spin h-8 w-8 border-4 border-violet-600 border-t-transparent rounded-full" />
+        <div className="space-y-6">
+          {/* Header Actions Skeleton */}
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-10 w-32" />
+            <div className="flex gap-2">
+              <Skeleton className="h-10 w-24" />
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </div>
+
+          {/* Tabs Skeleton */}
+          <div className="space-y-4">
+            <div className="flex gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
+              <Skeleton className="h-9 w-20" />
+              <Skeleton className="h-9 w-24" />
+              <Skeleton className="h-9 w-32" />
+              <Skeleton className="h-9 w-28" />
+              <Skeleton className="h-9 w-24" />
+              <Skeleton className="h-9 w-36" />
+            </div>
+
+            {/* Card Content Skeleton */}
+            <div className="space-y-4">
+              <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-6 space-y-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-48" />
+                  <Skeleton className="h-4 w-96" />
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-5 w-32" />
+                      <Skeleton className="h-4 w-80" />
+                    </div>
+                    <Skeleton className="h-6 w-12 rounded-full" />
+                  </div>
+                  <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-5 w-32" />
+                      <Skeleton className="h-4 w-80" />
+                    </div>
+                    <Skeleton className="h-6 w-12 rounded-full" />
+                  </div>
+                  <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-5 w-32" />
+                      <Skeleton className="h-4 w-80" />
+                    </div>
+                    <Skeleton className="h-6 w-12 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </MainLayout>
     );
@@ -288,12 +342,24 @@ export default function ApplicationVariablesPage() {
                   <div className="space-y-0.5">
                     <Label className="text-base">Demo Mode</Label>
                     <p className="text-sm text-gray-500">
-                      When enabled, the app uses local file-based storage. When disabled, it proxies requests to external services.
+                      When enabled, the app uses local file-based storage for data and schemas. When disabled, it proxies those requests to external services.
                     </p>
                   </div>
                   <Switch
                     checked={data.DEMO_MODE ?? true}
                     onCheckedChange={(checked) => setData((prev) => ({ ...prev, DEMO_MODE: checked }))}
+                  />
+                </div>
+                <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Login Locally</Label>
+                    <p className="text-sm text-gray-500">
+                      When enabled, login and logout use local demo users instead of the external authentication service. When disabled, authentication always goes to the server.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={data.LOGIN_LOCALLY ?? false}
+                    onCheckedChange={(checked) => setData((prev) => ({ ...prev, LOGIN_LOCALLY: checked }))}
                   />
                 </div>
                 <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">

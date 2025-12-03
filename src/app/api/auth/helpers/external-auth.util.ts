@@ -4,7 +4,10 @@ import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-
 export function isServerDemoMode(): boolean {
   try {
     const vars = loadApplicationVariables();
-    return Boolean(vars?.DEMO_MODE);
+    // For auth flows, prefer LOGIN_LOCALLY flag; fall back to DEMO_MODE for backward compatibility
+    return Boolean(
+      (vars as any)?.LOGIN_LOCALLY ?? (vars as any)?.DEMO_MODE
+    );
   } catch (error) {
     console.warn('[auth] Failed to determine demo mode state:', error);
     return true;

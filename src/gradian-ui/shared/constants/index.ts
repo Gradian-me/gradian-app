@@ -5,9 +5,9 @@ export const API_ENDPOINTS = {
 } as const;
 
 export const ROUTES = {
-  DASHBOARD: '/',
+  DASHBOARD: '/dashboard',
   VENDORS: '/vendors',
-  TENDERS: '/tenders',
+  TENDORS: '/tenders',
   PURCHASE_ORDERS: '/purchase-orders',
   INVOICES: '/invoices',
   SHIPMENTS: '/shipments',

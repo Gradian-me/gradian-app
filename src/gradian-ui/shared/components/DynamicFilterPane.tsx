@@ -85,6 +85,8 @@ export const DynamicFilterPane = ({
             <HierarchyExpandCollapseControls
               onExpandAll={onExpandAllHierarchy}
               onCollapseAll={onCollapseAllHierarchy}
+              variant="nobackground"
+              showBorder
             />
           )}
         </div>

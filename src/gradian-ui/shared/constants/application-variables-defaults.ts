@@ -52,6 +52,7 @@ export const DEFAULT_APPLICATION_VARIABLES = {
     "sectionsCount"
   ],
   DEMO_MODE: true,
+  LOGIN_LOCALLY: false,
   AD_MODE: false,
   AI_CONFIG: {
     LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions',

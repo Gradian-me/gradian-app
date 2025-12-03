@@ -45,6 +45,7 @@ const getDefaultData = (): ApplicationVariablesData => ({
   },
   SCHEMA_SUMMARY_EXCLUDED_KEYS: ['fields', 'sections', 'detailPageMetadata'],
   DEMO_MODE: true,
+  LOGIN_LOCALLY: false,
   AD_MODE: false,
   AI_CONFIG: {
     LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions',
@@ -72,6 +73,7 @@ interface ApplicationVariablesData {
   };
   SCHEMA_SUMMARY_EXCLUDED_KEYS: string[];
   DEMO_MODE: boolean;
+  LOGIN_LOCALLY?: boolean;
   AD_MODE: boolean;
   AI_CONFIG?: {
     LLM_API_URL?: string;

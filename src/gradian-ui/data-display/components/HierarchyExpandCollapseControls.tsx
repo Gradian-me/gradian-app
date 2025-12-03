@@ -10,7 +10,8 @@ export interface ExpandCollapseControlsProps {
   onCollapseAll?: () => void;
   expandDisabled?: boolean;
   collapseDisabled?: boolean;
-  variant?: 'default' | 'outline' | 'ghost';
+  // 'nobackground' is a semantic alias we can map to a ghost-style button
+  variant?: 'default' | 'outline' | 'ghost' | 'nobackground';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
   showLabels?: boolean;
@@ -36,31 +37,40 @@ export const ExpandCollapseControls: React.FC<ExpandCollapseControlsProps> = ({
   }
 
   const containerClasses = cn(
-    'flex items-center',
+    'flex h-full items-center',
     orientation === 'horizontal' ? 'flex-row space-x-1' : 'flex-col space-y-1',
-    showBorder && 'border-l border-gray-300 dark:border-gray-600 pl-1.5 sm:pl-2 ml-1.5 sm:ml-2',
+    showBorder && 'border-s border-gray-300 dark:border-gray-600 ps-1.5 sm:ps-2 ml-1.5 sm:ms-2',
     className
   );
 
   const buttonSize = size === 'icon' ? 'icon' : size;
-  const buttonClassName = size === 'icon' 
-    ? 'h-10 w-10' 
-    : size === 'sm' 
-      ? 'h-8' 
-      : size === 'lg'
-        ? 'h-12'
-        : 'h-10';
+  const buttonVariant = variant === 'nobackground' ? 'ghost' : variant;
+
+  // Match ViewSwitcher button dimensions/roundness when using "nobackground"
+  const buttonClassName =
+    size === 'icon' && variant === 'nobackground'
+      ? 'h-full w-10 p-0 rounded-md'
+      : size === 'icon'
+        ? 'h-10 w-10 rounded-md'
+        : size === 'sm'
+          ? 'h-8 rounded-md'
+          : size === 'lg'
+            ? 'h-12 rounded-md'
+            : 'h-10 rounded-md';
 
   return (
     <div className={containerClasses}>
       {onExpandAll && (
         <Button
           type="button"
-          variant={variant}
+          variant={buttonVariant}
           size={buttonSize}
           className={cn(
             buttonClassName,
-            variant === 'ghost' && 'text-gray-500 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-gray-800',
+            variant === 'ghost' &&
+              'text-gray-500 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-gray-800',
+            variant === 'nobackground' &&
+              'text-gray-500 hover:text-violet-600 hover:bg-violet-50',
             showLabels && 'gap-2'
           )}
           onClick={onExpandAll}
@@ -74,11 +84,14 @@ export const ExpandCollapseControls: React.FC<ExpandCollapseControlsProps> = ({
       {onCollapseAll && (
         <Button
           type="button"
-          variant={variant}
+          variant={buttonVariant}
           size={buttonSize}
           className={cn(
             buttonClassName,
-            variant === 'ghost' && 'text-gray-500 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-gray-800',
+            variant === 'ghost' &&
+              'text-gray-500 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-gray-800',
+            variant === 'nobackground' &&
+              'text-gray-500 hover:text-violet-600 hover:bg-violet-50',
             showLabels && 'gap-2'
           )}
           onClick={onCollapseAll}

@@ -2292,7 +2292,14 @@
         "validation": {
           "required": true
         },
-        "defaultValue": "GENERAL_ROLE",
+        "defaultValue": [
+          {
+            "id": "GENERAL_ROLE",
+            "label": "General Role",
+            "icon": "User",
+            "color": "cyan"
+          }
+        ],
         "colSpan": 1,
         "order": 3
       }
@@ -2612,7 +2619,6 @@
         "title": "Server Information",
         "colSpan": 1,
         "fieldIds": [
-          "server-name",
           "server-address",
           "server-owners"
         ]
@@ -2767,7 +2773,7 @@
         "isRepeatingSection": true,
         "repeatingConfig": {
           "minItems": 0,
-          "targetSchema": "url-repository",
+          "targetSchema": "url-repositories",
           "relationTypeId": "HAS_URL",
           "fieldRelationType": "connectToSchema"
         }
@@ -2797,7 +2803,7 @@
     "isNotCompanyBased": true
   },
   {
-    "id": "url-repository",
+    "id": "url-repositories",
     "description": "Manage and organize URLs with associated metadata",
     "singular_name": "URL Repository",
     "plural_name": "URL Repositories",
@@ -3183,7 +3189,7 @@
         "component": "picker",
         "placeholder": "Click to select target URL",
         "description": "The endpoint to call for syncing",
-        "targetSchema": "url-repository",
+        "targetSchema": "url-repositories",
         "validation": {
           "required": true
         },
@@ -3227,7 +3233,7 @@
         "placeholder": "Click to select source URL (optional)",
         "required": false,
         "description": "If provided, fetch data from this route first",
-        "targetSchema": "url-repository",
+        "targetSchema": "url-repositories",
         "colSpan": 2,
         "order": 4
       },
@@ -4382,7 +4388,7 @@
         "component": "picker",
         "placeholder": "Select URL from repository",
         "required": false,
-        "targetSchema": "url-repository",
+        "targetSchema": "url-repositories",
         "colSpan": 1,
         "order": 8
       },
