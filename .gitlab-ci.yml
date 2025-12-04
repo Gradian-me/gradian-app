@@ -47,8 +47,21 @@ build:
   tags:
     - CG-GR-APP-DEV-shell
   script:
+    - echo "🔍 Checking Docker configuration..."
+    - docker info | grep -i "registry\|mirror" || echo "No registry mirror configured"
+    - echo "📥 Attempting to pull base image..."
+    - |
+      if ! docker pull node:20-slim; then
+        echo "❌ Cannot reach Docker Hub. Checking for alternative registries..."
+        echo "💡 If this persists, you may need to:"
+        echo "   1. Configure a registry mirror on the GitLab runner"
+        echo "   2. Pre-push the base image to GitLab container registry"
+        echo "   3. Use a different base image source"
+        exit 1
+      fi
     - echo "🚀 Building Docker image..."
     - SHORT_SHA=${CI_COMMIT_SHA:0:8}
+    - export DOCKER_BUILDKIT=1
     - docker build --tag="$CI_REGISTRY_IMAGE:latest" --tag="$CI_REGISTRY_IMAGE:$SHORT_SHA" --build-arg NODE_ENV=$NODE_ENV .
     - docker push "$CI_REGISTRY_IMAGE:latest"
     - docker push "$CI_REGISTRY_IMAGE:$SHORT_SHA"
