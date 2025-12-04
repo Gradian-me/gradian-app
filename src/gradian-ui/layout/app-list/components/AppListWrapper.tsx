@@ -360,9 +360,6 @@ export function AppListWrapper() {
           <span className="font-medium text-gray-800 dark:text-gray-100">
             Launch your data-driven experiences
           </span>
-          <span className="hidden text-gray-500 dark:text-gray-400 sm:inline">
-            — browse, search, and open any app.
-          </span>
         </span>
       }
     >
