@@ -1581,5 +1581,40 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBM2XENHANCESCROLLXYZ011",
+    "timestamp": "2025-12-04T07:47:44.000Z",
+    "version": "1.12.000",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Introduced 'Solution Advisor' writing style to enhance user prompts for comprehensive solution proposals",
+        "priority": "High",
+        "affectedDomains": [
+          "professional-writing",
+          "ai-builder"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated system prompt to include structured guidance for the 'Solution Advisor' mode",
+        "priority": "Medium",
+        "affectedDomains": [
+          "professional-writing",
+          "ai-builder"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Modified ProfessionalWritingModal and related hooks to support the new writing style, improving user experience and functionality",
+        "priority": "Medium",
+        "affectedDomains": [
+          "professional-writing",
+          "ui",
+          "hooks"
+        ]
+      }
+    ]
   }
 ]

@@ -69,6 +69,34 @@ export function useProfessionalWriting(): UseProfessionalWritingReturn {
         userPrompt = `Please enhance the following text to a professional tone. Transform it into a polished, professional tone suitable for business communications, formal documents, and professional contexts. Fix all grammatical errors, improve sentence structure, and enhance clarity:\n\n${request.text.trim()}`;
       } else if (request.style === 'casual') {
         userPrompt = `Please convert the following text to a casual, friendly, and conversational tone. Make it more approachable and relatable while maintaining clarity and readability. Use everyday language and a warm, friendly voice:\n\n${request.text.trim()}`;
+      } else if (request.style === 'solution-advisor') {
+        userPrompt = `You are a Solution Advisor. Analyze the following question or problem and provide a comprehensive solution proposal following this exact structure:
+
+## Step 1: Expanded Question Context
+First, expand and clarify the user's question with additional context, background information, and related considerations that help frame the problem more comprehensively.
+
+## Step 2: Best Practices Research
+Search and identify industry best practices, proven methodologies, and expert recommendations relevant to this question. Categorize these findings into logical groups (e.g., Technical Approaches, Process Improvements, Tool Recommendations, etc.).
+
+## Step 3: Solution Summary
+Provide a concise executive summary (2-3 paragraphs) that synthesizes the key findings and presents the overall recommended approach.
+
+## Step 4: Best Solutions
+List the top solutions as bullet points, each with:
+- Clear, actionable recommendation
+- Brief explanation of why it's effective
+- When/where to apply it
+
+## Step 5: Considerations
+List important considerations, trade-offs, and potential challenges as bullet points, including:
+- Implementation challenges
+- Resource requirements
+- Risk factors
+- Alternative approaches
+- Success factors
+
+User's Question/Problem:
+${request.text.trim()}`;
       } else {
         userPrompt = request.text.trim();
       }

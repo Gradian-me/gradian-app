@@ -138,6 +138,7 @@ export function ProfessionalWritingModal({
                 { id: 'casual', value: 'casual', label: 'Casual' },
                 { id: 'translate', value: 'translate', label: 'Translate' },
                 { id: 'extended', value: 'extended', label: 'Extended' },
+                { id: 'solution-advisor', value: 'solution-advisor', label: 'Solution Advisor' },
               ]}
             />
           </div>
@@ -166,7 +167,9 @@ export function ProfessionalWritingModal({
               config={{
                 name: 'input-text',
                 label: 'Input Text',
-                placeholder: 'Enter text to enhance...',
+                placeholder: writingStyle === 'solution-advisor' 
+                  ? 'Enter your question or problem to get comprehensive solutions with best practices...'
+                  : 'Enter text to enhance...',
               }}
               value={inputText}
               onChange={(value) => {
