@@ -1616,5 +1616,22 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBM3XENHANCESCROLLXYZ012",
+    "timestamp": "2025-12-04T08:29:04.000Z",
+    "version": "1.12.001",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "Revised system prompt in ai-agents.json to enhance guidance for schema generation, emphasizing proactive field suggestions and industry best practices. This update aims to improve the quality and comprehensiveness of generated schemas.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "schema-manager",
+          "app-builder"
+        ]
+      }
+    ]
   }
 ]

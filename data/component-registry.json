@@ -22,57 +22,13 @@
     "componentValue": "text"
   },
   {
-    "id": "icon-input",
-    "label": "IconInput",
-    "color": "amber",
-    "icon": "Star",
-    "category": "form-elements",
-    "description": "Icon chooser input integrated with Lucide icon set.",
-    "usecase": "Pick an icon when configuring entities or UI.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/IconInput.tsx",
-    "componentValue": "icon"
-  },
-  {
-    "id": "color-picker",
-    "label": "ColorPicker",
-    "color": "rose",
-    "icon": "Palette",
-    "category": "form-elements",
-    "description": "Color picker input with previews.",
-    "usecase": "Select theme or status colors.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/ColorPicker.tsx",
-    "componentValue": "color-picker"
-  },
-  {
-    "id": "sortable-selector",
-    "label": "SortableSelector",
-    "color": "slate",
-    "icon": "MoveVertical",
-    "category": "form-elements",
-    "description": "Sortable list selector for ordering selected items.",
-    "usecase": "Order fields, steps, or preferences.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/SortableSelector.tsx",
-    "componentValue": "list-input"
-  },
-  {
-    "id": "name-input",
-    "label": "NameInput",
-    "color": "sky",
-    "icon": "Type",
-    "category": "form-elements",
-    "description": "Text input specialized for names with validation.",
-    "usecase": "Collect person or entity names.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/NameInput.tsx",
-    "componentValue": "name"
-  },
-  {
     "id": "text-input",
     "label": "TextInput",
     "color": "sky",
     "icon": "Type",
     "category": "form-elements",
     "description": "General purpose text input.",
-    "usecase": "Forms for arbitrary text.",
+    "usecase": "Forms for arbitrary text, names, titles, codes, identifiers, short descriptions.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/TextInput.tsx",
     "componentValue": "text",
     "configSchema": {
@@ -121,7 +77,7 @@
     "icon": "AtSign",
     "category": "form-elements",
     "description": "Email-specific input with validation.",
-    "usecase": "Collect email addresses.",
+    "usecase": "Collect email addresses, contact information, user accounts.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/EmailInput.tsx",
     "componentValue": "email",
     "configSchema": {
@@ -158,13 +114,13 @@
     }
   },
   {
-    "id": "url",
-    "label": "URL",
+    "id": "url-input",
+    "label": "URLInput",
     "color": "sky",
     "icon": "Link",
     "category": "form-elements",
     "description": "URL-specific input with validation and open link functionality.",
-    "usecase": "Collect and open URLs.",
+    "usecase": "Collect and open URLs, website links, documentation links.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/URLInput.tsx",
     "componentValue": "url",
     "configSchema": {
@@ -201,13 +157,54 @@
     }
   },
   {
+    "id": "phone-input",
+    "label": "PhoneInput",
+    "color": "teal",
+    "icon": "Phone",
+    "category": "form-elements",
+    "description": "Phone input with formatting.",
+    "usecase": "Collect phone numbers, contact details, support lines.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/PhoneInput.tsx",
+    "componentValue": "tel",
+    "configSchema": {
+      "fields": [
+        {
+          "name": "countryCode",
+          "label": "Default Country Code",
+          "type": "string",
+          "description": "Default country code (e.g., US, GB)",
+          "defaultValue": "US"
+        },
+        {
+          "name": "format",
+          "label": "Phone Format",
+          "type": "select",
+          "description": "Phone number format",
+          "defaultValue": "international",
+          "options": [
+            { "value": "international", "label": "International" },
+            { "value": "national", "label": "National" },
+            { "value": "e164", "label": "E.164" }
+          ]
+        },
+        {
+          "name": "allowExtensions",
+          "label": "Allow Extensions",
+          "type": "boolean",
+          "description": "Allow phone number extensions",
+          "defaultValue": false
+        }
+      ]
+    }
+  },
+  {
     "id": "password-input",
     "label": "PasswordInput",
     "color": "neutral",
     "icon": "EyeOff",
     "category": "form-elements",
     "description": "Password input with show/hide.",
-    "usecase": "Authentication forms.",
+    "usecase": "Authentication forms, secure data entry, login credentials.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/PasswordInput.tsx",
     "componentValue": "password"
   },
@@ -218,7 +215,7 @@
     "icon": "Hash",
     "category": "form-elements",
     "description": "Numeric input with constraints.",
-    "usecase": "Collect integers or floats.",
+    "usecase": "Collect integers or floats, quantities, prices, measurements, counts, ratings.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/NumberInput.tsx",
     "componentValue": "number",
     "configSchema": {
@@ -269,54 +266,13 @@
     }
   },
   {
-    "id": "phone-input",
-    "label": "PhoneInput",
-    "color": "teal",
-    "icon": "Phone",
-    "category": "form-elements",
-    "description": "Phone input with formatting.",
-    "usecase": "Collect phone numbers.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/PhoneInput.tsx",
-    "componentValue": "tel",
-    "configSchema": {
-      "fields": [
-        {
-          "name": "countryCode",
-          "label": "Default Country Code",
-          "type": "string",
-          "description": "Default country code (e.g., US, GB)",
-          "defaultValue": "US"
-        },
-        {
-          "name": "format",
-          "label": "Phone Format",
-          "type": "select",
-          "description": "Phone number format",
-          "defaultValue": "international",
-          "options": [
-            { "value": "international", "label": "International" },
-            { "value": "national", "label": "National" },
-            { "value": "e164", "label": "E.164" }
-          ]
-        },
-        {
-          "name": "allowExtensions",
-          "label": "Allow Extensions",
-          "type": "boolean",
-          "description": "Allow phone number extensions",
-          "defaultValue": false
-        }
-      ]
-    }
-  },
-  {
     "id": "date-input",
     "label": "DateInput",
     "color": "lime",
     "icon": "Calendar",
     "category": "form-elements",
     "description": "Date picker input.",
-    "usecase": "Pick dates.",
+    "usecase": "Pick dates, birth dates, deadlines, start/end dates, appointment dates.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/DateInput.tsx",
     "componentValue": "date",
     "configSchema": {
@@ -350,7 +306,7 @@
     "icon": "Clock",
     "category": "form-elements",
     "description": "Date and time picker input.",
-    "usecase": "Pick date-time values.",
+    "usecase": "Pick date-time values, timestamps, scheduled events, appointment times.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/DateTimeInput.tsx",
     "componentValue": "datetime-local",
     "configSchema": {
@@ -389,26 +345,42 @@
     }
   },
   {
-    "id": "file-input",
-    "label": "FileInput",
-    "color": "zinc",
-    "icon": "Paperclip",
+    "id": "textarea",
+    "label": "Textarea",
+    "color": "sky",
+    "icon": "FileText",
     "category": "form-elements",
-    "description": "File upload input.",
-    "usecase": "Upload files and attachments.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/FileInput.tsx",
-    "componentValue": "file"
-  },
-  {
-    "id": "picker-input",
-    "label": "PickerInput",
-    "color": "violet",
-    "icon": "Boxes",
-    "category": "form-elements",
-    "description": "Form element that opens PopupPicker to select related records.",
-    "usecase": "Reference fields.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/PickerInput.tsx",
-    "componentValue": "picker"
+    "description": "Multiline text input.",
+    "usecase": "Descriptions and notes, long-form content, comments, instructions.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/Textarea.tsx",
+    "componentValue": "textarea",
+    "configSchema": {
+      "fields": [
+        {
+          "name": "rows",
+          "label": "Rows",
+          "type": "number",
+          "description": "Number of visible rows",
+          "defaultValue": 4,
+          "min": 1,
+          "max": 20
+        },
+        {
+          "name": "maxLength",
+          "label": "Max Length",
+          "type": "number",
+          "description": "Maximum number of characters",
+          "min": 1
+        },
+        {
+          "name": "autoResize",
+          "label": "Auto Resize",
+          "type": "boolean",
+          "description": "Automatically resize based on content",
+          "defaultValue": false
+        }
+      ]
+    }
   },
   {
     "id": "select",
@@ -417,7 +389,7 @@
     "icon": "ChevronDown",
     "category": "form-elements",
     "description": "Select input supporting badges/options.",
-    "usecase": "Choose from a list.",
+    "usecase": "Choose from a list, status selection, category selection, single choice options.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/Select.tsx",
     "componentValue": "select",
     "configSchema": {
@@ -454,13 +426,101 @@
     }
   },
   {
+    "id": "checkbox-list",
+    "label": "CheckboxList",
+    "color": "purple",
+    "icon": "SquareCheck",
+    "category": "form-elements",
+    "description": "Checklist for multiple selections.",
+    "usecase": "Multiple booleans/options, tags selection, feature flags, permissions.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/CheckboxList.tsx",
+    "componentValue": "checkbox-list"
+  },
+  {
+    "id": "picker-input",
+    "label": "PickerInput",
+    "color": "violet",
+    "icon": "Boxes",
+    "category": "form-elements",
+    "description": "Form element that opens PopupPicker to select related records.",
+    "usecase": "Reference fields, relational data, selecting from other schemas.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/PickerInput.tsx",
+    "componentValue": "picker"
+  },
+  {
+    "id": "color-picker",
+    "label": "ColorPicker",
+    "color": "rose",
+    "icon": "Palette",
+    "category": "form-elements",
+    "description": "Color picker input with previews.",
+    "usecase": "Select theme or status colors, branding, visual customization.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/ColorPicker.tsx",
+    "componentValue": "color-picker"
+  },
+  {
+    "id": "icon-input",
+    "label": "IconInput",
+    "color": "amber",
+    "icon": "Star",
+    "category": "form-elements",
+    "description": "Icon chooser input integrated with Lucide icon set.",
+    "usecase": "Pick an icon when configuring entities or UI, visual identifiers.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/IconInput.tsx",
+    "componentValue": "icon"
+  },
+  {
+    "id": "switch",
+    "label": "Switch",
+    "color": "emerald",
+    "icon": "ToggleRight",
+    "category": "form-elements",
+    "description": "Boolean toggle switch.",
+    "usecase": "Enable/disable flags, on/off settings, feature toggles.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/Switch.tsx",
+    "componentValue": "switch"
+  },
+  {
+    "id": "checkbox",
+    "label": "Checkbox",
+    "color": "purple",
+    "icon": "CheckSquare",
+    "category": "form-elements",
+    "description": "Single checkbox input.",
+    "usecase": "Single boolean, agreement checkboxes, terms acceptance.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/Checkbox.tsx",
+    "componentValue": "checkbox"
+  },
+  {
+    "id": "toggle",
+    "label": "Toggle",
+    "color": "emerald",
+    "icon": "ToggleLeft",
+    "category": "form-elements",
+    "description": "Toggle button.",
+    "usecase": "Alternative to switch, compact boolean controls.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/Toggle.tsx",
+    "componentValue": "toggle"
+  },
+  {
+    "id": "toggle-group",
+    "label": "ToggleGroup",
+    "color": "emerald",
+    "icon": "LayoutGrid",
+    "category": "form-elements",
+    "description": "Exclusive or multi toggle groups.",
+    "usecase": "Segmented controls, view switchers, filter toggles.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/ToggleGroup.tsx",
+    "componentValue": "toggle-group"
+  },
+  {
     "id": "slider",
     "label": "Slider",
     "color": "orange",
     "icon": "Sliders",
     "category": "form-elements",
     "description": "Slider input for continuous values.",
-    "usecase": "Pick numeric ranges/values.",
+    "usecase": "Pick numeric ranges/values, volume controls, progress indicators, rating scales.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/Slider.tsx",
     "componentValue": "slider",
     "configSchema": {
@@ -504,119 +564,15 @@
     }
   },
   {
-    "id": "switch",
-    "label": "Switch",
-    "color": "emerald",
-    "icon": "ToggleRight",
+    "id": "tag-input",
+    "label": "TagInput",
+    "color": "cyan",
+    "icon": "Tags",
     "category": "form-elements",
-    "description": "Boolean toggle switch.",
-    "usecase": "Enable/disable flags.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/Switch.tsx",
-    "componentValue": "switch"
-  },
-  {
-    "id": "radio-group",
-    "label": "RadioGroup",
-    "color": "purple",
-    "icon": "CircleDot",
-    "category": "form-elements",
-    "description": "Radio buttons group.",
-    "usecase": "Pick one option.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/RadioGroup.tsx",
-    "componentValue": "radio"
-  },
-  {
-    "id": "checkbox",
-    "label": "Checkbox",
-    "color": "purple",
-    "icon": "CheckSquare",
-    "category": "form-elements",
-    "description": "Single checkbox input.",
-    "usecase": "Single boolean.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/Checkbox.tsx",
-    "componentValue": "checkbox"
-  },
-  {
-    "id": "checkbox-list",
-    "label": "CheckboxList",
-    "color": "purple",
-    "icon": "SquareCheck",
-    "category": "form-elements",
-    "description": "Checklist for multiple selections.",
-    "usecase": "Multiple booleans/options.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/CheckboxList.tsx",
-    "componentValue": "checkbox-list"
-  },
-  {
-    "id": "toggle",
-    "label": "Toggle",
-    "color": "emerald",
-    "icon": "ToggleLeft",
-    "category": "form-elements",
-    "description": "Toggle button.",
-    "usecase": "Alternative to switch.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/Toggle.tsx",
-    "componentValue": "toggle"
-  },
-  {
-    "id": "toggle-group",
-    "label": "ToggleGroup",
-    "color": "emerald",
-    "icon": "LayoutGrid",
-    "category": "form-elements",
-    "description": "Exclusive or multi toggle groups.",
-    "usecase": "Segmented controls.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/ToggleGroup.tsx",
-    "componentValue": "toggle-group"
-  },
-  {
-    "id": "textarea",
-    "label": "Textarea",
-    "color": "sky",
-    "icon": "FileText",
-    "category": "form-elements",
-    "description": "Multiline text input.",
-    "usecase": "Descriptions and notes.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/Textarea.tsx",
-    "componentValue": "textarea",
-    "configSchema": {
-      "fields": [
-        {
-          "name": "rows",
-          "label": "Rows",
-          "type": "number",
-          "description": "Number of visible rows",
-          "defaultValue": 4,
-          "min": 1,
-          "max": 20
-        },
-        {
-          "name": "maxLength",
-          "label": "Max Length",
-          "type": "number",
-          "description": "Maximum number of characters",
-          "min": 1
-        },
-        {
-          "name": "autoResize",
-          "label": "Auto Resize",
-          "type": "boolean",
-          "description": "Automatically resize based on content",
-          "defaultValue": false
-        }
-      ]
-    }
-  },
-  {
-    "id": "otp-input",
-    "label": "OTPInput",
-    "color": "fuchsia",
-    "icon": "Keyboard",
-    "category": "form-elements",
-    "description": "One-time-password input with slots.",
-    "usecase": "Verification codes.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/OTPInput.tsx",
-    "componentValue": "otp-input"
+    "description": "Tag input with badge display for multiple values.",
+    "usecase": "Email addresses, tags, labels, and multiple selections.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/TagInput.tsx",
+    "componentValue": "tag-input"
   },
   {
     "id": "list-input",
@@ -630,26 +586,92 @@
     "componentValue": "list-input"
   },
   {
-    "id": "tag-input",
-    "label": "TagInput",
-    "color": "cyan",
-    "icon": "Tags",
-    "category": "form-elements",
-    "description": "Tag input with badge display for multiple values.",
-    "usecase": "Email addresses, tags, labels, and multiple selections.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/TagInput.tsx",
-    "componentValue": "tag-input"
-  },
-  {
     "id": "rating",
     "label": "Rating",
     "color": "yellow",
     "icon": "Star",
     "category": "form-elements",
     "description": "Star rating input.",
-    "usecase": "Feedback and reviews.",
+    "usecase": "Feedback and reviews, quality ratings, satisfaction scores.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/Rating.tsx",
     "componentValue": "rating"
+  },
+  {
+    "id": "name-input",
+    "label": "NameInput",
+    "color": "sky",
+    "icon": "Type",
+    "category": "form-elements",
+    "description": "Name input with customizable format.",
+    "usecase": "Person names, customizable name fields.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/NameInput.tsx",
+    "componentValue": "name"
+  },
+  {
+    "id": "button",
+    "label": "Button",
+    "color": "indigo",
+    "icon": "MousePointerClick",
+    "category": "form-elements",
+    "description": "Button component.",
+    "usecase": "Action buttons, form submissions.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/Button.tsx",
+    "componentValue": "button"
+  },
+  {
+    "id": "radio-group",
+    "label": "RadioGroup",
+    "color": "purple",
+    "icon": "CircleDot",
+    "category": "form-elements",
+    "description": "Radio buttons group.",
+    "usecase": "Pick one option from a small set, mutually exclusive choices.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/RadioGroup.tsx",
+    "componentValue": "radio"
+  },
+  {
+    "id": "file-input",
+    "label": "FileInput",
+    "color": "zinc",
+    "icon": "Paperclip",
+    "category": "form-elements",
+    "description": "File upload input.",
+    "usecase": "Upload files and attachments, document management, media uploads.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/FileInput.tsx",
+    "componentValue": "file"
+  },
+  {
+    "id": "otp-input",
+    "label": "OTPInput",
+    "color": "fuchsia",
+    "icon": "Keyboard",
+    "category": "form-elements",
+    "description": "One-time-password input with slots.",
+    "usecase": "Verification codes, 2FA, security tokens.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/OTPInput.tsx",
+    "componentValue": "otp-input"
+  },
+  {
+    "id": "image-text",
+    "label": "ImageText",
+    "color": "pink",
+    "icon": "Image",
+    "category": "form-elements",
+    "description": "Image with text overlay.",
+    "usecase": "Display images with text content.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/ImageText.tsx",
+    "componentValue": "image-text"
+  },
+  {
+    "id": "image-viewer",
+    "label": "ImageViewer",
+    "color": "pink",
+    "icon": "Image",
+    "category": "form-elements",
+    "description": "Image display component.",
+    "usecase": "Displaying images from URLs or base64 content.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/ImageViewer.tsx",
+    "componentValue": "image-viewer"
   },
   {
     "id": "avatar",
@@ -658,42 +680,64 @@
     "icon": "User",
     "category": "form-elements",
     "description": "Avatar display component.",
-    "usecase": "Initials-based avatar.",
+    "usecase": "User avatars, profile pictures.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/Avatar.tsx",
     "componentValue": "avatar"
   },
   {
-    "id": "cta-button",
-    "label": "CTAButton",
-    "color": "indigo",
-    "icon": "ArrowRight",
+    "id": "input",
+    "label": "Input",
+    "color": "slate",
+    "icon": "Type",
     "category": "form-elements",
-    "description": "Call-to-action button with icon and color variants.",
-    "usecase": "Primary action buttons.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/CTAButton.tsx",
-    "componentValue": "text"
+    "description": "Generic input component.",
+    "usecase": "Custom input needs.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/Input.tsx",
+    "componentValue": "input"
   },
   {
-    "id": "add-button-full",
-    "label": "AddButtonFull",
-    "color": "indigo",
-    "icon": "Plus",
+    "id": "countdown",
+    "label": "Countdown",
+    "color": "red",
+    "icon": "Timer",
     "category": "form-elements",
-    "description": "Full-width call-to-action button (e.g., Load More).",
-    "usecase": "List/grid actions.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/AddButtonFull.tsx",
-    "componentValue": "text"
+    "description": "Countdown timer.",
+    "usecase": "Time-based countdowns, deadlines.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/Countdown.tsx",
+    "componentValue": "countdown"
   },
   {
-    "id": "code-badge",
-    "label": "CodeBadge",
+    "id": "language-selector",
+    "label": "LanguageSelector",
+    "color": "blue",
+    "icon": "Languages",
+    "category": "form-elements",
+    "description": "Language selection dropdown.",
+    "usecase": "Selecting languages, translation settings.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/LanguageSelector.tsx",
+    "componentValue": "language-selector"
+  },
+  {
+    "id": "badge",
+    "label": "Badge",
     "color": "gray",
     "icon": "Tag",
     "category": "form-elements",
-    "description": "Compact code/tag badge used in lists.",
-    "usecase": "Show entity codes.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/CodeBadge.tsx",
+    "description": "Badge display component.",
+    "usecase": "Display badges, labels, tags.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/Badge.tsx",
     "componentValue": "badge"
+  },
+  {
+    "id": "sortable-selector",
+    "label": "SortableSelector",
+    "color": "slate",
+    "icon": "MoveVertical",
+    "category": "form-elements",
+    "description": "Sortable list selector for ordering selected items.",
+    "usecase": "Order fields, steps, or preferences.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/SortableSelector.tsx",
+    "componentValue": "list-input"
   },
   {
     "id": "end-line",
@@ -856,4 +900,3 @@
     }
   }
 ]
-
