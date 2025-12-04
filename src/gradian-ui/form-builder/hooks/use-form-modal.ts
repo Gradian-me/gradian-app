@@ -8,7 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { asFormBuilderSchema } from '@/gradian-ui/schema-manager/utils/schema-utils';
-import type { FormSchema as FormBuilderSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import type { FormSchema as FormBuilderSchema, DataRelation } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useCompanyStore } from '@/stores/company.store';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { toast } from 'sonner';
@@ -41,6 +41,96 @@ function reconstructRegExp(obj: any): any {
   }
   
   return obj;
+}
+
+/**
+ * Apply HAS_FIELD_VALUE relations to an entity so that picker fields
+ * are populated from relations instead of only direct stored values.
+ * This runs on edit mode after the entity has been loaded.
+ */
+async function applyHasFieldValueRelationsToEntity(params: {
+  schemaId: string;
+  formBuilderSchema: FormBuilderSchema;
+  entity: any;
+}): Promise<any> {
+  const { schemaId, formBuilderSchema, entity } = params;
+
+  if (!entity || !entity.id) {
+    return entity;
+  }
+
+  try {
+    const query = new URLSearchParams({
+      sourceSchema: schemaId,
+      sourceId: String(entity.id),
+      relationTypeId: 'HAS_FIELD_VALUE',
+      resolveTargets: 'true', // Request enriched target data with label/icon/color
+    });
+
+    const response = await apiRequest<Array<DataRelation & { targetData?: { id: string; label?: string; icon?: string; color?: string } }>>(`/api/relations?${query.toString()}`);
+
+    if (!response.success || !Array.isArray(response.data) || response.data.length === 0) {
+      return entity;
+    }
+
+    const relations = response.data;
+
+    // Group relations by fieldId to easily map back to fields
+    const relationsByFieldId = relations.reduce<Record<string, typeof relations>>((acc, rel) => {
+      if (!rel.fieldId) return acc;
+      if (!acc[rel.fieldId]) {
+        acc[rel.fieldId] = [];
+      }
+      acc[rel.fieldId].push(rel);
+      return acc;
+    }, {});
+
+    // If no relations have fieldId, leave entity as-is
+    if (Object.keys(relationsByFieldId).length === 0) {
+      return entity;
+    }
+
+    const updatedEntity = { ...entity };
+
+    for (const field of formBuilderSchema.fields ?? []) {
+      if (field.component !== 'picker' || !field.name) {
+        continue;
+      }
+
+      const fieldId = field.id || field.name;
+      const fieldRelations = relationsByFieldId[fieldId];
+
+      if (!fieldRelations || fieldRelations.length === 0) {
+        continue;
+      }
+
+      // Map relations to normalized options with id, label, icon, color
+      // This format matches what PickerInput expects
+      const newValue = fieldRelations.map((rel) => {
+        if (rel.targetData) {
+          // Use enriched target data if available
+          return {
+            id: rel.targetData.id,
+            label: rel.targetData.label || rel.targetData.id,
+            icon: rel.targetData.icon,
+            color: rel.targetData.color,
+          };
+        }
+        // Fallback to just ID if targetData wasn't resolved
+        return {
+          id: rel.targetId,
+          label: rel.targetId,
+        };
+      });
+
+      updatedEntity[field.name] = newValue;
+    }
+
+    return updatedEntity;
+  } catch (error) {
+    console.warn('[useFormModal] Failed to apply HAS_FIELD_VALUE relations to entity', error);
+    return entity;
+  }
 }
 
 export type FormModalMode = 'create' | 'edit';
@@ -292,8 +382,15 @@ export function useFormModal(
           entitySource = entityResult.data;
         }
 
-        // Set entity data (either from initial source or API)
-        setEntityData(entitySource);
+        // Apply HAS_FIELD_VALUE relations to entity so picker fields can be populated from relations
+        const enrichedEntity = await applyHasFieldValueRelationsToEntity({
+          schemaId,
+          formBuilderSchema,
+          entity: entitySource,
+        });
+
+        // Set entity data (either from initial source or API, enriched with relations)
+        setEntityData(enrichedEntity);
         setEntityId(editEntityId);
       } else {
         // Create mode - clear entity data

@@ -368,5 +368,51 @@
     "id": "01KBHH7C1QGMS54XPVZBEWYTGB",
     "createdAt": "2025-12-03T07:18:29.687Z",
     "updatedAt": "2025-12-03T07:18:29.687Z"
+  },
+  {
+    "id": "01KBME9NN49RHBYT83YTFVH5AS",
+    "sourceSchema": "servers",
+    "sourceId": "01KBAT7P2B5NZYX26HVWYV28N1",
+    "targetSchema": "users",
+    "targetId": "01KBAT78NRNB8KCD4Z625KH07A",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-04T10:25:02.624Z",
+    "updatedAt": "2025-12-04T10:41:00.142Z",
+    "inactive": true
+  },
+  {
+    "id": "01KBMF20YRGDS0EZVJ49DAYGQ3",
+    "sourceSchema": "servers",
+    "sourceId": "01KBAT7P2B5NZYX26HVWYV28N1",
+    "targetSchema": "users",
+    "targetId": "01KAEC9VRPRR23C24QHTR0NSF9",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-04T10:38:20.630Z",
+    "updatedAt": "2025-12-04T10:41:00.142Z",
+    "inactive": true
+  },
+  {
+    "id": "01KBMF20YZ6A5SFJ4ZWQ3PKTZW",
+    "sourceSchema": "servers",
+    "sourceId": "01KBAT7P2B5NZYX26HVWYV28N1",
+    "targetSchema": "users",
+    "targetId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-04T10:38:20.630Z",
+    "updatedAt": "2025-12-04T10:41:00.142Z"
+  },
+  {
+    "id": "01KBMF6WQE6GDCJDXJ390G6N5M",
+    "sourceSchema": "servers",
+    "sourceId": "01KBAT7P2B5NZYX26HVWYV28N1",
+    "targetSchema": "users",
+    "targetId": "01KBF8N88CG4YPK6VDNQAE420Z",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-04T10:41:00.142Z",
+    "updatedAt": "2025-12-04T10:41:00.142Z"
   }
 ]

@@ -492,6 +492,16 @@ export interface DataRelation {
   targetSchema: string;
   targetId: string;
   relationTypeId: string;
+  /**
+   * Optional field identifier (form field id) that owns this relation.
+   * Used primarily for HAS_FIELD_VALUE relations to map back to specific fields.
+   */
+  fieldId?: string;
+  /**
+   * Soft-delete flag for relations.
+   * When true, relation is kept for history but should be treated as inactive.
+   */
+  inactive?: boolean;
   createdAt?: string;
   updatedAt?: string;
   // Direction indicator for API responses - indicates whether this relation is from the perspective of source or target

@@ -5,7 +5,7 @@ import { FormSchema, FormData, FormErrors, FormTouched } from '@/gradian-ui/sche
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '../form-elements/components/Switch';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } from '../form-elements/components/Textarea';
 import { cn } from '../../shared/utils';
 import { PickerInput } from '../form-elements/components/PickerInput';
 import { DateInput } from '../form-elements/components/DateInput';
@@ -132,21 +132,19 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
 
           {schema.allowDataForce && forceValue && (
             <div className="space-y-2">
-              <Label
-                htmlFor="system-force-reason"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Force Reason
-              </Label>
               <Textarea
-                id="system-force-reason"
-                name="forceReason"
+                config={{
+                  name: 'forceReason',
+                  label: 'Force Reason',
+                  placeholder: 'Enter the reason for forcing this record...',
+                }}
                 value={forceReasonValue}
-                onChange={(e) => onChange('forceReason', e.target.value)}
+                onChange={(value) => onChange('forceReason', value)}
                 onBlur={() => onBlur('forceReason')}
-                placeholder="Enter the reason for forcing this record..."
-                rows={3}
+                error={errors?.forceReason}
+                touched={typeof touched?.forceReason === 'boolean' ? touched.forceReason : undefined}
                 disabled={disabled}
+                rows={3}
                 className="w-full"
               />
             </div>

@@ -9,6 +9,7 @@ import { BaseEntity } from '@/gradian-ui/shared/domain/types/base.types';
 import { isValidSchemaId, getSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
 import { loadAllCompanies, clearCompaniesCache } from '@/gradian-ui/shared/utils/companies-loader';
 import { isDemoModeEnabled, proxyDataRequest, enrichWithUsers, enrichEntitiesWithUsers } from '../utils';
+import { syncHasFieldValueRelationsForEntity } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
 
 /**
  * Create controller instance for the given schema
@@ -204,30 +205,55 @@ export async function POST(
     
     // If single item, use controller (maintains existing behavior)
     if (!isArray) {
-    const controller = await createController(schemaId);
-    const response = await controller.create(request, requestBody);
-    
-    // Clear companies cache if a company was created
-    if (schemaId === 'companies') {
-      clearCompaniesCache();
-    }
-    
-    // Enrich response with user objects in demo mode
-    if (isDemoModeEnabled()) {
+      const controller = await createController(schemaId);
+      const response = await controller.create(request, requestBody);
+
+      // Parse response once so we can augment it (relations, enrichment) and then send
+      let responseData: any;
       try {
-        const responseData = await response.json();
-        if (responseData && responseData.success && responseData.data && typeof responseData.data === 'object') {
-          responseData.data = await enrichWithUsers(responseData.data);
-        }
-        return NextResponse.json(responseData, { status: response.status });
+        responseData = await response.json();
       } catch (error) {
-        // If JSON parsing fails, return original response
-        console.warn('[POST /api/data] Failed to enrich response:', error);
-        return response;
+        console.warn('[POST /api/data] Failed to parse create response JSON:', error);
+        responseData = null;
       }
-    }
-    
-    return response;
+
+      // Clear companies cache if a company was created
+      if (schemaId === 'companies') {
+        clearCompaniesCache();
+      }
+
+      // In demo mode, also synchronize HAS_FIELD_VALUE relations after entity creation
+      if (isDemoModeEnabled() && responseData?.success && responseData.data && typeof responseData.data === 'object') {
+        try {
+          await syncHasFieldValueRelationsForEntity({
+            schemaId,
+            entity: responseData.data,
+          });
+        } catch (error) {
+          console.warn('[POST /api/data] Failed to sync HAS_FIELD_VALUE relations', error);
+        }
+      }
+
+      // Enrich response with user objects in demo mode
+      if (isDemoModeEnabled() && responseData) {
+        try {
+          if (responseData && responseData.success && responseData.data && typeof responseData.data === 'object') {
+            responseData.data = await enrichWithUsers(responseData.data);
+          }
+          return NextResponse.json(responseData, { status: response.status });
+        } catch (error) {
+          // If JSON parsing fails, fall back to minimal response
+          console.warn('[POST /api/data] Failed to enrich response:', error);
+          return NextResponse.json(responseData, { status: response.status });
+        }
+      }
+
+      // For non-demo or parse failures, return original response as-is
+      if (responseData) {
+        return NextResponse.json(responseData, { status: response.status });
+      }
+
+      return response;
     }
 
     // Handle array of entities

@@ -14,6 +14,10 @@ import {
 } from '@/gradian-ui/shared/domain/utils/relations-storage.util';
 import { DataRelation } from '@/gradian-ui/schema-manager/types/form-schema';
 import { handleDomainError } from '@/gradian-ui/shared/domain/errors/domain.errors';
+import { getExternalNodes } from '@/gradian-ui/shared/domain/utils/external-nodes.util';
+import { getSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
+import { BaseRepository } from '@/gradian-ui/shared/domain/repositories/base.repository';
+import { getValueByRole, getSingleValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 
 /**
  * GET - Query relations
@@ -46,6 +50,9 @@ export async function GET(request: NextRequest) {
     const targetSchema = searchParams.get('targetSchema');
     const targetId = searchParams.get('targetId');
     const relationTypeId = searchParams.get('relationTypeId');
+    const fieldId = searchParams.get('fieldId');
+    const includeInactive = searchParams.get('includeInactive') === 'true';
+    const resolveTargets = searchParams.get('resolveTargets') === 'true';
 
     let relations: DataRelation[];
 
@@ -88,6 +95,114 @@ export async function GET(request: NextRequest) {
     // Get all relations
     else {
       relations = readAllRelations();
+    }
+
+    // Optional filter by fieldId (mainly for HAS_FIELD_VALUE)
+    if (fieldId) {
+      relations = relations.filter((r) => r.fieldId === fieldId);
+    }
+
+    // By default, hide inactive relations when a relationTypeId is specified,
+    // unless includeInactive=true is explicitly requested.
+    if (relationTypeId && !includeInactive) {
+      relations = relations.filter((r) => r.inactive !== true);
+    }
+
+    // If resolveTargets=true, enrich relations with target node data (label, icon, color)
+    // OPTIMIZED: Batch fetch entities by schema to avoid N+1 queries
+    if (resolveTargets && isDemoModeEnabled()) {
+      // Batch process external nodes (single read)
+      const externalNodes = getExternalNodes();
+      const externalNodeMap = new Map(externalNodes.map((node) => [node.id, node]));
+
+      // Group internal relations by targetSchema to batch fetch
+      const relationsBySchema = new Map<string, DataRelation[]>();
+      for (const rel of relations) {
+        if (rel.targetSchema !== 'external-nodes') {
+          if (!relationsBySchema.has(rel.targetSchema)) {
+            relationsBySchema.set(rel.targetSchema, []);
+          }
+          relationsBySchema.get(rel.targetSchema)!.push(rel);
+        }
+      }
+
+      // Batch fetch all entities and schemas by schema (one read per schema, not per relation)
+      const schemaEntityMap = new Map<string, Map<string, any>>();
+      const schemaMap = new Map<string, any>();
+      
+      await Promise.all(
+        Array.from(relationsBySchema.keys()).map(async (schemaId) => {
+          try {
+            const [targetSchema, allEntities] = await Promise.all([
+              getSchemaById(schemaId),
+              new BaseRepository(schemaId).findAll(),
+            ]);
+            
+            if (targetSchema) {
+              schemaMap.set(schemaId, targetSchema);
+            }
+            
+            // Create a map of entity ID -> entity for fast lookup
+            const entityMap = new Map(allEntities.map((e: any) => [e.id, e]));
+            schemaEntityMap.set(schemaId, entityMap);
+          } catch (error) {
+            console.warn(`[GET /api/relations] Failed to batch fetch schema ${schemaId}:`, error);
+          }
+        })
+      );
+
+      // Enrich relations using batched data
+      const enrichedRelations = relations.map((rel) => {
+        try {
+          let targetData: { id: string; label?: string; icon?: string; color?: string } | null = null;
+
+          if (rel.targetSchema === 'external-nodes') {
+            // Lookup from pre-loaded external nodes map
+            const externalNode = externalNodeMap.get(rel.targetId);
+            if (externalNode) {
+              targetData = {
+                id: externalNode.id,
+                label: externalNode.label,
+                icon: externalNode.icon,
+                color: externalNode.color,
+              };
+            }
+          } else {
+            // Lookup from pre-loaded schema entity map
+            const entityMap = schemaEntityMap.get(rel.targetSchema);
+            const entity = entityMap?.get(rel.targetId);
+            const targetSchema = schemaMap.get(rel.targetSchema);
+
+            if (entity && targetSchema) {
+              // Use proper field resolution with schema
+              const label = getValueByRole(targetSchema, entity, 'title') || entity.name || entity.title || rel.targetId;
+              const icon = getSingleValueByRole(targetSchema, entity, 'icon') || entity.icon;
+              const color = getSingleValueByRole(targetSchema, entity, 'color') || entity.color;
+
+              targetData = {
+                id: rel.targetId,
+                label: typeof label === 'string' ? label : String(label),
+                icon: icon ? String(icon) : undefined,
+                color: color ? String(color) : undefined,
+              };
+            }
+          }
+
+          return {
+            ...rel,
+            targetData,
+          };
+        } catch (error) {
+          console.warn(`[GET /api/relations] Failed to enrich relation ${rel.id}:`, error);
+          return rel;
+        }
+      });
+
+      return NextResponse.json({
+        success: true,
+        data: enrichedRelations,
+        count: enrichedRelations.length,
+      });
     }
 
     return NextResponse.json({

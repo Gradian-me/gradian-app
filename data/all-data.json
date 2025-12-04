@@ -750,6 +750,15 @@
       "id": "HAS_STATUS_ITEM",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Has Field Value",
+      "color": "zinc",
+      "icon": "FormInput",
+      "incomplete": false,
+      "id": "HAS_FIELD_VALUE",
+      "createdAt": "2025-12-04T10:05:47.411Z",
+      "updatedAt": "2025-12-04T10:05:47.412Z"
     }
   ],
   "inquiry-vendors": [
@@ -1463,12 +1472,21 @@
           "color": "emerald"
         }
       ],
-      "owners": [],
+      "owners": [
+        {
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+          "label": "Mahyar Abidi"
+        },
+        {
+          "id": "01KBF8N88CG4YPK6VDNQAE420Z",
+          "label": "Gradian Administrator"
+        }
+      ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBAT7P2B5NZYX26HVWYV28N1",
       "createdAt": "2025-11-30T16:41:16.115Z",
-      "updatedAt": "2025-12-02T13:42:12.426Z",
+      "updatedAt": "2025-12-04T10:41:00.108Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "audienceId": "01KANTJN9VP30XGJY4FQTCTK7D",

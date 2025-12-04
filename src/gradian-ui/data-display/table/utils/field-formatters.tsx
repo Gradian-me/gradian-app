@@ -133,6 +133,46 @@ export const formatFieldValue = (
     (Array.isArray(value) || (typeof value === 'object' && value !== null));
 
   if (field?.component === 'picker' && field.targetSchema && row) {
+    // Check if value is an array (even single-item arrays should use BadgeViewer for consistency)
+    const isArrayValue = Array.isArray(value) && value.length > 0;
+    const isNormalizedArray = isArrayValue && normalizedOptions.length > 0;
+    
+    // For array values (multi-select or single-item arrays with normalized format),
+    // use BadgeViewer to show all items with proper formatting
+    if (isNormalizedArray || (isArrayValue && (value[0]?.label || value[0]?.id))) {
+      const handleBadgeClick = (item: BadgeItem) => {
+        const candidateId = item.normalized?.id ?? item.id;
+        if (!candidateId) return;
+        const targetSchema = field?.targetSchema;
+        if (!targetSchema) return;
+
+        const url = `/page/${targetSchema}/${encodeURIComponent(candidateId)}?showBack=true`;
+        if (typeof window !== 'undefined') {
+          window.open(url, '_self');
+        }
+      };
+
+      return wrapWithForceIcon(
+        <BadgeViewer
+          field={field}
+          value={value}
+          badgeVariant={field.roleColor || "default"}
+          enforceVariant
+          animate={true}
+          onBadgeClick={field?.targetSchema ? handleBadgeClick : undefined}
+          isItemClickable={
+            field?.targetSchema
+              ? (item) => Boolean(item.normalized?.id ?? item.id)
+              : () => false
+          }
+        />,
+        isForce,
+        field,
+        row
+      );
+    }
+    
+    // For single non-array values, show the label
     const pickerDisplay = getPickerDisplayValue(field, value, { row });
     if (pickerDisplay) {
       return wrapWithForceIcon(<span>{pickerDisplay}</span>, isForce, field, row);

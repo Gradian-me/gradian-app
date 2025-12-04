@@ -73,6 +73,92 @@ export function createRelation(relation: Omit<DataRelation, 'id' | 'createdAt' |
 }
 
 /**
+ * Upsert HAS_FIELD_VALUE-style relations for a specific field on an entity.
+ * - Marks previous relations for this (sourceSchema, sourceId, relationTypeId, fieldId)
+ *   as inactive when they are no longer selected.
+ * - Ensures currently selected targets are present and active.
+ */
+export function upsertFieldValueRelations(params: {
+  sourceSchema: string;
+  sourceId: string;
+  relationTypeId: string;
+  fieldId: string;
+  targets: Array<{ targetSchema: string; targetId: string }>;
+}): DataRelation[] {
+  const { sourceSchema, sourceId, relationTypeId, fieldId, targets } = params;
+
+  try {
+    const relations = readAllRelations();
+    const now = new Date().toISOString();
+
+    // Existing relations for this field on this entity
+    const existingForField = relations.filter(
+      (r) =>
+        r.sourceSchema === sourceSchema &&
+        r.sourceId === sourceId &&
+        r.relationTypeId === relationTypeId &&
+        r.fieldId === fieldId,
+    );
+
+    const targetKey = (t: { targetSchema: string; targetId: string }) => `${t.targetSchema}::${t.targetId}`;
+    const newTargetKeys = new Set(targets.map(targetKey));
+
+    const updatedRelations: DataRelation[] = relations.map((relation) => {
+      if (
+        relation.sourceSchema === sourceSchema &&
+        relation.sourceId === sourceId &&
+        relation.relationTypeId === relationTypeId &&
+        relation.fieldId === fieldId
+      ) {
+        const key = targetKey({ targetSchema: relation.targetSchema, targetId: relation.targetId });
+        const isStillSelected = newTargetKeys.has(key);
+
+        return {
+          ...relation,
+          inactive: !isStillSelected || relation.inactive === true ? !isStillSelected : undefined,
+          updatedAt: now,
+        };
+      }
+
+      return relation;
+    });
+
+    // Create relations for new targets that don't exist yet
+    const existingKeys = new Set(
+      existingForField.map((r) => targetKey({ targetSchema: r.targetSchema, targetId: r.targetId })),
+    );
+
+    const newRelations: DataRelation[] = targets
+      .filter((t) => !existingKeys.has(targetKey(t)))
+      .map((t) => ({
+        id: ulid(),
+        sourceSchema,
+        sourceId,
+        targetSchema: t.targetSchema,
+        targetId: t.targetId,
+        relationTypeId,
+        fieldId,
+        inactive: undefined,
+        createdAt: now,
+        updatedAt: now,
+      }));
+
+    const allRelations = [...updatedRelations, ...newRelations];
+    writeAllRelations(allRelations);
+
+    return allRelations.filter(
+      (r) =>
+        r.sourceSchema === sourceSchema &&
+        r.sourceId === sourceId &&
+        r.relationTypeId === relationTypeId &&
+        r.fieldId === fieldId,
+    );
+  } catch (error) {
+    throw new DataStorageError('upsert field value relations', error instanceof Error ? error.message : 'Unknown error');
+  }
+}
+
+/**
  * Delete a relation by ID
  */
 export function deleteRelation(relationId: string): void {
