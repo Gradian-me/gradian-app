@@ -15,6 +15,7 @@ before_script:
   - |
     cat > .env << EOF
     AVALAI_API_KEY=$AVALAI_API_KEY
+    APP_ID=$APP_ID
     CLIENT_ID=$CLIENT_ID
     DATABASE_URL=$DATABASE_URL
     JWT_SECRET=$JWT_SECRET
