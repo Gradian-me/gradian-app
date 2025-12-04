@@ -258,7 +258,7 @@ export const GoToTopForm: React.FC<GoToTopFormProps> = ({
             ease: [0.25, 0.46, 0.45, 0.94]
           }}
           className={cn(
-            'fixed z-[100]',
+            'fixed z-100',
             // Position inside ScrollArea viewport when in dialog to avoid scrollbar
             isInDialog && position === 'bottom-right' ? 'bottom-8 right-20' : positionClasses[position],
             className

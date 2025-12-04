@@ -378,7 +378,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T10:25:02.624Z",
-    "updatedAt": "2025-12-04T10:41:00.142Z",
+    "updatedAt": "2025-12-04T11:19:12.880Z",
     "inactive": true
   },
   {
@@ -390,7 +390,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T10:38:20.630Z",
-    "updatedAt": "2025-12-04T10:41:00.142Z",
+    "updatedAt": "2025-12-04T11:19:12.880Z",
     "inactive": true
   },
   {
@@ -402,7 +402,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T10:38:20.630Z",
-    "updatedAt": "2025-12-04T10:41:00.142Z"
+    "updatedAt": "2025-12-04T11:19:12.880Z"
   },
   {
     "id": "01KBMF6WQE6GDCJDXJ390G6N5M",
@@ -413,6 +413,314 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T10:41:00.142Z",
-    "updatedAt": "2025-12-04T10:41:00.142Z"
+    "updatedAt": "2025-12-04T11:19:12.880Z"
+  },
+  {
+    "id": "01KBMHCVGE0EMMSF57WWWY8GWK",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K971W83WWA4QCVFNAZSF5N11",
+    "targetSchema": "vendors",
+    "targetId": "01K9MP000000000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-04T11:19:12.653Z",
+    "updatedAt": "2025-12-04T11:19:12.653Z"
+  },
+  {
+    "id": "01KBMHCVH0J12NC9TCTF2B6PF2",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K971WG76Y655JPYJDAJTTVV3",
+    "targetSchema": "vendors",
+    "targetId": "01K9PG000000000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-04T11:19:12.672Z",
+    "updatedAt": "2025-12-04T11:19:12.672Z"
+  },
+  {
+    "id": "01KBMHCVHFHN8R6PVV0P0RK71B",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K971WTDXH1GAJ33MG2FYSVYG",
+    "targetSchema": "vendors",
+    "targetId": "01K9OP000000000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-04T11:19:12.687Z",
+    "updatedAt": "2025-12-04T11:19:12.687Z"
+  },
+  {
+    "id": "01KBMHCVHWPN9WYF6ZC0C6KTSN",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K97208RABW053BGN3A6W05FD",
+    "targetSchema": "vendors",
+    "targetId": "01K8QVCWS0ZSTMSVD5C6K7A806",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-04T11:19:12.700Z",
+    "updatedAt": "2025-12-04T11:19:12.700Z"
+  },
+  {
+    "id": "01KBMHCVJA651CA3CAV0C9T3FB",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K9720G4M9G75V3YWB9PGKBTM",
+    "targetSchema": "vendors",
+    "targetId": "01K9EX000000000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-04T11:19:12.714Z",
+    "updatedAt": "2025-12-04T11:19:12.714Z"
+  },
+  {
+    "id": "01KBMHCVJV9MK8590YC0DSWPFJ",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K97F0QV3S1JH1R8NJ1XWEPEG",
+    "targetSchema": "vendors",
+    "targetId": "01K9OP000000000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-04T11:19:12.731Z",
+    "updatedAt": "2025-12-04T11:19:12.731Z"
+  },
+  {
+    "id": "01KBMHCVKQ85RE3HGQ4FDS93G6",
+    "sourceSchema": "quotations",
+    "sourceId": "01K9724JFPP7A6RX7H6NTFHE1D",
+    "targetSchema": "vendors",
+    "targetId": "01K8QVCWS0ZSTMSVD5C6K7A806",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor",
+    "createdAt": "2025-12-04T11:19:12.759Z",
+    "updatedAt": "2025-12-04T11:19:12.759Z"
+  },
+  {
+    "id": "01KBMHCVMBA9F79XAHN1GGFDX8",
+    "sourceSchema": "quotation-items",
+    "sourceId": "01K9725HNMEAFXGB98SCER6JVK",
+    "targetSchema": "inquiry-items",
+    "targetId": "01K96WRHRE30636NDY6QVJT5AR",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "inquiry-item",
+    "createdAt": "2025-12-04T11:19:12.779Z",
+    "updatedAt": "2025-12-04T11:19:12.779Z"
+  },
+  {
+    "id": "01KBMHCVMRQ8XJKTPT3ARAQP2M",
+    "sourceSchema": "quotation-items",
+    "sourceId": "01K9726N9T00JAG6QC7ZWMX650",
+    "targetSchema": "inquiry-items",
+    "targetId": "01K96E06Z9H5G8FKH5QY0538JB",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "inquiry-item",
+    "createdAt": "2025-12-04T11:19:12.792Z",
+    "updatedAt": "2025-12-04T11:19:12.792Z"
+  },
+  {
+    "id": "01KBMHCVNPWXAER0AP9Z6RKKEF",
+    "sourceSchema": "servers",
+    "sourceId": "01KA8QZJ9SAJ6Y2GR05K42BQYF",
+    "targetSchema": "users",
+    "targetId": "01KBATBCQBC07CE2227A1V45VQ",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-04T11:19:12.822Z",
+    "updatedAt": "2025-12-04T11:19:12.822Z"
+  },
+  {
+    "id": "01KBMHCVP5AY689DCYAS0P3H3C",
+    "sourceSchema": "servers",
+    "sourceId": "01KA8TM7H68FPKTRNNNSPWWBKD",
+    "targetSchema": "users",
+    "targetId": "01KBAT78NRNB8KCD4Z625KH07A",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-04T11:19:12.837Z",
+    "updatedAt": "2025-12-04T11:19:12.837Z"
+  },
+  {
+    "id": "01KBMHCVPKKPC9TZPAR8SQ4X1R",
+    "sourceSchema": "servers",
+    "sourceId": "01KA8VVZENR2AS7YWTAY4T6HM7",
+    "targetSchema": "users",
+    "targetId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-04T11:19:12.851Z",
+    "updatedAt": "2025-12-04T11:19:12.851Z"
+  },
+  {
+    "id": "01KBMHCVQ142Y7F4402MHG5QKG",
+    "sourceSchema": "servers",
+    "sourceId": "01KBASP59XTTA4CNBNXMNNV7SC",
+    "targetSchema": "users",
+    "targetId": "01KBATBCQBC07CE2227A1V45VQ",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-04T11:19:12.865Z",
+    "updatedAt": "2025-12-04T11:19:12.865Z"
+  },
+  {
+    "id": "01KBMHCVQSCVRWE1028ZWFK9TZ",
+    "sourceSchema": "servers",
+    "sourceId": "01KBATBKE9E23X1JT9KDHK95H6",
+    "targetSchema": "users",
+    "targetId": "01KBATBCQBC07CE2227A1V45VQ",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-04T11:19:12.889Z",
+    "updatedAt": "2025-12-04T11:19:12.889Z"
+  },
+  {
+    "id": "01KBMHCVR5JTMYJTVEPS4MXP1W",
+    "sourceSchema": "servers",
+    "sourceId": "01KBATF2D6ZEEGP61ASG5CSZC3",
+    "targetSchema": "users",
+    "targetId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-04T11:19:12.901Z",
+    "updatedAt": "2025-12-04T11:19:12.901Z"
+  },
+  {
+    "id": "01KBMHCVS5EYZ71PH650KAP661",
+    "sourceSchema": "integrations",
+    "sourceId": "schemas_sync",
+    "targetSchema": "url-repositories",
+    "targetId": "01KA8TP4ZVMWVCGK25KPDQDPW1",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-target-route",
+    "createdAt": "2025-12-04T11:19:12.933Z",
+    "updatedAt": "2025-12-04T11:19:12.933Z"
+  },
+  {
+    "id": "01KBMHCVSDN2AB2EXAT1SV9S70",
+    "sourceSchema": "integrations",
+    "sourceId": "schemas_sync",
+    "targetSchema": "url-repositories",
+    "targetId": "01KA8VXHQFZR5TH0470163433K",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-source-route",
+    "createdAt": "2025-12-04T11:19:12.940Z",
+    "updatedAt": "2025-12-04T11:19:12.940Z"
+  },
+  {
+    "id": "01KBMHCVSWD9RSXFJZ4ZSZMBZN",
+    "sourceSchema": "integrations",
+    "sourceId": "schema_related_schemas_sync",
+    "targetSchema": "url-repositories",
+    "targetId": "01KABM5QX5HRPWMPA1M7YK21WJ",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-target-route",
+    "createdAt": "2025-12-04T11:19:12.956Z",
+    "updatedAt": "2025-12-04T11:19:12.956Z"
+  },
+  {
+    "id": "01KBMHCVTD3KVJTMAZKKBQ7WNW",
+    "sourceSchema": "integrations",
+    "sourceId": "graph_data_sync",
+    "targetSchema": "url-repositories",
+    "targetId": "01KANZNMEFM5H7211V450ZX2P8",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-target-route",
+    "createdAt": "2025-12-04T11:19:12.973Z",
+    "updatedAt": "2025-12-04T11:19:12.973Z"
+  },
+  {
+    "id": "01KBMHCVTMST7207PB9YZ4ZW70",
+    "sourceSchema": "integrations",
+    "sourceId": "graph_data_sync",
+    "targetSchema": "url-repositories",
+    "targetId": "01KANYZDJKCA9FNEFE7ZEY0KSD",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-source-route",
+    "createdAt": "2025-12-04T11:19:12.980Z",
+    "updatedAt": "2025-12-04T11:19:12.980Z"
+  },
+  {
+    "id": "01KBMHCVV9TN9M4XGWET3GF7QP",
+    "sourceSchema": "integrations",
+    "sourceId": "email_template_sync",
+    "targetSchema": "url-repositories",
+    "targetId": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-target-route",
+    "createdAt": "2025-12-04T11:19:13.000Z",
+    "updatedAt": "2025-12-04T11:19:13.000Z"
+  },
+  {
+    "id": "01KBMHCVVTR3JTN0MR8Z63KMJQ",
+    "sourceSchema": "integrations",
+    "sourceId": "lucide_icons_sync",
+    "targetSchema": "url-repositories",
+    "targetId": "01KA9LUCIDEICONSYNC001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-target-route",
+    "createdAt": "2025-12-04T11:19:13.018Z",
+    "updatedAt": "2025-12-04T11:19:13.018Z"
+  },
+  {
+    "id": "01KBMHCVW0AA30V55D4TXNSM3K",
+    "sourceSchema": "integrations",
+    "sourceId": "lucide_icons_sync",
+    "targetSchema": "url-repositories",
+    "targetId": "01KA9LUCIDEICONS001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-source-route",
+    "createdAt": "2025-12-04T11:19:13.024Z",
+    "updatedAt": "2025-12-04T11:19:13.024Z"
+  },
+  {
+    "id": "01KBMHCVWKZM1WPPZ7VSFRWEF9",
+    "sourceSchema": "integrations",
+    "sourceId": "git_sync_env",
+    "targetSchema": "url-repositories",
+    "targetId": "01KASYNCENV001GITLABSYNC",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-target-route",
+    "createdAt": "2025-12-04T11:19:13.043Z",
+    "updatedAt": "2025-12-04T11:19:13.043Z"
+  },
+  {
+    "id": "01KBMHCVX9QYHCP3W646Z4GV9R",
+    "sourceSchema": "integrations",
+    "sourceId": "genora_schema_sync",
+    "targetSchema": "url-repositories",
+    "targetId": "01KBATJ4GH09B0YETWF7W1SKM7",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-target-route",
+    "createdAt": "2025-12-04T11:19:13.065Z",
+    "updatedAt": "2025-12-04T11:19:13.065Z"
+  },
+  {
+    "id": "01KBMHCVXHGB6AG6FJQE3WCBMB",
+    "sourceSchema": "integrations",
+    "sourceId": "genora_schema_sync",
+    "targetSchema": "url-repositories",
+    "targetId": "01KA8VXHQFZR5TH0470163433K",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-source-route",
+    "createdAt": "2025-12-04T11:19:13.073Z",
+    "updatedAt": "2025-12-04T11:19:13.073Z"
+  },
+  {
+    "id": "01KBMHCVZ7PDHPCCYCE66HYFVW",
+    "sourceSchema": "app-permissions",
+    "sourceId": "01KBA5QDGEEJSJMJFSVABJGD70",
+    "targetSchema": "schemas",
+    "targetId": "vendors",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "resource",
+    "createdAt": "2025-12-04T11:19:13.127Z",
+    "updatedAt": "2025-12-04T11:19:13.127Z"
+  },
+  {
+    "id": "01KBMHCW15NJW6DSHKV55J1Y3J",
+    "sourceSchema": "menu-items",
+    "sourceId": "01KBSIINTEGRATIONS0000000000",
+    "targetSchema": "companies",
+    "targetId": "01K94V4PJSFKCXS6AVX07P86N5",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "menu-companies",
+    "createdAt": "2025-12-04T11:19:13.189Z",
+    "updatedAt": "2025-12-04T11:19:13.189Z"
   }
 ]

@@ -62,7 +62,7 @@ const AppListItem: React.FC<AppListItemProps> = ({
           transition: { type: 'spring', stiffness: 380, damping: 26 },
         }}
       >
-        <Card className="group relative flex h-full flex-col overflow-hidden border border-violet-100/70 bg-gradient-to-br from-violet-50/70 via-white to-indigo-50/60 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-xl dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40">
+        <Card className="group relative flex h-full flex-col overflow-hidden border border-violet-100/70 bg-linear-to-br from-violet-50/70 via-white to-indigo-50/60 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-xl dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40">
           <div
             className="pointer-events-none absolute inset-0 opacity-40 dark:opacity-30"
             style={{
@@ -141,7 +141,7 @@ const AppListItem: React.FC<AppListItemProps> = ({
         scale: 1.01,
         transition: { type: 'spring', stiffness: 380, damping: 26 },
       }}
-      className="group relative flex items-center justify-between gap-3 overflow-hidden rounded-xl border border-violet-100/70 bg-gradient-to-r from-violet-50/70 via-white to-indigo-50/60 p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-xl dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40"
+      className="group relative flex items-center justify-between gap-3 overflow-hidden rounded-xl border border-violet-100/70 bg-linear-to-r from-violet-50/70 via-white to-indigo-50/60 p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-xl dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40"
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-40 dark:opacity-30"
@@ -211,7 +211,7 @@ const AppCardSkeleton: React.FC<{ index: number }> = ({ index }) => {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.18, delay: animationDelay, ease: 'easeOut' }}
     >
-      <Card className="group relative flex h-full flex-col overflow-hidden border border-violet-100/70 bg-gradient-to-br from-violet-50/70 via-white to-indigo-50/60 shadow-sm dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40">
+      <Card className="group relative flex h-full flex-col overflow-hidden border border-violet-100/70 bg-linear-to-br from-violet-50/70 via-white to-indigo-50/60 shadow-sm dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40">
         <CardHeader className="relative z-10 flex-1 space-y-2 px-4 pb-2 pt-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
@@ -249,7 +249,7 @@ const AppListSkeleton: React.FC<{ index: number }> = ({ index }) => {
       initial={{ opacity: 0, x: -20, scale: 0.99 }}
       animate={{ opacity: 1, x: 0, scale: 1 }}
       transition={{ duration: 0.18, delay: animationDelay, ease: 'easeOut' }}
-      className="group relative flex items-center justify-between gap-3 overflow-hidden rounded-xl border border-violet-100/70 bg-gradient-to-r from-violet-50/70 via-white to-indigo-50/60 p-4 shadow-sm dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40"
+      className="group relative flex items-center justify-between gap-3 overflow-hidden rounded-xl border border-violet-100/70 bg-linear-to-r from-violet-50/70 via-white to-indigo-50/60 p-4 shadow-sm dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40"
     >
       <div className="relative z-10 flex flex-1 items-center gap-3">
         <Skeleton className="h-8 w-8 rounded shrink-0" />

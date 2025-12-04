@@ -60,6 +60,7 @@ export function GraphDesignerWrapper() {
 
   const canvasHandleRef = useRef<GraphCanvasHandle | null>(null);
   const formJustSavedRef = useRef(false);
+  const [formJustSaved, setFormJustSaved] = useState(false);
   const prevNodesIdsRef = useRef<string>(JSON.stringify(nodes.map(n => n.id).sort()));
   const prevEdgesIdsRef = useRef<string>(JSON.stringify(edges.map(e => e.id).sort()));
 
@@ -227,7 +228,7 @@ export function GraphDesignerWrapper() {
           )}
         </AnimatePresence>
         <div
-          className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-gray-400 bg-gradient-to-b from-background via-muted/40 to-background dark:border-gray-700"
+          className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-gray-400 bg-linear-to-b from-background via-muted/40 to-background dark:border-gray-700"
           onDragOver={handleDragOverCanvas}
           onDrop={handleDropOnCanvas}
         >
@@ -296,7 +297,7 @@ export function GraphDesignerWrapper() {
         </div>
       </div>
 
-      {activeSchemaId && activeNodeForForm && !formJustSavedRef.current && (
+      {activeSchemaId && activeNodeForForm && !formJustSaved && (
         <FormModal
           key={`${activeSchemaId}-${activeEntityId ?? 'new'}-${activeNodeForForm.id}-${activeNodeForForm.nodeId ?? 'no-nodeid'}`}
           schemaId={activeSchemaId}
@@ -416,6 +417,7 @@ export function GraphDesignerWrapper() {
             
             // Mark that form was just saved to prevent re-opening
             formJustSavedRef.current = true;
+            setFormJustSaved(true);
             
             // Close the form immediately to prevent multiple opens
             // Clear activeNodeForForm synchronously to prevent re-opening
@@ -424,6 +426,7 @@ export function GraphDesignerWrapper() {
             // Reset the flag after a short delay
             setTimeout(() => {
               formJustSavedRef.current = false;
+              setFormJustSaved(false);
             }, 100);
           }}
           onClose={() => {

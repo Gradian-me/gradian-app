@@ -256,12 +256,12 @@ export const FormModal: React.FC<FormModalProps> = ({
     if (isEdit && entityData) {
       return entityData;
     }
-    // Merge initialValues with entityData if entityData has ID (for incomplete saves)
+    // Merge initialValues with entityData if entityData has ID (for incomplete saves)  
     if (entityData?.id && initialValues) {
       return { ...initialValues, ...entityData };
     }
     return initialValues || {};
-  }, [isEdit, entityData, entityId]);
+  }, [isEdit, entityData, entityId, initialValues]);
     
   const modalDescription = description || (isEdit
     ? `Update ${(targetSchema?.name || 'item').toLowerCase()} information`

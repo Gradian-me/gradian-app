@@ -155,7 +155,7 @@ async function sendEmailToExternalService(
       loggingCustom(LogType.EMAIL_LOG, 'error', `Fetch error - Full details: ${JSON.stringify(errorInfo, null, 2)}`);
       
       // Provide more detailed error information
-      let errorDetails = errorInfo.message || 'Unknown fetch error';
+      const errorDetails = errorInfo.message || 'Unknown fetch error';
       let userFriendlyMessage = errorDetails;
       
       // Check error code (might be in cause)

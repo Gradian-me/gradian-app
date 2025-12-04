@@ -28,7 +28,7 @@ export function parseMarkdownTable(node: any): {
     }
     
     // First row is header (skip separator row if present)
-    let headerRowIndex = 0;
+    const headerRowIndex = 0;
     const headerRow = rows[headerRowIndex];
     if (!headerRow || headerRow.type !== 'tableRow') {
       return null;

@@ -180,7 +180,12 @@ export function MainLayout({
     });
   }, [isDesktop, isSidebarCollapsed]);
 
+  const [shouldAnimateSidebar, setShouldAnimateSidebar] = useState(false);
+
   useEffect(() => {
+    const prevWidth = prevSidebarWidthRef.current;
+    const shouldAnimate = prevWidth !== null && prevWidth !== sidebarWidth;
+    setShouldAnimateSidebar(shouldAnimate);
     prevSidebarWidthRef.current = sidebarWidth;
     if (typeof window !== 'undefined') {
       lastSidebarWidth = sidebarWidth;
@@ -431,8 +436,6 @@ export function MainLayout({
       </div>
     </div>
   );
-
-  const shouldAnimateSidebar = prevSidebarWidthRef.current !== null && prevSidebarWidthRef.current !== sidebarWidth;
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-950 relative">

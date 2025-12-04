@@ -1,4 +1,3 @@
-/// <reference path="../../../types/cytoscape-plugins.d.ts" />
 'use client';
 
 import React, { useEffect, useRef } from 'react';

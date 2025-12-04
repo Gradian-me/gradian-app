@@ -109,7 +109,6 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
       loadedBlobRef.current = null;
       setIsBlobLoaded(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recordedBlob]); // Only depend on recordedBlob, setPreloadedAudioBlob is stable
 
   // Cleanup when dialog closes and reset when it opens
@@ -142,7 +141,6 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
       setTokenUsage(null);
       setShouldAutoTranscribe(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]); // Only depend on isOpen to avoid infinite loops
 
   // Cleanup on unmount only
@@ -154,7 +152,6 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
       }
       clearRecording();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run on unmount
 
   // Auto-transcribe when blob is ready after stop-and-transcribe
@@ -166,7 +163,6 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
         handleTranscribe();
       }, 200);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldAutoTranscribe, recordedBlob, isRecording]);
 
   const handleStartRecording = async () => {

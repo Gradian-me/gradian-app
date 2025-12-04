@@ -6,8 +6,6 @@
 FROM node:20-slim AS builder
 
 # Install build dependencies for native modules (argon2, etc.)
-# Combined into single layer to reduce image size
-# Added DEBIAN_FRONTEND=noninteractive and retry logic to prevent hanging
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update -qq && \
     apt-get install -y --no-install-recommends \
@@ -49,7 +47,6 @@ ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1
 
 # Create a non-root user and install tini and curl in a single layer
-# Added DEBIAN_FRONTEND=noninteractive to prevent hanging
 RUN export DEBIAN_FRONTEND=noninteractive && \
     groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs nextjs && \
@@ -59,21 +56,20 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
         curl \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/* && \
-    apt-get clean && \
-    chown -R nextjs:nodejs /app
+    apt-get clean
 
-# Copy necessary files from builder
-# Using --chown to set ownership during copy (more efficient)
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# Copy full Next.js build output and critical files from builder
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/next.config.* ./
+COPY --from=builder /app/data ./data
 
-# Copy full Next.js build output (.next) and node_modules for non-standalone runtime
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/package*.json ./
-COPY --from=builder --chown=nextjs:nodejs /app/next.config.* ./
+# Copy public folder as root, then fix ownership (public assets not loading can be due to bad ownership/permissions)
+COPY --from=builder /app/public ./public
 
-# Copy data directory (contains JSON files used at runtime)
-COPY --from=builder --chown=nextjs:nodejs /app/data ./data
+# Fix permissions for everything, including /app/public (must run as root)
+RUN chown -R nextjs:nodejs /app
 
 # Switch to non-root user
 USER nextjs

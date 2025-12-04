@@ -1668,5 +1668,52 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBM5PICKERRELATIONS001",
+    "timestamp": "2025-12-04T12:03:00.000Z",
+    "version": "1.13.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Change Popup Pickers into Relation Edges",
+        "priority": "High",
+        "affectedDomains": [
+          "form-builder",
+          "data-management",
+          "relations"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated all-data.json and all-data-relations.json to support new picker field handling, improving data integrity and user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "relations",
+          "data-storage"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced functions for extracting and minimizing picker field values, enhancing relations management",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "relations",
+          "utils"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined API routes to enrich entities with picker field data from relations, optimizing performance and usability",
+        "priority": "Medium",
+        "affectedDomains": [
+          "api",
+          "data-display",
+          "performance"
+        ]
+      }
+    ]
   }
 ]

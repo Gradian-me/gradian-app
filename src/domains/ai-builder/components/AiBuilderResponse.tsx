@@ -144,24 +144,20 @@ export function AiBuilderResponse({
     prevIsLoadingRef.current = isLoading;
   }, [isLoading, response]);
 
-  if (!response) {
-    return null;
-  }
-
   // Check if we should render as table
   const shouldRenderTable = agent?.requiredOutputFormat === 'table';
   const { data: tableData, isValid: isValidTable } = useMemo(() => {
-    if (shouldRenderTable) {
-      return parseTableData(response);
+    if (!response || !shouldRenderTable) {
+      return { data: [], isValid: false };
     }
-    return { data: [], isValid: false };
+    return parseTableData(response);
   }, [response, shouldRenderTable]);
 
   const tableColumns = useMemo(() => {
-    if (shouldRenderTable && isValidTable && tableData.length > 0) {
-      return generateColumnsFromData(tableData);
+    if (!shouldRenderTable || !isValidTable || tableData.length === 0) {
+      return [];
     }
-    return [];
+    return generateColumnsFromData(tableData);
   }, [shouldRenderTable, isValidTable, tableData]);
 
   const tableConfig: TableConfig = useMemo(() => {
@@ -190,6 +186,10 @@ export function AiBuilderResponse({
       bordered: false,
     };
   }, [tableColumns, tableData]);
+
+  if (!response) {
+    return null;
+  }
 
   return (
     <div className="space-y-4">

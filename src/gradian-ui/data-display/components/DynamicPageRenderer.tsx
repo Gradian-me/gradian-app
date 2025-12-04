@@ -613,27 +613,32 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           
           return (
             <div className="flex items-center justify-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
+              <div
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setRepeatingSectionDialog({
-                    isOpen: true,
-                    sectionId: section.id,
-                    sectionTitle: section.title || section.id,
-                    entityData: row,
-                    entityId: row.id,
-                  });
                 }}
-                className="h-8 px-3 hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition-all duration-200"
               >
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setRepeatingSectionDialog({
+                      isOpen: true,
+                      sectionId: section.id,
+                      sectionTitle: section.title || section.id,
+                      entityData: row,
+                      entityId: row.id,
+                    });
+                  }}
+                  className="h-8 px-3 hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition-all duration-200"
+                >
                 <Table2 className="h-4 w-4" />
                 {itemCount !== null && (
                   <span className="text-xs font-medium ml-1.5">{itemCount}</span>
                 )}
               </Button>
+              </div>
             </div>
           );
         },
@@ -748,7 +753,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   <TooltipContent
                     side="bottom"
                     sideOffset={8}
-                    className="z-[100]"
+                    className="z-100"
                     avoidCollisions={true}
                     collisionPadding={8}
                   >
@@ -820,7 +825,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   <TooltipContent
                     side="bottom"
                     sideOffset={8}
-                    className="z-[100]"
+                    className="z-100"
                     avoidCollisions={true}
                     collisionPadding={8}
                   >

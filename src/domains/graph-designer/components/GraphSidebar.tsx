@@ -28,18 +28,27 @@ export function GraphSidebar(props: GraphSidebarProps) {
     setIsMounted(true);
   }, []);
 
-  const filter = (items: FormSchema[]) =>
-    items.filter((schema) => {
-      if (!search.trim()) return true;
-      const q = search.toLowerCase();
+  const filteredSystem = useMemo(() => {
+    if (!search.trim()) return systemSchemas;
+    const q = search.toLowerCase();
+    return systemSchemas.filter((schema) => {
       const pluralName = (schema.plural_name ?? '').toString().toLowerCase();
       const singularName = (schema.singular_name ?? schema.name ?? '').toString().toLowerCase();
       const id = (schema.id ?? '').toString().toLowerCase();
       return pluralName.includes(q) || singularName.includes(q) || id.includes(q);
     });
-
-  const filteredSystem = useMemo(() => filter(systemSchemas), [systemSchemas, search]);
-  const filteredBusiness = useMemo(() => filter(businessSchemas), [businessSchemas, search]);
+  }, [systemSchemas, search]);
+  
+  const filteredBusiness = useMemo(() => {
+    if (!search.trim()) return businessSchemas;
+    const q = search.toLowerCase();
+    return businessSchemas.filter((schema) => {
+      const pluralName = (schema.plural_name ?? '').toString().toLowerCase();
+      const singularName = (schema.singular_name ?? schema.name ?? '').toString().toLowerCase();
+      const id = (schema.id ?? '').toString().toLowerCase();
+      return pluralName.includes(q) || singularName.includes(q) || id.includes(q);
+    });
+  }, [businessSchemas, search]);
 
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>, schema: FormSchema) => {
     event.dataTransfer.setData(

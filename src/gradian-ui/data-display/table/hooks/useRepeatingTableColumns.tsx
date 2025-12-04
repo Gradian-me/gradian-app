@@ -117,7 +117,7 @@ export function useRepeatingTableColumns({
     }
 
     return [viewColumn, ...baseColumns];
-  }, [baseColumns, getRowId, renderActionCell]);
+  }, [baseColumns, getRowId, renderActionCell, showForceColumn]);
 
   return columnsWithActions;
 }

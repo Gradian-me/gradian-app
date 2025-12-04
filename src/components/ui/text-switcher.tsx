@@ -25,11 +25,6 @@ export function TextSwitcher({
   // Normalize texts to array
   const textsArray = Array.isArray(texts) ? texts : texts ? [texts] : [];
   
-  // If empty array or only one text, handle accordingly
-  if (textsArray.length === 0) {
-    return null;
-  }
-  
   // If only one text, just display it without switching
   const shouldSwitch = textsArray.length > 1;
   
@@ -44,6 +39,11 @@ export function TextSwitcher({
 
     return () => clearInterval(interval);
   }, [textsArray.length, switchInterval, shouldSwitch]);
+
+  // If empty array, return null
+  if (textsArray.length === 0) {
+    return null;
+  }
 
   const currentText = textsArray[currentIndex];
 

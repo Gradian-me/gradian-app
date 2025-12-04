@@ -763,10 +763,11 @@
   ],
   "inquiry-vendors": [
     {
-      "vendorId": {
-        "id": "01K9MP000000000000000000001",
-        "label": "Mana Pharma"
-      },
+      "vendorId": [
+        {
+          "id": "01K9MP000000000000000000001"
+        }
+      ],
       "status": "quotation_added",
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K971W83WWA4QCVFNAZSF5N11",
@@ -776,10 +777,11 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "vendorId": {
-        "id": "01K9PG000000000000000000001",
-        "label": "Pharmagona"
-      },
+      "vendorId": [
+        {
+          "id": "01K9PG000000000000000000001"
+        }
+      ],
       "status": "reviewed",
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K971WG76Y655JPYJDAJTTVV3",
@@ -789,10 +791,11 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "vendorId": {
-        "id": "01K9OP000000000000000000001",
-        "label": "Ottana Pharmed"
-      },
+      "vendorId": [
+        {
+          "id": "01K9OP000000000000000000001"
+        }
+      ],
       "status": "rejected",
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K971WTDXH1GAJ33MG2FYSVYG",
@@ -802,10 +805,11 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "vendorId": {
-        "id": "01K8QVCWS0ZSTMSVD5C6K7A806",
-        "label": "Transfarma"
-      },
+      "vendorId": [
+        {
+          "id": "01K8QVCWS0ZSTMSVD5C6K7A806"
+        }
+      ],
       "status": "awarded",
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K97208RABW053BGN3A6W05FD",
@@ -815,10 +819,11 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "vendorId": {
-        "id": "01K9EX000000000000000000001",
-        "label": "Exapilog"
-      },
+      "vendorId": [
+        {
+          "id": "01K9EX000000000000000000001"
+        }
+      ],
       "status": "awarded",
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K9720G4M9G75V3YWB9PGKBTM",
@@ -828,10 +833,11 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "vendorId": {
-        "id": "01K9OP000000000000000000001",
-        "label": "Ottana Pharmed"
-      },
+      "vendorId": [
+        {
+          "id": "01K9OP000000000000000000001"
+        }
+      ],
       "status": "reviewed",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01K97F0QV3S1JH1R8NJ1XWEPEG",
@@ -935,9 +941,7 @@
       "updatedAt": "2025-11-23T06:40:54.912Z",
       "vendorId": [
         {
-          "id": "01K8QVCWS0ZSTMSVD5C6K7A806",
-          "label": "Transfarma",
-          "color": "amber"
+          "id": "01K8QVCWS0ZSTMSVD5C6K7A806"
         }
       ],
       "currency": [
@@ -965,10 +969,11 @@
   ],
   "quotation-items": [
     {
-      "inquiryItemId": {
-        "id": "01K96WRHRE30636NDY6QVJT5AR",
-        "label": "HPLC Equipment Agilent 2190 "
-      },
+      "inquiryItemId": [
+        {
+          "id": "01K96WRHRE30636NDY6QVJT5AR"
+        }
+      ],
       "unitPrice": 7500,
       "totalPrice": 15500,
       "estimatedDeliveryDate": "2025-12-18",
@@ -980,10 +985,11 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "inquiryItemId": {
-        "id": "01K96E06Z9H5G8FKH5QY0538JB",
-        "label": "Himedia Feed Alpha"
-      },
+      "inquiryItemId": [
+        {
+          "id": "01K96E06Z9H5G8FKH5QY0538JB"
+        }
+      ],
       "unitPrice": 260,
       "totalPrice": 6000,
       "estimatedDeliveryDate": "2026-01-21",
@@ -1373,8 +1379,7 @@
       ],
       "owners": [
         {
-          "id": "01KBATBCQBC07CE2227A1V45VQ",
-          "label": "Masoud Mirghasemi"
+          "id": "01KBATBCQBC07CE2227A1V45VQ"
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1400,8 +1405,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "owners": [
         {
-          "id": "01KBAT78NRNB8KCD4Z625KH07A",
-          "label": "Hossein Rezaeifard"
+          "id": "01KBAT78NRNB8KCD4Z625KH07A"
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1427,8 +1431,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "owners": [
         {
-          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-          "label": "Mahyar Abidi"
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2"
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1453,8 +1456,7 @@
       "url-repositories": [],
       "owners": [
         {
-          "id": "01KBATBCQBC07CE2227A1V45VQ",
-          "label": "Masoud Mirghasemi"
+          "id": "01KBATBCQBC07CE2227A1V45VQ"
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1474,12 +1476,10 @@
       ],
       "owners": [
         {
-          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-          "label": "Mahyar Abidi"
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2"
         },
         {
-          "id": "01KBF8N88CG4YPK6VDNQAE420Z",
-          "label": "Gradian Administrator"
+          "id": "01KBF8N88CG4YPK6VDNQAE420Z"
         }
       ],
       "incomplete": false,
@@ -1505,8 +1505,7 @@
       ],
       "owners": [
         {
-          "id": "01KBATBCQBC07CE2227A1V45VQ",
-          "label": "Masoud Mirghasemi"
+          "id": "01KBATBCQBC07CE2227A1V45VQ"
         }
       ],
       "incomplete": false,
@@ -1530,8 +1529,7 @@
       ],
       "owners": [
         {
-          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-          "label": "Mahyar Abidi"
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2"
         }
       ],
       "incomplete": false,
@@ -1751,11 +1749,7 @@
       "icon": "LucidePencilRuler",
       "targetRoute": [
         {
-          "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
-          "label": "Schema Bulk Sync",
-          "metadata": {
-            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas"
-          }
+          "id": "01KA8TP4ZVMWVCGK25KPDQDPW1"
         }
       ],
       "targetMethod": [
@@ -1768,11 +1762,7 @@
       ],
       "sourceRoute": [
         {
-          "id": "01KA8VXHQFZR5TH0470163433K",
-          "label": "Schemas",
-          "metadata": {
-            "address": "http://localhost:3000/api/schemas"
-          }
+          "id": "01KA8VXHQFZR5TH0470163433K"
         }
       ],
       "sourceMethod": [
@@ -1810,11 +1800,7 @@
       "icon": "FolderTree",
       "targetRoute": [
         {
-          "id": "01KABM5QX5HRPWMPA1M7YK21WJ",
-          "label": "Schema Related Schemas Sync",
-          "metadata": {
-            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/relations/generate"
-          }
+          "id": "01KABM5QX5HRPWMPA1M7YK21WJ"
         }
       ],
       "targetMethod": [
@@ -1842,7 +1828,8 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Generated relations for 26 out of 26 schemas"
+      "lastSyncMessage": "Generated relations for 26 out of 26 schemas",
+      "sourceRoute": []
     },
     {
       "color": "blue",
@@ -1851,11 +1838,7 @@
       "icon": "GitGraph",
       "targetRoute": [
         {
-          "id": "01KANZNMEFM5H7211V450ZX2P8",
-          "label": "Backend Graph API",
-          "metadata": {
-            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/graph"
-          }
+          "id": "01KANZNMEFM5H7211V450ZX2P8"
         }
       ],
       "targetMethod": [
@@ -1868,11 +1851,7 @@
       ],
       "sourceRoute": [
         {
-          "id": "01KANYZDJKCA9FNEFE7ZEY0KSD",
-          "label": "Graph API",
-          "metadata": {
-            "address": "http://localhost:3000/api/graph"
-          }
+          "id": "01KANYZDJKCA9FNEFE7ZEY0KSD"
         }
       ],
       "sourceMethod": [
@@ -1912,11 +1891,7 @@
       "lastSynced": "",
       "targetRoute": [
         {
-          "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
-          "label": "Email Template Sync",
-          "metadata": {
-            "address": "https://octa.cinnagen.com/integration/notifications/cache/refresh"
-          }
+          "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X"
         }
       ],
       "targetMethod": [
@@ -1941,7 +1916,8 @@
           "icon": "Server",
           "color": "purple"
         }
-      ]
+      ],
+      "sourceRoute": []
     },
     {
       "color": "violet",
@@ -1950,11 +1926,7 @@
       "icon": "Palette",
       "targetRoute": [
         {
-          "id": "01KA9LUCIDEICONSYNC001",
-          "label": "Lucide Icons Sync",
-          "metadata": {
-            "address": "http://localhost:3000/api/integrations/lucide-icons/sync"
-          }
+          "id": "01KA9LUCIDEICONSYNC001"
         }
       ],
       "targetMethod": [
@@ -1967,11 +1939,7 @@
       ],
       "sourceRoute": [
         {
-          "id": "01KA9LUCIDEICONS001",
-          "label": "Lucide Icons",
-          "metadata": {
-            "address": "http://localhost:3000/api/integrations/lucide-icons"
-          }
+          "id": "01KA9LUCIDEICONS001"
         }
       ],
       "sourceMethod": [
@@ -2006,11 +1974,7 @@
       "icon": "GitBranch",
       "targetRoute": [
         {
-          "id": "01KASYNCENV001GITLABSYNC",
-          "label": "Git Sync Environment Variables",
-          "metadata": {
-            "address": "http://localhost:3000/api/git/sync-env"
-          }
+          "id": "01KASYNCENV001GITLABSYNC"
         }
       ],
       "targetMethod": [
@@ -2037,7 +2001,8 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Replaced all variables: deleted 20, created 20"
+      "lastSyncMessage": "Replaced all variables: deleted 20, created 20",
+      "sourceRoute": []
     },
     {
       "color": "blue",
@@ -2046,11 +2011,7 @@
       "icon": "Database",
       "targetRoute": [
         {
-          "id": "01KBATJ4GH09B0YETWF7W1SKM7",
-          "label": "Gradian Genora Schema",
-          "metadata": {
-            "address": "https://octa.cinnagen.com/genora/api/schemas"
-          }
+          "id": "01KBATJ4GH09B0YETWF7W1SKM7"
         }
       ],
       "targetMethod": [
@@ -2063,11 +2024,7 @@
       ],
       "sourceRoute": [
         {
-          "id": "01KA8VXHQFZR5TH0470163433K",
-          "label": "Schemas",
-          "metadata": {
-            "address": "http://localhost:3000/api/schemas"
-          }
+          "id": "01KA8VXHQFZR5TH0470163433K"
         }
       ],
       "sourceDataPath": "data",
@@ -2680,13 +2637,7 @@
       ],
       "resource": [
         {
-          "id": "vendors",
-          "label": "Vendor",
-          "icon": "User",
-          "description": "Add a new vendor to your supply chain management system",
-          "metadata": {
-            "description": "Add a new vendor to your supply chain management system"
-          }
+          "id": "vendors"
         }
       ],
       "action-types": [
@@ -2730,16 +2681,10 @@
       "updatedAt": "2025-11-30T11:16:21.230Z",
       "actionTypes": [
         {
-          "id": "EDIT",
-          "label": "Edit",
-          "icon": "Edit",
-          "color": "amber"
+          "id": "EDIT"
         },
         {
-          "id": "VIEW",
-          "label": "View",
-          "icon": "Eye",
-          "color": "sky"
+          "id": "VIEW"
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2780,7 +2725,8 @@
       "createdAt": "2025-12-01T00:00:00.000Z",
       "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": []
     },
     {
       "menuTitle": "Tender Calendar",
@@ -2795,7 +2741,8 @@
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": []
     },
     {
       "menuTitle": "Analytics",
@@ -2808,7 +2755,8 @@
       "createdAt": "2025-12-01T00:00:00.000Z",
       "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": []
     },
     {
       "menuTitle": "Integrations",
@@ -2822,8 +2770,7 @@
       "updatedAt": "2025-12-01T11:13:24.692Z",
       "companies": [
         {
-          "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": "CinnaGen"
+          "id": "01K94V4PJSFKCXS6AVX07P86N5"
         }
       ],
       "incomplete": false,
@@ -2841,7 +2788,8 @@
       "createdAt": "2025-12-01T00:00:00.000Z",
       "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": []
     },
     {
       "menuTitle": "Schema Builder",
@@ -2854,7 +2802,8 @@
       "createdAt": "2025-12-01T00:00:00.000Z",
       "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": []
     },
     {
       "menuTitle": "Builder",
@@ -2867,7 +2816,8 @@
       "createdAt": "2025-12-01T00:00:00.000Z",
       "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": []
     },
     {
       "menuTitle": "AI Builder",
@@ -2880,7 +2830,8 @@
       "createdAt": "2025-12-01T00:00:00.000Z",
       "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": []
     }
   ],
   "status-groups": [

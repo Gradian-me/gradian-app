@@ -1,6 +1,6 @@
 // Hook to evaluate business rule effects (push-based model)
 
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import type { BusinessRuleWithEffects, RuleTarget } from '../types';
 import { evaluateRule } from '../utils/rule-evaluator';
 import { extractFieldsFromRule } from '../utils/rule-field-extractor';
@@ -43,15 +43,9 @@ export function useBusinessRuleEffects(
     return Array.from(allFields);
   }, [businessRules]);
 
-  // Extract only the watched field values to avoid re-computation when unrelated fields change
-  // This is critical for performance - we only want to re-evaluate when watched fields change
-  // Use a ref to track the serialized watched values and only update when they actually change
-  const prevSerializedRef = useRef<string>('');
-  const prevWatchedValuesRef = useRef<Record<string, any>>({});
-  
   // Create a serialized string of watched field values for comparison
   // We access formValues directly here but only use the serialized string as the stable dependency
-  const watchedValuesSerialized = (() => {
+  const watchedValuesSerialized = useMemo(() => {
     if (watchFields.length === 0) {
       return '';
     }
@@ -59,17 +53,13 @@ export function useBusinessRuleEffects(
     return JSON.stringify(
       sortedFields.map((fieldName) => [fieldName, formValues[fieldName]])
     );
-  })();
+  }, [watchFields, formValues]);
   
-  // Only update watchedValues if the serialized string changed
+  // Extract only the watched field values to avoid re-computation when unrelated fields change
+  // This is critical for performance - we only want to re-evaluate when watched fields change
   const watchedValues = useMemo(() => {
     if (watchFields.length === 0) {
       return {};
-    }
-    
-    // If serialized string hasn't changed, return previous object to maintain reference equality
-    if (watchedValuesSerialized === prevSerializedRef.current && Object.keys(prevWatchedValuesRef.current).length > 0) {
-      return prevWatchedValuesRef.current;
     }
     
     // Extract current watched field values
@@ -78,14 +68,10 @@ export function useBusinessRuleEffects(
       currentValues[fieldName] = formValues[fieldName];
     });
     
-    // Update refs
-    prevSerializedRef.current = watchedValuesSerialized;
-    prevWatchedValuesRef.current = currentValues;
-    
     return currentValues;
-    // Depend only on the serialized string and watchFields - this ensures we only
+    // Depend on the serialized string and watchFields - this ensures we only
     // recalculate when watched field values actually change, not when any field changes
-  }, [watchedValuesSerialized, watchFields.join(',')]);
+  }, [watchedValuesSerialized, watchFields, formValues]);
 
   return useMemo(() => {
     const effects: BusinessRuleEffectsMap = {
@@ -178,7 +164,6 @@ export function useBusinessRuleEffects(
     return effects;
     // Only depend on the specific fields referenced in rules via watchedValues
     // This ensures we only re-evaluate when watched fields change, not when any field changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessRules, fieldIds, sectionIds, watchedValues]);
 }
 

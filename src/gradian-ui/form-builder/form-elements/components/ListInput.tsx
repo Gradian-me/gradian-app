@@ -314,14 +314,19 @@ export const ListInput: React.FC<ListInputProps> = ({
 }) => {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const inputRefs = React.useRef<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map());
+  const [itemRefsMap, setItemRefsMap] = useState<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map());
   
-  // Get or create ref for an item
-  const getInputRef = useCallback((itemId: string): React.RefObject<HTMLInputElement | null> => {
-    if (!inputRefs.current.has(itemId)) {
-      inputRefs.current.set(itemId, React.createRef<HTMLInputElement>());
-    }
-    return inputRefs.current.get(itemId)!;
-  }, []);
+  // Set up refs for all current items using useEffect to avoid accessing refs during render
+  React.useEffect(() => {
+    const refsMap = new Map<string, React.RefObject<HTMLInputElement | null>>();
+    value.forEach((item) => {
+      if (!inputRefs.current.has(item.id)) {
+        inputRefs.current.set(item.id, React.createRef<HTMLInputElement>());
+      }
+      refsMap.set(item.id, inputRefs.current.get(item.id)!);
+    });
+    setItemRefsMap(refsMap);
+  }, [value]);
 
   // Clean up refs for deleted items
   React.useEffect(() => {
@@ -501,7 +506,7 @@ export const ListInput: React.FC<ListInputProps> = ({
           isEditingControlled={editingItemId === item.id}
           onEnterPress={handleEnterPress}
           onEditStateChange={handleEditStateChange}
-          inputRef={getInputRef(item.id)}
+          inputRef={itemRefsMap.get(item.id)}
           onPasteSplit={handlePasteSplit}
         />
       ))}

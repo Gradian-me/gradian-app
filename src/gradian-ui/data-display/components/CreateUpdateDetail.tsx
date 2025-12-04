@@ -254,7 +254,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
               <TooltipContent
                 side="bottom"
                 sideOffset={8}
-                className="z-[100]"
+                className="z-100"
                 avoidCollisions={true}
                 collisionPadding={8}
               >
@@ -290,7 +290,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
               <TooltipContent
                 side="bottom"
                 sideOffset={8}
-                className="z-[100]"
+                className="z-100"
                 avoidCollisions={true}
                 collisionPadding={8}
               >
@@ -327,7 +327,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                 <TooltipContent
                   side="bottom"
                   sideOffset={8}
-                  className="z-[100]"
+                  className="z-100"
                   avoidCollisions={true}
                   collisionPadding={8}
                 >
@@ -370,7 +370,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                 <TooltipContent
                   side="bottom"
                   sideOffset={8}
-                  className="z-[100]"
+                  className="z-100"
                   avoidCollisions={true}
                   collisionPadding={8}
                 >
@@ -432,7 +432,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
             <TooltipContent
               side="bottom"
               sideOffset={8}
-              className="z-[100]"
+                  className="z-100"
               avoidCollisions={true}
               collisionPadding={8}
             >
@@ -470,7 +470,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
             <TooltipContent
               side="bottom"
               sideOffset={8}
-              className="z-[100]"
+                  className="z-100"
               avoidCollisions={true}
               collisionPadding={8}
             >

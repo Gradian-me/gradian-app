@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Prepare system prompt with preloaded context
-    let systemPrompt = (agent.systemPrompt || '') + preloadedContext;
+    const systemPrompt = (agent.systemPrompt || '') + preloadedContext;
 
     // Format annotations in TOON-like format and add to user prompt
     let finalUserPrompt = userPrompt;

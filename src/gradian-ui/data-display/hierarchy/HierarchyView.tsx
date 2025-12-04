@@ -356,13 +356,11 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
   React.useEffect(() => {
     if (expandAllTrigger === undefined) return;
     handleExpandAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expandAllTrigger]);
 
   React.useEffect(() => {
     if (collapseAllTrigger === undefined) return;
     handleCollapseAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collapseAllTrigger]);
 
   const effectiveRoots = useMemo(() => {

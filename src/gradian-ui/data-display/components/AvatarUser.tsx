@@ -163,7 +163,7 @@ export const AvatarUser: React.FC<AvatarUserProps> = ({
         </DialogTrigger>
         <DialogContent className="w-full max-w-xl p-0 overflow-hidden border-0 shadow-2xl">
           <DialogTitle className="sr-only">{displayName} - User Details</DialogTitle>
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200/50 dark:border-violet-800/50">
+          <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200/50 dark:border-violet-800/50">
             {/* Decorative background pattern */}
             <div className="absolute inset-0 opacity-5 dark:opacity-10">
               <div

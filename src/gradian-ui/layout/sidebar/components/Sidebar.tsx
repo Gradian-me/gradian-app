@@ -24,13 +24,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const width = isMobile ? 320 : (isCollapsed ? config.styling?.collapsedWidth || 80 : config.styling?.expandedWidth || 280);
   const prevWidthRef = useRef<number>(width);
+  const [shouldAnimate, setShouldAnimate] = React.useState(false);
 
   // Only animate if width actually changed
   useEffect(() => {
+    const prevWidth = prevWidthRef.current;
+    setShouldAnimate(prevWidth !== width);
     prevWidthRef.current = width;
   }, [width]);
 
-  const shouldAnimate = prevWidthRef.current !== width;
   const showUserControls = (!isCollapsed || isMobile);
 
   return (

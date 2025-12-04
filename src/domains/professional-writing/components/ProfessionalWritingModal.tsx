@@ -107,7 +107,7 @@ export function ProfessionalWritingModal({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="w-[80vw] max-w-2xl sm:max-w-3xl p-2 overflow-hidden max-h-[90vh] flex flex-col">
-        <DialogHeader className="p-2 flex-shrink-0">
+        <DialogHeader className="p-2 shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-violet-500" />
             Professional Writing Assistant
@@ -257,7 +257,7 @@ export function ProfessionalWritingModal({
 
         </div>
 
-        <DialogFooter className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 p-2 mt-auto">
+        <DialogFooter className="shrink-0 border-t border-gray-200 dark:border-gray-700 p-2 mt-auto">
           <Button
             variant="outline"
             onClick={handleCancel}

@@ -14,13 +14,13 @@ interface TestimonialsSectionProps {
 }
 
 export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) {
-  if (testimonials.length === 0) {
-    return null;
-  }
-
   const plugin = React.useRef(
     Autoplay({ delay: 4000, stopOnInteraction: true })
   );
+
+  if (testimonials.length === 0) {
+    return null;
+  }
 
   return (
     <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-7xl px-8 z-20">

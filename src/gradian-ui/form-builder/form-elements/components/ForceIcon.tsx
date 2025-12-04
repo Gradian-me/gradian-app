@@ -92,7 +92,7 @@ export const ForceIcon: React.FC<ForceIconProps> = ({
           <TooltipContent 
             side="bottom" 
             sideOffset={8}
-            className="z-[100]"
+            className="z-100"
             onClick={(e) => e.stopPropagation()}
             avoidCollisions={true}
             collisionPadding={8}

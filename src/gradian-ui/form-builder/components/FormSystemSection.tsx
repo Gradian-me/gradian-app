@@ -33,19 +33,6 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
   // Check if System Section should be shown
   const hasStatusGroup = Array.isArray(schema.statusGroup) && schema.statusGroup.length > 0;
 
-  const shouldShow =
-    schema.allowDataInactive === true ||
-    schema.allowDataForce === true ||
-    schema.allowDataAssignedTo === true ||
-    schema.allowDataDueDate === true ||
-    schema.allowHierarchicalParent === true ||
-    schema.canSelectMultiCompanies === true ||
-    hasStatusGroup;
-
-  if (!shouldShow) {
-    return null;
-  }
-
   const inactiveValue = values.inactive === true;
   const forceValue = values.isForce === true;
   const forceReasonValue = values.forceReason || '';

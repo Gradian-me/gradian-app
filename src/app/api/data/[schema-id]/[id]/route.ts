@@ -9,7 +9,7 @@ import { BaseEntity } from '@/gradian-ui/shared/domain/types/base.types';
 import { isValidSchemaId, getSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
 import { clearCompaniesCache } from '@/gradian-ui/shared/utils/companies-loader';
 import { isDemoModeEnabled, proxyDataRequest, enrichWithUsers } from '../../utils';
-import { syncHasFieldValueRelationsForEntity } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
+import { syncHasFieldValueRelationsForEntity, minimizePickerFieldValues, enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
 
 /**
  * Create controller instance for the given schema
@@ -54,12 +54,18 @@ export async function GET(
     const controller = await createController(schemaId);
     const response = await controller.getById(id);
     
-    // Enrich response with user objects in demo mode
+    // Enrich response with user objects and picker field data from relations in demo mode
     if (isDemoModeEnabled()) {
       try {
         const responseData = await response.json();
         if (responseData && responseData.success && responseData.data && typeof responseData.data === 'object') {
+          // Enrich with users first
           responseData.data = await enrichWithUsers(responseData.data);
+          // Then enrich picker fields from relations
+          responseData.data = await enrichEntityPickerFieldsFromRelations({
+            schemaId,
+            entity: responseData.data,
+          });
         }
         return NextResponse.json(responseData, { status: response.status });
       } catch (error) {
@@ -110,8 +116,42 @@ export async function PUT(
       );
     }
 
+    // Read request body BEFORE passing to controller (body can only be read once)
+    let requestBody: any = {};
+    try {
+      requestBody = await request.json();
+    } catch (error) {
+      console.warn('[PUT /api/data/:id] Failed to parse request body:', error);
+    }
+
+    // In demo mode, extract picker values and minimize them in request body before saving
+    // This keeps minimal [{id}, {id}] format for tracing while using relations for operations
+    let pickerValues: Record<string, any> = {};
+    if (isDemoModeEnabled()) {
+      try {
+        const schema = await getSchemaById(schemaId);
+        if (schema) {
+          // Extract picker field values before minimizing them
+          const { extractPickerFieldValues, minimizePickerFieldValues: minimizeValues } = await import('@/gradian-ui/shared/domain/utils/field-value-relations.util');
+          pickerValues = extractPickerFieldValues({ schema, data: requestBody });
+          
+          // Minimize picker values to [{id}, {id}] format (keep IDs for tracing)
+          requestBody = minimizeValues({ schema, data: requestBody });
+        }
+      } catch (error) {
+        console.warn('[PUT /api/data/:id] Failed to extract picker values:', error);
+      }
+    }
+
+    // Clone request with cleaned body (without picker values) for controller
+    const clonedRequest = new NextRequest(request.url, {
+      method: request.method,
+      headers: request.headers,
+      body: JSON.stringify(requestBody),
+    });
+
     const controller = await createController(schemaId);
-    const response = await controller.update(id, request);
+    const response = await controller.update(id, clonedRequest);
 
     // Parse response once so we can augment it (relations, enrichment) and then send
     let responseData: any;
@@ -121,24 +161,43 @@ export async function PUT(
       console.warn('[PUT /api/data/:id] Failed to parse update response JSON:', error);
       responseData = null;
     }
-
+    
     // Clear companies cache if a company was updated
     if (schemaId === 'companies') {
       clearCompaniesCache();
     }
 
     // In demo mode, synchronize HAS_FIELD_VALUE relations after entity update
-    if (isDemoModeEnabled() && responseData?.success && responseData.data && typeof responseData.data === 'object') {
+    // Use the extracted picker values to create relations
+    if (isDemoModeEnabled() && responseData?.success && responseData.data && typeof responseData.data === 'object' && Object.keys(pickerValues).length > 0) {
       try {
+        // Create relations from the extracted picker values
+        const entityWithPickerValues = { ...responseData.data, ...pickerValues };
         await syncHasFieldValueRelationsForEntity({
           schemaId,
-          entity: responseData.data,
+          entity: entityWithPickerValues,
         });
+        
+        // Update entity with minimized picker values (keep IDs for tracing)
+        const schema = await getSchemaById(schemaId);
+        if (schema) {
+          const minimizedEntity = minimizePickerFieldValues({
+            schema,
+            data: responseData.data,
+          });
+          
+          // Update entity in storage with minimized values
+          const repository = new BaseRepository(schemaId);
+          await repository.update(id, minimizedEntity);
+          
+          // Update response data to reflect minimized entity
+          responseData.data = minimizedEntity;
+        }
       } catch (error) {
         console.warn('[PUT /api/data/:id] Failed to sync HAS_FIELD_VALUE relations', error);
       }
     }
-
+    
     // Enrich response with user objects in demo mode
     if (isDemoModeEnabled() && responseData) {
       try {
@@ -156,7 +215,7 @@ export async function PUT(
     if (responseData) {
       return NextResponse.json(responseData, { status: response.status });
     }
-
+    
     return response;
   } catch (error) {
     return NextResponse.json(

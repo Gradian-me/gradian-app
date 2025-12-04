@@ -70,12 +70,21 @@ async function applyHasFieldValueRelationsToEntity(params: {
     const response = await apiRequest<Array<DataRelation & { targetData?: { id: string; label?: string; icon?: string; color?: string } }>>(`/api/relations?${query.toString()}`);
 
     if (!response.success || !Array.isArray(response.data) || response.data.length === 0) {
-      return entity;
+      // No relations found - for relations-only storage, picker fields should be empty
+      // Remove any picker field values that might exist on the entity (legacy data)
+      const updatedEntity = { ...entity };
+      for (const field of formBuilderSchema.fields ?? []) {
+        if (field.component === 'picker' && field.name) {
+          delete updatedEntity[field.name];
+        }
+      }
+      return updatedEntity;
     }
 
     const relations = response.data;
 
     // Group relations by fieldId to easily map back to fields
+    // Also create a map by field name for fallback matching
     const relationsByFieldId = relations.reduce<Record<string, typeof relations>>((acc, rel) => {
       if (!rel.fieldId) return acc;
       if (!acc[rel.fieldId]) {
@@ -84,28 +93,55 @@ async function applyHasFieldValueRelationsToEntity(params: {
       acc[rel.fieldId].push(rel);
       return acc;
     }, {});
-
-    // If no relations have fieldId, leave entity as-is
-    if (Object.keys(relationsByFieldId).length === 0) {
-      return entity;
-    }
+    
+    // Also group by field name (for fallback if fieldId doesn't match)
+    const relationsByFieldName = relations.reduce<Record<string, typeof relations>>((acc, rel) => {
+      if (!rel.fieldId) return acc;
+      // Try to find the field name from the formBuilderSchema
+      const field = formBuilderSchema.fields?.find((f) => (f.id || f.name) === rel.fieldId);
+      if (field && field.name) {
+        if (!acc[field.name]) {
+          acc[field.name] = [];
+        }
+        acc[field.name].push(rel);
+      }
+      return acc;
+    }, {});
 
     const updatedEntity = { ...entity };
 
+    // Process all picker fields to populate from relations (for form display)
+    // Relations are the source of truth for full data (label, icon, color)
+    // But we preserve minimal IDs in entity for tracing
     for (const field of formBuilderSchema.fields ?? []) {
       if (field.component !== 'picker' || !field.name) {
         continue;
       }
 
       const fieldId = field.id || field.name;
-      const fieldRelations = relationsByFieldId[fieldId];
+      // Try to find relations by fieldId first, then fallback to field name
+      let fieldRelations = relationsByFieldId[fieldId];
+      if (!fieldRelations || fieldRelations.length === 0) {
+        fieldRelations = relationsByFieldName[field.name];
+      }
 
       if (!fieldRelations || fieldRelations.length === 0) {
+        // No relations found - preserve minimal IDs from entity if they exist
+        // Otherwise initialize as empty array
+        const existingValue = updatedEntity[field.name];
+        if (Array.isArray(existingValue) && existingValue.length > 0) {
+          // Keep existing minimal IDs for tracing
+          updatedEntity[field.name] = existingValue;
+        } else {
+          // Initialize empty array if no relations and no existing value
+          updatedEntity[field.name] = [];
+        }
         continue;
       }
 
       // Map relations to normalized options with id, label, icon, color
-      // This format matches what PickerInput expects
+      // This format matches what PickerInput expects: [{id, label, icon, color}, ...]
+      // Relations are the source of truth for form display
       const newValue = fieldRelations.map((rel) => {
         if (rel.targetData) {
           // Use enriched target data if available

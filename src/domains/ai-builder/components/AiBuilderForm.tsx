@@ -223,7 +223,7 @@ export function AiBuilderForm({
     });
     
     sortedFields.forEach((field) => {
-      let fieldValue = values[field.name];
+      const fieldValue = values[field.name];
       
       // Skip empty values
       if (fieldValue === undefined || fieldValue === null || fieldValue === '') {
@@ -280,7 +280,7 @@ export function AiBuilderForm({
     });
     
     return parts.join('\n\n');
-  }, [formFields]);
+  }, [formFields, selectedAgent?.renderComponents]);
 
   // Reset form values when agent changes
   useEffect(() => {
@@ -336,7 +336,6 @@ export function AiBuilderForm({
     if (initialPrompt) {
       onPromptChange(initialPrompt);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAgentId, buildConcatenatedPrompt]); // Reset when agent ID changes
 
   // Sync userPrompt with formValues when userPrompt changes externally
@@ -574,7 +573,7 @@ export function AiBuilderForm({
   return (
     <div className="space-y-6">
       {/* Modern Gradient Card Container */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200/50 dark:border-violet-800/50 shadow-sm">
+      <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200/50 dark:border-violet-800/50 shadow-sm">
         <div className="relative p-6 space-y-4">
           {/* Header Section */}
           <div className="flex flex-row justify-end items-center flex-wrap gap-4">
@@ -746,7 +745,7 @@ export function AiBuilderForm({
                   disabled={!isFormValid || !userPrompt.trim() || disabled}
                   size="default"
                   variant="default"
-                  className="h-10 shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                  className="h-10 shadow-sm bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
                   Do the Magic
@@ -759,4 +758,6 @@ export function AiBuilderForm({
     </div>
   );
 }
+
+FieldItem.displayName = 'FieldItem';
 

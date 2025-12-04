@@ -122,7 +122,7 @@ export function useNodePicker(
     }
 
     closePicker();
-  }, [pickerState.node, pickerState.schema, updateNode, closePicker]);
+  }, [pickerState.node, pickerState.schema, updateNode, closePicker, existingNodes]);
 
   return {
     pickerState,
