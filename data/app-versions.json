@@ -1633,5 +1633,40 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBM4DYNREPEATINGSECT001",
+    "timestamp": "2025-12-04T09:10:00.000Z",
+    "version": "1.12.002",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Enhanced DynamicPageRenderer to prevent default click behavior on repeating-section buttons, improving user interaction and avoiding unintended detail dialog openings.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new button functionalities in RepeatingSectionDialog for selecting and adding related items via popup picker and form modal, enhancing the user experience for relation-based sections.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined state management and logic for relation-based repeating sections in RepeatingSectionDialog to improve code clarity and maintainability.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "form-builder"
+        ]
+      }
+    ]
   }
 ]

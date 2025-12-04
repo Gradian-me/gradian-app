@@ -616,7 +616,9 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   setRepeatingSectionDialog({
                     isOpen: true,
                     sectionId: section.id,

@@ -17,10 +17,13 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Button as UIButton } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Plus, List } from 'lucide-react';
 import { getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { cn } from '@/gradian-ui/shared/utils';
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
+import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/PopupPicker';
+import { NormalizedOption } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
+import { apiRequest } from '@/gradian-ui/shared/utils/api';
 
 interface RepeatingSectionDialogProps {
   isOpen: boolean;
@@ -46,17 +49,6 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
     [schema.sections, sectionId]
   );
 
-  const isRelationBased = useMemo(
-    () => !!(section?.repeatingConfig?.targetSchema && section?.repeatingConfig?.relationTypeId),
-    [section]
-  );
-
-  // Check if this is a connectToSchema type (relation-based) vs addFields type (regular repeating)
-  const isConnectToSchema = useMemo(
-    () => section?.repeatingConfig?.fieldRelationType === 'connectToSchema',
-    [section]
-  );
-
   const tableDataState = useRepeatingTableData({
     config: {
       id: sectionId,
@@ -75,6 +67,8 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
   });
 
   const {
+    isRelationBased,
+    section: resolvedSection,
     sectionData,
     fieldsToDisplay,
     targetSchemaData,
@@ -83,17 +77,45 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
     refresh,
   } = tableDataState;
 
+  const effectiveSection = resolvedSection || section;
+
   const schemaForColumns = isRelationBased ? targetSchemaData : schema;
   const isLoading = isLoadingRelations || (isRelationBased && isLoadingTargetSchema);
   
   // State for edit modal
   const [editEntityId, setEditEntityId] = useState<string | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   // Get parent entity title using getValueByRole
   const parentTitle = useMemo(() => {
     if (!entityData) return '';
     return getValueByRole(schema, entityData, 'title') || entityData.name || entityData.title || '';
   }, [schema, entityData]);
+
+  // Get repeating config and addType
+  const repeatingConfig = effectiveSection?.repeatingConfig;
+  const addType = repeatingConfig?.addType || 'addOnly';
+  const isConnectToSchema =
+    repeatingConfig?.fieldRelationType === 'connectToSchema';
+
+  const currentEntityId = entityId || entityData?.id;
+  const targetSchemaId = isRelationBased && repeatingConfig?.targetSchema
+    ? repeatingConfig.targetSchema
+    : schema.id;
+
+  // For unique selection, exclude already-related IDs from picker
+  const selectedIds: string[] = useMemo(
+    () =>
+      isRelationBased
+        ? (sectionData || [])
+            .map((item: any) => (item?.id != null ? String(item.id) : null))
+            .filter((id: string | null): id is string => Boolean(id))
+        : [],
+    [isRelationBased, sectionData]
+  );
+
+  const shouldExcludeIds = isRelationBased && repeatingConfig?.isUnique === true;
 
   const handleRefreshClick = useCallback(
     async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -197,9 +219,70 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
     [columns, sectionData, sectionId, isLoading]
   );
 
-  const targetSchemaId = isRelationBased && section?.repeatingConfig?.targetSchema
-    ? section.repeatingConfig.targetSchema
-    : schema.id;
+  const handleSelectFromPicker = useCallback(
+    async (selectedItems: NormalizedOption[], rawItems: any[]) => {
+      if (!currentEntityId || !repeatingConfig?.relationTypeId || !targetSchemaId) {
+        return;
+      }
+
+      try {
+        const normalizedSelections = Array.isArray(selectedItems) ? selectedItems : [];
+        const operations = normalizedSelections
+          .map((selection) => {
+            if (!selection?.id) {
+              return null;
+            }
+
+            return apiRequest('/api/relations', {
+              method: 'POST',
+              body: {
+                sourceSchema: schema.id,
+                sourceId: currentEntityId,
+                targetSchema: targetSchemaId,
+                targetId: selection.id,
+                relationTypeId: repeatingConfig.relationTypeId,
+              },
+            });
+          })
+          .filter(Boolean) as Promise<any>[];
+
+        if (operations.length === 0 && rawItems?.length) {
+          const fallbackId = rawItems[0]?.id;
+          if (fallbackId) {
+            operations.push(
+              apiRequest('/api/relations', {
+                method: 'POST',
+                body: {
+                  sourceSchema: schema.id,
+                  sourceId: currentEntityId,
+                  targetSchema: targetSchemaId,
+                  targetId: fallbackId,
+                  relationTypeId: repeatingConfig.relationTypeId,
+                },
+              })
+            );
+          }
+        }
+
+        if (operations.length === 0) {
+          return;
+        }
+
+        const results = await Promise.all(operations);
+        const hasFailure = results.some((response) => !response?.success);
+        if (hasFailure) {
+          console.error('Failed to create one or more relations from picker:', results);
+        } else {
+          await refresh();
+        }
+      } catch (error) {
+        console.error('Error creating relation from picker:', error);
+      } finally {
+        setIsPickerOpen(false);
+      }
+    },
+    [currentEntityId, repeatingConfig?.relationTypeId, schema.id, targetSchemaId, refresh]
+  );
 
   // Prevent clicks inside dialog from propagating to parent elements
   const stopPropagation = useCallback((e: React.MouseEvent | React.PointerEvent) => {
@@ -231,46 +314,100 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
                     </p>
                   )}
                 </div>
-                {isLoading ? (
-                  <Badge variant="secondary" className="animate-pulse shrink-0">
-                    Loading...
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary" className="shrink-0">
-                    {sectionData.length} {sectionData.length === 1 ? 'item' : 'items'}
-                  </Badge>
-                )}
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={handleRefreshClick}
-                disabled={isLoading}
-                className="text-gray-400 hover:text-violet-600 hover:bg-violet-50 transition-colors duration-200 p-1.5 shrink-0"
-                aria-label="Refresh table"
-              >
-                <RefreshCw className={cn('h-4 w-4', isLoading && 'animate-spin text-violet-600')} />
-              </Button>
+              <div className="flex items-center gap-2">
+                {/* Select from existing data */}
+                {isRelationBased &&
+                  repeatingConfig?.fieldRelationType === 'connectToSchema' &&
+                  (addType === 'canSelectFromData' || addType === 'mustSelectFromData') &&
+                  targetSchemaId && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsPickerOpen(true);
+                      }}
+                      disabled={isLoading || !currentEntityId}
+                      className="text-xs inline-flex items-center gap-1.5"
+                    >
+                      <List className="h-3.5 w-3.5" />
+                      Select{' '}
+                      {targetSchemaData?.plural_name ||
+                        targetSchemaData?.singular_name ||
+                        targetSchemaId}
+                    </Button>
+                  )}
+
+                {/* Add new related item */}
+                {isRelationBased &&
+                  repeatingConfig?.fieldRelationType === 'connectToSchema' &&
+                  addType !== 'mustSelectFromData' &&
+                  targetSchemaId && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsAddModalOpen(true);
+                      }}
+                      disabled={isLoading || !currentEntityId}
+                      className="text-xs inline-flex items-center gap-1.5"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Add{' '}
+                      {targetSchemaData?.singular_name ||
+                        targetSchemaData?.plural_name ||
+                        targetSchemaId}
+                    </Button>
+                  )}
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleRefreshClick}
+                  disabled={isLoading}
+                  className="text-gray-400 hover:text-violet-600 hover:bg-violet-50 transition-colors duration-200 p-1.5 shrink-0"
+                  aria-label="Refresh table"
+                >
+                  <RefreshCw className={cn('h-4 w-4', isLoading && 'animate-spin text-violet-600')} />
+                </Button>
+              </div>
             </div>
           </DialogHeader>
           <div 
-            className="flex-1 overflow-auto mt-4" 
+            className="flex-1 overflow-auto mt-2" 
             onClick={stopPropagation}
             onMouseDown={stopPropagation}
           >
-              <TableWrapper
-                tableConfig={tableConfig}
-                columns={columns}
-                data={sectionData}
-                showCards={false}
-                disableAnimation={false}
-                index={0}
-                isLoading={isLoading}
-                onRowClick={handleTableRowClick}
-                schema={schemaForColumns || undefined}
-              />
+            <div className="flex items-center justify-end mb-1 pr-1">
+              {isLoading ? (
+                <Badge variant="secondary" className="animate-pulse shrink-0">
+                  Loading...
+                </Badge>
+              ) : (
+                <Badge variant="secondary" className="shrink-0">
+                  {sectionData.length} {sectionData.length === 1 ? 'item' : 'items'}
+                </Badge>
+              )}
             </div>
+            <TableWrapper
+              tableConfig={tableConfig}
+              columns={columns}
+              data={sectionData}
+              showCards={false}
+              disableAnimation={false}
+              index={0}
+              isLoading={isLoading}
+              onRowClick={handleTableRowClick}
+              schema={schemaForColumns || undefined}
+            />
+          </div>
         </DialogContent>
       </Dialog>
       
@@ -290,6 +427,75 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
           }}
         />
       )}
+
+      {/* Add related item modal for relation-based sections */}
+      {isRelationBased &&
+        repeatingConfig?.fieldRelationType === 'connectToSchema' &&
+        isAddModalOpen &&
+        targetSchemaId && (
+          <FormModal
+            schemaId={targetSchemaId}
+            mode="create"
+            onSuccess={async (createdEntity) => {
+              setIsAddModalOpen(false);
+              const newEntityId =
+                createdEntity?.id || (createdEntity as any)?.data?.id;
+
+              if (currentEntityId && newEntityId && repeatingConfig?.relationTypeId) {
+                try {
+                  const relationResponse = await apiRequest('/api/relations', {
+                    method: 'POST',
+                    body: {
+                      sourceSchema: schema.id,
+                      sourceId: currentEntityId,
+                      targetSchema: targetSchemaId,
+                      targetId: newEntityId,
+                      relationTypeId: repeatingConfig.relationTypeId,
+                    },
+                  });
+
+                  if (!relationResponse.success) {
+                    console.error('Failed to create relation for new item:', relationResponse.error);
+                  } else {
+                    await refresh();
+                  }
+                } catch (error) {
+                  console.error('Error creating relation for new item:', error);
+                }
+              }
+            }}
+            onClose={() => {
+              setIsAddModalOpen(false);
+            }}
+          />
+        )}
+
+      {/* Popup picker for selecting existing related items */}
+      {isRelationBased &&
+        repeatingConfig?.fieldRelationType === 'connectToSchema' &&
+        isPickerOpen &&
+        targetSchemaId && (
+          <PopupPicker
+            isOpen={isPickerOpen}
+            onClose={() => setIsPickerOpen(false)}
+            schemaId={targetSchemaId}
+            schema={targetSchemaData || undefined}
+            onSelect={handleSelectFromPicker}
+            title={`Select ${
+              targetSchemaData?.plural_name ||
+              targetSchemaData?.singular_name ||
+              targetSchemaId
+            }`}
+            description={`Choose existing ${
+              targetSchemaData?.singular_name || 'items'
+            } to link to this record`}
+            excludeIds={shouldExcludeIds ? selectedIds : undefined}
+            selectedIds={selectedIds}
+            canViewList={true}
+            viewListUrl={`/page/${targetSchemaId}`}
+            allowMultiselect={true}
+          />
+        )}
     </>
   );
 };
