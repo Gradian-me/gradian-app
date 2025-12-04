@@ -11,6 +11,7 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { toast } from 'sonner';
 import { getFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
+import { useTenantStore } from '@/stores/tenant.store';
 
 // Helper function to resolve API endpoint URL
 // IMPORTANT: Always use relative URLs so requests go through Next.js API routes
@@ -86,8 +87,8 @@ const headersToObject = (headers?: HeadersInit): Record<string, string> => {
 };
 
 /**
- * Extracts the domain from the current URL
- * Returns the hostname (e.g., "cms.cinnagen.com" from "https://cms.cinnagen.com/api/integration")
+ * Extracts the tenant domain from the tenant store or falls back to current URL hostname
+ * Returns the domain (e.g., "cms.cinnagen.com" from tenant store or window.location.hostname)
  */
 const getTenantDomain = (): string | undefined => {
   if (!isBrowserEnvironment()) {
@@ -95,10 +96,25 @@ const getTenantDomain = (): string | undefined => {
   }
   
   try {
+    // Try to get domain from tenant store first
+    const tenantStore = useTenantStore.getState();
+    const selectedTenant = tenantStore.selectedTenant;
+    
+    // If tenant is selected and has a domain, use it
+    if (selectedTenant && selectedTenant.domain && selectedTenant.domain.trim().length > 0) {
+      return selectedTenant.domain.trim();
+    }
+    
+    // Fall back to window.location.hostname if no tenant is selected or tenant has no domain
     const hostname = window.location.hostname;
     return hostname || undefined;
   } catch {
-    return undefined;
+    // Fallback to window.location.hostname on error
+    try {
+      return window.location.hostname || undefined;
+    } catch {
+      return undefined;
+    }
   }
 };
 

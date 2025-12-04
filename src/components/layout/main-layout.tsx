@@ -18,10 +18,12 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { CompanySelector } from './CompanySelector';
+import { TenantSelector } from './TenantSelector';
 import { useCompanyStore } from '@/stores/company.store';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { UserProfileSelector } from './UserProfileSelector';
 import { DemoModeBadge } from './DemoModeBadge';
+import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import type { HeaderConfig } from '@/gradian-ui/layout/header';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useTheme } from 'next-themes';
@@ -388,6 +390,7 @@ export function MainLayout({
       <div className="hidden lg:flex items-center space-x-4">
         <DemoModeBadge />
         <CompanySelector />
+        {DEMO_MODE && <TenantSelector />}
         <ModeToggle />
         <NotificationsDropdown initialCount={5} />
         <UserProfileSelector theme={profileTheme} />

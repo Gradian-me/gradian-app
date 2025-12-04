@@ -6,6 +6,7 @@ import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { apiRequest } from '../utils/api';
 import { useCompanyStore } from '@/stores/company.store';
 import { PaginationMeta } from '../utils/pagination-utils';
+import { ApiResponse } from '../types/common';
 
 interface EntityFilters {
   search?: string;
@@ -95,12 +96,14 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
       if (response.success && response.data) {
         setEntities(response.data);
         // Extract pagination metadata from response if available
-        if (response.meta && typeof response.meta === 'object') {
-          setPaginationMeta(response.meta as PaginationMeta);
+        // The API response may include a meta property even though ApiResponse type doesn't include it
+        const responseWithMeta = response as ApiResponse<T[]> & { meta?: PaginationMeta };
+        if (responseWithMeta.meta && typeof responseWithMeta.meta === 'object') {
+          setPaginationMeta(responseWithMeta.meta);
         } else {
           setPaginationMeta(null);
         }
-        return { success: true as const, meta: response.meta as PaginationMeta | undefined };
+        return { success: true as const, meta: responseWithMeta.meta };
       } else {
         const errorMessage = response.error || 'Failed to fetch entities';
         setError(errorMessage);

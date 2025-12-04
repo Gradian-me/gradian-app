@@ -1536,5 +1536,50 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBM1DDMHCDKXQ3REX849TNKJ",
+    "timestamp": "2025-12-04T06:39:52.000Z",
+    "version": "1.11.000",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Introduced TenantSelector component for tenant selection in the MainLayout",
+        "priority": "High",
+        "affectedDomains": [
+          "layout",
+          "tenant-management",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated tenant selection logic to handle domain fallback and localStorage persistence",
+        "priority": "High",
+        "affectedDomains": [
+          "tenant-management",
+          "state-management"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Modified API utility to prioritize tenant domain from the store",
+        "priority": "High",
+        "affectedDomains": [
+          "api",
+          "tenant-management"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved pagination metadata handling in useDynamicEntity hook for better data fetching",
+        "priority": "Medium",
+        "affectedDomains": [
+          "hooks",
+          "data-display",
+          "api"
+        ]
+      }
+    ]
   }
 ]
