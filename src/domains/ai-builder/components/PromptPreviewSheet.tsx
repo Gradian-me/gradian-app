@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Loader2, Eye } from 'lucide-react';
+import { MarkdownViewer } from '@/gradian-ui/data-display/markdown';
 
 interface PromptPreviewSheetProps {
   isOpen: boolean;
@@ -79,11 +80,18 @@ export function PromptPreviewSheet({
                         Loading preloaded context...
                       </div>
                     </div>
+                  ) : systemPrompt ? (
+                    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                      <MarkdownViewer 
+                        content={systemPrompt}
+                        showToggle={false}
+                      />
+                    </div>
                   ) : (
                     <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
-                      <pre className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap wrap-break-word">
-                        {systemPrompt || '(No system prompt configured)'}
-                      </pre>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        (No system prompt configured)
+                      </p>
                     </div>
                   )}
                 </div>

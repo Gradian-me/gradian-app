@@ -2,7 +2,7 @@
 
 // CheckboxList Component - Multiple checkbox selection
 
-import React, { forwardRef, useImperativeHandle } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
 import { FormElementProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -29,6 +29,10 @@ export interface CheckboxListProps extends FormElementProps {
    * Sort order for options: 'ASC' (ascending), 'DESC' (descending), or null (no sorting, default)
    */
   sortType?: SortType;
+  /**
+   * Show a "Select All" checkbox at the top
+   */
+  showSelectAll?: boolean;
 }
 
 export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
@@ -49,10 +53,14 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
       queryParams,
       transform,
       sortType = null,
+      showSelectAll,
       ...props
     },
     ref
   ) => {
+    // Get showSelectAll from prop or config, default to false
+    const shouldShowSelectAll = showSelectAll ?? config.showSelectAll ?? false;
+
     // Fetch options from URL if sourceUrl is provided
     const {
       options: urlOptions,
@@ -67,6 +75,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
 
     // Ensure value is an array
     const currentValue = extractIds(value);
+    const selectAllCheckboxRef = useRef<HTMLButtonElement>(null);
 
     // Get options from config if not provided directly, or use URL options
     const checkboxOptions: CheckboxListProps['options'] = sourceUrl
@@ -86,6 +95,45 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
       normalizeOptionArray(checkboxOptions),
       sortType
     );
+
+    // Get selectable options (not disabled)
+    const selectableOptions = normalizedOptions.filter(opt => !opt.disabled);
+    const selectableOptionIds = selectableOptions.map(opt => opt.id);
+    
+    // Calculate select all state
+    const selectedSelectableCount = selectableOptionIds.filter(id => currentValue.includes(id)).length;
+    const isAllSelected = selectableOptions.length > 0 && selectedSelectableCount === selectableOptions.length;
+    const isIndeterminate = selectedSelectableCount > 0 && selectedSelectableCount < selectableOptions.length;
+
+    // Handle select all/deselect all
+    const handleSelectAll = (checked: boolean) => {
+      if (checked) {
+        // Select all selectable options
+        const newValue = Array.from(new Set([...currentValue, ...selectableOptionIds]));
+        onChange?.(newValue);
+      } else {
+        // Deselect all selectable options
+        const newValue = currentValue.filter((v: string) => !selectableOptionIds.includes(v));
+        onChange?.(newValue);
+      }
+    };
+
+    // Set indeterminate state on select all checkbox
+    useEffect(() => {
+      if (selectAllCheckboxRef.current && shouldShowSelectAll) {
+        // Try to find the actual input element (could be nested in button)
+        const checkbox = selectAllCheckboxRef.current.querySelector('input[type="checkbox"]') as HTMLInputElement;
+        if (checkbox) {
+          checkbox.indeterminate = isIndeterminate;
+        } else {
+          // If no input found, try to set on the element itself (in case it's a native checkbox)
+          const element = selectAllCheckboxRef.current as any;
+          if (element && typeof element.indeterminate !== 'undefined') {
+            element.indeterminate = isIndeterminate;
+          }
+        }
+      }
+    }, [isIndeterminate, shouldShowSelectAll]);
 
     useImperativeHandle(ref, () => ({
       focus: () => {
@@ -131,6 +179,30 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
           >
             {fieldLabel}
           </label>
+        )}
+        {shouldShowSelectAll && !isLoadingOptions && !optionsError && normalizedOptions.length > 0 && (
+          <div className="flex items-center space-x-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <Checkbox
+              id={`${fieldName}-select-all`}
+              checked={isAllSelected}
+              onCheckedChange={handleSelectAll}
+              disabled={disabled || selectableOptions.length === 0}
+              className={cn(
+                error && "border-red-500 focus-visible:ring-red-500"
+              )}
+              ref={selectAllCheckboxRef}
+            />
+            <Label
+              htmlFor={`${fieldName}-select-all`}
+              className={cn(
+                'text-sm font-medium cursor-pointer',
+                error ? 'text-red-700' : 'text-gray-700',
+                (disabled || selectableOptions.length === 0) && 'opacity-50 cursor-not-allowed'
+              )}
+            >
+              Select All
+            </Label>
+          </div>
         )}
         {isLoadingOptions ? (
           <div className="text-sm text-gray-500 py-2">Loading options...</div>

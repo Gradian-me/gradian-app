@@ -93,8 +93,8 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       resize === 'horizontal' && 'resize-x',
       resize === 'vertical' && 'resize-y',
       resize === 'both' && 'resize',
-      aiAgentId && 'pr-10',
-      enableVoiceInput && 'pb-10',
+      aiAgentId && 'pr-11',
+      enableVoiceInput && 'pb-11',
       className
     );
 
@@ -148,34 +148,36 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
                 onClick={handleAiAgentClick}
                 disabled={disabled}
                 className={cn(
-                  'p-1.5 rounded-md transition-colors',
-                  'hover:bg-violet-100 dark:hover:bg-violet-900/30',
-                  'text-violet-600 dark:text-violet-400',
-                  'disabled:opacity-50 disabled:cursor-not-allowed',
+                  'h-8 w-8 rounded-full border border-violet-200/70 bg-white/80 text-violet-600 shadow-sm transition-all',
+                  'flex items-center justify-center',
+                  'hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 hover:shadow-md',
+                  'dark:border-violet-500/50 dark:bg-gray-900/80 dark:text-violet-200 dark:hover:bg-violet-500/10',
+                  'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-violet-200/70 disabled:hover:bg-white/80',
                   'focus:outline-none focus:ring-2 focus:ring-violet-300 dark:focus:ring-violet-700'
                 )}
                 title="Enhance with AI"
               >
-                <IconRenderer iconName="Sparkles" className="h-4 w-4" />
+                <IconRenderer iconName="Sparkles" className="h-3.5 w-3.5" />
               </button>
             )}
           </div>
           {enableVoiceInput && (
-            <div className="absolute right-3 bottom-2 flex items-center gap-1">
+            <div className="absolute right-3 bottom-4 flex items-center gap-1">
               <button
                 type="button"
                 onClick={handleVoiceInputClick}
                 disabled={disabled}
                 className={cn(
-                  'p-1.5 rounded-md transition-colors',
-                  'hover:bg-violet-100 dark:hover:bg-violet-900/30',
-                  'text-violet-600 dark:text-violet-400',
-                  'disabled:opacity-50 disabled:cursor-not-allowed',
+                  'h-8 w-8 rounded-full border border-violet-200/70 bg-white/80 text-violet-600 shadow-sm transition-all',
+                  'flex items-center justify-center',
+                  'hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 hover:shadow-md',
+                  'dark:border-violet-500/50 dark:bg-gray-900/80 dark:text-violet-200 dark:hover:bg-violet-500/10',
+                  'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-violet-200/70 disabled:hover:bg-white/80',
                   'focus:outline-none focus:ring-2 focus:ring-violet-300 dark:focus:ring-violet-700'
                 )}
                 title="Voice Input"
               >
-                <Mic className="h-4 w-4" />
+                <Mic className="h-3.5 w-3.5" />
               </button>
             </div>
           )}

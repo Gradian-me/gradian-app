@@ -98,6 +98,9 @@ export function createTableConfig(
     pagination: { enabled: false },
     sorting: { enabled: false },
     filtering: { enabled: false },
+    striped: true,
+    bordered: true,
+    hoverable: true,
   };
 }
 

@@ -35,6 +35,7 @@ export interface ListInputProps {
   addButtonText?: string;
   className?: string;
   enableReordering?: boolean; // Enable drag-and-drop reordering (default: true)
+  disabled?: boolean; // Disable add button when loading (default: false)
 }
 
 const SortableListItem: React.FC<{
@@ -311,6 +312,7 @@ export const ListInput: React.FC<ListInputProps> = ({
   addButtonText = 'Add Annotation',
   className,
   enableReordering = true,
+  disabled = false,
 }) => {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const inputRefs = React.useRef<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map());
@@ -534,7 +536,7 @@ export const ListInput: React.FC<ListInputProps> = ({
         )
       ) : (
         <div className="text-sm text-gray-500 dark:text-gray-400 text-center py-4 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-          No annotations yet. Click the button below to add one.
+          Click the button below to add one.
         </div>
       )}
 
@@ -542,7 +544,7 @@ export const ListInput: React.FC<ListInputProps> = ({
         type="button"
         variant="outline"
         onClick={handleAddItem}
-        disabled={hasEmptyItem}
+        disabled={hasEmptyItem || disabled}
         className="w-full gap-2"
       >
         <Plus className="h-4 w-4" />

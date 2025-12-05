@@ -2,10 +2,16 @@
 
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useTheme } from 'next-themes';
+import { RefreshCw, Download } from 'lucide-react';
+import { CopyContent } from '../../../form-builder/form-elements/components/CopyContent';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface MermaidDiagramSimpleProps {
   diagram: string;
   className?: string;
+  markdownLoadedTimestamp?: number;
 }
 
 // Global state to ensure mermaid is loaded and initialized only once
@@ -16,13 +22,17 @@ const globalMermaidState = {
   loadingPromise: null as Promise<any> | null
 };
 
-export function MermaidDiagramSimple({ diagram, className }: MermaidDiagramSimpleProps) {
+export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimestamp }: MermaidDiagramSimpleProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
-  const mountedRef = useRef<boolean>(false);
+  const [isMounted, setIsMounted] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const lastRenderKeyRef = useRef<string>('');
-  const isRenderingRef = useRef<boolean>(false);
+  const [isRendering, setIsRendering] = useState<boolean>(false);
+  const [hasSvg, setHasSvg] = useState<boolean>(false);
+  const styleElementRef = useRef<HTMLStyleElement | null>(null);
+  const mountedRef = useRef<boolean>(false); // Keep for internal checks in callbacks
+  const isRenderingRef = useRef<boolean>(false); // Keep for internal checks in callbacks
 
   // Clean and format the diagram code
   const cleanDiagram = useMemo(() => {
@@ -222,23 +232,42 @@ export function MermaidDiagramSimple({ diagram, className }: MermaidDiagramSimpl
         secondBkgColor: isDark ? '#374151' : '#f9fafb',
         textColor: isDark ? '#f3f4f6' : '#111827',
         edgeLabelBackground: isDark ? '#374151' : '#f3f4f6',
+        // Make nodes smaller
+        fontSize: '12px',
+        fontFamily: 'inherit',
+        // Node dimensions
+        nodeBorder: isDark ? '#a78bfa' : '#6d28d9',
+        nodeBkg: isDark ? '#1f2937' : '#ffffff',
+        // Cluster dimensions
+        clusterBkg: isDark ? '#374151' : '#f9fafb',
+        clusterBorder: isDark ? '#6366f1' : '#4f46e5',
+        // Default link color
+        defaultLinkColor: isDark ? '#6366f1' : '#4f46e5',
+        // Title color
+        titleColor: isDark ? '#f3f4f6' : '#111827',
       },
     };
   }, []);
 
   // Store the last rendered diagram to prevent re-rendering the same content
   const lastRenderedDiagramRef = useRef<string>('');
+  const forceRefreshRef = useRef<boolean>(false);
 
   // Render diagram function
-  const renderDiagram = useCallback(async () => {
+  const renderDiagram = useCallback(async (force = false) => {
     if (!mountedRef.current || !containerRef.current || !cleanDiagram) {
       return;
     }
 
     // Check if we need to re-render - compare actual diagram content, not just renderKey
-    if (cleanDiagram === lastRenderedDiagramRef.current && renderKey === lastRenderKeyRef.current) {
+    if (!force && !forceRefreshRef.current && cleanDiagram === lastRenderedDiagramRef.current && renderKey === lastRenderKeyRef.current) {
       // Already rendered this exact diagram with this theme
       return;
+    }
+
+    // Reset force refresh flag
+    if (forceRefreshRef.current) {
+      forceRefreshRef.current = false;
     }
 
     // Prevent concurrent renders
@@ -247,6 +276,7 @@ export function MermaidDiagramSimple({ diagram, className }: MermaidDiagramSimpl
     }
 
     isRenderingRef.current = true;
+    setIsRendering(true);
     lastRenderKeyRef.current = renderKey;
     lastRenderedDiagramRef.current = cleanDiagram;
     setError(null);
@@ -272,8 +302,15 @@ export function MermaidDiagramSimple({ diagram, className }: MermaidDiagramSimpl
           theme,
           themeVariables,
           securityLevel: 'loose',
-          flowchart: { htmlLabels: true, curve: 'basis', useMaxWidth: true },
-          sequence: { useMaxWidth: true },
+          flowchart: { 
+            htmlLabels: true, 
+            curve: 'basis', 
+            useMaxWidth: true,
+            nodeSpacing: 50,
+            rankSpacing: 20,
+            padding: 2
+          },
+          sequence: { useMaxWidth: true, diagramMarginX: 10, diagramMarginY: 10 },
           gantt: { useMaxWidth: true },
           pie: { useMaxWidth: true },
           journey: { useMaxWidth: true },
@@ -289,6 +326,7 @@ export function MermaidDiagramSimple({ diagram, className }: MermaidDiagramSimpl
 
       // Clear previous content
       container.innerHTML = '';
+      setHasSvg(false);
       const id = `mermaid-simple-${Math.random().toString(36).substr(2, 9)}`;
       
       // Use mermaidAPI.render if available, otherwise use render
@@ -303,17 +341,254 @@ export function MermaidDiagramSimple({ diagram, className }: MermaidDiagramSimpl
           savedRenderKey === lastRenderKeyRef.current && 
           savedCleanDiagram === lastRenderedDiagramRef.current &&
           containerRef.current === container) {
-        container.innerHTML = typeof svg === 'string' ? svg : svg.outerHTML;
+        const svgString = typeof svg === 'string' ? svg : svg.outerHTML;
+        container.innerHTML = svgString;
+        
+        // Ensure SVG is centered and make nodes smaller
+        const insertedSvg = container.querySelector('svg');
+        if (insertedSvg) {
+          insertedSvg.style.display = 'block';
+          insertedSvg.style.margin = '0 auto';
+          insertedSvg.style.maxWidth = '100%';
+          insertedSvg.style.height = 'auto';
+          insertedSvg.style.transform = 'scale(0.85)';
+          insertedSvg.style.transformOrigin = 'center center';
+          
+          // Clean up previous style element if it exists
+          if (styleElementRef.current && styleElementRef.current.parentNode) {
+            styleElementRef.current.parentNode.removeChild(styleElementRef.current);
+            styleElementRef.current = null;
+          }
+          
+          // Make nodes smaller by scaling down font sizes and node dimensions
+          const svgId = insertedSvg.id || `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+          if (!insertedSvg.id) {
+            insertedSvg.id = svgId;
+          }
+          
+          const style = document.createElement('style');
+          style.id = `mermaid-style-${svgId}`;
+          style.textContent = `
+            #${svgId} {
+              transform: scale(0.85) !important;
+              transform-origin: center center !important;
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+            #${svgId} .flowchart-label {
+              margin: 0 !important;
+            }
+            #${svgId} .node rect,
+            #${svgId} .node circle,
+            #${svgId} .node ellipse,
+            #${svgId} .node polygon,
+            #${svgId} .node path {
+              font-size: 11px !important;
+            }
+            #${svgId} .nodeLabel {
+              font-size: 11px !important;
+            }
+            #${svgId} .nodeLabel tspan {
+              word-wrap: break-word !important;
+              overflow-wrap: break-word !important;
+              white-space: normal !important;
+            }
+            #${svgId} .nodeLabel foreignObject {
+              overflow: visible !important;
+              height: auto !important;
+            }
+            #${svgId} .nodeLabel foreignObject > div {
+              word-wrap: break-word !important;
+              overflow-wrap: break-word !important;
+              white-space: normal !important;
+              text-align: center !important;
+              padding: 4px 8px !important;
+              line-height: 1.3 !important;
+              display: block !important;
+              box-sizing: border-box !important;
+            }
+            #${svgId} .nodeLabel foreignObject > div > p {
+              margin: 0 !important;
+              word-wrap: break-word !important;
+              overflow-wrap: break-word !important;
+              white-space: normal !important;
+            }
+            #${svgId} .nodeLabel foreignObject > div > span {
+              word-wrap: break-word !important;
+              overflow-wrap: break-word !important;
+              white-space: normal !important;
+            }
+            #${svgId} .edgeLabel {
+              font-size: 10px !important;
+              word-wrap: break-word !important;
+              overflow-wrap: break-word !important;
+            }
+            #${svgId} .cluster-label {
+              font-size: 12px !important;
+              word-wrap: break-word !important;
+              overflow-wrap: break-word !important;
+            }
+            #${svgId} text {
+              font-size: 11px !important;
+              word-wrap: break-word !important;
+              overflow-wrap: break-word !important;
+            }
+            #${svgId} .node {
+              min-width: 60px !important;
+            }
+            #${svgId} .node rect {
+              rx: 4px !important;
+              ry: 4px !important;
+            }
+          `;
+          document.head.appendChild(style);
+          styleElementRef.current = style;
+          
+          // Post-process to ensure all node labels wrap properly
+          // Use multiple animation frames to ensure DOM is fully rendered and measured
+          const processNodes = () => {
+            // Process HTML labels (foreignObject)
+            const foreignObjects = insertedSvg.querySelectorAll('.nodeLabel foreignObject');
+            foreignObjects.forEach((fo: any) => {
+              const div = fo.querySelector('div');
+              if (div) {
+                const textContent = div.textContent || '';
+                
+                // Calculate required width based on text length
+                // For 11px font, estimate ~6-7px per character
+                // Allow for wrapping: if text is long, set a reasonable max width
+                const charCount = textContent.length;
+                let requiredWidth: number;
+                
+                if (charCount <= 20) {
+                  // Short text: single line
+                  requiredWidth = Math.max(charCount * 7 + 32, 100);
+                } else if (charCount <= 40) {
+                  // Medium text: allow 2 lines
+                  requiredWidth = Math.max(charCount * 3.5 + 32, 150);
+                } else {
+                  // Long text: allow 3+ lines
+                  requiredWidth = Math.min(charCount * 2.5 + 32, 400);
+                }
+                
+                // Get current width
+                const currentWidth = parseFloat(fo.getAttribute('width') || '0');
+                
+                // Set new width if needed
+                if (requiredWidth > currentWidth) {
+                  fo.setAttribute('width', requiredWidth.toString());
+                }
+                
+                // Ensure div can wrap
+                div.style.width = '100%';
+                div.style.maxWidth = '100%';
+                
+                // Update foreignObject height to accommodate wrapped text
+                const divHeight = div.scrollHeight || div.offsetHeight;
+                if (divHeight > 0) {
+                  const currentHeight = parseFloat(fo.getAttribute('height') || '0');
+                  if (divHeight + 8 > currentHeight) {
+                    fo.setAttribute('height', (divHeight + 8).toString());
+                  }
+                }
+                
+                // Update the node rectangle to match foreignObject dimensions
+                const node = fo.closest('.node');
+                if (node) {
+                  const rect = node.querySelector('rect');
+                  if (rect) {
+                    // Update width
+                    const currentRectWidth = parseFloat(rect.getAttribute('width') || '0');
+                    if (requiredWidth > currentRectWidth) {
+                      rect.setAttribute('width', requiredWidth.toString());
+                    }
+                    // Update height
+                    const foHeight = parseFloat(fo.getAttribute('height') || '0');
+                    const currentRectHeight = parseFloat(rect.getAttribute('height') || '0');
+                    if (foHeight > currentRectHeight) {
+                      rect.setAttribute('height', foHeight.toString());
+                    }
+                  }
+                }
+              }
+            });
+            
+            // Process SVG text labels (non-HTML)
+            const allNodes = insertedSvg.querySelectorAll('.node');
+            allNodes.forEach((node: any) => {
+              const hasForeignObject = node.querySelector('.nodeLabel foreignObject');
+              if (!hasForeignObject) {
+                const rect = node.querySelector('rect');
+                const textEl = node.querySelector('.nodeLabel text');
+                if (rect && textEl) {
+                  try {
+                    const textBBox = textEl.getBBox();
+                    const currentWidth = parseFloat(rect.getAttribute('width') || '0');
+                    // Expand node if text is wider than current width (with padding)
+                    if (textBBox.width + 20 > currentWidth) {
+                      rect.setAttribute('width', (textBBox.width + 20).toString());
+                    }
+                  } catch (e) {
+                    // getBBox might fail if element is not rendered yet
+                    console.debug('Could not get text bbox:', e);
+                  }
+                }
+              }
+            });
+          };
+          
+          // Use multiple frames to ensure proper measurement
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              processNodes();
+              
+              // Adjust container height to fit the diagram
+              if (insertedSvg && container) {
+                // Wait a bit more for final layout
+                setTimeout(() => {
+                  const svgRect = insertedSvg.getBoundingClientRect();
+                  const viewBox = insertedSvg.viewBox?.baseVal;
+                  
+                  // Use viewBox height if available (more accurate), otherwise use rendered height
+                  let svgHeight = 0;
+                  if (viewBox && viewBox.height > 0) {
+                    svgHeight = viewBox.height;
+                  } else if (svgRect.height > 0) {
+                    // If using rendered height, account for scale already applied
+                    svgHeight = svgRect.height / 0.85; // Reverse the scale to get original height
+                  }
+                  
+                  // Account for the scale transform (0.85)
+                  const scaledHeight = svgHeight * 0.85;
+                  
+                  // Set container height to fit the scaled diagram with minimal padding
+                  if (scaledHeight > 0 && container) {
+                    container.style.height = `${scaledHeight + 8}px`; // 8px for minimal vertical padding
+                    container.style.minHeight = 'auto';
+                    container.style.maxHeight = 'none';
+                    container.style.overflow = 'visible';
+                  }
+                }, 100);
+              }
+            });
+          });
+        }
+        
         if (bindFunctions && typeof bindFunctions === 'function') {
           bindFunctions(container);
         }
         isRenderingRef.current = false;
+        setIsRendering(false);
+        setHasSvg(true);
       } else {
         isRenderingRef.current = false;
+        setIsRendering(false);
       }
     } catch (err: any) {
       console.error('Mermaid rendering error in simple viewer:', err);
       isRenderingRef.current = false;
+      setIsRendering(false);
+      setHasSvg(false);
       if (mountedRef.current && savedRenderKey === lastRenderKeyRef.current && containerRef.current === container) {
         const errorMsg = err.message || 'Failed to render diagram';
         setError(errorMsg);
@@ -322,13 +597,183 @@ export function MermaidDiagramSimple({ diagram, className }: MermaidDiagramSimpl
     }
   }, [cleanDiagram, renderKey, resolvedTheme, initializeMermaid, getThemeConfig]);
 
+  // Refresh handler
+  const handleRefresh = useCallback(() => {
+    if (!mountedRef.current || !containerRef.current || !cleanDiagram) {
+      return;
+    }
+    // Force refresh by clearing the last rendered diagram
+    lastRenderedDiagramRef.current = '';
+    lastRenderKeyRef.current = '';
+    forceRefreshRef.current = true;
+    renderDiagram(true);
+  }, [cleanDiagram, renderDiagram]);
+
+  // Export PNG handler
+  const handleExportPNG = useCallback(async () => {
+    if (!containerRef.current) {
+      toast.error('No diagram to export');
+      return;
+    }
+
+    const svgElement = containerRef.current.querySelector('svg');
+    if (!svgElement) {
+      toast.error('Diagram not ready for export');
+      return;
+    }
+
+    try {
+      // Clone the SVG to avoid modifying the original
+      const clonedSvg = svgElement.cloneNode(true) as SVGElement;
+      
+      // Get SVG dimensions
+      const svgRect = svgElement.getBoundingClientRect();
+      const viewBox = svgElement.viewBox?.baseVal;
+      const svgWidth = viewBox?.width || parseFloat(svgElement.getAttribute('width') || '0') || svgRect.width || 800;
+      const svgHeight = viewBox?.height || parseFloat(svgElement.getAttribute('height') || '0') || svgRect.height || 600;
+
+      // Set explicit dimensions on cloned SVG
+      clonedSvg.setAttribute('width', String(svgWidth));
+      clonedSvg.setAttribute('height', String(svgHeight));
+      clonedSvg.setAttribute('style', 'max-width: none; max-height: none;');
+      
+      // Remove any external references that might cause CORS issues
+      const externalImages = clonedSvg.querySelectorAll('image');
+      externalImages.forEach((img) => {
+        const href = img.getAttribute('href') || img.getAttribute('xlink:href');
+        if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+          // Remove external images to avoid CORS issues
+          img.remove();
+        }
+      });
+
+      // Get SVG content and convert to data URL
+      const svgData = new XMLSerializer().serializeToString(clonedSvg);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      
+      // Use FileReader to create a data URL instead of object URL
+      const reader = new FileReader();
+      const svgDataUrl = await new Promise<string>((resolve, reject) => {
+        reader.onload = (e) => {
+          const result = e.target?.result;
+          if (typeof result === 'string') {
+            resolve(result);
+          } else {
+            reject(new Error('Failed to read SVG blob'));
+          }
+        };
+        reader.onerror = () => reject(new Error('Failed to read SVG blob'));
+        reader.readAsDataURL(svgBlob);
+      });
+
+      // Create an image element to load the SVG
+      const img = new Image();
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        toast.error('Failed to create canvas context');
+        return;
+      }
+
+      // Wait for image to load
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => {
+          try {
+            // Set canvas dimensions with some padding
+            const padding = 20;
+            const scale = 2; // Higher resolution
+            canvas.width = (img.width + padding * 2) * scale;
+            canvas.height = (img.height + padding * 2) * scale;
+
+            // Scale context for higher resolution
+            ctx.scale(scale, scale);
+
+            // Clear canvas (transparent background)
+            ctx.clearRect(0, 0, canvas.width / scale, canvas.height / scale);
+
+            // Draw the image on canvas with padding
+            ctx.drawImage(img, padding, padding);
+
+            // Convert to PNG
+            canvas.toBlob((blob) => {
+              if (!blob) {
+                reject(new Error('Failed to create PNG blob'));
+                return;
+              }
+
+              // Create download link
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `Gradian_Diagram_${Date.now()}.png`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+
+              // Cleanup
+              URL.revokeObjectURL(url);
+              resolve();
+            }, 'image/png');
+          } catch (err) {
+            reject(err);
+          }
+        };
+
+        img.onerror = () => {
+          reject(new Error('Failed to load SVG image'));
+        };
+
+        // Set crossOrigin before setting src to avoid CORS issues
+        img.crossOrigin = 'anonymous';
+        img.src = svgDataUrl;
+      });
+
+      toast.success('Diagram exported as PNG');
+    } catch (err: any) {
+      console.error('Export PNG error:', err);
+      toast.error(err.message || 'Failed to export diagram as PNG');
+    }
+  }, []);
+
   // Mount effect (runs once)
   useEffect(() => {
     mountedRef.current = true;
+    setIsMounted(true);
     return () => {
       mountedRef.current = false;
+      setIsMounted(false);
+      // Clean up style element on unmount
+      if (styleElementRef.current && styleElementRef.current.parentNode) {
+        styleElementRef.current.parentNode.removeChild(styleElementRef.current);
+        styleElementRef.current = null;
+      }
     };
   }, []);
+
+  // Update hasSvg state when container content changes
+  useEffect(() => {
+    if (!containerRef.current) return;
+    
+    const checkSvg = () => {
+      const hasSvgElement = !!containerRef.current?.querySelector('svg');
+      setHasSvg(hasSvgElement);
+    };
+    
+    // Check immediately
+    checkSvg();
+    
+    // Use MutationObserver to watch for SVG changes
+    const observer = new MutationObserver(checkSvg);
+    if (containerRef.current) {
+      observer.observe(containerRef.current, {
+        childList: true,
+        subtree: true,
+      });
+    }
+    
+    return () => observer.disconnect();
+  }, [renderKey, cleanDiagram]);
 
   // Render effect (runs when diagram or theme changes)
   useEffect(() => {
@@ -356,7 +801,43 @@ export function MermaidDiagramSimple({ diagram, className }: MermaidDiagramSimpl
     return () => clearTimeout(timer);
   }, [renderKey, cleanDiagram, renderDiagram]);
 
-  if (!mountedRef.current) {
+  // Auto-refresh effect: refresh diagram 3 seconds after markdown is loaded
+  const markdownLoadedTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastMarkdownLoadedTimestampRef = useRef<number | undefined>(undefined);
+  
+  useEffect(() => {
+    if (!mountedRef.current || !cleanDiagram) {
+      return;
+    }
+
+    // If markdownLoadedTimestamp is provided and has changed, schedule refresh
+    if (markdownLoadedTimestamp && markdownLoadedTimestamp !== lastMarkdownLoadedTimestampRef.current) {
+      lastMarkdownLoadedTimestampRef.current = markdownLoadedTimestamp;
+      
+      // Clear any existing timer
+      if (markdownLoadedTimerRef.current) {
+        clearTimeout(markdownLoadedTimerRef.current);
+        markdownLoadedTimerRef.current = null;
+      }
+
+      // Schedule refresh 3 seconds after markdown is loaded
+      markdownLoadedTimerRef.current = setTimeout(() => {
+        if (mountedRef.current && containerRef.current && cleanDiagram && !isRenderingRef.current) {
+          handleRefresh();
+        }
+        markdownLoadedTimerRef.current = null;
+      }, 3000); // 3 seconds after markdown is loaded
+    }
+
+    return () => {
+      if (markdownLoadedTimerRef.current) {
+        clearTimeout(markdownLoadedTimerRef.current);
+        markdownLoadedTimerRef.current = null;
+      }
+    };
+  }, [markdownLoadedTimestamp, cleanDiagram, handleRefresh]);
+
+  if (!isMounted) {
     return (
       <div className={`flex items-center justify-center min-h-[100px] bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 ${className || ''}`}>
         <div className="text-gray-500 dark:text-gray-400">Loading diagram...</div>
@@ -369,7 +850,51 @@ export function MermaidDiagramSimple({ diagram, className }: MermaidDiagramSimpl
   }
 
   return (
-    <div className={`flex justify-center overflow-x-auto ${className || ''}`}>
+    <div className={`border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden ${className || ''}`}>
+      {/* Header with actions */}
+      <div className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
+        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          Mermaid Diagram
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isRendering}
+            className="h-7 w-7 p-0 hover:bg-violet-100 hover:text-violet-600 dark:hover:bg-violet-900/20 dark:hover:text-violet-400 transition-all duration-200"
+            title="Refresh diagram"
+            aria-label="Refresh diagram"
+          >
+            <RefreshCw 
+              className={cn(
+                'h-4 w-4 transition-transform duration-200',
+                isRendering && 'animate-spin'
+              )} 
+            />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleExportPNG}
+            disabled={!hasSvg}
+            className="h-7 w-7 p-0 hover:bg-violet-100 hover:text-violet-600 dark:hover:bg-violet-900/20 dark:hover:text-violet-400 transition-all duration-200"
+            title="Export as PNG"
+            aria-label="Export as PNG"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+          <CopyContent 
+            content={cleanDiagram}
+            className="h-7 w-7"
+          />
+        </div>
+      </div>
+
+      {/* Diagram content */}
+      <div className="flex justify-center overflow-x-auto bg-white dark:bg-gray-900 py-2 px-4">
       {error ? (
         <div className="text-red-500 dark:text-red-400 p-4 rounded bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 w-full">
           <p className="font-semibold mb-1">Mermaid Diagram Error</p>
@@ -384,10 +909,11 @@ export function MermaidDiagramSimple({ diagram, className }: MermaidDiagramSimpl
       ) : (
         <div 
           ref={containerRef} 
-          className="mermaid w-full"
+            className="mermaid w-full flex justify-center"
           suppressHydrationWarning
         />
       )}
+      </div>
     </div>
   );
 }

@@ -229,7 +229,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       return <Checkbox config={config} {...commonProps} />;
     
     case 'checkbox-list':
-      return <CheckboxList config={config} options={config.options || []} {...commonProps} />;
+      return <CheckboxList config={config} options={config.options || []} showSelectAll={config.showSelectAll} {...commonProps} />;
 
     case 'switch': {
       // Filter out touched and other non-DOM props from commonProps

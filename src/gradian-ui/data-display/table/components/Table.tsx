@@ -46,8 +46,9 @@ export function Table<T = any>({
   };
 
   const containerClasses = cn(
-    'overflow-x-auto w-full',
-    config.bordered && 'border border-gray-200 dark:border-gray-700 rounded-lg m-2',
+    'w-full',
+    !config.bordered && 'overflow-x-auto',
+    config.bordered && 'm-2',
     className
   );
 
@@ -71,33 +72,65 @@ export function Table<T = any>({
 
   return (
     <div className={containerClasses} style={{ width: '-webkit-fill-available' }}>
-      <table className={tableClasses} style={tableStyle}>
-        <TableHeader
-          columns={config.columns}
-          sortBy={state.sortBy}
-          sortDirection={state.sortDirection}
-          onSort={config.sorting?.enabled ? handleSort : undefined}
-          stickyHeader={config.stickyHeader}
-          selectionEnabled={config.selection?.enabled}
-          allSelected={state.selectedRows.size === processedData.length && processedData.length > 0}
-          onSelectAll={selectAll}
-          onClearSelection={clearSelection}
-          striped={config.striped}
-          bordered={config.bordered}
-        />
-        <TableBody
-          data={processedData}
-          columns={config.columns}
-          selectedRows={state.selectedRows}
-          onRowClick={onRowClick}
-          onCellClick={onCellClick}
-          onRowSelect={config.selection?.enabled ? toggleRowSelection : undefined}
-          striped={config.striped}
-          hoverable={config.hoverable}
-          bordered={config.bordered}
-          highlightQuery={highlightQuery}
-        />
-      </table>
+      {config.bordered ? (
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-x-auto overflow-y-hidden w-full">
+          <table className={tableClasses} style={tableStyle}>
+            <TableHeader
+              columns={config.columns}
+              sortBy={state.sortBy}
+              sortDirection={state.sortDirection}
+              onSort={config.sorting?.enabled ? handleSort : undefined}
+              stickyHeader={config.stickyHeader}
+              selectionEnabled={config.selection?.enabled}
+              allSelected={state.selectedRows.size === processedData.length && processedData.length > 0}
+              onSelectAll={selectAll}
+              onClearSelection={clearSelection}
+              striped={config.striped}
+              bordered={config.bordered}
+            />
+            <TableBody
+              data={processedData}
+              columns={config.columns}
+              selectedRows={state.selectedRows}
+              onRowClick={onRowClick}
+              onCellClick={onCellClick}
+              onRowSelect={config.selection?.enabled ? toggleRowSelection : undefined}
+              striped={config.striped}
+              hoverable={config.hoverable}
+              bordered={config.bordered}
+              highlightQuery={highlightQuery}
+            />
+          </table>
+        </div>
+      ) : (
+        <table className={tableClasses} style={tableStyle}>
+          <TableHeader
+            columns={config.columns}
+            sortBy={state.sortBy}
+            sortDirection={state.sortDirection}
+            onSort={config.sorting?.enabled ? handleSort : undefined}
+            stickyHeader={config.stickyHeader}
+            selectionEnabled={config.selection?.enabled}
+            allSelected={state.selectedRows.size === processedData.length && processedData.length > 0}
+            onSelectAll={selectAll}
+            onClearSelection={clearSelection}
+            striped={config.striped}
+            bordered={config.bordered}
+          />
+          <TableBody
+            data={processedData}
+            columns={config.columns}
+            selectedRows={state.selectedRows}
+            onRowClick={onRowClick}
+            onCellClick={onCellClick}
+            onRowSelect={config.selection?.enabled ? toggleRowSelection : undefined}
+            striped={config.striped}
+            hoverable={config.hoverable}
+            bordered={config.bordered}
+            highlightQuery={highlightQuery}
+          />
+        </table>
+      )}
 
       {config.pagination?.enabled && (config.pagination.alwaysShow || totalPages > 1 || state.pageSize === 'all') && (
         <DynamicPagination

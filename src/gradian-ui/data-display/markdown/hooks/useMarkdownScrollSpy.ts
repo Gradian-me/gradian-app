@@ -193,7 +193,6 @@ export function useMarkdownScrollSpy(headings: Heading[]) {
     return () => {
       cleanup?.();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [headings]); // Only depend on headings, activeHeadingId is managed internally
 
   return activeHeadingId;

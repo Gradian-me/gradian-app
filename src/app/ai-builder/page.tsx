@@ -497,6 +497,7 @@ export default function AiBuilderPage() {
                   onChange={handleModalAnnotationChange}
                   placeholder="Enter annotation..."
                   addButtonText="Add Annotation"
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -543,14 +544,16 @@ export default function AiBuilderPage() {
               className="rounded-xl overflow-hidden"
             />
             {selectedAgent?.loadingTextSwitches && (
-              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <TextSwitcher
-                  texts={selectedAgent.loadingTextSwitches}
-                  className="text-gray-900 dark:text-white font-medium text-sm md:text-base px-4 py-2"
-                  switchInterval={3000}
-                  transitionDuration={0.5}
-                  shimmerDuration={1}
-                />
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4">
+                <div className="max-w-[85%]">
+                  <TextSwitcher
+                    texts={selectedAgent.loadingTextSwitches}
+                    className="text-gray-900 dark:text-white font-medium text-sm md:text-base px-4 py-2"
+                    switchInterval={3000}
+                    transitionDuration={0.5}
+                    shimmerDuration={1}
+                  />
+                </div>
               </div>
             )}
           </motion.div>

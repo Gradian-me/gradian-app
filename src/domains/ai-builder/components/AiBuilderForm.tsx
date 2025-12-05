@@ -74,9 +74,61 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
   const fieldError = formErrors[field.name];
   const fieldTouched = touched[field.name];
 
-  // Determine column span: textarea = 2 (full width), others = 1 (half width)
-  const colSpan = field.component === 'textarea' ? 2 : 1;
-  const colSpanClass = colSpan === 2 ? 'col-span-2' : 'col-span-1';
+  // Helper function to determine column span based on field config
+  // Similar to AccordionFormSection.tsx
+  const getColSpan = (field: any): number => {
+    const gridColumns = 2; // Fixed 2-column grid for AiBuilderForm
+    
+    // First check for explicit colSpan at field level
+    if (field.colSpan != null) {
+      return field.colSpan;
+    }
+    
+    // Fallback to layout.colSpan for backward compatibility
+    if (field.layout?.colSpan != null) {
+      return field.layout.colSpan;
+    }
+
+    // Then check for width percentages and convert to colSpan
+    const width = field.layout?.width;
+    
+    if (width === '100%') {
+      return gridColumns; // Full width spans all columns
+    } else if (width === '50%') {
+      return Math.ceil(gridColumns / 2); // Half width
+    } else if (width === '33.33%' || width === '33.3%') {
+      return Math.ceil(gridColumns / 3); // One third width
+    } else if (width === '25%') {
+      return Math.ceil(gridColumns / 4); // One fourth width
+    } else if (width === '66.66%' || width === '66.6%') {
+      return Math.ceil((gridColumns / 3) * 2); // Two thirds width
+    } else if (width === '75%') {
+      return Math.ceil((gridColumns / 4) * 3); // Three fourths width
+    }
+    
+    // Default: textarea components span full width, others span 1 column
+    if (field.component === 'textarea') {
+      return gridColumns;
+    }
+    
+    // Default to 1 column if no width specified
+    return 1;
+  };
+
+  const colSpan = getColSpan(field);
+  
+  // Generate appropriate column span class for 2-column grid
+  // Default to single column on mobile to avoid overlap,
+  // and apply the actual span at md and up.
+  // For a 2-column grid: colSpan 1 = half width, colSpan 2 = full width
+  let colSpanClass = 'col-span-1';
+  if (colSpan >= 2) {
+    // Full width: span both columns
+    colSpanClass = 'col-span-1 md:col-span-2';
+  } else {
+    // Half width: span one column
+    colSpanClass = 'col-span-1';
+  }
 
   // Special styling for textarea/prompt field
   const isPromptField = field.name === 'userPrompt' || field.id === 'user-prompt';
@@ -109,9 +161,6 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
   return (
     <div 
       className={cn('relative space-y-2', colSpanClass)}
-      style={{
-        gridColumn: colSpan === 2 ? 'span 2 / span 2' : 'span 1 / span 1'
-      }}
     >
       {(field.label || shouldShowCopyInLabel) && (
         <div className="flex items-center justify-between mb-2">

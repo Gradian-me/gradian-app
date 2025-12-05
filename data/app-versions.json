@@ -1772,5 +1772,71 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBM7ENHANCEMENTS001",
+    "timestamp": "2025-12-05T08:00:00.000Z",
+    "version": "1.14.001",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Improved loading text formatting in ai-agents.json for better readability",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "New \"Select All\" feature in CheckboxList component to enhance user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui",
+          "components"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated AiBuilderForm to dynamically determine column spans based on field configuration",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ai-builder",
+          "layout"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Enhanced Markdown rendering components for better styling and usability",
+        "priority": "Medium",
+        "affectedDomains": [
+          "markdown-viewer",
+          "ui",
+          "data-display"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Adjusted Table component to support conditional styling based on configuration",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "table",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Cleaned up Textarea component styles for consistency",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui",
+          "components"
+        ]
+      }
+    ]
   }
 ]

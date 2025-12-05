@@ -26,6 +26,8 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "scripts/webpack-cdn/**/*.min.js",
+      "public/cdn/**/*.min.js",
     ],
   },
 ];

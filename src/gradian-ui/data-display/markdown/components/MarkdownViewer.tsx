@@ -149,11 +149,43 @@ export function MarkdownViewer({
     return JSON.stringify([...stickyHeadings].sort());
   }, [stickyHeadings]);
   
+  // Track when markdown is fully loaded
+  const [markdownLoadedTimestamp, setMarkdownLoadedTimestamp] = useState<number | undefined>(undefined);
+  const markdownContentRef = useRef<HTMLDivElement>(null);
+  
+  // Detect when markdown rendering is complete
+  useEffect(() => {
+    if (viewMode !== 'preview' || !content) {
+      setMarkdownLoadedTimestamp(undefined);
+      return;
+    }
+
+    // Use a combination of requestAnimationFrame and setTimeout to detect when rendering is complete
+    const checkRenderComplete = () => {
+      // Wait for ReactMarkdown to finish rendering
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          // Additional delay to ensure all components (including mermaid) are mounted
+          setTimeout(() => {
+            setMarkdownLoadedTimestamp(Date.now());
+          }, 100);
+        });
+      });
+    };
+
+    // Small delay to ensure ReactMarkdown has started rendering
+    const timer = setTimeout(checkRenderComplete, 0);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [content, viewMode]);
+
   // Create components with sticky headings configuration (memoized)
   const markdownComponents = useMemo(() => {
     const levels = stickyHeadingsKey ? JSON.parse(stickyHeadingsKey) : [];
-    return createMarkdownComponents(levels);
-  }, [stickyHeadingsKey]);
+    return createMarkdownComponents(levels, markdownLoadedTimestamp);
+  }, [stickyHeadingsKey, markdownLoadedTimestamp]);
 
   return (
     <div className="space-y-4">
@@ -171,7 +203,7 @@ export function MarkdownViewer({
           <EndLine />
         </div>
       ) : (
-        <article className="prose prose-lg dark:prose-invert max-w-none">
+        <article ref={markdownContentRef} className="prose prose-lg dark:prose-invert max-w-none">
           <ReactMarkdown
             remarkPlugins={[
               remarkGfm,

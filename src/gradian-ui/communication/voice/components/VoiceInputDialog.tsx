@@ -312,14 +312,16 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                 className="rounded-xl overflow-hidden"
               />
               {loadingTextSwitches && (isRecording || isTranscribing) && (
-                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                  <TextSwitcher
-                    texts={loadingTextSwitches}
-                    className="text-white dark:text-white font-medium text-sm md:text-base px-4 py-2 rounded-lg bg-black/20 dark:bg-white/10 backdrop-blur-sm"
-                    switchInterval={3000}
-                    transitionDuration={0.5}
-                    shimmerDuration={1}
-                  />
+                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4">
+                  <div className="max-w-[85%]">
+                    <TextSwitcher
+                      texts={loadingTextSwitches}
+                      className="text-white dark:text-white font-medium text-sm md:text-base px-4 py-2 rounded-lg bg-black/20 dark:bg-white/10 backdrop-blur-sm"
+                      switchInterval={3000}
+                      transitionDuration={0.5}
+                      shimmerDuration={1}
+                    />
+                  </div>
                 </div>
               )}
             </div>
