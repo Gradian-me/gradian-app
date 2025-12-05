@@ -203,7 +203,7 @@ export function MarkdownViewer({
           <EndLine />
         </div>
       ) : (
-        <article ref={markdownContentRef} className="prose prose-lg dark:prose-invert max-w-none">
+        <article ref={markdownContentRef} dir="auto" className="prose prose-lg dark:prose-invert max-w-none">
           <ReactMarkdown
             remarkPlugins={[
               remarkGfm,
