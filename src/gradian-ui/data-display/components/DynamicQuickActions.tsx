@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { FormModal } from '@/gradian-ui/form-builder';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { AiAgentDialog } from '@/domains/ai-builder/components/AiAgentDialog';
 
 export interface DynamicQuickActionsProps {
   actions: QuickAction[];
@@ -34,6 +35,9 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
   const [loadingActionId, setLoadingActionId] = useState<string | null>(null);
   const [targetSchemaId, setTargetSchemaId] = useState<string | null>(null);
   const [schemaCacheState, setSchemaCacheState] = useState<Record<string, FormSchema>>(() => schemaCache || {});
+  const [aiAgentAction, setAiAgentAction] = useState<QuickAction | null>(null);
+  const [agentForDialog, setAgentForDialog] = useState<any | null>(null);
+  const [loadingAgent, setLoadingAgent] = useState(false);
 
   useEffect(() => {
     if (!schemaCache) {
@@ -95,6 +99,28 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
           setLoadingActionId(null);
         }, 100);
       }
+    } else if (action.action === 'runAiAgent' && action.agentId) {
+      // Fetch the specific agent and open dialog
+      setLoadingActionId(action.id);
+      setLoadingAgent(true);
+      
+      fetch(`/api/ai-agents/${action.agentId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.data) {
+            setAgentForDialog(data.data);
+            setAiAgentAction(action);
+          } else {
+            console.error('Failed to load agent:', data.error);
+          }
+        })
+        .catch(err => {
+          console.error('Error loading agent:', err);
+        })
+        .finally(() => {
+          setLoadingAgent(false);
+          setLoadingActionId(null);
+        });
     }
   }, [router, data, schemaCacheState]);
 
@@ -155,6 +181,21 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
           onClose={() => {
             setTargetSchemaId(null);
           }}
+        />
+      )}
+
+      {/* AI Agent Dialog */}
+      {aiAgentAction && aiAgentAction.agentId && agentForDialog && (
+        <AiAgentDialog
+          isOpen={!!aiAgentAction}
+          onClose={() => {
+            setAiAgentAction(null);
+            setAgentForDialog(null);
+          }}
+          action={aiAgentAction}
+          schema={schema}
+          data={data}
+          agent={agentForDialog}
         />
       )}
     </>

@@ -363,7 +363,7 @@ export function SchemaBuilderEditor({
 
   if (loadError) {
     return (
-      <MainLayout title={title || 'Schema Not Found'} subtitle={subtitle} icon="PencilRuler">
+      <MainLayout title={title || 'Schema Not Found'} subtitle={subtitle} icon="PencilRuler" showEndLine={false}>
         <SchemaNotFound
           onGoBack={onBack}
           showGoBackButton={!!onBack}

@@ -42,6 +42,7 @@ interface MainLayoutProps {
   isAdmin?: boolean;
   navigationSchemas?: FormSchema[];
   customHeaderActions?: React.ReactNode;
+  showEndLine?: boolean;
 }
 
 const DESKTOP_BREAKPOINT = 768;
@@ -82,6 +83,7 @@ export function MainLayout({
   isAdmin = false,
   navigationSchemas,
   customHeaderActions,
+  showEndLine = true,
 }: MainLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -529,7 +531,7 @@ export function MainLayout({
         >
           <div className="max-w-9xl mx-auto w-full h-full">
             {children}
-            <EndLine />
+            {showEndLine && <EndLine />}
           </div>
         </motion.main>
         

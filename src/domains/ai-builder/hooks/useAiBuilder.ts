@@ -55,7 +55,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const abortControllerRef = useRef<AbortController | null>(null);
   
   const user = useUserStore((state) => state.user);
-  const { createPrompt } = useAiPrompts();
+  const { createPrompt } = useAiPrompts(undefined, { autoFetch: false });
 
   const loadPreloadRoutes = useCallback(async (agent: AiAgent) => {
     if (!agent.preloadRoutes || !Array.isArray(agent.preloadRoutes) || agent.preloadRoutes.length === 0) {

@@ -13,4 +13,8 @@ export * from './components/AiBuilderForm';
 export * from './components/AiBuilderResponse';
 export * from './components/PromptPreviewSheet';
 export * from './components/MessageDisplay';
+export * from './components/AiBuilderWrapper';
+export * from './components/AiBuilderLoadingIndicator';
+export * from './components/AiAgentDialog';
+export * from './components/AiAgentNotFound';
 

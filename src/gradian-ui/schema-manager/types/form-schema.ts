@@ -288,10 +288,28 @@ export interface QuickAction {
   label: string;
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'gradient';
   icon?: string; // Icon name to display before the label
-  action: 'goToUrl' | 'openUrl' | 'openFormDialog';
+  action: 'goToUrl' | 'openUrl' | 'openFormDialog' | 'runAiAgent';
   targetSchema?: string; // Required for openFormDialog action
   targetUrl?: string; // Required for goToUrl and openUrl actions
   passItemAsReference?: boolean; // Default: false - if true, pass current schema item as reference to target URL
+  // Properties for runAiAgent action
+  agentId?: string; // ID of the AI agent to run
+  selectedFields?: string[]; // Array of field IDs to include in prompt
+  selectedSections?: string[]; // Array of section IDs to include in prompt
+  additionalSystemPrompt?: string; // Additional system prompt to append to agent's system prompt for extra context
+  preloadRoutes?: Array<{
+    route: string; // Supports dynamic context variables like {{formData.id}}
+    title: string;
+    description: string;
+    method?: 'GET' | 'POST';
+    jsonPath?: string;
+    body?: any;
+    queryParameters?: Record<string, string>; // Values support dynamic context variables
+    outputFormat?: 'json' | 'string' | 'toon';
+    includedFields?: string[];
+  }>; // Additional preload routes to fetch before running the agent
+  displayType?: 'default' | 'hideForm' | 'showFooter'; // Control what parts of the form to show
+  runType?: 'manual' | 'automatic'; // manual: user clicks "Do the Magic", automatic: auto-runs when dialog opens
 }
 
 export interface DetailPageMetadata {

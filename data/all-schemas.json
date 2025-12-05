@@ -1024,6 +1024,46 @@
     "detailPageMetadata": {
       "quickActions": [
         {
+          "id": "analyze-with-ai",
+          "label": "Analyze with AI",
+          "icon": "Brain",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "general-assistant",
+          "selectedFields": [
+            "company-name",
+            "email-address",
+            "phone-number",
+            "country",
+            "status",
+            "rating",
+            "description",
+            "performanceMetrics"
+          ],
+          "selectedSections": [
+            "basic-information",
+            "business-details"
+          ],
+          "additionalSystemPrompt": "Focus your analysis on this vendor's profile, business details, and provide insights about vendor management, risk assessment, and recommendations for working with this vendor.",
+          "displayType": "hideForm",
+          "runType": "automatic",
+          "preloadRoutes": [
+            {
+              "route": "/api/data/all-relations",
+              "title": "Vendor Relations",
+              "description": "All relations for this vendor including inquiries and other related data",
+              "method": "GET",
+              "jsonPath": "data",
+              "outputFormat": "json",
+              "queryParameters": {
+                "schema": "vendors",
+                "otherSchema": "inquiry-vendors",
+                "id": "{{formData.id}}"
+              }
+            }
+          ]
+        },
+        {
           "id": "create-inquiry",
           "label": "Create Inquiry",
           "icon": "ShoppingCart",

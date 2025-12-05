@@ -15,12 +15,19 @@ interface UseAiAgentsReturn {
   refreshAgents: () => Promise<void>;
 }
 
+interface UseAiAgentsOptions {
+  agentId?: string; // If provided, fetch only this specific agent
+  enabled?: boolean; // If false, don't fetch agents (default: true)
+}
+
 /**
  * Hook to manage AI agents
+ * @param options - Optional configuration including agentId to fetch a single agent
  */
-export function useAiAgents(): UseAiAgentsReturn {
+export function useAiAgents(options?: UseAiAgentsOptions): UseAiAgentsReturn {
+  const { agentId, enabled = true } = options || {};
   const [agents, setAgents] = useState<AiAgent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAgents = useCallback(async () => {
@@ -28,24 +35,46 @@ export function useAiAgents(): UseAiAgentsReturn {
     setError(null);
     
     try {
-      const response = await fetch('/api/ai-agents');
-      const data = await response.json();
+      let response: Response;
       
-      if (data.success && data.data && data.data.length > 0) {
-        setAgents(data.data);
+      // If agentId is provided, fetch only that specific agent
+      if (agentId) {
+        response = await fetch(`/api/ai-agents/${agentId}`);
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          // Return as array for consistency
+          setAgents([data.data]);
+        } else {
+          setError(data.error || `Failed to fetch agent "${agentId}"`);
+          setAgents([]);
+        }
       } else {
-        setError(data.error || 'Failed to fetch agents');
+        // Fetch all agents
+        response = await fetch('/api/ai-agents');
+        const data = await response.json();
+        
+        if (data.success && data.data && data.data.length > 0) {
+          setAgents(data.data);
+        } else {
+          setError(data.error || 'Failed to fetch agents');
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch agents');
+      setAgents([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [agentId]);
 
   useEffect(() => {
-    fetchAgents();
-  }, [fetchAgents]);
+    if (enabled) {
+      fetchAgents();
+    } else {
+      setLoading(false);
+    }
+  }, [enabled, fetchAgents]);
 
   return {
     agents,

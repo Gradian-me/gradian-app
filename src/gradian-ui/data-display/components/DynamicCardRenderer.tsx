@@ -407,10 +407,15 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
           behavior: { hoverable: !disableAnimation, clickable: true }
         }}
         className={cn(
-          "h-full bg-white dark:bg-gray-800 rounded-2xl overflow-hidden",
+          "h-full bg-white dark:bg-gray-800 overflow-hidden",
+          isInDialog 
+            ? "rounded-lg sm:rounded-xl" 
+            : "rounded-2xl",
           !className?.includes('border-none') && "border border-gray-200 dark:border-gray-700",
-          !disableAnimation && "transition-colors hover:bg-gray-200 dark:hover:bg-gray-600",
-          className?.includes('border-none') ? "focus-within:ring-0" : "focus-within:ring-2 focus-within:ring-violet-400 focus-within:ring-offset-0 focus-within:rounded-xl"
+          !disableAnimation && !isInDialog && "transition-colors hover:bg-gray-200 dark:hover:bg-gray-600",
+          className?.includes('border-none') 
+            ? "focus-within:ring-0" 
+            : !isInDialog && "focus-within:ring-2 focus-within:ring-violet-400 focus-within:ring-offset-0 focus-within:rounded-xl"
         )}
         onKeyDown={(e: KeyboardEvent) => {
           if (isInDialog) return;
@@ -421,12 +426,27 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
           }
         }}
       >
-        <CardContent className={cn("h-full flex flex-col", viewMode === 'list' ? 'p-2' : 'p-3 sm:p-4')}>
+        <CardContent className={cn(
+          "h-full flex flex-col",
+          viewMode === 'list' 
+            ? 'p-2 sm:p-3' 
+            : isInDialog 
+              ? 'p-2 sm:p-3 md:p-4' 
+              : 'p-3 sm:p-4'
+        )}>
           {viewMode === 'grid' ? (
             <>
               {/* Avatar and Status Header */}
-              <div className="flex justify-between space-x-3 mb-2 flex-nowrap w-full">
-                <div className="flex items-center gap-2 truncate">
+              <div className={cn(
+                "flex justify-between mb-2 w-full",
+                isInDialog 
+                  ? "flex-col sm:flex-row gap-2 sm:gap-3 sm:space-x-3" 
+                  : "flex-row space-x-3 flex-nowrap"
+              )}>
+                <div className={cn(
+                  "flex items-center gap-2",
+                  isInDialog ? "w-full sm:flex-1 min-w-0" : "flex-1 min-w-0 truncate"
+                )}>
                   {(hasAvatarField || hasIconField || hasColorField) && (
                     <motion.div
                       initial={disableAnimation ? false : { opacity: 0, scale: 0.8 }}
@@ -453,8 +473,14 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         whileHover={{ x: 2, transition: { duration: 0.15, delay: 0 } }}
                       >
                         <motion.h3
-                          className="text-md font-semibold text-gray-900 dark:text-gray-50 group-hover:text-violet-800 dark:group-hover:text-violet-300 transition-colors duration-100 truncate flex-1 min-w-0"
-                          whileHover={{ x: 2, transition: { duration: 0.15, delay: 0 } }}
+                          className={cn(
+                            "font-semibold text-gray-900 dark:text-gray-50 transition-colors duration-100 truncate flex-1 min-w-0",
+                            isInDialog 
+                              ? "text-sm sm:text-base" 
+                              : "text-md",
+                            !isInDialog && "group-hover:text-violet-800 dark:group-hover:text-violet-300"
+                          )}
+                          whileHover={isInDialog ? undefined : { x: 2, transition: { duration: 0.15, delay: 0 } }}
                         >
                           <span className="inline-flex items-center gap-1.5">
                             <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} />
@@ -510,7 +536,12 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   </div>
                 </div>
                 {(hasRatingField || hasStatusField) && (
-                  <div className="flex flex-col items-end gap-2">
+                  <div className={cn(
+                    "flex gap-2",
+                    isInDialog 
+                      ? "flex-row sm:flex-col items-start sm:items-end w-full sm:w-auto sm:shrink-0" 
+                      : "flex-col items-end shrink-0"
+                  )}>
                     {/* Rating */}
                     {hasRatingField && (
                       <motion.div
@@ -680,10 +711,12 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
               <div className="flex-1">
                 <motion.div
                   className={cn(
-                    "grid gap-4 text-xs",
+                    "grid text-xs",
                     filteredSections.length === 1 
-                      ? "grid-cols-1" 
-                      : "grid-cols-1 sm:grid-cols-2"
+                      ? "grid-cols-1 gap-3 sm:gap-4" 
+                      : isInDialog
+                        ? "grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4"
+                        : "grid-cols-1 sm:grid-cols-2 gap-4"
                   )}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}

@@ -14,6 +14,7 @@ import { FormSchema, DetailPageMetadata, DetailPageSection, ComponentRendererCon
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { useAiAgents } from '@/domains/ai-builder';
 
 interface DetailPageMetadataTabProps {
   schema: FormSchema;
@@ -30,10 +31,12 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
     header: false,
   });
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const { agents } = useAiAgents();
 
   const detailPageMetadata: DetailPageMetadata = schema.detailPageMetadata || {};
   const allFields = schema.fields || [];
   const availableFields = allFields.filter(f => !f.inactive);
+  const allSections = schema.sections || [];
 
   const convertFieldsToSelectorItems = (fields: FormField[]): SortableSelectorItem[] => {
     return fields.map(field => {
@@ -608,7 +611,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                           <Label className="text-sm font-medium text-gray-700 mb-2 block">Action Type</Label>
                           <Select
                             value={action.action}
-                            onValueChange={(value: 'goToUrl' | 'openUrl' | 'openFormDialog') =>
+                            onValueChange={(value: 'goToUrl' | 'openUrl' | 'openFormDialog' | 'runAiAgent') =>
                               updateQuickAction(action.id, { action: value })
                             }
                           >
@@ -619,6 +622,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                               <SelectItem value="goToUrl">Go to URL</SelectItem>
                               <SelectItem value="openUrl">Open URL</SelectItem>
                               <SelectItem value="openFormDialog">Open Form Dialog</SelectItem>
+                              <SelectItem value="runAiAgent">Run AI Agent</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -680,6 +684,99 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                             <Label htmlFor={`pass-item-${action.id}`} className="cursor-pointer text-sm">
                               Pass Item as Reference
                             </Label>
+                          </div>
+                        </>
+                      )}
+                      {action.action === 'runAiAgent' && (
+                        <>
+                          <div>
+                            <Label className="text-sm font-medium text-gray-700 mb-2 block">AI Agent</Label>
+                            <Select
+                              value={action.agentId || ''}
+                              onValueChange={(value) => updateQuickAction(action.id, { agentId: value })}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select an AI agent" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {agents.map((agent) => (
+                                  <SelectItem key={agent.id} value={agent.id}>
+                                    {agent.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-sm font-medium text-gray-700 mb-2 block">Selected Fields</Label>
+                            <div className="max-h-48 overflow-y-auto border rounded-md p-3 space-y-2">
+                              {availableFields.length === 0 ? (
+                                <p className="text-sm text-gray-500">No fields available</p>
+                              ) : (
+                                availableFields.map((field) => (
+                                  <div key={field.id} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`field-${action.id}-${field.id}`}
+                                      checked={action.selectedFields?.includes(field.id) || false}
+                                      onCheckedChange={(checked) => {
+                                        const currentFields = action.selectedFields || [];
+                                        const newFields = checked
+                                          ? [...currentFields, field.id]
+                                          : currentFields.filter(f => f !== field.id);
+                                        updateQuickAction(action.id, { selectedFields: newFields });
+                                      }}
+                                    />
+                                    <Label
+                                      htmlFor={`field-${action.id}-${field.id}`}
+                                      className="text-sm font-normal cursor-pointer flex-1"
+                                    >
+                                      {field.label || field.name}
+                                    </Label>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <Label className="text-sm font-medium text-gray-700 mb-2 block">Selected Sections</Label>
+                            <div className="max-h-48 overflow-y-auto border rounded-md p-3 space-y-2">
+                              {allSections.length === 0 ? (
+                                <p className="text-sm text-gray-500">No sections available</p>
+                              ) : (
+                                allSections.map((section) => (
+                                  <div key={section.id} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`section-${action.id}-${section.id}`}
+                                      checked={action.selectedSections?.includes(section.id) || false}
+                                      onCheckedChange={(checked) => {
+                                        const currentSections = action.selectedSections || [];
+                                        const newSections = checked
+                                          ? [...currentSections, section.id]
+                                          : currentSections.filter(s => s !== section.id);
+                                        updateQuickAction(action.id, { selectedSections: newSections });
+                                      }}
+                                    />
+                                    <Label
+                                      htmlFor={`section-${action.id}-${section.id}`}
+                                      className="text-sm font-normal cursor-pointer flex-1"
+                                    >
+                                      {section.title || section.id}
+                                    </Label>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <Textarea
+                              config={{ 
+                                name: 'additional-system-prompt', 
+                                label: 'Additional System Prompt',
+                                placeholder: 'Optional: Add extra context to the system prompt...'
+                              }}
+                              value={action.additionalSystemPrompt || ''}
+                              onChange={(value) => updateQuickAction(action.id, { additionalSystemPrompt: value })}
+                            />
                           </div>
                         </>
                       )}

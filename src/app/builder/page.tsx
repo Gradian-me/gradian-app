@@ -22,7 +22,9 @@ import {
   Code,
   Share2,
   GitBranch,
-  HeartPulse
+  HeartPulse,
+  Bot,
+  QrCode
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
@@ -38,6 +40,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; style?: 
   Share2,
   GitBranch,
   HeartPulse,
+  Bot,
+  QrCode,
 };
 
 // Helper to get icon background and text color classes from Tailwind color name

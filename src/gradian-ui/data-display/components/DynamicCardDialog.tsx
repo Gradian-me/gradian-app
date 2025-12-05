@@ -86,20 +86,32 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} data-test-id="dynamic-card-dialog">
-      <DialogContent className={cn("min-w-2xl min-h-[50vh] max-w-5xl max-h-[90vh] overflow-y-auto", className)} data-test-id="dynamic-card-dialog-content">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-semibold flex items-center gap-2">
-            <span>{title}</span>
+      <DialogContent 
+        className={cn(
+          "w-[95vw] sm:w-full",
+          "min-h-[50vh] max-h-[90vh]",
+          "max-w-full sm:max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl",
+          "overflow-y-auto",
+          "p-2 sm:p-4 md:p-6",
+          className
+        )} 
+        data-test-id="dynamic-card-dialog-content"
+      >
+        <DialogHeader className="px-0 sm:px-1">
+          <DialogTitle className="text-base sm:text-lg font-semibold flex items-center gap-2 flex-wrap">
+            <span className="truncate">{title}</span>
             {data?.id && (
               <>
-                <span className="text-base text-gray-500 dark:text-gray-400 font-normal font-mono">({data.id})</span>
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-normal font-mono truncate">
+                  ({data.id})
+                </span>
                 <CopyContent content={String(data.id)} />
               </>
             )}
           </DialogTitle>
         </DialogHeader>
         
-        <div className="mt-2">
+        <div className="mt-2 sm:mt-4">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}

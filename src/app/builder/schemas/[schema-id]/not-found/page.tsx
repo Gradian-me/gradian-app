@@ -23,6 +23,7 @@ export default function BuilderSchemaNotFoundPage({
     <MainLayout
       title="Schema Not Found"
       subtitle={schemaId ? `We couldn't find a schema with the ID "${schemaId}".` : undefined}
+      showEndLine={false}
     >
       <SchemaNotFound
         onGoBack={() => router.push('/builder/schemas')}

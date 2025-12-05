@@ -1727,7 +1727,7 @@
         "priority": "High",
         "affectedDomains": [
           "ai-builder",
-          "process-analysis",
+          "process-analyst",
           "visualization"
         ]
       },
@@ -1835,6 +1835,82 @@
           "form-builder",
           "ui",
           "components"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KBR9A7Y1BXYB6V5YTM1G8XM5",
+    "timestamp": "2025-12-05T22:15:54.518Z",
+    "version": "1.15.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "RUN AI AGENTS AS QUICK ACTIONS + Dynamic Preloads + AI Agent Designers",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "quick-actions",
+          "data-display",
+          "dynamic-preloads"
+        ]
+      },
+      {
+        "changeType": "feature",
+        "description": "Added new AI agent \"General Assistant\" with capabilities for comprehensive business and data analysis",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated AI agents API to support dynamic loading and creation of agents",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "api"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined AiBuilderForm and integrated AiBuilderWrapper for improved component structure",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Enhanced DynamicQuickActions to include AI agent execution options",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "quick-actions",
+          "ai-builder"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved error handling and data validation in AI agents API",
+        "priority": "Medium",
+        "affectedDomains": [
+          "api",
+          "error-handling",
+          "ai-builder"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Added support for additional system prompts and field selection in quick actions",
+        "priority": "Medium",
+        "affectedDomains": [
+          "quick-actions",
+          "ai-builder",
+          "form-builder"
         ]
       }
     ]

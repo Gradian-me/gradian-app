@@ -16,12 +16,17 @@ interface UseAiPromptsReturn {
   refreshPrompts: (filters?: AiPromptFilters) => Promise<void>;
 }
 
+interface UseAiPromptsOptions {
+  autoFetch?: boolean;
+}
+
 /**
  * Hook to manage AI prompts
  */
-export function useAiPrompts(filters?: AiPromptFilters): UseAiPromptsReturn {
+export function useAiPrompts(filters?: AiPromptFilters, options?: UseAiPromptsOptions): UseAiPromptsReturn {
+  const { autoFetch = true } = options || {};
   const [prompts, setPrompts] = useState<AiPrompt[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(autoFetch);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPrompts = useCallback(async (promptFilters?: AiPromptFilters) => {
@@ -65,8 +70,10 @@ export function useAiPrompts(filters?: AiPromptFilters): UseAiPromptsReturn {
       const result = await response.json();
       
       if (result.success) {
-        // Refresh prompts after creation
-        await fetchPrompts(filters);
+        // Only refresh prompts if autoFetch is enabled
+        if (autoFetch) {
+          await fetchPrompts(filters);
+        }
         return result.data;
       } else {
         setError(result.error || 'Failed to create prompt');
@@ -76,11 +83,13 @@ export function useAiPrompts(filters?: AiPromptFilters): UseAiPromptsReturn {
       setError(err instanceof Error ? err.message : 'Failed to create prompt');
       return null;
     }
-  }, [filters, fetchPrompts]);
+  }, [filters, fetchPrompts, autoFetch]);
 
   useEffect(() => {
-    fetchPrompts(filters);
-  }, [fetchPrompts, filters]);
+    if (autoFetch) {
+      fetchPrompts(filters);
+    }
+  }, [autoFetch, fetchPrompts, filters]);
 
   return {
     prompts,

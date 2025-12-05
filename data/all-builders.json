@@ -15,6 +15,25 @@
     "stats": []
   },
   {
+    "id": "ai-agents",
+    "title": "AI Agents Builder",
+    "description": "Build intelligent AI agents with custom prompts, models, and workflows to automate complex tasks and enhance user experiences",
+    "icon": "Bot",
+    "href": "/builder/ai-agents",
+    "color": "blue",
+    "features": [
+      "🤖 Create powerful AI agents with custom configurations",
+      "🧠 Configure advanced system prompts and model settings",
+      "⚡ Build dynamic forms with AI-powered components",
+      "🔄 Set up intelligent preload routes and data fetching",
+      "📝 Real-time JSON editor with syntax validation",
+      "🎨 Beautiful grid, list, and table view modes",
+      "🔍 Smart search and filter capabilities",
+      "✨ Seamless integration with your application workflows"
+    ],
+    "stats": []
+  },
+  {
     "id": "graphs",
     "title": "Graph Designer",
     "description": "Design and manage data relationship graphs with visual node connections and edge configurations",

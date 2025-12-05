@@ -318,20 +318,30 @@ export function formatPreloadRouteResult(
     return `## ${cleanText(result.title)}\n${cleanText(result.description)}\n\n` +
       `Data from ${result.route}:\n\`\`\`\n${toonFormatted}\n\`\`\`\n`;
   } else if (outputFormat === 'string') {
-    // String format
+    // String format - filter data if includedFields is provided
+    let dataToFormat = result.data;
+    if (route.includedFields && route.includedFields.length > 0) {
+      dataToFormat = filterFields(result.data, route.includedFields);
+    }
+    
     let stringFormatted: string;
-    if (typeof result.data === 'string') {
-      stringFormatted = cleanText(result.data);
+    if (typeof dataToFormat === 'string') {
+      stringFormatted = cleanText(dataToFormat);
     } else {
-      const jsonString = JSON.stringify(result.data, null, 2);
+      const jsonString = JSON.stringify(dataToFormat, null, 2);
       stringFormatted = cleanText(jsonString);
     }
     return `## ${cleanText(result.title)}\n${cleanText(result.description)}\n\n` +
       `Data from ${result.route}:\n\`\`\`\n${stringFormatted}\n\`\`\`\n`;
   } else {
-    // Default JSON formatting
+    // Default JSON formatting - filter data if includedFields is provided
+    let dataToFormat = result.data;
+    if (route.includedFields && route.includedFields.length > 0) {
+      dataToFormat = filterFields(result.data, route.includedFields);
+    }
+    
     return `## ${cleanText(result.title)}\n${cleanText(result.description)}\n\n` +
-      `Data from ${result.route}:\n\`\`\`json\n${JSON.stringify(result.data, null, 2)}\n\`\`\`\n`;
+      `Data from ${result.route}:\n\`\`\`json\n${JSON.stringify(dataToFormat, null, 2)}\n\`\`\`\n`;
   }
 }
 

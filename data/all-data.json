@@ -814,9 +814,10 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01K97208RABW053BGN3A6W05FD",
       "createdAt": "2025-11-04T09:08:40.337Z",
-      "updatedAt": "2025-11-04T12:57:29.563Z",
+      "updatedAt": "2025-12-05T21:12:10.901Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "incomplete": false
     },
     {
       "vendorId": [

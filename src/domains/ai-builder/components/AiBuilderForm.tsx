@@ -220,6 +220,8 @@ interface AiBuilderFormProps {
   onSheetOpenChange?: (open: boolean) => void;
   disabled?: boolean;
   onReset?: () => void;
+  displayType?: 'default' | 'hideForm' | 'showFooter';
+  runType?: 'manual' | 'automatic';
 }
 
 export function AiBuilderForm({
@@ -237,6 +239,8 @@ export function AiBuilderForm({
   onSheetOpenChange,
   disabled = false,
   onReset,
+  displayType = 'default',
+  runType = 'manual',
 }: AiBuilderFormProps) {
   // Get selected agent
   const selectedAgent = agents.find(agent => agent.id === selectedAgentId);
@@ -619,191 +623,202 @@ export function AiBuilderForm({
     sectionIds
   );
 
+  // Determine what to show based on displayType
+  const showForm = displayType === 'default' || displayType === 'showFooter';
+  const showFooter = displayType === 'showFooter' || displayType === 'default';
+
   return (
     <div className="space-y-6">
-      {/* Modern Gradient Card Container */}
-      <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200/50 dark:border-violet-800/50 shadow-sm">
-        <div className="relative p-6 space-y-4">
-          {/* Header Section */}
-          <div className="flex flex-row justify-end items-center flex-wrap gap-4">
-            <div className="flex items-center gap-2">
-              {/* Agent Select - use renderComponents if available, otherwise fallback */}
-              {agentSelectField ? (
-                <div className="w-48">
-                  <FormElementFactory
-                    config={{
-                      ...agentSelectField,
-                      options: agents.map(agent => ({
-                        id: agent.id,
-                        label: agent.label,
-                        icon: agent.icon,
-                      })),
-                    }}
-                    value={selectedAgentId}
-                    onChange={(value) => {
-                      // Handle both string and NormalizedOption[] from Select
-                      if (Array.isArray(value) && value.length > 0) {
-                        onAgentChange(value[0].id as string);
-                      } else if (typeof value === 'string') {
-                        onAgentChange(value);
-                      }
-                    }}
-                    disabled={isLoading || disabled}
-                    error={formErrors[agentSelectField.name]}
-                    touched={touched[agentSelectField.name]}
-                    onBlur={() => handleFieldBlur(agentSelectField.name)}
-                    onFocus={() => handleFieldFocus(agentSelectField.name)}
-                    className="w-full"
-                  />
+      {showForm && (
+        <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200/50 dark:border-violet-800/50 shadow-sm">
+          <div className="relative p-6 space-y-4">
+            {/* Header Section */}
+            {displayType === 'default' && (
+              <div className="flex flex-row justify-end items-center flex-wrap gap-4">
+                <div className="flex items-center gap-2">
+                  {/* Agent Select - use renderComponents if available, otherwise fallback */}
+                  {agentSelectField ? (
+                    <div className="w-48">
+                      <FormElementFactory
+                        config={{
+                          ...agentSelectField,
+                          options: agents.map(agent => ({
+                            id: agent.id,
+                            label: agent.label,
+                            icon: agent.icon,
+                          })),
+                        }}
+                        value={selectedAgentId}
+                        onChange={(value) => {
+                          // Handle both string and NormalizedOption[] from Select
+                          if (Array.isArray(value) && value.length > 0) {
+                            onAgentChange(value[0].id as string);
+                          } else if (typeof value === 'string') {
+                            onAgentChange(value);
+                          }
+                        }}
+                        disabled={isLoading || disabled}
+                        error={formErrors[agentSelectField.name]}
+                        touched={touched[agentSelectField.name]}
+                        onBlur={() => handleFieldBlur(agentSelectField.name)}
+                        onFocus={() => handleFieldFocus(agentSelectField.name)}
+                        className="w-full"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-56">
+                      <FormElementFactory
+                        config={{
+                          id: 'ai-agent-select',
+                          name: 'aiAgentSelect',
+                          label: '',
+                          component: 'select',
+                          type: 'select',
+                          options: agents.map(agent => ({
+                            id: agent.id,
+                            label: agent.label,
+                            icon: agent.icon,
+                          })),
+                        }}
+                        value={selectedAgentId}
+                        onChange={(value) => {
+                          // Handle both string and NormalizedOption[] from Select
+                          if (Array.isArray(value) && value.length > 0) {
+                            onAgentChange(value[0].id as string);
+                          } else if (typeof value === 'string') {
+                            onAgentChange(value);
+                          }
+                        }}
+                        disabled={isLoading || disabled}
+                        className="w-full"
+                      />
+                    </div>
+                  )}
+                  {onReset && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={onReset}
+                      className="h-9 w-9 p-0 shrink-0"
+                      title="Reset everything"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" size="sm" className="gap-2 shrink-0">
+                      <History className="h-4 w-4" />
+                      Prompt History
+                    </Button>
+                  </Link>
                 </div>
-              ) : (
-                <div className="w-56">
-                  <FormElementFactory
-                    config={{
-                      id: 'ai-agent-select',
-                      name: 'aiAgentSelect',
-                      label: '',
-                      component: 'select',
-                      type: 'select',
-                      options: agents.map(agent => ({
-                        id: agent.id,
-                        label: agent.label,
-                        icon: agent.icon,
-                      })),
-                    }}
-                    value={selectedAgentId}
-                    onChange={(value) => {
-                      // Handle both string and NormalizedOption[] from Select
-                      if (Array.isArray(value) && value.length > 0) {
-                        onAgentChange(value[0].id as string);
-                      } else if (typeof value === 'string') {
-                        onAgentChange(value);
-                      }
-                    }}
-                    disabled={isLoading || disabled}
-                    className="w-full"
-                  />
-                </div>
-              )}
-              {onReset && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onReset}
-                  className="h-9 w-9 p-0 shrink-0"
-                  title="Reset everything"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-              )}
-              <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="sm" className="gap-2 shrink-0">
-                  <History className="h-4 w-4" />
-                  Prompt History
-                </Button>
-              </Link>
-            </div>
-          </div>
+              </div>
+            )}
 
-          {/* Render form fields from renderComponents in a 2-column grid */}
-          <div className="grid grid-cols-2 gap-4">
-            {sortedFields.map((field) => {
-              // Skip agent select field as it's rendered in header
-              if (field.name === 'aiAgentSelect' || field.id === 'ai-agent-select') {
-                return null;
-              }
+            {/* Render form fields from renderComponents in a 2-column grid */}
+            {displayType === 'default' && (
+              <div className="grid grid-cols-2 gap-4">
+                {sortedFields.map((field) => {
+                  // Skip agent select field as it's rendered in header
+                  if (field.name === 'aiAgentSelect' || field.id === 'ai-agent-select') {
+                    return null;
+                  }
 
-              return (
-                <FieldItem
-                  key={field.id || field.name}
-                  field={field}
-                  formValues={formValues}
-                  formErrors={formErrors}
-                  touched={touched}
-                  isLoading={isLoading}
-                  disabled={disabled}
-                  handleFieldChange={handleFieldChange}
-                  handleFieldBlur={handleFieldBlur}
-                  handleFieldFocus={handleFieldFocus}
-                  ruleEffects={ruleEffects}
-                  agentBusinessRules={agentBusinessRules}
-                  selectedAgent={selectedAgent}
-                />
-              );
-            })}
-          </div>
-          
-          {/* Footer Section with Model Badge and Buttons */}
-          <div className="flex justify-between items-center pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
-            {/* Model Badge on Left */}
-            {selectedAgent?.model && (
-              <Badge 
-                className={cn(
-                  'shrink-0',
-                  'bg-violet-100 text-cyan-700 border-cyan-200',
-                  'dark:bg-cyan-900/50 dark:text-cyan-300 dark:border-cyan-800',
-                  'font-medium shadow-sm'
-                )}
-              >
-                {selectedAgent.model}
-              </Badge>
+                  return (
+                    <FieldItem
+                      key={field.id || field.name}
+                      field={field}
+                      formValues={formValues}
+                      formErrors={formErrors}
+                      touched={touched}
+                      isLoading={isLoading}
+                      disabled={disabled}
+                      handleFieldChange={handleFieldChange}
+                      handleFieldBlur={handleFieldBlur}
+                      handleFieldFocus={handleFieldFocus}
+                      ruleEffects={ruleEffects}
+                      agentBusinessRules={agentBusinessRules}
+                      selectedAgent={selectedAgent}
+                    />
+                  );
+                })}
+              </div>
             )}
             
-            {/* Buttons on Right */}
-            <div className="flex items-center gap-2">
-              {onSheetOpenChange && (
-                <PromptPreviewSheet
-                  isOpen={isSheetOpen}
-                  onOpenChange={onSheetOpenChange}
-                  systemPrompt={systemPrompt}
-                  userPrompt={userPrompt}
-                  isLoadingPreload={isLoadingPreload}
-                  disabled={!userPrompt.trim() || disabled}
-                />
-              )}
-              {isLoading ? (
-                <>
-                  <Button
-                    onClick={onGenerate}
-                    disabled={true}
-                    size="default"
-                    variant="default"
-                    className="h-10 shadow-sm"
+            {/* Footer Section with Model Badge and Buttons */}
+            {showFooter && (
+              <div className="flex justify-between items-center pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
+                {/* Model Badge on Left */}
+                {selectedAgent?.model && (
+                  <Badge 
+                    className={cn(
+                      'shrink-0',
+                      'bg-violet-100 text-cyan-700 border-cyan-200',
+                      'dark:bg-cyan-900/50 dark:text-cyan-300 dark:border-cyan-800',
+                      'font-medium shadow-sm'
+                    )}
                   >
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Generating
-                  </Button>
-                  <Button
-                    onClick={onStop}
-                    variant="outline"
-                    size="default"
-                    className="h-10 shadow-sm"
-                  >
-                    <Square className="h-4 w-4 mr-2 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
-                    Stop
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  onClick={() => {
-                    // Validate all fields before generating
-                    if (validateAllFields()) {
-                      onGenerate();
-                    }
-                  }}
-                  disabled={!isFormValid || !userPrompt.trim() || disabled}
-                  size="default"
-                  variant="default"
-                  className="h-10 shadow-sm bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
-                >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Do the Magic
-                </Button>
-              )}
-            </div>
+                    {selectedAgent.model}
+                  </Badge>
+                )}
+                
+                {/* Buttons on Right */}
+                <div className="flex items-center gap-2">
+                  {onSheetOpenChange && (
+                    <PromptPreviewSheet
+                      isOpen={isSheetOpen}
+                      onOpenChange={onSheetOpenChange}
+                      systemPrompt={systemPrompt}
+                      userPrompt={userPrompt}
+                      isLoadingPreload={isLoadingPreload}
+                      disabled={!userPrompt.trim() || disabled}
+                    />
+                  )}
+                  {isLoading ? (
+                    <>
+                      <Button
+                        onClick={onGenerate}
+                        disabled={true}
+                        size="default"
+                        variant="default"
+                        className="h-10 shadow-sm"
+                      >
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Generating
+                      </Button>
+                      <Button
+                        onClick={onStop}
+                        variant="outline"
+                        size="default"
+                        className="h-10 shadow-sm"
+                      >
+                        <Square className="h-4 w-4 mr-2 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
+                        Stop
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      onClick={() => {
+                        // Validate all fields before generating
+                        if (validateAllFields()) {
+                          onGenerate();
+                        }
+                      }}
+                      disabled={!isFormValid || !userPrompt.trim() || disabled || runType === 'automatic'}
+                      size="default"
+                      variant="default"
+                      className="h-10 shadow-sm bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                    >
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Do the Magic
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
