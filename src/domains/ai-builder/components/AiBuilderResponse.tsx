@@ -15,6 +15,7 @@ import { ResponseCardViewer } from './ResponseCardViewer';
 import { ResponseAnnotationViewer } from './ResponseAnnotationViewer';
 import { TableWrapper } from '@/gradian-ui/data-display/table/components/TableWrapper';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
+import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';
 import { cn } from '@/gradian-ui/shared/utils';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
 import type { AiAgent, TokenUsage, SchemaAnnotation, AnnotationItem } from '../types';
@@ -313,7 +314,7 @@ export function AiBuilderResponse({
           </details>
         </div>
       ) : agent?.requiredOutputFormat === 'string' ? (
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center">
             <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-2" />
@@ -323,22 +324,14 @@ export function AiBuilderResponse({
             </div>
             <CopyContent content={response} />
           </div>
-          <textarea
-            readOnly
-            value={response}
-            className={cn(
-              'w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100',
-              'font-mono text-sm leading-6 p-4',
-              'border-0 outline-none resize-none',
-              'focus:ring-0 focus:outline-none',
-              'overflow-auto min-h-[200px]'
-            )}
-            dir="auto"
-            style={{
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
+          <div className="w-full">
+            <div className="p-4">
+              <MarkdownViewer 
+                content={response}
+                showToggle={true}
           />
+            </div>
+          </div>
         </div>
       ) : (
         <CodeViewer

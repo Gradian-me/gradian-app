@@ -15,6 +15,12 @@ export interface Heading {
 export function useMarkdownScrollSpy(headings: Heading[]) {
   const [activeHeadingId, setActiveHeadingId] = useState<string | undefined>();
   const isUpdatingHashRef = useRef(false);
+  const activeHeadingIdRef = useRef<string | undefined>(undefined);
+  
+  // Keep ref in sync with state
+  useEffect(() => {
+    activeHeadingIdRef.current = activeHeadingId;
+  }, [activeHeadingId]);
 
   // Get initial hash from URL
   useEffect(() => {
@@ -114,7 +120,8 @@ export function useMarkdownScrollSpy(headings: Heading[]) {
 
       // Update hash and active state
       const updateActiveHeading = (id: string | undefined) => {
-        if (id && id !== activeHeadingId) {
+        const currentActiveId = activeHeadingIdRef.current;
+        if (id && id !== currentActiveId) {
           setActiveHeadingId(id);
           
           // Update URL hash if it's different (but don't trigger hashchange event)
@@ -125,7 +132,7 @@ export function useMarkdownScrollSpy(headings: Heading[]) {
               isUpdatingHashRef.current = false;
             }, 100);
           }
-        } else if (!id && activeHeadingId) {
+        } else if (!id && currentActiveId) {
           setActiveHeadingId(undefined);
         }
       };
@@ -186,7 +193,8 @@ export function useMarkdownScrollSpy(headings: Heading[]) {
     return () => {
       cleanup?.();
     };
-  }, [headings, activeHeadingId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [headings]); // Only depend on headings, activeHeadingId is managed internally
 
   return activeHeadingId;
 }

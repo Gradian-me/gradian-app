@@ -5,11 +5,15 @@ import { useRouter } from 'next/navigation';
 import { SignInPage } from '@/components/ui/sign-in';
 import { ensureFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
 import { useUserStore } from '@/stores/user.store';
+import { useTenantStore } from '@/stores/tenant.store';
+import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
+import { TenantSelector } from '@/components/layout/TenantSelector';
 import { toast } from 'sonner';
 
 export default function LoginPage() {
   const router = useRouter();
   const { setUser } = useUserStore();
+  const { selectedTenant } = useTenantStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fingerprint, setFingerprint] = useState<string | null>(null);
@@ -46,12 +50,17 @@ export default function LoginPage() {
         setFingerprint(fingerprintValue);
       }
 
+      // Get tenant domain for x-tenant-domain header in demo mode
+      const tenantDomain = selectedTenant?.domain || null;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...(fingerprintValue ? { 'x-fingerprint': fingerprintValue } : {}),
+        ...(tenantDomain ? { 'x-tenant-domain': tenantDomain } : {}),
+      };
+
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(fingerprintValue ? { 'x-fingerprint': fingerprintValue } : {}),
-        },
+        headers,
         body: JSON.stringify({
           emailOrUsername: email,
           password,
@@ -110,14 +119,21 @@ export default function LoginPage() {
   };
 
   return (
-    <SignInPage
-      //heroImageSrc="/screenshots/gradian.me_bg_desktop.png"
-      onSignIn={handleSignIn}
-      onResetPassword={handleResetPassword}
-      onCreateAccount={handleCreateAccount}
-      error={error}
-      isLoading={isLoading}
-    />
+    <>
+      {DEMO_MODE && (
+        <div className="fixed top-4 right-4 z-50 w-64">
+          <TenantSelector placeholder="Select tenant" />
+        </div>
+      )}
+      <SignInPage
+        //heroImageSrc="/screenshots/gradian.me_bg_desktop.png"
+        onSignIn={handleSignIn}
+        onResetPassword={handleResetPassword}
+        onCreateAccount={handleCreateAccount}
+        error={error}
+        isLoading={isLoading}
+      />
+    </>
   );
 }
 

@@ -5,6 +5,7 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { TableWrapper } from '../../table/components/TableWrapper';
 import { parseMarkdownTable, createTableColumns, createTableConfig } from '../utils/tableParser';
+import { MermaidDiagramSimple } from './MermaidDiagramSimple';
 
 /**
  * Create custom components for ReactMarkdown with sticky headings support
@@ -21,6 +22,12 @@ export function createMarkdownComponents(stickyHeadings: string[] = []) {
   code({ node, inline, className, children, ...props }: any) {
     const match = /language-(\w+)/.exec(className || '');
     const language = match ? match[1] : '';
+    
+    // Render Mermaid diagrams
+    if (!inline && language === 'mermaid') {
+      const diagram = String(children).replace(/\n$/, '');
+      return <MermaidDiagramSimple diagram={diagram} />;
+    }
     
     if (!inline && match) {
       return (

@@ -1715,5 +1715,62 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBM6PROCESSANALYSIS001",
+    "timestamp": "2025-12-05T07:14:20.934Z",
+    "version": "1.14.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Process Analysis Agent + Mermaid",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "process-analysis",
+          "visualization"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Enhanced login functionality to support tenant selection in demo mode",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "tenant-management",
+          "demo-mode"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Integrated tenant domain handling in authentication requests",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "tenant-management",
+          "api"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved AI response rendering with Markdown support, including Mermaid diagram rendering for better visualization",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "markdown-viewer",
+          "visualization"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined Markdown viewer and scroll spy hooks for optimized performance and user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "markdown-viewer",
+          "hooks",
+          "performance"
+        ]
+      }
+    ]
   }
 ]
