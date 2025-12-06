@@ -6,6 +6,7 @@
     "dev": "next dev", 
     "build": "next build --webpack",
     "build:release": "OBFUSCATE=true next build --webpack",
+    "verify": "tsc --noEmit && eslint .",
     "start": "next start",
     "start:standalone": "node .next/standalone/server.js",
     "lint": "eslint",
