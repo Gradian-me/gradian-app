@@ -5078,6 +5078,22 @@
         "order": 4
       },
       {
+        "id": "change-procedure",
+        "name": "changeProcedure",
+        "label": "Change Procedure",
+        "sectionId": "qa-analysis",
+        "component": "picker",
+        "placeholder": "Click to select change procedure",
+        "allowMultiselect": true,
+        "description": "Select change procedure(s) from popup picker",
+        "targetSchema": "change-procedure",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 5
+      },
+      {
         "id": "change-conclusion",
         "name": "changeConclusion",
         "label": "Change Conclusion",
@@ -5174,6 +5190,38 @@
         "columns": 2
       }
     ],
+    "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "quality-assurance-analysis-ai",
+          "label": "Quality Assurance Analysis",
+          "icon": "Brain",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "quality-assurance-analyst",
+          "selectedFields": [
+            "change-title",
+            "change-description",
+            "change-solution",
+            "change-categories",
+            "change-conditions",
+            "supporting-data",
+            "change-additional-description",
+            "change-conclusion",
+            "change-is-approved-by-qa",
+            "change-effectiveness"
+          ],
+          "selectedSections": [
+            "change-information",
+            "qa-analysis",
+            "change-conclusion"
+          ],
+          "additionalSystemPrompt": "Analyze this change management record from a quality assurance perspective. Provide comprehensive analysis including risk assessment, compliance evaluation, and recommendations based on GMP, ISO 9001, and pharmaceutical quality standards.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        }
+      ]
+    },
     "showInNavigation": true,
     "icon": "GitBranch"
   },

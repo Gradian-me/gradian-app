@@ -744,5 +744,36 @@
     "fieldId": "integration-source-route",
     "createdAt": "2025-12-06T09:56:03.141Z",
     "updatedAt": "2025-12-06T09:59:24.339Z"
+  },
+  {
+    "id": "01KBSMF1YF8VDC43SDJWPX3EN5",
+    "sourceSchema": "quality-assurance-analysis",
+    "sourceId": "01KBSMF1X8N2BEJ7ENHJDT17MX",
+    "targetSchema": "users",
+    "targetId": "01KBSMDRHJTDY7SFEY6VWK2HEK",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "analyst",
+    "createdAt": "2025-12-06T10:49:02.670Z",
+    "updatedAt": "2025-12-06T10:49:02.670Z"
+  },
+  {
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSMAB5KHQXD0VMT3GZERCGT",
+    "targetSchema": "quality-assurance-analysis",
+    "targetId": "01KBSMF1X8N2BEJ7ENHJDT17MX",
+    "relationTypeId": "HAS_QUALITY_ASSURANCE_ANALYSIS",
+    "id": "01KBSMF247Y11DM50Y59JKXV10",
+    "createdAt": "2025-12-06T10:49:02.855Z",
+    "updatedAt": "2025-12-06T10:49:02.855Z"
+  },
+  {
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSMAB5KHQXD0VMT3GZERCGT",
+    "targetSchema": "qa-guideline-analysis",
+    "targetId": "01KBSMFBBBQ4RFCPQ81MY4V11T",
+    "relationTypeId": "HAS_QA_GUIDELINE_ANALYSIS",
+    "id": "01KBSMFBE9R1KCMWHNP839HRZY",
+    "createdAt": "2025-12-06T10:49:12.393Z",
+    "updatedAt": "2025-12-06T10:49:12.393Z"
   }
 ]
