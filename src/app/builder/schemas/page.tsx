@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { SchemaManagerWrapper } from '@/gradian-ui/schema-manager/components';
+import SchemaBuilderClient from './SchemaBuilderClient';
 
 export const metadata: Metadata = {
   title: 'Schema Builder | Gradian',
@@ -7,6 +7,6 @@ export const metadata: Metadata = {
 };
 
 export default function SchemaBuilderPage() {
-  return <SchemaManagerWrapper />;
+  return <SchemaBuilderClient />;
 }
 

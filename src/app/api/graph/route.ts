@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
       
       // Include edge if schema matches (either source or target) and neither is excluded
       if (schemaMatches && !isExcluded) {
-        edges.push({
+        const edge: any = {
           id: relation.id,
           sourceId: relation.sourceId,
           targetId: relation.targetId,
@@ -162,7 +162,14 @@ export async function GET(request: NextRequest) {
           relationTypeId: relation.relationTypeId,
           createdAt: relation.createdAt,
           updatedAt: relation.updatedAt,
-        });
+        };
+        
+        // Include fieldId if it exists in the relation
+        if (relation.fieldId) {
+          edge.fieldId = relation.fieldId;
+        }
+        
+        edges.push(edge);
       }
     }
 
@@ -315,7 +322,7 @@ export async function POST(request: NextRequest) {
       const targetEntityId = (targetNode?.payload as any)?.id || targetNode?.id || edge.targetId;
       
       const existingIndex = allRelations.findIndex((r: any) => r.id === edge.id);
-      const relationData = {
+      const relationData: any = {
         id: edge.id,
         sourceSchema: edge.sourceSchema,
         sourceId: sourceEntityId,
@@ -325,6 +332,11 @@ export async function POST(request: NextRequest) {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
+      
+      // Include fieldId if it exists in the edge data
+      if ((edge as any).fieldId) {
+        relationData.fieldId = (edge as any).fieldId;
+      }
       if (existingIndex >= 0) {
         allRelations[existingIndex] = { ...allRelations[existingIndex], ...relationData, updatedAt: new Date().toISOString() };
       } else {
