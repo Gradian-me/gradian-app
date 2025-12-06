@@ -115,7 +115,7 @@ export function HealthPageHeader({
           disabled={loading || refreshing}
           className="w-full sm:w-auto"
         >
-          <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-4 w-4 me-2 ${refreshing ? 'animate-spin' : ''}`} />
           <span className="hidden sm:inline">Refresh All</span>
           <span className="sm:hidden">Refresh</span>
         </Button>

@@ -257,7 +257,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
               </div>
             </div>
           </CardContent>
-          <div className="pr-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+          <div className="pe-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             <DynamicActionButtons
               variant="minimal"
               actions={[
@@ -291,7 +291,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
             animate="expanded"
             exit="collapsed"
             transition={{ duration: 0.18, ease: 'easeInOut' }}
-            className="pl-6 border-l border-dashed border-gray-200 dark:border-gray-700"
+            className="ps-6 border-l border-dashed border-gray-200 dark:border-gray-700"
           >
             {node.children.map((child, idx) => (
               <HierarchyNodeCard
@@ -442,7 +442,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
                 <Skeleton className="h-3 w-24" />
               </div>
             </div>
-            <div className="flex items-center gap-2 pr-2">
+            <div className="flex items-center gap-2 pe-2">
               <Skeleton className="h-8 w-8 rounded-md" />
               <Skeleton className="h-8 w-8 rounded-md" />
               <Skeleton className="h-8 w-8 rounded-md" />
@@ -450,7 +450,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
           </CardContent>
         </Card>
         {showNested && (
-          <div className="pl-6 border-l border-dashed border-gray-200 dark:border-gray-700">
+          <div className="ps-6 border-l border-dashed border-gray-200 dark:border-gray-700">
             <HierarchySkeleton depth={depth + 1} index={index} />
           </div>
         )}

@@ -180,7 +180,7 @@ export function AiAgentEditor({
 
         <div className="flex items-center justify-between gap-2">
           <Button variant="outline" onClick={onBack || (() => router.push('/builder/ai-agents'))}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 me-2" />
             Back to AI Agents
           </Button>
           <div className="flex items-center gap-2">
@@ -190,7 +190,7 @@ export function AiAgentEditor({
               onClick={() => loadAgent(agentId)}
               disabled={loading}
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 me-2 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
             {hasChanges && (
@@ -203,11 +203,11 @@ export function AiAgentEditor({
               size="sm"
               onClick={() => setDeleteDialogOpen(true)}
             >
-              <Trash2 className="h-4 w-4 mr-2" />
+              <Trash2 className="h-4 w-4 me-2" />
               Delete
             </Button>
             <Button onClick={handleSave} disabled={saving || !!jsonError || !hasChanges}>
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="h-4 w-4 me-2" />
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>

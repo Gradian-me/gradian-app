@@ -1252,7 +1252,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                             return (
                               <div
                                 key={(entity as any).id || `entity-${index}`}
-                                className="rounded-xl bg-white dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+                                className="rounded-xl overflow-hidden"
                               >
                                 {targetSchemaData ? (
                                   <DynamicCardRenderer
@@ -1265,7 +1265,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                       if (relation) handleEditEntity((data as any).id, relation.id);
                                     }}
                                     onEdit={(data) => {
-                                      if (relation) handleEditEntity((data as any).id, relation.id);
+                                      // Stop propagation to prevent form from closing
+                                      if (relation) {
+                                        handleEditEntity((data as any).id, relation.id);
+                                      }
                                     }}
                                     onDelete={(data) => {
                                       if (relation) handleDeleteClick(relation.id, {} as React.MouseEvent);
@@ -1273,7 +1276,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                     disableAnimation={false}
                                     isInDialog={false}
                                     showUserDetails={false}
-                                    className="border-none"
+                                    className="border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200"
                                   />
                                 ) : (
                                   <div className="px-4 sm:px-6 py-4">
@@ -1387,7 +1390,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                       return (
                         <div
                           key={(entity as any).id || `entity-${index}`}
-                          className="rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+                          className="rounded-xl overflow-hidden"
                         >
                           {targetSchemaData ? (
                             <DynamicCardRenderer
@@ -1399,7 +1402,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                 if (relation) handleEditEntity((data as any).id, relation.id);
                               }}
                               onEdit={(data) => {
-                                if (relation) handleEditEntity((data as any).id, relation.id);
+                                // Stop propagation to prevent form from closing
+                                if (relation) {
+                                  handleEditEntity((data as any).id, relation.id);
+                                }
                               }}
                               onDelete={(data) => {
                                 if (relation) handleDeleteClick(relation.id, {} as React.MouseEvent);
@@ -1407,7 +1413,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                               disableAnimation={false}
                               isInDialog={false}
                               showUserDetails={false}
-                              className="border-none"
+                              className="border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200"
                             />
                           ) : (
                             <div className="px-4 sm:px-6 py-4">

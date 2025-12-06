@@ -262,7 +262,7 @@ export const DataDisplayWrapper: React.FC<DataDisplayWrapperProps> = ({
                       )}
                       disabled={action.disabled}
                     >
-                      {action.icon && <span className="mr-2">{action.icon}</span>}
+                      {action.icon && <span className="me-2">{action.icon}</span>}
                       {action.label}
                     </button>
                   ) : null;

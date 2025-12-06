@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/gradian-ui/shared/utils';
 import { Check } from 'lucide-react';
+import { isEmptyChildren } from '../utils/markdownComponentUtils';
 
 export interface TaskListItemProps {
   children: React.ReactNode;
@@ -16,13 +17,18 @@ export interface TaskListItemProps {
 export function TaskListItem({ children, checked: initialChecked, ...props }: TaskListItemProps) {
   const [isChecked, setIsChecked] = useState(initialChecked === true);
 
+  // Don't render empty task list items
+  if (isEmptyChildren(children)) {
+    return null;
+  }
+
   return (
     <li className="mb-1 flex items-start gap-2" {...props}>
       <button
         type="button"
         onClick={() => setIsChecked(!isChecked)}
         className={cn(
-          "mt-0.5 shrink-0 w-5 h-5 rounded border-2 transition-all duration-200 flex items-center justify-center",
+          "mt-0.5 shrink-0 w-5 h-5 rounded border-2 transition-all duration-200 flex items-center justify-center cursor-pointer",
           "focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1",
           isChecked
             ? "bg-violet-600 border-violet-600 dark:bg-violet-500 dark:border-violet-500 text-white"

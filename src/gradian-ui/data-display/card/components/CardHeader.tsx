@@ -42,7 +42,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
       </div>
       
       {actions && (
-        <div className="shrink-0 ml-4">
+        <div className="shrink-0 ms-4">
           {actions}
         </div>
       )}

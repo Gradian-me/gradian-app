@@ -453,11 +453,13 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
           "h-full bg-white dark:bg-gray-800 overflow-hidden",
           isInDialog 
             ? "rounded-lg sm:rounded-xl" 
-            : "rounded-2xl",
-          !className?.includes('border-none') && "border border-gray-200 dark:border-gray-700",
+            : viewMode === 'list'
+              ? "rounded-xl" // Match container roundness in list mode
+              : "rounded-2xl",
+          !className?.includes('border-none') && !className?.includes('border ') && "border border-gray-200 dark:border-gray-700",
           !disableAnimation && !isInDialog && "transition-colors hover:bg-gray-200 dark:hover:bg-gray-600",
           className?.includes('border-none') 
-            ? "focus-within:ring-0" 
+            ? "focus-within:ring-0 border-none" 
             : !isInDialog && "focus-within:ring-2 focus-within:ring-violet-400 focus-within:ring-offset-0 focus-within:rounded-xl"
         )}
         onKeyDown={(e: KeyboardEvent) => {

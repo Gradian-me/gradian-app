@@ -20,7 +20,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       error,
       disabled = false,
       required = false,
-      rows = 3,
+      rows = 5,
       cols,
       resize = 'vertical',
       maxLength,
@@ -93,7 +93,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       resize === 'horizontal' && 'resize-x',
       resize === 'vertical' && 'resize-y',
       resize === 'both' && 'resize',
-      aiAgentId && 'pr-11',
+      aiAgentId && 'pe-11',
       enableVoiceInput && 'pb-11',
       className
     );
@@ -108,7 +108,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
                 className={cn(
                   'block text-xs font-medium',
                   error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
-                  required && 'after:content-["*"] after:ml-1 after:text-red-500 dark:after:text-red-400'
+                  required && 'after:content-["*"] after:ms-1 after:text-red-500 dark:after:text-red-400'
                 )}
               >
                 {config.label}

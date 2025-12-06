@@ -18,6 +18,10 @@ export interface TableColumn<T = any> {
    * Defaults to true when maxWidth is provided for backward compatibility.
    */
   allowWrap?: boolean;
+  /**
+   * Optional field metadata (used for component-specific rendering)
+   */
+  field?: any;
 }
 
 export interface TableConfig<T = any> {

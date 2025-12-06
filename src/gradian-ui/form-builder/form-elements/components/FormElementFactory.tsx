@@ -223,7 +223,16 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       );
     
     case 'textarea':
-      return <Textarea config={config} {...commonProps} canCopy={canCopy} enableVoiceInput={enableVoiceInput} loadingTextSwitches={loadingTextSwitches} />;
+      return (
+        <Textarea 
+          config={config} 
+          {...commonProps} 
+          canCopy={canCopy} 
+          enableVoiceInput={enableVoiceInput} 
+          loadingTextSwitches={loadingTextSwitches}
+          rows={(config as any)?.rows || (restProps as any)?.rows || 5}
+        />
+      );
     
     case 'checkbox':
       return <Checkbox config={config} {...commonProps} />;
@@ -416,7 +425,12 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           value={Number(restProps.value) || 0}
           maxValue={(config as any).maxValue || 5}
           size={(config as any).size || 'md'}
-          showValue={(config as any).showValue || false}
+          showValue={true}
+          onChange={restProps.onChange ? (value: number) => restProps.onChange?.(value) : undefined}
+          disabled={restProps.disabled}
+          label={(config as any).label}
+          required={restProps.required}
+          error={restProps.error}
           className={restProps.className}
         />
       );
@@ -453,6 +467,10 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           placeholder={(config as any).placeholder || 'Enter annotation...'}
           addButtonText={(config as any).addButtonText || 'Add Item'}
           className={restProps.className}
+          label={(config as any).label}
+          required={restProps.required}
+          error={restProps.error}
+          disabled={restProps.disabled}
         />
       );
     

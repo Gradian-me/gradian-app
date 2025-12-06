@@ -52,3 +52,19 @@ export function isTaskList(children: React.ReactNode): boolean {
   });
 }
 
+/**
+ * Check if children are empty (null, undefined, or only whitespace)
+ */
+export function isEmptyChildren(children: React.ReactNode): boolean {
+  if (children === null || children === undefined) return true;
+  if (typeof children === 'string') return children.trim() === '';
+  if (Array.isArray(children)) {
+    return children.length === 0 || children.every(child => isEmptyChildren(child));
+  }
+  if (React.isValidElement(children)) {
+    const props = children.props as { children?: React.ReactNode };
+    return isEmptyChildren(props?.children);
+  }
+  return false;
+}
+

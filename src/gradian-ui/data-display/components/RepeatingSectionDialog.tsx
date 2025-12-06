@@ -385,7 +385,7 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
             onClick={stopPropagation}
             onMouseDown={stopPropagation}
           >
-            <div className="flex items-center justify-end mb-1 pr-1">
+            <div className="flex items-center justify-end mb-1 pe-1">
               {isLoading ? (
                 <Badge variant="secondary" className="animate-pulse shrink-0">
                   Loading...

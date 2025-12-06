@@ -66,7 +66,7 @@ export function RenderComponentsTab({ agent, onUpdate, readonly = false }: Rende
           <CardTitle>Render Components</CardTitle>
           {!readonly && (
             <Button size="sm" onClick={addComponent}>
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               Add Component
             </Button>
           )}
@@ -78,7 +78,7 @@ export function RenderComponentsTab({ agent, onUpdate, readonly = false }: Rende
             <p>No render components configured.</p>
             {!readonly && (
               <Button variant="outline" size="sm" onClick={addComponent} className="mt-4">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 Add First Component
               </Button>
             )}
@@ -101,7 +101,7 @@ export function RenderComponentsTab({ agent, onUpdate, readonly = false }: Rende
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 mr-2"
+                        className="h-8 w-8 me-2"
                         onClick={(e) => {
                           e.stopPropagation();
                           setDeleteConfirmIndex(index);

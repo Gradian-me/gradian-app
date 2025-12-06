@@ -46,7 +46,7 @@ export function SortableSelectedField({ id, label, name, onRemove }: SortableSel
             </button>
             <div className="flex-1 min-w-0">
               <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{label}</span>
-              <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({name})</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 ms-1">({name})</span>
             </div>
             <Button
               variant="ghost"

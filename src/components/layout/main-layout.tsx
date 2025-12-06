@@ -404,7 +404,7 @@ export function MainLayout({
       </div>
       <div className="flex lg:hidden items-center space-x-2">
         {customHeaderActions && (
-          <div className="flex items-center mr-2">
+          <div className="flex items-center me-2">
             {customHeaderActions}
           </div>
         )}

@@ -77,7 +77,7 @@
       }
     ],
     "nextAction": {
-      "label": "Approve Response",
+      "label": "Deploy Modules",
       "icon": "CheckCircle2",
       "route": "/api/schemas"
     },
@@ -648,7 +648,7 @@
           }
         ],
         "validation": {
-          "required": true
+          "required": false
         },
         "colSpan": 1,
         "order": 2
@@ -675,7 +675,7 @@
         ],
         "defaultValue": "url",
         "validation": {
-          "required": true
+          "required": false
         },
         "colSpan": 1,
         "order": 3

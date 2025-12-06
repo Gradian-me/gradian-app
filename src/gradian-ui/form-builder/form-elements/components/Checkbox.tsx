@@ -81,9 +81,9 @@ export const Checkbox = forwardRef<FormElementRef, CheckboxProps>(
             <label
               htmlFor={config.name}
               className={cn(
-                'ml-2 text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+                'ms-2 text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
                 error ? 'text-destructive' : 'text-foreground',
-                required && 'after:content-["*"] after:ml-1 after:text-destructive',
+                required && 'after:content-["*"] after:ms-1 after:text-destructive',
                 disabled && 'opacity-50'
               )}
             >

@@ -170,7 +170,7 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
               className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide"
             >
               {field.label}
-              {isRequired && <span className="text-red-500 ml-1">*</span>}
+              {isRequired && <span className="text-red-500 ms-1">*</span>}
             </label>
           ) : (
             <div></div>
@@ -783,7 +783,7 @@ export function AiBuilderForm({
                         variant="default"
                         className="h-10 shadow-sm"
                       >
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        <Loader2 className="h-4 w-4 me-2 animate-spin" />
                         Generating
                       </Button>
                       <Button
@@ -792,7 +792,7 @@ export function AiBuilderForm({
                         size="default"
                         className="h-10 shadow-sm"
                       >
-                        <Square className="h-4 w-4 mr-2 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
+                        <Square className="h-4 w-4 me-2 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
                         Stop
                       </Button>
                     </>
@@ -809,7 +809,7 @@ export function AiBuilderForm({
                       variant="default"
                       className="h-10 shadow-sm bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
                     >
-                      <Sparkles className="h-4 w-4 mr-2" />
+                      <Sparkles className="h-4 w-4 me-2" />
                       Do the Magic
                     </Button>
                   )}

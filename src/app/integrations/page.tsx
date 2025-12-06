@@ -807,7 +807,7 @@ export default function IntegrationsPage() {
               disabled={loading || integrations.length === 0 || syncing.size > 0}
               className="w-full sm:w-auto"
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${syncing.size > 0 ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 me-2 ${syncing.size > 0 ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Sync All</span>
               <span className="sm:hidden">Sync All</span>
             </Button>
@@ -819,7 +819,7 @@ export default function IntegrationsPage() {
               }}
               className="w-full sm:w-auto"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               <span className="hidden sm:inline">Add Integration</span>
               <span className="sm:hidden">Add</span>
             </Button>
@@ -1039,7 +1039,7 @@ export default function IntegrationsPage() {
                     router.push('/integrations/configure');
                   }
                 }}>
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   Add Your First Integration
                 </Button>
               </CardContent>

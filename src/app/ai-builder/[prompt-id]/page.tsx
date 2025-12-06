@@ -432,7 +432,7 @@ export default function AiBuilderPromptPage() {
           {/* Modified Prompts Skeleton */}
           <div className="space-y-4 p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
             <Skeleton className="h-5 w-40 rounded-md bg-gray-200 dark:bg-gray-700" />
-            <div className="ml-6 pl-4 border-l-2 border-violet-200 dark:border-violet-800 space-y-3">
+            <div className="ms-6 ps-4 border-l-2 border-violet-200 dark:border-violet-800 space-y-3">
               <Skeleton className="h-12 w-full rounded-lg bg-gray-200 dark:bg-gray-700" />
               <Skeleton className="h-12 w-full rounded-lg bg-gray-200 dark:bg-gray-700" />
             </div>
@@ -453,7 +453,7 @@ export default function AiBuilderPromptPage() {
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400 mb-4">Prompt not found</p>
             <Button onClick={() => router.push('/ai-builder')} variant="outline">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4 me-2" />
               Back to AI Builder
             </Button>
           </div>
@@ -473,7 +473,7 @@ export default function AiBuilderPromptPage() {
       <div className="space-y-6 max-w-5xl mx-auto">
         <div className="flex items-center justify-between">
           <Button onClick={() => router.push('/ai-builder')} variant="outline" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 me-2" />
             Back to AI Builder
           </Button>
         </div>

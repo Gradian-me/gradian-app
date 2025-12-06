@@ -188,22 +188,22 @@ export function AiAgentTabbedEditor({
         <div className="flex items-center justify-between gap-2 flex-wrap">
           {onBack && (
             <Button variant="ghost" onClick={onBack}>
-              <ArrowLeft className="h-4 w-4 md:mr-2" />
+              <ArrowLeft className="h-4 w-4 md:me-2" />
               <span className="hidden md:inline">Back to AI Agents</span>
             </Button>
           )}
-          <div className="flex gap-2 ml-auto flex-wrap">
+          <div className="flex gap-2 ms-auto flex-wrap">
             <Button
               variant="outline"
               onClick={() => loadAgent(agentId)}
               disabled={loading}
             >
-              <RefreshCw className={`h-4 w-4 md:mr-2 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 md:me-2 ${loading ? 'animate-spin' : ''}`} />
               <span className="hidden md:inline">Refresh</span>
             </Button>
             {hasChanges && (
               <Button variant="outline" onClick={() => setShowResetDialog(true)}>
-                <RotateCcw className="h-4 w-4 md:mr-2" />
+                <RotateCcw className="h-4 w-4 md:me-2" />
                 <span className="hidden md:inline">Reset</span>
               </Button>
             )}
@@ -211,14 +211,14 @@ export function AiAgentTabbedEditor({
               variant="destructive"
               onClick={() => setDeleteDialogOpen(true)}
             >
-              <Trash2 className="h-4 w-4 md:mr-2" />
+              <Trash2 className="h-4 w-4 md:me-2" />
               <span className="hidden md:inline">Delete</span>
             </Button>
             <Button onClick={handleSave} disabled={saving || !hasChanges}>
               {saving ? (
-                <RefreshCw className="h-4 w-4 md:mr-2 animate-spin" />
+                <RefreshCw className="h-4 w-4 md:me-2 animate-spin" />
               ) : (
-                <Save className="h-4 w-4 md:mr-2" />
+                <Save className="h-4 w-4 md:me-2" />
               )}
               <span className="hidden md:inline">{saving ? 'Saving...' : 'Save Changes'}</span>
             </Button>
@@ -231,14 +231,14 @@ export function AiAgentTabbedEditor({
               value="general"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
-              <Settings className="h-4 w-4 mr-1 sm:mr-2" />
+              <Settings className="h-4 w-4 me-1 sm:me-2" />
               <span className="truncate">General</span>
             </TabsTrigger>
             <TabsTrigger
               value="system-prompt"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
-              <FileText className="h-4 w-4 mr-1 sm:mr-2" />
+              <FileText className="h-4 w-4 me-1 sm:me-2" />
               <span className="truncate hidden sm:inline">System Prompt</span>
               <span className="truncate sm:hidden">Prompt</span>
             </TabsTrigger>
@@ -246,21 +246,21 @@ export function AiAgentTabbedEditor({
               value="components"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
-              <Code className="h-4 w-4 mr-1 sm:mr-2" />
+              <Code className="h-4 w-4 me-1 sm:me-2" />
               <span className="truncate">Components</span>
             </TabsTrigger>
             <TabsTrigger
               value="routes"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
-              <Route className="h-4 w-4 mr-1 sm:mr-2" />
+              <Route className="h-4 w-4 me-1 sm:me-2" />
               <span className="truncate">Routes</span>
             </TabsTrigger>
             <TabsTrigger
               value="next-action"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
-              <ArrowRight className="h-4 w-4 mr-1 sm:mr-2" />
+              <ArrowRight className="h-4 w-4 me-1 sm:me-2" />
               <span className="truncate hidden sm:inline">Next Action</span>
               <span className="truncate sm:hidden">Action</span>
             </TabsTrigger>
@@ -268,7 +268,7 @@ export function AiAgentTabbedEditor({
               value="response-cards"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
-              <Layout className="h-4 w-4 mr-1 sm:mr-2" />
+              <Layout className="h-4 w-4 me-1 sm:me-2" />
               <span className="truncate hidden sm:inline">Response Cards</span>
               <span className="truncate sm:hidden">Cards</span>
             </TabsTrigger>

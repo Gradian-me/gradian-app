@@ -210,7 +210,7 @@ export function AiBuilderResponse({
           >
             {isApproving ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="me-2 h-4 w-4 animate-spin" />
                 Processing...
               </>
             ) : (
@@ -218,7 +218,7 @@ export function AiBuilderResponse({
                 {agent.nextAction.icon && (
                   <IconRenderer
                     iconName={agent.nextAction.icon}
-                    className="mr-2 h-4 w-4"
+                    className="me-2 h-4 w-4"
                   />
                 )}
                 {agent.nextAction.label}

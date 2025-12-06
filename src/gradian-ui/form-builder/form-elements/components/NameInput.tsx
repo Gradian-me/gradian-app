@@ -88,7 +88,7 @@ export const NameInput = forwardRef<FormElementRef, NameInputProps>(
     const hasValue = Boolean(value);
     const showCheckCircle = isValidName && !error;
     const showCopyButton = canCopy && hasValue;
-    const rightPadding = showCopyButton && showCheckCircle ? 'pr-20' : (showCopyButton || showCheckCircle ? 'pr-10' : '');
+    const rightPadding = showCopyButton && showCheckCircle ? 'pe-20' : (showCopyButton || showCheckCircle ? 'pe-10' : '');
 
     const inputClasses = cn(
       'w-full direction-auto px-3 py-2 border rounded-lg border-gray-300 bg-white text-sm text-gray-900 ring-offset-background placeholder:text-gray-400 transition-colors',
@@ -120,7 +120,7 @@ export const NameInput = forwardRef<FormElementRef, NameInputProps>(
                 className={cn(
                   'block text-xs font-medium',
                   error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
-                  (required ?? config?.required ?? config?.validation?.required ?? false) && 'after:content-["*"] after:ml-1 after:text-red-500 dark:after:text-red-400'
+                  (required ?? config?.required ?? config?.validation?.required ?? false) && 'after:content-["*"] after:ms-1 after:text-red-500 dark:after:text-red-400'
                 )}
               >
                 {fieldLabel}

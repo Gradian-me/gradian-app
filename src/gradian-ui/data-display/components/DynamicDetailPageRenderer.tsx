@@ -635,7 +635,8 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     };
   }, [schema?.plural_name, schema?.title, schema?.name, headerInfo.title, headerInfo.subtitle, headerInfo.code, data?.name]);
 
-  if (isLoading) {
+  // Show skeleton when loading or refreshing
+  if (isLoading || isRefreshing) {
     const detailMetadata = schema?.detailPageMetadata;
     const hasSidebar = (detailMetadata?.quickActions?.length ?? 0) > 0 || 
                       detailMetadata?.sections?.some(s => s.columnArea === 'sidebar');
@@ -867,7 +868,8 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     );
   }
 
-  if (error || !data) {
+  // Only show error if not refreshing (during refresh, show skeleton instead)
+  if ((error || !data) && !isRefreshing) {
     return (
       <div className="container mx-auto px-4 py-6">
         <div className="text-center py-12">
@@ -875,7 +877,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
           <p className="text-gray-500 mb-4">{error || 'Data not found'}</p>
           {onBack && (
             <Button onClick={onBack} variant="outline">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4 me-2" />
               {showBack ? 'Back' : (schema.plural_name || 'Back')}
             </Button>
           )}
@@ -1010,7 +1012,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                   variant="ghost"
                   onClick={onBack}
                 >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  <ArrowLeft className="h-4 w-4 me-2" />
                   {showBack ? 'Back' : (schema.plural_name || 'Back')}
                 </Button>
               )}
@@ -1123,7 +1125,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
               </div>
               <div className="flex items-center space-x-2 flex-row flex-wrap">
                 {headerInfo.personField && (
-                  <div className="mr-2 flex items-center gap-2">
+                  <div className="me-2 flex items-center gap-2">
                     <AvatarUser
                       user={headerInfo.personField}
                       avatarType="user"
@@ -1134,7 +1136,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                   </div>
                 )}
                 {headerInfo.duedate && (
-                  <div className="mr-2">
+                  <div className="me-2">
                     <Countdown
                       expireDate={headerInfo.duedate}
                       includeTime={true}
@@ -1169,7 +1171,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                     >
                       <Badge variant={badgeConfig.color ?? 'outline'}>
                         {badgeConfig.icon && (
-                          <IconRenderer iconName={badgeConfig.icon} className="h-3 w-3 mr-1" />
+                          <IconRenderer iconName={badgeConfig.icon} className="h-3 w-3 me-1" />
                         )}
                         {badgeConfig.label}
                       </Badge>
@@ -1221,7 +1223,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                   >
                     <Badge variant={badgeConfig.color ?? 'outline'}>
                       {badgeConfig.icon && (
-                        <IconRenderer iconName={badgeConfig.icon} className="h-3 w-3 mr-1" />
+                        <IconRenderer iconName={badgeConfig.icon} className="h-3 w-3 me-1" />
                       )}
                       {badgeConfig.label}
                     </Badge>

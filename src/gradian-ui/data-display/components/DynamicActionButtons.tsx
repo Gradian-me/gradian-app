@@ -69,7 +69,10 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
     return configs[type];
   };
 
-  const handleClick = (action: ActionConfig) => {
+  const handleClick = (action: ActionConfig) => (e: React.MouseEvent) => {
+    if (stopPropagation) {
+      e.stopPropagation();
+    }
     action.onClick();
   };
 
@@ -98,7 +101,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
               key={`${action.type}-${index}`}
               variant="outline"
               size="sm"
-              onClick={() => handleClick(action)}
+              onClick={handleClick(action)}
               disabled={action.disabled}
               className={cn(
                 'flex-1 transition-all duration-200 text-xs bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600',
@@ -106,7 +109,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
               )}
               data-action-button
             >
-              <IconRenderer iconName={config.icon} className="h-4 w-4 mr-2" />
+              <IconRenderer iconName={config.icon} className="h-4 w-4 me-2" />
               {config.label}
             </Button>
           );
@@ -129,7 +132,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
             key={`${action.type}-${index}`}
             variant="outline"
             size="sm"
-            onClick={() => handleClick(action)}
+            onClick={handleClick(action)}
             disabled={action.disabled}
             className={cn(
               'h-8 w-8 p-0 transition-all duration-200 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600',

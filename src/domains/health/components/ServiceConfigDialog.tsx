@@ -83,7 +83,7 @@ export function ServiceConfigDialog({
                 onClose();
               }}
             >
-              <Settings className="h-4 w-4 mr-2" />
+              <Settings className="h-4 w-4 me-2" />
               Edit Service
             </Button>
             <Button

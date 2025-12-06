@@ -160,7 +160,7 @@ export const TagInput = forwardRef<FormElementRef, TagInputProps>(
             className={cn(
               'block text-xs font-medium mb-2',
               error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
-              required && 'after:content-["*"] after:ml-1 after:text-red-500 dark:after:text-red-400'
+              required && 'after:content-["*"] after:ms-1 after:text-red-500 dark:after:text-red-400'
             )}
           >
             {fieldLabel}
@@ -188,7 +188,7 @@ export const TagInput = forwardRef<FormElementRef, TagInputProps>(
                 <button
                   type="button"
                   onClick={() => removeTag(tag)}
-                  className="ml-1 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none"
+                  className="ms-1 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none"
                   aria-label={`Remove ${tag}`}
                 >
                   <X className="h-3 w-3" />

@@ -5,10 +5,15 @@ const nextConfig: NextConfig = {
   /* config options here */
   // Argon2 is a native module that should only run on the server
   // serverExternalPackages tells Next.js/Turbopack not to bundle this package
-  serverExternalPackages: ["argon2"],
-  // Disable Turbopack to use webpack for obfuscation
-  // Empty turbopack config to silence the warning (Next.js 16 uses Turbopack by default)
-  turbopack: {},
+  serverExternalPackages: [
+    "argon2",
+    "swagger-jsdoc",
+    "jsonwebtoken",
+    "remark",
+    "remark-parse",
+    "remark-gfm",
+  ],
+
   // Enable experimental build cache for faster incremental builds
   experimental: {
     // Optimize package imports - reduces bundle size and improves build speed
@@ -28,22 +33,13 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-tooltip',
       // Icons and utilities
       'lucide-react',
-      'date-fns',
       // Data fetching and state management
       '@tanstack/react-query',
       '@tanstack/react-table',
-      // Animation library
-      'framer-motion',
       // Form handling
       'react-hook-form',
-      // Charts
-      'recharts',
-      'echarts',
-      'echarts-for-react',
       // Date picker
-      'react-day-picker',
-      // Syntax highlighting
-      'react-syntax-highlighter',
+      'react-day-picker'
     ],
   },
   webpack: (config, { dev, isServer }) => {
@@ -52,21 +48,14 @@ const nextConfig: NextConfig = {
     config.cache = {
       type: 'filesystem',
       buildDependencies: {
-        // Reference the actual source config file, not the compiled one
-        config: [path.resolve(__dirname, 'next.config.ts')],
+        config: [__filename],
       },
-      // Cache location - must be absolute path
-      cacheDirectory: path.resolve(__dirname, '.next/cache/webpack'),
-      // Compression for cache files
-      compression: 'gzip',
-      // Only cache in production builds (dev mode has its own caching)
-      ...(dev ? {} : {
-        maxMemoryGenerations: 1,
-      }),
     };
+    
 
-    // Only obfuscate in production builds and for client-side code
-    if (!dev && !isServer) {
+
+    // Only obfuscate in release builds (when OBFUSCATE=true) and for client-side code
+    if (!dev && !isServer && process.env.OBFUSCATE === "true") {
       // Use dynamic require to avoid issues with Next.js config compilation
       try {
         const webpackObfuscatorModule = require("webpack-obfuscator");

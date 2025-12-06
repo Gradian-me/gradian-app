@@ -65,7 +65,7 @@ export function RelationTypeEditor({
         <h3 className="text-xl font-semibold mb-4">Relation Type not found</h3>
         <p className="text-gray-600 mb-6">Please try loading a different relation type.</p>
         <Button onClick={onBack}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-4 w-4 me-2" />
           Go Back
         </Button>
       </div>
@@ -83,14 +83,14 @@ export function RelationTypeEditor({
             onClick={handleDelete}
             className="text-red-600 hover:text-red-700 hover:bg-red-50"
           >
-            <Trash2 className="h-4 w-4 mr-2" />
+            <Trash2 className="h-4 w-4 me-2" />
             Delete
           </Button>
           <Button
             variant="outline"
             onClick={onBack}
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 me-2" />
             Back
           </Button>
           <Button
@@ -99,12 +99,12 @@ export function RelationTypeEditor({
           >
             {state.saving ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="h-4 w-4 me-2 animate-spin" />
                 Saving...
               </>
             ) : (
               <>
-                <Save className="h-4 w-4 mr-2" />
+                <Save className="h-4 w-4 me-2" />
                 Save Changes
               </>
             )}

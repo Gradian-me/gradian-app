@@ -420,14 +420,14 @@ export function SchemaBuilderEditor({
               value="general"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
-              <Settings className="h-4 w-4 mr-1 sm:mr-2" />
+              <Settings className="h-4 w-4 me-1 sm:me-2" />
               <span className="truncate">General</span>
             </TabsTrigger>
             <TabsTrigger
               value="sections"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
-              <Layers className="h-4 w-4 mr-1 sm:mr-2" />
+              <Layers className="h-4 w-4 me-1 sm:me-2" />
               <span className="truncate hidden sm:inline">Sections & Fields</span>
               <span className="truncate sm:hidden">Fields</span>
             </TabsTrigger>
@@ -435,7 +435,7 @@ export function SchemaBuilderEditor({
               value="card"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
-              <Layout className="h-4 w-4 mr-1 sm:mr-2" />
+              <Layout className="h-4 w-4 me-1 sm:me-2" />
               <span className="truncate hidden sm:inline">Card Metadata</span>
               <span className="truncate sm:hidden">Card</span>
             </TabsTrigger>
@@ -443,7 +443,7 @@ export function SchemaBuilderEditor({
               value="detail"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
-              <FileText className="h-4 w-4 mr-1 sm:mr-2" />
+              <FileText className="h-4 w-4 me-1 sm:me-2" />
               <span className="truncate hidden sm:inline">Detail Page</span>
               <span className="truncate sm:hidden">Detail</span>
             </TabsTrigger>

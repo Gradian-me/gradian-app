@@ -1,12 +1,19 @@
 // Table Body Component
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { TableColumn } from '../types';
 import { getCellValue } from '../utils';
 import { cn } from '../../../shared/utils';
 import { extractLabels } from '../../../form-builder/form-elements/utils/option-normalizer';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { CopyContent } from '../../../form-builder/form-elements/components/CopyContent';
 
 export interface TableBodyProps<T = any> {
   data: T[];
@@ -35,6 +42,22 @@ export function TableBody<T = any>({
   selectionEnabled,
   highlightQuery,
 }: TableBodyProps<T>) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogContent, setDialogContent] = useState<{ fieldName: string; content: string } | null>(null);
+
+  // Helper function to truncate text to 200 characters
+  const truncateText = (text: string, maxChars: number = 200): string => {
+    if (!text) return '';
+    if (text.length <= maxChars) return text;
+    return text.substring(0, maxChars) + '...';
+  };
+
+  const handleShowMore = (fieldName: string, content: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDialogContent({ fieldName, content });
+    setDialogOpen(true);
+  };
+
   const applyHighlight = (node: React.ReactNode): React.ReactNode => {
     if (!highlightQuery || node === null || node === undefined || typeof node === 'boolean') {
       return node;
@@ -155,6 +178,12 @@ export function TableBody<T = any>({
               // Allow wrapping when explicitly enabled or when maxWidth is provided (backward compatible)
               const shouldAllowWrapping = column.allowWrap ?? !!column.maxWidth;
 
+              // Check if this is a textarea field with long content (more than 200 characters)
+              const isTextarea = column.field?.component === 'textarea';
+              const textValue = isTextarea && value ? String(value) : null;
+              const shouldTruncate = isTextarea && textValue && textValue.length > 200;
+              const truncatedText = shouldTruncate ? truncateText(textValue!, 200) : null;
+
               return (
                 <td
                   key={column.id}
@@ -193,7 +222,22 @@ export function TableBody<T = any>({
                     }}
                 >
                   {column.render ? (
-                    applyHighlight(column.render(value, row, rowIndex))
+                    shouldTruncate ? (
+                      <div className="space-y-1">
+                        <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                          {truncatedText}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => handleShowMore(column.label, textValue!, e)}
+                          className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium"
+                        >
+                          Show more
+                        </button>
+                      </div>
+                    ) : (
+                      applyHighlight(column.render(value, row, rowIndex))
+                    )
                   ) : (
                     <span className="block">
                       {(() => {
@@ -233,6 +277,24 @@ export function TableBody<T = any>({
           </motion.tr>
         );
       })}
+      {/* Dialog for showing full textarea content */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle>{dialogContent?.fieldName || 'Content'}</DialogTitle>
+              {dialogContent && (
+                <CopyContent content={dialogContent.content} />
+              )}
+            </div>
+          </DialogHeader>
+          <div className="mt-4">
+            <pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300 font-sans bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+              {dialogContent?.content || ''}
+            </pre>
+          </div>
+        </DialogContent>
+      </Dialog>
     </tbody>
   );
 }

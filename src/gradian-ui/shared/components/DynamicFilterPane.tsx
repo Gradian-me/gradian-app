@@ -59,7 +59,7 @@ export const DynamicFilterPane = ({
       </div>
       <div className="flex flex-row gap-1.5 sm:gap-2 items-center w-full lg:w-auto">
         <Button variant="outline" size="sm" className="h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap">
-          <Filter className="h-4 w-4 sm:mr-2" />
+          <Filter className="h-4 w-4 sm:me-2" />
           <span className="hidden sm:inline">Filters</span>
         </Button>
         {onRefresh && (
@@ -91,7 +91,7 @@ export const DynamicFilterPane = ({
           )}
         </div>
         {customActions && (
-          <div className="flex items-center border-l border-gray-300 dark:border-gray-500 pl-2">
+          <div className="flex items-center border-l border-gray-300 dark:border-gray-500 ps-2">
             {customActions}
           </div>
         )}
@@ -101,7 +101,7 @@ export const DynamicFilterPane = ({
           className="h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap text-xs sm:text-sm"
           onClick={onAddNew}
         >
-          <Plus className="h-4 w-4 sm:mr-2" />
+          <Plus className="h-4 w-4 sm:me-2" />
           <span className="hidden sm:inline">{addButtonText}</span>
           <span className="sm:hidden">Add</span>
         </Button>

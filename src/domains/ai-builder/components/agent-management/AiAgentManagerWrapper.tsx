@@ -83,7 +83,7 @@ export function AiAgentManagerWrapper() {
         </p>
         {!isSearching && (
           <Button onClick={openCreateDialog}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 me-2" />
             Create Your First AI Agent
           </Button>
         )}
@@ -108,12 +108,12 @@ export function AiAgentManagerWrapper() {
 
         <div className="flex items-center justify-between gap-2 mb-2">
           <Button variant="outline" onClick={() => router.push('/builder')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 me-2" />
             Back to Builder
           </Button>
           <div className="flex items-center gap-2">
             <Button size="sm" onClick={openCreateDialog}>
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               New Agent
             </Button>
           </div>

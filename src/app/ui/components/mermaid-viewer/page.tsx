@@ -61,7 +61,7 @@ export default function MermaidViewerPage() {
                 size="sm"
                 className="bg-violet-600 hover:bg-violet-700 text-white"
               >
-                <RefreshCw className="h-4 w-4 mr-2" />
+                <RefreshCw className="h-4 w-4 me-2" />
                 Render Diagram
               </Button>
             </div>

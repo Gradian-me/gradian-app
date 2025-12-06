@@ -54,7 +54,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           variant="default"
           size="default"
           onClick={() => onSearch?.(value || '')}
-          className="ml-2"
+          className="ms-2"
         >
           Search
         </Button>

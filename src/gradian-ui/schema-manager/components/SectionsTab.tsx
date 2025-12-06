@@ -133,7 +133,7 @@ export function SectionsTab({
             </div>
           </div>
           <Button variant="ghost" size="sm" onClick={onCollapseAll} className="text-gray-600 dark:text-gray-300">
-            <ChevronsUp className="h-4 w-4 mr-1" />
+            <ChevronsUp className="h-4 w-4 me-1" />
             Collapse all
           </Button>
         </div>

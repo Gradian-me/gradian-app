@@ -84,9 +84,9 @@ export const AddButtonFull: React.FC<AddButtonFullProps> = ({
       )}
     >
       {loading ? (
-        <Loader2 className={cn(iconSize, 'mr-2 animate-spin')} />
+        <Loader2 className={cn(iconSize, 'me-2 animate-spin')} />
       ) : (
-        <Plus className={cn(iconSize, 'mr-2')} />
+        <Plus className={cn(iconSize, 'me-2')} />
       )}
       {loading ? 'Loading...' : label}
     </Button>

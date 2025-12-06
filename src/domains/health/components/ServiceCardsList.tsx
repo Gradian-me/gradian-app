@@ -299,19 +299,19 @@ export function ServiceCardsList({
                         const date = new Date(status.lastChecked);
                         if (isNaN(date.getTime())) {
                           return (
-                            <div className="text-xs text-gray-500 dark:text-gray-400 ml-12">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 ms-12">
                               Last checked: {formatDateTimeWithFallback(status.lastChecked)}
                             </div>
                           );
                         }
                         return (
-                          <div className="text-xs text-gray-500 dark:text-gray-400 ml-12">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 ms-12">
                             Last checked: {formatRelativeTime(date)}
                           </div>
                         );
                       } catch {
                         return (
-                          <div className="text-xs text-gray-500 dark:text-gray-400 ml-12">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 ms-12">
                             Last checked: {formatDateTimeWithFallback(status.lastChecked)}
                           </div>
                         );
@@ -349,7 +349,7 @@ export function ServiceCardsList({
                         onClick={() => onConfigureService(service.id)}
                         className="flex-1 sm:flex-none h-8 px-2"
                       >
-                        <Settings className="h-3.5 w-3.5 sm:mr-3.5" />
+                        <Settings className="h-3.5 w-3.5 sm:me-3.5" />
                         <span className="hidden sm:inline text-xs">Config</span>
                       </Button>
                       <Button
@@ -359,7 +359,7 @@ export function ServiceCardsList({
                         disabled={isRefreshing || isMonitoringDisabled}
                         className="flex-1 sm:flex-none h-8 px-2"
                       >
-                        <RefreshCw className={`h-3.5 w-3.5 sm:mr-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        <RefreshCw className={`h-3.5 w-3.5 sm:me-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
                         <span className="hidden sm:inline text-xs">Refresh</span>
                       </Button>
                     </div>
@@ -464,7 +464,7 @@ export function ServiceCardsList({
                               <div className="text-xs font-medium text-gray-900 dark:text-gray-100 capitalize truncate">
                                 {checkName}
                               </div>
-                              <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                              <div className="flex items-center gap-1.5 shrink-0 ms-2">
                                 {check.responseTime !== undefined && (
                                   <div className="text-xs text-gray-600 dark:text-gray-400">
                                     {check.responseTime}ms

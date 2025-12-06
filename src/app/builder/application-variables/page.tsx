@@ -279,7 +279,7 @@ export default function ApplicationVariablesPage() {
             variant="outline"
             onClick={() => router.push('/builder')}
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 me-2" />
             Back to Builder
           </Button>
           <div className="flex gap-2">
@@ -288,14 +288,14 @@ export default function ApplicationVariablesPage() {
               onClick={fetchData}
               disabled={loading}
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 me-2 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
             <Button
               onClick={handleSave}
               disabled={saving}
             >
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="h-4 w-4 me-2" />
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
@@ -559,7 +559,7 @@ export default function ApplicationVariablesPage() {
                   <Label className="text-base font-semibold mb-4 block">
                     Card Index Delay
                   </Label>
-                  <div className="space-y-4 pl-4 border-s-2 border-violet-200 dark:border-violet-800">
+                  <div className="space-y-4 ps-4 border-s-2 border-violet-200 dark:border-violet-800">
                     <div className="space-y-2">
                       <Label htmlFor="step-delay">Step Delay (seconds)</Label>
                       <Input

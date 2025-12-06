@@ -209,7 +209,7 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
             </div>
             
             {/* Buttons on the right side */}
-            <div className="flex flex-col items-stretch gap-2 shrink-0 sm:items-end sm:ml-4">
+            <div className="flex flex-col items-stretch gap-2 shrink-0 sm:items-end sm:ms-4">
               <div className="flex items-center justify-end gap-2 sm:justify-center">
                 {!notification.isRead && (
                   <div className="w-2 h-2 bg-violet-500 rounded-full"></div>
@@ -225,7 +225,7 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
                         onAcknowledge(notification.id);
                       }}
                     >
-                      <CheckCheck className="h-3 w-3 mr-1" />
+                      <CheckCheck className="h-3 w-3 me-1" />
                       Acknowledge
                     </Button>
                   ) : onMarkAsUnread ? (
@@ -238,7 +238,7 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
                         onMarkAsUnread(notification.id);
                       }}
                     >
-                      <Circle className="h-3 w-3 mr-1" />
+                      <Circle className="h-3 w-3 me-1" />
                       Mark Unread
                     </Button>
                   ) : null
@@ -252,7 +252,7 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
                       onMarkAsRead(notification.id);
                     }}
                   >
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                    <CheckCircle2 className="h-3 w-3 me-1" />
                     Mark Read
                   </Button>
                 ) : (
@@ -266,7 +266,7 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
                         onMarkAsUnread(notification.id);
                       }}
                     >
-                      <Circle className="h-3 w-3 mr-1" />
+                      <Circle className="h-3 w-3 me-1" />
                       Mark Unread
                     </Button>
                   )

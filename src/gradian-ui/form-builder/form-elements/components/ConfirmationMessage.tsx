@@ -144,7 +144,7 @@ export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
               className={button.className}
               type="button"
             >
-              {button.icon && <IconRenderer iconName={button.icon} className="h-4 w-4 mr-2" />}
+              {button.icon && <IconRenderer iconName={button.icon} className="h-4 w-4 me-2" />}
               {button.label}
             </Button>
           ))}

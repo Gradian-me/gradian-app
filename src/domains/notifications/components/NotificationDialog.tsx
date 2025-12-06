@@ -235,7 +235,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Created</span>
                     <div className="text-sm text-gray-900 dark:text-gray-200">
                       {formatFullDate(notification.createdAt)}
-                      <span className="text-gray-500 dark:text-gray-400 ml-2">
+                      <span className="text-gray-500 dark:text-gray-400 ms-2">
                         ({formatRelativeTime(notification.createdAt)})
                       </span>
                     </div>
@@ -245,7 +245,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                       <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Read</span>
                       <div className="text-sm text-gray-900 dark:text-gray-200">
                         {formatFullDate(notification.readAt)}
-                        <span className="text-gray-500 dark:text-gray-400 ml-2">
+                        <span className="text-gray-500 dark:text-gray-400 ms-2">
                           ({formatRelativeTime(notification.readAt)})
                         </span>
                       </div>
@@ -256,7 +256,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                       <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Acknowledged</span>
                       <div className="text-sm text-gray-900 dark:text-gray-200">
                         {formatFullDate(notification.acknowledgedAt)}
-                        <span className="text-gray-500 dark:text-gray-400 ml-2">
+                        <span className="text-gray-500 dark:text-gray-400 ms-2">
                           ({formatRelativeTime(notification.acknowledgedAt)})
                         </span>
                       </div>
@@ -281,7 +281,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                       disabled={isAcknowledging}
                       className="text-sm bg-violet-600 hover:bg-violet-700 text-white border-violet-600"
                     >
-                      <CheckCheck className="h-4 w-4 mr-2" />
+                      <CheckCheck className="h-4 w-4 me-2" />
                       {isAcknowledging ? 'Acknowledging...' : 'Acknowledge'}
                     </Button>
                   ) : null
@@ -292,7 +292,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                     disabled={isMarkingAsRead}
                     className="text-sm"
                   >
-                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                    <CheckCircle2 className="h-4 w-4 me-2" />
                     {isMarkingAsRead ? 'Marking...' : 'Mark as Read'}
                   </Button>
                 )
@@ -304,7 +304,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                     disabled={isMarkingAsUnread}
                     className="text-sm"
                   >
-                    <Circle className="h-4 w-4 mr-2" />
+                    <Circle className="h-4 w-4 me-2" />
                     {isMarkingAsUnread ? 'Marking...' : 'Mark as Unread'}
                   </Button>
                 )
@@ -318,7 +318,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                   onClick={handleViewAction}
                   className="bg-violet-600 hover:bg-violet-700"
                 >
-                  <ExternalLink className="h-4 w-4 mr-2" />
+                  <ExternalLink className="h-4 w-4 me-2" />
                   View Details
                 </Button>
               )}

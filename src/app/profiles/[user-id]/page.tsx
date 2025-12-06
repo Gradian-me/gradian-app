@@ -95,15 +95,15 @@ export default function ProfilePage() {
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-2 pt-2">
                 <Button variant="outline" size="sm" className="dark:border-gray-700 dark:text-gray-200">
-                  <Mail className="h-4 w-4 mr-2" />
+                  <Mail className="h-4 w-4 me-2" />
                   Message
                 </Button>
                 <Button variant="outline" size="sm" className="dark:border-gray-700 dark:text-gray-200">
-                  <Share2 className="h-4 w-4 mr-2" />
+                  <Share2 className="h-4 w-4 me-2" />
                   Share
                 </Button>
                 <Button variant="outline" size="sm" className="dark:border-gray-700 dark:text-gray-200">
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Edit className="h-4 w-4 me-2" />
                   Edit Profile
                 </Button>
               </div>
@@ -115,7 +115,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="rounded-xl border border-gray-200 bg-white/70 p-4 text-center shadow-sm dark:border-gray-700 dark:bg-gray-900/70">
                   <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Experience</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">{profile.metrics?.experience ?? 8}<span className="text-sm font-medium text-gray-500 dark:text-gray-300 ml-1">yrs</span></p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">{profile.metrics?.experience ?? 8}<span className="text-sm font-medium text-gray-500 dark:text-gray-300 ms-1">yrs</span></p>
                 </div>
                 <div className="rounded-xl border border-gray-200 bg-white/70 p-4 text-center shadow-sm dark:border-gray-700 dark:bg-gray-900/70">
                   <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Rating</p>

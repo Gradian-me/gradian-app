@@ -3657,7 +3657,7 @@
       ],
       "id": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
       "createdAt": "2025-12-06T12:14:36.501Z",
-      "updatedAt": "2025-12-06T13:38:55.234Z",
+      "updatedAt": "2025-12-06T18:40:03.466Z",
       "status": [
         {
           "id": "01KBSSGEYXCK2TAB2R0X80RMGG",
@@ -3686,7 +3686,8 @@
           "id": "item-1765026576130-in3o3smqm",
           "label": "شسی"
         }
-      ]
+      ],
+      "changeEffectiveness": 4
     }
   ],
   "change-classification": [

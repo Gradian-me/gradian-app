@@ -101,7 +101,7 @@ export default function CompaniesBuilderPage() {
             onClick={() => router.push('/builder')}
             className="mt-4"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 me-2" />
             Back to Builder
           </Button>
         </div>
@@ -122,7 +122,7 @@ export default function CompaniesBuilderPage() {
           onClick={() => router.push('/builder')}
           className="mb-2"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-4 w-4 me-2" />
           Back to Builder
         </Button>
 

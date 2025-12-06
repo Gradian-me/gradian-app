@@ -75,14 +75,14 @@ export function SchemaBuilder({ schemaId, config }: SchemaBuilderProps) {
             value="general"
             className="flex items-center justify-center gap-2 rounded-lg py-2 px-3 text-sm font-medium text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
           >
-            <Settings className="h-4 w-4 mr-2" />
+            <Settings className="h-4 w-4 me-2" />
             General
           </TabsTrigger>
           <TabsTrigger
             value="sections"
             className="flex items-center justify-center gap-2 rounded-lg py-2 px-3 text-sm font-medium text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
           >
-            <Layers className="h-4 w-4 mr-2" />
+            <Layers className="h-4 w-4 me-2" />
             Sections & Fields
           </TabsTrigger>
         </TabsList>

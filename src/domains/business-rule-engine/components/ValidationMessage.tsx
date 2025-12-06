@@ -40,7 +40,7 @@ export function ValidationMessage({ errors, className }: ValidationMessageProps)
                 <li key={index}>
                   <span className="font-medium">{error.field}:</span> {error.message}
                   {error.conditionId && (
-                    <span className="text-xs ml-2">(Condition: {error.conditionId.slice(0, 8)})</span>
+                    <span className="text-xs ms-2">(Condition: {error.conditionId.slice(0, 8)})</span>
                   )}
                 </li>
               ))}

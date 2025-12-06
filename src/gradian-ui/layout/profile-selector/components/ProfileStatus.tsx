@@ -21,9 +21,9 @@ export const ProfileStatus: React.FC<ProfileStatusProps> = ({
   );
 
   const dotClasses = cn(
-    'w-2 h-2 rounded-full mr-1.5',
-    size === 'sm' && 'w-1.5 h-1.5 mr-1',
-    size === 'lg' && 'w-2.5 h-2.5 mr-2',
+    'w-2 h-2 rounded-full me-1.5',
+    size === 'sm' && 'w-1.5 h-1.5 me-1',
+    size === 'lg' && 'w-2.5 h-2.5 me-2',
     status === 'active' && 'bg-green-400',
     status === 'inactive' && 'bg-gray-400',
     status === 'pending' && 'bg-yellow-400'

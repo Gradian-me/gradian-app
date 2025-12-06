@@ -39,23 +39,23 @@ export function SchemaActions({
     <div className="flex items-center justify-between gap-2 flex-wrap">
       {onBack && (
         <Button variant="ghost" onClick={onBack}>
-          <ArrowLeft className="h-4 w-4 md:mr-2" />
+          <ArrowLeft className="h-4 w-4 md:me-2" />
           <span className="hidden md:inline">{backLabel}</span>
         </Button>
       )}
-      <div className="flex gap-2 ml-auto flex-wrap">
+      <div className="flex gap-2 ms-auto flex-wrap">
         {viewSchemaListUrl ? (
           // Use Link component for middle-click support (opens in new tab)
           <Button variant="outline" asChild>
             <Link href={viewSchemaListUrl}>
-              <LayoutList className="h-4 w-4 md:mr-2" />
+              <LayoutList className="h-4 w-4 md:me-2" />
               <span className="hidden md:inline">{viewSchemaListLabel}</span>
             </Link>
           </Button>
         ) : onViewSchemaList ? (
           // Fallback to onClick handler if URL is not provided
           <Button variant="outline" onClick={onViewSchemaList}>
-            <LayoutList className="h-4 w-4 md:mr-2" />
+            <LayoutList className="h-4 w-4 md:me-2" />
             <span className="hidden md:inline">{viewSchemaListLabel}</span>
           </Button>
         ) : null}
@@ -66,22 +66,22 @@ export function SchemaActions({
             disabled={refreshing}
             title={refreshLabel}
           >
-            <RefreshCw className={`h-4 w-4 md:mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 md:me-2 ${refreshing ? 'animate-spin' : ''}`} />
             <span className="hidden md:inline">{refreshLabel}</span>
           </Button>
         )}
         {onReset && (
           <Button variant="outline" onClick={onReset}>
-            <RotateCcw className="h-4 w-4 md:mr-2" />
+            <RotateCcw className="h-4 w-4 md:me-2" />
             <span className="hidden md:inline">{resetLabel}</span>
           </Button>
         )}
         {onSave && (
           <Button onClick={onSave} disabled={saving}>
             {saving ? (
-              <Loader2 className="h-4 w-4 md:mr-2 animate-spin" />
+              <Loader2 className="h-4 w-4 md:me-2 animate-spin" />
             ) : (
-              <Save className="h-4 w-4 md:mr-2" />
+              <Save className="h-4 w-4 md:me-2" />
             )}
             <span className="hidden md:inline">{saveLabel}</span>
           </Button>

@@ -140,7 +140,7 @@ export function SettingsForm({
             onClick={handleSave} 
             disabled={!hasChanges || loading}
           >
-            <Save className="h-4 w-4 mr-2" />
+            <Save className="h-4 w-4 me-2" />
             Save Changes
           </Button>
         </div>

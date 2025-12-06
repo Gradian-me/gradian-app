@@ -48,7 +48,7 @@ export function CardSectionEditor({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5 max-h-[70vh] overflow-y-auto pr-2">
+        <div className="space-y-5 max-h-[70vh] overflow-y-auto pe-2">
           <div className="grid gap-4">
             <TextInput
               config={{ name: 'section-title', label: 'Card Section Title' }}

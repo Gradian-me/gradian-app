@@ -270,7 +270,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
                 onClick={() => setIsExpanded(true)}
                 className="flex items-center justify-center w-full px-3 py-1.5 border-2 border-dashed border-gray-400 dark:border-gray-500 rounded-lg text-gray-700 dark:text-gray-200 hover:border-violet-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-200 dark:hover:bg-violet-900/30 transition-colors duration-200 text-sm"
               >
-                <ChevronDown className="w-4 h-4 mr-2" />
+                <ChevronDown className="w-4 h-4 me-2" />
                 Show all {totalLines} lines
               </button>
             ) : (
@@ -278,7 +278,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
                 onClick={() => setIsExpanded(false)}
                 className="flex items-center justify-center w-full px-3 py-1.5 border-2 border-dashed border-gray-400 dark:border-gray-500 rounded-lg text-gray-700 dark:text-gray-200 hover:border-violet-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-200 dark:hover:bg-violet-900/30 transition-colors duration-200 text-sm"
               >
-                <ChevronUp className="w-4 h-4 mr-2" />
+                <ChevronUp className="w-4 h-4 me-2" />
                 Collapse to first {initialLineNumbers} lines
               </button>
             )}

@@ -271,7 +271,7 @@ export function UserProfileSelector({
                       action();
                     }}
                   >
-                    <Icon className="mr-3 h-4 w-4" />
+                    <Icon className="me-3 h-4 w-4" />
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{label}</span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">{description}</span>
@@ -291,7 +291,7 @@ export function UserProfileSelector({
                     handleLogout();
                   }}
                 >
-                  <LogOut className="mr-3 h-4 w-4" />
+                  <LogOut className="me-3 h-4 w-4" />
                   <div className="flex flex-col">
                     <span className="text-sm font-medium">Logout</span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">Sign out of your account</span>

@@ -69,7 +69,7 @@ export const SearchInput = forwardRef<FormElementRef, SearchInputProps>(
       error
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',
-      value && onClear ? 'pl-10 pr-10' : 'pl-10',
+      value && onClear ? 'ps-10 pe-10' : 'ps-10',
       className
     );
 

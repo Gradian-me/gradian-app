@@ -96,7 +96,7 @@ const KPIListItemComponent = ({
         )}
       </div>
       
-      <div className="flex items-center gap-2 ml-3 flex-shrink-0">
+      <div className="flex items-center gap-2 ms-3 flex-shrink-0">
         {item.status && (
           <Badge
             variant={getStatusBadgeVariant(item.status.color)}

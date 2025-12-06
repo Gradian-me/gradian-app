@@ -114,7 +114,7 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
                 </p>
               )}
             </div>
-            <div className="flex gap-0.5 ml-2 shrink-0">
+            <div className="flex gap-0.5 ms-2 shrink-0">
               <Button
                 variant="ghost"
                 size="icon"

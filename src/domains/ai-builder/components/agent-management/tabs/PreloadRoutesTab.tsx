@@ -47,7 +47,7 @@ export function PreloadRoutesTab({ agent, onUpdate, readonly = false }: PreloadR
           <CardTitle>Preload Routes</CardTitle>
           {!readonly && (
             <Button size="sm" onClick={addRoute}>
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               Add Route
             </Button>
           )}
@@ -59,7 +59,7 @@ export function PreloadRoutesTab({ agent, onUpdate, readonly = false }: PreloadR
             <p>No preload routes configured.</p>
             {!readonly && (
               <Button variant="outline" size="sm" onClick={addRoute} className="mt-4">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 Add First Route
               </Button>
             )}
@@ -76,7 +76,7 @@ export function PreloadRoutesTab({ agent, onUpdate, readonly = false }: PreloadR
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 mr-2"
+                      className="h-8 w-8 me-2"
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeleteConfirmIndex(index);

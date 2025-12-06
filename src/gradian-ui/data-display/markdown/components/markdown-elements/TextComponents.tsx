@@ -51,7 +51,7 @@ export function Link({ href, children }: LinkProps) {
 
 export function Blockquote({ children }: BlockquoteProps) {
   return (
-    <blockquote className="border-l-4 border-violet-500 dark:border-violet-400 pl-4 py-2 my-4 bg-violet-50 dark:bg-violet-950/20 italic text-gray-700 dark:text-gray-300">
+    <blockquote className="border-l-4 border-violet-500 dark:border-violet-400 ps-4 py-2 my-4 bg-violet-50 dark:bg-violet-950/20 italic text-gray-700 dark:text-gray-300">
       {children || ''}
     </blockquote>
   );
