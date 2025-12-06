@@ -39,12 +39,10 @@ export async function exportMarkdownToPdf(
     throw new Error('PDF export is only available in the browser');
   }
 
-  // Dynamically import libraries - use webpack magic comments to create separate chunks
-  // This prevents webpack from trying to bundle these during SSR
-  // @ts-expect-error - jsPDF types may not be available, but module exists at runtime
-  const jsPDFModule = await import(/* webpackChunkName: "jspdf" */ 'jspdf');
-  // @ts-expect-error - html2canvas types may not be available, but module exists at runtime
-  const html2canvasModule = await import(/* webpackChunkName: "html2canvas" */ 'html2canvas');
+  // Dynamically import libraries using Function constructor to prevent webpack static analysis
+  // This ensures webpack doesn't try to bundle these modules at build time
+  const jsPDFModule = await new Function('return import("jspdf")')();
+  const html2canvasModule = await new Function('return import("html2canvas")')();
   
   const jsPDF: any = jsPDFModule.jsPDF || jsPDFModule.default?.jsPDF || jsPDFModule.default;
   const html2canvas: any = html2canvasModule.default || html2canvasModule;
@@ -192,9 +190,8 @@ export async function exportMarkdownToPdfAdvanced(
     throw new Error('PDF export is only available in the browser');
   }
 
-  // Dynamically import libraries - use webpack magic comments to create separate chunks
-  // @ts-expect-error - jsPDF types may not be available, but module exists at runtime
-  const jsPDFModule = await import(/* webpackChunkName: "jspdf" */ 'jspdf');
+  // Dynamically import libraries using Function constructor to prevent webpack static analysis
+  const jsPDFModule = await new Function('return import("jspdf")')();
   const jsPDF: any = jsPDFModule.jsPDF || jsPDFModule.default?.jsPDF || jsPDFModule.default;
 
   const {

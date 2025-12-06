@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
     "remark",
     "remark-parse",
     "remark-gfm",
+    "jspdf",
+    "html2canvas",
   ],
 
   // Enable experimental build cache for faster incremental builds
@@ -52,14 +54,28 @@ const nextConfig: NextConfig = {
       },
     };
 
-    // Mark client-only packages as externals for server-side rendering
-    // These packages are only used on the client side and should not be bundled on the server
-    if (isServer) {
-      config.externals = config.externals || [];
-      config.externals.push({
-        'jspdf': 'commonjs jspdf',
-        'html2canvas': 'commonjs html2canvas',
-      });
+    // Mark client-only packages as externals to prevent webpack from bundling them
+    // These packages are loaded dynamically at runtime using Function constructor
+    // Only mark as externals for client-side builds (not server)
+    if (!isServer) {
+      const originalExternals = config.externals;
+      if (typeof originalExternals === 'function') {
+        config.externals = [
+          originalExternals,
+          'jspdf',
+          'html2canvas',
+        ];
+      } else if (Array.isArray(originalExternals)) {
+        config.externals = [...originalExternals, 'jspdf', 'html2canvas'];
+      } else if (typeof originalExternals === 'object' && originalExternals !== null) {
+        config.externals = {
+          ...originalExternals,
+          'jspdf': 'commonjs jspdf',
+          'html2canvas': 'commonjs html2canvas',
+        };
+      } else {
+        config.externals = ['jspdf', 'html2canvas'];
+      }
     }
 
 
