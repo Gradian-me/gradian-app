@@ -775,5 +775,302 @@
     "id": "01KBSMFBE9R1KCMWHNP839HRZY",
     "createdAt": "2025-12-06T10:49:12.393Z",
     "updatedAt": "2025-12-06T10:49:12.393Z"
+  },
+  {
+    "id": "01KBSSBQFYZMH5GMR47G7W427S",
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
+    "targetSchema": "change-classification",
+    "targetId": "01KBSR7B9B3S0A9JMAWHWNJ8S3",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-classification",
+    "createdAt": "2025-12-06T12:14:36.541Z",
+    "updatedAt": "2025-12-06T13:38:55.216Z"
+  },
+  {
+    "id": "01KBSSBQG7HER0SF2JH04E5V3S",
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
+    "targetSchema": "change-subject-types",
+    "targetId": "01KBSSBGXTJPDC00J7QPRQCR7S",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-subject-types",
+    "createdAt": "2025-12-06T12:14:36.551Z",
+    "updatedAt": "2025-12-06T13:38:55.218Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSSD57TNGK1EP7SG2JGYH1C",
+    "targetSchema": "status-items",
+    "targetId": "01KBSSDQ8E2T0D0F5X5Y3K9HS6",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSSDQG4GFD4NPDSC2751A6Y",
+    "createdAt": "2025-12-06T12:15:42.084Z",
+    "updatedAt": "2025-12-06T12:15:42.084Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSSD57TNGK1EP7SG2JGYH1C",
+    "targetSchema": "status-items",
+    "targetId": "01KBSSG0C215GPQFKAXWK54DTQ",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSSG0GGHYNVQMF44P0QF5NY",
+    "createdAt": "2025-12-06T12:16:56.848Z",
+    "updatedAt": "2025-12-06T12:16:56.848Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSSD57TNGK1EP7SG2JGYH1C",
+    "targetSchema": "status-items",
+    "targetId": "01KBSSGEYXCK2TAB2R0X80RMGG",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSSGF1T2EKZMBKZ1MQRER3G",
+    "createdAt": "2025-12-06T12:17:11.738Z",
+    "updatedAt": "2025-12-06T12:17:11.738Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSSD57TNGK1EP7SG2JGYH1C",
+    "targetSchema": "status-items",
+    "targetId": "01KBSSK2D70JP21YEM6187PX9M",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSSK2GWSQC8TT6GCZMHGM7F",
+    "createdAt": "2025-12-06T12:18:37.212Z",
+    "updatedAt": "2025-12-06T12:18:37.212Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSSD57TNGK1EP7SG2JGYH1C",
+    "targetSchema": "status-items",
+    "targetId": "01KBSSMTA2575E5RCWHY8AV8R9",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSSMTD4ZJXVE21PS7X7MDS2",
+    "createdAt": "2025-12-06T12:19:34.436Z",
+    "updatedAt": "2025-12-06T12:19:34.436Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSSD57TNGK1EP7SG2JGYH1C",
+    "targetSchema": "status-items",
+    "targetId": "01KBSSNSJXNCGYP6PMSEV3NAD2",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSSNSYAE2CGCCSF5RBRCM2D",
+    "createdAt": "2025-12-06T12:20:06.730Z",
+    "updatedAt": "2025-12-06T12:20:06.730Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSSD57TNGK1EP7SG2JGYH1C",
+    "targetSchema": "status-items",
+    "targetId": "01KBSSP49BTQXY12YW52SEW78B",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSSP4PFR8J9QPJE4B7DM9PT",
+    "createdAt": "2025-12-06T12:20:17.742Z",
+    "updatedAt": "2025-12-06T12:20:17.742Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSSD57TNGK1EP7SG2JGYH1C",
+    "targetSchema": "status-items",
+    "targetId": "01KBSSPJT149PY8A5VG5S2M3XZ",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSSPJWAP4W83CP1TK6J9D1X",
+    "createdAt": "2025-12-06T12:20:32.266Z",
+    "updatedAt": "2025-12-06T12:20:32.266Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSSD57TNGK1EP7SG2JGYH1C",
+    "targetSchema": "status-items",
+    "targetId": "01KBSSR4NWQN5DN50STWSACGEN",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSSR4XC2Q49Y6KB7G9BSZNK",
+    "createdAt": "2025-12-06T12:21:23.500Z",
+    "updatedAt": "2025-12-06T12:21:23.500Z"
+  },
+  {
+    "sourceSchema": "user-roles",
+    "sourceId": "01KBSTNKY2QYRYQ6EWK0ZJ6NX6",
+    "targetSchema": "users",
+    "targetId": "01KBSMDRHJTDY7SFEY6VWK2HEK",
+    "relationTypeId": "HAS_MEMBER",
+    "id": "01KBSTSTEPRJXVW79J55NRGVKA",
+    "createdAt": "2025-12-06T12:39:46.902Z",
+    "updatedAt": "2025-12-06T12:39:46.902Z"
+  },
+  {
+    "sourceSchema": "user-roles",
+    "sourceId": "01KBSTPYV9RMR9FNZS7HWPBPY2",
+    "targetSchema": "users",
+    "targetId": "01KBSTVK8P6Y3P4MW060HNNKB1",
+    "relationTypeId": "HAS_MEMBER",
+    "id": "01KBSTVKAAB9BZYNC9ENQMQSY1",
+    "createdAt": "2025-12-06T12:40:45.130Z",
+    "updatedAt": "2025-12-06T12:40:45.130Z"
+  },
+  {
+    "id": "01KBSV30T2W84PM4SCMJPKV842",
+    "sourceSchema": "quality-assurance-analysis",
+    "sourceId": "01KBSV30SMKKF9VHR0WP459XME",
+    "targetSchema": "users",
+    "targetId": "01KBSMDRHJTDY7SFEY6VWK2HEK",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "analyst",
+    "createdAt": "2025-12-06T12:44:48.322Z",
+    "updatedAt": "2025-12-06T12:45:07.453Z"
+  },
+  {
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
+    "targetSchema": "quality-assurance-analysis",
+    "targetId": "01KBSV30SMKKF9VHR0WP459XME",
+    "relationTypeId": "HAS_QUALITY_ASSURANCE_ANALYSIS",
+    "id": "01KBSV313248RYTMED8QWPQ3D2",
+    "createdAt": "2025-12-06T12:44:48.610Z",
+    "updatedAt": "2025-12-06T12:44:48.610Z"
+  },
+  {
+    "id": "01KBSV4N766K42DXDNER8WMWG3",
+    "sourceSchema": "quality-assurance-analysis",
+    "sourceId": "01KBSV4N6KC3PD26QW4BT26GT0",
+    "targetSchema": "users",
+    "targetId": "01KBSTVK8P6Y3P4MW060HNNKB1",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "analyst",
+    "createdAt": "2025-12-06T12:45:41.990Z",
+    "updatedAt": "2025-12-06T12:45:41.990Z"
+  },
+  {
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
+    "targetSchema": "quality-assurance-analysis",
+    "targetId": "01KBSV4N6KC3PD26QW4BT26GT0",
+    "relationTypeId": "HAS_QUALITY_ASSURANCE_ANALYSIS",
+    "id": "01KBSV4NCE851V2PRXYX0SGA5P",
+    "createdAt": "2025-12-06T12:45:42.158Z",
+    "updatedAt": "2025-12-06T12:45:42.158Z"
+  },
+  {
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
+    "targetSchema": "qa-guideline-analysis",
+    "targetId": "01KBSV603NZMKK2E664YQKY9WM",
+    "relationTypeId": "HAS_QA_GUIDELINE_ANALYSIS",
+    "id": "01KBSV605A746R688W77B27NW2",
+    "createdAt": "2025-12-06T12:46:25.962Z",
+    "updatedAt": "2025-12-06T12:46:25.962Z"
+  },
+  {
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
+    "targetSchema": "qa-guideline-analysis",
+    "targetId": "01KBSV6CBE96W03F12GNTTMXXH",
+    "relationTypeId": "HAS_QA_GUIDELINE_ANALYSIS",
+    "id": "01KBSV6CCRX59504XWJPNP1PN0",
+    "createdAt": "2025-12-06T12:46:38.488Z",
+    "updatedAt": "2025-12-06T12:46:38.488Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSVY7K52MC3H25R3JQQAKCA",
+    "targetSchema": "status-items",
+    "targetId": "01KBSVYXHRWPMBAACHKSBQ1E4R",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSVYXK372B44E23PP7ZE11A",
+    "createdAt": "2025-12-06T13:00:02.531Z",
+    "updatedAt": "2025-12-06T13:00:02.531Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSVY7K52MC3H25R3JQQAKCA",
+    "targetSchema": "status-items",
+    "targetId": "01KBSVZ3N828YPGRXFDY84D15W",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSVZ3PXSAQPJ0Q3XBT8JX6B",
+    "createdAt": "2025-12-06T13:00:08.797Z",
+    "updatedAt": "2025-12-06T13:00:08.797Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSVY7K52MC3H25R3JQQAKCA",
+    "targetSchema": "status-items",
+    "targetId": "01KBSVZ9NT2Z23FXK7B1G7AYS8",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSVZ9Q510GHWCT98S5HCZK4",
+    "createdAt": "2025-12-06T13:00:14.949Z",
+    "updatedAt": "2025-12-06T13:00:14.949Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSVY7K52MC3H25R3JQQAKCA",
+    "targetSchema": "status-items",
+    "targetId": "01KBSVZHFGX0F3YKHV44J3H2QM",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSVZHH6461M96D5M1WP3S69",
+    "createdAt": "2025-12-06T13:00:22.950Z",
+    "updatedAt": "2025-12-06T13:00:22.950Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KBSVY7K52MC3H25R3JQQAKCA",
+    "targetSchema": "status-items",
+    "targetId": "01KBSVZZDK10007V2G1QTTYV1A",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KBSVZZF1C2R17BK1AK5P2H24",
+    "createdAt": "2025-12-06T13:00:37.217Z",
+    "updatedAt": "2025-12-06T13:00:37.217Z"
+  },
+  {
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
+    "targetSchema": "tasks",
+    "targetId": "01KBSW35VJHAB75VRTGXMRHK7Y",
+    "relationTypeId": "HAS_TASK",
+    "id": "01KBSW35WXQ1R9XTRZKRZ1D7W5",
+    "createdAt": "2025-12-06T13:02:22.109Z",
+    "updatedAt": "2025-12-06T13:02:22.109Z"
+  },
+  {
+    "id": "01KBSWGJ9Z52YP1F6MM28BGRPN",
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
+    "targetSchema": "change-categories",
+    "targetId": "01KBSQZRHZW4PHXF2D1WKD2YE1",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-categories",
+    "createdAt": "2025-12-06T13:09:40.798Z",
+    "updatedAt": "2025-12-06T13:38:55.220Z"
+  },
+  {
+    "id": "01KBSWNJCNT0Z5ZTEC07YKKBC4",
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
+    "targetSchema": "change-procedure",
+    "targetId": "01KBSWN6QGRA5JQQKRNRVP2WNV",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-procedure",
+    "createdAt": "2025-12-06T13:12:24.725Z",
+    "updatedAt": "2025-12-06T13:38:55.225Z"
+  },
+  {
+    "id": "01KBSWNJCNZ559E9W1P3KNM3G0",
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
+    "targetSchema": "change-procedure",
+    "targetId": "01KBSWK2Z59QSKHQSBACV5Y880",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-procedure",
+    "createdAt": "2025-12-06T13:12:24.725Z",
+    "updatedAt": "2025-12-06T13:38:55.225Z"
+  },
+  {
+    "sourceSchema": "change-management",
+    "sourceId": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
+    "targetSchema": "tasks",
+    "targetId": "01KBSWPJ9SEZN67XGNGZ3YD16S",
+    "relationTypeId": "HAS_TASK",
+    "id": "01KBSWPJC707R04DK6JX6T6X00",
+    "createdAt": "2025-12-06T13:12:57.479Z",
+    "updatedAt": "2025-12-06T13:12:57.479Z"
   }
 ]

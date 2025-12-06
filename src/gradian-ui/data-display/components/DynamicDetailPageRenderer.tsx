@@ -861,7 +861,8 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   let sections: DetailPageSection[] = [];
   if (metadataSections.length === 0 && (!detailMetadata || !detailMetadata.sections)) {
     // Fields to exclude (already shown in header or special fields)
-    const excludedRoles = ['title', 'subtitle', 'avatar', 'status', 'rating', 'duedate', 'code', 'description'];
+    // Note: 'description' removed from excluded roles to allow textarea fields to display
+    const excludedRoles = ['title', 'subtitle', 'avatar', 'status', 'rating', 'duedate', 'code'];
     
     // Get all fields that should be displayed
     const displayableFields = schema?.fields?.filter(field => {

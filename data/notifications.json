@@ -74,7 +74,8 @@
       "registrationDate": "2024-12-09",
       "approver": "Supply Chain Manager",
       "status": "Active"
-    }
+    },
+    "interactionType": "canRead"
   },
   {
     "id": "5",
@@ -173,7 +174,7 @@
     "type": "success",
     "category": "system",
     "priority": "medium",
-    "isRead": false,
+    "isRead": true,
     "createdAt": "2024-12-10T12:15:00.000Z",
     "actionUrl": "/quality-control/qc-2024-001",
     "metadata": {

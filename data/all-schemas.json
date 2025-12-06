@@ -4848,10 +4848,10 @@
     "isSystemSchema": true
   },
   {
-    "id": "change-management-types",
-    "description": "Manage change management types with multilingual labels",
+    "id": "change-classification",
+    "description": "Manage change classifications with multilingual labels",
     "singular_name": "Change Management Type",
-    "plural_name": "Change Management Types",
+    "plural_name": "Change Classifications",
     "fields": [
       {
         "id": "change-management-type-label-fa",
@@ -4951,6 +4951,35 @@
     "plural_name": "Change Management",
     "fields": [
       {
+        "id": "change-number",
+        "name": "changeNumber",
+        "label": "Change Number",
+        "sectionId": "change-information",
+        "component": "text",
+        "placeholder": "Enter change number",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1,
+        "role": "code"
+      },
+      {
+        "id": "change-request-date",
+        "name": "changeRequestDate",
+        "label": "Change Request Date",
+        "sectionId": "change-information",
+        "component": "date",
+        "placeholder": "Select change request date",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "duedate"
+      },
+      {
         "id": "change-title",
         "name": "changeTitle",
         "label": "Change Title",
@@ -4962,7 +4991,7 @@
           "minLength": 1
         },
         "colSpan": 2,
-        "order": 1,
+        "order": 3,
         "role": "title"
       },
       {
@@ -4977,7 +5006,7 @@
           "minLength": 1
         },
         "colSpan": 2,
-        "order": 2,
+        "order": 4,
         "role": "description"
       },
       {
@@ -4991,22 +5020,22 @@
           "required": false
         },
         "colSpan": 2,
-        "order": 3
+        "order": 5
       },
       {
-        "id": "change-management-types",
+        "id": "change-classification",
         "name": "changeManagementTypes",
-        "label": "Change Management Types",
+        "label": "Change Classification",
         "sectionId": "change-information",
         "component": "picker",
         "placeholder": "Click to select change management type",
         "description": "Select change management type from popup picker",
-        "targetSchema": "change-management-types",
+        "targetSchema": "change-classification",
         "validation": {
           "required": false
         },
         "colSpan": 1,
-        "order": 4
+        "order": 6
       },
       {
         "id": "change-subject-types",
@@ -5021,7 +5050,7 @@
           "required": false
         },
         "colSpan": 1,
-        "order": 5
+        "order": 7
       },
       {
         "id": "change-categories",
@@ -5188,6 +5217,24 @@
         "description": "Change conclusion and approval information",
         "initialState": "expanded",
         "columns": 2
+      },
+      {
+        "id": "follow-up",
+        "title": "Follow Up",
+        "description": "Follow-up tasks for this change",
+        "isRepeatingSection": true,
+        "initialState": "expanded",
+        "columns": 2,
+        "repeatingConfig": {
+          "minItems": 0,
+          "maxItems": 100,
+          "targetSchema": "tasks",
+          "relationTypeId": "HAS_TASK",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
+        }
       }
     ],
     "detailPageMetadata": {
@@ -5223,7 +5270,13 @@
       ]
     },
     "showInNavigation": true,
-    "icon": "GitBranch"
+    "icon": "GitBranch",
+    "statusGroup": [
+      {
+        "id": "01KBSSD57TNGK1EP7SG2JGYH1C",
+        "label": "Change Management Status"
+      }
+    ]
   },
   {
     "id": "quality-assurance-analysis",
@@ -5549,5 +5602,60 @@
     ],
     "showInNavigation": false,
     "icon": "FileCode"
+  },
+  {
+    "id": "tasks",
+    "description": "Manage tasks and follow-up items",
+    "singular_name": "Task",
+    "plural_name": "Tasks",
+    "fields": [
+      {
+        "id": "task-title",
+        "name": "taskTitle",
+        "label": "Task Title",
+        "sectionId": "task-information",
+        "component": "text",
+        "placeholder": "Enter task title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "title"
+      },
+      {
+        "id": "task-description",
+        "name": "taskDescription",
+        "label": "Task Description",
+        "sectionId": "task-information",
+        "component": "textarea",
+        "placeholder": "Enter task description",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 2
+      }
+    ],
+    "sections": [
+      {
+        "id": "task-information",
+        "title": "Task Information",
+        "description": "Task details and description",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Checklist",
+    "statusGroup": [
+      {
+        "id": "01KBSVY7K52MC3H25R3JQQAKCA",
+        "label": "Follow Up Status"
+      }
+    ],
+    "allowDataDueDate": true,
+    "allowDataAssignedTo": true
   }
 ]
