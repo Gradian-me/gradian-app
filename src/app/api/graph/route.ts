@@ -165,6 +165,8 @@ export async function GET(request: NextRequest) {
         };
         
         // Include fieldId if it exists in the relation
+        // This is especially important for HAS_FIELD_VALUE relations used in integrations
+        // to map picker field values back to their source form fields
         if (relation.fieldId) {
           edge.fieldId = relation.fieldId;
         }
