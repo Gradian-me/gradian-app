@@ -46,12 +46,22 @@ const nextConfig: NextConfig = {
     // Enable webpack caching for faster builds
     // Cache is stored in .next/cache/webpack
     config.cache = {
-      type: 'filesystem',
+      type: "filesystem",
       buildDependencies: {
-        config: [__filename],
+        config: [path.join(process.cwd(), "next.config.ts")],
       },
     };
-    
+
+    // Mark client-only packages as externals for server-side rendering
+    // These packages are only used on the client side and should not be bundled on the server
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push({
+        'jspdf': 'commonjs jspdf',
+        'html2canvas': 'commonjs html2canvas',
+      });
+    }
+
 
 
     // Only obfuscate in release builds (when OBFUSCATE=true) and for client-side code

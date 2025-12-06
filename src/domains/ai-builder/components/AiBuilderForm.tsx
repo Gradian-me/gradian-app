@@ -15,6 +15,7 @@ import { Sparkles, Loader2, Square, History, RotateCcw } from 'lucide-react';
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { PromptPreviewSheet } from './PromptPreviewSheet';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
+import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
 import type { AiAgent } from '../types';
 import { useBusinessRuleEffects, getFieldEffects } from '@/domains/business-rule-engine';
 import type { BusinessRuleWithEffects, BusinessRuleEffectsMap } from '@/domains/business-rule-engine';
@@ -222,6 +223,8 @@ interface AiBuilderFormProps {
   onReset?: () => void;
   displayType?: 'default' | 'hideForm' | 'showFooter';
   runType?: 'manual' | 'automatic';
+  selectedLanguage?: string;
+  onLanguageChange?: (language: string) => void;
 }
 
 export function AiBuilderForm({
@@ -241,17 +244,31 @@ export function AiBuilderForm({
   onReset,
   displayType = 'default',
   runType = 'manual',
+  selectedLanguage = 'text',
+  onLanguageChange,
 }: AiBuilderFormProps) {
   // Get selected agent
   const selectedAgent = agents.find(agent => agent.id === selectedAgentId);
 
-  // Filter renderComponents to only include form fields (exclude preloadRoutes)
+  // Check if agent has string output format
+  const isStringOutput = selectedAgent?.requiredOutputFormat === 'string';
+
+  // Filter renderComponents to only include form fields (exclude preloadRoutes and language fields for string output agents)
   const formFields = useMemo(() => {
     if (!selectedAgent?.renderComponents) return [];
     return selectedAgent.renderComponents.filter(
-      (component) => component.component && !component.route
+      (component) => {
+        // Exclude preload routes
+        if (!component.component || component.route) return false;
+        // For string output agents, exclude language-related fields
+        if (isStringOutput) {
+          const fieldName = (component.name || component.id || '').toLowerCase();
+          return !fieldName.includes('language') && !fieldName.includes('output-language');
+        }
+        return true;
+      }
     );
-  }, [selectedAgent]);
+  }, [selectedAgent, isStringOutput]);
 
   // State for form values - initialize with userPrompt
   const [formValues, setFormValues] = useState<Record<string, any>>({
@@ -765,14 +782,30 @@ export function AiBuilderForm({
                 {/* Buttons on Right */}
                 <div className="flex items-center gap-2">
                   {onSheetOpenChange && (
-                    <PromptPreviewSheet
-                      isOpen={isSheetOpen}
-                      onOpenChange={onSheetOpenChange}
-                      systemPrompt={systemPrompt}
-                      userPrompt={userPrompt}
-                      isLoadingPreload={isLoadingPreload}
-                      disabled={!userPrompt.trim() || disabled}
-                    />
+                    <>
+                      {isStringOutput && onLanguageChange && (
+                        <div className="w-36">
+                          <LanguageSelector
+                            config={{
+                              name: 'output-language',
+                              label: '',
+                              placeholder: 'Language',
+                            }}
+                            value={selectedLanguage}
+                            onChange={onLanguageChange}
+                            defaultLanguage="en"
+                          />
+                        </div>
+                      )}
+                      <PromptPreviewSheet
+                        isOpen={isSheetOpen}
+                        onOpenChange={onSheetOpenChange}
+                        systemPrompt={systemPrompt}
+                        userPrompt={userPrompt}
+                        isLoadingPreload={isLoadingPreload}
+                        disabled={!userPrompt.trim() || disabled}
+                      />
+                    </>
                   )}
                   {isLoading ? (
                     <>

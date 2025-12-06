@@ -188,19 +188,17 @@ export function AiAgentDialog({
       size="xl"
       showCloseButton={true}
     >
-      <div className="max-h-[80vh] overflow-y-auto">
-        <AiBuilderWrapper
-          initialAgentId={action.agentId || agent.id}
-          initialUserPrompt={userPrompt}
-          mode="dialog"
-          additionalSystemPrompt={action.additionalSystemPrompt}
-          customPreloadRoutes={preloadRoutes}
-          showResetButton={false}
-          displayType={action.displayType || 'default'}
-          runType={action.runType || 'manual'}
-          agent={agent}
-        />
-      </div>
+      <AiBuilderWrapper
+        initialAgentId={action.agentId || agent.id}
+        initialUserPrompt={userPrompt}
+        mode="dialog"
+        additionalSystemPrompt={action.additionalSystemPrompt}
+        customPreloadRoutes={preloadRoutes}
+        showResetButton={false}
+        displayType={action.displayType || 'default'}
+        runType={action.runType || 'manual'}
+        agent={agent}
+      />
     </Modal>
   );
 }

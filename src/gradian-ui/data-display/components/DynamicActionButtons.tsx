@@ -70,6 +70,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
   };
 
   const handleClick = (action: ActionConfig) => (e: React.MouseEvent) => {
+    e.preventDefault();
     if (stopPropagation) {
       e.stopPropagation();
     }
@@ -99,6 +100,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
           return (
             <Button
               key={`${action.type}-${index}`}
+              type="button"
               variant="outline"
               size="sm"
               onClick={handleClick(action)}
@@ -130,6 +132,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
         return (
           <Button
             key={`${action.type}-${index}`}
+            type="button"
             variant="outline"
             size="sm"
             onClick={handleClick(action)}

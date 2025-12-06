@@ -13,6 +13,7 @@ import { MarkdownNavigation } from './MarkdownNavigation';
 import { extractHeadings } from '../utils/headingExtractor';
 import { useMarkdownScrollSpy } from '../hooks/useMarkdownScrollSpy';
 import { MarkdownViewerProps } from '../types';
+import { exportMarkdownToPdf } from '../utils/pdfExport';
 
 export function MarkdownViewer({ 
   content, 
@@ -187,10 +188,32 @@ export function MarkdownViewer({
     return createMarkdownComponents(levels, markdownLoadedTimestamp);
   }, [stickyHeadingsKey, markdownLoadedTimestamp]);
 
+  // PDF export handler
+  const handleExportPdf = useCallback(async () => {
+    if (!markdownContentRef.current || viewMode !== 'preview') {
+      return;
+    }
+
+    try {
+      await exportMarkdownToPdf(markdownContentRef.current, {
+        filename: `markdown-document-${Date.now()}.pdf`,
+        title: 'Markdown Document',
+      });
+    } catch (error) {
+      console.error('PDF export error:', error);
+      throw error;
+    }
+  }, [viewMode]);
+
   return (
     <div className="space-y-4">
       {showToggle && (
-        <MarkdownToolbox viewMode={viewMode} onViewModeChange={setViewMode} />
+        <MarkdownToolbox 
+          viewMode={viewMode} 
+          onViewModeChange={setViewMode}
+          onExportPdf={handleExportPdf}
+          showPdfExport={true}
+        />
       )}
 
       {viewMode === 'raw' ? (

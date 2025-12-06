@@ -33,6 +33,7 @@ interface AiBuilderResponseProps {
   onAnnotationsChange?: (schemaId: string, annotations: AnnotationItem[]) => void;
   onRemoveSchema?: (schemaId: string) => void;
   onApplyAnnotations?: (annotations: SchemaAnnotation[]) => void;
+  selectedLanguage?: string;
 }
 
 // Utility function to generate table columns from JSON data
@@ -118,6 +119,7 @@ export function AiBuilderResponse({
   onAnnotationsChange,
   onRemoveSchema,
   onApplyAnnotations,
+  selectedLanguage = 'text',
 }: AiBuilderResponseProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const prevIsLoadingRef = useRef<boolean>(isLoading);
@@ -329,7 +331,7 @@ export function AiBuilderResponse({
               <MarkdownViewer 
                 content={response}
                 showToggle={true}
-          />
+              />
             </div>
           </div>
         </div>

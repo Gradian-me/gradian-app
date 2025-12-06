@@ -1,17 +1,66 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Eye, FileCode } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Eye, FileCode, FileDown, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export interface MarkdownToolboxProps {
   viewMode: 'preview' | 'raw';
   onViewModeChange: (value: 'preview' | 'raw') => void;
+  onExportPdf?: () => Promise<void>;
+  showPdfExport?: boolean;
 }
 
-export function MarkdownToolbox({ viewMode, onViewModeChange }: MarkdownToolboxProps) {
+export function MarkdownToolbox({ 
+  viewMode, 
+  onViewModeChange,
+  onExportPdf,
+  showPdfExport = true 
+}: MarkdownToolboxProps) {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportPdf = async () => {
+    if (!onExportPdf) return;
+    
+    setIsExporting(true);
+    try {
+      await onExportPdf();
+      toast.success('PDF exported successfully');
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast.error('Failed to export PDF. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
-    <div className="flex items-center justify-end mb-4 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+    <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="flex items-center gap-2">
+        {showPdfExport && onExportPdf && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportPdf}
+            disabled={isExporting || viewMode === 'raw'}
+            className="gap-2"
+          >
+            {isExporting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Exporting...</span>
+              </>
+            ) : (
+              <>
+                <FileDown className="h-4 w-4" />
+                <span>Export PDF</span>
+              </>
+            )}
+          </Button>
+        )}
+      </div>
       <div className="flex items-center gap-2">
         <span className="text-sm text-gray-600 dark:text-gray-400">View:</span>
         <ToggleGroup

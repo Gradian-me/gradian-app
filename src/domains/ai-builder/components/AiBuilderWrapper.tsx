@@ -65,6 +65,7 @@ export function AiBuilderWrapper({
   const [selectedAgentId, setSelectedAgentId] = useState<string>(initialAgentId);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [previewSchema, setPreviewSchema] = useState<{ schema: FormSchema; schemaId: string } | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en'); // Default language for string output agents
   const [annotations, setAnnotations] = useState<Map<string, SchemaAnnotation>>(new Map());
   const [lastPromptId, setLastPromptId] = useState<string | null>(null);
   const [firstPromptId, setFirstPromptId] = useState<string | null>(null);
@@ -464,6 +465,8 @@ export function AiBuilderWrapper({
           onReset={showResetButton ? handleReset : undefined}
           displayType={displayType}
           runType={runType}
+          selectedLanguage={selectedLanguage}
+          onLanguageChange={setSelectedLanguage}
         />
       )}
 
@@ -491,6 +494,7 @@ export function AiBuilderWrapper({
               onAnnotationsChange={handleAnnotationChange}
               onRemoveSchema={handleRemoveSchema}
               onApplyAnnotations={handleApplyAnnotations}
+              selectedLanguage={selectedLanguage}
             />
           </motion.div>
         ) : null}

@@ -785,7 +785,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "change-classification",
     "createdAt": "2025-12-06T12:14:36.541Z",
-    "updatedAt": "2025-12-06T18:40:03.400Z"
+    "updatedAt": "2025-12-06T20:27:08.416Z"
   },
   {
     "id": "01KBSSBQG7HER0SF2JH04E5V3S",
@@ -796,7 +796,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "change-subject-types",
     "createdAt": "2025-12-06T12:14:36.551Z",
-    "updatedAt": "2025-12-06T18:40:03.410Z"
+    "updatedAt": "2025-12-06T20:27:08.422Z"
   },
   {
     "sourceSchema": "status-groups",
@@ -1039,7 +1039,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "change-categories",
     "createdAt": "2025-12-06T13:09:40.798Z",
-    "updatedAt": "2025-12-06T18:40:03.424Z"
+    "updatedAt": "2025-12-06T20:27:08.426Z"
   },
   {
     "id": "01KBSWNJCNT0Z5ZTEC07YKKBC4",
@@ -1050,7 +1050,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "change-procedure",
     "createdAt": "2025-12-06T13:12:24.725Z",
-    "updatedAt": "2025-12-06T18:40:03.432Z"
+    "updatedAt": "2025-12-06T20:27:08.429Z"
   },
   {
     "id": "01KBSWNJCNZ559E9W1P3KNM3G0",
@@ -1061,7 +1061,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "change-procedure",
     "createdAt": "2025-12-06T13:12:24.725Z",
-    "updatedAt": "2025-12-06T18:40:03.432Z"
+    "updatedAt": "2025-12-06T20:27:08.429Z"
   },
   {
     "sourceSchema": "change-management",
