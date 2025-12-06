@@ -6,6 +6,7 @@ import React from 'react';
 import { ArrowLeft, Edit, RefreshCw, Trash2, LayoutList } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
+import { AvatarUser } from './AvatarUser';
 import { Badge } from '../../../components/ui/badge';
 import { GridBuilder } from '../../layout/grid-builder';
 import { FormSchema, DetailPageSection } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -260,6 +261,45 @@ const getHeaderInfo = (schema: FormSchema, data: any) => {
 
   const statusOptions = statusField?.options;
 
+  // Get person field (assignedTo)
+  const personFieldDef = schema.fields?.find(field => field.role === 'person');
+  const personValue = personFieldDef ? (data[personFieldDef.name] || data.assignedTo) : (data.assignedTo || null);
+  let personField: any = null;
+  if (personValue) {
+    const normalizedPerson = normalizeOptionArray(personValue)[0];
+    if (normalizedPerson) {
+      personField = {
+        label: normalizedPerson.label || normalizedPerson.normalized?.label || personValue?.label || personValue?.name || personValue?.email || 'Unknown',
+        avatar: normalizedPerson.avatar || normalizedPerson.normalized?.avatar || personValue?.avatar || personValue?.image || personValue?.avatarUrl || null,
+        avatarUrl: normalizedPerson.avatar || normalizedPerson.normalized?.avatar || personValue?.avatar || personValue?.image || personValue?.avatarUrl || null,
+        id: normalizedPerson.id || normalizedPerson.normalized?.id || personValue?.id,
+        email: normalizedPerson.email || normalizedPerson.normalized?.email || personValue?.email || null,
+        firstName: normalizedPerson.firstName || normalizedPerson.normalized?.firstName || personValue?.firstName || null,
+        lastName: normalizedPerson.lastName || normalizedPerson.normalized?.lastName || personValue?.lastName || null,
+        username: normalizedPerson.username || normalizedPerson.normalized?.username || personValue?.username || null,
+        postTitle: normalizedPerson.postTitle || normalizedPerson.normalized?.postTitle || personValue?.postTitle || null,
+        company: normalizedPerson.company || normalizedPerson.normalized?.company || personValue?.company || null,
+        ...normalizedPerson,
+        ...normalizedPerson.normalized,
+        ...personValue,
+      };
+    } else if (personValue && typeof personValue === 'object') {
+      personField = {
+        label: personValue.label || personValue.name || personValue.email || 'Unknown',
+        avatar: personValue.avatar || personValue.image || personValue.avatarUrl || null,
+        avatarUrl: personValue.avatar || personValue.image || personValue.avatarUrl || null,
+        id: personValue.id,
+        email: personValue.email || null,
+        firstName: personValue.firstName || null,
+        lastName: personValue.lastName || null,
+        username: personValue.username || null,
+        postTitle: personValue.postTitle || null,
+        company: personValue.company || null,
+        ...personValue,
+      };
+    }
+  }
+
   return {
     title,
     subtitle,
@@ -268,6 +308,7 @@ const getHeaderInfo = (schema: FormSchema, data: any) => {
     rating,
     duedate,
     code,
+    personField,
     statusOptions,
     statusMetadata: {
       color: normalizedStatusOption?.color,
@@ -537,6 +578,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     rating: 0,
     duedate: null,
     code: '',
+    personField: null,
     statusOptions: undefined,
     statusMetadata: undefined
   };
@@ -862,7 +904,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   if (metadataSections.length === 0 && (!detailMetadata || !detailMetadata.sections)) {
     // Fields to exclude (already shown in header or special fields)
     // Note: 'description' removed from excluded roles to allow textarea fields to display
-    const excludedRoles = ['title', 'subtitle', 'avatar', 'status', 'rating', 'duedate', 'code'];
+    const excludedRoles = ['title', 'subtitle', 'avatar', 'status', 'rating', 'duedate', 'code', 'person'];
     
     // Get all fields that should be displayed
     const displayableFields = schema?.fields?.filter(field => {
@@ -1080,6 +1122,17 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                 </div>
               </div>
               <div className="flex items-center space-x-2 flex-row flex-wrap">
+                {headerInfo.personField && (
+                  <div className="mr-2 flex items-center gap-2">
+                    <AvatarUser
+                      user={headerInfo.personField}
+                      avatarType="user"
+                      size="md"
+                      showDialog={true}
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{headerInfo.personField.label}</span>
+                  </div>
+                )}
                 {headerInfo.duedate && (
                   <div className="mr-2">
                     <Countdown

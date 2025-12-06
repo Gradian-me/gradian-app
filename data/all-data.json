@@ -3515,6 +3515,8 @@
     },
     {
       "label": "Not Started",
+      "icon": "Circle",
+      "color": "slate",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSVYXHRWPMBAACHKSBQ1E4R",
@@ -3523,6 +3525,8 @@
     },
     {
       "label": "In Progress",
+      "icon": "Loader",
+      "color": "blue",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSVZ3N828YPGRXFDY84D15W",
@@ -3531,6 +3535,8 @@
     },
     {
       "label": "Completed",
+      "icon": "CheckCircle",
+      "color": "emerald",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSVZ9NT2Z23FXK7B1G7AYS8",
@@ -3539,6 +3545,8 @@
     },
     {
       "label": "Cancelled",
+      "icon": "XCircle",
+      "color": "red",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSVZHFGX0F3YKHV44J3H2QM",
@@ -3547,6 +3555,8 @@
     },
     {
       "label": "Hold",
+      "icon": "PauseCircle",
+      "color": "orange",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSVZZDK10007V2G1QTTYV1A",
@@ -3614,22 +3624,6 @@
   "routes": [],
   "schemas": [],
   "change-management": [
-    {
-      "changeTitle": "test ",
-      "changeDescription": "Reason for Change\n\n(Why this change is needed — factual, compliance-driven.)\n\nThe current temperature monitoring system (TMS v2.3) has exhibited intermittent alarm failures and lacks redundancy to meet updated internal data integrity requirements and current FDA expectations for critical storage monitoring. The vendor has discontinued support for v2.3. Upgrading to TMS v3.1 provides validated dual-channel alarms, robust audit trails, and enhanced reporting functions.\n\n2. Description of Change\n\n(What will be changed — clear, scoped, auditable.)\n\nReplace existing TMS servers and software with TMS v3.1.\n\nInstall new dual-probe sensors across all warehouse zones.\n\nIntegrate TMS with the corporate data historian system.\n\nUpdate SOP-WH-014 (Warehouse Environmental Monitoring) and WI-ENG-008 (TMS Calibration).\n\nRetrain Warehouse and Engineering personnel on new system interface.",
-      "changeSolution": "test ",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "changeManagementTypes": [],
-      "changeSubjectTypes": [],
-      "changeCategories": [],
-      "id": "01KBSMAB5KHQXD0VMT3GZERCGT",
-      "createdAt": "2025-12-06T10:46:28.286Z",
-      "updatedAt": "2025-12-06T11:03:58.364Z",
-      "quality-assurance-analyses": [],
-      "qa-guideline-analyses": [],
-      "changeProcedure": []
-    },
     {
       "changeNumber": "CC-2025082405",
       "changeRequestDate": "2026-01-09",
@@ -3951,8 +3945,10 @@
       "dueDate": "2025-12-18",
       "status": [
         {
-          "id": "01KBSVYXHRWPMBAACHKSBQ1E4R",
-          "label": "Not Started"
+          "id": "01KBSVZ9NT2Z23FXK7B1G7AYS8",
+          "label": "Completed",
+          "icon": "CheckCircle",
+          "color": "emerald"
         }
       ],
       "taskTitle": "Task A",
@@ -3960,7 +3956,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSW269QC0V5HH9RA6GJR7S2",
       "createdAt": "2025-12-06T13:01:49.752Z",
-      "updatedAt": "2025-12-06T13:01:49.752Z"
+      "updatedAt": "2025-12-06T16:14:57.718Z"
     },
     {
       "assignedTo": [
@@ -3972,8 +3968,10 @@
       "dueDate": "2025-12-10",
       "status": [
         {
-          "id": "01KBSVYXHRWPMBAACHKSBQ1E4R",
-          "label": "Not Started"
+          "id": "01KBSVZ9NT2Z23FXK7B1G7AYS8",
+          "label": "Completed",
+          "icon": "CheckCircle",
+          "color": "emerald"
         }
       ],
       "taskTitle": "Task B",
@@ -3981,7 +3979,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSW35VJHAB75VRTGXMRHK7Y",
       "createdAt": "2025-12-06T13:02:22.067Z",
-      "updatedAt": "2025-12-06T13:02:22.067Z"
+      "updatedAt": "2025-12-06T16:15:19.796Z"
     },
     {
       "assignedTo": [
@@ -3993,8 +3991,10 @@
       "dueDate": "2025-12-30",
       "status": [
         {
-          "id": "01KBSVZ3N828YPGRXFDY84D15W",
-          "label": "In Progress"
+          "id": "01KBSVZHFGX0F3YKHV44J3H2QM",
+          "label": "Cancelled",
+          "icon": "XCircle",
+          "color": "red"
         }
       ],
       "taskTitle": "Task C",
@@ -4002,7 +4002,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSWPJ9SEZN67XGNGZ3YD16S",
       "createdAt": "2025-12-06T13:12:57.404Z",
-      "updatedAt": "2025-12-06T13:12:57.404Z"
+      "updatedAt": "2025-12-06T16:22:37.830Z",
+      "taskDescription": "test description"
     },
     {
       "assignedTo": [

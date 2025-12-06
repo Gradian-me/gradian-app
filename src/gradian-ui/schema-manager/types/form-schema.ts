@@ -20,7 +20,7 @@ export interface FormField {
   canCopy?: boolean;
   inactive?: boolean;
   addToReferenceMetadata?: boolean;
-  role?: 'title' | 'subtitle' | 'description' | 'image' | 'avatar' | 'icon' | 'rating' | 'badge' | 'status' | 'email' | 'location' | 'tel' | 'duedate' | 'code' | 'color';
+  role?: 'title' | 'subtitle' | 'description' | 'image' | 'avatar' | 'icon' | 'rating' | 'badge' | 'status' | 'email' | 'location' | 'tel' | 'duedate' | 'code' | 'color' | 'person';
   roleColor?: 'default' | 'secondary' | 'outline' | 'destructive' | 'gradient' | 'success' | 'warning' | 'info' | 'muted';
   validation?: {
     required?: boolean;

@@ -58,6 +58,7 @@ export const ROLES: Array<{
   { value: 'duedate', label: 'Due Date', description: 'Due date/countdown' },
   { value: 'code', label: 'Code', description: 'Code identifier (displayed as cyan badge)' },
   { value: 'color', label: 'Color', description: 'Tailwind color id used for visual styling (e.g., avatar, badges)' },
+  { value: 'person', label: 'Person', description: 'Person/assigned user with avatar and label' },
 ];
 
 /**

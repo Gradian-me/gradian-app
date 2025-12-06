@@ -1988,5 +1988,50 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBPERSONROLE001",
+    "timestamp": "2025-12-06T12:00:00.000Z",
+    "version": "1.16.000",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Added 'person' role to form schema for better user assignment representation",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "form-builder"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "New fields for 'person' role in various components including DynamicCardRenderer and DynamicDetailPageRenderer",
+        "priority": "High",
+        "affectedDomains": [
+          "data-display",
+          "components",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Enhanced data handling for assigned users across multiple schemas and components",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "schema-manager",
+          "form-builder"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved metadata processing to include virtual fields for due dates and assigned users",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "data-management"
+        ]
+      }
+    ]
   }
 ]

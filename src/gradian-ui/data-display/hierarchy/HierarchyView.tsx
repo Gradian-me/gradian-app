@@ -16,6 +16,9 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatFieldValue } from '../table/utils/field-formatters';
 import { EntityMetadata } from '../components/CreateUpdateDetail';
+import { Avatar } from '@/gradian-ui/form-builder/form-elements/components/Avatar';
+import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
+import { AvatarUser } from '../components/AvatarUser';
 
 export interface HierarchyViewProps {
   schema: FormSchema;
@@ -112,6 +115,46 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
   const statusFieldDef = schema?.fields?.find(field => field.role === 'status');
   const hasStatusField = Boolean(statusFieldDef);
   const statusValue = statusFieldDef ? entity?.[statusFieldDef.name] : entity?.status;
+  
+  // Get person field (assignedTo)
+  const hasPersonField = schema?.fields?.some(field => field.role === 'person') || false;
+  const personFieldDef = schema?.fields?.find(field => field.role === 'person');
+  const personValue = hasPersonField ? (personFieldDef ? (entity[personFieldDef.name] || entity.assignedTo) : (entity.assignedTo || null)) : null;
+  let personField: any = null;
+  if (personValue) {
+    const normalizedPerson = normalizeOptionArray(personValue)[0];
+    if (normalizedPerson) {
+      personField = {
+        label: normalizedPerson.label || normalizedPerson.normalized?.label || personValue?.label || personValue?.name || personValue?.email || 'Unknown',
+        avatar: normalizedPerson.avatar || normalizedPerson.normalized?.avatar || personValue?.avatar || personValue?.image || personValue?.avatarUrl || null,
+        avatarUrl: normalizedPerson.avatar || normalizedPerson.normalized?.avatar || personValue?.avatar || personValue?.image || personValue?.avatarUrl || null,
+        id: normalizedPerson.id || normalizedPerson.normalized?.id || personValue?.id,
+        email: normalizedPerson.email || normalizedPerson.normalized?.email || personValue?.email || null,
+        firstName: normalizedPerson.firstName || normalizedPerson.normalized?.firstName || personValue?.firstName || null,
+        lastName: normalizedPerson.lastName || normalizedPerson.normalized?.lastName || personValue?.lastName || null,
+        username: normalizedPerson.username || normalizedPerson.normalized?.username || personValue?.username || null,
+        postTitle: normalizedPerson.postTitle || normalizedPerson.normalized?.postTitle || personValue?.postTitle || null,
+        company: normalizedPerson.company || normalizedPerson.normalized?.company || personValue?.company || null,
+        ...normalizedPerson,
+        ...normalizedPerson.normalized,
+        ...personValue,
+      };
+    } else if (personValue && typeof personValue === 'object') {
+      personField = {
+        label: personValue.label || personValue.name || personValue.email || 'Unknown',
+        avatar: personValue.avatar || personValue.image || personValue.avatarUrl || null,
+        avatarUrl: personValue.avatar || personValue.image || personValue.avatarUrl || null,
+        id: personValue.id,
+        email: personValue.email || null,
+        firstName: personValue.firstName || null,
+        lastName: personValue.lastName || null,
+        username: personValue.username || null,
+        postTitle: personValue.postTitle || null,
+        company: personValue.company || null,
+        ...personValue,
+      };
+    }
+  }
 
   return (
     <div className="space-y-1">
@@ -184,6 +227,18 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                 {subtitle && (
                   <div className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                     {renderHighlightedText(String(subtitle), highlightQuery)}
+                  </div>
+                )}
+                {/* Person Field */}
+                {hasPersonField && personField && (
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <AvatarUser
+                      user={personField}
+                      avatarType="user"
+                      size="sm"
+                      showDialog={true}
+                    />
+                    <span className="text-xs text-gray-600 dark:text-gray-400 truncate">{personField.label}</span>
                   </div>
                 )}
                 {/* Entity Metadata */}

@@ -5,12 +5,13 @@ import React, { KeyboardEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import type { BadgeProps } from '@/components/ui/badge';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { Rating, Countdown, CodeBadge, ForceIcon } from '@/gradian-ui/form-builder/form-elements';
+import { Rating, Countdown, CodeBadge, ForceIcon, Avatar } from '@/gradian-ui/form-builder/form-elements';
 import { CardSection, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '@/gradian-ui/shared/utils';
 import { CardContent } from '@/gradian-ui/data-display/card/components/CardContent';
 import { CardWrapper } from '@/gradian-ui/data-display/card/components/CardWrapper';
 import { getArrayValuesByRole, getBadgeConfig, getSingleValueByRole, getValueByRole, renderCardSection, RoleBasedAvatar } from '../utils';
+import { AvatarUser } from './AvatarUser';
 import { BadgeViewer, BadgeRenderer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { getFieldsByRole } from '../../form-builder/form-elements/utils/field-resolver';
 import { DynamicActionButtons } from './DynamicActionButtons';
@@ -97,7 +98,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   // Check if schema has statusGroup configured (new status system)
   const hasStatusGroup = Array.isArray(schema?.statusGroup) && schema.statusGroup.length > 0;
 
-  // Check if rating, status, duedate, code, avatar, and icon fields exist in schema
+  // Check if rating, status, duedate, code, avatar, icon, and person fields exist in schema
   const hasRatingField = schema?.fields?.some(field => field.role === 'rating') || false;
   const hasStatusField = schema?.fields?.some(field => field.role === 'status') || false || hasStatusGroup;
   const hasDuedateField = schema?.fields?.some(field => field.role === 'duedate') || false;
@@ -106,6 +107,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   const hasAvatarField = schema?.fields?.some(field => field.role === 'avatar') || false;
   const hasIconField = schema?.fields?.some(field => field.role === 'icon') || false;
   const hasColorField = schema?.fields?.some(field => field.role === 'color') || false;
+  const hasPersonField = schema?.fields?.some(field => field.role === 'person') || false;
 
   // Filter out performance section from cardMetadata
   const filteredSections = cardMetadata.filter(section =>
@@ -288,6 +290,46 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     }
   }
 
+  // Get person value (assignedTo)
+  const personFieldDef = schema?.fields?.find(field => field.role === 'person');
+  const personValue = personFieldDef ? (data[personFieldDef.name] || data.assignedTo) : (data.assignedTo || null);
+  let personField: any = null;
+  if (personValue) {
+    // Normalize person value
+    const normalizedPerson = normalizeOptionArray(personValue)[0];
+    if (normalizedPerson) {
+      personField = {
+        label: normalizedPerson.label || normalizedPerson.normalized?.label || personValue?.label || personValue?.name || personValue?.email || 'Unknown',
+        avatar: normalizedPerson.avatar || normalizedPerson.normalized?.avatar || personValue?.avatar || personValue?.image || personValue?.avatarUrl || null,
+        avatarUrl: normalizedPerson.avatar || normalizedPerson.normalized?.avatar || personValue?.avatar || personValue?.image || personValue?.avatarUrl || null,
+        id: normalizedPerson.id || normalizedPerson.normalized?.id || personValue?.id,
+        email: normalizedPerson.email || normalizedPerson.normalized?.email || personValue?.email || null,
+        firstName: normalizedPerson.firstName || normalizedPerson.normalized?.firstName || personValue?.firstName || null,
+        lastName: normalizedPerson.lastName || normalizedPerson.normalized?.lastName || personValue?.lastName || null,
+        username: normalizedPerson.username || normalizedPerson.normalized?.username || personValue?.username || null,
+        postTitle: normalizedPerson.postTitle || normalizedPerson.normalized?.postTitle || personValue?.postTitle || null,
+        company: normalizedPerson.company || normalizedPerson.normalized?.company || personValue?.company || null,
+        ...normalizedPerson,
+        ...normalizedPerson.normalized,
+        ...personValue,
+      };
+    } else if (personValue && typeof personValue === 'object') {
+      personField = {
+        label: personValue.label || personValue.name || personValue.email || 'Unknown',
+        avatar: personValue.avatar || personValue.image || personValue.avatarUrl || null,
+        avatarUrl: personValue.avatar || personValue.image || personValue.avatarUrl || null,
+        id: personValue.id,
+        email: personValue.email || null,
+        firstName: personValue.firstName || null,
+        lastName: personValue.lastName || null,
+        username: personValue.username || null,
+        postTitle: personValue.postTitle || null,
+        company: personValue.company || null,
+        ...personValue,
+      };
+    }
+  }
+
   // Get title - check if role "title" exists, otherwise use first text field
   const hasTitleRole = schema?.fields?.some(field => field.role === 'title') || false;
   let title: string = '';
@@ -337,6 +379,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     codeField: codeFieldValue,
     metricsField: data.performanceMetrics || null,
     duedateField,
+    personField,
     sections: filteredSections,
     statusOptions,
     isIncomplete
@@ -689,6 +732,27 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                 </motion.div>
               )}
 
+              {/* Person Field */}
+              {hasPersonField && cardConfig.personField && (
+                <motion.div
+                  initial={disableAnimation ? false : { opacity: 0, y: 10 }}
+                  animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+                  transition={disableAnimation ? {} : { duration: 0.3 }}
+                  className="w-full mb-3 flex items-center gap-2"
+                >
+                  <AvatarUser
+                    user={cardConfig.personField}
+                    avatarType="user"
+                    size="md"
+                    showDialog={true}
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Assigned To</span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{cardConfig.personField.label}</span>
+                  </div>
+                </motion.div>
+              )}
+
               {/* Due Date Countdown */}
               {hasDuedateField && cardConfig.duedateField && (
                 <motion.div
@@ -892,9 +956,29 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   </div>
                 </div>
               </div>
-              {(hasRatingField || hasStatusField || hasDuedateField) && (
+              {(hasRatingField || hasStatusField || hasDuedateField || hasPersonField) && (
                 <div className="flex flex-row items-center justify-between space-y-1 ms-auto gap-2">
                   <div className="flex items-center gap-2">
+                    {hasPersonField && cardConfig.personField && (
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, y: -10 }}
+                        animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+                        transition={disableAnimation ? {} : { duration: 0.3 }}
+                        whileHover={disableAnimation ? undefined : {
+                          scale: 1.01,
+                          transition: { type: "spring", stiffness: 300, damping: 30 }
+                        }}
+                        className="flex items-center gap-2"
+                      >
+                        <AvatarUser
+                          user={cardConfig.personField}
+                          avatarType="user"
+                          size="sm"
+                          showDialog={true}
+                        />
+                        <span className="text-xs text-gray-600 dark:text-gray-400">{cardConfig.personField.label}</span>
+                      </motion.div>
+                    )}
                     {hasDuedateField && cardConfig.duedateField && (
                       <motion.div
                         initial={disableAnimation ? false : { opacity: 0, y: -10 }}

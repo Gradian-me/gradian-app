@@ -16,6 +16,8 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Avatar } from '@/gradian-ui/form-builder/form-elements/components/Avatar';
 import { ForceIcon } from '@/gradian-ui/form-builder/form-elements/components/ForceIcon';
+import { Countdown } from '@/gradian-ui/form-builder/form-elements/components/Countdown';
+import { AvatarUser } from '../../components/AvatarUser';
 import { toast } from 'sonner';
 import { cn } from '@/gradian-ui/shared/utils';
 
@@ -406,6 +408,94 @@ export const formatFieldValue = (
       <div className="inline-flex items-center">
         {renderRatingValue(value, { size: 'sm', showValue: true })}
       </div>
+    );
+  }
+
+  // Handle duedate role - show as Countdown by default
+  if (field?.role === 'duedate') {
+    if (!value || value === '' || value === null || value === undefined) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    // Validate that value is a valid date
+    let dateValue: string | Date | null = null;
+    if (value instanceof Date) {
+      dateValue = value;
+    } else if (typeof value === 'string' && value.trim() !== '') {
+      const parsedDate = new Date(value);
+      if (!isNaN(parsedDate.getTime())) {
+        dateValue = value;
+      }
+    }
+    
+    if (!dateValue) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    return wrapWithForceIcon(
+      <Countdown
+        expireDate={dateValue}
+        includeTime={true}
+        size="sm"
+        showIcon={true}
+        fieldLabel={field.label || 'Due Date'}
+      />,
+      isForce,
+      field,
+      row
+    );
+  }
+
+  // Handle person role - show avatar and label
+  if (field?.role === 'person') {
+    if (!value || (Array.isArray(value) && value.length === 0)) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    // Normalize value to array format
+    const normalizedValue = Array.isArray(value) ? value : [value];
+    if (normalizedValue.length === 0) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    // Get first person (assignedTo is typically single-select)
+    const person = normalizedValue[0];
+    const normalizedPerson = normalizeOptionArray(person)[0];
+    
+    // Get person details
+    const personLabel = normalizedPerson?.label || normalizedPerson?.normalized?.label || person?.label || person?.name || person?.email || 'Unknown';
+    const personAvatar = normalizedPerson?.avatar || normalizedPerson?.normalized?.avatar || person?.avatar || person?.image || person?.avatarUrl || null;
+    const personId = normalizedPerson?.id || normalizedPerson?.normalized?.id || person?.id;
+    
+    // Convert person data to AvatarUser format
+    const userData = {
+      id: personId,
+      label: personLabel,
+      name: personLabel,
+      email: person?.email || normalizedPerson?.email || normalizedPerson?.normalized?.email || null,
+      avatarUrl: personAvatar,
+      firstName: person?.firstName || normalizedPerson?.firstName || normalizedPerson?.normalized?.firstName || null,
+      lastName: person?.lastName || normalizedPerson?.lastName || normalizedPerson?.normalized?.lastName || null,
+      username: person?.username || normalizedPerson?.username || normalizedPerson?.normalized?.username || null,
+      postTitle: person?.postTitle || normalizedPerson?.postTitle || normalizedPerson?.normalized?.postTitle || null,
+      company: person?.company || normalizedPerson?.company || normalizedPerson?.normalized?.company || null,
+      ...person,
+      ...normalizedPerson,
+    };
+    
+    return wrapWithForceIcon(
+      <div className="inline-flex items-center gap-2">
+        <AvatarUser
+          user={userData}
+          avatarType="user"
+          size="sm"
+          showDialog={true}
+        />
+        <span className="text-sm text-gray-700 dark:text-gray-300">{personLabel}</span>
+      </div>,
+      isForce,
+      field,
+      row
     );
   }
 

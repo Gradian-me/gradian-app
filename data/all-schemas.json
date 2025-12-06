@@ -2948,7 +2948,8 @@
           "allowMultiselect": true
         },
         "colSpan": 1,
-        "order": 7
+        "order": 7,
+        "role": "person"
       }
     ],
     "sections": [
@@ -5635,7 +5636,8 @@
           "required": false
         },
         "colSpan": 2,
-        "order": 2
+        "order": 2,
+        "role": "description"
       }
     ],
     "sections": [
@@ -5656,6 +5658,7 @@
       }
     ],
     "allowDataDueDate": true,
-    "allowDataAssignedTo": true
+    "allowDataAssignedTo": true,
+    "allowDataForce": true
   }
 ]
