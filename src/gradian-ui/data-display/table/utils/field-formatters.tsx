@@ -465,10 +465,12 @@ export const formatFieldValue = (
     // Get person details
     const personLabel = normalizedPerson?.label || normalizedPerson?.normalized?.label || person?.label || person?.name || person?.email || 'Unknown';
     const personAvatar = normalizedPerson?.avatar || normalizedPerson?.normalized?.avatar || person?.avatar || person?.image || person?.avatarUrl || null;
-    const personId = normalizedPerson?.id || normalizedPerson?.normalized?.id || person?.id;
+    const personId = normalizedPerson?.id || normalizedPerson?.normalized?.id || person?.id || null;
     
     // Convert person data to AvatarUser format
     const userData = {
+      ...person,
+      ...normalizedPerson,
       id: personId,
       label: personLabel,
       name: personLabel,
@@ -479,8 +481,6 @@ export const formatFieldValue = (
       username: person?.username || normalizedPerson?.username || normalizedPerson?.normalized?.username || null,
       postTitle: person?.postTitle || normalizedPerson?.postTitle || normalizedPerson?.normalized?.postTitle || null,
       company: person?.company || normalizedPerson?.company || normalizedPerson?.normalized?.company || null,
-      ...person,
-      ...normalizedPerson,
     };
     
     return wrapWithForceIcon(

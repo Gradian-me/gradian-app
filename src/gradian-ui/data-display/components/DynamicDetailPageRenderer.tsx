@@ -269,26 +269,26 @@ const getHeaderInfo = (schema: FormSchema, data: any) => {
     const normalizedPerson = normalizeOptionArray(personValue)[0];
     if (normalizedPerson) {
       personField = {
+        ...normalizedPerson,
+        ...normalizedPerson.normalized,
+        ...personValue,
         label: normalizedPerson.label || normalizedPerson.normalized?.label || personValue?.label || personValue?.name || personValue?.email || 'Unknown',
         avatar: normalizedPerson.avatar || normalizedPerson.normalized?.avatar || personValue?.avatar || personValue?.image || personValue?.avatarUrl || null,
         avatarUrl: normalizedPerson.avatar || normalizedPerson.normalized?.avatar || personValue?.avatar || personValue?.image || personValue?.avatarUrl || null,
-        id: normalizedPerson.id || normalizedPerson.normalized?.id || personValue?.id,
+        id: normalizedPerson.id || normalizedPerson.normalized?.id || personValue?.id || null,
         email: normalizedPerson.email || normalizedPerson.normalized?.email || personValue?.email || null,
         firstName: normalizedPerson.firstName || normalizedPerson.normalized?.firstName || personValue?.firstName || null,
         lastName: normalizedPerson.lastName || normalizedPerson.normalized?.lastName || personValue?.lastName || null,
         username: normalizedPerson.username || normalizedPerson.normalized?.username || personValue?.username || null,
         postTitle: normalizedPerson.postTitle || normalizedPerson.normalized?.postTitle || personValue?.postTitle || null,
         company: normalizedPerson.company || normalizedPerson.normalized?.company || personValue?.company || null,
-        ...normalizedPerson,
-        ...normalizedPerson.normalized,
-        ...personValue,
       };
     } else if (personValue && typeof personValue === 'object') {
       personField = {
         label: personValue.label || personValue.name || personValue.email || 'Unknown',
         avatar: personValue.avatar || personValue.image || personValue.avatarUrl || null,
         avatarUrl: personValue.avatar || personValue.image || personValue.avatarUrl || null,
-        id: personValue.id,
+        id: personValue.id || null,
         email: personValue.email || null,
         firstName: personValue.firstName || null,
         lastName: personValue.lastName || null,
