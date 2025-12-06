@@ -1316,6 +1316,72 @@
       "updatedAt": "2025-11-30T10:05:20.885Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "name": "Change Management",
+      "icon": "GitBranch",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBFCM00000000000000000001",
+      "createdAt": "2025-12-06T12:00:00.000Z",
+      "updatedAt": "2025-12-06T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "name": "Quality Base Information",
+      "icon": "Database",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBFCM00000000000000000002",
+      "createdAt": "2025-12-06T12:00:00.000Z",
+      "updatedAt": "2025-12-06T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "name": "Deviation Management",
+      "icon": "AlertTriangle",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBFCM00000000000000000003",
+      "createdAt": "2025-12-06T12:00:00.000Z",
+      "updatedAt": "2025-12-06T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "name": "Risk Management",
+      "icon": "ShieldAlert",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBFCM00000000000000000004",
+      "createdAt": "2025-12-06T12:00:00.000Z",
+      "updatedAt": "2025-12-06T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "name": "Compliance Management",
+      "icon": "FileCheck",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBFCM00000000000000000005",
+      "createdAt": "2025-12-06T12:00:00.000Z",
+      "updatedAt": "2025-12-06T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "name": "Audit Management",
+      "icon": "FileSearch",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBFCM00000000000000000006",
+      "createdAt": "2025-12-06T12:00:00.000Z",
+      "updatedAt": "2025-12-06T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "production-actuals": [],
@@ -1355,6 +1421,19 @@
       "id": "01KBA3HVK0QBJ28FYBJP5FYQD0",
       "createdAt": "2025-12-02T11:27:38.000Z",
       "updatedAt": "2025-12-02T11:27:38.000Z",
+      "applications": [],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "color": "emerald",
+      "title": "Quality Management",
+      "icon": "ShieldCheck",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBFQM00000000000000000001",
+      "createdAt": "2025-12-06T12:00:00.000Z",
+      "updatedAt": "2025-12-06T12:00:00.000Z",
       "applications": [],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -1735,12 +1814,12 @@
     },
     {
       "title": "Gradian Genora Schema",
-      "address": "https://octa.cinnagen.com/genora/api/schemas",
+      "address": "https://genora.cinnagen.com/api/schemas",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBATJ4GH09B0YETWF7W1SKM7",
       "createdAt": "2025-11-30T16:46:58.586Z",
-      "updatedAt": "2025-12-02T13:42:41.109Z",
+      "updatedAt": "2025-12-06T10:04:12.142Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "enableSystemToken": true
@@ -2085,8 +2164,8 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-06T10:00:13.001Z",
-      "lastSynced": "2025-12-06T10:00:13.001Z",
+      "updatedAt": "2025-12-06T10:04:44.658Z",
+      "lastSynced": "2025-12-06T10:04:44.658Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -3151,5 +3230,8 @@
     }
   ],
   "routes": [],
-  "schemas": []
+  "schemas": [],
+  "change-management": [],
+  "change-management-types": [],
+  "change-subject-types": []
 }
