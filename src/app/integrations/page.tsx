@@ -126,7 +126,7 @@ const CardTenantSelector: React.FC<CardTenantSelectorProps> = ({ integrationId, 
 };
 
 // Helper to get icon background and text color classes from Tailwind color name
-const getIconColorClasses = (color: string): { bg: string; text: string } => {
+const getIconColorClasses = (color?: string | null): { bg: string; text: string } => {
   const colorMap: Record<string, { bg: string; text: string }> = {
     violet: {
       bg: 'bg-violet-50 dark:bg-violet-500/15',
@@ -182,6 +182,10 @@ const getIconColorClasses = (color: string): { bg: string; text: string } => {
     },
   };
   
+  if (!color || typeof color !== 'string') {
+    return colorMap.violet;
+  }
+  
   return colorMap[color.toLowerCase()] || colorMap.violet;
 };
 
@@ -190,7 +194,7 @@ interface Integration {
   title: string;
   description: string;
   icon: string;
-  color: string;
+  color?: string;
   lastSynced: string;
   lastSyncMessage?: string;
   targetRoute: string;

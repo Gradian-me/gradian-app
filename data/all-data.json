@@ -1485,7 +1485,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBAT7P2B5NZYX26HVWYV28N1",
       "createdAt": "2025-11-30T16:41:16.115Z",
-      "updatedAt": "2025-12-06T06:35:08.965Z",
+      "updatedAt": "2025-12-06T09:50:05.595Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "audienceId": "01KANTJN9VP30XGJY4FQTCTK7D",
@@ -1744,6 +1744,26 @@
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "enableSystemToken": true
+    },
+    {
+      "title": "Schema Related Schemas Sync",
+      "address": "https://octa.cinnagen.com/genora/api/schemas/relations/generate",
+      "enableSystemToken": true,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBSH199BZ64HYDFMS2JP6F22",
+      "createdAt": "2025-12-06T09:49:05.727Z",
+      "updatedAt": "2025-12-06T09:49:30.060Z"
+    },
+    {
+      "title": "Backend Graph API",
+      "address": "https://octa.cinnagen.com/genora/api/graph",
+      "enableSystemToken": true,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBSH31P7JNZD64ED1A09DYK6",
+      "createdAt": "2025-12-06T09:50:03.477Z",
+      "updatedAt": "2025-12-06T09:50:03.477Z"
     }
   ],
   "integrations": [
@@ -2036,7 +2056,11 @@
       "icon": "Database",
       "targetRoute": [
         {
-          "id": "01KBATJ4GH09B0YETWF7W1SKM7"
+          "id": "01KBATJ4GH09B0YETWF7W1SKM7",
+          "label": "Gradian Genora Schema",
+          "metadata": {
+            "address": "https://octa.cinnagen.com/genora/api/schemas"
+          }
         }
       ],
       "targetMethod": [
@@ -2049,7 +2073,11 @@
       ],
       "sourceRoute": [
         {
-          "id": "01KA8VXHQFZR5TH0470163433K"
+          "id": "01KA8VXHQFZR5TH0470163433K",
+          "label": "Schemas",
+          "metadata": {
+            "address": "http://localhost:3000/api/schemas"
+          }
         }
       ],
       "sourceDataPath": "data",
@@ -2057,8 +2085,8 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-03T12:51:12.732Z",
-      "lastSynced": "2025-12-02T10:39:58.243Z",
+      "updatedAt": "2025-12-06T10:00:13.001Z",
+      "lastSynced": "2025-12-06T10:00:13.001Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2069,7 +2097,95 @@
           "color": "emerald"
         }
       ],
-      "isTenantBased": true
+      "isTenantBased": true,
+      "lastSyncMessage": "Token exchange failed: Token exchange failed with status 401: Invalid or expired token"
+    },
+    {
+      "title": "Schema Related Schemas Sync Production",
+      "description": "Schema Related Schemas Sync Production",
+      "targetRoute": [
+        {
+          "id": "01KBSH199BZ64HYDFMS2JP6F22",
+          "metadata": {
+            "address": "https://octa.cinnagen.com/genora/api/schemas/relations/generate"
+          }
+        }
+      ],
+      "targetMethod": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "Upload",
+          "color": "success"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "sourceRoute": [],
+      "id": "schema_related_schemas_sync_prod",
+      "createdAt": "2025-12-06T09:54:51.218Z",
+      "updatedAt": "2025-12-06T09:59:15.573Z",
+      "isTenantBased": true,
+      "category": [
+        {
+          "id": "production-integration",
+          "label": "Production Integration",
+          "icon": "Rocket",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "title": "Graph Data Sync Production",
+      "description": "Graph Data Sync Production",
+      "isTenantBased": true,
+      "targetRoute": [
+        {
+          "id": "01KBSH31P7JNZD64ED1A09DYK6",
+          "metadata": {
+            "address": "https://octa.cinnagen.com/genora/api/graph"
+          }
+        }
+      ],
+      "targetMethod": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "Upload",
+          "color": "success"
+        }
+      ],
+      "targetDataPath": "data",
+      "sourceDataPath": "data",
+      "sourceRoute": [
+        {
+          "id": "01KANYZDJKCA9FNEFE7ZEY0KSD",
+          "metadata": {
+            "address": "http://localhost:3000/api/graph"
+          }
+        }
+      ],
+      "sourceMethod": [
+        {
+          "id": "GET",
+          "label": "GET",
+          "icon": "Download",
+          "color": "info"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "graph_data_sync_prod",
+      "createdAt": "2025-12-06T09:56:02.933Z",
+      "updatedAt": "2025-12-06T09:59:24.350Z",
+      "category": [
+        {
+          "id": "production-integration",
+          "label": "Production Integration",
+          "icon": "Rocket",
+          "color": "emerald"
+        }
+      ]
     }
   ],
   "databases": [

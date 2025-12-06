@@ -368,8 +368,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T10:25:02.624Z",
-    "updatedAt": "2025-12-06T06:35:08.953Z",
-    "inactive": false
+    "updatedAt": "2025-12-06T09:50:05.587Z"
   },
   {
     "id": "01KBMF20YRGDS0EZVJ49DAYGQ3",
@@ -380,7 +379,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T10:38:20.630Z",
-    "updatedAt": "2025-12-06T06:35:08.953Z",
+    "updatedAt": "2025-12-06T09:50:05.587Z",
     "inactive": true
   },
   {
@@ -392,7 +391,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T10:38:20.630Z",
-    "updatedAt": "2025-12-06T06:35:08.953Z",
+    "updatedAt": "2025-12-06T09:50:05.587Z",
     "inactive": true
   },
   {
@@ -404,7 +403,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T10:41:00.142Z",
-    "updatedAt": "2025-12-06T06:35:08.953Z",
+    "updatedAt": "2025-12-06T09:50:05.587Z",
     "inactive": true
   },
   {
@@ -692,5 +691,58 @@
     "fieldId": "menu-companies",
     "createdAt": "2025-12-04T11:19:13.189Z",
     "updatedAt": "2025-12-04T11:19:13.189Z"
+  },
+  {
+    "sourceSchema": "servers",
+    "sourceId": "01KBAT7P2B5NZYX26HVWYV28N1",
+    "targetSchema": "url-repositories",
+    "targetId": "01KBSH199BZ64HYDFMS2JP6F22",
+    "relationTypeId": "HAS_URL",
+    "id": "01KBSH19BQ7RXJBPEQ9SHW7B0P",
+    "createdAt": "2025-12-06T09:49:05.783Z",
+    "updatedAt": "2025-12-06T09:49:05.783Z"
+  },
+  {
+    "sourceSchema": "servers",
+    "sourceId": "01KBAT7P2B5NZYX26HVWYV28N1",
+    "targetSchema": "url-repositories",
+    "targetId": "01KBSH31P7JNZD64ED1A09DYK6",
+    "relationTypeId": "HAS_URL",
+    "id": "01KBSH31T613D8H1WM01A5B2DJ",
+    "createdAt": "2025-12-06T09:50:03.590Z",
+    "updatedAt": "2025-12-06T09:50:03.590Z"
+  },
+  {
+    "id": "01KBSHBTQ42ZWEKZPE5JMP3W40",
+    "sourceSchema": "integrations",
+    "sourceId": "schema_related_schemas_sync_prod",
+    "targetSchema": "url-repositories",
+    "targetId": "01KBSH199BZ64HYDFMS2JP6F22",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-target-route",
+    "createdAt": "2025-12-06T09:54:51.235Z",
+    "updatedAt": "2025-12-06T09:59:15.555Z"
+  },
+  {
+    "id": "01KBSHE0TNJEB7E5ZTAQ69CC4X",
+    "sourceSchema": "integrations",
+    "sourceId": "graph_data_sync_prod",
+    "targetSchema": "url-repositories",
+    "targetId": "01KBSH31P7JNZD64ED1A09DYK6",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-target-route",
+    "createdAt": "2025-12-06T09:56:03.029Z",
+    "updatedAt": "2025-12-06T09:59:24.336Z"
+  },
+  {
+    "id": "01KBSHE0Y86WZ2B4CBSJSJZB63",
+    "sourceSchema": "integrations",
+    "sourceId": "graph_data_sync_prod",
+    "targetSchema": "url-repositories",
+    "targetId": "01KANYZDJKCA9FNEFE7ZEY0KSD",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-source-route",
+    "createdAt": "2025-12-06T09:56:03.141Z",
+    "updatedAt": "2025-12-06T09:59:24.339Z"
   }
 ]
