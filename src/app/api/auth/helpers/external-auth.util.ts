@@ -56,6 +56,11 @@ export function buildProxyHeaders(request: NextRequest): HeadersInit {
     headers.authorization = authorizationHeader;
   }
 
+  const tenantDomainHeader = request.headers.get('x-tenant-domain');
+  if (tenantDomainHeader) {
+    headers['x-tenant-domain'] = tenantDomainHeader;
+  }
+
   return headers;
 }
 

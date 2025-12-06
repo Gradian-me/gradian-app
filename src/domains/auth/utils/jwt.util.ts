@@ -106,3 +106,34 @@ export function extractTokenFromCookies(cookies: string | null, cookieName: stri
   return cookieMap.get(cookieName) || null;
 }
 
+/**
+ * Add audienceId claim to an existing JWT token
+ * Decodes the token, adds the audienceId, and re-signs it
+ */
+export function addAudienceToToken(token: string, audienceId: string): string {
+  try {
+    // Decode without verification to get the payload
+    const decoded = jwt.decode(token) as any;
+    if (!decoded) {
+      throw new Error('Failed to decode token');
+    }
+
+    // Create new token with audienceId added
+    return jwt.sign(
+      {
+        userId: decoded.userId,
+        email: decoded.email,
+        name: decoded.name,
+        role: decoded.role,
+        audience: audienceId,
+      },
+      AUTH_CONFIG.JWT_SECRET,
+      {
+        expiresIn: decoded.exp ? decoded.exp - Math.floor(Date.now() / 1000) : AUTH_CONFIG.ACCESS_TOKEN_EXPIRY,
+      }
+    );
+  } catch (error) {
+    throw new Error(`Failed to add audience to token: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+

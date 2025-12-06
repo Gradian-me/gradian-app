@@ -58,9 +58,16 @@ export const SignInPage: React.FC<SignInPageProps> = ({
       neonOrbsSubtitle={neonOrbsSubtitle}
       showModeToggle={false}
     >
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md pt-20 md:pt-8">
         <div className="flex flex-col gap-6">
-          <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">{title}</h1>
+          <h1 
+            className="animate-element animate-delay-100 font-semibold leading-tight whitespace-nowrap overflow-hidden"
+            style={{
+              fontSize: "clamp(1.5rem, 3vw + 0.5rem, 3rem)"
+            }}
+          >
+            {title}
+          </h1>
           <p className="animate-element animate-delay-200 text-muted-foreground">{description}</p>
 
           {error && (
@@ -71,7 +78,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 
           <form className="space-y-5" onSubmit={onSignIn}>
             <div className="animate-element animate-delay-300 flex flex-col gap-2">
-              <label className="text-sm font-medium text-muted-foreground">Email Address</label>
+              <label className="hidden md:block text-sm font-medium text-muted-foreground">Email Address</label>
               <GlassInputWrapper>
                 <UserIcon className="w-5 h-5 text-muted-foreground ms-2 shrink-0" />
                 <input
@@ -87,7 +94,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             </div>
 
             <div className="animate-element animate-delay-400 flex flex-col gap-2">
-              <label className="text-sm font-medium text-muted-foreground">Password</label>
+              <label className="hidden md:block text-sm font-medium text-muted-foreground">Password</label>
               <GlassInputWrapper>
                 <LockIcon className="w-5 h-5 text-muted-foreground ms-2 shrink-0" /> 
                   <input

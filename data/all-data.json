@@ -1391,7 +1391,7 @@
       "name": "CG-GR-API-DEV-1",
       "id": "01KA8TM7H68FPKTRNNNSPWWBKD",
       "createdAt": "2025-11-17T11:53:56.527Z",
-      "updatedAt": "2025-11-30T16:44:26.042Z",
+      "updatedAt": "2025-12-06T06:34:51.958Z",
       "url-repositories": [],
       "color": "blue",
       "environment": [
@@ -1410,7 +1410,8 @@
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "audienceId": "01KANTJN9VP30XGJY4FQTCTK7D"
     },
     {
       "name": "Gradian App Dev",
@@ -1477,17 +1478,14 @@
       ],
       "owners": [
         {
-          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2"
-        },
-        {
-          "id": "01KBF8N88CG4YPK6VDNQAE420Z"
+          "id": "01KBAT78NRNB8KCD4Z625KH07A"
         }
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBAT7P2B5NZYX26HVWYV28N1",
       "createdAt": "2025-11-30T16:41:16.115Z",
-      "updatedAt": "2025-12-04T10:41:00.108Z",
+      "updatedAt": "2025-12-06T06:35:08.965Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "audienceId": "01KANTJN9VP30XGJY4FQTCTK7D",
@@ -1575,10 +1573,12 @@
       "title": "Schema Bulk Sync",
       "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
       "createdAt": "2025-11-17T11:54:59.460Z",
-      "updatedAt": "2025-11-23T07:30:21.432Z",
+      "updatedAt": "2025-12-06T06:25:02.466Z",
       "incomplete": false,
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "enableSystemToken": true,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "title": "Schemas",
@@ -1644,9 +1644,12 @@
       ],
       "id": "01KABM5QX5HRPWMPA1M7YK21WJ",
       "createdAt": "2025-11-18T13:58:53.618Z",
-      "updatedAt": "2025-11-18T13:58:53.618Z",
+      "updatedAt": "2025-12-06T06:25:29.596Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "enableSystemToken": true,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "title": "Graph API",
@@ -1708,9 +1711,10 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KANZNMEFM5H7211V450ZX2P8",
       "createdAt": "2025-11-22T14:32:13.019Z",
-      "updatedAt": "2025-11-30T14:36:40.131Z",
+      "updatedAt": "2025-12-06T06:25:40.006Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "enableSystemToken": true
     },
     {
       "title": "Git Sync Environment Variables",
@@ -1750,7 +1754,11 @@
       "icon": "LucidePencilRuler",
       "targetRoute": [
         {
-          "id": "01KA8TP4ZVMWVCGK25KPDQDPW1"
+          "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
+          "label": "Schema Bulk Sync",
+          "metadata": {
+            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas"
+          }
         }
       ],
       "targetMethod": [
@@ -1763,7 +1771,11 @@
       ],
       "sourceRoute": [
         {
-          "id": "01KA8VXHQFZR5TH0470163433K"
+          "id": "01KA8VXHQFZR5TH0470163433K",
+          "label": "Schemas",
+          "metadata": {
+            "address": "http://localhost:3000/api/schemas"
+          }
         }
       ],
       "sourceMethod": [
@@ -1776,10 +1788,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-03T15:27:30.814Z",
+      "updatedAt": "2025-12-06T07:44:52.464Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-12-03T15:27:30.814Z",
+      "lastSynced": "2025-12-06T07:44:52.464Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1792,7 +1804,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 26 schemas: 26 succeeded, 0 failed (0 created, 26 updated)"
+      "lastSyncMessage": "Processed 28 schemas: 28 succeeded, 0 failed (28 created, 0 updated)"
     },
     {
       "color": "blue",
@@ -1801,7 +1813,11 @@
       "icon": "FolderTree",
       "targetRoute": [
         {
-          "id": "01KABM5QX5HRPWMPA1M7YK21WJ"
+          "id": "01KABM5QX5HRPWMPA1M7YK21WJ",
+          "label": "Schema Related Schemas Sync",
+          "metadata": {
+            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/relations/generate"
+          }
         }
       ],
       "targetMethod": [
@@ -1815,8 +1831,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-03T15:27:42.683Z",
-      "lastSynced": "2025-12-03T15:27:42.683Z",
+      "updatedAt": "2025-12-06T07:45:11.267Z",
+      "lastSynced": "2025-12-06T07:45:11.267Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1829,7 +1845,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Generated relations for 26 out of 26 schemas",
+      "lastSyncMessage": "Generated relations for 28 out of 28 schemas",
       "sourceRoute": []
     },
     {
@@ -1839,7 +1855,11 @@
       "icon": "GitGraph",
       "targetRoute": [
         {
-          "id": "01KANZNMEFM5H7211V450ZX2P8"
+          "id": "01KANZNMEFM5H7211V450ZX2P8",
+          "label": "Backend Graph API",
+          "metadata": {
+            "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/graph"
+          }
         }
       ],
       "targetMethod": [
@@ -1852,7 +1872,11 @@
       ],
       "sourceRoute": [
         {
-          "id": "01KANYZDJKCA9FNEFE7ZEY0KSD"
+          "id": "01KANYZDJKCA9FNEFE7ZEY0KSD",
+          "label": "Graph API",
+          "metadata": {
+            "address": "http://localhost:3000/api/graph"
+          }
         }
       ],
       "sourceMethod": [
@@ -1868,9 +1892,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-03T15:28:02.433Z",
+      "updatedAt": "2025-12-06T07:45:49.817Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-03T15:28:02.433Z",
+      "lastSynced": "2025-12-06T07:45:49.817Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1881,7 +1905,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 149, edges created: 37, nodes failed: 0, edges failed: 0.",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 148, nodes updated: 5, edges created: 66, nodes failed: 0, edges failed: 0.",
       "isTenantBased": false
     },
     {
@@ -2626,72 +2650,7 @@
       "updatedAt": "2025-12-03T16:30:04.244Z"
     }
   ],
-  "app-permissions": [
-    {
-      "resourceType": [
-        {
-          "id": "SCHEMA",
-          "label": "Schema",
-          "icon": "Database",
-          "color": "amber"
-        }
-      ],
-      "resource": [
-        {
-          "id": "vendors"
-        }
-      ],
-      "action-types": [
-        {
-          "id": "CREATE",
-          "label": "Create",
-          "icon": "Plus",
-          "color": "emerald"
-        },
-        {
-          "id": "VIEW",
-          "label": "View",
-          "icon": "Eye",
-          "color": "sky"
-        },
-        {
-          "id": "EDIT",
-          "label": "Edit",
-          "icon": "Edit",
-          "color": "amber"
-        },
-        {
-          "id": "DELETE",
-          "label": "Delete",
-          "icon": "Trash2",
-          "color": "red"
-        }
-      ],
-      "permissionType": [
-        {
-          "id": "ALLOW",
-          "label": "Allow",
-          "icon": "CheckCircle",
-          "color": "emerald"
-        }
-      ],
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KBA5QDGEEJSJMJFSVABJGD70",
-      "createdAt": "2025-11-30T10:42:51.551Z",
-      "updatedAt": "2025-11-30T11:16:21.230Z",
-      "actionTypes": [
-        {
-          "id": "EDIT"
-        },
-        {
-          "id": "VIEW"
-        }
-      ],
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    }
-  ],
+  "app-permissions": [],
   "access-policies": [],
   "app-access-policies": [
     {
@@ -3074,5 +3033,7 @@
       "createdAt": "2025-12-02T11:00:19.878Z",
       "updatedAt": "2025-12-02T11:00:19.878Z"
     }
-  ]
+  ],
+  "routes": [],
+  "schemas": []
 }

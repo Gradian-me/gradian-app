@@ -36,7 +36,7 @@ export function ModeToggle({ className }: ModeToggleProps) {
   // Show loading state during SSR to avoid hydration mismatch
   if (!mounted) {
     return (
-      <Button variant="outline" size="icon" className={className} disabled>
+      <Button variant="outline" size="icon" className={className} disabled type="button">
         <Sun className="h-[1.2rem] w-[1.2rem]" />
         <span className="sr-only">Toggle theme</span>
       </Button>
@@ -51,6 +51,7 @@ export function ModeToggle({ className }: ModeToggleProps) {
       size="icon" 
       className={className}
       onClick={toggleTheme}
+      type="button"
     >
       {isDark ? (
         <Moon className="h-[1.2rem] w-[1.2rem]" />

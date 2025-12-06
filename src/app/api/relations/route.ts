@@ -179,11 +179,24 @@ export async function GET(request: NextRequest) {
               const icon = getSingleValueByRole(targetSchema, entity, 'icon') || entity.icon;
               const color = getSingleValueByRole(targetSchema, entity, 'color') || entity.color;
 
+              // Extract metadata from fields with addToReferenceMetadata: true
+              const metadataFields = targetSchema.fields?.filter((f: any) => f.addToReferenceMetadata === true) || [];
+              const metadata: Record<string, any> = {};
+              if (metadataFields.length > 0) {
+                metadataFields.forEach((field: any) => {
+                  const fieldName = field.name;
+                  if (fieldName && entity[fieldName] !== undefined && entity[fieldName] !== null) {
+                    metadata[fieldName] = entity[fieldName];
+                  }
+                });
+              }
+
               targetData = {
                 id: rel.targetId,
                 label: typeof label === 'string' ? label : String(label),
                 icon: icon ? String(icon) : undefined,
                 color: color ? String(color) : undefined,
+                ...(Object.keys(metadata).length > 0 ? { metadata } : {}),
               };
             }
           }

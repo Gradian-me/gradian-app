@@ -4,9 +4,11 @@ import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
 import { readSchemaData, writeSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
 import { extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
+import { addAudienceToToken } from '@/domains/auth/utils/jwt.util';
 import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
 // system-token.util is server-only - import directly
-import { getSystemTokenForTargetRoute } from '@/gradian-ui/shared/utils/system-token.util';
+import { getSystemTokenForTargetRoute, getAudienceIdFromTargetRoute } from '@/gradian-ui/shared/utils/system-token.util';
+import { enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
 
 /**
  * Get the API URL for internal server-side calls
@@ -77,6 +79,85 @@ function isServerDemoMode(): boolean {
     );
     return true;
   }
+}
+
+/**
+ * Resolve a route to its actual URL/address
+ * Handles:
+ * 1. Direct URLs (http:// or https://)
+ * 2. Objects with metadata.address (from stored data or picker with addToReferenceMetadata)
+ * 3. Route IDs that need to be looked up in url-repositories
+ */
+function resolveRouteToUrl(route: string | object | null): string | null {
+  if (!route) {
+    return null;
+  }
+
+  // If it's an object (from picker or stored data), check for metadata.address first
+  if (typeof route === 'object' && route !== null) {
+    // First priority: Check stored metadata.address (from all-data.json)
+    const storedMetadataAddress = (route as any).metadata?.address;
+    if (storedMetadataAddress) {
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `resolveRouteToUrl: Found stored metadata.address in route object`);
+      return storedMetadataAddress;
+    }
+    
+    // Second priority: Check direct address/url fields
+    const directAddress = (route as any).address || (route as any).url || (route as any).value;
+    if (directAddress) {
+      return directAddress;
+    }
+    
+    // Extract ID from object to resolve
+    const routeId = (route as any).id || (route as any).value;
+    if (routeId) {
+      route = routeId;
+    } else {
+      return null;
+    }
+  }
+
+  // If it's a string, check if it's already a URL
+  if (typeof route === 'string') {
+    if (route.startsWith('http://') || route.startsWith('https://')) {
+      return route;
+    }
+
+    // If it looks like a route ID (starts with alphanumeric and is long), try to resolve it
+    if (/^[A-Z0-9]{20,}$/.test(route)) {
+      try {
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `resolveRouteToUrl: Attempting to resolve route ID: ${route}`);
+        const urlRepositories = readSchemaData<any>('url-repositories');
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `resolveRouteToUrl: Found ${urlRepositories.length} url-repositories in data`);
+        
+        const routeEntity = urlRepositories.find((r: any) => String(r.id) === String(route));
+        if (!routeEntity) {
+          loggingCustom(LogType.INTEGRATION_LOG, 'warn', `resolveRouteToUrl: Route not found for ID: ${route}`);
+          return null;
+        }
+
+        // Extract URL from route entity
+        const url = routeEntity.address || routeEntity.url || routeEntity.value || null;
+        if (!url) {
+          loggingCustom(LogType.INTEGRATION_LOG, 'warn', `resolveRouteToUrl: Route found but has no address/url field. Route ID: ${route}`);
+          return null;
+        }
+
+        loggingCustom(LogType.INTEGRATION_LOG, 'info', `resolveRouteToUrl: Resolved route ID ${route} to URL: ${url}`);
+        return url;
+      } catch (error) {
+        loggingCustom(
+          LogType.INTEGRATION_LOG,
+          'error',
+          `resolveRouteToUrl: Error resolving route ID ${route}: ${error instanceof Error ? error.message : String(error)}`
+        );
+        return null;
+      }
+    }
+  }
+
+  // If it doesn't look like an ID and isn't a URL, return as-is (might be a relative path)
+  return typeof route === 'string' ? route : null;
 }
 
 function resolveTenantDomainFromId(tenantId: string | number | undefined | null): string | null {
@@ -402,6 +483,36 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Enrich integration with route data from relations (HAS_FIELD_VALUE)
+    // This will populate targetRoute and sourceRoute with full data including metadata.address
+    try {
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Enriching integration with route data from relations');
+      integration = await enrichEntityPickerFieldsFromRelations({
+        schemaId: 'integrations',
+        entity: integration,
+      });
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Integration enriched with route data from relations');
+    } catch (enrichError) {
+      loggingCustom(
+        LogType.INTEGRATION_LOG,
+        'warn',
+        `Failed to enrich integration with relations: ${enrichError instanceof Error ? enrichError.message : String(enrichError)}`
+      );
+      // Continue with unenriched integration
+    }
+
+    // TypeScript guard: integration should not be null at this point, but check to be safe
+    if (!integration) {
+      loggingCustom(LogType.INTEGRATION_LOG, 'error', `Integration became null after enrichment`);
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Integration with id "${id}" not found`
+        },
+        { status: 404 }
+      );
+    }
     
     loggingCustom(LogType.INTEGRATION_LOG, 'info', `Integration found: ${integration.title || integration.name || id}`);
     loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Integration isTenantBased: ${integration.isTenantBased}, tenantId from request: ${tenantId}`);
@@ -418,18 +529,17 @@ export async function POST(request: NextRequest) {
     }
     
     // Extract targetRoute - handle string, object, or array (from picker fields)
+    // Keep the full object if it's an object/array to preserve metadata
     loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Extracting targetRoute from integration');
-    let targetRoute: string | null = null;
+    let targetRoute: string | object | null = null;
     if (typeof integration.targetRoute === 'string') {
       targetRoute = integration.targetRoute;
     } else if (Array.isArray(integration.targetRoute) && integration.targetRoute.length > 0) {
-      // If it's an array (from picker multiselect), get the first item
-      const firstRoute = integration.targetRoute[0];
-      // Extract metadata.address if available, otherwise fall back to other properties
-      targetRoute = firstRoute?.metadata?.address || firstRoute?.address || firstRoute?.url || firstRoute?.value || firstRoute?.id || null;
+      // If it's an array (from picker multiselect), keep the first item as object to preserve metadata
+      targetRoute = integration.targetRoute[0];
     } else if (integration.targetRoute && typeof integration.targetRoute === 'object') {
-      // If it's an object (from picker), try to extract the address/url
-      targetRoute = integration.targetRoute.metadata?.address || integration.targetRoute.address || integration.targetRoute.url || integration.targetRoute.value || null;
+      // If it's an object (from picker), keep it as object to preserve metadata
+      targetRoute = integration.targetRoute;
     }
     
     if (!targetRoute) {
@@ -443,25 +553,44 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target route: ${targetRoute}`);
+    // Resolve targetRoute to URL (handles objects with metadata, IDs, and direct URLs)
+    const resolvedTargetRoute = resolveRouteToUrl(targetRoute);
+    if (!resolvedTargetRoute) {
+      loggingCustom(LogType.INTEGRATION_LOG, 'error', `Failed to resolve targetRoute: ${targetRoute}`);
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Failed to resolve targetRoute: ${targetRoute}`
+        },
+        { status: 400 }
+      );
+    }
+    
+    loggingCustom(LogType.INTEGRATION_LOG, 'info', `Target route: ${resolvedTargetRoute}`);
     
     // Extract sourceRoute - handle string, object, or array (from picker fields)
+    // Keep the full object if it's an object/array to preserve metadata
     loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Extracting sourceRoute from integration');
-    let sourceRoute: string | null = null;
+    let sourceRoute: string | object | null = null;
     if (typeof integration.sourceRoute === 'string') {
       sourceRoute = integration.sourceRoute;
     } else if (Array.isArray(integration.sourceRoute) && integration.sourceRoute.length > 0) {
-      // If it's an array (from picker multiselect), get the first item
-      const firstRoute = integration.sourceRoute[0];
-      // Extract metadata.address if available, otherwise fall back to other properties
-      sourceRoute = firstRoute?.metadata?.address || firstRoute?.address || firstRoute?.url || firstRoute?.value || firstRoute?.id || null;
+      // If it's an array (from picker multiselect), keep the first item as object to preserve metadata
+      sourceRoute = integration.sourceRoute[0];
     } else if (integration.sourceRoute && typeof integration.sourceRoute === 'object') {
-      // If it's an object (from picker), try to extract the address/url
-      sourceRoute = integration.sourceRoute.metadata?.address || integration.sourceRoute.address || integration.sourceRoute.url || integration.sourceRoute.value || null;
+      // If it's an object (from picker), keep it as object to preserve metadata
+      sourceRoute = integration.sourceRoute;
     }
     
+    // Resolve sourceRoute to URL (handles objects with metadata, IDs, and direct URLs)
+    let resolvedSourceRoute: string | null = null;
     if (sourceRoute) {
-      loggingCustom(LogType.INTEGRATION_LOG, 'info', `Source route: ${sourceRoute}`);
+      resolvedSourceRoute = resolveRouteToUrl(sourceRoute);
+      if (resolvedSourceRoute) {
+        loggingCustom(LogType.INTEGRATION_LOG, 'info', `Source route: ${resolvedSourceRoute}`);
+      } else {
+        loggingCustom(LogType.INTEGRATION_LOG, 'warn', `Failed to resolve sourceRoute: ${sourceRoute}`);
+      }
     } else {
       loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'No source route configured, will call target route directly');
     }
@@ -471,8 +600,8 @@ export async function POST(request: NextRequest) {
     
     try {
       // Step 1: If sourceRoute exists, fetch data from it first
-      if (sourceRoute) {
-        loggingCustom(LogType.INTEGRATION_LOG, 'info', `Step 1: Fetching data from source route: ${sourceRoute}`);
+      if (resolvedSourceRoute) {
+        loggingCustom(LogType.INTEGRATION_LOG, 'info', `Step 1: Fetching data from source route: ${resolvedSourceRoute}`);
         // Extract sourceMethod - handle string, object, or array (from picker fields)
         let sourceMethodValue: string = 'GET';
         if (typeof integration.sourceMethod === 'string') {
@@ -506,7 +635,10 @@ export async function POST(request: NextRequest) {
           sourceFetchOptions.body = JSON.stringify({});
         }
         
-        const sourceResponse = await fetch(sourceRoute, sourceFetchOptions);
+        // Convert to absolute URL if needed
+        const sourceUrl = getApiUrl(resolvedSourceRoute);
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Source URL (resolved): ${sourceUrl}`);
+        const sourceResponse = await fetch(sourceUrl, sourceFetchOptions);
         
         if (!sourceResponse.ok) {
           loggingCustom(LogType.INTEGRATION_LOG, 'error', `Source route failed: ${sourceResponse.status} ${sourceResponse.statusText}`);
@@ -543,7 +675,7 @@ export async function POST(request: NextRequest) {
       // Step 3: POST data to targetRoute
       // If we have data from source route, always POST it to target route
       // Otherwise, use the configured targetMethod (or default to POST)
-      loggingCustom(LogType.INTEGRATION_LOG, 'info', `Step 3: Calling target route: ${targetRoute}`);
+      loggingCustom(LogType.INTEGRATION_LOG, 'info', `Step 3: Calling target route: ${resolvedTargetRoute}`);
       let targetMethodValue: string = 'POST';
       if (dataToSend) {
         // When we have data from source route, always use POST
@@ -563,7 +695,9 @@ export async function POST(request: NextRequest) {
       }
       const method = String(targetMethodValue || 'POST').toUpperCase();
       loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target method: ${method}`);
-      const targetUrl = targetRoute;
+      // Convert to absolute URL if needed
+      const targetUrl = getApiUrl(resolvedTargetRoute);
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Target URL (resolved): ${targetUrl}`);
       
       // Build headers for target route
       const targetHeaders: Record<string, string> = {
@@ -597,9 +731,29 @@ export async function POST(request: NextRequest) {
         finalAuthHeader = systemToken;
         loggingCustom(LogType.INTEGRATION_LOG, 'info', 'Using system token for target route authorization');
       } else if (authHeader) {
-        // Fall back to client JWT if system token is not available
-        finalAuthHeader = authHeader;
-        loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Using client JWT for target route authorization');
+        // Fall back to client JWT, but add audienceId if available
+        try {
+          const audienceId = await getAudienceIdFromTargetRoute(integration.targetRoute);
+          if (audienceId) {
+            // Extract token from Bearer header
+            const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader;
+            // Add audienceId to the token
+            const tokenWithAudience = addAudienceToToken(token, audienceId);
+            finalAuthHeader = `Bearer ${tokenWithAudience}`;
+            loggingCustom(LogType.INTEGRATION_LOG, 'info', `Using client JWT with audienceId: ${audienceId}`);
+          } else {
+            finalAuthHeader = authHeader;
+            loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Using client JWT for target route authorization (no audienceId found)');
+          }
+        } catch (error) {
+          // If adding audience fails, use original token
+          finalAuthHeader = authHeader;
+          loggingCustom(
+            LogType.INTEGRATION_LOG,
+            'warn',
+            `Failed to add audienceId to token: ${error instanceof Error ? error.message : String(error)}. Using original token.`
+          );
+        }
       }
       
       // Pass authorization header to target route if present

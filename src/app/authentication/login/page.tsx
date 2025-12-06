@@ -8,6 +8,7 @@ import { useUserStore } from '@/stores/user.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { TenantSelector } from '@/components/layout/TenantSelector';
+import { Logo } from '@/gradian-ui/layout/logo/components/Logo';
 import { toast } from 'sonner';
 
 export default function LoginPage() {
@@ -125,8 +126,12 @@ export default function LoginPage() {
           <TenantSelector placeholder="Select tenant" />
         </div>
       )}
+      <div className="fixed top-8 left-8 z-50">
+        <Logo variant="auto" width={140} height={46} />
+      </div>
       <SignInPage
         //heroImageSrc="/screenshots/gradian.me_bg_desktop.png"
+        showTestimonials={false}
         onSignIn={handleSignIn}
         onResetPassword={handleResetPassword}
         onCreateAccount={handleCreateAccount}

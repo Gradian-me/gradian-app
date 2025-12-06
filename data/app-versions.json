@@ -1914,5 +1914,79 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBS0SCHEMAPAGEAPI001",
+    "timestamp": "2025-12-06T00:00:00.000Z",
+    "version": "1.15.001",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "Enhanced data relations and schemas with improved metadata handling",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "schemas"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Removed deprecated unused relations in all-data-relations.json",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "relations"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "New audienceId field in application variables for better integration",
+        "priority": "Medium",
+        "affectedDomains": [
+          "application-variables",
+          "configuration"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated login functionality to include detailed logging for authentication processes",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "logging"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined API routes for graph and relations to validate node existence and improve error handling",
+        "priority": "Medium",
+        "affectedDomains": [
+          "api",
+          "graph-designer",
+          "relations",
+          "error-handling"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Improved UI components for better user experience and accessibility",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "components",
+          "accessibility"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated page routes to use API endpoint /api/schemas/[schema-id] instead of loading all schemas",
+        "priority": "High",
+        "affectedDomains": [
+          "routing",
+          "api",
+          "pages"
+        ]
+      }
+    ]
   }
 ]

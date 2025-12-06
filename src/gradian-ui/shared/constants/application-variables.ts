@@ -9,6 +9,7 @@ export enum LogType {
   INTEGRATION_LOG = 'INTEGRATION_LOG',
   GRAPH_LOG = 'GRAPH_LOG',
   EMAIL_LOG = 'EMAIL_LOG',
+  LOGIN_LOG = 'LOGIN_LOG',
 }
 
 // Try to import JSON file as single source of truth for defaults

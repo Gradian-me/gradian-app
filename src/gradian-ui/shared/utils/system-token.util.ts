@@ -68,6 +68,35 @@ function extractUrlRepositoryId(targetRoute: any): string | null {
 }
 
 /**
+ * Extract URL address from targetRoute (for lookup by address)
+ * targetRoute can be a string (URL), object (picker with metadata.address), or array
+ */
+function extractUrlAddress(targetRoute: any): string | null {
+  if (!targetRoute) {
+    return null;
+  }
+
+  // If it's a string URL, return it
+  if (typeof targetRoute === 'string') {
+    return targetRoute;
+  }
+
+  // If it's an array (from picker multiselect), get the first item
+  if (Array.isArray(targetRoute) && targetRoute.length > 0) {
+    const firstRoute = targetRoute[0];
+    // Check metadata.address first, then direct address/url fields
+    return firstRoute?.metadata?.address || firstRoute?.address || firstRoute?.url || null;
+  }
+
+  // If it's an object (from picker), check metadata.address first, then direct fields
+  if (typeof targetRoute === 'object') {
+    return targetRoute.metadata?.address || targetRoute.address || targetRoute.url || null;
+  }
+
+  return null;
+}
+
+/**
  * Fetch URL repository entity by ID
  */
 async function fetchUrlRepositoryById(id: string): Promise<any | null> {
@@ -282,6 +311,68 @@ async function getSystemAccessToken(audience: string): Promise<string | null> {
 }
 
 /**
+ * Get audienceId from URL repository's related server
+ * @param targetRoute - The target route (can be string, object, or array from picker)
+ * @returns The audienceId string, or null if not found
+ */
+export async function getAudienceIdFromTargetRoute(targetRoute: any): Promise<string | null> {
+  try {
+    // Extract URL repository ID or address
+    const urlRepositoryId = extractUrlRepositoryId(targetRoute);
+    const urlAddress = extractUrlAddress(targetRoute);
+    let urlRepository: any = null;
+
+    if (urlRepositoryId) {
+      // Fetch by ID
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `[getAudienceIdFromTargetRoute] Fetching URL repository by ID: ${urlRepositoryId}`);
+      urlRepository = await fetchUrlRepositoryById(urlRepositoryId);
+    } else if (urlAddress) {
+      // Fetch by address (from metadata.address or direct URL)
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `[getAudienceIdFromTargetRoute] Fetching URL repository by address: ${urlAddress}`);
+      urlRepository = await fetchUrlRepositoryByAddress(urlAddress);
+    }
+
+    if (!urlRepository) {
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `[getAudienceIdFromTargetRoute] URL repository not found. ID: ${urlRepositoryId || 'N/A'}, Address: ${urlAddress || 'N/A'}`);
+      return null;
+    }
+
+    // Get related servers
+    const repositoryId = urlRepository.id || urlRepositoryId;
+    if (!repositoryId) {
+      loggingCustom(LogType.INTEGRATION_LOG, 'error', 'Cannot determine URL repository ID for fetching related servers');
+      return null;
+    }
+
+    const servers = await getRelatedServers(repositoryId);
+    if (servers.length === 0) {
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'No related servers found for URL repository');
+      return null;
+    }
+
+    // Get the first server's audience ID
+    // Field can be stored as either the field ID (server-audience-id) or the field name (audienceId)
+    const firstServer = servers[0];
+    const audienceId = firstServer['server-audience-id'] || firstServer['audienceId'];
+
+    if (!audienceId) {
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Server does not have server-audience-id or audienceId configured');
+      return null;
+    }
+
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Found audienceId: ${audienceId}`);
+    return audienceId;
+  } catch (error) {
+    loggingCustom(
+      LogType.INTEGRATION_LOG,
+      'error',
+      `Error getting audienceId from target route: ${error instanceof Error ? error.message : String(error)}`
+    );
+    return null;
+  }
+}
+
+/**
  * Get system token for a target route if enabled
  * @param targetRoute - The target route (can be string, object, or array from picker)
  * @returns The system access token as Bearer token string, or null if not applicable
@@ -290,24 +381,31 @@ export async function getSystemTokenForTargetRoute(targetRoute: any): Promise<st
   try {
     // Extract URL repository ID or address
     const urlRepositoryId = extractUrlRepositoryId(targetRoute);
+    const urlAddress = extractUrlAddress(targetRoute);
     let urlRepository: any = null;
 
     if (urlRepositoryId) {
       // Fetch by ID
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Fetching URL repository by ID: ${urlRepositoryId}`);
       urlRepository = await fetchUrlRepositoryById(urlRepositoryId);
-    } else if (typeof targetRoute === 'string') {
-      // Fetch by address
-      urlRepository = await fetchUrlRepositoryByAddress(targetRoute);
+    } else if (urlAddress) {
+      // Fetch by address (from metadata.address or direct URL)
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Fetching URL repository by address: ${urlAddress}`);
+      urlRepository = await fetchUrlRepositoryByAddress(urlAddress);
     }
 
     if (!urlRepository) {
-      loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'URL repository not found, skipping system token');
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `URL repository not found. ID: ${urlRepositoryId || 'N/A'}, Address: ${urlAddress || 'N/A'}`);
       return null;
     }
+
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `URL repository found: ${urlRepository.id || 'N/A'}`);
 
     // Check if system token is enabled
     // Field can be stored as either the field ID (url-enable-system-token) or the field name (enableSystemToken)
     const enableSystemToken = urlRepository['url-enable-system-token'] || urlRepository['enableSystemToken'];
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `System token enabled check: ${enableSystemToken} (field values: url-enable-system-token=${urlRepository['url-enable-system-token']}, enableSystemToken=${urlRepository['enableSystemToken']})`);
+    
     if (!enableSystemToken) {
       loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'System token is not enabled for this URL repository');
       return null;
@@ -328,13 +426,20 @@ export async function getSystemTokenForTargetRoute(targetRoute: any): Promise<st
       return null;
     }
 
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Found ${servers.length} related server(s)`);
+
     // Get the first server's audience ID
     // Field can be stored as either the field ID (server-audience-id) or the field name (audienceId)
     const firstServer = servers[0];
-    const audienceId = firstServer['audienceId'];
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `First server ID: ${firstServer.id || 'N/A'}`);
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `First server keys: ${Object.keys(firstServer).join(', ')}`);
+    
+    const audienceId = firstServer['server-audience-id'] || firstServer['audienceId'];
+    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Server audience ID check - server-audience-id: ${firstServer['server-audience-id'] || 'undefined'}, audienceId: ${firstServer['audienceId'] || 'undefined'}`);
 
     if (!audienceId) {
       loggingCustom(LogType.INTEGRATION_LOG, 'error', 'Server does not have server-audience-id or audienceId configured');
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Full server object: ${JSON.stringify(firstServer, null, 2)}`);
       return null;
     }
 

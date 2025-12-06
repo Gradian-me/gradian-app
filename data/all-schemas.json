@@ -1,5 +1,185 @@
 [
   {
+    "id": "schemas",
+    "description": "Schema definitions and metadata",
+    "singular_name": "Schema",
+    "plural_name": "Schemas",
+    "fields": [
+      {
+        "id": "schema-id",
+        "name": "id",
+        "label": "Schema ID",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter schema ID",
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "schema-singular-name",
+        "name": "singular_name",
+        "label": "Singular Name",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter singular name",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "schema-plural-name",
+        "name": "plural_name",
+        "label": "Plural Name",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter plural name",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "schema-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter schema description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 4
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Schema identification and description",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Database",
+    "isSystemSchema": true,
+    "isNotCompanyBased": true
+  },
+  {
+    "id": "external-nodes",
+    "description": "Manage external nodes from external data sources and APIs",
+    "singular_name": "External Node",
+    "plural_name": "External Nodes",
+    "fields": [
+      {
+        "id": "external-node-id",
+        "name": "id",
+        "label": "ID",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter external node ID",
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1,
+        "canCopy": true
+      },
+      {
+        "id": "external-node-label",
+        "name": "label",
+        "label": "Label",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter label",
+        "role": "subtitle",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "external-node-source-url",
+        "name": "sourceUrl",
+        "label": "Source URL",
+        "sectionId": "basic-information",
+        "component": "url",
+        "placeholder": "Enter source URL (e.g., https://api.example.com/endpoint)",
+        "validation": {
+          "required": true,
+          "pattern": "^https?:\\/\\/.+"
+        },
+        "colSpan": 1,
+        "order": 3,
+        "role": "subtitle"
+      },
+      {
+        "id": "external-node-icon",
+        "name": "icon",
+        "label": "Icon",
+        "sectionId": "basic-information",
+        "component": "icon",
+        "placeholder": "Enter Lucide Icon name (e.g., ExternalLink)",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4,
+        "role": "icon"
+      },
+      {
+        "id": "external-node-color",
+        "name": "color",
+        "label": "Color",
+        "sectionId": "basic-information",
+        "component": "color-picker",
+        "placeholder": "Select color",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 5,
+        "role": "color"
+      },
+      {
+        "id": "external-node-extra-payload",
+        "name": "extraPayload",
+        "label": "Extra Payload",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter extra payload data (JSON format)",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 6
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "External Node Information",
+        "description": "Basic external node details and configuration",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "ExternalLink",
+    "isSystemSchema": true,
+    "isNotCompanyBased": true
+  },
+  {
     "id": "inquiries",
     "description": "Create and manage inquiries for procurement and supply chain needs",
     "singular_name": "Inquiry",

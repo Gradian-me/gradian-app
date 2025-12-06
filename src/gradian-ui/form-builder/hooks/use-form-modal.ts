@@ -67,7 +67,7 @@ async function applyHasFieldValueRelationsToEntity(params: {
       resolveTargets: 'true', // Request enriched target data with label/icon/color
     });
 
-    const response = await apiRequest<Array<DataRelation & { targetData?: { id: string; label?: string; icon?: string; color?: string } }>>(`/api/relations?${query.toString()}`);
+    const response = await apiRequest<Array<DataRelation & { targetData?: { id: string; label?: string; icon?: string; color?: string; metadata?: Record<string, any> } }>>(`/api/relations?${query.toString()}`);
 
     if (!response.success || !Array.isArray(response.data) || response.data.length === 0) {
       // No relations found - for relations-only storage, picker fields should be empty
@@ -139,8 +139,8 @@ async function applyHasFieldValueRelationsToEntity(params: {
         continue;
       }
 
-      // Map relations to normalized options with id, label, icon, color
-      // This format matches what PickerInput expects: [{id, label, icon, color}, ...]
+      // Map relations to normalized options with id, label, icon, color, metadata
+      // This format matches what PickerInput expects: [{id, label, icon, color, metadata}, ...]
       // Relations are the source of truth for form display
       const newValue = fieldRelations.map((rel) => {
         if (rel.targetData) {
@@ -150,6 +150,7 @@ async function applyHasFieldValueRelationsToEntity(params: {
             label: rel.targetData.label || rel.targetData.id,
             icon: rel.targetData.icon,
             color: rel.targetData.color,
+            ...(rel.targetData.metadata ? { metadata: rel.targetData.metadata } : {}),
           };
         }
         // Fallback to just ID if targetData wasn't resolved

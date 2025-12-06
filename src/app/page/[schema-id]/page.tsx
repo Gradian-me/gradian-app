@@ -3,7 +3,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { DynamicEntityPageClient } from './DynamicEntityPageClient';
-import { getAllSchemasArray, getAvailableSchemaIds } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
+import { findSchemaById, getAvailableSchemaIds, getAllSchemasArray } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { checkSchemaAccess } from '@/gradian-ui/shared/utils/access-control';
 import { getCurrentUser } from '@/gradian-ui/shared/utils/server-auth.util';
@@ -47,12 +47,23 @@ function serializeSchema(schema: FormSchema): any {
 
 export default async function DynamicEntityPage({ params }: PageProps) {
   const { 'schema-id': schemaId } = await params;
-  // Load all schemas and find the specific one for consistency and reliability
-  const navigationSchemas = await getAllSchemasArray();
-  const schema = navigationSchemas.find((entry) => entry.id === schemaId) ?? null;
+  
+  // Load the specific schema from API endpoint /api/schemas/[schema-id]
+  const schema = await findSchemaById(schemaId);
 
   if (!schema) {
     notFound();
+  }
+  
+  // Load navigation schemas separately (for sidebar/navigation)
+  // This is done after schema validation to avoid unnecessary loading if schema doesn't exist
+  let navigationSchemas: FormSchema[] = [];
+  try {
+    navigationSchemas = await getAllSchemasArray();
+  } catch (error) {
+    // If loading all schemas fails, use just the current schema for navigation
+    console.warn('Failed to load all schemas for navigation:', error);
+    navigationSchemas = [schema];
   }
 
   // Check access permissions
@@ -94,9 +105,9 @@ export default async function DynamicEntityPage({ params }: PageProps) {
 
 export async function generateMetadata({ params }: PageProps) {
   const { 'schema-id': schemaId } = await params;
-  // Load all schemas and find the specific one for consistency and reliability
-  const navigationSchemas = await getAllSchemasArray();
-  const schema = navigationSchemas.find((entry) => entry.id === schemaId) ?? null;
+  
+  // Load the specific schema from API endpoint /api/schemas/[schema-id]
+  const schema = await findSchemaById(schemaId);
 
   if (!schema) {
     return {

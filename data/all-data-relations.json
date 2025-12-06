@@ -210,16 +210,6 @@
     "updatedAt": "2025-11-30T10:06:09.560Z"
   },
   {
-    "sourceSchema": "app-access-policies",
-    "sourceId": "01KBA5MV6M0A74BHVCJFQMHK6S",
-    "targetSchema": "app-permissions",
-    "targetId": "01KBA5QDGEEJSJMJFSVABJGD70",
-    "relationTypeId": "HAS_APP_PERMISSION",
-    "id": "01KBA5QDPQHFW2AHBVD85VAT3Z",
-    "createdAt": "2025-11-30T10:42:51.735Z",
-    "updatedAt": "2025-11-30T10:42:51.735Z"
-  },
-  {
     "sourceSchema": "user-roles",
     "sourceId": "01KB9Y5NKY5ZZS6BFYPC8684E9",
     "targetSchema": "app-access-policies",
@@ -378,8 +368,8 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T10:25:02.624Z",
-    "updatedAt": "2025-12-04T11:19:12.880Z",
-    "inactive": true
+    "updatedAt": "2025-12-06T06:35:08.953Z",
+    "inactive": false
   },
   {
     "id": "01KBMF20YRGDS0EZVJ49DAYGQ3",
@@ -390,7 +380,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T10:38:20.630Z",
-    "updatedAt": "2025-12-04T11:19:12.880Z",
+    "updatedAt": "2025-12-06T06:35:08.953Z",
     "inactive": true
   },
   {
@@ -402,7 +392,8 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T10:38:20.630Z",
-    "updatedAt": "2025-12-04T11:19:12.880Z"
+    "updatedAt": "2025-12-06T06:35:08.953Z",
+    "inactive": true
   },
   {
     "id": "01KBMF6WQE6GDCJDXJ390G6N5M",
@@ -413,7 +404,8 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T10:41:00.142Z",
-    "updatedAt": "2025-12-04T11:19:12.880Z"
+    "updatedAt": "2025-12-06T06:35:08.953Z",
+    "inactive": true
   },
   {
     "id": "01KBMHCVGE0EMMSF57WWWY8GWK",
@@ -458,17 +450,6 @@
     "fieldId": "vendor-field",
     "createdAt": "2025-12-04T11:19:12.700Z",
     "updatedAt": "2025-12-05T21:12:10.877Z"
-  },
-  {
-    "id": "01KBMHCVJA651CA3CAV0C9T3FB",
-    "sourceSchema": "inquiry-vendors",
-    "sourceId": "01K9720G4M9G75V3YWB9PGKBTM",
-    "targetSchema": "vendors",
-    "targetId": "01K9EX000000000000000000001",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "vendor-field",
-    "createdAt": "2025-12-04T11:19:12.714Z",
-    "updatedAt": "2025-12-04T11:19:12.714Z"
   },
   {
     "id": "01KBMHCVJV9MK8590YC0DSWPFJ",
@@ -534,7 +515,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "server-owners",
     "createdAt": "2025-12-04T11:19:12.837Z",
-    "updatedAt": "2025-12-04T11:19:12.837Z"
+    "updatedAt": "2025-12-06T06:34:51.945Z"
   },
   {
     "id": "01KBMHCVPKKPC9TZPAR8SQ4X1R",
@@ -589,7 +570,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "integration-target-route",
     "createdAt": "2025-12-04T11:19:12.933Z",
-    "updatedAt": "2025-12-04T11:19:12.933Z"
+    "updatedAt": "2025-12-06T06:23:07.124Z"
   },
   {
     "id": "01KBMHCVSDN2AB2EXAT1SV9S70",
@@ -600,7 +581,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "integration-source-route",
     "createdAt": "2025-12-04T11:19:12.940Z",
-    "updatedAt": "2025-12-04T11:19:12.940Z"
+    "updatedAt": "2025-12-06T06:23:07.131Z"
   },
   {
     "id": "01KBMHCVSWD9RSXFJZ4ZSZMBZN",
@@ -611,7 +592,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "integration-target-route",
     "createdAt": "2025-12-04T11:19:12.956Z",
-    "updatedAt": "2025-12-04T11:19:12.956Z"
+    "updatedAt": "2025-12-06T06:09:20.908Z"
   },
   {
     "id": "01KBMHCVTD3KVJTMAZKKBQ7WNW",
@@ -622,7 +603,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "integration-target-route",
     "createdAt": "2025-12-04T11:19:12.973Z",
-    "updatedAt": "2025-12-04T11:19:12.973Z"
+    "updatedAt": "2025-12-06T06:15:01.764Z"
   },
   {
     "id": "01KBMHCVTMST7207PB9YZ4ZW70",
@@ -633,7 +614,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "integration-source-route",
     "createdAt": "2025-12-04T11:19:12.980Z",
-    "updatedAt": "2025-12-04T11:19:12.980Z"
+    "updatedAt": "2025-12-06T06:15:01.768Z"
   },
   {
     "id": "01KBMHCVV9TN9M4XGWET3GF7QP",
@@ -700,17 +681,6 @@
     "fieldId": "integration-source-route",
     "createdAt": "2025-12-04T11:19:13.073Z",
     "updatedAt": "2025-12-04T11:19:13.073Z"
-  },
-  {
-    "id": "01KBMHCVZ7PDHPCCYCE66HYFVW",
-    "sourceSchema": "app-permissions",
-    "sourceId": "01KBA5QDGEEJSJMJFSVABJGD70",
-    "targetSchema": "schemas",
-    "targetId": "vendors",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "resource",
-    "createdAt": "2025-12-04T11:19:13.127Z",
-    "updatedAt": "2025-12-04T11:19:13.127Z"
   },
   {
     "id": "01KBMHCW15NJW6DSHKV55J1Y3J",

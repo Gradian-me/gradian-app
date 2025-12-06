@@ -93,6 +93,43 @@ export async function PUT(
       );
     }
 
+    // Validate that all edges reference existing nodes
+    const nodeIds = new Set(nodes.map((n: GraphNodeData) => n.id));
+    const missingNodes: Array<{ edgeIndex: number; nodeId: string; schema: string; type: 'source' | 'target' }> = [];
+    
+    edges.forEach((edge: GraphEdgeData, index: number) => {
+      if (!nodeIds.has(edge.source)) {
+        missingNodes.push({
+          edgeIndex: index,
+          nodeId: edge.source,
+          schema: edge.sourceSchema || 'unknown',
+          type: 'source',
+        });
+      }
+      if (!nodeIds.has(edge.target)) {
+        missingNodes.push({
+          edgeIndex: index,
+          nodeId: edge.target,
+          schema: edge.targetSchema || 'unknown',
+          type: 'target',
+        });
+      }
+    });
+
+    if (missingNodes.length > 0) {
+      const errorDetails = missingNodes.map(m => 
+        `Edge at index ${m.edgeIndex}: ${m.type} node with id '${m.nodeId}' does not exist in schema '${m.schema}'`
+      ).join('; ');
+      
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Cannot create edges: The following nodes do not exist and were not created in this request: ${missingNodes.map(m => `- Node ${m.nodeId} in schema '${m.schema}'`).join(' ')} Details: ${errorDetails}. Please ensure all referenced nodes exist in the database or are included in the 'nodes' array of this request.`,
+        },
+        { status: 400 }
+      );
+    }
+
     const graphs = await readGraphs();
     
     // Check if graph exists

@@ -105,15 +105,22 @@ export function NeonOrbs({
       </div>
 
       {/* Center text */}
-      <div className="relative z-10 text-center text-indigo-900 dark:text-white transition-colors duration-500">
-        <h1 
-          className={`text-4xl md:text-7xl font-extralight tracking-[0.2em] mb-4 transition-all duration-1000 ease-out ${
-              mounted 
-                ? "opacity-100 translate-y-0 blur-0" 
-                : "opacity-0 translate-y-8 blur-sm"
-            }`}
-            style={{ transitionDelay: "500ms" }}
-          >
+      <div className="relative z-10 text-center text-indigo-900 dark:text-white transition-colors duration-500 w-full max-w-full px-4">
+        <div className="w-full max-w-full overflow-hidden flex justify-center">
+          <h1 
+            className={`font-extralight tracking-[0.2em] mb-4 transition-all duration-1000 ease-out whitespace-nowrap ${
+                mounted 
+                  ? "opacity-100 translate-y-0 blur-0" 
+                  : "opacity-0 translate-y-8 blur-sm"
+              }`}
+              style={{ 
+                transitionDelay: "500ms",
+                fontSize: "clamp(2rem, 2vw + 1rem, 4.5rem)",
+                maxWidth: "100%",
+                transform: "scale(1)",
+                transformOrigin: "center"
+              }}
+            >
             {title.split("").map((char, i) => (
               <span
                 key={i}
@@ -126,14 +133,15 @@ export function NeonOrbs({
               </span>
             ))}
           </h1>
-          <p 
-            className={`text-lg md:text-xl font-light tracking-widest text-indigo-600/60 dark:text-white/60 transition-all duration-1000 ease-out ${
-              mounted 
-                ? "opacity-100 translate-y-0 blur-0" 
-                : "opacity-0 translate-y-4 blur-sm"
-            }`}
-            style={{ transitionDelay: "1500ms" }}
-          >
+        </div>
+        <p 
+          className={`text-lg md:text-xl font-light tracking-widest text-indigo-600/60 dark:text-white/60 transition-all duration-1000 ease-out ${
+            mounted 
+              ? "opacity-100 translate-y-0 blur-0" 
+              : "opacity-0 translate-y-4 blur-sm"
+          }`}
+          style={{ transitionDelay: "1500ms" }}
+        >
           {subtitle}
         </p>
       </div>

@@ -46,9 +46,10 @@ export function extractPickerFieldValues(params: {
 }
 
 /**
- * Convert picker field values to minimal [{id}, {id}] format for tracing.
- * This keeps IDs in the entity for backward compatibility and tracing,
+ * Convert picker field values to minimal [{id, metadata}, {id, metadata}] format for tracing.
+ * This keeps IDs and metadata in the entity for backward compatibility and tracing,
  * but all operations should use relations for full data (label, icon, color).
+ * Metadata is preserved from fields with addToReferenceMetadata: true.
  */
 export function minimizePickerFieldValues(params: {
   schema: FormSchema;
@@ -69,24 +70,44 @@ export function minimizePickerFieldValues(params: {
       // Set to empty array if field exists but is null/undefined
       minimized[fieldName] = [];
     } else if (Array.isArray(value)) {
-      // Convert array to minimal [{id}, {id}] format
+      // Convert array to minimal [{id, metadata}, {id, metadata}] format
       minimized[fieldName] = value.map((item) => {
         if (typeof item === 'string' || typeof item === 'number') {
           return { id: String(item) };
         } else if (typeof item === 'object' && item !== null) {
-          // Extract just the ID, ignore label/icon/color
+          // Extract ID and preserve metadata if present
           const id = item.id ?? (item as any).value;
-          return id ? { id: String(id) } : null;
+          if (!id) return null;
+          
+          const minimizedItem: { id: string; metadata?: Record<string, any> } = { id: String(id) };
+          
+          // Preserve metadata if it exists
+          if (item.metadata && typeof item.metadata === 'object' && Object.keys(item.metadata).length > 0) {
+            minimizedItem.metadata = item.metadata;
+          }
+          
+          return minimizedItem;
         }
         return null;
       }).filter((item) => item !== null);
     } else {
-      // Single value - convert to [{id}] format
+      // Single value - convert to [{id, metadata}] format
       if (typeof value === 'string' || typeof value === 'number') {
         minimized[fieldName] = [{ id: String(value) }];
       } else if (typeof value === 'object' && value !== null) {
         const id = value.id ?? (value as any).value;
-        minimized[fieldName] = id ? [{ id: String(id) }] : [];
+        if (!id) {
+          minimized[fieldName] = [];
+        } else {
+          const minimizedItem: { id: string; metadata?: Record<string, any> } = { id: String(id) };
+          
+          // Preserve metadata if it exists
+          if (value.metadata && typeof value.metadata === 'object' && Object.keys(value.metadata).length > 0) {
+            minimizedItem.metadata = value.metadata;
+          }
+          
+          minimized[fieldName] = [minimizedItem];
+        }
       } else {
         minimized[fieldName] = [];
       }
@@ -401,12 +422,34 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
       }
 
       if (fieldRelations.length === 0) {
-        // No relations for this field, keep existing value (minimal IDs or empty)
+        // No relations for this field, but check if we have stored values with metadata
+        const existingValue = enrichedEntity[fieldName];
+        if (Array.isArray(existingValue) && existingValue.length > 0) {
+          // Keep existing stored values (which may include metadata)
+          // Don't overwrite - they're already in the correct format
+          continue;
+        }
+        // No relations and no existing value, skip this field
         continue;
       }
 
       // Map relations to enriched format
+      // First, check if there are existing stored values with metadata
+      const existingValue = enrichedEntity[fieldName];
+      const existingValueMap = new Map<string, any>();
+      if (Array.isArray(existingValue)) {
+        existingValue.forEach((item: any) => {
+          if (item && item.id) {
+            existingValueMap.set(String(item.id), item);
+          }
+        });
+      }
+
       const enrichedValues = fieldRelations.map((rel) => {
+        // Check if we have stored metadata for this ID
+        const storedItem = existingValueMap.get(String(rel.targetId));
+        const storedMetadata = storedItem?.metadata;
+
         if (rel.targetSchema === 'external-nodes') {
           const externalNode = externalNodeMap.get(rel.targetId);
           if (externalNode) {
@@ -415,11 +458,13 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
               label: externalNode.label || externalNode.id,
               icon: externalNode.icon,
               color: externalNode.color,
+              ...(storedMetadata ? { metadata: storedMetadata } : {}),
             };
           }
           return {
             id: rel.targetId,
             label: rel.targetId,
+            ...(storedMetadata ? { metadata: storedMetadata } : {}),
           };
         } else {
           const entityMap = schemaEntityMap.get(rel.targetSchema);
@@ -431,16 +476,32 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
             const icon = getSingleValueByRole(targetSchema, targetEntity, 'icon') || targetEntity.icon;
             const color = getSingleValueByRole(targetSchema, targetEntity, 'color') || targetEntity.color;
 
+            // Use stored metadata if available, otherwise extract from fields with addToReferenceMetadata: true
+            let metadata: Record<string, any> = storedMetadata || {};
+            if (!storedMetadata || Object.keys(storedMetadata).length === 0) {
+              const metadataFields = targetSchema.fields?.filter((f: any) => f.addToReferenceMetadata === true) || [];
+              if (metadataFields.length > 0) {
+                metadataFields.forEach((field: any) => {
+                  const fieldName = field.name;
+                  if (fieldName && targetEntity[fieldName] !== undefined && targetEntity[fieldName] !== null) {
+                    metadata[fieldName] = targetEntity[fieldName];
+                  }
+                });
+              }
+            }
+
             return {
               id: rel.targetId,
               label: typeof label === 'string' ? label : String(label),
               icon: icon ? String(icon) : undefined,
               color: color ? String(color) : undefined,
+              ...(Object.keys(metadata).length > 0 ? { metadata } : {}),
             };
           }
           return {
             id: rel.targetId,
             label: rel.targetId,
+            ...(storedMetadata ? { metadata: storedMetadata } : {}),
           };
         }
       });
