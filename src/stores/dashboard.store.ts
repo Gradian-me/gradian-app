@@ -3,6 +3,8 @@ import { devtools } from 'zustand/middleware';
 import { DashboardStats, SpendAnalysisData, KpiCard } from '../domains/dashboard/types';
 import { dashboardService } from '../domains/dashboard/services/dashboard.service';
 import { LoadingState } from '@/gradian-ui/shared/types/common';
+import { sanitizeNestedData } from '@/gradian-ui/shared/utils/security.util';
+import { getZustandDevToolsConfig } from '@/gradian-ui/shared/utils/zustand-devtools.util';
 
 interface DashboardState extends LoadingState {
   stats: DashboardStats | null;
@@ -45,8 +47,10 @@ export const useDashboardStore = create<DashboardState & DashboardActions>()(
         
         try {
           const stats = await dashboardService.getDashboardStats(filters);
+          // Sanitize stats before storing
+          const sanitizedStats = stats ? sanitizeNestedData(stats) : null;
           set({
-            stats,
+            stats: sanitizedStats,
             filters: filters || {},
             isLoading: false,
           });
@@ -63,8 +67,10 @@ export const useDashboardStore = create<DashboardState & DashboardActions>()(
         
         try {
           const spendAnalysisData = await dashboardService.getSpendAnalysisData(filters);
+          // Sanitize data before storing
+          const sanitizedData = spendAnalysisData ? sanitizeNestedData(spendAnalysisData) : null;
           set({
-            spendAnalysisData,
+            spendAnalysisData: sanitizedData,
             isLoading: false,
           });
         } catch (error) {
@@ -80,8 +86,10 @@ export const useDashboardStore = create<DashboardState & DashboardActions>()(
         
         try {
           const kpiCards = await dashboardService.getKpiCards();
+          // Sanitize KPI cards before storing
+          const sanitizedCards = kpiCards ? sanitizeNestedData(kpiCards) : null;
           set({
-            kpiCards,
+            kpiCards: sanitizedCards || [],
             isLoading: false,
           });
         } catch (error) {
@@ -97,8 +105,10 @@ export const useDashboardStore = create<DashboardState & DashboardActions>()(
         
         try {
           const performanceMetrics = await dashboardService.getPerformanceMetrics();
+          // Sanitize metrics before storing
+          const sanitizedMetrics = performanceMetrics ? sanitizeNestedData(performanceMetrics) : null;
           set({
-            performanceMetrics,
+            performanceMetrics: sanitizedMetrics,
             isLoading: false,
           });
         } catch (error) {
@@ -110,7 +120,9 @@ export const useDashboardStore = create<DashboardState & DashboardActions>()(
       },
 
       setFilters: (filters: any) => {
-        set({ filters });
+        // Sanitize filters before storing
+        const sanitizedFilters = filters ? sanitizeNestedData(filters) : {};
+        set({ filters: sanitizedFilters });
       },
 
       clearError: () => {
@@ -121,8 +133,6 @@ export const useDashboardStore = create<DashboardState & DashboardActions>()(
         set(initialState);
       },
     }),
-    {
-      name: 'dashboard-store',
-    }
+    getZustandDevToolsConfig<DashboardState & DashboardActions>('dashboard-store')
   )
 );

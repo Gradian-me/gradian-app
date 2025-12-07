@@ -3,21 +3,23 @@
 import React, { useState } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Button } from '@/components/ui/button';
-import { Eye, FileCode, FileDown, Loader2 } from 'lucide-react';
+import { Eye, FileCode, FileDown, Loader2, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 
 export interface MarkdownToolboxProps {
-  viewMode: 'preview' | 'raw';
-  onViewModeChange: (value: 'preview' | 'raw') => void;
+  viewMode: 'editor' | 'preview' | 'raw';
+  onViewModeChange: (value: 'editor' | 'preview' | 'raw') => void;
   onExportPdf?: () => Promise<void>;
   showPdfExport?: boolean;
+  showEditor?: boolean;
 }
 
 export function MarkdownToolbox({ 
   viewMode, 
   onViewModeChange,
   onExportPdf,
-  showPdfExport = true 
+  showPdfExport = true,
+  showEditor = false 
 }: MarkdownToolboxProps) {
   const [isExporting, setIsExporting] = useState(false);
 
@@ -44,7 +46,7 @@ export function MarkdownToolbox({
             variant="outline"
             size="sm"
             onClick={handleExportPdf}
-            disabled={isExporting || viewMode === 'raw'}
+            disabled={isExporting || viewMode === 'raw' || viewMode === 'editor'}
             className="gap-2"
           >
             {isExporting ? (
@@ -67,7 +69,7 @@ export function MarkdownToolbox({
           type="single"
           value={viewMode}
           onValueChange={(value) => {
-            if (value === 'preview' || value === 'raw') {
+            if (value === 'editor' || value === 'preview' || value === 'raw') {
               onViewModeChange(value);
             }
           }}
@@ -81,10 +83,20 @@ export function MarkdownToolbox({
             <Eye className="h-4 w-4" />
             <span>Preview</span>
           </ToggleGroupItem>
+          {showEditor && (
+            <ToggleGroupItem 
+              value="editor" 
+              aria-label="Editor" 
+              className="gap-2 rounded-none border-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 data-[state=on]:bg-violet-200 dark:data-[state=on]:bg-violet-900 data-[state=on]:text-violet-800 dark:data-[state=on]:text-violet-200"
+            >
+              <Pencil className="h-4 w-4" />
+              <span>Editor</span>
+            </ToggleGroupItem>
+          )}
           <ToggleGroupItem 
             value="raw" 
             aria-label="Raw" 
-            className="gap-2 rounded-r-md rounded-l-none border-0 bg-white dark:bg-gray-800 data-[state=on]:bg-violet-200 dark:data-[state=on]:bg-violet-900 data-[state=on]:text-violet-800 dark:data-[state=on]:text-violet-200"
+            className={`gap-2 ${showEditor ? 'rounded-r-md rounded-l-none' : 'rounded-r-md rounded-l-none'} border-0 bg-white dark:bg-gray-800 data-[state=on]:bg-violet-200 dark:data-[state=on]:bg-violet-900 data-[state=on]:text-violet-800 dark:data-[state=on]:text-violet-200`}
           >
             <FileCode className="h-4 w-4" />
             <span>Raw</span>

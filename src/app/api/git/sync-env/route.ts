@@ -69,11 +69,16 @@ export async function POST(request: NextRequest) {
     // Parse .env.prod file (includes parsing variable options from comments)
     const { envVars, varOptions } = parseEnvFile(envFileContent);
 
+    // Log all parsed variables for debugging
+    console.log(`Parsed ${Object.keys(envVars).length} environment variables from .env.prod:`, Object.keys(envVars));
+
     // Exclude GitLab-specific variables from syncing
     const excludedVars = ['GITLAB_TOKEN', 'GITLAB_PROJECT_ID', 'GITLAB_API_URL'];
     const varsToSync = Object.entries(envVars).filter(
       ([key]) => !excludedVars.includes(key)
     );
+
+    console.log(`After excluding GitLab-specific variables, ${varsToSync.length} variables will be synced:`, varsToSync.map(([key]) => key));
 
     if (varsToSync.length === 0) {
       return NextResponse.json(
@@ -122,7 +127,20 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const existingVarKeys = replaceAll ? new Set<string>() : new Set(existingVars.map((v: any) => v.key));
+    // Create a map of existing variables by key and environment_scope
+    // GitLab allows the same key with different environment_scopes
+    const existingVarsMap = new Map<string, any>();
+    if (!replaceAll) {
+      for (const variable of existingVars) {
+        const scope = variable.environment_scope || '*';
+        const mapKey = `${variable.key}:${scope}`;
+        existingVarsMap.set(mapKey, variable);
+        // Also store by key alone for backward compatibility
+        if (!existingVarsMap.has(variable.key)) {
+          existingVarsMap.set(variable.key, variable);
+        }
+      }
+    }
 
     // Sync variables
     const results = {
@@ -149,9 +167,15 @@ export async function POST(request: NextRequest) {
           raw: mergedOptions.raw !== false ? true : false, // raw=true hides from UI
         };
         
-        console.log(`Variable ${key} options:`, { protected: options.protected, masked: options.masked, raw: options.raw });
+        const environmentScope = options.environment_scope || '*';
+        const mapKey = `${key}:${environmentScope}`;
+        
+        console.log(`Variable ${key} options:`, { protected: options.protected, masked: options.masked, raw: options.raw, environment_scope: environmentScope });
 
-        if (existingVarKeys.has(key)) {
+        // Check if variable exists (by key:scope or just key)
+        const existingVar = existingVarsMap.get(mapKey) || existingVarsMap.get(key);
+
+        if (existingVar && !replaceAll) {
           // Update existing variable
           await updateGitLabVariable(
             gitlabApiUrl,
@@ -163,16 +187,47 @@ export async function POST(request: NextRequest) {
           );
           results.updated.push(key);
         } else {
-          // Create new variable
-          await createGitLabVariable(
-            gitlabApiUrl,
-            gitlabToken,
-            gitlabProjectId,
-            key,
-            value,
-            options
-          );
-          results.created.push(key);
+          // Try to create new variable
+          try {
+            await createGitLabVariable(
+              gitlabApiUrl,
+              gitlabToken,
+              gitlabProjectId,
+              key,
+              value,
+              options
+            );
+            results.created.push(key);
+          } catch (createError) {
+            // If creation fails with "already exists" error, try updating instead
+            const errorMessage = createError instanceof Error ? createError.message : String(createError);
+            if (errorMessage.includes('has already been taken') || errorMessage.includes('already exists')) {
+              console.log(`Variable ${key} already exists, attempting to update instead...`);
+              try {
+                await updateGitLabVariable(
+                  gitlabApiUrl,
+                  gitlabToken,
+                  gitlabProjectId,
+                  key,
+                  value,
+                  options
+                );
+                results.updated.push(key);
+              } catch (updateError) {
+                // If update also fails, record the original creation error
+                results.failed.push({
+                  key,
+                  error: errorMessage,
+                });
+              }
+            } else {
+              // For other errors, record as failed
+              results.failed.push({
+                key,
+                error: errorMessage,
+              });
+            }
+          }
         }
       } catch (error) {
         results.failed.push({
@@ -267,12 +322,42 @@ function parseEnvFile(
     }
 
     // Parse KEY=VALUE format
-    const match = trimmedLine.match(/^([^=:#]+)=(.*)$/);
+    // Support: VAR=value, VAR="value", VAR='value', VAR= (empty), VAR=value # comment
+    const match = trimmedLine.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
     if (match) {
       const key = match[1].trim();
       let value = match[2].trim();
 
-      // Remove quotes if present
+      // Remove inline comments (everything after # that's not inside quotes)
+      // This handles cases like: VAR=value # comment
+      if (value.includes('#')) {
+        // Check if # is inside quotes
+        let inQuotes = false;
+        let quoteChar = '';
+        let commentIndex = -1;
+        
+        for (let i = 0; i < value.length; i++) {
+          const char = value[i];
+          if ((char === '"' || char === "'") && (i === 0 || value[i - 1] !== '\\')) {
+            if (!inQuotes) {
+              inQuotes = true;
+              quoteChar = char;
+            } else if (char === quoteChar) {
+              inQuotes = false;
+              quoteChar = '';
+            }
+          } else if (char === '#' && !inQuotes) {
+            commentIndex = i;
+            break;
+          }
+        }
+        
+        if (commentIndex !== -1) {
+          value = value.substring(0, commentIndex).trim();
+        }
+      }
+
+      // Remove quotes if present (handle both single and double quotes)
       if (
         (value.startsWith('"') && value.endsWith('"')) ||
         (value.startsWith("'") && value.endsWith("'"))
@@ -280,7 +365,7 @@ function parseEnvFile(
         value = value.slice(1, -1);
       }
 
-      // Only add non-empty keys
+      // Add variable even if value is empty (empty values are valid)
       if (key) {
         envVars[key] = value;
         
@@ -370,8 +455,26 @@ async function createGitLabVariable(
   try {
     // Ensure raw, masked, and protected are explicitly set (default to true)
     const rawValue = options.raw !== undefined ? options.raw : true;
-    const maskedValue = options.masked !== undefined ? options.masked : true;
+    let maskedValue = options.masked !== undefined ? options.masked : true;
     const protectedValue = options.protected !== undefined ? options.protected : true;
+    
+    // GitLab requires masked variables to be at least 8 characters and match a regex pattern
+    // If masking is requested but value doesn't meet requirements, disable masking
+    if (maskedValue && value) {
+      // GitLab masked variable requirements:
+      // - At least 8 characters
+      // - Must match: ^.{8,}$
+      // - Cannot contain newlines or control characters
+      const canBeMasked = value.length >= 8 && 
+                         !value.includes('\n') && 
+                         !value.includes('\r') &&
+                         /^[\x20-\x7E]{8,}$/.test(value);
+      
+      if (!canBeMasked) {
+        console.warn(`Variable ${key} cannot be masked (value too short or contains invalid characters). Disabling masking.`);
+        maskedValue = false;
+      }
+    }
     
     const payload: any = {
       key,
@@ -382,7 +485,8 @@ async function createGitLabVariable(
       environment_scope: options.environment_scope || '*',
     };
 
-    console.log(`Creating variable ${key} with protected=${protectedValue}, masked=${maskedValue}, raw=${rawValue}`);
+    console.log(`Creating variable ${key} with protected=${protectedValue}, masked=${maskedValue}, raw=${rawValue}, valueLength=${value.length}, valuePreview=${value.substring(0, 50)}${value.length > 50 ? '...' : ''}`);
+    console.log(`Payload for ${key}:`, JSON.stringify({ ...payload, value: value.substring(0, 20) + '...' }));
 
     await axios.post(
       `${apiUrl}/projects/${projectId}/variables`,
@@ -396,9 +500,62 @@ async function createGitLabVariable(
     );
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      const errorMsg = error.response?.data?.message || error.message;
+      // Extract detailed error information from GitLab API response
+      let errorMsg = error.message;
+      
+      // Log the full error for debugging
+      console.error(`Error creating variable ${key}:`, {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        headers: error.response?.headers,
+      });
+      
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        
+        // GitLab API can return errors in different formats
+        try {
+          if (typeof errorData === 'string') {
+            errorMsg = errorData;
+          } else if (errorData.message) {
+            errorMsg = typeof errorData.message === 'string' 
+              ? errorData.message 
+              : JSON.stringify(errorData.message, null, 2);
+          } else if (Array.isArray(errorData)) {
+            errorMsg = errorData.map((err: any) => {
+              if (typeof err === 'string') return err;
+              if (err?.message) return err.message;
+              try {
+                return JSON.stringify(err, null, 2);
+              } catch {
+                return String(err);
+              }
+            }).join(', ');
+          } else if (errorData.error) {
+            errorMsg = typeof errorData.error === 'string' 
+              ? errorData.error 
+              : JSON.stringify(errorData.error, null, 2);
+          } else {
+            // Try to stringify the whole error data with proper formatting
+            try {
+              errorMsg = JSON.stringify(errorData, null, 2);
+            } catch (stringifyError) {
+              // If stringify fails (circular reference), try to extract what we can
+              errorMsg = `Error object: ${String(errorData)}`;
+            }
+          }
+        } catch (parseError) {
+          errorMsg = `Failed to parse error: ${String(errorData)}`;
+        }
+      }
+      
+      const statusInfo = error.response?.status 
+        ? ` (Status: ${error.response.status} ${error.response.statusText})`
+        : '';
+      
       throw new Error(
-        `Failed to create GitLab variable ${key}: ${errorMsg}`
+        `Failed to create GitLab variable ${key}: ${errorMsg}${statusInfo}`
       );
     }
     throw error;
@@ -419,8 +576,26 @@ async function updateGitLabVariable(
   try {
     // Ensure raw, masked, and protected are explicitly set (default to true)
     const rawValue = options.raw !== undefined ? options.raw : true;
-    const maskedValue = options.masked !== undefined ? options.masked : true;
+    let maskedValue = options.masked !== undefined ? options.masked : true;
     const protectedValue = options.protected !== undefined ? options.protected : true;
+    
+    // GitLab requires masked variables to be at least 8 characters and match a regex pattern
+    // If masking is requested but value doesn't meet requirements, disable masking
+    if (maskedValue && value) {
+      // GitLab masked variable requirements:
+      // - At least 8 characters
+      // - Must match: ^.{8,}$
+      // - Cannot contain newlines or control characters
+      const canBeMasked = value.length >= 8 && 
+                         !value.includes('\n') && 
+                         !value.includes('\r') &&
+                         /^[\x20-\x7E]{8,}$/.test(value);
+      
+      if (!canBeMasked) {
+        console.warn(`Variable ${key} cannot be masked (value too short or contains invalid characters). Disabling masking.`);
+        maskedValue = false;
+      }
+    }
     
     const payload: any = {
       value,
@@ -430,10 +605,19 @@ async function updateGitLabVariable(
       environment_scope: options.environment_scope || '*',
     };
 
-    console.log(`Updating variable ${key} with protected=${protectedValue}, masked=${maskedValue}, raw=${rawValue}`);
+    const environmentScope = options.environment_scope || '*';
+    
+    console.log(`Updating variable ${key} with protected=${protectedValue}, masked=${maskedValue}, raw=${rawValue}, valueLength=${value.length}, valuePreview=${value.substring(0, 50)}${value.length > 50 ? '...' : ''}, environment_scope=${environmentScope}`);
+
+    // GitLab API requires environment_scope in the URL if it's not '*'
+    // Format: /projects/:id/variables/:key?filter[environment_scope]=:scope
+    let updateUrl = `${apiUrl}/projects/${projectId}/variables/${encodeURIComponent(key)}`;
+    if (environmentScope !== '*') {
+      updateUrl += `?filter[environment_scope]=${encodeURIComponent(environmentScope)}`;
+    }
 
     await axios.put(
-      `${apiUrl}/projects/${projectId}/variables/${encodeURIComponent(key)}`,
+      updateUrl,
       payload,
       {
         headers: {
@@ -444,9 +628,62 @@ async function updateGitLabVariable(
     );
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      const errorMsg = error.response?.data?.message || error.message;
+      // Extract detailed error information from GitLab API response
+      let errorMsg = error.message;
+      
+      // Log the full error for debugging
+      console.error(`Error updating variable ${key}:`, {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        headers: error.response?.headers,
+      });
+      
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        
+        // GitLab API can return errors in different formats
+        try {
+          if (typeof errorData === 'string') {
+            errorMsg = errorData;
+          } else if (errorData.message) {
+            errorMsg = typeof errorData.message === 'string' 
+              ? errorData.message 
+              : JSON.stringify(errorData.message, null, 2);
+          } else if (Array.isArray(errorData)) {
+            errorMsg = errorData.map((err: any) => {
+              if (typeof err === 'string') return err;
+              if (err?.message) return err.message;
+              try {
+                return JSON.stringify(err, null, 2);
+              } catch {
+                return String(err);
+              }
+            }).join(', ');
+          } else if (errorData.error) {
+            errorMsg = typeof errorData.error === 'string' 
+              ? errorData.error 
+              : JSON.stringify(errorData.error, null, 2);
+          } else {
+            // Try to stringify the whole error data with proper formatting
+            try {
+              errorMsg = JSON.stringify(errorData, null, 2);
+            } catch (stringifyError) {
+              // If stringify fails (circular reference), try to extract what we can
+              errorMsg = `Error object: ${String(errorData)}`;
+            }
+          }
+        } catch (parseError) {
+          errorMsg = `Failed to parse error: ${String(errorData)}`;
+        }
+      }
+      
+      const statusInfo = error.response?.status 
+        ? ` (Status: ${error.response.status} ${error.response.statusText})`
+        : '';
+      
       throw new Error(
-        `Failed to update GitLab variable ${key}: ${errorMsg}`
+        `Failed to update GitLab variable ${key}: ${errorMsg}${statusInfo}`
       );
     }
     throw error;

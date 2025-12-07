@@ -2,6 +2,7 @@
 export { MarkdownViewer } from './components/MarkdownViewer';
 export { MarkdownToolbox } from './components/MarkdownToolbox';
 export { MarkdownNavigation } from './components/MarkdownNavigation';
+export { MarkdownEditor } from './components/MarkdownEditor';
 export { markdownComponents, createMarkdownComponents } from './components/MarkdownComponents';
 export * from './types';
 export * from './hooks';

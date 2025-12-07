@@ -457,6 +457,96 @@
     }
   },
   {
+    "id": "multi-select",
+    "label": "MultiSelect",
+    "color": "violet",
+    "icon": "CheckSquare",
+    "category": "form-elements",
+    "description": "Multi-select input supporting badges/options with search and grouped options.",
+    "usecase": "Choose multiple items from a list, tag selection, multiple category selection, feature flags.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/MultiSelect.tsx",
+    "componentValue": "multi-select",
+    "configSchema": {
+      "fields": [
+        {
+          "name": "maxCount",
+          "label": "Max Selections",
+          "type": "number",
+          "description": "Maximum number of selections allowed",
+          "min": 1
+        },
+        {
+          "name": "maxSelections",
+          "label": "Max Selections (Alternative)",
+          "type": "number",
+          "description": "Alternative prop name for maximum number of selections",
+          "min": 1
+        },
+        {
+          "name": "schemaId",
+          "label": "Schema ID",
+          "type": "string",
+          "description": "Schema ID to fetch options from (e.g., 'users', 'companies')"
+        },
+        {
+          "name": "sourceUrl",
+          "label": "Source URL",
+          "type": "string",
+          "description": "URL to fetch options from (overrides schemaId if both provided)"
+        },
+        {
+          "name": "queryParams",
+          "label": "Query Parameters",
+          "type": "object",
+          "description": "Query parameters for fetching options"
+        },
+        {
+          "name": "transform",
+          "label": "Transform Function",
+          "type": "string",
+          "description": "Transform function to convert API response to option format (as code string)"
+        },
+        {
+          "name": "sortType",
+          "label": "Sort Type",
+          "type": "select",
+          "description": "Sort order for options",
+          "options": [
+            { "value": "ASC", "label": "Ascending" },
+            { "value": "DESC", "label": "Descending" },
+            { "value": null, "label": "No Sorting" }
+          ]
+        },
+        {
+          "name": "columnMap",
+          "label": "Column Map",
+          "type": "object",
+          "description": "Column mapping configuration for API requests"
+        },
+        {
+          "name": "variant",
+          "label": "Variant",
+          "type": "select",
+          "description": "Visual variant of the multi-select",
+          "defaultValue": "default",
+          "options": [
+            { "value": "default", "label": "Default" },
+            { "value": "secondary", "label": "Secondary" },
+            { "value": "destructive", "label": "Destructive" },
+            { "value": "inverted", "label": "Inverted" }
+          ]
+        },
+        {
+          "name": "searchable",
+          "label": "Searchable",
+          "type": "boolean",
+          "description": "Enable search functionality in dropdown",
+          "defaultValue": true
+        }
+      ]
+    }
+  },
+  {
     "id": "checkbox-list",
     "label": "CheckboxList",
     "color": "purple",

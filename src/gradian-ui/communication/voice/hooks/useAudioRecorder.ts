@@ -88,7 +88,44 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       setIsRecording(true);
     } catch (err) {
       console.error('Error starting recording:', err);
-      setError('Failed to start recording. Please check microphone permissions.');
+      
+      // Provide more specific error messages based on error type
+      let errorMessage = 'Failed to start recording. ';
+      
+      if (err instanceof DOMException || err instanceof Error) {
+        const errorName = err.name || (err as DOMException).name;
+        
+        switch (errorName) {
+          case 'NotAllowedError':
+          case 'PermissionDeniedError':
+            errorMessage += 'Microphone permission denied. Please allow microphone access in your browser settings.';
+            break;
+          case 'NotFoundError':
+          case 'DevicesNotFoundError':
+            errorMessage += 'No microphone found. Please connect a microphone and try again.';
+            break;
+          case 'NotReadableError':
+          case 'TrackStartError':
+            errorMessage += 'Microphone is already in use by another application. Please close other applications using the microphone.';
+            break;
+          case 'OverconstrainedError':
+          case 'ConstraintNotSatisfiedError':
+            errorMessage += 'Microphone constraints not supported. Please try a different microphone.';
+            break;
+          case 'NotSupportedError':
+            errorMessage += 'Recording is not supported in this browser. Please use a modern browser.';
+            break;
+          case 'SecurityError':
+            errorMessage += 'Microphone access blocked. Please use HTTPS or localhost.';
+            break;
+          default:
+            errorMessage += 'Please check microphone permissions and try again.';
+        }
+      } else {
+        errorMessage += 'Please check microphone permissions and try again.';
+      }
+      
+      setError(errorMessage);
       setIsRecording(false);
       // Clean up any partial stream on error
       if (streamRef.current) {

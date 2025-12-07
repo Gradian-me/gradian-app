@@ -1,8 +1,7 @@
 // Select Component
 'use client';
 
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useMemo } from 'react';
 import {
   Select as RadixSelect,
   SelectContent,
@@ -17,8 +16,7 @@ import { Badge } from '../../../../components/ui/badge';
 import { motion } from 'framer-motion';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { extractFirstId, normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';
-import { BadgeViewer } from '../utils/badge-viewer';
-import { Check, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { useOptionsFromSchemaOrUrl } from '../hooks/useOptionsFromSchemaOrUrl';
 import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
@@ -124,10 +122,6 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const fieldName = config?.name || 'unknown';
   const fieldLabel = config?.label;
   const fieldPlaceholder = placeholder || config?.placeholder || 'Select an option...';
-  const allowMultiselect = Boolean(
-    config?.metadata?.allowMultiselect ??
-    (config as any)?.allowMultiselect
-  );
 
   const renderFieldLabel = () =>
     fieldLabel ? (
@@ -143,10 +137,6 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       </p>
     ) : null;
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const panelRef = useRef<HTMLDivElement | null>(null);
-  const isClickingPanelRef = useRef(false);
 
   const normalizedValueArray = useMemo(
     () => normalizeOptionArray(value),
@@ -201,287 +191,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     [normalizedOptions]
   );
 
-  useEffect(() => {
-    if (!allowMultiselect || !isDropdownOpen) {
-      return;
-    }
 
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!containerRef.current) return;
-      // If we're clicking inside the panel, don't close
-      if (isClickingPanelRef.current) {
-        isClickingPanelRef.current = false;
-        return;
-      }
-      const target = event.target as Node;
-      // Check if click is outside both the trigger container and the portaled panel
-      const isOutsideTrigger = !containerRef.current.contains(target);
-      const isInsidePanel = panelRef.current?.contains(target);
-      
-      // Only close if click is outside trigger AND outside panel
-      if (isOutsideTrigger && !isInsidePanel) {
-        setIsDropdownOpen(false);
-        onOpenChange?.(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsDropdownOpen(false);
-        onOpenChange?.(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [allowMultiselect, isDropdownOpen, onOpenChange]);
-
-  useEffect(() => {
-    if (!allowMultiselect) {
-      setIsDropdownOpen(false);
-      onOpenChange?.(false);
-    }
-  }, [allowMultiselect, onOpenChange]);
-
-  useEffect(() => {
-    if (disabled) {
-      setIsDropdownOpen(false);
-      onOpenChange?.(false);
-    }
-  }, [disabled, onOpenChange]);
-
-  const normalizedValueIds = useMemo(
-    () =>
-      normalizedValueArray
-        .map((opt) => opt.id)
-        .filter((id): id is string => Boolean(id))
-        .map((id) => String(id)),
-    [normalizedValueArray]
-  );
-
-  const normalizedValueIdsKey = useMemo(
-    () => JSON.stringify(normalizedValueIds),
-    [normalizedValueIds]
-  );
-
-  const [multiSelectionIds, setMultiSelectionIds] = useState<string[]>(normalizedValueIds);
-
-  const [panelPlacement, setPanelPlacement] = useState<'bottom' | 'top'>('bottom');
-  const [panelMaxHeight, setPanelMaxHeight] = useState<number>(256);
-  const [panelOffset, setPanelOffset] = useState<number>(8);
-  const [shouldShowMultiChevron, setShouldShowMultiChevron] = useState(true);
-  const [panelPosition, setPanelPosition] = useState<{ left: number; top: number; width: number } | null>(null);
-
-  const updatePanelPosition = useCallback(() => {
-    if (!allowMultiselect || !isDropdownOpen || disabled) {
-      return;
-    }
-
-    const triggerEl = containerRef.current;
-    if (!triggerEl) {
-      return;
-    }
-
-    const triggerRect = triggerEl.getBoundingClientRect();
-    const panelEl = panelRef.current;
-    // Use actual panel height if available, otherwise estimate based on options
-    const estimatedOptionHeight = size === 'sm' ? 34 : size === 'lg' ? 46 : 40;
-    const estimatedPanelHeight = Math.min(validOptions.length * estimatedOptionHeight, 360);
-    const panelHeight = panelEl?.offsetHeight ?? estimatedPanelHeight;
-    const viewportHeight = window.innerHeight;
-    const spacing = 12;
-
-    const dialogEl = triggerEl.closest('[role="dialog"]');
-    const dialogRect = dialogEl?.getBoundingClientRect();
-
-    const boundaryTop = dialogRect ? dialogRect.top + spacing : spacing;
-    const boundaryBottom = dialogRect ? dialogRect.bottom - spacing : viewportHeight - spacing;
-
-    const spaceAbove = triggerRect.top - boundaryTop;
-    const spaceBelow = boundaryBottom - triggerRect.bottom;
-
-    let placement: 'bottom' | 'top' = 'bottom';
-    let availableSpace = spaceBelow;
-
-    if ((spaceBelow < panelHeight && spaceAbove > spaceBelow) || (spaceBelow < 160 && spaceAbove > spaceBelow)) {
-      placement = 'top';
-      availableSpace = spaceAbove;
-    }
-
-    const safeSpace = Math.max(80, availableSpace);
-    const maxHeight = Math.max(120, Math.min(Math.floor(safeSpace), 360));
-    const offset = Math.max(6, Math.min(12, Math.floor(Math.min(safeSpace / 6, 12))));
-
-    // Calculate fixed position for portaled dropdown
-    const left = triggerRect.left;
-    const top = placement === 'bottom' 
-      ? triggerRect.bottom + offset
-      : triggerRect.top - offset;
-    const width = triggerRect.width;
-
-    setPanelPlacement(placement);
-    setPanelMaxHeight(maxHeight);
-    setPanelOffset(offset);
-    setPanelPosition({ left, top, width });
-  }, [allowMultiselect, disabled, isDropdownOpen, size, validOptions]);
-
-  // Calculate panel position immediately when dropdown opens
-  useEffect(() => {
-    if (isDropdownOpen && allowMultiselect) {
-      // Use requestAnimationFrame to ensure DOM is ready
-      requestAnimationFrame(() => {
-        updatePanelPosition();
-      });
-    }
-  }, [isDropdownOpen, allowMultiselect, updatePanelPosition]);
-
-  useLayoutEffect(() => {
-    if (isDropdownOpen) {
-      updatePanelPosition();
-    }
-  }, [updatePanelPosition, isDropdownOpen, multiSelectionIds, normalizedOptionsLookup]);
-
-  useEffect(() => {
-    if (!allowMultiselect || !isDropdownOpen) {
-      return;
-    }
-
-    // Use ResizeObserver to watch for trigger element size changes
-    const triggerEl = containerRef.current;
-    let resizeObserver: ResizeObserver | null = null;
-
-    if (triggerEl && typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(() => {
-        updatePanelPosition();
-      });
-      resizeObserver.observe(triggerEl);
-    }
-
-    window.addEventListener('resize', updatePanelPosition);
-    window.addEventListener('scroll', updatePanelPosition, true);
-
-    return () => {
-      if (resizeObserver && triggerEl) {
-        resizeObserver.unobserve(triggerEl);
-        resizeObserver.disconnect();
-      }
-      window.removeEventListener('resize', updatePanelPosition);
-      window.removeEventListener('scroll', updatePanelPosition, true);
-    };
-  }, [allowMultiselect, isDropdownOpen, updatePanelPosition]);
-
-  useEffect(() => {
-    if (!isDropdownOpen) {
-      setPanelPosition(null);
-    }
-  }, [isDropdownOpen]);
-
-  useEffect(() => {
-    if (!allowMultiselect) {
-      setMultiSelectionIds([]);
-      return;
-    }
-
-    const idsFromValue: string[] = normalizedValueIdsKey
-      ? JSON.parse(normalizedValueIdsKey).map((id: any) => String(id))
-      : [];
-
-    setMultiSelectionIds((prev) => {
-      // Use Set-based comparison for order-independent comparison
-      const prevSet = new Set(prev.map((id) => String(id)));
-      const valueSet = new Set(idsFromValue.map((id) => String(id)));
-      
-      // Check if sets are equal (same items, order-independent)
-      if (prevSet.size === valueSet.size) {
-        let isEqual = true;
-        for (const id of prevSet) {
-          if (!valueSet.has(id)) {
-            isEqual = false;
-            break;
-          }
-        }
-        if (isEqual) {
-          return prev;
-        }
-      }
-      // Only update if the incoming value is actually different
-      return idsFromValue;
-    });
-  }, [allowMultiselect, normalizedValueIdsKey]);
-
-  const validOptionsCount = validOptions.length;
-
-  useEffect(() => {
-    // Always show chevron in multiselect mode to indicate dropdown can be opened
-    if (allowMultiselect) {
-      setShouldShowMultiChevron(true);
-      return;
-    }
-
-    // For single select, show chevron by default
-    setShouldShowMultiChevron(true);
-  }, [allowMultiselect]);
-
-  const arraysMatch = useCallback(
-    (a: string[], b: string[]) => {
-      if (a.length !== b.length) return false;
-      for (let i = 0; i < a.length; i += 1) {
-        if (a[i] !== b[i]) return false;
-      }
-      return true;
-    },
-    []
-  );
-
-  const sortedNormalizedValueIds = useMemo(
-    () => [...normalizedValueIds].sort(),
-    [normalizedValueIds]
-  );
-
-  const multiSelectionSet = useMemo(() => new Set(multiSelectionIds), [multiSelectionIds]);
-
-  const selectionKey = useMemo(() => [...multiSelectionIds].sort().join('|'), [multiSelectionIds]);
-  const normalizedValueKey = useMemo(
-    () => sortedNormalizedValueIds.join('|'),
-    [sortedNormalizedValueIds]
-  );
-  const lastEmittedKeyRef = useRef<string>('');
-
-  useEffect(() => {
-    if (!allowMultiselect || !onNormalizedChange) {
-      return;
-    }
-
-    // If selection matches incoming value, treat as synchronized and skip emission
-    if (selectionKey === normalizedValueKey) {
-      lastEmittedKeyRef.current = selectionKey;
-      return;
-    }
-
-    // Avoid emitting the same selection repeatedly
-    if (selectionKey === lastEmittedKeyRef.current) {
-      return;
-    }
-
-    const normalizedSelection = multiSelectionIds
-      .map((id) => normalizedOptionsLookup.get(id))
-      .filter((opt): opt is NormalizedOption => Boolean(opt));
-
-    lastEmittedKeyRef.current = selectionKey;
-    onNormalizedChange(normalizedSelection);
-  }, [
-    allowMultiselect,
-    multiSelectionIds,
-    normalizedOptionsLookup,
-    normalizedValueKey,
-    onNormalizedChange,
-    selectionKey,
-  ]);
 
   // Check if color is a valid badge variant, custom color, or Tailwind classes
   const isValidBadgeVariant = (color?: string): boolean => {
@@ -598,19 +308,14 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   if (hasNormalizedOptions) {
     const selectedOption = normalizedOptions.find((opt) => opt.id === normalizedCurrentValue);
     // Convert empty string to undefined so placeholder shows
-    const selectValue = allowMultiselect
-      ? undefined
-      : selectedOption?.id ?? (normalizedCurrentValue === '' ? undefined : normalizedCurrentValue);
-    const displayOption =
-      !allowMultiselect
-        ? selectedOption ??
-          (normalizedValueEntry
-            ? {
-                ...normalizedValueEntry,
-                label: normalizedValueEntry.label ?? normalizedValueEntry.id,
-              }
-            : undefined)
-        : undefined;
+    const selectValue = selectedOption?.id ?? (normalizedCurrentValue === '' ? undefined : normalizedCurrentValue);
+    const displayOption = selectedOption ??
+      (normalizedValueEntry
+        ? {
+            ...normalizedValueEntry,
+            label: normalizedValueEntry.label ?? normalizedValueEntry.id,
+          }
+        : undefined);
 
     const handleRadixChange = (selectedId: string) => {
       if (onValueChange) {
@@ -625,235 +330,6 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
         onNormalizedChange(matched ? [matched] : []);
       }
     };
-
-    if (allowMultiselect) {
-      const multiSelectedOptions = multiSelectionIds
-        .map((id) => normalizedOptionsLookup.get(id))
-        .filter((opt): opt is NormalizedOption => Boolean(opt));
-
-      const triggerSizeClasses = {
-        sm: 'min-h-8',
-        md: 'min-h-10',
-        lg: 'min-h-12',
-      } as const;
-
-      const triggerClasses = cn(
-        'flex w-full items-center justify-between rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 shadow-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 ring-offset-background dark:ring-offset-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:ring-offset-1 focus:border-violet-400 dark:focus:border-violet-500 transition-colors',
-        triggerSizeClasses[size],
-        disabled ? 'pointer-events-none opacity-60 cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-gray-800/30 disabled:text-gray-500 dark:disabled:text-gray-400' : 'cursor-pointer',
-        error
-          ? 'border-red-500 dark:border-red-500 focus:ring-red-300 dark:focus:ring-red-400 focus:border-red-500 dark:focus:border-red-500'
-          : 'hover:border-violet-400 dark:hover:border-violet-500',
-        'items-start gap-2',
-        className
-      );
-
-      const panelClasses = cn(
-        'fixed z-[9999] rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-lg overflow-hidden',
-        panelPlacement === 'bottom' ? 'mt-0' : 'mb-0'
-      );
-
-      const optionButtonClasses = (isSelected: boolean) =>
-        cn(
-          'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors text-left',
-          isSelected
-            ? 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 shadow-inner'
-            : 'hover:bg-gray-50 dark:hover:bg-slate-700'
-        );
-
-      const renderMultiTriggerContent = () => {
-        if (multiSelectionIds.length === 0) {
-          return (
-            <span className="text-sm text-gray-400 dark:text-gray-500">
-              {fieldPlaceholder}
-            </span>
-          );
-        }
-
-        const selectedOptions = multiSelectionIds
-          .map((id) => normalizedOptionsLookup.get(id))
-          .filter((opt): opt is NormalizedOption => Boolean(opt));
-
-        if (selectedOptions.length === 0) {
-          return (
-            <span className="text-sm text-gray-400 dark:text-gray-500">
-              {fieldPlaceholder}
-            </span>
-          );
-        }
-
-        return (
-          <BadgeViewer
-            field={{
-              name: fieldName,
-              label: fieldLabel ?? fieldName,
-              type: 'select',
-              component: 'select',
-              sectionId: '',
-              options: normalizedOptions,
-            } as any}
-            value={selectedOptions}
-            maxBadges={0}
-            className="flex flex-wrap gap-1"
-            enforceVariant={false}
-          />
-        );
-      };
-
-      const toggleOption = (option: NormalizedOption) => {
-        if (disabled) return;
-        const optionId = option.id;
-        // Ensure optionId is a valid string (not empty, null, or undefined)
-        if (!optionId || String(optionId).trim() === '') {
-          return;
-        }
-
-        const optionIdString = String(optionId);
-        setMultiSelectionIds((prev) => {
-          const alreadySelected = prev.includes(optionIdString);
-          const next = alreadySelected
-            ? prev.filter((id) => id !== optionIdString)
-            : [...prev, optionIdString];
-          return next;
-        });
-      };
-
-      return (
-        <div className="w-full" ref={containerRef}>
-          {renderFieldLabel()}
-          <div className="relative">
-            <button
-              type="button"
-              className={triggerClasses}
-              onClick={(e) => {
-                e.stopPropagation();
-                const willOpen = !isDropdownOpen;
-                if (willOpen && containerRef.current) {
-                  // Calculate position immediately using trigger element
-                  const triggerEl = containerRef.current;
-                  const triggerRect = triggerEl.getBoundingClientRect();
-                  const viewportHeight = window.innerHeight;
-                  const spacing = 12;
-                  
-                  const dialogEl = triggerEl.closest('[role="dialog"]');
-                  const dialogRect = dialogEl?.getBoundingClientRect();
-                  const boundaryTop = dialogRect ? dialogRect.top + spacing : spacing;
-                  const boundaryBottom = dialogRect ? dialogRect.bottom - spacing : viewportHeight - spacing;
-                  
-                  const spaceBelow = boundaryBottom - triggerRect.bottom;
-                  const estimatedOptionHeight = size === 'sm' ? 34 : size === 'lg' ? 46 : 40;
-                  const estimatedPanelHeight = Math.min(validOptions.length * estimatedOptionHeight, 360);
-                  
-                  let placement: 'bottom' | 'top' = 'bottom';
-                  if (spaceBelow < 160) {
-                    placement = 'top';
-                  }
-                  
-                  const safeSpace = Math.max(80, spaceBelow);
-                  const maxHeight = Math.max(120, Math.min(Math.floor(safeSpace), 360));
-                  const offset = Math.max(6, Math.min(12, Math.floor(Math.min(safeSpace / 6, 12))));
-                  
-                  const left = triggerRect.left;
-                  const top = placement === 'bottom' 
-                    ? triggerRect.bottom + offset
-                    : triggerRect.top - offset;
-                  const width = triggerRect.width;
-                  
-                  setPanelPlacement(placement);
-                  setPanelMaxHeight(maxHeight);
-                  setPanelOffset(offset);
-                  setPanelPosition({ left, top, width });
-                }
-                setIsDropdownOpen((prev) => {
-                  const next = !prev;
-                  onOpenChange?.(next);
-                  return next;
-                });
-              }}
-            >
-              <div className="flex flex-1 flex-wrap gap-1">
-                {renderMultiTriggerContent()}
-              </div>
-              <ChevronDown className="h-4 w-4 text-gray-600 dark:text-gray-300 opacity-70 shrink-0" />
-            </button>
-            {isDropdownOpen && panelPosition && typeof document !== 'undefined' && createPortal(
-              <div
-                className={panelClasses}
-                ref={panelRef}
-                style={{
-                  left: `${panelPosition.left}px`,
-                  top: `${panelPosition.top}px`,
-                  transform: panelPlacement === 'top' ? 'translateY(-100%)' : 'none',
-                  width: `${panelPosition.width}px`,
-                  maxHeight: panelMaxHeight,
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  isClickingPanelRef.current = true;
-                }}
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                  isClickingPanelRef.current = true;
-                }}
-              >
-                <div className="max-h-full overflow-y-auto py-1">
-                  {validOptions.length === 0 ? (
-                    <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                      No options available
-                    </div>
-                  ) : (
-                    validOptions.map((option, index) => {
-                      const optionId = option.id ? String(option.id) : '';
-                      const isSelected = optionId !== '' && multiSelectionSet.has(optionId);
-                      return (
-                        <motion.div
-                          key={optionId}
-                          initial={{ opacity: 0, y: 4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.17, delay: Math.min(index * 0.04, 0.25) }}
-                        >
-                          <button
-                            type="button"
-                            className={optionButtonClasses(isSelected)}
-                            onClick={(event) => {
-                              event.preventDefault();
-                              event.stopPropagation();
-                              isClickingPanelRef.current = true;
-                              toggleOption(option);
-                            }}
-                            onMouseDown={(event) => {
-                              event.preventDefault();
-                              event.stopPropagation();
-                              isClickingPanelRef.current = true;
-                            }}
-                          >
-                            <span
-                              className={cn(
-                                'flex h-4 w-4 items-center justify-center rounded border transition-colors',
-                                isSelected
-                                  ? 'border-violet-500 dark:border-violet-400 bg-violet-500 dark:bg-violet-400 shadow-sm text-white'
-                                  : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50'
-                              )}
-                            >
-                              {isSelected && <Check className="h-3 w-3" />}
-                            </span>
-                            <span className="flex min-w-0 flex-1 items-center gap-2">
-                              {renderBadgeContent(option)}
-                            </span>
-                          </button>
-                        </motion.div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>,
-              document.body
-            )}
-          </div>
-          {error && renderErrorMessage(error)}
-        </div>
-      );
-    }
 
     return (
       <div className="w-full">

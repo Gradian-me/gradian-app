@@ -38,20 +38,43 @@ export function mapMenuItemsToNavigationItems(
 ): NavigationItem[] {
   if (!Array.isArray(menuItems)) return [];
 
-  return menuItems
+  const filtered = menuItems
     .filter((item) => {
       if (!AD_MODE) return true;
       return !item.hideInAD;
     })
     .filter((item) => {
-      if (companyId === null || companyId === undefined) return true;
-      const companies = item.companies;
-      if (!companies || !Array.isArray(companies) || companies.length === 0) {
-        // No company restriction, visible for all
+      // If no company is selected (or "All Companies" is selected), show all items
+      if (companyId === null || companyId === undefined) {
         return true;
       }
-      // companies is expected to be an array of picker values { id, label, ... }
-      return companies.some((c: any) => String(c?.id) === String(companyId));
+      
+      const companies = item.companies;
+      // If item has no company restrictions, it's visible for all companies
+      if (!companies || !Array.isArray(companies) || companies.length === 0) {
+        return true;
+      }
+      
+      // Item has company restrictions - check if selected company matches
+      // Normalize both IDs to strings for comparison
+      const normalizedCompanyId = String(companyId);
+      const matches = companies.some((c: any) => {
+        if (!c || c.id === null || c.id === undefined) return false;
+        return String(c.id) === normalizedCompanyId;
+      });
+      
+      // Debug logging for Integrations menu item
+      if (item.menuTitle === 'Integrations' || item.menuUrl === '/integrations') {
+        console.log('[Menu Filter] Integrations item:', {
+          menuTitle: item.menuTitle,
+          companyId,
+          normalizedCompanyId,
+          companies: companies.map((c: any) => ({ id: c?.id, label: c?.label })),
+          matches,
+        });
+      }
+      
+      return matches;
     })
     .map<NavigationItem>((item) => {
       const iconName: string | undefined = item.menuIcon;
@@ -64,6 +87,20 @@ export function mapMenuItemsToNavigationItems(
         icon: Icon,
       };
     });
+
+  // Debug logging
+  console.log('[Menu Filter] Results:', {
+    totalItems: menuItems.length,
+    filteredCount: filtered.length,
+    companyId,
+    items: filtered.map((item: any) => ({
+      title: item.menuTitle,
+      url: item.menuUrl,
+      companies: item.companies?.map((c: any) => c?.id) || [],
+    })),
+  });
+
+  return filtered;
 }
 /**
  * Get initials from a name

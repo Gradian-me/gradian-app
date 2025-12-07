@@ -322,9 +322,11 @@ export function AiBuilderWrapper({
     }
   }, [selectedAgentId, previousUserPrompt, previousAiResponse, firstPromptId, generateResponse, aiResponse, userPrompt]);
 
-  const handleApprove = () => {
+  const handleApprove = (editedContent?: string) => {
     if (!selectedAgent || !aiResponse) return;
-    approveResponse(aiResponse, selectedAgent);
+    // Use edited content if provided, otherwise use original response
+    const contentToApprove = editedContent || aiResponse;
+    approveResponse(contentToApprove, selectedAgent);
   };
 
   const handleCardClick = useCallback((cardData: { id: string; label: string; icon?: string }, schemaData: any) => {

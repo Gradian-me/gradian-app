@@ -107,6 +107,9 @@ const config: Config = {
         'slide-down': 'slideDown 0.5s ease-out',
         'scale-in': 'scaleIn 0.2s ease-out',
         'bounce-subtle': 'bounceSubtle 2s infinite',
+        'slideInDown': 'slideInDown 0.2s ease-out',
+        'flipIn': 'flipIn 0.2s ease-out',
+        'wiggle': 'wiggle 0.5s ease-in-out',
       },
       keyframes: {
         fadeIn: {
@@ -128,6 +131,19 @@ const config: Config = {
         bounceSubtle: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-5px)' },
+        },
+        slideInDown: {
+          '0%': { opacity: '0', transform: 'translateY(-10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        flipIn: {
+          '0%': { opacity: '0', transform: 'rotateY(-90deg)' },
+          '100%': { opacity: '1', transform: 'rotateY(0)' },
+        },
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(-3deg)' },
+          '75%': { transform: 'rotate(3deg)' },
         },
       },
       backdropBlur: {

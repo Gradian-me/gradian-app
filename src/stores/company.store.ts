@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { sanitizeNestedData } from '@/gradian-ui/shared/utils/security.util';
+import { getZustandDevToolsConfig } from '@/gradian-ui/shared/utils/zustand-devtools.util';
 
 interface Company {
   id: string | number;
@@ -23,7 +25,9 @@ export const useCompanyStore = create<CompanyState>()(
         selectedCompany: null,
         
         setSelectedCompany: (company: Company | null) => {
-          set({ selectedCompany: company }, false, 'setSelectedCompany');
+          // Sanitize company data before storing
+          const sanitizedCompany = company ? sanitizeNestedData(company) : null;
+          set({ selectedCompany: sanitizedCompany }, false, 'setSelectedCompany');
         },
         
         getCompanyId: () => {
@@ -43,8 +47,6 @@ export const useCompanyStore = create<CompanyState>()(
         name: 'company-store',
       }
     ),
-    {
-      name: 'company-store',
-    }
+    getZustandDevToolsConfig<CompanyState>('company-store')
   )
 );

@@ -10,6 +10,7 @@ import { EndLine } from '@/gradian-ui/layout/end-line/components/EndLine';
 import { createMarkdownComponents } from './MarkdownComponents';
 import { MarkdownToolbox } from './MarkdownToolbox';
 import { MarkdownNavigation } from './MarkdownNavigation';
+import { MarkdownEditor } from './MarkdownEditor';
 import { extractHeadings } from '../utils/headingExtractor';
 import { useMarkdownScrollSpy } from '../hooks/useMarkdownScrollSpy';
 import { MarkdownViewerProps } from '../types';
@@ -17,13 +18,29 @@ import { exportMarkdownToPdf } from '../utils/pdfExport';
 
 export function MarkdownViewer({ 
   content, 
-  showToggle = true, 
+  showToggle = true,
+  isEditable = false,
+  onChange,
   stickyHeadings = [],
   navigationHeadingLevels = [],
   onNavigationData
 }: MarkdownViewerProps) {
-  const [viewMode, setViewMode] = useState<'preview' | 'raw'>('preview');
+  const [viewMode, setViewMode] = useState<'editor' | 'preview' | 'raw'>('preview');
   const [headings, setHeadings] = useState<Array<{ id: string; text: string; level: number }>>([]);
+  const lastSentContentRef = useRef<string>(content);
+  
+  // Handle content changes from editor - immediately update store
+  const handleContentChange = useCallback((newContent: string) => {
+    // Track what we're sending to parent/store
+    lastSentContentRef.current = newContent;
+    // Immediately notify parent/store of changes
+    onChange?.(newContent);
+  }, [onChange]);
+  
+  // Always use content prop as source of truth (it should come from store)
+  // This ensures preview/raw modes always show the latest from store
+  // When editing, onChange updates the store, which updates content prop, which flows back
+  const displayContent = content;
   
   // Memoize navigationHeadingLevels array to prevent unnecessary re-renders
   const navigationLevelsKey = useMemo(() => {
@@ -33,8 +50,8 @@ export function MarkdownViewer({
   
   // Memoize content key to detect actual content changes
   const contentKey = useMemo(() => {
-    return content || '';
-  }, [content]);
+    return displayContent || '';
+  }, [displayContent]);
   
   // Track previous values to prevent unnecessary state updates
   const prevContentKeyRef = useRef<string>('');
@@ -142,6 +159,8 @@ export function MarkdownViewer({
       
       stableOnNavigationData.current({ headings, activeHeadingId });
     }
+    // Note: onNavigationData is tracked via ref in the previous useEffect, so we don't need it here
+    // This keeps the dependency array size constant
   }, [headings, activeHeadingId]);
   
   // Memoize sticky headings to prevent recreating components unnecessarily
@@ -156,7 +175,7 @@ export function MarkdownViewer({
   
   // Detect when markdown rendering is complete
   useEffect(() => {
-    if (viewMode !== 'preview' || !content) {
+    if (viewMode !== 'preview' || !displayContent) {
       setMarkdownLoadedTimestamp(undefined);
       return;
     }
@@ -180,7 +199,7 @@ export function MarkdownViewer({
     return () => {
       clearTimeout(timer);
     };
-  }, [content, viewMode]);
+  }, [displayContent, viewMode]);
 
   // Create components with sticky headings configuration (memoized)
   const markdownComponents = useMemo(() => {
@@ -213,20 +232,38 @@ export function MarkdownViewer({
           onViewModeChange={setViewMode}
           onExportPdf={handleExportPdf}
           showPdfExport={true}
+          showEditor={isEditable}
         />
       )}
 
-      {viewMode === 'raw' ? (
+      {viewMode === 'editor' ? (
+        <div className="my-4">
+          <MarkdownEditor
+            key="markdown-editor" // Stable key to preserve editor instance across mode switches
+            content={content}
+            onChange={handleContentChange}
+            readOnly={false}
+            className="w-full"
+          />
+          <EndLine />
+        </div>
+      ) : viewMode === 'raw' ? (
         <div className="my-4">
           <CodeViewer
-            code={content}
+            key={displayContent} // Force re-render when content changes
+            code={displayContent}
             programmingLanguage="markdown"
             title="Raw Markdown"
           />
           <EndLine />
         </div>
       ) : (
-        <article ref={markdownContentRef} dir="auto" className="prose prose-lg dark:prose-invert max-w-none">
+        <article 
+          ref={markdownContentRef} 
+          dir="auto" 
+          className="prose prose-lg dark:prose-invert max-w-none"
+          key={displayContent} // Force re-render when content changes
+        >
           <ReactMarkdown
             remarkPlugins={[
               remarkGfm,
@@ -235,7 +272,7 @@ export function MarkdownViewer({
             ]}
             components={markdownComponents}
           >
-            {content}
+            {displayContent}
           </ReactMarkdown>
           <EndLine />
         </article>

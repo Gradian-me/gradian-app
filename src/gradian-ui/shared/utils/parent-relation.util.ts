@@ -22,14 +22,17 @@ export const syncParentRelation = async ({
     if (!schemaId || !childId) return;
 
     // 1) Load existing parent relations for this child
+    // Build query params ensuring 'id' is always last
+    const queryParams = new URLSearchParams();
+    queryParams.append('schema', schemaId);
+    queryParams.append('direction', 'target');
+    queryParams.append('relationTypeId', RELATION_TYPE_ID);
+    queryParams.append('id', childId); // id is always last
+    
     const existingRes = await apiRequest<{
       success: boolean;
       data?: any[];
-    }>(
-      `/api/relations?schema=${encodeURIComponent(schemaId)}&id=${encodeURIComponent(
-        childId
-      )}&direction=target&relationTypeId=${encodeURIComponent(RELATION_TYPE_ID)}`
-    );
+    }>(`/api/relations?${queryParams.toString()}`);
 
     const existing = existingRes.success && Array.isArray(existingRes.data) ? existingRes.data : [];
 

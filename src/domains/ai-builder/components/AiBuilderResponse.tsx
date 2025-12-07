@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -17,6 +17,7 @@ import { TableWrapper } from '@/gradian-ui/data-display/table/components/TableWr
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';
 import { cn } from '@/gradian-ui/shared/utils';
+import { useAiResponseStore } from '@/stores/ai-response.store';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
 import type { AiAgent, TokenUsage, SchemaAnnotation, AnnotationItem } from '../types';
 
@@ -27,7 +28,7 @@ interface AiBuilderResponseProps {
   duration: number | null;
   isApproving: boolean;
   isLoading?: boolean;
-  onApprove: () => void;
+  onApprove: (content?: string) => void;
   onCardClick?: (cardData: { id: string; label: string; icon?: string }, schemaData: any) => void;
   annotations?: SchemaAnnotation[];
   onAnnotationsChange?: (schemaId: string, annotations: AnnotationItem[]) => void;
@@ -123,6 +124,82 @@ export function AiBuilderResponse({
 }: AiBuilderResponseProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const prevIsLoadingRef = useRef<boolean>(isLoading);
+  const lastResponseRef = useRef<string>('');
+  
+  // Get agent format
+  const agentFormat = useMemo(() => {
+    if (!agent?.requiredOutputFormat) return 'string';
+    return agent.requiredOutputFormat as 'string' | 'json' | 'table';
+  }, [agent?.requiredOutputFormat]);
+  
+  // Reactively get latest response from store using selector
+  const latestResponse = useAiResponseStore((state) => {
+    if (!agent?.id) return null;
+    const latestKey = `ai-response-${agent.id}-${agentFormat}-latest`;
+    const latestDatetime = state.latestResponses[latestKey];
+    if (!latestDatetime) return null;
+    const storageKey = `ai-response-${agent.id}-${agentFormat}-${latestDatetime}`;
+    return state.responses[storageKey] || null;
+  });
+  
+  // Use stored content if available, otherwise use response
+  const displayContent = useMemo(() => {
+    if (latestResponse?.content && latestResponse.content.trim()) {
+      return latestResponse.content;
+    }
+    return (response && response.trim()) || '';
+  }, [latestResponse, response]);
+  
+  // Get store actions
+  const saveResponse = useAiResponseStore((state) => state.saveResponse);
+  const updateResponse = useAiResponseStore((state) => state.updateResponse);
+  
+  // Handle content changes from MarkdownEditor - update store directly with debouncing
+  const handleContentChangeRef = useRef<NodeJS.Timeout | null>(null);
+  const handleContentChange = useCallback(async (newContent: string) => {
+    if (!agent?.id || !latestResponse) return;
+    
+    // Clear previous timeout
+    if (handleContentChangeRef.current) {
+      clearTimeout(handleContentChangeRef.current);
+    }
+    
+    // Debounce store updates to avoid too many writes
+    handleContentChangeRef.current = setTimeout(async () => {
+      const storageKey = `ai-response-${agent.id}-${agentFormat}-${latestResponse.id}`;
+      await updateResponse(storageKey, newContent);
+    }, 500);
+  }, [agent?.id, agentFormat, latestResponse, updateResponse]);
+  
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (handleContentChangeRef.current) {
+        clearTimeout(handleContentChangeRef.current);
+      }
+    };
+  }, []);
+  
+  // Save response to store when AI generates a response
+  useEffect(() => {
+    if (!agent?.id || !response || !response.trim() || isLoading) {
+      return;
+    }
+
+    // Don't save if it's the same as the last response we saved
+    if (lastResponseRef.current === response) {
+      return;
+    }
+
+    const saveAsync = async () => {
+      const timestamp = await saveResponse(agent.id, agentFormat, response, tokenUsage || undefined, duration || undefined);
+      if (timestamp) {
+        lastResponseRef.current = response;
+      }
+    };
+
+    saveAsync();
+  }, [response, agent?.id, agentFormat, tokenUsage, duration, isLoading, saveResponse]);
 
   // Scroll to "Your Creation" heading when generation finishes
   useEffect(() => {
@@ -150,11 +227,11 @@ export function AiBuilderResponse({
   // Check if we should render as table
   const shouldRenderTable = agent?.requiredOutputFormat === 'table';
   const { data: tableData, isValid: isValidTable } = useMemo(() => {
-    if (!response || !shouldRenderTable) {
+    if (!displayContent || !shouldRenderTable) {
       return { data: [], isValid: false };
     }
-    return parseTableData(response);
-  }, [response, shouldRenderTable]);
+    return parseTableData(displayContent);
+  }, [displayContent, shouldRenderTable]);
 
   const tableColumns = useMemo(() => {
     if (!shouldRenderTable || !isValidTable || tableData.length === 0) {
@@ -190,7 +267,8 @@ export function AiBuilderResponse({
     };
   }, [tableColumns, tableData]);
 
-  if (!response) {
+  // Don't render if we have no content to display
+  if (!displayContent || !displayContent.trim()) {
     return null;
   }
 
@@ -205,7 +283,11 @@ export function AiBuilderResponse({
         </h2>
         {agent?.nextAction && (
           <Button
-            onClick={onApprove}
+            onClick={() => {
+              // Use displayContent from store (which includes any edits)
+              const contentToApprove = displayContent !== response ? displayContent : undefined;
+              onApprove(contentToApprove);
+            }}
             disabled={isApproving}
             variant="default"
             size="default"
@@ -275,7 +357,7 @@ export function AiBuilderResponse({
 
       {agent?.responseCards && agent.responseCards.length > 0 && onCardClick && (
         <ResponseCardViewer
-          response={response}
+          response={displayContent}
           responseCards={agent.responseCards}
           onCardClick={onCardClick}
         />
@@ -308,7 +390,7 @@ export function AiBuilderResponse({
             </summary>
             <div className="mt-2">
               <CodeViewer
-                code={response}
+                code={displayContent}
                 programmingLanguage="json"
                 title="Raw JSON Response"
                 initialLineNumbers={10}
@@ -325,20 +407,22 @@ export function AiBuilderResponse({
                 AI Generated Content
               </h3>
             </div>
-            <CopyContent content={response} />
+            <CopyContent content={displayContent} />
           </div>
           <div className="w-full">
             <div className="p-4">
               <MarkdownViewer 
-                content={response}
+                content={displayContent}
                 showToggle={true}
+                isEditable={true}
+                onChange={handleContentChange}
               />
             </div>
           </div>
         </div>
       ) : (
         <CodeViewer
-          code={response}
+          code={displayContent}
           programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}
           title="AI Generated Content"
           initialLineNumbers={10}

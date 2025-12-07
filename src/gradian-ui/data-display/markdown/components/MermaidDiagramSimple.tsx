@@ -142,76 +142,96 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
       return globalMermaidState.loadingPromise;
     }
 
-    // Start loading
-    globalMermaidState.loadingPromise = new Promise<any>((resolve, reject) => {
-      // Check if script already exists
-      const existingScript = document.querySelector('script[data-mermaid-cdn]');
-      if (existingScript) {
-        // Wait for mermaid to be available
-        const checkInterval = setInterval(() => {
-          if ((window as any).mermaid) {
-            clearInterval(checkInterval);
-            globalMermaidState.instance = (window as any).mermaid;
-            globalMermaidState.loadingPromise = null;
-            resolve(globalMermaidState.instance);
-          }
-        }, 50);
-        setTimeout(() => {
-          clearInterval(checkInterval);
-          if ((window as any).mermaid) {
-            globalMermaidState.instance = (window as any).mermaid;
-            globalMermaidState.loadingPromise = null;
-            resolve(globalMermaidState.instance);
-          } else {
-            globalMermaidState.loadingPromise = null;
-            reject(new Error('Mermaid loading timeout'));
-          }
-        }, 5000);
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.type = 'module';
-      script.setAttribute('data-mermaid-cdn', 'true');
-      script.textContent = `
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.12.2/+esm';
-        window.mermaid = mermaid;
-        window.__mermaidReady = true;
-        window.dispatchEvent(new CustomEvent('mermaidLoaded'));
-      `;
-      
-      // Listen for custom event
-      const handleMermaidLoaded = () => {
-        window.removeEventListener('mermaidLoaded', handleMermaidLoaded);
-        if ((window as any).mermaid) {
-          globalMermaidState.instance = (window as any).mermaid;
-          globalMermaidState.loadingPromise = null;
-          resolve(globalMermaidState.instance);
-        } else {
-          globalMermaidState.loadingPromise = null;
-          reject(new Error('Mermaid loaded but not found on window'));
+    // Start loading - use dynamic import from installed package
+    globalMermaidState.loadingPromise = (async () => {
+      try {
+        // Use the installed package (more secure, no CSP issues, already in dependencies)
+        const mermaidModule = await import('mermaid');
+        const mermaidInstance = mermaidModule.default || mermaidModule;
+        
+        // Store on window for compatibility
+        if (typeof window !== 'undefined') {
+          (window as any).mermaid = mermaidInstance;
         }
-      };
-      
-      window.addEventListener('mermaidLoaded', handleMermaidLoaded);
-      
-      script.onerror = () => {
-        window.removeEventListener('mermaidLoaded', handleMermaidLoaded);
+        
+        globalMermaidState.instance = mermaidInstance;
         globalMermaidState.loadingPromise = null;
-        reject(new Error('Failed to load Mermaid from CDN'));
-      };
-      
-      document.head.appendChild(script);
-      
-      // Fallback timeout
-      setTimeout(() => {
-        window.removeEventListener('mermaidLoaded', handleMermaidLoaded);
-        if (!globalMermaidState.instance) {
-          globalMermaidState.loadingPromise = null;
-          reject(new Error('Mermaid loading timeout'));
-        }
-      }, 10000);
-    });
+        return mermaidInstance;
+      } catch (importError: any) {
+        console.warn('[Mermaid] Failed to load from package, trying CDN fallback:', importError);
+        
+        // Fallback to CDN if package import fails
+        return new Promise<any>((resolve, reject) => {
+          // Check if script already exists
+          const existingScript = document.querySelector('script[data-mermaid-cdn]');
+          if (existingScript) {
+            // Wait for mermaid to be available
+            const checkInterval = setInterval(() => {
+              if ((window as any).mermaid) {
+                clearInterval(checkInterval);
+                globalMermaidState.instance = (window as any).mermaid;
+                globalMermaidState.loadingPromise = null;
+                resolve(globalMermaidState.instance);
+              }
+            }, 50);
+            setTimeout(() => {
+              clearInterval(checkInterval);
+              if ((window as any).mermaid) {
+                globalMermaidState.instance = (window as any).mermaid;
+                globalMermaidState.loadingPromise = null;
+                resolve(globalMermaidState.instance);
+              } else {
+                globalMermaidState.loadingPromise = null;
+                reject(new Error('Mermaid loading timeout - CDN fallback failed'));
+              }
+            }, 5000);
+            return;
+          }
+
+          const script = document.createElement('script');
+          script.type = 'module';
+          script.setAttribute('data-mermaid-cdn', 'true');
+          script.textContent = `
+            import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.12.2/+esm';
+            window.mermaid = mermaid;
+            window.__mermaidReady = true;
+            window.dispatchEvent(new CustomEvent('mermaidLoaded'));
+          `;
+          
+          // Listen for custom event
+          const handleMermaidLoaded = () => {
+            window.removeEventListener('mermaidLoaded', handleMermaidLoaded);
+            if ((window as any).mermaid) {
+              globalMermaidState.instance = (window as any).mermaid;
+              globalMermaidState.loadingPromise = null;
+              resolve(globalMermaidState.instance);
+            } else {
+              globalMermaidState.loadingPromise = null;
+              reject(new Error('Mermaid loaded but not found on window'));
+            }
+          };
+          
+          window.addEventListener('mermaidLoaded', handleMermaidLoaded);
+          
+          script.onerror = () => {
+            window.removeEventListener('mermaidLoaded', handleMermaidLoaded);
+            globalMermaidState.loadingPromise = null;
+            reject(new Error('Failed to load Mermaid from CDN - check CSP settings and network connection'));
+          };
+          
+          document.head.appendChild(script);
+          
+          // Fallback timeout
+          setTimeout(() => {
+            window.removeEventListener('mermaidLoaded', handleMermaidLoaded);
+            if (!globalMermaidState.instance) {
+              globalMermaidState.loadingPromise = null;
+              reject(new Error('Mermaid loading timeout'));
+            }
+          }, 10000);
+        });
+      }
+    })();
 
     return globalMermaidState.loadingPromise;
   }, []);
@@ -351,7 +371,7 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
           insertedSvg.style.margin = '0 auto';
           insertedSvg.style.maxWidth = '100%';
           insertedSvg.style.height = 'auto';
-          insertedSvg.style.transform = 'scale(0.85)';
+          insertedSvg.style.transform = 'scale(1)';
           insertedSvg.style.transformOrigin = 'center center';
           
           // Clean up previous style element if it exists
@@ -370,7 +390,7 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
           style.id = `mermaid-style-${svgId}`;
           style.textContent = `
             #${svgId} {
-              transform: scale(0.85) !important;
+              transform: scale(1) !important;
               transform-origin: center center !important;
               margin: 0 !important;
               padding: 0 !important;
@@ -555,11 +575,11 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
                     svgHeight = viewBox.height;
                   } else if (svgRect.height > 0) {
                     // If using rendered height, account for scale already applied
-                    svgHeight = svgRect.height / 0.85; // Reverse the scale to get original height
+                    svgHeight = svgRect.height / 1; // Reverse the scale to get original height
                   }
                   
-                  // Account for the scale transform (0.85)
-                  const scaledHeight = svgHeight * 0.85;
+                  // Account for the scale transform (1)
+                  const scaledHeight = svgHeight * 1;
                   
                   // Set container height to fit the scaled diagram with minimal padding
                   if (scaledHeight > 0 && container) {

@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { sanitizeNestedData } from '@/gradian-ui/shared/utils/security.util';
+import { getZustandDevToolsConfig } from '@/gradian-ui/shared/utils/zustand-devtools.util';
 
 interface Tenant {
   id: string | number;
@@ -22,7 +24,9 @@ export const useTenantStore = create<TenantState>()(
         selectedTenant: null,
 
         setSelectedTenant: (tenant: Tenant | null) => {
-          set({ selectedTenant: tenant }, false, 'setSelectedTenant');
+          // Sanitize tenant data before storing
+          const sanitizedTenant = tenant ? sanitizeNestedData(tenant) : null;
+          set({ selectedTenant: sanitizedTenant }, false, 'setSelectedTenant');
         },
 
         clearSelectedTenant: () => {
@@ -41,9 +45,7 @@ export const useTenantStore = create<TenantState>()(
         name: 'tenant-store',
       }
     ),
-    {
-      name: 'tenant-store',
-    }
+    getZustandDevToolsConfig<TenantState>('tenant-store')
   )
 );
 

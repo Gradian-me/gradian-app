@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { User } from '@/types';
+import { sanitizeNestedData } from '@/gradian-ui/shared/utils/security.util';
+import { getZustandDevToolsConfig } from '@/gradian-ui/shared/utils/zustand-devtools.util';
 
 interface UserState {
   user: User | null;
@@ -16,7 +18,9 @@ export const useUserStore = create<UserState>()(
         user: null,
         
         setUser: (user: User | null) => {
-          set({ user }, false, 'setUser');
+          // Sanitize user data before storing to prevent sensitive data leakage
+          const sanitizedUser = user ? sanitizeNestedData(user) : null;
+          set({ user: sanitizedUser }, false, 'setUser');
         },
         
         getUserId: () => {
@@ -32,9 +36,7 @@ export const useUserStore = create<UserState>()(
         name: 'user-store',
       }
     ),
-    {
-      name: 'user-store',
-    }
+    getZustandDevToolsConfig<UserState>('user-store')
   )
 );
 

@@ -1,0 +1,48 @@
+'use client';
+
+import { useEffect } from 'react';
+import { initializeSecurity } from '@/gradian-ui/shared/utils/security.util';
+
+/**
+ * SecurityProvider - Initializes security measures on client-side
+ * Should be placed at the root of your application
+ */
+export function SecurityProvider({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    // Initialize security measures
+    initializeSecurity();
+
+    // Optional: Disable console methods in production to prevent information leakage
+    // Note: This can be aggressive and may interfere with error tracking services
+    // Consider using environment variable to control this behavior
+    if (
+      process.env.NODE_ENV === 'production' &&
+      process.env.NEXT_PUBLIC_DISABLE_CONSOLE === 'true'
+    ) {
+      // Keep console.error for error tracking
+      const originalError = console.error;
+      
+      // Override console methods to prevent information leakage
+      console.log = () => {};
+      console.debug = () => {};
+      console.info = () => {};
+      console.warn = () => {};
+      
+      // Keep console.error for critical errors but sanitize
+      console.error = (...args: any[]) => {
+        // Only log errors in production, but sanitize sensitive data
+        const sanitizedArgs = args.map((arg) => {
+          if (typeof arg === 'string') {
+            // Remove potential sensitive patterns
+            return arg.replace(/(token|password|secret|key)=[^&\s]+/gi, '$1=***');
+          }
+          return arg;
+        });
+        originalError(...sanitizedArgs);
+      };
+    }
+  }, []);
+
+  return <>{children}</>;
+}
+

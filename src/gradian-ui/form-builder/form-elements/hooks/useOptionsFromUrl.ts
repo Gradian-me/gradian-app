@@ -86,17 +86,41 @@ export function useOptionsFromUrl({
 
     try {
       // Build URL with query parameters
+      // Ensure 'id' parameter is added last
       let url = sourceUrl;
       if (queryParams && Object.keys(queryParams).length > 0) {
         const params = new URLSearchParams();
+        let idValue: string | string[] | undefined = undefined;
+        
         Object.entries(queryParams).forEach(([key, value]) => {
-          if (Array.isArray(value)) {
-            value.forEach(v => params.append(key, String(v)));
-          } else if (value !== undefined && value !== null) {
-            params.append(key, String(value));
+          if (key === 'id') {
+            // Store id to add it last
+            if (Array.isArray(value)) {
+              idValue = value.map(v => String(v));
+            } else if (value !== undefined && value !== null) {
+              idValue = String(value);
+            }
+          } else {
+            // Add all other parameters first
+            if (Array.isArray(value)) {
+              value.forEach(v => params.append(key, String(v)));
+            } else if (value !== undefined && value !== null) {
+              params.append(key, String(value));
+            }
           }
         });
-        url = `${sourceUrl}?${params.toString()}`;
+        
+        // Add 'id' as the last parameter if it exists
+        if (idValue !== undefined && idValue !== null) {
+          if (Array.isArray(idValue)) {
+            (idValue as string[]).forEach((v: string) => params.append('id', v));
+          } else if (typeof idValue === 'string') {
+            params.append('id', idValue);
+          }
+        }
+        
+        const separator = sourceUrl.includes('?') ? '&' : '?';
+        url = `${sourceUrl}${separator}${params.toString()}`;
       }
 
       const response = await apiRequest<any[]>(url);

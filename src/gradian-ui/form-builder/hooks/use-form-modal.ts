@@ -60,12 +60,13 @@ async function applyHasFieldValueRelationsToEntity(params: {
   }
 
   try {
-    const query = new URLSearchParams({
-      sourceSchema: schemaId,
-      sourceId: String(entity.id),
-      relationTypeId: 'HAS_FIELD_VALUE',
-      resolveTargets: 'true', // Request enriched target data with label/icon/color
-    });
+    // Build query params ensuring 'id' is always last
+    const query = new URLSearchParams();
+    query.append('sourceSchema', schemaId);
+    query.append('sourceId', String(entity.id));
+    query.append('relationTypeId', 'HAS_FIELD_VALUE');
+    query.append('resolveTargets', 'true'); // Request enriched target data with label/icon/color
+    // If id exists, it will be added last (not applicable here, but structure supports it)
 
     const response = await apiRequest<Array<DataRelation & { targetData?: { id: string; label?: string; icon?: string; color?: string; metadata?: Record<string, any> } }>>(`/api/relations?${query.toString()}`);
 

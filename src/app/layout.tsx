@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { DialogProvider } from "@/gradian-ui/shared/contexts/DialogContext";
+import { SecurityProvider } from "@/components/security/SecurityProvider";
 
 export const metadata: Metadata = {
   title: "Gradian",
@@ -28,19 +29,21 @@ export default function RootLayout({
         className="font-sans antialiased"
         suppressHydrationWarning={true}
       >
-        <QueryProvider>
-          <DialogProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="dark"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <Toaster />
-              {children}
-            </ThemeProvider>
-          </DialogProvider>
-        </QueryProvider>
+        <SecurityProvider>
+          <QueryProvider>
+            <DialogProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="dark"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <Toaster />
+                {children}
+              </ThemeProvider>
+            </DialogProvider>
+          </QueryProvider>
+        </SecurityProvider>
       </body>
     </html>
   );

@@ -211,6 +211,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
               onChange?.(text);
               setIsVoiceDialogOpen(false);
             }}
+            autoStart={true}
           />
         )}
       </div>

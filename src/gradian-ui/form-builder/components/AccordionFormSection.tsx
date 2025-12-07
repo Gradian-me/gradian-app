@@ -155,9 +155,17 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     
     setIsLoadingRelations(true);
     try {
+      // Build query params ensuring 'id' is always last
+      const queryParams = new URLSearchParams();
+      queryParams.append('sourceSchema', sourceSchemaId);
+      queryParams.append('sourceId', currentEntityId);
+      queryParams.append('relationTypeId', relationTypeId);
+      queryParams.append('targetSchema', targetSchema);
+      // If id needs to be added, append it here as the last parameter
+      
       // Fetch relations
       const relationsResponse = await apiRequest<DataRelation[]>(
-        `/api/relations?sourceSchema=${sourceSchemaId}&sourceId=${currentEntityId}&relationTypeId=${relationTypeId}&targetSchema=${targetSchema}`
+        `/api/relations?${queryParams.toString()}`
       );
       
       if (relationsResponse.success && relationsResponse.data) {

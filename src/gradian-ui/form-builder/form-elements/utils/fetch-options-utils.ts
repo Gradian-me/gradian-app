@@ -95,16 +95,39 @@ export async function fetchOptionsFromSchemaOrUrl(
   if (useSourceUrl) {
     // Fetch from sourceUrl
     // Convert queryParams to Record<string, string> for mapRequestParams
+    // Extract 'id' parameter to add it last
     const stringParams: Record<string, string> = {};
+    
+    // Extract 'id' value first
+    const idParam = queryParams.id;
+    let idValue: string | undefined = undefined;
+    if (idParam !== undefined) {
+      if (Array.isArray(idParam)) {
+        idValue = idParam.join(',');
+      } else {
+        idValue = String(idParam);
+      }
+    }
+    
+    // Process all other parameters
     Object.entries(queryParams).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        // For arrays, join with comma or handle multiple values
-        stringParams[key] = value.join(',');
-      } else if (value !== undefined && value !== null) {
-        stringParams[key] = String(value);
+      if (key !== 'id') {
+        // Add all other parameters first
+        if (Array.isArray(value)) {
+          stringParams[key] = value.join(',');
+        } else if (value !== undefined && value !== null) {
+          stringParams[key] = String(value);
+        }
       }
     });
+    
     const mappedParams = mapRequestParams(stringParams, columnMap);
+    
+    // Add 'id' as the last parameter if it exists
+    if (idValue !== undefined && idValue.length > 0) {
+      mappedParams.set('id', idValue);
+    }
+    
     const queryString = mappedParams.toString();
     const separator = sourceUrl!.includes('?') ? '&' : '?';
     const url = `${sourceUrl}${queryString ? `${separator}${queryString}` : ''}`;

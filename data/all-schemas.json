@@ -2022,10 +2022,9 @@
         "name": "paymentMethod",
         "label": "Payment Method",
         "sectionId": "basic-information",
-        "component": "select",
+        "component": "multi-select",
         "placeholder": "Choose payment method",
         "required": false,
-        "allowMultiselect": true,
         "orientation": "horizontal",
         "options": [
           {
@@ -3073,10 +3072,9 @@
         "name": "methods",
         "label": "Methods",
         "sectionId": "basic-information",
-        "component": "select",
+        "component": "multi-select",
         "placeholder": "Select HTTP methods",
         "required": false,
-        "allowMultiselect": true,
         "options": [
           {
             "id": "GET",

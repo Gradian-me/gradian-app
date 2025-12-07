@@ -1,0 +1,225 @@
+# Security Guidelines
+
+This document outlines security measures implemented to protect sensitive data from exposure in browser DevTools and client-side inspection.
+
+## Overview
+
+The application implements multiple layers of security to prevent sensitive data from being exposed through React DevTools, browser console, or client-side inspection tools.
+
+## Security Features
+
+### 1. React DevTools Protection
+
+React DevTools are automatically disabled in production builds to prevent inspection of component state, props, and hooks.
+
+**Implementation:**
+- `src/gradian-ui/shared/utils/security.util.ts` - Core security utilities
+- `src/components/security/SecurityProvider.tsx` - Security initialization component
+
+**Configuration:**
+- DevTools are disabled when `NODE_ENV=production`
+- Can be explicitly disabled with `NEXT_PUBLIC_DISABLE_DEVTOOLS=true`
+
+### 2. Zustand Store Security
+
+All Zustand stores use conditional DevTools that are automatically disabled in production.
+
+**Stores Updated:**
+- `user.store.ts` - User data sanitized before storage
+- `company.store.ts` - Company data sanitized
+- `tenant.store.ts` - Tenant data sanitized
+- `dashboard.store.ts` - Dashboard data sanitized
+- `dynamic-form-context.store.ts` - Form data sanitized
+- `ai-response.store.ts` - AI responses (already encrypted)
+- `language.store.ts` - Language preference
+
+**Implementation:**
+- `src/gradian-ui/shared/utils/zustand-devtools.util.ts` - Conditional DevTools wrapper
+
+### 3. Data Sanitization
+
+Sensitive data is automatically sanitized before being stored in React state.
+
+**Sanitized Fields:**
+- `password`
+- `token`
+- `accessToken`
+- `refreshToken`
+- `secret`
+- `apiKey`
+- `privateKey`
+- `creditCard`
+- `ssn`
+- `socialSecurityNumber`
+- `passport`
+
+**Usage:**
+```typescript
+import { sanitizeNestedData } from '@/gradian-ui/shared/utils/security.util';
+
+const sanitizedUser = sanitizeNestedData(userData);
+```
+
+### 4. Secure Token Storage
+
+**Important:** Tokens should NEVER be stored in localStorage or React state.
+
+**Current Implementation:**
+- Tokens are stored in httpOnly cookies (set by server)
+- localStorage token storage has been removed from login flow
+- Tokens are automatically sent with requests via cookies
+
+**Best Practices:**
+1. Server sets tokens as httpOnly cookies (prevents XSS)
+2. Cookies use `secure` flag in production (HTTPS only)
+3. Cookies use `sameSite=strict` to prevent CSRF
+4. Never expose tokens in client-side code
+
+**Migration Utility:**
+```typescript
+import { migrateTokensToCookies } from '@/gradian-ui/shared/utils/token-storage.util';
+
+// Migrate existing localStorage tokens to cookies
+await migrateTokensToCookies();
+```
+
+### 5. Environment Variables
+
+**Never expose sensitive values in client-side code:**
+
+✅ **Safe (Server-only):**
+```env
+DATABASE_URL=...
+JWT_SECRET=...
+API_KEY=...
+```
+
+❌ **Dangerous (Client-exposed):**
+```env
+NEXT_PUBLIC_API_KEY=...  # Visible in browser bundle
+NEXT_PUBLIC_SECRET=...   # Visible in browser bundle
+```
+
+**Rule:** Any variable prefixed with `NEXT_PUBLIC_` is exposed to the browser and should NOT contain secrets.
+
+### 6. Console Logging
+
+In production:
+- `console.log`, `console.debug`, `console.info`, `console.warn` are disabled
+- `console.error` is preserved but sanitized to remove sensitive patterns
+
+**Configuration:**
+- Automatically applied in production builds
+- Controlled by `SecurityProvider` component
+
+### 7. Security Headers
+
+Next.js security headers are configured to prevent common attacks:
+
+- **Strict-Transport-Security** - Force HTTPS
+- **X-Frame-Options** - Prevent clickjacking
+- **X-Content-Type-Options** - Prevent MIME sniffing
+- **X-XSS-Protection** - XSS protection
+- **Content-Security-Policy** - Control resource loading
+- **Referrer-Policy** - Control referrer information
+
+See `next.config.ts` for full configuration.
+
+## Developer Guidelines
+
+### DO ✅
+
+1. **Sanitize sensitive data before storing in state:**
+   ```typescript
+   const sanitized = sanitizeNestedData(userData);
+   setUser(sanitized);
+   ```
+
+2. **Store tokens in httpOnly cookies (server-side):**
+   ```typescript
+   response.cookies.set('auth_token', token, {
+     httpOnly: true,
+     secure: process.env.NODE_ENV === 'production',
+     sameSite: 'strict',
+   });
+   ```
+
+3. **Use environment variables for server-only secrets:**
+   ```typescript
+   // Server-side only
+   const secret = process.env.JWT_SECRET;
+   ```
+
+4. **Mask sensitive values in logs:**
+   ```typescript
+   import { maskSensitiveValue } from '@/gradian-ui/shared/utils/security.util';
+   console.log('Token:', maskSensitiveValue(token)); // Shows only first/last 4 chars
+   ```
+
+### DON'T ❌
+
+1. **Never store sensitive data in:**
+   - React state without sanitization
+   - localStorage
+   - sessionStorage (unless encrypted)
+   - Component props
+   - URL parameters
+   - Browser cookies (use httpOnly cookies instead)
+
+2. **Never expose:**
+   - API keys in client code
+   - Secrets in environment variables prefixed with `NEXT_PUBLIC_`
+   - Passwords or tokens in console logs
+   - Sensitive data in error messages
+
+3. **Never disable security in production:**
+   - Always keep DevTools disabled in production
+   - Always sanitize data before storage
+   - Always use secure cookie flags in production
+
+## Testing Security
+
+### Verify DevTools are Disabled
+
+1. Build for production: `npm run build`
+2. Start production server: `npm start`
+3. Open browser DevTools
+4. Verify React DevTools are not available or show empty state
+
+### Verify Token Storage
+
+1. Login to the application
+2. Check browser DevTools → Application → Storage
+3. Verify tokens are NOT in localStorage
+4. Verify tokens ARE in Cookies (httpOnly, secure)
+
+### Verify Data Sanitization
+
+1. Check Zustand DevTools in development
+2. Verify sensitive fields (password, token, etc.) are not present
+3. Verify user data doesn't contain secrets
+
+## Production Checklist
+
+- [ ] React DevTools disabled
+- [ ] Zustand DevTools disabled
+- [ ] Console methods disabled/sanitized
+- [ ] Tokens stored in httpOnly cookies only
+- [ ] No sensitive data in localStorage
+- [ ] All sensitive data sanitized before state storage
+- [ ] Security headers configured
+- [ ] Environment variables properly scoped (no `NEXT_PUBLIC_` on secrets)
+- [ ] CSP headers configured appropriately
+- [ ] HTTPS enabled in production
+
+## Additional Resources
+
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [Next.js Security Best Practices](https://nextjs.org/docs/going-to-production#security)
+- [React Security Best Practices](https://reactjs.org/docs/security.html)
+- [Cookie Security](https://owasp.org/www-community/HttpOnly)
+
+## Support
+
+For security concerns or questions, please contact the development team.
+

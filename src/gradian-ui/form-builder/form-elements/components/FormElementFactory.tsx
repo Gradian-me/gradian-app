@@ -8,6 +8,7 @@ import { Textarea } from './Textarea';
 import { MarkdownInput } from './MarkdownInput';
 import { Checkbox } from './Checkbox';
 import { CheckboxList } from './CheckboxList';
+import { MultiSelect } from './MultiSelect';
 import { RadioGroup } from './RadioGroup';
 import { Select } from './Select';
 import { NormalizedOption, normalizeOptionArray } from '../utils/option-normalizer';
@@ -220,6 +221,37 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           error={restProps.error}
           required={config.validation?.required ?? false}
           placeholder={config.placeholder}
+        />
+      );
+    
+    case 'multi-select':
+      // Debug: Verify component type is being matched
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[FormElementFactory] Rendering MultiSelect component', {
+          elementType,
+          hasOptions: !!config.options,
+          optionsCount: config.options?.length || 0,
+        });
+      }
+      return (
+        <MultiSelect
+          config={config}
+          value={restProps.value}
+          onChange={restProps.onChange}
+          placeholder={config.placeholder}
+          error={restProps.error}
+          required={config.validation?.required ?? false}
+          disabled={restProps.disabled}
+          className={restProps.className}
+          options={config.options}
+          schemaId={config.schemaId}
+          sourceUrl={config.sourceUrl}
+          queryParams={config.queryParams}
+          transform={config.transform}
+          sortType={config.sortType}
+          columnMap={config.columnMap}
+          maxCount={config.maxCount || config.maxSelections}
+          variant="default"
         />
       );
     

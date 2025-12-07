@@ -374,14 +374,14 @@ export function MainLayout({
           )}
         </motion.div>
         {subtitle && (
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, x: 5 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
-            className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 hidden lg:block"
+            className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 hidden lg:block truncate min-w-0"
           >
             {subtitle}
-          </motion.p>
+          </motion.div>
         )}
       </div>
     </div>

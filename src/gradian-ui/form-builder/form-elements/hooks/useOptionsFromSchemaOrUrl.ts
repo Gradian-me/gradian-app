@@ -5,6 +5,7 @@ import { normalizeOptionArray, NormalizedOption } from '../utils/option-normaliz
 import { SortType } from '@/gradian-ui/shared/utils/sort-utils';
 import { useCompanyStore } from '@/stores/company.store';
 import { fetchOptionsFromSchemaOrUrl } from '../utils/fetch-options-utils';
+import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 
 export interface UseOptionsFromSchemaOrUrlOptions {
   /**
@@ -46,6 +47,11 @@ export interface UseOptionsFromSchemaOrUrlOptions {
    * @default true (auto-detected based on schema)
    */
   filterByCompany?: boolean;
+  
+  /**
+   * Column mapping configuration for API requests (only applies when using sourceUrl)
+   */
+  columnMap?: ColumnMapConfig;
 }
 
 export interface UseOptionsFromSchemaOrUrlResult {
@@ -101,6 +107,7 @@ export function useOptionsFromSchemaOrUrl({
   queryParams,
   sortType = null,
   filterByCompany = true,
+  columnMap,
 }: UseOptionsFromSchemaOrUrlOptions): UseOptionsFromSchemaOrUrlResult {
   const [options, setOptions] = useState<NormalizedOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -126,6 +133,7 @@ export function useOptionsFromSchemaOrUrl({
         sortType,
         companyId: activeCompanyId,
         filterByCompany,
+        columnMap,
       });
 
       let data = result.data;
@@ -159,7 +167,7 @@ export function useOptionsFromSchemaOrUrl({
     } finally {
       setIsLoading(false);
     }
-  }, [sourceUrl, schemaId, enabled, queryParams, transform, sortType, filterByCompany, activeCompanyId]);
+  }, [sourceUrl, schemaId, enabled, queryParams, transform, sortType, filterByCompany, activeCompanyId, columnMap]);
 
   useEffect(() => {
     if ((sourceUrl || schemaId) && enabled) {

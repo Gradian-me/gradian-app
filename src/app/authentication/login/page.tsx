@@ -79,9 +79,18 @@ export default function LoginPage() {
         return;
       }
 
-      if (data.tokens) {
-        localStorage.setItem('auth_token', data.tokens.accessToken);
-        localStorage.setItem('refresh_token', data.tokens.refreshToken);
+      // SECURITY: Tokens are stored in httpOnly cookies by the server
+      // Do not store tokens in localStorage as they are accessible to JavaScript
+      // and visible in browser DevTools. Cookies are automatically sent with requests.
+      
+      // Clean up any existing tokens in localStorage for security
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('refresh_token');
+        } catch (error) {
+          console.warn('[Security] Failed to clear tokens from localStorage:', error);
+        }
       }
 
       if (data.user) {

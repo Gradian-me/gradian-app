@@ -108,8 +108,15 @@ export default function ChangePasswordPage() {
       }
 
       toast.success(data.message || 'Password changed successfully. Please sign in again.');
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('refresh_token');
+      // Clear tokens using secure utility (tokens should be in httpOnly cookies)
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('refresh_token');
+        } catch (error) {
+          console.warn('[Security] Failed to clear tokens:', error);
+        }
+      }
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');

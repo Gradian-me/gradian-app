@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +38,7 @@ interface VoiceInputDialogProps {
   onApply?: (text: string) => void;
   className?: string;
   loadingTextSwitches?: string | string[];
+  autoStart?: boolean;
 }
 
 export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
@@ -47,6 +48,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   onApply,
   className,
   loadingTextSwitches,
+  autoStart = false,
 }) => {
   const [transcription, setTranscription] = useState<string | null>(null);
   const [isTranscribing, setIsTranscribing] = useState(false);
@@ -111,6 +113,21 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
     }
   }, [recordedBlob]); // Only depend on recordedBlob, setPreloadedAudioBlob is stable
 
+  const handleStartRecording = useCallback(async () => {
+    await startRecording();
+  }, [startRecording]);
+
+  // Auto-start recording when dialog opens with autoStart prop
+  useEffect(() => {
+    if (isOpen && autoStart && !isRecording && !recordedBlob) {
+      // Small delay to ensure dialog is fully mounted
+      const timer = setTimeout(() => {
+        handleStartRecording();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, autoStart, isRecording, recordedBlob, handleStartRecording]); // Include all dependencies
+
   // Cleanup when dialog closes and reset when it opens
   useEffect(() => {
     if (!isOpen) {
@@ -165,12 +182,21 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
     }
   }, [shouldAutoTranscribe, recordedBlob, isRecording]);
 
-  const handleStartRecording = async () => {
-    await startRecording();
-  };
-
   const handleStopRecording = () => {
+    // Stop the recording but keep the blob so user can record again
     stopRecording();
+    
+    // Don't clear the recording blob - keep it so the visualizer stays visible
+    // This allows the user to record again from the same page without navigating away
+    
+    // Clear transcription state (but keep the recording)
+    setTranscription(null);
+    setTranscriptionError(null);
+    setTokenUsage(null);
+    
+    // Note: stopRecording() will handle stopping the MediaRecorder
+    // The blob will be created in the onstop callback, and we keep it
+    // so the user can see their recording and choose to record again or transcribe
   };
 
   const handleStopAndTranscribe = () => {
@@ -432,7 +458,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                 )}
               </div>
             ) : (
-              // Playback Controls
+              // Playback Controls - Show when recording exists
               <div className="flex items-center justify-between w-full gap-3">
                 <div className="flex items-center gap-3 px-4 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                   <ButtonMinimal
@@ -448,6 +474,21 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                     color="gray"
                     size="md"
                     onClick={handleClear}
+                  />
+                  {/* Record Again Button - Allows recording over the current recording */}
+                  <ButtonMinimal
+                    icon={Circle}
+                    title="Record Again"
+                    color="red"
+                    size="md"
+                    onClick={() => {
+                      // Clear current recording and start fresh
+                      handleClear();
+                      // Small delay to ensure cleanup, then start recording
+                      setTimeout(() => {
+                        handleStartRecording();
+                      }, 100);
+                    }}
                   />
                 </div>
                 <div className="flex items-center gap-3">

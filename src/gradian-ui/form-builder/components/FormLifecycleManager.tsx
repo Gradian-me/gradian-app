@@ -609,8 +609,20 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           )
           .map(async (section) => {
             try {
+              // Build query params ensuring 'id' is always last
+              const queryParams = new URLSearchParams();
+              queryParams.append('sourceSchema', schema.id);
+              queryParams.append('sourceId', state.values.id);
+              if (section.repeatingConfig!.relationTypeId) {
+                queryParams.append('relationTypeId', section.repeatingConfig!.relationTypeId);
+              }
+              if (section.repeatingConfig!.targetSchema) {
+                queryParams.append('targetSchema', section.repeatingConfig!.targetSchema);
+              }
+              // If id needs to be added, append it here as the last parameter
+              
               const response = await apiRequest<any>(
-                `/api/relations?sourceSchema=${schema.id}&sourceId=${state.values.id}&relationTypeId=${section.repeatingConfig!.relationTypeId}&targetSchema=${section.repeatingConfig!.targetSchema}`
+                `/api/relations?${queryParams.toString()}`
               );
               if (response.success) {
                 const countFromResponse = (response as { count?: number }).count;
@@ -752,8 +764,20 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         )
         .map(async (section) => {
           try {
+            // Build query params ensuring 'id' is always last
+            const queryParams = new URLSearchParams();
+            queryParams.append('sourceSchema', schema.id);
+            queryParams.append('sourceId', state.values.id);
+            if (section.repeatingConfig!.relationTypeId) {
+              queryParams.append('relationTypeId', section.repeatingConfig!.relationTypeId);
+            }
+            if (section.repeatingConfig!.targetSchema) {
+              queryParams.append('targetSchema', section.repeatingConfig!.targetSchema);
+            }
+            // If id needs to be added, append it here as the last parameter
+            
             const response = await apiRequest<any>(
-              `/api/relations?sourceSchema=${schema.id}&sourceId=${state.values.id}&relationTypeId=${section.repeatingConfig!.relationTypeId}&targetSchema=${section.repeatingConfig!.targetSchema}`
+              `/api/relations?${queryParams.toString()}`
             );
             if (response.success) {
               const countFromResponse = (response as { count?: number }).count;

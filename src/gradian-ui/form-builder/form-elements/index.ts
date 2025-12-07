@@ -7,6 +7,7 @@ export * from './components/Textarea';
 export * from './components/MarkdownInput';
 export * from './components/Checkbox';
 export * from './components/CheckboxList';
+export * from './components/MultiSelect';
 export * from './components/RadioGroup';
 export { FormElementFactory } from './components/FormElementFactory';
 
