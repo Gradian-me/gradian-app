@@ -30,7 +30,6 @@ export function UserProfileSelector({
 }: UserProfileSelectorProps) {
   const user = useUserStore((state) => state.user);
   const router = useRouter();
-  const [hasAccessToken, setHasAccessToken] = useState<boolean>(true);
   const [isMounted, setIsMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -39,8 +38,6 @@ export function UserProfileSelector({
 
   useEffect(() => {
     setIsMounted(true);
-    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-    setHasAccessToken(Boolean(token));
   }, []);
 
   const computedVariant =
@@ -112,33 +109,41 @@ export function UserProfileSelector({
   const handleLogout = async () => {
     setIsMenuOpen(false);
     try {
-      const authToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+      // Tokens are stored in httpOnly cookies, so they're automatically sent with the request
       const fingerprint = await ensureFingerprintCookie();
 
       await fetch('/api/auth/logout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
           ...(fingerprint ? { 'x-fingerprint': fingerprint } : {}),
         },
         body: JSON.stringify({
           deviceFingerprint: fingerprint ?? undefined,
         }),
+        credentials: 'include', // Ensure cookies are sent
       });
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
       useUserStore.getState().clearUser();
+      // Clean up any localStorage tokens if they exist (for migration purposes)
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('refresh_token');
+        try {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+        } catch (error) {
+          // Ignore errors
+        }
       }
       router.push('/authentication/login');
     }
   };
 
-  if (!hasAccessToken || !user) {
+  // Check if user is logged in by checking the user store
+  // Tokens are stored in httpOnly cookies, so we can't check them from JavaScript
+  // The user store is set after successful login, so if user exists, they're authenticated
+  if (!user) {
     return (
       <Button
         type="button"

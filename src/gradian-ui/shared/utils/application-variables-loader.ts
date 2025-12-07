@@ -23,7 +23,7 @@ const getDefaultData = (): ApplicationVariablesData => ({
     JWT_SECRET: process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'your-default-secret-key-change-in-production',
     ACCESS_TOKEN_EXPIRY: parseInt(process.env.JWT_ACCESS_TOKEN_EXPIRY || '3600', 10),
     REFRESH_TOKEN_EXPIRY: parseInt(process.env.JWT_REFRESH_TOKEN_EXPIRY || '604800', 10),
-    ACCESS_TOKEN_COOKIE: 'auth_token',
+    ACCESS_TOKEN_COOKIE: 'access_token',
     REFRESH_TOKEN_COOKIE: 'refresh_token',
     USERS_API_PATH: '/api/data/users',
     ERROR_MESSAGES: {
@@ -47,6 +47,9 @@ const getDefaultData = (): ApplicationVariablesData => ({
   DEMO_MODE: true,
   LOGIN_LOCALLY: false,
   AD_MODE: false,
+  REQUIRE_LOGIN: false,
+  EXCLUDED_LOGIN_ROUTES: ['/authentication'],
+  FORBIDDEN_ROUTES_PRODUCTION: [],
   AI_CONFIG: {
     LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions',
     LLM_TRANSCRIBE_URL: 'https://api.avalai.ir/v1/audio/transcriptions',
@@ -75,6 +78,9 @@ interface ApplicationVariablesData {
   DEMO_MODE: boolean;
   LOGIN_LOCALLY?: boolean;
   AD_MODE: boolean;
+  REQUIRE_LOGIN?: boolean;
+  EXCLUDED_LOGIN_ROUTES?: string[];
+  FORBIDDEN_ROUTES_PRODUCTION?: string[];
   AI_CONFIG?: {
     LLM_API_URL?: string;
     LLM_TRANSCRIBE_URL?: string;
@@ -120,6 +126,10 @@ export function loadApplicationVariables(): ApplicationVariablesData {
     if (!fs.existsSync(APPLICATION_VARIABLES_FILE)) {
       // If file doesn't exist, use defaults
       const defaultData = getDefaultData();
+      // Force DEMO_MODE to false if NODE_ENV is not development
+      if (process.env.NODE_ENV !== 'development') {
+        defaultData.DEMO_MODE = false;
+      }
       cachedVariables = defaultData;
       return defaultData;
     }
@@ -138,6 +148,11 @@ export function loadApplicationVariables(): ApplicationVariablesData {
         process.env.JWT_REFRESH_TOKEN_EXPIRY || String(data.AUTH_CONFIG.REFRESH_TOKEN_EXPIRY),
         10
       );
+    }
+
+    // Force DEMO_MODE to false if NODE_ENV is not development
+    if (process.env.NODE_ENV !== 'development') {
+      data.DEMO_MODE = false;
     }
 
     cachedVariables = data;

@@ -111,7 +111,7 @@ export default function ChangePasswordPage() {
       // Clear tokens using secure utility (tokens should be in httpOnly cookies)
       if (typeof window !== 'undefined') {
         try {
-          localStorage.removeItem('auth_token');
+          localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
         } catch (error) {
           console.warn('[Security] Failed to clear tokens:', error);

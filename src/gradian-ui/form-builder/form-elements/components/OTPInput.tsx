@@ -189,7 +189,7 @@ const InputOTPPrimitive = React.forwardRef<HTMLDivElement, InputOTPPrimitiveProp
       <InputOTPContext.Provider value={contextValue}>
         <div ref={ref} className={cn('flex w-full flex-col gap-4', className)} {...rest}>
           {resendDuration ? (
-            <div className="flex flex-col gap-3 rounded-2xl border border-border bg-white/70 px-4 py-3 shadow-sm dark:bg-white/5">
+            <div className="flex flex-col gap-3 rounded-2xl border border-gray-400 dark:border-gray-300 bg-white/70 px-4 py-3 shadow-sm dark:bg-white/5">
               <div className="flex items-center justify-center gap-3">
                 <div className="flex items-center gap-3">
                   {hasCustomChildren ? children : defaultSlots}

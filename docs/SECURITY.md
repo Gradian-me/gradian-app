@@ -137,7 +137,7 @@ See `next.config.ts` for full configuration.
 
 2. **Store tokens in httpOnly cookies (server-side):**
    ```typescript
-   response.cookies.set('auth_token', token, {
+   response.cookies.set('access_token', token, {
      httpOnly: true,
      secure: process.env.NODE_ENV === 'production',
      sameSite: 'strict',

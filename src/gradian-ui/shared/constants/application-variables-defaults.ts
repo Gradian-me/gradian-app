@@ -21,7 +21,7 @@ export const DEFAULT_APPLICATION_VARIABLES = {
     JWT_SECRET: 'your-default-secret-key-change-in-production',
     ACCESS_TOKEN_EXPIRY: 3600,
     REFRESH_TOKEN_EXPIRY: 604800,
-    ACCESS_TOKEN_COOKIE: 'auth_token',
+    ACCESS_TOKEN_COOKIE: 'access_token',
     REFRESH_TOKEN_COOKIE: 'refresh_token',
     SESSION_TOKEN_COOKIE: 'session_token',
     USER_SESSION_ID_COOKIE: 'user_session_id',
@@ -56,6 +56,9 @@ export const DEFAULT_APPLICATION_VARIABLES = {
   DEMO_MODE: true,
   LOGIN_LOCALLY: false,
   AD_MODE: false,
+  REQUIRE_LOGIN: false,
+  EXCLUDED_LOGIN_ROUTES: ['/authentication'],
+  FORBIDDEN_ROUTES_PRODUCTION: [] as string[],
   AI_CONFIG: {
     LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions',
     LLM_TRANSCRIBE_URL: 'https://api.avalai.ir/v1/audio/transcriptions',

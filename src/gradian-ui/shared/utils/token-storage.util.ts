@@ -21,7 +21,7 @@ export const clearTokensFromLocalStorage = (): void => {
   if (typeof window === 'undefined') return;
   
   try {
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
   } catch (error) {
     console.warn('[Security] Failed to clear tokens from localStorage:', error);
@@ -35,7 +35,7 @@ export const hasTokensInLocalStorage = (): boolean => {
   if (typeof window === 'undefined') return false;
   
   try {
-    const authToken = localStorage.getItem('auth_token');
+    const authToken = localStorage.getItem('access_token');
     const refreshToken = localStorage.getItem('refresh_token');
     return !!(authToken || refreshToken);
   } catch {
@@ -84,7 +84,7 @@ export const migrateTokensToCookies = async (): Promise<void> => {
  * 
  * The login API should set tokens as httpOnly cookies:
  * ```typescript
- * response.cookies.set('auth_token', token, {
+ * response.cookies.set('access_token', token, {
  *   httpOnly: true,
  *   secure: process.env.NODE_ENV === 'production',
  *   sameSite: 'strict',

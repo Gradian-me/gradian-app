@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { encryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { MainLayout } from '@/components/layout/main-layout';
@@ -17,7 +18,7 @@ import {
   FormTabsContent,
 } from '@/gradian-ui/form-builder/form-elements';
 import { ArrowLeft, Save, RefreshCw } from 'lucide-react';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType, FORBIDDEN_ROUTES_PRODUCTION } from '@/gradian-ui/shared/constants/application-variables';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface ApplicationVariablesData {
@@ -42,6 +43,9 @@ interface ApplicationVariablesData {
   DEMO_MODE?: boolean;
   LOGIN_LOCALLY?: boolean;
   AD_MODE?: boolean;
+  REQUIRE_LOGIN?: boolean;
+  EXCLUDED_LOGIN_ROUTES?: string[];
+  FORBIDDEN_ROUTES_PRODUCTION?: string[];
   AI_CONFIG?: {
     LLM_API_URL?: string;
   };
@@ -56,12 +60,66 @@ export default function ApplicationVariablesPage() {
     AUTH_CONFIG: {},
     UI_PARAMS: {},
     SCHEMA_SUMMARY_EXCLUDED_KEYS: [],
+    EXCLUDED_LOGIN_ROUTES: [],
+    FORBIDDEN_ROUTES_PRODUCTION: [],
     AI_CONFIG: {},
   });
+
+  // Redirect to Forbidden if not in development environment and route is in FORBIDDEN_ROUTES_PRODUCTION
+  useEffect(() => {
+    const forbiddenRoutes = FORBIDDEN_ROUTES_PRODUCTION ?? [];
+    if (forbiddenRoutes.length > 0) {
+      // Check NODE_ENV - in Next.js, NODE_ENV is available on both client and server
+      // It's replaced at build time, so it's safe to check
+      const nodeEnv = process.env.NODE_ENV || 'production';
+      const isDev = nodeEnv === 'development';
+      
+      // Check if current path is in forbidden routes
+      const currentPath = window.location.pathname;
+      const isForbidden = forbiddenRoutes.some((route: string) => 
+        currentPath === route || currentPath.startsWith(route)
+      );
+      
+      if (!isDev && isForbidden) {
+        router.replace('/forbidden');
+        return;
+      }
+    }
+  }, [router]);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Check authentication if REQUIRE_LOGIN is enabled
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      if (data.REQUIRE_LOGIN) {
+        try {
+          const response = await fetch('/api/auth/token/validate', {
+            method: 'GET',
+            credentials: 'include',
+          });
+          const result = await response.json();
+
+          if (!result.success || !result.valid) {
+            // Not authenticated, redirect to login
+            const encryptedReturnUrl = encryptReturnUrl(window.location.pathname);
+            router.push(`/authentication/login?returnUrl=${encryptedReturnUrl}`);
+          }
+        } catch (error) {
+          console.error('Error checking authentication:', error);
+          // On error, redirect to login
+          const encryptedReturnUrl = encryptReturnUrl(window.location.pathname);
+          router.push(`/authentication/login?returnUrl=${encryptedReturnUrl}`);
+        }
+      }
+    };
+
+    if (!loading && data.REQUIRE_LOGIN !== undefined) {
+      checkAuthentication();
+    }
+  }, [data.REQUIRE_LOGIN, loading, router]);
 
   const fetchData = async () => {
     try {
@@ -197,6 +255,56 @@ export default function ApplicationVariablesPage() {
     setData((prev) => ({
       ...prev,
       SCHEMA_SUMMARY_EXCLUDED_KEYS: prev.SCHEMA_SUMMARY_EXCLUDED_KEYS.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateExcludedLoginRoute = (index: number, value: string) => {
+    setData((prev) => {
+      const newRoutes = [...(prev.EXCLUDED_LOGIN_ROUTES || [])];
+      newRoutes[index] = value;
+      return {
+        ...prev,
+        EXCLUDED_LOGIN_ROUTES: newRoutes,
+      };
+    });
+  };
+
+  const addExcludedLoginRoute = () => {
+    setData((prev) => ({
+      ...prev,
+      EXCLUDED_LOGIN_ROUTES: [...(prev.EXCLUDED_LOGIN_ROUTES || []), ''],
+    }));
+  };
+
+  const removeExcludedLoginRoute = (index: number) => {
+    setData((prev) => ({
+      ...prev,
+      EXCLUDED_LOGIN_ROUTES: prev.EXCLUDED_LOGIN_ROUTES?.filter((_, i) => i !== index) || [],
+    }));
+  };
+
+  const updateForbiddenRoute = (index: number, value: string) => {
+    setData((prev) => {
+      const newRoutes = [...(prev.FORBIDDEN_ROUTES_PRODUCTION || [])];
+      newRoutes[index] = value;
+      return {
+        ...prev,
+        FORBIDDEN_ROUTES_PRODUCTION: newRoutes,
+      };
+    });
+  };
+
+  const addForbiddenRoute = () => {
+    setData((prev) => ({
+      ...prev,
+      FORBIDDEN_ROUTES_PRODUCTION: [...(prev.FORBIDDEN_ROUTES_PRODUCTION || []), ''],
+    }));
+  };
+
+  const removeForbiddenRoute = (index: number) => {
+    setData((prev) => ({
+      ...prev,
+      FORBIDDEN_ROUTES_PRODUCTION: prev.FORBIDDEN_ROUTES_PRODUCTION?.filter((_, i) => i !== index) || [],
     }));
   };
 
@@ -374,6 +482,94 @@ export default function ApplicationVariablesPage() {
                     onCheckedChange={(checked) => setData((prev) => ({ ...prev, AD_MODE: checked }))}
                   />
                 </div>
+                <Separator />
+                <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Require Login</Label>
+                    <p className="text-sm text-gray-500">
+                      When enabled, all pages will require authentication except those listed in Excluded Login Routes. Users will be redirected to the login page if not authenticated.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={data.REQUIRE_LOGIN ?? false}
+                    onCheckedChange={(checked) => setData((prev) => ({ ...prev, REQUIRE_LOGIN: checked }))}
+                  />
+                </div>
+                {data.REQUIRE_LOGIN && (
+                  <div className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg space-y-4">
+                    <div className="space-y-2">
+                      <Label>Excluded Login Routes</Label>
+                      <p className="text-sm text-gray-500">
+                        Routes that should not require authentication. Supports exact paths and path prefixes (e.g., "/public" or "/docs").
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      {(data.EXCLUDED_LOGIN_ROUTES || []).map((route, index) => (
+                        <div key={index} className="flex gap-2">
+                          <Input
+                            value={route}
+                            onChange={(e) => updateExcludedLoginRoute(index, e.target.value)}
+                            placeholder="/public or /docs"
+                            className="flex-1"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeExcludedLoginRoute(index)}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={addExcludedLoginRoute}
+                      >
+                        Add Route
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                <Separator />
+                <div className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-base">Forbidden Routes in Production</Label>
+                    <p className="text-sm text-gray-500">
+                      Routes that should be forbidden (redirect to /forbidden) when NODE_ENV is not "development". Supports exact paths and path prefixes (e.g., "/builder/application-variables" or "/builder").
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {(data.FORBIDDEN_ROUTES_PRODUCTION || []).map((route, index) => (
+                      <div key={index} className="flex gap-2">
+                        <Input
+                          value={route}
+                          onChange={(e) => updateForbiddenRoute(index, e.target.value)}
+                          placeholder="/builder/application-variables"
+                          className="flex-1"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeForbiddenRoute(index)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addForbiddenRoute}
+                    >
+                      Add Route
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </FormTabsContent>
@@ -493,7 +689,7 @@ export default function ApplicationVariablesPage() {
                       id="access-token-cookie"
                       value={data.AUTH_CONFIG.ACCESS_TOKEN_COOKIE || ''}
                       onChange={(e) => updateAuthConfig('ACCESS_TOKEN_COOKIE', e.target.value)}
-                      placeholder="auth_token"
+                      placeholder="access_token"
                     />
                   </div>
 

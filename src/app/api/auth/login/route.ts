@@ -51,9 +51,11 @@ const applyTokenCookies = (response: NextResponse, tokens?: any): void => {
 };
 
 export async function POST(request: NextRequest) {
+  loggingCustom(LogType.LOGIN_LOG, 'info', '========== LOGIN API CALLED ==========');
+  loggingCustom(LogType.LOGIN_LOG, 'info', `Request received at: ${new Date().toISOString()}`);
   try {
     // Log route being called
-    loggingCustom(LogType.LOGIN_LOG, 'info', `POST /api/auth/login - Request received`);
+    loggingCustom(LogType.LOGIN_LOG, 'info', 'POST /api/auth/login - Request received');
 
     // Log headers
     const headers: Record<string, string> = {};
@@ -62,7 +64,18 @@ export async function POST(request: NextRequest) {
     });
     loggingCustom(LogType.LOGIN_LOG, 'debug', `Headers: ${JSON.stringify(headers, null, 2)}`);
 
+    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Parsing request body...');
     const body = await request.json();
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Request body received: ${JSON.stringify({
+      emailOrUsername: body.emailOrUsername || body.email,
+      hasPassword: !!body.password,
+      deviceFingerprint: body.deviceFingerprint || body.fingerprint,
+      fullBody: {
+        ...body,
+        password: body.password ? '***MASKED***' : undefined,
+      },
+    })}`);
+    
     const emailOrUsername = body.emailOrUsername || body.email;
     const password = body.password;
     const deviceFingerprint = body.deviceFingerprint || body.fingerprint;
@@ -75,7 +88,9 @@ export async function POST(request: NextRequest) {
     loggingCustom(LogType.LOGIN_LOG, 'debug', `Request Body: ${JSON.stringify(sanitizedBody, null, 2)}`);
 
     // Validate input
+    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Validating input...');
     if (!emailOrUsername || !password) {
+      loggingCustom(LogType.LOGIN_LOG, 'warn', 'Validation failed - missing email or password');
       const errorResponse = {
         success: false,
         error: 'Email and password are required',
@@ -83,16 +98,27 @@ export async function POST(request: NextRequest) {
       loggingCustom(LogType.LOGIN_LOG, 'warn', `Response (400): ${JSON.stringify(errorResponse, null, 2)}`);
       return NextResponse.json(errorResponse, { status: 400 });
     }
+    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Input validation passed');
 
     const useDemoMode = isServerDemoMode();
     loggingCustom(LogType.LOGIN_LOG, 'debug', `Demo mode: ${useDemoMode}`);
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Login locally: ${useDemoMode}`);
 
     if (useDemoMode) {
+      loggingCustom(LogType.LOGIN_LOG, 'info', 'Using local authentication (demo mode)');
       // Authenticate against local data
+      loggingCustom(LogType.LOGIN_LOG, 'debug', 'Calling authenticateUser...');
       const result = await authenticateUser({ email: emailOrUsername, password });
+      loggingCustom(LogType.LOGIN_LOG, 'debug', `authenticateUser result: ${JSON.stringify({
+        success: result.success,
+        hasUser: !!result.user,
+        hasTokens: !!result.tokens,
+        error: result.error,
+        message: result.message,
+      })}`);
 
       if (!result.success) {
-        console.error('Authentication failed:', result.error);
+        loggingCustom(LogType.LOGIN_LOG, 'error', `Authentication failed: ${result.error}`);
         const errorResponse = {
           success: false,
           error: result.error || AUTH_CONFIG.ERROR_MESSAGES.UNAUTHORIZED,
@@ -120,25 +146,39 @@ export async function POST(request: NextRequest) {
         { status: 200 }
       );
 
+      loggingCustom(LogType.LOGIN_LOG, 'debug', 'Applying token cookies...');
       applyTokenCookies(response, result.tokens);
-
+      loggingCustom(LogType.LOGIN_LOG, 'debug', 'Token cookies applied');
+      loggingCustom(LogType.LOGIN_LOG, 'info', '========== LOGIN API COMPLETED SUCCESSFULLY (DEMO MODE) ==========');
       return response;
     }
 
     // Proxy authentication request to external service
+    loggingCustom(LogType.LOGIN_LOG, 'info', 'Using external authentication service');
     const proxyBody = {
       emailOrUsername,
       password,
       appId: getAuthServiceAppId(),
       deviceFingerprint: deviceFingerprint ?? '',
     };
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Proxy body prepared: ${JSON.stringify({
+      ...proxyBody,
+      password: '***MASKED***',
+      appId: proxyBody.appId,
+    })}`);
 
     // Build proxy headers and URL
     let proxyHeaders: HeadersInit;
     let authServiceUrl: string;
     try {
+      loggingCustom(LogType.LOGIN_LOG, 'debug', 'Building proxy headers and URL...');
       proxyHeaders = buildProxyHeaders(request);
       authServiceUrl = buildAuthServiceUrl('/login');
+      
+      loggingCustom(LogType.LOGIN_LOG, 'debug', `External auth service details: ${JSON.stringify({
+        url: authServiceUrl,
+        headers: proxyHeaders,
+      })}`);
       
       // Log the external service URL and headers being sent
       loggingCustom(LogType.LOGIN_LOG, 'info', `Forwarding to external auth service: ${authServiceUrl}`);
@@ -149,15 +189,39 @@ export async function POST(request: NextRequest) {
       throw urlError;
     }
 
+    loggingCustom(LogType.LOGIN_LOG, 'info', 'Sending request to external auth service...');
+    const fetchStartTime = Date.now();
     const upstreamResponse = await fetch(authServiceUrl, {
       method: 'POST',
       headers: proxyHeaders,
       body: JSON.stringify(proxyBody),
     });
+    const fetchDuration = Date.now() - fetchStartTime;
+    loggingCustom(LogType.LOGIN_LOG, 'info', `External auth service response: ${JSON.stringify({
+      duration: `${fetchDuration}ms`,
+      status: upstreamResponse.status,
+      statusText: upstreamResponse.statusText,
+      ok: upstreamResponse.ok,
+      headers: Object.fromEntries(upstreamResponse.headers.entries()),
+    })}`);
 
+    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Parsing external auth service response...');
     const upstreamJson = await upstreamResponse.json().catch(() => null);
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `External auth service response data: ${JSON.stringify({
+      success: upstreamJson?.success,
+      hasUser: !!upstreamJson?.user,
+      hasTokens: !!upstreamJson?.tokens,
+      error: upstreamJson?.error,
+      message: upstreamJson?.message,
+      fullData: JSON.stringify(upstreamJson, null, 2),
+    })}`);
 
     if (!upstreamResponse.ok) {
+      loggingCustom(LogType.LOGIN_LOG, 'error', `External auth service returned error: ${JSON.stringify({
+        status: upstreamResponse.status,
+        error: upstreamJson?.error,
+        message: upstreamJson?.message,
+      })}`);
       const errorResponse = {
         success: false,
         error:
@@ -181,16 +245,26 @@ export async function POST(request: NextRequest) {
     loggingCustom(LogType.LOGIN_LOG, 'info', `Response (${upstreamResponse.status} - External Auth): ${JSON.stringify(sanitizedResponse, null, 2)}`);
 
     const response = NextResponse.json(upstreamJson ?? { success: true }, { status: upstreamResponse.status });
+    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Applying token cookies from external auth...');
     applyTokenCookies(response, upstreamJson?.tokens);
+    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Forwarding set-cookie headers from external auth...');
     forwardSetCookieHeaders(upstreamResponse, response);
+    loggingCustom(LogType.LOGIN_LOG, 'info', '========== LOGIN API COMPLETED SUCCESSFULLY (EXTERNAL AUTH) ==========');
     return response;
   } catch (error) {
-    console.error('Login API error:', error);
+    loggingCustom(LogType.LOGIN_LOG, 'error', '========== LOGIN API ERROR OCCURRED ==========');
+    loggingCustom(LogType.LOGIN_LOG, 'error', `Error details: ${JSON.stringify({
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined,
+      cause: error instanceof Error ? error.cause : undefined,
+    })}`);
 
     const errorMessage = error instanceof Error ? error.message : 'Login failed';
     loggingCustom(LogType.LOGIN_LOG, 'error', `Exception caught: ${errorMessage}`);
 
     if (error instanceof Error && (error.message.includes('URL_AUTHENTICATION') || error.message.includes('APP_ID'))) {
+      loggingCustom(LogType.LOGIN_LOG, 'error', 'Configuration error detected');
       const errorResponse = {
         success: false,
         error: error.message,
@@ -203,6 +277,7 @@ export async function POST(request: NextRequest) {
       error: errorMessage,
     };
     loggingCustom(LogType.LOGIN_LOG, 'error', `Response (500): ${JSON.stringify(errorResponse, null, 2)}`);
+    loggingCustom(LogType.LOGIN_LOG, 'error', '========== LOGIN API ENDED WITH ERROR ==========');
     return NextResponse.json(errorResponse, { status: 500 });
   }
 }

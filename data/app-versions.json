@@ -2234,5 +2234,52 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBWR12E6V44YY7Y6WXYYZBHN",
+    "timestamp": "2025-12-07T16:00:00.000Z",
+    "version": "1.19.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "LOGIN CONNECTED TO BACKEND SUCCESSFULLY! - Integrated authentication system with external backend service, supporting both local and external authentication modes",
+        "priority": "High",
+        "affectedDomains": [
+          "auth",
+          "api",
+          "backend"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Changed the access token cookie name from 'auth_token' to 'access_token' across various files for consistency",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "configuration"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new configuration options for REQUIRE_LOGIN, EXCLUDED_LOGIN_ROUTES, and FORBIDDEN_ROUTES_PRODUCTION in application variables to enhance authentication control",
+        "priority": "High",
+        "affectedDomains": [
+          "auth",
+          "configuration",
+          "application-variables"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved logging in the login API and middleware for better error tracking and debugging, using custom LOGIN_LOG logging type",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "logging",
+          "api",
+          "middleware"
+        ]
+      }
+    ]
   }
 ]

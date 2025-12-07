@@ -62,7 +62,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
       neonOrbsSubtitle={neonOrbsSubtitle}
       showModeToggle={false}
     >
-      <div className="w-full max-w-md pt-20 md:pt-8">
+      <div className="w-full max-w-md pt-10 md:pt-4">
         <div className="flex flex-col gap-6">
           <h1 
             className="animate-element animate-delay-100 font-semibold leading-tight whitespace-nowrap overflow-hidden"

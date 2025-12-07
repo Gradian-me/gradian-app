@@ -39,9 +39,20 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
 
   const isParentLocked = values.__parentLocked === true;
 
+  // Check if there are any fields available in the system section
+  const hasInactiveField = schema.allowDataInactive === true;
+  const hasForceField = schema.allowDataForce === true;
+  const hasForceReasonField = schema.allowDataForce === true && forceValue === true;
+  const hasAssignedToField = schema.allowDataAssignedTo === true;
+  const hasDueDateField = schema.allowDataDueDate === true;
+  const hasStatusField = hasStatusGroup === true;
+  const hasParentField = schema.allowHierarchicalParent === true;
+  const hasMultiCompaniesField = schema.canSelectMultiCompanies === true;
+
   // Memoize the status sourceUrl to prevent it from changing on every render
   // This ensures PickerInput doesn't reset when form values change
   // Get statusGroup ID directly from schema prop (more stable than dynamic context)
+  // NOTE: Must be called before any early returns to comply with Rules of Hooks
   const statusSourceUrl = useMemo(() => {
     if (!hasStatusGroup || !schema.statusGroup || !Array.isArray(schema.statusGroup) || schema.statusGroup.length === 0) {
       return '';
@@ -57,6 +68,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
   }, [hasStatusGroup, schema.statusGroup]);
 
   // Memoize the status picker config to prevent PickerInput from resetting when config object reference changes
+  // NOTE: Must be called before any early returns to comply with Rules of Hooks
   const statusPickerConfig = useMemo(() => ({
     name: 'status',
     label: "Status",
@@ -77,6 +89,23 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
     },
   }), [statusSourceUrl]);
 
+  // Count available fields
+  const availableFieldsCount = [
+    hasInactiveField,
+    hasForceField,
+    hasForceReasonField,
+    hasAssignedToField,
+    hasDueDateField,
+    hasStatusField,
+    hasParentField,
+    hasMultiCompaniesField,
+  ].filter(Boolean).length;
+
+  // Hide system section if no fields are available
+  if (availableFieldsCount === 0) {
+    return null;
+  }
+
   return (
     <Card className={cn(
       'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
@@ -87,35 +116,37 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
           System Section
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-6 pb-6 overflow-visible">
+      <CardContent className="pt-0 px-6 pb-6 overflow-visible">
         <div className="space-y-4">
-          <div className="flex flex-row items-center gap-6">
-            {schema.allowDataInactive && (
-              <Switch
-                config={{
-                  name: 'system-inactive',
-                  label: 'Inactive',
-                }}
-                checked={inactiveValue}
-                onChange={(checked) => onChange('inactive', checked)}
-                onBlur={() => onBlur('inactive')}
-                disabled={disabled}
-              />
-            )}
+          {(hasInactiveField || hasForceField) && (
+            <div className="flex flex-row items-center gap-6">
+              {hasInactiveField && (
+                <Switch
+                  config={{
+                    name: 'system-inactive',
+                    label: 'Inactive',
+                  }}
+                  checked={inactiveValue}
+                  onChange={(checked) => onChange('inactive', checked)}
+                  onBlur={() => onBlur('inactive')}
+                  disabled={disabled}
+                />
+              )}
 
-            {schema.allowDataForce && (
-              <Switch
-                config={{
-                  name: 'system-force',
-                  label: 'Force',
-                }}
-                checked={forceValue}
-                onChange={(checked) => onChange('isForce', checked)}
-                onBlur={() => onBlur('isForce')}
-                disabled={disabled}
-              />
-            )}
-          </div>
+              {hasForceField && (
+                <Switch
+                  config={{
+                    name: 'system-force',
+                    label: 'Force',
+                  }}
+                  checked={forceValue}
+                  onChange={(checked) => onChange('isForce', checked)}
+                  onBlur={() => onBlur('isForce')}
+                  disabled={disabled}
+                />
+              )}
+            </div>
+          )}
 
           {schema.allowDataForce && forceValue && (
             <div className="space-y-2">
@@ -137,10 +168,20 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
             </div>
           )}
 
-          {(schema.allowDataAssignedTo || schema.allowDataDueDate || hasStatusGroup) && (
-            <div className="pt-2 border-t border-dashed border-gray-200 dark:border-gray-700">
-              <div className="grid grid-cols-3 gap-4">
-                {schema.allowDataAssignedTo && (
+          {(hasAssignedToField || hasDueDateField || hasStatusField) && (
+            <div className="pt-2">
+              <div className={cn(
+                'grid gap-4',
+                // Dynamic grid columns based on available fields
+                (hasAssignedToField && hasDueDateField && hasStatusField) && 'grid-cols-1 md:grid-cols-3',
+                ((hasAssignedToField && hasDueDateField && !hasStatusField) || 
+                 (hasAssignedToField && !hasDueDateField && hasStatusField) ||
+                 (!hasAssignedToField && hasDueDateField && hasStatusField)) && 'grid-cols-1 md:grid-cols-2',
+                ((hasAssignedToField && !hasDueDateField && !hasStatusField) ||
+                 (!hasAssignedToField && hasDueDateField && !hasStatusField) ||
+                 (!hasAssignedToField && !hasDueDateField && hasStatusField)) && 'grid-cols-1'
+              )}>
+                {hasAssignedToField && (
                   <div className="space-y-2">
                     <PickerInput
                       config={{
@@ -166,7 +207,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
                   </div>
                 )}
 
-                {schema.allowDataDueDate && (
+                {hasDueDateField && (
                   <div className="space-y-2">
                     <Label
                       htmlFor="system-due-date"
@@ -189,7 +230,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
                   </div>
                 )}
 
-                {hasStatusGroup && (
+                {hasStatusField && (
                   <div className="space-y-2">
                     <PickerInput
                       key={`status-picker-${statusSourceUrl}`} // Stable key based on sourceUrl to prevent remounting
@@ -222,7 +263,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
           )}
 
           {schema.allowHierarchicalParent && (
-            <div className="space-y-2 pt-2 border-t border-dashed border-gray-200 dark:border-gray-700">
+            <div className="space-y-2">
               <PickerInput
                 config={{
                   name: 'parent',
@@ -255,7 +296,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
           )}
 
           {schema.canSelectMultiCompanies && (
-            <div className="space-y-2 pt-2 border-t border-dashed border-gray-200 dark:border-gray-700">
+            <div className="space-y-2">
               <PickerInput
                 config={{
                   name: 'related-companies',

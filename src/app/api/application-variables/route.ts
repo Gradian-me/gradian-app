@@ -28,7 +28,7 @@ async function ensureApplicationVariablesFile(): Promise<void> {
         JWT_SECRET: 'your-default-secret-key-change-in-production',
         ACCESS_TOKEN_EXPIRY: 3600,
         REFRESH_TOKEN_EXPIRY: 604800,
-        ACCESS_TOKEN_COOKIE: 'auth_token',
+        ACCESS_TOKEN_COOKIE: 'access_token',
         REFRESH_TOKEN_COOKIE: 'refresh_token',
         USERS_API_PATH: '/api/data/users',
         ERROR_MESSAGES: {
@@ -56,6 +56,9 @@ async function ensureApplicationVariablesFile(): Promise<void> {
       DEMO_MODE: true,
       LOGIN_LOCALLY: false,
       AD_MODE: false,
+      REQUIRE_LOGIN: false,
+      EXCLUDED_LOGIN_ROUTES: ['/authentication'],
+      FORBIDDEN_ROUTES_PRODUCTION: [],
       AI_CONFIG: {
         LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions'
       }
@@ -134,6 +137,9 @@ export async function PUT(request: NextRequest) {
       ...(body.DEMO_MODE !== undefined && { DEMO_MODE: body.DEMO_MODE }),
       ...(body.LOGIN_LOCALLY !== undefined && { LOGIN_LOCALLY: body.LOGIN_LOCALLY }),
       ...(body.AD_MODE !== undefined && { AD_MODE: body.AD_MODE }),
+      ...(body.REQUIRE_LOGIN !== undefined && { REQUIRE_LOGIN: body.REQUIRE_LOGIN }),
+      ...(body.EXCLUDED_LOGIN_ROUTES !== undefined && { EXCLUDED_LOGIN_ROUTES: body.EXCLUDED_LOGIN_ROUTES }),
+      ...(body.FORBIDDEN_ROUTES_PRODUCTION !== undefined && { FORBIDDEN_ROUTES_PRODUCTION: body.FORBIDDEN_ROUTES_PRODUCTION }),
       ...(body.AI_CONFIG && {
         AI_CONFIG: {
           ...currentData.AI_CONFIG,
