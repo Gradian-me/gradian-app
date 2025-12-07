@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.16.001",
+  "version": "1.17.000",
   "private": true,
   "scripts": {
     "dev": "next dev", 

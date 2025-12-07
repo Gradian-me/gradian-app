@@ -2071,5 +2071,21 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBAIBUILDER001",
+    "timestamp": "2025-12-07T00:00:00.000Z",
+    "version": "1.17.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Introduced a new AI Agent Builder configuration in ai-agents.json, enabling the creation of AI agents based on user requirements. This includes a comprehensive system prompt, loading text switches, render components for user input, and preload routes for existing agents and form components. This enhancement aims to streamline the process of generating AI agents and ensure adherence to best practices in agent configuration.",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents"
+        ]
+      }
+    ]
   }
 ]
