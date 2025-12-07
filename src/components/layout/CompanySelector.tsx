@@ -9,7 +9,7 @@ import { Avatar } from '@/gradian-ui/form-builder/form-elements';
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useCompanyStore } from '@/stores/company.store';
-import { useCompanies } from '@/gradian-ui/shared/hooks/use-companies';
+import { useTenantStore } from '@/stores/tenant.store';
 import { useTheme } from 'next-themes';
 
 interface Company {
@@ -35,7 +35,9 @@ export function CompanySelector({
   showLogo = 'full',
 }: CompanySelectorProps) {
   const { selectedCompany, setSelectedCompany } = useCompanyStore();
-  const { companies, isLoading: loading } = useCompanies();
+  const { selectedTenant } = useTenantStore();
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const onCompanyChangeFullRef = useRef(onCompanyChangeFull);
@@ -58,24 +60,84 @@ export function CompanySelector({
     setIsMounted(true);
   }, []);
 
+  // Load companies from tenant-store in localStorage
+  useEffect(() => {
+    if (!isMounted) return;
+
+    try {
+      // Try to get from Zustand store first
+      const tenant = selectedTenant;
+      
+      // If not in store, read directly from localStorage
+      let relatedCompanies: Array<{ id: string; label: string }> = [];
+      
+      if (tenant && tenant['related-companies']) {
+        relatedCompanies = tenant['related-companies'];
+      } else if (typeof window !== 'undefined') {
+        const tenantStoreData = localStorage.getItem('tenant-store');
+        if (tenantStoreData) {
+          const parsed = JSON.parse(tenantStoreData);
+          if (parsed?.state?.selectedTenant?.['related-companies']) {
+            relatedCompanies = parsed.state.selectedTenant['related-companies'];
+          }
+        }
+      }
+
+      // Map related-companies to Company format (label -> name)
+      const mappedCompanies: Company[] = relatedCompanies.map((company) => ({
+        id: company.id,
+        name: company.label,
+      }));
+
+      setCompanies(mappedCompanies);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading companies from tenant-store:', error);
+      setCompanies([]);
+      setLoading(false);
+    }
+  }, [isMounted, selectedTenant]);
+
   // Set default company when companies are loaded
   useEffect(() => {
     if (isMounted && companies.length > 0) {
-      // Set "All Companies" as default if nothing is in store
-      if (!selectedCompany) {
-        const allCompaniesOption = companies.find(c => c.id === -1);
-        if (allCompaniesOption) {
-          setSelectedCompany(allCompaniesOption);
-          // Set cookie for default
+      // If there's only one company, automatically set it as default
+      if (companies.length === 1) {
+        const singleCompany = companies[0];
+        if (!selectedCompany || selectedCompany.id !== singleCompany.id) {
+          setSelectedCompany(singleCompany);
+          // Set cookie for the single company
           if (typeof document !== 'undefined') {
-            document.cookie = `selectedCompanyId=; path=/; max-age=0`; // Clear for "All Companies"
+            const companyId = singleCompany.id !== -1 ? String(singleCompany.id) : '';
+            document.cookie = `selectedCompanyId=${companyId}; path=/; max-age=${60 * 60 * 24 * 365}`;
           }
         }
       } else {
-        // Sync cookie with store
-        if (typeof document !== 'undefined') {
-          const companyId = selectedCompany.id !== -1 ? String(selectedCompany.id) : '';
-          document.cookie = `selectedCompanyId=${companyId}; path=/; max-age=${60 * 60 * 24 * 365}`;
+        // Set default company if nothing is in store (for multiple companies)
+        if (!selectedCompany) {
+          // First try to find "All Companies" option
+          const allCompaniesOption = companies.find(c => c.id === -1);
+          if (allCompaniesOption) {
+            setSelectedCompany(allCompaniesOption);
+            // Set cookie for default
+            if (typeof document !== 'undefined') {
+              document.cookie = `selectedCompanyId=; path=/; max-age=0`; // Clear for "All Companies"
+            }
+          } else if (companies.length > 0) {
+            // Otherwise, select the first company
+            setSelectedCompany(companies[0]);
+            // Set cookie for first company
+            if (typeof document !== 'undefined') {
+              const companyId = companies[0].id !== -1 ? String(companies[0].id) : '';
+              document.cookie = `selectedCompanyId=${companyId}; path=/; max-age=${60 * 60 * 24 * 365}`;
+            }
+          }
+        } else {
+          // Sync cookie with store
+          if (typeof document !== 'undefined') {
+            const companyId = selectedCompany.id !== -1 ? String(selectedCompany.id) : '';
+            document.cookie = `selectedCompanyId=${companyId}; path=/; max-age=${60 * 60 * 24 * 365}`;
+          }
         }
       }
     }
@@ -147,6 +209,11 @@ export function CompanySelector({
     isDarkVariant ? "bg-gray-700" : "bg-gray-200"
   );
   const menuItemBaseClasses = "relative flex cursor-pointer select-none items-center rounded-lg px-2 py-1.5 text-sm outline-none transition-colors";
+
+  // Hide component if there's only one company (it's automatically selected)
+  if (isMounted && !loading && companies.length === 1) {
+    return null;
+  }
 
   if (!isMounted || loading) {
     return (
