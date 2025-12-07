@@ -2087,5 +2087,32 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBAIVALIDATION001",
+    "timestamp": "2025-12-07T12:00:00.000Z",
+    "version": "1.17.001",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "Refactored AI agent validation logic in useAiBuilder to differentiate between AI agent and schema routes, ensuring proper validation of required fields for each type",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "validation",
+          "hooks"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved AiAgentCardGrid component layout by repositioning model and output format badges for better visibility. This update aims to enhance user experience and maintain data integrity across AI agent configurations",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ui",
+          "components"
+        ]
+      }
+    ]
   }
 ]

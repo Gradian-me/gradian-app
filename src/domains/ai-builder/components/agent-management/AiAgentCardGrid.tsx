@@ -74,16 +74,6 @@ const AiAgentCardComponent = memo(({ agent, index, onEdit, onView, onDelete }: A
                 <CardTitle className="text-base font-semibold truncate text-gray-900 dark:text-gray-100">
                   {agent.label}
                 </CardTitle>
-                {agent.model && (
-                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                    {agent.model}
-                  </Badge>
-                )}
-                {agent.requiredOutputFormat && (
-                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300">
-                    {agent.requiredOutputFormat}
-                  </Badge>
-                )}
               </div>
               {agent.description && (
                 <p className="text-xs line-clamp-2 mt-1 text-gray-500 dark:text-gray-400">
@@ -123,7 +113,7 @@ const AiAgentCardComponent = memo(({ agent, index, onEdit, onView, onDelete }: A
           </div>
         </CardHeader>
         {showStats && (
-          <CardContent className="relative z-10 pt-2 px-4 pb-4">
+          <CardContent className="relative z-10 pt-2 px-4 pb-3">
             <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
               {renderComponentsCount > 0 && (
                 <div className="flex items-center gap-1.5">
@@ -136,6 +126,22 @@ const AiAgentCardComponent = memo(({ agent, index, onEdit, onView, onDelete }: A
                   <Sparkles className="h-3.5 w-3.5" />
                   <span>{preloadRoutesCount} Routes</span>
                 </div>
+              )}
+            </div>
+          </CardContent>
+        )}
+        {(agent.model || agent.requiredOutputFormat) && (
+          <CardContent className="relative z-10 pt-0 px-4 pb-4 mt-auto">
+            <div className="flex items-center justify-end gap-2">
+              {agent.model && (
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                  {agent.model}
+                </Badge>
+              )}
+              {agent.requiredOutputFormat && (
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300">
+                  {agent.requiredOutputFormat}
+                </Badge>
               )}
             </div>
           </CardContent>

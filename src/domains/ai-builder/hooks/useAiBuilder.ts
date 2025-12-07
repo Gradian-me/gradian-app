@@ -352,61 +352,135 @@ export function useAiBuilder(): UseAiBuilderReturn {
         try {
           const parsed = JSON.parse(response);
           
-          // Handle both single schema object and array of schemas
+          // Determine if this is an AI agent route or schema route
+          const isAiAgentRoute = agent.nextAction.route.includes('/api/ai-agents') || 
+                                  agent.nextAction.route.includes('/api/ai-agent-builder');
+          const isSchemaRoute = agent.nextAction.route.includes('/api/schemas');
+          
+          // Handle both single object and array of objects
           if (Array.isArray(parsed)) {
-            // Validate array of schemas
             if (parsed.length === 0) {
-              throw new Error('Schema array cannot be empty.');
+              throw new Error('Array cannot be empty.');
             }
             
-            // Validate each schema in the array
-            parsed.forEach((schema, index) => {
-              if (!schema || typeof schema !== 'object' || Array.isArray(schema)) {
-                throw new Error(`Invalid schema at index ${index}: must be an object`);
+            // Validate each object in the array based on route type
+            parsed.forEach((item, index) => {
+              if (!item || typeof item !== 'object' || Array.isArray(item)) {
+                throw new Error(`Invalid object at index ${index}: must be an object`);
               }
               
-              if (!schema.id) {
-                throw new Error(`Schema at index ${index} must have an "id" field.`);
+              if (!item.id) {
+                throw new Error(`Object at index ${index} must have an "id" field.`);
               }
               
-              if (!schema.singular_name) {
-                throw new Error(`Schema at index ${index} must have a "singular_name" field.`);
+              // Validate schema fields only for schema routes
+              if (isSchemaRoute) {
+                if (!item.singular_name) {
+                  throw new Error(`Schema at index ${index} must have a "singular_name" field.`);
+                }
+                
+                if (!item.plural_name) {
+                  throw new Error(`Schema at index ${index} must have a "plural_name" field.`);
+                }
+                
+                if (!Array.isArray(item.fields)) {
+                  throw new Error(`Schema at index ${index} must have a "fields" array.`);
+                }
+                
+                if (!Array.isArray(item.sections)) {
+                  throw new Error(`Schema at index ${index} must have a "sections" array.`);
+                }
               }
               
-              if (!schema.plural_name) {
-                throw new Error(`Schema at index ${index} must have a "plural_name" field.`);
-              }
-              
-              if (!Array.isArray(schema.fields)) {
-                throw new Error(`Schema at index ${index} must have a "fields" array.`);
-              }
-              
-              if (!Array.isArray(schema.sections)) {
-                throw new Error(`Schema at index ${index} must have a "sections" array.`);
+              // Validate AI agent fields only for AI agent routes
+              if (isAiAgentRoute) {
+                if (!item.label) {
+                  throw new Error(`AI agent at index ${index} must have a "label" field.`);
+                }
+                
+                if (!item.icon) {
+                  throw new Error(`AI agent at index ${index} must have an "icon" field.`);
+                }
+                
+                if (!item.description) {
+                  throw new Error(`AI agent at index ${index} must have a "description" field.`);
+                }
+                
+                if (!item.requiredOutputFormat) {
+                  throw new Error(`AI agent at index ${index} must have a "requiredOutputFormat" field.`);
+                }
+                
+                if (!item.model) {
+                  throw new Error(`AI agent at index ${index} must have a "model" field.`);
+                }
+                
+                if (!item.systemPrompt) {
+                  throw new Error(`AI agent at index ${index} must have a "systemPrompt" field.`);
+                }
+                
+                // AI agents should NOT have schema fields
+                if (item.singular_name || item.plural_name || item.fields || item.sections) {
+                  throw new Error(`AI agent at index ${index} must NOT have schema fields (singular_name, plural_name, fields, sections). These are schema fields, not AI agent fields.`);
+                }
               }
             });
             
             requestBody = parsed;
           } else if (parsed && typeof parsed === 'object') {
-            // Validate single schema object
+            // Validate single object based on route type
             if (!parsed.id) {
-              throw new Error('Schema must have an "id" field.');
+              throw new Error('Object must have an "id" field.');
             }
             
-            if (!parsed.singular_name) {
-              throw new Error('Schema must have a "singular_name" field.');
+            // Validate schema fields only for schema routes
+            if (isSchemaRoute) {
+              if (!parsed.singular_name) {
+                throw new Error('Schema must have a "singular_name" field.');
+              }
+              
+              if (!parsed.plural_name) {
+                throw new Error('Schema must have a "plural_name" field.');
+              }
+              
+              if (!Array.isArray(parsed.fields)) {
+                throw new Error('Schema must have a "fields" array.');
+              }
+              
+              if (!Array.isArray(parsed.sections)) {
+                throw new Error('Schema must have a "sections" array.');
+              }
             }
             
-            if (!parsed.plural_name) {
-              throw new Error('Schema must have a "plural_name" field.');
-            }
-            
-            if (!Array.isArray(parsed.fields)) {
-              throw new Error('Schema must have a "fields" array.');
-            }
-            
-            if (!Array.isArray(parsed.sections)) {
-              throw new Error('Schema must have a "sections" array.');
+            // Validate AI agent fields only for AI agent routes
+            if (isAiAgentRoute) {
+              if (!parsed.label) {
+                throw new Error('AI agent must have a "label" field.');
+              }
+              
+              if (!parsed.icon) {
+                throw new Error('AI agent must have an "icon" field.');
+              }
+              
+              if (!parsed.description) {
+                throw new Error('AI agent must have a "description" field.');
+              }
+              
+              if (!parsed.requiredOutputFormat) {
+                throw new Error('AI agent must have a "requiredOutputFormat" field.');
+              }
+              
+              if (!parsed.model) {
+                throw new Error('AI agent must have a "model" field.');
+              }
+              
+              if (!parsed.systemPrompt) {
+                throw new Error('AI agent must have a "systemPrompt" field.');
+              }
+              
+              // AI agents should NOT have schema fields
+              if (parsed.singular_name || parsed.plural_name || parsed.fields || parsed.sections) {
+                throw new Error('AI agent must NOT have schema fields (singular_name, plural_name, fields, sections). These are schema fields, not AI agent fields.');
+              }
             }
             
             requestBody = parsed;
