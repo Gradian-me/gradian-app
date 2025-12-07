@@ -5658,5 +5658,81 @@
     "allowDataDueDate": true,
     "allowDataAssignedTo": true,
     "allowDataForce": true
+  },
+  {
+    "id": "attachments",
+    "description": "Manage file attachments and documents",
+    "singular_name": "Attachment",
+    "plural_name": "Attachments",
+    "fields": [
+      {
+        "id": "attachment-file",
+        "name": "file",
+        "label": "File",
+        "sectionId": "basic-information",
+        "component": "file",
+        "placeholder": "Select file to upload",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "attachment-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter attachment title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 2,
+        "role": "title"
+      },
+      {
+        "id": "attachment-code",
+        "name": "code",
+        "label": "Code",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter attachment code",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3,
+        "role": "code"
+      },
+      {
+        "id": "attachment-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter attachment description",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4,
+        "role": "description"
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Attachment Information",
+        "description": "Basic attachment details",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Paperclip",
+    "isSystemSchema": true
   }
 ]

@@ -760,6 +760,15 @@
       "id": "HAS_FIELD_VALUE",
       "createdAt": "2025-12-04T10:05:47.411Z",
       "updatedAt": "2025-12-04T10:05:47.412Z"
+    },
+    {
+      "id": "HAS_ATTACHMENT",
+      "label": "Has Attachment",
+      "description": "An entity has one or more attachments",
+      "color": "blue",
+      "icon": "Paperclip",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "inquiry-vendors": [
@@ -4057,6 +4066,19 @@
       "id": "01KBSWN6QGRA5JQQKRNRVP2WNV",
       "createdAt": "2025-12-06T13:12:12.784Z",
       "updatedAt": "2025-12-06T13:12:12.784Z"
+    }
+  ],
+  "attachments": [
+    {
+      "file": {},
+      "title": "Change Management Doc 1",
+      "code": "CC-20250108",
+      "description": "Test Description",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBW8Z924XKTEH1S2E9FPVFSD",
+      "createdAt": "2025-12-07T11:25:54.629Z",
+      "updatedAt": "2025-12-07T11:25:54.629Z"
     }
   ]
 }
