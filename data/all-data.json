@@ -2322,7 +2322,11 @@
       "icon": "GitBranch",
       "targetRoute": [
         {
-          "id": "01KASYNCENV001GITLABSYNC"
+          "id": "01KASYNCENV001GITLABSYNC",
+          "label": "Git Sync Environment Variables",
+          "metadata": {
+            "address": "http://localhost:3000/api/git/sync-env"
+          }
         }
       ],
       "targetMethod": [
@@ -2335,8 +2339,8 @@
       ],
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-12-03T13:10:28.734Z",
-      "lastSynced": "2025-12-03T13:10:28.734Z",
+      "updatedAt": "2025-12-07T05:45:21.748Z",
+      "lastSynced": "2025-12-07T05:45:21.748Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2349,7 +2353,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Replaced all variables: deleted 20, created 20",
+      "lastSyncMessage": "Replaced all variables: deleted 20, created 21",
       "sourceRoute": []
     },
     {
