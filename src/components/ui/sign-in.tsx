@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Eye, EyeOff, LockIcon, UserIcon } from 'lucide-react';
+import { Eye, EyeOff, LockIcon, UserIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { AuthenticationLayout, GlassInputWrapper } from '@/components/authentication';
 import { ModeToggle } from '@/gradian-ui/layout';
+import { Button } from '@/components/ui/button';
 
 interface SignInPageProps {
   title?: React.ReactNode;
@@ -16,6 +17,7 @@ interface SignInPageProps {
   onResetPassword?: () => void;
   onCreateAccount?: () => void;
   error?: string | null;
+  errorDetails?: string | null;
   isLoading?: boolean;
 }
 
@@ -32,9 +34,11 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   onResetPassword,
   onCreateAccount,
   error,
+  errorDetails,
   isLoading = false,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showErrorDetails, setShowErrorDetails] = useState(false);
   const [formValues, setFormValues] = useState({ email: '', password: '' });
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +76,39 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 
           {error && (
             <div className="animate-element animate-delay-250 rounded-2xl border border-red-500/50 bg-red-500/10 dark:bg-red-500/5 p-4">
-              <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
+              <div className="flex flex-col gap-2">
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
+                {errorDetails && (
+                  <div className="mt-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowErrorDetails(!showErrorDetails)}
+                      className="h-7 px-2 text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-500/20 dark:hover:bg-red-500/10"
+                    >
+                      {showErrorDetails ? (
+                        <>
+                          <ChevronUp className="h-3 w-3 me-1" />
+                          Hide Details
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="h-3 w-3 me-1" />
+                          Show Details
+                        </>
+                      )}
+                    </Button>
+                    {showErrorDetails && (
+                      <div className="mt-2 p-3 rounded-lg bg-red-500/10 dark:bg-red-500/5 border border-red-500/30 dark:border-red-500/20">
+                        <pre className="text-xs text-red-700 dark:text-red-300 whitespace-pre-wrap break-words font-mono overflow-auto max-h-64">
+                          {errorDetails}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

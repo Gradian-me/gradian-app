@@ -17,6 +17,7 @@ export default function LoginPage() {
   const { selectedTenant } = useTenantStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [fingerprint, setFingerprint] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function LoginPage() {
 
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
     setError(null);
+    setErrorDetails(null);
     event.preventDefault();
     setIsLoading(true);
 
@@ -59,21 +61,60 @@ export default function LoginPage() {
         ...(tenantDomain ? { 'x-tenant-domain': tenantDomain } : {}),
       };
 
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          emailOrUsername: email,
-          password,
-          deviceFingerprint: fingerprintValue,
-        }),
-      });
+      let response: Response;
+      let data: any;
+      
+      try {
+        response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            emailOrUsername: email,
+            password,
+            deviceFingerprint: fingerprintValue,
+          }),
+        });
 
-      const data = await response.json();
+        // Clone response to read as text if JSON parsing fails
+        const responseClone = response.clone();
+        
+        try {
+          data = await response.json();
+        } catch (jsonError) {
+          // If JSON parsing fails, read as text
+          const text = await responseClone.text().catch(() => 'Unable to read response');
+          const errorMessage = `Login failed with status ${response.status}`;
+          const details = `Status: ${response.status} ${response.statusText}\n\nResponse body:\n${text}`;
+          setError(errorMessage);
+          setErrorDetails(details);
+          toast.error(errorMessage);
+          setIsLoading(false);
+          return;
+        }
 
-      if (!response.ok || !data.success) {
-        const errorMessage = data.error || 'Login failed. Please check your credentials.';
+        if (!response.ok || !data.success) {
+          const errorMessage = data.error || `Login failed with status ${response.status}`;
+          const details = [
+            `Status: ${response.status} ${response.statusText}`,
+            data.error ? `Error: ${data.error}` : '',
+            data.message ? `Message: ${data.message}` : '',
+            Object.keys(data).length > 0 ? `\nFull response:\n${JSON.stringify(data, null, 2)}` : '',
+          ].filter(Boolean).join('\n');
+          setError(errorMessage);
+          setErrorDetails(details);
+          toast.error(errorMessage);
+          setIsLoading(false);
+          return;
+        }
+      } catch (fetchError) {
+        // Network error or fetch failed
+        const errorMessage = 'Network error: Failed to connect to the server';
+        const details = [
+          `Error: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`,
+          fetchError instanceof Error && fetchError.stack ? `\nStack trace:\n${fetchError.stack}` : '',
+        ].filter(Boolean).join('\n');
         setError(errorMessage);
+        setErrorDetails(details);
         toast.error(errorMessage);
         setIsLoading(false);
         return;
@@ -113,8 +154,14 @@ export default function LoginPage() {
       setIsLoading(false);
     } catch (error) {
       console.error('Login error:', error);
-      const errorMessage = 'An error occurred during login. Please try again.';
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred during login. Please try again.';
+      const details = [
+        `Error: ${errorMessage}`,
+        error instanceof Error && error.stack ? `\nStack trace:\n${error.stack}` : '',
+        error instanceof Error && error.cause ? `\nCause: ${error.cause}` : '',
+      ].filter(Boolean).join('\n');
       setError(errorMessage);
+      setErrorDetails(details);
       toast.error(errorMessage);
       setIsLoading(false);
     }
@@ -145,6 +192,7 @@ export default function LoginPage() {
         onResetPassword={handleResetPassword}
         onCreateAccount={handleCreateAccount}
         error={error}
+        errorDetails={errorDetails}
         isLoading={isLoading}
       />
     </>

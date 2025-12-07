@@ -2076,5 +2076,37 @@
     "totalPrice": 0.00142815,
     "responseTime": 3809,
     "duration": 3810
+  },
+  {
+    "id": "01KBWF9VCY993XS0PHKKEMY7DM",
+    "timestamp": "2025-12-07T13:16:32.546Z",
+    "username": "abidim",
+    "aiAgent": "professional-writing",
+    "userPrompt": "Writing Style: Translate\n\nUser Prompt: test\nasd asd asdas dasd asd as\nRequired Output Format: String",
+    "agentResponse": "test  \nasd asd asdas dasd asd as",
+    "inputTokens": 644,
+    "inputPrice": 0.0000966,
+    "outputTokens": 13,
+    "outputPrice": 0.0000078,
+    "totalTokens": 657,
+    "totalPrice": 0.0001044,
+    "responseTime": 1152,
+    "duration": 1160
+  },
+  {
+    "id": "01KBWFA26A7XMR6X9ZRWAG4M1G",
+    "timestamp": "2025-12-07T13:16:39.504Z",
+    "username": "abidim",
+    "aiAgent": "professional-writing",
+    "userPrompt": "Writing Style: Professional\n\nUser Prompt: test\nasd asd asdas dasd asd as\nRequired Output Format: String",
+    "agentResponse": "test asd asd asdas dasd asd as",
+    "inputTokens": 644,
+    "inputPrice": 0.0000966,
+    "outputTokens": 13,
+    "outputPrice": 0.0000078,
+    "totalTokens": 657,
+    "totalPrice": 0.0001044,
+    "responseTime": 1448,
+    "duration": 1451
   }
 ]

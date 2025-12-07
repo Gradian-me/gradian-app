@@ -2348,8 +2348,8 @@
       ],
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-12-07T12:18:48.491Z",
-      "lastSynced": "2025-12-07T12:18:48.491Z",
+      "updatedAt": "2025-12-07T13:23:11.597Z",
+      "lastSynced": "2025-12-07T13:23:11.597Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -4080,5 +4080,6 @@
       "createdAt": "2025-12-07T11:25:54.629Z",
       "updatedAt": "2025-12-07T11:25:54.629Z"
     }
-  ]
+  ],
+  "sync-strategies": []
 }
