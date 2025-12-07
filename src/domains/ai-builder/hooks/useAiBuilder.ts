@@ -353,7 +353,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
           const parsed = JSON.parse(response);
           
           // Determine if this is an AI agent route or schema route
-          const isAiAgentRoute = agent.nextAction.route.includes('/api/ai-agent-builder');
+          const isAiAgentRoute = agent.nextAction.route.includes('/api/ai-agents');
           const isSchemaRoute = agent.nextAction.route.includes('/api/schemas');
           
           // Handle both single object and array of objects

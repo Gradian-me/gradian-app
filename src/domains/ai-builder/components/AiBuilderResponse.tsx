@@ -209,6 +209,7 @@ export function AiBuilderResponse({
             disabled={isApproving}
             variant="default"
             size="default"
+            className="h-10 shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
           >
             {isApproving ? (
               <>

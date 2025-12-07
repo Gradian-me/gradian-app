@@ -11,7 +11,7 @@ import { FormElementFactory } from '@/gradian-ui/form-builder/form-elements/comp
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn, validateField } from '@/gradian-ui/shared/utils';
-import { Sparkles, Loader2, Square, History, RotateCcw } from 'lucide-react';
+import { Sparkles, Loader2, Square, History, RotateCcw, PencilRuler } from 'lucide-react';
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { PromptPreviewSheet } from './PromptPreviewSheet';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
@@ -165,17 +165,22 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
     >
       {(field.label || shouldShowCopyInLabel) && (
         <div className="flex items-center justify-between mb-2">
-          {field.label ? (
-            <label
-              htmlFor={field.id || field.name}
-              className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide"
-            >
-              {field.label}
-              {isRequired && <span className="text-red-500 ms-1">*</span>}
-            </label>
-          ) : (
-            <div></div>
-          )}
+          <div className="flex-1">
+            {field.label && (
+              <label
+                htmlFor={field.id || field.name}
+                className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide block"
+              >
+                {field.label}
+                {isRequired && <span className="text-red-500 ms-1">*</span>}
+              </label>
+            )}
+            {field.component === 'list-input' && field.placeholder && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-normal normal-case">
+                {field.placeholder}
+              </p>
+            )}
+          </div>
           {shouldShowCopyInLabel && (
             <CopyContent content={String(fieldValue)} />
           )}
@@ -655,7 +660,7 @@ export function AiBuilderForm({
                 <div className="flex items-center gap-2">
                   {/* Agent Select - use renderComponents if available, otherwise fallback */}
                   {agentSelectField ? (
-                    <div className="w-48">
+                    <div className="w-72">
                       <FormElementFactory
                         config={{
                           ...agentSelectField,
@@ -683,7 +688,7 @@ export function AiBuilderForm({
                       />
                     </div>
                   ) : (
-                    <div className="w-56">
+                    <div className="w-72">
                       <FormElementFactory
                         config={{
                           id: 'ai-agent-select',
@@ -710,6 +715,19 @@ export function AiBuilderForm({
                         className="w-full"
                       />
                     </div>
+                  )}
+                  {DEMO_MODE && selectedAgentId && (
+                    <Link href={`/builder/ai-agents/${selectedAgentId}`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9 shrink-0"
+                        title="Edit Agent"
+                      >
+                        <PencilRuler className="h-4 w-4 me-2" />
+                        Edit Agent
+                      </Button>
+                    </Link>
                   )}
                   {onReset && (
                     <Button
@@ -840,7 +858,7 @@ export function AiBuilderForm({
                       disabled={!isFormValid || !userPrompt.trim() || disabled || runType === 'automatic'}
                       size="default"
                       variant="default"
-                      className="h-10 shadow-sm bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                      className="h-10 shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
                     >
                       <Sparkles className="h-4 w-4 me-2" />
                       Do the Magic

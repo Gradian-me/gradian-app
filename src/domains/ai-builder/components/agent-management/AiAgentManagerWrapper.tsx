@@ -1,11 +1,12 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowLeft, Plus, RefreshCw, Bot } from 'lucide-react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { AiAgentCardGrid, AiAgentCardSkeletonGrid } from './AiAgentCardGrid';
 import { AiAgentListView } from './AiAgentListView';
 import { AiAgentTableView } from './AiAgentTableView';
@@ -22,9 +23,11 @@ import { MessageBox } from '@/gradian-ui/layout/message-box';
 import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
 import { useAiAgentManagerPage } from '../../hooks/useAiAgentManagerPage';
 import { AiAgent } from '../../types';
+import { AiPromptHistory } from '@/domains/ai-prompts';
 
 export function AiAgentManagerWrapper() {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState('agents');
   const {
     loading,
     refreshing,
@@ -95,7 +98,16 @@ export function AiAgentManagerWrapper() {
     <MainLayout 
       title="AI Agents Builder"
       icon="Bot" 
-      subtitle="Create and manage AI agents for intelligent automation">
+      subtitle={
+        <div className="flex items-center gap-2">
+          <span>Create and manage AI agents for intelligent automation</span>
+          {!loading && agents.length > 0 && (
+            <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+              {agents.length}
+            </Badge>
+          )}
+        </div>
+      }>
       <div className="space-y-6">
         {messages && (messages.message || messages.error) && !createDialogOpen && (
           <MessageBox
@@ -112,86 +124,107 @@ export function AiAgentManagerWrapper() {
             Back to Builder
           </Button>
           <div className="flex items-center gap-2">
-            <Button size="sm" onClick={openCreateDialog}>
-              <Plus className="h-4 w-4 me-2" />
-              New Agent
-            </Button>
+            {activeTab === 'agents' && (
+              <Button size="sm" onClick={openCreateDialog}>
+                <Plus className="h-4 w-4 me-2" />
+                New Agent
+              </Button>
+            )}
           </div>
         </div>
 
-        <div className="flex gap-2 items-center">
-          <div className="flex-1">
-            <SearchInput
-              config={{ name: 'search', placeholder: 'Search AI agents...' }}
-              value={searchQuery}
-              onChange={setSearchQuery}
-              onClear={() => setSearchQuery('')}
-              className="[&_input]:h-10"
-            />
-          </div>
-          <div className="border border-gray-300 dark:border-gray-500 rounded-md h-10 flex items-center shrink-0">
-            <ViewSwitcher
-              currentView={viewMode}
-              onViewChange={handleViewChange}
-              className="h-full"
-              showHierarchy={false}
-            />
-          </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleRefresh}
-            disabled={loading || refreshing}
-            className="h-10 w-10"
-            title="Refresh"
-          >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
+        <FormTabs value={activeTab} onValueChange={setActiveTab}>
+          <FormTabsList>
+            <FormTabsTrigger value="agents">
+              <Bot className="h-4 w-4 me-2" />
+              AI Agents
+            </FormTabsTrigger>
+            <FormTabsTrigger value="history">
+              <RefreshCw className="h-4 w-4 me-2" />
+              Prompt History
+            </FormTabsTrigger>
+          </FormTabsList>
 
-        <div className="mt-4">
-          {loading ? (
-            viewMode === 'table' ? (
-              <div className="w-full">
-                <AiAgentTableView
-                  agents={[]}
-                  onEdit={handleEditAgent}
-                  onView={handleViewAgent}
-                  onDelete={openDeleteDialog}
-                  isLoading={true}
+          <FormTabsContent value="agents" className="space-y-4 mt-4">
+            <div className="flex gap-2 items-center">
+              <div className="flex-1">
+                <SearchInput
+                  config={{ name: 'search', placeholder: 'Search AI agents...' }}
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                  onClear={() => setSearchQuery('')}
+                  className="[&_input]:h-10"
                 />
               </div>
-            ) : (
-              <AiAgentCardSkeletonGrid />
-            )
-          ) : filteredAgents.length > 0 ? (
-            viewMode === 'table' ? (
-              <AiAgentTableView
-                agents={filteredAgents}
-                onEdit={handleEditAgent}
-                onView={handleViewAgent}
-                onDelete={openDeleteDialog}
-                isLoading={false}
-              />
-            ) : viewMode === 'list' ? (
-              <AiAgentListView
-                agents={filteredAgents}
-                onEdit={handleEditAgent}
-                onView={handleViewAgent}
-                onDelete={openDeleteDialog}
-              />
-            ) : (
-              <AiAgentCardGrid
-                agents={filteredAgents}
-                onEdit={handleEditAgent}
-                onView={handleViewAgent}
-                onDelete={openDeleteDialog}
-              />
-            )
-          ) : (
-            emptyState
-          )}
-        </div>
+              <div className="border border-gray-300 dark:border-gray-500 rounded-md h-10 flex items-center shrink-0">
+                <ViewSwitcher
+                  currentView={viewMode}
+                  onViewChange={handleViewChange}
+                  className="h-full"
+                  showHierarchy={false}
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleRefresh}
+                disabled={loading || refreshing}
+                className="h-10 w-10"
+                title="Refresh"
+              >
+                <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              </Button>
+            </div>
+
+            <div className="mt-4">
+              {loading ? (
+                viewMode === 'table' ? (
+                  <div className="w-full">
+                    <AiAgentTableView
+                      agents={[]}
+                      onEdit={handleEditAgent}
+                      onView={handleViewAgent}
+                      onDelete={openDeleteDialog}
+                      isLoading={true}
+                    />
+                  </div>
+                ) : (
+                  <AiAgentCardSkeletonGrid />
+                )
+              ) : filteredAgents.length > 0 ? (
+                viewMode === 'table' ? (
+                  <AiAgentTableView
+                    agents={filteredAgents}
+                    onEdit={handleEditAgent}
+                    onView={handleViewAgent}
+                    onDelete={openDeleteDialog}
+                    isLoading={false}
+                  />
+                ) : viewMode === 'list' ? (
+                  <AiAgentListView
+                    agents={filteredAgents}
+                    onEdit={handleEditAgent}
+                    onView={handleViewAgent}
+                    onDelete={openDeleteDialog}
+                  />
+                ) : (
+                  <AiAgentCardGrid
+                    agents={filteredAgents}
+                    onEdit={handleEditAgent}
+                    onView={handleViewAgent}
+                    onDelete={openDeleteDialog}
+                  />
+                )
+              ) : (
+                emptyState
+              )}
+            </div>
+          </FormTabsContent>
+
+          <FormTabsContent value="history" className="mt-4">
+            <AiPromptHistory showFilters={true} />
+          </FormTabsContent>
+        </FormTabs>
       </div>
 
       <CreateAiAgentDialog

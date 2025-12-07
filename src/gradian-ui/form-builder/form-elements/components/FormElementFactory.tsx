@@ -5,6 +5,7 @@ import { FormElementConfig, FormElementProps, ToggleGroupOption } from '../types
 import { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 import { TextInput } from './TextInput';
 import { Textarea } from './Textarea';
+import { MarkdownInput } from './MarkdownInput';
 import { Checkbox } from './Checkbox';
 import { CheckboxList } from './CheckboxList';
 import { RadioGroup } from './RadioGroup';
@@ -225,6 +226,19 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     case 'textarea':
       return (
         <Textarea 
+          config={config} 
+          {...commonProps} 
+          canCopy={canCopy} 
+          enableVoiceInput={enableVoiceInput} 
+          loadingTextSwitches={loadingTextSwitches}
+          rows={(config as any)?.rows || (restProps as any)?.rows || 5}
+        />
+      );
+    
+    case 'markdown-input':
+    case 'markdown':
+      return (
+        <MarkdownInput 
           config={config} 
           {...commonProps} 
           canCopy={canCopy} 

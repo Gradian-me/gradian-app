@@ -4,6 +4,7 @@ export * from './types';
 export * from './components/TextInput';
 export * from './components/SearchInput';
 export * from './components/Textarea';
+export * from './components/MarkdownInput';
 export * from './components/Checkbox';
 export * from './components/CheckboxList';
 export * from './components/RadioGroup';

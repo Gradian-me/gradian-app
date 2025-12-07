@@ -2114,5 +2114,32 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBAIVERSION002",
+    "timestamp": "2025-12-07T12:30:00.000Z",
+    "version": "1.17.002",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "Modified AI agent configuration in ai-agents.json to change the required output format from 'json' to 'string' and updated the next action route to '/api/ai-agents'",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "configuration"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved the AI Builder page layout by adding a button for managing AI agents and enhancing the form field structure in AiBuilderForm",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ui",
+          "form-builder"
+        ]
+      }
+    ]
   }
 ]

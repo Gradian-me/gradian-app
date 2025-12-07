@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
-import { TextInput, Textarea, Select, NameInput, ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements';
+import { TextInput, Textarea, Select, NameInput, ConfirmationMessage, Switch, NumberInput } from '@/gradian-ui/form-builder/form-elements';
 import { AiAgent } from '../../../types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { fetchFormComponents } from '@/gradian-ui/schema-manager/utils/component-registry-client';
@@ -49,7 +49,17 @@ export function RenderComponentsTab({ agent, onUpdate, readonly = false }: Rende
 
   const updateComponent = (index: number, updates: any) => {
     const updated = [...renderComponents];
-    updated[index] = { ...updated[index], ...updates };
+    const component = { ...updated[index], ...updates };
+    
+    // Clean up validation object - remove undefined values and empty object
+    if (component.validation) {
+      const cleanedValidation = Object.fromEntries(
+        Object.entries(component.validation).filter(([_, value]) => value !== undefined && value !== null && value !== '')
+      );
+      component.validation = Object.keys(cleanedValidation).length > 0 ? cleanedValidation : undefined;
+    }
+    
+    updated[index] = component;
     onUpdate({ renderComponents: updated });
   };
 
@@ -256,6 +266,108 @@ export function RenderComponentsTab({ agent, onUpdate, readonly = false }: Rende
                               onChange={(value) => updateComponent(index, { aiAgentId: value })}
                               disabled={readonly}
                             />
+                          </div>
+                        </div>
+                        
+                        {/* Validation Section */}
+                        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Validation</h4>
+                          <div className="space-y-4">
+                            <div>
+                              <Switch
+                                config={{ name: 'required', label: 'Required' }}
+                                value={component.validation?.required || false}
+                                onChange={(value) => {
+                                  const validation = component.validation || {};
+                                  updateComponent(index, {
+                                    validation: { ...validation, required: value }
+                                  });
+                                }}
+                                disabled={readonly}
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <NumberInput
+                                  config={{ name: 'minLength', label: 'Min Length' }}
+                                  value={component.validation?.minLength ?? ''}
+                                  onChange={(value) => {
+                                    const validation = component.validation || {};
+                                    updateComponent(index, {
+                                      validation: { 
+                                        ...validation, 
+                                        minLength: value !== '' && value !== null && value !== undefined ? Number(value) : undefined 
+                                      }
+                                    });
+                                  }}
+                                  disabled={readonly}
+                                />
+                              </div>
+                              <div>
+                                <NumberInput
+                                  config={{ name: 'maxLength', label: 'Max Length' }}
+                                  value={component.validation?.maxLength ?? ''}
+                                  onChange={(value) => {
+                                    const validation = component.validation || {};
+                                    updateComponent(index, {
+                                      validation: { 
+                                        ...validation, 
+                                        maxLength: value !== '' && value !== null && value !== undefined ? Number(value) : undefined 
+                                      }
+                                    });
+                                  }}
+                                  disabled={readonly}
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <NumberInput
+                                  config={{ name: 'min', label: 'Min Value' }}
+                                  value={component.validation?.min ?? ''}
+                                  onChange={(value) => {
+                                    const validation = component.validation || {};
+                                    updateComponent(index, {
+                                      validation: { 
+                                        ...validation, 
+                                        min: value !== '' && value !== null && value !== undefined ? Number(value) : undefined 
+                                      }
+                                    });
+                                  }}
+                                  disabled={readonly}
+                                />
+                              </div>
+                              <div>
+                                <NumberInput
+                                  config={{ name: 'max', label: 'Max Value' }}
+                                  value={component.validation?.max ?? ''}
+                                  onChange={(value) => {
+                                    const validation = component.validation || {};
+                                    updateComponent(index, {
+                                      validation: { 
+                                        ...validation, 
+                                        max: value !== '' && value !== null && value !== undefined ? Number(value) : undefined 
+                                      }
+                                    });
+                                  }}
+                                  disabled={readonly}
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <TextInput
+                                config={{ name: 'pattern', label: 'Pattern (Regex)' }}
+                                value={component.validation?.pattern || ''}
+                                onChange={(value) => {
+                                  const validation = component.validation || {};
+                                  updateComponent(index, {
+                                    validation: { ...validation, pattern: value || undefined }
+                                  });
+                                }}
+                                placeholder="e.g., ^[A-Za-z]+$"
+                                disabled={readonly}
+                              />
+                            </div>
                           </div>
                         </div>
                       </>
