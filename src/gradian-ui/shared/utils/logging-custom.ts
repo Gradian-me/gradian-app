@@ -7,21 +7,42 @@ const getLogFlag = (logType: LogType): boolean => {
 };
 
 /**
+ * Check if logging is enabled via environment variable
+ * For server: ENABLE_LOGGING=true
+ * For client: NEXT_PUBLIC_ENABLE_LOGGING=true
+ */
+const isLoggingEnabled = (): boolean => {
+  if (typeof process !== 'undefined') {
+    // Server-side check
+    if (process.env?.ENABLE_LOGGING === 'true') {
+      return true;
+    }
+    
+    // Client-side check (Next.js bundles process.env for client with NEXT_PUBLIC_ prefix)
+    if (process.env?.NEXT_PUBLIC_ENABLE_LOGGING === 'true') {
+      return true;
+    }
+  }
+  
+  return false;
+};
+
+/**
  * Custom logging function that checks if logging is enabled for the given log type
- * Only logs in development mode (npm run dev), not in production (npm start)
+ * Requires ENABLE_LOGGING=true (server) or NEXT_PUBLIC_ENABLE_LOGGING=true (client)
  * @param logType - The type of logging from LogType enum
  * @param level - The log level (log, info, warn, error, debug)
  * @param message - The message to log
  */
 export const loggingCustom = (logType: LogType, level: LogLevel, message: string) => {
-  // Only log in development mode
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  if (!isDevelopment) {
+  // Check if logging is enabled via environment variable
+  if (!isLoggingEnabled()) {
     return;
   }
 
   // Check if logging is enabled for this log type
-  if (!getLogFlag(logType)) {
+  const isLogEnabled = getLogFlag(logType);
+  if (!isLogEnabled) {
     return;
   }
 

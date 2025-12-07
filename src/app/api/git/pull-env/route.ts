@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import axios from 'axios';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface PullEnvRequestBody {
   outputFile?: string; // Default: '.env'
@@ -46,11 +48,13 @@ export async function POST(request: NextRequest) {
     const environmentScope = requestBody.environmentScope || '*';
 
     // Fetch variables from GitLab
+    loggingCustom(LogType.INFRA_LOG, 'info', `Fetching environment variables from GitLab (Project ID: ${gitlabProjectId}, Scope: ${environmentScope})`);
     const gitlabVars = await getGitLabVariables(
       gitlabApiUrl,
       gitlabToken,
       gitlabProjectId
     );
+    loggingCustom(LogType.INFRA_LOG, 'info', `Retrieved ${gitlabVars.length} variable(s) from GitLab`);
 
     if (gitlabVars.length === 0) {
       return NextResponse.json(
@@ -76,6 +80,7 @@ export async function POST(request: NextRequest) {
       }
       return true;
     });
+    loggingCustom(LogType.INFRA_LOG, 'info', `Filtered to ${filteredVars.length} variable(s) after applying scope and exclusion filters`);
 
     if (filteredVars.length === 0) {
       return NextResponse.json(
@@ -97,7 +102,9 @@ export async function POST(request: NextRequest) {
 
     // Write to file
     const envFilePath = join(process.cwd(), outputFile);
+    loggingCustom(LogType.INFRA_LOG, 'info', `Writing ${filteredVars.length} variable(s) to file: ${outputFile}`);
     await writeFile(envFilePath, envFileContent, 'utf-8');
+    loggingCustom(LogType.INFRA_LOG, 'info', `Successfully wrote environment file: ${envFilePath}`);
 
     return NextResponse.json(
       {
@@ -111,7 +118,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('GitLab pull env error:', error);
+    loggingCustom(LogType.INFRA_LOG, 'error', `GitLab pull env error: ${error instanceof Error ? error.message : String(error)}`);
     return NextResponse.json(
       {
         success: false,

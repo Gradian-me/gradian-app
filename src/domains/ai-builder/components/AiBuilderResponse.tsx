@@ -169,7 +169,7 @@ export function AiBuilderResponse({
       const storageKey = `ai-response-${agent.id}-${agentFormat}-${latestResponse.id}`;
       await updateResponse(storageKey, newContent);
     }, 500);
-  }, [agent?.id, agentFormat, latestResponse, updateResponse]);
+  }, [agent, agentFormat, latestResponse, updateResponse]);
   
   // Cleanup timeout on unmount
   useEffect(() => {

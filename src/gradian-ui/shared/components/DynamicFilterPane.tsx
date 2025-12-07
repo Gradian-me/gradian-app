@@ -98,7 +98,7 @@ export const DynamicFilterPane = ({
         <Button 
           variant="default" 
           size="sm" 
-          className="h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap text-xs sm:text-sm"
+          className="h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap text-xs sm:text-sm shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
           onClick={onAddNew}
         >
           <Plus className="h-4 w-4 sm:me-2" />

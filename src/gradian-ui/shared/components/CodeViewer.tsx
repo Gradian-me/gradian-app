@@ -191,7 +191,13 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
             </span>
           )}
         </div>
-        <CopyContent content={currentCode} />
+        <div
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+        >
+          <CopyContent content={currentCode} />
+        </div>
       </div>
       <div className="overflow-hidden">
         {isEditable ? (

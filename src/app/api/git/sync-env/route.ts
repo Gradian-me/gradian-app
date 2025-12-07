@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import axios from 'axios';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface VariableOptions {
   protected?: boolean;
@@ -70,7 +72,7 @@ export async function POST(request: NextRequest) {
     const { envVars, varOptions } = parseEnvFile(envFileContent);
 
     // Log all parsed variables for debugging
-    console.log(`Parsed ${Object.keys(envVars).length} environment variables from .env.prod:`, Object.keys(envVars));
+    loggingCustom(LogType.INFRA_LOG, 'info', `Parsed ${Object.keys(envVars).length} environment variables from .env.prod: ${Object.keys(envVars).join(', ')}`);
 
     // Exclude GitLab-specific variables from syncing
     const excludedVars = ['GITLAB_TOKEN', 'GITLAB_PROJECT_ID', 'GITLAB_API_URL'];
@@ -78,7 +80,7 @@ export async function POST(request: NextRequest) {
       ([key]) => !excludedVars.includes(key)
     );
 
-    console.log(`After excluding GitLab-specific variables, ${varsToSync.length} variables will be synced:`, varsToSync.map(([key]) => key));
+    loggingCustom(LogType.INFRA_LOG, 'info', `After excluding GitLab-specific variables, ${varsToSync.length} variables will be synced: ${varsToSync.map(([key]) => key).join(', ')}`);
 
     if (varsToSync.length === 0) {
       return NextResponse.json(
@@ -121,7 +123,7 @@ export async function POST(request: NextRequest) {
           );
           deletedVars.push(variable.key);
         } catch (error) {
-          console.error(`Failed to delete variable ${variable.key}:`, error);
+          loggingCustom(LogType.INFRA_LOG, 'error', `Failed to delete variable ${variable.key}: ${error instanceof Error ? error.message : String(error)}`);
           // Continue with deletion of other variables
         }
       }
@@ -170,7 +172,7 @@ export async function POST(request: NextRequest) {
         const environmentScope = options.environment_scope || '*';
         const mapKey = `${key}:${environmentScope}`;
         
-        console.log(`Variable ${key} options:`, { protected: options.protected, masked: options.masked, raw: options.raw, environment_scope: environmentScope });
+        loggingCustom(LogType.INFRA_LOG, 'debug', `Variable ${key} options: protected=${options.protected}, masked=${options.masked}, raw=${options.raw}, environment_scope=${environmentScope}`);
 
         // Check if variable exists (by key:scope or just key)
         const existingVar = existingVarsMap.get(mapKey) || existingVarsMap.get(key);
@@ -202,7 +204,7 @@ export async function POST(request: NextRequest) {
             // If creation fails with "already exists" error, try updating instead
             const errorMessage = createError instanceof Error ? createError.message : String(createError);
             if (errorMessage.includes('has already been taken') || errorMessage.includes('already exists')) {
-              console.log(`Variable ${key} already exists, attempting to update instead...`);
+              loggingCustom(LogType.INFRA_LOG, 'info', `Variable ${key} already exists, attempting to update instead...`);
               try {
                 await updateGitLabVariable(
                   gitlabApiUrl,
@@ -260,7 +262,7 @@ export async function POST(request: NextRequest) {
       { status: results.failed.length === 0 ? 200 : 207 } // 207 Multi-Status if some failed
     );
   } catch (error) {
-    console.error('GitLab sync error:', error);
+    loggingCustom(LogType.INFRA_LOG, 'error', `GitLab sync error: ${error instanceof Error ? error.message : String(error)}`);
     return NextResponse.json(
       {
         success: false,
@@ -471,7 +473,7 @@ async function createGitLabVariable(
                          /^[\x20-\x7E]{8,}$/.test(value);
       
       if (!canBeMasked) {
-        console.warn(`Variable ${key} cannot be masked (value too short or contains invalid characters). Disabling masking.`);
+        loggingCustom(LogType.INFRA_LOG, 'warn', `Variable ${key} cannot be masked (value too short or contains invalid characters). Disabling masking.`);
         maskedValue = false;
       }
     }
@@ -485,8 +487,8 @@ async function createGitLabVariable(
       environment_scope: options.environment_scope || '*',
     };
 
-    console.log(`Creating variable ${key} with protected=${protectedValue}, masked=${maskedValue}, raw=${rawValue}, valueLength=${value.length}, valuePreview=${value.substring(0, 50)}${value.length > 50 ? '...' : ''}`);
-    console.log(`Payload for ${key}:`, JSON.stringify({ ...payload, value: value.substring(0, 20) + '...' }));
+    loggingCustom(LogType.INFRA_LOG, 'info', `Creating variable ${key} with protected=${protectedValue}, masked=${maskedValue}, raw=${rawValue}, valueLength=${value.length}, valuePreview=${value.substring(0, 50)}${value.length > 50 ? '...' : ''}`);
+    loggingCustom(LogType.INFRA_LOG, 'debug', `Payload for ${key}: ${JSON.stringify({ ...payload, value: value.substring(0, 20) + '...' })}`);
 
     await axios.post(
       `${apiUrl}/projects/${projectId}/variables`,
@@ -504,12 +506,7 @@ async function createGitLabVariable(
       let errorMsg = error.message;
       
       // Log the full error for debugging
-      console.error(`Error creating variable ${key}:`, {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        headers: error.response?.headers,
-      });
+      loggingCustom(LogType.INFRA_LOG, 'error', `Error creating variable ${key}: Status=${error.response?.status}, StatusText=${error.response?.statusText}, Data=${JSON.stringify(error.response?.data)}`);
       
       if (error.response?.data) {
         const errorData = error.response.data;
@@ -592,7 +589,7 @@ async function updateGitLabVariable(
                          /^[\x20-\x7E]{8,}$/.test(value);
       
       if (!canBeMasked) {
-        console.warn(`Variable ${key} cannot be masked (value too short or contains invalid characters). Disabling masking.`);
+        loggingCustom(LogType.INFRA_LOG, 'warn', `Variable ${key} cannot be masked (value too short or contains invalid characters). Disabling masking.`);
         maskedValue = false;
       }
     }
@@ -607,7 +604,7 @@ async function updateGitLabVariable(
 
     const environmentScope = options.environment_scope || '*';
     
-    console.log(`Updating variable ${key} with protected=${protectedValue}, masked=${maskedValue}, raw=${rawValue}, valueLength=${value.length}, valuePreview=${value.substring(0, 50)}${value.length > 50 ? '...' : ''}, environment_scope=${environmentScope}`);
+    loggingCustom(LogType.INFRA_LOG, 'info', `Updating variable ${key} with protected=${protectedValue}, masked=${maskedValue}, raw=${rawValue}, valueLength=${value.length}, valuePreview=${value.substring(0, 50)}${value.length > 50 ? '...' : ''}, environment_scope=${environmentScope}`);
 
     // GitLab API requires environment_scope in the URL if it's not '*'
     // Format: /projects/:id/variables/:key?filter[environment_scope]=:scope
@@ -632,12 +629,7 @@ async function updateGitLabVariable(
       let errorMsg = error.message;
       
       // Log the full error for debugging
-      console.error(`Error updating variable ${key}:`, {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        headers: error.response?.headers,
-      });
+      loggingCustom(LogType.INFRA_LOG, 'error', `Error updating variable ${key}: Status=${error.response?.status}, StatusText=${error.response?.statusText}, Data=${JSON.stringify(error.response?.data)}`);
       
       if (error.response?.data) {
         const errorData = error.response.data;

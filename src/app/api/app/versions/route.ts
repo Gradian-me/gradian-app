@@ -10,6 +10,12 @@ const DATA_FILE = join(process.cwd(), 'data', 'app-versions.json');
 const DATA_DIR = join(process.cwd(), 'data');
 const PACKAGE_JSON_FILE = join(process.cwd(), 'package.json');
 
+// Debug: Log the resolved path (only in development)
+if (process.env.NODE_ENV === 'development') {
+  console.log('DATA_FILE path:', DATA_FILE);
+  console.log('Current working directory:', process.cwd());
+}
+
 /**
  * Ensure data directory and file exist
  */
@@ -33,15 +39,36 @@ async function ensureDataFile(): Promise<void> {
 async function readVersions(): Promise<AppVersion[]> {
   try {
     await ensureDataFile();
+    
+    // Check if file exists
+    if (!existsSync(DATA_FILE)) {
+      console.error(`Data file does not exist at: ${DATA_FILE}`);
+      return [];
+    }
+    
     const fileContent = await readFile(DATA_FILE, 'utf-8');
+    
+    // Check if file is empty
+    if (!fileContent || fileContent.trim().length === 0) {
+      console.error(`Data file is empty at: ${DATA_FILE}`);
+      return [];
+    }
+    
     const versions = JSON.parse(fileContent);
-    return Array.isArray(versions) ? versions : [];
+    
+    if (!Array.isArray(versions)) {
+      console.error(`Data file does not contain an array. Got: ${typeof versions}`);
+      return [];
+    }
+    
+    return versions;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       await ensureDataFile();
       return [];
     }
     console.error('Error reading versions:', error);
+    console.error(`Attempted to read from: ${DATA_FILE}`);
     return [];
   }
 }
@@ -186,6 +213,8 @@ function filterVersions(versions: AppVersion[], searchParams: URLSearchParams): 
 export async function GET(request: NextRequest) {
   try {
     const versions = await readVersions();
+    console.log(`Read ${versions.length} versions from file`);
+    
     const searchParams = request.nextUrl.searchParams;
     const filtered = filterVersions(versions, searchParams);
     

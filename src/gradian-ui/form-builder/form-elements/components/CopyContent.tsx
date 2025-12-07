@@ -21,7 +21,9 @@ export const CopyContent: React.FC<CopyContentProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     try {
       const textToCopy = String(content);
 
