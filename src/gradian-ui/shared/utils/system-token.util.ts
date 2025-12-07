@@ -4,6 +4,9 @@
 import 'server-only';
 import { loggingCustom } from './logging-custom';
 import { LogType } from '../constants/application-variables';
+import { loadApplicationVariables } from './application-variables-loader';
+import { readSchemaData } from '../domain/utils/data-storage.util';
+import { getRelationsBySchemaAndId } from '../domain/utils/relations-storage.util';
 
 /**
  * Get the API URL for internal server-side calls
@@ -97,9 +100,49 @@ function extractUrlAddress(targetRoute: any): string | null {
 }
 
 /**
+ * Check if server is in demo mode (uses local data store)
+ */
+function isServerDemoMode(): boolean {
+  try {
+    const vars = loadApplicationVariables();
+    return Boolean(vars?.DEMO_MODE);
+  } catch (error) {
+    loggingCustom(
+      LogType.INTEGRATION_LOG,
+      'warn',
+      `Failed to read application variables for demo mode detection: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+    return true; // Default to demo mode if we can't determine
+  }
+}
+
+/**
  * Fetch URL repository entity by ID
  */
 async function fetchUrlRepositoryById(id: string): Promise<any | null> {
+  // If in demo mode, use local data store instead of API
+  if (isServerDemoMode()) {
+    try {
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `[Local] Fetching URL repository by ID from local data: ${id}`);
+      const repositories = readSchemaData<any>('url-repositories');
+      const repository = repositories.find((repo: any) => String(repo.id) === String(id));
+      if (repository) {
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `[Local] URL repository found: ${id}`);
+        return repository;
+      }
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `[Local] URL repository not found: ${id}`);
+      return null;
+    } catch (error) {
+      loggingCustom(
+        LogType.INTEGRATION_LOG,
+        'error',
+        `Error fetching URL repository from local data ${id}: ${error instanceof Error ? error.message : String(error)}`
+      );
+      // Fall through to API fetch as fallback
+    }
+  }
   try {
     const url = getApiUrl(`/api/data/url-repositories/${id}`);
     const response = await fetch(url, {
@@ -139,6 +182,33 @@ async function fetchUrlRepositoryById(id: string): Promise<any | null> {
  * Fetch URL repository entity by address (when ID is not available)
  */
 async function fetchUrlRepositoryByAddress(address: string): Promise<any | null> {
+  // If in demo mode, use local data store instead of API
+  if (isServerDemoMode()) {
+    try {
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `[Local] Fetching URL repository by address from local data: ${address}`);
+      const repositories = readSchemaData<any>('url-repositories');
+      const repository = repositories.find((repo: any) => {
+        return (
+          repo.metadata?.address === address ||
+          repo.address === address ||
+          repo.url === address
+        );
+      });
+      if (repository) {
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `[Local] URL repository found by address: ${address}`);
+        return repository;
+      }
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `[Local] URL repository not found by address: ${address}`);
+      return null;
+    } catch (error) {
+      loggingCustom(
+        LogType.INTEGRATION_LOG,
+        'error',
+        `Error fetching URL repository by address from local data: ${error instanceof Error ? error.message : String(error)}`
+      );
+      // Fall through to API fetch as fallback
+    }
+  }
   try {
     const url = getApiUrl('/api/data/url-repositories');
     const response = await fetch(url, {
@@ -187,6 +257,47 @@ async function fetchUrlRepositoryByAddress(address: string): Promise<any | null>
  * Get related servers for a URL repository
  */
 async function getRelatedServers(urlRepositoryId: string): Promise<any[]> {
+  // If in demo mode, use local relations store instead of API
+  if (isServerDemoMode()) {
+    try {
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `[Local] Fetching related servers from local relations for URL repository: ${urlRepositoryId}`);
+      
+      // Get relations between url-repositories and servers
+      const relations = getRelationsBySchemaAndId('url-repositories', urlRepositoryId, 'both', 'servers');
+      
+      // Filter for active relations only
+      const activeRelations = relations.filter(r => r.inactive !== true);
+      
+      if (activeRelations.length === 0) {
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `[Local] No related servers found for URL repository: ${urlRepositoryId}`);
+        return [];
+      }
+      
+      // Get all server IDs from relations (from both source and target directions)
+      const serverIds = new Set<string>();
+      for (const rel of activeRelations) {
+        if (rel.sourceSchema === 'url-repositories' && rel.sourceId === urlRepositoryId) {
+          serverIds.add(rel.targetId);
+        } else if (rel.targetSchema === 'url-repositories' && rel.targetId === urlRepositoryId) {
+          serverIds.add(rel.sourceId);
+        }
+      }
+      
+      // Fetch servers from local data
+      const servers = readSchemaData<any>('servers');
+      const relatedServers = servers.filter((server: any) => serverIds.has(String(server.id)));
+      
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', `[Local] Found ${relatedServers.length} related server(s) for URL repository: ${urlRepositoryId}`);
+      return relatedServers;
+    } catch (error) {
+      loggingCustom(
+        LogType.INTEGRATION_LOG,
+        'error',
+        `Error fetching related servers from local data: ${error instanceof Error ? error.message : String(error)}`
+      );
+      // Fall through to API fetch as fallback
+    }
+  }
   try {
     const url = getApiUrl(
       `/api/data/all-relations?schema=url-repositories&direction=both&otherSchema=servers&id=${urlRepositoryId}`
