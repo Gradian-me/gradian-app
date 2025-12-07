@@ -76,7 +76,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                   )}
                 </AnimatePresence>
                 {item.badge && (!isCollapsed || isMobile) && (
-                  <span className="ml-auto bg-violet-600 text-white text-xs px-2 py-0.5 rounded-full">
+                  <span className="ms-auto bg-violet-600 text-white text-xs px-2 py-0.5 rounded-full">
                     {item.badge}
                   </span>
                 )}

@@ -16,8 +16,11 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Avatar } from '@/gradian-ui/form-builder/form-elements/components/Avatar';
 import { ForceIcon } from '@/gradian-ui/form-builder/form-elements/components/ForceIcon';
+import { Countdown } from '@/gradian-ui/form-builder/form-elements/components/Countdown';
+import { AvatarUser } from '../../components/AvatarUser';
 import { toast } from 'sonner';
 import { cn } from '@/gradian-ui/shared/utils';
+import { CodeBadge } from '@/gradian-ui/form-builder/form-elements/components/CodeBadge';
 
 export const getFieldValue = (field: any, row: any): any => {
   if (!field || !row) return null;
@@ -132,14 +135,83 @@ export const formatFieldValue = (
     displayStrings.length > 0 &&
     (Array.isArray(value) || (typeof value === 'object' && value !== null));
 
-  if (field?.component === 'picker' && field.targetSchema && row) {
+  // Handle list-input component FIRST - render as bullet list (before picker field check)
+  if (field?.component === 'list-input' || field?.component === 'listinput') {
+    if (!value || (Array.isArray(value) && value.length === 0)) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    // Normalize value to array format
+    const listItems = Array.isArray(value) ? value : [value];
+    if (listItems.length === 0) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    // Extract labels from list items
+    const itemLabels = listItems.map((item: any) => {
+      if (typeof item === 'string') {
+        return item;
+      }
+      if (typeof item === 'object' && item !== null) {
+        return item.label || item.name || item.title || item.value || item.id || String(item);
+      }
+      return String(item);
+    }).filter((label: string) => label && label.trim() !== '');
+    
+    if (itemLabels.length === 0) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    return wrapWithForceIcon(
+      <ul className="list-disc list-inside space-y-0.5 text-sm text-gray-700 dark:text-gray-300">
+        {itemLabels.map((label: string, index: number) => (
+          <li key={index} className="truncate">{label}</li>
+        ))}
+      </ul>,
+      isForce,
+      field,
+      row
+    );
+  }
+
+  // Handle picker fields - check for component type or if value is an object/array that looks like a picker value
+  const isPickerComponent = field?.component === 'picker' || 
+                            field?.component === 'popup-picker' ||
+                            field?.component === 'popuppicker' ||
+                            field?.component === 'popup-picker-input' ||
+                            field?.component === 'pickerinput';
+  
+  // Check if value looks like a picker value (object/array with id/label structure)
+  const looksLikePickerValue = (val: any): boolean => {
+    if (Array.isArray(val) && val.length > 0) {
+      return val.some(item => 
+        (typeof item === 'object' && item !== null && (item.id || item.label || item.name || item.title))
+      );
+    }
+    if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
+      return !!(val.id || val.label || val.name || val.title || val.value);
+    }
+    return false;
+  };
+  
+  const isPickerField = isPickerComponent || 
+                        (field?.targetSchema && (typeof value === 'object' || Array.isArray(value))) ||
+                        (looksLikePickerValue(value) && (typeof value === 'object' || Array.isArray(value)));
+  
+  if (isPickerField) {
     // Check if value is an array (even single-item arrays should use BadgeViewer for consistency)
     const isArrayValue = Array.isArray(value) && value.length > 0;
     const isNormalizedArray = isArrayValue && normalizedOptions.length > 0;
     
     // For array values (multi-select or single-item arrays with normalized format),
     // use BadgeViewer to show all items with proper formatting
-    if (isNormalizedArray || (isArrayValue && (value[0]?.label || value[0]?.id))) {
+    // Check if array items look like picker objects (have id, label, name, title, icon, or color)
+    const arrayItemsLookLikePicker = isArrayValue && value.some((item: any) => 
+      typeof item === 'object' && item !== null && 
+      (item.id || item.label || item.name || item.title || item.icon || item.color)
+    );
+    
+    if (isNormalizedArray || arrayItemsLookLikePicker) {
       const handleBadgeClick = (item: BadgeItem) => {
         const candidateId = item.normalized?.id ?? item.id;
         if (!candidateId) return;
@@ -172,11 +244,41 @@ export const formatFieldValue = (
       );
     }
     
-    // For single non-array values, show the label
-    const pickerDisplay = getPickerDisplayValue(field, value, { row });
-    if (pickerDisplay) {
-      return wrapWithForceIcon(<span>{pickerDisplay}</span>, isForce, field, row);
+    // For single non-array values (including objects), try to get display value
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      // Try to get display value from the object
+      const pickerDisplay = getPickerDisplayValue(field, value, { row });
+      if (pickerDisplay) {
+        return wrapWithForceIcon(<span>{pickerDisplay}</span>, isForce, field, row);
+      }
+      
+      // Fallback: try to extract label/name/title/id directly
+      const fallbackDisplay = value.label || value.name || value.title || value.value || value.id;
+      if (fallbackDisplay !== undefined && fallbackDisplay !== null) {
+        return wrapWithForceIcon(<span>{String(fallbackDisplay)}</span>, isForce, field, row);
+      }
+      
+      // If still no display value, show empty instead of [object Object]
+      const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
+      const inactiveContent = isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
+      return isForce && isTitle ? (
+        <span className="inline-flex items-center gap-1.5">
+          <ForceIcon isForce={isForce} size="md" forceReason={row?.forceReason} />
+          {inactiveContent}
+        </span>
+      ) : inactiveContent;
+    } else if (Array.isArray(value) && value.length === 0) {
+      // Empty array
+      const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
+      return isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
+    } else {
+      // For non-object values, use getPickerDisplayValue
+      const pickerDisplay = getPickerDisplayValue(field, value, { row });
+      if (pickerDisplay) {
+        return wrapWithForceIcon(<span>{pickerDisplay}</span>, isForce, field, row);
+      }
     }
+    
     const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
     const inactiveContent = isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
     return isForce && isTitle ? (
@@ -409,6 +511,122 @@ export const formatFieldValue = (
     );
   }
 
+  // Handle code role - show as CodeBadge
+  if (field?.role === 'code') {
+    if (!value && value !== 0) {
+      return <span className="text-gray-400">—</span>;
+    }
+    return wrapWithForceIcon(
+      <CodeBadge code={value} />,
+      isForce,
+      field,
+      row
+    );
+  }
+
+  // Handle duedate role - show as formatted date in tables (not countdown)
+  if (field?.role === 'duedate') {
+    if (!value || value === '' || value === null || value === undefined) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    // Validate that value is a valid date
+    let dateValue: string | Date | null = null;
+    if (value instanceof Date) {
+      dateValue = value;
+    } else if (typeof value === 'string' && value.trim() !== '') {
+      const parsedDate = new Date(value);
+      if (!isNaN(parsedDate.getTime())) {
+        dateValue = parsedDate;
+      }
+    }
+    
+    if (!dateValue) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    // Check if field component is 'date' (not 'datetime' or 'datetime-local')
+    const isDateOnly = field?.component === 'date';
+    
+    // Format date for table display
+    // If component is 'date', show only date without time
+    // Otherwise, show date with time
+    const formattedDate = isDateOnly
+      ? formatDate(dateValue, {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        })
+      : formatDate(dateValue, {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+    
+    return wrapWithForceIcon(
+      <span className="text-gray-700 dark:text-gray-300">{formattedDate}</span>,
+      isForce,
+      field,
+      row
+    );
+  }
+
+  // Handle person role - show avatar and label
+  if (field?.role === 'person') {
+    if (!value || (Array.isArray(value) && value.length === 0)) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    // Normalize value to array format
+    const normalizedValue = Array.isArray(value) ? value : [value];
+    if (normalizedValue.length === 0) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    // Get first person (assignedTo is typically single-select)
+    const person = normalizedValue[0];
+    const normalizedPerson = normalizeOptionArray(person)[0];
+    
+    // Get person details
+    const personLabel = normalizedPerson?.label || normalizedPerson?.normalized?.label || person?.label || person?.name || person?.email || 'Unknown';
+    const personAvatar = normalizedPerson?.avatar || normalizedPerson?.normalized?.avatar || person?.avatar || person?.image || person?.avatarUrl || null;
+    const personId = normalizedPerson?.id || normalizedPerson?.normalized?.id || person?.id || null;
+    
+    // Convert person data to AvatarUser format
+    const userData = {
+      ...person,
+      ...normalizedPerson,
+      id: personId,
+      label: personLabel,
+      name: personLabel,
+      email: person?.email || normalizedPerson?.email || normalizedPerson?.normalized?.email || null,
+      avatarUrl: personAvatar,
+      firstName: person?.firstName || normalizedPerson?.firstName || normalizedPerson?.normalized?.firstName || null,
+      lastName: person?.lastName || normalizedPerson?.lastName || normalizedPerson?.normalized?.lastName || null,
+      username: person?.username || normalizedPerson?.username || normalizedPerson?.normalized?.username || null,
+      postTitle: person?.postTitle || normalizedPerson?.postTitle || normalizedPerson?.normalized?.postTitle || null,
+      company: person?.company || normalizedPerson?.company || normalizedPerson?.normalized?.company || null,
+    };
+    
+    return wrapWithForceIcon(
+      <div className="inline-flex items-center gap-2">
+        <AvatarUser
+          user={userData}
+          avatarType="user"
+          size="sm"
+          showDialog={true}
+        />
+        <span className="text-sm text-gray-700 dark:text-gray-300">{personLabel}</span>
+      </div>,
+      isForce,
+      field,
+      row
+    );
+  }
+
   const candidateComponents = new Set([
     'select',
     'checkbox',
@@ -424,8 +642,11 @@ export const formatFieldValue = (
   ]);
   const componentKey = (field?.component || '').toString().toLowerCase();
   const hasFieldOptions = Array.isArray(field?.options) && field.options.length > 0;
+  // Exclude list-input from badge rendering (it's handled separately above)
   const shouldRenderAsBadges =
     (field?.role === 'badge' || candidateComponents.has(componentKey)) &&
+    componentKey !== 'list-input' &&
+    componentKey !== 'listinput' &&
     (hasStructuredOptions || hasFieldOptions || Array.isArray(value));
 
   if (shouldRenderAsBadges) {
@@ -556,6 +777,19 @@ export const formatFieldValue = (
         const label = normalizedOptions[0].label ?? normalizedOptions[0].id;
         return wrapWithForceIcon(<span>{String(label)}</span>, isForce, field, row);
       }
+      
+      // Handle object values that weren't caught by picker field check
+      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        // Try to extract a display value from the object
+        const objectDisplay = value.label || value.name || value.title || value.value || value.id;
+        if (objectDisplay !== undefined && objectDisplay !== null) {
+          return wrapWithForceIcon(<span>{String(objectDisplay)}</span>, isForce, field, row);
+        }
+        // If no display value found, show empty instead of [object Object]
+        const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
+        return isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
+      }
+      
       // Check if it's a URL even if not explicitly typed as url
       const stringValue = String(value);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');

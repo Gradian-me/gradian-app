@@ -146,6 +146,38 @@ function processSchema(schema: any): FormSchema {
     processedSchema.sections = [];
   }
 
+  // Add virtual fields for allowDataDueDate and allowDataAssignedTo
+  // Check if these fields already exist to avoid duplicates
+  const hasDueDateField = processedSchema.fields.some((f: FormField) => f.name === 'dueDate' && f.role === 'duedate');
+  const hasAssignedToField = processedSchema.fields.some((f: FormField) => f.name === 'assignedTo' && f.role === 'person');
+  
+  if (processedSchema.allowDataDueDate && !hasDueDateField) {
+    // Add virtual dueDate field with role duedate
+    processedSchema.fields.push({
+      id: `virtual-dueDate-${processedSchema.id}`,
+      name: 'dueDate',
+      label: 'Due Date',
+      sectionId: processedSchema.sections?.[0]?.id || 'system',
+      component: 'date',
+      role: 'duedate',
+      order: 9999,
+    } as FormField);
+  }
+  
+  if (processedSchema.allowDataAssignedTo && !hasAssignedToField) {
+    // Add virtual assignedTo field with role person
+    processedSchema.fields.push({
+      id: `virtual-assignedTo-${processedSchema.id}`,
+      name: 'assignedTo',
+      label: 'Assigned To',
+      sectionId: processedSchema.sections?.[0]?.id || 'system',
+      component: 'picker',
+      role: 'person',
+      targetSchema: 'users',
+      order: 9998,
+    } as FormField);
+  }
+
   return processedSchema as FormSchema;
 }
 

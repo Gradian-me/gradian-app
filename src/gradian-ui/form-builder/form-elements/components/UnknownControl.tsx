@@ -31,7 +31,7 @@ export const UnknownControl: React.FC<UnknownControlProps> = ({
           className={cn(
             'block text-xs font-medium mb-2',
             error ? 'text-red-700' : 'text-gray-700',
-            required && 'after:content-["*"] after:ml-1 after:text-red-500'
+            required && 'after:content-["*"] after:ms-1 after:text-red-500'
           )}
         >
           {fieldLabel}

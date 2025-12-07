@@ -279,7 +279,7 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
             className={cn(
               'flex items-center justify-between gap-2 text-xs font-medium',
               error ? 'text-red-700' : 'text-gray-700',
-              required && 'after:content-["*"] after:ml-1 after:text-red-500'
+              required && 'after:content-["*"] after:ms-1 after:text-red-500'
             )}
           >
             <span>{config?.label}</span>

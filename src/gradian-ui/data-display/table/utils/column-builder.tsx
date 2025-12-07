@@ -26,6 +26,7 @@ export const buildTableColumns = (
       width: widthSettings.width,
       allowWrap: shouldAllowWrap(field, widthSettings),
       render: (value: any, row: any) => formatFieldValue(field, value, row),
+      field: field, // Store field for component-specific rendering
     } as TableColumn;
   });
 };

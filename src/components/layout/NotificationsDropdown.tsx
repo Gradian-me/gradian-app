@@ -107,7 +107,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
           </div>
           
           <ScrollArea className="h-80">
-            <div className="p-2 pr-4 space-y-1">
+            <div className="p-2 pe-4 space-y-1">
               <DropdownMenuPrimitive.Item
                 className={cn(
                   "relative flex cursor-pointer select-none items-start rounded-lg p-3 text-sm outline-none",

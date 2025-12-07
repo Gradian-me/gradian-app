@@ -104,7 +104,7 @@ export default function RelationTypeDetailPage({ params }: { params: PageProps['
             onClick={() => router.push('/builder/relation-types')}
             className="mt-4"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 me-2" />
             Back to Relation Types
           </Button>
         </div>
@@ -125,7 +125,7 @@ export default function RelationTypeDetailPage({ params }: { params: PageProps['
           onClick={() => router.push('/builder/relation-types')}
           className="mb-2"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-4 w-4 me-2" />
           Back to Relation Types
         </Button>
 

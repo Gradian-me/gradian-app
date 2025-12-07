@@ -68,7 +68,7 @@ export const SyncButton: React.FC<SyncButtonProps> = ({
   const iconClasses = cn(
     iconSize,
     syncing && 'animate-spin',
-    'mr-2'
+    'me-2'
   );
 
   return (

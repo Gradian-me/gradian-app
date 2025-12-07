@@ -96,7 +96,7 @@ export function CreateAiAgentDialog({ open, onOpenChange, onSubmit }: CreateAiAg
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="flex-1 px-1">
-          <div className="space-y-4 py-4 pr-4">
+          <div className="space-y-4 py-4 pe-4">
             {errorResult && errorResult.error && (
               <MessageBox
                 message={errorResult.error}
@@ -209,7 +209,7 @@ export function CreateAiAgentDialog({ open, onOpenChange, onSubmit }: CreateAiAg
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 me-2" />
             {isSubmitting ? 'Creating...' : 'Create Agent'}
           </Button>
         </DialogFooter>

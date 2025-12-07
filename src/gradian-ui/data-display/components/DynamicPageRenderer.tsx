@@ -635,7 +635,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                 >
                 <Table2 className="h-4 w-4" />
                 {itemCount !== null && (
-                  <span className="text-xs font-medium ml-1.5">{itemCount}</span>
+                  <span className="text-xs font-medium ms-1.5">{itemCount}</span>
                 )}
               </Button>
               </div>
@@ -764,7 +764,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   </TooltipContent>
                 </Tooltip>
                 {createdByName && (
-                  <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 pl-4.5">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 ps-4.5">
                     <Avatar className="h-4 w-4">
                       {createdByAvatarUrl && (
                         <AvatarImage src={createdByAvatarUrl} alt={createdByName} />
@@ -836,7 +836,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   </TooltipContent>
                 </Tooltip>
                 {updatedByName && (
-                  <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 pl-4.5">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 ps-4.5">
                     <Avatar className="h-4 w-4">
                       {updatedByAvatarUrl && (
                         <AvatarImage src={updatedByAvatarUrl} alt={updatedByName} />
@@ -1072,7 +1072,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   className="whitespace-nowrap"
                 >
                   {action.icon && (
-                    <IconRenderer iconName={action.icon} className="h-4 w-4 mr-2" />
+                    <IconRenderer iconName={action.icon} className="h-4 w-4 me-2" />
                   )}
                   {action.label}
                 </Button>
@@ -1393,7 +1393,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               }
               action={
                 <Button onClick={handleOpenCreateModal}>
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   Add {singularName}
                 </Button>
               }

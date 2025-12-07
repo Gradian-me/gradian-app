@@ -146,7 +146,7 @@ export const DynamicCard: React.FC<DynamicCardProps> = ({
                     maxRating: metadata.rating?.maxRating || 5
                   })}
                   {metadata.rating?.showValue && (
-                    <span className="text-sm text-gray-500 ml-1">
+                    <span className="text-sm text-gray-500 ms-1">
                       {(Number(getValueByRole(formSchema || {} as any, data, 'rating') || '0') || 0).toFixed(1)}
                     </span>
                   )}

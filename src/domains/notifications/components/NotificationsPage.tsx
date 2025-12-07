@@ -210,7 +210,7 @@ export function NotificationsPage() {
                     onClick={() => setShowFilters(!showFilters)}
                     className="w-full"
                   >
-                    <Filter className="h-4 w-4 mr-2" />
+                    <Filter className="h-4 w-4 me-2" />
                     Filters
                   </Button>
                   {unreadCount > 0 && (
@@ -220,7 +220,7 @@ export function NotificationsPage() {
                       onClick={markAllAsRead}
                       className="w-full bg-violet-600 hover:bg-violet-700 text-white"
                     >
-                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      <CheckCircle2 className="h-4 w-4 me-2" />
                       Mark All Read
                     </Button>
                   )}

@@ -22,6 +22,7 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable';
 import { cn } from '@/lib/utils';
+import { getLabelClasses } from '../utils/field-styles';
 
 export interface AnnotationItem {
   id: string;
@@ -36,6 +37,9 @@ export interface ListInputProps {
   className?: string;
   enableReordering?: boolean; // Enable drag-and-drop reordering (default: true)
   disabled?: boolean; // Disable add button when loading (default: false)
+  label?: string; // Label to display above the list
+  required?: boolean; // Whether the field is required
+  error?: string; // Error message to display
 }
 
 const SortableListItem: React.FC<{
@@ -160,7 +164,7 @@ const SortableListItem: React.FC<{
     if (e.key === 'Enter') {
       e.preventDefault();
       e.stopPropagation();
-      // Save current item if it has content, then switch to view mode
+      // Just save and submit the current item (don't add new item)
       if (editValue.trim()) {
         onEdit(item.id, editValue.trim());
       }
@@ -170,10 +174,7 @@ const SortableListItem: React.FC<{
       } else {
         setInternalIsEditing(false);
       }
-      // If onEnterPress is provided, add new item (which will be in edit mode)
-      if (onEnterPress) {
-        onEnterPress(item.id, editValue.trim());
-      }
+      // Don't call onEnterPress - just check/submit the current item
     } else if (e.key === 'Escape') {
       e.preventDefault();
       e.stopPropagation();
@@ -189,7 +190,17 @@ const SortableListItem: React.FC<{
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // Show confirmation dialog
+    
+    // Check if item has no value (empty or just whitespace)
+    const hasNoValue = !item.label || item.label.trim() === '';
+    
+    // If item has no value, delete without confirmation (even in edit mode)
+    if (hasNoValue) {
+      onDelete(item.id);
+      return;
+    }
+    
+    // If item has value, ask for confirmation
     const confirmed = window.confirm('Are you sure you want to delete this item?');
     if (confirmed) {
       // Delete the item directly, regardless of edit state
@@ -204,10 +215,10 @@ const SortableListItem: React.FC<{
     <div ref={setNodeRef} style={style} className="relative">
       <div
         className={cn(
-          'w-full rounded-lg border transition-all duration-200',
+          'w-full rounded border transition-all duration-200',
           isDragging
             ? 'border-violet-400 shadow-md ring-2 ring-violet-200 bg-white'
-            : 'border-gray-200 bg-white hover:shadow-sm dark:border-gray-700 dark:bg-gray-800'
+            : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600'
         )}
       >
         <div className="p-2">
@@ -242,6 +253,7 @@ const SortableListItem: React.FC<{
                   }}
                   onKeyDown={handleKeyDown}
                   className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                  dir="auto"
                 />
               ) : (
                 <span
@@ -313,6 +325,9 @@ export const ListInput: React.FC<ListInputProps> = ({
   className,
   enableReordering = true,
   disabled = false,
+  label,
+  required = false,
+  error,
 }) => {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const inputRefs = React.useRef<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map());
@@ -401,30 +416,6 @@ export const ListInput: React.FC<ListInputProps> = ({
     [value, onChange, editingItemId]
   );
 
-  const handleEnterPress = useCallback(
-    (id: string, label: string) => {
-      // Save the current item and add a new one in a single update
-      const updatedItems = value.map((item) =>
-        item.id === id ? { ...item, label } : item
-      );
-      const newId = `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      const newItem: AnnotationItem = {
-        id: newId,
-        label: '',
-      };
-      onChange([...updatedItems, newItem]);
-      // Close edit mode for current item and open for new item
-      setEditingItemId(newId);
-      // Focus the new item's input after it's rendered
-      setTimeout(() => {
-        const newItemRef = inputRefs.current.get(newId);
-        if (newItemRef?.current) {
-          newItemRef.current.focus();
-        }
-      }, 0);
-    },
-    [value, onChange]
-  );
 
   const handleEditStateChange = useCallback((id: string, isEditing: boolean) => {
     if (isEditing) {
@@ -506,7 +497,6 @@ export const ListInput: React.FC<ListInputProps> = ({
           onDelete={handleDeleteItem}
           isSortable={enableReordering && value.length > 1}
           isEditingControlled={editingItemId === item.id}
-          onEnterPress={handleEnterPress}
           onEditStateChange={handleEditStateChange}
           inputRef={itemRefsMap.get(item.id)}
           onPasteSplit={handlePasteSplit}
@@ -516,7 +506,17 @@ export const ListInput: React.FC<ListInputProps> = ({
   );
 
   return (
-    <div className={cn('space-y-3', className)}>
+    <div className={cn('w-full space-y-3', className)}>
+      {label && (
+        <label
+          className={getLabelClasses({ error: Boolean(error), required, disabled })}
+        >
+          {label}
+        </label>
+      )}
+      {error && (
+        <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>
+      )}
       {value.length > 0 ? (
         enableReordering ? (
           <DndContext

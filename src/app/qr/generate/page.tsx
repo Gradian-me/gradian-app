@@ -162,7 +162,7 @@ export default function QRGeneratePage() {
             size="lg"
             className="px-8"
           >
-            <QrCode className="h-5 w-5 mr-2" />
+            <QrCode className="h-5 w-5 me-2" />
             Generate QR Code
           </Button>
         </div>

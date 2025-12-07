@@ -8,6 +8,7 @@ import { readAllData } from '@/gradian-ui/shared/domain/utils/data-storage.util'
 import { DataRelation } from '@/gradian-ui/schema-manager/types/form-schema';
 import { handleDomainError } from '@/gradian-ui/shared/domain/errors/domain.errors';
 import { isDemoModeEnabled, proxyDataRequest } from '../utils';
+import { enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
 
 // Route segment config to optimize performance
 export const dynamic = 'force-dynamic';
@@ -159,11 +160,22 @@ export async function GET(request: NextRequest) {
       // Get schema data
       const schemaData = allData[groupInfo.schema] || [];
       
-      // Fetch entities by IDs
+      // Fetch entities by IDs and enrich picker fields
       for (const entityId of groupInfo.entityIds) {
         const entity = schemaData.find((e: any) => e.id === entityId);
         if (entity) {
-          entities.push(entity);
+          // Enrich picker fields with id, label, icon, color from relations
+          try {
+            const enrichedEntity = await enrichEntityPickerFieldsFromRelations({
+              schemaId: groupInfo.schema,
+              entity: entity,
+            });
+            entities.push(enrichedEntity);
+          } catch (error) {
+            // If enrichment fails, use original entity
+            console.warn(`Failed to enrich entity ${entityId} in schema ${groupInfo.schema}:`, error);
+            entities.push(entity);
+          }
         }
       }
 

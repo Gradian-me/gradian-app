@@ -159,7 +159,7 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="flex-1 px-1">
-          <div className="space-y-4 py-4 pr-4">
+          <div className="space-y-4 py-4 pe-4">
           {errorResult && ((errorResult.messages && errorResult.messages.length > 0) || errorResult.message) && (
             <MessageBox
               messages={errorResult.messages}
@@ -183,7 +183,7 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
           </div>
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label htmlFor="schema-plural-name" className="text-sm font-medium text-gray-700 after:content-['*'] after:ml-1 after:text-red-500">
+              <label htmlFor="schema-plural-name" className="text-sm font-medium text-gray-700 after:content-['*'] after:ms-1 after:text-red-500">
                 Plural Name
               </label>
               <Button
@@ -299,7 +299,7 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 me-2" />
             {isSubmitting ? 'Creating...' : 'Create Schema'}
           </Button>
         </DialogFooter>

@@ -33,6 +33,7 @@ interface AiBuilderResponseProps {
   onAnnotationsChange?: (schemaId: string, annotations: AnnotationItem[]) => void;
   onRemoveSchema?: (schemaId: string) => void;
   onApplyAnnotations?: (annotations: SchemaAnnotation[]) => void;
+  selectedLanguage?: string;
 }
 
 // Utility function to generate table columns from JSON data
@@ -118,6 +119,7 @@ export function AiBuilderResponse({
   onAnnotationsChange,
   onRemoveSchema,
   onApplyAnnotations,
+  selectedLanguage = 'text',
 }: AiBuilderResponseProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const prevIsLoadingRef = useRef<boolean>(isLoading);
@@ -207,10 +209,11 @@ export function AiBuilderResponse({
             disabled={isApproving}
             variant="default"
             size="default"
+            className="h-10 shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
           >
             {isApproving ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="me-2 h-4 w-4 animate-spin" />
                 Processing...
               </>
             ) : (
@@ -218,7 +221,7 @@ export function AiBuilderResponse({
                 {agent.nextAction.icon && (
                   <IconRenderer
                     iconName={agent.nextAction.icon}
-                    className="mr-2 h-4 w-4"
+                    className="me-2 h-4 w-4"
                   />
                 )}
                 {agent.nextAction.label}
@@ -329,7 +332,7 @@ export function AiBuilderResponse({
               <MarkdownViewer 
                 content={response}
                 showToggle={true}
-          />
+              />
             </div>
           </div>
         </div>

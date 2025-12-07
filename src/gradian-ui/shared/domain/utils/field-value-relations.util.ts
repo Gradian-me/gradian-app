@@ -477,7 +477,7 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
             const color = getSingleValueByRole(targetSchema, targetEntity, 'color') || targetEntity.color;
 
             // Use stored metadata if available, otherwise extract from fields with addToReferenceMetadata: true
-            let metadata: Record<string, any> = storedMetadata || {};
+            const metadata: Record<string, any> = storedMetadata || {};
             if (!storedMetadata || Object.keys(storedMetadata).length === 0) {
               const metadataFields = targetSchema.fields?.filter((f: any) => f.addToReferenceMetadata === true) || [];
               if (metadataFields.length > 0) {

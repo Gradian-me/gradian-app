@@ -85,7 +85,7 @@ export function GraphSidebar(props: GraphSidebarProps) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search schemas..."
-            className="h-8 pl-8 text-sm"
+            className="h-8 ps-8 text-sm"
           />
         </div>
         <Button
@@ -140,7 +140,7 @@ export function GraphSidebar(props: GraphSidebarProps) {
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="ml-1 h-5 w-5 shrink-0 rounded-full border border-violet-300 bg-white/90 text-violet-600 hover:bg-violet-50 hover:text-violet-700 dark:bg-violet-500/20 dark:border-violet-500 dark:text-violet-100"
+                          className="ms-1 h-5 w-5 shrink-0 rounded-full border border-violet-300 bg-white/90 text-violet-600 hover:bg-violet-50 hover:text-violet-700 dark:bg-violet-500/20 dark:border-violet-500 dark:text-violet-100"
                           onClick={(e) => {
                             e.stopPropagation();
                             e.preventDefault();
@@ -195,7 +195,7 @@ export function GraphSidebar(props: GraphSidebarProps) {
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="ml-1 h-5 w-5 shrink-0 rounded-full border border-violet-300 bg-white/90 text-violet-600 hover:bg-violet-50 hover:text-violet-700 dark:bg-violet-500/20 dark:border-violet-500 dark:text-violet-100"
+                          className="ms-1 h-5 w-5 shrink-0 rounded-full border border-violet-300 bg-white/90 text-violet-600 hover:bg-violet-50 hover:text-violet-700 dark:bg-violet-500/20 dark:border-violet-500 dark:text-violet-100"
                           onClick={(e) => {
                             e.stopPropagation();
                             e.preventDefault();

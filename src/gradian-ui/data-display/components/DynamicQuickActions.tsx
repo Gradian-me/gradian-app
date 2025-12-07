@@ -151,7 +151,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
                   size="sm"
                 >
                   {action.icon && (
-                    <IconRenderer iconName={action.icon} className="h-4 w-4 mr-2" />
+                    <IconRenderer iconName={action.icon} className="h-4 w-4 me-2" />
                   )}
                   {isLoading ? 'Loading...' : action.label}
                 </Button>

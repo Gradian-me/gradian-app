@@ -2,7 +2,7 @@ import { ColumnWidthConfig, ColumnWidthMap } from '../types';
 
 export const DEFAULT_COLUMN_WIDTHS: ColumnWidthMap = {
   text: { minWidth: 150, maxWidth: 400 },
-  textarea: { minWidth: 300, maxWidth: 800 },
+  textarea: { minWidth: 400, maxWidth: 1200 },
   email: { minWidth: 200, maxWidth: 300 },
   url: { minWidth: 220, maxWidth: 350 },
   phone: { minWidth: 150, maxWidth: 200 },
@@ -44,7 +44,7 @@ export function resolveColumnWidth(
   
   // Special handling for textarea: ensure wider width
   if (fieldType === 'textarea' || field?.component === 'textarea') {
-    widthSettings = { minWidth: 300, maxWidth: 800, ...widthSettings };
+    widthSettings = { minWidth: 400, maxWidth: 1200, ...widthSettings };
   }
 
   const normalizedFieldName = typeof field?.name === 'string' ? field.name.toLowerCase() : '';
@@ -56,7 +56,7 @@ export function resolveColumnWidth(
       widthSettings = { minWidth: 250, maxWidth: 500, ...widthSettings };
     } else {
       // For textarea address fields, ensure they get the full textarea width
-      widthSettings = { minWidth: 300, maxWidth: 800, ...widthSettings };
+      widthSettings = { minWidth: 400, maxWidth: 1200, ...widthSettings };
     }
   } else if (['city', 'state', 'zipcode', 'zip'].includes(normalizedFieldName)) {
     widthSettings = { maxWidth: 200, ...widthSettings };

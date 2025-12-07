@@ -99,7 +99,7 @@ export const RepeatingSection: React.FC<RepeatingSectionProps> = ({
             disabled={disabled}
             className="w-full flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-violet-400 hover:text-violet-600 hover:bg-violet-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Plus className="w-5 h-5 mr-2" />
+            <Plus className="w-5 h-5 me-2" />
             Add {title}
           </Button>
         </div>

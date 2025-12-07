@@ -150,7 +150,7 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
       error
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',
-      canCopy && 'pr-10',
+      canCopy && 'pe-10',
       className
     );
 

@@ -42,7 +42,7 @@ export function ServiceFormDialog({
             {editingService ? 'Update the health service configuration' : 'Create a new health service to monitor'}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 mt-4 overflow-y-auto flex-1 pr-2">
+        <div className="space-y-4 mt-4 overflow-y-auto flex-1 pe-2">
           <div className="space-y-2">
             <Label htmlFor="service-id" className="required">
               Service ID

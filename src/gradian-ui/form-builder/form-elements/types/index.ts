@@ -239,7 +239,7 @@ export interface ButtonProps extends BaseComponentProps {
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline' | 'ghost' | 'link';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement> | (() => void);
   disabled?: boolean;
   loading?: boolean;
   type?: 'button' | 'submit' | 'reset';

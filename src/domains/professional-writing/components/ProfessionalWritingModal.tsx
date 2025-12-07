@@ -190,12 +190,12 @@ export function ProfessionalWritingModal({
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="me-2 h-4 w-4 animate-spin" />
                 Generating...
               </>
             ) : (
               <>
-                <Sparkles className="mr-2 h-4 w-4" />
+                <Sparkles className="me-2 h-4 w-4" />
                 Generate Enhanced Text
               </>
             )}
@@ -236,7 +236,7 @@ export function ProfessionalWritingModal({
                   title="Replace input text with enhanced text"
                   aria-label="Replace input text"
                 >
-                  <ArrowUp className="h-4 w-4 mr-2" />
+                  <ArrowUp className="h-4 w-4 me-2" />
                   Replace Input Text
                 </Button>
               </div>

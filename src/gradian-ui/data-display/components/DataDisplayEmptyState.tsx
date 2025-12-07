@@ -61,7 +61,7 @@ export const DataDisplayEmptyState: React.FC<DataDisplayEmptyStateProps> = ({
                 'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
               )}
             >
-              {action.icon && <span className="mr-2">{action.icon}</span>}
+              {action.icon && <span className="me-2">{action.icon}</span>}
               {action.label}
             </button>
           ))}
@@ -75,14 +75,14 @@ export const DataDisplayEmptyState: React.FC<DataDisplayEmptyStateProps> = ({
             onClick={() => handleAction('add')}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 me-2" />
             Add New Item
           </button>
           <button
             onClick={() => handleAction('refresh')}
             className="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-900 rounded-md font-medium hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
           >
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="h-4 w-4 me-2" />
             Refresh
           </button>
         </div>

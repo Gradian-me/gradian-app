@@ -39,7 +39,7 @@ export const ExpandCollapseControls: React.FC<ExpandCollapseControlsProps> = ({
   const containerClasses = cn(
     'flex h-full items-center',
     orientation === 'horizontal' ? 'flex-row space-x-1' : 'flex-col space-y-1',
-    showBorder && 'border-s border-gray-300 dark:border-gray-600 ps-1.5 sm:ps-2 ml-1.5 sm:ms-2',
+    showBorder && 'border-s border-gray-300 dark:border-gray-600 ps-1.5 sm:ps-2 ms-1.5 sm:ms-2',
     className
   );
 

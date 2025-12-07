@@ -101,7 +101,7 @@ export default async function ComponentDetailPage({ params }: PageProps) {
         </div>
         <aside className="space-y-3">
           <h3 className="text-base font-semibold">Inspirations</h3>
-          <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+          <ul className="list-disc ps-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
             <li>Real-world usage patterns and UX ideas</li>
             <li>Composable props for flexible deployment</li>
             <li>Performance notes and accessibility considerations</li>

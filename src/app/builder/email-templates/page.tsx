@@ -329,7 +329,7 @@ export default function EmailTemplateBuilderPage() {
       </CardHeader>
       <CardFooter>
         <Button onClick={handleCreateTemplate} disabled={mutationState.create}>
-          {mutationState.create && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {mutationState.create && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
           Create template
         </Button>
       </CardFooter>
@@ -499,7 +499,7 @@ export default function EmailTemplateBuilderPage() {
                     <CardDescription>Switch between reusable layouts.</CardDescription>
                   </div>
                   <Button size="sm" onClick={handleCreateTemplate} disabled={mutationState.create}>
-                    {mutationState.create && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {mutationState.create && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                     New
                   </Button>
                 </div>
@@ -520,7 +520,7 @@ export default function EmailTemplateBuilderPage() {
                         onClick={() => setSelectedTemplateId(template.id)}
                         className="w-full text-left"
                       >
-                        <div className="flex items-center justify-between gap-2 pr-6">
+                        <div className="flex items-center justify-between gap-2 pe-6">
                           <p className="font-medium">{template.name}</p>
                           {isActive && <Badge variant="secondary">Active</Badge>}
                         </div>
@@ -563,9 +563,9 @@ export default function EmailTemplateBuilderPage() {
                         disabled={mutationState.delete}
                       >
                         {mutationState.delete ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <Loader2 className="me-2 h-4 w-4 animate-spin" />
                         ) : (
-                          <IconRenderer iconName="Trash2" className="mr-2 h-4 w-4" />
+                          <IconRenderer iconName="Trash2" className="me-2 h-4 w-4" />
                         )}
                         Delete
                       </Button>
@@ -578,7 +578,7 @@ export default function EmailTemplateBuilderPage() {
                         }} 
                         disabled={mutationState.update}
                       >
-                        {mutationState.update && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {mutationState.update && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                         Save template
                       </Button>
                     </div>
@@ -766,12 +766,12 @@ export default function EmailTemplateBuilderPage() {
                         >
                           {isSendingEmail ? (
                             <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              <Loader2 className="me-2 h-4 w-4 animate-spin" />
                               Sending...
                             </>
                           ) : (
                             <>
-                              <Send className="mr-2 h-4 w-4" />
+                              <Send className="me-2 h-4 w-4" />
                               Send Test Email
                             </>
                           )}

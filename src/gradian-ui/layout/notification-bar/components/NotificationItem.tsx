@@ -122,7 +122,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
         {getIcon(notification.type)}
       </div>
       
-      <div className="ml-3 flex-1">
+      <div className="ms-3 flex-1">
         <h3 className="text-sm font-medium">
           {notification.title}
         </h3>
@@ -142,7 +142,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
         )}
       </div>
       
-      <div className="ml-4 shrink-0">
+      <div className="ms-4 shrink-0">
         <button
           onClick={handleDismiss}
           className="text-gray-400 hover:text-gray-600"

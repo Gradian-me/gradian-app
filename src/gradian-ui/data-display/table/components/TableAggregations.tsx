@@ -195,14 +195,14 @@ export function TableAggregations<T = any>({
                   )}>
                     <span className="text-gray-700 font-medium">
                       {column.label}
-                      <span className="text-gray-400 font-normal text-sm ml-1">
+                      <span className="text-gray-400 font-normal text-sm ms-1">
                         ({getAggregationLabel(aggConfig.aggregationTypes[0])})
                       </span>:
                     </span>
                     <span className={cn(
                       "text-gray-900 font-medium",
-                      alignment === 'start' && "ml-2",
-                      alignment === 'center' && "ml-2"
+                      alignment === 'start' && "ms-2",
+                      alignment === 'center' && "ms-2"
                     )}>
                       {formatAggregationValue(
                         calculateAggregation(values, aggConfig.aggregationTypes[0]),
@@ -233,8 +233,8 @@ export function TableAggregations<T = any>({
                           >
                             <span className={cn(
                               "text-gray-400 font-normal text-sm",
-                              alignment === 'center' && "mr-2",
-                              alignment === 'start' && "mr-2"
+                              alignment === 'center' && "me-2",
+                              alignment === 'start' && "me-2"
                             )}>
                               {getAggregationLabel(aggType)}:
                             </span>

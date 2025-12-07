@@ -45,19 +45,19 @@ export const HierarchyActionsMenu: React.FC<HierarchyActionsMenuProps> = ({
       <DropdownMenuContent align="end" className="w-44">
         {onAddChild && (
           <DropdownMenuItem onClick={onAddChild}>
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="me-2 h-4 w-4" />
             <span>Add child</span>
           </DropdownMenuItem>
         )}
         {onChangeParent && hasParent && (
           <DropdownMenuItem onClick={onChangeParent}>
-            <ArrowRightLeft className="mr-2 h-4 w-4" />
+            <ArrowRightLeft className="me-2 h-4 w-4" />
             <span>Change parent</span>
           </DropdownMenuItem>
         )}
         {onEdit && (
           <DropdownMenuItem onClick={onEdit}>
-            <Pencil className="mr-2 h-4 w-4" />
+            <Pencil className="me-2 h-4 w-4" />
             <span>Edit</span>
           </DropdownMenuItem>
         )}
@@ -66,7 +66,7 @@ export const HierarchyActionsMenu: React.FC<HierarchyActionsMenuProps> = ({
             onClick={onDelete}
             className="text-red-600 focus:text-red-600"
           >
-            <Trash2 className="mr-2 h-4 w-4" />
+            <Trash2 className="me-2 h-4 w-4" />
             <span>Delete</span>
           </DropdownMenuItem>
         )}

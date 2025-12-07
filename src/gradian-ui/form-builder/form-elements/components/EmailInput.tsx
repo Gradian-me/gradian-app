@@ -92,7 +92,7 @@ export const EmailInput = forwardRef<FormElementRef, TextInputProps>(
             className={cn(
               'block text-xs font-medium mb-2',
               error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
-              required && 'after:content-["*"] after:ml-1 after:text-red-500 dark:after:text-red-400'
+              required && 'after:content-["*"] after:ms-1 after:text-red-500 dark:after:text-red-400'
             )}
           >
             {fieldLabel}
@@ -114,7 +114,7 @@ export const EmailInput = forwardRef<FormElementRef, TextInputProps>(
             required={required ?? config.required ?? config.validation?.required ?? false}
             disabled={disabled}
             autoComplete="email"
-            className={cn(inputClasses, hasValue && !canCopy && 'pr-10', hasValue && canCopy && 'pr-20')}
+            className={cn(inputClasses, hasValue && !canCopy && 'pe-10', hasValue && canCopy && 'pe-20')}
             {...props}
           />
           <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">

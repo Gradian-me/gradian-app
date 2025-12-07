@@ -383,6 +383,37 @@
     }
   },
   {
+    "id": "markdown-input",
+    "label": "MarkdownInput",
+    "color": "indigo",
+    "icon": "FileCode",
+    "category": "form-elements",
+    "description": "Multiline text input optimized for markdown content with syntax highlighting support.",
+    "usecase": "Markdown content, documentation, formatted text, system prompts, code documentation.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/MarkdownInput.tsx",
+    "componentValue": "markdown-input",
+    "configSchema": {
+      "fields": [
+        {
+          "name": "rows",
+          "label": "Rows",
+          "type": "number",
+          "description": "Number of visible rows",
+          "defaultValue": 5,
+          "min": 1,
+          "max": 20
+        },
+        {
+          "name": "maxLength",
+          "label": "Max Length",
+          "type": "number",
+          "description": "Maximum number of characters",
+          "min": 1
+        }
+      ]
+    }
+  },
+  {
     "id": "select",
     "label": "Select",
     "color": "violet",

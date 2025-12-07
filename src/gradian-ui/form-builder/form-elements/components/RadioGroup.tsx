@@ -103,7 +103,7 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
               className={cn(
                 'text-xs font-medium mb-2',
                 error ? 'text-red-700' : 'text-gray-700',
-                required && 'after:content-["*"] after:ml-1 after:text-red-500'
+                required && 'after:content-["*"] after:ms-1 after:text-red-500'
               )}
             >
               {config.label}
@@ -149,7 +149,7 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
                   <label
                     htmlFor={`${config.name}-${index}`}
                     className={cn(
-                      'ml-2 text-sm font-medium',
+                      'ms-2 text-sm font-medium',
                       error ? 'text-red-700' : 'text-gray-700',
                       (disabled || option.disabled) && 'text-gray-400'
                     )}

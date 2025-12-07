@@ -74,8 +74,8 @@ export const IconInput = forwardRef<FormElementRef, IconInputProps>(
       error
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',
-      (canCopy || shouldShowLibraryButton) && 'pr-16',
-      !isEmpty && 'pl-12', // Add extra left padding when icon is shown inside circle
+      (canCopy || shouldShowLibraryButton) && 'pe-16',
+      !isEmpty && 'ps-12', // Add extra left padding when icon is shown inside circle
       className
     );
 
@@ -100,7 +100,7 @@ export const IconInput = forwardRef<FormElementRef, IconInputProps>(
             className={cn(
               'block text-xs font-medium mb-2',
               error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-slate-200',
-              required && 'after:content-["*"] after:ml-1 after:text-red-500'
+              required && 'after:content-["*"] after:ms-1 after:text-red-500'
             )}
           >
             {fieldLabel}

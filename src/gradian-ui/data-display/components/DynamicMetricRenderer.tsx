@@ -91,26 +91,26 @@ export const DynamicMetricRenderer: React.FC<DynamicMetricRendererProps> = ({
         <div className="flex flex-col">
           <div className="flex items-center">
             {metric.icon && (
-              <span className="mr-1 text-gray-500 dark:text-gray-400">
+              <span className="me-1 text-gray-500 dark:text-gray-400">
                 <IconRenderer iconName={metric.icon} className="h-3 w-3" />
               </span>
             )}
             <span className="text-xs text-gray-500 dark:text-gray-400">{pascalCaseLabel}</span>
             {metric.subLabel && (
-              <span className="text-[0.6rem] text-gray-400 dark:text-gray-500 ml-1">
+              <span className="text-[0.6rem] text-gray-400 dark:text-gray-500 ms-1">
                 ({metric.subLabel})
               </span>
             )}
-            <span className="text-xs text-gray-500 dark:text-gray-400 ml-0.5">:</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 ms-0.5">:</span>
           </div>
         </div>
         <div className="flex items-center">
           <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
             {formatNumber(metric.value)}
-            {metric.unit && <span className="text-xs ml-0.5">{metric.unit}</span>}
+            {metric.unit && <span className="text-xs ms-0.5">{metric.unit}</span>}
           </span>
           {metric.trend && (
-            <span className="ml-1.5">
+            <span className="ms-1.5">
               {metric.trend === 'up' && <ArrowUp className="h-3 w-3 text-emerald-500" />}
               {metric.trend === 'down' && <ArrowDown className="h-3 w-3 text-red-500" />}
               {metric.trend === 'same' && <ArrowRight className="h-3 w-3 text-amber-500" />}

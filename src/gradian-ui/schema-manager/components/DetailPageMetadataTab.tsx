@@ -222,7 +222,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
               </Badge>
             </div>
             <Button onClick={addSection} size="sm" variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               Add Section
             </Button>
           </div>
@@ -494,7 +494,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
               </Badge>
             </div>
             <Button onClick={addQuickAction} size="sm" variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               Add Action
             </Button>
           </div>
@@ -818,7 +818,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
               </Badge>
             </div>
             <Button onClick={addTableRenderer} size="sm" variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               Add Table
             </Button>
           </div>
@@ -1089,7 +1089,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
               </Badge>
             </div>
             <Button onClick={addComponentRenderer} size="sm" variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               Add Component
             </Button>
           </div>

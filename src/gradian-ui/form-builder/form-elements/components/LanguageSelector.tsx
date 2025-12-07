@@ -2,9 +2,8 @@
 'use client';
 
 import React from 'react';
-import { Select, SelectOption } from './Select';
 import { FormElementProps } from '../types';
-import { cn } from '../../../shared/utils';
+import { Select, SelectOption } from './Select';
 
 export interface LanguageSelectorProps extends Omit<FormElementProps, 'config'> {
   config?: any;

@@ -472,12 +472,12 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                   >
                     {isTranscribing ? (
                       <>
-                        <Sparkles className="w-5 h-5 mr-3 animate-pulse" />
+                        <Sparkles className="w-5 h-5 me-3 animate-pulse" />
                         Transcribing...
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-5 h-5 mr-3" />
+                        <Sparkles className="w-5 h-5 me-3" />
                         Transcribe
                       </>
                     )}

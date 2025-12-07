@@ -11,10 +11,11 @@ import { FormElementFactory } from '@/gradian-ui/form-builder/form-elements/comp
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn, validateField } from '@/gradian-ui/shared/utils';
-import { Sparkles, Loader2, Square, History, RotateCcw } from 'lucide-react';
+import { Sparkles, Loader2, Square, History, RotateCcw, PencilRuler } from 'lucide-react';
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { PromptPreviewSheet } from './PromptPreviewSheet';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
+import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
 import type { AiAgent } from '../types';
 import { useBusinessRuleEffects, getFieldEffects } from '@/domains/business-rule-engine';
 import type { BusinessRuleWithEffects, BusinessRuleEffectsMap } from '@/domains/business-rule-engine';
@@ -164,17 +165,22 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
     >
       {(field.label || shouldShowCopyInLabel) && (
         <div className="flex items-center justify-between mb-2">
-          {field.label ? (
-            <label
-              htmlFor={field.id || field.name}
-              className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide"
-            >
-              {field.label}
-              {isRequired && <span className="text-red-500 ml-1">*</span>}
-            </label>
-          ) : (
-            <div></div>
-          )}
+          <div className="flex-1">
+            {field.label && (
+              <label
+                htmlFor={field.id || field.name}
+                className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide block"
+              >
+                {field.label}
+                {isRequired && <span className="text-red-500 ms-1">*</span>}
+              </label>
+            )}
+            {field.component === 'list-input' && field.placeholder && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-normal normal-case">
+                {field.placeholder}
+              </p>
+            )}
+          </div>
           {shouldShowCopyInLabel && (
             <CopyContent content={String(fieldValue)} />
           )}
@@ -222,6 +228,8 @@ interface AiBuilderFormProps {
   onReset?: () => void;
   displayType?: 'default' | 'hideForm' | 'showFooter';
   runType?: 'manual' | 'automatic';
+  selectedLanguage?: string;
+  onLanguageChange?: (language: string) => void;
 }
 
 export function AiBuilderForm({
@@ -241,17 +249,31 @@ export function AiBuilderForm({
   onReset,
   displayType = 'default',
   runType = 'manual',
+  selectedLanguage = 'text',
+  onLanguageChange,
 }: AiBuilderFormProps) {
   // Get selected agent
   const selectedAgent = agents.find(agent => agent.id === selectedAgentId);
 
-  // Filter renderComponents to only include form fields (exclude preloadRoutes)
+  // Check if agent has string output format
+  const isStringOutput = selectedAgent?.requiredOutputFormat === 'string';
+
+  // Filter renderComponents to only include form fields (exclude preloadRoutes and language fields for string output agents)
   const formFields = useMemo(() => {
     if (!selectedAgent?.renderComponents) return [];
     return selectedAgent.renderComponents.filter(
-      (component) => component.component && !component.route
+      (component) => {
+        // Exclude preload routes
+        if (!component.component || component.route) return false;
+        // For string output agents, exclude language-related fields
+        if (isStringOutput) {
+          const fieldName = (component.name || component.id || '').toLowerCase();
+          return !fieldName.includes('language') && !fieldName.includes('output-language');
+        }
+        return true;
+      }
     );
-  }, [selectedAgent]);
+  }, [selectedAgent, isStringOutput]);
 
   // State for form values - initialize with userPrompt
   const [formValues, setFormValues] = useState<Record<string, any>>({
@@ -638,7 +660,7 @@ export function AiBuilderForm({
                 <div className="flex items-center gap-2">
                   {/* Agent Select - use renderComponents if available, otherwise fallback */}
                   {agentSelectField ? (
-                    <div className="w-48">
+                    <div className="w-72">
                       <FormElementFactory
                         config={{
                           ...agentSelectField,
@@ -666,7 +688,7 @@ export function AiBuilderForm({
                       />
                     </div>
                   ) : (
-                    <div className="w-56">
+                    <div className="w-72">
                       <FormElementFactory
                         config={{
                           id: 'ai-agent-select',
@@ -693,6 +715,19 @@ export function AiBuilderForm({
                         className="w-full"
                       />
                     </div>
+                  )}
+                  {DEMO_MODE && selectedAgentId && (
+                    <Link href={`/builder/ai-agents/${selectedAgentId}`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9 shrink-0"
+                        title="Edit Agent"
+                      >
+                        <PencilRuler className="h-4 w-4 me-2" />
+                        Edit Agent
+                      </Button>
+                    </Link>
                   )}
                   {onReset && (
                     <Button
@@ -765,14 +800,30 @@ export function AiBuilderForm({
                 {/* Buttons on Right */}
                 <div className="flex items-center gap-2">
                   {onSheetOpenChange && (
-                    <PromptPreviewSheet
-                      isOpen={isSheetOpen}
-                      onOpenChange={onSheetOpenChange}
-                      systemPrompt={systemPrompt}
-                      userPrompt={userPrompt}
-                      isLoadingPreload={isLoadingPreload}
-                      disabled={!userPrompt.trim() || disabled}
-                    />
+                    <>
+                      {isStringOutput && onLanguageChange && (
+                        <div className="w-36">
+                          <LanguageSelector
+                            config={{
+                              name: 'output-language',
+                              label: '',
+                              placeholder: 'Language',
+                            }}
+                            value={selectedLanguage}
+                            onChange={onLanguageChange}
+                            defaultLanguage="en"
+                          />
+                        </div>
+                      )}
+                      <PromptPreviewSheet
+                        isOpen={isSheetOpen}
+                        onOpenChange={onSheetOpenChange}
+                        systemPrompt={systemPrompt}
+                        userPrompt={userPrompt}
+                        isLoadingPreload={isLoadingPreload}
+                        disabled={!userPrompt.trim() || disabled}
+                      />
+                    </>
                   )}
                   {isLoading ? (
                     <>
@@ -783,7 +834,7 @@ export function AiBuilderForm({
                         variant="default"
                         className="h-10 shadow-sm"
                       >
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        <Loader2 className="h-4 w-4 me-2 animate-spin" />
                         Generating
                       </Button>
                       <Button
@@ -792,7 +843,7 @@ export function AiBuilderForm({
                         size="default"
                         className="h-10 shadow-sm"
                       >
-                        <Square className="h-4 w-4 mr-2 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
+                        <Square className="h-4 w-4 me-2 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
                         Stop
                       </Button>
                     </>
@@ -807,9 +858,9 @@ export function AiBuilderForm({
                       disabled={!isFormValid || !userPrompt.trim() || disabled || runType === 'automatic'}
                       size="default"
                       variant="default"
-                      className="h-10 shadow-sm bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                      className="h-10 shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
                     >
-                      <Sparkles className="h-4 w-4 mr-2" />
+                      <Sparkles className="h-4 w-4 me-2" />
                       Do the Magic
                     </Button>
                   )}

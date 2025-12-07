@@ -111,7 +111,7 @@ export const DataDisplayFilterPane: React.FC<DataDisplayFilterPaneProps> = ({
                     }}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+                  <span className="ms-2 text-sm text-gray-700">{option.label}</span>
                 </label>
               ))}
             </div>
@@ -218,7 +218,7 @@ export const DataDisplayFilterPane: React.FC<DataDisplayFilterPaneProps> = ({
                     onChange={(e) => handleFilterChange(id, e.target.value)}
                     className="text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+                  <span className="ms-2 text-sm text-gray-700">{option.label}</span>
                 </label>
               ))}
             </div>
@@ -275,7 +275,7 @@ export const DataDisplayFilterPane: React.FC<DataDisplayFilterPaneProps> = ({
             <div key={filter.id} className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 {filter.label}
-                {filter.validation?.required && <span className="text-red-500 ml-1">*</span>}
+                {filter.validation?.required && <span className="text-red-500 ms-1">*</span>}
               </label>
               {renderFilter(filter)}
             </div>
@@ -299,7 +299,7 @@ export const DataDisplayFilterPane: React.FC<DataDisplayFilterPaneProps> = ({
                     (action.disabled || loading) && 'opacity-50 cursor-not-allowed'
                   )}
                 >
-                  {action.icon && <span className="mr-2">{action.icon}</span>}
+                  {action.icon && <span className="me-2">{action.icon}</span>}
                   {action.label}
                 </button>
               ))}
@@ -309,7 +309,7 @@ export const DataDisplayFilterPane: React.FC<DataDisplayFilterPaneProps> = ({
               onClick={handleAddNew}
               className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               Add New
             </button>
 
@@ -318,7 +318,7 @@ export const DataDisplayFilterPane: React.FC<DataDisplayFilterPaneProps> = ({
               disabled={loading}
               className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-900 rounded-md font-medium hover:bg-gray-300 transition-colors disabled:opacity-50"
             >
-              <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
+              <RefreshCw className={cn('h-4 w-4 me-2', loading && 'animate-spin')} />
               Refresh
             </button>
           </div>

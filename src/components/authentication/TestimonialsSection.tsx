@@ -35,11 +35,11 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
           slidesToScroll: 1,
         }}
       >
-        <CarouselContent className="-ml-2 lg:-ml-4 py-2">
+        <CarouselContent className="-ms-2 lg:-ms-4 py-2">
           {testimonials.map((testimonial, index) => (
             <CarouselItem 
               key={index} 
-              className="pl-2 lg:pl-4 basis-full lg:basis-1/2"
+              className="ps-2 lg:ps-4 basis-full lg:basis-1/2"
             >
               <TestimonialCard testimonial={testimonial} delay="" />
             </CarouselItem>

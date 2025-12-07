@@ -78,7 +78,7 @@ export function OperatorSelector({
       {value && !compact && (
         <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
           {value.sqlEquivalent && (
-            <span className="mr-2">SQL: {value.sqlEquivalent}</span>
+            <span className="me-2">SQL: {value.sqlEquivalent}</span>
           )}
         </div>
       )}

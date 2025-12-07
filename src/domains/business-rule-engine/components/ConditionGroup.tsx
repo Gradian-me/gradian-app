@@ -113,7 +113,7 @@ export function ConditionGroup({
   }, [onAddCondition]);
 
   const totalItems = group.conditions.length + group.groups.length;
-  const indentClass = level > 0 ? `ml-${level * 4}` : '';
+  const indentClass = level > 0 ? `ms-${level * 4}` : '';
 
   const handleEditCondition = (conditionId: string) => {
     setEditingConditionId(conditionId);

@@ -400,6 +400,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       setError(null);
       if (pageToLoad === 1) {
         setIsLoading(true);
+        // Don't clear items immediately - keep previous items visible while loading
+        // Only clear if this is a force refresh or initial load
+        if (forceRefresh || items.length === 0) {
+          setItems([]);
+          setFilteredItems([]);
+        }
       } else {
         setIsFetchingMore(true);
       }
@@ -492,6 +498,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       setError(null);
       if (pageToLoad === 1) {
         setIsLoading(true);
+        // Don't clear items immediately - keep previous items visible while loading
+        // Only clear if this is a force refresh or initial load
+        if (forceRefresh || items.length === 0) {
+          setItems([]);
+          setFilteredItems([]);
+        }
       } else {
         setIsFetchingMore(true);
       }
@@ -1569,7 +1581,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               animate="visible"
               exit="hidden"
             >
-              <div className="space-y-1 border-l border-dashed border-gray-200 dark:border-gray-700 ml-4 pl-3">
+              <div className="space-y-1 border-l border-dashed border-gray-200 dark:border-gray-700 ms-4 ps-3">
                 {node.children.map((child, idx) =>
                   renderHierarchyNode(child, depth + 1, index + idx + 1)
                 )}
@@ -1677,19 +1689,25 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
         {/* Items Grid / Hierarchy */}
         <div ref={listContainerRef} className="flex-1 overflow-y-auto min-h-0 px-2 py-1">
-          {isLoading ? (
+          {isLoading && filteredItems.length === 0 ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-              <span className="ml-2 text-sm text-gray-500">Loading items...</span>
+              <span className="ms-2 text-sm text-gray-500">Loading items...</span>
             </div>
           ) : error ? (
             <div className="text-center py-12 text-red-500 text-sm">{error}</div>
-          ) : filteredItems.length === 0 ? (
+          ) : filteredItems.length === 0 && !isLoading ? (
             <div className="text-center py-12 text-gray-500 text-sm">
               {searchQuery ? `No items found matching "${searchQuery}"` : 'No items available'}
             </div>
           ) : (
-            <>
+            <div className="relative">
+              {isLoading && filteredItems.length > 0 && (
+                <div className="absolute top-2 right-2 z-10 flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+                  <Loader2 className="h-4 w-4 animate-spin text-violet-600 dark:text-violet-400" />
+                  <span className="text-xs text-gray-600 dark:text-gray-400">Searching...</span>
+                </div>
+              )}
               {isHierarchical ? (
                 <div className="space-y-2">
                   {hierarchyRoots.map((node, index) => renderHierarchyNode(node, 0, index))}
@@ -1704,7 +1722,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                       <div ref={loadMoreTriggerRef} className="col-span-full h-1 w-full" />
                       {isFetchingMore && (
                         <div className="col-span-full flex items-center justify-center py-4 text-sm text-gray-500">
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          <Loader2 className="h-4 w-4 animate-spin me-2" />
                           Loading more icons...
                         </div>
                       )}
@@ -1727,7 +1745,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   )}
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
 

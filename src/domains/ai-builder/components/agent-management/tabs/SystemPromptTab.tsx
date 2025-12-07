@@ -1,8 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Textarea, ListInput } from '@/gradian-ui/form-builder/form-elements';
 import { AiAgent } from '../../../types';
+import { SystemPromptPreviewSheet } from '../SystemPromptPreviewSheet';
+import { Eye } from 'lucide-react';
 
 interface SystemPromptTabProps {
   agent: AiAgent;
@@ -11,6 +15,7 @@ interface SystemPromptTabProps {
 }
 
 export function SystemPromptTab({ agent, onUpdate, readonly = false }: SystemPromptTabProps) {
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const loadingTextSwitches = agent.loadingTextSwitches 
     ? (Array.isArray(agent.loadingTextSwitches) ? agent.loadingTextSwitches : [agent.loadingTextSwitches])
     : [];
@@ -21,28 +26,40 @@ export function SystemPromptTab({ agent, onUpdate, readonly = false }: SystemPro
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>System Prompt & Loading Messages</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <Textarea
-            config={{ 
-              name: 'system-prompt', 
-              label: 'System Prompt',
-              placeholder: 'Enter the system prompt for the AI agent...'
-            }}
-            value={agent.systemPrompt || ''}
-            onChange={(value) => onUpdate({ systemPrompt: value || undefined })}
-            rows={12}
-            disabled={readonly}
-            className="font-mono text-sm"
-          />
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            The system prompt defines the AI agent's behavior, capabilities, and instructions.
-          </p>
-        </div>
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>System Prompt & Loading Messages</CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsPreviewOpen(true)}
+              disabled={!agent.systemPrompt || !agent.systemPrompt.trim()}
+            >
+              <Eye className="h-4 w-4 me-2" />
+              Preview
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Textarea
+              config={{ 
+                name: 'system-prompt', 
+                label: 'System Prompt',
+                placeholder: 'Enter the system prompt for the AI agent...'
+              }}
+              value={agent.systemPrompt || ''}
+              onChange={(value) => onUpdate({ systemPrompt: value || undefined })}
+              rows={12}
+              disabled={readonly}
+              className="font-mono text-sm"
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              The system prompt defines the AI agent's behavior, capabilities, and instructions.
+            </p>
+          </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Loading Text Switches
@@ -63,6 +80,12 @@ export function SystemPromptTab({ agent, onUpdate, readonly = false }: SystemPro
         </div>
       </CardContent>
     </Card>
+    <SystemPromptPreviewSheet
+      isOpen={isPreviewOpen}
+      onOpenChange={setIsPreviewOpen}
+      systemPrompt={agent.systemPrompt || ''}
+    />
+    </>
   );
 }
 

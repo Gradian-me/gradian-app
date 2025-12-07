@@ -655,6 +655,7 @@
     },
     {
       "name": "NanoAlvand",
+      "logo": "https://jobvision.ir/blog/wp-content/uploads/2025/04/n00016680-b.jpg",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB85MPFBMS4GQ6KGA0EGJNGA",
@@ -1176,6 +1177,188 @@
       "updatedAt": "2025-12-03T07:54:31.706Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
+      "name": "Our Users",
+      "color": "violet",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSTF0BYDZ82KH018CM2EPWV",
+      "createdAt": "2025-12-06T12:33:52.511Z",
+      "updatedAt": "2025-12-06T12:33:52.512Z"
+    },
+    {
+      "parent": "01KBSTF0BYDZ82KH018CM2EPWV",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
+      "name": "CEO",
+      "color": "violet",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSTFQSKSN3W9CGK59VZ1FRX",
+      "createdAt": "2025-12-06T12:34:16.500Z",
+      "updatedAt": "2025-12-06T12:34:16.500Z"
+    },
+    {
+      "parent": "01KBSTFQSKSN3W9CGK59VZ1FRX",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
+      "name": "QA Deputy",
+      "color": "violet",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSTG96EC9TWABAV3QX42X1A",
+      "createdAt": "2025-12-06T12:34:34.318Z",
+      "updatedAt": "2025-12-06T12:34:34.318Z"
+    },
+    {
+      "parent": "01KBSTG96EC9TWABAV3QX42X1A",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
+      "name": "Regulatory",
+      "color": "fuchsia",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSTMAHS9QN2S28FZ70BD7Z3",
+      "createdAt": "2025-12-06T12:36:46.779Z",
+      "updatedAt": "2025-12-06T12:36:54.549Z"
+    },
+    {
+      "parent": "01KBSTG96EC9TWABAV3QX42X1A",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
+      "name": "Qualified Person",
+      "color": "fuchsia",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSTN4A1NKBY9M1WA3K0DGNB",
+      "createdAt": "2025-12-06T12:37:13.153Z",
+      "updatedAt": "2025-12-06T12:37:13.153Z"
+    },
+    {
+      "parent": "01KBSTG96EC9TWABAV3QX42X1A",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
+      "name": "GMP Compliance Manager",
+      "color": "purple",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSTNKY2QYRYQ6EWK0ZJ6NX6",
+      "createdAt": "2025-12-06T12:37:29.155Z",
+      "updatedAt": "2025-12-06T12:39:50.020Z",
+      "members": []
+    },
+    {
+      "parent": "01KBSTNKY2QYRYQ6EWK0ZJ6NX6",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
+      "name": "Quality Engineering Supervisor",
+      "color": "purple",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSTPYV9RMR9FNZS7HWPBPY2",
+      "createdAt": "2025-12-06T12:38:13.098Z",
+      "updatedAt": "2025-12-06T12:40:52.964Z",
+      "members": []
+    },
+    {
+      "parent": "01KBSTNKY2QYRYQ6EWK0ZJ6NX6",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
+      "name": "Audit and Inspection Supervisor",
+      "color": "violet",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSTQDP38WSTM1G6J3Z6KH9K",
+      "createdAt": "2025-12-06T12:38:28.291Z",
+      "updatedAt": "2025-12-06T12:38:28.291Z"
+    },
+    {
+      "parent": "01KBSTNKY2QYRYQ6EWK0ZJ6NX6",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
+      "name": "Process Compliance Supervisor",
+      "color": "violet",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSTQX9BF0624RTVA70J40QX",
+      "createdAt": "2025-12-06T12:38:44.268Z",
+      "updatedAt": "2025-12-06T12:38:44.268Z"
+    },
+    {
+      "parent": "01KBSTPYV9RMR9FNZS7HWPBPY2",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
+      "name": "Quality Engineering Expert",
+      "color": "violet",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSTRKNM2YSJ63BEBXBXSPY2",
+      "createdAt": "2025-12-06T12:39:07.189Z",
+      "updatedAt": "2025-12-06T12:39:33.539Z",
+      "members": []
     }
   ],
   "users": [
@@ -1299,6 +1482,47 @@
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "company": "AryoGen",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "username": "goudarzia",
+      "firstName": "Arman",
+      "lastName": "Goudarzi",
+      "email": "goudarzia@aryogen.com",
+      "postTitle": "Quality Assurance Manager",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBSMDRHJTDY7SFEY6VWK2HEK",
+      "createdAt": "2025-12-06T10:48:20.285Z",
+      "updatedAt": "2025-12-06T10:48:20.285Z"
+    },
+    {
+      "company": "AryoGen",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "username": "aminimehra",
+      "firstName": "Ali",
+      "lastName": "Aminimehr",
+      "email": "aminimehra@aryogen.com",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSTVK8P6Y3P4MW060HNNKB1",
+      "createdAt": "2025-12-06T12:40:45.079Z",
+      "updatedAt": "2025-12-06T12:40:45.079Z"
     }
   ],
   "purchaseOrders": [],
@@ -1362,13 +1586,13 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "name": "Compliance Management",
+      "name": "Complaint Management",
       "icon": "FileCheck",
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBFCM00000000000000000005",
       "createdAt": "2025-12-06T12:00:00.000Z",
-      "updatedAt": "2025-12-06T12:00:00.000Z",
+      "updatedAt": "2025-12-06T11:48:41.216Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2098,7 +2322,11 @@
       "icon": "GitBranch",
       "targetRoute": [
         {
-          "id": "01KASYNCENV001GITLABSYNC"
+          "id": "01KASYNCENV001GITLABSYNC",
+          "label": "Git Sync Environment Variables",
+          "metadata": {
+            "address": "http://localhost:3000/api/git/sync-env"
+          }
         }
       ],
       "targetMethod": [
@@ -2111,8 +2339,8 @@
       ],
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-12-03T13:10:28.734Z",
-      "lastSynced": "2025-12-03T13:10:28.734Z",
+      "updatedAt": "2025-12-07T05:45:21.748Z",
+      "lastSynced": "2025-12-07T05:45:21.748Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2125,7 +2353,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Replaced all variables: deleted 20, created 20",
+      "lastSyncMessage": "Replaced all variables: deleted 20, created 21",
       "sourceRoute": []
     },
     {
@@ -3040,6 +3268,35 @@
       "createdAt": "2025-12-03T06:18:29.876Z",
       "updatedAt": "2025-12-03T06:22:05.572Z",
       "status-items-section": []
+    },
+    {
+      "related-companies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "title": "Change Management Status",
+      "incomplete": true,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSSD57TNGK1EP7SG2JGYH1C",
+      "createdAt": "2025-12-06T12:15:23.388Z",
+      "updatedAt": "2025-12-06T12:15:23.388Z"
+    },
+    {
+      "related-companies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "title": "Follow Up Status",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSVY7K52MC3H25R3JQQAKCA",
+      "createdAt": "2025-12-06T12:59:40.005Z",
+      "updatedAt": "2025-12-06T13:00:50.354Z",
+      "status-items-section": []
     }
   ],
   "status-items": [
@@ -3170,6 +3427,146 @@
       "id": "01KBHH7BZ83ZVRY03177ECHBWV",
       "createdAt": "2025-12-03T07:18:29.621Z",
       "updatedAt": "2025-12-03T07:18:29.621Z"
+    },
+    {
+      "label": "Draft",
+      "icon": "FileText",
+      "color": "yellow",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSSDQ8E2T0D0F5X5Y3K9HS6",
+      "createdAt": "2025-12-06T12:15:41.846Z",
+      "updatedAt": "2025-12-06T12:15:41.846Z"
+    },
+    {
+      "label": "Submitted",
+      "icon": "Send",
+      "color": "sky",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSSG0C215GPQFKAXWK54DTQ",
+      "createdAt": "2025-12-06T12:16:56.709Z",
+      "updatedAt": "2025-12-06T12:16:56.709Z"
+    },
+    {
+      "label": "QA Initial Evaluation",
+      "icon": "FileSearch",
+      "color": "blue",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSSGEYXCK2TAB2R0X80RMGG",
+      "createdAt": "2025-12-06T12:17:11.646Z",
+      "updatedAt": "2025-12-06T12:17:11.646Z"
+    },
+    {
+      "label": "QA Detailed Evaluation",
+      "icon": "ClipboardCheck",
+      "color": "indigo",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSSK2D70JP21YEM6187PX9M",
+      "createdAt": "2025-12-06T12:18:37.096Z",
+      "updatedAt": "2025-12-06T12:18:37.096Z"
+    },
+    {
+      "label": "Waiting For Action Plans",
+      "icon": "Clock",
+      "color": "orange",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSSMTA2575E5RCWHY8AV8R9",
+      "createdAt": "2025-12-06T12:19:34.341Z",
+      "updatedAt": "2025-12-06T12:19:34.341Z"
+    },
+    {
+      "label": "QA Effectiveness Evaluation",
+      "icon": "BarChart",
+      "color": "emerald",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSSNSJXNCGYP6PMSEV3NAD2",
+      "createdAt": "2025-12-06T12:20:06.366Z",
+      "updatedAt": "2025-12-06T12:20:06.366Z"
+    },
+    {
+      "label": "Closed",
+      "icon": "CircleCheckBig",
+      "color": "emerald",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSSP49BTQXY12YW52SEW78B",
+      "createdAt": "2025-12-06T12:20:17.325Z",
+      "updatedAt": "2025-12-06T12:20:17.325Z"
+    },
+    {
+      "label": "Cancelled",
+      "icon": "Ban",
+      "color": "red",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSSPJT149PY8A5VG5S2M3XZ",
+      "createdAt": "2025-12-06T12:20:32.194Z",
+      "updatedAt": "2025-12-06T12:20:32.194Z"
+    },
+    {
+      "label": "Suspended",
+      "icon": "CircleStop",
+      "color": "stone",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSSR4NWQN5DN50STWSACGEN",
+      "createdAt": "2025-12-06T12:21:23.261Z",
+      "updatedAt": "2025-12-06T12:22:09.340Z"
+    },
+    {
+      "label": "Not Started",
+      "icon": "Circle",
+      "color": "slate",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSVYXHRWPMBAACHKSBQ1E4R",
+      "createdAt": "2025-12-06T13:00:02.488Z",
+      "updatedAt": "2025-12-06T13:00:02.488Z"
+    },
+    {
+      "label": "In Progress",
+      "icon": "Loader",
+      "color": "blue",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSVZ3N828YPGRXFDY84D15W",
+      "createdAt": "2025-12-06T13:00:08.744Z",
+      "updatedAt": "2025-12-06T13:00:08.744Z"
+    },
+    {
+      "label": "Completed",
+      "icon": "CheckCircle",
+      "color": "emerald",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSVZ9NT2Z23FXK7B1G7AYS8",
+      "createdAt": "2025-12-06T13:00:14.906Z",
+      "updatedAt": "2025-12-06T13:00:14.906Z"
+    },
+    {
+      "label": "Cancelled",
+      "icon": "XCircle",
+      "color": "red",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSVZHFGX0F3YKHV44J3H2QM",
+      "createdAt": "2025-12-06T13:00:22.897Z",
+      "updatedAt": "2025-12-06T13:00:22.897Z"
+    },
+    {
+      "label": "Hold",
+      "icon": "PauseCircle",
+      "color": "orange",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSVZZDK10007V2G1QTTYV1A",
+      "createdAt": "2025-12-06T13:00:37.171Z",
+      "updatedAt": "2025-12-06T13:00:37.171Z"
     }
   ],
   "tenants": [
@@ -3231,7 +3628,438 @@
   ],
   "routes": [],
   "schemas": [],
-  "change-management": [],
-  "change-management-types": [],
-  "change-subject-types": []
+  "change-management": [
+    {
+      "changeNumber": "CC-2025082405",
+      "changeRequestDate": "2026-01-09",
+      "changeTitle": "Integrated eQMS Implementation",
+      "changeDescription": "Define how changes related to development and deployment of the Integrated eQMS will be assessed, approved, implemented, verified, and closed in compliance with GMP and quality system expectations.",
+      "changeSolution": "This Change Plan covers:\n\nSelection, configuration, validation, and deployment of the eQMS platform\n\nMigration of SOPs, Quality Records, Training, Deviations, CAPA, Complaints, Change Control modules\n\nIntegration with ERP/LIMS/MES (where applicable)\n\nUser role and permission setup\n\nBusiness process redesign\n\nStaff training and system rollout\n\nPost-implementation monitoring and CAPA",
+      "changeManagementTypes": [
+        {
+          "id": "01KBSR7B9B3S0A9JMAWHWNJ8S3"
+        }
+      ],
+      "changeSubjectTypes": [
+        {
+          "id": "01KBSSBGXTJPDC00J7QPRQCR7S"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "changeCategories": [
+        {
+          "id": "01KBSQZRHZW4PHXF2D1WKD2YE1"
+        }
+      ],
+      "changeProcedure": [
+        {
+          "id": "01KBSWN6QGRA5JQQKRNRVP2WNV"
+        },
+        {
+          "id": "01KBSWK2Z59QSKHQSBACV5Y880"
+        }
+      ],
+      "id": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
+      "createdAt": "2025-12-06T12:14:36.501Z",
+      "updatedAt": "2025-12-06T20:27:08.439Z",
+      "status": [
+        {
+          "id": "01KBSSGEYXCK2TAB2R0X80RMGG",
+          "label": "QA Initial Evaluation",
+          "icon": "FileSearch",
+          "color": "blue"
+        }
+      ],
+      "quality-assurance-analyses": [],
+      "qa-guideline-analyses": [],
+      "follow-up": [],
+      "changeConditions": [
+        {
+          "id": "item-1765026571634-7iqsfi6yi",
+          "label": "مشسیشسیشسی"
+        },
+        {
+          "id": "item-1765026574741-a34179zgh",
+          "label": "شسیشسیشس"
+        },
+        {
+          "id": "item-1765026575413-fg3h33xtm",
+          "label": "شسیشسیی"
+        },
+        {
+          "id": "item-1765026576130-in3o3smqm",
+          "label": "شسی"
+        }
+      ],
+      "changeEffectiveness": 4
+    }
+  ],
+  "change-classification": [
+    {
+      "label_fa": "تغییرات کیفی عمده",
+      "label_en": "Major Quality Change ",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSR7B9B3S0A9JMAWHWNJ8S3",
+      "createdAt": "2025-12-06T11:54:44.397Z",
+      "updatedAt": "2025-12-06T11:54:44.397Z"
+    },
+    {
+      "label_fa": "تغییرات کیفی جزئی",
+      "label_en": "Minor Quality Change",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSR8J6EWGTQ6DPKGH5XR3VE",
+      "createdAt": "2025-12-06T11:55:24.239Z",
+      "updatedAt": "2025-12-06T11:55:24.239Z"
+    }
+  ],
+  "change-subject-types": [
+    {
+      "label_fa": "تغییرات نرم افزاری",
+      "label_en": "Software Change",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSSBGXTJPDC00J7QPRQCR7S",
+      "createdAt": "2025-12-06T12:14:29.822Z",
+      "updatedAt": "2025-12-06T12:14:29.822Z"
+    },
+    {
+      "label_fa": "WHO-TRS-1011:2015",
+      "label_en": "WHO-TRS-1011",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSVAZFKZGE307FSXWR5JGP3",
+      "createdAt": "2025-12-06T12:49:09.108Z",
+      "updatedAt": "2025-12-06T12:52:03.183Z"
+    },
+    {
+      "parent": "01KBSVAZFKZGE307FSXWR5JGP3",
+      "label_fa": "S01",
+      "label_en": "S01",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSVE4TZEN99T6NA6R4MQEV9",
+      "createdAt": "2025-12-06T12:50:52.896Z",
+      "updatedAt": "2025-12-06T12:50:52.896Z"
+    },
+    {
+      "parent": "01KBSVE4TZEN99T6NA6R4MQEV9",
+      "label_fa": "S01.P01",
+      "label_en": "S01.P01",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSVEMRCZ2X8C6BMM0QPJG0J",
+      "createdAt": "2025-12-06T12:51:09.196Z",
+      "updatedAt": "2025-12-06T12:51:09.196Z"
+    },
+    {
+      "parent": "01KBSVEMRCZ2X8C6BMM0QPJG0J",
+      "label_fa": "P022.A",
+      "label_en": "P022.A",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSVN7WEH5NHR7ZK731VPYCK",
+      "createdAt": "2025-12-06T12:54:45.391Z",
+      "updatedAt": "2025-12-06T12:54:45.391Z"
+    }
+  ],
+  "quality-assurance-analysis": [
+    {
+      "analyst": [
+        {
+          "id": "01KBSMDRHJTDY7SFEY6VWK2HEK"
+        }
+      ],
+      "analysisItems": [
+        {
+          "id": "item-1765018106941-wjxpjox1c",
+          "label": ""
+        }
+      ],
+      "date": "2025-12-04",
+      "analysisReport": "test",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBSMF1X8N2BEJ7ENHJDT17MX",
+      "createdAt": "2025-12-06T10:49:02.641Z",
+      "updatedAt": "2025-12-06T10:49:02.703Z"
+    },
+    {
+      "date": "2025-12-06",
+      "analyst": [
+        {
+          "id": "01KBSMDRHJTDY7SFEY6VWK2HEK"
+        }
+      ],
+      "analysisItems": [
+        {
+          "id": "item-1765025044886-7qd76dr8c",
+          "label": "asdasd"
+        },
+        {
+          "id": "item-1765025058196-ycfp0ja5z",
+          "label": "asdasdas"
+        },
+        {
+          "id": "item-1765025059073-8qg6u5ke3",
+          "label": "asfasfas"
+        },
+        {
+          "id": "item-1765025059795-sb5kqaimz",
+          "label": "asfasfas"
+        },
+        {
+          "id": "item-1765025060540-lk5s7zurb",
+          "label": "asfas"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSV30SMKKF9VHR0WP459XME",
+      "createdAt": "2025-12-06T12:44:48.309Z",
+      "updatedAt": "2025-12-06T12:45:07.469Z",
+      "analysisReport": "Test"
+    },
+    {
+      "date": "2025-12-17",
+      "analyst": [
+        {
+          "id": "01KBSTVK8P6Y3P4MW060HNNKB1"
+        }
+      ],
+      "analysisItems": [
+        {
+          "id": "item-1765025135469-yldsxwvaz",
+          "label": "fasfas"
+        },
+        {
+          "id": "item-1765025136876-iqgc9206r",
+          "label": "asfsafa"
+        },
+        {
+          "id": "item-1765025137719-08ttzt1sc",
+          "label": "asfasf"
+        },
+        {
+          "id": "item-1765025138649-c0d3d1i3x",
+          "label": "asgfasfg"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSV4N6KC3PD26QW4BT26GT0",
+      "createdAt": "2025-12-06T12:45:41.971Z",
+      "updatedAt": "2025-12-06T12:45:42.005Z"
+    }
+  ],
+  "qa-guideline-analysis": [
+    {
+      "guidelineDocument": [
+        {
+          "id": "WHO-TRS1011-ANNEX3",
+          "label": "WHO-TRS1011-ANNEX3"
+        }
+      ],
+      "guidelineParagraphNumber": "tet",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBSMFBBBQ4RFCPQ81MY4V11T",
+      "createdAt": "2025-12-06T10:49:12.310Z",
+      "updatedAt": "2025-12-06T10:49:12.310Z"
+    },
+    {
+      "guidelineDocument": [
+        {
+          "id": "WHO-TRS1011-ANNEX3",
+          "label": "WHO-TRS1011-ANNEX3"
+        }
+      ],
+      "guidelineParagraphNumber": "P105.123",
+      "justifications": "asfasfasf",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSV603NZMKK2E664YQKY9WM",
+      "createdAt": "2025-12-06T12:46:25.911Z",
+      "updatedAt": "2025-12-06T12:46:25.911Z"
+    },
+    {
+      "guidelineDocument": [
+        {
+          "id": "WHO-TRS993-ANNEX4",
+          "label": "WHO-TRS993-ANNEX4"
+        }
+      ],
+      "guidelineParagraphNumber": "P512.12",
+      "justifications": "asfasfas",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSV6CBE96W03F12GNTTMXXH",
+      "createdAt": "2025-12-06T12:46:38.446Z",
+      "updatedAt": "2025-12-06T12:46:38.446Z"
+    }
+  ],
+  "change-categories": [
+    {
+      "label_fa": "تغییر در مواد اولیه",
+      "label_en": "Raw Material Change",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSQYDTDYM44KMCPSMFCV13H",
+      "createdAt": "2025-12-06T11:49:52.082Z",
+      "updatedAt": "2025-12-06T11:49:52.082Z"
+    },
+    {
+      "parent": "01KBSQYDTDYM44KMCPSMFCV13H",
+      "label_fa": "تغییر در تأمین کننده",
+      "label_en": "Vendor Change",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSQZRHZW4PHXF2D1WKD2YE1",
+      "createdAt": "2025-12-06T11:50:35.844Z",
+      "updatedAt": "2025-12-06T11:50:35.844Z"
+    },
+    {
+      "label_fa": "تغییر در تجهیزات",
+      "label_en": "Equipment Change",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSR11NES9RQ5NRPVZ85XXWF",
+      "createdAt": "2025-12-06T11:51:17.936Z",
+      "updatedAt": "2025-12-06T11:51:17.936Z"
+    },
+    {
+      "parent": "01KBSR11NES9RQ5NRPVZ85XXWF",
+      "label_fa": "تغییر در جانمایی تجهیز",
+      "label_en": "Equipment Location Change",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSR2CVP1QNNKVV6XHMMV0RC",
+      "createdAt": "2025-12-06T11:52:02.168Z",
+      "updatedAt": "2025-12-06T11:52:02.168Z"
+    }
+  ],
+  "tasks": [
+    {
+      "assignedTo": [
+        {
+          "id": "01KBSMDRHJTDY7SFEY6VWK2HEK",
+          "label": "Arman Goudarzi"
+        }
+      ],
+      "dueDate": "2025-12-18",
+      "status": [
+        {
+          "id": "01KBSVZ9NT2Z23FXK7B1G7AYS8",
+          "label": "Completed",
+          "icon": "CheckCircle",
+          "color": "emerald"
+        }
+      ],
+      "taskTitle": "Task A",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSW269QC0V5HH9RA6GJR7S2",
+      "createdAt": "2025-12-06T13:01:49.752Z",
+      "updatedAt": "2025-12-06T16:14:57.718Z"
+    },
+    {
+      "assignedTo": [
+        {
+          "id": "01KBSTVK8P6Y3P4MW060HNNKB1",
+          "label": "Ali Aminimehr"
+        }
+      ],
+      "dueDate": "2025-12-10",
+      "status": [
+        {
+          "id": "01KBSVZ9NT2Z23FXK7B1G7AYS8",
+          "label": "Completed",
+          "icon": "CheckCircle",
+          "color": "emerald"
+        }
+      ],
+      "taskTitle": "Task B",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSW35VJHAB75VRTGXMRHK7Y",
+      "createdAt": "2025-12-06T13:02:22.067Z",
+      "updatedAt": "2025-12-06T16:15:19.796Z"
+    },
+    {
+      "assignedTo": [
+        {
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+          "label": "Mahyar Abidi"
+        }
+      ],
+      "dueDate": "2025-12-30",
+      "status": [
+        {
+          "id": "01KBSVZHFGX0F3YKHV44J3H2QM",
+          "label": "Cancelled",
+          "icon": "XCircle",
+          "color": "red"
+        }
+      ],
+      "taskTitle": "Task C",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSWPJ9SEZN67XGNGZ3YD16S",
+      "createdAt": "2025-12-06T13:12:57.404Z",
+      "updatedAt": "2025-12-06T16:22:37.830Z",
+      "taskDescription": "test description"
+    },
+    {
+      "assignedTo": [
+        {
+          "id": "01KBSTVK8P6Y3P4MW060HNNKB1",
+          "label": "Ali Aminimehr"
+        }
+      ],
+      "dueDate": "2025-12-09",
+      "status": [
+        {
+          "id": "01KBSVZHFGX0F3YKHV44J3H2QM",
+          "label": "Cancelled"
+        }
+      ],
+      "taskTitle": "تدتد",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBSYN40BXYQ9JNGREYPQRH2P",
+      "createdAt": "2025-12-06T13:47:07.147Z",
+      "updatedAt": "2025-12-06T13:47:07.147Z"
+    }
+  ],
+  "change-procedure": [
+    {
+      "label_fa": "PAS",
+      "label_en": "PAS",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSWHW394VY127WR6WSVSMMH",
+      "createdAt": "2025-12-06T13:10:23.594Z",
+      "updatedAt": "2025-12-06T13:10:23.594Z"
+    },
+    {
+      "label_fa": "Notification To NRA Is Not Required",
+      "label_en": "Notification To NRA Is Not Required",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSWK2Z59QSKHQSBACV5Y880",
+      "createdAt": "2025-12-06T13:11:03.398Z",
+      "updatedAt": "2025-12-06T13:11:03.398Z"
+    },
+    {
+      "label_fa": "P01",
+      "label_en": "P01",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBSWN6QGRA5JQQKRNRVP2WNV",
+      "createdAt": "2025-12-06T13:12:12.784Z",
+      "updatedAt": "2025-12-06T13:12:12.784Z"
+    }
+  ]
 }

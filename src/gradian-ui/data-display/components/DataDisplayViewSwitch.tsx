@@ -55,9 +55,9 @@ export const DataDisplayViewSwitch: React.FC<DataDisplayViewSwitchProps> = ({
       case 'bottom':
         return 'mt-4';
       case 'left':
-        return 'mr-4';
+        return 'me-4';
       case 'right':
-        return 'ml-4';
+        return 'ms-4';
       default:
         return 'mb-4';
     }
@@ -110,7 +110,7 @@ export const DataDisplayViewSwitch: React.FC<DataDisplayViewSwitchProps> = ({
       </div>
 
       {/* View Info */}
-      <div className="ml-4 text-sm text-gray-500">
+      <div className="ms-4 text-sm text-gray-500">
         {currentView.label} View
       </div>
     </div>

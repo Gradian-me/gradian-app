@@ -3,6 +3,7 @@
 
 import React from 'react';
 import { cn } from '../../../shared/utils';
+import { CopyContent } from './CopyContent';
 
 export interface CodeBadgeProps {
   code: string | number;
@@ -18,13 +19,14 @@ export const CodeBadge: React.FC<CodeBadgeProps> = ({
   return (
     <span
       className={cn(
-        'inline-flex items-center px-1.5 py-0.5 rounded text-[0.625rem] font-mono font-medium',
+        'inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded text-xs font-mono font-medium',
         'bg-cyan-50 text-cyan-700 border border-cyan-200',
         'select-none',
         className
       )}
     >
       {String(code)}
+      <CopyContent content={code} className="h-4 w-4" />
     </span>
   );
 };

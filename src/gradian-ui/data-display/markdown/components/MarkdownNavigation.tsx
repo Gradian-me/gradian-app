@@ -132,7 +132,7 @@ export function MarkdownNavigation({
           On this page
         </h3>
         <ScrollArea className="h-[calc(100vh-8rem)] px-4 pb-4">
-          <ul className="space-y-1 relative pl-3">
+          <ul className="space-y-1 relative ps-3">
             {/* Vertical line connecting items */}
             <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700" />
             
@@ -150,7 +150,7 @@ export function MarkdownNavigation({
                   
                   {/* Render level 2 children as nested list */}
                   {section.children.length > 0 && (
-                    <ul className={cn('space-y-1 mt-1', hasLevel1 && 'ml-4 pl-2 border-l border-gray-200 dark:border-gray-700')}>
+                    <ul className={cn('space-y-1 mt-1', hasLevel1 && 'ms-4 ps-2 border-l border-gray-200 dark:border-gray-700')}>
                       {section.children.map((child) => (
                         <li key={child.id} className="relative">
                           {renderHeadingLink(child, true)}

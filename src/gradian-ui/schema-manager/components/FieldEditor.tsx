@@ -129,7 +129,7 @@ export function FieldEditor({
             {field.name}
           </span>
         </div>
-        <div className="flex gap-0.5 ml-2 shrink-0">
+        <div className="flex gap-0.5 ms-2 shrink-0">
           <ButtonMinimal
             icon={Edit}
             title="Edit Field"

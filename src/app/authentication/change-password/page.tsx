@@ -176,7 +176,7 @@ export default function ChangePasswordPage() {
                   onChange={(event) => setCurrentPassword(event.target.value)}
                   autoComplete="current-password"
                   placeholder="Enter your current password"
-                  className="flex-1 bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
+                  className="flex-1 bg-transparent text-sm p-4 pe-12 rounded-2xl focus:outline-none"
                 />
                 <button
                   type="button"
@@ -206,7 +206,7 @@ export default function ChangePasswordPage() {
                   onChange={(event) => setNewPassword(event.target.value)}
                   autoComplete="new-password"
                   placeholder="Enter your new password"
-                  className="flex-1 bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
+                  className="flex-1 bg-transparent text-sm p-4 pe-12 rounded-2xl focus:outline-none"
                 />
                 <button
                   type="button"
@@ -236,7 +236,7 @@ export default function ChangePasswordPage() {
                   onChange={(event) => setConfirmPassword(event.target.value)}
                   autoComplete="new-password"
                   placeholder="Confirm your new password"
-                  className="flex-1 bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
+                  className="flex-1 bg-transparent text-sm p-4 pe-12 rounded-2xl focus:outline-none"
                 />
                 <button
                   type="button"

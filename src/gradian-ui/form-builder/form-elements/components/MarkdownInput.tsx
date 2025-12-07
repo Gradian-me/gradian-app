@@ -1,4 +1,5 @@
-// Textarea Component
+// MarkdownInput Component
+// A textarea component that handles markdown by default
 
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { TextareaProps, FormElementRef } from '../types';
@@ -9,7 +10,7 @@ import { IconRenderer } from '../../../shared/utils/icon-renderer';
 import { VoiceInputDialog } from '@/gradian-ui/communication/voice/components/VoiceInputDialog';
 import { Mic } from 'lucide-react';
 
-export const Textarea = forwardRef<FormElementRef, TextareaProps>(
+export const MarkdownInput = forwardRef<FormElementRef, TextareaProps>(
   (
     {
       config,
@@ -95,6 +96,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       resize === 'both' && 'resize',
       aiAgentId && 'pe-11',
       enableVoiceInput && 'pb-11',
+      'font-mono',
       className
     );
 
@@ -130,7 +132,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
           onChange={handleChange}
           onBlur={handleBlur}
           onFocus={handleFocus}
-          placeholder={config.placeholder}
+          placeholder={config.placeholder || 'Enter markdown content...'}
           rows={rows}
           cols={cols}
           maxLength={maxLength || config.validation?.maxLength}
@@ -192,6 +194,9 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
             {value.length}/{config.validation.maxLength}
           </p>
         )}
+        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          Markdown formatting is supported. Use standard markdown syntax for headings, lists, tables, code blocks, and more.
+        </p>
         {aiAgentId && (
           <ProfessionalWritingModal
             isOpen={isModalOpen}
@@ -218,4 +223,5 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
   }
 );
 
-Textarea.displayName = 'Textarea';
+MarkdownInput.displayName = 'MarkdownInput';
+

@@ -58,7 +58,7 @@ export function ResponseAnnotationViewer({
           onClick={() => setIsDialogOpen(true)}
           className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
         >
-          <CheckCircle2 className="h-4 w-4 mr-2" />
+          <CheckCircle2 className="h-4 w-4 me-2" />
           Apply ({totalAnnotations})
         </Button>
       </div>
@@ -166,7 +166,7 @@ export function ResponseAnnotationViewer({
                   }}
                   className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
                 >
-                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                  <CheckCircle2 className="h-4 w-4 me-2" />
                   Apply & Regenerate
                 </Button>
               </div>

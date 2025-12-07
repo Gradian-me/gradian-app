@@ -16,6 +16,9 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatFieldValue } from '../table/utils/field-formatters';
 import { EntityMetadata } from '../components/CreateUpdateDetail';
+import { Avatar } from '@/gradian-ui/form-builder/form-elements/components/Avatar';
+import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
+import { AvatarUser } from '../components/AvatarUser';
 
 export interface HierarchyViewProps {
   schema: FormSchema;
@@ -112,6 +115,46 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
   const statusFieldDef = schema?.fields?.find(field => field.role === 'status');
   const hasStatusField = Boolean(statusFieldDef);
   const statusValue = statusFieldDef ? entity?.[statusFieldDef.name] : entity?.status;
+  
+  // Get person field (assignedTo)
+  const hasPersonField = schema?.fields?.some(field => field.role === 'person') || false;
+  const personFieldDef = schema?.fields?.find(field => field.role === 'person');
+  const personValue = hasPersonField ? (personFieldDef ? (entity[personFieldDef.name] || entity.assignedTo) : (entity.assignedTo || null)) : null;
+  let personField: any = null;
+  if (personValue) {
+    const normalizedPerson = normalizeOptionArray(personValue)[0];
+    if (normalizedPerson) {
+      personField = {
+        ...normalizedPerson,
+        ...normalizedPerson.normalized,
+        ...personValue,
+        label: normalizedPerson.label || normalizedPerson.normalized?.label || personValue?.label || personValue?.name || personValue?.email || 'Unknown',
+        avatar: normalizedPerson.avatar || normalizedPerson.normalized?.avatar || personValue?.avatar || personValue?.image || personValue?.avatarUrl || null,
+        avatarUrl: normalizedPerson.avatar || normalizedPerson.normalized?.avatar || personValue?.avatar || personValue?.image || personValue?.avatarUrl || null,
+        id: normalizedPerson.id || normalizedPerson.normalized?.id || personValue?.id || null,
+        email: normalizedPerson.email || normalizedPerson.normalized?.email || personValue?.email || null,
+        firstName: normalizedPerson.firstName || normalizedPerson.normalized?.firstName || personValue?.firstName || null,
+        lastName: normalizedPerson.lastName || normalizedPerson.normalized?.lastName || personValue?.lastName || null,
+        username: normalizedPerson.username || normalizedPerson.normalized?.username || personValue?.username || null,
+        postTitle: normalizedPerson.postTitle || normalizedPerson.normalized?.postTitle || personValue?.postTitle || null,
+        company: normalizedPerson.company || normalizedPerson.normalized?.company || personValue?.company || null,
+      };
+    } else if (personValue && typeof personValue === 'object') {
+      personField = {
+        label: personValue.label || personValue.name || personValue.email || 'Unknown',
+        avatar: personValue.avatar || personValue.image || personValue.avatarUrl || null,
+        avatarUrl: personValue.avatar || personValue.image || personValue.avatarUrl || null,
+        id: personValue.id || null,
+        email: personValue.email || null,
+        firstName: personValue.firstName || null,
+        lastName: personValue.lastName || null,
+        username: personValue.username || null,
+        postTitle: personValue.postTitle || null,
+        company: personValue.company || null,
+        ...personValue,
+      };
+    }
+  }
 
   return (
     <div className="space-y-1">
@@ -186,6 +229,18 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                     {renderHighlightedText(String(subtitle), highlightQuery)}
                   </div>
                 )}
+                {/* Person Field */}
+                {hasPersonField && personField && (
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <AvatarUser
+                      user={personField}
+                      avatarType="user"
+                      size="sm"
+                      showDialog={true}
+                    />
+                    <span className="text-xs text-gray-600 dark:text-gray-400 truncate">{personField.label}</span>
+                  </div>
+                )}
                 {/* Entity Metadata */}
                 {showUserDetails && (
                   <div className="mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800">
@@ -202,7 +257,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
               </div>
             </div>
           </CardContent>
-          <div className="pr-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+          <div className="pe-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             <DynamicActionButtons
               variant="minimal"
               actions={[
@@ -236,7 +291,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
             animate="expanded"
             exit="collapsed"
             transition={{ duration: 0.18, ease: 'easeInOut' }}
-            className="pl-6 border-l border-dashed border-gray-200 dark:border-gray-700"
+            className="ps-6 border-l border-dashed border-gray-200 dark:border-gray-700"
           >
             {node.children.map((child, idx) => (
               <HierarchyNodeCard
@@ -387,7 +442,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
                 <Skeleton className="h-3 w-24" />
               </div>
             </div>
-            <div className="flex items-center gap-2 pr-2">
+            <div className="flex items-center gap-2 pe-2">
               <Skeleton className="h-8 w-8 rounded-md" />
               <Skeleton className="h-8 w-8 rounded-md" />
               <Skeleton className="h-8 w-8 rounded-md" />
@@ -395,7 +450,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
           </CardContent>
         </Card>
         {showNested && (
-          <div className="pl-6 border-l border-dashed border-gray-200 dark:border-gray-700">
+          <div className="ps-6 border-l border-dashed border-gray-200 dark:border-gray-700">
             <HierarchySkeleton depth={depth + 1} index={index} />
           </div>
         )}

@@ -26,6 +26,7 @@ import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { DynamicCardRenderer } from '../../data-display/components/DynamicCardRenderer';
 const fieldVariants = {
   hidden: { opacity: 0, y: 12 },
   visible: (index: number) => ({
@@ -1248,46 +1249,74 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                         <div className="space-y-3">
                           {itemsToDisplay.map((entity, index) => {
                             const relation = relations.find(r => r.targetId === (entity as any).id);
-                            const actionButtons = (
-                              <>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    if (relation) handleEditEntity((entity as any).id, relation.id);
-                                  }}
-                                  className="h-8 w-8"
-                                  title="Edit"
-                                  disabled={disabled}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                {relation && (
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => handleDeleteClick(relation.id, e)}
-                                    className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    title="Delete"
-                                    disabled={disabled}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                )}
-                              </>
-                            );
                             return (
                               <div
                                 key={(entity as any).id || `entity-${index}`}
-                                className="rounded-xl bg-white dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+                                className="rounded-xl overflow-hidden"
                               >
-                                <div className="px-4 sm:px-6 py-4">
-                                  {renderEntitySummary(entity, index + 1, actionButtons)}
-                                </div>
+                                {targetSchemaData ? (
+                                  <DynamicCardRenderer
+                                    schema={targetSchemaData}
+                                    data={entity}
+                                    index={index}
+                                    viewMode="list"
+                                    onView={(data) => {
+                                      // Open view dialog if needed
+                                      if (relation) handleEditEntity((data as any).id, relation.id);
+                                    }}
+                                    onEdit={(data) => {
+                                      // Stop propagation to prevent form from closing
+                                      if (relation) {
+                                        handleEditEntity((data as any).id, relation.id);
+                                      }
+                                    }}
+                                    onDelete={(data) => {
+                                      if (relation) handleDeleteClick(relation.id, {} as React.MouseEvent);
+                                    }}
+                                    disableAnimation={false}
+                                    isInDialog={false}
+                                    showUserDetails={false}
+                                    className="border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200"
+                                  />
+                                ) : (
+                                  <div className="px-4 sm:px-6 py-4">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <div className="text-sm text-gray-900 dark:text-gray-100">
+                                        {entity.name || entity.title || entity.id || `Item ${index + 1}`}
+                                      </div>
+                                      <div className="flex gap-1">
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            if (relation) handleEditEntity((entity as any).id, relation.id);
+                                          }}
+                                          className="h-8 w-8"
+                                          title="Edit"
+                                          disabled={disabled}
+                                        >
+                                          <Edit className="h-4 w-4" />
+                                        </Button>
+                                        {relation && (
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={(e) => handleDeleteClick(relation.id, e)}
+                                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                            title="Delete"
+                                            disabled={disabled}
+                                          >
+                                            <Trash2 className="h-4 w-4" />
+                                          </Button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             );
                           })}
@@ -1358,46 +1387,73 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   <div className="space-y-3">
                     {itemsToDisplay.map((entity, index) => {
                       const relation = relations.find(r => r.targetId === (entity as any).id);
-                      const actionButtons = (
-                        <>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              if (relation) handleEditEntity((entity as any).id, relation.id);
-                            }}
-                            className="h-8 w-8"
-                            title="Edit"
-                            disabled={disabled}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          {relation && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              onClick={(e) => handleDeleteClick(relation.id, e)}
-                              className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                              title="Delete"
-                              disabled={disabled}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </>
-                      );
                       return (
                         <div
                           key={(entity as any).id || `entity-${index}`}
-                          className="rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+                          className="rounded-xl overflow-hidden"
                         >
-                          <div className="px-4 sm:px-6 py-4">
-                            {renderEntitySummary(entity, index + 1, actionButtons)}
-                          </div>
+                          {targetSchemaData ? (
+                            <DynamicCardRenderer
+                              schema={targetSchemaData}
+                              data={entity}
+                              index={index}
+                              viewMode="list"
+                              onView={(data) => {
+                                if (relation) handleEditEntity((data as any).id, relation.id);
+                              }}
+                              onEdit={(data) => {
+                                // Stop propagation to prevent form from closing
+                                if (relation) {
+                                  handleEditEntity((data as any).id, relation.id);
+                                }
+                              }}
+                              onDelete={(data) => {
+                                if (relation) handleDeleteClick(relation.id, {} as React.MouseEvent);
+                              }}
+                              disableAnimation={false}
+                              isInDialog={false}
+                              showUserDetails={false}
+                              className="border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200"
+                            />
+                          ) : (
+                            <div className="px-4 sm:px-6 py-4">
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="text-sm text-gray-900 dark:text-gray-100">
+                                  {entity.name || entity.title || entity.id || `Item ${index + 1}`}
+                                </div>
+                                <div className="flex gap-1">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      if (relation) handleEditEntity((entity as any).id, relation.id);
+                                    }}
+                                    className="h-8 w-8"
+                                    title="Edit"
+                                    disabled={disabled}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  {relation && (
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={(e) => handleDeleteClick(relation.id, e)}
+                                      className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                      title="Delete"
+                                      disabled={disabled}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}

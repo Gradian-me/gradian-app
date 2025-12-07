@@ -52,7 +52,7 @@ export function ComponentConfigEditor({ componentType, config = {}, onChange }: 
             <Label className="text-xs font-medium text-gray-700 mb-1.5 block">
               {field.label}
               {field.description && (
-                <span className="text-gray-500 font-normal ml-1">({field.description})</span>
+                <span className="text-gray-500 font-normal ms-1">({field.description})</span>
               )}
             </Label>
             <NumberInput
@@ -73,7 +73,7 @@ export function ComponentConfigEditor({ componentType, config = {}, onChange }: 
             <Label className="text-xs font-medium text-gray-700 mb-1.5 block">
               {field.label}
               {field.description && (
-                <span className="text-gray-500 font-normal ml-1">({field.description})</span>
+                <span className="text-gray-500 font-normal ms-1">({field.description})</span>
               )}
             </Label>
             <TextInput
@@ -91,7 +91,7 @@ export function ComponentConfigEditor({ componentType, config = {}, onChange }: 
             <Label className="text-xs font-medium text-gray-700 mb-1.5 block">
               {field.label}
               {field.description && (
-                <span className="text-gray-500 font-normal ml-1">({field.description})</span>
+                <span className="text-gray-500 font-normal ms-1">({field.description})</span>
               )}
             </Label>
             <Select

@@ -48,7 +48,7 @@ export function ResponseCardsTab({ agent, onUpdate, readonly = false }: Response
           <CardTitle>Response Cards</CardTitle>
           {!readonly && (
             <Button size="sm" onClick={addCard}>
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               Add Card
             </Button>
           )}
@@ -60,7 +60,7 @@ export function ResponseCardsTab({ agent, onUpdate, readonly = false }: Response
             <p>No response cards configured.</p>
             {!readonly && (
               <Button variant="outline" size="sm" onClick={addCard} className="mt-4">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 Add First Card
               </Button>
             )}
@@ -77,7 +77,7 @@ export function ResponseCardsTab({ agent, onUpdate, readonly = false }: Response
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 mr-2"
+                      className="h-8 w-8 me-2"
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeleteConfirmIndex(index);

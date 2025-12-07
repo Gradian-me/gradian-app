@@ -42,7 +42,7 @@ export function ModifiedPromptsList({
 
   return (
     <>
-      <div className="ml-6 pl-4 border-l-2 border-violet-200 dark:border-violet-800 space-y-2">
+      <div className="ms-6 ps-4 border-l-2 border-violet-200 dark:border-violet-800 space-y-2">
         <div className="flex items-center gap-2 text-sm font-semibold text-violet-600 dark:text-violet-400 mb-2">
           <FileText className="h-4 w-4" />
           Modified Prompts ({modifiedPrompts.length})

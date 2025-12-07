@@ -549,7 +549,7 @@ export function SectionEditor({
                           })
                         }
                       />
-                      <p className="text-xs text-gray-500 pl-8">
+                      <p className="text-xs text-gray-500 ps-8">
                         If enabled, each item can only be selected once. Already selected items will be excluded from the picker.
                       </p>
                     </div>

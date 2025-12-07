@@ -200,11 +200,11 @@ export default function CalendarPage() {
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button variant="outline" className="w-full sm:w-auto justify-center">
-              <Calendar className="h-4 w-4 mr-2" />
+              <Calendar className="h-4 w-4 me-2" />
               View Calendar
             </Button>
             <Button className="w-full sm:w-auto justify-center">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               Add Event
             </Button>
           </div>

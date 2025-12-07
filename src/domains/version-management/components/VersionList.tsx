@@ -116,7 +116,7 @@ export const VersionList: React.FC<VersionListProps> = ({ version, index, query,
             >
               {filteredChanges.length} change{filteredChanges.length !== 1 ? 's' : ''}
               {filteredChanges.length !== version.changes.length && (
-                <span className="ml-1 text-gray-400">/ {version.changes.length}</span>
+                <span className="ms-1 text-gray-400">/ {version.changes.length}</span>
               )}
             </Badge>
           </div>

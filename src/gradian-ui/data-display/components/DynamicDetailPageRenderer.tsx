@@ -6,6 +6,7 @@ import React from 'react';
 import { ArrowLeft, Edit, RefreshCw, Trash2, LayoutList } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
+import { AvatarUser } from './AvatarUser';
 import { Badge } from '../../../components/ui/badge';
 import { GridBuilder } from '../../layout/grid-builder';
 import { FormSchema, DetailPageSection } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -260,6 +261,45 @@ const getHeaderInfo = (schema: FormSchema, data: any) => {
 
   const statusOptions = statusField?.options;
 
+  // Get person field (assignedTo)
+  const personFieldDef = schema.fields?.find(field => field.role === 'person');
+  const personValue = personFieldDef ? (data[personFieldDef.name] || data.assignedTo) : (data.assignedTo || null);
+  let personField: any = null;
+  if (personValue) {
+    const normalizedPerson = normalizeOptionArray(personValue)[0];
+    if (normalizedPerson) {
+      personField = {
+        ...normalizedPerson,
+        ...normalizedPerson.normalized,
+        ...personValue,
+        label: normalizedPerson.label || normalizedPerson.normalized?.label || personValue?.label || personValue?.name || personValue?.email || 'Unknown',
+        avatar: normalizedPerson.avatar || normalizedPerson.normalized?.avatar || personValue?.avatar || personValue?.image || personValue?.avatarUrl || null,
+        avatarUrl: normalizedPerson.avatar || normalizedPerson.normalized?.avatar || personValue?.avatar || personValue?.image || personValue?.avatarUrl || null,
+        id: normalizedPerson.id || normalizedPerson.normalized?.id || personValue?.id || null,
+        email: normalizedPerson.email || normalizedPerson.normalized?.email || personValue?.email || null,
+        firstName: normalizedPerson.firstName || normalizedPerson.normalized?.firstName || personValue?.firstName || null,
+        lastName: normalizedPerson.lastName || normalizedPerson.normalized?.lastName || personValue?.lastName || null,
+        username: normalizedPerson.username || normalizedPerson.normalized?.username || personValue?.username || null,
+        postTitle: normalizedPerson.postTitle || normalizedPerson.normalized?.postTitle || personValue?.postTitle || null,
+        company: normalizedPerson.company || normalizedPerson.normalized?.company || personValue?.company || null,
+      };
+    } else if (personValue && typeof personValue === 'object') {
+      personField = {
+        label: personValue.label || personValue.name || personValue.email || 'Unknown',
+        avatar: personValue.avatar || personValue.image || personValue.avatarUrl || null,
+        avatarUrl: personValue.avatar || personValue.image || personValue.avatarUrl || null,
+        id: personValue.id || null,
+        email: personValue.email || null,
+        firstName: personValue.firstName || null,
+        lastName: personValue.lastName || null,
+        username: personValue.username || null,
+        postTitle: personValue.postTitle || null,
+        company: personValue.company || null,
+        ...personValue,
+      };
+    }
+  }
+
   return {
     title,
     subtitle,
@@ -268,6 +308,7 @@ const getHeaderInfo = (schema: FormSchema, data: any) => {
     rating,
     duedate,
     code,
+    personField,
     statusOptions,
     statusMetadata: {
       color: normalizedStatusOption?.color,
@@ -537,6 +578,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     rating: 0,
     duedate: null,
     code: '',
+    personField: null,
     statusOptions: undefined,
     statusMetadata: undefined
   };
@@ -593,7 +635,8 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     };
   }, [schema?.plural_name, schema?.title, schema?.name, headerInfo.title, headerInfo.subtitle, headerInfo.code, data?.name]);
 
-  if (isLoading) {
+  // Show skeleton when loading or refreshing
+  if (isLoading || isRefreshing) {
     const detailMetadata = schema?.detailPageMetadata;
     const hasSidebar = (detailMetadata?.quickActions?.length ?? 0) > 0 || 
                       detailMetadata?.sections?.some(s => s.columnArea === 'sidebar');
@@ -825,7 +868,8 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     );
   }
 
-  if (error || !data) {
+  // Only show error if not refreshing (during refresh, show skeleton instead)
+  if ((error || !data) && !isRefreshing) {
     return (
       <div className="container mx-auto px-4 py-6">
         <div className="text-center py-12">
@@ -833,7 +877,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
           <p className="text-gray-500 mb-4">{error || 'Data not found'}</p>
           {onBack && (
             <Button onClick={onBack} variant="outline">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4 me-2" />
               {showBack ? 'Back' : (schema.plural_name || 'Back')}
             </Button>
           )}
@@ -861,7 +905,8 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   let sections: DetailPageSection[] = [];
   if (metadataSections.length === 0 && (!detailMetadata || !detailMetadata.sections)) {
     // Fields to exclude (already shown in header or special fields)
-    const excludedRoles = ['title', 'subtitle', 'avatar', 'status', 'rating', 'duedate', 'code', 'description'];
+    // Note: 'description' removed from excluded roles to allow textarea fields to display
+    const excludedRoles = ['title', 'subtitle', 'avatar', 'status', 'rating', 'duedate', 'code', 'person'];
     
     // Get all fields that should be displayed
     const displayableFields = schema?.fields?.filter(field => {
@@ -967,7 +1012,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                   variant="ghost"
                   onClick={onBack}
                 >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  <ArrowLeft className="h-4 w-4 me-2" />
                   {showBack ? 'Back' : (schema.plural_name || 'Back')}
                 </Button>
               )}
@@ -1079,8 +1124,19 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                 </div>
               </div>
               <div className="flex items-center space-x-2 flex-row flex-wrap">
+                {headerInfo.personField && (
+                  <div className="me-2 flex items-center gap-2">
+                    <AvatarUser
+                      user={headerInfo.personField}
+                      avatarType="user"
+                      size="md"
+                      showDialog={true}
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{headerInfo.personField.label}</span>
+                  </div>
+                )}
                 {headerInfo.duedate && (
-                  <div className="mr-2">
+                  <div className="me-2">
                     <Countdown
                       expireDate={headerInfo.duedate}
                       includeTime={true}
@@ -1115,7 +1171,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                     >
                       <Badge variant={badgeConfig.color ?? 'outline'}>
                         {badgeConfig.icon && (
-                          <IconRenderer iconName={badgeConfig.icon} className="h-3 w-3 mr-1" />
+                          <IconRenderer iconName={badgeConfig.icon} className="h-3 w-3 me-1" />
                         )}
                         {badgeConfig.label}
                       </Badge>
@@ -1167,7 +1223,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                   >
                     <Badge variant={badgeConfig.color ?? 'outline'}>
                       {badgeConfig.icon && (
-                        <IconRenderer iconName={badgeConfig.icon} className="h-3 w-3 mr-1" />
+                        <IconRenderer iconName={badgeConfig.icon} className="h-3 w-3 me-1" />
                       )}
                       {badgeConfig.label}
                     </Badge>

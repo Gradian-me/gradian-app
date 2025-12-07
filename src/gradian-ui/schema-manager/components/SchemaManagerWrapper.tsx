@@ -130,7 +130,7 @@ export function SchemaManagerWrapper() {
         </p>
         {!isSearching && (
           <Button onClick={openCreateDialog}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 me-2" />
             Create Your First Schema
           </Button>
         )}
@@ -155,7 +155,7 @@ export function SchemaManagerWrapper() {
 
         <div className="flex items-center justify-between gap-2 mb-2">
           <Button variant="outline" onClick={() => router.push('/builder')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 me-2" />
             Back to Builder
           </Button>
           <div className="flex items-center gap-2">
@@ -168,18 +168,18 @@ export function SchemaManagerWrapper() {
             >
               {isClearingCache ? (
                 <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  <RefreshCw className="h-4 w-4 me-2 animate-spin" />
                   Clearing...
                 </>
               ) : (
                 <>
-                  <RefreshCw className="h-4 w-4 mr-2" />
+                  <RefreshCw className="h-4 w-4 me-2" />
                   Clear Cache
                 </>
               )}
             </Button>
             <Button size="sm" onClick={openCreateDialog}>
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               New Schema
             </Button>
           </div>

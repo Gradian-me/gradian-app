@@ -66,7 +66,7 @@ export const AiAgentDeleteConfirmDialog: React.FC<AiAgentDeleteConfirmDialogProp
             onClick={handleConfirm}
             type="button"
           >
-            <IconRenderer iconName="Trash2" className="h-4 w-4 mr-2" />
+            <IconRenderer iconName="Trash2" className="h-4 w-4 me-2" />
             Delete
           </Button>
         </DialogFooter>

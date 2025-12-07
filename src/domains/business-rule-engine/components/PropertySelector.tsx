@@ -80,7 +80,7 @@ export function PropertySelector({
       />
       {value && (
         <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-          <Badge variant="outline" className="mr-2">
+          <Badge variant="outline" className="me-2">
             {getPropertyTypeDisplay(value.type)}
           </Badge>
           {value.description && <span>{value.description}</span>}

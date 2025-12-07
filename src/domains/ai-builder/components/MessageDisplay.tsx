@@ -30,7 +30,7 @@ export function MessageDisplay({ error, successMessage }: MessageDisplayProps) {
         <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-red-50 via-rose-50 to-pink-50 dark:from-red-950/30 dark:via-rose-950/30 dark:to-pink-950/30 border border-red-200/50 dark:border-red-800/50 shadow-sm">
           <div className="relative p-4">
             <div className="flex items-start">
-              <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/50 mr-3 shrink-0">
+              <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/50 me-3 shrink-0">
                 <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
               <div className="flex-1 min-w-0">
@@ -49,12 +49,12 @@ export function MessageDisplay({ error, successMessage }: MessageDisplayProps) {
                     >
                       {isExpanded ? (
                         <>
-                          <ChevronUp className="h-3 w-3 mr-1" />
+                          <ChevronUp className="h-3 w-3 me-1" />
                           Hide Details
                         </>
                       ) : (
                         <>
-                          <ChevronDown className="h-3 w-3 mr-1" />
+                          <ChevronDown className="h-3 w-3 me-1" />
                           Show Details
                         </>
                       )}
@@ -79,7 +79,7 @@ export function MessageDisplay({ error, successMessage }: MessageDisplayProps) {
         <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-950/30 dark:via-emerald-950/30 dark:to-teal-950/30 border border-green-200/50 dark:border-green-800/50 shadow-sm">
           <div className="relative p-4">
             <div className="flex items-start">
-              <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/50 mr-3 shrink-0">
+              <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/50 me-3 shrink-0">
                 <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
               <div className="flex-1">

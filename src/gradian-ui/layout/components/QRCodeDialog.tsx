@@ -99,7 +99,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
                   size="sm"
                   className="h-10 flex-1"
                 >
-                  <ExternalLink className="h-4 w-4 mr-2" />
+                  <ExternalLink className="h-4 w-4 me-2" />
                   Open URL
                 </Button>
               )}
@@ -110,7 +110,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
                 size="sm"
                 className="h-10 flex-1"
               >
-                <Download className="h-4 w-4 mr-2" />
+                <Download className="h-4 w-4 me-2" />
                 Download
               </Button>
               <Button
@@ -141,7 +141,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
                 size="sm"
                 className="h-10 flex-1"
               >
-                <Share2 className="h-4 w-4 mr-2" />
+                <Share2 className="h-4 w-4 me-2" />
                 Share
               </Button>
             </div>

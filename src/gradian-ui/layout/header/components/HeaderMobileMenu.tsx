@@ -106,7 +106,7 @@ export const HeaderMobileMenu: React.FC<HeaderMobileMenuProps> = ({
                         {item.icon && <span>{item.icon}</span>}
                         <span>{item.label}</span>
                         {item.badge && (
-                          <span className="ml-auto px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                          <span className="ms-auto px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
                             {item.badge}
                           </span>
                         )}
@@ -126,7 +126,7 @@ export const HeaderMobileMenu: React.FC<HeaderMobileMenuProps> = ({
                         {item.icon && <span>{item.icon}</span>}
                         <span>{item.label}</span>
                         {item.badge && (
-                          <span className="ml-auto px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                          <span className="ms-auto px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
                             {item.badge}
                           </span>
                         )}
@@ -136,7 +136,7 @@ export const HeaderMobileMenu: React.FC<HeaderMobileMenuProps> = ({
 
                   {/* Children items */}
                   {item.children && item.children.length > 0 && (
-                    <div className="ml-6 mt-2 space-y-1">
+                    <div className="ms-6 mt-2 space-y-1">
                       {item.children.map((child) => (
                         <a
                           key={child.id}
@@ -152,7 +152,7 @@ export const HeaderMobileMenu: React.FC<HeaderMobileMenuProps> = ({
                             {child.icon && <span>{child.icon}</span>}
                             <span>{child.label}</span>
                             {child.badge && (
-                              <span className="ml-auto px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                              <span className="ms-auto px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
                                 {child.badge}
                               </span>
                             )}

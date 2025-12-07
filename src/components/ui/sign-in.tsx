@@ -102,7 +102,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     placeholder="Enter your password"
-                    className="flex-1 bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
+                    className="flex-1 bg-transparent text-sm p-4 pe-12 rounded-2xl focus:outline-none"
                     value={formValues.password}
                     onChange={handleInputChange}
                   />

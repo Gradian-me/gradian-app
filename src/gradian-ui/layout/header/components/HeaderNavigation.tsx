@@ -53,7 +53,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
             {item.icon && <span>{item.icon}</span>}
             <span>{item.label}</span>
             {item.badge && (
-              <span className="ml-2 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+              <span className="ms-2 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
                 {item.badge}
               </span>
             )}
@@ -69,7 +69,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
             {item.icon && <span>{item.icon}</span>}
             <span>{item.label}</span>
             {item.badge && (
-              <span className="ml-2 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+              <span className="ms-2 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
                 {item.badge}
               </span>
             )}
@@ -92,7 +92,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
                   {child.icon && <span>{child.icon}</span>}
                   <span>{child.label}</span>
                   {child.badge && (
-                    <span className="ml-auto px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                    <span className="ms-auto px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
                       {child.badge}
                     </span>
                   )}

@@ -415,7 +415,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                         e.stopPropagation();
                         handleRemoveItem(optionId);
                       }}
-                      className="ml-0.5 rounded-full hover:bg-violet-200 dark:hover:bg-violet-800 focus:outline-none p-0.5 transition-colors"
+                      className="ms-0.5 rounded-full hover:bg-violet-200 dark:hover:bg-violet-800 focus:outline-none p-0.5 transition-colors"
                       aria-label={`Remove ${optionLabel}`}
                     >
                       <X className="h-3 w-3" />

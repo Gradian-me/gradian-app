@@ -278,7 +278,7 @@ function ResetPasswordContent() {
                   onChange={(event) => setPassword(event.target.value)}
                   autoComplete="new-password"
                   placeholder="Create a strong password"
-                  className="flex-1 bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
+                  className="flex-1 bg-transparent text-sm p-4 pe-12 rounded-2xl focus:outline-none"
                 />
                 <button
                   type="button"
@@ -308,7 +308,7 @@ function ResetPasswordContent() {
                   onChange={(event) => setConfirmPassword(event.target.value)}
                   autoComplete="new-password"
                   placeholder="Repeat your new password"
-                  className="flex-1 bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none"
+                  className="flex-1 bg-transparent text-sm p-4 pe-12 rounded-2xl focus:outline-none"
                 />
                 <button
                   type="button"

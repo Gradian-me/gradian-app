@@ -126,7 +126,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                 </AnimatePresence>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="pl-3 pr-0 pb-0">
+            <AccordionContent className="ps-3 pe-0 pb-0">
               <nav className="space-y-1 mt-1">
                 {schemas.map((schema, index) => {
                   const active = isActive(schema.id);
