@@ -353,8 +353,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
           const parsed = JSON.parse(response);
           
           // Determine if this is an AI agent route or schema route
-          const isAiAgentRoute = agent.nextAction.route.includes('/api/ai-agents') || 
-                                  agent.nextAction.route.includes('/api/ai-agent-builder');
+          const isAiAgentRoute = agent.nextAction.route.includes('/api/ai-agent-builder');
           const isSchemaRoute = agent.nextAction.route.includes('/api/schemas');
           
           // Handle both single object and array of objects
@@ -418,10 +417,6 @@ export function useAiBuilder(): UseAiBuilderReturn {
                   throw new Error(`AI agent at index ${index} must have a "systemPrompt" field.`);
                 }
                 
-                // AI agents should NOT have schema fields
-                if (item.singular_name || item.plural_name || item.fields || item.sections) {
-                  throw new Error(`AI agent at index ${index} must NOT have schema fields (singular_name, plural_name, fields, sections). These are schema fields, not AI agent fields.`);
-                }
               }
             });
             
