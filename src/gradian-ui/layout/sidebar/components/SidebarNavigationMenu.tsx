@@ -24,7 +24,7 @@ const SidebarNavigationSkeleton: React.FC<{ isCollapsed?: boolean; isMobile?: bo
   const skeletonItems = Array.from({ length: 3 }, (_, i) => i);
   
   return (
-    <ScrollArea className={cn("h-full px-4")} scrollbarVariant="dark">
+    <ScrollArea className={cn("h-full px-2")} scrollbarVariant="dark">
       <nav className="space-y-2 pt-2 pb-4">
         {skeletonItems.map((index) => (
           <div

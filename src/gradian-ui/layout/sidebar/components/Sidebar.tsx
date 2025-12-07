@@ -75,7 +75,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* User Profile / Mode Toggle */}
       {showUserControls && (
-        <div className="mt-auto border-t border-gray-800 p-4">
+        <div className="mt-auto border-t border-gray-800 p-4 sm:block lg:hidden">
           <div className="flex items-center gap-3 overflow-hidden">
             <UserProfileSelector
               className="flex-1 min-w-0"
