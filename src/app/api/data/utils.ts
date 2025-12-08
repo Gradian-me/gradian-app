@@ -415,7 +415,15 @@ export const proxyDataRequest = async (
   const targetUrl = `${baseUrl}${targetPathWithQuery}`;
 
   const headers = new Headers(request.headers);
+  // Remove hop-by-hop headers that shouldn't be forwarded
+  // These headers are connection-specific and cause issues in Docker/proxy environments
   headers.delete('host');
+  headers.delete('connection');
+  headers.delete('upgrade');
+  headers.delete('keep-alive');
+  headers.delete('transfer-encoding');
+  headers.delete('te');
+  headers.delete('trailer');
 
   if (options.headers) {
     const overrideEntries = new Headers(options.headers);
