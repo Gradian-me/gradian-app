@@ -2342,5 +2342,53 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBS4GRAPHVIEWER001",
+    "timestamp": "2025-12-08T09:17:17.000Z",
+    "version": "1.20.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "GRAPH VIEWER | Added GraphViewer component for displaying graphs in read-only mode with preset configurations for markdown integration",
+        "priority": "High",
+        "affectedDomains": [
+          "graph-designer",
+          "graph-viewer",
+          "visualization"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Added new properties to GraphCanvas component for better customization and control over node and relation types",
+        "priority": "Medium",
+        "affectedDomains": [
+          "graph-designer",
+          "graph-canvas",
+          "visualization"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced GraphViewer and GraphLegend components to enhance graph visualization capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "graph-designer",
+          "graph-viewer",
+          "graph-legend",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated GraphDesignerWrapper to support view-only mode and improved handling of graph data",
+        "priority": "Medium",
+        "affectedDomains": [
+          "graph-designer",
+          "graph-wrapper",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

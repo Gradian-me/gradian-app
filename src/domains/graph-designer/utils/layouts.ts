@@ -49,7 +49,7 @@ export const LAYOUTS: Record<GraphLayout, cytoscape.LayoutOptions> = {
     rankDir: 'LR',
     nodeSep: 40,
     rankSep: 80,
-    edgeSep: 20,
+    edgeSep: 50, // Increased minimum spacing between edges to prevent overlapping
     animate: true,
     animationDuration: 800,
     animationEasing: 'ease-out',

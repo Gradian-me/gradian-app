@@ -3,7 +3,9 @@
 import React from 'react';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { MermaidDiagramSimple } from '../MermaidDiagramSimple';
+import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
 import { extractLanguage, extractLanguageFromNode, getCodeContent } from '../../utils/markdownComponentUtils';
+import type { GraphNodeData, GraphEdgeData, GraphRecord } from '@/domains/graph-designer/types';
 
 export interface CodeComponentProps {
   node?: any;
@@ -44,6 +46,60 @@ export function CodeComponent({
           />
         </div>
       );
+    }
+  }
+  
+  // Render Cytoscape graphs (case-insensitive check for 'cytoscape' or 'cytoscape json')
+  if (!inline && (language === 'cytoscape' || language === 'cytoscape json')) {
+    const jsonContent = codeContent.replace(/\n$/, '').trim();
+    if (jsonContent) {
+      // Parse JSON and prepare data outside of JSX construction
+      let graphData: { nodes: GraphNodeData[]; edges: GraphEdgeData[] } | GraphRecord | null = null;
+      let parseError: string | null = null;
+      
+      try {
+        const parsed = JSON.parse(jsonContent);
+        
+        // Check if it's a full GraphRecord or just {nodes, edges}
+        if (parsed.nodes && Array.isArray(parsed.nodes) && parsed.edges && Array.isArray(parsed.edges)) {
+          // It's either {nodes, edges} or full GraphRecord
+          if ('id' in parsed && 'createdAt' in parsed) {
+            // Full GraphRecord
+            graphData = parsed as GraphRecord;
+          } else {
+            // Just {nodes, edges}
+            graphData = {
+              nodes: parsed.nodes as GraphNodeData[],
+              edges: parsed.edges as GraphEdgeData[],
+            };
+          }
+        } else {
+          // Invalid format
+          parseError = 'Invalid graph data format. Expected { nodes: [], edges: [] } or a full GraphRecord.';
+        }
+      } catch (error) {
+        // JSON parsing error
+        parseError = `Failed to parse graph JSON: ${error instanceof Error ? error.message : 'Invalid JSON'}`;
+      }
+      
+      // Construct JSX outside of try/catch
+      if (parseError) {
+        return (
+          <div className="my-4 p-4 border border-red-300 dark:border-red-700 rounded-lg bg-red-50 dark:bg-red-900/20">
+            <p className="text-sm text-red-800 dark:text-red-200">
+              {parseError}
+            </p>
+          </div>
+        );
+      }
+      
+      if (graphData) {
+        return (
+          <div className="my-6">
+            <GraphViewer data={graphData} />
+          </div>
+        );
+      }
     }
   }
   

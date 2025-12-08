@@ -3,6 +3,7 @@ import cytoscape from 'cytoscape';
 import type { GraphLayout } from '../types';
 import { LAYOUTS } from './layouts';
 import { GRAPH_STYLES } from './cytoscape-styles-config';
+import type { NodeType, RelationType } from './cytoscape-sync';
 import { NodeTooltipManager } from './node-tooltip';
 import { createEdgehandles } from './edgehandles-config';
 import { setupEdgehandlesEvents } from './edgehandles-events';
@@ -26,6 +27,10 @@ export interface CytoscapeInitConfig {
   onEdgeCreated?: (source: GraphNodeData, target: GraphNodeData) => void;
   onEdgeModeDisable?: () => void;
   edges: GraphEdgeData[];
+  readOnly?: boolean;
+  nodeTypes?: NodeType[];
+  relationTypes?: RelationType[];
+  schemasConfig?: Array<{ id: string; label: string; color: string; icon?: string }>;
 }
 
 /**
@@ -56,6 +61,10 @@ export function initializeCytoscape(config: CytoscapeInitConfig): CytoscapeInitR
     onEdgeCreated,
     onEdgeModeDisable,
     edges,
+    readOnly = false,
+    nodeTypes,
+    relationTypes,
+    schemasConfig,
   } = config;
 
   // Create Cytoscape instance
@@ -66,32 +75,38 @@ export function initializeCytoscape(config: CytoscapeInitConfig): CytoscapeInitR
   });
 
   // Initialize tooltip manager
-  const tooltipManager = new NodeTooltipManager(cy, schemas);
+  const tooltipManager = new NodeTooltipManager(cy, schemas, schemasConfig, nodeTypes, relationTypes);
   tooltipManager.setupEventHandlers();
 
-  // Setup event handlers
-  const eventHandlersCleanup = setupCytoscapeEventHandlers({
-    cy,
-    edgeModeEnabledRef,
-    multiSelectEnabledRef,
-    onNodeClick,
-    onBackgroundClick,
-    onNodeContextAction,
-    onEdgeContextAction,
-  });
-
-  // Initialize edgehandles plugin
-  const edgehandles = createEdgehandles(cy);
-
-  // Setup edgehandles event handlers
-  let edgehandlesCleanup: (() => void) | null = null;
-  if (onEdgeCreated || onEdgeModeDisable) {
-    edgehandlesCleanup = setupEdgehandlesEvents(cy, {
-      onEdgeCreated,
-      onEdgeModeDisable,
-      existingEdges: edges,
-      edgesRef,
+  // Setup event handlers (skip in read-only mode)
+  let eventHandlersCleanup: () => void = () => {};
+  if (!readOnly) {
+    eventHandlersCleanup = setupCytoscapeEventHandlers({
+      cy,
+      edgeModeEnabledRef,
+      multiSelectEnabledRef,
+      onNodeClick,
+      onBackgroundClick,
+      onNodeContextAction,
+      onEdgeContextAction,
     });
+  }
+
+  // Initialize edgehandles plugin (skip in read-only mode)
+  let edgehandles: any = null;
+  let edgehandlesCleanup: (() => void) | null = null;
+  if (!readOnly) {
+    edgehandles = createEdgehandles(cy);
+
+    // Setup edgehandles event handlers
+    if (onEdgeCreated || onEdgeModeDisable) {
+      edgehandlesCleanup = setupEdgehandlesEvents(cy, {
+        onEdgeCreated,
+        onEdgeModeDisable,
+        existingEdges: edges,
+        edgesRef,
+      });
+    }
   }
 
   // Return cleanup function

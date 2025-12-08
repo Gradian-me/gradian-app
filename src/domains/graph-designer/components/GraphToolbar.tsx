@@ -19,7 +19,10 @@ import {
   Share2,
   Workflow,
   ChartNetwork,
+  Info,
 } from 'lucide-react';
+import { GraphLegend } from './GraphLegend';
+import type { NodeType, RelationType } from './GraphViewer';
 
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -27,8 +30,8 @@ import type { GraphLayout } from '../types';
 
 // Layout configuration with icons and display names
 const LAYOUT_CONFIG: Record<GraphLayout, { name: string; icon: React.ComponentType<{ className?: string }> }> = {
-  dagre: { name: 'Top-Down', icon: Network },
   'dagre-lr': { name: 'Left-Right', icon: Share2 },
+  dagre: { name: 'Top-Down', icon: Network },
   cose: { name: 'Force-Directed', icon: Waypoints },
   breadthfirst: { name: 'Chart Network', icon: ChartNetwork },
   'bpmn': { name: 'BPMN', icon: Workflow },
@@ -53,6 +56,17 @@ interface GraphToolbarProps {
   onSave: () => void;
   onReset: () => void;
   onRefreshLayout: () => void;
+  viewMode?: boolean;
+  nodeTypes?: NodeType[];
+  relationTypes?: RelationType[];
+  schemas?: Array<{ id: string; label: string; color: string; icon?: string }>;
+  hiddenNodeTypeIds?: Set<string>;
+  hiddenRelationTypeIds?: Set<string>;
+  hiddenSchemaIds?: Set<string>;
+  onToggleNodeTypeVisibility?: (nodeTypeId: string) => void;
+  onToggleRelationTypeVisibility?: (relationTypeId: string) => void;
+  onToggleSchemaVisibility?: (schemaId: string) => void;
+  onResetVisibility?: () => void;
 }
 
 export function GraphToolbar(props: GraphToolbarProps) {
@@ -75,7 +89,20 @@ export function GraphToolbar(props: GraphToolbarProps) {
     onSave,
     onReset,
     onRefreshLayout,
+    viewMode = false,
+    nodeTypes,
+    relationTypes,
+    schemas,
+    hiddenNodeTypeIds,
+    hiddenRelationTypeIds,
+    hiddenSchemaIds,
+    onToggleNodeTypeVisibility,
+    onToggleRelationTypeVisibility,
+    onToggleSchemaVisibility,
+    onResetVisibility,
   } = props;
+
+  const [legendOpen, setLegendOpen] = React.useState(false);
 
   const [isMounted, setIsMounted] = useState(false);
 
@@ -103,64 +130,68 @@ export function GraphToolbar(props: GraphToolbarProps) {
   }
 
   return (
-    <div className="flex items-center gap-2 border-b border-gray-400 dark:border-gray-700 px-3 py-2">
-      <div className="flex items-center gap-1">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onToggleSidebar}
-          title={sidebarVisible ? 'Hide schema panel' : 'Show schema panel'}
-        >
-          <SidebarIcon
-            className={`h-4 w-4 transition-transform ${
-              sidebarVisible ? '' : '-scale-x-100'
-            }`}
-          />
-        </Button>
-      </div>
+    <div className="relative flex items-center gap-2 border-b border-gray-400 dark:border-gray-700 px-3 py-2">
+      {!viewMode && (
+        <>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onToggleSidebar}
+              title={sidebarVisible ? 'Hide schema panel' : 'Show schema panel'}
+            >
+              <SidebarIcon
+                className={`h-4 w-4 transition-transform ${
+                  sidebarVisible ? '' : '-scale-x-100'
+                }`}
+              />
+            </Button>
+          </div>
 
-      <div className="h-6 w-px bg-border" />
+          <div className="h-6 w-px bg-border" />
 
-      <div className="flex items-center gap-1">
-        <Button variant="outline" size="icon" disabled={!canUndo} onClick={onUndo} title="Undo (Ctrl+Z)">
-          <Undo2 className="h-4 w-4" />
-        </Button>
-        <Button variant="outline" size="icon" disabled={!canRedo} onClick={onRedo} title="Redo (Ctrl+Y)">
-          <Redo2 className="h-4 w-4" />
-        </Button>
-      </div>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="icon" disabled={!canUndo} onClick={onUndo} title="Undo (Ctrl+Z)">
+              <Undo2 className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" disabled={!canRedo} onClick={onRedo} title="Redo (Ctrl+Y)">
+              <Redo2 className="h-4 w-4" />
+            </Button>
+          </div>
 
-      <div className="h-6 w-px bg-border" />
+          <div className="h-6 w-px bg-border" />
 
-      <div className="flex items-center gap-1">
-        <Button
-          variant={multiSelectEnabled ? 'default' : 'outline'}
-          size="icon"
-          onClick={onToggleMultiSelect}
-          title="Toggle multi-select (useful on mobile)"
-        >
-          {multiSelectEnabled ? <MousePointerSquareDashed className="h-4 w-4" /> : <MousePointer2 className="h-4 w-4" />}
-        </Button>
-        <Button
-          variant={edgeModeEnabled ? 'default' : 'outline'}
-          size="icon"
-          onClick={onToggleEdgeMode}
-          title="Toggle edge creation mode"
-        >
-          <Route className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onGroupSelection}
-          disabled={!canGroupSelection}
-          title={canGroupSelection ? "Group selected nodes" : "Select 2 or more nodes to group"}
-        >
-          <Group className="h-4 w-4" />
-        </Button>
-      </div>
+          <div className="flex items-center gap-1">
+            <Button
+              variant={multiSelectEnabled ? 'default' : 'outline'}
+              size="icon"
+              onClick={onToggleMultiSelect}
+              title="Toggle multi-select (useful on mobile)"
+            >
+              {multiSelectEnabled ? <MousePointerSquareDashed className="h-4 w-4" /> : <MousePointer2 className="h-4 w-4" />}
+            </Button>
+            <Button
+              variant={edgeModeEnabled ? 'default' : 'outline'}
+              size="icon"
+              onClick={onToggleEdgeMode}
+              title="Toggle edge creation mode"
+            >
+              <Route className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onGroupSelection}
+              disabled={!canGroupSelection}
+              title={canGroupSelection ? "Group selected nodes" : "Select 2 or more nodes to group"}
+            >
+              <Group className="h-4 w-4" />
+            </Button>
+          </div>
 
-      <div className="h-6 w-px bg-border" />
+          <div className="h-6 w-px bg-border" />
+        </>
+      )}
 
       <div className="flex items-center gap-2 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-900/50">
         <LayoutTemplate className="h-4 w-4 text-muted-foreground" />
@@ -212,16 +243,46 @@ export function GraphToolbar(props: GraphToolbarProps) {
       <div className="flex-1" />
 
       <div className="flex items-center gap-1">
+        {(nodeTypes && nodeTypes.length > 0) || (relationTypes && relationTypes.length > 0) ? (
+          <Button
+            variant={legendOpen ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => setLegendOpen(!legendOpen)}
+            title="Toggle Legend"
+          >
+            <Info className="h-4 w-4" />
+          </Button>
+        ) : null}
         <Button variant="outline" size="icon" onClick={onExportPng} title="Export as PNG">
           <ImageDown className="h-4 w-4" />
         </Button>
-        <Button variant="outline" size="icon" onClick={onReset} title="Reset Graph">
-          <RotateCcw className="h-4 w-4" />
-        </Button>
-        <Button variant="default" size="icon" onClick={onSave} title="Save Graph">
-          <Save className="h-4 w-4" />
-        </Button>
+        {!viewMode && (
+          <>
+            <Button variant="outline" size="icon" onClick={onReset} title="Reset Graph">
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+            <Button variant="default" size="icon" onClick={onSave} title="Save Graph">
+              <Save className="h-4 w-4" />
+            </Button>
+          </>
+        )}
       </div>
+
+      <GraphLegend
+        nodeTypes={nodeTypes}
+        relationTypes={relationTypes}
+        schemas={schemas}
+        isOpen={legendOpen}
+        onClose={() => setLegendOpen(false)}
+        position="top-right"
+        hiddenNodeTypeIds={hiddenNodeTypeIds}
+        hiddenRelationTypeIds={hiddenRelationTypeIds}
+        hiddenSchemaIds={hiddenSchemaIds}
+        onToggleNodeTypeVisibility={onToggleNodeTypeVisibility}
+        onToggleRelationTypeVisibility={onToggleRelationTypeVisibility}
+        onToggleSchemaVisibility={onToggleSchemaVisibility}
+        onResetVisibility={onResetVisibility}
+      />
     </div>
   );
 }

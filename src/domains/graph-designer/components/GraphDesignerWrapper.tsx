@@ -21,10 +21,22 @@ import { useSchemaDragDrop } from '../hooks/useSchemaDragDrop';
 import { GraphSidebar } from './GraphSidebar';
 import { GraphToolbar } from './GraphToolbar';
 import { GraphCanvas, GraphCanvasHandle } from './GraphCanvas';
-import type { GraphLayout, GraphNodeData } from '../types';
+import type { GraphLayout, GraphNodeData, GraphEdgeData } from '../types';
 import { exportGraphAsPng } from '../utils/graph-export';
 
-export function GraphDesignerWrapper() {
+export interface GraphDesignerWrapperProps {
+  /**
+   * Enable view-only mode (hides sidebar, editing controls, etc.)
+   */
+  viewMode?: boolean;
+  /**
+   * Graph data to display (optional, if not provided uses store data)
+   */
+  graphData?: { nodes: GraphNodeData[]; edges: GraphEdgeData[] };
+}
+
+export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
+  const { viewMode = false, graphData } = props;
   const { schemas, isLoading, refetch } = useSchemaSummaries({ summary: true });
   const systemSchemas = useMemo(
     () =>
@@ -50,12 +62,16 @@ export function GraphDesignerWrapper() {
     [schemas],
   );
 
-  const { graph, nodes, edges, addNode, removeNode, removeEdge, addEdge, updateNode, setGraphElements, createNewGraph } = useGraphStore();
+  const { graph, nodes: storeNodes, edges: storeEdges, addNode, removeNode, removeEdge, addEdge, updateNode, setGraphElements, createNewGraph } = useGraphStore();
+
+  // Use graphData if provided, otherwise use store data
+  const nodes = graphData?.nodes ?? storeNodes;
+  const edges = graphData?.edges ?? storeEdges;
 
   const [layout, setLayout] = useState<GraphLayout>('dagre');
   const [multiSelectEnabled, setMultiSelectEnabled] = useState(false);
   const [edgeModeEnabled, setEdgeModeEnabled] = useState(false);
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [sidebarVisible, setSidebarVisible] = useState(!viewMode); // Hide sidebar in view mode
   const [showResetConfirmation, setShowResetConfirmation] = useState(false);
 
   const canvasHandleRef = useRef<GraphCanvasHandle | null>(null);
@@ -212,7 +228,7 @@ export function GraphDesignerWrapper() {
     >
       <div className="flex h-[calc(100vh-6.5rem)] gap-4 overflow-hidden">
         <AnimatePresence initial={false}>
-          {sidebarVisible && (
+          {!viewMode && sidebarVisible && (
             <motion.div
               key="graph-sidebar"
               initial={{ width: 0, opacity: 0 }}
@@ -229,8 +245,8 @@ export function GraphDesignerWrapper() {
         </AnimatePresence>
         <div
           className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-gray-400 bg-linear-to-b from-background via-muted/40 to-background dark:border-gray-700"
-          onDragOver={handleDragOverCanvas}
-          onDrop={handleDropOnCanvas}
+          onDragOver={viewMode ? undefined : handleDragOverCanvas}
+          onDrop={viewMode ? undefined : handleDropOnCanvas}
         >
           <GraphToolbar
             layout={layout}
@@ -251,30 +267,31 @@ export function GraphDesignerWrapper() {
             onSave={handleSave}
             onReset={handleReset}
             onRefreshLayout={handleRefreshLayout}
+            viewMode={viewMode}
           />
           <div className="flex-1">
             <GraphCanvas
               nodes={nodes}
               edges={edges}
               layout={layout}
-              onNodeClick={handleNodeClick}
-              onBackgroundClick={clearSelection}
-              onElementsChange={setGraphElements}
+              onNodeClick={viewMode ? undefined : handleNodeClick}
+              onBackgroundClick={viewMode ? undefined : clearSelection}
+              onElementsChange={viewMode ? undefined : setGraphElements}
               onReady={(handle) => {
                 canvasHandleRef.current = handle;
               }}
-              edgeModeEnabled={edgeModeEnabled}
-              onEdgeCreated={(source, target) => {
+              edgeModeEnabled={viewMode ? false : edgeModeEnabled}
+              onEdgeCreated={viewMode ? undefined : (source, target) => {
                 addEdge({ source, target });
               }}
-              onEdgeModeDisable={() => {
+              onEdgeModeDisable={viewMode ? undefined : () => {
                 setEdgeModeEnabled(false);
               }}
               selectedNodeId={selectedNodeId}
               selectedNodeIds={selectedNodeIds}
               multiSelectEnabled={multiSelectEnabled}
               schemas={schemas}
-              onNodeContextAction={(action, node) => {
+              onNodeContextAction={viewMode ? undefined : (action, node) => {
                 if (action === 'edit') {
                   handleEditNode(node);
                   return;
@@ -287,17 +304,18 @@ export function GraphDesignerWrapper() {
                   openDeleteConfirmation('node', node);
                 }
               }}
-              onEdgeContextAction={(action, edge) => {
+              onEdgeContextAction={viewMode ? undefined : (action, edge) => {
                 if (action === 'delete') {
                   openDeleteConfirmation('edge', edge);
                 }
               }}
+              readOnly={viewMode}
             />
           </div>
         </div>
       </div>
 
-      {activeSchemaId && activeNodeForForm && !formJustSaved && (
+      {!viewMode && activeSchemaId && activeNodeForForm && !formJustSaved && (
         <FormModal
           key={`${activeSchemaId}-${activeEntityId ?? 'new'}-${activeNodeForForm.id}-${activeNodeForForm.nodeId ?? 'no-nodeid'}`}
           schemaId={activeSchemaId}
@@ -435,8 +453,9 @@ export function GraphDesignerWrapper() {
         />
       )}
 
-      <ConfirmationMessage
-        isOpen={deleteConfirmation.isOpen}
+      {!viewMode && (
+        <ConfirmationMessage
+          isOpen={deleteConfirmation.isOpen}
         onOpenChange={(open) => {
           if (!open) closeDeleteConfirmation();
         }}
@@ -467,10 +486,12 @@ export function GraphDesignerWrapper() {
             action: confirmDelete,
           },
         ]}
-      />
+        />
+      )}
 
-      <ConfirmationMessage
-        isOpen={showResetConfirmation}
+      {!viewMode && (
+        <ConfirmationMessage
+          isOpen={showResetConfirmation}
         onOpenChange={setShowResetConfirmation}
         title="Reset Graph"
         subtitle="This will permanently clear all nodes and edges from the current graph."
@@ -489,10 +510,11 @@ export function GraphDesignerWrapper() {
             action: confirmReset,
           },
         ]}
-      />
+        />
+      )}
 
       {/* Popup Picker for selecting existing data */}
-      {pickerState.schema && (
+      {!viewMode && pickerState.schema && (
         <PopupPicker
           isOpen={pickerState.isOpen}
           onClose={closePicker}

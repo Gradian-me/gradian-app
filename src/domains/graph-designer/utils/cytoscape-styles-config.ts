@@ -9,9 +9,9 @@ export const GRAPH_STYLES: StylesheetJson = [
     selector: 'node',
     style: {
       shape: 'round-rectangle',
-      'background-color': '#f9f5ff', // violet-50
+      'background-color': '#f9f5ff', // violet-50 (default, will be overridden by nodeColor if set)
       'background-opacity': 0.95,
-      label: 'data(title)',
+      label: 'data(title)', // Just show title, badge is shown as background image
       color: '#1e293b', // slate-800
       events: 'yes', // Required for edgehandles to work
       'text-valign': 'center',
@@ -19,10 +19,11 @@ export const GRAPH_STYLES: StylesheetJson = [
       'font-size': 9.5,
       'text-wrap': 'wrap',
       'text-max-width': 80 as any,
-      width: 76 as any,
-      height: 46 as any,
+      'text-margin-y': 4, // Push label down to create gap from badge
+      width: 92 as any,
+      height: 46 as any, // Back to original height since badge is overlay
       'border-width': 2,
-      'border-color': '#8b5cf6', // violet-500
+      'border-color': '#8b5cf6', // violet-500 (default, will be overridden by nodeColor if set)
       'border-opacity': 0.9,
       padding: 5 as any,
       'shadow-blur': 8,
@@ -30,6 +31,20 @@ export const GRAPH_STYLES: StylesheetJson = [
       'shadow-color': '#4c1d95',
       'shadow-offset-x': 0,
       'shadow-offset-y': 2,
+    } as any,
+  },
+  {
+    // Style for nodes with badge - show badge as background image at top center
+    selector: 'node[badgeImage]',
+    style: {
+      'background-image': 'data(badgeImage)',
+      'background-width': '92px', // Match node width
+      'background-height': '46px', // Match node height
+      'background-position-x': '0px', // Align to left (badge is centered in SVG)
+      'background-position-y': '0px', // Align to top (badge is at top in SVG)
+      'background-fit': 'contain',
+      'background-repeat': 'no-repeat',
+      'text-margin-y': 10, // Push label down significantly to avoid overlapping badge (badge is ~18px tall at y=4)
     } as any,
   },
   {
@@ -68,10 +83,10 @@ export const GRAPH_STYLES: StylesheetJson = [
     selector: 'edge',
     style: {
       width: 2,
-      'line-color': '#6366f1', // indigo-500
-      'target-arrow-color': '#06b6d4', // cyan-500
+      'line-color': '#6366f1', // indigo-500 (default, will be overridden by relationColor if set)
+      'target-arrow-color': '#06b6d4', // cyan-500 (default, will be overridden by relationColor if set)
       'target-arrow-shape': 'triangle',
-      'curve-style': 'bezier',
+      'curve-style': 'unbundled-bezier',
     },
   },
   {
