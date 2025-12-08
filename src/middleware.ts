@@ -3,6 +3,7 @@ import { encryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util'
 import { extractTokenFromCookiesEdge } from '@/gradian-ui/shared/utils/edge-token-validation.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { decryptSkipKey } from '@/gradian-ui/shared/utils/decrypt-skip-key';
 
 /**
  * Edge-compatible: Build authentication service URL
@@ -313,7 +314,61 @@ async function attemptTokenRefresh(
   }
 }
 
+/**
+ * Handle skip_key decryption for API routes
+ * For GET requests: Decrypts encrypted skip_key query parameter and rewrites the request URL
+ * For POST/PUT/PATCH requests: Decrypts skip_key in request body (body modification requires route handler)
+ * Note: Middleware cannot modify request body, so POST requests with skip_key in body are handled in route handler
+ */
+async function handleSkipKeyDecryption(request: NextRequest): Promise<NextResponse | null> {
+  const { pathname, searchParams } = request.nextUrl;
+  
+  // Only process API routes that have skip_key parameter
+  if (!pathname.startsWith('/api/')) {
+    return null;
+  }
+  
+  // For GET requests, handle skip_key in query parameters
+  if (request.method === 'GET' || request.method === 'DELETE') {
+    const encryptedSkipKey = searchParams.get('skip_key');
+    if (!encryptedSkipKey) {
+      return null;
+    }
+    
+    try {
+      // Decrypt the skip key
+      const decryptedSkipKey = await decryptSkipKey(encryptedSkipKey);
+      if (!decryptedSkipKey) {
+        console.warn('[middleware] Failed to decrypt skip_key, leaving encrypted value');
+        return null;
+      }
+      
+      // Create new URL with decrypted skip_key
+      const newUrl = new URL(request.url);
+      newUrl.searchParams.set('skip_key', decryptedSkipKey);
+      
+      // Use NextResponse.rewrite() to rewrite the URL with decrypted skip_key
+      return NextResponse.rewrite(newUrl);
+    } catch (error) {
+      console.error('[middleware] Error decrypting skip_key:', error);
+      return null;
+    }
+  }
+  
+  // For POST/PUT/PATCH requests, skip_key should be in body
+  // Middleware cannot modify request body, so decryption will happen in route handler
+  // Return null to let the request proceed normally
+  return null;
+}
+
 export async function middleware(request: NextRequest) {
+  // Handle skip_key decryption for API routes before other middleware logic
+  const skipKeyResponse = await handleSkipKeyDecryption(request);
+  if (skipKeyResponse) {
+    // Return the rewritten response with decrypted skip_key
+    return skipKeyResponse;
+  }
+  
   const { pathname } = request.nextUrl;
   
   loggingCustom(LogType.LOGIN_LOG, 'info', '========== MIDDLEWARE CALLED ==========');
@@ -566,13 +621,12 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - authentication/* (login pages to prevent redirect loops)
+     * Note: API routes are included to handle skip_key decryption
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|authentication).*)',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
 

@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select as UiSelect, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { TextInput, Textarea, NumberInput, Slider, SortableSelector } from '@/gradian-ui/form-builder/form-elements';
+import { TextInput, Textarea, NumberInput, Slider, SortableSelector, Select as FormSelect } from '@/gradian-ui/form-builder/form-elements';
 import type { SortableSelectorItem } from '@/gradian-ui/form-builder/form-elements';
 import { FormSchema, DetailPageMetadata, DetailPageSection, ComponentRendererConfig, RepeatingTableRendererConfig, QuickAction, FormField } from '../types/form-schema';
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
@@ -355,7 +355,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                         </div>
                         <div>
                           <Label className="text-sm font-medium text-gray-700 mb-2 block">Column Area</Label>
-                          <Select
+                          <UiSelect
                             value={section.columnArea || 'main'}
                             onValueChange={(value: 'main' | 'sidebar') => updateSection(section.id, { columnArea: value })}
                           >
@@ -366,7 +366,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                               <SelectItem value="main">Main</SelectItem>
                               <SelectItem value="sidebar">Sidebar</SelectItem>
                             </SelectContent>
-                          </Select>
+                          </UiSelect>
                         </div>
                       </div>
                       <div>
@@ -388,7 +388,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       </div>
                       <div>
                         <Label className="text-sm font-medium text-gray-700 mb-2 block">Badge Variant</Label>
-                        <Select
+                        <UiSelect
                           value={section.badgeVariant || 'default'}
                           onValueChange={(value: any) => updateSection(section.id, { badgeVariant: value })}
                         >
@@ -406,7 +406,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                             <SelectItem value="info">Info</SelectItem>
                             <SelectItem value="muted">Muted</SelectItem>
                           </SelectContent>
-                        </Select>
+                        </UiSelect>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
@@ -609,10 +609,10 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Label className="text-sm font-medium text-gray-700 mb-2 block">Action Type</Label>
-                          <Select
+                          <UiSelect
                             value={action.action}
-                            onValueChange={(value: 'goToUrl' | 'openUrl' | 'openFormDialog' | 'runAiAgent') =>
-                              updateQuickAction(action.id, { action: value })
+                            onValueChange={(value: any) =>
+                              updateQuickAction(action.id, { action: value as any })
                             }
                           >
                             <SelectTrigger>
@@ -622,13 +622,15 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                               <SelectItem value="goToUrl">Go to URL</SelectItem>
                               <SelectItem value="openUrl">Open URL</SelectItem>
                               <SelectItem value="openFormDialog">Open Form Dialog</SelectItem>
+                              <SelectItem value="openActionForm">Open Action Form</SelectItem>
+                              <SelectItem value="callApi">Call API</SelectItem>
                               <SelectItem value="runAiAgent">Run AI Agent</SelectItem>
                             </SelectContent>
-                          </Select>
+                          </UiSelect>
                         </div>
                         <div>
                           <Label className="text-sm font-medium text-gray-700 mb-2 block">Variant</Label>
-                          <Select
+                          <UiSelect
                             value={action.variant || 'default'}
                             onValueChange={(value: any) => updateQuickAction(action.id, { variant: value })}
                           >
@@ -644,7 +646,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                               <SelectItem value="link">Link</SelectItem>
                               <SelectItem value="gradient">Gradient</SelectItem>
                             </SelectContent>
-                          </Select>
+                          </UiSelect>
                         </div>
                       </div>
                       <div>
@@ -655,13 +657,49 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                           placeholder="e.g., FilePlus, Download"
                         />
                       </div>
-                      {action.action === 'openFormDialog' && (
+                      {(action.action === 'openFormDialog' || action.action === 'openActionForm') && (
                         <div>
                           <TextInput
                             config={{ name: 'target-schema', label: 'Target Schema' }}
                             value={action.targetSchema || ''}
                             onChange={(value) => updateQuickAction(action.id, { targetSchema: value })}
                             placeholder="Schema ID"
+                          />
+                          {action.action === 'openFormDialog' && (
+                            <>
+                              <TextInput
+                                config={{
+                                  name: 'submit-route',
+                                  label: 'Custom Submit Route (optional)',
+                                  placeholder: 'e.g., /api/auth/password/reset or /api/data/users/{{formData.id}}',
+                                  description: 'Supports template variables like {{formData.id}}',
+                                }}
+                                value={action.submitRoute || ''}
+                                onChange={(value) => updateQuickAction(action.id, { submitRoute: value })}
+                              />
+                          <FormSelect
+                            config={{ name: 'submit-method', label: 'Submit Method' }}
+                            value={action.submitMethod || 'POST'}
+                            onValueChange={(value) =>
+                              updateQuickAction(action.id, { submitMethod: (value as 'POST' | 'PUT' | 'PATCH') || 'POST' })
+                            }
+                            options={[
+                              { id: 'POST', label: 'POST' },
+                              { id: 'PUT', label: 'PUT' },
+                              { id: 'PATCH', label: 'PATCH' },
+                            ]}
+                          />
+                            </>
+                          )}
+                          <TextInput
+                            config={{
+                              name: 'pass-parent-data-as',
+                              label: 'Pass Parent Entity As (optional)',
+                              placeholder: 'e.g., userId',
+                              description: 'Include parent entity data under this key in the submit payload',
+                            }}
+                            value={action.passParentDataAs || ''}
+                            onChange={(value) => updateQuickAction(action.id, { passParentDataAs: value })}
                           />
                         </div>
                       )}
@@ -687,11 +725,51 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                           </div>
                         </>
                       )}
+                      {action.action === 'callApi' && (
+                        <>
+                          <TextInput
+                            config={{ name: 'submit-route', label: 'API Route' }}
+                            value={action.submitRoute || ''}
+                            onChange={(value) => updateQuickAction(action.id, { submitRoute: value })}
+                            placeholder="/api/auth/password/reset"
+                          />
+                          <FormSelect
+                            config={{ name: 'submit-method', label: 'Method' }}
+                            value={action.submitMethod || 'POST'}
+                            onValueChange={(value: string) =>
+                              updateQuickAction(action.id, { submitMethod: (value as 'POST' | 'PUT' | 'PATCH') || 'POST' })
+                            }
+                            options={[
+                              { id: 'POST', label: 'POST' },
+                              { id: 'PUT', label: 'PUT' },
+                              { id: 'PATCH', label: 'PATCH' },
+                            ]}
+                          />
+                          <Textarea
+                            config={{
+                              name: 'submit-body',
+                              label: 'Custom Body (optional)',
+                              placeholder: '{ "username": "{{formData.username}}", "password": "{{formData.password}}", "confirmPassword": "{{formData.confirmPassword}}" }',
+                              description: 'Supports {{formData.*}} and {{formSchema.*}}',
+                            }}
+                            value={action.body ? JSON.stringify(action.body, null, 2) : ''}
+                            onChange={(value) => {
+                              try {
+                                const parsed = value ? JSON.parse(value) : undefined;
+                                updateQuickAction(action.id, { body: parsed });
+                              } catch {
+                                // Ignore parse errors silently; user will fix JSON
+                                updateQuickAction(action.id, { body: value as any });
+                              }
+                            }}
+                          />
+                        </>
+                      )}
                       {action.action === 'runAiAgent' && (
                         <>
                           <div>
                             <Label className="text-sm font-medium text-gray-700 mb-2 block">AI Agent</Label>
-                            <Select
+                            <UiSelect
                               value={action.agentId || ''}
                               onValueChange={(value) => updateQuickAction(action.id, { agentId: value })}
                             >
@@ -705,7 +783,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                   </SelectItem>
                                 ))}
                               </SelectContent>
-                            </Select>
+                            </UiSelect>
                           </div>
                           <div>
                             <Label className="text-sm font-medium text-gray-700 mb-2 block">Selected Fields</Label>
@@ -977,7 +1055,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                         </div>
                         <div>
                           <Label className="text-sm font-medium text-gray-700 mb-2 block">Column Area</Label>
-                          <Select
+                          <UiSelect
                             value={renderer.columnArea || 'main'}
                             onValueChange={(value: 'main' | 'sidebar') => updateTableRenderer(renderer.id, { columnArea: value })}
                           >
@@ -988,7 +1066,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                               <SelectItem value="main">Main</SelectItem>
                               <SelectItem value="sidebar">Sidebar</SelectItem>
                             </SelectContent>
-                          </Select>
+                          </UiSelect>
                         </div>
                       </div>
                       <div>
@@ -1196,7 +1274,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       </div>
                       <div>
                         <Label className="text-sm font-medium text-gray-700 mb-2 block">Component Type</Label>
-                        <Select
+                        <UiSelect
                           value={renderer.componentType}
                           onValueChange={(value: 'kpi' | 'chart' | 'metric' | 'custom') =>
                             updateComponentRenderer(renderer.id, { componentType: value })
@@ -1211,7 +1289,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                             <SelectItem value="metric">Metric</SelectItem>
                             <SelectItem value="custom">Custom</SelectItem>
                           </SelectContent>
-                        </Select>
+                        </UiSelect>
                       </div>
                       {renderer.componentType === 'custom' && (
                         <div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ulid } from 'ulid';
 import { toast } from 'sonner';
@@ -38,28 +38,33 @@ export interface GraphDesignerWrapperProps {
 export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
   const { viewMode = false, graphData } = props;
   const { schemas, isLoading, refetch } = useSchemaSummaries({ summary: true });
+  const normalizeSchemaType = useCallback(
+    (schema: any): 'system' | 'business' | 'action-form' =>
+      schema?.schemaType ? schema.schemaType : schema?.isSystemSchema === true ? 'system' : 'business',
+    [],
+  );
   const systemSchemas = useMemo(
     () =>
       schemas
-        .filter((schema) => schema.isSystemSchema === true)
+        .filter((schema) => normalizeSchemaType(schema) === 'system')
         .sort((a, b) => {
           const aName = a.plural_name || a.singular_name || a.id || '';
           const bName = b.plural_name || b.singular_name || b.id || '';
           return aName.localeCompare(bName);
         }),
-    [schemas],
+    [normalizeSchemaType, schemas],
   );
 
   const businessSchemas = useMemo(
     () =>
       schemas
-        .filter((schema) => schema.isSystemSchema !== true)
+        .filter((schema) => normalizeSchemaType(schema) === 'business')
         .sort((a, b) => {
           const aName = a.plural_name || a.singular_name || a.id || '';
           const bName = b.plural_name || b.singular_name || b.id || '';
           return aName.localeCompare(bName);
         }),
-    [schemas],
+    [normalizeSchemaType, schemas],
   );
 
   const { graph, nodes: storeNodes, edges: storeEdges, addNode, removeNode, removeEdge, addEdge, updateNode, setGraphElements, createNewGraph } = useGraphStore();

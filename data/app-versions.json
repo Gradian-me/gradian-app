@@ -2390,5 +2390,49 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBS5ACTIONFORMS001",
+    "timestamp": "2025-12-08T14:13:38.000Z",
+    "version": "1.21.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "ACTION FORMS DYNAMIC ACTIONS used in Quick Actions",
+        "priority": "High",
+        "affectedDomains": [
+          "quick-actions",
+          "form-builder",
+          "data-display"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Modified 2FA entry to mark it as expired in 2fa.json",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "2fa"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Updated timestamps in all-data.json and all-data-relations.json to reflect the latest sync time",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented skip_key decryption in middleware and enhanced API routes to support skip_key functionality",
+        "priority": "High",
+        "affectedDomains": [
+          "middleware",
+          "api",
+          "security"
+        ]
+      }
+    ]
   }
 ]

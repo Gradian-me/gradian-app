@@ -10,7 +10,9 @@ import { cn } from '@/lib/utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { FormModal } from '@/gradian-ui/form-builder';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { replaceDynamicContext, replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 import { AiAgentDialog } from '@/domains/ai-builder/components/AiAgentDialog';
+import { getEncryptedSkipKey } from '@/gradian-ui/shared/utils/skip-key-storage';
 
 export interface DynamicQuickActionsProps {
   actions: QuickAction[];
@@ -38,6 +40,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
   const [aiAgentAction, setAiAgentAction] = useState<QuickAction | null>(null);
   const [agentForDialog, setAgentForDialog] = useState<any | null>(null);
   const [loadingAgent, setLoadingAgent] = useState(false);
+  const [formAction, setFormAction] = useState<QuickAction | null>(null);
 
   useEffect(() => {
     if (!schemaCache) {
@@ -74,7 +77,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
       }
       window.open(url, '_blank', 'noopener,noreferrer');
       
-    } else if (action.action === 'openFormDialog' && action.targetSchema) {
+    } else if ((action.action === 'openFormDialog' || action.action === 'openActionForm') && action.targetSchema) {
       setLoadingActionId(action.id);
       
       try {
@@ -92,6 +95,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
         }
 
         setTargetSchemaId(action.targetSchema);
+        setFormAction(action);
       } catch (error) {
         console.error(`Failed to load schema for action ${action.id}:`, error);
       } finally {
@@ -121,6 +125,94 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
           setLoadingAgent(false);
           setLoadingActionId(null);
         });
+    } else if (action.action === 'callApi' && action.submitRoute) {
+      setLoadingActionId(action.id);
+      try {
+        // Fetch latest reference data if possible
+        let referenceData = data;
+        if (schema?.id && data?.id) {
+          try {
+            const latest = await apiRequest(`/api/data/${schema.id}/${data.id}`, { method: 'GET' });
+            if (latest.success && latest.data) {
+              referenceData = latest.data;
+            }
+          } catch (err) {
+            console.warn('Failed to fetch latest reference data, falling back to provided data', err);
+          }
+        }
+
+        let endpoint = replaceDynamicContext(
+          action.submitRoute,
+          {
+            formSchema: schema,
+            formData: referenceData,
+            referenceData,
+          } as any
+        );
+        
+        const method = action.submitMethod || 'POST';
+        let body = action.payloadTemplate
+          ? replaceDynamicContextInObject(action.payloadTemplate, {
+              formSchema: schema,
+              formData: referenceData,
+              referenceData,
+            } as any)
+          : referenceData;
+        
+        // Add encrypted skip_key to body for POST requests, or query parameter for GET requests
+        if (action.passSkipKey) {
+          // For body, get as object; for query params, get URL-encoded string
+          const isBodyMethod = method === 'POST' || method === 'PUT' || method === 'PATCH';
+          const encryptedSkipKey = getEncryptedSkipKey(!isBodyMethod); // encodeForUrl = !isBodyMethod
+          
+          if (encryptedSkipKey) {
+            if (isBodyMethod) {
+              // Add to body for POST/PUT/PATCH requests (use object, not string)
+              // getEncryptedSkipKey(false) returns an object {ciphertext, iv}
+              // This will be properly JSON.stringify'd by apiRequest
+              body = {
+                ...(typeof body === 'object' && body !== null ? body : {}),
+                skip_key: encryptedSkipKey,
+              };
+              console.log('[DynamicQuickActions] Added encrypted skip_key to request body:', {
+                endpoint,
+                method,
+                hasSkipKey: !!body.skip_key,
+                skipKeyType: typeof body.skip_key,
+              });
+            } else {
+              // Add to query parameter for GET/DELETE requests (use URL-encoded string)
+              const url = new URL(endpoint, window.location.origin);
+              url.searchParams.set('skip_key', encryptedSkipKey as string); // Type assertion: encodeForUrl=true returns string
+              endpoint = url.pathname + url.search;
+              console.log('[DynamicQuickActions] Added encrypted skip_key to query params:', {
+                endpoint,
+                method,
+              });
+            }
+          } else {
+            console.warn('[DynamicQuickActions] passSkipKey is true but encrypted skip key is not available. Make sure NEXT_PUBLIC_SKIP_KEY is set and initializeSkipKeyStorage() has been called.');
+          }
+        }
+        
+        // Debug: Log final body before sending
+        if (action.passSkipKey && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+          console.log('[DynamicQuickActions] Final body before apiRequest:', {
+            hasSkipKey: !!(body && typeof body === 'object' && 'skip_key' in body),
+            bodyKeys: body && typeof body === 'object' ? Object.keys(body) : [],
+            bodyStringified: JSON.stringify(body),
+          });
+        }
+        
+        await apiRequest(endpoint, {
+          method,
+          body,
+        });
+      } catch (error) {
+        console.error(`Failed to call API for action ${action.id}:`, error);
+      } finally {
+        setLoadingActionId(null);
+      }
     }
   }, [router, data, schemaCacheState]);
 
@@ -166,7 +258,12 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
         <FormModal
           schemaId={targetSchemaId}
           mode="create"
+          title={formAction?.label}
           getInitialSchema={(requestedId) => schemaCacheState?.[requestedId] ?? null}
+          customSubmitRoute={formAction?.submitRoute}
+          customSubmitMethod={formAction?.submitMethod}
+          referenceEntityData={data}
+          passParentDataAs={formAction?.passParentDataAs}
           enrichData={(formData) => {
             // Enrich data with reference if needed
             return data?.id ? {
@@ -177,9 +274,11 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
           }}
           onSuccess={() => {
             setTargetSchemaId(null);
+            setFormAction(null);
           }}
           onClose={() => {
             setTargetSchemaId(null);
+            setFormAction(null);
           }}
         />
       )}

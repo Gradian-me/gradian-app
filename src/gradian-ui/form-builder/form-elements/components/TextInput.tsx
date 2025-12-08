@@ -69,6 +69,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
     const fieldName = (config as any).name || 'unknown';
     const fieldLabel = (config as any).label;
     const fieldPlaceholder = (config as any).placeholder;
+    const fieldReadOnly = (config as any).readonly ?? (config as any).readOnly ?? false;
     
     if (!config) {
       console.error('TextInput: config is required');
@@ -101,6 +102,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
           pattern={pattern}
           required={required ?? (config as any).validation?.required ?? false}
           disabled={disabled}
+          readOnly={fieldReadOnly}
           autoComplete="off"
           dir="auto"
           className={inputClasses}

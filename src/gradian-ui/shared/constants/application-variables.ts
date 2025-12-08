@@ -39,9 +39,13 @@ function loadVariables() {
     return acc;
   }, {} as Record<LogType, boolean>);
 
-  // Force DEMO_MODE to false if NODE_ENV is not development
-  const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
-  const demoMode = isDev ? (defaults?.DEMO_MODE ?? DEFAULT_APPLICATION_VARIABLES.DEMO_MODE) : false;
+  // Allow explicitly disabling demo mode via env; default allows unless non-dev
+  const canSetDemoEnv = typeof process !== 'undefined' ? process.env.CAN_SET_DEMO_MODE : undefined;
+  const canSetDemoMode = canSetDemoEnv === undefined ? true : canSetDemoEnv.toLowerCase() === 'true';
+  // DEMO_MODE follows config unless explicitly disallowed via CAN_SET_DEMO_MODE=false
+  const demoMode = canSetDemoMode
+    ? (defaults?.DEMO_MODE ?? DEFAULT_APPLICATION_VARIABLES.DEMO_MODE)
+    : false;
 
   return {
     LOG_CONFIG: logConfig,

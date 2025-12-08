@@ -16,12 +16,13 @@ import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store'
  * extractValueFromContext('userData', 'email')
  */
 export function extractValueFromContext(
-  contextKey: 'formSchema' | 'formData' | 'userData',
+  contextKey: 'formSchema' | 'formData' | 'userData' | 'referenceData',
   path: string,
   data?: {
     formSchema?: any;
     formData?: any;
     userData?: any;
+    referenceData?: any;
   }
 ): string {
   // Use provided data or fall back to context store
@@ -78,6 +79,7 @@ export function replaceDynamicContext(
     formSchema?: any;
     formData?: any;
     userData?: any;
+    referenceData?: any;
   }
 ): string {
   if (!template || typeof template !== 'string') {
@@ -89,6 +91,7 @@ export function replaceDynamicContext(
     formSchema: useDynamicFormContextStore.getState().formSchema,
     formData: useDynamicFormContextStore.getState().formData,
     userData: useDynamicFormContextStore.getState().userData,
+    referenceData: useDynamicFormContextStore.getState().referenceData,
   };
 
   // Match variables in format {{contextKey.path}}
@@ -96,14 +99,14 @@ export function replaceDynamicContext(
   
   return template.replace(variablePattern, (match, contextKey, path) => {
     // Validate context key
-    if (!['formSchema', 'formData', 'userData'].includes(contextKey)) {
+    if (!['formSchema', 'formData', 'userData', 'referenceData'].includes(contextKey)) {
       console.warn(`Invalid context key in template: ${contextKey}`);
       return match; // Return original if invalid
     }
 
     // Extract value from context (pass data parameter if provided)
     const value = extractValueFromContext(
-      contextKey as 'formSchema' | 'formData' | 'userData',
+      contextKey as 'formSchema' | 'formData' | 'userData' | 'referenceData',
       path.trim(),
       data
     );

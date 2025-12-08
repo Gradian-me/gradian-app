@@ -54,6 +54,11 @@ export default async function DynamicEntityPage({ params }: PageProps) {
   if (!schema) {
     notFound();
   }
+
+  // Block action-form schemas from page rendering (no list/detail pages for action forms)
+  if (schema.schemaType === 'action-form') {
+    notFound();
+  }
   
   // Load navigation schemas separately (for sidebar/navigation)
   // This is done after schema validation to avoid unnecessary loading if schema doesn't exist

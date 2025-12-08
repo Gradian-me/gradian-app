@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { initializeSecurity } from '@/gradian-ui/shared/utils/security.util';
+import { initializeSkipKeyStorage } from '@/gradian-ui/shared/utils/skip-key-storage';
 
 /**
  * SecurityProvider - Initializes security measures on client-side
@@ -11,6 +12,11 @@ export function SecurityProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Initialize security measures
     initializeSecurity();
+    
+    // Initialize skip key storage (encrypts NEXT_PUBLIC_SKIP_KEY and stores in localStorage)
+    initializeSkipKeyStorage().catch((error) => {
+      console.warn('[SecurityProvider] Failed to initialize skip key storage:', error);
+    });
 
     // Optional: Disable console methods in production to prevent information leakage
     // Note: This can be aggressive and may interfere with error tracking services

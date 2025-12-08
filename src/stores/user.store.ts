@@ -3,6 +3,7 @@ import { devtools, persist } from 'zustand/middleware';
 import { User } from '@/types';
 import { sanitizeNestedData } from '@/gradian-ui/shared/utils/security.util';
 import { getZustandDevToolsConfig } from '@/gradian-ui/shared/utils/zustand-devtools.util';
+import { createEncryptedStorage } from '@/gradian-ui/shared/utils/encrypted-local-storage';
 
 interface UserState {
   user: User | null;
@@ -34,6 +35,7 @@ export const useUserStore = create<UserState>()(
       }),
       {
         name: 'user-store',
+        storage: createEncryptedStorage(),
       }
     ),
     getZustandDevToolsConfig<UserState>('user-store')

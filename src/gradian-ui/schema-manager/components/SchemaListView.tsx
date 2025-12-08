@@ -36,6 +36,7 @@ const SchemaListItemComponent = memo(
     const showSections = sectionCount > 0;
     const showFields = fieldCount > 0;
     const showStats = showSections || showFields;
+    const isActionForm = schema.schemaType === 'action-form';
 
     return (
       <motion.div
@@ -129,38 +130,40 @@ const SchemaListItemComponent = memo(
           </div>
         </div>
         <div className="relative z-10 flex gap-1 shrink-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={(e) => {
-              // Handle Ctrl/Cmd+click to open in new tab
-              if (e.ctrlKey || e.metaKey) {
-                e.preventDefault();
-                window.open(`/page/${schema.id}`, '_blank');
-                return;
-              }
-              // Regular click
-              onView(schema);
-            }}
-            onMouseDown={(e) => {
-              // Handle middle-click (button 1)
-              if (e.button === 1) {
-                e.preventDefault();
-                window.open(`/page/${schema.id}`, '_blank');
-              }
-            }}
-            onAuxClick={(e) => {
-              // Handle middle-click (auxiliary click)
-              if (e.button === 1) {
-                e.preventDefault();
-                window.open(`/page/${schema.id}`, '_blank');
-              }
-            }}
-            className="h-8 w-8 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:text-violet-200 dark:hover:bg-violet-500/10"
-            title="View List (Ctrl+Click or Middle-Click to open in new tab)"
-          >
-            <LayoutList className="h-4 w-4" />
-          </Button>
+          {!isActionForm && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                // Handle Ctrl/Cmd+click to open in new tab
+                if (e.ctrlKey || e.metaKey) {
+                  e.preventDefault();
+                  window.open(`/page/${schema.id}`, '_blank');
+                  return;
+                }
+                // Regular click
+                onView(schema);
+              }}
+              onMouseDown={(e) => {
+                // Handle middle-click (button 1)
+                if (e.button === 1) {
+                  e.preventDefault();
+                  window.open(`/page/${schema.id}`, '_blank');
+                }
+              }}
+              onAuxClick={(e) => {
+                // Handle middle-click (auxiliary click)
+                if (e.button === 1) {
+                  e.preventDefault();
+                  window.open(`/page/${schema.id}`, '_blank');
+                }
+              }}
+              className="h-8 w-8 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:text-violet-200 dark:hover:bg-violet-500/10"
+              title="View List (Ctrl+Click or Middle-Click to open in new tab)"
+            >
+              <LayoutList className="h-4 w-4" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"

@@ -1,7 +1,8 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TextInput, Textarea, IconInput, Switch, Select, PickerInput } from '@/gradian-ui/form-builder/form-elements';
+import { TextInput, Textarea, IconInput, Switch, PickerInput } from '@/gradian-ui/form-builder/form-elements';
+import { Select as FormSelect } from '@/gradian-ui/form-builder/form-elements';
 import { FormSchema } from '../types/form-schema';
 
 interface GeneralInfoTabProps {
@@ -11,6 +12,7 @@ interface GeneralInfoTabProps {
 }
 
 export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralInfoTabProps) {
+  const schemaType = schema.schemaType ?? (schema.isSystemSchema ? 'system' : 'business');
   return (
     <Card>
       <CardHeader>
@@ -66,10 +68,20 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
             onChange={(checked: boolean) => onUpdate({ showInNavigation: checked })}
             disabled={readonly}
           />
-          <Switch
-            config={{ name: 'is-system-schema', label: 'Is System Schema' }}
-            value={schema.isSystemSchema || false}
-            onChange={(checked: boolean) => onUpdate({ isSystemSchema: checked })}
+          <FormSelect
+            config={{ name: 'schema-type', label: 'Schema Type' }}
+            value={schemaType}
+            onValueChange={(value: 'system' | 'business' | 'action-form') =>
+              onUpdate({
+                schemaType: value,
+                isSystemSchema: value === 'system' ? true : value === 'business' ? false : undefined,
+              })
+            }
+            options={[
+              { id: 'system', label: 'System' },
+              { id: 'business', label: 'Business' },
+              { id: 'action-form', label: 'Action Form' },
+            ]}
             disabled={readonly}
           />
           <Switch
@@ -184,17 +196,19 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
               />
             </div>
             <div>
-              <Select
+              <FormSelect
                 config={{
                   name: 'sync-strategy',
                   label: 'Sync Strategy',
                   description: 'Choose how to sync the schema to databases',
                 }}
                 value={schema.syncStrategy || 'schema-only'}
-                onValueChange={(value) => onUpdate({ syncStrategy: value as 'schema-only' | 'schema-and-data' })}
+                onValueChange={(value: 'schema-only' | 'schema-and-data') =>
+                  onUpdate({ syncStrategy: value })
+                }
                 options={[
-                  { value: 'schema-only', label: 'Sync Schema Only' },
-                  { value: 'schema-and-data', label: 'Sync Schema and Data' },
+                  { id: 'schema-only', label: 'Sync Schema Only' },
+                  { id: 'schema-and-data', label: 'Sync Schema and Data' },
                 ]}
                 disabled={readonly}
               />

@@ -33,6 +33,6 @@ export interface GraphRecord {
   edges: GraphEdgeData[];
 }
 
-export interface SchemaSummary extends Pick<FormSchema, 'id' | 'name' | 'plural_name' | 'isSystemSchema'> {}
+export interface SchemaSummary extends Pick<FormSchema, 'id' | 'name' | 'plural_name' | 'schemaType'> {}
 
 

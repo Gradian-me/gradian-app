@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, RefreshCw, Settings, Building2, FileText } from 'lucide-react';
+import { ArrowLeft, Plus, RefreshCw, Settings, Building2, FileText, Zap } from 'lucide-react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +46,7 @@ export function SchemaManagerWrapper() {
     businessSchemas,
     systemSchemasCount,
     businessSchemasCount,
+    actionFormSchemasCount,
     handleRefresh,
     deleteDialog,
     openDeleteDialog,
@@ -187,9 +188,9 @@ export function SchemaManagerWrapper() {
 
         <FormTabs
           value={activeTab}
-          onValueChange={value => setActiveTab(value as 'system' | 'business')}
+          onValueChange={value => setActiveTab(value as 'system' | 'business' | 'action-form')}
         >
-          <FormTabsList className="inline-grid! w-full grid-cols-2 gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-slate-800 dark:bg-slate-900/40 select-none overflow-hidden h-auto! items-stretch">
+          <FormTabsList className="inline-grid! w-full grid-cols-3 gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-slate-800 dark:bg-slate-900/40 select-none overflow-hidden h-auto! items-stretch">
             <FormTabsTrigger
               value="system"
               className="flex items-center gap-2 flex-1 rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white min-w-0"
@@ -208,6 +209,16 @@ export function SchemaManagerWrapper() {
               <span className="truncate">Business Schemas</span>
               <Badge variant="secondary" className="ms-1 shrink-0 bg-violet-200 dark:bg-violet-500/20 dark:text-violet-100">
                 {businessSchemasCount}
+              </Badge>
+            </FormTabsTrigger>
+            <FormTabsTrigger
+              value="action-form"
+              className="flex items-center gap-2 flex-1 rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white min-w-0"
+            >
+              <Zap className="h-4 w-4" />
+              <span className="truncate">Action Forms</span>
+              <Badge variant="secondary" className="ms-1 shrink-0 bg-violet-200 dark:bg-violet-500/20 dark:text-violet-100">
+                {actionFormSchemasCount}
               </Badge>
             </FormTabsTrigger>
           </FormTabsList>
@@ -298,6 +309,49 @@ export function SchemaManagerWrapper() {
           </FormTabsContent>
 
           <FormTabsContent value="business" className="mt-4">
+            {loading ? (
+              viewMode === 'table' ? (
+                <div className="w-full">
+                  <SchemaTableView
+                    schemas={[]}
+                    onEdit={handleEditSchema}
+                    onView={handleViewSchema}
+                    onDelete={openDeleteDialog}
+                    isLoading={true}
+                  />
+                </div>
+              ) : (
+                <SchemaCardSkeletonGrid />
+              )
+            ) : filteredSchemas.length > 0 ? (
+              viewMode === 'table' ? (
+                <SchemaTableView
+                  schemas={filteredSchemas}
+                  onEdit={handleEditSchema}
+                  onView={handleViewSchema}
+                  onDelete={openDeleteDialog}
+                  isLoading={false}
+                />
+              ) : viewMode === 'list' ? (
+                <SchemaListView
+                  schemas={filteredSchemas}
+                  onEdit={handleEditSchema}
+                  onView={handleViewSchema}
+                  onDelete={openDeleteDialog}
+                />
+              ) : (
+                <SchemaCardGrid
+                  schemas={filteredSchemas}
+                  onEdit={handleEditSchema}
+                  onView={handleViewSchema}
+                  onDelete={openDeleteDialog}
+                />
+              )
+            ) : (
+              emptyState
+            )}
+          </FormTabsContent>
+          <FormTabsContent value="action-form" className="mt-4">
             {loading ? (
               viewMode === 'table' ? (
                 <div className="w-full">

@@ -39,7 +39,7 @@ export function checkSchemaAccess(
   // Replace this with your actual access control logic
   // Note: System schemas can be accessed without authentication for development
   // In production, you may want to enforce authentication for system schemas
-  // if (schema.isSystemSchema && !user) {
+  // if ((schema.schemaType === 'system' || schema.isSystemSchema) && !user) {
   //   return {
   //     hasAccess: false,
   //     reason: 'System schemas require authentication',

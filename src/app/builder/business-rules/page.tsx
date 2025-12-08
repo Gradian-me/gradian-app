@@ -1,5 +1,5 @@
-import { BusinessRuleWrapper } from '@/domains/business-rule-engine/components/BusinessRuleWrapper';
 import { Metadata } from 'next';
+import BusinessRulesClient from './BusinessRulesClient';
 
 export const metadata: Metadata = {
   title: 'Business Rules Builder | Gradian',
@@ -7,6 +7,6 @@ export const metadata: Metadata = {
 };
 
 export default function BusinessRulesBuilderPage() {
-  return <BusinessRuleWrapper title="Business Rules Builder" />;
+  return <BusinessRulesClient />;
 }
 

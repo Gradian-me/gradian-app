@@ -70,8 +70,8 @@
     ],
     "showInNavigation": false,
     "icon": "Database",
-    "isSystemSchema": true,
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "schemaType": "system"
   },
   {
     "id": "external-nodes",
@@ -176,8 +176,8 @@
     ],
     "showInNavigation": false,
     "icon": "ExternalLink",
-    "isSystemSchema": true,
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "schemaType": "system"
   },
   {
     "id": "inquiries",
@@ -486,7 +486,6 @@
     },
     "showInNavigation": false,
     "icon": "FileSearch",
-    "isSystemSchema": false,
     "isNotCompanyBased": false,
     "allowDataDueDate": true,
     "allowDataAssignedTo": true,
@@ -496,7 +495,8 @@
         "id": "01KBHD90EMZKAT502KNVVDQZC7",
         "label": "Progress Status"
       }
-    ]
+    ],
+    "schemaType": "business"
   },
   {
     "id": "inquiry-items",
@@ -643,7 +643,8 @@
       }
     ],
     "showInNavigation": false,
-    "icon": "Package"
+    "icon": "Package",
+    "schemaType": "business"
   },
   {
     "id": "inquiry-vendors",
@@ -724,7 +725,8 @@
       }
     ],
     "showInNavigation": false,
-    "icon": "Users"
+    "icon": "Users",
+    "schemaType": "business"
   },
   {
     "id": "vendors",
@@ -1390,7 +1392,8 @@
       ]
     },
     "showInNavigation": false,
-    "icon": "User"
+    "icon": "User",
+    "schemaType": "business"
   },
   {
     "id": "contacts",
@@ -1456,16 +1459,15 @@
     ],
     "icon": "Contact",
     "showInNavigation": false,
-    "isSystemSchema": true,
     "isNotCompanyBased": true,
-    "canSelectMultiCompanies": true
+    "canSelectMultiCompanies": true,
+    "schemaType": "system"
   },
   {
     "id": "companies",
     "description": "Manage company information including registration, address, and contact details",
     "singular_name": "Company",
     "plural_name": "Companies",
-    "isSystemSchema": true,
     "customButtons": [
       {
         "id": "go-to-schemas",
@@ -1626,14 +1628,14 @@
     },
     "showInNavigation": false,
     "icon": "Building2",
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "schemaType": "system"
   },
   {
     "id": "relation-types",
     "description": "Define and manage relationships between entities in your application",
     "singular_name": "Relation Type",
     "plural_name": "Relation Types",
-    "isSystemSchema": true,
     "customButtons": [
       {
         "id": "go-to-schemas",
@@ -1768,7 +1770,8 @@
     },
     "showInNavigation": false,
     "icon": "Link2",
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "schemaType": "system"
   },
   {
     "id": "quotations",
@@ -2222,7 +2225,8 @@
     "showInNavigation": false,
     "icon": "FileText",
     "allowDataInactive": true,
-    "allowDataForce": true
+    "allowDataForce": true,
+    "schemaType": "business"
   },
   {
     "id": "quotation-items",
@@ -2313,14 +2317,14 @@
       }
     ],
     "showInNavigation": false,
-    "icon": "Package"
+    "icon": "Package",
+    "schemaType": "business"
   },
   {
     "id": "applications",
     "description": "Define and manage applications in your system",
     "singular_name": "Application",
     "plural_name": "Applications",
-    "isSystemSchema": true,
     "customButtons": [
       {
         "id": "go-to-schemas",
@@ -2388,14 +2392,14 @@
     },
     "showInNavigation": false,
     "icon": "AppWindow",
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "schemaType": "system"
   },
   {
     "id": "user-roles",
     "description": "Define and manage user roles in your system",
     "singular_name": "User Role",
     "plural_name": "User Roles",
-    "isSystemSchema": true,
     "allowHierarchicalParent": true,
     "customButtons": [
       {
@@ -2568,14 +2572,14 @@
     },
     "showInNavigation": false,
     "icon": "UserCircle",
-    "allowDataInactive": true
+    "allowDataInactive": true,
+    "schemaType": "system"
   },
   {
     "id": "business-areas",
     "description": "Define and manage business areas in your system",
     "singular_name": "Business Area",
     "plural_name": "Business Areas",
-    "isSystemSchema": true,
     "customButtons": [
       {
         "id": "go-to-schemas",
@@ -2670,14 +2674,14 @@
     },
     "showInNavigation": false,
     "icon": "Folder",
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "schemaType": "system"
   },
   {
     "id": "users",
     "description": "Manage user accounts and profiles",
     "singular_name": "User",
     "plural_name": "Users",
-    "isSystemSchema": true,
     "cardMetadata": [
       {
         "id": "user-info",
@@ -2800,6 +2804,16 @@
             "company"
           ]
         }
+      ],
+      "quickActions": [
+        {
+          "id": "reset-password",
+          "label": "Reset Password",
+          "icon": "Key",
+          "variant": "default",
+          "action": "openActionForm",
+          "targetSchema": "reset-password-form"
+        }
       ]
     },
     "showInNavigation": false,
@@ -2810,7 +2824,8 @@
         "id": "01KBCXZ2KX7N336B5GDGKEKNRC",
         "label": "User Status"
       }
-    ]
+    ],
+    "schemaType": "system"
   },
   {
     "id": "servers",
@@ -3004,8 +3019,8 @@
     },
     "showInNavigation": false,
     "icon": "Server",
-    "isSystemSchema": true,
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "schemaType": "system"
   },
   {
     "id": "url-repositories",
@@ -3261,7 +3276,7 @@
     "showInNavigation": false,
     "icon": "Link",
     "isNotCompanyBased": true,
-    "isSystemSchema": true
+    "schemaType": "system"
   },
   {
     "id": "integrations",
@@ -3545,7 +3560,7 @@
     "showInNavigation": false,
     "icon": "Settings",
     "isNotCompanyBased": true,
-    "isSystemSchema": true
+    "schemaType": "system"
   },
   {
     "id": "databases",
@@ -3840,7 +3855,7 @@
     "showInNavigation": false,
     "icon": "Database",
     "isNotCompanyBased": true,
-    "isSystemSchema": true
+    "schemaType": "system"
   },
   {
     "id": "tags",
@@ -3926,7 +3941,7 @@
     "showInNavigation": false,
     "icon": "Tag",
     "isNotCompanyBased": true,
-    "isSystemSchema": true
+    "schemaType": "system"
   },
   {
     "id": "status-items",
@@ -4006,7 +4021,7 @@
     "icon": "CircleDot",
     "allowDataInactive": true,
     "isNotCompanyBased": true,
-    "isSystemSchema": true
+    "schemaType": "system"
   },
   {
     "id": "status-groups",
@@ -4061,8 +4076,8 @@
     "showInNavigation": false,
     "icon": "Layers",
     "isNotCompanyBased": false,
-    "isSystemSchema": true,
-    "canSelectMultiCompanies": true
+    "canSelectMultiCompanies": true,
+    "schemaType": "system"
   },
   {
     "id": "logical-operators",
@@ -4189,8 +4204,8 @@
     },
     "showInNavigation": false,
     "icon": "Code",
-    "isSystemSchema": true,
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "schemaType": "system"
   },
   {
     "id": "aggregation-types",
@@ -4308,15 +4323,14 @@
     },
     "showInNavigation": false,
     "icon": "Sigma",
-    "isSystemSchema": true,
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "schemaType": "system"
   },
   {
     "id": "app-permissions",
     "description": "Define and manage application permissions for resources and actions",
     "singular_name": "App Permission",
     "plural_name": "App Permissions",
-    "isSystemSchema": true,
     "cardMetadata": [],
     "fields": [
       {
@@ -4481,14 +4495,14 @@
     ],
     "showInNavigation": false,
     "icon": "Shield",
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "schemaType": "system"
   },
   {
     "id": "app-access-policies",
     "description": "Define and manage access policies with associated permissions",
     "singular_name": "Application Access Policy",
     "plural_name": "Application Access Policies",
-    "isSystemSchema": true,
     "cardMetadata": [],
     "fields": [
       {
@@ -4595,7 +4609,8 @@
     },
     "showInNavigation": false,
     "icon": "Lock",
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "schemaType": "system"
   },
   {
     "id": "menu-items",
@@ -4739,7 +4754,7 @@
     "allowDataInactive": true,
     "allowHierarchicalParent": true,
     "isNotCompanyBased": true,
-    "isSystemSchema": true
+    "schemaType": "system"
   },
   {
     "id": "tenants",
@@ -4845,7 +4860,7 @@
     "allowDataInactive": true,
     "isNotCompanyBased": true,
     "canSelectMultiCompanies": true,
-    "isSystemSchema": true
+    "schemaType": "system"
   },
   {
     "id": "change-classification",
@@ -4893,7 +4908,8 @@
       }
     ],
     "showInNavigation": true,
-    "icon": "Tag"
+    "icon": "Tag",
+    "schemaType": "business"
   },
   {
     "id": "change-subject-types",
@@ -4942,7 +4958,8 @@
       }
     ],
     "showInNavigation": true,
-    "icon": "FolderTree"
+    "icon": "FolderTree",
+    "schemaType": "business"
   },
   {
     "id": "change-management",
@@ -5276,7 +5293,8 @@
         "id": "01KBSSD57TNGK1EP7SG2JGYH1C",
         "label": "Change Management Status"
       }
-    ]
+    ],
+    "schemaType": "business"
   },
   {
     "id": "quality-assurance-analysis",
@@ -5350,7 +5368,8 @@
       }
     ],
     "showInNavigation": false,
-    "icon": "FileCheck"
+    "icon": "FileCheck",
+    "schemaType": "business"
   },
   {
     "id": "qa-guideline-analysis",
@@ -5418,7 +5437,8 @@
       }
     ],
     "showInNavigation": false,
-    "icon": "FileText"
+    "icon": "FileText",
+    "schemaType": "business"
   },
   {
     "id": "change-categories",
@@ -5467,7 +5487,8 @@
       }
     ],
     "showInNavigation": true,
-    "icon": "Tag"
+    "icon": "Tag",
+    "schemaType": "business"
   },
   {
     "id": "related-documents",
@@ -5553,7 +5574,8 @@
       }
     ],
     "showInNavigation": false,
-    "icon": "FileText"
+    "icon": "FileText",
+    "schemaType": "business"
   },
   {
     "id": "change-procedure",
@@ -5601,7 +5623,8 @@
       }
     ],
     "showInNavigation": false,
-    "icon": "FileCode"
+    "icon": "FileCode",
+    "schemaType": "business"
   },
   {
     "id": "tasks",
@@ -5658,7 +5681,8 @@
     ],
     "allowDataDueDate": true,
     "allowDataAssignedTo": true,
-    "allowDataForce": true
+    "allowDataForce": true,
+    "schemaType": "business"
   },
   {
     "id": "attachments",
@@ -5736,6 +5760,23 @@
         "colSpan": 2,
         "order": 5,
         "role": "description"
+      },
+      {
+        "id": "attachment-folder",
+        "name": "folder",
+        "label": "Attachment Folder",
+        "sectionId": "basic-information",
+        "component": "picker",
+        "placeholder": "Select parent folder",
+        "targetSchema": "attachment-folders",
+        "validation": {
+          "required": true
+        },
+        "metadata": {
+          "allowMultiselect": false
+        },
+        "colSpan": 2,
+        "order": 6
       }
     ],
     "sections": [
@@ -5749,7 +5790,71 @@
     ],
     "showInNavigation": false,
     "icon": "Paperclip",
-    "isSystemSchema": true
+    "schemaType": "system"
+  },
+  {
+    "id": "attachment-folders",
+    "description": "Organize attachments into hierarchical folders",
+    "singular_name": "Attachment Folder",
+    "plural_name": "Attachment Folders",
+    "allowHierarchicalParent": true,
+    "fields": [
+      {
+        "id": "attachment-folder-label",
+        "name": "label",
+        "label": "Label",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter folder label",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "title"
+      },
+      {
+        "id": "attachment-folder-icon",
+        "name": "icon",
+        "label": "Icon",
+        "sectionId": "basic-information",
+        "component": "icon",
+        "placeholder": "Enter Lucide icon name (optional)",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "icon"
+      },
+      {
+        "id": "attachment-folder-color",
+        "name": "color",
+        "label": "Color",
+        "sectionId": "basic-information",
+        "component": "color-picker",
+        "placeholder": "Select folder color (optional)",
+        "validation": {
+          "required": false
+        },
+        "role": "color",
+        "colSpan": 1,
+        "order": 3
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Folder Information",
+        "description": "Define folder label and appearance",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "FolderTree",
+    "schemaType": "system"
   },
   {
     "id": "sync-strategies",
@@ -5811,11 +5916,102 @@
         "columns": 2
       }
     ],
-    "showInNavigation": true,
+    "showInNavigation": false,
     "icon": "RefreshCw",
-    "isSystemSchema": true,
     "isNotCompanyBased": true,
     "canSelectMultiCompanies": false,
-    "allowDataInactive": true
+    "allowDataInactive": true,
+    "schemaType": "system"
+  },
+  {
+    "id": "reset-password-form",
+    "description": "Lightweight action form for resetting a user password via custom route",
+    "singular_name": "Reset Password Form",
+    "plural_name": "Reset Password Forms",
+    "icon": "KeyRound",
+    "schemaType": "action-form",
+    "showInNavigation": false,
+    "isNotCompanyBased": true,
+    "fields": [
+      {
+        "id": "reset-password-username",
+        "name": "username",
+        "label": "Username",
+        "sectionId": "credentials",
+        "component": "text",
+        "placeholder": "Username",
+        "disabled": true,
+        "defaultValue": "{{referenceData.username}}",
+        "readonly": true,
+        "validation": {
+          "required": true
+        },
+        "order": 0
+      },
+      {
+        "id": "reset-password-lastname",
+        "name": "lastname",
+        "label": "Last Name",
+        "sectionId": "credentials",
+        "component": "text",
+        "placeholder": "Last Name",
+        "disabled": true,
+        "defaultValue": "{{referenceData.firstName}} {{referenceData.lastName}}",
+        "readonly": true,
+        "validation": {
+          "required": true
+        },
+        "order": 1
+      },
+      {
+        "id": "reset-password-new",
+        "name": "password",
+        "label": "New Password",
+        "sectionId": "credentials",
+        "component": "password",
+        "placeholder": "Enter new password",
+        "validation": {
+          "required": true,
+          "minLength": 8
+        },
+        "order": 1
+      },
+      {
+        "id": "reset-password-confirm",
+        "name": "confirmPassword",
+        "label": "Confirm Password",
+        "sectionId": "credentials",
+        "component": "password",
+        "placeholder": "Confirm new password",
+        "validation": {
+          "required": true,
+          "minLength": 8
+        },
+        "order": 2
+      }
+    ],
+    "sections": [
+      {
+        "id": "credentials",
+        "title": "Credentials",
+        "description": "Enter and confirm the new password",
+        "initialState": "expanded",
+        "columns": 1
+      }
+    ],
+    "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "reset-password-call",
+          "label": "Reset Password",
+          "icon": "Key",
+          "variant": "default",
+          "action": "callApi",
+          "submitRoute": "/api/auth/password/reset",
+          "submitMethod": "POST",
+          "passSkipKey": true
+        }
+      ]
+    }
   }
 ]

@@ -11,6 +11,10 @@ export interface FormWrapperProps extends BaseComponentProps {
   initialValues?: Record<string, any>;
   validationMode?: 'onChange' | 'onBlur' | 'onSubmit';
   disabled?: boolean;
+  /**
+   * Reference entity data to support dynamic defaultValue replacement.
+   */
+  referenceEntityData?: Record<string, any>;
 }
 
 export interface FormConfig {

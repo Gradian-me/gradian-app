@@ -26,6 +26,7 @@ import { AccordionFormSection } from './AccordionFormSection';
 import { FormModal } from './FormModal';
 import { FormSystemSection } from './FormSystemSection';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
+import { replaceDynamicContext } from '../utils/dynamic-context-replacer';
 
 // Form Context
 const FormContext = createContext<FormContextType | null>(null);
@@ -39,7 +40,11 @@ export const useFormContext = () => {
 };
 
 // Helper function to merge initial values with default values from schema
-const mergeInitialValuesWithDefaults = (initialValues: FormData, schema: FormSchema): FormData => {
+const mergeInitialValuesWithDefaults = (
+  initialValues: FormData,
+  schema: FormSchema,
+  referenceEntityData?: Record<string, any>
+): FormData => {
   const mergedValues = { ...initialValues };
   
   // Process all fields to apply default values where needed
@@ -50,12 +55,29 @@ const mergeInitialValuesWithDefaults = (initialValues: FormData, schema: FormSch
       return;
     }
     
+    // Check if existing value is a template string that needs resolution
+    const currentValue = mergedValues[field.name];
+    if (typeof currentValue === 'string' && currentValue.includes('{{') && currentValue.includes('}}')) {
+      const resolved = replaceDynamicContext(currentValue, {
+        formSchema: schema,
+        formData: mergedValues,
+        referenceData: referenceEntityData ?? useDynamicFormContextStore.getState().referenceData,
+      } as any);
+      mergedValues[field.name] = resolved;
+    }
     // Apply defaultValue if field value is undefined, null, or empty string
-    if (field.defaultValue !== undefined && 
-        (mergedValues[field.name] === undefined || 
-         mergedValues[field.name] === null || 
+    else if (field.defaultValue !== undefined &&
+        (mergedValues[field.name] === undefined ||
+         mergedValues[field.name] === null ||
          mergedValues[field.name] === '')) {
-      mergedValues[field.name] = field.defaultValue;
+      const resolvedDefault = typeof field.defaultValue === 'string'
+        ? replaceDynamicContext(field.defaultValue, {
+            formSchema: schema,
+            formData: mergedValues,
+            referenceData: referenceEntityData ?? useDynamicFormContextStore.getState().referenceData,
+          } as any)
+        : field.defaultValue;
+      mergedValues[field.name] = resolvedDefault;
     }
   });
   
@@ -63,8 +85,12 @@ const mergeInitialValuesWithDefaults = (initialValues: FormData, schema: FormSch
 };
 
 // Helper function to ensure repeating section items have unique IDs
-const ensureRepeatingItemIds = (values: FormData, schema: FormSchema): FormData => {
-  const newValues = mergeInitialValuesWithDefaults(values, schema);
+const ensureRepeatingItemIds = (
+  values: FormData,
+  schema: FormSchema,
+  referenceEntityData?: Record<string, any>
+): FormData => {
+  const newValues = mergeInitialValuesWithDefaults(values, schema, referenceEntityData);
   
   schema.sections.forEach(section => {
     if (section.isRepeatingSection && newValues[section.id]) {
@@ -81,11 +107,18 @@ const ensureRepeatingItemIds = (values: FormData, schema: FormSchema): FormData 
             // Apply default values to repeating section items
             const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
             sectionFields.forEach(field => {
-              if (field.defaultValue !== undefined && 
-                  (itemWithId[field.name] === undefined || 
-                   itemWithId[field.name] === null || 
+              if (field.defaultValue !== undefined &&
+                  (itemWithId[field.name] === undefined ||
+                   itemWithId[field.name] === null ||
                    itemWithId[field.name] === '')) {
-                itemWithId[field.name] = field.defaultValue;
+                const resolvedDefault = typeof field.defaultValue === 'string'
+                  ? replaceDynamicContext(field.defaultValue, {
+                      formSchema: schema,
+                      formData: itemWithId,
+                      referenceData: referenceEntityData ?? useDynamicFormContextStore.getState().referenceData,
+                    } as any)
+                  : field.defaultValue;
+                itemWithId[field.name] = resolvedDefault;
               }
             });
             
@@ -95,11 +128,18 @@ const ensureRepeatingItemIds = (values: FormData, schema: FormSchema): FormData 
           // Apply default values to existing items too
           const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
           sectionFields.forEach(field => {
-            if (field.defaultValue !== undefined && 
-                (item[field.name] === undefined || 
-                 item[field.name] === null || 
+            if (field.defaultValue !== undefined &&
+                (item[field.name] === undefined ||
+                 item[field.name] === null ||
                  item[field.name] === '')) {
-              item[field.name] = field.defaultValue;
+              const resolvedDefault = typeof field.defaultValue === 'string'
+                ? replaceDynamicContext(field.defaultValue, {
+                    formSchema: schema,
+                    formData: item,
+                    referenceData: referenceEntityData ?? useDynamicFormContextStore.getState().referenceData,
+                  } as any)
+                : field.defaultValue;
+              item[field.name] = resolvedDefault;
             }
           });
           
@@ -118,7 +158,7 @@ type FormAction =
   | { type: 'SET_ERROR'; fieldName: string; error: string }
   | { type: 'SET_TOUCHED'; fieldName: string; touched: boolean }
   | { type: 'SET_SUBMITTING'; isSubmitting: boolean }
-  | { type: 'RESET'; initialValues: FormData; schema: FormSchema }
+  | { type: 'RESET'; initialValues: FormData; schema: FormSchema; referenceEntityData?: Record<string, any> }
   | { type: 'VALIDATE_FIELD'; fieldName: string; schema: FormSchema }
   | { type: 'VALIDATE_FORM'; schema: FormSchema }
   | { type: 'ADD_REPEATING_ITEM'; sectionId: string; defaultValue: any }
@@ -215,7 +255,7 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
     
     case 'RESET':
       return {
-        values: ensureRepeatingItemIds(action.initialValues, action.schema),
+        values: ensureRepeatingItemIds(action.initialValues, action.schema, action.referenceEntityData),
         errors: {},
         touched: {},
         dirty: false,
@@ -344,6 +384,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   onCancel,
   onFieldChange,
   initialValues = {},
+  referenceEntityData,
   validationMode = 'onSubmit',
   disabled = false,
   className,
@@ -360,7 +401,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   ...props
 }) => {
   const [state, dispatch] = useReducer(formReducer, {
-    values: ensureRepeatingItemIds(initialValues, schema),
+    values: ensureRepeatingItemIds(initialValues, schema, referenceEntityData),
     errors: {},
     touched: {},
     dirty: false,
@@ -408,7 +449,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     // 2. The form is not dirty (user hasn't made changes)
     if (prevInitialValuesRef.current !== currentInitialValues && !state.dirty) {
       prevInitialValuesRef.current = currentInitialValues;
-      dispatch({ type: 'RESET', initialValues, schema });
+      dispatch({ type: 'RESET', initialValues, schema, referenceEntityData: referenceEntityDataRef.current });
       // Check if loaded entity is incomplete (only for edit mode)
       if (initialValues?.incomplete === true) {
         setIsIncomplete(true);
@@ -832,7 +873,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   }, [schema, state.values]);
   
   const reset = useCallback(() => {
-    dispatch({ type: 'RESET', initialValues, schema });
+    dispatch({ type: 'RESET', initialValues, schema, referenceEntityData: referenceEntityDataRef.current });
     onReset?.();
   }, [initialValues, onReset, schema]);
 
@@ -847,26 +888,72 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   // Trigger to refresh relation-based sections (increments when relations are created)
   const [refreshRelationsTrigger, setRefreshRelationsTrigger] = React.useState(0);
 
-  // Dynamic form context (Zustand) - expose formSchema, formData, and userData
+  // Dynamic form context (Zustand) - expose formSchema, formData, userData, and referenceData
   const setFormSchemaInContext = useDynamicFormContextStore((s) => s.setFormSchema);
   const setFormDataInContext = useDynamicFormContextStore((s) => s.setFormData);
   const setUserDataInContext = useDynamicFormContextStore((s) => s.setUserData);
+  const setReferenceDataInContext = useDynamicFormContextStore((s) => s.setReferenceData);
   const resetDynamicContext = useDynamicFormContextStore((s) => s.reset);
   const currentUser = useUserStore((s) => s.user);
+
+  // Store referenceEntityData in a ref so it can be accessed in the reducer
+  const referenceEntityDataRef = React.useRef<Record<string, any> | undefined>(referenceEntityData);
+  React.useEffect(() => {
+    referenceEntityDataRef.current = referenceEntityData;
+  }, [referenceEntityData]);
 
   useEffect(() => {
     // Initialize dynamic form context when schema changes
     setFormSchemaInContext(schema);
     setUserDataInContext(currentUser ?? null);
+    setReferenceDataInContext(referenceEntityData ?? null);
     return () => {
       resetDynamicContext();
     };
-  }, [schema, currentUser, setFormSchemaInContext, setUserDataInContext, resetDynamicContext]);
+  }, [schema, currentUser, referenceEntityData, setFormSchemaInContext, setUserDataInContext, setReferenceDataInContext, resetDynamicContext]);
 
   useEffect(() => {
     // Keep form data in sync with Zustand context
     setFormDataInContext(state.values);
   }, [state.values, setFormDataInContext]);
+
+  // Re-process defaultValues when referenceEntityData becomes available
+  useEffect(() => {
+    if (!referenceEntityData || state.dirty) return;
+    
+    // Check if any field values contain unresolved template strings
+    const hasUnresolvedTemplates = schema.fields.some(field => {
+      const section = schema.sections.find(s => s.id === field.sectionId);
+      if (section?.isRepeatingSection) return false;
+      const value = state.values[field.name];
+      return typeof value === 'string' && value.includes('{{') && value.includes('}}');
+    });
+    
+    if (hasUnresolvedTemplates) {
+      // Re-process all values with ensureRepeatingItemIds which will resolve templates
+      const processedValues = ensureRepeatingItemIds(state.values, schema, referenceEntityData);
+      
+      // Check if any values actually changed
+      const hasChanges = schema.fields.some(field => {
+        const section = schema.sections.find(s => s.id === field.sectionId);
+        if (section?.isRepeatingSection) return false;
+        return state.values[field.name] !== processedValues[field.name];
+      });
+      
+      if (hasChanges) {
+        // Update all changed values
+        schema.fields.forEach(field => {
+          const section = schema.sections.find(s => s.id === field.sectionId);
+          if (section?.isRepeatingSection) return;
+          const oldValue = state.values[field.name];
+          const newValue = processedValues[field.name];
+          if (oldValue !== newValue) {
+            dispatch({ type: 'SET_VALUE', fieldName: field.name, value: newValue });
+          }
+        });
+      }
+    }
+  }, [referenceEntityData, schema, state.values, state.dirty, dispatch]);
 
   const addRepeatingItem = useCallback((sectionId: string) => {
     const section = schema.sections.find(s => s.id === sectionId);
@@ -962,7 +1049,18 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     // Add the new item
     const sectionFields = schema.fields.filter(f => f.sectionId === sectionId);
     const defaultValue = sectionFields.reduce((acc, field) => {
-      acc[field.name] = field.defaultValue || '';
+      if (field.defaultValue !== undefined) {
+        const resolvedDefault = typeof field.defaultValue === 'string'
+          ? replaceDynamicContext(field.defaultValue, {
+              formSchema: schema,
+              formData: state.values,
+              referenceData: referenceEntityDataRef.current ?? useDynamicFormContextStore.getState().referenceData,
+            } as any)
+          : field.defaultValue;
+        acc[field.name] = resolvedDefault;
+      } else {
+        acc[field.name] = '';
+      }
       return acc;
     }, {} as any);
     

@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { getInitials } from '@/gradian-ui/data-display/utils';
+import { getInitials } from '@/gradian-ui/form-builder/form-elements/utils/avatar-utils';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '@/gradian-ui/shared/utils';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';

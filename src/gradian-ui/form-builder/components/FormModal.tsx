@@ -11,6 +11,12 @@ import { getValueByRole } from '@/gradian-ui/data-display/utils';
 import { getPrimaryDisplayString, hasDisplayValue } from '@/gradian-ui/data-display/utils/value-display';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { MoreVertical } from 'lucide-react';
+import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { replaceDynamicContext, replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
+import { DynamicQuickActions } from '@/gradian-ui/data-display/components/DynamicQuickActions';
 
 const EXCLUDED_TITLE_ROLES = new Set(['code', 'subtitle', 'description']);
 
@@ -162,7 +168,70 @@ export const FormModal: React.FC<FormModalProps> = ({
   initialValues,
   hideDialogHeader = false,
   hideCloseButton = false,
+  referenceEntityData,
 }) => {
+  // Create customActionSubmit handler using useCallback to maintain hook order consistency
+  const customActionSubmit = React.useCallback(async (formData: Record<string, any>, schema: any) => {
+    // Only intercept action-forms that have a callApi quick action
+    if (schema.schemaType !== 'action-form') {
+      throw new Error('skip-default-submit');
+    }
+    const qa = schema.detailPageMetadata?.quickActions?.find((q: any) => q.action === 'callApi');
+    if (!qa?.submitRoute) {
+      throw new Error('No callApi quick action configured for this action form');
+    }
+    // If a payloadTemplate is provided, apply dynamic context replacement; otherwise use raw formData
+    let payload = qa.payloadTemplate
+      ? replaceDynamicContextInObject(
+          qa.payloadTemplate,
+          {
+          formSchema: schema,
+          formData,
+          referenceData: referenceEntityData,
+          } as any
+        )
+      : formData;
+    
+    // Add encrypted skip_key to body for POST/PUT/PATCH requests if passSkipKey is true
+    if (qa.passSkipKey) {
+      const { getEncryptedSkipKey } = await import('@/gradian-ui/shared/utils/skip-key-storage');
+      const method = qa.submitMethod || 'POST';
+      const isBodyMethod = method === 'POST' || method === 'PUT' || method === 'PATCH';
+      
+      if (isBodyMethod) {
+        const encryptedSkipKey = getEncryptedSkipKey(false); // Get as object for body (not URL-encoded)
+        if (encryptedSkipKey) {
+          payload = {
+            ...(typeof payload === 'object' && payload !== null ? payload : {}),
+            skip_key: encryptedSkipKey, // This will be an object {ciphertext, iv} that gets properly stringified
+          };
+          console.log('[FormModal] Added encrypted skip_key to action form payload:', {
+            endpoint: qa.submitRoute,
+            method,
+            hasSkipKey: !!payload.skip_key,
+            skipKeyType: typeof payload.skip_key,
+          });
+        } else {
+          console.warn('[FormModal] passSkipKey is true but encrypted skip key is not available.');
+        }
+      }
+    }
+    
+    const endpoint = replaceDynamicContext(
+      qa.submitRoute,
+      {
+        formSchema: schema,
+        formData: payload,
+        referenceData: referenceEntityData,
+      } as any
+    );
+    const method = qa.submitMethod || 'POST';
+    await apiRequest(endpoint, {
+      method,
+      body: payload,
+    });
+  }, [referenceEntityData]);
+
   const {
     targetSchema,
     entityData,
@@ -186,7 +255,10 @@ export const FormModal: React.FC<FormModalProps> = ({
     onClose,
     getInitialSchema,
     getInitialEntityData,
+    customActionSubmit,
   });
+
+  const [submitForm, setSubmitForm] = React.useState<(() => void) | null>(null);
 
   // Register dialog for back button handling on mobile
   useDialogBackHandler(isOpen, closeFormModal, 'modal', 'form-modal');
@@ -227,6 +299,10 @@ export const FormModal: React.FC<FormModalProps> = ({
 
   const modalMode = currentMode || mode;
   const isEdit = modalMode === 'edit';
+  const isActionForm = targetSchema?.schemaType === 'action-form';
+  const actionFormQuickAction = targetSchema?.detailPageMetadata?.quickActions?.find(
+    (qa) => qa.action === 'callApi'
+  );
 
   const schemaName = targetSchema?.name || 'Item';
   const defaultTitle = isEdit ? (entityDisplayTitle ? `Edit ${schemaName}: ${entityDisplayTitle}` : `Edit ${schemaName}`) : `Create New ${schemaName}`;
@@ -282,6 +358,30 @@ export const FormModal: React.FC<FormModalProps> = ({
       hideDialogHeader={hideDialogHeader}
       hideCloseButton={hideCloseButton}
     >
+      {/* Quick actions popover in form dialog */}
+      {targetSchema?.detailPageMetadata?.quickActions?.length ? (
+        <div className="mb-3 flex justify-end">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Quick actions">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
+              <div className="p-3">
+                <DynamicQuickActions
+                  actions={targetSchema.detailPageMetadata.quickActions}
+                  schema={targetSchema}
+                  data={referenceEntityData || {}}
+                  disableAnimation
+                  className="space-y-2"
+                />
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+      ) : null}
+
       {/* Loading indicator for schema/entity loading */}
       {isLoading && showLoadingSpinner && (
         <div className="flex items-center justify-center py-12">
@@ -324,6 +424,7 @@ export const FormModal: React.FC<FormModalProps> = ({
           onReset={() => {}}
           onCancel={closeFormModal}
           initialValues={memoizedInitialValues}
+          referenceEntityData={referenceEntityData}
           error={formError || undefined}
           message={formMessage}
           errorStatusCode={formErrorStatusCode}
@@ -331,7 +432,20 @@ export const FormModal: React.FC<FormModalProps> = ({
           disabled={isSubmitting}
           hideCollapseExpandButtons={true}
           forceExpandedSections={true}
+          hideActions={isActionForm}
+          onMount={(submitFn) => setSubmitForm(() => submitFn)}
         />
+      )}
+      {isActionForm && !isLoading && (
+        <div className="mt-4 flex justify-end">
+          <Button
+            type="button"
+            onClick={() => submitForm?.()}
+            disabled={isSubmitting}
+          >
+            {actionFormQuickAction?.label || title || 'Submit'}
+          </Button>
+        </div>
       )}
     </Modal>
   );

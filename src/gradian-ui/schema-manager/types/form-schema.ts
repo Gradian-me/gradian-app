@@ -288,10 +288,25 @@ export interface QuickAction {
   label: string;
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'gradient';
   icon?: string; // Icon name to display before the label
-  action: 'goToUrl' | 'openUrl' | 'openFormDialog' | 'runAiAgent';
+  action: 'goToUrl' | 'openUrl' | 'openFormDialog' | 'openActionForm' | 'runAiAgent' | 'callApi';
   targetSchema?: string; // Required for openFormDialog action
   targetUrl?: string; // Required for goToUrl and openUrl actions
   passItemAsReference?: boolean; // Default: false - if true, pass current schema item as reference to target URL
+  // Custom submission route for openFormDialog actions
+  submitRoute?: string; // Supports dynamic context variables like {{formData.id}}
+  submitMethod?: 'POST' | 'PUT' | 'PATCH'; // HTTP method for custom submit route
+  passParentDataAs?: string; // Optional key name to include parent entity data in submission payload
+  enrichFormData?: boolean; // Whether to enrich form data with parent entity context (default true)
+  /**
+   * Optional payload template for callApi actions.
+   * When provided, the body is built from this template with dynamic context replacement.
+   */
+  payloadTemplate?: any;
+  /**
+   * Optional payload override for callApi/openFormDialog actions.
+   * Supports dynamic context replacement via {{formData.*}} and {{formSchema.*}}.
+   */
+  body?: any;
   // Properties for runAiAgent action
   agentId?: string; // ID of the AI agent to run
   selectedFields?: string[]; // Array of field IDs to include in prompt
@@ -310,6 +325,11 @@ export interface QuickAction {
   }>; // Additional preload routes to fetch before running the agent
   displayType?: 'default' | 'hideForm' | 'showFooter'; // Control what parts of the form to show
   runType?: 'manual' | 'automatic'; // manual: user clicks "Do the Magic", automatic: auto-runs when dialog opens
+  /**
+   * If true, will add encrypted skip_key from localStorage as query parameter to the API call
+   * The middleware will decrypt this parameter before the request reaches the route handler
+   */
+  passSkipKey?: boolean;
 }
 
 export interface DetailPageMetadata {
@@ -342,6 +362,16 @@ export interface FormSchema {
   title?: string; // Alias for plural_name
   icon?: string;
   showInNavigation?: boolean;
+  /**
+   * Schema type selector. Replaces legacy isSystemSchema boolean.
+   * - system: platform/system schemas
+   * - business: customer/business schemas
+   * - action-form: lightweight action-only forms (e.g., reset password)
+   */
+  schemaType?: 'system' | 'business' | 'action-form';
+  /**
+   * @deprecated Use schemaType instead. Kept for backward compatibility during migration.
+   */
   isSystemSchema?: boolean;
   isNotCompanyBased?: boolean;
   /**
@@ -450,6 +480,7 @@ export interface FormWrapperProps {
   onCancel?: () => void;
   onFieldChange?: (fieldName: string, value: any) => void;
   initialValues?: FormData;
+  referenceEntityData?: Record<string, any>;
   validationMode?: 'onChange' | 'onBlur' | 'onSubmit';
   disabled?: boolean;
   className?: string;

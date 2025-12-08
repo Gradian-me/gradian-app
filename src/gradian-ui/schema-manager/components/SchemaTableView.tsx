@@ -26,43 +26,46 @@ export function SchemaTableView({ schemas, onEdit, onView, onDelete, isLoading =
       align: 'center',
       width: 140,
       render: (_value: any, row: FormSchema) => {
+        const isActionForm = row.schemaType === 'action-form';
         return (
           <div className="flex items-center justify-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                // Handle middle-click or Ctrl/Cmd+click to open in new tab
-                if (e.button === 1 || e.ctrlKey || e.metaKey) {
-                  e.preventDefault();
-                  window.open(`/page/${row.id}`, '_blank');
-                  return;
-                }
-                // Regular click
-                onView(row);
-              }}
-              onMouseDown={(e) => {
-                // Handle middle-click (button 1)
-                if (e.button === 1) {
-                  e.preventDefault();
+            {!isActionForm && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
                   e.stopPropagation();
-                  window.open(`/page/${row.id}`, '_blank');
-                }
-              }}
-              onAuxClick={(e) => {
-                // Handle middle-click (auxiliary click)
-                if (e.button === 1) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  window.open(`/page/${row.id}`, '_blank');
-                }
-              }}
-              className="h-8 w-8 p-0 hover:bg-sky-50 hover:border-sky-300 hover:text-sky-700 transition-all duration-200"
-              title="View List (Ctrl+Click or Middle-Click to open in new tab)"
-            >
-              <LayoutList className="h-4 w-4" />
-            </Button>
+                  // Handle middle-click or Ctrl/Cmd+click to open in new tab
+                  if (e.button === 1 || e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    window.open(`/page/${row.id}`, '_blank');
+                    return;
+                  }
+                  // Regular click
+                  onView(row);
+                }}
+                onMouseDown={(e) => {
+                  // Handle middle-click (button 1)
+                  if (e.button === 1) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.open(`/page/${row.id}`, '_blank');
+                  }
+                }}
+                onAuxClick={(e) => {
+                  // Handle middle-click (auxiliary click)
+                  if (e.button === 1) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.open(`/page/${row.id}`, '_blank');
+                  }
+                }}
+                className="h-8 w-8 p-0 hover:bg-sky-50 hover:border-sky-300 hover:text-sky-700 transition-all duration-200"
+                title="View List (Ctrl+Click or Middle-Click to open in new tab)"
+              >
+                <LayoutList className="h-4 w-4" />
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"

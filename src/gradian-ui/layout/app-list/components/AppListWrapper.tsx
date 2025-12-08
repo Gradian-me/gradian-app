@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AppWindow, Grid3X3, List, RefreshCw, Sparkles } from 'lucide-react';
@@ -29,6 +29,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 type AppViewMode = 'grid' | 'list';
 
+const getSchemaType = (schema: FormSchema): 'system' | 'business' | 'action-form' =>
+  schema.schemaType ? schema.schemaType : schema.isSystemSchema ? 'system' : 'business';
+
 interface AppListItemProps {
   schema: FormSchema;
   index: number;
@@ -48,6 +51,9 @@ const AppListItem: React.FC<AppListItemProps> = ({
     index * UI_PARAMS.CARD_INDEX_DELAY.STEP,
     UI_PARAMS.CARD_INDEX_DELAY.MAX,
   );
+
+  const schemaType = getSchemaType(schema);
+  const isSystemSchema = schemaType === 'system';
 
   const isGrid = viewMode === 'grid';
 
@@ -109,7 +115,7 @@ const AppListItem: React.FC<AppListItemProps> = ({
               >
                 App
               </Badge>
-              {schema.isSystemSchema && (
+              {isSystemSchema && (
                 <Badge
                   variant="outline"
                   className="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200"
@@ -167,7 +173,7 @@ const AppListItem: React.FC<AppListItemProps> = ({
                 'bg-violet-100/70 text-violet-900 rounded px-0.5 dark:bg-violet-500/30 dark:text-violet-50'
               )}
             </h3>
-            {schema.isSystemSchema && (
+            {isSystemSchema && (
               <Badge
                 variant="outline"
                 className="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200"
@@ -307,7 +313,7 @@ export function AppListWrapper() {
             schema.showInNavigation !== false &&
             !schema.inactive &&
             // Do not show system schemas in Apps list
-            !schema.isSystemSchema
+            getSchemaType(schema) !== 'system'
         )
         .sort((a, b) => {
           const aName = a.plural_name || a.singular_name || a.id || '';

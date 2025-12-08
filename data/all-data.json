@@ -1429,11 +1429,11 @@
       "firstName": "Nima",
       "lastName": "Heydarzadeh",
       "email": "heydarzadehn@cinnagen.com",
-      "postTitle": "AI Engineer",
+      "postTitle": "AI Engineers",
       "id": "01KAEC9VRPRR23C24QHTR0NSF9",
       "createdAt": "2025-11-19T15:39:03.349Z",
-      "updatedAt": "2025-12-01T16:30:41.046Z",
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "updatedAt": "2025-12-08T14:23:05.560Z",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "status": [
         {
           "id": "01KBCZZ31X6X01VNJ045CWYSB8",
@@ -1444,7 +1444,9 @@
       ],
       "incomplete": false,
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "password": "$argon2id$v=19$m=32768,t=3,p=4$XB+zf/PTthumVNZ39wjB8w$i2JsJwbPZU65/I1xnDueJ7ayPzp1484F5fzLWHWWf00",
+      "hashType": "argon2"
     },
     {
       "company": "CinnaGen",
@@ -2059,23 +2061,23 @@
     },
     {
       "title": "Schema Related Schemas Sync",
-      "address": "https://octa.cinnagen.com/genora/api/schemas/relations/generate",
+      "address": "https://genora.cinnagen.com/api/schemas/relations/generate",
       "enableSystemToken": true,
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSH199BZ64HYDFMS2JP6F22",
       "createdAt": "2025-12-06T09:49:05.727Z",
-      "updatedAt": "2025-12-06T09:49:30.060Z"
+      "updatedAt": "2025-12-08T13:44:40.871Z"
     },
     {
       "title": "Backend Graph API",
-      "address": "https://octa.cinnagen.com/genora/api/graph",
+      "address": "https://genora.cinnagen.com/api/graph",
       "enableSystemToken": true,
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSH31P7JNZD64ED1A09DYK6",
       "createdAt": "2025-12-06T09:50:03.477Z",
-      "updatedAt": "2025-12-06T09:50:03.477Z"
+      "updatedAt": "2025-12-08T13:45:00.608Z"
     }
   ],
   "integrations": [
@@ -2120,10 +2122,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-06T09:22:53.486Z",
+      "updatedAt": "2025-12-08T14:08:40.345Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-12-06T09:22:53.486Z",
+      "lastSynced": "2025-12-08T14:08:40.345Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2136,7 +2138,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 28 schemas: 28 succeeded, 0 failed (28 created, 0 updated)"
+      "lastSyncMessage": "Processed 41 schemas: 41 succeeded, 0 failed (41 created, 0 updated)"
     },
     {
       "color": "blue",
@@ -2163,8 +2165,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-06T09:23:07.443Z",
-      "lastSynced": "2025-12-06T09:23:07.443Z",
+      "updatedAt": "2025-12-08T14:08:44.087Z",
+      "lastSynced": "2025-12-08T14:08:44.087Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2177,7 +2179,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Generated relations for 28 out of 28 schemas",
+      "lastSyncMessage": "Generated relations for 41 out of 41 schemas",
       "sourceRoute": []
     },
     {
@@ -2224,9 +2226,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-06T09:24:12.345Z",
+      "updatedAt": "2025-12-08T14:08:59.953Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-06T09:24:12.345Z",
+      "lastSynced": "2025-12-08T14:08:59.953Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2237,7 +2239,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 153, edges created: 66, nodes failed: 0, edges failed: 0.",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 218, nodes updated: 5, edges created: 101, nodes failed: 0, edges failed: 0.",
       "isTenantBased": false
     },
     {
@@ -2375,7 +2377,7 @@
           "id": "01KBATJ4GH09B0YETWF7W1SKM7",
           "label": "Gradian Genora Schema",
           "metadata": {
-            "address": "https://octa.cinnagen.com/genora/api/schemas"
+            "address": "https://genora.cinnagen.com/api/schemas"
           }
         }
       ],
@@ -2398,11 +2400,11 @@
       ],
       "sourceDataPath": "data",
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-06T10:04:44.658Z",
-      "lastSynced": "2025-12-06T10:04:44.658Z",
+      "updatedAt": "2025-12-08T13:45:48.428Z",
+      "lastSynced": "2025-12-08T13:45:48.428Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2414,7 +2416,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Token exchange failed: Token exchange failed with status 401: Invalid or expired token"
+      "lastSyncMessage": "Processed 41 schemas: 41 succeeded, 0 failed (0 created, 41 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -2422,8 +2424,9 @@
       "targetRoute": [
         {
           "id": "01KBSH199BZ64HYDFMS2JP6F22",
+          "label": "Schema Related Schemas Sync",
           "metadata": {
-            "address": "https://octa.cinnagen.com/genora/api/schemas/relations/generate"
+            "address": "https://genora.cinnagen.com/api/schemas/relations/generate"
           }
         }
       ],
@@ -2436,11 +2439,11 @@
         }
       ],
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-06T09:59:15.573Z",
+      "updatedAt": "2025-12-08T13:46:38.512Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2449,7 +2452,9 @@
           "icon": "Rocket",
           "color": "emerald"
         }
-      ]
+      ],
+      "lastSynced": "2025-12-08T13:46:38.512Z",
+      "lastSyncMessage": "Generated relations for 41 out of 41 schemas"
     },
     {
       "title": "Graph Data Sync Production",
@@ -2458,8 +2463,9 @@
       "targetRoute": [
         {
           "id": "01KBSH31P7JNZD64ED1A09DYK6",
+          "label": "Backend Graph API",
           "metadata": {
-            "address": "https://octa.cinnagen.com/genora/api/graph"
+            "address": "https://genora.cinnagen.com/api/graph"
           }
         }
       ],
@@ -2476,6 +2482,7 @@
       "sourceRoute": [
         {
           "id": "01KANYZDJKCA9FNEFE7ZEY0KSD",
+          "label": "Graph API",
           "metadata": {
             "address": "http://localhost:3000/api/graph"
           }
@@ -2490,10 +2497,10 @@
         }
       ],
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-06T09:59:24.350Z",
+      "updatedAt": "2025-12-08T13:46:55.872Z",
       "category": [
         {
           "id": "production-integration",
@@ -2501,7 +2508,9 @@
           "icon": "Rocket",
           "color": "emerald"
         }
-      ]
+      ],
+      "lastSynced": "2025-12-08T13:46:55.872Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 218, nodes updated: 5, edges created: 101, nodes failed: 0, edges failed: 0."
     }
   ],
   "databases": [
@@ -4068,18 +4077,61 @@
       "updatedAt": "2025-12-06T13:12:12.784Z"
     }
   ],
+  "attachment-folders": [
+    {
+      "label": "General",
+      "icon": "Folder",
+      "color": "#94a3b8",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KBZAFOLDERGEN000000000000",
+      "createdAt": "2025-12-08T00:00:00.000Z",
+      "updatedAt": "2025-12-08T00:00:00.000Z"
+    },
+    {
+      "label": "All Attachments",
+      "icon": "LucideLink",
+      "color": "violet",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBYJ40F51J6FZTD3RHX80SQR",
+      "createdAt": "2025-12-08T08:44:15.725Z",
+      "updatedAt": "2025-12-08T08:44:15.725Z"
+    },
+    {
+      "parent": "01KBYJ40F51J6FZTD3RHX80SQR",
+      "label": "Gradian App",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBYJ4K8Q9Q65YCGKD403MGJP",
+      "createdAt": "2025-12-08T08:44:34.975Z",
+      "updatedAt": "2025-12-08T08:44:34.975Z"
+    },
+    {
+      "parent": "01KBYJ4K8Q9Q65YCGKD403MGJP",
+      "label": "Change Managements",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBYJ66RDMEV638X04Q73W26E",
+      "createdAt": "2025-12-08T08:45:27.700Z",
+      "updatedAt": "2025-12-08T08:45:27.700Z"
+    }
+  ],
   "attachments": [
     {
       "file": {},
       "title": "Change Management Doc 1",
       "code": "CC-20250108",
       "description": "Test Description",
+      "folder": {
+        "id": "01KBZAFOLDERGEN000000000000",
+        "label": "General"
+      },
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBW8Z924XKTEH1S2E9FPVFSD",
       "createdAt": "2025-12-07T11:25:54.629Z",
       "updatedAt": "2025-12-07T11:25:54.629Z"
     }
-  ],
-  "sync-strategies": []
+  ]
 }

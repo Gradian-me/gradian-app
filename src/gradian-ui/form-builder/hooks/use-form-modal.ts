@@ -14,6 +14,7 @@ import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-
 import { toast } from 'sonner';
 import { filterFormDataForSubmission } from '../utils/form-data-filter';
 import { syncParentRelation } from '@/gradian-ui/shared/utils/parent-relation.util';
+import { replaceDynamicContext } from '../utils/dynamic-context-replacer';
 
 /**
  * Reconstruct RegExp objects from serialized schema
@@ -180,6 +181,26 @@ export interface UseFormModalOptions {
    * For edit mode: (formData, entityId) => enrichedData
    */
   enrichData?: (formData: Record<string, any>, entityId?: string) => Record<string, any>;
+  /**
+   * Optional custom submit handler (e.g., action-form callApi)
+   */
+  customActionSubmit?: (formData: Record<string, any>, schema: FormSchema) => Promise<any>;
+  /**
+   * Custom route to submit form data to (supports {{formData.*}} templates)
+   */
+  customSubmitRoute?: string;
+  /**
+   * HTTP method for custom submit route
+   */
+  customSubmitMethod?: 'POST' | 'PUT' | 'PATCH';
+  /**
+   * Reference entity data (the record that initiated the action) for template replacement or payload enrichment
+   */
+  referenceEntityData?: Record<string, any>;
+  /**
+   * Optional key to include reference entity data in submission payload
+   */
+  passParentDataAs?: string;
   
   /**
    * Optional callback when entity is successfully created/updated
@@ -320,7 +341,19 @@ export interface UseFormModalReturn {
 export function useFormModal(
   options: UseFormModalOptions = {}
 ): UseFormModalReturn {
-  const { enrichData, onSuccess, onIncompleteSave, onClose, getInitialSchema, getInitialEntityData } = options;
+  const {
+    enrichData,
+    customActionSubmit,
+    customSubmitRoute,
+    customSubmitMethod,
+    referenceEntityData,
+    passParentDataAs,
+    onSuccess,
+    onIncompleteSave,
+    onClose,
+    getInitialSchema,
+    getInitialEntityData,
+  } = options;
   const { getCompanyId } = useCompanyStore();
   const queryClient = useQueryClient();
   const [targetSchema, setTargetSchema] = useState<FormBuilderSchema | null>(null);
@@ -516,16 +549,56 @@ export function useFormModal(
         }
       }
 
-      // Determine API endpoint and method based on mode
-      const apiEndpoint = mode === 'edit' && entityId
-        ? `/api/data/${targetSchema.id}/${entityId}`
-        : `/api/data/${targetSchema.id}`;
-      
-      const method = mode === 'edit' ? 'PUT' : 'POST';
+      // Optionally attach reference entity data in payload
+      const payloadData =
+        passParentDataAs && referenceEntityData
+          ? { ...enrichedData, [passParentDataAs]: referenceEntityData }
+          : enrichedData;
 
-      const result = await apiRequest<Record<string, any>>(apiEndpoint, {
+      // Allow template replacement to see reference entity data even if not included in payload
+      const templateContext = referenceEntityData
+        ? { ...referenceEntityData, ...payloadData }
+        : payloadData;
+
+      // If a custom action submit handler is provided (e.g., action-form callApi), use it and skip default data save
+      if (customActionSubmit) {
+        try {
+          await customActionSubmit(payloadData, targetSchema);
+          toast.success(`${targetSchema.name || targetSchema.singular_name || 'Action'} completed`);
+          setIsSubmitting(false);
+          closeFormModal();
+          onSuccess?.(payloadData);
+          return;
+        } catch (error) {
+          // If error is 'skip-default-submit', continue with default submission for non-action forms
+          if (error instanceof Error && error.message === 'skip-default-submit') {
+            // Continue with default submission flow below
+          } else {
+            // Re-throw other errors
+            throw error;
+          }
+        }
+      }
+
+      // Determine API endpoint and method based on mode or custom route
+      const resolvedEndpoint = customSubmitRoute
+        ? replaceDynamicContext(customSubmitRoute, {
+            formSchema: targetSchema,
+            formData: templateContext,
+          })
+        : mode === 'edit' && entityId
+          ? `/api/data/${targetSchema.id}/${entityId}`
+          : `/api/data/${targetSchema.id}`;
+      
+      const method = customSubmitRoute
+        ? customSubmitMethod || 'POST'
+        : mode === 'edit'
+          ? 'PUT'
+          : 'POST';
+
+      const result = await apiRequest<Record<string, any>>(resolvedEndpoint, {
         method,
-        body: enrichedData,
+        body: payloadData,
       });
 
       if (result.success) {
@@ -643,7 +716,20 @@ export function useFormModal(
       setFormErrorStatusCode(undefined);
       setIsSubmitting(false);
     }
-  }, [targetSchema, mode, entityId, enrichData, closeFormModal, onSuccess, getCompanyId]);
+  }, [
+    targetSchema,
+    mode,
+    entityId,
+    enrichData,
+    customSubmitRoute,
+    customSubmitMethod,
+    referenceEntityData,
+    passParentDataAs,
+    onSuccess,
+    onIncompleteSave,
+    closeFormModal,
+    getCompanyId,
+  ]);
 
   const clearFormError = useCallback(() => {
     setFormError(null);

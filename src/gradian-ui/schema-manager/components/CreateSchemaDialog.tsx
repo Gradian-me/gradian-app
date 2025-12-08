@@ -18,6 +18,13 @@ import { CreateSchemaPayload, SchemaCreateResult } from '../types/schema-manager
 import { generatePluralName, generateSchemaId } from '../utils/schema-form';
 import { Switch as FormSwitch } from '@/gradian-ui/form-builder/form-elements/components/Switch';
 import { NameInput } from '@/gradian-ui/form-builder/form-elements';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface CreateSchemaDialogProps {
   open: boolean;
@@ -31,7 +38,7 @@ const INITIAL_FORM_STATE: CreateSchemaPayload = {
   schemaId: '',
   description: '',
   showInNavigation: false,
-  isSystemSchema: false,
+  schemaType: 'business',
   isNotCompanyBased: false,
   allowDataInactive: false,
   allowDataForce: false,
@@ -104,7 +111,6 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
   const handleSwitchChange = (
     key:
       | 'showInNavigation'
-      | 'isSystemSchema'
       | 'isNotCompanyBased'
       | 'allowDataInactive'
       | 'allowDataForce'
@@ -247,11 +253,24 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
               value={formState.showInNavigation}
               onChange={handleSwitchChange('showInNavigation')}
             />
-            <FormSwitch
-              config={{ name: 'isSystemSchema', label: 'Is System Schema' }}
-              value={formState.isSystemSchema}
-              onChange={handleSwitchChange('isSystemSchema')}
-            />
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">Schema Type</label>
+              <Select
+                value={formState.schemaType}
+                onValueChange={(value: 'system' | 'business' | 'action-form') =>
+                  setFormState((prev) => ({ ...prev, schemaType: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="system">System</SelectItem>
+                  <SelectItem value="business">Business</SelectItem>
+                  <SelectItem value="action-form">Action Form</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <FormSwitch
               config={{ name: 'isNotCompanyBased', label: 'Is Not Company Based' }}
               value={formState.isNotCompanyBased}

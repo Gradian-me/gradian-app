@@ -74,40 +74,80 @@ export const useSchemaManagerPage = () => {
     }
   }, [schemasError]);
 
+  const normalizeSchemaType = useCallback((schema: FormSchema): 'system' | 'business' | 'action-form' => {
+    if (schema.schemaType) return schema.schemaType;
+    // Legacy fallback: infer from isSystemSchema
+    if (schema.isSystemSchema === true) return 'system';
+    return 'business';
+  }, []);
+
   const systemSchemas = useMemo(
-    () => schemas.filter(schema => schema.isSystemSchema === true).sort((a, b) => {
-      const aName = a.plural_name || a.singular_name || a.id || '';
-      const bName = b.plural_name || b.singular_name || b.id || '';
-      return aName.localeCompare(bName);
-    }),
-    [schemas],
+    () =>
+      schemas
+        .filter((schema) => normalizeSchemaType(schema) === 'system')
+        .sort((a, b) => {
+          const aName = a.plural_name || a.singular_name || a.id || '';
+          const bName = b.plural_name || b.singular_name || b.id || '';
+          return aName.localeCompare(bName);
+        }),
+    [normalizeSchemaType, schemas],
   );
 
   const businessSchemas = useMemo(
-    () => schemas.filter(schema => schema.isSystemSchema !== true).sort((a, b) => {
-      const aName = a.plural_name || a.singular_name || a.id || '';
-      const bName = b.plural_name || b.singular_name || b.id || '';
-      return aName.localeCompare(bName);
-    }),
-    [schemas],
+    () =>
+      schemas
+        .filter((schema) => normalizeSchemaType(schema) === 'business')
+        .sort((a, b) => {
+          const aName = a.plural_name || a.singular_name || a.id || '';
+          const bName = b.plural_name || b.singular_name || b.id || '';
+          return aName.localeCompare(bName);
+        }),
+    [normalizeSchemaType, schemas],
+  );
+
+  const actionFormSchemas = useMemo(
+    () =>
+      schemas
+        .filter((schema) => normalizeSchemaType(schema) === 'action-form')
+        .sort((a, b) => {
+          const aName = a.plural_name || a.singular_name || a.id || '';
+          const bName = b.plural_name || b.singular_name || b.id || '';
+          return aName.localeCompare(bName);
+        }),
+    [normalizeSchemaType, schemas],
   );
 
   const systemSchemasCount = useMemo(
-    () => showInactive 
-      ? systemSchemas.length 
-      : systemSchemas.filter(schema => !schema.inactive).length,
+    () =>
+      showInactive
+        ? systemSchemas.length
+        : systemSchemas.filter((schema) => !schema.inactive).length,
     [systemSchemas, showInactive],
   );
 
   const businessSchemasCount = useMemo(
-    () => showInactive 
-      ? businessSchemas.length 
-      : businessSchemas.filter(schema => !schema.inactive).length,
+    () =>
+      showInactive
+        ? businessSchemas.length
+        : businessSchemas.filter((schema) => !schema.inactive).length,
     [businessSchemas, showInactive],
   );
 
+  const actionFormSchemasCount = useMemo(
+    () =>
+      showInactive
+        ? actionFormSchemas.length
+        : actionFormSchemas.filter((schema) => !schema.inactive).length,
+    [actionFormSchemas, showInactive],
+  );
+
   const filteredSchemas = useMemo(() => {
-    const listToFilter = activeTab === 'system' ? systemSchemas : businessSchemas;
+    const listToFilter =
+      activeTab === 'system'
+        ? systemSchemas
+        : activeTab === 'business'
+          ? businessSchemas
+          : actionFormSchemas;
 
     return listToFilter.filter(schema => {
       // Filter by inactive status if showInactive is false
@@ -126,7 +166,7 @@ export const useSchemaManagerPage = () => {
         schemaId.includes(query)
       );
     });
-  }, [activeTab, businessSchemas, searchQuery, showInactive, systemSchemas]);
+  }, [actionFormSchemas, activeTab, businessSchemas, searchQuery, showInactive, systemSchemas]);
 
   const invalidateSchemaQueryCaches = useCallback(async () => {
     await Promise.all([
@@ -300,7 +340,7 @@ export const useSchemaManagerPage = () => {
       pluralName,
       description,
       showInNavigation,
-      isSystemSchema,
+      schemaType,
       isNotCompanyBased,
       allowDataInactive,
       allowDataForce,
@@ -313,6 +353,9 @@ export const useSchemaManagerPage = () => {
       return { success: false, error: 'Schema ID, Singular Name, and Plural Name are required' };
     }
 
+    const resolvedSchemaType: 'system' | 'business' | 'action-form' =
+      schemaType || 'business';
+
     // Clear any existing messages when starting a new create operation
     setMessages(null);
 
@@ -323,7 +366,14 @@ export const useSchemaManagerPage = () => {
         singular_name: singularName,
         plural_name: pluralName,
         showInNavigation,
-        isSystemSchema,
+        schemaType: resolvedSchemaType,
+      // Legacy bridge for older APIs that still expect isSystemSchema
+        isSystemSchema:
+          resolvedSchemaType === 'system'
+            ? true
+            : resolvedSchemaType === 'business'
+              ? false
+              : undefined,
         isNotCompanyBased,
         allowDataInactive,
         allowDataForce,
@@ -404,8 +454,10 @@ export const useSchemaManagerPage = () => {
     filteredSchemas,
     systemSchemas,
     businessSchemas,
+    actionFormSchemas,
     systemSchemasCount,
     businessSchemasCount,
+    actionFormSchemasCount,
     handleRefresh,
     deleteDialog,
     openDeleteDialog,

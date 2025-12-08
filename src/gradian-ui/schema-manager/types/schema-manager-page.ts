@@ -1,7 +1,7 @@
 import { FormSchema } from './form-schema';
 import { Message } from '@/gradian-ui/layout/message-box';
 
-export type SchemaTab = 'system' | 'business';
+export type SchemaTab = 'system' | 'business' | 'action-form';
 
 export interface DeleteDialogState {
   open: boolean;
@@ -14,7 +14,7 @@ export interface CreateSchemaPayload {
   schemaId: string;
   description: string;
   showInNavigation: boolean;
-  isSystemSchema: boolean;
+  schemaType: 'system' | 'business' | 'action-form';
   isNotCompanyBased: boolean;
   allowDataInactive?: boolean;
   allowDataForce?: boolean;
