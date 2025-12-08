@@ -47,6 +47,12 @@ const mergeInitialValuesWithDefaults = (
 ): FormData => {
   const mergedValues = { ...initialValues };
   
+  // Ensure schema has fields array
+  if (!schema?.fields || !Array.isArray(schema.fields)) {
+    console.warn('[mergeInitialValuesWithDefaults] Schema fields is missing or not an array:', { schemaId: schema?.id });
+    return mergedValues;
+  }
+  
   // Process all fields to apply default values where needed
   schema.fields.forEach(field => {
     // Skip if field is in a repeating section (handled separately)
@@ -92,6 +98,12 @@ const ensureRepeatingItemIds = (
 ): FormData => {
   const newValues = mergeInitialValuesWithDefaults(values, schema, referenceEntityData);
   
+  // Ensure schema has sections array
+  if (!schema?.sections || !Array.isArray(schema.sections)) {
+    console.warn('[ensureRepeatingItemIds] Schema sections is missing or not an array:', { schemaId: schema?.id });
+    return newValues;
+  }
+  
   schema.sections.forEach(section => {
     if (section.isRepeatingSection && newValues[section.id]) {
       const items = newValues[section.id];
@@ -105,7 +117,7 @@ const ensureRepeatingItemIds = (
             };
             
             // Apply default values to repeating section items
-            const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
+            const sectionFields = schema.fields?.filter(f => f.sectionId === section.id) || [];
             sectionFields.forEach(field => {
               if (field.defaultValue !== undefined &&
                   (itemWithId[field.name] === undefined ||
@@ -126,7 +138,7 @@ const ensureRepeatingItemIds = (
           }
           
           // Apply default values to existing items too
-          const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
+          const sectionFields = schema.fields?.filter(f => f.sectionId === section.id) || [];
           sectionFields.forEach(field => {
             if (field.defaultValue !== undefined &&
                 (item[field.name] === undefined ||
@@ -420,10 +432,13 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>(() => {
     // Initialize based on section initialState prop or forceExpandedSections
     const initial: Record<string, boolean> = {};
-    schema.sections.forEach(section => {
-      // If forceExpandedSections is true, always expand; otherwise use initialState
-      initial[section.id] = forceExpandedSections ? true : (section.initialState !== 'collapsed');
-    });
+    // Ensure schema has sections array
+    if (schema?.sections && Array.isArray(schema.sections)) {
+      schema.sections.forEach(section => {
+        // If forceExpandedSections is true, always expand; otherwise use initialState
+        initial[section.id] = forceExpandedSections ? true : (section.initialState !== 'collapsed');
+      });
+    }
     return initial;
   });
 
@@ -476,21 +491,30 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   }, [initialValues, schema, state.dirty, state.values?.id]);
 
   // Update expanded sections when schema sections change
-  const sectionIds = useMemo(() => schema.sections.map(s => s.id).join(','), [schema.sections]);
+  const sectionIds = useMemo(() => {
+    if (!schema?.sections || !Array.isArray(schema.sections)) {
+      return '';
+    }
+    return schema.sections.map(s => s.id).join(',');
+  }, [schema?.sections]);
+  
   useEffect(() => {
     setExpandedSections(prev => {
       const newExpanded: Record<string, boolean> = {};
-      schema.sections.forEach(section => {
-        // If forceExpandedSections is true, always expand; otherwise preserve existing state or use initialState
-        newExpanded[section.id] = forceExpandedSections 
-          ? true 
-          : (prev[section.id] !== undefined 
-            ? prev[section.id]
-            : (section.initialState !== 'collapsed'));
-      });
+      // Ensure schema has sections array
+      if (schema?.sections && Array.isArray(schema.sections)) {
+        schema.sections.forEach(section => {
+          // If forceExpandedSections is true, always expand; otherwise preserve existing state or use initialState
+          newExpanded[section.id] = forceExpandedSections 
+            ? true 
+            : (prev[section.id] !== undefined 
+              ? prev[section.id]
+              : (section.initialState !== 'collapsed'));
+        });
+      }
       return newExpanded;
     });
-  }, [sectionIds, forceExpandedSections]);
+  }, [sectionIds, forceExpandedSections, schema?.sections]);
 
   const setValue = useCallback((fieldName: string, value: any) => {
     loggingCustom(LogType.FORM_DATA, 'info', `Setting field "${fieldName}" to: ${JSON.stringify(value)}`);

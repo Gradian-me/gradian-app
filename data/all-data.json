@@ -1424,77 +1424,6 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "company": "CinnaGen",
-      "username": "heydarzadehn",
-      "firstName": "Nima",
-      "lastName": "Heydarzadeh",
-      "email": "heydarzadehn@cinnagen.com",
-      "postTitle": "AI Engineers",
-      "id": "01KAEC9VRPRR23C24QHTR0NSF9",
-      "createdAt": "2025-11-19T15:39:03.349Z",
-      "updatedAt": "2025-12-08T14:23:05.560Z",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "status": [
-        {
-          "id": "01KBCZZ31X6X01VNJ045CWYSB8",
-          "label": "Pending",
-          "icon": "ClockFading",
-          "color": "yellow"
-        }
-      ],
-      "incomplete": false,
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "password": "$argon2id$v=19$m=32768,t=3,p=4$XB+zf/PTthumVNZ39wjB8w$i2JsJwbPZU65/I1xnDueJ7ayPzp1484F5fzLWHWWf00",
-      "hashType": "argon2"
-    },
-    {
-      "company": "CinnaGen",
-      "username": "rezaeifardh",
-      "firstName": "Hossein",
-      "lastName": "Rezaeifard",
-      "email": "rezaeifardh@cinnagen.com",
-      "postTitle": "Backend Developer",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KBAT78NRNB8KCD4Z625KH07A",
-      "createdAt": "2025-11-30T16:41:02.398Z",
-      "updatedAt": "2025-12-01T16:38:56.725Z",
-      "status": [
-        {
-          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
-          "label": "Active",
-          "icon": "CheckCheck",
-          "color": "emerald"
-        }
-      ],
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "company": "CinnaGen",
-      "username": "ghasemimas",
-      "firstName": "Masoud",
-      "lastName": "Mirghasemi",
-      "email": "ghasemimas@cinnagen.com",
-      "postTitle": "Backend Developer",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KBATBCQBC07CE2227A1V45VQ",
-      "createdAt": "2025-11-30T16:43:17.622Z",
-      "updatedAt": "2025-12-01T16:39:19.744Z",
-      "status": [
-        {
-          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
-          "label": "Active",
-          "icon": "CheckCheck",
-          "color": "emerald"
-        }
-      ],
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
       "company": "AryoGen",
       "status": [
         {
@@ -1504,16 +1433,18 @@
           "color": "emerald"
         }
       ],
-      "username": "goudarzia",
+      "username": "goudarziar",
       "firstName": "Arman",
       "lastName": "Goudarzi",
-      "email": "goudarzia@aryogen.com",
+      "email": "goudarziar@aryogen.com",
       "postTitle": "Quality Assurance Manager",
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSMDRHJTDY7SFEY6VWK2HEK",
       "createdAt": "2025-12-06T10:48:20.285Z",
-      "updatedAt": "2025-12-06T10:48:20.285Z"
+      "updatedAt": "2025-12-08T14:33:19.454Z",
+      "password": "$argon2id$v=19$m=32768,t=3,p=4$6FMxlYRqKjO7dE6Pd6LUFA$QrrLBt+KmmX7Oc7SjDxSRAF9IZJ81XQexsv3ZUBFmqA",
+      "hashType": "argon2"
     },
     {
       "company": "AryoGen",
@@ -1533,7 +1464,24 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSTVK8P6Y3P4MW060HNNKB1",
       "createdAt": "2025-12-06T12:40:45.079Z",
-      "updatedAt": "2025-12-06T12:40:45.079Z"
+      "updatedAt": "2025-12-08T14:33:00.161Z",
+      "password": "$argon2id$v=19$m=32768,t=3,p=4$bAwGvyQyORW6Acrt3OcPuQ$h8/UhXDl2FBP55sdXjeAP846VlsKIxQa+SepjJ+43IM",
+      "hashType": "argon2"
+    },
+    {
+      "username": "vaziril",
+      "firstName": "Laleh",
+      "lastName": "Vaziri",
+      "email": "vaziril@aryogen.com",
+      "postTitle": "QA Deputy",
+      "company": "AryoGen",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KBZ64EBC9SWWTCCYKEMGK21E",
+      "createdAt": "2025-12-08T14:34:01.460Z",
+      "updatedAt": "2025-12-08T14:34:11.339Z",
+      "password": "$argon2id$v=19$m=32768,t=3,p=4$gGbYpp66WV8vRbM6uoX56g$Vw83f/KKDMndrgUwFY+wl6PAQuSwFqFohNkyua4Tbqo",
+      "hashType": "argon2"
     }
   ],
   "purchaseOrders": [],
@@ -2403,8 +2351,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-08T13:45:48.428Z",
-      "lastSynced": "2025-12-08T13:45:48.428Z",
+      "updatedAt": "2025-12-08T14:36:42.158Z",
+      "lastSynced": "2025-12-08T14:36:42.158Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2416,7 +2364,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 41 schemas: 41 succeeded, 0 failed (0 created, 41 updated)"
+      "lastSyncMessage": "Processed 41 schemas: 41 succeeded, 0 failed (41 created, 0 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -2443,7 +2391,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-08T13:46:38.512Z",
+      "updatedAt": "2025-12-08T14:36:49.973Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2453,7 +2401,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-08T13:46:38.512Z",
+      "lastSynced": "2025-12-08T14:36:49.973Z",
       "lastSyncMessage": "Generated relations for 41 out of 41 schemas"
     },
     {
@@ -2500,7 +2448,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-08T13:46:55.872Z",
+      "updatedAt": "2025-12-08T14:43:25.720Z",
       "category": [
         {
           "id": "production-integration",
@@ -2509,8 +2457,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-08T13:46:55.872Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 218, nodes updated: 5, edges created: 101, nodes failed: 0, edges failed: 0."
+      "lastSynced": "2025-12-08T14:43:25.720Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 215, nodes updated: 5, edges created: 76, nodes failed: 0, edges failed: 0."
     }
   ],
   "databases": [
@@ -3643,73 +3591,7 @@
   ],
   "routes": [],
   "schemas": [],
-  "change-management": [
-    {
-      "changeNumber": "CC-2025082405",
-      "changeRequestDate": "2026-01-09",
-      "changeTitle": "Integrated eQMS Implementation",
-      "changeDescription": "Define how changes related to development and deployment of the Integrated eQMS will be assessed, approved, implemented, verified, and closed in compliance with GMP and quality system expectations.",
-      "changeSolution": "This Change Plan covers:\n\nSelection, configuration, validation, and deployment of the eQMS platform\n\nMigration of SOPs, Quality Records, Training, Deviations, CAPA, Complaints, Change Control modules\n\nIntegration with ERP/LIMS/MES (where applicable)\n\nUser role and permission setup\n\nBusiness process redesign\n\nStaff training and system rollout\n\nPost-implementation monitoring and CAPA",
-      "changeManagementTypes": [
-        {
-          "id": "01KBSR7B9B3S0A9JMAWHWNJ8S3"
-        }
-      ],
-      "changeSubjectTypes": [
-        {
-          "id": "01KBSSBGXTJPDC00J7QPRQCR7S"
-        }
-      ],
-      "incomplete": false,
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "changeCategories": [
-        {
-          "id": "01KBSQZRHZW4PHXF2D1WKD2YE1"
-        }
-      ],
-      "changeProcedure": [
-        {
-          "id": "01KBSWN6QGRA5JQQKRNRVP2WNV"
-        },
-        {
-          "id": "01KBSWK2Z59QSKHQSBACV5Y880"
-        }
-      ],
-      "id": "01KBSSBQEM5RZ16S0RYCF4Y1GY",
-      "createdAt": "2025-12-06T12:14:36.501Z",
-      "updatedAt": "2025-12-06T20:27:08.439Z",
-      "status": [
-        {
-          "id": "01KBSSGEYXCK2TAB2R0X80RMGG",
-          "label": "QA Initial Evaluation",
-          "icon": "FileSearch",
-          "color": "blue"
-        }
-      ],
-      "quality-assurance-analyses": [],
-      "qa-guideline-analyses": [],
-      "follow-up": [],
-      "changeConditions": [
-        {
-          "id": "item-1765026571634-7iqsfi6yi",
-          "label": "مشسیشسیشسی"
-        },
-        {
-          "id": "item-1765026574741-a34179zgh",
-          "label": "شسیشسیشس"
-        },
-        {
-          "id": "item-1765026575413-fg3h33xtm",
-          "label": "شسیشسیی"
-        },
-        {
-          "id": "item-1765026576130-in3o3smqm",
-          "label": "شسی"
-        }
-      ],
-      "changeEffectiveness": 4
-    }
-  ],
+  "change-management": [],
   "change-classification": [
     {
       "label_fa": "تغییرات کیفی عمده",

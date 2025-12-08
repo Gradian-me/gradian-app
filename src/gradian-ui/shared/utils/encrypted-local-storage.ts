@@ -4,6 +4,7 @@
  */
 
 import { encryptPayload, decryptPayload, type EncryptedPayload } from '@/gradian-ui/indexdb-manager/utils/crypto';
+import type { PersistStorage, StorageValue } from 'zustand/middleware';
 
 const STORAGE_PREFIX = 'encrypted:';
 
@@ -11,11 +12,11 @@ const STORAGE_PREFIX = 'encrypted:';
  * Create encrypted localStorage adapter for Zustand persist
  * This adapter encrypts data before storing and decrypts when reading
  */
-export function createEncryptedStorage() {
+export function createEncryptedStorage<T = any>(): PersistStorage<T> {
   if (typeof window === 'undefined') {
     // Return a no-op storage for SSR
     return {
-      getItem: async () => null,
+      getItem: async () => null as StorageValue<T> | null,
       setItem: async () => {},
       removeItem: async () => {},
     };
@@ -24,8 +25,9 @@ export function createEncryptedStorage() {
   return {
     /**
      * Get and decrypt item from localStorage
+     * Returns StorageValue<T> which is { state: T, version?: number }
      */
-    getItem: async (name: string): Promise<string | null> => {
+    getItem: async (name: string): Promise<StorageValue<T> | null> => {
       try {
         const storageKey = `${STORAGE_PREFIX}${name}`;
         const stored = localStorage.getItem(storageKey);
@@ -36,26 +38,31 @@ export function createEncryptedStorage() {
           if (unencrypted) {
             // Migrate to encrypted storage
             try {
-              const parsed = JSON.parse(unencrypted);
-              await createEncryptedStorage().setItem(name, unencrypted);
+              const parsed: StorageValue<T> = JSON.parse(unencrypted);
+              const storage = createEncryptedStorage<T>();
+              await storage.setItem(name, parsed);
               // Keep unencrypted version for now, will be cleaned up later
             } catch {
               // Ignore migration errors
             }
-            return unencrypted;
+            try {
+              return JSON.parse(unencrypted) as StorageValue<T>;
+            } catch {
+              return null;
+            }
           }
           return null;
         }
 
         const encrypted: EncryptedPayload = JSON.parse(stored);
-        const decrypted = await decryptPayload<any>(encrypted);
+        const decrypted = await decryptPayload<StorageValue<T>>(encrypted);
         
         if (decrypted === null) {
           console.warn(`[encrypted-local-storage] Failed to decrypt data for key: ${name}`);
           return null;
         }
         
-        return JSON.stringify(decrypted);
+        return decrypted;
       } catch (error) {
         console.error(`[encrypted-local-storage] Error retrieving encrypted data for key "${name}":`, error);
         return null;
@@ -64,66 +71,33 @@ export function createEncryptedStorage() {
 
     /**
      * Encrypt and store item in localStorage
-     * Zustand persist middleware serializes state to JSON string before calling this
+     * Zustand persist passes StorageValue<T> which is { state: T, version?: number }
      */
-    setItem: async (name: string, value: string): Promise<void> => {
+    setItem: async (name: string, value: StorageValue<T>): Promise<void> => {
       try {
-        // Ensure value is a string (Zustand persist should pass JSON string)
-        let valueString: string;
-        if (typeof value === 'string') {
-          valueString = value;
-          // Check if it's the problematic "[object Object]" string
-          if (valueString === '[object Object]') {
-            console.error(`[encrypted-local-storage] Received "[object Object]" string for key "${name}". This indicates a serialization issue.`);
-            // Skip encryption and fallback to unencrypted
-            localStorage.setItem(name, '{}');
-            return;
-          }
-        } else if (value === null || value === undefined) {
-          // Handle null/undefined
-          localStorage.removeItem(`${STORAGE_PREFIX}${name}`);
-          localStorage.removeItem(name);
-          return;
-        } else {
-          // Convert object to JSON string if needed (shouldn't happen with Zustand persist)
-          try {
-            valueString = JSON.stringify(value);
-          } catch (stringifyError) {
-            console.error(`[encrypted-local-storage] Failed to stringify value for key "${name}":`, stringifyError);
-            // Fallback: try to store empty object
-            localStorage.setItem(name, '{}');
-            return;
-          }
-        }
-
-        // Validate that valueString is valid JSON before parsing
-        if (!valueString || valueString.trim() === '') {
-          console.warn(`[encrypted-local-storage] Empty value for key "${name}"`);
-          localStorage.removeItem(`${STORAGE_PREFIX}${name}`);
-          localStorage.removeItem(name);
+        // Validate that value is a StorageValue object
+        if (!value || typeof value !== 'object') {
+          console.error(`[encrypted-local-storage] Invalid value type for key "${name}":`, typeof value);
           return;
         }
 
-        // Parse the JSON string to get the actual data
-        // Zustand persist wraps state in { state: {...}, version: 0 }
-        let parsed: any;
-        try {
-          parsed = JSON.parse(valueString);
-        } catch (parseError) {
-          console.error(`[encrypted-local-storage] Failed to parse JSON for key "${name}":`, parseError);
-          console.error(`[encrypted-local-storage] Value that failed to parse:`, valueString.substring(0, 200));
-          // Fallback to unencrypted storage if parsing fails
-          localStorage.setItem(name, valueString);
+        // Check if it has the expected structure
+        if (!('state' in value)) {
+          console.error(`[encrypted-local-storage] Value missing 'state' property for key "${name}"`);
           return;
         }
         
-        // Encrypt the parsed data
-        const encrypted = await encryptPayload(parsed);
+        // Encrypt the StorageValue object directly
+        const encrypted = await encryptPayload(value);
         
         if (!encrypted) {
           console.warn(`[encrypted-local-storage] Failed to encrypt data for key: ${name}`);
           // Fallback to unencrypted storage if encryption fails
-          localStorage.setItem(name, valueString);
+          try {
+            localStorage.setItem(name, JSON.stringify(value));
+          } catch (fallbackError) {
+            console.error(`[encrypted-local-storage] Fallback storage also failed for key "${name}":`, fallbackError);
+          }
           return;
         }
 
@@ -138,10 +112,7 @@ export function createEncryptedStorage() {
         console.error(`[encrypted-local-storage] Error storing encrypted data for key "${name}":`, error);
         // Fallback to unencrypted storage if encryption fails
         try {
-          const valueString = typeof value === 'string' ? value : JSON.stringify(value);
-          if (valueString && valueString !== '[object Object]') {
-            localStorage.setItem(name, valueString);
-          }
+          localStorage.setItem(name, JSON.stringify(value));
         } catch (fallbackError) {
           console.error(`[encrypted-local-storage] Fallback storage also failed for key "${name}":`, fallbackError);
         }
