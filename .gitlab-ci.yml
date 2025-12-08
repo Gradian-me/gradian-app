@@ -74,7 +74,7 @@ build:
     - echo "🚀 Building Docker image..."
     - SHORT_SHA=${CI_COMMIT_SHA:0:8}
     - export DOCKER_BUILDKIT=1
-    - docker build --tag="$CI_REGISTRY_IMAGE:latest" --tag="$CI_REGISTRY_IMAGE:$SHORT_SHA" --build-arg NODE_ENV=$NODE_ENV .
+    - docker build --tag="$CI_REGISTRY_IMAGE:latest" --tag="$CI_REGISTRY_IMAGE:$SHORT_SHA" --build-arg NODE_ENV=$NODE_ENV --build-arg NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY .
     - docker push "$CI_REGISTRY_IMAGE:latest"
     - docker push "$CI_REGISTRY_IMAGE:$SHORT_SHA"
     - echo "🧹 Cleaning Docker after build..."
