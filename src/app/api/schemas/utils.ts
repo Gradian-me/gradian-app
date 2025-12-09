@@ -453,6 +453,11 @@ export const proxySchemaRequest = async (
   // Try to extract token from Authorization header if present
   if (authHeader) {
     authToken = extractTokenFromHeader(authHeader);
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'info',
+      `Authorization header present in request, token extracted`
+    );
   }
 
   // If no token from header, try to extract from cookies
@@ -464,20 +469,42 @@ export const proxySchemaRequest = async (
       authHeader = `Bearer ${authToken}`;
       loggingCustom(
         LogType.CALL_BACKEND,
-        'debug',
+        'info',
         `Authorization token extracted from cookie and added as Bearer header`
+      );
+    } else {
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'warn',
+        `No authorization token found in header or cookies for schema request`
       );
     }
   } else {
     // Ensure header is in Bearer format if it's just a token
     if (authHeader && !authHeader.toLowerCase().startsWith('bearer ')) {
       authHeader = `Bearer ${authToken}`;
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'info',
+        `Authorization header formatted as Bearer token`
+      );
     }
   }
 
   // Set Authorization header if we have a token
   if (authHeader) {
     headers.set('authorization', authHeader);
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'info',
+      `Authorization header set for backend request: ${authHeader.substring(0, 20)}...`
+    );
+  } else {
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'error',
+      `WARNING: No Authorization header available for backend schema request`
+    );
   }
 
   let body: BodyInit | undefined;
