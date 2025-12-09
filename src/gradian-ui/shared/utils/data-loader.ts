@@ -35,18 +35,20 @@ function getApiUrl(apiPath: string): string {
 
   // Check if we're in a build context (Next.js build time)
   // During build, API routes aren't available, so we should avoid fetch calls
-  const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' || 
-                       process.env.NODE_ENV === 'production' && !process.env.VERCEL_URL && !process.env.NEXTAUTH_URL;
+  const isBuildTime =
+    process.env.NEXT_PHASE === 'phase-production-build' ||
+    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_URL);
 
-  // For relative URLs, construct absolute URL for server-side fetch
-  // Priority: NEXTAUTH_URL > VERCEL_URL > localhost (default for development)
-  let baseUrl = process.env.NEXTAUTH_URL;
+  // For relative URLs, construct absolute URL for server-side fetch.
+  // IMPORTANT: do NOT use NEXTAUTH_URL here because it may point to an external
+  // auth host (e.g., https://octa.../auth) which causes 401s when we call our
+  // own API routes. Always prefer this app's origin.
+  let baseUrl =
+    process.env.INTERNAL_API_BASE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
 
   if (!baseUrl) {
-    // Use Vercel URL if available (for Vercel deployments)
-    if (process.env.VERCEL_URL) {
-      baseUrl = `https://${process.env.VERCEL_URL}`;
-    } else if (!isBuildTime) {
+    if (!isBuildTime) {
       // Default to localhost for local development (but not during build)
       const port = process.env.PORT || '3000';
       baseUrl = `http://localhost:${port}`;
