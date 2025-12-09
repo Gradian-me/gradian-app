@@ -44,6 +44,7 @@ services:
       - CAN_SET_DEMO_MODE=${CAN_SET_DEMO_MODE}
       - NEXT_PUBLIC_SKIP_KEY=${NEXT_PUBLIC_SKIP_KEY}
       - REQUIRE_LOGIN=${REQUIRE_LOGIN}
+      - INTERNAL_API_BASE_URL=${INTERNAL_API_BASE_URL}
 
 networks:
   gradian-network:
