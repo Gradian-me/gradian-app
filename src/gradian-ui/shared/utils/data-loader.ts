@@ -4,6 +4,7 @@
 
 import 'server-only';
 
+import { cookies } from 'next/headers';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
@@ -22,6 +23,21 @@ const cacheRegistry = new Map<string, {
 }>();
 
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours default TTL
+
+/**
+ * Get cookies from Next.js cookies() and format as cookie header string
+ * This allows server-side fetch calls to forward cookies from the original browser request
+ */
+async function getCookieHeader(): Promise<string | undefined> {
+  try {
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
+    return cookieHeader || undefined;
+  } catch (error) {
+    // cookies() may not be available in all contexts (e.g., during build)
+    return undefined;
+  }
+}
 
 /**
  * Get the API URL for internal server-side calls
@@ -164,11 +180,18 @@ export async function loadData<T = any>(
         const fetchUrl = getApiUrl(apiPath);
         loggingCustom(logType, 'info', `🌐 [${instanceId}] Fetching data from ${fetchUrl}`);
 
+        // Get cookies from Next.js request context to forward to internal API calls
+        const cookieHeader = await getCookieHeader();
+        const fetchHeaders: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
+        if (cookieHeader) {
+          fetchHeaders['cookie'] = cookieHeader;
+        }
+
         const response = await fetch(fetchUrl, {
           cache: 'no-store',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: fetchHeaders,
         });
 
         if (!response.ok) {
@@ -301,11 +324,18 @@ export async function loadDataById<T = any>(
       const fetchUrl = getApiUrl(`${apiBasePath}/${id}`);
       const startTime = Date.now();
 
+      // Get cookies from Next.js request context to forward to internal API calls
+      const cookieHeader = await getCookieHeader();
+      const fetchHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (cookieHeader) {
+        fetchHeaders['cookie'] = cookieHeader;
+      }
+
       const response = await fetch(fetchUrl, {
         cache: 'no-store',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: fetchHeaders,
       });
 
       if (!response.ok) {
@@ -409,11 +439,18 @@ export async function loadDataById<T = any>(
     const fetchUrl = getApiUrl(`${apiBasePath}/${id}`);
     const startTime = Date.now();
 
+    // Get cookies from Next.js request context to forward to internal API calls
+    const cookieHeader = await getCookieHeader();
+    const fetchHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (cookieHeader) {
+      fetchHeaders['cookie'] = cookieHeader;
+    }
+
     const response = await fetch(fetchUrl, {
       cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: fetchHeaders,
     });
 
     if (!response.ok) {
