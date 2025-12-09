@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { LogType, DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
+import { extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
+import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
 
 const TRUTHY_VALUES = new Set(['true', '1', 'yes', 'on']);
 const SCHEMA_ROUTE_PREFIX = '/api/schemas';
@@ -442,6 +444,41 @@ export const proxySchemaRequest = async (
   headers.delete('transfer-encoding');
   headers.delete('te');
   headers.delete('trailer');
+
+  // Extract authorization token and ensure it's in Bearer format
+  // Backend APIs require Authorization: Bearer <token> header
+  let authHeader = headers.get('authorization');
+  let authToken: string | null = null;
+
+  // Try to extract token from Authorization header if present
+  if (authHeader) {
+    authToken = extractTokenFromHeader(authHeader);
+  }
+
+  // If no token from header, try to extract from cookies
+  if (!authToken) {
+    const cookies = request.headers.get('cookie');
+    authToken = extractTokenFromCookies(cookies, AUTH_CONFIG.ACCESS_TOKEN_COOKIE);
+    if (authToken) {
+      // Format as Bearer token
+      authHeader = `Bearer ${authToken}`;
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'debug',
+        `Authorization token extracted from cookie and added as Bearer header`
+      );
+    }
+  } else {
+    // Ensure header is in Bearer format if it's just a token
+    if (authHeader && !authHeader.toLowerCase().startsWith('bearer ')) {
+      authHeader = `Bearer ${authToken}`;
+    }
+  }
+
+  // Set Authorization header if we have a token
+  if (authHeader) {
+    headers.set('authorization', authHeader);
+  }
 
   let body: BodyInit | undefined;
   if (options.body !== undefined) {
