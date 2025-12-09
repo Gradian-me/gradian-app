@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "start:dev": "next dev --turbopack",
     "build": "next build --webpack",
     "build:release": "OBFUSCATE=true next build --webpack",
     "verify": "tsc --noEmit && eslint .",

@@ -90,12 +90,24 @@ interface ApplicationVariablesData {
 let cachedVariables: ApplicationVariablesData | null = null;
 let cachedFileMtime: number | null = null;
 
+const toBoolean = (value: unknown, fallback: boolean): boolean => {
+  if (value === undefined || value === null) return fallback;
+  const normalized = String(value).trim().toLowerCase();
+  if (['true', '1', 'yes', 'on'].includes(normalized)) return true;
+  if (['false', '0', 'no', 'off'].includes(normalized)) return false;
+  return fallback;
+};
+
 /**
  * Load application variables from JSON file
  * Uses caching to avoid reading from disk on every call
  * Cache is invalidated if file modification time changes
  */
 export function loadApplicationVariables(): ApplicationVariablesData {
+  const envDemoMode = process.env.DEMO_MODE;
+  // Require explicit opt-in for demo in production to avoid accidental exposure
+  const canSetDemoMode = toBoolean(process.env.CAN_SET_DEMO_MODE, false);
+
   // Check if file exists and get its modification time
   let currentMtime: number | null = null;
   try {
@@ -126,8 +138,9 @@ export function loadApplicationVariables(): ApplicationVariablesData {
     if (!fs.existsSync(APPLICATION_VARIABLES_FILE)) {
       // If file doesn't exist, use defaults
       const defaultData = getDefaultData();
-      // Force DEMO_MODE to false if NODE_ENV is not development
-      if (process.env.NODE_ENV !== 'development') {
+      // Allow env override for DEMO_MODE; still require opt-in in production
+      defaultData.DEMO_MODE = toBoolean(envDemoMode, defaultData.DEMO_MODE);
+      if (process.env.NODE_ENV !== 'development' && !canSetDemoMode) {
         defaultData.DEMO_MODE = false;
       }
       cachedVariables = defaultData;
@@ -150,8 +163,9 @@ export function loadApplicationVariables(): ApplicationVariablesData {
       );
     }
 
-    // Force DEMO_MODE to false if NODE_ENV is not development
-    if (process.env.NODE_ENV !== 'development') {
+    // Respect DEMO_MODE env override, but gate production with CAN_SET_DEMO_MODE
+    data.DEMO_MODE = toBoolean(envDemoMode, data.DEMO_MODE);
+    if (process.env.NODE_ENV !== 'development' && !canSetDemoMode) {
       data.DEMO_MODE = false;
     }
 
