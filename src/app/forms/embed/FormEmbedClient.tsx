@@ -48,11 +48,12 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
   const isOriginAllowed = useCallback(
     (origin: string | undefined | null): boolean => {
       if (!origin) return false;
+      const originEvent = { origin } as MessageEvent;
       if (allowedOrigins && allowedOrigins.length > 0) {
-        return allowedOrigins.some((o) => validateMessageOrigin(origin, o));
+        return validateMessageOrigin(originEvent, allowedOrigins);
       }
       if (returnOrigin && returnOrigin !== '*') {
-        return validateMessageOrigin(origin, returnOrigin);
+        return validateMessageOrigin(originEvent, [returnOrigin]);
       }
       return false;
     },
