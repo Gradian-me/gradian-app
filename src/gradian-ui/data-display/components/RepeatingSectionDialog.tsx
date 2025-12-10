@@ -9,14 +9,13 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { TableWrapper } from '../table/components/TableWrapper';
-import { TableConfig, TableColumn } from '../table/types';
+import { TableConfig } from '../table/types';
 import { useRepeatingTableColumns } from '../table/hooks/useRepeatingTableColumns';
 import { useRepeatingTableData } from '../table/hooks/useRepeatingTableData';
+import { RelationActionCell } from '../table/components/RelationActionCell';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
-import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Button as UIButton } from '@/components/ui/button';
 import { RefreshCw, Plus, List } from 'lucide-react';
 import { getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { cn } from '@/gradian-ui/shared/utils';
@@ -147,35 +146,16 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
     (_row: any, itemId: string | number | undefined) => {
       if (!itemId) return null;
       return (
-        <div className="flex items-center justify-center gap-1.5">
-          <UIButton
-            variant="outline"
-            size="sm"
-            onClick={(event) => {
-              event.stopPropagation();
-              handleViewDetails(itemId);
-            }}
-            className="h-8 w-8 p-0 hover:bg-sky-50 hover:border-sky-300 hover:text-sky-700 transition-all duration-200"
-            title="View Details"
-          >
-            <IconRenderer iconName="Eye" className="h-4 w-4" />
-          </UIButton>
-          <UIButton
-            variant="outline"
-            size="sm"
-            onClick={(event) => {
-              event.stopPropagation();
-              handleEditDetails(itemId);
-            }}
-            className="h-8 w-8 p-0 hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition-all duration-200"
-            title="Edit"
-          >
-            <IconRenderer iconName="Edit" className="h-4 w-4" />
-          </UIButton>
-        </div>
+        <RelationActionCell
+          itemId={itemId}
+          relationId={_row?.__relationId}
+          onView={handleViewDetails}
+          onEdit={handleEditDetails}
+          onDeleted={refresh}
+        />
       );
     },
-    [handleViewDetails, handleEditDetails]
+    [handleEditDetails, handleViewDetails, refresh]
   );
 
   const columns = useRepeatingTableColumns({

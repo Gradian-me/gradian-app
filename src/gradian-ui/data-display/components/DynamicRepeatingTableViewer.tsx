@@ -13,10 +13,10 @@ import {
   useResponsiveCards,
   ColumnWidthMap,
 } from '../table';
+import { RelationActionCell } from '../table/components/RelationActionCell';
 import { CardWrapper, CardHeader, CardTitle, CardContent } from '../card/components/CardWrapper';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '../../shared/utils';
-import { DynamicActionButtons } from './DynamicActionButtons';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Badge } from '../../form-builder/form-elements/components/Badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -105,18 +105,15 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
     (_row: any, itemId: string | number | undefined) => {
       if (!itemId) return null;
       return (
-        <DynamicActionButtons
-          variant="minimal"
-          actions={[
-            {
-              type: 'view',
-              onClick: () => handleViewDetails(itemId),
-            },
-          ]}
+        <RelationActionCell
+          itemId={itemId}
+          relationId={_row?.__relationId}
+          onView={handleViewDetails}
+          onDeleted={refresh}
         />
       );
     },
-    [handleViewDetails]
+    [handleViewDetails, refresh]
   );
 
   const columns = useRepeatingTableColumns({

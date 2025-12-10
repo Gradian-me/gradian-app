@@ -66,6 +66,29 @@ export function useRepeatingTableData(
     setIsLoadingRelations(true);
 
     try {
+      // Fetch relation metadata (ids) for delete/edit actions
+      const relationsMetaResponse = await apiRequest<Array<{
+        id: string;
+        sourceSchema: string;
+        sourceId: string;
+        targetSchema: string;
+        targetId: string;
+        relationTypeId: string;
+      }>>(
+        `/api/relations?sourceSchema=${effectiveSourceSchemaId}&sourceId=${effectiveSourceId}&targetSchema=${targetSchemaId}${
+          relationTypeId ? `&relationTypeId=${relationTypeId}` : ''
+        }&includeInactive=true`
+      );
+
+      const relationIdByTargetId = new Map<string, string>();
+      if (relationsMetaResponse.success && Array.isArray(relationsMetaResponse.data)) {
+        relationsMetaResponse.data.forEach((rel) => {
+          if (rel.targetId) {
+            relationIdByTargetId.set(String(rel.targetId), rel.id);
+          }
+        });
+      }
+
       const allRelationsUrl = `/api/data/all-relations?schema=${effectiveSourceSchemaId}&id=${effectiveSourceId}&direction=both&otherSchema=${targetSchemaId}`;
 
       const allRelationsResponse = await apiRequest<Array<{
@@ -88,6 +111,7 @@ export function useRepeatingTableData(
           const annotatedData = group.data.map((item) => ({
             ...item,
             __relationType: group.relation_type,
+            __relationId: relationIdByTargetId.get(String(item?.id)) || null,
           }));
           entities.push(...annotatedData);
         }

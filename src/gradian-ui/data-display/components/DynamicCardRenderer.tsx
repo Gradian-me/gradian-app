@@ -388,7 +388,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
 
 
   const cardClasses = cn(
-    'group cursor-pointer transition-all duration-100 h-full',
+    'group cursor-pointer transition-all duration-100 h-full rounded-xl',
     viewMode === 'list' && 'w-full',
     className
   );
@@ -450,7 +450,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
           behavior: { hoverable: !disableAnimation, clickable: true }
         }}
         className={cn(
-          "h-full bg-white dark:bg-gray-800 overflow-hidden",
+          "h-full bg-white dark:bg-gray-800 overflow-hidden rounded-xl",
           isInDialog 
             ? "rounded-lg sm:rounded-xl" 
             : viewMode === 'list'

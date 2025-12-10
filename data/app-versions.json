@@ -2517,5 +2517,50 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBZUIRELATIONS001",
+    "timestamp": "2025-12-10T00:00:00.000Z",
+    "version": "1.22.002",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "Enhanced UI components by adding rounded corners to DynamicCardRenderer and DynamicPageRenderer",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "layout"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Replaced Button with RepeatingSectionButton for better code clarity in DynamicPageRenderer",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "data-display"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced RelationActionCell in DynamicRepeatingTableViewer and RepeatingSectionDialog for improved action handling",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "data-display",
+          "relations"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated logging utility to mask sensitive information in logs, enhancing security during authentication processes",
+        "priority": "High",
+        "affectedDomains": [
+          "logging",
+          "security",
+          "auth"
+        ]
+      }
+    ]
   }
 ]

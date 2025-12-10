@@ -46,6 +46,7 @@ import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/
 import { syncParentRelation } from '@/gradian-ui/shared/utils/parent-relation.util';
 import { getParentIdFromEntity } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
 import { RepeatingSectionDialog } from './RepeatingSectionDialog';
+import { RepeatingSectionButton } from './RepeatingSectionButton';
 import { Table2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { EntityMetadata } from './CreateUpdateDetail';
@@ -619,25 +620,22 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   e.stopPropagation();
                 }}
               >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
+                <RepeatingSectionButton
+                  sectionId={section.id}
+                  sectionTitle={section.title}
+                  entityData={row}
+                  entityId={row.id}
+                  itemCount={itemCount}
+                  onOpen={({ sectionId, sectionTitle, entityData, entityId }) => {
                     setRepeatingSectionDialog({
                       isOpen: true,
-                      sectionId: section.id,
-                      sectionTitle: section.title || section.id,
-                      entityData: row,
-                      entityId: row.id,
+                      sectionId,
+                      sectionTitle: sectionTitle || sectionId,
+                      entityData,
+                      entityId,
                     });
                   }}
-                  className="h-8 px-3 hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition-all duration-200"
-                >
-                <Table2 className="h-4 w-4" />
-                {itemCount !== null && (
-                  <span className="text-xs font-medium ms-1.5">{itemCount}</span>
-                )}
-              </Button>
+                />
               </div>
             </div>
           );

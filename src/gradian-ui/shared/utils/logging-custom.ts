@@ -6,6 +6,28 @@ const getLogFlag = (logType: LogType): boolean => {
   return LOG_CONFIG[logType] ?? false;
 };
 
+// Keys whose values must be redacted when logging authentication cookies/details
+const SENSITIVE_KEYS = ['access_token', 'refresh_token', 'password', 'key', 'apikey', 'api_key'];
+const MASKED_VALUE = '[MASKED]';
+
+/**
+ * Masks sensitive tokens/keys inside login logs to prevent leaking secrets.
+ * Applies only to LOGIN_LOG to avoid over-masking other log categories.
+ */
+const maskSensitiveMessage = (logType: LogType, message: string): string => {
+  if (logType !== LogType.LOGIN_LOG) {
+    return message;
+  }
+
+  // Match cookie-style or key/value pairs: access_token=abc, "refresh_token": "abc", key: abc
+  const pattern = new RegExp(
+    `\\b(${SENSITIVE_KEYS.join('|')})\\b\\s*[:=]\\s*("([^"]*)"|[^;,"\\s]+)`,
+    'gi',
+  );
+
+  return message.replace(pattern, (_match, key) => `${key}=${MASKED_VALUE}`);
+};
+
 /**
  * Check if logging is enabled via environment variable
  * For server: ENABLE_LOGGING=true
@@ -47,7 +69,8 @@ export const loggingCustom = (logType: LogType, level: LogLevel, message: string
   }
 
   const prefix = `[${logType}]`;
-  const formattedMessage = `${prefix} ${message}`;
+  const sanitizedMessage = maskSensitiveMessage(logType, message);
+  const formattedMessage = `${prefix} ${sanitizedMessage}`;
 
   switch (level) {
     case 'log':
