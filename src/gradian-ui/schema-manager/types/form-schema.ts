@@ -20,6 +20,7 @@ export interface FormField {
   canCopy?: boolean;
   inactive?: boolean;
   addToReferenceMetadata?: boolean;
+  isSensitive?: boolean; // If true, field value will be encrypted before storage and decrypted for display
   role?: 'title' | 'subtitle' | 'description' | 'image' | 'avatar' | 'icon' | 'rating' | 'badge' | 'status' | 'email' | 'location' | 'tel' | 'duedate' | 'code' | 'color' | 'person';
   roleColor?: 'default' | 'secondary' | 'outline' | 'destructive' | 'gradient' | 'success' | 'warning' | 'info' | 'muted';
   validation?: {

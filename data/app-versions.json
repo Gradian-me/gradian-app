@@ -2434,5 +2434,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBS6SENSITIVEFIELDS001",
+    "timestamp": "2025-12-10T10:07:49.000Z",
+    "version": "1.22.000",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "Enhanced data handling by adding multiple user entries in all-data.json and establishing new relations in all-data-relations.json",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "relations"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced isSensitive field in form schema to support sensitive data encryption",
+        "priority": "High",
+        "affectedDomains": [
+          "schema-manager",
+          "form-builder",
+          "security"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated password processing logic to handle sensitive fields and improved response filtering to decrypt sensitive data",
+        "priority": "High",
+        "affectedDomains": [
+          "security",
+          "api",
+          "data-management",
+          "password-processing"
+        ]
+      }
+    ]
   }
 ]

@@ -5,7 +5,7 @@ import { IService } from '../interfaces/service.interface';
 import { IRepository } from '../interfaces/repository.interface';
 import { BaseEntity, FilterParams, ApiResponse } from '../types/base.types';
 import { EntityNotFoundError, ValidationError, handleDomainError } from '../errors/domain.errors';
-import { filterPasswordFields } from '../utils/response-filter.util';
+import { filterPasswordFields, decryptSensitiveFields } from '../utils/response-filter.util';
 
 export class BaseService<T extends BaseEntity> implements IService<T> {
   constructor(
@@ -19,9 +19,14 @@ export class BaseService<T extends BaseEntity> implements IService<T> {
       const entities = await this.repository.findAll(filters);
       
       // Filter out password fields from response
-      const filteredData = this.schemaId 
+      let filteredData = this.schemaId 
         ? await filterPasswordFields(this.schemaId, entities)
         : entities;
+      
+      // Decrypt sensitive fields
+      filteredData = this.schemaId 
+        ? await decryptSensitiveFields(this.schemaId, filteredData)
+        : filteredData;
       
       return {
         success: true,
@@ -46,9 +51,14 @@ export class BaseService<T extends BaseEntity> implements IService<T> {
       }
 
       // Filter out password fields from response
-      const filteredData = this.schemaId 
+      let filteredData = this.schemaId 
         ? await filterPasswordFields(this.schemaId, entity)
         : entity;
+
+      // Decrypt sensitive fields
+      filteredData = this.schemaId 
+        ? await decryptSensitiveFields(this.schemaId, filteredData)
+        : filteredData;
 
       return {
         success: true,
@@ -73,9 +83,14 @@ export class BaseService<T extends BaseEntity> implements IService<T> {
       const entity = await this.repository.create(data);
       
       // Filter out password fields from response
-      const filteredData = this.schemaId 
+      let filteredData = this.schemaId 
         ? await filterPasswordFields(this.schemaId, entity)
         : entity;
+
+      // Decrypt sensitive fields
+      filteredData = this.schemaId 
+        ? await decryptSensitiveFields(this.schemaId, filteredData)
+        : filteredData;
       
       return {
         success: true,
@@ -112,9 +127,14 @@ export class BaseService<T extends BaseEntity> implements IService<T> {
       }
 
       // Filter out password fields from response
-      const filteredData = this.schemaId 
+      let filteredData = this.schemaId 
         ? await filterPasswordFields(this.schemaId, entity)
         : entity;
+
+      // Decrypt sensitive fields
+      filteredData = this.schemaId 
+        ? await decryptSensitiveFields(this.schemaId, filteredData)
+        : filteredData;
 
       return {
         success: true,

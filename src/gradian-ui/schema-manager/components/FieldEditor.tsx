@@ -358,6 +358,11 @@ export function FieldEditor({
                   checked={tempField.addToReferenceMetadata || false}
                   onChange={(checked) => setTempField({ ...tempField, addToReferenceMetadata: checked })}
                 />
+                <Switch
+                  config={{ name: `isSensitive-${field.id}`, label: 'Is Sensitive' }}
+                  checked={tempField.isSensitive || false}
+                  onChange={(checked) => setTempField({ ...tempField, isSensitive: checked })}
+                />
               </div>
               {tempField.component && (
                 <ComponentConfigEditor

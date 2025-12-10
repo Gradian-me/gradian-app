@@ -1,5 +1,5 @@
 // Password Processor Utility
-// Automatically detects and hashes password fields based on schema role="password"
+// Automatically detects and hashes password fields based on component="password" or role="password"
 
 import { hashPassword, HashType } from '@/domains/auth/utils/password.util';
 
@@ -18,8 +18,8 @@ async function getSchema(schemaId: string): Promise<any> {
 
 /**
  * Process entity data to hash password fields
- * Detects fields with role="password" in the schema and hashes them
- * @param schemaId - The schema ID (e.g., "users")
+ * Detects fields with component="password" or role="password" in the schema and hashes them
+ * @param schemaId - The schema ID (e.g., "users", "databases")
  * @param data - The entity data to process
  * @param hashType - The hash type to use ("none" for clear text, "argon2" for hashing)
  * @returns Processed data with hashed passwords
@@ -29,20 +29,15 @@ export async function processPasswordFields(
   data: Record<string, any>,
   hashType: HashType = "argon2"
 ): Promise<Record<string, any>> {
-  // Only process if this is the users schema
-  if (schemaId !== 'users') {
-    return data;
-  }
-
   // Get the schema to find password fields
   const schema = await getSchema(schemaId);
   if (!schema || !schema.fields) {
     return data;
   }
 
-  // Find fields with role="password"
+  // Find fields with component="password" or role="password" (more secure: check component first)
   const passwordFields = schema.fields.filter(
-    (field: any) => field.role === 'password'
+    (field: any) => field.component === 'password' || field.role === 'password'
   );
 
   if (passwordFields.length === 0) {

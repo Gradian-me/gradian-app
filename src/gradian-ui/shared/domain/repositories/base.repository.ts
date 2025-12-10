@@ -7,6 +7,7 @@ import { BaseEntity, FilterParams } from '../types/base.types';
 import { readSchemaData, writeSchemaData, ensureSchemaCollection } from '../utils/data-storage.util';
 import { EntityNotFoundError } from '../errors/domain.errors';
 import { processPasswordFields } from '../utils/password-processor.util';
+import { processSensitiveFields } from '../utils/sensitive-field-processor.util';
 import { applySchemaDefaults } from '../utils/default-processor.util';
 
 export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
@@ -153,6 +154,12 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
       processedData
     );
     
+    // Process sensitive fields for all schemas
+    processedData = await processSensitiveFields(
+      this.schemaId,
+      processedData
+    );
+    
     // Clean up undefined/null/"undefined" values before saving
     processedData = this.cleanData(processedData);
     
@@ -195,45 +202,66 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
       return null;
     }
 
-    // Process password fields if this is the users schema
-    // Always process password fields when updating users to detect and hash fields with role="password"
+    // Process password fields for all schemas
+    // Always process password fields to detect and hash fields with component="password" or role="password"
     const existingEntity = entities[index] as Record<string, any>;
     let processedData = data as Record<string, any>;
     
-    if (this.schemaId === 'users') {
-      // Merge existing data with new data for processing
-      // This ensures we have all fields needed for password processing
-      const mergedData = { ...existingEntity, ...data };
+    // Cast data to Record for dynamic property access
+    const dataRecord = data as Record<string, any>;
+    
+    // Get schema once for both password and sensitive field processing (loaded once to avoid duplicates)
+    const schema = await (async () => {
+      try {
+        const { getSchemaById } = await import('@/gradian-ui/schema-manager/utils/schema-registry.server');
+        return await getSchemaById(this.schemaId);
+      } catch {
+        return null;
+      }
+    })();
+    
+    // Merge existing data with new data for processing
+    // This ensures we have all fields needed for password processing
+    const mergedData = { ...existingEntity, ...data };
+    
+    // Process password fields - this will detect fields with component="password" or role="password" from schema
+    const processed = await processPasswordFields(this.schemaId, mergedData);
+    
+    // Start with the original update data
+    processedData = { ...data };
+    
+    if (schema && schema.fields) {
+      // Find all password fields (component="password" or role="password")
+      const passwordFields = schema.fields.filter(
+        (field: any) => field.component === 'password' || field.role === 'password'
+      );
       
-      // Process password fields - this will detect fields with role="password" from schema
-      const processed = await processPasswordFields(this.schemaId, mergedData);
-      
-      // Start with the original update data
-      processedData = { ...data };
-      
-      // If password field was in the update data, use the processed (hashed) version
-      if ('password' in data) {
-        // Check if password hashing failed
-        if (processed._passwordHashFailed) {
-          console.error(`[PASSWORD] Password hashing failed: ${processed._passwordHashError || 'Unknown error'}`);
-          // Don't update the password if hashing failed - keep the existing one
-          // Remove password from update data to prevent unhashed password from being saved
-          delete processedData.password;
-          console.warn(`[PASSWORD] Password update skipped due to hashing failure. Please set PEPPER environment variable.`);
-        } else if (processed.password !== undefined && processed._passwordHashed) {
-          // Use the processed password (which will be hashed if it wasn't already)
-          processedData.password = processed.password;
-          const originalLength =
-            typeof data.password === 'string' ? data.password.length : 0;
-          const hashedLength =
-            typeof processed.password === 'string' ? processed.password.length : 0;
-          console.log(
-            `[PASSWORD] Password updated - original length: ${originalLength}, hashed length: ${hashedLength}`
-          );
-        } else if (processed.password === undefined && 'password' in data) {
-          // Password was removed during processing (hashing failed), don't update it
-          delete processedData.password;
-          console.warn(`[PASSWORD] Password update skipped - password was not processed`);
+      // Update each password field that was in the update data
+      for (const field of passwordFields) {
+        const fieldName = field.name;
+        if (fieldName in dataRecord) {
+          // Check if password hashing failed
+          if (processed._passwordHashFailed) {
+            console.error(`[PASSWORD] Password hashing failed for field ${fieldName}: ${processed._passwordHashError || 'Unknown error'}`);
+            // Don't update the password if hashing failed - keep the existing one
+            // Remove password from update data to prevent unhashed password from being saved
+            delete processedData[fieldName];
+            console.warn(`[PASSWORD] Password update skipped for ${fieldName} due to hashing failure. Please set PEPPER environment variable.`);
+          } else if (processed[fieldName] !== undefined && processed._passwordHashed) {
+            // Use the processed password (which will be hashed if it wasn't already)
+            processedData[fieldName] = processed[fieldName];
+            const originalLength =
+              typeof dataRecord[fieldName] === 'string' ? dataRecord[fieldName].length : 0;
+            const hashedLength =
+              typeof processed[fieldName] === 'string' ? processed[fieldName].length : 0;
+            console.log(
+              `[PASSWORD] Password updated for ${fieldName} - original length: ${originalLength}, hashed length: ${hashedLength}`
+            );
+          } else if (processed[fieldName] === undefined && fieldName in dataRecord) {
+            // Password was removed during processing (hashing failed), don't update it
+            delete processedData[fieldName];
+            console.warn(`[PASSWORD] Password update skipped for ${fieldName} - password was not processed`);
+          }
         }
       }
       
@@ -246,6 +274,26 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
       delete processedData._passwordHashed;
       delete processedData._passwordHashFailed;
       delete processedData._passwordHashError;
+    }
+
+    // Process sensitive fields for all schemas
+    // Merge existing data with new data for processing
+    const mergedDataForSensitive = { ...existingEntity, ...processedData };
+    const processedSensitive = await processSensitiveFields(this.schemaId, mergedDataForSensitive);
+    
+    // Update only fields that were actually changed and are sensitive
+    // Check which sensitive fields exist in the schema and update them if they were in the original update data
+    // Reuse the same schema variable loaded earlier (no duplicate declaration)
+    if (schema && schema.fields) {
+      const sensitiveFields = schema.fields.filter((field: any) => field.isSensitive === true);
+      
+      for (const field of sensitiveFields) {
+        const fieldName = field.name;
+        // Only update if this field was in the original update data
+        if (fieldName in dataRecord && processedSensitive[fieldName] !== undefined) {
+          processedData[fieldName] = processedSensitive[fieldName];
+        }
+      }
     }
 
     // Clean up undefined/null/"undefined" values before saving

@@ -783,5 +783,71 @@
     "id": "01KBSVZZF1C2R17BK1AK5P2H24",
     "createdAt": "2025-12-06T13:00:37.217Z",
     "updatedAt": "2025-12-06T13:00:37.217Z"
+  },
+  {
+    "id": "01KC3F79Z4TWYW4AVB7VKZCETY",
+    "sourceSchema": "servers",
+    "sourceId": "01KA8TM7H68FPKTRNNNSPWWBKD",
+    "targetSchema": "users",
+    "targetId": "01KC3F76QSDY5P2XVP3T2E0DAD",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-10T06:29:50.179Z",
+    "updatedAt": "2025-12-10T06:29:50.179Z"
+  },
+  {
+    "id": "01KC3F9WAGWZNNZHW6KTRGYC7F",
+    "sourceSchema": "servers",
+    "sourceId": "01KBAT7P2B5NZYX26HVWYV28N1",
+    "targetSchema": "users",
+    "targetId": "01KC3F76QSDY5P2XVP3T2E0DAD",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-10T06:31:14.512Z",
+    "updatedAt": "2025-12-10T06:31:14.512Z"
+  },
+  {
+    "id": "01KC3FBQMC73YKVGSX08860N46",
+    "sourceSchema": "servers",
+    "sourceId": "01KA8QZJ9SAJ6Y2GR05K42BQYF",
+    "targetSchema": "users",
+    "targetId": "01KC3FBM8YXB7V70SQMEBN0151",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-10T06:32:15.244Z",
+    "updatedAt": "2025-12-10T06:32:15.244Z"
+  },
+  {
+    "id": "01KC3FCAT4S35GXMEKPQ6F161K",
+    "sourceSchema": "servers",
+    "sourceId": "01KA8VVZENR2AS7YWTAY4T6HM7",
+    "targetSchema": "users",
+    "targetId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-10T06:32:34.884Z",
+    "updatedAt": "2025-12-10T06:32:34.884Z"
+  },
+  {
+    "id": "01KC3FCK795611KRV9HCVDTEC8",
+    "sourceSchema": "servers",
+    "sourceId": "01KBASP59XTTA4CNBNXMNNV7SC",
+    "targetSchema": "users",
+    "targetId": "01KC3FBM8YXB7V70SQMEBN0151",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-10T06:32:43.497Z",
+    "updatedAt": "2025-12-10T06:32:43.497Z"
+  },
+  {
+    "id": "01KC3FCY9EYQPNFFQCVQ9K3T6F",
+    "sourceSchema": "servers",
+    "sourceId": "01KBATBKE9E23X1JT9KDHK95H6",
+    "targetSchema": "users",
+    "targetId": "01KC3FBM8YXB7V70SQMEBN0151",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2025-12-10T06:32:54.830Z",
+    "updatedAt": "2025-12-10T06:32:54.830Z"
   }
 ]

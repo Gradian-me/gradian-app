@@ -1482,6 +1482,48 @@
       "updatedAt": "2025-12-08T14:34:11.339Z",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$gGbYpp66WV8vRbM6uoX56g$Vw83f/KKDMndrgUwFY+wl6PAQuSwFqFohNkyua4Tbqo",
       "hashType": "argon2"
+    },
+    {
+      "company": "CinnaGen",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "username": "rezaeifardh",
+      "firstName": "Hossein",
+      "lastName": "Rezaeifard",
+      "email": "rezaeifardh@cinnagen.com",
+      "postTitle": "Backend Developer",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KC3F76QSDY5P2XVP3T2E0DAD",
+      "createdAt": "2025-12-10T06:29:46.883Z",
+      "updatedAt": "2025-12-10T06:29:46.883Z"
+    },
+    {
+      "company": "CinnaGen",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "username": "ghasemimas",
+      "firstName": "Masoud",
+      "lastName": "Mirghasemi",
+      "email": "ghasemimas@cinnagen.com",
+      "postTitle": "Backend Developer",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KC3FBM8YXB7V70SQMEBN0151",
+      "createdAt": "2025-12-10T06:32:11.814Z",
+      "updatedAt": "2025-12-10T06:32:11.814Z"
     }
   ],
   "purchaseOrders": [],
@@ -1625,10 +1667,10 @@
   "servers": [
     {
       "name": "Gradian Integration",
-      "address": "https://octa.cinnagen.com/integration",
+      "address": "{\"ciphertext\":\"Sk9ZEorIWF+TaPDusnYjiAJMecBh5H69O9Gtv7USOcaE82qCCFk3p34NcsWO8AsQ9NorolE=\",\"iv\":\"J6cx9WGObuRvzKPb\"}",
       "id": "01KA8QZJ9SAJ6Y2GR05K42BQYF",
       "createdAt": "2025-11-17T11:07:42.270Z",
-      "updatedAt": "2025-11-30T16:44:37.719Z",
+      "updatedAt": "2025-12-10T06:32:15.295Z",
       "url-repositories": [],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -1642,18 +1684,18 @@
       ],
       "owners": [
         {
-          "id": "01KBATBCQBC07CE2227A1V45VQ"
+          "id": "01KC3FBM8YXB7V70SQMEBN0151"
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/",
+      "address": "{\"ciphertext\":\"jWiJABm4WXXcvC7EP/4qWq2hYUtjSeIEKzLegc0sa5AMi9joy5Rw3rTETRQhK4PTOixTSDbBGvAv\",\"iv\":\"NicNhjdMGtq7vRkz\"}",
       "name": "CG-GR-API-DEV-1",
       "id": "01KA8TM7H68FPKTRNNNSPWWBKD",
       "createdAt": "2025-11-17T11:53:56.527Z",
-      "updatedAt": "2025-12-06T06:34:51.958Z",
+      "updatedAt": "2025-12-10T06:29:50.223Z",
       "url-repositories": [],
       "color": "blue",
       "environment": [
@@ -1668,7 +1710,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "owners": [
         {
-          "id": "01KBAT78NRNB8KCD4Z625KH07A"
+          "id": "01KC3F76QSDY5P2XVP3T2E0DAD"
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1677,10 +1719,10 @@
     },
     {
       "name": "Gradian App Dev",
-      "address": "http://localhost:3000",
+      "address": "{\"ciphertext\":\"OhiNzpM5frmsQYRgXe8fQrGq7D+o99xY84oL/qFwbY+BHQtU5g==\",\"iv\":\"Ic/DDNAtu7CwGprv\"}",
       "id": "01KA8VVZENR2AS7YWTAY4T6HM7",
       "createdAt": "2025-11-17T12:15:38.970Z",
-      "updatedAt": "2025-11-30T16:44:18.232Z",
+      "updatedAt": "2025-12-10T06:32:34.944Z",
       "url-repositories": [],
       "color": "blue",
       "environment": [
@@ -1703,7 +1745,7 @@
     },
     {
       "name": "Gradian OCTA",
-      "address": "https://octa.cinnagen.com",
+      "address": "{\"ciphertext\":\"0H5biZwvMXL3rtXo2ahuQNZ+MKU6tgu2KtDnA2tMuFI3NEyrmi/K0aI=\",\"iv\":\"f8i774pfSrhWflIn\"}",
       "environment": [
         {
           "id": "production",
@@ -1716,11 +1758,11 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBASP59XTTA4CNBNXMNNV7SC",
       "createdAt": "2025-11-30T16:31:41.891Z",
-      "updatedAt": "2025-11-30T16:44:11.239Z",
+      "updatedAt": "2025-12-10T06:32:43.533Z",
       "url-repositories": [],
       "owners": [
         {
-          "id": "01KBATBCQBC07CE2227A1V45VQ"
+          "id": "01KC3FBM8YXB7V70SQMEBN0151"
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1729,7 +1771,7 @@
     {
       "color": "blue",
       "name": "Gradian Genora",
-      "address": "https://octa.cinnagen.com/genora",
+      "address": "{\"ciphertext\":\"FEjbEmBnBIG7qWK9t1PH1rf0C6rUezF4s9qj13cyvAgw1WpTdcpNxFAafGP95zgS\",\"iv\":\"yXUQhxqobJT2P6Jv\"}",
       "environment": [
         {
           "id": "production",
@@ -1740,14 +1782,14 @@
       ],
       "owners": [
         {
-          "id": "01KBAT78NRNB8KCD4Z625KH07A"
+          "id": "01KC3F76QSDY5P2XVP3T2E0DAD"
         }
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBAT7P2B5NZYX26HVWYV28N1",
       "createdAt": "2025-11-30T16:41:16.115Z",
-      "updatedAt": "2025-12-06T09:50:05.595Z",
+      "updatedAt": "2025-12-10T06:31:14.571Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "audienceId": "01KANTJN9VP30XGJY4FQTCTK7D",
@@ -1755,7 +1797,7 @@
     },
     {
       "name": "Gradian Authentication",
-      "address": "https://octa.cinnagen.com/auth",
+      "address": "{\"ciphertext\":\"uAHtEJyA6B73EZH69ZIx1hj7eoQfGeMujpWMa/y8klN5t30KnleSyx6liWPPhw==\",\"iv\":\"jj/NSMRLoAq5PdnU\"}",
       "environment": [
         {
           "id": "production",
@@ -1766,14 +1808,14 @@
       ],
       "owners": [
         {
-          "id": "01KBATBCQBC07CE2227A1V45VQ"
+          "id": "01KC3FBM8YXB7V70SQMEBN0151"
         }
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBATBKE9E23X1JT9KDHK95H6",
       "createdAt": "2025-11-30T16:43:24.494Z",
-      "updatedAt": "2025-11-30T16:43:24.494Z",
+      "updatedAt": "2025-12-10T06:32:54.881Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },

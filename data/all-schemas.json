@@ -2870,6 +2870,7 @@
           "required": true,
           "pattern": "^https?:\\/\\/.+"
         },
+        "isSensitive": true,
         "colSpan": 1,
         "order": 2
       },
