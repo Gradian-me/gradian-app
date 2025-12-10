@@ -826,29 +826,42 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   }, [isOpen, supportsPagination, searchQuery, includeKey, excludeKey, loadItems, companyKey]);
 
   useEffect(() => {
-    if (supportsPagination) {
+    const trimmed = searchQuery.trim();
+    const baseSorted = sortOptions(items, sortType);
+
+    if (!trimmed) {
+      // Avoid redundant state updates if already equal
+      if (filteredItems.length === baseSorted.length && filteredItems.every((v, i) => v === baseSorted[i])) {
+        return;
+      }
+      setFilteredItems(baseSorted);
       return;
     }
 
-    if (!searchQuery.trim()) {
-      const sortedItems = sortOptions(items, sortType);
-      setFilteredItems(sortedItems);
-      return;
-    }
-
-    const query = searchQuery.toLowerCase();
+    const query = trimmed.toLowerCase();
     const filtered = items.filter((item) => {
       if (!effectiveSchema) {
         if (effectiveSourceColumnRoles) {
-          const title = getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) ||
-                        item.name || item.title || item.singular_name || '';
-          const subtitle = getValueByRoleFromSourceColumns(item, 'subtitle', effectiveSourceColumnRoles) ||
-                           item.email || item.subtitle || '';
-          const description = getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles) ||
-                              item.description || '';
-          return title.toLowerCase().includes(query) ||
-                 subtitle.toLowerCase().includes(query) ||
-                 description.toLowerCase().includes(query);
+          const title =
+            getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) ||
+            item.name ||
+            item.title ||
+            item.singular_name ||
+            '';
+          const subtitle =
+            getValueByRoleFromSourceColumns(item, 'subtitle', effectiveSourceColumnRoles) ||
+            item.email ||
+            item.subtitle ||
+            '';
+          const description =
+            getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles) ||
+            item.description ||
+            '';
+          return (
+            title.toLowerCase().includes(query) ||
+            subtitle.toLowerCase().includes(query) ||
+            description.toLowerCase().includes(query)
+          );
         }
         const title = item.name || item.title || item.singular_name || '';
         const subtitle = item.email || item.subtitle || '';
@@ -856,13 +869,17 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       }
 
       const title = getValueByRole(effectiveSchema, item, 'title') || item.name || '';
-      const subtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
+      const subtitle =
+        getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
       return title.toLowerCase().includes(query) || subtitle.toLowerCase().includes(query);
     });
 
     const sortedFiltered = sortOptions(filtered, sortType);
+    if (filteredItems.length === sortedFiltered.length && filteredItems.every((v, i) => v === sortedFiltered[i])) {
+      return;
+    }
     setFilteredItems(sortedFiltered);
-  }, [supportsPagination, searchQuery, items, effectiveSchema, sortType, effectiveSourceColumnRoles]);
+  }, [searchQuery, items, filteredItems, effectiveSchema, sortType, effectiveSourceColumnRoles]);
 
   useEffect(() => {
     if (!supportsPagination || !isOpen) {

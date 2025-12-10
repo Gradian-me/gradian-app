@@ -2374,6 +2374,21 @@
         "description": "Application name and icon",
         "initialState": "expanded",
         "columns": 2
+      },
+      {
+        "id": "application-schemas",
+        "title": "Schemas",
+        "description": "Schemas that belong to this application",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 0,
+          "targetSchema": "schemas",
+          "relationTypeId": "HAS_SCHEMA",
+          "addType": "mustSelectFromData",
+          "fieldRelationType": "connectToSchema",
+          "isUnique": true
+        }
       }
     ],
     "detailPageMetadata": {

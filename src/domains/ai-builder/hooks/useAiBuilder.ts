@@ -83,9 +83,23 @@ export function useAiBuilder(): UseAiBuilderReturn {
               routePath = queryString ? `${path}?${queryString}` : path;
             }
 
-            const fullUrl = routePath.startsWith('http') 
-              ? routePath 
-              : `${baseUrl}${routePath.startsWith('/') ? routePath : '/' + routePath}`;
+            // Enforce same-origin: allow absolute URLs only when matching current origin
+            let fullUrl: string;
+            if (routePath.startsWith('http')) {
+              const parsed = new URL(routePath);
+              if (parsed.origin !== baseUrl) {
+                return {
+                  route: route.route,
+                  title: route.title,
+                  description: route.description,
+                  success: false,
+                  error: 'Preload route must be same-origin',
+                };
+              }
+              fullUrl = routePath;
+            } else {
+              fullUrl = `${baseUrl}${routePath.startsWith('/') ? routePath : '/' + routePath}`;
+            }
 
             const fetchOptions: RequestInit = {
               method,
@@ -309,7 +323,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
           error: err,
           message: errorMessage,
           agentId: request.agentId,
-          userPrompt: request.userPrompt.substring(0, 100) + '...',
+          userPrompt: request.userPrompt.substring(0, 64) + '...',
         });
       }
     } finally {
@@ -494,6 +508,13 @@ export function useAiBuilder(): UseAiBuilderReturn {
 
       if (!requestBody) {
         throw new Error('No data to send. Please try generating a new response.');
+      }
+
+      // Only allow same-origin relative routes to avoid SSRF
+      if (typeof window !== 'undefined') {
+        if (!agent.nextAction.route.startsWith('/')) {
+          throw new Error('Next action route must be a same-origin relative path.');
+        }
       }
 
       const fetchResponse = await fetch(agent.nextAction.route, {

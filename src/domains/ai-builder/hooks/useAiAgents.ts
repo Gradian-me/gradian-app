@@ -36,14 +36,23 @@ export function useAiAgents(options?: UseAiAgentsOptions): UseAiAgentsReturn {
     
     try {
       let response: Response;
+      let data: any = null;
+      
+      const handleResponse = async (res: Response): Promise<any> => {
+        const text = await res.text();
+        try {
+          return text ? JSON.parse(text) : {};
+        } catch {
+          return { error: text || 'Unexpected response format' };
+        }
+      };
       
       // If agentId is provided, fetch only that specific agent
       if (agentId) {
         response = await fetch(`/api/ai-agents/${agentId}`);
-        const data = await response.json();
+        data = await handleResponse(response);
         
-        if (data.success && data.data) {
-          // Return as array for consistency
+        if (response.ok && data.success && data.data) {
           setAgents([data.data]);
         } else {
           setError(data.error || `Failed to fetch agent "${agentId}"`);
@@ -52,12 +61,13 @@ export function useAiAgents(options?: UseAiAgentsOptions): UseAiAgentsReturn {
       } else {
         // Fetch all agents
         response = await fetch('/api/ai-agents');
-        const data = await response.json();
+        data = await handleResponse(response);
         
-        if (data.success && data.data && data.data.length > 0) {
+        if (response.ok && data.success && data.data && Array.isArray(data.data)) {
           setAgents(data.data);
         } else {
           setError(data.error || 'Failed to fetch agents');
+          setAgents([]);
         }
       }
     } catch (err) {

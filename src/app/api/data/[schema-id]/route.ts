@@ -182,7 +182,6 @@ export async function POST(
         body = undefined;
       }
       
-      console.log(`[POST /api/data/${schemaId}] Proxying to: ${targetPath}`);
       return proxyDataRequest(request, targetPath, {
         body,
         headers: { 'content-type': 'application/json' },

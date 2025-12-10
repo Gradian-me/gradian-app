@@ -263,31 +263,40 @@ export class ApiClient {
 
     try {
       const response = await fetch(url, requestConfig);
-      const data = await response.json();
 
-      // Add status code to response
+      // Safely parse response; don't assume JSON
+      const contentType = response.headers.get('content-type') || '';
+      let parsed: any = null;
+      try {
+        if (contentType.includes('application/json')) {
+          parsed = await response.json();
+        } else {
+          const text = await response.text();
+          parsed = text ? { message: text } : {};
+        }
+      } catch (parseErr) {
+        parsed = { message: 'Unable to parse response body' };
+      }
+
       const responseWithStatus: ApiResponse<T> = {
-        ...data,
+        ...(parsed || {}),
         statusCode: response.status,
       };
 
       if (!response.ok) {
-        const errorMessage = data.error || data.message || '';
-        // Check if it's a connection error (502 Bad Gateway or error message indicates connection issue)
-        // Suppress generic toast for integration sync - it will show a specific toast with domain
+        const errorMessage = parsed?.error || parsed?.message || '';
         const suppressToast = endpoint.includes('/api/integrations/sync');
         if (isConnectionError(null, response.status) || isConnectionError({ message: errorMessage })) {
           showConnectionErrorToast(undefined, suppressToast);
         }
         
-        // Return error response with status code, preserving messages if present
         return {
           success: false,
           error: errorMessage || `HTTP error! status: ${response.status}`,
           statusCode: response.status,
           data: null as any,
-          messages: data.messages,
-          message: data.message && typeof data.message === 'string' ? data.message : undefined,
+          messages: parsed?.messages,
+          message: typeof parsed?.message === 'string' ? parsed.message : undefined,
         };
       }
 

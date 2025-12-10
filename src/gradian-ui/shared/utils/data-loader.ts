@@ -23,6 +23,7 @@ const cacheRegistry = new Map<string, {
 }>();
 
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours default TTL
+const MAX_JSON_BYTES = 8 * 1024 * 1024; // defensive cap for in-memory responses
 
 /**
  * Get cookies from Next.js cookies() and format as cookie header string
@@ -198,7 +199,13 @@ export async function loadData<T = any>(
           throw new Error(`Failed to fetch data from ${apiPath}: ${response.status} ${response.statusText}`);
         }
 
-        const result = await response.json();
+        // Safely parse JSON with size guard
+        const text = await response.text();
+        const byteLength = Buffer.byteLength(text, 'utf8');
+        if (byteLength > MAX_JSON_BYTES) {
+          throw new Error(`Response too large (${byteLength} bytes)`);
+        }
+        const result = text ? JSON.parse(text) : {};
 
         if (!result.success) {
           throw new Error(result.error || `Failed to load data from ${apiPath}`);
@@ -342,7 +349,12 @@ export async function loadDataById<T = any>(
         return null;
       }
 
-      const result = await response.json();
+        const text = await response.text();
+        const byteLength = Buffer.byteLength(text, 'utf8');
+        if (byteLength > MAX_JSON_BYTES) {
+          throw new Error(`Response too large (${byteLength} bytes)`);
+        }
+        const result = text ? JSON.parse(text) : {};
 
       if (!result.success || !result.data) {
         return null;

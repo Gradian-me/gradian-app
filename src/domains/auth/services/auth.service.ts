@@ -57,22 +57,8 @@ async function extractAvatarFromUser(userData: any): Promise<string | undefined>
 async function findUserByEmail(email: string): Promise<User | null> {
   try {
     const users = readSchemaData<User>('users');
-    console.log(`[AUTH] Looking for user with email: ${email}`);
-    console.log(`[AUTH] Total users in database: ${users.length}`);
-    
-    if (users.length === 0) {
-      console.warn('[AUTH] No users found in database. Users array is empty.');
-    }
     
     const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (user) {
-      console.log(`[AUTH] User found: ${user.email} (ID: ${user.id})`);
-    } else {
-      console.log(`[AUTH] User not found with email: ${email}`);
-      console.log(`[AUTH] Available emails: ${users.map(u => u.email).join(', ') || 'none'}`);
-    }
-    
     return user || null;
   } catch (error) {
     // Handle DataStorageError and other errors gracefully
@@ -103,7 +89,6 @@ async function validatePassword(user: User, password: string): Promise<boolean> 
   
   // Verify password using the appropriate method
   const isValid = await verifyPassword(password, user.password, hashType);
-  console.log(`[AUTH] Password validation for ${user.email}: ${isValid ? 'valid' : 'invalid'} (hashType: ${hashType})`);
   return isValid;
 }
 

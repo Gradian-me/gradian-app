@@ -485,9 +485,13 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   };
   
   // Handler to open delete confirmation
-  const handleDeleteClick = (relationId: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleDeleteClick = (relationId: string, e?: React.MouseEvent) => {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation();
+    }
     setDeleteConfirmDialog({ open: true, relationId });
   };
 
@@ -505,36 +509,41 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
 
     try {
       const normalizedSelections = Array.isArray(selectedItems) ? selectedItems : [];
-      const operations = normalizedSelections.map(selection => {
-        if (!selection?.id) {
-          return null;
-        }
+      const existingIds = new Set(relations.map((r) => String(r.targetId)));
+      const toCreate = normalizedSelections.filter(
+        (selection) => selection?.id && !existingIds.has(String(selection.id))
+      );
 
-        return apiRequest('/api/relations', {
-        method: 'POST',
-        body: {
-          sourceSchema: sourceSchemaId,
-          sourceId: currentEntityId,
-          targetSchema: targetSchema,
-            targetId: selection.id,
-          relationTypeId: relationTypeId,
-        },
-      });
-      }).filter(Boolean) as Promise<any>[];
-
-      if (operations.length === 0 && rawItems?.length) {
-        const fallbackId = rawItems[0]?.id;
-        if (fallbackId) {
-          operations.push(apiRequest('/api/relations', {
+      const operations = toCreate
+        .map((selection) =>
+          apiRequest('/api/relations', {
             method: 'POST',
             body: {
               sourceSchema: sourceSchemaId,
               sourceId: currentEntityId,
               targetSchema: targetSchema,
-              targetId: fallbackId,
+              targetId: selection.id,
               relationTypeId: relationTypeId,
             },
-          }));
+          })
+        )
+        .filter(Boolean) as Promise<any>[];
+
+      if (operations.length === 0 && rawItems?.length) {
+        const fallbackId = rawItems[0]?.id;
+        if (fallbackId && !existingIds.has(String(fallbackId))) {
+          operations.push(
+            apiRequest('/api/relations', {
+              method: 'POST',
+              body: {
+                sourceSchema: sourceSchemaId,
+                sourceId: currentEntityId,
+                targetSchema: targetSchema,
+                targetId: fallbackId,
+                relationTypeId: relationTypeId,
+              },
+            })
+          );
         }
       }
 
@@ -547,11 +556,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       if (hasFailure) {
         console.error('Failed to create one or more relations from picker:', results);
       } else {
-        fetchRelations();
+        await fetchRelations();
       }
     } catch (error) {
       console.error('Error creating relation from picker:', error);
     }
+    setIsPickerOpen(false);
   };
 
   // Get already selected IDs to exclude from picker
@@ -1562,6 +1572,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               excludeIds={shouldExcludeIds ? selectedIds : undefined}
               canViewList={true}
               viewListUrl={`/page/${targetSchema}`}
+            allowMultiselect={false}
             />
           )}
           

@@ -9,6 +9,10 @@ import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData } from '../u
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
 import { clearCache as clearSharedSchemaCache } from '@/gradian-ui/shared/utils/data-loader';
 
+const MAX_SCHEMA_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
+const SCHEMA_FILE_PATH = path.join(process.cwd(), 'data', 'all-schemas.json');
+const SCHEMA_FILE_TMP_PATH = path.join(process.cwd(), 'data', 'all-schemas.tmp.json');
+
 /**
  * Get CORS headers for cross-origin requests
  * Prepares for future API key authentication
@@ -16,11 +20,10 @@ import { clearCache as clearSharedSchemaCache } from '@/gradian-ui/shared/utils/
 function getCorsHeaders(request: NextRequest): Record<string, string> {
   const origin = request.headers.get('origin');
   const allowedOrigins = process.env.FORM_EMBED_ALLOWED_ORIGINS
-    ? process.env.FORM_EMBED_ALLOWED_ORIGINS.split(',')
-    : ['*']; // Default to allow all for development
+    ? process.env.FORM_EMBED_ALLOWED_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean)
+    : [];
 
-  // Check if origin is allowed
-  const isAllowed = allowedOrigins.includes('*') || (origin && allowedOrigins.includes(origin));
+  const isAllowed = origin ? allowedOrigins.includes(origin) : false;
 
   const headers: Record<string, string> = {
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
@@ -30,8 +33,6 @@ function getCorsHeaders(request: NextRequest): Record<string, string> {
   if (isAllowed && origin) {
     headers['Access-Control-Allow-Origin'] = origin;
     headers['Access-Control-Allow-Credentials'] = 'true';
-  } else if (allowedOrigins.includes('*')) {
-    headers['Access-Control-Allow-Origin'] = '*';
   }
 
   return headers;
@@ -69,16 +70,17 @@ function clearSchemaCache() {
  * Cache is invalidated if file modification time changes or TTL expires
  */
 function loadSchemas(): any[] {
-  const dataPath = path.join(process.cwd(), 'data', 'all-schemas.json');
-  
-  if (!fs.existsSync(dataPath)) {
+  if (!fs.existsSync(SCHEMA_FILE_PATH)) {
     return [];
   }
   
   // Check file modification time
   let currentMtime: number | null = null;
   try {
-    const stats = fs.statSync(dataPath);
+    const stats = fs.statSync(SCHEMA_FILE_PATH);
+    if (stats.size > MAX_SCHEMA_FILE_BYTES) {
+      throw new Error('Schemas file exceeds safe size limit');
+    }
     currentMtime = stats.mtimeMs;
   } catch {
     // If we can't get file stats, invalidate cache and reload
@@ -99,12 +101,18 @@ function loadSchemas(): any[] {
   }
   
   // Cache miss, expired, or file changed - read from file and update cache
-  const fileContents = fs.readFileSync(dataPath, 'utf8');
+  const fileContents = fs.readFileSync(SCHEMA_FILE_PATH, 'utf8');
   cachedSchemas = JSON.parse(fileContents);
   cacheTimestamp = now;
   cachedFileMtime = currentMtime;
   
   return cachedSchemas || [];
+}
+
+function writeSchemasAtomically(schemas: any[]): void {
+  const payload = JSON.stringify(schemas, null, 2);
+  fs.writeFileSync(SCHEMA_FILE_TMP_PATH, payload, { encoding: 'utf8', mode: 0o600 });
+  fs.renameSync(SCHEMA_FILE_TMP_PATH, SCHEMA_FILE_PATH);
 }
 
 /**
@@ -237,9 +245,8 @@ export async function PUT(
     // Update the schema
     schemas[schemaIndex] = { ...schemas[schemaIndex], ...updatedSchema };
 
-    // Write back to file
-    const dataPath = path.join(process.cwd(), 'data', 'all-schemas.json');
-    fs.writeFileSync(dataPath, JSON.stringify(schemas, null, 2), 'utf8');
+    // Write back to file atomically
+    writeSchemasAtomically(schemas);
     
     // Clear caches to force reload on next request
     cachedSchemas = null;
@@ -347,9 +354,8 @@ export async function DELETE(
       schemas[schemaIndex] = { ...deletedSchema, inactive: true };
     }
 
-    // Write back to file
-    const dataPath = path.join(process.cwd(), 'data', 'all-schemas.json');
-    fs.writeFileSync(dataPath, JSON.stringify(schemas, null, 2), 'utf8');
+    // Write back to file atomically
+    writeSchemasAtomically(schemas);
     
     // Clear caches to force reload on next request
     cachedSchemas = null;

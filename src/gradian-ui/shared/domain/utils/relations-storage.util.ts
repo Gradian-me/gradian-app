@@ -9,6 +9,8 @@ import { DataRelation } from '@/gradian-ui/schema-manager/types/form-schema';
 import { ulid } from 'ulid';
 
 const RELATIONS_FILE_PATH = path.join(process.cwd(), 'data', 'all-data-relations.json');
+const RELATIONS_TMP_PATH = path.join(process.cwd(), 'data', 'all-data-relations.tmp.json');
+const MAX_RELATIONS_FILE_BYTES = 8 * 1024 * 1024; // 8MB cap to avoid runaway growth
 
 /**
  * Ensure data directory and relations file exist
@@ -22,8 +24,13 @@ function ensureRelationsFile(): void {
   
   if (!fs.existsSync(RELATIONS_FILE_PATH)) {
     const initialData: DataRelation[] = [];
-    fs.writeFileSync(RELATIONS_FILE_PATH, JSON.stringify(initialData, null, 2), 'utf-8');
+    fs.writeFileSync(RELATIONS_FILE_PATH, JSON.stringify(initialData, null, 2), { encoding: 'utf-8', mode: 0o600 });
   }
+}
+
+function writeRelationsAtomically(payload: string): void {
+  fs.writeFileSync(RELATIONS_TMP_PATH, payload, { encoding: 'utf-8', mode: 0o600 });
+  fs.renameSync(RELATIONS_TMP_PATH, RELATIONS_FILE_PATH);
 }
 
 /**
@@ -32,6 +39,10 @@ function ensureRelationsFile(): void {
 export function readAllRelations(): DataRelation[] {
   try {
     ensureRelationsFile();
+    const { size } = fs.statSync(RELATIONS_FILE_PATH);
+    if (size > MAX_RELATIONS_FILE_BYTES) {
+      throw new DataStorageError('read relations', 'Relations file exceeds safe size limit');
+    }
     const rawData = fs.readFileSync(RELATIONS_FILE_PATH, 'utf-8');
     return JSON.parse(rawData);
   } catch (error) {
@@ -45,7 +56,8 @@ export function readAllRelations(): DataRelation[] {
 export function writeAllRelations(relations: DataRelation[]): void {
   try {
     ensureRelationsFile();
-    fs.writeFileSync(RELATIONS_FILE_PATH, JSON.stringify(relations, null, 2), 'utf-8');
+    const payload = JSON.stringify(relations, null, 2);
+    writeRelationsAtomically(payload);
   } catch (error) {
     throw new DataStorageError('write relations', error instanceof Error ? error.message : 'Unknown error');
   }

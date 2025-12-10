@@ -54,41 +54,24 @@ export async function POST(request: NextRequest) {
   loggingCustom(LogType.LOGIN_LOG, 'info', '========== LOGIN API CALLED ==========');
   loggingCustom(LogType.LOGIN_LOG, 'info', `Request received at: ${new Date().toISOString()}`);
   try {
-    // Log route being called
     loggingCustom(LogType.LOGIN_LOG, 'info', 'POST /api/auth/login - Request received');
 
-    // Log headers
-    const headers: Record<string, string> = {};
-    request.headers.forEach((value, key) => {
-      headers[key] = value;
-    });
-    loggingCustom(LogType.LOGIN_LOG, 'debug', `Headers: ${JSON.stringify(headers, null, 2)}`);
-
-    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Parsing request body...');
-    const body = await request.json();
-    loggingCustom(LogType.LOGIN_LOG, 'debug', `Request body received: ${JSON.stringify({
-      emailOrUsername: body.emailOrUsername || body.email,
-      hasPassword: !!body.password,
-      deviceFingerprint: body.deviceFingerprint || body.fingerprint,
-      fullBody: {
-        ...body,
-        password: body.password ? '***MASKED***' : undefined,
-      },
-    })}`);
+    let body: any;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      loggingCustom(LogType.LOGIN_LOG, 'warn', `Invalid JSON body: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+      return NextResponse.json(
+        { success: false, error: 'Invalid request payload' },
+        { status: 400 }
+      );
+    }
     
     const emailOrUsername = body.emailOrUsername || body.email;
     const password = body.password;
     const deviceFingerprint = body.deviceFingerprint || body.fingerprint;
 
-    // Log body (mask password for security)
-    const sanitizedBody = { ...body };
-    if (sanitizedBody.password) {
-      sanitizedBody.password = '***MASKED***';
-    }
-    loggingCustom(LogType.LOGIN_LOG, 'debug', `Request Body: ${JSON.stringify(sanitizedBody, null, 2)}`);
-
     // Validate input
-    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Validating input...');
     if (!emailOrUsername || !password) {
       loggingCustom(LogType.LOGIN_LOG, 'warn', 'Validation failed - missing email or password');
       const errorResponse = {

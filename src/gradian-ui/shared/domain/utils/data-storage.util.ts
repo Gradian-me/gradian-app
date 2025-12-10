@@ -6,7 +6,11 @@ import fs from 'fs';
 import path from 'path';
 import { DataStorageError } from '../errors/domain.errors';
 
+// Cap data file size to reduce risk of loading corrupted/oversized JSON
+const MAX_DATA_FILE_BYTES = 10 * 1024 * 1024; // 10MB
+
 const DATA_FILE_PATH = path.join(process.cwd(), 'data', 'all-data.json');
+const DATA_TMP_PATH = path.join(process.cwd(), 'data', 'all-data.tmp.json');
 
 /**
  * Ensure data directory and file exist
@@ -28,7 +32,7 @@ function ensureDataFile(): void {
       invoices: [],
       users: [],
     };
-    fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(initialData, null, 2), 'utf-8');
+    fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(initialData, null, 2), { encoding: 'utf-8', mode: 0o600 });
   }
 }
 
@@ -38,6 +42,10 @@ function ensureDataFile(): void {
 export function readAllData(): Record<string, any[]> {
   try {
     ensureDataFile();
+    const { size } = fs.statSync(DATA_FILE_PATH);
+    if (size > MAX_DATA_FILE_BYTES) {
+      throw new DataStorageError('read', 'Data file exceeds safe size limit');
+    }
     const rawData = fs.readFileSync(DATA_FILE_PATH, 'utf-8');
     return JSON.parse(rawData);
   } catch (error) {
@@ -51,7 +59,10 @@ export function readAllData(): Record<string, any[]> {
 export function writeAllData(data: Record<string, any[]>): void {
   try {
     ensureDataFile();
-    fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    const payload = JSON.stringify(data, null, 2);
+    // Write atomically to reduce risk of partial writes
+    fs.writeFileSync(DATA_TMP_PATH, payload, { encoding: 'utf-8', mode: 0o600 });
+    fs.renameSync(DATA_TMP_PATH, DATA_FILE_PATH);
   } catch (error) {
     throw new DataStorageError('write', error instanceof Error ? error.message : 'Unknown error');
   }

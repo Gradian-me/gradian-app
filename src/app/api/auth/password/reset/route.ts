@@ -27,47 +27,23 @@ export async function POST(request: NextRequest) {
     const password = body.password;
     const confirmPassword = body.confirmPassword;
 
-    // Log the entire body for debugging
-    console.log('[password/reset] Received request body:', {
-      bodyKeys: Object.keys(body),
-      hasSkipKey: 'skip_key' in body,
-      skipKeyType: body.skip_key ? typeof body.skip_key : 'undefined',
-      skipKeyValue: body.skip_key 
-        ? (typeof body.skip_key === 'string' 
-          ? body.skip_key.substring(0, 100) + '...' 
-          : JSON.stringify(body.skip_key))
-        : null,
-    });
-
-    // Check if skip_key is provided and matches NEXT_PUBLIC_SKIP_KEY
+    // Check if skip_key is provided and matches server-only PASSWORD_RESET_SKIP_KEY
     // Skip key can be in body (for POST) or query params (fallback)
     // Skip key may be encrypted (needs decryption) or plain text
     // Skip key from body will be an object {ciphertext, iv}, from query params will be a string
     let skipKeyRaw: string | Record<string, string> | null = null;
     
     // For POST requests, check body first
-    if (body.skip_key) {
-      skipKeyRaw = body.skip_key as string | Record<string, string>;
-      console.log('[password/reset] Found skip_key in request body:', {
-        hasSkipKey: !!skipKeyRaw,
-        skipKeyType: typeof skipKeyRaw,
-        isObject: typeof skipKeyRaw === 'object',
-        skipKeyStructure: typeof skipKeyRaw === 'object' 
-          ? { hasCiphertext: 'ciphertext' in skipKeyRaw, hasIv: 'iv' in skipKeyRaw }
-          : null,
-      });
-    } else {
+  if (body.skip_key) {
+    skipKeyRaw = body.skip_key as string | Record<string, string>;
+  } else {
       // Fallback to query parameter
       const querySkipKey = new URL(request.url).searchParams.get('skip_key');
       skipKeyRaw = querySkipKey;
-      console.log('[password/reset] Skip_key not in body, checking query params:', {
-        hasSkipKey: !!skipKeyRaw,
-      });
     }
     
-    console.log('[password/reset] Attempting to decrypt skip_key...');
     const skipKey = skipKeyRaw ? await decryptSkipKeyFromRequest(request, skipKeyRaw) : null;
-    const expectedSkipKey = process.env.NEXT_PUBLIC_SKIP_KEY;
+  const expectedSkipKey = process.env.PASSWORD_RESET_SKIP_KEY;
     
     // Normalize the skip key (remove any surrounding quotes or whitespace)
     let normalizedSkipKey = skipKey?.trim() || null;
@@ -77,26 +53,7 @@ export async function POST(request: NextRequest) {
     }
     const normalizedExpectedKey = expectedSkipKey?.trim() || null;
     
-    console.log('[password/reset] After decryption:', {
-      skipKeyDecrypted: !!skipKey,
-      skipKeyLength: skipKey?.length || 0,
-      expectedKeyExists: !!expectedSkipKey,
-      expectedKeyLength: expectedSkipKey?.length || 0,
-    });
-    
     const shouldSkipOTP = normalizedSkipKey && normalizedExpectedKey && normalizedSkipKey === normalizedExpectedKey;
-    
-    console.log('[password/reset] Skip key validation:', {
-      hasSkipKey: !!skipKey,
-      hasExpectedKey: !!expectedSkipKey,
-      shouldSkipOTP,
-      skipKeyMatch: normalizedSkipKey === normalizedExpectedKey,
-      skipKeyRaw: skipKey || 'null',
-      skipKeyNormalized: normalizedSkipKey || 'null',
-      expectedKeyRaw: expectedSkipKey || 'null',
-      expectedKeyNormalized: normalizedExpectedKey || 'null',
-      exactMatch: normalizedSkipKey === normalizedExpectedKey,
-    });
 
     if (!username) {
       return NextResponse.json(

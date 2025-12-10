@@ -9,6 +9,9 @@ import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData } from './ut
 import { SCHEMA_SUMMARY_EXCLUDED_KEYS } from '@/gradian-ui/shared/constants/application-variables';
 
 const SCHEMA_SUMMARY_EXCLUDED_KEY_SET = new Set<string>(SCHEMA_SUMMARY_EXCLUDED_KEYS);
+const MAX_SCHEMA_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
+const SCHEMA_FILE_PATH = path.join(process.cwd(), 'data', 'all-schemas.json');
+const SCHEMA_FILE_TMP_PATH = path.join(process.cwd(), 'data', 'all-schemas.tmp.json');
 
 function buildSchemaSummary<T extends Record<string, any>>(schema: T): T {
   if (!schema || typeof schema !== 'object' || Array.isArray(schema)) {
@@ -50,15 +53,18 @@ function clearSchemaCache() {
  * Load schemas (always fresh, no caching)
  */
 async function loadSchemas(): Promise<any[]> {
-  const dataPath = path.join(process.cwd(), 'data', 'all-schemas.json');
-  
-  if (!fs.existsSync(dataPath)) {
+  if (!fs.existsSync(SCHEMA_FILE_PATH)) {
     console.warn(`[API] Schemas file not found at: ${dataPath}`);
     return [];
   }
   
   try {
-    const fileContents = fs.readFileSync(dataPath, 'utf8');
+    const { size } = fs.statSync(SCHEMA_FILE_PATH);
+    if (size > MAX_SCHEMA_FILE_BYTES) {
+      throw new Error('Schemas file exceeds safe size limit');
+    }
+
+    const fileContents = fs.readFileSync(SCHEMA_FILE_PATH, 'utf8');
     
     // Check if file is empty or just whitespace
     if (!fileContents || fileContents.trim().length === 0) {
@@ -87,9 +93,15 @@ async function loadSchemas(): Promise<any[]> {
     console.warn(`[API] Schemas file contains invalid data format at: ${dataPath}`);
     return [];
   } catch (error) {
-    console.error(`[API] Error parsing schemas file at ${dataPath}:`, error);
+    console.error(`[API] Error parsing schemas file at ${SCHEMA_FILE_PATH}:`, error);
     throw new Error(`Failed to parse schemas file: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
+}
+
+function writeSchemasAtomically(schemas: any[]): void {
+  const payload = JSON.stringify(schemas, null, 2);
+  fs.writeFileSync(SCHEMA_FILE_TMP_PATH, payload, { encoding: 'utf8', mode: 0o600 });
+  fs.renameSync(SCHEMA_FILE_TMP_PATH, SCHEMA_FILE_PATH);
 }
 
 /**
@@ -322,9 +334,8 @@ export async function POST(request: NextRequest) {
     // Add all new schemas
     schemas.push(...newSchemas);
 
-    // Write back to file
-    const schemaFilePath = path.join(process.cwd(), 'data', 'all-schemas.json');
-    fs.writeFileSync(schemaFilePath, JSON.stringify(schemas, null, 2), 'utf8');
+    // Write back to file atomically
+    writeSchemasAtomically(schemas);
 
     // Always call clear-cache API endpoint after creating schemas
     // This ensures caches are cleared even when demo mode is off (will proxy to remote)

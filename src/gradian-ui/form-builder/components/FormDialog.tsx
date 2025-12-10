@@ -65,10 +65,10 @@ export const FormDialog: React.FC<FormDialogProps> = ({
   }, [schema.actions, singularName, editMode]);
 
   const handleSubmit = async (data: Record<string, any>) => {
-    // Log form submission
+    // Log without sensitive payload
     loggingCustom(LogType.FORM_DATA, 'info', '=== FORM DIALOG SUBMISSION STARTED ===');
     loggingCustom(LogType.FORM_DATA, 'info', `Dialog Title: ${title || 'Untitled'}`);
-    loggingCustom(LogType.FORM_DATA, 'info', `Form Data Being Submitted: ${JSON.stringify(data, null, 2)}`);
+    loggingCustom(LogType.FORM_DATA, 'info', `Fields submitted: ${Object.keys(data || {}).length}`);
     
     setIsSubmitting(true);
     try {

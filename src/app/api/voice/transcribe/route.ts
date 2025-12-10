@@ -5,6 +5,9 @@ import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import fs from 'fs';
 import path from 'path';
 
+const MAX_UPLOAD_BYTES = 15 * 1024 * 1024; // 15MB limit to avoid abuse
+const ALLOWED_MIME_PREFIXES = ['audio/', 'video/']; // whisper-like endpoints often accept audio/video containers
+
 /**
  * Load AI agents from JSON file
  */
@@ -37,7 +40,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    loggingCustom(LogType.REQUEST_RESPONSE, 'info', `Transcription request received - File: ${file.name}, Size: ${file.size} bytes, Type: ${file.type}, Language: ${language || 'not specified'}`);
+    if (typeof file.size === 'number' && file.size > MAX_UPLOAD_BYTES) {
+      loggingCustom(LogType.REQUEST_RESPONSE, 'warn', `Transcription request rejected - file too large (${file.size} bytes)`);
+      return NextResponse.json(
+        { success: false, error: `File too large. Max allowed is ${Math.floor(MAX_UPLOAD_BYTES / (1024 * 1024))}MB` },
+        { status: 413 }
+      );
+    }
+
+    if (file.type && !ALLOWED_MIME_PREFIXES.some((prefix) => file.type.startsWith(prefix))) {
+      loggingCustom(LogType.REQUEST_RESPONSE, 'warn', `Transcription request rejected - unsupported mime type: ${file.type}`);
+      return NextResponse.json(
+        { success: false, error: 'Unsupported file type. Please upload an audio file.' },
+        { status: 400 }
+      );
+    }
+
+    loggingCustom(
+      LogType.REQUEST_RESPONSE,
+      'info',
+      `Transcription request received - File: ${file.name || 'unnamed'}, Size: ${file.size ?? 0} bytes, Type: ${file.type || 'unknown'}, Language: ${language || 'not specified'}`
+    );
 
     // Get API key from environment
     const apiKey = process.env.LLM_API_KEY || process.env.AVALAI_API_KEY;

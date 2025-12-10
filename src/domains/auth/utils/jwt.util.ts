@@ -112,24 +112,26 @@ export function extractTokenFromCookies(cookies: string | null, cookieName: stri
  */
 export function addAudienceToToken(token: string, audienceId: string): string {
   try {
-    // Decode without verification to get the payload
-    const decoded = jwt.decode(token) as any;
-    if (!decoded) {
-      throw new Error('Failed to decode token');
+    const verified = jwt.verify(token, AUTH_CONFIG.JWT_SECRET) as JWTPayload;
+    const nowSeconds = Math.floor(Date.now() / 1000);
+
+    if (verified.exp && verified.exp <= nowSeconds) {
+      throw new Error('Token has expired');
     }
 
-    // Create new token with audienceId added
+    const remainingTtl = verified.exp ? Math.max(verified.exp - nowSeconds, 1) : AUTH_CONFIG.ACCESS_TOKEN_EXPIRY;
+
     return jwt.sign(
       {
-        userId: decoded.userId,
-        email: decoded.email,
-        name: decoded.name,
-        role: decoded.role,
+        userId: verified.userId,
+        email: verified.email,
+        name: verified.name,
+        role: verified.role,
         audience: audienceId,
       },
       AUTH_CONFIG.JWT_SECRET,
       {
-        expiresIn: decoded.exp ? decoded.exp - Math.floor(Date.now() / 1000) : AUTH_CONFIG.ACCESS_TOKEN_EXPIRY,
+        expiresIn: remainingTtl,
       }
     );
   } catch (error) {

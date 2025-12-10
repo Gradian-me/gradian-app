@@ -444,16 +444,13 @@ export const proxyDataRequest = async (
     if (authToken) {
       // Format as Bearer token
       authHeader = `Bearer ${authToken}`;
-      loggingCustom(
-        LogType.CALL_BACKEND,
-        'debug',
-        `Authorization token extracted from cookie and added as Bearer header`
-      );
+      loggingCustom(LogType.CALL_BACKEND, 'info', 'Authorization token added from cookie');
     }
   } else {
     // Ensure header is in Bearer format if it's just a token
     if (authHeader && !authHeader.toLowerCase().startsWith('bearer ')) {
       authHeader = `Bearer ${authToken}`;
+      loggingCustom(LogType.CALL_BACKEND, 'info', 'Authorization header normalized to Bearer token');
     }
   }
 
@@ -492,11 +489,7 @@ export const proxyDataRequest = async (
     ? methodValue.toUpperCase() 
     : 'GET';
 
-  loggingCustom(
-    LogType.CALL_BACKEND,
-    'info',
-    `→ ${method} ${targetUrl}`
-  );
+  loggingCustom(LogType.CALL_BACKEND, 'info', `→ ${method} ${targetUrl}`);
 
   if (body) {
     loggingCustom(

@@ -909,5 +909,115 @@
     "id": "01KC3JJK6K7K5K75S9ZC5G5DVR",
     "createdAt": "2025-12-10T07:28:25.811Z",
     "updatedAt": "2025-12-10T07:28:25.811Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-classifications",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC3VQGECCHHQZTHJVD0DCSZT",
+    "createdAt": "2025-12-10T10:08:24.011Z",
+    "updatedAt": "2025-12-10T10:08:24.011Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-management",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC3VQGHHPEWQ65PG36BR9A67",
+    "createdAt": "2025-12-10T10:08:24.113Z",
+    "updatedAt": "2025-12-10T10:08:24.113Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "related-documents",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC3VQGK3J246GSV9FKXSBR85",
+    "createdAt": "2025-12-10T10:08:24.163Z",
+    "updatedAt": "2025-12-10T10:08:24.163Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-procedure",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC3VQGNE31QSRDX2FV227GBC",
+    "createdAt": "2025-12-10T10:08:24.238Z",
+    "updatedAt": "2025-12-10T10:08:24.238Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-categories",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC3VQGRSHV8168FHG1NT9F30",
+    "createdAt": "2025-12-10T10:08:24.345Z",
+    "updatedAt": "2025-12-10T10:08:24.345Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-subject-types",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC3VQGTJX7FPQ3K9QVXJTSP8",
+    "createdAt": "2025-12-10T10:08:24.402Z",
+    "updatedAt": "2025-12-10T10:08:24.402Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-management",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC3VQVBH8PY2KMMA08NDGVD2",
+    "createdAt": "2025-12-10T10:08:35.185Z",
+    "updatedAt": "2025-12-10T10:08:35.185Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-management",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC3VSYPQK4Q5VQTT8GD9SAVJ",
+    "createdAt": "2025-12-10T10:09:44.151Z",
+    "updatedAt": "2025-12-10T10:09:44.151Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-management",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC3VZSNA1T4V2BE13CWNR004",
+    "createdAt": "2025-12-10T10:12:55.594Z",
+    "updatedAt": "2025-12-10T10:12:55.594Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-management",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC3W07FXMVVNWNM97G6VKTBV",
+    "createdAt": "2025-12-10T10:13:09.757Z",
+    "updatedAt": "2025-12-10T10:13:09.757Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-management",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC3W86CNGWZ3YQ7THMBNNXYP",
+    "createdAt": "2025-12-10T10:17:30.773Z",
+    "updatedAt": "2025-12-10T10:17:30.773Z"
   }
 ]

@@ -453,11 +453,6 @@ export const proxySchemaRequest = async (
   // Try to extract token from Authorization header if present
   if (authHeader) {
     authToken = extractTokenFromHeader(authHeader);
-    loggingCustom(
-      LogType.CALL_BACKEND,
-      'info',
-      `Authorization header present in request, token extracted`
-    );
   }
 
   // If no token from header, try to extract from cookies
@@ -467,11 +462,7 @@ export const proxySchemaRequest = async (
     if (authToken) {
       // Format as Bearer token
       authHeader = `Bearer ${authToken}`;
-      loggingCustom(
-        LogType.CALL_BACKEND,
-        'info',
-        `Authorization token extracted from cookie and added as Bearer header`
-      );
+      loggingCustom(LogType.CALL_BACKEND, 'info', 'Authorization token added from cookie');
     } else {
       loggingCustom(
         LogType.CALL_BACKEND,
@@ -483,22 +474,13 @@ export const proxySchemaRequest = async (
     // Ensure header is in Bearer format if it's just a token
     if (authHeader && !authHeader.toLowerCase().startsWith('bearer ')) {
       authHeader = `Bearer ${authToken}`;
-      loggingCustom(
-        LogType.CALL_BACKEND,
-        'info',
-        `Authorization header formatted as Bearer token`
-      );
+      loggingCustom(LogType.CALL_BACKEND, 'info', 'Authorization header normalized to Bearer token');
     }
   }
 
   // Set Authorization header if we have a token
   if (authHeader) {
     headers.set('authorization', authHeader);
-    loggingCustom(
-      LogType.CALL_BACKEND,
-      'info',
-      `Authorization header set for backend request: ${authHeader.substring(0, 20)}...`
-    );
   } else {
     loggingCustom(
       LogType.CALL_BACKEND,

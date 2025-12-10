@@ -17,6 +17,7 @@ import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Plus, List } from 'lucide-react';
+import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements';
 import { getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { cn } from '@/gradian-ui/shared/utils';
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
@@ -85,6 +86,11 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
   const [editEntityId, setEditEntityId] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{ open: boolean; relationId: string | null; targetId: string | null }>({
+    open: false,
+    relationId: null,
+    targetId: null,
+  });
 
   // Get parent entity title using getValueByRole
   const parentTitle = useMemo(() => {
@@ -116,6 +122,16 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
 
   const shouldExcludeIds = isRelationBased && repeatingConfig?.isUnique === true;
 
+  const handleDeleteClick = useCallback((relationId: string, targetId?: string, e?: React.MouseEvent) => {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation();
+    }
+    setDeleteConfirmDialog({ open: true, relationId, targetId: targetId ?? null });
+  }, []);
+
   const handleRefreshClick = useCallback(
     async (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
@@ -145,17 +161,22 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
   const actionCellRenderer = useCallback(
     (_row: any, itemId: string | number | undefined) => {
       if (!itemId) return null;
+      const relationId = _row?.__relationId;
       return (
         <RelationActionCell
           itemId={itemId}
-          relationId={_row?.__relationId}
+          relationId={relationId}
           onView={handleViewDetails}
           onEdit={handleEditDetails}
-          onDeleted={refresh}
+          onDeleteClick={
+            relationId
+              ? (relId) => handleDeleteClick(String(relId), itemId ? String(itemId) : undefined)
+              : undefined
+          }
         />
       );
     },
-    [handleEditDetails, handleViewDetails, refresh]
+    [handleEditDetails, handleViewDetails, handleDeleteClick]
   );
 
   const columns = useRepeatingTableColumns({
@@ -207,13 +228,14 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
 
       try {
         const normalizedSelections = Array.isArray(selectedItems) ? selectedItems : [];
-        const operations = normalizedSelections
-          .map((selection) => {
-            if (!selection?.id) {
-              return null;
-            }
+        const existingIds = new Set(selectedIds.map((id) => String(id)));
+        const toCreate = normalizedSelections.filter(
+          (selection) => selection?.id && !existingIds.has(String(selection.id))
+        );
 
-            return apiRequest('/api/relations', {
+        const operations = toCreate
+          .map((selection) =>
+            apiRequest('/api/relations', {
               method: 'POST',
               body: {
                 sourceSchema: schema.id,
@@ -222,13 +244,13 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
                 targetId: selection.id,
                 relationTypeId: repeatingConfig.relationTypeId,
               },
-            });
           })
+          )
           .filter(Boolean) as Promise<any>[];
 
         if (operations.length === 0 && rawItems?.length) {
           const fallbackId = rawItems[0]?.id;
-          if (fallbackId) {
+          if (fallbackId && !existingIds.has(String(fallbackId))) {
             operations.push(
               apiRequest('/api/relations', {
                 method: 'POST',
@@ -273,6 +295,37 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
   const handleTableRowClick = useCallback((row: any, index: number) => {
     // Do nothing - just prevent event from propagating to parent
   }, []);
+
+  const handleRemoveRelation = useCallback(
+    async (relationId: string, targetId?: string | null) => {
+      try {
+        const deleteType = repeatingConfig?.deleteType || 'itemAndRelation';
+        // Delete relation first
+        const relationResponse = await apiRequest(`/api/relations/${relationId}`, {
+          method: 'DELETE',
+        });
+
+        if (!relationResponse.success) {
+          console.error('Failed to delete relation:', relationResponse.error);
+        } else if (deleteType === 'itemAndRelation' && targetId && targetSchemaId) {
+          // If configured, also delete the target item
+          const itemResponse = await apiRequest(`/api/data/${targetSchemaId}/${targetId}`, {
+            method: 'DELETE',
+          });
+          if (!itemResponse.success) {
+            console.error('Failed to delete target item:', itemResponse.error);
+          }
+        }
+
+        await refresh();
+      } catch (error) {
+        console.error('Error removing relation:', error);
+      } finally {
+        setDeleteConfirmDialog({ open: false, relationId: null, targetId: null });
+      }
+    },
+    [refresh, repeatingConfig?.deleteType, targetSchemaId]
+  );
 
   return (
     <>
@@ -473,9 +526,45 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
             selectedIds={selectedIds}
             canViewList={true}
             viewListUrl={`/page/${targetSchemaId}`}
-            allowMultiselect={true}
+            allowMultiselect={false}
           />
         )}
+
+      {/* Delete Confirmation Dialog for relation-based sections */}
+      <ConfirmationMessage
+        isOpen={deleteConfirmDialog.open}
+        onOpenChange={(open) =>
+          setDeleteConfirmDialog((prev) => ({ ...prev, open }))
+        }
+        title={
+          repeatingConfig?.deleteType === 'relationOnly'
+            ? 'Remove Relation'
+            : 'Delete Item'
+        }
+        message={
+          repeatingConfig?.deleteType === 'relationOnly'
+            ? 'Are you sure you want to remove this relation? The related item will remain but will no longer be linked to this record.'
+            : 'Are you sure you want to delete this item and its relation? This action cannot be undone.'
+        }
+        variant={repeatingConfig?.deleteType === 'relationOnly' ? 'default' : 'destructive'}
+        buttons={[
+          {
+            label: 'Cancel',
+            variant: 'outline',
+            action: () => setDeleteConfirmDialog({ open: false, relationId: null, targetId: null }),
+          },
+          {
+            label: repeatingConfig?.deleteType === 'relationOnly' ? 'Remove' : 'Delete',
+            variant: repeatingConfig?.deleteType === 'relationOnly' ? 'default' : 'destructive',
+            icon: 'Trash2',
+            action: () => {
+              if (deleteConfirmDialog.relationId) {
+                handleRemoveRelation(deleteConfirmDialog.relationId, deleteConfirmDialog.targetId);
+              }
+            },
+          },
+        ]}
+      />
     </>
   );
 };

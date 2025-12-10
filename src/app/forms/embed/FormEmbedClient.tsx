@@ -45,42 +45,49 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
   // Check if we're in modal mode
   const isModalMode = searchParams?.get('modalMode') === 'true';
 
-  // Send message to parent window
+  const isOriginAllowed = useCallback(
+    (origin: string | undefined | null): boolean => {
+      if (!origin) return false;
+      if (allowedOrigins && allowedOrigins.length > 0) {
+        return allowedOrigins.some((o) => validateMessageOrigin(origin, o));
+      }
+      if (returnOrigin && returnOrigin !== '*') {
+        return validateMessageOrigin(origin, returnOrigin);
+      }
+      return false;
+    },
+    [allowedOrigins, returnOrigin]
+  );
+
+  // Send message to parent window with origin enforcement
   const sendMessage = useCallback(
     (message: FormEmbedMessage) => {
       if (typeof window === 'undefined') {
         return;
       }
 
-      // In modal mode, send to parent (iframe parent)
-      // In popup mode, send to opener
       const targetWindow = isModalMode ? window.parent : window.opener;
-      
+      const originHint = returnOrigin || allowedOrigins?.[0];
+      const targetOrigin = originHint && originHint !== '*' ? originHint : undefined;
+
       if (!targetWindow) {
-        // If no target, we're not in a popup or iframe - log for debugging
-        console.log('[FormEmbed] Message (no target window):', message);
+        console.warn('[FormEmbed] No target window available for messaging');
         return;
       }
 
-      // Validate origin if returnOrigin is specified
-      if (returnOrigin) {
-        const targetOrigin = returnOrigin === '*' ? '*' : returnOrigin;
-        try {
-          targetWindow.postMessage(message, targetOrigin);
-        } catch (error) {
-          console.error('[FormEmbed] Failed to send message:', error);
-        }
-      } else {
-        // Send to any origin (less secure, but allows flexibility)
-        // In production, this should be more restrictive
-        try {
-          targetWindow.postMessage(message, '*');
-        } catch (error) {
-          console.error('[FormEmbed] Failed to send message:', error);
-        }
+      const originToUse = targetOrigin || (typeof window !== 'undefined' ? window.origin : undefined);
+      if (!originToUse) {
+        console.warn('[FormEmbed] Unable to determine safe target origin; message not sent');
+        return;
+      }
+
+      try {
+        targetWindow.postMessage(message, originToUse);
+      } catch (error) {
+        console.error('[FormEmbed] Failed to send message:', error);
       }
     },
-    [returnOrigin, isModalMode]
+    [returnOrigin, allowedOrigins, isModalMode]
   );
 
   // Notify parent that form is ready
@@ -153,6 +160,10 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
     }
 
     const handleMessage = (event: MessageEvent) => {
+      if (!isOriginAllowed(event.origin)) {
+        console.warn('[FormEmbed] Ignoring message from untrusted origin:', event.origin);
+        return;
+      }
       // Handle close message from parent modal
       if (event.data && event.data.type === 'close-form') {
         handleClose();

@@ -12,6 +12,7 @@ type RelationActionCellProps = {
   onView?: (itemId: string | number) => void;
   onEdit?: (itemId: string | number) => void;
   onDeleted?: () => Promise<void> | void;
+  onDeleteClick?: (relationId: string | number, itemId: string | number) => void;
   isDeletingLabel?: string;
 };
 
@@ -25,6 +26,7 @@ export function RelationActionCell({
   onView,
   onEdit,
   onDeleted,
+  onDeleteClick,
   isDeletingLabel = 'Deleting...',
 }: RelationActionCellProps) {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -49,6 +51,10 @@ export function RelationActionCell({
     async (event: React.MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
       if (!relationId) return;
+      if (onDeleteClick) {
+        onDeleteClick(relationId, itemId);
+        return;
+      }
       try {
         setIsDeleting(true);
         const response = await apiRequest(`/api/relations/${relationId}`, {
