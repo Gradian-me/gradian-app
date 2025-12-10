@@ -4,6 +4,7 @@
 
 import 'server-only';
 
+import { cookies } from 'next/headers';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
@@ -24,6 +25,21 @@ const cacheRegistry = new Map<string, {
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours default TTL
 
 /**
+ * Get cookies from Next.js cookies() and format as cookie header string
+ * This allows server-side fetch calls to forward cookies from the original browser request
+ */
+async function getCookieHeader(): Promise<string | undefined> {
+  try {
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
+    return cookieHeader || undefined;
+  } catch (error) {
+    // cookies() may not be available in all contexts (e.g., during build)
+    return undefined;
+  }
+}
+
+/**
  * Get the API URL for internal server-side calls
  * Server-side fetch requires absolute URLs, so we construct them here
  */
@@ -35,18 +51,20 @@ function getApiUrl(apiPath: string): string {
 
   // Check if we're in a build context (Next.js build time)
   // During build, API routes aren't available, so we should avoid fetch calls
-  const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' || 
-                       process.env.NODE_ENV === 'production' && !process.env.VERCEL_URL && !process.env.NEXTAUTH_URL;
+  const isBuildTime =
+    process.env.NEXT_PHASE === 'phase-production-build' ||
+    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_URL);
 
-  // For relative URLs, construct absolute URL for server-side fetch
-  // Priority: NEXTAUTH_URL > VERCEL_URL > localhost (default for development)
-  let baseUrl = process.env.NEXTAUTH_URL;
+  // For relative URLs, construct absolute URL for server-side fetch.
+  // IMPORTANT: do NOT use NEXTAUTH_URL here because it may point to an external
+  // auth host (e.g., https://octa.../auth) which causes 401s when we call our
+  // own API routes. Always prefer this app's origin.
+  let baseUrl =
+    process.env.INTERNAL_API_BASE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
 
   if (!baseUrl) {
-    // Use Vercel URL if available (for Vercel deployments)
-    if (process.env.VERCEL_URL) {
-      baseUrl = `https://${process.env.VERCEL_URL}`;
-    } else if (!isBuildTime) {
+    if (!isBuildTime) {
       // Default to localhost for local development (but not during build)
       const port = process.env.PORT || '3000';
       baseUrl = `http://localhost:${port}`;
@@ -162,11 +180,18 @@ export async function loadData<T = any>(
         const fetchUrl = getApiUrl(apiPath);
         loggingCustom(logType, 'info', `🌐 [${instanceId}] Fetching data from ${fetchUrl}`);
 
+        // Get cookies from Next.js request context to forward to internal API calls
+        const cookieHeader = await getCookieHeader();
+        const fetchHeaders: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
+        if (cookieHeader) {
+          fetchHeaders['cookie'] = cookieHeader;
+        }
+
         const response = await fetch(fetchUrl, {
           cache: 'no-store',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: fetchHeaders,
         });
 
         if (!response.ok) {
@@ -299,11 +324,18 @@ export async function loadDataById<T = any>(
       const fetchUrl = getApiUrl(`${apiBasePath}/${id}`);
       const startTime = Date.now();
 
+      // Get cookies from Next.js request context to forward to internal API calls
+      const cookieHeader = await getCookieHeader();
+      const fetchHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (cookieHeader) {
+        fetchHeaders['cookie'] = cookieHeader;
+      }
+
       const response = await fetch(fetchUrl, {
         cache: 'no-store',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: fetchHeaders,
       });
 
       if (!response.ok) {
@@ -407,11 +439,18 @@ export async function loadDataById<T = any>(
     const fetchUrl = getApiUrl(`${apiBasePath}/${id}`);
     const startTime = Date.now();
 
+    // Get cookies from Next.js request context to forward to internal API calls
+    const cookieHeader = await getCookieHeader();
+    const fetchHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (cookieHeader) {
+      fetchHeaders['cookie'] = cookieHeader;
+    }
+
     const response = await fetch(fetchUrl, {
       cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: fetchHeaders,
     });
 
     if (!response.ok) {

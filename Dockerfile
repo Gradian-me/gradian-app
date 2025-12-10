@@ -6,6 +6,8 @@ FROM node:20-slim AS builder
 # Accept build-time env vars needed for client bundle
 ARG NEXT_PUBLIC_ENCRYPTION_KEY
 ENV NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY
+ARG NEXT_PUBLIC_SKIP_KEY
+ENV NEXT_PUBLIC_SKIP_KEY=$NEXT_PUBLIC_SKIP_KEY
 
 # Install build dependencies for native modules (argon2, etc.)
 RUN export DEBIAN_FRONTEND=noninteractive && \
