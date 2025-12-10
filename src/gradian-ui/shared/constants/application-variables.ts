@@ -24,6 +24,15 @@ try {
 
 import { DEFAULT_APPLICATION_VARIABLES } from './application-variables-defaults';
 
+// Normalize booleans coming from env or config
+const toBoolean = (value: unknown, fallback: boolean): boolean => {
+  if (value === undefined || value === null) return fallback;
+  const normalized = String(value).trim().toLowerCase();
+  if (['true', '1', 'yes', 'on'].includes(normalized)) return true;
+  if (['false', '0', 'no', 'off'].includes(normalized)) return false;
+  return fallback;
+};
+
 // CLIENT-SAFE: This file must not import server-only modules
 // Server-side code that needs file system access should import
 // application-variables-loader directly
@@ -31,6 +40,7 @@ import { DEFAULT_APPLICATION_VARIABLES } from './application-variables-defaults'
 function loadVariables() {
   // Use imported JSON if available, otherwise use shared defaults
   const defaults = defaultVariables || DEFAULT_APPLICATION_VARIABLES;
+  const isProdLike = typeof process !== 'undefined' ? process.env.NODE_ENV !== 'development' : true;
   
   // Ensure we always have a valid LOG_CONFIG structure
   const sourceLogConfig = defaults?.LOG_CONFIG || DEFAULT_APPLICATION_VARIABLES.LOG_CONFIG || {};
@@ -39,13 +49,16 @@ function loadVariables() {
     return acc;
   }, {} as Record<LogType, boolean>);
 
-  // Allow explicitly disabling demo mode via env; default allows unless non-dev
-  const canSetDemoEnv = typeof process !== 'undefined' ? process.env.CAN_SET_DEMO_MODE : undefined;
-  const canSetDemoMode = canSetDemoEnv === undefined ? true : canSetDemoEnv.toLowerCase() === 'true';
-  // DEMO_MODE follows config unless explicitly disallowed via CAN_SET_DEMO_MODE=false
-  const demoMode = canSetDemoMode
-    ? (defaults?.DEMO_MODE ?? DEFAULT_APPLICATION_VARIABLES.DEMO_MODE)
-    : false;
+  // In prod-like envs, require explicit opt-in to allow demo mode
+  const canSetDemoMode = toBoolean(
+    typeof process !== 'undefined' ? process.env.CAN_SET_DEMO_MODE : undefined,
+    isProdLike ? false : true
+  );
+
+  // DEMO_MODE follows config or env override, but is gated by CAN_SET_DEMO_MODE in prod
+  const envDemoMode = toBoolean(typeof process !== 'undefined' ? process.env.DEMO_MODE : undefined, undefined as any);
+  const configDemoMode = defaults?.DEMO_MODE ?? DEFAULT_APPLICATION_VARIABLES.DEMO_MODE;
+  const demoMode = canSetDemoMode ? toBoolean(envDemoMode, configDemoMode) : false;
 
   return {
     LOG_CONFIG: logConfig,
