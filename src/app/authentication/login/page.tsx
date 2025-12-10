@@ -91,10 +91,14 @@ function LoginPageContent() {
         setFingerprint(fingerprintValue);
       }
 
-      // Get tenant domain for x-tenant-domain header in demo mode
-      const tenantDomain = selectedTenant?.domain || null;
+      // Derive tenant domain from explicit selection or current host (sent as X-Tenant-Domain)
+      const currentHost =
+        typeof window !== 'undefined' ? window.location.host : null;
+      const sanitizedHost = currentHost?.replace(/[^a-zA-Z0-9\.\-:]/g, '');
+      const tenantDomain = selectedTenant?.domain || sanitizedHost || null;
       console.log('[LOGIN] Tenant domain:', tenantDomain);
       console.log('[LOGIN] Selected tenant:', selectedTenant);
+      console.log('[LOGIN] Current host:', currentHost);
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
