@@ -1476,12 +1476,20 @@
       "postTitle": "QA Deputy",
       "company": "AryoGen",
       "incomplete": false,
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBZ64EBC9SWWTCCYKEMGK21E",
       "createdAt": "2025-12-08T14:34:01.460Z",
-      "updatedAt": "2025-12-08T14:34:11.339Z",
+      "updatedAt": "2025-12-10T06:53:58.427Z",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$gGbYpp66WV8vRbM6uoX56g$Vw83f/KKDMndrgUwFY+wl6PAQuSwFqFohNkyua4Tbqo",
-      "hashType": "argon2"
+      "hashType": "argon2",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
     },
     {
       "company": "CinnaGen",

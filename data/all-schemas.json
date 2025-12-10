@@ -4864,9 +4864,9 @@
     "schemaType": "system"
   },
   {
-    "id": "change-classification",
+    "id": "change-classifications",
     "description": "Manage change classifications with multilingual labels",
-    "singular_name": "Change Management Type",
+    "singular_name": "Change Classification",
     "plural_name": "Change Classifications",
     "fields": [
       {
@@ -5048,7 +5048,7 @@
         "component": "picker",
         "placeholder": "Click to select change management type",
         "description": "Select change management type from popup picker",
-        "targetSchema": "change-classification",
+        "targetSchema": "change-classifications",
         "validation": {
           "required": false
         },
