@@ -2,9 +2,41 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { revalidatePath } from 'next/cache';
-import { clearApplicationVariablesCache } from '@/gradian-ui/shared/utils/application-variables-loader';
+import { clearApplicationVariablesCache, loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
 
 const APPLICATION_VARIABLES_FILE = join(process.cwd(), 'data', 'application-variables.json');
+
+const toBoolean = (value: unknown, fallback: boolean): boolean => {
+  if (value === undefined || value === null) return fallback;
+  const normalized = String(value).trim().toLowerCase();
+  if (['true', '1', 'yes', 'on'].includes(normalized)) return true;
+  if (['false', '0', 'no', 'off'].includes(normalized)) return false;
+  return fallback;
+};
+
+const applyDemoModeGuard = (value: boolean): boolean => {
+  const canSetDemoMode = toBoolean(process.env.CAN_SET_DEMO_MODE, false);
+  const envDemoMode = toBoolean(process.env.DEMO_MODE, value);
+
+  // In production-like environments, disable demo mode unless explicitly permitted
+  if (process.env.NODE_ENV !== 'development' && !canSetDemoMode) {
+    return false;
+  }
+
+  return envDemoMode;
+};
+
+const sanitizeVariablesForClient = (data: any) => ({
+  ...data,
+  DEMO_MODE: applyDemoModeGuard(data?.DEMO_MODE ?? false),
+  AUTH_CONFIG: data?.AUTH_CONFIG
+    ? {
+        ...data.AUTH_CONFIG,
+        // Never leak secrets to the client
+        JWT_SECRET: undefined,
+      }
+    : undefined,
+});
 
 /**
  * Ensure the application variables JSON file exists
@@ -73,12 +105,12 @@ async function ensureApplicationVariablesFile(): Promise<void> {
 export async function GET(request: NextRequest) {
   try {
     await ensureApplicationVariablesFile();
-    const fileContent = await readFile(APPLICATION_VARIABLES_FILE, 'utf-8');
-    const data = JSON.parse(fileContent);
+    // Use loader to respect environment guards (e.g., CAN_SET_DEMO_MODE) and caching
+    const data = loadApplicationVariables();
 
     return NextResponse.json({
       success: true,
-      data
+      data: sanitizeVariablesForClient(data),
     });
   } catch (error) {
     return NextResponse.json(
@@ -147,6 +179,9 @@ export async function PUT(request: NextRequest) {
         }
       })
     };
+
+    // Enforce demo-mode guard before persisting
+    updatedData.DEMO_MODE = applyDemoModeGuard(updatedData.DEMO_MODE);
 
     // Write back to file
     await writeFile(APPLICATION_VARIABLES_FILE, JSON.stringify(updatedData, null, 2), 'utf-8');
