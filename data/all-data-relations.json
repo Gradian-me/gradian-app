@@ -849,5 +849,65 @@
     "fieldId": "server-owners",
     "createdAt": "2025-12-10T06:32:54.830Z",
     "updatedAt": "2025-12-10T06:32:54.830Z"
+  },
+  {
+    "sourceSchema": "business-areas",
+    "sourceId": "01KBFQM00000000000000000001",
+    "targetSchema": "applications",
+    "targetId": "01KBFCM00000000000000000001",
+    "relationTypeId": "HAS_ADDRESS",
+    "id": "01KC3JJ6DR2K8NA0K1P2HPBSN9",
+    "createdAt": "2025-12-10T07:28:12.728Z",
+    "updatedAt": "2025-12-10T07:28:12.728Z"
+  },
+  {
+    "sourceSchema": "business-areas",
+    "sourceId": "01KBFQM00000000000000000001",
+    "targetSchema": "applications",
+    "targetId": "01KBFCM00000000000000000002",
+    "relationTypeId": "HAS_ADDRESS",
+    "id": "01KC3JJBP5RFDX00AWWJ6NYASN",
+    "createdAt": "2025-12-10T07:28:18.117Z",
+    "updatedAt": "2025-12-10T07:28:18.117Z"
+  },
+  {
+    "sourceSchema": "business-areas",
+    "sourceId": "01KBFQM00000000000000000001",
+    "targetSchema": "applications",
+    "targetId": "01KBFCM00000000000000000003",
+    "relationTypeId": "HAS_ADDRESS",
+    "id": "01KC3JJE17T2WTQ34F2XZNBWR2",
+    "createdAt": "2025-12-10T07:28:20.519Z",
+    "updatedAt": "2025-12-10T07:28:20.519Z"
+  },
+  {
+    "sourceSchema": "business-areas",
+    "sourceId": "01KBFQM00000000000000000001",
+    "targetSchema": "applications",
+    "targetId": "01KBFCM00000000000000000004",
+    "relationTypeId": "HAS_ADDRESS",
+    "id": "01KC3JJFQZC18KPNT2G0TXR68X",
+    "createdAt": "2025-12-10T07:28:22.271Z",
+    "updatedAt": "2025-12-10T07:28:22.271Z"
+  },
+  {
+    "sourceSchema": "business-areas",
+    "sourceId": "01KBFQM00000000000000000001",
+    "targetSchema": "applications",
+    "targetId": "01KBFCM00000000000000000006",
+    "relationTypeId": "HAS_ADDRESS",
+    "id": "01KC3JJHGJ97TZTWEP9EJH5B6F",
+    "createdAt": "2025-12-10T07:28:24.082Z",
+    "updatedAt": "2025-12-10T07:28:24.082Z"
+  },
+  {
+    "sourceSchema": "business-areas",
+    "sourceId": "01KBFQM00000000000000000001",
+    "targetSchema": "applications",
+    "targetId": "01KBFCM00000000000000000005",
+    "relationTypeId": "HAS_ADDRESS",
+    "id": "01KC3JJK6K7K5K75S9ZC5G5DVR",
+    "createdAt": "2025-12-10T07:28:25.811Z",
+    "updatedAt": "2025-12-10T07:28:25.811Z"
   }
 ]

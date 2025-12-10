@@ -2471,5 +2471,51 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KBZPROXYAUTH001",
+    "timestamp": "2025-12-10T00:00:00.000Z",
+    "version": "1.22.001",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "Refactored proxy logic to enhance authentication flow with edge compatibility",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "proxy",
+          "security"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Added functions for building authentication service URLs and proxy headers for external auth",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "proxy",
+          "infrastructure"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved token handling and logging for better monitoring across proxy flow",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "logging",
+          "monitoring"
+        ]
+      },
+      {
+        "changeType": "delete",
+        "description": "Removed outdated middleware file to streamline codebase and adopt proxy convention",
+        "priority": "Medium",
+        "affectedDomains": [
+          "infrastructure",
+          "auth"
+        ]
+      }
+    ]
   }
 ]

@@ -1,19 +1,72 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
-import { validateToken, extractTokenFromCookies } from '@/domains/auth';
-import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
-import { buildAuthServiceUrl, buildProxyHeaders } from '@/app/api/auth/helpers/external-auth.util';
+import { encryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util';
+import { extractTokenFromCookiesEdge } from '@/gradian-ui/shared/utils/edge-token-validation.util';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { decryptSkipKey } from '@/gradian-ui/shared/utils/decrypt-skip-key';
+import {
+  EXCLUDED_LOGIN_ROUTES,
+  LOGIN_LOCALLY,
+  AUTH_CONFIG,
+  FORBIDDEN_ROUTES_PRODUCTION,
+} from '@/gradian-ui/shared/constants/application-variables';
+
+/**
+ * Edge-compatible: Build authentication service URL
+ */
+function buildAuthServiceUrlEdge(path: string): string {
+  const baseUrl = process.env.URL_AUTHENTICATION;
+  if (!baseUrl) {
+    throw new Error('URL_AUTHENTICATION is not configured');
+  }
+  const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `${normalizedBaseUrl}${normalizedPath}`;
+}
+
+/**
+ * Edge-compatible: Build proxy headers for external auth requests
+ */
+function buildProxyHeadersEdge(request: NextRequest): HeadersInit {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  };
+
+  const cookieHeader = request.headers.get('cookie');
+  if (cookieHeader) {
+    headers.cookie = cookieHeader;
+  }
+
+  const fingerprintHeader = request.headers.get('x-fingerprint');
+  if (fingerprintHeader) {
+    headers['x-fingerprint'] = fingerprintHeader;
+  }
+
+  const authorizationHeader = request.headers.get('authorization');
+  if (authorizationHeader) {
+    headers.authorization = authorizationHeader;
+  }
+
+  const tenantDomainHeader = request.headers.get('x-tenant-domain');
+  if (tenantDomainHeader) {
+    headers['x-tenant-domain'] = tenantDomainHeader;
+  }
+
+  return headers;
+}
+
+// REQUIRE_LOGIN comes from environment variable for Edge Runtime compatibility
+const REQUIRE_LOGIN = process.env.REQUIRE_LOGIN === 'true' || false;
 
 /**
  * Check if a path should be excluded from authentication
  */
 function isExcludedPath(pathname: string, excludedRoutes: string[]): boolean {
-  // Check exact matches
   if (excludedRoutes.includes(pathname)) {
     return true;
   }
 
-  // Check prefix matches
   for (const route of excludedRoutes) {
     if (pathname.startsWith(route)) {
       return true;
@@ -24,16 +77,42 @@ function isExcludedPath(pathname: string, excludedRoutes: string[]): boolean {
 }
 
 /**
- * Check if path should be excluded from middleware (static files, Next.js internals, API routes)
+ * Check if path should be excluded from proxy (static files, Next.js internals, API routes)
  */
-function shouldSkipMiddleware(pathname: string): boolean {
-  // Skip Next.js internals
+function shouldSkipProxy(pathname: string): boolean {
   if (
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/api/') ||
+    pathname.startsWith('/static/')
+  ) {
+    return true;
+  }
+
+  const staticFileExtensions = [
+    'ico', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'avif', 'bmp', 'tiff',
+    'woff', 'woff2', 'ttf', 'eot', 'otf',
+    'css',
+    'js', 'mjs', 'cjs',
+    'pdf', 'json', 'xml', 'txt', 'csv',
+    'mp3', 'mp4', 'webm', 'ogg', 'wav',
+    'zip', 'tar', 'gz',
+    'map', 'webmanifest', 'manifest',
+  ];
+
+  const staticFilePattern = new RegExp(`\\.(${staticFileExtensions.join('|')})(\\?.*)?$`, 'i');
+  if (staticFilePattern.test(pathname)) {
+    return true;
+  }
+
+  if (
     pathname === '/favicon.ico' ||
-    pathname.startsWith('/static/') ||
-    pathname.match(/\.(ico|png|jpg|jpeg|gif|svg|css|js|woff|woff2|ttf|eot)$/)
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml' ||
+    pathname.startsWith('/logo/') ||
+    pathname.startsWith('/images/') ||
+    pathname.startsWith('/assets/') ||
+    pathname.startsWith('/fonts/') ||
+    pathname.startsWith('/icons/')
   ) {
     return true;
   }
@@ -44,11 +123,11 @@ function shouldSkipMiddleware(pathname: string): boolean {
 /**
  * Extract refresh token from cookies
  */
-function getRefreshTokenFromCookies(cookies: string | null): string | null {
+function getRefreshTokenFromCookies(cookies: string | null, cookieName: string): string | null {
   if (!cookies) {
     return null;
   }
-  return extractTokenFromCookies(cookies, AUTH_CONFIG.REFRESH_TOKEN_COOKIE);
+  return extractTokenFromCookiesEdge(cookies, cookieName);
 }
 
 /**
@@ -61,61 +140,136 @@ async function attemptTokenRefresh(
 ): Promise<{ success: boolean; accessToken?: string; error?: string }> {
   try {
     if (loginLocally) {
-      // Use local refresh endpoint
       const baseUrl = request.nextUrl.origin;
       const refreshUrl = `${baseUrl}/api/auth/token/refresh`;
 
+      loggingCustom(LogType.LOGIN_LOG, 'info', '========== REFRESH TOKEN REQUEST (LOCAL) ==========');
+      loggingCustom(LogType.LOGIN_LOG, 'info', `Refresh URL: ${refreshUrl}`);
+      loggingCustom(LogType.LOGIN_LOG, 'info', 'Method: POST');
+      loggingCustom(LogType.LOGIN_LOG, 'debug', `Refresh token (first 20 chars): ${refreshToken.substring(0, 20)}...`);
+      loggingCustom(LogType.LOGIN_LOG, 'debug', `Request body: ${JSON.stringify({ refreshToken: refreshToken.substring(0, 20) + '...' })}`);
+
+      const requestHeaders = {
+        'Content-Type': 'application/json',
+      };
+      loggingCustom(LogType.LOGIN_LOG, 'debug', `Request headers: ${JSON.stringify(requestHeaders)}`);
+
+      const startTime = Date.now();
       const response = await fetch(refreshUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: requestHeaders,
         body: JSON.stringify({ refreshToken }),
       });
 
+      const responseTime = Date.now() - startTime;
+      loggingCustom(LogType.LOGIN_LOG, 'info', `Response received: ${JSON.stringify({
+        status: response.status,
+        statusText: response.statusText,
+        responseTime: `${responseTime}ms`,
+        headers: Object.fromEntries(response.headers.entries()),
+      })}`);
+
       const data = await response.json();
+      loggingCustom(LogType.LOGIN_LOG, 'info', `Response data: ${JSON.stringify({
+        success: data.success,
+        hasAccessToken: !!data.accessToken,
+        error: data.error,
+        message: data.message,
+      })}`);
 
       if (response.ok && data.success && data.accessToken) {
+        loggingCustom(LogType.LOGIN_LOG, 'info', '========== REFRESH TOKEN SUCCESS (LOCAL) ==========');
         return {
           success: true,
           accessToken: data.accessToken,
         };
       }
 
+      loggingCustom(LogType.LOGIN_LOG, 'warn', '========== REFRESH TOKEN FAILED (LOCAL) ==========');
       return {
         success: false,
         error: data.error || 'Token refresh failed',
       };
     } else {
-      // Use external authentication service
       try {
-        const refreshUrl = buildAuthServiceUrl('/refresh');
-        const headers = buildProxyHeaders(request);
+        const refreshUrl = buildAuthServiceUrlEdge('/refresh');
+        const headers = buildProxyHeadersEdge(request);
 
+        loggingCustom(LogType.LOGIN_LOG, 'info', '========== REFRESH TOKEN REQUEST (EXTERNAL) ==========');
+        loggingCustom(LogType.LOGIN_LOG, 'info', `Refresh URL: ${refreshUrl}`);
+        loggingCustom(LogType.LOGIN_LOG, 'info', 'Method: POST');
+        loggingCustom(LogType.LOGIN_LOG, 'debug', `Refresh token (first 20 chars): ${refreshToken.substring(0, 20)}...`);
+        loggingCustom(LogType.LOGIN_LOG, 'debug', `Request body: ${JSON.stringify({ refreshToken: refreshToken.substring(0, 20) + '...' })}`);
+        const headersForLog = headers as Record<string, string>;
+        loggingCustom(LogType.LOGIN_LOG, 'debug', `Request headers: ${JSON.stringify({
+          ...headersForLog,
+          cookie: headersForLog.cookie ? `${headersForLog.cookie.substring(0, 50)}...` : undefined,
+        })}`);
+
+        const requestHeaders = {
+          ...headers,
+          'Content-Type': 'application/json',
+        };
+
+        const startTime = Date.now();
         const response = await fetch(refreshUrl, {
           method: 'POST',
-          headers: {
-            ...headers,
-            'Content-Type': 'application/json',
-          },
+          headers: requestHeaders,
           body: JSON.stringify({ refreshToken }),
         });
 
-        const data = await response.json();
+        const responseTime = Date.now() - startTime;
+        loggingCustom(LogType.LOGIN_LOG, 'info', `Response received: ${JSON.stringify({
+          status: response.status,
+          statusText: response.statusText,
+          responseTime: `${responseTime}ms`,
+          headers: Object.fromEntries(response.headers.entries()),
+        })}`);
 
-        if (response.ok && data.success && data.accessToken) {
-          return {
-            success: true,
-            accessToken: data.accessToken,
-          };
+        const data = await response.json();
+        loggingCustom(LogType.LOGIN_LOG, 'info', `Response data: ${JSON.stringify({
+          success: data.success,
+          hasAccessToken: data.hasAccessToken,
+          accessToken: !!data.accessToken,
+          error: data.error,
+          message: data.message,
+        })}`);
+
+        if (response.ok) {
+          if (data.success && data.accessToken) {
+            loggingCustom(LogType.LOGIN_LOG, 'info', '========== REFRESH TOKEN SUCCESS (EXTERNAL) - New token provided ==========');
+            return {
+              success: true,
+              accessToken: data.accessToken,
+            };
+          } else if (data.hasAccessToken === true) {
+            loggingCustom(LogType.LOGIN_LOG, 'info', '========== REFRESH TOKEN SUCCESS (EXTERNAL) - Access token already valid ==========');
+            return {
+              success: true,
+              accessToken: undefined,
+            };
+          }
         }
 
+        loggingCustom(LogType.LOGIN_LOG, 'warn', '========== REFRESH TOKEN FAILED (EXTERNAL) ==========');
+        loggingCustom(LogType.LOGIN_LOG, 'warn', `Failure reason: ${JSON.stringify({
+          responseOk: response.ok,
+          hasSuccess: !!data.success,
+          hasAccessToken: data.hasAccessToken,
+          hasAccessTokenField: !!data.accessToken,
+          error: data.error,
+          message: data.message,
+        })}`);
         return {
           success: false,
-          error: data.error || 'Token refresh failed',
+          error: data.error || data.message || 'Token refresh failed',
         };
       } catch (error) {
-        // If URL_AUTHENTICATION is not configured, buildAuthServiceUrl will throw
+        loggingCustom(LogType.LOGIN_LOG, 'error', '========== REFRESH TOKEN ERROR (EXTERNAL) ==========');
+        loggingCustom(LogType.LOGIN_LOG, 'error', `Error details: ${JSON.stringify({
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        })}`);
         return {
           success: false,
           error: error instanceof Error ? error.message : 'External authentication service not configured',
@@ -123,6 +277,11 @@ async function attemptTokenRefresh(
       }
     }
   } catch (error) {
+    loggingCustom(LogType.LOGIN_LOG, 'error', '========== REFRESH TOKEN ERROR ==========');
+    loggingCustom(LogType.LOGIN_LOG, 'error', `Error details: ${JSON.stringify({
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    })}`);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Token refresh failed',
@@ -130,149 +289,262 @@ async function attemptTokenRefresh(
   }
 }
 
-export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  
-  console.log('[PROXY] ========== PROXY CALLED ==========');
-  console.log('[PROXY] Pathname:', pathname);
-  console.log('[PROXY] URL:', request.url);
-  console.log('[PROXY] Method:', request.method);
+/**
+ * Handle skip_key decryption for API routes
+ */
+async function handleSkipKeyDecryption(request: NextRequest): Promise<NextResponse | null> {
+  const { pathname, searchParams } = request.nextUrl;
 
-  // Skip middleware for static files, Next.js internals, and API routes
-  if (shouldSkipMiddleware(pathname)) {
-    console.log('[PROXY] Skipping middleware for path:', pathname);
+  if (!pathname.startsWith('/api/')) {
+    return null;
+  }
+
+  if (request.method === 'GET' || request.method === 'DELETE') {
+    const encryptedSkipKey = searchParams.get('skip_key');
+    if (!encryptedSkipKey) {
+      return null;
+    }
+
+    try {
+      const decryptedSkipKey = await decryptSkipKey(encryptedSkipKey);
+      if (!decryptedSkipKey) {
+        console.warn('[proxy] Failed to decrypt skip_key, leaving encrypted value');
+        return null;
+      }
+
+      const newUrl = new URL(request.url);
+      newUrl.searchParams.set('skip_key', decryptedSkipKey);
+      return NextResponse.rewrite(newUrl);
+    } catch (error) {
+      console.error('[proxy] Error decrypting skip_key:', error);
+      return null;
+    }
+  }
+
+  return null;
+}
+
+export async function proxy(request: NextRequest) {
+  const skipKeyResponse = await handleSkipKeyDecryption(request);
+  if (skipKeyResponse) {
+    return skipKeyResponse;
+  }
+
+  const { pathname } = request.nextUrl;
+
+  loggingCustom(LogType.LOGIN_LOG, 'info', '========== PROXY CALLED ==========');
+  loggingCustom(LogType.LOGIN_LOG, 'info', `Pathname: ${pathname}`);
+  loggingCustom(LogType.LOGIN_LOG, 'info', `URL: ${request.url}`);
+  loggingCustom(LogType.LOGIN_LOG, 'info', `Method: ${request.method}`);
+
+  const forbiddenRoutes = FORBIDDEN_ROUTES_PRODUCTION ?? [];
+  if (forbiddenRoutes.length > 0) {
+    const nodeEnv = process.env.NODE_ENV || 'production';
+    if (nodeEnv !== 'development') {
+      const isForbidden = forbiddenRoutes.some((route: string) =>
+        pathname === route || pathname.startsWith(route)
+      );
+
+      if (isForbidden) {
+        loggingCustom(LogType.LOGIN_LOG, 'warn', `Access to ${pathname} denied - NODE_ENV is ${nodeEnv}, route is in FORBIDDEN_ROUTES_PRODUCTION`);
+        return NextResponse.redirect(new URL('/forbidden', request.url));
+      }
+    }
+  }
+
+  if (shouldSkipProxy(pathname)) {
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Skipping proxy for path: ${pathname}`);
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith('/authentication/')) {
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Skipping authentication pages: ${pathname}`);
     return NextResponse.next();
   }
 
   try {
-    // Load application variables
-    console.log('[PROXY] Loading application variables...');
-    const vars = loadApplicationVariables();
-    const requireLogin = vars.REQUIRE_LOGIN ?? false;
-    const excludedRoutes = vars.EXCLUDED_LOGIN_ROUTES ?? [];
-    const loginLocally = vars.LOGIN_LOCALLY ?? false;
+    const requireLogin = REQUIRE_LOGIN ?? false;
+    const excludedRoutes = EXCLUDED_LOGIN_ROUTES ?? [];
+    const loginLocally = LOGIN_LOCALLY ?? false;
+    const ACCESS_TOKEN_COOKIE = AUTH_CONFIG?.ACCESS_TOKEN_COOKIE || 'access_token';
+    const REFRESH_TOKEN_COOKIE = AUTH_CONFIG?.REFRESH_TOKEN_COOKIE || 'refresh_token';
+    const ACCESS_TOKEN_EXPIRY = AUTH_CONFIG?.ACCESS_TOKEN_EXPIRY || 3600;
 
-    console.log('[PROXY] Application variables:', {
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Application variables: ${JSON.stringify({
       REQUIRE_LOGIN: requireLogin,
       EXCLUDED_LOGIN_ROUTES: excludedRoutes,
       LOGIN_LOCALLY: loginLocally,
-    });
+    })}`);
 
-    // If login is not required, allow all requests
     if (!requireLogin) {
-      console.log('[PROXY] REQUIRE_LOGIN is false, allowing request');
+      loggingCustom(LogType.LOGIN_LOG, 'debug', 'REQUIRE_LOGIN is false, allowing request');
       return NextResponse.next();
     }
 
-    console.log('[PROXY] REQUIRE_LOGIN is true, checking authentication...');
+    loggingCustom(LogType.LOGIN_LOG, 'info', 'REQUIRE_LOGIN is true, checking authentication...');
 
-    // Check if path is in excluded routes
     if (isExcludedPath(pathname, excludedRoutes)) {
-      console.log('[PROXY] Path is in excluded routes, allowing request');
+      loggingCustom(LogType.LOGIN_LOG, 'debug', 'Path is in excluded routes, allowing request');
       return NextResponse.next();
     }
 
-    // Get access token from cookies
     const cookies = request.headers.get('cookie');
-    console.log('[PROXY] Cookies:', cookies ? 'Present' : 'Missing');
-    console.log('[PROXY] Cookie name:', AUTH_CONFIG.ACCESS_TOKEN_COOKIE);
-    const accessToken = extractTokenFromCookies(cookies, AUTH_CONFIG.ACCESS_TOKEN_COOKIE);
-    console.log('[PROXY] Access token:', accessToken ? `${accessToken.substring(0, 20)}...` : 'Missing');
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Cookies: ${cookies ? 'Present' : 'Missing'}`);
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Cookie name: ${ACCESS_TOKEN_COOKIE}`);
 
-    // If no access token, try to refresh
-    if (!accessToken) {
-      console.log('[PROXY] No access token found, checking for refresh token...');
-      const refreshToken = getRefreshTokenFromCookies(cookies);
-      console.log('[PROXY] Refresh token:', refreshToken ? `${refreshToken.substring(0, 20)}...` : 'Missing');
+    if (cookies) {
+      const cookieNames = cookies.split(';').map(c => c.trim().split('=')[0]);
+      loggingCustom(LogType.LOGIN_LOG, 'debug', `Available cookie names: ${cookieNames.join(', ')}`);
+    }
+
+    const accessToken = extractTokenFromCookiesEdge(cookies, ACCESS_TOKEN_COOKIE);
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Access token: ${accessToken ? `${accessToken.substring(0, 20)}...` : 'Missing'}`);
+
+    let accessTokenValid = false;
+    if (accessToken) {
+      try {
+        const parts = accessToken.split('.');
+        if (parts.length === 3) {
+          const payload = parts[1];
+          let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+          while (base64.length % 4) {
+            base64 += '=';
+          }
+          const decoded = atob(base64);
+          const parsed = JSON.parse(decoded) as { exp?: number };
+
+          if (parsed.exp) {
+            const now = Math.floor(Date.now() / 1000);
+            accessTokenValid = parsed.exp > now;
+            loggingCustom(LogType.LOGIN_LOG, 'debug', `Access token expiration check: ${JSON.stringify({
+              exp: parsed.exp,
+              now,
+              valid: accessTokenValid,
+            })}`);
+          } else {
+            accessTokenValid = true;
+            loggingCustom(LogType.LOGIN_LOG, 'debug', 'Access token has no expiration claim, considering valid');
+          }
+        } else {
+          loggingCustom(LogType.LOGIN_LOG, 'warn', 'Access token has invalid format');
+        }
+      } catch (error) {
+        loggingCustom(LogType.LOGIN_LOG, 'warn', `Failed to decode access token: ${error instanceof Error ? error.message : String(error)}`);
+        accessTokenValid = false;
+      }
+    }
+
+    if (!accessToken || !accessTokenValid) {
+      loggingCustom(LogType.LOGIN_LOG, 'info', 'Access token missing or expired, checking for refresh token...');
+      const refreshToken = getRefreshTokenFromCookies(cookies, REFRESH_TOKEN_COOKIE);
+      loggingCustom(LogType.LOGIN_LOG, 'debug', `Refresh token: ${refreshToken ? `${refreshToken.substring(0, 20)}...` : 'Missing'}`);
 
       if (!refreshToken) {
-        // No tokens available, redirect to login
-        console.log('[PROXY] No tokens available, redirecting to login');
+        const referer = request.headers.get('referer');
+        if (referer && referer.includes('/authentication/login')) {
+          loggingCustom(LogType.LOGIN_LOG, 'warn', 'Already redirected from login, allowing request to prevent loop');
+          return NextResponse.next();
+        }
+        loggingCustom(LogType.LOGIN_LOG, 'info', 'No refresh token available, redirecting to login');
         const loginUrl = new URL('/authentication/login', request.url);
-        loginUrl.searchParams.set('returnUrl', pathname);
-        console.log('[PROXY] Redirect URL:', loginUrl.toString());
+        const encryptedReturnUrl = encryptReturnUrl(pathname);
+        loginUrl.searchParams.set('returnUrl', encryptedReturnUrl);
+        loggingCustom(LogType.LOGIN_LOG, 'info', `Redirect URL: ${loginUrl.toString()}`);
         return NextResponse.redirect(loginUrl);
       }
 
-      // Attempt to refresh token
+      let refreshTokenValid = false;
+      try {
+        const parts = refreshToken.split('.');
+        if (parts.length === 3) {
+          const payload = parts[1];
+          let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+          while (base64.length % 4) {
+            base64 += '=';
+          }
+          const decoded = atob(base64);
+          const parsed = JSON.parse(decoded) as { exp?: number };
+
+          if (parsed.exp) {
+            const now = Math.floor(Date.now() / 1000);
+            refreshTokenValid = parsed.exp > now;
+            loggingCustom(LogType.LOGIN_LOG, 'debug', `Refresh token expiration check: ${JSON.stringify({
+              exp: parsed.exp,
+              now,
+              valid: refreshTokenValid,
+            })}`);
+          } else {
+            refreshTokenValid = true;
+            loggingCustom(LogType.LOGIN_LOG, 'debug', 'Refresh token has no expiration claim, considering valid');
+          }
+        } else {
+          loggingCustom(LogType.LOGIN_LOG, 'warn', 'Refresh token has invalid format');
+        }
+      } catch (error) {
+        loggingCustom(LogType.LOGIN_LOG, 'warn', `Failed to decode refresh token: ${error instanceof Error ? error.message : String(error)}`);
+        refreshTokenValid = false;
+      }
+
+      if (!refreshTokenValid) {
+        const referer = request.headers.get('referer');
+        if (referer && referer.includes('/authentication/login')) {
+          loggingCustom(LogType.LOGIN_LOG, 'warn', 'Already redirected from login, allowing request to prevent loop');
+          return NextResponse.next();
+        }
+        loggingCustom(LogType.LOGIN_LOG, 'info', 'Refresh token expired, redirecting to login');
+        const loginUrl = new URL('/authentication/login', request.url);
+        const encryptedReturnUrl = encryptReturnUrl(pathname);
+        loginUrl.searchParams.set('returnUrl', encryptedReturnUrl);
+        loggingCustom(LogType.LOGIN_LOG, 'info', `Redirect URL: ${loginUrl.toString()}`);
+        return NextResponse.redirect(loginUrl);
+      }
+
+      loggingCustom(LogType.LOGIN_LOG, 'info', 'Refresh token is valid, attempting to refresh access token...');
       const refreshResult = await attemptTokenRefresh(refreshToken, loginLocally, request);
 
-      if (refreshResult.success && refreshResult.accessToken) {
-        // Create response and set new access token cookie
-        const response = NextResponse.next();
-        response.cookies.set(AUTH_CONFIG.ACCESS_TOKEN_COOKIE, refreshResult.accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          maxAge: AUTH_CONFIG.ACCESS_TOKEN_EXPIRY,
-          path: '/',
-        });
-        return response;
+      if (refreshResult.success) {
+        if (refreshResult.accessToken) {
+          loggingCustom(LogType.LOGIN_LOG, 'info', 'Token refresh successful, setting new access token');
+          const response = NextResponse.next();
+          response.cookies.set(ACCESS_TOKEN_COOKIE, refreshResult.accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: ACCESS_TOKEN_EXPIRY,
+            path: '/',
+          });
+          loggingCustom(LogType.LOGIN_LOG, 'info', 'New access token cookie set, allowing request');
+          return response;
+        } else {
+          loggingCustom(LogType.LOGIN_LOG, 'info', 'External service confirmed access token is valid, allowing request');
+          return NextResponse.next();
+        }
       } else {
-        // Refresh failed, redirect to login
+        const referer = request.headers.get('referer');
+        if (referer && referer.includes('/authentication/login')) {
+          loggingCustom(LogType.LOGIN_LOG, 'warn', 'Already redirected from login, allowing request to prevent loop');
+          return NextResponse.next();
+        }
+        loggingCustom(LogType.LOGIN_LOG, 'warn', `Token refresh failed: ${refreshResult.error || 'Unknown error'}`);
+        loggingCustom(LogType.LOGIN_LOG, 'info', 'Redirecting to login');
         const loginUrl = new URL('/authentication/login', request.url);
-        loginUrl.searchParams.set('returnUrl', pathname);
+        const encryptedReturnUrl = encryptReturnUrl(pathname);
+        loginUrl.searchParams.set('returnUrl', encryptedReturnUrl);
+        loggingCustom(LogType.LOGIN_LOG, 'info', `Redirect URL: ${loginUrl.toString()}`);
         return NextResponse.redirect(loginUrl);
       }
     }
 
-    // Validate access token
-    console.log('[PROXY] Validating access token...');
-    const validationResult = validateToken(accessToken);
-    console.log('[PROXY] Token validation result:', {
-      valid: validationResult.valid,
-      error: validationResult.error,
-    });
-
-    if (!validationResult.valid) {
-      console.log('[PROXY] Access token is invalid, trying to refresh...');
-      // Token is invalid, try to refresh
-      const refreshToken = getRefreshTokenFromCookies(cookies);
-      console.log('[PROXY] Refresh token:', refreshToken ? `${refreshToken.substring(0, 20)}...` : 'Missing');
-
-      if (!refreshToken) {
-        // No refresh token, redirect to login
-        const loginUrl = new URL('/authentication/login', request.url);
-        loginUrl.searchParams.set('returnUrl', pathname);
-        return NextResponse.redirect(loginUrl);
-      }
-
-      // Attempt to refresh token
-      const refreshResult = await attemptTokenRefresh(refreshToken, loginLocally, request);
-
-      if (refreshResult.success && refreshResult.accessToken) {
-        // Create response and set new access token cookie
-        const response = NextResponse.next();
-        response.cookies.set(AUTH_CONFIG.ACCESS_TOKEN_COOKIE, refreshResult.accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          maxAge: AUTH_CONFIG.ACCESS_TOKEN_EXPIRY,
-          path: '/',
-        });
-        return response;
-      } else {
-        // Refresh failed, redirect to login
-        const loginUrl = new URL('/authentication/login', request.url);
-        loginUrl.searchParams.set('returnUrl', pathname);
-        return NextResponse.redirect(loginUrl);
-      }
-    }
-
-    // Token is valid, allow request to proceed
-    console.log('[PROXY] Token is valid, allowing request to proceed');
-    console.log('[PROXY] ========== PROXY COMPLETED SUCCESSFULLY ==========');
+    loggingCustom(LogType.LOGIN_LOG, 'info', 'Access token is valid, allowing request');
+    loggingCustom(LogType.LOGIN_LOG, 'info', '========== PROXY COMPLETED SUCCESSFULLY ==========');
     return NextResponse.next();
   } catch (error) {
-    console.error('[PROXY] ========== PROXY ERROR ==========');
-    console.error('[PROXY] Error details:', {
-      error,
-      message: error instanceof Error ? error.message : String(error),
+    loggingCustom(LogType.LOGIN_LOG, 'error', '========== PROXY ERROR ==========');
+    loggingCustom(LogType.LOGIN_LOG, 'error', `Error details: ${JSON.stringify({
+      error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
-    });
-    // On error, allow request to proceed (fail open)
-    // In production, you might want to fail closed instead
-    console.log('[PROXY] Allowing request to proceed due to error (fail open)');
+    })}`);
+    loggingCustom(LogType.LOGIN_LOG, 'warn', 'Allowing request to proceed due to error (fail open)');
     return NextResponse.next();
   }
 }
@@ -281,12 +553,12 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * Note: API routes are included to handle skip_key decryption
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
 
