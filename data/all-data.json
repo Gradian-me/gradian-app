@@ -3132,6 +3132,20 @@
   ],
   "menu-items": [
     {
+      "menuTitle": "Home",
+      "menuIcon": "Home",
+      "hideInAD": false,
+      "description": "Home",
+      "menuUrl": "/",
+      "openInNewTab": false,
+      "id": "home-menu-item",
+      "createdAt": "2025-12-11T00:00:00.000Z",
+      "updatedAt": "2025-12-11T00:00:00.000Z",
+      "createdBy": "system",
+      "updatedBy": "system",
+      "companies": []
+    },
+    {
       "menuTitle": "Dashboard",
       "menuIcon": "LayoutDashboard",
       "hideInAD": false,
@@ -3668,7 +3682,7 @@
   "routes": [],
   "schemas": [],
   "change-management": [],
-  "change-classification": [
+  "change-classifications": [
     {
       "label_fa": "تغییرات کیفی عمده",
       "label_en": "Major Quality Change ",
