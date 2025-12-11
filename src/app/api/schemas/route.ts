@@ -54,7 +54,7 @@ function clearSchemaCache() {
  */
 async function loadSchemas(): Promise<any[]> {
   if (!fs.existsSync(SCHEMA_FILE_PATH)) {
-    console.warn(`[API] Schemas file not found at: ${dataPath}`);
+    console.warn(`[API] Schemas file not found at: ${SCHEMA_FILE_PATH}`);
     return [];
   }
   
@@ -68,7 +68,7 @@ async function loadSchemas(): Promise<any[]> {
     
     // Check if file is empty or just whitespace
     if (!fileContents || fileContents.trim().length === 0) {
-      console.warn(`[API] Schemas file is empty at: ${dataPath}`);
+      console.warn(`[API] Schemas file is empty at: ${SCHEMA_FILE_PATH}`);
       return [];
     }
     
@@ -90,7 +90,7 @@ async function loadSchemas(): Promise<any[]> {
       }
     }
     
-    console.warn(`[API] Schemas file contains invalid data format at: ${dataPath}`);
+    console.warn(`[API] Schemas file contains invalid data format at: ${SCHEMA_FILE_PATH}`);
     return [];
   } catch (error) {
     console.error(`[API] Error parsing schemas file at ${SCHEMA_FILE_PATH}:`, error);
