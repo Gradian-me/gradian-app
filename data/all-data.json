@@ -1368,6 +1368,24 @@
       "createdAt": "2025-12-06T12:39:07.189Z",
       "updatedAt": "2025-12-06T12:39:33.539Z",
       "members": []
+    },
+    {
+      "parent": "01KB9Y5NKY5ZZS6BFYPC8684E9",
+      "type": [
+        {
+          "id": "GENERAL_ROLE",
+          "label": "General Role",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
+      "name": "test",
+      "color": "red",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KC652PSQFD5BYMZ1QW3SMBHC",
+      "createdAt": "2025-12-11T07:30:17.046Z",
+      "updatedAt": "2025-12-11T07:30:17.046Z"
     }
   ],
   "users": [

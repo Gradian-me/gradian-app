@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isDemoModeEnabled, proxyDataRequest } from '../data/utils';
 import {
   readAllRelations,
+  writeAllRelations,
   createRelation,
   getRelationsBySource,
   getRelationsByTarget,
@@ -266,6 +267,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Prevent duplicate relation for same (sourceSchema, sourceId, targetSchema, targetId, relationTypeId)
+    const relations = readAllRelations();
+    const existingIndex = relations.findIndex(
+      (r) =>
+        r.sourceSchema === sourceSchema &&
+        r.sourceId === sourceId &&
+        r.targetSchema === targetSchema &&
+        r.targetId === targetId &&
+        r.relationTypeId === relationTypeId
+    );
+
+    if (existingIndex >= 0) {
+      const existing = relations[existingIndex];
+      // If it was inactive, revive it; otherwise block duplicate
+      if (existing.inactive) {
+        const revived = {
+          ...existing,
+          inactive: false,
+          updatedAt: new Date().toISOString(),
+        };
+        relations[existingIndex] = revived;
+        writeAllRelations(relations);
+        return NextResponse.json(
+          { success: true, data: revived, revived: true },
+          { status: 200 }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Duplicate relation not allowed for the same source, target, and relation type.',
+          existing: existing,
+        },
+        { status: 409 }
+      );
+    }
+
     const relation = createRelation({
       sourceSchema,
       sourceId,
@@ -274,10 +313,13 @@ export async function POST(request: NextRequest) {
       relationTypeId,
     });
 
-    return NextResponse.json({
-      success: true,
-      data: relation,
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        data: relation,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     const errorResponse = handleDomainError(error);
     return NextResponse.json(

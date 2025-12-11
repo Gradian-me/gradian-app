@@ -89,7 +89,9 @@ export function useRepeatingTableData(
         });
       }
 
-      const allRelationsUrl = `/api/data/all-relations?schema=${effectiveSourceSchemaId}&id=${effectiveSourceId}&direction=both&otherSchema=${targetSchemaId}`;
+      // Add cache-busting timestamp to ensure fresh data on refresh
+      const timestamp = Date.now();
+      const allRelationsUrl = `/api/data/all-relations?schema=${effectiveSourceSchemaId}&id=${effectiveSourceId}&direction=both&otherSchema=${targetSchemaId}${relationTypeId ? `&relationTypeId=${relationTypeId}` : ''}&_t=${timestamp}`;
 
       const allRelationsResponse = await apiRequest<Array<{
         schema: string;
@@ -114,6 +116,103 @@ export function useRepeatingTableData(
             __relationId: relationIdByTargetId.get(String(item?.id)) || null,
           }));
           entities.push(...annotatedData);
+        }
+
+        // Fallback: If all-relations returned empty but we have relations, fetch entities directly
+        if (entities.length === 0 && relationIdByTargetId.size > 0) {
+          const uniqueTargetIds = Array.from(relationIdByTargetId.keys());
+          
+          // Special handling for "schemas" schema - use /api/schemas endpoint
+          const isSchemasSchema = targetSchemaId === 'schemas';
+          const baseEndpoint = isSchemasSchema ? '/api/schemas' : `/api/data/${targetSchemaId}`;
+          
+          try {
+            if (isSchemasSchema) {
+              // For schemas, fetch individually (schemas endpoint doesn't support batch)
+              const fetchPromises = uniqueTargetIds.map(async (targetId) => {
+                try {
+                  const entityResponse = await apiRequest<any>(`${baseEndpoint}/${targetId}`);
+                  if (entityResponse.success && entityResponse.data) {
+                    return {
+                      ...entityResponse.data,
+                      __relationType: relationTypeId || '',
+                      __relationId: relationIdByTargetId.get(targetId) || null,
+                    };
+                  }
+                  return null;
+                } catch (error) {
+                  console.error(`Error fetching schema ${targetId}:`, error);
+                  return null;
+                }
+              });
+
+              const fetchedEntities = await Promise.all(fetchPromises);
+              entities = fetchedEntities.filter((entity): entity is any => entity !== null);
+              
+              if (entities.length > 0) {
+                directionsSet.add('source');
+              }
+            } else {
+              // For regular schemas, try batch fetch first
+              const batchResponse = await apiRequest<any[]>(baseEndpoint, {
+                params: {
+                  includeIds: uniqueTargetIds.join(','),
+                },
+              });
+
+              if (batchResponse.success && Array.isArray(batchResponse.data)) {
+                const entityMap = new Map<string, any>(
+                  batchResponse.data.map((entity) => [String(entity.id), entity])
+                );
+
+                entities = uniqueTargetIds
+                  .map((targetId) => {
+                    const entity = entityMap.get(targetId);
+                    if (entity) {
+                      return {
+                        ...entity,
+                        __relationType: relationTypeId || '',
+                        __relationId: relationIdByTargetId.get(targetId) || null,
+                      };
+                    }
+                    return null;
+                  })
+                  .filter((entity): entity is any => entity !== null);
+
+                // Add direction if we have entities
+                if (entities.length > 0) {
+                  directionsSet.add('source');
+                }
+              } else {
+                // Fallback to individual fetches
+                const fetchPromises = uniqueTargetIds.map(async (targetId) => {
+                  try {
+                    const entityResponse = await apiRequest<any>(`${baseEndpoint}/${targetId}`);
+                    if (entityResponse.success && entityResponse.data) {
+                      return {
+                        ...entityResponse.data,
+                        __relationType: relationTypeId || '',
+                        __relationId: relationIdByTargetId.get(targetId) || null,
+                      };
+                    }
+                    return null;
+                  } catch (error) {
+                    console.error(`Error fetching entity ${targetId}:`, error);
+                    return null;
+                  }
+                });
+
+                const fetchedEntities = await Promise.all(fetchPromises);
+                entities = fetchedEntities.filter((entity): entity is any => entity !== null);
+                
+                if (entities.length > 0) {
+                  directionsSet.add('source');
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error in fallback entity fetch:', error);
+          }
         }
 
         if (targetSchemaData?.fields?.length && entities.length > 0) {
@@ -170,8 +269,156 @@ export function useRepeatingTableData(
         setRelatedEntities(entities);
         setRelationDirections(directionsSet);
       } else {
-        setRelatedEntities([]);
-        setRelationDirections(new Set());
+        // If all-relations failed but we have relations metadata, try fallback fetch
+        if (relationIdByTargetId.size > 0) {
+          const uniqueTargetIds = Array.from(relationIdByTargetId.keys());
+          
+          // Special handling for "schemas" schema - use /api/schemas endpoint
+          const isSchemasSchema = targetSchemaId === 'schemas';
+          const baseEndpoint = isSchemasSchema ? '/api/schemas' : `/api/data/${targetSchemaId}`;
+          
+          try {
+            let fallbackEntities: any[] = [];
+            
+            if (isSchemasSchema) {
+              // For schemas, fetch individually (schemas endpoint doesn't support batch)
+              const fetchPromises = uniqueTargetIds.map(async (targetId) => {
+                try {
+                  const entityResponse = await apiRequest<any>(`${baseEndpoint}/${targetId}`);
+                  if (entityResponse.success && entityResponse.data) {
+                    return {
+                      ...entityResponse.data,
+                      __relationType: relationTypeId || '',
+                      __relationId: relationIdByTargetId.get(targetId) || null,
+                    };
+                  }
+                  return null;
+                } catch (error) {
+                  console.error(`Error fetching schema ${targetId}:`, error);
+                  return null;
+                }
+              });
+
+              const fetchedEntities = await Promise.all(fetchPromises);
+              fallbackEntities = fetchedEntities.filter((entity): entity is any => entity !== null);
+            } else {
+              // For regular schemas, try batch fetch first
+              const batchResponse = await apiRequest<any[]>(baseEndpoint, {
+                params: {
+                  includeIds: uniqueTargetIds.join(','),
+                },
+              });
+              
+              if (batchResponse.success && Array.isArray(batchResponse.data)) {
+                const entityMap = new Map<string, any>(
+                  batchResponse.data.map((entity) => [String(entity.id), entity])
+                );
+
+                fallbackEntities = uniqueTargetIds
+                  .map((targetId) => {
+                    const entity = entityMap.get(targetId);
+                    if (entity) {
+                      return {
+                        ...entity,
+                        __relationType: relationTypeId || '',
+                        __relationId: relationIdByTargetId.get(targetId) || null,
+                      };
+                    }
+                    return null;
+                  })
+                  .filter((entity): entity is any => entity !== null);
+              } else {
+                // Fallback to individual fetches
+                const fetchPromises = uniqueTargetIds.map(async (targetId) => {
+                  try {
+                    const entityResponse = await apiRequest<any>(`${baseEndpoint}/${targetId}`);
+                    if (entityResponse.success && entityResponse.data) {
+                      return {
+                        ...entityResponse.data,
+                        __relationType: relationTypeId || '',
+                        __relationId: relationIdByTargetId.get(targetId) || null,
+                      };
+                    }
+                    return null;
+                  } catch (error) {
+                    console.error(`Error fetching entity ${targetId}:`, error);
+                    return null;
+                  }
+                });
+
+                const fetchedEntities = await Promise.all(fetchPromises);
+                fallbackEntities = fetchedEntities.filter((entity): entity is any => entity !== null);
+              }
+            }
+
+            if (fallbackEntities.length > 0) {
+              // Resolve picker fields if needed
+              if (targetSchemaData?.fields?.length) {
+                const pickerFields = targetSchemaData.fields.filter(
+                  (field: any) => field.component === 'picker' && field.targetSchema
+                );
+
+                const resolvedPromises = fallbackEntities.map(async (entity) => {
+                  await Promise.all(
+                    pickerFields
+                      .filter((field: any) => entity[field.name])
+                      .map(async (field: any) => {
+                        const fieldValue = entity[field.name];
+                        if (typeof fieldValue !== 'string' || fieldValue.trim() === '') {
+                          return;
+                        }
+
+                        try {
+                          const resolvedResponse = await apiRequest<any>(
+                            `/api/data/${field.targetSchema}/${fieldValue}`
+                          );
+                          if (resolvedResponse.success && resolvedResponse.data) {
+                            const resolvedEntity = resolvedResponse.data;
+                            let resolvedLabel = resolvedEntity.name || resolvedEntity.title || fieldValue;
+
+                            const targetSchemaForPicker = await fetchSchemaClient(field.targetSchema);
+                            if (targetSchemaForPicker) {
+                              const titleByRole = getValueByRole(
+                                targetSchemaForPicker,
+                                resolvedEntity,
+                                'title'
+                              );
+                              if (titleByRole && titleByRole.trim() !== '') {
+                                resolvedLabel = titleByRole;
+                              }
+                            }
+
+                            entity[`_${field.name}_resolved`] = {
+                              ...resolvedEntity,
+                              _resolvedLabel: resolvedLabel,
+                            };
+                          }
+                        } catch (error) {
+                          console.error(`Error resolving picker field ${field.name}:`, error);
+                        }
+                      })
+                  );
+                  return entity;
+                });
+
+                fallbackEntities = await Promise.all(resolvedPromises);
+              }
+
+              setRelatedEntities(fallbackEntities);
+              setRelationDirections(new Set(['source']));
+            } else {
+              setRelatedEntities([]);
+              setRelationDirections(new Set());
+            }
+          } catch (error) {
+            console.error('Error in fallback entity fetch:', error);
+            setRelatedEntities([]);
+            setRelationDirections(new Set());
+          }
+        } else {
+          setRelatedEntities([]);
+          setRelationDirections(new Set());
+        }
       }
     } catch (error) {
       console.error('Error fetching relations:', error);
@@ -283,6 +530,10 @@ export function useRepeatingTableData(
 
   const refresh = useCallback(async () => {
     if (isRelationBased) {
+      // Reset the fetch params ref to force a fresh fetch
+      lastFetchParamsRef.current = '';
+      // Reset the fetching flag to allow immediate fetch
+      isFetchingRelationsRef.current = false;
       await fetchRelations();
     }
   }, [fetchRelations, isRelationBased]);

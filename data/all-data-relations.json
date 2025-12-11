@@ -1019,5 +1019,25 @@
     "id": "01KC3W86CNGWZ3YQ7THMBNNXYP",
     "createdAt": "2025-12-10T10:17:30.773Z",
     "updatedAt": "2025-12-10T10:17:30.773Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-management",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC61CWZX27ZJXQ00C2RBC4SB",
+    "createdAt": "2025-12-11T06:25:56.730Z",
+    "updatedAt": "2025-12-11T06:25:56.730Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-procedure",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KC6217KXR0N5M4533FBPEYZZ",
+    "createdAt": "2025-12-11T06:37:02.972Z",
+    "updatedAt": "2025-12-11T06:37:02.972Z"
   }
 ]

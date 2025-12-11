@@ -36,6 +36,19 @@ export async function GET(
   { params }: { params: Promise<{ 'schema-id': string; id: string }> }
 ) {
   const { 'schema-id': schemaId, id } = await params;
+
+  // Special-case: if schema is "schemas", delegate to /api/schemas/:id
+  if (schemaId === 'schemas') {
+    const targetUrl = new URL(request.nextUrl.toString());
+    targetUrl.pathname = `/api/schemas/${id}`;
+    const response = await fetch(targetUrl.toString(), {
+      method: request.method,
+      headers: request.headers,
+      cache: 'no-store',
+    });
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
+  }
   const targetPath = `/api/data/${schemaId}/${id}${request.nextUrl.search}`;
 
   if (!isDemoModeEnabled()) {

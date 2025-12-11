@@ -27,6 +27,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DynamicCardRenderer } from '../../data-display/components/DynamicCardRenderer';
+import { toast } from 'sonner';
 const fieldVariants = {
   hidden: { opacity: 0, y: 12 },
   visible: (index: number) => ({
@@ -191,6 +192,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         let resolvedEntities: any[] = [];
 
         if (uniqueTargetIds.length > 0) {
+          const isSchemasSchema = targetSchema === 'schemas';
+
+          if (!isSchemasSchema) {
+            // Try batch fetch first for regular schemas
           const batchResponse = await apiRequest<any[]>(`/api/data/${targetSchema}`, {
             params: {
               includeIds: uniqueTargetIds.join(','),
@@ -205,11 +210,24 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             resolvedEntities = relationsList
               .map((relation) => entityMap.get(relation.targetId))
               .filter((entity): entity is any => Boolean(entity));
-          } else {
+            }
+          }
+
+          // If schemas schema or batch failed/empty, fall back to individual fetches
+          if (resolvedEntities.length === 0) {
             const fallbackEntities = await Promise.all(
               relationsList.map(async (relation: DataRelation) => {
+                try {
+                  if (isSchemasSchema) {
+                    const entityResponse = await apiRequest<any>(`/api/schemas/${relation.targetId}`);
+                    return entityResponse.success && entityResponse.data ? entityResponse.data : null;
+                  }
                 const entityResponse = await apiRequest<any>(`/api/data/${targetSchema}/${relation.targetId}`);
                 return entityResponse.success && entityResponse.data ? entityResponse.data : null;
+                } catch (error) {
+                  console.error(`Error fetching related entity ${relation.targetId}:`, error);
+                  return null;
+                }
               })
             );
             resolvedEntities = fallbackEntities.filter((entity): entity is any => Boolean(entity));
@@ -503,65 +521,111 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
 
   // Handler for selecting an item from popup picker
   const handleSelectFromPicker = async (selectedItems: NormalizedOption[], rawItems: any[]) => {
-    if (!currentEntityId || !relationTypeId || !targetSchema) {
+    // Validate required parameters
+    if (!currentEntityId) {
+      toast.error('Cannot create relation', {
+        description: 'Source entity ID is missing. Please save the form first.',
+      });
+      setIsPickerOpen(false);
+      return;
+    }
+
+    if (!relationTypeId) {
+      toast.error('Cannot create relation', {
+        description: 'Relation type is not configured for this section.',
+      });
+      setIsPickerOpen(false);
+      return;
+    }
+
+    if (!targetSchema) {
+      toast.error('Cannot create relation', {
+        description: 'Target schema is not configured for this section.',
+      });
+      setIsPickerOpen(false);
       return;
     }
 
     try {
       const normalizedSelections = Array.isArray(selectedItems) ? selectedItems : [];
       const existingIds = new Set(relations.map((r) => String(r.targetId)));
-      const toCreate = normalizedSelections.filter(
-        (selection) => selection?.id && !existingIds.has(String(selection.id))
-      );
+      
+      // Extract IDs from normalized selections
+      const selectionIds = normalizedSelections
+        .map((selection) => selection?.id)
+        .filter((id): id is string => Boolean(id));
+      
+      // Also check rawItems for fallback
+      const rawItemIds = Array.isArray(rawItems)
+        ? rawItems.map((item) => item?.id).filter((id): id is string => Boolean(id))
+        : [];
+      
+      // Combine and deduplicate IDs
+      const allCandidateIds = Array.from(new Set([...selectionIds, ...rawItemIds]));
+      
+      // Filter out already existing relations
+      const toCreateIds = allCandidateIds.filter((id) => !existingIds.has(String(id)));
 
-      const operations = toCreate
-        .map((selection) =>
-          apiRequest('/api/relations', {
-            method: 'POST',
-            body: {
-              sourceSchema: sourceSchemaId,
-              sourceId: currentEntityId,
-              targetSchema: targetSchema,
-              targetId: selection.id,
-              relationTypeId: relationTypeId,
-            },
-          })
-        )
-        .filter(Boolean) as Promise<any>[];
+      if (toCreateIds.length === 0) {
+        toast.info('Item already linked', {
+          description: 'This item is already linked to the current record.',
+        });
+        setIsPickerOpen(false);
+        return;
+      }
 
-      if (operations.length === 0 && rawItems?.length) {
-        const fallbackId = rawItems[0]?.id;
-        if (fallbackId && !existingIds.has(String(fallbackId))) {
-          operations.push(
+      // Create relation operations
+      const operations = toCreateIds.map((targetId) =>
             apiRequest('/api/relations', {
               method: 'POST',
               body: {
                 sourceSchema: sourceSchemaId,
                 sourceId: currentEntityId,
                 targetSchema: targetSchema,
-                targetId: fallbackId,
+            targetId: targetId,
                 relationTypeId: relationTypeId,
               },
             })
           );
-        }
-      }
 
-      if (operations.length === 0) {
-        return;
-      }
-
+      // Execute all operations
       const results = await Promise.all(operations);
-      const hasFailure = results.some(response => !response?.success);
-      if (hasFailure) {
-        console.error('Failed to create one or more relations from picker:', results);
+      
+      // Check for failures
+      const failedResults = results.filter((response) => !response?.success);
+      const successCount = results.length - failedResults.length;
+
+      if (failedResults.length > 0) {
+        console.error('Failed to create one or more relations from picker:', failedResults);
+        const errorMessages = failedResults
+          .map((r) => r.error || 'Unknown error')
+          .join(', ');
+        
+        if (successCount > 0) {
+          toast.warning('Partial success', {
+            description: `Created ${successCount} relation(s), but ${failedResults.length} failed: ${errorMessages}`,
+          });
       } else {
-        await fetchRelations();
+          toast.error('Failed to create relation', {
+            description: errorMessages || 'An error occurred while creating the relation.',
+          });
+        }
+      } else {
+        toast.success('Relation created', {
+          description: `Successfully linked ${successCount} item(s).`,
+        });
       }
+
+      // Refresh relations to show updated data
+        await fetchRelations();
     } catch (error) {
       console.error('Error creating relation from picker:', error);
-    }
+      toast.error('Error creating relation', {
+        description: error instanceof Error ? error.message : 'An unexpected error occurred.',
+      });
+    } finally {
     setIsPickerOpen(false);
+    }
   };
 
   // Get already selected IDs to exclude from picker

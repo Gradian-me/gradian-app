@@ -24,6 +24,7 @@ import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
 import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/PopupPicker';
 import { NormalizedOption } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { toast } from 'sonner';
 
 interface RepeatingSectionDialogProps {
   isOpen: boolean;
@@ -222,68 +223,113 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
 
   const handleSelectFromPicker = useCallback(
     async (selectedItems: NormalizedOption[], rawItems: any[]) => {
-      if (!currentEntityId || !repeatingConfig?.relationTypeId || !targetSchemaId) {
+      // Validate required parameters
+      if (!currentEntityId) {
+        toast.error('Cannot create relation', {
+          description: 'Source entity ID is missing. Please save the form first.',
+        });
+        setIsPickerOpen(false);
+        return;
+      }
+
+      if (!repeatingConfig?.relationTypeId) {
+        toast.error('Cannot create relation', {
+          description: 'Relation type is not configured for this section.',
+        });
+        setIsPickerOpen(false);
+        return;
+      }
+
+      if (!targetSchemaId) {
+        toast.error('Cannot create relation', {
+          description: 'Target schema is not configured for this section.',
+        });
+        setIsPickerOpen(false);
         return;
       }
 
       try {
         const normalizedSelections = Array.isArray(selectedItems) ? selectedItems : [];
         const existingIds = new Set(selectedIds.map((id) => String(id)));
-        const toCreate = normalizedSelections.filter(
-          (selection) => selection?.id && !existingIds.has(String(selection.id))
-        );
+        
+        // Extract IDs from normalized selections
+        const selectionIds = normalizedSelections
+          .map((selection) => selection?.id)
+          .filter((id): id is string => Boolean(id));
+        
+        // Also check rawItems for fallback
+        const rawItemIds = Array.isArray(rawItems)
+          ? rawItems.map((item) => item?.id).filter((id): id is string => Boolean(id))
+          : [];
+        
+        // Combine and deduplicate IDs
+        const allCandidateIds = Array.from(new Set([...selectionIds, ...rawItemIds]));
+        
+        // Filter out already existing relations
+        const toCreateIds = allCandidateIds.filter((id) => !existingIds.has(String(id)));
 
-        const operations = toCreate
-          .map((selection) =>
-            apiRequest('/api/relations', {
-              method: 'POST',
-              body: {
-                sourceSchema: schema.id,
-                sourceId: currentEntityId,
-                targetSchema: targetSchemaId,
-                targetId: selection.id,
-                relationTypeId: repeatingConfig.relationTypeId,
-              },
-          })
-          )
-          .filter(Boolean) as Promise<any>[];
-
-        if (operations.length === 0 && rawItems?.length) {
-          const fallbackId = rawItems[0]?.id;
-          if (fallbackId && !existingIds.has(String(fallbackId))) {
-            operations.push(
-              apiRequest('/api/relations', {
-                method: 'POST',
-                body: {
-                  sourceSchema: schema.id,
-                  sourceId: currentEntityId,
-                  targetSchema: targetSchemaId,
-                  targetId: fallbackId,
-                  relationTypeId: repeatingConfig.relationTypeId,
-                },
-              })
-            );
-          }
-        }
-
-        if (operations.length === 0) {
+        if (toCreateIds.length === 0) {
+          toast.info('Item already linked', {
+            description: 'This item is already linked to the current record.',
+          });
+          setIsPickerOpen(false);
           return;
         }
 
+        // Create relation operations
+        const operations = toCreateIds.map((targetId) =>
+          apiRequest('/api/relations', {
+            method: 'POST',
+            body: {
+              sourceSchema: schema.id,
+              sourceId: currentEntityId,
+              targetSchema: targetSchemaId,
+              targetId: targetId,
+              relationTypeId: repeatingConfig.relationTypeId,
+            },
+          })
+        );
+
+        // Execute all operations
         const results = await Promise.all(operations);
-        const hasFailure = results.some((response) => !response?.success);
-        if (hasFailure) {
-          console.error('Failed to create one or more relations from picker:', results);
+        
+        // Check for failures
+        const failedResults = results.filter((response) => !response?.success);
+        const successCount = results.length - failedResults.length;
+
+        if (failedResults.length > 0) {
+          console.error('Failed to create one or more relations from picker:', failedResults);
+          const errorMessages = failedResults
+            .map((r) => r.error || 'Unknown error')
+            .join(', ');
+          
+          if (successCount > 0) {
+            toast.warning('Partial success', {
+              description: `Created ${successCount} relation(s), but ${failedResults.length} failed: ${errorMessages}`,
+            });
+          } else {
+            toast.error('Failed to create relation', {
+              description: errorMessages || 'An error occurred while creating the relation.',
+            });
+          }
         } else {
-          await refresh();
+          toast.success('Relation created', {
+            description: `Successfully linked ${successCount} item(s).`,
+          });
         }
+
+        // Refresh the table data
+        await refresh();
       } catch (error) {
         console.error('Error creating relation from picker:', error);
+        toast.error('Error creating relation', {
+          description: error instanceof Error ? error.message : 'An unexpected error occurred.',
+        });
       } finally {
         setIsPickerOpen(false);
       }
     },
-    [currentEntityId, repeatingConfig?.relationTypeId, schema.id, targetSchemaId, refresh]
+    [currentEntityId, repeatingConfig?.relationTypeId, schema.id, targetSchemaId, selectedIds, refresh]
   );
 
   // Prevent clicks inside dialog from propagating to parent elements
@@ -307,8 +353,13 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
 
         if (!relationResponse.success) {
           console.error('Failed to delete relation:', relationResponse.error);
-        } else if (deleteType === 'itemAndRelation' && targetId && targetSchemaId) {
-          // If configured, also delete the target item
+        } else if (
+          deleteType === 'itemAndRelation' &&
+          targetId &&
+          targetSchemaId &&
+          targetSchemaId !== 'schemas' // Never attempt to delete schema definitions
+        ) {
+          // If configured, also delete the target item (skip for schemas catalog)
           const itemResponse = await apiRequest(`/api/data/${targetSchemaId}/${targetId}`, {
             method: 'DELETE',
           });
