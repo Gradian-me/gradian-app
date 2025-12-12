@@ -41,6 +41,40 @@ async function getCookieHeader(): Promise<string | undefined> {
 }
 
 /**
+ * Get tenant domain for server-side requests
+ * Extracts tenant domain from DNS/hostname in request headers only
+ * This ensures multi-tenant deployments work correctly based on the actual DNS domain
+ */
+function getTenantDomainForServerFetch(): string | undefined {
+  // Extract from incoming request headers (DNS-based multi-tenant)
+  // This is the only method - tenant is always determined by the DNS domain
+  try {
+    const hMaybe = nextHeaders();
+    const h = hMaybe && typeof (hMaybe as any).then !== 'function' ? (hMaybe as any) : null;
+    if (h && typeof h.get === 'function') {
+      // Prefer x-forwarded-host (set by reverse proxy/load balancer)
+      // Then fall back to host header
+      const forwardedHost = h.get('x-forwarded-host');
+      const hostHeader = h.get('host');
+      const host = (forwardedHost || hostHeader || '').trim();
+      if (host) {
+        // Extract just the hostname (remove port and protocol if present)
+        const hostname = host.split(':')[0].split('/')[0].toLowerCase();
+        // Skip localhost/127.0.0.1 as those are internal calls without tenant context
+        if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+          return hostname;
+        }
+      }
+    }
+  } catch {
+    // headers() not available or returns Promise, return undefined
+    // Tenant domain cannot be determined without request context
+  }
+
+  return undefined;
+}
+
+/**
  * Get the API URL for internal server-side calls
  * Server-side fetch requires absolute URLs, so we construct them here
  */
@@ -213,6 +247,17 @@ export async function loadData<T = any>(
           fetchHeaders['cookie'] = cookieHeader;
         }
 
+        // Include tenant domain header for server-side internal fetches
+        // This ensures the proxy can identify the correct tenant even for localhost fetches
+        // The internal fetch URL may be localhost, but the tenant comes from the original request DNS
+        const tenantDomain = getTenantDomainForServerFetch();
+        if (tenantDomain) {
+          fetchHeaders['x-tenant-domain'] = tenantDomain;
+          loggingCustom(logType, 'debug', `[${instanceId}] Adding x-tenant-domain header: ${tenantDomain} for internal fetch to ${fetchUrl}`);
+        } else {
+          loggingCustom(logType, 'warn', `[${instanceId}] No tenant domain extracted from DNS for internal fetch to ${fetchUrl}`);
+        }
+
         const response = await fetch(fetchUrl, {
           cache: 'no-store',
           headers: fetchHeaders,
@@ -363,6 +408,12 @@ export async function loadDataById<T = any>(
         fetchHeaders['cookie'] = cookieHeader;
       }
 
+      // Include tenant domain header for server-side internal fetches
+      const tenantDomain = getTenantDomainForServerFetch();
+      if (tenantDomain) {
+        fetchHeaders['x-tenant-domain'] = tenantDomain;
+      }
+
       const response = await fetch(fetchUrl, {
         cache: 'no-store',
         headers: fetchHeaders,
@@ -481,6 +532,12 @@ export async function loadDataById<T = any>(
     };
     if (cookieHeader) {
       fetchHeaders['cookie'] = cookieHeader;
+    }
+
+    // Include tenant domain header for server-side internal fetches
+    const tenantDomain = getTenantDomainForServerFetch();
+    if (tenantDomain) {
+      fetchHeaders['x-tenant-domain'] = tenantDomain;
     }
 
     const response = await fetch(fetchUrl, {

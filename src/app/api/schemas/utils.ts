@@ -446,12 +446,16 @@ export const proxySchemaRequest = async (
   headers.delete('trailer');
 
   // Ensure tenant context is forwarded even for server-side rendered requests
-  // Prefer existing header; otherwise derive from the incoming host.
+  // Priority: x-tenant-domain header (from DNS extraction) → derive from host DNS
+  // Note: Internal server-side fetches may go to localhost, but include x-tenant-domain
+  // header extracted from the original request's DNS, so we use that header here.
   const existingTenantHeader =
     headers.get('x-tenant-domain') || headers.get('X-Tenant-Domain');
 
   if (!existingTenantHeader) {
+    // Fallback: Extract from request host DNS (only for direct browser requests)
     // Prefer forwarded host (edge/proxy) → host header → request URL host
+    // Skip localhost/127.0.0.1 as those are internal calls without real tenant context
     const forwardedHost = request.headers.get('x-forwarded-host');
     const rawHost =
       forwardedHost ||
@@ -459,7 +463,8 @@ export const proxySchemaRequest = async (
       request.nextUrl?.hostname ||
       '';
     const normalizedHost = rawHost.trim().toLowerCase().split(':')[0];
-    if (normalizedHost) {
+    // Only set tenant header if we have a real domain (not localhost/internal)
+    if (normalizedHost && normalizedHost !== 'localhost' && normalizedHost !== '127.0.0.1') {
       headers.set('x-tenant-domain', normalizedHost);
     }
   }
