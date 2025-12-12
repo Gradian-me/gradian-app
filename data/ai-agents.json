@@ -703,7 +703,7 @@
         "label": "Image Size",
         "sectionId": "body",
         "component": "select",
-        "defaultValue": "1024x1792",
+        "defaultValue": "1024x1536",
         "options": [
           {
             "id": "1024x1024",
@@ -712,14 +712,14 @@
             "color": "default"
           },
           {
-            "id": "1024x1792",
-            "label": "1024x1792 (Portrait)",
+            "id": "1024x1536",
+            "label": "1024x1536 (Portrait)",
             "icon": "RectangleVertical",
             "color": "default"
           },
           {
-            "id": "1792x1024",
-            "label": "1792x1024 (Landscape)",
+            "id": "1024x1536",
+            "label": "1024x1536 (Landscape)",
             "icon": "RectangleHorizontal",
             "color": "default"
           }

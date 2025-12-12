@@ -447,7 +447,9 @@ export function AiBuilderResponse({
                     onClick={async () => {
                       try {
                         let blob: Blob;
-                        let filename = 'generated-image.png';
+                        // Generate filename with timestamp: Gradian_Image_{time}.png
+                        const timestamp = Date.now();
+                        const filename = `Gradian_Image_${timestamp}.png`;
                         
                         if (imageData.b64_json) {
                           // Handle base64 image
@@ -468,12 +470,6 @@ export function AiBuilderResponse({
                           // Handle URL image - fetch and convert to blob
                           const response = await fetch(imageData.url);
                           blob = await response.blob();
-                          // Try to get filename from URL
-                          const urlPath = new URL(imageData.url).pathname;
-                          const urlFilename = urlPath.split('/').pop();
-                          if (urlFilename && urlFilename.includes('.')) {
-                            filename = urlFilename;
-                          }
                         } else {
                           return;
                         }
@@ -508,14 +504,19 @@ export function AiBuilderResponse({
                         if (imageData.url) {
                           imageUrl = imageData.url;
                         } else if (imageData.b64_json) {
-                          // Convert base64 to data URL
-                          imageUrl = imageData.b64_json.startsWith('data:image/')
-                            ? imageData.b64_json
-                            : `data:image/png;base64,${imageData.b64_json}`;
+                          // Convert base64 to data URL format: data:image/jpeg;base64,...
+                          if (imageData.b64_json.startsWith('data:image/')) {
+                            // Already has data URL prefix
+                            imageUrl = imageData.b64_json;
+                          } else {
+                            // Add data URL prefix - use jpeg format as it works reliably
+                            imageUrl = `data:image/jpeg;base64,${imageData.b64_json}`;
+                          }
                         } else {
                           return;
                         }
                         
+                        // Open in new tab with data URL
                         window.open(imageUrl, '_blank', 'noopener,noreferrer');
                       } catch (error) {
                         console.error('Error opening image:', error);
