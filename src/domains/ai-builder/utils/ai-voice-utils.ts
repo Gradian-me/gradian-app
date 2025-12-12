@@ -7,9 +7,20 @@ import { AgentRequestData, AgentResponse } from './ai-agent-utils';
 import { getApiUrlForAgentType } from './ai-agent-url';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
-
-const MAX_UPLOAD_BYTES = 15 * 1024 * 1024; // 15MB limit to avoid abuse
-const ALLOWED_MIME_PREFIXES = ['audio/', 'video/']; // whisper-like endpoints often accept audio/video containers
+import {
+  getApiKey,
+  sanitizeErrorMessage,
+  safeJsonParse,
+  validateFile,
+  SECURITY_CONSTANTS,
+} from './ai-security-utils';
+import {
+  createAbortController,
+  parseErrorResponse,
+  buildTimingInfo,
+  validateAgentConfig,
+  normalizeLanguageCode,
+} from './ai-common-utils';
 
 /**
  * Process voice transcription request
@@ -18,15 +29,27 @@ export async function processVoiceRequest(
   agent: any,
   requestData: AgentRequestData
 ): Promise<AgentResponse> {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
   try {
-    // Get API key from environment
-    const apiKey = process.env.LLM_API_KEY || process.env.AVALAI_API_KEY;
-    if (!apiKey) {
+    // Security: Validate agent configuration
+    const agentValidation = validateAgentConfig(agent);
+    if (!agentValidation.valid) {
       return {
         success: false,
-        error: 'LLM_API_KEY is not configured',
+        error: agentValidation.error || 'Invalid agent configuration',
       };
     }
+
+    // Security: Get API key with validation
+    const apiKeyResult = getApiKey();
+    if (!apiKeyResult.key) {
+      return {
+        success: false,
+        error: apiKeyResult.error || 'LLM_API_KEY is not configured',
+      };
+    }
+    const apiKey = apiKeyResult.key;
 
     // Extract file from request data
     const file = requestData.file as File | Blob | undefined;
@@ -37,22 +60,17 @@ export async function processVoiceRequest(
       };
     }
 
-    // Validate file size
-    if (typeof (file as File).size === 'number' && (file as File).size > MAX_UPLOAD_BYTES) {
+    // Security: Validate file using shared utility
+    const fileValidation = validateFile(file);
+    if (!fileValidation.valid) {
       return {
         success: false,
-        error: `File too large. Max allowed is ${Math.floor(MAX_UPLOAD_BYTES / (1024 * 1024))}MB`,
+        error: fileValidation.error || 'Invalid file',
       };
     }
 
-    // Validate file type
+    // Get file type for logging
     const fileType = (file as File).type || '';
-    if (fileType && !ALLOWED_MIME_PREFIXES.some((prefix) => fileType.startsWith(prefix))) {
-      return {
-        success: false,
-        error: 'Unsupported file type. Please upload an audio file.',
-      };
-    }
 
     // Get model and settings from agent config
     const model = agent.model || 'gpt-4o-mini-transcribe';
@@ -77,9 +95,10 @@ export async function processVoiceRequest(
       transcriptionFormData.append('response_format', responseFormat);
     }
 
-    // Add language parameter if provided
+    // Security: Normalize and validate language parameter if provided
     if (requestData.language) {
-      transcriptionFormData.append('language', requestData.language);
+      const normalizedLanguage = normalizeLanguageCode(requestData.language);
+      transcriptionFormData.append('language', normalizedLanguage);
     }
 
     // Build request body info for logging (exclude file blob)
@@ -108,48 +127,39 @@ export async function processVoiceRequest(
     // Track timing
     const startTime = Date.now();
 
-    // Call the transcription API
-    const response = await fetch(transcribeUrl, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: transcriptionFormData,
-    });
+    // Performance: Create AbortController with timeout (120 seconds for voice transcription)
+    const { controller, timeoutId } = createAbortController(120000);
 
-    const responseTime = Date.now() - startTime;
+    try {
+      // Call the transcription API
+      const response = await fetch(transcribeUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: transcriptionFormData,
+        signal: controller.signal,
+      });
 
-    if (!response.ok) {
-      let errorMessage = 'Transcription failed';
-      try {
-        const errorData = await response.json();
-        // Extract error message from API response
-        if (errorData?.error?.message) {
-          errorMessage = errorData.error.message;
-        } else if (errorData?.error) {
-          errorMessage =
-            typeof errorData.error === 'string'
-              ? errorData.error
-              : JSON.stringify(errorData.error);
-        } else if (errorData?.message) {
-          errorMessage = errorData.message;
-        } else {
-          errorMessage = JSON.stringify(errorData);
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        // Security: Use shared error parsing utility
+        const errorMessage = await parseErrorResponse(response);
+        
+        if (isDevelopment) {
+          console.error('Voice transcription API error:', errorMessage);
         }
-      } catch {
-        // If JSON parsing fails, try to get text
-        const errorText = await response.text();
-        errorMessage = errorText || `HTTP ${response.status}: ${response.statusText}`;
-      }
-      return {
-        success: false,
-        error: errorMessage,
-      };
-    }
 
-    // Check if response is streaming
-    const contentType = response.headers.get('content-type') || '';
-    const isStreaming = contentType.includes('text/event-stream') || contentType.includes('stream');
+        return {
+          success: false,
+          error: sanitizeErrorMessage(errorMessage, isDevelopment),
+        };
+      }
+
+      // Check if response is streaming
+      const contentType = response.headers.get('content-type') || '';
+      const isStreaming = contentType.includes('text/event-stream') || contentType.includes('stream');
 
     if (isStreaming) {
       // Handle streaming response
@@ -230,14 +240,15 @@ export async function processVoiceRequest(
         }
 
         const finalTranscription = transcription.trim();
+        
+        // Performance: Use shared timing utility
+        const timing = buildTimingInfo(startTime);
+        
         return {
           success: true,
           data: {
             transcription: finalTranscription,
-            timing: {
-              responseTime,
-              duration: responseTime,
-            },
+            timing,
           },
         };
       } catch (streamError) {
@@ -251,13 +262,27 @@ export async function processVoiceRequest(
       }
     } else {
       // Handle non-streaming response
-      const result = await response.json();
+      // Security: Use safe JSON parsing
+      const responseText = await response.text();
+      const parseResult = safeJsonParse(responseText);
+      
+      if (!parseResult.success || !parseResult.data) {
+        return {
+          success: false,
+          error: parseResult.error || 'Invalid response format from transcription service',
+        };
+      }
+
+      const result = parseResult.data;
 
       // Check if we got verbose_json format (has task, language, duration fields)
       const isVerboseJson = result.task !== undefined && result.language !== undefined && result.duration !== undefined;
 
       // Extract text from response
       const transcription = result.text || result.transcription || JSON.stringify(result);
+
+      // Performance: Use shared timing utility
+      const timing = buildTimingInfo(startTime);
 
       // Return response with metadata if verbose_json format was received
       return {
@@ -277,18 +302,33 @@ export async function processVoiceRequest(
               words: result.words,
             },
           }),
-          timing: {
-            responseTime,
-            duration: responseTime,
-          },
+          timing,
         },
       };
     }
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+
+      // Handle timeout errors
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        if (isDevelopment) {
+          console.error('Request timeout in voice transcription API:', fetchError);
+        }
+        return {
+          success: false,
+          error: sanitizeErrorMessage('Request timeout', isDevelopment),
+        };
+      }
+
+      throw fetchError;
+    }
   } catch (error) {
-    console.error('Error in voice transcription request:', error);
+    if (isDevelopment) {
+      console.error('Error in voice transcription request:', error);
+    }
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred',
+      error: sanitizeErrorMessage(error, isDevelopment),
     };
   }
 }

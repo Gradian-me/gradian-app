@@ -637,7 +637,7 @@ export function AiBuilderForm({
         }));
       }
     }
-  }, [formValues, formFields, formErrors, buildConcatenatedPrompt, onPromptChange]);
+  }, [formValues, formFields, formErrors, buildConcatenatedPrompt, onPromptChange, selectedLanguage, onFormValuesChange]);
 
   // Handle field blur
   const handleFieldBlur = useCallback((fieldName: string) => {

@@ -8,6 +8,20 @@ import { getApiUrlForAgentType } from './ai-agent-url';
 import { extractParametersBySectionId, parseUserPromptToFormValues } from './ai-shared-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import {
+  sanitizePrompt,
+  getApiKey,
+  sanitizeErrorMessage,
+  safeJsonParse,
+  validateImageSize,
+  validateOutputFormat,
+} from './ai-security-utils';
+import {
+  createAbortController,
+  parseErrorResponse,
+  buildTimingInfo,
+  validateAgentConfig,
+} from './ai-common-utils';
 
 /**
  * Process image generation request
@@ -16,15 +30,27 @@ export async function processImageRequest(
   agent: any,
   requestData: AgentRequestData
 ): Promise<AgentResponse> {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
   try {
-    // Get API key from environment
-    const apiKey = process.env.LLM_API_KEY || process.env.AVALAI_API_KEY;
-    if (!apiKey) {
+    // Security: Validate agent configuration
+    const agentValidation = validateAgentConfig(agent);
+    if (!agentValidation.valid) {
       return {
         success: false,
-        error: 'LLM_API_KEY is not configured',
+        error: agentValidation.error || 'Invalid agent configuration',
       };
     }
+
+    // Security: Get API key with validation
+    const apiKeyResult = getApiKey();
+    if (!apiKeyResult.key) {
+      return {
+        success: false,
+        error: apiKeyResult.error || 'LLM_API_KEY is not configured',
+      };
+    }
+    const apiKey = apiKeyResult.key;
 
     // Use body and extra_body from requestData if provided, otherwise calculate from formValues
     let bodyParams: Record<string, any> = {};
@@ -99,6 +125,7 @@ export async function processImageRequest(
       }
     }
 
+    // Security: Sanitize and validate prompt
     if (!cleanPrompt || typeof cleanPrompt !== 'string') {
       return {
         success: false,
@@ -106,28 +133,36 @@ export async function processImageRequest(
       };
     }
 
+    cleanPrompt = sanitizePrompt(cleanPrompt);
+    if (!cleanPrompt) {
+      return {
+        success: false,
+        error: 'Prompt cannot be empty after sanitization',
+      };
+    }
+
     // Get model from agent config
     const model = agent.model || 'flux-1.1-pro';
 
-    // Validate size if present in bodyParams
+    // Security: Validate size if present in bodyParams
     if (bodyParams.size) {
-      const validSizes = ['1024x1024', '1024x1792', '1792x1024'];
-      if (!validSizes.includes(bodyParams.size)) {
+      const sizeValidation = validateImageSize(bodyParams.size);
+      if (!sizeValidation.valid) {
         return {
           success: false,
-          error: `Invalid size. Must be one of: ${validSizes.join(', ')}`,
+          error: sizeValidation.error || 'Invalid size',
         };
       }
     }
 
-    // Validate response format if present in extraParams
+    // Security: Validate response format if present in extraParams
     // Note: The API expects "png" in the request, not "b64_json"
     if (extraParams.output_format) {
-      const validFormats = ['url', 'png'];
-      if (!validFormats.includes(extraParams.output_format)) {
+      const formatValidation = validateOutputFormat(extraParams.output_format);
+      if (!formatValidation.valid) {
         return {
           success: false,
-          error: `output_format must be either "url" or "png". Received: ${extraParams.output_format}`,
+          error: formatValidation.error || 'Invalid output format',
         };
       }
     }
@@ -138,9 +173,8 @@ export async function processImageRequest(
     // Track timing
     const startTime = Date.now();
 
-    // Create AbortController with timeout (60 seconds for image generation)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds
+    // Performance: Use shared AbortController utility
+    const { controller, timeoutId } = createAbortController(60000); // 60 seconds
 
     try {
       // Build request body - model, prompt, and all body parameters
@@ -181,34 +215,32 @@ export async function processImageRequest(
 
       clearTimeout(timeoutId);
 
-      const responseTime = Date.now() - startTime;
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Images API error:', errorText);
-
-        // Try to parse error response
-        let errorMessage = `Image generation failed: ${response.statusText}`;
-        try {
-          const errorData = JSON.parse(errorText);
-          if (errorData?.error?.message) {
-            errorMessage = errorData.error.message;
-          } else if (errorData?.message) {
-            errorMessage = errorData.message;
-          } else if (typeof errorData?.error === 'string') {
-            errorMessage = errorData.error;
-          }
-        } catch (parseError) {
-          // Use generic message if parsing fails
+        // Security: Use shared error parsing utility
+        const errorMessage = await parseErrorResponse(response);
+        
+        if (isDevelopment) {
+          console.error('Images API error:', errorMessage);
         }
 
         return {
           success: false,
-          error: errorMessage,
+          error: sanitizeErrorMessage(errorMessage, isDevelopment),
         };
       }
 
-      const data = await response.json();
+      // Security: Use safe JSON parsing
+      const responseText = await response.text();
+      const parseResult = safeJsonParse(responseText);
+      
+      if (!parseResult.success || !parseResult.data) {
+        return {
+          success: false,
+          error: parseResult.error || 'Invalid response format from image generation service',
+        };
+      }
+
+      const data = parseResult.data;
 
       // Extract image data
       const imageData = data.data?.[0];
@@ -226,16 +258,16 @@ export async function processImageRequest(
         revised_prompt: imageData.revised_prompt || null,
       };
 
+      // Performance: Use shared timing utility
+      const timing = buildTimingInfo(startTime);
+
       // Format response data for AiBuilderResponseData structure
       const responseData = {
         image: result,
         format: extraParams.output_format || 'url',
         ...bodyParams, // Include all body parameters in response
         model,
-        timing: {
-          responseTime,
-          duration: responseTime,
-        },
+        timing,
       };
 
       return {
@@ -244,10 +276,7 @@ export async function processImageRequest(
           response: JSON.stringify(responseData, null, 2), // Stringify for consistency with other agent types
           format: 'image' as const,
           tokenUsage: null, // Image generation doesn't use tokens
-          timing: {
-            responseTime,
-            duration: responseTime,
-          },
+          timing,
           agent: {
             id: agent.id,
             label: agent.label,
@@ -262,20 +291,24 @@ export async function processImageRequest(
 
       // Handle timeout errors
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        console.error('Request timeout in image generation API:', fetchError);
+        if (isDevelopment) {
+          console.error('Request timeout in image generation API:', fetchError);
+        }
         return {
           success: false,
-          error: 'Request timeout. The image generation service took too long to respond. Please try again.',
+          error: sanitizeErrorMessage('Request timeout', isDevelopment),
         };
       }
 
       throw fetchError;
     }
   } catch (error) {
-    console.error('Error in image generation request:', error);
+    if (isDevelopment) {
+      console.error('Error in image generation request:', error);
+    }
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Internal server error',
+      error: sanitizeErrorMessage(error, isDevelopment),
     };
   }
 }

@@ -10,21 +10,72 @@ import { getApiUrlForAgentType } from './ai-agent-url';
 import { validateAgentFormFields, buildStandardizedPrompt } from './prompt-builder';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import {
+  sanitizePrompt,
+  getApiKey,
+  sanitizeErrorMessage,
+  safeJsonParse,
+  validateAgentId,
+} from './ai-security-utils';
+import {
+  createAbortController,
+  parseErrorResponse,
+  buildTimingInfo,
+  validateAgentConfig,
+} from './ai-common-utils';
 import fs from 'fs';
 import path from 'path';
 
+// Performance: Cache AI models to avoid repeated file reads
+let cachedModels: any[] | null = null;
+let modelsCacheTime: number = 0;
+const MODELS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 /**
- * Load AI models from JSON file
+ * Load AI models from JSON file with caching
+ * Performance: Cache models to avoid repeated file system operations
  */
 function loadAiModels(): any[] {
-  const dataPath = path.join(process.cwd(), 'data', 'ai-models.json');
+  const now = Date.now();
   
-  if (!fs.existsSync(dataPath)) {
+  // Return cached models if still valid
+  if (cachedModels !== null && (now - modelsCacheTime) < MODELS_CACHE_TTL) {
+    return cachedModels;
+  }
+
+  try {
+    const dataPath = path.join(process.cwd(), 'data', 'ai-models.json');
+    
+    // Security: Validate path to prevent directory traversal
+    const resolvedPath = path.resolve(dataPath);
+    const dataDir = path.resolve(process.cwd(), 'data');
+    if (!resolvedPath.startsWith(dataDir)) {
+      console.error('Invalid models file path');
+      return [];
+    }
+    
+    if (!fs.existsSync(resolvedPath)) {
+      cachedModels = [];
+      modelsCacheTime = now;
+      return cachedModels;
+    }
+    
+    const fileContents = fs.readFileSync(resolvedPath, 'utf8');
+    
+    // Security: Use safe JSON parsing with size limits
+    const parseResult = safeJsonParse(fileContents, 1 * 1024 * 1024); // 1MB max for models file
+    if (!parseResult.success || !Array.isArray(parseResult.data)) {
+      console.error('Invalid models file format');
+      return [];
+    }
+    
+    cachedModels = parseResult.data;
+    modelsCacheTime = now;
+    return cachedModels;
+  } catch (error) {
+    console.error('Error loading AI models:', error);
     return [];
   }
-  
-  const fileContents = fs.readFileSync(dataPath, 'utf8');
-  return JSON.parse(fileContents);
 }
 
 /**
@@ -73,7 +124,18 @@ export async function processChatRequest(
   requestData: AgentRequestData,
   baseUrl?: string
 ): Promise<AgentResponse> {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
   try {
+    // Security: Validate agent configuration
+    const agentValidation = validateAgentConfig(agent);
+    if (!agentValidation.valid) {
+      return {
+        success: false,
+        error: agentValidation.error || 'Invalid agent configuration',
+      };
+    }
+
     // Validate form fields if renderComponents exist
     if (agent.renderComponents && requestData.formValues) {
       const validationErrors = validateAgentFormFields(agent, requestData.formValues);
@@ -96,6 +158,7 @@ export async function processChatRequest(
       }
     }
 
+    // Security: Sanitize and validate prompt
     if (!userPrompt || typeof userPrompt !== 'string') {
       return {
         success: false,
@@ -103,14 +166,23 @@ export async function processChatRequest(
       };
     }
 
-    // Get API key from environment
-    const apiKey = process.env.LLM_API_KEY || process.env.AVALAI_API_KEY;
-    if (!apiKey) {
+    userPrompt = sanitizePrompt(userPrompt);
+    if (!userPrompt) {
       return {
         success: false,
-        error: 'LLM_API_KEY is not configured',
+        error: 'Prompt cannot be empty after sanitization',
       };
     }
+
+    // Security: Get API key with validation
+    const apiKeyResult = getApiKey();
+    if (!apiKeyResult.key) {
+      return {
+        success: false,
+        error: apiKeyResult.error || 'LLM_API_KEY is not configured',
+      };
+    }
+    const apiKey = apiKeyResult.key;
 
     // Preload routes if configured
     let preloadedContext = '';
@@ -167,9 +239,8 @@ export async function processChatRequest(
     // Track timing
     const startTime = Date.now();
 
-    // Create AbortController with longer timeout (120 seconds)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 seconds
+    // Performance: Use shared AbortController utility
+    const { controller, timeoutId } = createAbortController(120000); // 120 seconds
 
     try {
       // Build request body
@@ -198,40 +269,35 @@ export async function processChatRequest(
 
       clearTimeout(timeoutId);
 
-      // Track response time (time when response is received)
-      const responseTime = Date.now();
-      const responseTimeMs = responseTime - startTime;
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('LLM API error:', errorText);
-
-        // Try to parse error response and extract the message
-        let errorMessage = `AI API request failed: ${response.statusText}`;
-        try {
-          const errorData = JSON.parse(errorText);
-          if (errorData?.error?.message) {
-            errorMessage = errorData.error.message;
-          } else if (errorData?.message) {
-            errorMessage = errorData.message;
-          } else if (typeof errorData?.error === 'string') {
-            errorMessage = errorData.error;
-          }
-        } catch (parseError) {
-          // If parsing fails, use the generic message
+        // Security: Use shared error parsing utility
+        const errorMessage = await parseErrorResponse(response);
+        
+        if (isDevelopment) {
+          console.error('LLM API error:', errorMessage);
         }
 
         return {
           success: false,
-          error: errorMessage,
+          error: sanitizeErrorMessage(errorMessage, isDevelopment),
         };
       }
 
-      const data = await response.json();
+      // Security: Use safe JSON parsing
+      const responseText = await response.text();
+      const parseResult = safeJsonParse(responseText);
+      
+      if (!parseResult.success || !parseResult.data) {
+        return {
+          success: false,
+          error: parseResult.error || 'Invalid response format from AI service',
+        };
+      }
 
-      // Track total duration (time to process response)
-      const endTime = Date.now();
-      const durationMs = endTime - startTime;
+      const data = parseResult.data;
+
+      // Performance: Use shared timing utility
+      const timing = buildTimingInfo(startTime);
       const aiResponseContent = data.choices?.[0]?.message?.content || '';
 
       if (!aiResponseContent) {
@@ -288,10 +354,7 @@ export async function processChatRequest(
           response: processedResponse,
           format: agent.requiredOutputFormat === 'table' ? 'json' : agent.requiredOutputFormat || 'string',
           tokenUsage,
-          timing: {
-            responseTime: responseTimeMs, // Time to receive response
-            duration: durationMs, // Total time from start to completion
-          },
+          timing,
           agent: {
             id: agent.id,
             label: agent.label,
@@ -306,10 +369,12 @@ export async function processChatRequest(
 
       // Handle timeout errors specifically
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        console.error('Request timeout in AI chat request:', fetchError);
+        if (isDevelopment) {
+          console.error('Request timeout in AI chat request:', fetchError);
+        }
         return {
           success: false,
-          error: 'Request timeout. The AI service took too long to respond. Please try again.',
+          error: sanitizeErrorMessage('Request timeout', isDevelopment),
         };
       }
 
@@ -317,10 +382,12 @@ export async function processChatRequest(
       throw fetchError;
     }
   } catch (error) {
-    console.error('Error in AI chat request:', error);
+    if (isDevelopment) {
+      console.error('Error in AI chat request:', error);
+    }
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Internal server error',
+      error: sanitizeErrorMessage(error, isDevelopment),
     };
   }
 }
