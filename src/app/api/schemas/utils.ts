@@ -449,12 +449,29 @@ export const proxySchemaRequest = async (
   // Prefer existing header; otherwise derive from the incoming host.
   const existingTenantHeader =
     headers.get('x-tenant-domain') || headers.get('X-Tenant-Domain');
+
   if (!existingTenantHeader) {
-    const host = request.nextUrl?.hostname?.trim().toLowerCase();
-    if (host) {
-      headers.set('x-tenant-domain', host);
+    // Prefer forwarded host (edge/proxy) → host header → request URL host
+    const forwardedHost = request.headers.get('x-forwarded-host');
+    const rawHost =
+      forwardedHost ||
+      request.headers.get('host') ||
+      request.nextUrl?.hostname ||
+      '';
+    const normalizedHost = rawHost.trim().toLowerCase().split(':')[0];
+    if (normalizedHost) {
+      headers.set('x-tenant-domain', normalizedHost);
     }
   }
+
+  const tenantForLog = headers.get('x-tenant-domain');
+  loggingCustom(
+    LogType.CALL_BACKEND,
+    tenantForLog ? 'info' : 'warn',
+    tenantForLog
+      ? `Tenant header set for schema proxy: ${tenantForLog}`
+      : 'Tenant header missing for schema proxy; downstream may reject request'
+  );
 
   // Extract authorization token and ensure it's in Bearer format
   // Backend APIs require Authorization: Bearer <token> header

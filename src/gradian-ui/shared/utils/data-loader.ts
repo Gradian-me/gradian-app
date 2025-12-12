@@ -4,7 +4,7 @@
 
 import 'server-only';
 
-import { cookies } from 'next/headers';
+import { cookies, headers as nextHeaders } from 'next/headers';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
@@ -63,6 +63,29 @@ function getApiUrl(apiPath: string): string {
   let baseUrl =
     process.env.INTERNAL_API_BASE_URL ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
+
+  // If still unset, try to derive from incoming request headers (host/forwarded)
+  if (!baseUrl) {
+    try {
+      const hMaybe = nextHeaders();
+      // Next.js may return a Promise in some contexts; skip if so to avoid sync dynamic API error
+      const h =
+        hMaybe && typeof (hMaybe as any).then !== 'function'
+          ? (hMaybe as any)
+          : null;
+      if (h && typeof h.get === 'function') {
+        const forwardedHost = h.get('x-forwarded-host');
+        const hostHeader = h.get('host');
+        const host = (forwardedHost || hostHeader || '').trim();
+        const proto = h.get('x-forwarded-proto') || 'https';
+        if (host) {
+          baseUrl = `${proto}://${host}`;
+        }
+      }
+    } catch {
+      // headers() may not be available in all contexts; fallback below
+    }
+  }
 
   if (!baseUrl) {
     if (!isBuildTime) {
