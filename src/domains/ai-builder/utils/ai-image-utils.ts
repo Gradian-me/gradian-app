@@ -24,6 +24,116 @@ import {
 } from './ai-common-utils';
 
 /**
+ * Image Type Prompt Dictionary
+ * Contains specialized prompts for different image generation types
+ */
+export const IMAGE_TYPE_PROMPTS: Record<string, string> = {
+  standard: '', // No special prompt for standard images
+  infographic: `You are an Infographic Intelligence Model.
+
+Your sole purpose is to convert any user prompt into a crystal-clear, text-accurate, insight-dense infographic.
+
+You always prioritize:
+
+Perfect text clarity (no distortions, no hallucinated characters, consistent typography).
+
+Logical structure (hierarchy → sections → relationships).
+
+Visual cleanliness (minimalism, high contrast, no decorative noise).
+
+Decision-enabling insight (models, comparisons, flows, frameworks).
+
+Professional design (balanced spacing, alignment, visual rhythm).
+
+For every prompt:
+
+Extract the core idea.
+
+Identify the decisions the user needs to make.
+
+Choose the optimal infographic structure (graph (nodes and edges), list, matrix, flowchart, tree, quadrant, timeline).
+
+Generate text exactly and accurately with zero visual distortion.
+
+Lay out the infographic with precise typography (clean sans-serif, uniform size, perfect spacing).
+
+Use white background and theme of violet, blue, cyan, indigo for shapes if needed, texts are black.
+
+Avoid unnecessary icons, textures, abstract art, or stylization.
+
+Do not add content not grounded in the user's prompt.
+
+Your outputs must always be:
+
+Insightful
+
+Structured
+
+Minimal
+
+Readable
+
+Actionable
+
+You will generate:
+
+A final infographic image
+
+A text breakdown that matches the design exactly
+
+If the prompt is vague, you infer the clearest possible structure.
+If the prompt is complex, you chunk it into a decision framework.
+If the prompt is contradictory, you choose clarity over completeness.
+
+`,
+  '3d-model': `You are a 3D Model Generation Specialist.
+
+Your purpose is to generate realistic, detailed 3D models from text descriptions.
+
+You always prioritize:
+
+Three-dimensional depth and perspective.
+
+Realistic lighting and shadows.
+
+Accurate proportions and geometry.
+
+Material textures and surface details.
+
+Professional 3D rendering quality.
+
+For every prompt:
+
+Understand the 3D structure and form.
+
+Apply appropriate lighting (directional, ambient, point lights).
+
+Use realistic materials and textures.
+
+Ensure proper perspective and camera angles.
+
+Maintain consistent scale and proportions.
+
+Avoid flat or 2D-looking representations.
+
+Do not add elements that contradict 3D realism.
+
+Your outputs must always be:
+
+Three-dimensional
+
+Realistic
+
+Detailed
+
+Well-lit
+
+Professionally rendered
+
+`,
+};
+
+/**
  * Process image generation request
  */
 export async function processImageRequest(
@@ -133,6 +243,26 @@ export async function processImageRequest(
       };
     }
 
+    // Get image type and prepend the corresponding prompt if available
+    // Check both bodyParams and promptParams for imageType
+    const imageType = bodyParams.imageType || promptParams.imageType || 'infographic';
+    const imageTypePrompt = IMAGE_TYPE_PROMPTS[imageType] || '';
+    
+    // Log for debugging
+    if (isDevelopment) {
+      console.log('[ai-image-utils] Image type:', imageType, 'Prompt exists:', !!imageTypePrompt);
+    }
+    
+    // Concatenate image type prompt before user prompt if prompt exists
+    if (imageTypePrompt && imageTypePrompt.trim()) {
+      cleanPrompt = `${imageTypePrompt.trim()}\n\nUser Prompt: ${cleanPrompt}`;
+      if (isDevelopment) {
+        console.log('[ai-image-utils] Applied image type prompt for', imageType, '. Final prompt length:', cleanPrompt.length);
+      }
+    } else if (isDevelopment && imageType !== 'standard') {
+      console.warn('[ai-image-utils] Image type is', imageType, 'but no prompt found or empty');
+    }
+
     cleanPrompt = sanitizePrompt(cleanPrompt);
     if (!cleanPrompt) {
       return {
@@ -178,10 +308,12 @@ export async function processImageRequest(
 
     try {
       // Build request body - model, prompt, and all body parameters
+      // Exclude imageType as it's only used for prompt building, not sent to API
+      const { imageType: _, ...bodyParamsWithoutImageType } = bodyParams;
       const requestBody: Record<string, any> = {
         model,
         prompt: cleanPrompt,
-        ...bodyParams, // Include all fields with sectionId: "body"
+        ...bodyParamsWithoutImageType, // Include all fields with sectionId: "body" except imageType
       };
 
       // Build extra_body - all parameters with sectionId: "extra"

@@ -10,6 +10,8 @@ import {
 import { getZustandDevToolsConfig } from '@/gradian-ui/shared/utils/zustand-devtools.util';
 
 const STORAGE_KEY = 'ai-response-store';
+const MAX_RESPONSES_PER_AGENT = 5; // Keep only the last 5 responses per agent/format
+const MAX_CONTENT_LENGTH = 500000; // ~500KB - skip storing very large content (like base64 images)
 
 interface AiResponse {
   id: string; // datetime-based ID
@@ -49,6 +51,12 @@ export const useAiResponseStore = create<AiResponseState>()(
       latestResponses: {},
 
       saveResponse: async (agentId, format, content, tokenUsage, duration) => {
+        // Skip storing very large content (like base64 images) to prevent quota issues
+        if (content.length > MAX_CONTENT_LENGTH) {
+          console.warn(`[ai-response-store] Content too large (${content.length} bytes), skipping storage to prevent quota issues`);
+          return new Date().toISOString().replace(/[:.]/g, '-');
+        }
+
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const key = generateStorageKey(agentId, format, timestamp);
         const latestKey = generateLatestKey(agentId, format);
@@ -63,34 +71,101 @@ export const useAiResponseStore = create<AiResponseState>()(
           duration,
         };
 
+        // Clean up old responses for this agent/format before adding new one
+        const state = get();
+        const responsesForAgent = Object.entries(state.responses)
+          .filter(([k]) => k.startsWith(`ai-response-${agentId}-${format}-`))
+          .sort(([, a], [, b]) => {
+            // Sort by timestamp descending (newest first)
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+          });
+
+        // Remove oldest responses if we exceed the limit
+        const responsesToKeep = responsesForAgent.slice(0, MAX_RESPONSES_PER_AGENT - 1);
+        const responsesToRemove = responsesForAgent.slice(MAX_RESPONSES_PER_AGENT - 1);
+
+        const newResponses = { ...state.responses };
+        responsesToRemove.forEach(([k]) => {
+          delete newResponses[k];
+        });
+
+        // Add new response
+        newResponses[key] = response;
+
         set(
-          (state) => ({
-            responses: {
-              ...state.responses,
-              [key]: response,
-            },
+          {
+            responses: newResponses,
             latestResponses: {
               ...state.latestResponses,
               [latestKey]: timestamp,
             },
-          }),
+          },
           false,
           'saveResponse'
         );
 
-        // Persist to encrypted sessionStorage
+        // Persist to encrypted sessionStorage with retry on quota error
         try {
-          const state = get();
+          const currentState = get();
           await setEncryptedSessionStorage(STORAGE_KEY, {
-            responses: state.responses,
-            latestResponses: state.latestResponses,
+            responses: currentState.responses,
+            latestResponses: currentState.latestResponses,
           });
           notifyEncryptedSessionStorageChange(STORAGE_KEY, {
-            responses: state.responses,
-            latestResponses: state.latestResponses,
+            responses: currentState.responses,
+            latestResponses: currentState.latestResponses,
           });
-        } catch (error) {
-          console.warn('[ai-response-store] Failed to persist to encrypted storage:', error);
+        } catch (error: any) {
+          // Handle quota exceeded error by cleaning up more aggressively
+          if (error?.name === 'QuotaExceededError' || error?.message?.includes('quota')) {
+            console.warn('[ai-response-store] Storage quota exceeded, cleaning up old responses...');
+            
+            // Clean up all but the latest response for each agent/format
+            const cleanupState = get();
+            const cleanedResponses: Record<string, AiResponse> = {};
+            const cleanedLatestResponses: Record<string, string> = { ...cleanupState.latestResponses };
+
+            // Group responses by agent/format and keep only the latest
+            Object.entries(cleanupState.responses).forEach(([k, v]) => {
+              const latestKeyForAgent = generateLatestKey(v.agentId, v.format);
+              const latestTimestamp = cleanupState.latestResponses[latestKeyForAgent];
+              
+              // Only keep the latest response for each agent/format
+              if (v.timestamp === latestTimestamp) {
+                cleanedResponses[k] = v;
+              }
+            });
+
+            // Add the new response
+            cleanedResponses[key] = response;
+            cleanedLatestResponses[latestKey] = timestamp;
+
+            set(
+              {
+                responses: cleanedResponses,
+                latestResponses: cleanedLatestResponses,
+              },
+              false,
+              'saveResponse-cleanup'
+            );
+
+            // Retry saving after cleanup
+            try {
+              const retryState = get();
+              await setEncryptedSessionStorage(STORAGE_KEY, {
+                responses: retryState.responses,
+                latestResponses: retryState.latestResponses,
+              });
+              notifyEncryptedSessionStorageChange(STORAGE_KEY, {
+                responses: retryState.responses,
+                latestResponses: retryState.latestResponses,
+              });
+            } catch (retryError) {
+              console.warn('[ai-response-store] Failed to persist after cleanup:', retryError);
+            }
+          } else {
+            console.warn('[ai-response-store] Failed to persist to encrypted storage:', error);
+          }
         }
 
         return timestamp;
@@ -120,6 +195,12 @@ export const useAiResponseStore = create<AiResponseState>()(
         },
 
         updateResponse: async (key, content) => {
+          // Skip storing very large content updates
+          if (content.length > MAX_CONTENT_LENGTH) {
+            console.warn(`[ai-response-store] Content update too large (${content.length} bytes), skipping storage`);
+            return;
+          }
+
           set(
             (state) => {
               const response = state.responses[key];
@@ -139,7 +220,7 @@ export const useAiResponseStore = create<AiResponseState>()(
             'updateResponse'
           );
 
-          // Persist to encrypted sessionStorage
+          // Persist to encrypted sessionStorage with quota error handling
           try {
             const state = get();
             await setEncryptedSessionStorage(STORAGE_KEY, {
@@ -150,8 +231,12 @@ export const useAiResponseStore = create<AiResponseState>()(
               responses: state.responses,
               latestResponses: state.latestResponses,
             });
-          } catch (error) {
-            console.warn('[ai-response-store] Failed to persist update to encrypted storage:', error);
+          } catch (error: any) {
+            if (error?.name === 'QuotaExceededError' || error?.message?.includes('quota')) {
+              console.warn('[ai-response-store] Storage quota exceeded during update, skipping update persistence');
+            } else {
+              console.warn('[ai-response-store] Failed to persist update to encrypted storage:', error);
+            }
           }
         },
 

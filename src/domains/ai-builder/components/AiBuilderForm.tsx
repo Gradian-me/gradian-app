@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn, validateField } from '@/gradian-ui/shared/utils';
 import { Sparkles, Loader2, Square, History, RotateCcw, PencilRuler } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { PromptPreviewSheet } from './PromptPreviewSheet';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
@@ -120,24 +122,24 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
 
   const colSpan = getColSpan(field);
   
-  // Generate appropriate column span class for 2-column grid
-  // Default to single column on mobile to avoid overlap,
-  // and apply the actual span at md and up.
+  // Generate appropriate column span class for responsive grid
+  // Mobile: always full width (1 column)
+  // Tablet/Desktop: respect colSpan (1 or 2 columns)
   // For a 2-column grid: colSpan 1 = half width, colSpan 2 = full width
   let colSpanClass = 'col-span-1';
   if (colSpan >= 2) {
-    // Full width: span both columns
+    // Full width: span both columns on md+ screens
     colSpanClass = 'col-span-1 md:col-span-2';
   } else {
-    // Half width: span one column
-    colSpanClass = 'col-span-1';
+    // Half width: span one column on md+ screens, full width on mobile
+    colSpanClass = 'col-span-1 md:col-span-1';
   }
 
   // Special styling for textarea/prompt field
   const isPromptField = field.name === 'userPrompt' || field.id === 'user-prompt';
   const customClassName = isPromptField
     ? cn(
-        'min-h-[140px] px-5 py-4 rounded-xl border',
+        'min-h-[120px] md:min-h-[140px] px-4 md:px-5 py-3 md:py-4 rounded-xl border',
         'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm',
         'border-violet-200/50 dark:border-violet-700/50',
         'text-gray-900 dark:text-gray-100',
@@ -145,7 +147,8 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
         'focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:border-violet-400',
         'shadow-sm',
         'transition-all duration-200',
-        'direction-auto'
+        'direction-auto',
+        'text-sm md:text-base' // Responsive text size
       )
     : undefined;
 
@@ -232,6 +235,8 @@ interface AiBuilderFormProps {
   runType?: 'manual' | 'automatic';
   selectedLanguage?: string;
   onLanguageChange?: (language: string) => void;
+  includeImage?: boolean;
+  onIncludeImageChange?: (includeImage: boolean) => void;
   onFormValuesChange?: (formValues: Record<string, any>) => void; // Callback to expose formValues
 }
 
@@ -254,6 +259,8 @@ export function AiBuilderForm({
   runType = 'manual',
   selectedLanguage = 'text',
   onLanguageChange,
+  includeImage = false,
+  onIncludeImageChange,
   onFormValuesChange,
 }: AiBuilderFormProps) {
   // Get selected agent
@@ -817,14 +824,14 @@ export function AiBuilderForm({
     <div className="space-y-6">
       {showForm && (
         <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200/50 dark:border-violet-800/50 shadow-sm">
-          <div className="relative p-6 space-y-4">
+          <div className="relative p-4 md:p-6 space-y-4">
             {/* Header Section */}
             {displayType === 'default' && (
-              <div className="flex flex-row justify-end items-center flex-wrap gap-4">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center flex-wrap gap-3 sm:gap-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2 w-full sm:w-auto">
                   {/* Agent Select - use renderComponents if available, otherwise fallback */}
                   {agentSelectField ? (
-                    <div className="w-72">
+                    <div className="w-full sm:w-72">
                       <FormElementFactory
                         config={{
                           ...agentSelectField,
@@ -852,7 +859,7 @@ export function AiBuilderForm({
                       />
                     </div>
                   ) : (
-                    <div className="w-72">
+                    <div className="w-full sm:w-72">
                       <FormElementFactory
                         config={{
                           id: 'ai-agent-select',
@@ -880,43 +887,47 @@ export function AiBuilderForm({
                       />
                     </div>
                   )}
-                  {DEMO_MODE && selectedAgentId && (
-                    <Link href={`/builder/ai-agents/${selectedAgentId}`}>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {DEMO_MODE && selectedAgentId && (
+                      <Link href={`/builder/ai-agents/${selectedAgentId}`} className="flex-1 sm:flex-initial">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-9 w-full sm:w-auto shrink-0"
+                          title="Edit Agent"
+                        >
+                          <PencilRuler className="h-4 w-4 me-2" />
+                          <span className="hidden xs:inline">Edit Agent</span>
+                          <span className="xs:hidden">Edit</span>
+                        </Button>
+                      </Link>
+                    )}
+                    {onReset && (
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 shrink-0"
-                        title="Edit Agent"
+                        onClick={onReset}
+                        className="h-9 w-9 sm:w-9 p-0 shrink-0"
+                        title="Reset everything"
                       >
-                        <PencilRuler className="h-4 w-4 me-2" />
-                        Edit Agent
+                        <RotateCcw className="h-4 w-4" />
+                      </Button>
+                    )}
+                    <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer" className="flex-1 sm:flex-initial">
+                      <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto shrink-0">
+                        <History className="h-4 w-4" />
+                        <span className="hidden xs:inline">Prompt History</span>
+                        <span className="xs:hidden">History</span>
                       </Button>
                     </Link>
-                  )}
-                  {onReset && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={onReset}
-                      className="h-9 w-9 p-0 shrink-0"
-                      title="Reset everything"
-                    >
-                      <RotateCcw className="h-4 w-4" />
-                    </Button>
-                  )}
-                  <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm" className="gap-2 shrink-0">
-                      <History className="h-4 w-4" />
-                      Prompt History
-                    </Button>
-                  </Link>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Render form fields from renderComponents in a 2-column grid */}
+            {/* Render form fields from renderComponents in responsive grid */}
             {displayType === 'default' && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {sortedFields.map((field) => {
                   // Skip agent select field as it's rendered in header
                   if (field.name === 'aiAgentSelect' || field.id === 'ai-agent-select') {
@@ -946,12 +957,12 @@ export function AiBuilderForm({
             
             {/* Footer Section with Model Badge and Buttons */}
             {showFooter && (
-              <div className="flex justify-between items-center pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
+              <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-2 pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
                 {/* Model Badge on Left */}
                 {selectedAgent?.model && (
                   <Badge 
                     className={cn(
-                      'shrink-0',
+                      'shrink-0 self-start',
                       'bg-violet-100 text-cyan-700 border-cyan-200',
                       'dark:bg-cyan-900/50 dark:text-cyan-300 dark:border-cyan-800',
                       'font-medium shadow-sm'
@@ -962,11 +973,11 @@ export function AiBuilderForm({
                 )}
                 
                 {/* Buttons on Right */}
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                   {onSheetOpenChange && (
                     <>
                       {onLanguageChange && (
-                        <div className="w-36">
+                        <div className="w-full sm:w-36">
                           <LanguageSelector
                             config={{
                               name: 'output-language',
@@ -997,6 +1008,31 @@ export function AiBuilderForm({
                           />
                         </div>
                       )}
+                      {onIncludeImageChange && (
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                          <Switch
+                            id="include-image"
+                            checked={includeImage}
+                            onCheckedChange={(checked) => {
+                              onIncludeImageChange(checked);
+                              // Also update formValues
+                              const newFormValues = {
+                                ...formValues,
+                                includeImage: checked,
+                              };
+                              setFormValues(newFormValues);
+                              // Notify parent of formValues change
+                              if (onFormValuesChange) {
+                                onFormValuesChange(newFormValues);
+                              }
+                            }}
+                            disabled={isLoading || disabled}
+                          />
+                          <Label htmlFor="include-image" className="text-sm font-medium cursor-pointer whitespace-nowrap">
+                            Include Image
+                          </Label>
+                        </div>
+                      )}
                       {(() => {
                         const params = selectedAgent && formValues 
                           ? extractParametersBySectionId(selectedAgent, formValues)
@@ -1017,27 +1053,28 @@ export function AiBuilderForm({
                     </>
                   )}
                   {isLoading ? (
-                    <>
+                    <div className="flex flex-row gap-2 w-full sm:w-auto">
                       <Button
                         onClick={onGenerate}
                         disabled={true}
                         size="default"
                         variant="default"
-                        className="h-10 shadow-sm"
+                        className="h-10 shadow-sm flex-1 sm:flex-initial"
                       >
                         <Loader2 className="h-4 w-4 me-2 animate-spin" />
-                        Generating
+                        <span className="hidden xs:inline">Generating</span>
+                        <span className="xs:hidden">...</span>
                       </Button>
                       <Button
                         onClick={onStop}
                         variant="outline"
                         size="default"
-                        className="h-10 shadow-sm"
+                        className="h-10 shadow-sm flex-1 sm:flex-initial"
                       >
                         <Square className="h-4 w-4 me-2 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
                         Stop
                       </Button>
-                    </>
+                    </div>
                   ) : (
                     <Button
                       onClick={() => {
@@ -1049,10 +1086,11 @@ export function AiBuilderForm({
                       disabled={!isFormValid || !userPrompt.trim() || disabled || runType === 'automatic'}
                       size="default"
                       variant="default"
-                      className="h-10 shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                      className="h-10 shadow-sm w-full sm:w-auto bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
                     >
                       <Sparkles className="h-4 w-4 me-2" />
-                      Do the Magic
+                      <span className="hidden xs:inline">Do the Magic</span>
+                      <span className="xs:hidden">Generate</span>
                     </Button>
                   )}
                 </div>

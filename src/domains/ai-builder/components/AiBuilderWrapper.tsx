@@ -66,6 +66,7 @@ export function AiBuilderWrapper({
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [previewSchema, setPreviewSchema] = useState<{ schema: FormSchema; schemaId: string } | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en'); // Default language for string output agents
+  const [includeImage, setIncludeImage] = useState<boolean>(false);
   const [annotations, setAnnotations] = useState<Map<string, SchemaAnnotation>>(new Map());
   const [lastPromptId, setLastPromptId] = useState<string | null>(null);
   const [firstPromptId, setFirstPromptId] = useState<string | null>(null);
@@ -103,6 +104,8 @@ export function AiBuilderWrapper({
     successMessage,
     preloadedContext,
     isLoadingPreload,
+    imageResponse,
+    imageError,
     lastPromptId: hookLastPromptId,
     generateResponse,
     stopGeneration,
@@ -242,13 +245,17 @@ export function AiBuilderWrapper({
       extra_body = Object.keys(params.extra).length > 0 ? params.extra : undefined;
     }
     
+    // Extract includeImage from formValues or use state
+    const shouldIncludeImage = formValues.includeImage ?? includeImage;
+    
     generateResponse({
       userPrompt,
       agentId: selectedAgentId,
       body,
       extra_body,
+      includeImage: shouldIncludeImage,
     });
-  }, [selectedAgentId, userPrompt, generateResponse, selectedAgent, formValues]);
+  }, [selectedAgentId, userPrompt, generateResponse, selectedAgent, formValues, includeImage]);
 
   // Reset auto-generated flag when agent or prompt changes
   useEffect(() => {
@@ -483,11 +490,19 @@ export function AiBuilderWrapper({
           runType={runType}
           selectedLanguage={selectedLanguage}
           onLanguageChange={setSelectedLanguage}
+          includeImage={includeImage}
+          onIncludeImageChange={setIncludeImage}
           onFormValuesChange={setFormValues}
         />
       )}
 
       <MessageDisplay error={error} successMessage={successMessage} />
+      {imageError && (
+        <div className="rounded-lg border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30 p-4">
+          <p className="text-sm text-orange-800 dark:text-orange-200 font-medium">Image Generation Warning</p>
+          <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">{imageError}</p>
+        </div>
+      )}
 
       <AnimatePresence mode="wait">
         {aiResponse && selectedAgent ? (
@@ -512,6 +527,8 @@ export function AiBuilderWrapper({
               onRemoveSchema={handleRemoveSchema}
               onApplyAnnotations={handleApplyAnnotations}
               selectedLanguage={selectedLanguage}
+              imageResponse={imageResponse}
+              imageError={imageError}
             />
           </motion.div>
         ) : null}

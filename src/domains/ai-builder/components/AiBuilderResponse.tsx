@@ -36,6 +36,8 @@ interface AiBuilderResponseProps {
   onRemoveSchema?: (schemaId: string) => void;
   onApplyAnnotations?: (annotations: SchemaAnnotation[]) => void;
   selectedLanguage?: string;
+  imageResponse?: string | null;
+  imageError?: string | null;
 }
 
 // Utility function to generate table columns from JSON data
@@ -122,6 +124,8 @@ export function AiBuilderResponse({
   onRemoveSchema,
   onApplyAnnotations,
   selectedLanguage = 'text',
+  imageResponse,
+  imageError,
 }: AiBuilderResponseProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const prevIsLoadingRef = useRef<boolean>(isLoading);
@@ -230,6 +234,29 @@ export function AiBuilderResponse({
     prevIsLoadingRef.current = isLoading;
   }, [isLoading, response]);
 
+  // Parse image data from imageResponse prop (parallel image generation)
+  const parallelImageData = useMemo(() => {
+    if (!imageResponse) {
+      return null;
+    }
+    
+    try {
+      const parsed = JSON.parse(imageResponse);
+      
+      // The response structure is: { image: { url, b64_json, revised_prompt }, format, ... }
+      if (parsed && typeof parsed === 'object' && parsed.image) {
+        const img = parsed.image;
+        if (img && (img.url || img.b64_json)) {
+          return img;
+        }
+      }
+      return null;
+    } catch (e) {
+      console.warn('Failed to parse parallel image data:', e, 'Content:', imageResponse?.substring(0, 200));
+      return null;
+    }
+  }, [imageResponse]);
+
   // Parse image data if format is image
   // Also detect image format from response content as fallback
   const imageData = useMemo(() => {
@@ -322,6 +349,177 @@ export function AiBuilderResponse({
 
   // Don't render if we have no content to display
   if (!displayContent || !displayContent.trim()) {
+    // Still render parallel image and metrics if available
+    if (parallelImageData || (tokenUsage || duration !== null)) {
+      return (
+        <div className="space-y-4">
+          {/* Token Usage & Pricing - MetricCard */}
+          {(tokenUsage || duration !== null) && (
+            <MetricCard
+              gradient="indigo"
+              metrics={[
+                ...(tokenUsage ? [
+                  {
+                    id: 'total-tokens',
+                    label: 'Total Tokens',
+                    value: tokenUsage.total_tokens,
+                    unit: 'tokens',
+                    icon: 'Hash',
+                    iconColor: 'cyan' as const,
+                    format: 'number' as const,
+                  },
+                  {
+                    id: 'total-cost',
+                    label: 'Total Cost',
+                    value: tokenUsage.pricing?.total_cost || 0,
+                    prefix: '$',
+                    icon: 'Coins',
+                    iconColor: 'pink' as const,
+                    format: 'currency' as const,
+                    precision: 4,
+                  },
+                ] : []),
+                ...(duration !== null ? [{
+                  id: 'duration',
+                  label: 'Duration',
+                  value: duration < 1000 ? duration : duration / 1000,
+                  unit: duration < 1000 ? 'ms' : 's',
+                  icon: 'Timer',
+                  iconColor: 'emerald' as const,
+                  format: 'number' as const,
+                  precision: duration < 1000 ? 0 : 2,
+                }] : []),
+              ]}
+              footer={{
+                icon: 'Sparkles',
+                text: 'Powered by Gradian AI • Efficient & Cost-Effective',
+              }}
+            />
+          )}
+
+          {/* Parallel Image */}
+          {parallelImageData && (
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-2" />
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    Generated Image
+                  </h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* Save Image Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        let blob: Blob;
+                        const timestamp = Date.now();
+                        const filename = `Gradian_Image_${timestamp}.png`;
+                        
+                        if (parallelImageData.b64_json) {
+                          const base64String = parallelImageData.b64_json.startsWith('data:image/')
+                            ? parallelImageData.b64_json.split(',')[1] || parallelImageData.b64_json
+                            : parallelImageData.b64_json;
+                          
+                          const byteCharacters = atob(base64String);
+                          const byteNumbers = new Array(byteCharacters.length);
+                          for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                          }
+                          const byteArray = new Uint8Array(byteNumbers);
+                          blob = new Blob([byteArray], { type: 'image/png' });
+                        } else if (parallelImageData.url) {
+                          const response = await fetch(parallelImageData.url);
+                          blob = await response.blob();
+                        } else {
+                          return;
+                        }
+                        
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                      } catch (error) {
+                        console.error('Error saving image:', error);
+                      }
+                    }}
+                    className="h-8"
+                  >
+                    <Download className="h-4 w-4 me-1.5" />
+                    Save
+                  </Button>
+                  
+                  {/* Open in New Tab Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      try {
+                        let imageUrl: string;
+                        
+                        if (parallelImageData.url) {
+                          imageUrl = parallelImageData.url;
+                        } else if (parallelImageData.b64_json) {
+                          if (parallelImageData.b64_json.startsWith('data:image/')) {
+                            imageUrl = parallelImageData.b64_json;
+                          } else {
+                            imageUrl = `data:image/jpeg;base64,${parallelImageData.b64_json}`;
+                          }
+                        } else {
+                          return;
+                        }
+                        
+                        window.open(imageUrl, '_blank', 'noopener,noreferrer');
+                      } catch (error) {
+                        console.error('Error opening image:', error);
+                      }
+                    }}
+                    className="h-8"
+                  >
+                    <ExternalLink className="h-4 w-4 me-1.5" />
+                    Open
+                  </Button>
+                  
+                  {parallelImageData.url && <CopyContent content={parallelImageData.url} />}
+                </div>
+              </div>
+              <div className="flex justify-center items-center">
+                <ImageViewer
+                  sourceUrl={parallelImageData.url || undefined}
+                  content={parallelImageData.b64_json || undefined}
+                  alt="AI Generated Image"
+                  width={1024}
+                  height={1024}
+                  objectFit="contain"
+                  className="max-w-full h-auto rounded-lg"
+                />
+              </div>
+              {parallelImageData.revised_prompt && (
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                    Revised Prompt:
+                  </p>
+                  <p className="text-sm text-gray-900 dark:text-gray-100">
+                    {parallelImageData.revised_prompt}
+                  </p>
+                </div>
+              )}
+              {imageError && (
+                <div className="mt-4 p-3 bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-lg">
+                  <p className="text-sm text-orange-800 dark:text-orange-200">{imageError}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
     return null;
   }
 
@@ -408,6 +606,127 @@ export function AiBuilderResponse({
             text: 'Powered by Gradian AI • Efficient & Cost-Effective',
           }}
         />
+      )}
+
+      {/* Parallel Image - shown after MetricCard, before main response */}
+      {parallelImageData && (
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-2" />
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                Generated Image
+              </h3>
+            </div>
+            <div className="flex items-center gap-2">
+              {/* Save Image Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  try {
+                    let blob: Blob;
+                    const timestamp = Date.now();
+                    const filename = `Gradian_Image_${timestamp}.png`;
+                    
+                    if (parallelImageData.b64_json) {
+                      const base64String = parallelImageData.b64_json.startsWith('data:image/')
+                        ? parallelImageData.b64_json.split(',')[1] || parallelImageData.b64_json
+                        : parallelImageData.b64_json;
+                      
+                      const byteCharacters = atob(base64String);
+                      const byteNumbers = new Array(byteCharacters.length);
+                      for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                      }
+                      const byteArray = new Uint8Array(byteNumbers);
+                      blob = new Blob([byteArray], { type: 'image/png' });
+                    } else if (parallelImageData.url) {
+                      const response = await fetch(parallelImageData.url);
+                      blob = await response.blob();
+                    } else {
+                      return;
+                    }
+                    
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                  } catch (error) {
+                    console.error('Error saving image:', error);
+                  }
+                }}
+                className="h-8"
+              >
+                <Download className="h-4 w-4 me-1.5" />
+                Save
+              </Button>
+              
+              {/* Open in New Tab Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  try {
+                    let imageUrl: string;
+                    
+                    if (parallelImageData.url) {
+                      imageUrl = parallelImageData.url;
+                    } else if (parallelImageData.b64_json) {
+                      if (parallelImageData.b64_json.startsWith('data:image/')) {
+                        imageUrl = parallelImageData.b64_json;
+                      } else {
+                        imageUrl = `data:image/jpeg;base64,${parallelImageData.b64_json}`;
+                      }
+                    } else {
+                      return;
+                    }
+                    
+                    window.open(imageUrl, '_blank', 'noopener,noreferrer');
+                  } catch (error) {
+                    console.error('Error opening image:', error);
+                  }
+                }}
+                className="h-8"
+              >
+                <ExternalLink className="h-4 w-4 me-1.5" />
+                Open
+              </Button>
+              
+              {parallelImageData.url && <CopyContent content={parallelImageData.url} />}
+            </div>
+          </div>
+          <div className="flex justify-center items-center">
+            <ImageViewer
+              sourceUrl={parallelImageData.url || undefined}
+              content={parallelImageData.b64_json || undefined}
+              alt="AI Generated Image"
+              width={1024}
+              height={1024}
+              objectFit="contain"
+              className="max-w-full h-auto rounded-lg"
+            />
+          </div>
+          {parallelImageData.revised_prompt && (
+            <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                Revised Prompt:
+              </p>
+              <p className="text-sm text-gray-900 dark:text-gray-100">
+                {parallelImageData.revised_prompt}
+              </p>
+            </div>
+          )}
+          {imageError && (
+            <div className="mt-4 p-3 bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-lg">
+              <p className="text-sm text-orange-800 dark:text-orange-200">{imageError}</p>
+            </div>
+          )}
+        </div>
       )}
 
       {agent?.responseCards && agent.responseCards.length > 0 && onCardClick && (

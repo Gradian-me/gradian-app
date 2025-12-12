@@ -674,7 +674,7 @@
     "icon": "Image",
     "description": "Generate images from text descriptions using AI",
     "requiredOutputFormat": "image",
-    "model": "flux-1.1-pro",
+    "model": "gemini-2.5-flash-image",
     "loadingTextSwitches": [
       "Analyzing your prompt...",
       "Generating your image...",
@@ -682,6 +682,39 @@
       "Finalizing the image..."
     ],
     "renderComponents": [
+      {
+        "id": "imageType",
+        "name": "imageType",
+        "label": "Image Type",
+        "sectionId": "body",
+        "component": "select",
+        "defaultValue": "infographic",
+        "options": [
+          {
+            "id": "standard",
+            "label": "Standard",
+            "icon": "Image",
+            "color": "default"
+          },
+          {
+            "id": "infographic",
+            "label": "Infographic",
+            "icon": "FileText",
+            "color": "default"
+          },
+          {
+            "id": "3d-model",
+            "label": "3D Model",
+            "icon": "Box",
+            "color": "default"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 0
+      },
       {
         "id": "prompt",
         "name": "prompt",
@@ -703,7 +736,7 @@
         "label": "Image Size",
         "sectionId": "body",
         "component": "select",
-        "defaultValue": "1024x1536",
+        "defaultValue": "1024x1024",
         "options": [
           {
             "id": "1024x1024",
@@ -712,15 +745,9 @@
             "color": "default"
           },
           {
-            "id": "1024x1536",
-            "label": "1024x1536 (Portrait)",
+            "id": "auto",
+            "label": "Auto",
             "icon": "RectangleVertical",
-            "color": "default"
-          },
-          {
-            "id": "1024x1536",
-            "label": "1024x1536 (Landscape)",
-            "icon": "RectangleHorizontal",
             "color": "default"
           }
         ],
