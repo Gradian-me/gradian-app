@@ -25,6 +25,18 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       setError(null);
       chunksRef.current = [];
 
+      // Note: We don't check permission status upfront because:
+      // 1. Permission status might be "prompt" which we need to trigger
+      // 2. getUserMedia will handle permission requests properly
+      // 3. We'll catch the error and provide better feedback
+
+      // Ensure mediaDevices is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setError('Failed to start recording. MediaDevices API is not supported in this browser.');
+        setIsRecording(false);
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: false,
@@ -98,7 +110,9 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
         switch (errorName) {
           case 'NotAllowedError':
           case 'PermissionDeniedError':
-            errorMessage += 'Microphone permission denied. Please allow microphone access in your browser settings.';
+            errorMessage += 'Microphone permission denied. ';
+            errorMessage += 'If you just granted permission, please refresh the page and try again. ';
+            errorMessage += 'Otherwise, please check your browser settings to allow microphone access for this site.';
             break;
           case 'NotFoundError':
           case 'DevicesNotFoundError':

@@ -24,6 +24,8 @@ interface PromptPreviewSheetProps {
   userPrompt: string;
   isLoadingPreload: boolean;
   disabled?: boolean;
+  extraBody?: Record<string, any>;
+  bodyParams?: Record<string, any>;
 }
 
 export function PromptPreviewSheet({
@@ -33,15 +35,21 @@ export function PromptPreviewSheet({
   userPrompt,
   isLoadingPreload,
   disabled = false,
+  extraBody,
+  bodyParams,
 }: PromptPreviewSheetProps) {
   const hasPrompt = systemPrompt || userPrompt.trim();
+  const hasExtraBody = extraBody && Object.keys(extraBody).length > 0;
+  const hasBodyParams = bodyParams && Object.keys(bodyParams).length > 0;
+  // Enable preview if there's a prompt OR if there are body/extra params (for image generation, etc.)
+  const canPreview = hasPrompt || hasBodyParams || hasExtraBody;
 
   return (
     <>
       <Button
         variant="outline"
         size="default"
-        disabled={!userPrompt.trim() || disabled}
+        disabled={!canPreview || disabled}
         className="h-10"
         onClick={() => onOpenChange(true)}
       >
@@ -57,27 +65,34 @@ export function PromptPreviewSheet({
             </SheetDescription>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
-            {hasPrompt ? (
+            {(hasPrompt || hasBodyParams || hasExtraBody) ? (
               <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
-                    User Prompt:
-                  </h3>
-                  {userPrompt.trim() ? (
+                {/* Show prompt from bodyParams if userPrompt is empty but bodyParams has prompt */}
+                {(!userPrompt.trim() && bodyParams?.prompt) ? (
+                  <div>
+                    <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                      Prompt (from body parameters):
+                    </h3>
+                    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                      <MarkdownViewer 
+                        content={String(bodyParams.prompt)}
+                        showToggle={false}
+                      />
+                    </div>
+                  </div>
+                ) : userPrompt.trim() ? (
+                  <div>
+                    <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                      User Prompt:
+                    </h3>
                     <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                       <MarkdownViewer 
                         content={userPrompt.trim()}
                         showToggle={false}
                       />
                     </div>
-                  ) : (
-                    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        (No user prompt entered)
-                      </p>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                ) : null}
                 <div>
                   <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
                     System Prompt:
@@ -104,6 +119,39 @@ export function PromptPreviewSheet({
                     </div>
                   )}
                 </div>
+                {(hasBodyParams || hasExtraBody) && (
+                  <div>
+                    <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                      Request Parameters:
+                    </h3>
+                    <div className="space-y-3">
+                      {hasBodyParams && (
+                        <div>
+                          <h4 className="text-xs font-medium mb-1 text-gray-700 dark:text-gray-300">
+                            Body Parameters (sectionId: "body"):
+                          </h4>
+                          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                            <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words font-mono">
+                              {JSON.stringify(bodyParams, null, 2)}
+                            </pre>
+                          </div>
+                        </div>
+                      )}
+                      {hasExtraBody && (
+                        <div>
+                          <h4 className="text-xs font-medium mb-1 text-gray-700 dark:text-gray-300">
+                            Extra Body Parameters (sectionId: "extra"):
+                          </h4>
+                          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                            <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words font-mono">
+                              {JSON.stringify(extraBody, null, 2)}
+                            </pre>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">

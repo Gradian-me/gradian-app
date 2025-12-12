@@ -91,9 +91,6 @@ async function ensureApplicationVariablesFile(): Promise<void> {
       REQUIRE_LOGIN: false,
       EXCLUDED_LOGIN_ROUTES: ['/authentication'],
       FORBIDDEN_ROUTES_PRODUCTION: [],
-      AI_CONFIG: {
-        LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions'
-      }
     };
     await writeFile(APPLICATION_VARIABLES_FILE, JSON.stringify(defaultData, null, 2), 'utf-8');
   }
@@ -172,12 +169,6 @@ export async function PUT(request: NextRequest) {
       ...(body.REQUIRE_LOGIN !== undefined && { REQUIRE_LOGIN: body.REQUIRE_LOGIN }),
       ...(body.EXCLUDED_LOGIN_ROUTES !== undefined && { EXCLUDED_LOGIN_ROUTES: body.EXCLUDED_LOGIN_ROUTES }),
       ...(body.FORBIDDEN_ROUTES_PRODUCTION !== undefined && { FORBIDDEN_ROUTES_PRODUCTION: body.FORBIDDEN_ROUTES_PRODUCTION }),
-      ...(body.AI_CONFIG && {
-        AI_CONFIG: {
-          ...currentData.AI_CONFIG,
-          ...body.AI_CONFIG
-        }
-      })
     };
 
     // Enforce demo-mode guard before persisting

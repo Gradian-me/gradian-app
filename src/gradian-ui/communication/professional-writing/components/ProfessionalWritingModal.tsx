@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Select } from '@/gradian-ui/form-builder/form-elements/components/Select';
 import { Textarea } from '@/gradian-ui/form-builder/form-elements/components/Textarea';
 import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
+import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';
 import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card';
 import { useProfessionalWriting } from '../hooks/useProfessionalWriting';
 import type { WritingStyle } from '../types';
@@ -37,7 +38,7 @@ export function ProfessionalWritingModal({
   onApply,
 }: ProfessionalWritingModalProps) {
   const [inputText, setInputText] = useState(initialText);
-  const [writingStyle, setWritingStyle] = useState<WritingStyle>('professional');
+  const [writingStyle, setWritingStyle] = useState<WritingStyle>('extended');
   const [targetLanguage, setTargetLanguage] = useState<string>('');
   
   const {
@@ -134,10 +135,10 @@ export function ProfessionalWritingModal({
                 clearResponse();
               }}
               options={[
+                { id: 'extended', value: 'extended', label: 'Extended' },
                 { id: 'professional', value: 'professional', label: 'Professional' },
                 { id: 'casual', value: 'casual', label: 'Casual' },
                 { id: 'translate', value: 'translate', label: 'Translate' },
-                { id: 'extended', value: 'extended', label: 'Extended' },
                 { id: 'solution-advisor', value: 'solution-advisor', label: 'Solution Advisor' },
               ]}
             />
@@ -208,21 +209,21 @@ export function ProfessionalWritingModal({
             </div>
           )}
 
-          {/* Output Textarea */}
+          {/* Output MarkdownViewer */}
           {enhancedText && (
             <div className="w-full space-y-2">
-              <Textarea
-                config={{
-                  name: 'enhanced-text',
-                  label: 'Enhanced Text',
-                }}
-                value={enhancedText}
-                onChange={() => {}}
-                rows={6}
-                resize="none"
-                canCopy={true}
-                disabled={true}
+              <div className="w-full">
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Enhanced Text
+                </label>
+                <div className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-4 min-h-[200px] max-h-[400px] overflow-y-auto">
+                  <MarkdownViewer
+                    content={enhancedText}
+                    showToggle={false}
+                    isEditable={false}
               />
+                </div>
+              </div>
               <div className="flex justify-end mt-2">
                 <Button
                   type="button"

@@ -55,9 +55,5 @@
   "EXCLUDED_LOGIN_ROUTES": [
     "/authentication"
   ],
-  "FORBIDDEN_ROUTES_PRODUCTION": [],
-  "AI_CONFIG": {
-    "LLM_API_URL": "https://api.avalai.ir/v1/chat/completions",
-    "LLM_TRANSCRIBE_URL": "https://api.avalai.ir/v1/audio/transcriptions"
-  }
+  "FORBIDDEN_ROUTES_PRODUCTION": []
 }

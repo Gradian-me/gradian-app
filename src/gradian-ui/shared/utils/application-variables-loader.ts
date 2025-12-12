@@ -50,10 +50,6 @@ const getDefaultData = (): ApplicationVariablesData => ({
   REQUIRE_LOGIN: false,
   EXCLUDED_LOGIN_ROUTES: ['/authentication'],
   FORBIDDEN_ROUTES_PRODUCTION: [],
-  AI_CONFIG: {
-    LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions',
-    LLM_TRANSCRIBE_URL: 'https://api.avalai.ir/v1/audio/transcriptions',
-  },
 });
 
 interface ApplicationVariablesData {
@@ -81,10 +77,6 @@ interface ApplicationVariablesData {
   REQUIRE_LOGIN?: boolean;
   EXCLUDED_LOGIN_ROUTES?: string[];
   FORBIDDEN_ROUTES_PRODUCTION?: string[];
-  AI_CONFIG?: {
-    LLM_API_URL?: string;
-    LLM_TRANSCRIBE_URL?: string;
-  };
 }
 
 let cachedVariables: ApplicationVariablesData | null = null;

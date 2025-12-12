@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, memo, useRef } from 'react';
 import Link from 'next/link';
 import { FormElementFactory } from '@/gradian-ui/form-builder/form-elements/components/FormElementFactory';
 import { Button } from '@/components/ui/button';
@@ -16,9 +16,11 @@ import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { PromptPreviewSheet } from './PromptPreviewSheet';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
+import { formatArrayFieldToToon } from '../utils/prompt-builder';
 import type { AiAgent } from '../types';
 import { useBusinessRuleEffects, getFieldEffects } from '@/domains/business-rule-engine';
 import type { BusinessRuleWithEffects, BusinessRuleEffectsMap } from '@/domains/business-rule-engine';
+import { extractParametersBySectionId } from '../utils/ai-shared-utils';
 
 // Separate component for field item to allow hook usage
 interface FieldItemProps {
@@ -230,6 +232,7 @@ interface AiBuilderFormProps {
   runType?: 'manual' | 'automatic';
   selectedLanguage?: string;
   onLanguageChange?: (language: string) => void;
+  onFormValuesChange?: (formValues: Record<string, any>) => void; // Callback to expose formValues
 }
 
 export function AiBuilderForm({
@@ -251,6 +254,7 @@ export function AiBuilderForm({
   runType = 'manual',
   selectedLanguage = 'text',
   onLanguageChange,
+  onFormValuesChange,
 }: AiBuilderFormProps) {
   // Get selected agent
   const selectedAgent = agents.find(agent => agent.id === selectedAgentId);
@@ -278,6 +282,8 @@ export function AiBuilderForm({
   // State for form values - initialize with userPrompt
   const [formValues, setFormValues] = useState<Record<string, any>>({
     userPrompt: userPrompt,
+    // Include selectedLanguage in formValues for all agents
+    ...(selectedLanguage && selectedLanguage !== 'text' ? { 'output-language': selectedLanguage } : {}),
   });
 
   // State for form errors
@@ -304,13 +310,45 @@ export function AiBuilderForm({
       if (fieldValue === undefined || fieldValue === null || fieldValue === '') {
         return;
       }
+
+      // Skip fields with sectionId "body" or "extra" - these go in body/extra_body, not in prompt
+      // Exception: include "prompt" field in userPrompt for display purposes, even if it has sectionId "body"
+      const isPromptField = (field.name === 'prompt' || field.id === 'prompt');
+      if ((field.sectionId === 'body' || field.sectionId === 'extra') && !isPromptField) {
+        return;
+      }
       
       // Format the value based on field type
       let formattedValue = '';
       
-      // Handle NormalizedOption array (from Select component)
-      if (Array.isArray(fieldValue) && fieldValue.length > 0 && typeof fieldValue[0] === 'object' && 'id' in fieldValue[0]) {
-        // Extract the first option's label or id
+      // Check if this is an array component that should use TOON format
+      const isArrayComponent = [
+        'checkbox-list',
+        'radio',
+        'toggle-group',
+        'tag-input',
+        'list-input'
+      ].includes(field.component);
+      
+      // Check if select is multiple
+      const isMultipleSelect = 
+        field.component === 'select' &&
+        (field.multiple || 
+         field.metadata?.allowMultiselect ||
+         field.selectionType === 'multiple' ||
+         field.selectionMode === 'multiple' ||
+         field.mode === 'multiple');
+      
+      if (isArrayComponent || isMultipleSelect) {
+        // Format arrays in TOON format
+        formattedValue = formatArrayFieldToToon(field.name || field.id || 'field', field, fieldValue);
+        if (formattedValue) {
+          // For TOON format, we don't need a label prefix since the format is self-contained
+          parts.push(formattedValue);
+          return;
+        }
+      } else if (Array.isArray(fieldValue) && fieldValue.length > 0 && typeof fieldValue[0] === 'object' && 'id' in fieldValue[0]) {
+        // Handle NormalizedOption array (from single Select component) - only first option
         const normalizedOption = fieldValue[0];
         formattedValue = normalizedOption.label || normalizedOption.id || String(normalizedOption.value || '');
       } else if (field.component === 'select') {
@@ -354,11 +392,53 @@ export function AiBuilderForm({
       }
     });
     
-    return parts.join('\n\n');
-  }, [formFields, selectedAgent?.renderComponents]);
+    let finalPrompt = parts.join('\n\n');
+    
+    // Add language instructions if language is specified (check common language field names)
+    // Also check selectedLanguage prop as fallback
+    const outputLanguage = values['output-language'] || values['outputLanguage'] || values['language'] || values['lang'] || selectedLanguage;
+    if (outputLanguage && typeof outputLanguage === 'string' && outputLanguage.trim() && outputLanguage.toLowerCase() !== 'en' && outputLanguage !== 'text') {
+      const languageMap: Record<string, string> = {
+        'en': 'English',
+        'fa': 'Persian (Farsi)',
+        'ar': 'Arabic',
+        'es': 'Spanish',
+        'fr': 'French',
+        'de': 'German',
+        'it': 'Italian',
+        'pt': 'Portuguese',
+        'ru': 'Russian',
+        'zh': 'Chinese',
+        'ja': 'Japanese',
+        'ko': 'Korean',
+      };
+      
+      const languageCode = outputLanguage.trim().toLowerCase();
+      const languageName = languageMap[languageCode] || languageCode.toUpperCase();
+      
+      finalPrompt += `\n\nIMPORTANT OUTPUT LANGUAGE REQUIREMENT:\nAll output must be in ${languageName} (${languageCode.toUpperCase()}). This includes:\n- All titles, subtitles, and headings\n- All body text and descriptions\n- All user-facing content\n\nHowever, keep the following in English:\n- Professional and technical abbreviations (e.g., API, JSON, HTTP, CSS, HTML, SQL, UUID, ID, URL)\n- Industry-standard terms and acronyms (e.g., SEO, CRM, UX, UI, SDK, IDE, CLI)\n- Programming language keywords and syntax\n- Technical specification names and standards\n- Brand names and product names that are internationally recognized\n- Scientific and medical terminology abbreviations\n\nEnsure natural, fluent ${languageName} while preserving essential English technical terms.`;
+    }
+    
+    return finalPrompt;
+  }, [formFields, selectedAgent?.renderComponents, selectedLanguage]);
 
-  // Reset form values when agent changes
+  // Reset form values when agent changes (NOT when language changes)
+  // Use ref for buildConcatenatedPrompt to avoid resetting form when language changes
+  const buildConcatenatedPromptForResetRef = useRef(buildConcatenatedPrompt);
   useEffect(() => {
+    buildConcatenatedPromptForResetRef.current = buildConcatenatedPrompt;
+  }, [buildConcatenatedPrompt]);
+  
+  // Track previous agent ID to only reset when agent actually changes
+  const prevAgentIdRef = useRef<string>(selectedAgentId);
+  
+  useEffect(() => {
+    // Only reset if agent ID actually changed
+    if (prevAgentIdRef.current === selectedAgentId) {
+      return;
+    }
+    prevAgentIdRef.current = selectedAgentId;
+    
     if (!selectedAgent?.renderComponents) return;
     
     const fields = selectedAgent.renderComponents.filter(
@@ -386,7 +466,18 @@ export function AiBuilderForm({
       }
     });
     
+    // Always include selectedLanguage in formValues if it's set
+    if (selectedLanguage && selectedLanguage !== 'text') {
+      initialValues['output-language'] = selectedLanguage;
+    }
+    
     setFormValues(initialValues);
+    
+    // Notify parent of formValues change
+    if (onFormValuesChange) {
+      onFormValuesChange(initialValues);
+    }
+    
     // Reset errors and touched when agent changes
     setFormErrors({});
     setTouched({});
@@ -407,11 +498,74 @@ export function AiBuilderForm({
     }
     
     // Build initial concatenated prompt and update userPrompt
-    const initialPrompt = buildConcatenatedPrompt(initialValues);
+    const initialPrompt = buildConcatenatedPromptForResetRef.current(initialValues);
     if (initialPrompt) {
       onPromptChange(initialPrompt);
     }
-  }, [selectedAgentId, buildConcatenatedPrompt]); // Reset when agent ID changes
+  }, [selectedAgentId, selectedAgent, userPrompt, onFormValuesChange, onPromptChange, selectedLanguage]); // Only reset when agent ID changes, not when buildConcatenatedPrompt changes
+
+  // Track previous selectedLanguage to avoid unnecessary updates
+  const prevSelectedLanguageRef = useRef<string | undefined>(selectedLanguage);
+  const buildConcatenatedPromptRef = useRef(buildConcatenatedPrompt);
+  const onPromptChangeRef = useRef(onPromptChange);
+  const onFormValuesChangeRef = useRef(onFormValuesChange);
+  
+  // Keep refs updated
+  useEffect(() => {
+    buildConcatenatedPromptRef.current = buildConcatenatedPrompt;
+    onPromptChangeRef.current = onPromptChange;
+    onFormValuesChangeRef.current = onFormValuesChange;
+  }, [buildConcatenatedPrompt, onPromptChange, onFormValuesChange]);
+  
+  // Sync selectedLanguage with formValues and rebuild prompt when language changes
+  // This effect ONLY updates the language field and rebuilds the prompt - it does NOT touch other form values
+  useEffect(() => {
+    // Only update if language actually changed
+    if (prevSelectedLanguageRef.current === selectedLanguage) {
+      return;
+    }
+    prevSelectedLanguageRef.current = selectedLanguage;
+    
+    // Use functional update to preserve ALL existing form values
+    setFormValues((prevFormValues) => {
+      // Create a copy to avoid mutating the previous state
+      const newFormValues = { ...prevFormValues };
+      
+      if (selectedLanguage && selectedLanguage !== 'text') {
+        // Only update if language is different from current formValues
+        if (newFormValues['output-language'] === selectedLanguage) {
+          // Language hasn't changed, but we still need to rebuild prompt in case other values changed
+          const concatenatedPrompt = buildConcatenatedPromptRef.current(newFormValues);
+          onPromptChangeRef.current(concatenatedPrompt);
+          return prevFormValues; // Return previous to avoid unnecessary update
+        }
+        
+        // Update only the language field, preserve everything else
+        newFormValues['output-language'] = selectedLanguage;
+      } else {
+        // Remove language if selectedLanguage is 'text' or empty
+        if (newFormValues['output-language']) {
+          delete newFormValues['output-language'];
+        } else {
+          // No language field to remove, just rebuild prompt
+          const concatenatedPrompt = buildConcatenatedPromptRef.current(newFormValues);
+          onPromptChangeRef.current(concatenatedPrompt);
+          return prevFormValues; // Return previous to avoid unnecessary update
+        }
+      }
+      
+      // Notify parent of formValues change (only language field changed)
+      if (onFormValuesChangeRef.current) {
+        onFormValuesChangeRef.current(newFormValues);
+      }
+      
+      // Rebuild prompt with updated language
+      const concatenatedPrompt = buildConcatenatedPromptRef.current(newFormValues);
+      onPromptChangeRef.current(concatenatedPrompt);
+      
+      return newFormValues;
+    });
+  }, [selectedLanguage]); // Only depend on selectedLanguage
 
   // Sync userPrompt with formValues when userPrompt changes externally
   // This handles external updates to userPrompt (e.g., from parent component)
@@ -443,7 +597,17 @@ export function AiBuilderForm({
       [fieldName]: actualValue,
     };
     
+    // Ensure selectedLanguage is always in formValues
+    if (selectedLanguage && selectedLanguage !== 'text') {
+      newFormValues['output-language'] = selectedLanguage;
+    }
+    
     setFormValues(newFormValues);
+    
+    // Notify parent of formValues change
+    if (onFormValuesChange) {
+      onFormValuesChange(newFormValues);
+    }
 
     // Build concatenated prompt from all fields and update userPrompt
     // Pass the original value array to buildConcatenatedPrompt so it can extract labels
@@ -801,7 +965,7 @@ export function AiBuilderForm({
                 <div className="flex items-center gap-2">
                   {onSheetOpenChange && (
                     <>
-                      {isStringOutput && onLanguageChange && (
+                      {onLanguageChange && (
                         <div className="w-36">
                           <LanguageSelector
                             config={{
@@ -810,19 +974,46 @@ export function AiBuilderForm({
                               placeholder: 'Language',
                             }}
                             value={selectedLanguage}
-                            onChange={onLanguageChange}
+                            onChange={(lang) => {
+                              onLanguageChange(lang);
+                              // Also update formValues to include language
+                              const newFormValues = {
+                                ...formValues,
+                                'output-language': lang,
+                              };
+                              setFormValues(newFormValues);
+                              // Notify parent of formValues change
+                              if (onFormValuesChange) {
+                                onFormValuesChange(newFormValues);
+                              }
+                              // Rebuild prompt with new language
+                              const valuesForPrompt = {
+                                ...newFormValues,
+                              };
+                              const concatenatedPrompt = buildConcatenatedPrompt(valuesForPrompt);
+                              onPromptChange(concatenatedPrompt);
+                            }}
                             defaultLanguage="en"
                           />
                         </div>
                       )}
-                      <PromptPreviewSheet
-                        isOpen={isSheetOpen}
-                        onOpenChange={onSheetOpenChange}
-                        systemPrompt={systemPrompt}
-                        userPrompt={userPrompt}
-                        isLoadingPreload={isLoadingPreload}
-                        disabled={!userPrompt.trim() || disabled}
-                      />
+                      {(() => {
+                        const params = selectedAgent && formValues 
+                          ? extractParametersBySectionId(selectedAgent, formValues)
+                          : { body: {}, extra: {}, prompt: {} };
+                        return (
+                          <PromptPreviewSheet
+                            isOpen={isSheetOpen}
+                            onOpenChange={onSheetOpenChange}
+                            systemPrompt={systemPrompt}
+                            userPrompt={userPrompt}
+                            isLoadingPreload={isLoadingPreload}
+                            disabled={!userPrompt.trim() || disabled}
+                            extraBody={Object.keys(params.extra).length > 0 ? params.extra : undefined}
+                            bodyParams={Object.keys(params.body).length > 0 ? params.body : undefined}
+                          />
+                        );
+                      })()}
                     </>
                   )}
                   {isLoading ? (

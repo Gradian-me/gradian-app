@@ -9,13 +9,14 @@ import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react'
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { Loader2, Sparkles, Timer } from 'lucide-react';
+import { Loader2, Sparkles, Timer, Download, ExternalLink } from 'lucide-react';
 import { MetricCard } from '@/gradian-ui/analytics';
 import { ResponseCardViewer } from './ResponseCardViewer';
 import { ResponseAnnotationViewer } from './ResponseAnnotationViewer';
 import { TableWrapper } from '@/gradian-ui/data-display/table/components/TableWrapper';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';
+import { ImageViewer } from '@/gradian-ui/form-builder/form-elements/components/ImageViewer';
 import { cn } from '@/gradian-ui/shared/utils';
 import { useAiResponseStore } from '@/stores/ai-response.store';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
@@ -129,16 +130,21 @@ export function AiBuilderResponse({
   // Get agent format
   const agentFormat = useMemo(() => {
     if (!agent?.requiredOutputFormat) return 'string';
-    return agent.requiredOutputFormat as 'string' | 'json' | 'table';
+    return agent.requiredOutputFormat as 'string' | 'json' | 'table' | 'image';
   }, [agent?.requiredOutputFormat]);
+  
+  // Use 'json' format for storage if agent format is 'image' (store may not support 'image' yet)
+  const storageFormat = useMemo(() => {
+    return agentFormat === 'image' ? 'json' : agentFormat;
+  }, [agentFormat]);
   
   // Reactively get latest response from store using selector
   const latestResponse = useAiResponseStore((state) => {
     if (!agent?.id) return null;
-    const latestKey = `ai-response-${agent.id}-${agentFormat}-latest`;
+    const latestKey = `ai-response-${agent.id}-${storageFormat}-latest`;
     const latestDatetime = state.latestResponses[latestKey];
     if (!latestDatetime) return null;
-    const storageKey = `ai-response-${agent.id}-${agentFormat}-${latestDatetime}`;
+    const storageKey = `ai-response-${agent.id}-${storageFormat}-${latestDatetime}`;
     return state.responses[storageKey] || null;
   });
   
@@ -166,10 +172,10 @@ export function AiBuilderResponse({
     
     // Debounce store updates to avoid too many writes
     handleContentChangeRef.current = setTimeout(async () => {
-      const storageKey = `ai-response-${agent.id}-${agentFormat}-${latestResponse.id}`;
+      const storageKey = `ai-response-${agent.id}-${storageFormat}-${latestResponse.id}`;
       await updateResponse(storageKey, newContent);
     }, 500);
-  }, [agent, agentFormat, latestResponse, updateResponse]);
+  }, [agent, storageFormat, latestResponse, updateResponse]);
   
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -192,7 +198,7 @@ export function AiBuilderResponse({
     }
 
     const saveAsync = async () => {
-      const timestamp = await saveResponse(agent.id, agentFormat, response, tokenUsage || undefined, duration || undefined);
+      const timestamp = await saveResponse(agent.id, storageFormat, response, tokenUsage || undefined, duration || undefined);
       if (timestamp) {
         lastResponseRef.current = response;
       }
@@ -223,6 +229,53 @@ export function AiBuilderResponse({
     }
     prevIsLoadingRef.current = isLoading;
   }, [isLoading, response]);
+
+  // Parse image data if format is image
+  // Also detect image format from response content as fallback
+  const imageData = useMemo(() => {
+    if (!displayContent) {
+      return null;
+    }
+    
+    // Check if agent requires image format OR if response content looks like image data
+    const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
+    const isImageFormat = agentFormatValue === 'image';
+    
+    try {
+      const parsed = JSON.parse(displayContent);
+      
+      // Check if response has image structure (fallback detection)
+      const hasImageStructure = parsed && typeof parsed === 'object' && parsed.image && 
+        (parsed.image.url || parsed.image.b64_json);
+      
+      // Only proceed if agent format is image OR if we detect image structure
+      if (!isImageFormat && !hasImageStructure) {
+        return null;
+      }
+      
+      // The response structure is: { image: { url, b64_json, revised_prompt }, format, ... }
+      // Check if we have an image object with either url or b64_json
+      if (parsed && typeof parsed === 'object' && parsed.image) {
+        const img = parsed.image;
+        // Return image data even if url is null, as long as b64_json exists
+        if (img && (img.url || img.b64_json)) {
+          return img;
+        }
+      }
+      return null;
+    } catch (e) {
+      // If parsing fails, return null
+      console.warn('Failed to parse image data:', e, 'Content:', displayContent?.substring(0, 200));
+      return null;
+    }
+  }, [agent?.requiredOutputFormat, displayContent]);
+  
+  // Determine if we should render as image (agent format OR detected from content)
+  const shouldRenderImage = useMemo(() => {
+    const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
+    return agentFormatValue === 'image' || !!imageData;
+  }, [agent?.requiredOutputFormat, imageData]);
+
 
   // Check if we should render as table
   const shouldRenderTable = agent?.requiredOutputFormat === 'table';
@@ -314,29 +367,31 @@ export function AiBuilderResponse({
       </div>
 
       {/* Token Usage & Pricing - MetricCard */}
-      {tokenUsage && (
+      {(tokenUsage || duration !== null) && (
         <MetricCard
           gradient="indigo"
           metrics={[
-            {
-              id: 'total-tokens',
-              label: 'Total Tokens',
-              value: tokenUsage.total_tokens,
-              unit: 'tokens',
-              icon: 'Hash',
-              iconColor: 'cyan',
-              format: 'number',
-            },
-            {
-              id: 'total-cost',
-              label: 'Total Cost',
-              value: tokenUsage.pricing?.total_cost || 0,
-              prefix: '$',
-              icon: 'Coins',
-              iconColor: 'pink',
-              format: 'currency',
-              precision: 4,
-            },
+            ...(tokenUsage ? [
+              {
+                id: 'total-tokens',
+                label: 'Total Tokens',
+                value: tokenUsage.total_tokens,
+                unit: 'tokens',
+                icon: 'Hash',
+                iconColor: 'cyan' as const,
+                format: 'number' as const,
+              },
+              {
+                id: 'total-cost',
+                label: 'Total Cost',
+                value: tokenUsage.pricing?.total_cost || 0,
+                prefix: '$',
+                icon: 'Coins',
+                iconColor: 'pink' as const,
+                format: 'currency' as const,
+                precision: 4,
+              },
+            ] : []),
             ...(duration !== null ? [{
               id: 'duration',
               label: 'Duration',
@@ -373,7 +428,166 @@ export function AiBuilderResponse({
         />
       )}
 
-      {shouldRenderTable && isValidTable && tableData.length > 0 ? (
+      {shouldRenderImage ? (
+        imageData ? (
+          <div className="space-y-4">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-2" />
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    Generated Image
+                  </h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* Save Image Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        let blob: Blob;
+                        let filename = 'generated-image.png';
+                        
+                        if (imageData.b64_json) {
+                          // Handle base64 image
+                          // Extract base64 string (remove data URL prefix if present)
+                          const base64String = imageData.b64_json.startsWith('data:image/')
+                            ? imageData.b64_json.split(',')[1] || imageData.b64_json
+                            : imageData.b64_json;
+                          
+                          // Convert base64 to blob
+                          const byteCharacters = atob(base64String);
+                          const byteNumbers = new Array(byteCharacters.length);
+                          for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                          }
+                          const byteArray = new Uint8Array(byteNumbers);
+                          blob = new Blob([byteArray], { type: 'image/png' });
+                        } else if (imageData.url) {
+                          // Handle URL image - fetch and convert to blob
+                          const response = await fetch(imageData.url);
+                          blob = await response.blob();
+                          // Try to get filename from URL
+                          const urlPath = new URL(imageData.url).pathname;
+                          const urlFilename = urlPath.split('/').pop();
+                          if (urlFilename && urlFilename.includes('.')) {
+                            filename = urlFilename;
+                          }
+                        } else {
+                          return;
+                        }
+                        
+                        // Download the image
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                      } catch (error) {
+                        console.error('Error saving image:', error);
+                      }
+                    }}
+                    className="h-8"
+                  >
+                    <Download className="h-4 w-4 me-1.5" />
+                    Save
+                  </Button>
+                  
+                  {/* Open in New Tab Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      try {
+                        let imageUrl: string;
+                        
+                        if (imageData.url) {
+                          imageUrl = imageData.url;
+                        } else if (imageData.b64_json) {
+                          // Convert base64 to data URL
+                          imageUrl = imageData.b64_json.startsWith('data:image/')
+                            ? imageData.b64_json
+                            : `data:image/png;base64,${imageData.b64_json}`;
+                        } else {
+                          return;
+                        }
+                        
+                        window.open(imageUrl, '_blank', 'noopener,noreferrer');
+                      } catch (error) {
+                        console.error('Error opening image:', error);
+                      }
+                    }}
+                    className="h-8"
+                  >
+                    <ExternalLink className="h-4 w-4 me-1.5" />
+                    Open
+                  </Button>
+                  
+                  {imageData.url && <CopyContent content={imageData.url} />}
+                </div>
+              </div>
+              <div className="flex justify-center items-center">
+                <ImageViewer
+                  sourceUrl={imageData.url || undefined}
+                  content={imageData.b64_json || undefined}
+                  alt="AI Generated Image"
+                  width={1024}
+                  height={1024}
+                  objectFit="contain"
+                  className="max-w-full h-auto rounded-lg"
+                />
+              </div>
+              {imageData.revised_prompt && (
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                    Revised Prompt:
+                  </p>
+                  <p className="text-sm text-gray-900 dark:text-gray-100">
+                    {imageData.revised_prompt}
+                  </p>
+                </div>
+              )}
+            </div>
+            <details className="text-sm">
+              <summary className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+                View Raw Response Data
+              </summary>
+              <div className="mt-2">
+                <CodeViewer
+                  code={displayContent}
+                  programmingLanguage="json"
+                  title="Raw Response Data"
+                  initialLineNumbers={10}
+                />
+              </div>
+            </details>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-2" />
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  Generated Image (Parsing Error)
+                </h3>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Unable to parse image data from response. Showing raw response:
+            </p>
+            <CodeViewer
+              code={displayContent}
+              programmingLanguage="json"
+              title="Raw Response Data"
+              initialLineNumbers={10}
+            />
+          </div>
+        )
+      ) : shouldRenderTable && isValidTable && tableData.length > 0 ? (
         <div className="space-y-4">
           <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
             <TableWrapper

@@ -1,32 +1,30 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useParams, useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
-import { Modal } from '@/gradian-ui/data-display/components/Modal';
-import { SchemaFormWrapper } from '@/gradian-ui/form-builder/components/FormLifecycleManager';
-import { ListInput } from '@/gradian-ui/form-builder/form-elements';
-import { Spinner } from '@/components/ui/spinner';
 import {
-  useAiAgents,
-  useAiBuilder,
   AiBuilderForm,
   AiBuilderResponse,
   MessageDisplay,
+  useAiAgents,
+  useAiBuilder,
 } from '@/domains/ai-builder';
-import { ResponseAnnotationViewer } from '@/domains/ai-builder/components/ResponseAnnotationViewer';
-import type { SchemaAnnotation, AnnotationItem } from '@/domains/ai-builder/types';
-import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import type { AnnotationItem, SchemaAnnotation } from '@/domains/ai-builder/types';
 import { useAiPrompts } from '@/domains/ai-prompts';
 import { ModifiedPromptsList } from '@/domains/ai-prompts/components/ModifiedPromptsList';
 import type { AiPrompt } from '@/domains/ai-prompts/types';
-import { useUserStore } from '@/stores/user.store';
-import { config } from '@/lib/config';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { Modal } from '@/gradian-ui/data-display/components/Modal';
+import { SchemaFormWrapper } from '@/gradian-ui/form-builder/components/FormLifecycleManager';
+import { ListInput } from '@/gradian-ui/form-builder/form-elements';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
+import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { config } from '@/lib/config';
+import { useUserStore } from '@/stores/user.store';
+import { ArrowLeft } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { extractParametersBySectionId } from '@/domains/ai-builder/utils/ai-shared-utils';
 
 export default function AiBuilderPromptPage() {
   const params = useParams();
@@ -48,6 +46,7 @@ export default function AiBuilderPromptPage() {
   const [agents, setAgents] = useState<Array<{ id: string; label: string; icon?: string; model?: string }>>([]);
   const [users, setUsers] = useState<Array<{ id: string; name: string; lastname?: string; username?: string }>>([]);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [formValues, setFormValues] = useState<Record<string, any>>({});
   
   const user = useUserStore((state) => state.user);
   const { createPrompt } = useAiPrompts();
@@ -256,9 +255,22 @@ export default function AiBuilderPromptPage() {
       setFirstPromptId(null);
     }
     setIsApplyingAnnotations(false);
+    
+    // Calculate body and extra_body from formValues
+    let body: Record<string, any> | undefined;
+    let extra_body: Record<string, any> | undefined;
+    
+    if (selectedAgent && Object.keys(formValues).length > 0) {
+      const params = extractParametersBySectionId(selectedAgent, formValues);
+      body = Object.keys(params.body).length > 0 ? params.body : undefined;
+      extra_body = Object.keys(params.extra).length > 0 ? params.extra : undefined;
+    }
+    
     generateResponse({
       userPrompt,
       agentId: selectedAgentId,
+      body,
+      extra_body,
     });
   };
 
@@ -492,6 +504,7 @@ export default function AiBuilderPromptPage() {
           isLoadingPreload={isLoadingPreload}
           systemPrompt={promptForLLM?.systemPrompt}
           onReset={handleReset}
+          onFormValuesChange={setFormValues}
         />
 
         <MessageDisplay

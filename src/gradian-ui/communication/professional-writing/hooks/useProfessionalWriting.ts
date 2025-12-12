@@ -101,14 +101,14 @@ ${request.text.trim()}`;
         userPrompt = request.text.trim();
       }
 
-      const response = await fetch('/api/ai-builder', {
+      // Use the new route format: /api/ai-builder/[agent-id]
+      const response = await fetch('/api/ai-builder/professional-writing', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userPrompt,
-          agentId: 'professional-writing',
         }),
         signal: abortController.signal,
       });

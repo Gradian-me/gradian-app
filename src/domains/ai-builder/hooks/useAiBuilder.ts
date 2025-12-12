@@ -190,17 +190,23 @@ export function useAiBuilder(): UseAiBuilderReturn {
     try {
       let response: Response;
       try {
-        response = await fetch('/api/ai-builder', {
+        // Use the new route format: /api/ai-builder/[agent-id]
+        const agentId = request.agentId;
+        if (!agentId) {
+          throw new Error('agentId is required');
+        }
+        response = await fetch(`/api/ai-builder/${agentId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userPrompt: request.userPrompt.trim(),
-          agentId: request.agentId,
           previousAiResponse: request.previousAiResponse,
           previousUserPrompt: request.previousUserPrompt,
           annotations: request.annotations,
+          body: request.body,
+          extra_body: request.extra_body,
         }),
         signal: abortController.signal,
       });
@@ -572,6 +578,8 @@ export function useAiBuilder(): UseAiBuilderReturn {
     setAiResponse('');
     setTokenUsage(null);
     setDuration(null);
+    setError(null);
+    setSuccessMessage(null);
   }, []);
 
   const clearError = useCallback(() => {

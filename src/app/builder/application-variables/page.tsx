@@ -46,9 +46,6 @@ interface ApplicationVariablesData {
   REQUIRE_LOGIN?: boolean;
   EXCLUDED_LOGIN_ROUTES?: string[];
   FORBIDDEN_ROUTES_PRODUCTION?: string[];
-  AI_CONFIG?: {
-    LLM_API_URL?: string;
-  };
 }
 
 export default function ApplicationVariablesPage() {
@@ -62,7 +59,6 @@ export default function ApplicationVariablesPage() {
     SCHEMA_SUMMARY_EXCLUDED_KEYS: [],
     EXCLUDED_LOGIN_ROUTES: [],
     FORBIDDEN_ROUTES_PRODUCTION: [],
-    AI_CONFIG: {},
   });
 
   // Redirect to Forbidden if not in development environment and route is in FORBIDDEN_ROUTES_PRODUCTION
@@ -430,9 +426,6 @@ export default function ApplicationVariablesPage() {
             </FormTabsTrigger>
             <FormTabsTrigger value="schema" className="px-4 py-1.5 text-sm shrink-0">
               Schema
-            </FormTabsTrigger>
-            <FormTabsTrigger value="ai" className="px-4 py-1.5 text-sm shrink-0">
-              AI Configuration
             </FormTabsTrigger>
           </FormTabsList>
 
@@ -848,39 +841,6 @@ export default function ApplicationVariablesPage() {
                 >
                   Add Key
                 </Button>
-              </CardContent>
-            </Card>
-          </FormTabsContent>
-
-          {/* AI Configuration */}
-          <FormTabsContent value="ai" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>AI Configuration</CardTitle>
-                <CardDescription>
-                  Configure AI service endpoints and settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="llm-api-url">LLM API URL</Label>
-                  <Input
-                    id="llm-api-url"
-                    type="url"
-                    value={data.AI_CONFIG?.LLM_API_URL || ''}
-                    onChange={(e) => setData((prev) => ({
-                      ...prev,
-                      AI_CONFIG: {
-                        ...prev.AI_CONFIG,
-                        LLM_API_URL: e.target.value,
-                      },
-                    }))}
-                    placeholder="https://api.openai.com/v1/chat/completions"
-                  />
-                  <p className="text-xs text-gray-500">
-                    The API endpoint URL for LLM chat completions service (e.g., OpenAI, OpenRouter, AvalAI)
-                  </p>
-                </div>
               </CardContent>
             </Card>
           </FormTabsContent>

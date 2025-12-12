@@ -38,6 +38,11 @@ interface VoiceInputDialogProps {
   onApply?: (text: string) => void;
   className?: string;
   loadingTextSwitches?: string | string[];
+  /**
+   * @deprecated Auto-start functionality has been removed to prevent permission issues.
+   * Recording is now always manual - users must click the record button to start.
+   * This prop is kept for backwards compatibility but has no effect.
+   */
   autoStart?: boolean;
 }
 
@@ -57,6 +62,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   const [isBlobLoaded, setIsBlobLoaded] = useState(false);
   const [tokenUsage, setTokenUsage] = useState<{ usage?: any; estimated_cost?: any } | null>(null);
   const [shouldAutoTranscribe, setShouldAutoTranscribe] = useState(false);
+  const [isRequestingPermission, setIsRequestingPermission] = useState(false);
   
   const {
     isRecording,
@@ -117,16 +123,110 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
     await startRecording();
   }, [startRecording]);
 
-  // Auto-start recording when dialog opens with autoStart prop
-  useEffect(() => {
-    if (isOpen && autoStart && !isRecording && !recordedBlob) {
-      // Small delay to ensure dialog is fully mounted
-      const timer = setTimeout(() => {
-        handleStartRecording();
-      }, 100);
-      return () => clearTimeout(timer);
+  // Get browser-specific instructions
+  const getBrowserInstructions = useCallback(() => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (userAgent.includes('chrome') || userAgent.includes('edg')) {
+      return '• Click the lock icon (🔒) in the address bar\n• Click "Site settings"\n• Find "Microphone" and click "Reset"\n• Refresh this page and try again';
+    } else if (userAgent.includes('firefox')) {
+      return '• Click the lock icon (🔒) in the address bar\n• Click "Clear Permissions"\n• Refresh this page and try again';
+    } else if (userAgent.includes('safari')) {
+      return '• Go to Safari menu → Settings\n• Click "Websites" tab\n• Click "Microphone" in left sidebar\n• Find this site and select "Ask" or "Allow"\n• Refresh this page and try again';
+    } else {
+      return '• Open your browser settings\n• Find "Site permissions" or "Privacy"\n• Look for microphone permissions\n• Reset permissions for this site\n• Refresh this page and try again';
     }
-  }, [isOpen, autoStart, isRecording, recordedBlob, handleStartRecording]); // Include all dependencies
+  }, []);
+
+  // Request microphone permission explicitly
+  const handleRequestPermission = useCallback(async () => {
+    setIsRequestingPermission(true);
+    setTranscriptionError(null);
+    // Note: error from useAudioRecorder will be cleared when startRecording is called
+    
+    try {
+      // Check if mediaDevices is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setTranscriptionError('Microphone access is not supported in this browser.');
+        setIsRequestingPermission(false);
+        return;
+      }
+
+      // Directly request permission - don't check status first as it may be cached
+      // getUserMedia will properly trigger the permission prompt
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Permission granted! Stop the test stream and start actual recording
+      stream.getTracks().forEach(track => track.stop());
+      
+      // Small delay to ensure stream is fully cleaned up
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Now start the actual recording
+      await handleStartRecording();
+    } catch (err) {
+      console.error('Permission request failed:', err);
+      
+      let errorMessage = '';
+      let showHelp = false;
+      
+      if (err instanceof DOMException || err instanceof Error) {
+        const errorName = err.name || (err as DOMException).name;
+        
+        switch (errorName) {
+          case 'NotAllowedError':
+          case 'PermissionDeniedError':
+            // After getUserMedia fails, check if permission is permanently denied
+            try {
+              const permStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+              if (permStatus.state === 'denied') {
+                // Permanently denied - show instructions
+                const instructions = getBrowserInstructions();
+                errorMessage = 'Microphone permission is permanently denied.\n\nTo fix this, reset the permission in your browser:\n\n' + instructions;
+                showHelp = true;
+              } else if (permStatus.state === 'prompt') {
+                // Still in prompt state - user might have dismissed it
+                errorMessage = 'Permission was denied. Please click "Allow" when the browser shows the microphone permission prompt.';
+              } else {
+                // Permission granted but still getting error - might be a different issue
+                errorMessage = 'Permission issue detected. Please try again or check your browser settings.';
+                showHelp = true;
+              }
+            } catch {
+              // Permissions API not available - generic message
+              errorMessage = 'Permission was denied. Please allow microphone access in your browser settings.';
+              showHelp = true;
+            }
+            break;
+          case 'NotFoundError':
+          case 'DevicesNotFoundError':
+            errorMessage = 'No microphone found. Please connect a microphone and try again.';
+            break;
+          case 'NotReadableError':
+          case 'TrackStartError':
+            errorMessage = 'Microphone is already in use by another application. Please close other applications using the microphone and try again.';
+            break;
+          default:
+            errorMessage = 'Failed to access microphone. Please check your browser settings.';
+            showHelp = true;
+        }
+      } else {
+        errorMessage = 'An unexpected error occurred while requesting microphone permission.';
+      }
+      
+      if (showHelp) {
+        const instructions = getBrowserInstructions();
+        errorMessage += '\n\n' + instructions;
+      }
+      
+      setTranscriptionError(errorMessage);
+    } finally {
+      setIsRequestingPermission(false);
+    }
+  }, [handleStartRecording, getBrowserInstructions]);
+
+  // Note: Auto-start functionality removed to prevent permission issues
+  // Users must manually click the record button to start recording
+  // This ensures permission is requested only after explicit user interaction
 
   // Cleanup when dialog closes and reset when it opens
   useEffect(() => {
@@ -140,9 +240,8 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
       // This must happen to prevent the browser from showing the microphone icon
       clearRecording();
       
-      // Note: VoicePoweredOrb will automatically stop its microphone when enableVoiceControl becomes false
-      // The enableVoiceControl prop is set to (isRecording && isOpen), so when isOpen becomes false,
-      // VoicePoweredOrb's useEffect will trigger and call stopMicrophone()
+      // Note: VoicePoweredOrb has enableVoiceControl={false}, so it won't request microphone access
+      // This prevents conflicts with the useAudioRecorder hook
       
       // Clear transcription and errors when dialog closes
       setTranscription(null);
@@ -158,7 +257,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
       setTokenUsage(null);
       setShouldAutoTranscribe(false);
     }
-  }, [isOpen]); // Only depend on isOpen to avoid infinite loops
+  }, [isOpen, isRecording, stopRecording, clearRecording]); // Include all dependencies
 
   // Cleanup on unmount only
   useEffect(() => {
@@ -242,7 +341,8 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
       formData.append('file', recordedBlob, 'recording.webm');
       formData.append('language', outputLanguage);
 
-      const response = await fetch('/api/voice/transcribe', {
+      // Use the new unified route with voice-transcription agent
+      const response = await fetch('/api/ai-builder/voice-transcription', {
         method: 'POST',
         body: formData,
       });
@@ -255,16 +355,23 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
         throw new Error(errorMessage);
       }
 
-      if (data.success && data.transcription) {
-        setTranscription(data.transcription);
+      if (data.success && data.data) {
+        // Handle the new response format
+        // The unified route returns: { success: true, data: { transcription, usage, estimated_cost, metadata, timing } }
+        const transcriptionText = data.data.transcription;
+        if (transcriptionText) {
+          setTranscription(transcriptionText);
         // Store usage and cost information if available
-        if (data.usage || data.estimated_cost) {
+          if (data.data.usage || data.data.estimated_cost) {
           setTokenUsage({
-            usage: data.usage,
-            estimated_cost: data.estimated_cost,
+              usage: data.data.usage,
+              estimated_cost: data.data.estimated_cost,
           });
         } else {
           setTokenUsage(null);
+          }
+        } else {
+          throw new Error('No transcription received');
         }
         // Don't call onTranscript here - only apply when user clicks Apply button
       } else {
@@ -334,7 +441,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
           {!recordedBlob && isOpen && (
             <div className="w-full h-96 relative rounded-xl overflow-hidden">
               <VoicePoweredOrb
-                enableVoiceControl={isRecording && isOpen}
+                enableVoiceControl={false}
                 className="rounded-xl overflow-hidden"
               />
               {loadingTextSwitches && (isRecording || isTranscribing) && (
@@ -384,20 +491,81 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
 
           {/* Error Messages */}
           {(error || visualizerError) && (
-            <div className="w-full p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-              <p className="text-sm text-red-600 dark:text-red-400">
+            <div className="w-full p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+              <div className="flex flex-col gap-3">
+                <div className="text-sm text-red-600 dark:text-red-400 whitespace-pre-line">
                 {error && typeof error === 'object' && 'message' in error 
                   ? (error as Error).message 
                   : String(error || '') || 
                   (visualizerError && typeof visualizerError === 'object' && 'message' in visualizerError
                     ? (visualizerError as Error).message
                     : String(visualizerError || ''))}
-              </p>
+                </div>
+                {/* Show permission request button if it's a permission error */}
+                {(() => {
+                  if (!error) return false;
+                  const errorMessage = typeof error === 'string' 
+                    ? error 
+                    : (typeof error === 'object' && 'message' in error 
+                        ? String((error as Error).message) 
+                        : '');
+                  return errorMessage.toLowerCase().includes('permission') || 
+                         errorMessage.toLowerCase().includes('denied');
+                })() && (
+                  <Button
+                    onClick={handleRequestPermission}
+                    disabled={isRequestingPermission || isRecording}
+                    variant="outline"
+                    size="sm"
+                    className="self-start border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/30"
+                  >
+                    {isRequestingPermission ? (
+                      <>
+                        <Mic className="w-4 h-4 mr-2 animate-pulse" />
+                        Requesting Permission...
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="w-4 h-4 mr-2" />
+                        Request Microphone Permission
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
           )}
           {transcriptionError && (
-            <div className="w-full p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-              <p className="text-sm text-red-600 dark:text-red-400">{transcriptionError}</p>
+            <div className="w-full p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+              <div className="flex flex-col gap-3">
+                <div className="text-sm text-red-600 dark:text-red-400 whitespace-pre-line">
+                  {transcriptionError}
+                </div>
+                {transcriptionError.toLowerCase().includes('permanently denied') && (
+                  <Button
+                    onClick={() => {
+                      // Try to help user navigate to settings
+                      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                        // Trigger another permission request - browser will show settings link if available
+                        navigator.mediaDevices.getUserMedia({ audio: true })
+                          .then(stream => {
+                            stream.getTracks().forEach(track => track.stop());
+                            // If we get here, permission might have been reset
+                            handleRequestPermission();
+                          })
+                          .catch(() => {
+                            // Permission still denied - user needs to reset in browser settings
+                          });
+                      }
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="self-start border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/30"
+                  >
+                    Try Again After Resetting
+                  </Button>
+                )}
+              </div>
             </div>
           )}
 
@@ -410,7 +578,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                   // Start Recording - Red Circle Button
                   <button
                     onClick={handleStartRecording}
-                    disabled={!!error}
+                    disabled={isRequestingPermission}
                     className={cn(
                       "h-16 w-16 rounded-full bg-red-500 hover:bg-red-600",
                       "dark:bg-red-600 dark:hover:bg-red-700",
