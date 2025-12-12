@@ -445,15 +445,18 @@ export const proxySchemaRequest = async (
   headers.delete('te');
   headers.delete('trailer');
 
-  // Ensure tenant context is forwarded even for server-side rendered requests
-  // Priority: x-tenant-domain header (from DNS extraction) → derive from host DNS
-  // Note: Internal server-side fetches may go to localhost, but include x-tenant-domain
-  // header extracted from the original request's DNS, so we use that header here.
+  // Extract tenant domain for forwarding to external backend
+  // Flow:
+  // 1. Internal Next.js API requests (from data-loader.ts) include x-tenant-domain header
+  // 2. External backend proxy gets x-tenant-domain from incoming request header OR extracts from DNS
+  // 3. External backend proxy forwards x-tenant-domain to external backend
+  //
+  // Priority: x-tenant-domain header (from internal request) → extract from host DNS
   const existingTenantHeader =
     headers.get('x-tenant-domain') || headers.get('X-Tenant-Domain');
 
   if (!existingTenantHeader) {
-    // Fallback: Extract from request host DNS (only for direct browser requests)
+    // Fallback: Extract from request host DNS (for direct browser requests without header)
     // Prefer forwarded host (edge/proxy) → host header → request URL host
     // Skip localhost/127.0.0.1 as those are internal calls without real tenant context
     const forwardedHost = request.headers.get('x-forwarded-host');
@@ -468,6 +471,9 @@ export const proxySchemaRequest = async (
       headers.set('x-tenant-domain', normalizedHost);
     }
   }
+
+  // At this point, headers object has x-tenant-domain set (either from incoming header or DNS)
+  // This will be forwarded to the external backend in the fetch call below
 
   const tenantForLog = headers.get('x-tenant-domain');
   loggingCustom(

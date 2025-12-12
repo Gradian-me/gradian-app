@@ -258,8 +258,11 @@ export async function loadData<T = any>(
           fetchHeaders['cookie'] = cookieHeader;
         }
 
-        // Include tenant domain header for server-side internal fetches
-        // This ensures the proxy can identify the correct tenant even for localhost fetches
+        // Set x-tenant-domain header for internal Next.js API requests
+        // Flow:
+        // 1. Extract tenant domain from request DNS (x-forwarded-host or host header)
+        // 2. Include x-tenant-domain header in internal Next.js API request
+        // 3. Next.js API proxy functions will forward this header to external backend
         // The internal fetch URL may be localhost, but the tenant comes from the original request DNS
         const tenantDomain = getTenantDomainForServerFetch();
         if (tenantDomain) {
@@ -419,7 +422,8 @@ export async function loadDataById<T = any>(
         fetchHeaders['cookie'] = cookieHeader;
       }
 
-      // Include tenant domain header for server-side internal fetches
+      // Set x-tenant-domain header for internal Next.js API requests
+      // This header will be forwarded to external backend by proxy functions
       const tenantDomain = getTenantDomainForServerFetch();
       if (tenantDomain) {
         fetchHeaders['x-tenant-domain'] = tenantDomain;

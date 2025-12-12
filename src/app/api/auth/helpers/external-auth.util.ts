@@ -56,12 +56,18 @@ export function buildProxyHeaders(request: NextRequest): HeadersInit {
     headers.authorization = authorizationHeader;
   }
 
-  // Extract tenant domain: prefer existing header, otherwise derive from DNS/hostname
+  // Extract tenant domain for forwarding to external backend
+  // Flow:
+  // 1. Internal Next.js API requests include x-tenant-domain header
+  // 2. External backend proxy gets x-tenant-domain from incoming request header OR extracts from DNS
+  // 3. External backend proxy forwards x-tenant-domain to external backend
+  //
+  // Priority: x-tenant-domain header (from internal request) → extract from host DNS
   const tenantDomainHeader = request.headers.get('x-tenant-domain');
   if (tenantDomainHeader) {
     headers['x-tenant-domain'] = tenantDomainHeader;
   } else {
-    // Derive from request hostname (DNS-based multi-tenant)
+    // Fallback: Derive from request hostname (DNS-based multi-tenant)
     // Prefer x-forwarded-host (from reverse proxy) → host header → nextUrl hostname
     const forwardedHost = request.headers.get('x-forwarded-host');
     const hostHeader = request.headers.get('host');
@@ -72,6 +78,9 @@ export function buildProxyHeaders(request: NextRequest): HeadersInit {
       headers['x-tenant-domain'] = normalizedHost;
     }
   }
+
+  // At this point, headers object has x-tenant-domain set (either from incoming header or DNS)
+  // This will be forwarded to the external backend
 
   return headers;
 }
