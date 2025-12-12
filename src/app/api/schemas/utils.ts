@@ -445,6 +445,17 @@ export const proxySchemaRequest = async (
   headers.delete('te');
   headers.delete('trailer');
 
+  // Ensure tenant context is forwarded even for server-side rendered requests
+  // Prefer existing header; otherwise derive from the incoming host.
+  const existingTenantHeader =
+    headers.get('x-tenant-domain') || headers.get('X-Tenant-Domain');
+  if (!existingTenantHeader) {
+    const host = request.nextUrl?.hostname?.trim().toLowerCase();
+    if (host) {
+      headers.set('x-tenant-domain', host);
+    }
+  }
+
   // Extract authorization token and ensure it's in Bearer format
   // Backend APIs require Authorization: Bearer <token> header
   let authHeader = headers.get('authorization');
