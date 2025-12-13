@@ -87,7 +87,7 @@ export interface GeneratePromptRequest {
   previousUserPrompt?: string; // Previous user prompt for annotation-based regeneration
   body?: Record<string, any>; // Parameters with sectionId: "body"
   extra_body?: Record<string, any>; // Parameters with sectionId: "extra"
-  includeImage?: boolean; // Whether to generate image in parallel
+  imageType?: string; // Image type to generate (e.g., "infographic", "creative", etc.) - if set and not "none", will generate image in parallel
 }
 
 export interface ApproveRequest {

@@ -235,8 +235,6 @@ interface AiBuilderFormProps {
   runType?: 'manual' | 'automatic';
   selectedLanguage?: string;
   onLanguageChange?: (language: string) => void;
-  includeImage?: boolean;
-  onIncludeImageChange?: (includeImage: boolean) => void;
   onFormValuesChange?: (formValues: Record<string, any>) => void; // Callback to expose formValues
 }
 
@@ -259,8 +257,6 @@ export function AiBuilderForm({
   runType = 'manual',
   selectedLanguage = 'text',
   onLanguageChange,
-  includeImage = false,
-  onIncludeImageChange,
   onFormValuesChange,
 }: AiBuilderFormProps) {
   // Get selected agent
@@ -782,12 +778,15 @@ export function AiBuilderForm({
     };
   }, [formValues, formFields]);
 
-  // Find the prompt field and agent select field
+  // Find the prompt field, agent select field, and imageType field
   const promptField = formFields.find(
     (field) => field.name === 'userPrompt' || field.id === 'user-prompt'
   );
   const agentSelectField = formFields.find(
     (field) => field.name === 'aiAgentSelect' || field.id === 'ai-agent-select'
+  );
+  const imageTypeField = formFields.find(
+    (field) => field.name === 'imageType' || field.id === 'imageType'
   );
 
   // Sort fields by order if available
@@ -933,6 +932,10 @@ export function AiBuilderForm({
                   if (field.name === 'aiAgentSelect' || field.id === 'ai-agent-select') {
                     return null;
                   }
+                  // Skip imageType field as it's rendered in footer
+                  if (field.name === 'imageType' || field.id === 'imageType') {
+                    return null;
+                  }
 
                   return (
                     <FieldItem
@@ -1008,17 +1011,26 @@ export function AiBuilderForm({
                           />
                         </div>
                       )}
-                      {onIncludeImageChange && (
-                        <div className="flex items-center gap-2 w-full sm:w-auto">
-                          <Switch
-                            id="include-image"
-                            checked={includeImage}
-                            onCheckedChange={(checked) => {
-                              onIncludeImageChange(checked);
-                              // Also update formValues
+                      {imageTypeField && (
+                        <div className="w-full sm:w-40">
+                          <FormElementFactory
+                            config={{
+                              ...imageTypeField,
+                              label: '',
+                            }}
+                            value={formValues[imageTypeField.name] || imageTypeField.defaultValue || 'none'}
+                            onChange={(value) => {
+                              // Handle both string and NormalizedOption[] from Select
+                              let actualValue = value;
+                              if (Array.isArray(value) && value.length > 0) {
+                                actualValue = value[0].id || value[0].value || value;
+                              } else if (typeof value === 'string') {
+                                actualValue = value;
+                              }
+                              
                               const newFormValues = {
                                 ...formValues,
-                                includeImage: checked,
+                                [imageTypeField.name]: actualValue,
                               };
                               setFormValues(newFormValues);
                               // Notify parent of formValues change
@@ -1027,10 +1039,12 @@ export function AiBuilderForm({
                               }
                             }}
                             disabled={isLoading || disabled}
+                            error={formErrors[imageTypeField.name]}
+                            touched={touched[imageTypeField.name]}
+                            onBlur={() => handleFieldBlur(imageTypeField.name)}
+                            onFocus={() => handleFieldFocus(imageTypeField.name)}
+                            className="w-full"
                           />
-                          <Label htmlFor="include-image" className="text-sm font-medium cursor-pointer whitespace-nowrap">
-                            Include Image
-                          </Label>
                         </div>
                       )}
                       {(() => {

@@ -2688,5 +2688,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCAIIMAGETYPESELECT001",
+    "timestamp": "2025-12-13T08:04:02.000Z",
+    "version": "1.24.001",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated image type (Creative, Sketch, Iconic, Editorial, Random) selection in ai-agents.json to include new options for better customization",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "form-builder"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Removed includeImage state from AiBuilderForm and AiBuilderWrapper components, streamlining the form handling logic",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Integrated imageType field into the form to manage image generation preferences effectively",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "form-builder",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

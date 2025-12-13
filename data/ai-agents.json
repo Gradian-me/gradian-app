@@ -688,8 +688,14 @@
         "label": "Image Type",
         "sectionId": "body",
         "component": "select",
-        "defaultValue": "infographic",
+        "defaultValue": "none",
         "options": [
+          {
+            "id": "none",
+            "label": "None",
+            "icon": "X",
+            "color": "default"
+          },
           {
             "id": "standard",
             "label": "Standard",
@@ -706,6 +712,36 @@
             "id": "3d-model",
             "label": "3D Model",
             "icon": "Box",
+            "color": "default"
+          },
+          {
+            "id": "creative",
+            "label": "Creative",
+            "icon": "Palette",
+            "color": "default"
+          },
+          {
+            "id": "sketch",
+            "label": "Sketch",
+            "icon": "Pencil",
+            "color": "default"
+          },
+          {
+            "id": "iconic",
+            "label": "Iconic",
+            "icon": "Star",
+            "color": "default"
+          },
+          {
+            "id": "editorial",
+            "label": "Editorial",
+            "icon": "Newspaper",
+            "color": "default"
+          },
+          {
+            "id": "random",
+            "label": "Random",
+            "icon": "Shuffle",
             "color": "default"
           }
         ],

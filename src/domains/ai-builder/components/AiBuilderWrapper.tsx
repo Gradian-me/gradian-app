@@ -66,7 +66,6 @@ export function AiBuilderWrapper({
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [previewSchema, setPreviewSchema] = useState<{ schema: FormSchema; schemaId: string } | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en'); // Default language for string output agents
-  const [includeImage, setIncludeImage] = useState<boolean>(false);
   const [annotations, setAnnotations] = useState<Map<string, SchemaAnnotation>>(new Map());
   const [lastPromptId, setLastPromptId] = useState<string | null>(null);
   const [firstPromptId, setFirstPromptId] = useState<string | null>(null);
@@ -245,17 +244,17 @@ export function AiBuilderWrapper({
       extra_body = Object.keys(params.extra).length > 0 ? params.extra : undefined;
     }
     
-    // Extract includeImage from formValues or use state
-    const shouldIncludeImage = formValues.includeImage ?? includeImage;
+    // Extract imageType from body - if it exists and is not "none", pass it separately for parallel image generation
+    const imageType = body?.imageType;
     
     generateResponse({
       userPrompt,
       agentId: selectedAgentId,
       body,
       extra_body,
-      includeImage: shouldIncludeImage,
+      imageType: imageType && imageType !== 'none' ? imageType : undefined,
     });
-  }, [selectedAgentId, userPrompt, generateResponse, selectedAgent, formValues, includeImage]);
+  }, [selectedAgentId, userPrompt, generateResponse, selectedAgent, formValues]);
 
   // Reset auto-generated flag when agent or prompt changes
   useEffect(() => {
@@ -490,8 +489,6 @@ export function AiBuilderWrapper({
           runType={runType}
           selectedLanguage={selectedLanguage}
           onLanguageChange={setSelectedLanguage}
-          includeImage={includeImage}
-          onIncludeImageChange={setIncludeImage}
           onFormValuesChange={setFormValues}
         />
       )}

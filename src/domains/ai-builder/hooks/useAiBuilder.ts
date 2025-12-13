@@ -199,8 +199,9 @@ export function useAiBuilder(): UseAiBuilderReturn {
         throw new Error('agentId is required');
       }
 
-      // If includeImage is true, run both requests in parallel with Promise.allSettled
-      if (request.includeImage) {
+      // If imageType is set and not "none", run both requests in parallel with Promise.allSettled
+      const imageType = request.imageType || request.body?.imageType;
+      if (imageType && imageType !== 'none') {
         const [mainResult, imageResult] = await Promise.allSettled([
           // Main agent request
           fetch(`/api/ai-builder/${agentId}`, {
@@ -227,11 +228,13 @@ export function useAiBuilder(): UseAiBuilderReturn {
             body: JSON.stringify({
               userPrompt: request.userPrompt.trim(),
               body: {
-                imageType: 'infographic',
+                imageType: imageType,
                 prompt: request.userPrompt.trim(),
+                ...(request.body || {}), // Include other body params if any
               },
               extra_body: {
                 output_format: 'png',
+                ...(request.extra_body || {}), // Include other extra params if any
               },
             }),
             signal: abortController.signal,
@@ -360,8 +363,8 @@ export function useAiBuilder(): UseAiBuilderReturn {
           setImageError(`Image Generation Error: ${errorMessage}`);
           setImageResponse(null);
         }
-      } else {
-        // Original single request flow when includeImage is false
+        } else {
+        // Original single request flow when imageType is not set or is "none"
         let response: Response;
         try {
           response = await fetch(`/api/ai-builder/${agentId}`, {
