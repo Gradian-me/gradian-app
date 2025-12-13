@@ -597,22 +597,35 @@ export async function processImageRequest(
     }
     
     // Get the image type prompt - ensure we're using the correct key
-    let imageTypePrompt = '';
+    // Always start with GENERAL_IMAGE_PROMPT for all image types
+    let imageTypePrompt = GENERAL_IMAGE_PROMPT;
+    
+    // If imageType is set and not "none" or "standard", append the specific type prompt
     if (imageType && imageType !== 'none' && imageType !== 'standard') {
-      imageTypePrompt = IMAGE_TYPE_PROMPTS[imageType] || '';
+      const specificPrompt = IMAGE_TYPE_PROMPTS[imageType] || '';
       
       // If not found, try with different casing
-      if (!imageTypePrompt) {
+      if (!specificPrompt) {
         const lowerKey = imageType.toLowerCase();
         const upperKey = imageType.toUpperCase();
         const titleKey = imageType.charAt(0).toUpperCase() + imageType.slice(1).toLowerCase();
         
-        imageTypePrompt = IMAGE_TYPE_PROMPTS[lowerKey] || 
-                         IMAGE_TYPE_PROMPTS[upperKey] || 
-                         IMAGE_TYPE_PROMPTS[titleKey] || 
-                         '';
+        const foundPrompt = IMAGE_TYPE_PROMPTS[lowerKey] || 
+                           IMAGE_TYPE_PROMPTS[upperKey] || 
+                           IMAGE_TYPE_PROMPTS[titleKey] || 
+                           '';
+        
+        if (foundPrompt) {
+          // If specific prompt is found, it already includes GENERAL_IMAGE_PROMPT, so use it directly
+          imageTypePrompt = foundPrompt;
+        }
+        // If not found, keep GENERAL_IMAGE_PROMPT (already set above)
+      } else {
+        // Specific prompt found - it already includes GENERAL_IMAGE_PROMPT, so use it directly
+        imageTypePrompt = specificPrompt;
       }
     }
+    // For "none" or "standard", imageTypePrompt is already set to GENERAL_IMAGE_PROMPT above
     
     // Log for debugging
     if (isDevelopment) {
