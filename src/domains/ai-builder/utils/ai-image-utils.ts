@@ -24,12 +24,61 @@ import {
 } from './ai-common-utils';
 
 /**
+ * General Image Generation Prompt
+ * Applies to all image types - emphasizes text clarity and readability
+ */
+const GENERAL_IMAGE_PROMPT = `CRITICAL TEXT GENERATION REQUIREMENTS:
+
+You MUST prioritize text clarity and readability above all else.
+
+Text Generation Rules:
+- All text in the image must be perfectly readable, clear, and legible
+- Use high contrast between text and background (dark text on light background or light text on dark background)
+- Choose clear, readable fonts (sans-serif preferred for clarity)
+- Ensure adequate font size - text must be large enough to read comfortably
+- Maintain consistent typography throughout the image
+- Avoid text distortion, blur, or overlapping characters
+- Do not use decorative fonts that sacrifice readability
+- Ensure proper spacing between letters, words, and lines
+
+Language Translation Requirements:
+- If the user prompt contains text in languages other than English (such as Farsi, Arabic, Chinese, etc.), you MUST:
+  1. First translate ALL non-English text to English
+  2. Then display the translated English text in the image
+- NEVER display non-English text directly in the image without translation
+- If the user wants to show multilingual content, translate everything to English first, then display it
+- This ensures maximum readability and accessibility
+
+Text Accuracy:
+- Generate text exactly as specified - no hallucinations or made-up content
+- If numbers, dates, or specific terms are mentioned, display them accurately
+- Maintain the original meaning when translating to English
+
+Visual Hierarchy:
+- Use text size, weight, and color to create clear visual hierarchy
+- Important information should be more prominent
+- Ensure all text elements are properly aligned and organized
+
+Watermark Requirement:
+- ALL images MUST include a minimal text watermark in the bottom right corner
+- The watermark text must be: "Powered by Gradian AI"
+- Use small, subtle font size (not too prominent, but readable)
+- Use a semi-transparent or low-contrast color that doesn't distract from the main content
+- Position it in the bottom right corner with appropriate padding from edges
+- Ensure the watermark is always visible but unobtrusive
+- This watermark must appear on EVERY generated image without exception
+
+`;
+
+/**
  * Image Type Prompt Dictionary
  * Contains specialized prompts for different image generation types
  */
 export const IMAGE_TYPE_PROMPTS: Record<string, string> = {
-  standard: '', // No special prompt for standard images
-  infographic: `You are an Infographic Intelligence Model.
+  standard: GENERAL_IMAGE_PROMPT, // General prompt applies to standard images
+  infographic: `${GENERAL_IMAGE_PROMPT}
+
+You are an Infographic Intelligence Model.
 
 Your sole purpose is to convert any user prompt into a crystal-clear, text-accurate, insight-dense infographic.
 
@@ -86,7 +135,9 @@ If the prompt is complex, you chunk it into a decision framework.
 If the prompt is contradictory, you choose clarity over completeness.
 
 `,
-  '3d-model': `You are a 3D Model Generation Specialist.
+  '3d-model': `${GENERAL_IMAGE_PROMPT}
+
+You are a 3D Model Generation Specialist.
 
 Your purpose is to generate realistic, detailed 3D models from text descriptions.
 
@@ -131,7 +182,9 @@ Well-lit
 Professionally rendered
 
 `,
-  creative: `You are a Creative Image Generation Specialist.
+  creative: `${GENERAL_IMAGE_PROMPT}
+
+You are a Creative Image Generation Specialist.
 
 Your purpose is to generate highly creative, artistic, and imaginative images from text descriptions.
 
@@ -176,7 +229,9 @@ Visually striking
 Unique
 
 `,
-  sketch: `You are a Sketch Art Generation Specialist.
+  sketch: `${GENERAL_IMAGE_PROMPT}
+
+You are a Sketch Art Generation Specialist.
 
 Your purpose is to generate hand-drawn, sketchy, artistic images from text descriptions.
 
@@ -221,7 +276,9 @@ Organic
 Expressive
 
 `,
-  iconic: `You are an Iconic Image Generation Specialist.
+  iconic: `${GENERAL_IMAGE_PROMPT}
+
+You are an Iconic Image Generation Specialist.
 
 Your purpose is to generate symbolic, minimalist, instantly recognizable images from text descriptions.
 
@@ -266,7 +323,9 @@ Recognizable
 Impactful
 
 `,
-  editorial: `You are an Editorial Image Generation Specialist.
+  editorial: `${GENERAL_IMAGE_PROMPT}
+
+You are an Editorial Image Generation Specialist.
 
 Your purpose is to generate professional, magazine-style editorial images from text descriptions.
 
@@ -311,7 +370,9 @@ Storytelling
 Publication-ready
 
 `,
-  random: `You are a Versatile Image Generation Specialist.
+  random: `${GENERAL_IMAGE_PROMPT}
+
+You are a Versatile Image Generation Specialist.
 
 Your purpose is to generate images from text descriptions using a random, varied approach to style and interpretation.
 
@@ -458,6 +519,10 @@ export async function processImageRequest(
           cleanPrompt = cleanPrompt.replace(/^(?:Prompt|User Prompt):\s*/i, '');
         }
       }
+    } else if (bodyParams.prompt && bodyParams.prompt !== cleanPrompt) {
+      // If we have a cleanPrompt from promptParams but bodyParams also has a prompt,
+      // prefer bodyParams.prompt for image generation (it's the actual user prompt)
+      cleanPrompt = bodyParams.prompt;
     }
 
     // Security: Sanitize and validate prompt
@@ -469,23 +534,82 @@ export async function processImageRequest(
     }
 
     // Get image type and prepend the corresponding prompt if available
-    // Check both bodyParams and promptParams for imageType
-    const imageType = bodyParams.imageType || promptParams.imageType || 'infographic';
-    const imageTypePrompt = IMAGE_TYPE_PROMPTS[imageType] || '';
+    // Check multiple sources for imageType (in order of priority)
+    let imageType: string = 'infographic'; // Default fallback
+    
+    // Priority 1: bodyParams (from requestData.body)
+    if (bodyParams?.imageType && bodyParams.imageType !== 'none') {
+      imageType = bodyParams.imageType;
+    }
+    // Priority 2: promptParams (from formValues extraction)
+    else if (promptParams?.imageType && promptParams.imageType !== 'none') {
+      imageType = promptParams.imageType;
+    }
+    // Priority 3: requestData.body directly (fallback)
+    else if (requestData.body?.imageType && requestData.body.imageType !== 'none') {
+      imageType = requestData.body.imageType;
+    }
+    // Priority 4: requestData.formValues (if body wasn't provided)
+    else if (requestData.formValues?.imageType && requestData.formValues.imageType !== 'none') {
+      imageType = requestData.formValues.imageType;
+    }
+    
+    // Get the image type prompt - ensure we're using the correct key
+    let imageTypePrompt = '';
+    if (imageType && imageType !== 'none' && imageType !== 'standard') {
+      imageTypePrompt = IMAGE_TYPE_PROMPTS[imageType] || '';
+      
+      // If not found, try with different casing
+      if (!imageTypePrompt) {
+        const lowerKey = imageType.toLowerCase();
+        const upperKey = imageType.toUpperCase();
+        const titleKey = imageType.charAt(0).toUpperCase() + imageType.slice(1).toLowerCase();
+        
+        imageTypePrompt = IMAGE_TYPE_PROMPTS[lowerKey] || 
+                         IMAGE_TYPE_PROMPTS[upperKey] || 
+                         IMAGE_TYPE_PROMPTS[titleKey] || 
+                         '';
+      }
+    }
     
     // Log for debugging
     if (isDevelopment) {
-      console.log('[ai-image-utils] Image type:', imageType, 'Prompt exists:', !!imageTypePrompt);
+      console.log('[ai-image-utils] ===== IMAGE TYPE DETECTION =====');
+      console.log('[ai-image-utils] Request data body:', JSON.stringify(requestData.body, null, 2));
+      console.log('[ai-image-utils] bodyParams:', JSON.stringify(bodyParams, null, 2));
+      console.log('[ai-image-utils] promptParams:', JSON.stringify(promptParams, null, 2));
+      console.log('[ai-image-utils] formValues:', JSON.stringify(requestData.formValues, null, 2));
+      console.log('[ai-image-utils] Detected imageType:', imageType);
+      console.log('[ai-image-utils] imageTypePrompt exists:', !!imageTypePrompt);
+      console.log('[ai-image-utils] imageTypePrompt length:', imageTypePrompt?.length || 0);
+      console.log('[ai-image-utils] Available image types in IMAGE_TYPE_PROMPTS:', Object.keys(IMAGE_TYPE_PROMPTS));
+      console.log('[ai-image-utils] IMAGE_TYPE_PROMPTS[imageType]:', IMAGE_TYPE_PROMPTS[imageType] ? 'EXISTS' : 'NOT FOUND');
+      if (IMAGE_TYPE_PROMPTS[imageType]) {
+        console.log('[ai-image-utils] First 100 chars of imageTypePrompt:', IMAGE_TYPE_PROMPTS[imageType].substring(0, 100));
+      }
     }
     
     // Concatenate image type prompt before user prompt if prompt exists
+    // IMPORTANT: This must happen BEFORE sanitization to preserve the full prompt
     if (imageTypePrompt && imageTypePrompt.trim()) {
+      const originalPrompt = cleanPrompt;
       cleanPrompt = `${imageTypePrompt.trim()}\n\nUser Prompt: ${cleanPrompt}`;
       if (isDevelopment) {
-        console.log('[ai-image-utils] Applied image type prompt for', imageType, '. Final prompt length:', cleanPrompt.length);
+        console.log('[ai-image-utils] Applied image type prompt for', imageType);
+        console.log('[ai-image-utils] Image type prompt length:', imageTypePrompt.trim().length);
+        console.log('[ai-image-utils] Original prompt length:', originalPrompt.length);
+        console.log('[ai-image-utils] Final prompt length:', cleanPrompt.length);
+        console.log('[ai-image-utils] First 200 chars of final prompt:', cleanPrompt.substring(0, 200));
       }
-    } else if (isDevelopment && imageType !== 'standard') {
-      console.warn('[ai-image-utils] Image type is', imageType, 'but no prompt found or empty');
+    } else {
+      // Log warning if imageType is set but no prompt found
+      if (isDevelopment) {
+        if (imageType && imageType !== 'standard' && imageType !== 'none') {
+          console.warn('[ai-image-utils] Image type is', imageType, 'but no prompt found in IMAGE_TYPE_PROMPTS');
+          console.warn('[ai-image-utils] Available image types:', Object.keys(IMAGE_TYPE_PROMPTS));
+          console.warn('[ai-image-utils] imageTypePrompt value:', imageTypePrompt);
+        }
+      }
     }
 
     cleanPrompt = sanitizePrompt(cleanPrompt);
@@ -533,12 +657,14 @@ export async function processImageRequest(
 
     try {
       // Build request body - model, prompt, and all body parameters
-      // Exclude imageType as it's only used for prompt building, not sent to API
-      const { imageType: _, ...bodyParamsWithoutImageType } = bodyParams;
+      // Exclude imageType and prompt from bodyParams since:
+      // - imageType is only used for prompt building, not sent to API
+      // - prompt is replaced with cleanPrompt which includes the image type prompt
+      const { imageType: _, prompt: __, ...bodyParamsWithoutImageTypeAndPrompt } = bodyParams;
       const requestBody: Record<string, any> = {
         model,
-        prompt: cleanPrompt,
-        ...bodyParamsWithoutImageType, // Include all fields with sectionId: "body" except imageType
+        prompt: cleanPrompt, // Use cleanPrompt which includes the image type prompt concatenated
+        ...bodyParamsWithoutImageTypeAndPrompt, // Include all other fields with sectionId: "body" except imageType and prompt
       };
 
       // Build extra_body - all parameters with sectionId: "extra"
@@ -554,7 +680,7 @@ export async function processImageRequest(
 
       // Log request body
       loggingCustom(
-        LogType.REQUEST_BODY,
+        LogType.AI_BODY_LOG,
         'info',
         `Image Generation Request to ${imagesApiUrl}: ${JSON.stringify(finalRequestBody, null, 2)}`
       );

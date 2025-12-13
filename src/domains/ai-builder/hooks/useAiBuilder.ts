@@ -363,7 +363,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
           setImageError(`Image Generation Error: ${errorMessage}`);
           setImageResponse(null);
         }
-        } else {
+      } else {
         // Original single request flow when imageType is not set or is "none"
         let response: Response;
         try {

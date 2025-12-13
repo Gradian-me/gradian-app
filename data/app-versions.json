@@ -2725,5 +2725,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCB8VNWHQ55Z0T6C183F48AF",
+    "timestamp": "2025-12-13T10:42:27.000Z",
+    "version": "1.24.002",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Added AI body and response logging capabilities in application variables for improved debugging",
+        "priority": "Medium",
+        "affectedDomains": [
+          "application-variables",
+          "logging",
+          "ai-builder"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Integrated new image type field in AiBuilderForm for better image generation customization",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined image handling and response management in AiBuilderResponse and related components for enhanced clarity and performance",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "image-generation",
+          "performance"
+        ]
+      }
+    ]
   }
 ]

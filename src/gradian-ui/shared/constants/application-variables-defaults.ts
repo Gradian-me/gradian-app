@@ -8,6 +8,8 @@ export const DEFAULT_APPLICATION_VARIABLES = {
     FORM_DATA: true,
     REQUEST_BODY: true,
     REQUEST_RESPONSE: true,
+    AI_BODY_LOG: true,
+    AI_RESPONSE_LOG: true,
     SCHEMA_LOADER: true,
     CALL_BACKEND: true,
     INDEXDB_CACHE: true,

@@ -119,7 +119,7 @@ export async function processVoiceRequest(
 
     // Log request body (without the actual file blob)
     loggingCustom(
-      LogType.REQUEST_BODY,
+      LogType.AI_BODY_LOG,
       'info',
       `Voice Transcription Request to ${transcribeUrl}: ${JSON.stringify(requestBodyInfo, null, 2)}`
     );

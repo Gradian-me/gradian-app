@@ -182,7 +182,8 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                 // Permanently denied - show instructions
                 const instructions = getBrowserInstructions();
                 errorMessage = 'Microphone permission is permanently denied.\n\nTo fix this, reset the permission in your browser:\n\n' + instructions;
-                showHelp = true;
+                // Don't set showHelp = true here since we've already included instructions
+                showHelp = false;
               } else if (permStatus.state === 'prompt') {
                 // Still in prompt state - user might have dismissed it
                 errorMessage = 'Permission was denied. Please click "Allow" when the browser shows the microphone permission prompt.';
@@ -543,26 +544,23 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                 </div>
                 {transcriptionError.toLowerCase().includes('permanently denied') && (
                   <Button
-                    onClick={() => {
-                      // Try to help user navigate to settings
-                      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                        // Trigger another permission request - browser will show settings link if available
-                        navigator.mediaDevices.getUserMedia({ audio: true })
-                          .then(stream => {
-                            stream.getTracks().forEach(track => track.stop());
-                            // If we get here, permission might have been reset
-                            handleRequestPermission();
-                          })
-                          .catch(() => {
-                            // Permission still denied - user needs to reset in browser settings
-                          });
-                      }
-                    }}
+                    onClick={handleRequestPermission}
+                    disabled={isRequestingPermission}
                     variant="outline"
                     size="sm"
                     className="self-start border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/30"
                   >
-                    Try Again After Resetting
+                    {isRequestingPermission ? (
+                      <>
+                        <Mic className="w-4 h-4 mr-2 animate-pulse" />
+                        Requesting Permission...
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="w-4 h-4 mr-2" />
+                        Try Requesting Permission Again
+                      </>
+                    )}
                   </Button>
                 )}
               </div>

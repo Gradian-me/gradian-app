@@ -789,6 +789,35 @@ export function AiBuilderForm({
     (field) => field.name === 'imageType' || field.id === 'imageType'
   );
 
+  // Default imageType field configuration (used when not in agent's renderComponents)
+  // IMPORTANT: sectionId must be 'body' so it gets extracted into body params
+  const defaultImageTypeField = useMemo(() => ({
+    id: 'imageType',
+    name: 'imageType',
+    label: 'Image Type',
+    sectionId: 'body', // Must be 'body' to be included in body params
+    component: 'select',
+    type: 'select',
+    defaultValue: 'none',
+    options: [
+      { id: 'none', label: 'None', icon: 'X', color: 'default' },
+      { id: 'standard', label: 'Standard', icon: 'Image', color: 'default' },
+      { id: 'infographic', label: 'Infographic', icon: 'FileText', color: 'default' },
+      { id: '3d-model', label: '3D Model', icon: 'Box', color: 'default' },
+      { id: 'creative', label: 'Creative', icon: 'Palette', color: 'default' },
+      { id: 'sketch', label: 'Sketch', icon: 'Pencil', color: 'default' },
+      { id: 'iconic', label: 'Iconic', icon: 'Star', color: 'default' },
+      { id: 'editorial', label: 'Editorial', icon: 'Newspaper', color: 'default' },
+      { id: 'random', label: 'Random', icon: 'Shuffle', color: 'default' },
+    ],
+    validation: { required: false },
+    colSpan: 1,
+    order: 0,
+  }), []);
+
+  // Use imageTypeField from agent if available, otherwise use default
+  const effectiveImageTypeField = imageTypeField || defaultImageTypeField;
+
   // Sort fields by order if available
   const sortedFields = [...formFields].sort((a, b) => {
     const orderA = a.order ?? 999;
@@ -987,13 +1016,14 @@ export function AiBuilderForm({
                               label: '',
                               placeholder: 'Language',
                             }}
-                            value={selectedLanguage}
+                            value={selectedLanguage || 'en'}
                             onChange={(lang) => {
-                              onLanguageChange(lang);
+                              const languageValue = lang || 'en';
+                              onLanguageChange(languageValue);
                               // Also update formValues to include language
                               const newFormValues = {
                                 ...formValues,
-                                'output-language': lang,
+                                'output-language': languageValue,
                               };
                               setFormValues(newFormValues);
                               // Notify parent of formValues change
@@ -1008,29 +1038,29 @@ export function AiBuilderForm({
                               onPromptChange(concatenatedPrompt);
                             }}
                             defaultLanguage="en"
+                            disabled={isLoading || disabled}
                           />
                         </div>
                       )}
-                      {imageTypeField && (
-                        <div className="w-full sm:w-40">
-                          <FormElementFactory
-                            config={{
-                              ...imageTypeField,
-                              label: '',
-                            }}
-                            value={formValues[imageTypeField.name] || imageTypeField.defaultValue || 'none'}
-                            onChange={(value) => {
-                              // Handle both string and NormalizedOption[] from Select
-                              let actualValue = value;
-                              if (Array.isArray(value) && value.length > 0) {
-                                actualValue = value[0].id || value[0].value || value;
-                              } else if (typeof value === 'string') {
-                                actualValue = value;
-                              }
-                              
+                      <div className="w-full sm:w-40">
+                        <FormElementFactory
+                          config={{
+                            ...effectiveImageTypeField,
+                            label: '',
+                          }}
+                          value={formValues[effectiveImageTypeField.name] || effectiveImageTypeField.defaultValue || 'none'}
+                          onChange={(value) => {
+                            // Handle both string and NormalizedOption[] from Select
+                            let actualValue = value;
+                            if (Array.isArray(value) && value.length > 0) {
+                              actualValue = value[0].id || value[0].value || value;
+                            } else if (typeof value === 'string') {
+                              actualValue = value;
+                            }
+                            
                               const newFormValues = {
                                 ...formValues,
-                                [imageTypeField.name]: actualValue,
+                              [effectiveImageTypeField.name]: actualValue,
                               };
                               setFormValues(newFormValues);
                               // Notify parent of formValues change
@@ -1039,14 +1069,13 @@ export function AiBuilderForm({
                               }
                             }}
                             disabled={isLoading || disabled}
-                            error={formErrors[imageTypeField.name]}
-                            touched={touched[imageTypeField.name]}
-                            onBlur={() => handleFieldBlur(imageTypeField.name)}
-                            onFocus={() => handleFieldFocus(imageTypeField.name)}
-                            className="w-full"
+                          error={formErrors[effectiveImageTypeField.name]}
+                          touched={touched[effectiveImageTypeField.name]}
+                          onBlur={() => handleFieldBlur(effectiveImageTypeField.name)}
+                          onFocus={() => handleFieldFocus(effectiveImageTypeField.name)}
+                          className="w-full"
                           />
                         </div>
-                      )}
                       {(() => {
                         const params = selectedAgent && formValues 
                           ? extractParametersBySectionId(selectedAgent, formValues)
@@ -1104,7 +1133,7 @@ export function AiBuilderForm({
                     >
                       <Sparkles className="h-4 w-4 me-2" />
                       <span className="hidden xs:inline">Do the Magic</span>
-                      <span className="xs:hidden">Generate</span>
+                      <span className="xs:hidden">Do the Magic</span>
                     </Button>
                   )}
                 </div>

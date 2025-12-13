@@ -13,7 +13,7 @@ export default function AiBuilderPage() {
       title="AI Builder"
       subtitle="Transform your ideas into reality with the power of AI"
       icon="Sparkles"
-      showEndLine={false}
+      showEndLine={true}
     >
       <div className="space-y-6 max-w-5xl mx-auto">
         <div className="flex justify-end">

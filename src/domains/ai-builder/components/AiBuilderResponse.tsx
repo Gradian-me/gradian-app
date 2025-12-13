@@ -10,6 +10,7 @@ import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Loader2, Sparkles, Timer, Download, ExternalLink } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { MetricCard } from '@/gradian-ui/analytics';
 import { ResponseCardViewer } from './ResponseCardViewer';
 import { ResponseAnnotationViewer } from './ResponseAnnotationViewer';
@@ -38,6 +39,8 @@ interface AiBuilderResponseProps {
   selectedLanguage?: string;
   imageResponse?: string | null;
   imageError?: string | null;
+  imageType?: string; // The type of image that was generated (e.g., "infographic", "sketch", "creative")
+  imageModel?: string; // The model used for image generation (e.g., "gemini-2.5-flash-image")
 }
 
 // Utility function to generate table columns from JSON data
@@ -126,6 +129,8 @@ export function AiBuilderResponse({
   selectedLanguage = 'text',
   imageResponse,
   imageError,
+  imageType,
+  imageModel,
 }: AiBuilderResponseProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const prevIsLoadingRef = useRef<boolean>(isLoading);
@@ -234,6 +239,21 @@ export function AiBuilderResponse({
     prevIsLoadingRef.current = isLoading;
   }, [isLoading, response]);
 
+  // Helper function to format image type label
+  const getImageTypeLabel = (type?: string): string => {
+    if (!type || type === 'none' || type === 'standard') return '';
+    const labels: Record<string, string> = {
+      'infographic': 'Infographic',
+      '3d-model': '3D Model',
+      'creative': 'Creative',
+      'sketch': 'Sketch',
+      'iconic': 'Iconic',
+      'editorial': 'Editorial',
+      'random': 'Random',
+    };
+    return labels[type] || type.charAt(0).toUpperCase() + type.slice(1);
+  };
+
   // Parse image data from imageResponse prop (parallel image generation)
   const parallelImageData = useMemo(() => {
     if (!imageResponse) {
@@ -264,9 +284,20 @@ export function AiBuilderResponse({
       return null;
     }
     
-    // Check if agent requires image format OR if response content looks like image data
+    // Check if agent requires image format
     const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
     const isImageFormat = agentFormatValue === 'image';
+    
+    // Only try to parse as JSON if:
+    // 1. Agent format is image, OR
+    // 2. Content looks like JSON (starts with '{' or '[')
+    const trimmedContent = displayContent.trim();
+    const looksLikeJson = trimmedContent.startsWith('{') || trimmedContent.startsWith('[');
+    
+    if (!isImageFormat && !looksLikeJson) {
+      // Content is clearly not JSON (likely markdown or text), skip parsing
+      return null;
+    }
     
     try {
       const parsed = JSON.parse(displayContent);
@@ -291,8 +322,11 @@ export function AiBuilderResponse({
       }
       return null;
     } catch (e) {
-      // If parsing fails, return null
-      console.warn('Failed to parse image data:', e, 'Content:', displayContent?.substring(0, 200));
+      // If parsing fails and it's not an image format agent, silently return null
+      // Only log warning if it's an image format agent (unexpected error)
+      if (isImageFormat) {
+        console.warn('Failed to parse image data:', e, 'Content:', displayContent?.substring(0, 200));
+      }
       return null;
     }
   }, [agent?.requiredOutputFormat, displayContent]);
@@ -401,11 +435,27 @@ export function AiBuilderResponse({
           {parallelImageData && (
             <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-2" />
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     Generated Image
                   </h3>
+                  {imageType && getImageTypeLabel(imageType) && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs font-medium bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800"
+                    >
+                      {getImageTypeLabel(imageType)}
+                    </Badge>
+                  )}
+                  {(imageModel || agent?.model) && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs font-medium bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800"
+                    >
+                      {imageModel || agent?.model}
+                    </Badge>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   {/* Save Image Button */}
@@ -489,16 +539,16 @@ export function AiBuilderResponse({
                   {parallelImageData.url && <CopyContent content={parallelImageData.url} />}
                 </div>
               </div>
-              <div className="flex justify-center items-center">
-                <ImageViewer
-                  sourceUrl={parallelImageData.url || undefined}
-                  content={parallelImageData.b64_json || undefined}
-                  alt="AI Generated Image"
-                  width={1024}
-                  height={1024}
-                  objectFit="contain"
-                  className="max-w-full h-auto rounded-lg"
-                />
+              <div className="flex justify-center items-center w-full">
+                <div className="w-full max-w-4xl">
+                  <ImageViewer
+                    sourceUrl={parallelImageData.url || undefined}
+                    content={parallelImageData.b64_json || undefined}
+                    alt="AI Generated Image"
+                    objectFit="contain"
+                    className="w-full h-auto rounded-lg"
+                  />
+                </div>
               </div>
               {parallelImageData.revised_prompt && (
                 <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
@@ -612,11 +662,27 @@ export function AiBuilderResponse({
       {parallelImageData && (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-2" />
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                 Generated Image
               </h3>
+              {imageType && getImageTypeLabel(imageType) && (
+                <Badge
+                  variant="outline"
+                  className="text-xs font-medium bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800"
+                >
+                  {getImageTypeLabel(imageType)}
+                </Badge>
+              )}
+              {(imageModel || agent?.model) && (
+                <Badge
+                  variant="outline"
+                  className="text-xs font-medium bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800"
+                >
+                  {imageModel || agent?.model}
+                </Badge>
+              )}
             </div>
             <div className="flex items-center gap-2">
               {/* Save Image Button */}
@@ -700,16 +766,16 @@ export function AiBuilderResponse({
               {parallelImageData.url && <CopyContent content={parallelImageData.url} />}
             </div>
           </div>
-          <div className="flex justify-center items-center">
-            <ImageViewer
-              sourceUrl={parallelImageData.url || undefined}
-              content={parallelImageData.b64_json || undefined}
-              alt="AI Generated Image"
-              width={1024}
-              height={1024}
-              objectFit="contain"
-              className="max-w-full h-auto rounded-lg"
-            />
+          <div className="flex justify-center items-center w-full">
+            <div className="w-full max-w-4xl">
+              <ImageViewer
+                sourceUrl={parallelImageData.url || undefined}
+                content={parallelImageData.b64_json || undefined}
+                alt="AI Generated Image"
+                objectFit="contain"
+                className="max-w-full h-auto rounded-lg"
+              />
+            </div>
           </div>
           {parallelImageData.revised_prompt && (
             <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
@@ -752,11 +818,27 @@ export function AiBuilderResponse({
           <div className="space-y-4">
             <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-2" />
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     Generated Image
                   </h3>
+                  {imageType && getImageTypeLabel(imageType) && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs font-medium bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800"
+                    >
+                      {getImageTypeLabel(imageType)}
+                    </Badge>
+                  )}
+                  {(imageModel || agent?.model) && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs font-medium bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800"
+                    >
+                      {imageModel || agent?.model}
+                    </Badge>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   {/* Save Image Button */}
@@ -850,16 +932,16 @@ export function AiBuilderResponse({
                   {imageData.url && <CopyContent content={imageData.url} />}
                 </div>
               </div>
-              <div className="flex justify-center items-center">
-                <ImageViewer
-                  sourceUrl={imageData.url || undefined}
-                  content={imageData.b64_json || undefined}
-                  alt="AI Generated Image"
-                  width={1024}
-                  height={1024}
-                  objectFit="contain"
-                  className="max-w-full h-auto rounded-lg"
-                />
+              <div className="flex justify-center items-center w-full">
+                <div className="w-full max-w-4xl">
+                  <ImageViewer
+                    sourceUrl={imageData.url || undefined}
+                    content={imageData.b64_json || undefined}
+                    alt="AI Generated Image"
+                    objectFit="contain"
+                    className="w-full h-auto rounded-lg"
+                  />
+                </div>
               </div>
               {imageData.revised_prompt && (
                 <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
@@ -889,11 +971,27 @@ export function AiBuilderResponse({
         ) : (
           <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-2" />
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                   Generated Image (Parsing Error)
                 </h3>
+                {imageType && getImageTypeLabel(imageType) && (
+                  <Badge
+                    variant="outline"
+                    className="text-xs font-medium bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800"
+                  >
+                    {getImageTypeLabel(imageType)}
+                  </Badge>
+                )}
+                {agent?.model && (
+                  <Badge
+                    variant="outline"
+                    className="text-xs font-medium bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800"
+                  >
+                    {imageModel || agent?.model}
+                  </Badge>
+                )}
               </div>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">

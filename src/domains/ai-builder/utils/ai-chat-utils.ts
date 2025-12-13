@@ -251,7 +251,7 @@ export async function processChatRequest(
 
       // Log request body
       loggingCustom(
-        LogType.REQUEST_BODY,
+        LogType.AI_BODY_LOG,
         'info',
         `Chat Completion Request to ${apiUrl}: ${JSON.stringify(requestBody, null, 2)}`
       );
