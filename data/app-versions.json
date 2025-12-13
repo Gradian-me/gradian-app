@@ -2823,5 +2823,52 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCC5EM4MZD20GV5BR25MXDVM",
+    "timestamp": "2025-12-13T15:31:16.000Z",
+    "version": "1.24.005",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Introduced new 'Agent Type' selection in ai-agents.json for enhanced agent configuration options, allowing users to specify types such as 'Chat', 'Image Generation', and 'Voice Transcription'",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "form-builder"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented 'Pharmaceutical Deviation Tracker' and 'Presentation Slide Creator' agents in ai-agents.json, expanding the capabilities of the AI builder",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated AiBuilderForm and AiBuilderResponse components to support new agent types and improve user interface responsiveness",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ui",
+          "form-builder",
+          "responsive"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined image handling and response management in useAiBuilder and related components for better performance and clarity",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "image-generation",
+          "performance"
+        ]
+      }
+    ]
   }
 ]

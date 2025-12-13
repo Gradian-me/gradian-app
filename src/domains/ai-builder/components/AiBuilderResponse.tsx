@@ -158,12 +158,18 @@ export function AiBuilderResponse({
   });
   
   // Use stored content if available, otherwise use response
+  // For image-generator agent, always use the current response (don't use stored content)
   const displayContent = useMemo(() => {
+    // Skip using stored content for image-generator agent to avoid showing stale cached responses
+    if (agent?.id === 'image-generator' || agentFormat === 'image') {
+      return (response && response.trim()) || '';
+    }
+    
     if (latestResponse?.content && latestResponse.content.trim()) {
       return latestResponse.content;
     }
     return (response && response.trim()) || '';
-  }, [latestResponse, response]);
+  }, [latestResponse, response, agent?.id, agentFormat]);
   
   // Get store actions
   const saveResponse = useAiResponseStore((state) => state.saveResponse);
@@ -196,8 +202,14 @@ export function AiBuilderResponse({
   }, []);
   
   // Save response to store when AI generates a response
+  // Skip saving for image-generator agent responses as they're too large (base64 images)
   useEffect(() => {
     if (!agent?.id || !response || !response.trim() || isLoading) {
+      return;
+    }
+
+    // Skip storing image responses (they're too large and cause quota issues)
+    if (agent.id === 'image-generator' || agentFormat === 'image') {
       return;
     }
 
@@ -247,6 +259,7 @@ export function AiBuilderResponse({
       '3d-model': '3D Model',
       'creative': 'Creative',
       'sketch': 'Sketch',
+      'comic-book': 'Comic Book',
       'iconic': 'Iconic',
       'editorial': 'Editorial',
       'random': 'Random',

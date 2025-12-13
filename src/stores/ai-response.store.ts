@@ -54,7 +54,31 @@ export const useAiResponseStore = create<AiResponseState>()(
         // Skip storing very large content (like base64 images) to prevent quota issues
         if (content.length > MAX_CONTENT_LENGTH) {
           console.warn(`[ai-response-store] Content too large (${content.length} bytes), skipping storage to prevent quota issues`);
-          return new Date().toISOString().replace(/[:.]/g, '-');
+          // Clear the latest response entry for this agent/format to prevent showing stale cached data
+          const latestKey = generateLatestKey(agentId, format);
+          const state = get();
+          const newLatestResponses = { ...state.latestResponses };
+          delete newLatestResponses[latestKey];
+          set({ latestResponses: newLatestResponses }, false, 'clearLatestForLargeContent');
+          
+          // Persist the cleared state
+          try {
+            const currentState = get();
+            await setEncryptedSessionStorage(STORAGE_KEY, {
+              responses: currentState.responses,
+              latestResponses: currentState.latestResponses,
+            });
+            notifyEncryptedSessionStorageChange(STORAGE_KEY, {
+              responses: currentState.responses,
+              latestResponses: currentState.latestResponses,
+            });
+          } catch (error: any) {
+            // Silently fail if storage is full - we're already skipping storage
+            console.warn('[ai-response-store] Failed to persist cleared latest response:', error);
+          }
+          
+          // Don't update latestResponses when content is too large - return null to indicate no storage
+          return null;
         }
 
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');

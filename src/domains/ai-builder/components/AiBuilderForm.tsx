@@ -806,6 +806,7 @@ export function AiBuilderForm({
       { id: '3d-model', label: '3D Model', icon: 'Box', color: 'default' },
       { id: 'creative', label: 'Creative', icon: 'Palette', color: 'default' },
       { id: 'sketch', label: 'Sketch', icon: 'Pencil', color: 'default' },
+      { id: 'comic-book', label: 'Comic Book', icon: 'BookOpen', color: 'default' },
       { id: 'iconic', label: 'Iconic', icon: 'Star', color: 'default' },
       { id: 'editorial', label: 'Editorial', icon: 'Newspaper', color: 'default' },
       { id: 'random', label: 'Random', icon: 'Shuffle', color: 'default' },
@@ -855,11 +856,11 @@ export function AiBuilderForm({
           <div className="relative p-4 md:p-6 space-y-4">
             {/* Header Section */}
             {displayType === 'default' && (
-              <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center flex-wrap gap-3 sm:gap-4">
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2 w-full sm:w-auto">
+              <div className="flex flex-col md:flex-row justify-end items-stretch md:items-center flex-wrap gap-3 md:gap-4">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-2 w-full md:w-auto">
                   {/* Agent Select - use renderComponents if available, otherwise fallback */}
                   {agentSelectField ? (
-                    <div className="w-full sm:w-72">
+                    <div className="w-full md:w-72">
                       <FormElementFactory
                         config={{
                           ...agentSelectField,
@@ -887,7 +888,7 @@ export function AiBuilderForm({
                       />
                     </div>
                   ) : (
-                    <div className="w-full sm:w-72">
+                    <div className="w-full md:w-72">
                       <FormElementFactory
                         config={{
                           id: 'ai-agent-select',
@@ -921,12 +922,12 @@ export function AiBuilderForm({
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-9 w-full sm:w-auto shrink-0"
+                          className="h-9 w-full md:w-auto shrink-0"
                           title="Edit Agent"
                         >
                           <PencilRuler className="h-4 w-4 me-2" />
-                          <span className="hidden xs:inline">Edit Agent</span>
-                          <span className="xs:hidden">Edit</span>
+                          <span className="hidden md:inline">Edit Agent</span>
+                          <span className="md:hidden">Edit</span>
                         </Button>
                       </Link>
                     )}
@@ -935,17 +936,17 @@ export function AiBuilderForm({
                         variant="outline"
                         size="sm"
                         onClick={onReset}
-                        className="h-9 w-9 sm:w-9 p-0 shrink-0"
+                        className="h-9 w-9 md:w-9 p-0 shrink-0"
                         title="Reset everything"
                       >
                         <RotateCcw className="h-4 w-4" />
                       </Button>
                     )}
-                    <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer" className="flex-1 sm:flex-initial">
-                      <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto shrink-0">
+                    <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer" className="flex-1 md:flex-initial">
+                      <Button variant="outline" size="sm" className="gap-2 w-full md:w-auto shrink-0">
                         <History className="h-4 w-4" />
-                        <span className="hidden xs:inline">Prompt History</span>
-                        <span className="xs:hidden">History</span>
+                        <span className="hidden md:inline">Prompt History</span>
+                        <span className="md:hidden">History</span>
                       </Button>
                     </Link>
                   </div>
@@ -989,7 +990,7 @@ export function AiBuilderForm({
             
             {/* Footer Section with Model Badge and Buttons */}
             {showFooter && (
-              <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-2 pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
+              <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 md:gap-2 pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
                 {/* Model Badge on Left */}
                 {selectedAgent?.model && (
                   <Badge 
@@ -1005,11 +1006,11 @@ export function AiBuilderForm({
                 )}
                 
                 {/* Buttons on Right */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto">
                   {onSheetOpenChange && (
                     <>
                       {onLanguageChange && (
-                        <div className="w-full sm:w-36">
+                        <div className="w-full md:w-36">
                           <LanguageSelector
                             config={{
                               name: 'output-language',
@@ -1042,7 +1043,7 @@ export function AiBuilderForm({
                           />
                         </div>
                       )}
-                      <div className="w-full sm:w-40">
+                      <div className="w-full md:w-40">
                         <FormElementFactory
                           config={{
                             ...effectiveImageTypeField,
@@ -1096,23 +1097,23 @@ export function AiBuilderForm({
                     </>
                   )}
                   {isLoading ? (
-                    <div className="flex flex-row gap-2 w-full sm:w-auto">
+                    <div className="flex flex-row gap-2 w-full md:w-auto">
                       <Button
                         onClick={onGenerate}
                         disabled={true}
                         size="default"
                         variant="default"
-                        className="h-10 shadow-sm flex-1 sm:flex-initial"
+                        className="h-10 shadow-sm flex-1 md:flex-initial"
                       >
                         <Loader2 className="h-4 w-4 me-2 animate-spin" />
-                        <span className="hidden xs:inline">Generating</span>
-                        <span className="xs:hidden">...</span>
+                        <span className="hidden md:inline">Generating</span>
+                        <span className="md:hidden">...</span>
                       </Button>
                       <Button
                         onClick={onStop}
                         variant="outline"
                         size="default"
-                        className="h-10 shadow-sm flex-1 sm:flex-initial"
+                        className="h-10 shadow-sm flex-1 md:flex-initial"
                       >
                         <Square className="h-4 w-4 me-2 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
                         Stop
@@ -1129,11 +1130,11 @@ export function AiBuilderForm({
                       disabled={!isFormValid || !userPrompt.trim() || disabled || runType === 'automatic'}
                       size="default"
                       variant="default"
-                      className="h-10 shadow-sm w-full sm:w-auto bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                      className="h-10 shadow-sm w-full md:w-auto bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
                     >
                       <Sparkles className="h-4 w-4 me-2" />
-                      <span className="hidden xs:inline">Do the Magic</span>
-                      <span className="xs:hidden">Do the Magic</span>
+                      <span className="hidden md:inline">Do the Magic</span>
+                      <span className="md:hidden">Do the Magic</span>
                     </Button>
                   )}
                 </div>

@@ -374,6 +374,112 @@ Storytelling
 Publication-ready
 
 `,
+  'comic-book': `${GENERAL_IMAGE_PROMPT}
+
+You are a Comic-Book Story Engine with strict structural rules.
+
+Your task is to convert the provided event into a visually clear, role-defined comic-book narrative.
+
+You must ensure absolute clarity of:
+
+- who each character is
+- what role they play
+- what equipment or system components represent
+- who is speaking in each speech bubble
+- what appears as narration text versus dialogue
+
+Do NOT allow ambiguity.
+
+PROCESS
+
+1. Extract and Define Roles
+
+Create a Character & Equipment Table:
+
+For each human or non-human entity, define:
+
+- Name
+- Role
+- Function in the event
+- Comic interpretation (hero, villain, mentor, AI system, monster, robot, etc.)
+- Visual appearance
+- Core abilities / tools
+
+For each piece of equipment/system:
+
+- Name
+- Type (server, sensor, tool, process, etc.)
+- Comic reinterpretation (robot, fortress, AI companion, weapon, etc.)
+- How it interacts in the story
+
+2. Produce a Structured Comic Narrative
+
+Break the output into the following:
+
+A. Issue Title
+
+A dramatic comic-book title.
+
+B. Opening Splash Page Description
+
+Describe the visual scene with clarity.
+
+C. Story (Panel-by-Panel)
+
+**CRITICAL REQUIREMENT: The comic must have AT LEAST SIX (6) PANELS.** This is a mandatory minimum. Use more panels if needed to fully tell the story, but never fewer than six.
+
+For each panel, explicitly include:
+
+- Panel Number
+- Panel Visual Description
+- Characters present
+- Equipment present
+- Narration Box Text (if any)
+- Speech Bubbles
+
+Format them as:
+
+CHARACTER NAME (speech bubble): "Text..."
+
+- Sound Effects (SFX)
+
+Panels must follow the event sequence:
+
+- Act I: Setup (minimum 2 panels)
+- Act II: Conflict, root causes manifest (minimum 2 panels)
+- Act III: Resolution, actions taken (minimum 2 panels)
+
+3. Clarity Rules
+
+- **MANDATORY: Create at least SIX (6) panels minimum.** Never create fewer than six panels.
+- Every speech bubble must contain a clear speaker label.
+- Equipment must be referenced consistently with the same name.
+- Root causes must be personified or visually represented.
+- Actions taken must appear explicitly as character actions or system actions.
+- No vague references ("someone," "a device," "the team"). Everything must be named.
+
+4. Final Deliverables
+
+Your output must include:
+
+- Short Summary (1 paragraph)
+- Character & Equipment Table
+- Full Panel-by-Panel Comic Script
+
+Visual Style Guidelines:
+
+- **MANDATORY: Generate at least SIX (6) panels.** Each panel should be clearly separated with borders.
+- Use bold, dynamic comic book art style with clear panel borders
+- Arrange panels in a readable grid layout (e.g., 3x2, 2x3, or similar) to accommodate at least 6 panels
+- Apply vibrant colors typical of comic books
+- Include speech bubbles with clear text and speaker labels
+- Use narration boxes where appropriate
+- Add sound effects (SFX) in stylized text
+- Create dramatic compositions with clear visual hierarchy
+- Use comic book typography for titles and text elements
+- Ensure all text in speech bubbles and narration boxes is perfectly readable
+
+`,
   random: `${GENERAL_IMAGE_PROMPT}
 
 You are a Versatile Image Generation Specialist.
@@ -729,20 +835,63 @@ export async function processImageRequest(
 
       const data = parseResult.data;
 
-      // Extract image data
-      const imageData = data.data?.[0];
-      if (!imageData) {
+      // Log the response structure in development for debugging
+      if (isDevelopment) {
+        console.log('Image API response structure:', JSON.stringify(data, null, 2).substring(0, 1000));
+      }
+
+      // Extract image data - handle different possible response structures
+      // Try multiple possible locations for image data
+      let imageData: any = null;
+      
+      // Structure 1: data.data[0] (OpenAI-style)
+      if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+        imageData = data.data[0];
+      }
+      // Structure 2: data.candidates?.[0]?.content?.parts?.[0] (Gemini-style)
+      else if (data.candidates && Array.isArray(data.candidates) && data.candidates.length > 0) {
+        const candidate = data.candidates[0];
+        if (candidate.content?.parts && Array.isArray(candidate.content.parts) && candidate.content.parts.length > 0) {
+          const part = candidate.content.parts[0];
+          // Gemini returns base64 images in the inlineData field
+          if (part.inlineData?.data) {
+            imageData = {
+              b64_json: part.inlineData.data,
+              mimeType: part.inlineData.mimeType || 'image/png',
+            };
+          } else if (part.url) {
+            imageData = { url: part.url };
+          }
+        }
+      }
+      // Structure 3: Direct image object in data
+      else if (data.image && (data.image.url || data.image.b64_json || data.image.data)) {
+        imageData = data.image;
+      }
+      // Structure 4: Direct base64 data
+      else if (data.b64_json || data.data) {
+        imageData = {
+          b64_json: data.b64_json || data.data,
+        };
+      }
+      
+      if (!imageData || (!imageData.url && !imageData.b64_json && !imageData.data)) {
+        const errorDetails = isDevelopment 
+          ? ` Response structure: ${JSON.stringify(Object.keys(data || {})).substring(0, 200)}`
+          : '';
         return {
           success: false,
-          error: 'No image data in response',
+          error: `No image data in response.${errorDetails}`,
         };
       }
 
       // Return image URL or base64 content
+      // Handle both OpenAI format (b64_json) and Gemini format (data field)
       const result = {
         url: imageData.url || null,
-        b64_json: imageData.b64_json || null,
+        b64_json: imageData.b64_json || imageData.data || null,
         revised_prompt: imageData.revised_prompt || null,
+        mimeType: imageData.mimeType || null,
       };
 
       // Performance: Use shared timing utility

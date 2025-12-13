@@ -9,6 +9,7 @@ export interface AiAgent {
   label: string;
   icon: string;
   description: string;
+  agentType?: 'chat' | 'image-generation' | 'voice-transcription'; // Type of AI agent
   requiredOutputFormat: 'json' | 'string' | 'table';
   model?: string;
   systemPrompt?: string;
