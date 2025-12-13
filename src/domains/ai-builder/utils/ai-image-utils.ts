@@ -376,108 +376,40 @@ Publication-ready
 `,
   'comic-book': `${GENERAL_IMAGE_PROMPT}
 
-You are a Comic-Book Story Engine with strict structural rules.
+You are a Comic Book Art Generator.
 
-Your task is to convert the provided event into a visually clear, role-defined comic-book narrative.
+Your task is to create a visually compelling comic book layout that tells the story from the user's prompt.
 
-You must ensure absolute clarity of:
+CRITICAL VISUAL REQUIREMENTS:
 
-- who each character is
-- what role they play
-- what equipment or system components represent
-- who is speaking in each speech bubble
-- what appears as narration text versus dialogue
+- Create a comic book page layout with AT LEAST SIX (6) panels arranged in a clear grid (e.g., 3x2 or 2x3 layout)
+- Each panel must be clearly separated with bold black borders
+- Use vibrant, bold comic book colors with high contrast
+- Apply classic comic book art style with dynamic compositions
+- Include speech bubbles with readable text where dialogue is needed
+- Use narration boxes for key story points
+- Add stylized sound effects (SFX) text where appropriate
+- Create clear visual hierarchy with bold lines and dramatic angles
 
-Do NOT allow ambiguity.
+PROMPT PROCESSING:
 
-PROCESS
+- Simplify the user's story into key visual moments
+- Identify main characters, events, and actions
+- Convert technical terms into visual comic elements (e.g., equipment as characters or objects)
+- Focus on the most important story beats for the 6+ panels
+- Create a clear visual narrative flow from left to right, top to bottom
 
-1. Extract and Define Roles
+OUTPUT:
 
-Create a Character & Equipment Table:
+Generate a single comic book page image with:
+- 6 or more panels arranged in a grid layout
+- Clear panel borders separating each scene
+- Visual storytelling that conveys the key story elements
+- Speech bubbles and narration boxes with clear, readable text
+- Bold comic book art style with vibrant colors
+- Dramatic visual compositions
 
-For each human or non-human entity, define:
-
-- Name
-- Role
-- Function in the event
-- Comic interpretation (hero, villain, mentor, AI system, monster, robot, etc.)
-- Visual appearance
-- Core abilities / tools
-
-For each piece of equipment/system:
-
-- Name
-- Type (server, sensor, tool, process, etc.)
-- Comic reinterpretation (robot, fortress, AI companion, weapon, etc.)
-- How it interacts in the story
-
-2. Produce a Structured Comic Narrative
-
-Break the output into the following:
-
-A. Issue Title
-
-A dramatic comic-book title.
-
-B. Opening Splash Page Description
-
-Describe the visual scene with clarity.
-
-C. Story (Panel-by-Panel)
-
-**CRITICAL REQUIREMENT: The comic must have AT LEAST SIX (6) PANELS.** This is a mandatory minimum. Use more panels if needed to fully tell the story, but never fewer than six.
-
-For each panel, explicitly include:
-
-- Panel Number
-- Panel Visual Description
-- Characters present
-- Equipment present
-- Narration Box Text (if any)
-- Speech Bubbles
-
-Format them as:
-
-CHARACTER NAME (speech bubble): "Text..."
-
-- Sound Effects (SFX)
-
-Panels must follow the event sequence:
-
-- Act I: Setup (minimum 2 panels)
-- Act II: Conflict, root causes manifest (minimum 2 panels)
-- Act III: Resolution, actions taken (minimum 2 panels)
-
-3. Clarity Rules
-
-- **MANDATORY: Create at least SIX (6) panels minimum.** Never create fewer than six panels.
-- Every speech bubble must contain a clear speaker label.
-- Equipment must be referenced consistently with the same name.
-- Root causes must be personified or visually represented.
-- Actions taken must appear explicitly as character actions or system actions.
-- No vague references ("someone," "a device," "the team"). Everything must be named.
-
-4. Final Deliverables
-
-Your output must include:
-
-- Short Summary (1 paragraph)
-- Character & Equipment Table
-- Full Panel-by-Panel Comic Script
-
-Visual Style Guidelines:
-
-- **MANDATORY: Generate at least SIX (6) panels.** Each panel should be clearly separated with borders.
-- Use bold, dynamic comic book art style with clear panel borders
-- Arrange panels in a readable grid layout (e.g., 3x2, 2x3, or similar) to accommodate at least 6 panels
-- Apply vibrant colors typical of comic books
-- Include speech bubbles with clear text and speaker labels
-- Use narration boxes where appropriate
-- Add sound effects (SFX) in stylized text
-- Create dramatic compositions with clear visual hierarchy
-- Use comic book typography for titles and text elements
-- Ensure all text in speech bubbles and narration boxes is perfectly readable
+Keep the visual style bold, clear, and readable. Focus on creating an engaging comic book layout that visually tells the story.
 
 `,
   random: `${GENERAL_IMAGE_PROMPT}
@@ -847,6 +779,10 @@ export async function processImageRequest(
       // Structure 1: data.data[0] (OpenAI-style)
       if (data.data && Array.isArray(data.data) && data.data.length > 0) {
         imageData = data.data[0];
+        // Handle case where b64_json might be an empty array
+        if (imageData.b64_json && Array.isArray(imageData.b64_json) && imageData.b64_json.length === 0) {
+          imageData.b64_json = null;
+        }
       }
       // Structure 2: data.candidates?.[0]?.content?.parts?.[0] (Gemini-style)
       else if (data.candidates && Array.isArray(data.candidates) && data.candidates.length > 0) {
@@ -887,12 +823,29 @@ export async function processImageRequest(
 
       // Return image URL or base64 content
       // Handle both OpenAI format (b64_json) and Gemini format (data field)
+      // Filter out empty arrays - convert to null
+      let b64Data = imageData.b64_json || imageData.data || null;
+      if (Array.isArray(b64Data) && b64Data.length === 0) {
+        b64Data = null;
+      }
+      
       const result = {
         url: imageData.url || null,
-        b64_json: imageData.b64_json || imageData.data || null,
+        b64_json: b64Data,
         revised_prompt: imageData.revised_prompt || null,
         mimeType: imageData.mimeType || null,
       };
+      
+      // Final validation - must have either url or b64_json
+      if (!result.url && !result.b64_json) {
+        const errorDetails = isDevelopment 
+          ? ` Response structure: ${JSON.stringify(Object.keys(data || {})).substring(0, 200)}, imageData keys: ${JSON.stringify(Object.keys(imageData || {}))}`
+          : '';
+        return {
+          success: false,
+          error: `No valid image data found in response (url and b64_json are both null/empty).${errorDetails}`,
+        };
+      }
 
       // Performance: Use shared timing utility
       const timing = buildTimingInfo(startTime);
