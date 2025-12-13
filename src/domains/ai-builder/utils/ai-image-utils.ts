@@ -249,6 +249,8 @@ Expressive line quality and shading.
 
 For every prompt:
 
+Use white background for all sketches.
+
 Use sketch-like line work and hatching.
 
 Apply hand-drawn textures and strokes.
@@ -274,6 +276,8 @@ Artistic
 Organic
 
 Expressive
+
+White background
 
 `,
   iconic: `${GENERAL_IMAGE_PROMPT}

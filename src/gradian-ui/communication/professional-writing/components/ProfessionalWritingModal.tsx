@@ -139,6 +139,7 @@ export function ProfessionalWritingModal({
                 { id: 'professional', value: 'professional', label: 'Professional' },
                 { id: 'casual', value: 'casual', label: 'Casual' },
                 { id: 'translate', value: 'translate', label: 'Translate' },
+                { id: 'summarizer', value: 'summarizer', label: 'Summarizer' },
                 { id: 'solution-advisor', value: 'solution-advisor', label: 'Solution Advisor' },
               ]}
             />
