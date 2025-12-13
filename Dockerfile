@@ -1,7 +1,7 @@
 # =============================================================================
 # Build stage
 # =============================================================================
-FROM node:20-slim AS builder
+FROM reg.cinnagen.com:8083/node:20-slim AS builder
 
 # Accept build-time env vars needed for client bundle
 ARG NEXT_PUBLIC_ENCRYPTION_KEY
@@ -40,7 +40,7 @@ RUN npm run build
 # =============================================================================
 # Production stage
 # =============================================================================
-FROM node:20-slim AS runner
+FROM reg.cinnagen.com:8083/node:20-slim AS runner
 
 WORKDIR /app
 
