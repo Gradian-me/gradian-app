@@ -434,6 +434,119 @@ export const proxySchemaRequest = async (
 
   const targetUrl = `${baseUrl}${targetPathWithQuery}`;
 
+  // Extract tenant domain BEFORE creating new Headers object to ensure we check original request
+  // IMPORTANT: Tenant domain must come from the browser/app domain, NOT from backend service URLs
+  // Flow:
+  // 1. Internal Next.js API requests (from data-loader.ts) include x-tenant-domain header
+  // 2. External backend proxy gets x-tenant-domain from incoming request header OR extracts from browser/app DNS
+  // 3. External backend proxy forwards x-tenant-domain to external backend
+  //
+  // Priority: x-tenant-domain header (from internal request) → extract from browser/app host DNS
+  let tenantDomain: string | undefined;
+  
+  // Log all relevant headers for debugging tenant domain extraction
+  const xTenantDomainHeader = request.headers.get('x-tenant-domain');
+  const xTenantDomainHeaderUpper = request.headers.get('X-Tenant-Domain');
+  const xForwardedHost = request.headers.get('x-forwarded-host');
+  const hostHeader = request.headers.get('host');
+  const nextUrlHostname = request.nextUrl?.hostname;
+  
+  loggingCustom(
+    LogType.CALL_BACKEND,
+    'debug',
+    `[Tenant Domain Extraction] Headers: x-tenant-domain="${xTenantDomainHeader || xTenantDomainHeaderUpper || '(not set)'}", x-forwarded-host="${xForwardedHost || '(not set)'}", host="${hostHeader || '(not set)'}", nextUrl.hostname="${nextUrlHostname || '(not set)'}"`
+  );
+  
+  // First, check if x-tenant-domain is already in the incoming request
+  // This header comes from the browser/app domain, not from backend URLs
+  // IMPORTANT: Normalize it - extract hostname if it's a URL, or use as-is if it's already a hostname
+  const existingTenantHeader = xTenantDomainHeader || xTenantDomainHeaderUpper;
+  
+  if (existingTenantHeader) {
+    const tenantValue = existingTenantHeader.trim();
+    try {
+      // If it's a URL (starts with http:// or https://), extract hostname
+      if (tenantValue.startsWith('http://') || tenantValue.startsWith('https://')) {
+        const url = new URL(tenantValue);
+        tenantDomain = url.hostname.toLowerCase();
+        loggingCustom(
+          LogType.CALL_BACKEND,
+          'info',
+          `[Tenant Domain Extraction] Using x-tenant-domain header (extracted hostname from URL): ${tenantDomain}`
+        );
+      } else {
+        // If it's already a hostname, use it directly (but normalize to lowercase)
+        tenantDomain = tenantValue.toLowerCase();
+        loggingCustom(
+          LogType.CALL_BACKEND,
+          'info',
+          `[Tenant Domain Extraction] Using x-tenant-domain header (hostname): ${tenantDomain}`
+        );
+      }
+    } catch {
+      // If URL parsing fails, treat as hostname
+      tenantDomain = tenantValue.toLowerCase();
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'info',
+        `[Tenant Domain Extraction] Using x-tenant-domain header (as hostname after parse error): ${tenantDomain}`
+      );
+    }
+  } else {
+    // Fallback: Extract from browser/app request host DNS (NOT from backend service URLs)
+    // IMPORTANT: Prioritize x-forwarded-host and host header over nextUrl.hostname
+    // because nextUrl.hostname may be localhost for internal fetches, but the headers
+    // contain the original browser domain
+    let rawHost = '';
+    if (xForwardedHost) {
+      rawHost = xForwardedHost;
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'debug',
+        `[Tenant Domain Extraction] Using x-forwarded-host: ${rawHost}`
+      );
+    } else if (hostHeader) {
+      rawHost = hostHeader;
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'debug',
+        `[Tenant Domain Extraction] Using host header: ${rawHost}`
+      );
+    } else if (nextUrlHostname) {
+      rawHost = nextUrlHostname;
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'debug',
+        `[Tenant Domain Extraction] Using nextUrl.hostname: ${rawHost}`
+      );
+    }
+    
+    const normalizedHost = rawHost.trim().toLowerCase().split(':')[0];
+    
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'debug',
+      `[Tenant Domain Extraction] Extracted host="${rawHost}", normalized="${normalizedHost}"`
+    );
+    
+    // Only use if we have a real domain (not localhost/internal)
+    if (normalizedHost && normalizedHost !== 'localhost' && normalizedHost !== '127.0.0.1') {
+      tenantDomain = normalizedHost;
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'info',
+        `[Tenant Domain Extraction] Using extracted tenant domain from DNS: ${tenantDomain}`
+      );
+    } else {
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'warn',
+        `[Tenant Domain Extraction] Skipping localhost/internal hostname: ${normalizedHost || '(empty)'}`
+      );
+    }
+    // Note: If localhost, tenant domain is undefined - this is correct as localhost has no tenant context
+  }
+
   const headers = new Headers(request.headers);
   // Remove hop-by-hop headers that shouldn't be forwarded
   // These headers are connection-specific and cause issues in Docker/proxy environments
@@ -444,6 +557,23 @@ export const proxySchemaRequest = async (
   headers.delete('transfer-encoding');
   headers.delete('te');
   headers.delete('trailer');
+
+  // Set x-tenant-domain header if we extracted it (either from header or DNS)
+  if (tenantDomain) {
+    headers.set('x-tenant-domain', tenantDomain);
+  }
+
+  // At this point, headers object has x-tenant-domain set (either from incoming header or DNS)
+  // This will be forwarded to the external backend in the fetch call below
+
+  // Log final tenant domain result
+  loggingCustom(
+    LogType.CALL_BACKEND,
+    tenantDomain ? 'info' : 'warn',
+    tenantDomain
+      ? `[Tenant Domain Extraction] Final result: x-tenant-domain="${tenantDomain}" will be forwarded to backend`
+      : '[Tenant Domain Extraction] Final result: No tenant domain extracted; x-tenant-domain header will NOT be set. Backend may reject request or use fallback.'
+  );
 
   // Extract authorization token and ensure it's in Bearer format
   // Backend APIs require Authorization: Bearer <token> header

@@ -48,10 +48,33 @@ function buildProxyHeadersEdge(request: NextRequest): HeadersInit {
     headers.authorization = authorizationHeader;
   }
 
+  // Extract tenant domain for forwarding to external backend
+  // Flow:
+  // 1. Internal Next.js API requests include x-tenant-domain header
+  // 2. External backend proxy gets x-tenant-domain from incoming request header OR extracts from DNS
+  // 3. External backend proxy forwards x-tenant-domain to external backend
+  //
+  // Priority: x-tenant-domain header (from internal request) → extract from host DNS
   const tenantDomainHeader = request.headers.get('x-tenant-domain');
   if (tenantDomainHeader) {
     headers['x-tenant-domain'] = tenantDomainHeader;
+  } else {
+    // Fallback: Derive from browser/app request hostname (DNS-based multi-tenant)
+    // IMPORTANT: Tenant domain comes from browser/app domain, NOT from backend service URLs
+    // Prefer x-forwarded-host (from reverse proxy) → host header → nextUrl hostname
+    const forwardedHost = request.headers.get('x-forwarded-host');
+    const hostHeader = request.headers.get('host');
+    const rawHost = forwardedHost || hostHeader || request.nextUrl?.hostname || '';
+    const normalizedHost = rawHost.trim().toLowerCase().split(':')[0];
+    // Only set if we have a real domain (not localhost/internal)
+    // Note: localhost means no tenant context - this is correct
+    if (normalizedHost && normalizedHost !== 'localhost' && normalizedHost !== '127.0.0.1') {
+      headers['x-tenant-domain'] = normalizedHost;
+    }
   }
+
+  // At this point, headers object has x-tenant-domain set (either from incoming header or DNS)
+  // This will be forwarded to the external backend
 
   return headers;
 }
@@ -137,7 +160,7 @@ async function attemptTokenRefresh(
   refreshToken: string,
   loginLocally: boolean,
   request: NextRequest
-): Promise<{ success: boolean; accessToken?: string; error?: string }> {
+): Promise<{ success: boolean; accessToken?: string; expiresIn?: number; error?: string }> {
   try {
     if (loginLocally) {
       const baseUrl = request.nextUrl.origin;
@@ -182,6 +205,7 @@ async function attemptTokenRefresh(
         return {
           success: true,
           accessToken: data.accessToken,
+          expiresIn: data.expiresIn, // Include expiresIn if provided by refresh endpoint
         };
       }
 
@@ -219,30 +243,61 @@ async function attemptTokenRefresh(
         });
 
         const responseTime = Date.now() - startTime;
+        
+        // Check for Set-Cookie headers that might delete cookies
+        const setCookieHeaders = response.headers.get('set-cookie');
+        const allSetCookies = response.headers.getSetCookie?.() || [];
         loggingCustom(LogType.LOGIN_LOG, 'info', `Response received: ${JSON.stringify({
           status: response.status,
           statusText: response.statusText,
           responseTime: `${responseTime}ms`,
-          headers: Object.fromEntries(response.headers.entries()),
+          hasSetCookieHeader: !!setCookieHeaders,
+          setCookieCount: allSetCookies.length,
+          setCookieHeaders: allSetCookies.map(c => c.substring(0, 100)), // Log first 100 chars of each
         })}`);
 
-        const data = await response.json();
+        let data: any = null;
+        try {
+          const responseText = await response.text();
+          loggingCustom(LogType.LOGIN_LOG, 'info', `External refresh response received: status=${response.status}, content-length=${responseText.length}`);
+          
+          if (responseText) {
+            try {
+              data = JSON.parse(responseText);
+              loggingCustom(LogType.LOGIN_LOG, 'info', `External refresh response parsed successfully`);
+            } catch (parseError) {
+              loggingCustom(LogType.LOGIN_LOG, 'error', `Failed to parse refresh response as JSON: ${responseText.substring(0, 500)}`);
+              data = null;
+            }
+          }
+        } catch (error) {
+          loggingCustom(LogType.LOGIN_LOG, 'error', `Failed to read refresh response: ${error instanceof Error ? error.message : String(error)}`);
+        }
+        
+        // Handle both nested (tokens.accessToken) and flat (accessToken) response formats
+        const accessToken = data?.tokens?.accessToken || data?.accessToken;
+        const expiresIn = data?.tokens?.expiresIn || data?.expiresIn;
+        const hasAccessToken = data?.hasAccessToken !== undefined ? data.hasAccessToken : (!!accessToken);
+        
         loggingCustom(LogType.LOGIN_LOG, 'info', `Response data: ${JSON.stringify({
-          success: data.success,
-          hasAccessToken: data.hasAccessToken,
-          accessToken: !!data.accessToken,
-          error: data.error,
-          message: data.message,
+          success: data?.success,
+          hasAccessToken: hasAccessToken,
+          accessToken: !!accessToken,
+          hasNestedTokens: !!data?.tokens,
+          expiresIn: expiresIn,
+          error: data?.error,
+          message: data?.message,
         })}`);
 
         if (response.ok) {
-          if (data.success && data.accessToken) {
+          if (data.success && accessToken) {
             loggingCustom(LogType.LOGIN_LOG, 'info', '========== REFRESH TOKEN SUCCESS (EXTERNAL) - New token provided ==========');
             return {
               success: true,
-              accessToken: data.accessToken,
+              accessToken: accessToken,
+              expiresIn: expiresIn, // Include expiresIn if provided by external service
             };
-          } else if (data.hasAccessToken === true) {
+          } else if (hasAccessToken === true) {
             loggingCustom(LogType.LOGIN_LOG, 'info', '========== REFRESH TOKEN SUCCESS (EXTERNAL) - Access token already valid ==========');
             return {
               success: true,
@@ -251,15 +306,35 @@ async function attemptTokenRefresh(
           }
         }
 
-        loggingCustom(LogType.LOGIN_LOG, 'warn', '========== REFRESH TOKEN FAILED (EXTERNAL) ==========');
-        loggingCustom(LogType.LOGIN_LOG, 'warn', `Failure reason: ${JSON.stringify({
+        loggingCustom(LogType.LOGIN_LOG, 'error', '========== REFRESH TOKEN FAILED (EXTERNAL) ==========');
+        loggingCustom(LogType.LOGIN_LOG, 'error', `Failure reason: ${JSON.stringify({
           responseOk: response.ok,
-          hasSuccess: !!data.success,
-          hasAccessToken: data.hasAccessToken,
-          hasAccessTokenField: !!data.accessToken,
-          error: data.error,
-          message: data.message,
+          responseStatus: response.status,
+          responseStatusText: response.statusText,
+          hasSuccess: !!data?.success,
+          hasAccessToken: hasAccessToken,
+          hasAccessTokenField: !!accessToken,
+          hasNestedTokens: !!data?.tokens,
+          error: data?.error,
+          message: data?.message,
+          fullResponse: data ? JSON.stringify(data, null, 2) : 'null',
         })}`);
+        loggingCustom(LogType.LOGIN_LOG, 'error', `Refresh URL: ${refreshUrl}`);
+        loggingCustom(LogType.LOGIN_LOG, 'error', `Refresh token (first 20 chars): ${refreshToken.substring(0, 20)}...`);
+        
+        // Log Set-Cookie headers from failed response to debug cookie deletion
+        if (allSetCookies.length > 0) {
+          loggingCustom(LogType.LOGIN_LOG, 'warn', `WARNING: External service sent ${allSetCookies.length} Set-Cookie headers on refresh failure. These will NOT be forwarded to browser.`);
+          allSetCookies.forEach((cookie, idx) => {
+            const isDeletion = cookie.includes('Max-Age=0') || 
+                               cookie.includes('Expires=Thu, 01 Jan 1970') ||
+                               cookie.match(/^[^=]+=\s*;\s*Expires=/);
+            loggingCustom(LogType.LOGIN_LOG, 'warn', `Set-Cookie ${idx + 1}: ${isDeletion ? 'DELETION' : 'SET'} - ${cookie.substring(0, 150)}`);
+          });
+        }
+        
+        // Return failure WITHOUT forwarding any Set-Cookie headers
+        // This ensures cookies are NOT deleted even if external service sends deletion headers
         return {
           success: false,
           error: data.error || data.message || 'Token refresh failed',
@@ -506,14 +581,16 @@ export async function proxy(request: NextRequest) {
         if (refreshResult.accessToken) {
           loggingCustom(LogType.LOGIN_LOG, 'info', 'Token refresh successful, setting new access token');
           const response = NextResponse.next();
+          // Use expiresIn from refresh response if available, otherwise use config default
+          const tokenMaxAge = refreshResult.expiresIn ?? ACCESS_TOKEN_EXPIRY;
           response.cookies.set(ACCESS_TOKEN_COOKIE, refreshResult.accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
-            maxAge: ACCESS_TOKEN_EXPIRY,
+            maxAge: tokenMaxAge,
             path: '/',
           });
-          loggingCustom(LogType.LOGIN_LOG, 'info', 'New access token cookie set, allowing request');
+          loggingCustom(LogType.LOGIN_LOG, 'info', `New access token cookie set with maxAge: ${tokenMaxAge}, allowing request`);
           return response;
         } else {
           loggingCustom(LogType.LOGIN_LOG, 'info', 'External service confirmed access token is valid, allowing request');
@@ -525,13 +602,28 @@ export async function proxy(request: NextRequest) {
           loggingCustom(LogType.LOGIN_LOG, 'warn', 'Already redirected from login, allowing request to prevent loop');
           return NextResponse.next();
         }
-        loggingCustom(LogType.LOGIN_LOG, 'warn', `Token refresh failed: ${refreshResult.error || 'Unknown error'}`);
-        loggingCustom(LogType.LOGIN_LOG, 'info', 'Redirecting to login');
+        loggingCustom(LogType.LOGIN_LOG, 'error', `========== TOKEN REFRESH FAILED - REDIRECTING TO LOGIN ==========`);
+        loggingCustom(LogType.LOGIN_LOG, 'error', `Refresh error: ${refreshResult.error || 'Unknown error'}`);
+        loggingCustom(LogType.LOGIN_LOG, 'error', `Request path: ${pathname}`);
+        loggingCustom(LogType.LOGIN_LOG, 'error', `Request method: ${request.method}`);
+        loggingCustom(LogType.LOGIN_LOG, 'error', `Request URL: ${request.url}`);
+        loggingCustom(LogType.LOGIN_LOG, 'error', `Referer: ${referer || 'none'}`);
+        loggingCustom(LogType.LOGIN_LOG, 'error', `User-Agent: ${request.headers.get('user-agent') || 'none'}`);
+        loggingCustom(LogType.LOGIN_LOG, 'info', 'Redirecting to login - preserving refresh_token cookie');
+        
+        // Create redirect response WITHOUT modifying cookies
+        // This ensures refresh_token cookie is preserved even when redirecting to login
         const loginUrl = new URL('/authentication/login', request.url);
         const encryptedReturnUrl = encryptReturnUrl(pathname);
         loginUrl.searchParams.set('returnUrl', encryptedReturnUrl);
         loggingCustom(LogType.LOGIN_LOG, 'info', `Redirect URL: ${loginUrl.toString()}`);
-        return NextResponse.redirect(loginUrl);
+        loggingCustom(LogType.LOGIN_LOG, 'info', `Redirect URL: ${loginUrl.toString()}`);
+        
+        // Return redirect without touching cookies - preserve existing cookies
+        // The refresh_token should remain intact for future refresh attempts
+        const redirectResponse = NextResponse.redirect(loginUrl);
+        // Explicitly do NOT delete or modify any cookies here
+        return redirectResponse;
       }
     }
 

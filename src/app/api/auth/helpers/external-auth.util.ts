@@ -56,10 +56,33 @@ export function buildProxyHeaders(request: NextRequest): HeadersInit {
     headers.authorization = authorizationHeader;
   }
 
+  // Extract tenant domain for forwarding to external backend
+  // Flow:
+  // 1. Internal Next.js API requests include x-tenant-domain header
+  // 2. External backend proxy gets x-tenant-domain from incoming request header OR extracts from DNS
+  // 3. External backend proxy forwards x-tenant-domain to external backend
+  //
+  // Priority: x-tenant-domain header (from internal request) → extract from host DNS
   const tenantDomainHeader = request.headers.get('x-tenant-domain');
   if (tenantDomainHeader) {
     headers['x-tenant-domain'] = tenantDomainHeader;
+  } else {
+    // Fallback: Derive from browser/app request hostname (DNS-based multi-tenant)
+    // IMPORTANT: Tenant domain comes from browser/app domain, NOT from backend service URLs
+    // Prefer x-forwarded-host (from reverse proxy) → host header → nextUrl hostname
+    const forwardedHost = request.headers.get('x-forwarded-host');
+    const hostHeader = request.headers.get('host');
+    const rawHost = forwardedHost || hostHeader || request.nextUrl?.hostname || '';
+    const normalizedHost = rawHost.trim().toLowerCase().split(':')[0];
+    // Only set if we have a real domain (not localhost/internal)
+    // Note: localhost means no tenant context - this is correct
+    if (normalizedHost && normalizedHost !== 'localhost' && normalizedHost !== '127.0.0.1') {
+      headers['x-tenant-domain'] = normalizedHost;
+    }
   }
+
+  // At this point, headers object has x-tenant-domain set (either from incoming header or DNS)
+  // This will be forwarded to the external backend
 
   return headers;
 }
@@ -74,7 +97,15 @@ export function forwardSetCookieHeaders(upstream: Response, downstream: NextResp
   if (setCookieValues?.length) {
     setCookieValues.forEach((cookie) => {
       if (cookie) {
-        downstream.headers.append('set-cookie', cookie);
+        // Filter out cookie deletion headers (cookies with empty value or expires in past)
+        // Only forward cookies that are being set, not deleted
+        const isDeletion = cookie.includes('Max-Age=0') || 
+                           cookie.includes('Expires=Thu, 01 Jan 1970') ||
+                           cookie.match(/^[^=]+=\s*;\s*Expires=/);
+        
+        if (!isDeletion) {
+          downstream.headers.append('set-cookie', cookie);
+        }
       }
     });
   }

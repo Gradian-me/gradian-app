@@ -4,7 +4,7 @@
 
 import 'server-only';
 
-import { cookies } from 'next/headers';
+import { cookies, headers as nextHeaders } from 'next/headers';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
@@ -41,6 +41,135 @@ async function getCookieHeader(): Promise<string | undefined> {
 }
 
 /**
+ * Get tenant domain for server-side requests
+ * Extracts tenant domain from DNS/hostname in request headers only
+ * This ensures multi-tenant deployments work correctly based on the actual DNS domain
+ */
+async function getTenantDomainForServerFetch(): Promise<string | undefined> {
+  // Extract from incoming request headers (DNS-based multi-tenant)
+  // IMPORTANT: This extracts from the ORIGINAL browser request headers, not from internal fetch URLs
+  // This ensures internal server-side fetches include the correct tenant domain from the browser
+  try {
+    const hMaybe = nextHeaders();
+    
+    // Check if headers() returned a Promise (async context) - await it
+    let h: any;
+    if (hMaybe && typeof (hMaybe as any).then === 'function') {
+      // In async context, await the Promise
+      h = await (hMaybe as Promise<any>);
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'debug',
+        `[getTenantDomainForServerFetch] headers() returned Promise - awaited successfully`
+      );
+    } else {
+      h = hMaybe as any;
+    }
+    if (!h || typeof h.get !== 'function') {
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'debug',
+        `[getTenantDomainForServerFetch] Headers not available or invalid`
+      );
+      return undefined;
+    }
+    
+    // Prefer x-forwarded-host (set by reverse proxy/load balancer)
+    // Then fall back to host header
+    const forwardedHost = h.get('x-forwarded-host');
+    const hostHeader = h.get('host');
+    const xTenantDomain = h.get('x-tenant-domain');
+    const host = (forwardedHost || hostHeader || '').trim();
+    
+    // Log for debugging
+    loggingCustom(
+      LogType.SCHEMA_LOADER,
+      'debug',
+      `[getTenantDomainForServerFetch] Headers: x-tenant-domain="${xTenantDomain || '(not set)'}", x-forwarded-host="${forwardedHost || '(not set)'}", host="${hostHeader || '(not set)'}"`
+    );
+    
+    // First check if x-tenant-domain is already set (from a previous internal request)
+    if (xTenantDomain) {
+      // Extract hostname from x-tenant-domain if it contains a URL
+      const tenantValue = xTenantDomain.trim();
+      try {
+        // If it's a URL, extract hostname
+        if (tenantValue.startsWith('http://') || tenantValue.startsWith('https://')) {
+          const url = new URL(tenantValue);
+          const hostname = url.hostname.toLowerCase();
+          if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+            loggingCustom(
+              LogType.SCHEMA_LOADER,
+              'info',
+              `[getTenantDomainForServerFetch] Using x-tenant-domain header (extracted hostname from URL): ${hostname}`
+            );
+            return hostname;
+          }
+        } else {
+          // If it's just a hostname, use it directly
+          const hostname = tenantValue.toLowerCase();
+          if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+            loggingCustom(
+              LogType.SCHEMA_LOADER,
+              'info',
+              `[getTenantDomainForServerFetch] Using x-tenant-domain header: ${hostname}`
+            );
+            return hostname;
+          }
+        }
+      } catch {
+        // Invalid URL format, try as hostname
+        const hostname = tenantValue.toLowerCase();
+        if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+          loggingCustom(
+            LogType.SCHEMA_LOADER,
+            'info',
+            `[getTenantDomainForServerFetch] Using x-tenant-domain header (as hostname): ${hostname}`
+          );
+          return hostname;
+        }
+      }
+    }
+    
+    // Extract tenant domain from host headers
+    if (host) {
+      // Extract just the hostname (remove port and protocol if present)
+      const hostname = host.split(':')[0].split('/')[0].toLowerCase();
+      // Skip localhost/127.0.0.1 as those are internal calls without tenant context
+      if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+        loggingCustom(
+          LogType.SCHEMA_LOADER,
+          'info',
+          `[getTenantDomainForServerFetch] Using extracted hostname from headers: ${hostname}`
+        );
+        return hostname;
+      } else {
+        loggingCustom(
+          LogType.SCHEMA_LOADER,
+          'warn',
+          `[getTenantDomainForServerFetch] Skipping localhost/internal hostname: ${hostname || '(empty)'}`
+        );
+      }
+    }
+  } catch (error) {
+    // headers() not available, called outside request scope, or other error
+    // This can happen during build time or when headers() is not available in the context
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    
+    // Only log if it's not the expected "outside request scope" error (to reduce noise)
+    if (!errorMsg.includes('outside a request scope') && !errorMsg.includes('dynamic API')) {
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'warn',
+        `[getTenantDomainForServerFetch] Error extracting tenant domain: ${errorMsg}`
+      );
+    }
+  }
+
+  return undefined;
+}
+
+/**
  * Get the API URL for internal server-side calls
  * Server-side fetch requires absolute URLs, so we construct them here
  */
@@ -60,9 +189,43 @@ function getApiUrl(apiPath: string): string {
   // IMPORTANT: do NOT use NEXTAUTH_URL here because it may point to an external
   // auth host (e.g., https://octa.../auth) which causes 401s when we call our
   // own API routes. Always prefer this app's origin.
-  let baseUrl =
-    process.env.INTERNAL_API_BASE_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
+  // Priority: Extract from request DNS → INTERNAL_API_BASE_URL env → localhost
+  let baseUrl: string | undefined;
+
+  // PRIORITY 1: Extract from incoming request headers (DNS-based for multi-tenant)
+  // This ensures the internal API URL matches the actual domain being accessed
+  try {
+    const hMaybe = nextHeaders();
+    // Next.js may return a Promise in some contexts; skip if so to avoid sync dynamic API error
+    const h =
+      hMaybe && typeof (hMaybe as any).then !== 'function'
+        ? (hMaybe as any)
+        : null;
+    if (h && typeof h.get === 'function') {
+      const forwardedHost = h.get('x-forwarded-host');
+      const hostHeader = h.get('host');
+      const host = (forwardedHost || hostHeader || '').trim();
+      // Extract protocol from headers or default to https for production
+      const proto = h.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : 'http');
+      if (host) {
+        // Extract just the hostname (remove port if present in forwarded-host)
+        const hostname = host.split(':')[0];
+        // Only use real domains, not localhost (which would be handled by fallback)
+        if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+          baseUrl = `${proto}://${hostname}`;
+        }
+      }
+    }
+  } catch {
+    // headers() may not be available in all contexts; fallback below
+  }
+
+  // PRIORITY 2: Fallback to environment variable (if DNS extraction failed)
+  if (!baseUrl) {
+    baseUrl =
+      process.env.INTERNAL_API_BASE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
+  }
 
   if (!baseUrl) {
     if (!isBuildTime) {
@@ -188,6 +351,20 @@ export async function loadData<T = any>(
         };
         if (cookieHeader) {
           fetchHeaders['cookie'] = cookieHeader;
+        }
+
+        // Set x-tenant-domain header for internal Next.js API requests
+        // Flow:
+        // 1. Extract tenant domain from request DNS (x-forwarded-host or host header)
+        // 2. Include x-tenant-domain header in internal Next.js API request
+        // 3. Next.js API proxy functions will forward this header to external backend
+        // The internal fetch URL may be localhost, but the tenant comes from the original request DNS
+        const tenantDomain = await getTenantDomainForServerFetch();
+        if (tenantDomain) {
+          fetchHeaders['x-tenant-domain'] = tenantDomain;
+          loggingCustom(logType, 'debug', `[${instanceId}] Adding x-tenant-domain header: ${tenantDomain} for internal fetch to ${fetchUrl}`);
+        } else {
+          loggingCustom(logType, 'warn', `[${instanceId}] No tenant domain extracted from DNS for internal fetch to ${fetchUrl}`);
         }
 
         const response = await fetch(fetchUrl, {
@@ -340,6 +517,13 @@ export async function loadDataById<T = any>(
         fetchHeaders['cookie'] = cookieHeader;
       }
 
+      // Set x-tenant-domain header for internal Next.js API requests
+      // This header will be forwarded to external backend by proxy functions
+      const tenantDomain = await getTenantDomainForServerFetch();
+      if (tenantDomain) {
+        fetchHeaders['x-tenant-domain'] = tenantDomain;
+      }
+
       const response = await fetch(fetchUrl, {
         cache: 'no-store',
         headers: fetchHeaders,
@@ -458,6 +642,12 @@ export async function loadDataById<T = any>(
     };
     if (cookieHeader) {
       fetchHeaders['cookie'] = cookieHeader;
+    }
+
+    // Include tenant domain header for server-side internal fetches
+    const tenantDomain = await getTenantDomainForServerFetch();
+    if (tenantDomain) {
+      fetchHeaders['x-tenant-domain'] = tenantDomain;
     }
 
     const response = await fetch(fetchUrl, {
