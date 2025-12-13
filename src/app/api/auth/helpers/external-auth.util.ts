@@ -67,13 +67,15 @@ export function buildProxyHeaders(request: NextRequest): HeadersInit {
   if (tenantDomainHeader) {
     headers['x-tenant-domain'] = tenantDomainHeader;
   } else {
-    // Fallback: Derive from request hostname (DNS-based multi-tenant)
+    // Fallback: Derive from browser/app request hostname (DNS-based multi-tenant)
+    // IMPORTANT: Tenant domain comes from browser/app domain, NOT from backend service URLs
     // Prefer x-forwarded-host (from reverse proxy) → host header → nextUrl hostname
     const forwardedHost = request.headers.get('x-forwarded-host');
     const hostHeader = request.headers.get('host');
     const rawHost = forwardedHost || hostHeader || request.nextUrl?.hostname || '';
     const normalizedHost = rawHost.trim().toLowerCase().split(':')[0];
     // Only set if we have a real domain (not localhost/internal)
+    // Note: localhost means no tenant context - this is correct
     if (normalizedHost && normalizedHost !== 'localhost' && normalizedHost !== '127.0.0.1') {
       headers['x-tenant-domain'] = normalizedHost;
     }
