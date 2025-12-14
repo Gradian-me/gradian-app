@@ -64,7 +64,7 @@ export function AccessDenied({
               className="relative"
             >
               <div className="absolute inset-0 bg-red-100 rounded-full blur-md opacity-50" />
-              <div className="relative bg-linear-to-br from-red-50 to-red-50 p-8 rounded-full w-32 h-32 flex items-center justify-center">
+              <div className="relative bg-gradient-to-br from-red-50 to-red-50 p-8 rounded-full w-32 h-32 flex items-center justify-center">
                 <ShieldX className="h-16 w-16 text-red-600" strokeWidth={1.5} />
               </div>
             </motion.div>

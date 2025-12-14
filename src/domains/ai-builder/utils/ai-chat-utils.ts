@@ -16,6 +16,7 @@ import {
   sanitizeErrorMessage,
   safeJsonParse,
   validateAgentId,
+  cleanMarkdownResponse,
 } from './ai-security-utils';
 import {
   createAbortController,
@@ -346,6 +347,9 @@ export async function processChatRequest(
             error: 'Failed to extract valid JSON from AI response',
           };
         }
+      } else if (agent.requiredOutputFormat === 'string') {
+        // Clean markdown response by removing meta-commentary prefixes (like "markdown" keywords)
+        processedResponse = cleanMarkdownResponse(aiResponseContent);
       }
 
       return {

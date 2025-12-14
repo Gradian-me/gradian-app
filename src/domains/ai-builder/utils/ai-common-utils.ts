@@ -102,7 +102,7 @@ export function validateAgentConfig(agent: any): { valid: boolean; error?: strin
     return { valid: false, error: 'Agent ID is required' };
   }
 
-  if (!agent.agentType || !['chat', 'voice-transcription', 'image-generation'].includes(agent.agentType)) {
+  if (!agent.agentType || !['chat', 'voice-transcription', 'image-generation', 'video-generation'].includes(agent.agentType)) {
     return { valid: false, error: 'Invalid agent type' };
   }
 

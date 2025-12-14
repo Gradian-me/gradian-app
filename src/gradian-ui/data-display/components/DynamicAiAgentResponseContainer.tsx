@@ -4,7 +4,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CardContent, CardHeader, CardTitle, CardWrapper } from '../card/components/CardWrapper';
 import { QuickAction, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '../../shared/utils';
@@ -19,7 +19,11 @@ import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/Ma
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { TableWrapper } from '@/gradian-ui/data-display/table/components/TableWrapper';
 import { ImageViewer } from '@/gradian-ui/form-builder/form-elements/components/ImageViewer';
+import { VideoViewer } from '@/gradian-ui/form-builder/form-elements/components/VideoViewer';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
+import { VoicePoweredOrb } from '@/components/ui/voice-powered-orb';
+import { TextSwitcher } from '@/components/ui/text-switcher';
+import { cleanMarkdownResponse } from '@/domains/ai-builder/utils/ai-security-utils';
 
 export interface DynamicAiAgentResponseContainerProps {
   action: QuickAction;
@@ -173,11 +177,55 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     }
   }, [aiResponse, agent]);
 
+  // Parse video data if format is video
+  const videoData = useMemo(() => {
+    if (!aiResponse || !agent) return null;
+    
+    const agentFormatValue = agent.requiredOutputFormat as string | undefined;
+    const isVideoFormat = agentFormatValue === 'video';
+    
+    // Only try to parse as JSON if agent format is video or content looks like JSON
+    const trimmedContent = aiResponse.trim();
+    const looksLikeJson = trimmedContent.startsWith('{') || trimmedContent.startsWith('[');
+    
+    if (!isVideoFormat && !looksLikeJson) {
+      return null;
+    }
+    
+    try {
+      const parsed = JSON.parse(aiResponse);
+      
+      // Check if response has video structure
+      const hasVideoStructure = parsed && typeof parsed === 'object' && parsed.video && 
+        (parsed.video.video_id || parsed.video.url || parsed.video.file_path);
+      
+      if (!isVideoFormat && !hasVideoStructure) {
+        return null;
+      }
+      
+      if (parsed && typeof parsed === 'object' && parsed.video) {
+        const vid = parsed.video;
+        // Return video data if we have video_id, url, or file_path
+        if (vid && (vid.video_id || vid.url || vid.file_path)) {
+          return vid;
+        }
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }, [aiResponse, agent]);
+
   // Determine render format
   const shouldRenderImage = useMemo(() => {
     const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
     return agentFormatValue === 'image' || !!imageData;
   }, [agent?.requiredOutputFormat, imageData]);
+
+  const shouldRenderVideo = useMemo(() => {
+    const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
+    return agentFormatValue === 'video' || !!videoData;
+  }, [agent?.requiredOutputFormat, videoData]);
 
   const shouldRenderTable = agent?.requiredOutputFormat === 'table';
   const { data: tableData, isValid: isValidTable } = useMemo(() => {
@@ -504,7 +552,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
           }}
           className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm"
         >
-          <CardHeader className="relative bg-gradient-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4">
+          <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4">
             {/* Dotted background pattern */}
             <div className="absolute inset-0 opacity-10 dark:opacity-15 rounded-t-xl">
               <div
@@ -524,7 +572,22 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
             </div>
           </CardHeader>
           <CardContent className="p-6">
-            <Skeleton className="h-32 w-full" />
+            <div className="w-full h-96 relative rounded-xl overflow-hidden">
+              <VoicePoweredOrb
+                enableVoiceControl={false}
+                className="rounded-xl overflow-hidden"
+              />
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4">
+                <div className="max-w-[85%] text-center">
+                  <TextSwitcher
+                    texts={['Loading agent...', 'Preparing AI...']}
+                    className="text-violet-900 dark:text-white font-medium text-sm md:text-base px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
+                    switchInterval={3000}
+                    transitionDuration={0.5}
+                  />
+                </div>
+              </div>
+            </div>
           </CardContent>
         </CardWrapper>
       </motion.div>
@@ -561,7 +624,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
         }}
         className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm"
       >
-        <CardHeader className="relative bg-gradient-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4">
+        <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4">
           {/* Dotted background pattern */}
           <div className="absolute inset-0 opacity-10 dark:opacity-15 rounded-t-xl">
             <div
@@ -606,79 +669,40 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
           }
         >
           {showSkeleton ? (
-            <div className="w-full">
-              {(agent?.requiredOutputFormat as string | undefined) === 'image' ? (
-                // Image skeleton
-                <div className="flex justify-center items-center w-full">
-                  <div className="w-full max-w-4xl">
-                    <Skeleton className="w-full h-64 md:h-96 rounded-lg" />
-                  </div>
-                </div>
-              ) : agent?.requiredOutputFormat === 'table' ? (
-                // Table skeleton
-                <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
-                  <div className="space-y-2">
-                    {/* Table header */}
-                    <div className="flex items-center gap-4 p-4 border-b border-gray-200 dark:border-gray-700">
-                      {Array.from({ length: 4 }).map((_, i) => (
-                        <Skeleton key={`header-${i}`} className="h-4 w-24 flex-1" />
-                      ))}
-                    </div>
-                    {/* Table rows */}
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <div
-                        key={`table-row-${index}`}
-                        className="flex items-center gap-4 p-4 border-b border-gray-100 dark:border-gray-800"
-                      >
-                        {Array.from({ length: 4 }).map((_, i) => (
-                          <Skeleton key={`cell-${index}-${i}`} className="h-4 w-full flex-1" />
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : agent?.requiredOutputFormat === 'string' ? (
-                // Markdown/Text skeleton
-                <div className="space-y-4">
-                  <div className="space-y-3">
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-5/6" />
-                  </div>
-                  <div className="space-y-3 pt-4">
-                    <Skeleton className="h-5 w-2/3" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-4/5" />
-                  </div>
-                  <div className="space-y-3 pt-4">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-5/6" />
-                    <Skeleton className="h-4 w-4/6" />
-                  </div>
-                </div>
-              ) : (
-                // Code/JSON skeleton
-                <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4">
-                  <div className="space-y-2">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                      <Skeleton 
-                        key={`code-line-${i}`} 
-                        className={`h-4 ${i % 2 === 0 ? 'w-full' : i % 3 === 0 ? 'w-5/6' : 'w-4/6'}`} 
+            <AnimatePresence>
+              <motion.div
+                key="loading-orb"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="w-full h-96 relative rounded-xl overflow-hidden"
+              >
+                <VoicePoweredOrb
+                  enableVoiceControl={false}
+                  className="rounded-xl overflow-hidden"
+                />
+                {agent?.loadingTextSwitches && agent.loadingTextSwitches.length > 0 && (
+                  <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4">
+                    <div className="max-w-[85%] text-center">
+                      <TextSwitcher
+                        texts={agent.loadingTextSwitches}
+                        className="text-violet-900 dark:text-white font-medium text-sm md:text-base px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
+                        switchInterval={3000}
+                        transitionDuration={0.5}
                       />
-                    ))}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
           ) : showManualButton ? (
             <div className="flex items-center justify-center min-h-[200px]">
               <Button
                 onClick={executeAgent}
                 size="default"
                 variant="default"
-                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
+                className="bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
               >
                 <Sparkles className="h-4 w-4 me-2" />
                 Do the Magic
@@ -707,6 +731,30 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
                     initialLineNumbers={10}
                   />
                 )
+              ) : shouldRenderVideo ? (
+                videoData ? (
+                  <div className="flex justify-center items-center w-full">
+                    <div className="w-full max-w-4xl">
+                      <VideoViewer
+                        videoId={videoData.video_id || undefined}
+                        sourceUrl={videoData.url || undefined}
+                        content={videoData.file_path || undefined}
+                        value={videoData}
+                        alt="AI Generated Video"
+                        className="w-full h-auto rounded-lg"
+                        controls={true}
+                        autoplay={false}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <CodeViewer
+                    code={aiResponse}
+                    programmingLanguage="json"
+                    title="AI Generated Content"
+                    initialLineNumbers={10}
+                  />
+                )
               ) : shouldRenderTable && isValidTable && tableData.length > 0 ? (
                 <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
                   <TableWrapper
@@ -719,7 +767,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
                 </div>
               ) : agent?.requiredOutputFormat === 'string' ? (
                 <MarkdownViewer 
-                  content={aiResponse}
+                  content={cleanMarkdownResponse(aiResponse || '')}
                   showToggle={false}
                   isEditable={false}
                 />

@@ -40,6 +40,7 @@ import { ListInput } from './ListInput';
 import { TagInput } from './TagInput';
 import { LanguageSelector } from './LanguageSelector';
 import { ImageViewer } from './ImageViewer';
+import { VideoViewer } from './VideoViewer';
 
 // Support both config-based and field-based interfaces
 export interface FormElementFactoryProps extends Omit<FormElementProps, 'config' | 'touched'> {
@@ -405,6 +406,27 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           objectFit={config?.objectFit || 'contain'}
           priority={config?.priority || false}
           quality={config?.quality || 90}
+        />
+      );
+    
+    case 'video-viewer':
+      return (
+        <VideoViewer
+          config={config}
+          value={restProps.value}
+          sourceUrl={config?.sourceUrl || restProps.value?.url || restProps.value?.sourceUrl || restProps.value?.file_path}
+          content={config?.content || restProps.value?.content}
+          videoId={config?.videoId || restProps.value?.video_id || restProps.value?.videoId || restProps.value?.id}
+          alt={config?.alt || config?.videoAlt}
+          width={config?.width || '100%'}
+          height={config?.height || 'auto'}
+          className={restProps.className}
+          autoplay={config?.autoplay || false}
+          controls={config?.controls !== undefined ? config.controls : true}
+          loop={config?.loop || false}
+          muted={config?.muted || false}
+          poster={config?.poster || restProps.value?.poster}
+          playsInline={config?.playsInline !== undefined ? config.playsInline : true}
         />
       );
     

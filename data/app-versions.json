@@ -3050,5 +3050,81 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCEVIDEOGENERATOR001",
+    "timestamp": "2025-12-14T20:00:00.000Z",
+    "version": "1.27.000",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Added new 'Video Generator' AI agent in ai-agents.json for video generation capabilities",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "video-generation"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated AiBuilderResponse and AiBuilderWrapper components to support video data rendering and usage metrics",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ui",
+          "data-display"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented video validation functions in ai-security-utils for improved input handling",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "security",
+          "validation"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Enhanced DynamicAiAgentResponseContainer to include video rendering logic, improving user interaction with video content",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "ai-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Created VideoViewer component for displaying generated videos with polling and progress tracking",
+        "priority": "High",
+        "affectedDomains": [
+          "form-builder",
+          "ui",
+          "video-generation"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented video generation API routes for status checking and content fetching",
+        "priority": "High",
+        "affectedDomains": [
+          "api",
+          "video-generation"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Added video usage metrics (duration and cost) display in AI builder response",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "analytics",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

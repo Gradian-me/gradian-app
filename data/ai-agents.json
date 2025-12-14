@@ -861,6 +861,102 @@
     ]
   },
   {
+    "id": "video-generator",
+    "agentType": "video-generation",
+    "label": "Video Generator",
+    "icon": "Video",
+    "description": "Generate videos from text descriptions using AI",
+    "requiredOutputFormat": "video",
+    "model": "veo-3.1-fast-generate-preview",
+    "loadingTextSwitches": [
+      "Analyzing your prompt...",
+      "Generating your video...",
+      "Processing frames...",
+      "Refining video details...",
+      "Finalizing the video..."
+    ],
+    "renderComponents": [
+      {
+        "id": "prompt",
+        "name": "prompt",
+        "label": "Video Description",
+        "sectionId": "body",
+        "component": "textarea",
+        "aiAgentId": "professional-writing",
+        "placeholder": "Describe the video you want to generate... Be creative and detailed!",
+        "validation": {
+          "required": true,
+          "minLength": 10
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "input_reference",
+        "name": "input_reference",
+        "label": "Reference Image (Optional)",
+        "sectionId": "body",
+        "component": "file-input",
+        "placeholder": "Upload an image to use as reference for video generation",
+        "accept": "image/*",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "size",
+        "name": "size",
+        "label": "Video Size",
+        "sectionId": "body",
+        "component": "select",
+        "defaultValue": "1280x720",
+        "options": [
+          {
+            "id": "1280x720",
+            "label": "1280x720 (HD)",
+            "icon": "Monitor",
+            "color": "default"
+          },
+          {
+            "id": "1920x1080",
+            "label": "1920x1080 (Full HD)",
+            "icon": "Monitor",
+            "color": "default"
+          },
+          {
+            "id": "1024x1024",
+            "label": "1024x1024 (Square)",
+            "icon": "Square",
+            "color": "default"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "seconds",
+        "name": "seconds",
+        "label": "Duration (seconds)",
+        "sectionId": "body",
+        "component": "number",
+        "placeholder": "Enter video duration in seconds (1-10)",
+        "defaultValue": "4",
+        "validation": {
+          "required": true,
+          "min": 1,
+          "max": 10
+        },
+        "colSpan": 1,
+        "order": 4
+      }
+    ]
+  },
+  {
     "id": "general-assistant",
     "agentType": "chat",
     "label": "General Assistant",

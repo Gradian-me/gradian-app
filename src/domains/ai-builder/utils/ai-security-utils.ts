@@ -9,7 +9,9 @@ const MAX_JSON_SIZE = 10 * 1024 * 1024; // 10MB max JSON size
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB max file size
 const ALLOWED_MIME_PREFIXES = ['audio/', 'video/'];
 const VALID_IMAGE_SIZES = ['1024x1024', '1024x1792', '1792x1024'] as const;
+const VALID_VIDEO_SIZES = ['1280x720', '1920x1080', '1024x1024'] as const;
 const VALID_OUTPUT_FORMATS = ['url', 'png'] as const;
+const VALID_VIDEO_FORMATS = ['url', 'mp4'] as const;
 
 /**
  * Sanitize user prompt to prevent injection attacks
@@ -172,6 +174,91 @@ export function validateImageSize(size: string): { valid: boolean; error?: strin
 }
 
 /**
+ * Validate video size parameter
+ */
+export function validateVideoSize(size: string): { valid: boolean; error?: string } {
+  if (!size || typeof size !== 'string') {
+    return { valid: false, error: 'Video size is required' };
+  }
+
+  // Validate format: WIDTHxHEIGHT
+  const sizePattern = /^\d+x\d+$/;
+  if (!sizePattern.test(size)) {
+    return {
+      valid: false,
+      error: 'Invalid video size format. Must be in format WIDTHxHEIGHT (e.g., 1280x720)',
+    };
+  }
+
+  // Check if it's in the allowed list
+  if (!VALID_VIDEO_SIZES.includes(size as any)) {
+    // Allow custom sizes but validate dimensions are reasonable
+    const [width, height] = size.split('x').map(Number);
+    if (isNaN(width) || isNaN(height) || width < 256 || width > 4096 || height < 256 || height > 4096) {
+      return {
+        valid: false,
+        error: `Invalid video dimensions. Width and height must be between 256 and 4096 pixels. Valid sizes: ${VALID_VIDEO_SIZES.join(', ')}`,
+      };
+    }
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Validate video output format parameter
+ */
+export function validateVideoOutputFormat(format: string): { valid: boolean; error?: string } {
+  if (!format || typeof format !== 'string') {
+    return { valid: false, error: 'Output format is required' };
+  }
+
+  if (!VALID_VIDEO_FORMATS.includes(format as any)) {
+    return {
+      valid: false,
+      error: `Output format must be either "url" or "mp4". Received: ${format}`,
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Validate video duration (seconds)
+ */
+export function validateVideoDuration(seconds: string | number): { valid: boolean; error?: string } {
+  if (seconds === undefined || seconds === null) {
+    return { valid: false, error: 'Video duration is required' };
+  }
+
+  const numSeconds = typeof seconds === 'string' ? parseFloat(seconds) : seconds;
+  
+  if (isNaN(numSeconds) || numSeconds <= 0) {
+    return {
+      valid: false,
+      error: 'Video duration must be a positive number',
+    };
+  }
+
+  // Reasonable limits: minimum 1 second, maximum 60 seconds
+  if (numSeconds < 1) {
+    return {
+      valid: false,
+      error: 'Video duration must be at least 1 second',
+    };
+  }
+
+  if (numSeconds > 60) {
+    return {
+      valid: false,
+      error: 'Video duration must not exceed 60 seconds',
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
  * Validate output format parameter
  */
 export function validateOutputFormat(format: string): { valid: boolean; error?: string } {
@@ -219,6 +306,29 @@ export function safeJsonParse<T = any>(jsonString: string, maxSize: number = MAX
       error: error instanceof Error ? error.message : 'Invalid JSON format',
     };
   }
+}
+
+/**
+ * Clean markdown response by removing meta-commentary prefixes
+ * Removes leading "markdown" keywords and other common prefixes that AI might add
+ */
+export function cleanMarkdownResponse(content: string): string {
+  if (!content || typeof content !== 'string') {
+    return content;
+  }
+
+  // Remove leading "markdown" text (case-insensitive, with optional whitespace/newlines)
+  // Pattern matches: "markdown", "markdown\n", "markdown\n\n", etc.
+  let cleaned = content.trim();
+  
+  // Remove leading "markdown" word(s) - handles multiple variations
+  // Matches: "markdown", "markdown markdown", "markdown\nmarkdown", etc.
+  cleaned = cleaned.replace(/^(markdown[\s\n]*)+/i, '');
+  
+  // Remove any remaining leading whitespace/newlines
+  cleaned = cleaned.trim();
+  
+  return cleaned;
 }
 
 /**
@@ -289,6 +399,8 @@ export const SECURITY_CONSTANTS = {
   MAX_FILE_SIZE,
   ALLOWED_MIME_PREFIXES,
   VALID_IMAGE_SIZES,
+  VALID_VIDEO_SIZES,
   VALID_OUTPUT_FORMATS,
+  VALID_VIDEO_FORMATS,
 } as const;
 
