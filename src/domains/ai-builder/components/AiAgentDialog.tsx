@@ -160,8 +160,8 @@ export function AiAgentDialog({
 
     const promptParts: string[] = [];
 
-    // Add context about what we're working with
-    promptParts.push(`Working with ${schema.singular_name || schema.name} data:`);
+    // Add context about what we're working on
+    promptParts.push(`Working on ${schema.singular_name || schema.name} data:`);
 
     // Extract data based on selected fields
     if (action.selectedFields && action.selectedFields.length > 0) {

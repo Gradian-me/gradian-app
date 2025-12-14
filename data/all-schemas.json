@@ -1293,7 +1293,9 @@
             "company-name",
             "description"
           ],
-          "additionalSystemPrompt": "Create a comic book style illustration based on the vendor information provided."
+          "additionalSystemPrompt": "Create a comic book style illustration based on the vendor information provided.",
+          "displayType": "hideForm",
+          "runType": "automatic"
         },
         {
           "id": "create-sketch",
@@ -1311,7 +1313,26 @@
             "certifications",
             "performanceMetrics"
           ],
-          "additionalSystemPrompt": "Create a sketch-style illustration based on the vendor information provided."
+          "additionalSystemPrompt": "Create a sketch-style illustration based on the vendor information provided.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "analyze-with-ai",
+          "label": "Analyze with AI",
+          "icon": "BarChart",
+          "variant": "default",
+          "action": "runAiAgent",
+          "agentId": "data-analysis-expert",
+          "selectedFields": [
+            "company-name",
+            "description",
+            "certifications",
+            "performanceMetrics"
+          ],
+          "additionalSystemPrompt": "Perform comprehensive analysis of the vendor data including strengths, weaknesses, risks, and improvement opportunities.",
+          "displayType": "hideForm",
+          "runType": "automatic"
         }
       ],
       "componentRenderers": [
@@ -5331,6 +5352,68 @@
             "change-conclusion"
           ],
           "additionalSystemPrompt": "Analyze this change management record from a quality assurance perspective. Provide comprehensive analysis including risk assessment, compliance evaluation, and recommendations based on GMP, ISO 9001, and pharmaceutical quality standards.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "create-comic-book",
+          "label": "Create Comic Book",
+          "icon": "Image",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "comic-book"
+          },
+          "selectedFields": [
+            "change-title",
+            "change-description",
+            "change-solution"
+          ],
+          "additionalSystemPrompt": "Create a comic book style illustration based on the change management information provided.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "create-sketch",
+          "label": "Create Sketch",
+          "icon": "Pencil",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "sketch"
+          },
+          "selectedFields": [
+            "change-title",
+            "change-description",
+            "change-solution",
+            "change-categories",
+            "change-conditions"
+          ],
+          "additionalSystemPrompt": "Create a sketch-style illustration based on the change management information provided.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "analyze-with-ai",
+          "label": "Analyze with AI",
+          "icon": "BarChart",
+          "variant": "default",
+          "action": "runAiAgent",
+          "agentId": "data-analysis-expert",
+          "selectedFields": [
+            "change-title",
+            "change-description",
+            "change-solution",
+            "change-categories",
+            "change-conditions",
+            "supporting-data",
+            "change-additional-description",
+            "change-conclusion",
+            "change-effectiveness"
+          ],
+          "additionalSystemPrompt": "Perform comprehensive analysis of the change management data including strengths, weaknesses, risks, and improvement opportunities.",
           "displayType": "hideForm",
           "runType": "automatic"
         }
