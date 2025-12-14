@@ -2562,5 +2562,447 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCAIBUILDERREFACTOR001",
+    "timestamp": "2025-12-13T01:14:24.000Z",
+    "version": "1.23.000",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "AI BUILDER into shared and common reusable utils",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "shared",
+          "utils"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "AI BUILDER POST ROUTE using Agent ID",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "api"
+        ]
+      },
+      {
+        "changeType": "fix",
+        "description": "BUG FIXED for Image Generator AI",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "image-generation"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Removed deprecated AI configuration from application variables and related files, streamlining the codebase",
+        "priority": "Medium",
+        "affectedDomains": [
+          "application-variables",
+          "configuration"
+        ]
+      },
+      {
+        "changeType": "delete",
+        "description": "Removed unused professional writing domain files to reduce clutter",
+        "priority": "Medium",
+        "affectedDomains": [
+          "professional-writing"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCAISECURITYENHANCE001",
+    "timestamp": "2025-12-13T01:29:40.000Z",
+    "version": "1.23.001",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Improved AI model loading with caching and security validations in ai-chat-utils, ai-image-utils, and ai-voice-utils",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "performance",
+          "security"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined error handling and response parsing across utilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "error-handling"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced shared utilities for error parsing, prompt sanitization, and agent configuration validation to enhance security and performance",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "shared",
+          "utils",
+          "security"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCAIIMAGEENHANCE001",
+    "timestamp": "2025-12-13T03:07:53.000Z",
+    "version": "1.24.000",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated AI image generation to support parallel requests, allowing for simultaneous text and image processing",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "image-generation",
+          "performance"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new image type selection in ai-agents.json for better customization of generated images",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "form-builder"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved error handling and response management in useAiBuilder and ai-response.store for enhanced reliability and performance",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "error-handling",
+          "performance"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCAIIMAGETYPESELECT001",
+    "timestamp": "2025-12-13T08:04:02.000Z",
+    "version": "1.24.001",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated image type (Creative, Sketch, Iconic, Editorial, Random) selection in ai-agents.json to include new options for better customization",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "form-builder"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Removed includeImage state from AiBuilderForm and AiBuilderWrapper components, streamlining the form handling logic",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Integrated imageType field into the form to manage image generation preferences effectively",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "form-builder",
+          "ui"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCB8VNWHQ55Z0T6C183F48AF",
+    "timestamp": "2025-12-13T10:42:27.000Z",
+    "version": "1.24.002",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Added AI body and response logging capabilities in application variables for improved debugging",
+        "priority": "Medium",
+        "affectedDomains": [
+          "application-variables",
+          "logging",
+          "ai-builder"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Integrated new image type field in AiBuilderForm for better image generation customization",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined image handling and response management in AiBuilderResponse and related components for enhanced clarity and performance",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "image-generation",
+          "performance"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCBQTW4Y8GBY8B82R5QPZY5G",
+    "timestamp": "2025-12-13T15:04:14.000Z",
+    "version": "1.24.003",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Introduced 'Summarizer' writing style in ProfessionalWritingModal and updated ai-agents.json to include 'Summarizer' capability",
+        "priority": "Medium",
+        "affectedDomains": [
+          "professional-writing",
+          "ai-agents",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated system prompt in ai-agents.json to define the new 'Summarizer' functionality, improving text summarization capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-agents",
+          "professional-writing"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Adjusted WritingStyle type to accommodate the new 'Summarizer' option for better type safety",
+        "priority": "Medium",
+        "affectedDomains": [
+          "professional-writing",
+          "types"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCBS7JQ1SQ13DA5CZPQDYX72",
+    "timestamp": "2025-12-13T11:49:38.000Z",
+    "version": "1.24.004",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated various dependencies including @milkdown/crepe, @radix-ui/react-avatar, @radix-ui/react-label, and others for improved functionality and performance",
+        "priority": "Medium",
+        "affectedDomains": [
+          "infrastructure",
+          "dependencies"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Adjusted dependency versions for better compatibility and security across the application",
+        "priority": "Medium",
+        "affectedDomains": [
+          "infrastructure",
+          "dependencies",
+          "security"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCC5EM4MZD20GV5BR25MXDVM",
+    "timestamp": "2025-12-13T15:31:16.000Z",
+    "version": "1.24.005",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Introduced new 'Agent Type' selection in ai-agents.json for enhanced agent configuration options, allowing users to specify types such as 'Chat', 'Image Generation', and 'Voice Transcription'",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "form-builder"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented 'Pharmaceutical Deviation Tracker' and 'Presentation Slide Creator' agents in ai-agents.json, expanding the capabilities of the AI builder",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated AiBuilderForm and AiBuilderResponse components to support new agent types and improve user interface responsiveness",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ui",
+          "form-builder",
+          "responsive"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined image handling and response management in useAiBuilder and related components for better performance and clarity",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "image-generation",
+          "performance"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCD0AIAGENTACTIONS001",
+    "timestamp": "2025-12-14T03:31:10.000Z",
+    "version": "1.25.000",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Introduced new AI agent actions for creating comic book and sketch illustrations in all-schemas.json",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "quick-actions",
+          "schema-manager"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated AiAgentDialog and AiBuilderWrapper components to support preset body parameters for AI agent API calls, improving context handling",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "quick-actions",
+          "form-builder"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Enhanced MarkdownToolbox and MarkdownViewer components to include AI agent integration for content enhancement",
+        "priority": "Medium",
+        "affectedDomains": [
+          "markdown-viewer",
+          "ai-builder",
+          "ui"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCD1DATAANALYSIS001",
+    "timestamp": "2025-12-14T07:01:10.000Z",
+    "version": "1.25.001",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Introduced a new 'Data Analysis Expert' AI agent in ai-agents.json for comprehensive data analysis capabilities",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated change management records in all-data.json to include detailed change descriptions and risk assessments",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "change-management"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved DynamicInfoCard and CodeBadge components for better layout and user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "ui",
+          "components"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCE2T19VGC4VCN173VZNNXHV",
+    "timestamp": "2025-12-14T09:24:15.000Z",
+    "version": "1.26.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Entity Type in Data - Introduced new entity type system for improved data structure and management",
+        "priority": "High",
+        "affectedDomains": [
+          "data-management",
+          "entity-types"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new 'OOX Analyzer for Quality Control' AI agent in ai-agents.json, enhancing data analysis capabilities",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new 'Business Process Generator' AI agent in ai-agents.json, expanding automation capabilities",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented new entity type relations in all-data-relations.json and updated all-data.json to include entity type items, improving data structure",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "data-structure"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated DynamicActionButtons and DynamicCardRenderer components to support new entity type features, enhancing user interaction and data representation",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "ui",
+          "components"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved form handling in FormSystemSection and PickerInput components for better entity type management and user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

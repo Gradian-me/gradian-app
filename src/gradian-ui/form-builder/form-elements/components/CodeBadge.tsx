@@ -21,12 +21,12 @@ export const CodeBadge: React.FC<CodeBadgeProps> = ({
       className={cn(
         'inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded text-xs font-mono font-medium',
         'bg-cyan-50 text-cyan-700 border border-cyan-200',
-        'select-none',
+        'select-none whitespace-nowrap',
         className
       )}
     >
       {String(code)}
-      <CopyContent content={code} className="h-4 w-4" />
+      <CopyContent content={code} className="h-4 w-4 flex-shrink-0" />
     </span>
   );
 };

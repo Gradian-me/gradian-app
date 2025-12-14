@@ -6,12 +6,13 @@ import { ImageGenerationRequest, ImageGenerationResponse } from '../types/image-
 
 /**
  * Generate image from text prompt
+ * Uses the unified AI builder route: /api/ai-builder/image-generator
  */
 export async function generateImage(
   request: ImageGenerationRequest
 ): Promise<ImageGenerationResponse> {
   try {
-    const response = await fetch('/api/image/generate', {
+    const response = await fetch('/api/ai-builder/image-generator', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -33,7 +34,21 @@ export async function generateImage(
     }
 
     const data = await response.json();
-    return data;
+    
+    // The unified route returns { success: true, data: { ... } }
+    // Return in the expected ImageGenerationResponse format
+    if (data.success && data.data) {
+      return {
+        success: true,
+        data: data.data,
+      };
+    }
+    
+    // Handle unexpected response format
+    return {
+      success: false,
+      error: data.error || 'Unexpected response format from server',
+    };
   } catch (error) {
     return {
       success: false,

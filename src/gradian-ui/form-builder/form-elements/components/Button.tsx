@@ -10,6 +10,9 @@ export const Button: React.FC<ButtonProps> = ({
   size = 'md',
   className,
   children,
+  href,
+  canOpenInNewTab = false,
+  onClick,
   ...props
 }) => {
   // Map gradian-ui Button variants to UI Button styles (matches button.tsx)
@@ -39,8 +42,36 @@ export const Button: React.FC<ButtonProps> = ({
     className
   );
 
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Handle Ctrl+click (or Cmd+click on Mac) to open in new tab
+    if (canOpenInNewTab && href && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      window.open(href, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    // Call original onClick handler
+    if (onClick) {
+      onClick(e);
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Handle middle-click to open in new tab
+    if (canOpenInNewTab && href && e.button === 1) {
+      e.preventDefault();
+      window.open(href, '_blank', 'noopener,noreferrer');
+      return;
+    }
+  };
+
   return (
-    <RadixButton className={buttonClasses} {...props}>
+    <RadixButton 
+      className={buttonClasses} 
+      onClick={handleClick}
+      onMouseDown={handleMouseDown}
+      {...props}
+    >
       {children}
     </RadixButton>
   );

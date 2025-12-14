@@ -21,7 +21,7 @@ export interface FormField {
   inactive?: boolean;
   addToReferenceMetadata?: boolean;
   isSensitive?: boolean; // If true, field value will be encrypted before storage and decrypted for display
-  role?: 'title' | 'subtitle' | 'description' | 'image' | 'avatar' | 'icon' | 'rating' | 'badge' | 'status' | 'email' | 'location' | 'tel' | 'duedate' | 'code' | 'color' | 'person';
+  role?: 'title' | 'subtitle' | 'description' | 'image' | 'avatar' | 'icon' | 'rating' | 'badge' | 'status' | 'email' | 'location' | 'tel' | 'duedate' | 'code' | 'color' | 'person' | 'entityType';
   roleColor?: 'default' | 'secondary' | 'outline' | 'destructive' | 'gradient' | 'success' | 'warning' | 'info' | 'muted';
   validation?: {
     required?: boolean;
@@ -305,9 +305,16 @@ export interface QuickAction {
   payloadTemplate?: any;
   /**
    * Optional payload override for callApi/openFormDialog actions.
+   * For runAiAgent actions, this is passed as the 'body' parameter to the AI agent API.
    * Supports dynamic context replacement via {{formData.*}} and {{formSchema.*}}.
    */
   body?: any;
+  /**
+   * Optional extra body parameters for runAiAgent actions.
+   * This is passed as the 'extra_body' parameter to the AI agent API.
+   * Supports dynamic context replacement via {{formData.*}} and {{formSchema.*}}.
+   */
+  extra_body?: any;
   // Properties for runAiAgent action
   agentId?: string; // ID of the AI agent to run
   selectedFields?: string[]; // Array of field IDs to include in prompt
@@ -402,6 +409,12 @@ export interface FormSchema {
    * Stored as an array of selection objects (first item is the primary group).
    */
   statusGroup?: any[];
+  /**
+   * Optional entity type group configuration for this schema.
+   * When set, forms can show an entity type selector based on related entity type items.
+   * Stored as an array of selection objects (first item is the primary group).
+   */
+  entityTypeGroup?: any[];
   syncToDatabases?: string[]; // Array of database IDs to sync this schema to
   syncStrategy?: 'schema-only' | 'schema-and-data'; // Sync strategy: schema only or schema and data
   fields: FormField[]; // All fields at schema level, each with a sectionId

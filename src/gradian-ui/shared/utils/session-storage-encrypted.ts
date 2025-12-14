@@ -23,9 +23,23 @@ export async function setEncryptedSessionStorage<T>(key: string, value: T): Prom
     }
 
     const storageKey = `${STORAGE_PREFIX}${key}`;
-    sessionStorage.setItem(storageKey, JSON.stringify(encrypted));
+    const serialized = JSON.stringify(encrypted);
+    
+    // Check if the data is too large (sessionStorage typically has ~5-10MB limit)
+    if (serialized.length > 4 * 1024 * 1024) { // 4MB threshold
+      console.warn(`[encrypted-session-storage] Data too large (${serialized.length} bytes) for key: ${key}, skipping storage`);
+      return false;
+    }
+
+    sessionStorage.setItem(storageKey, serialized);
     return true;
-  } catch (error) {
+  } catch (error: any) {
+    // Handle quota exceeded errors specifically
+    if (error?.name === 'QuotaExceededError' || error?.message?.includes('quota')) {
+      console.error(`[encrypted-session-storage] Storage quota exceeded for key "${key}". Data size: ${JSON.stringify(value).length} bytes`);
+      // Re-throw to allow caller to handle cleanup
+      throw error;
+    }
     console.error(`[encrypted-session-storage] Error storing encrypted data for key "${key}":`, error);
     return false;
   }

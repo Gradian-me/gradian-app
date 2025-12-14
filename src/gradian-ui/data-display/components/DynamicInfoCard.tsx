@@ -236,35 +236,45 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
         </CardHeader>
         <CardContent>
           <div className={gridClasses}>
-            {fields.map((field: any) => (
-              <motion.div
-                key={field.id}
-                className="space-y-1"
-                whileHover={{ x: 2 }}
-                transition={{ duration: 0.15 }}
-              >
-                <label className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                  {field.icon && (
-                    <IconRenderer iconName={field.icon} className="h-4 w-4" />
-                  )}
-                  {field.label}
-                </label>
-                <div className="flex items-center gap-2">
-                  <div className="text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word flex-1">
-                    {formatFieldValue(field, field.value, data, false)}
-                  </div>
-                  {field.canCopy && field.value && field.value !== '' && (
-                    <div
-                      onClick={(e) => e.stopPropagation()}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onKeyDown={(e) => e.stopPropagation()}
-                    >
-                      <CopyContent content={typeof field.value === 'string' || typeof field.value === 'number' ? field.value : JSON.stringify(field.value)} />
+            {fields.map((field: any) => {
+              const isTextarea = field.component === 'textarea';
+              const fieldClasses = cn(
+                "space-y-1",
+                isTextarea && gridColumns === 1 && "col-span-1",
+                isTextarea && gridColumns === 2 && "col-span-1 md:col-span-2",
+                isTextarea && gridColumns === 3 && "col-span-1 md:col-span-2 lg:col-span-3"
+              );
+              
+              return (
+                <motion.div
+                  key={field.id}
+                  className={fieldClasses}
+                  whileHover={{ x: 2 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                    {field.icon && (
+                      <IconRenderer iconName={field.icon} className="h-4 w-4" />
+                    )}
+                    {field.label}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word flex-1">
+                      {formatFieldValue(field, field.value, data, false)}
                     </div>
-                  )}
-                </div>
-              </motion.div>
-            ))}
+                    {field.canCopy && field.value && field.value !== '' && (
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      >
+                        <CopyContent content={typeof field.value === 'string' || typeof field.value === 'number' ? field.value : JSON.stringify(field.value)} />
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </CardContent>
       </CardWrapper>

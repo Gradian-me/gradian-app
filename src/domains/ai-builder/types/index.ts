@@ -9,6 +9,7 @@ export interface AiAgent {
   label: string;
   icon: string;
   description: string;
+  agentType?: 'chat' | 'image-generation' | 'voice-transcription'; // Type of AI agent
   requiredOutputFormat: 'json' | 'string' | 'table';
   model?: string;
   systemPrompt?: string;
@@ -55,7 +56,7 @@ export interface TokenUsage {
 
 export interface AiBuilderResponseData {
   response: string;
-  format: 'json' | 'string' | 'table';
+  format: 'json' | 'string' | 'table' | 'image';
   tokenUsage: TokenUsage | null;
   timing?: {
     responseTime: number; // Time to receive response in milliseconds
@@ -65,7 +66,7 @@ export interface AiBuilderResponseData {
     id: string;
     label: string;
     description: string;
-    requiredOutputFormat: 'json' | 'string' | 'table';
+    requiredOutputFormat: 'json' | 'string' | 'table' | 'image';
     nextAction: {
       label: string;
       icon?: string;
@@ -85,6 +86,9 @@ export interface GeneratePromptRequest {
   }>; // Annotations to include when saving
   previousAiResponse?: string; // Previous AI response for annotation-based regeneration
   previousUserPrompt?: string; // Previous user prompt for annotation-based regeneration
+  body?: Record<string, any>; // Parameters with sectionId: "body"
+  extra_body?: Record<string, any>; // Parameters with sectionId: "extra"
+  imageType?: string; // Image type to generate (e.g., "infographic", "creative", etc.) - if set and not "none", will generate image in parallel
 }
 
 export interface ApproveRequest {

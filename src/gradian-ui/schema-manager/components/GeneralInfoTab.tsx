@@ -166,6 +166,24 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
             disabled={readonly}
           />
         </div>
+        <div>
+          <PickerInput
+            config={{
+              name: 'entity-type-group',
+              label: 'Entity Type Group',
+              description: 'Select an entity type group to enable selection on this schema.',
+              targetSchema: 'entity-type-groups',
+              metadata: {
+                allowMultiselect: false,
+              },
+            }}
+            value={schema.entityTypeGroup || []}
+            onChange={(selections) => {
+              onUpdate({ entityTypeGroup: selections && selections.length > 0 ? selections : undefined });
+            }}
+            disabled={readonly}
+          />
+        </div>
         <div className="border-t pt-4 mt-4 border-gray-200 dark:border-gray-700">
           <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Server Sync Options</h3>
           <div className="space-y-4">

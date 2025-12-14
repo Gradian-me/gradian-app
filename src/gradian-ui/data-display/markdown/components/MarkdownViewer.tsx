@@ -15,6 +15,7 @@ import { extractHeadings } from '../utils/headingExtractor';
 import { useMarkdownScrollSpy } from '../hooks/useMarkdownScrollSpy';
 import { MarkdownViewerProps } from '../types';
 import { exportMarkdownToPdf } from '../utils/pdfExport';
+import { ProfessionalWritingModal } from '@/gradian-ui/communication/professional-writing';
 
 export function MarkdownViewer({ 
   content, 
@@ -23,11 +24,13 @@ export function MarkdownViewer({
   onChange,
   stickyHeadings = [],
   navigationHeadingLevels = [],
-  onNavigationData
+  onNavigationData,
+  aiAgentId
 }: MarkdownViewerProps) {
   const [viewMode, setViewMode] = useState<'editor' | 'preview' | 'raw'>('preview');
   const [headings, setHeadings] = useState<Array<{ id: string; text: string; level: number }>>([]);
   const lastSentContentRef = useRef<string>(content);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   
   // Handle content changes from editor - immediately update store
   const handleContentChange = useCallback((newContent: string) => {
@@ -224,6 +227,16 @@ export function MarkdownViewer({
     }
   }, [viewMode]);
 
+  // AI agent handler
+  const handleAiAgentClick = useCallback(() => {
+    setIsAiModalOpen(true);
+  }, []);
+
+  const handleApplyEnhancedText = useCallback((enhancedText: string) => {
+    onChange?.(enhancedText);
+    setIsAiModalOpen(false);
+  }, [onChange]);
+
   return (
     <div className="space-y-4">
       {showToggle && (
@@ -233,6 +246,9 @@ export function MarkdownViewer({
           onExportPdf={handleExportPdf}
           showPdfExport={true}
           showEditor={isEditable}
+          aiAgentId={aiAgentId}
+          onAiAgentClick={handleAiAgentClick}
+          hasContent={!!content && content.trim().length > 0}
         />
       )}
 
@@ -276,6 +292,14 @@ export function MarkdownViewer({
           </ReactMarkdown>
           <EndLine />
         </article>
+      )}
+      {aiAgentId && (
+        <ProfessionalWritingModal
+          isOpen={isAiModalOpen}
+          onOpenChange={setIsAiModalOpen}
+          initialText={content || ''}
+          onApply={handleApplyEnhancedText}
+        />
       )}
     </div>
   );

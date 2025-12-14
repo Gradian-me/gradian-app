@@ -97,10 +97,13 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   
   // Check if schema has statusGroup configured (new status system)
   const hasStatusGroup = Array.isArray(schema?.statusGroup) && schema.statusGroup.length > 0;
+  // Check if schema has entityTypeGroup configured (new entity type system)
+  const hasEntityTypeGroup = Array.isArray(schema?.entityTypeGroup) && schema.entityTypeGroup.length > 0;
 
-  // Check if rating, status, duedate, code, avatar, icon, and person fields exist in schema
+  // Check if rating, status, entityType, duedate, code, avatar, icon, and person fields exist in schema
   const hasRatingField = schema?.fields?.some(field => field.role === 'rating') || false;
   const hasStatusField = schema?.fields?.some(field => field.role === 'status') || false || hasStatusGroup;
+  const hasEntityTypeField = schema?.fields?.some(field => field.role === 'entityType') || false || hasEntityTypeGroup;
   const hasDuedateField = schema?.fields?.some(field => field.role === 'duedate') || false;
   const duedateFieldLabel = schema?.fields?.find(field => field.role === 'duedate')?.label || 'Due Date';
   const hasCodeField = schema?.fields?.some(field => field.role === 'code') || false;
@@ -199,6 +202,43 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     icon: normalizedStatusOption?.icon ?? configMetadata.icon,
     label: statusLabel,
     value: statusValueForConfig,
+  };
+
+  // Entity Type handling (similar to status)
+  const entityTypeFieldDef = schema?.fields?.find(field => field.role === 'entityType');
+  const entityTypeRoleValues = getArrayValuesByRole(schema, data, 'entityType');
+  const entityTypeFieldArray = entityTypeRoleValues.length > 0 ? entityTypeRoleValues : [];
+  const rawEntityTypeValueFromField = entityTypeFieldDef ? data?.[entityTypeFieldDef.name] : undefined;
+  
+  const normalizedEntityTypeOption =
+    normalizeOptionArray(rawEntityTypeValueFromField)[0] ??
+    normalizeOptionArray(entityTypeFieldArray)[0] ??
+    normalizeOptionArray(data?.entityType)[0];
+  const entityTypeValueFromRole = getSingleValueByRole(schema, data, 'entityType', '');
+
+  const entityTypeIdentifier =
+    normalizedEntityTypeOption?.id ??
+    (typeof rawEntityTypeValueFromField === 'string' || typeof rawEntityTypeValueFromField === 'number'
+      ? String(rawEntityTypeValueFromField)
+      : undefined) ??
+    (typeof data?.entityType === 'string' || typeof data?.entityType === 'number'
+      ? String(data.entityType)
+      : undefined);
+
+  const entityTypeLabel =
+    normalizedEntityTypeOption?.label ??
+    (entityTypeValueFromRole && entityTypeValueFromRole.trim() !== '' ? entityTypeValueFromRole : undefined) ??
+    getPrimaryDisplayString(rawEntityTypeValueFromField) ??
+    getPrimaryDisplayString(entityTypeFieldArray) ??
+    getPrimaryDisplayString(data?.entityType) ??
+    entityTypeIdentifier ??
+    '';
+
+  const normalizedEntityTypeMetadata = {
+    color: normalizedEntityTypeOption?.color ?? 'purple',
+    icon: normalizedEntityTypeOption?.icon ?? 'Tag',
+    label: entityTypeLabel,
+    value: entityTypeIdentifier ?? entityTypeLabel ?? '',
   };
 
   // Check if subtitle role exists in schema
@@ -580,7 +620,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     )}
                   </div>
                 </div>
-                {(hasRatingField || hasStatusField) && (
+                {(hasRatingField || hasStatusField || hasEntityTypeField) && (
                   <div className={cn(
                     "flex gap-2",
                     isInDialog 
@@ -618,6 +658,26 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                             component: 'picker',
                           },
                           rawStatusValueFromField || data?.status,
+                          data
+                        )}
+                      </motion.div>
+                    )}
+                    {/* Entity Type */}
+                    {hasEntityTypeField && (entityTypeFieldDef || hasEntityTypeGroup) && normalizedEntityTypeMetadata.label && (
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
+                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                        transition={disableAnimation ? {} : { duration: 0.2 }}
+                        whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05, transition: { duration: 0.1, delay: 0 } }}
+                      >
+                        {formatFieldValue(
+                          entityTypeFieldDef || {
+                            id: 'entityType',
+                            name: 'entityType',
+                            role: 'entityType',
+                            component: 'picker',
+                          },
+                          rawEntityTypeValueFromField || data?.entityType,
                           data
                         )}
                       </motion.div>
@@ -958,7 +1018,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   </div>
                 </div>
               </div>
-              {(hasRatingField || hasStatusField || hasDuedateField || hasPersonField) && (
+              {(hasRatingField || hasStatusField || hasEntityTypeField || hasDuedateField || hasPersonField) && (
                 <div className="flex flex-row items-center justify-between space-y-1 ms-auto gap-2">
                   <div className="flex items-center gap-2">
                     {hasPersonField && cardConfig.personField && (
@@ -1037,6 +1097,28 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                             component: 'picker',
                           },
                           rawStatusValueFromField || data?.status,
+                          data
+                        )}
+                      </motion.div>
+                    )}
+                    {hasEntityTypeField && (entityTypeFieldDef || hasEntityTypeGroup) && normalizedEntityTypeMetadata.label && (
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
+                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                        transition={disableAnimation ? {} : { duration: 0.3 }}
+                        whileHover={disableAnimation ? undefined : {
+                          scale: 1.01,
+                          transition: { type: "spring", stiffness: 300, damping: 30 }
+                        }}
+                      >
+                        {formatFieldValue(
+                          entityTypeFieldDef || {
+                            id: 'entityType',
+                            name: 'entityType',
+                            role: 'entityType',
+                            component: 'picker',
+                          },
+                          rawEntityTypeValueFromField || data?.entityType,
                           data
                         )}
                       </motion.div>

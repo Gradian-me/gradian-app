@@ -8,6 +8,8 @@ export const DEFAULT_APPLICATION_VARIABLES = {
     FORM_DATA: true,
     REQUEST_BODY: true,
     REQUEST_RESPONSE: true,
+    AI_BODY_LOG: true,
+    AI_RESPONSE_LOG: true,
     SCHEMA_LOADER: true,
     CALL_BACKEND: true,
     INDEXDB_CACHE: true,
@@ -59,9 +61,5 @@ export const DEFAULT_APPLICATION_VARIABLES = {
   REQUIRE_LOGIN: false,
   EXCLUDED_LOGIN_ROUTES: ['/authentication'],
   FORBIDDEN_ROUTES_PRODUCTION: [] as string[],
-  AI_CONFIG: {
-    LLM_API_URL: 'https://api.avalai.ir/v1/chat/completions',
-    LLM_TRANSCRIBE_URL: 'https://api.avalai.ir/v1/audio/transcriptions',
-  },
 } as const;
 

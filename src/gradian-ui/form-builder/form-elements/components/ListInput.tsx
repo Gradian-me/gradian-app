@@ -378,7 +378,13 @@ export const ListInput: React.FC<ListInputProps> = ({
     [value, onChange]
   );
 
-  const handleAddItem = useCallback(() => {
+  const handleAddItem = useCallback((e?: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevent form submission if button is inside a form
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     // Check if there's an empty item - prevent adding new one
     const hasEmptyItem = value.some(item => !item.label || item.label.trim() === '');
     if (hasEmptyItem) {

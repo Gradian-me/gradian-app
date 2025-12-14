@@ -3,8 +3,10 @@
 import React, { useState } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Button } from '@/components/ui/button';
-import { Eye, FileCode, FileDown, Loader2, Pencil } from 'lucide-react';
+import { Eye, FileCode, FileDown, Loader2, Pencil, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { cn } from '@/lib/utils';
 
 export interface MarkdownToolboxProps {
   viewMode: 'editor' | 'preview' | 'raw';
@@ -12,6 +14,9 @@ export interface MarkdownToolboxProps {
   onExportPdf?: () => Promise<void>;
   showPdfExport?: boolean;
   showEditor?: boolean;
+  aiAgentId?: string;
+  onAiAgentClick?: () => void;
+  hasContent?: boolean;
 }
 
 export function MarkdownToolbox({ 
@@ -19,7 +24,10 @@ export function MarkdownToolbox({
   onViewModeChange,
   onExportPdf,
   showPdfExport = true,
-  showEditor = false 
+  showEditor = false,
+  aiAgentId,
+  onAiAgentClick,
+  hasContent = false
 }: MarkdownToolboxProps) {
   const [isExporting, setIsExporting] = useState(false);
 
@@ -41,6 +49,22 @@ export function MarkdownToolbox({
   return (
     <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
       <div className="flex items-center gap-2">
+        {aiAgentId && hasContent && onAiAgentClick && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onAiAgentClick}
+            className={cn(
+              "gap-2",
+              "border-violet-200/70 bg-white/80 text-violet-600",
+              "hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700",
+              "dark:border-violet-500/50 dark:bg-gray-900/80 dark:text-violet-200 dark:hover:bg-violet-500/10"
+            )}
+          >
+            <IconRenderer iconName="Sparkles" className="h-4 w-4" />
+            <span>Enhance with AI</span>
+          </Button>
+        )}
         {showPdfExport && onExportPdf && (
           <Button
             variant="outline"

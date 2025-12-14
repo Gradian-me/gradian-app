@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Select as UiSelect, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { TextInput, Textarea, NumberInput, Slider, SortableSelector, Select as FormSelect } from '@/gradian-ui/form-builder/form-elements';
+import { TextInput, Textarea, NumberInput, Slider, SortableSelector, Select as FormSelect, IconInput } from '@/gradian-ui/form-builder/form-elements';
 import type { SortableSelectorItem } from '@/gradian-ui/form-builder/form-elements';
 import { FormSchema, DetailPageMetadata, DetailPageSection, ComponentRendererConfig, RepeatingTableRendererConfig, QuickAction, FormField } from '../types/form-schema';
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
@@ -650,11 +650,10 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                         </div>
                       </div>
                       <div>
-                        <TextInput
-                          config={{ name: 'action-icon', label: 'Icon' }}
+                        <IconInput
+                          config={{ name: 'action-icon', label: 'Icon', placeholder: 'Enter Lucide Icon name (e.g., FilePlus, Download)' }}
                           value={action.icon || ''}
                           onChange={(value) => updateQuickAction(action.id, { icon: value })}
-                          placeholder="e.g., FilePlus, Download"
                         />
                       </div>
                       {(action.action === 'openFormDialog' || action.action === 'openActionForm') && (
@@ -855,6 +854,78 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                               value={action.additionalSystemPrompt || ''}
                               onChange={(value) => updateQuickAction(action.id, { additionalSystemPrompt: value })}
                             />
+                          </div>
+                          <div>
+                            <Textarea
+                              config={{
+                                name: 'preset-body',
+                                label: 'Preset Body Parameters (optional)',
+                                placeholder: '{ "imageType": "comic-book" } or { "imageType": "{{formData.imageType}}" }',
+                                description: 'Preset parameters to pass to AI agent API. Supports {{formData.*}} and {{formSchema.*}} dynamic context replacement.',
+                              }}
+                              value={action.body ? JSON.stringify(action.body, null, 2) : ''}
+                              onChange={(value) => {
+                                try {
+                                  const parsed = value.trim() ? JSON.parse(value) : undefined;
+                                  updateQuickAction(action.id, { body: parsed });
+                                } catch {
+                                  // Ignore parse errors silently; user will fix JSON
+                                  updateQuickAction(action.id, { body: value as any });
+                                }
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <Textarea
+                              config={{
+                                name: 'preset-extra-body',
+                                label: 'Preset Extra Body Parameters (optional)',
+                                placeholder: '{ "output_format": "png" }',
+                                description: 'Preset extra_body parameters to pass to AI agent API. Supports {{formData.*}} and {{formSchema.*}} dynamic context replacement.',
+                              }}
+                              value={action.extra_body ? JSON.stringify(action.extra_body, null, 2) : ''}
+                              onChange={(value) => {
+                                try {
+                                  const parsed = value.trim() ? JSON.parse(value) : undefined;
+                                  updateQuickAction(action.id, { extra_body: parsed });
+                                } catch {
+                                  // Ignore parse errors silently; user will fix JSON
+                                  updateQuickAction(action.id, { extra_body: value as any });
+                                }
+                              }}
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label className="text-sm font-medium text-gray-700 mb-2 block">Run Type</Label>
+                              <UiSelect
+                                value={action.runType || 'manual'}
+                                onValueChange={(value: any) => updateQuickAction(action.id, { runType: value })}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="manual">Manual</SelectItem>
+                                  <SelectItem value="automatic">Automatic</SelectItem>
+                                </SelectContent>
+                              </UiSelect>
+                            </div>
+                            <div>
+                              <Label className="text-sm font-medium text-gray-700 mb-2 block">Display Type</Label>
+                              <UiSelect
+                                value={action.displayType || 'showForm'}
+                                onValueChange={(value: any) => updateQuickAction(action.id, { displayType: value })}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="showForm">Show Form</SelectItem>
+                                  <SelectItem value="hideForm">Hide Form</SelectItem>
+                                </SelectContent>
+                              </UiSelect>
+                            </div>
                           </div>
                         </>
                       )}

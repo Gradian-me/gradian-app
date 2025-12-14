@@ -5,20 +5,24 @@
 
 'use client';
 
-import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, memo, useRef } from 'react';
 import Link from 'next/link';
 import { FormElementFactory } from '@/gradian-ui/form-builder/form-elements/components/FormElementFactory';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn, validateField } from '@/gradian-ui/shared/utils';
 import { Sparkles, Loader2, Square, History, RotateCcw, PencilRuler } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
 import { PromptPreviewSheet } from './PromptPreviewSheet';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
+import { formatArrayFieldToToon } from '../utils/prompt-builder';
 import type { AiAgent } from '../types';
 import { useBusinessRuleEffects, getFieldEffects } from '@/domains/business-rule-engine';
 import type { BusinessRuleWithEffects, BusinessRuleEffectsMap } from '@/domains/business-rule-engine';
+import { extractParametersBySectionId } from '../utils/ai-shared-utils';
 
 // Separate component for field item to allow hook usage
 interface FieldItemProps {
@@ -118,24 +122,24 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
 
   const colSpan = getColSpan(field);
   
-  // Generate appropriate column span class for 2-column grid
-  // Default to single column on mobile to avoid overlap,
-  // and apply the actual span at md and up.
+  // Generate appropriate column span class for responsive grid
+  // Mobile: always full width (1 column)
+  // Tablet/Desktop: respect colSpan (1 or 2 columns)
   // For a 2-column grid: colSpan 1 = half width, colSpan 2 = full width
   let colSpanClass = 'col-span-1';
   if (colSpan >= 2) {
-    // Full width: span both columns
+    // Full width: span both columns on md+ screens
     colSpanClass = 'col-span-1 md:col-span-2';
   } else {
-    // Half width: span one column
-    colSpanClass = 'col-span-1';
+    // Half width: span one column on md+ screens, full width on mobile
+    colSpanClass = 'col-span-1 md:col-span-1';
   }
 
   // Special styling for textarea/prompt field
   const isPromptField = field.name === 'userPrompt' || field.id === 'user-prompt';
   const customClassName = isPromptField
     ? cn(
-        'min-h-[140px] px-5 py-4 rounded-xl border',
+        'min-h-[120px] md:min-h-[140px] px-4 md:px-5 py-3 md:py-4 rounded-xl border',
         'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm',
         'border-violet-200/50 dark:border-violet-700/50',
         'text-gray-900 dark:text-gray-100',
@@ -143,7 +147,8 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
         'focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:border-violet-400',
         'shadow-sm',
         'transition-all duration-200',
-        'direction-auto'
+        'direction-auto',
+        'text-sm md:text-base' // Responsive text size
       )
     : undefined;
 
@@ -230,6 +235,7 @@ interface AiBuilderFormProps {
   runType?: 'manual' | 'automatic';
   selectedLanguage?: string;
   onLanguageChange?: (language: string) => void;
+  onFormValuesChange?: (formValues: Record<string, any>) => void; // Callback to expose formValues
 }
 
 export function AiBuilderForm({
@@ -251,6 +257,7 @@ export function AiBuilderForm({
   runType = 'manual',
   selectedLanguage = 'text',
   onLanguageChange,
+  onFormValuesChange,
 }: AiBuilderFormProps) {
   // Get selected agent
   const selectedAgent = agents.find(agent => agent.id === selectedAgentId);
@@ -278,6 +285,8 @@ export function AiBuilderForm({
   // State for form values - initialize with userPrompt
   const [formValues, setFormValues] = useState<Record<string, any>>({
     userPrompt: userPrompt,
+    // Include selectedLanguage in formValues for all agents
+    ...(selectedLanguage && selectedLanguage !== 'text' ? { 'output-language': selectedLanguage } : {}),
   });
 
   // State for form errors
@@ -304,13 +313,45 @@ export function AiBuilderForm({
       if (fieldValue === undefined || fieldValue === null || fieldValue === '') {
         return;
       }
+
+      // Skip fields with sectionId "body" or "extra" - these go in body/extra_body, not in prompt
+      // Exception: include "prompt" field in userPrompt for display purposes, even if it has sectionId "body"
+      const isPromptField = (field.name === 'prompt' || field.id === 'prompt');
+      if ((field.sectionId === 'body' || field.sectionId === 'extra') && !isPromptField) {
+        return;
+      }
       
       // Format the value based on field type
       let formattedValue = '';
       
-      // Handle NormalizedOption array (from Select component)
-      if (Array.isArray(fieldValue) && fieldValue.length > 0 && typeof fieldValue[0] === 'object' && 'id' in fieldValue[0]) {
-        // Extract the first option's label or id
+      // Check if this is an array component that should use TOON format
+      const isArrayComponent = [
+        'checkbox-list',
+        'radio',
+        'toggle-group',
+        'tag-input',
+        'list-input'
+      ].includes(field.component);
+      
+      // Check if select is multiple
+      const isMultipleSelect = 
+        field.component === 'select' &&
+        (field.multiple || 
+         field.metadata?.allowMultiselect ||
+         field.selectionType === 'multiple' ||
+         field.selectionMode === 'multiple' ||
+         field.mode === 'multiple');
+      
+      if (isArrayComponent || isMultipleSelect) {
+        // Format arrays in TOON format
+        formattedValue = formatArrayFieldToToon(field.name || field.id || 'field', field, fieldValue);
+        if (formattedValue) {
+          // For TOON format, we don't need a label prefix since the format is self-contained
+          parts.push(formattedValue);
+          return;
+        }
+      } else if (Array.isArray(fieldValue) && fieldValue.length > 0 && typeof fieldValue[0] === 'object' && 'id' in fieldValue[0]) {
+        // Handle NormalizedOption array (from single Select component) - only first option
         const normalizedOption = fieldValue[0];
         formattedValue = normalizedOption.label || normalizedOption.id || String(normalizedOption.value || '');
       } else if (field.component === 'select') {
@@ -354,11 +395,53 @@ export function AiBuilderForm({
       }
     });
     
-    return parts.join('\n\n');
-  }, [formFields, selectedAgent?.renderComponents]);
+    let finalPrompt = parts.join('\n\n');
+    
+    // Add language instructions if language is specified (check common language field names)
+    // Also check selectedLanguage prop as fallback
+    const outputLanguage = values['output-language'] || values['outputLanguage'] || values['language'] || values['lang'] || selectedLanguage;
+    if (outputLanguage && typeof outputLanguage === 'string' && outputLanguage.trim() && outputLanguage.toLowerCase() !== 'en' && outputLanguage !== 'text') {
+      const languageMap: Record<string, string> = {
+        'en': 'English',
+        'fa': 'Persian (Farsi)',
+        'ar': 'Arabic',
+        'es': 'Spanish',
+        'fr': 'French',
+        'de': 'German',
+        'it': 'Italian',
+        'pt': 'Portuguese',
+        'ru': 'Russian',
+        'zh': 'Chinese',
+        'ja': 'Japanese',
+        'ko': 'Korean',
+      };
+      
+      const languageCode = outputLanguage.trim().toLowerCase();
+      const languageName = languageMap[languageCode] || languageCode.toUpperCase();
+      
+      finalPrompt += `\n\nIMPORTANT OUTPUT LANGUAGE REQUIREMENT:\nAll output must be in ${languageName} (${languageCode.toUpperCase()}). This includes:\n- All titles, subtitles, and headings\n- All body text and descriptions\n- All user-facing content\n\nHowever, keep the following in English:\n- Professional and technical abbreviations (e.g., API, JSON, HTTP, CSS, HTML, SQL, UUID, ID, URL)\n- Industry-standard terms and acronyms (e.g., SEO, CRM, UX, UI, SDK, IDE, CLI)\n- Programming language keywords and syntax\n- Technical specification names and standards\n- Brand names and product names that are internationally recognized\n- Scientific and medical terminology abbreviations\n\nEnsure natural, fluent ${languageName} while preserving essential English technical terms.`;
+    }
+    
+    return finalPrompt;
+  }, [formFields, selectedAgent?.renderComponents, selectedLanguage]);
 
-  // Reset form values when agent changes
+  // Reset form values when agent changes (NOT when language changes)
+  // Use ref for buildConcatenatedPrompt to avoid resetting form when language changes
+  const buildConcatenatedPromptForResetRef = useRef(buildConcatenatedPrompt);
   useEffect(() => {
+    buildConcatenatedPromptForResetRef.current = buildConcatenatedPrompt;
+  }, [buildConcatenatedPrompt]);
+  
+  // Track previous agent ID to only reset when agent actually changes
+  const prevAgentIdRef = useRef<string>(selectedAgentId);
+  
+  useEffect(() => {
+    // Only reset if agent ID actually changed
+    if (prevAgentIdRef.current === selectedAgentId) {
+      return;
+    }
+    prevAgentIdRef.current = selectedAgentId;
+    
     if (!selectedAgent?.renderComponents) return;
     
     const fields = selectedAgent.renderComponents.filter(
@@ -386,7 +469,18 @@ export function AiBuilderForm({
       }
     });
     
+    // Always include selectedLanguage in formValues if it's set
+    if (selectedLanguage && selectedLanguage !== 'text') {
+      initialValues['output-language'] = selectedLanguage;
+    }
+    
     setFormValues(initialValues);
+    
+    // Notify parent of formValues change
+    if (onFormValuesChange) {
+      onFormValuesChange(initialValues);
+    }
+    
     // Reset errors and touched when agent changes
     setFormErrors({});
     setTouched({});
@@ -407,11 +501,74 @@ export function AiBuilderForm({
     }
     
     // Build initial concatenated prompt and update userPrompt
-    const initialPrompt = buildConcatenatedPrompt(initialValues);
+    const initialPrompt = buildConcatenatedPromptForResetRef.current(initialValues);
     if (initialPrompt) {
       onPromptChange(initialPrompt);
     }
-  }, [selectedAgentId, buildConcatenatedPrompt]); // Reset when agent ID changes
+  }, [selectedAgentId, selectedAgent, userPrompt, onFormValuesChange, onPromptChange, selectedLanguage]); // Only reset when agent ID changes, not when buildConcatenatedPrompt changes
+
+  // Track previous selectedLanguage to avoid unnecessary updates
+  const prevSelectedLanguageRef = useRef<string | undefined>(selectedLanguage);
+  const buildConcatenatedPromptRef = useRef(buildConcatenatedPrompt);
+  const onPromptChangeRef = useRef(onPromptChange);
+  const onFormValuesChangeRef = useRef(onFormValuesChange);
+  
+  // Keep refs updated
+  useEffect(() => {
+    buildConcatenatedPromptRef.current = buildConcatenatedPrompt;
+    onPromptChangeRef.current = onPromptChange;
+    onFormValuesChangeRef.current = onFormValuesChange;
+  }, [buildConcatenatedPrompt, onPromptChange, onFormValuesChange]);
+  
+  // Sync selectedLanguage with formValues and rebuild prompt when language changes
+  // This effect ONLY updates the language field and rebuilds the prompt - it does NOT touch other form values
+  useEffect(() => {
+    // Only update if language actually changed
+    if (prevSelectedLanguageRef.current === selectedLanguage) {
+      return;
+    }
+    prevSelectedLanguageRef.current = selectedLanguage;
+    
+    // Use functional update to preserve ALL existing form values
+    setFormValues((prevFormValues) => {
+      // Create a copy to avoid mutating the previous state
+      const newFormValues = { ...prevFormValues };
+      
+      if (selectedLanguage && selectedLanguage !== 'text') {
+        // Only update if language is different from current formValues
+        if (newFormValues['output-language'] === selectedLanguage) {
+          // Language hasn't changed, but we still need to rebuild prompt in case other values changed
+          const concatenatedPrompt = buildConcatenatedPromptRef.current(newFormValues);
+          onPromptChangeRef.current(concatenatedPrompt);
+          return prevFormValues; // Return previous to avoid unnecessary update
+        }
+        
+        // Update only the language field, preserve everything else
+        newFormValues['output-language'] = selectedLanguage;
+      } else {
+        // Remove language if selectedLanguage is 'text' or empty
+        if (newFormValues['output-language']) {
+          delete newFormValues['output-language'];
+        } else {
+          // No language field to remove, just rebuild prompt
+          const concatenatedPrompt = buildConcatenatedPromptRef.current(newFormValues);
+          onPromptChangeRef.current(concatenatedPrompt);
+          return prevFormValues; // Return previous to avoid unnecessary update
+        }
+      }
+      
+      // Notify parent of formValues change (only language field changed)
+      if (onFormValuesChangeRef.current) {
+        onFormValuesChangeRef.current(newFormValues);
+      }
+      
+      // Rebuild prompt with updated language
+      const concatenatedPrompt = buildConcatenatedPromptRef.current(newFormValues);
+      onPromptChangeRef.current(concatenatedPrompt);
+      
+      return newFormValues;
+    });
+  }, [selectedLanguage]); // Only depend on selectedLanguage
 
   // Sync userPrompt with formValues when userPrompt changes externally
   // This handles external updates to userPrompt (e.g., from parent component)
@@ -443,7 +600,17 @@ export function AiBuilderForm({
       [fieldName]: actualValue,
     };
     
+    // Ensure selectedLanguage is always in formValues
+    if (selectedLanguage && selectedLanguage !== 'text') {
+      newFormValues['output-language'] = selectedLanguage;
+    }
+    
     setFormValues(newFormValues);
+    
+    // Notify parent of formValues change
+    if (onFormValuesChange) {
+      onFormValuesChange(newFormValues);
+    }
 
     // Build concatenated prompt from all fields and update userPrompt
     // Pass the original value array to buildConcatenatedPrompt so it can extract labels
@@ -473,7 +640,7 @@ export function AiBuilderForm({
         }));
       }
     }
-  }, [formValues, formFields, formErrors, buildConcatenatedPrompt, onPromptChange]);
+  }, [formValues, formFields, formErrors, buildConcatenatedPrompt, onPromptChange, selectedLanguage, onFormValuesChange]);
 
   // Handle field blur
   const handleFieldBlur = useCallback((fieldName: string) => {
@@ -611,13 +778,46 @@ export function AiBuilderForm({
     };
   }, [formValues, formFields]);
 
-  // Find the prompt field and agent select field
+  // Find the prompt field, agent select field, and imageType field
   const promptField = formFields.find(
     (field) => field.name === 'userPrompt' || field.id === 'user-prompt'
   );
   const agentSelectField = formFields.find(
     (field) => field.name === 'aiAgentSelect' || field.id === 'ai-agent-select'
   );
+  const imageTypeField = formFields.find(
+    (field) => field.name === 'imageType' || field.id === 'imageType'
+  );
+
+  // Default imageType field configuration (used when not in agent's renderComponents)
+  // IMPORTANT: sectionId must be 'body' so it gets extracted into body params
+  const defaultImageTypeField = useMemo(() => ({
+    id: 'imageType',
+    name: 'imageType',
+    label: 'Image Type',
+    sectionId: 'body', // Must be 'body' to be included in body params
+    component: 'select',
+    type: 'select',
+    defaultValue: 'none',
+    options: [
+      { id: 'none', label: 'None', icon: 'X', color: 'default' },
+      { id: 'standard', label: 'Standard', icon: 'Image', color: 'default' },
+      { id: 'infographic', label: 'Infographic', icon: 'FileText', color: 'default' },
+      { id: '3d-model', label: '3D Model', icon: 'Box', color: 'default' },
+      { id: 'creative', label: 'Creative', icon: 'Palette', color: 'default' },
+      { id: 'sketch', label: 'Sketch', icon: 'Pencil', color: 'default' },
+      { id: 'comic-book', label: 'Comic Book', icon: 'BookOpen', color: 'default' },
+      { id: 'iconic', label: 'Iconic', icon: 'Star', color: 'default' },
+      { id: 'editorial', label: 'Editorial', icon: 'Newspaper', color: 'default' },
+      { id: 'random', label: 'Random', icon: 'Shuffle', color: 'default' },
+    ],
+    validation: { required: false },
+    colSpan: 1,
+    order: 0,
+  }), []);
+
+  // Use imageTypeField from agent if available, otherwise use default
+  const effectiveImageTypeField = imageTypeField || defaultImageTypeField;
 
   // Sort fields by order if available
   const sortedFields = [...formFields].sort((a, b) => {
@@ -653,14 +853,14 @@ export function AiBuilderForm({
     <div className="space-y-6">
       {showForm && (
         <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200/50 dark:border-violet-800/50 shadow-sm">
-          <div className="relative p-6 space-y-4">
+          <div className="relative p-4 md:p-6 space-y-4">
             {/* Header Section */}
             {displayType === 'default' && (
-              <div className="flex flex-row justify-end items-center flex-wrap gap-4">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col md:flex-row justify-end items-stretch md:items-center flex-wrap gap-3 md:gap-4">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-2 w-full md:w-auto">
                   {/* Agent Select - use renderComponents if available, otherwise fallback */}
                   {agentSelectField ? (
-                    <div className="w-72">
+                    <div className="w-full md:w-72">
                       <FormElementFactory
                         config={{
                           ...agentSelectField,
@@ -688,7 +888,7 @@ export function AiBuilderForm({
                       />
                     </div>
                   ) : (
-                    <div className="w-72">
+                    <div className="w-full md:w-72">
                       <FormElementFactory
                         config={{
                           id: 'ai-agent-select',
@@ -716,46 +916,54 @@ export function AiBuilderForm({
                       />
                     </div>
                   )}
-                  {DEMO_MODE && selectedAgentId && (
-                    <Link href={`/builder/ai-agents/${selectedAgentId}`}>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {DEMO_MODE && selectedAgentId && (
+                      <Link href={`/builder/ai-agents/${selectedAgentId}`} className="flex-1 sm:flex-initial">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-9 w-full md:w-auto shrink-0"
+                          title="Edit Agent"
+                        >
+                          <PencilRuler className="h-4 w-4 me-2" />
+                          <span className="hidden md:inline">Edit Agent</span>
+                          <span className="md:hidden">Edit</span>
+                        </Button>
+                      </Link>
+                    )}
+                    {onReset && (
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 shrink-0"
-                        title="Edit Agent"
+                        onClick={onReset}
+                        className="h-9 w-9 md:w-9 p-0 shrink-0"
+                        title="Reset everything"
                       >
-                        <PencilRuler className="h-4 w-4 me-2" />
-                        Edit Agent
+                        <RotateCcw className="h-4 w-4" />
+                      </Button>
+                    )}
+                    <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer" className="flex-1 md:flex-initial">
+                      <Button variant="outline" size="sm" className="gap-2 w-full md:w-auto shrink-0">
+                        <History className="h-4 w-4" />
+                        <span className="hidden md:inline">Prompt History</span>
+                        <span className="md:hidden">History</span>
                       </Button>
                     </Link>
-                  )}
-                  {onReset && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={onReset}
-                      className="h-9 w-9 p-0 shrink-0"
-                      title="Reset everything"
-                    >
-                      <RotateCcw className="h-4 w-4" />
-                    </Button>
-                  )}
-                  <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm" className="gap-2 shrink-0">
-                      <History className="h-4 w-4" />
-                      Prompt History
-                    </Button>
-                  </Link>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Render form fields from renderComponents in a 2-column grid */}
+            {/* Render form fields from renderComponents in responsive grid */}
             {displayType === 'default' && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {sortedFields.map((field) => {
                   // Skip agent select field as it's rendered in header
                   if (field.name === 'aiAgentSelect' || field.id === 'ai-agent-select') {
+                    return null;
+                  }
+                  // Skip imageType field as it's rendered in footer
+                  if (field.name === 'imageType' || field.id === 'imageType') {
                     return null;
                   }
 
@@ -782,12 +990,12 @@ export function AiBuilderForm({
             
             {/* Footer Section with Model Badge and Buttons */}
             {showFooter && (
-              <div className="flex justify-between items-center pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
+              <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 md:gap-2 pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
                 {/* Model Badge on Left */}
                 {selectedAgent?.model && (
                   <Badge 
                     className={cn(
-                      'shrink-0',
+                      'shrink-0 self-start',
                       'bg-violet-100 text-cyan-700 border-cyan-200',
                       'dark:bg-cyan-900/50 dark:text-cyan-300 dark:border-cyan-800',
                       'font-medium shadow-sm'
@@ -798,55 +1006,119 @@ export function AiBuilderForm({
                 )}
                 
                 {/* Buttons on Right */}
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto">
                   {onSheetOpenChange && (
                     <>
-                      {isStringOutput && onLanguageChange && (
-                        <div className="w-36">
+                      {onLanguageChange && (
+                        <div className="w-full md:w-36">
                           <LanguageSelector
                             config={{
                               name: 'output-language',
                               label: '',
                               placeholder: 'Language',
                             }}
-                            value={selectedLanguage}
-                            onChange={onLanguageChange}
+                            value={selectedLanguage || 'en'}
+                            onChange={(lang) => {
+                              const languageValue = lang || 'en';
+                              onLanguageChange(languageValue);
+                              // Also update formValues to include language
+                              const newFormValues = {
+                                ...formValues,
+                                'output-language': languageValue,
+                              };
+                              setFormValues(newFormValues);
+                              // Notify parent of formValues change
+                              if (onFormValuesChange) {
+                                onFormValuesChange(newFormValues);
+                              }
+                              // Rebuild prompt with new language
+                              const valuesForPrompt = {
+                                ...newFormValues,
+                              };
+                              const concatenatedPrompt = buildConcatenatedPrompt(valuesForPrompt);
+                              onPromptChange(concatenatedPrompt);
+                            }}
                             defaultLanguage="en"
+                            disabled={isLoading || disabled}
                           />
                         </div>
                       )}
-                      <PromptPreviewSheet
-                        isOpen={isSheetOpen}
-                        onOpenChange={onSheetOpenChange}
-                        systemPrompt={systemPrompt}
-                        userPrompt={userPrompt}
-                        isLoadingPreload={isLoadingPreload}
-                        disabled={!userPrompt.trim() || disabled}
-                      />
+                      <div className="w-full md:w-40">
+                        <FormElementFactory
+                          config={{
+                            ...effectiveImageTypeField,
+                            label: '',
+                          }}
+                          value={formValues[effectiveImageTypeField.name] || effectiveImageTypeField.defaultValue || 'none'}
+                          onChange={(value) => {
+                            // Handle both string and NormalizedOption[] from Select
+                            let actualValue = value;
+                            if (Array.isArray(value) && value.length > 0) {
+                              actualValue = value[0].id || value[0].value || value;
+                            } else if (typeof value === 'string') {
+                              actualValue = value;
+                            }
+                            
+                              const newFormValues = {
+                                ...formValues,
+                              [effectiveImageTypeField.name]: actualValue,
+                              };
+                              setFormValues(newFormValues);
+                              // Notify parent of formValues change
+                              if (onFormValuesChange) {
+                                onFormValuesChange(newFormValues);
+                              }
+                            }}
+                            disabled={isLoading || disabled}
+                          error={formErrors[effectiveImageTypeField.name]}
+                          touched={touched[effectiveImageTypeField.name]}
+                          onBlur={() => handleFieldBlur(effectiveImageTypeField.name)}
+                          onFocus={() => handleFieldFocus(effectiveImageTypeField.name)}
+                          className="w-full"
+                          />
+                        </div>
+                      {(() => {
+                        const params = selectedAgent && formValues 
+                          ? extractParametersBySectionId(selectedAgent, formValues)
+                          : { body: {}, extra: {}, prompt: {} };
+                        return (
+                          <PromptPreviewSheet
+                            isOpen={isSheetOpen}
+                            onOpenChange={onSheetOpenChange}
+                            systemPrompt={systemPrompt}
+                            userPrompt={userPrompt}
+                            isLoadingPreload={isLoadingPreload}
+                            disabled={!userPrompt.trim() || disabled}
+                            extraBody={Object.keys(params.extra).length > 0 ? params.extra : undefined}
+                            bodyParams={Object.keys(params.body).length > 0 ? params.body : undefined}
+                          />
+                        );
+                      })()}
                     </>
                   )}
                   {isLoading ? (
-                    <>
+                    <div className="flex flex-row gap-2 w-full md:w-auto">
                       <Button
                         onClick={onGenerate}
                         disabled={true}
                         size="default"
                         variant="default"
-                        className="h-10 shadow-sm"
+                        className="h-10 shadow-sm flex-1 md:flex-initial"
                       >
                         <Loader2 className="h-4 w-4 me-2 animate-spin" />
-                        Generating
+                        <span className="hidden md:inline">Generating</span>
+                        <span className="md:hidden">...</span>
                       </Button>
                       <Button
                         onClick={onStop}
                         variant="outline"
                         size="default"
-                        className="h-10 shadow-sm"
+                        className="h-10 shadow-sm flex-1 md:flex-initial"
                       >
                         <Square className="h-4 w-4 me-2 text-gray-600 dark:text-gray-400 fill-gray-600 dark:fill-gray-400" />
                         Stop
                       </Button>
-                    </>
+                    </div>
                   ) : (
                     <Button
                       onClick={() => {
@@ -858,10 +1130,11 @@ export function AiBuilderForm({
                       disabled={!isFormValid || !userPrompt.trim() || disabled || runType === 'automatic'}
                       size="default"
                       variant="default"
-                      className="h-10 shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                      className="h-10 shadow-sm w-full md:w-auto bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
                     >
                       <Sparkles className="h-4 w-4 me-2" />
-                      Do the Magic
+                      <span className="hidden md:inline">Do the Magic</span>
+                      <span className="md:hidden">Do the Magic</span>
                     </Button>
                   )}
                 </div>

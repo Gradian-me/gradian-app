@@ -1278,6 +1278,61 @@
           "action": "goToUrl",
           "targetUrl": "/page/vendors",
           "passItemAsReference": true
+        },
+        {
+          "id": "create-comic-book",
+          "label": "Create Comic Book",
+          "icon": "Image",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "comic-book"
+          },
+          "selectedFields": [
+            "company-name",
+            "description"
+          ],
+          "additionalSystemPrompt": "Create a comic book style illustration based on the vendor information provided.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "create-sketch",
+          "label": "Create Sketch",
+          "icon": "Pencil",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "sketch"
+          },
+          "selectedFields": [
+            "company-name",
+            "description",
+            "certifications",
+            "performanceMetrics"
+          ],
+          "additionalSystemPrompt": "Create a sketch-style illustration based on the vendor information provided.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "analyze-with-ai",
+          "label": "Analyze with AI",
+          "icon": "BarChart",
+          "variant": "default",
+          "action": "runAiAgent",
+          "agentId": "data-analysis-expert",
+          "selectedFields": [
+            "company-name",
+            "description",
+            "certifications",
+            "performanceMetrics"
+          ],
+          "additionalSystemPrompt": "Perform comprehensive analysis of the vendor data including strengths, weaknesses, risks, and improvement opportunities.",
+          "displayType": "hideForm",
+          "runType": "automatic"
         }
       ],
       "componentRenderers": [
@@ -4040,6 +4095,142 @@
     "schemaType": "system"
   },
   {
+    "id": "entity-type-items",
+    "description": "Define reusable entity type items with label, icon, color, and inactive handling",
+    "singular_name": "Entity Type Item",
+    "plural_name": "Entity Type Items",
+    "cardMetadata": [],
+    "fields": [
+      {
+        "id": "entity-type-item-label",
+        "name": "label",
+        "label": "Label",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter entity type label",
+        "description": "Human readable label shown in UI",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "title"
+      },
+      {
+        "id": "entity-type-item-icon",
+        "name": "icon",
+        "label": "Icon",
+        "sectionId": "basic-information",
+        "component": "icon",
+        "placeholder": "Enter Lucide Icon name (e.g., CheckCircle)",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "icon"
+      },
+      {
+        "id": "entity-type-item-color",
+        "name": "color",
+        "label": "Color",
+        "sectionId": "basic-information",
+        "component": "color-picker",
+        "placeholder": "Select color",
+        "description": "Choose a color from the Tailwind palette for this entity type.",
+        "role": "color",
+        "colSpan": 1,
+        "order": 3
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Entity type item label, icon and color",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "entity-type-item-overview",
+          "title": "Entity Type Item Overview",
+          "description": "Basic entity type item information",
+          "colSpan": 2,
+          "fieldIds": [
+            "entity-type-item-label",
+            "entity-type-item-icon",
+            "entity-type-item-color"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": false,
+    "icon": "Tag",
+    "allowDataInactive": true,
+    "isNotCompanyBased": true,
+    "schemaType": "system"
+  },
+  {
+    "id": "entity-type-groups",
+    "description": "Group entity type items into reusable entity type groups, optionally scoped to companies",
+    "singular_name": "Entity Type Group",
+    "plural_name": "Entity Type Groups",
+    "fields": [
+      {
+        "id": "entity-type-group-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter entity type group title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "title"
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Entity type group title, description and company scope",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "entity-type-items-section",
+        "title": "Entity Type Items",
+        "description": "Entity type items that belong to this group",
+        "initialState": "expanded",
+        "columns": 1,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "connectToSchema",
+          "minItems": 1,
+          "maxItems": 0,
+          "itemTitle": null,
+          "targetSchema": "entity-type-items",
+          "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": true
+        }
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Tags",
+    "isNotCompanyBased": false,
+    "canSelectMultiCompanies": true,
+    "schemaType": "system"
+  },
+  {
     "id": "status-groups",
     "description": "Group status items into reusable status groups, optionally scoped to companies",
     "singular_name": "Status Group",
@@ -5299,6 +5490,68 @@
           "additionalSystemPrompt": "Analyze this change management record from a quality assurance perspective. Provide comprehensive analysis including risk assessment, compliance evaluation, and recommendations based on GMP, ISO 9001, and pharmaceutical quality standards.",
           "displayType": "hideForm",
           "runType": "automatic"
+        },
+        {
+          "id": "create-comic-book",
+          "label": "Create Comic Book",
+          "icon": "Image",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "comic-book"
+          },
+          "selectedFields": [
+            "change-title",
+            "change-description",
+            "change-solution"
+          ],
+          "additionalSystemPrompt": "Create a comic book style illustration based on the change management information provided.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "create-sketch",
+          "label": "Create Sketch",
+          "icon": "Pencil",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "sketch"
+          },
+          "selectedFields": [
+            "change-title",
+            "change-description",
+            "change-solution",
+            "change-categories",
+            "change-conditions"
+          ],
+          "additionalSystemPrompt": "Create a sketch-style illustration based on the change management information provided.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "analyze-with-ai",
+          "label": "Analyze with AI",
+          "icon": "BarChart",
+          "variant": "default",
+          "action": "runAiAgent",
+          "agentId": "data-analysis-expert",
+          "selectedFields": [
+            "change-title",
+            "change-description",
+            "change-solution",
+            "change-categories",
+            "change-conditions",
+            "supporting-data",
+            "change-additional-description",
+            "change-conclusion",
+            "change-effectiveness"
+          ],
+          "additionalSystemPrompt": "Perform comprehensive analysis of the change management data including strengths, weaknesses, risks, and improvement opportunities.",
+          "displayType": "hideForm",
+          "runType": "automatic"
         }
       ]
     },
@@ -5698,7 +5951,13 @@
     "allowDataDueDate": true,
     "allowDataAssignedTo": true,
     "allowDataForce": true,
-    "schemaType": "business"
+    "schemaType": "business",
+    "entityTypeGroup": [
+      {
+        "id": "01KCDZTASKGROUP0000000000001",
+        "label": "Task Types"
+      }
+    ]
   },
   {
     "id": "attachments",
@@ -6026,6 +6285,240 @@
           "submitRoute": "/api/auth/password/reset",
           "submitMethod": "POST",
           "passSkipKey": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "oox-analyzer",
+    "description": "Analyzer for evaluating OOX incidents in quality control, including description, analysis, and compliance reporting.",
+    "singular_name": "OOX Analyzer",
+    "plural_name": "OOX Analyzers",
+    "icon": "ClipboardList",
+    "fields": [
+      {
+        "id": "oox-date",
+        "name": "date",
+        "label": "OOX Date",
+        "sectionId": "analysis-details",
+        "type": "date",
+        "component": "datetime-local",
+        "required": true,
+        "colSpan": 1,
+        "order": 0
+      },
+      {
+        "id": "operator",
+        "name": "operator",
+        "label": "Operator",
+        "sectionId": "analysis-details",
+        "type": "picker",
+        "component": "picker",
+        "targetSchema": "users",
+        "required": true,
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "oox-description",
+        "name": "description",
+        "label": "OXO Description",
+        "sectionId": "analysis-details",
+        "type": "textarea",
+        "component": "textarea",
+        "required": true,
+        "role": "title",
+        "colSpan": 2,
+        "order": 2
+      },
+      {
+        "id": "oox-type",
+        "name": "type",
+        "label": "Type of OOX",
+        "sectionId": "analysis-details",
+        "type": "select",
+        "component": "select",
+        "options": [
+          {
+            "id": "oos",
+            "label": "Out of Specification",
+            "icon": "AlertTriangle",
+            "color": "red"
+          },
+          {
+            "id": "oot",
+            "label": "Out of Trend",
+            "icon": "TrendingUp",
+            "color": "orange"
+          },
+          {
+            "id": "ooe",
+            "label": "Out of Expectation",
+            "icon": "Info",
+            "color": "yellow"
+          }
+        ],
+        "required": true,
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "specification-analysis",
+        "name": "specifications",
+        "label": "Specifications Analysis",
+        "sectionId": "analysis-details",
+        "type": "textarea",
+        "component": "textarea",
+        "required": true,
+        "role": "description",
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "outliers",
+        "name": "outliers",
+        "label": "Detected Outliers",
+        "sectionId": "analysis-details",
+        "type": "textarea",
+        "component": "textarea",
+        "role": "description",
+        "colSpan": 2,
+        "order": 5
+      },
+      {
+        "id": "root-cause-analysis",
+        "name": "rootCauseAnalysis",
+        "label": "Root Cause Analysis (6M Model)",
+        "sectionId": "analysis-details",
+        "type": "textarea",
+        "component": "textarea",
+        "required": true,
+        "colSpan": 2,
+        "order": 6
+      },
+      {
+        "id": "preventive-actions",
+        "name": "preventiveActions",
+        "label": "Preventive Actions",
+        "sectionId": "actions",
+        "type": "textarea",
+        "component": "textarea",
+        "colSpan": 2,
+        "order": 7
+      },
+      {
+        "id": "corrective-actions",
+        "name": "correctiveActions",
+        "label": "Corrective Actions",
+        "sectionId": "actions",
+        "type": "textarea",
+        "component": "textarea",
+        "colSpan": 2,
+        "order": 8
+      },
+      {
+        "id": "risk-assessment",
+        "name": "riskAssessment",
+        "label": "Risk Assessment",
+        "sectionId": "risk-assessment",
+        "type": "textarea",
+        "component": "textarea",
+        "colSpan": 2,
+        "order": 9
+      },
+      {
+        "id": "regulatory-compliance",
+        "name": "regulatoryCompliance",
+        "label": "Regulatory Compliance Details",
+        "sectionId": "regulatory-details",
+        "type": "textarea",
+        "component": "textarea",
+        "required": true,
+        "colSpan": 2,
+        "order": 10
+      }
+    ],
+    "sections": [
+      {
+        "id": "analysis-details",
+        "title": "Analysis Details",
+        "columns": 2
+      },
+      {
+        "id": "actions",
+        "title": "Action Plans",
+        "columns": 2
+      },
+      {
+        "id": "risk-assessment",
+        "title": "Risk Assessment",
+        "columns": 2
+      },
+      {
+        "id": "regulatory-details",
+        "title": "Regulatory Compliance",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": true,
+    "statusGroup": [
+      {
+        "id": "01KBHD90EMZKAT502KNVVDQZC7",
+        "label": "Progress Status"
+      }
+    ],
+    "allowDataDueDate": true,
+    "allowDataAssignedTo": true,
+    "allowDataForce": true,
+    "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "quick-action-1765695086645",
+          "label": "Analyze OOX with AI",
+          "action": "runAiAgent",
+          "variant": "default",
+          "icon": "User",
+          "agentId": "oox-analyzer-quality-control",
+          "runType": "automatic",
+          "displayType": "hideForm",
+          "selectedFields": [
+            "oox-date",
+            "operator",
+            "oox-description",
+            "oox-type",
+            "specification-analysis",
+            "outliers",
+            "root-cause-analysis",
+            "preventive-actions",
+            "corrective-actions",
+            "risk-assessment",
+            "regulatory-compliance"
+          ],
+          "selectedSections": [
+            "analysis-details",
+            "actions",
+            "risk-assessment",
+            "regulatory-details"
+          ]
+        },
+        {
+          "id": "create-sketch",
+          "label": "Create Sketch",
+          "icon": "Pencil",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "sketch"
+          },
+          "selectedFields": [
+            "oox-description",
+            "specification-analysis",
+            "root-cause-analysis"
+          ],
+          "additionalSystemPrompt": "Create a sketch-style illustration based on the OOX analyzer information provided.",
+          "displayType": "hideForm",
+          "runType": "automatic"
         }
       ]
     }

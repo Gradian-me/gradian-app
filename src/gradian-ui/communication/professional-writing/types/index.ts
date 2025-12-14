@@ -2,7 +2,7 @@
  * Professional Writing Domain Types
  */
 
-export type WritingStyle = 'professional' | 'casual' | 'translate' | 'extended' | 'solution-advisor';
+export type WritingStyle = 'extended' | 'professional' | 'casual' | 'translate' | 'summarizer' | 'solution-advisor';
 
 export interface TranslationLanguage {
   code: string;

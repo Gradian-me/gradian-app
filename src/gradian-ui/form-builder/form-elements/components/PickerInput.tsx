@@ -81,10 +81,35 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     return [value];
   }, [value]);
 
-  const normalizedSelection = useMemo(
-    () => normalizeOptionArray(normalizedValue),
-    [normalizedValue]
-  );
+  // Base normalized selection (without enrichment to avoid circular dependencies)
+  const baseNormalizedSelection = useMemo(() => {
+    return normalizeOptionArray(normalizedValue);
+  }, [normalizedValue]);
+
+  // Enrich normalized selection with icon/color from selectedItem (only for display, not as dependency)
+  const normalizedSelection = useMemo(() => {
+    const normalized = baseNormalizedSelection;
+    
+    // If normalized selection doesn't have icon/color, try to enrich it from selectedItem
+    if (normalized.length > 0 && normalized[0]?.id && (!normalized[0]?.icon && !normalized[0]?.color)) {
+      // If selectedItem has icon/color, use them to enrich the normalized selection
+      // This works for both sourceUrl and targetSchema (like users)
+      if (selectedItem && (selectedItem.icon || selectedItem.color)) {
+        return normalized.map((opt, idx) => {
+          if (idx === 0 && String(opt.id) === String(selectedItem.id)) {
+            return {
+              ...opt,
+              icon: opt.icon || selectedItem.icon,
+              color: opt.color || selectedItem.color,
+            };
+          }
+          return opt;
+        });
+      }
+    }
+    
+    return normalized;
+  }, [baseNormalizedSelection, selectedItem]);
   const selectedIdsForPicker = useMemo(
     () =>
       normalizedSelection
@@ -122,22 +147,84 @@ export const PickerInput: React.FC<PickerInputProps> = ({
         // Skip fetching if using sourceUrl instead of targetSchema
         if (sourceUrl || !targetSchemaId || !targetSchema) {
           if (sourceUrl && primaryValue) {
+            const resolvedId = extractFirstId(primaryValue);
+            
             // For sourceUrl, use the normalized option which has label/icon/color
             if (typeof primaryValue === 'object' && primaryValue.id) {
               // If it's a normalized option (has id, label, icon, color), use it directly
-              setSelectedItem({
-                id: primaryValue.id,
-                label: primaryValue.label,
-                name: primaryValue.label || primaryValue.name || primaryValue.title,
-                title: primaryValue.label || primaryValue.title,
-                icon: primaryValue.icon,
-                color: primaryValue.color,
-              });
+              const hasIconOrColor = primaryValue.icon || primaryValue.color;
+              
+              if (hasIconOrColor) {
+                setSelectedItem({
+                  id: primaryValue.id,
+                  label: primaryValue.label,
+                  name: primaryValue.label || primaryValue.name || primaryValue.title,
+                  title: primaryValue.label || primaryValue.title,
+                  icon: primaryValue.icon,
+                  color: primaryValue.color,
+                });
+              } else if (resolvedId) {
+                // If no icon/color but we have an ID, fetch from sourceUrl to get icon/color
+                try {
+                  const response = await apiRequest<any>(`${sourceUrl}&includeIds=${encodeURIComponent(resolvedId)}`);
+                  if (response.success && response.data && Array.isArray(response.data) && response.data.length > 0) {
+                    const items = response.data[0]?.data || [];
+                    const matchedItem = items.find((item: any) => String(item.id) === String(resolvedId));
+                    if (matchedItem) {
+                      setSelectedItem({
+                        id: resolvedId,
+                        label: matchedItem.label || primaryValue.label,
+                        name: matchedItem.label || primaryValue.label || primaryValue.name || primaryValue.title,
+                        title: matchedItem.label || primaryValue.label || primaryValue.title,
+                        icon: matchedItem.icon || primaryValue.icon,
+                        color: matchedItem.color || primaryValue.color,
+                      });
+                      return;
+                    }
+                  }
+                } catch (err) {
+                  console.warn('Error fetching item from sourceUrl for icon/color:', err);
+                }
+                
+                // Fallback: use what we have
+                setSelectedItem({
+                  id: primaryValue.id,
+                  label: primaryValue.label,
+                  name: primaryValue.label || primaryValue.name || primaryValue.title,
+                  title: primaryValue.label || primaryValue.title,
+                  icon: primaryValue.icon,
+                  color: primaryValue.color,
+                });
+              } else {
+                setSelectedItem(primaryValue);
+              }
             } else if (typeof primaryValue === 'object') {
               // Fallback for other object formats
               setSelectedItem(primaryValue);
+            } else if (resolvedId) {
+              // If we only have an ID, fetch from sourceUrl to get icon/color
+              try {
+                const response = await apiRequest<any>(`${sourceUrl}&includeIds=${encodeURIComponent(resolvedId)}`);
+                if (response.success && response.data && Array.isArray(response.data) && response.data.length > 0) {
+                  const items = response.data[0]?.data || [];
+                  const matchedItem = items.find((item: any) => String(item.id) === String(resolvedId));
+                  if (matchedItem) {
+                    setSelectedItem({
+                      id: resolvedId,
+                      label: matchedItem.label,
+                      name: matchedItem.label,
+                      title: matchedItem.label,
+                      icon: matchedItem.icon,
+                      color: matchedItem.color,
+                    });
+                    return;
+                  }
+                }
+              } catch (err) {
+                console.warn('Error fetching item from sourceUrl:', err);
+              }
+              setSelectedItem({ id: resolvedId });
             } else {
-              const resolvedId = extractFirstId(primaryValue);
               setSelectedItem({ id: resolvedId });
             }
           } else {
@@ -159,7 +246,17 @@ export const PickerInput: React.FC<PickerInputProps> = ({
 
         const response = await apiRequest<any>(`/api/data/${targetSchemaId}/${resolvedId}`);
         if (response.success && response.data) {
-          setSelectedItem(response.data);
+          const itemData = response.data;
+          // Add default icon/color for users schema if missing
+          if (targetSchemaId === 'users') {
+            setSelectedItem({
+              ...itemData,
+              icon: itemData.icon || 'User',
+              color: itemData.color || 'blue',
+            });
+          } else {
+            setSelectedItem(itemData);
+          }
           return;
         }
 
@@ -187,11 +284,12 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       return;
     }
 
-    const primaryValue = normalizedSelection[0] ?? normalizedValue[0];
+    const primaryValue = baseNormalizedSelection[0] ?? normalizedValue[0];
     fetchSelectedItem(primaryValue);
     // Note: sourceUrl is intentionally NOT in dependencies - we only want to re-fetch when value changes,
     // not when sourceUrl changes. sourceUrl is just configuration, not a trigger for re-fetching.
-  }, [normalizedValue, normalizedSelection, targetSchemaId, targetSchema]);
+    // Use baseNormalizedSelection instead of normalizedSelection to avoid circular dependency with selectedItem
+  }, [normalizedValue, baseNormalizedSelection, targetSchemaId, targetSchema]);
 
   const handleSelect = async (selectedOptions: NormalizedOption[], rawItems: any[]) => {
     // Guard against empty selections - only process if we have valid options

@@ -4,7 +4,7 @@ import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { TextareaProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
 import { CopyContent } from './CopyContent';
-import { ProfessionalWritingModal } from '@/domains/professional-writing';
+import { ProfessionalWritingModal } from '@/gradian-ui/communication/professional-writing';
 import { IconRenderer } from '../../../shared/utils/icon-renderer';
 import { VoiceInputDialog } from '@/gradian-ui/communication/voice/components/VoiceInputDialog';
 import { Mic } from 'lucide-react';
@@ -20,7 +20,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       error,
       disabled = false,
       required = false,
-      rows = 5,
+      rows = 8,
       cols,
       resize = 'vertical',
       maxLength,
@@ -93,8 +93,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       resize === 'horizontal' && 'resize-x',
       resize === 'vertical' && 'resize-y',
       resize === 'both' && 'resize',
-      aiAgentId && 'pe-11',
-      enableVoiceInput && 'pb-11',
+      (aiAgentId || enableVoiceInput) && 'pr-12',
       className
     );
 
@@ -211,7 +210,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
               onChange?.(text);
               setIsVoiceDialogOpen(false);
             }}
-            autoStart={true}
+            autoStart={false}
           />
         )}
       </div>

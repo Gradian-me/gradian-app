@@ -27,6 +27,8 @@ interface UseAiBuilderReturn {
   successMessage: string | null;
   preloadedContext: string;
   isLoadingPreload: boolean;
+  imageResponse: string | null;
+  imageError: string | null;
   generateResponse: (request: GeneratePromptRequest) => Promise<void>;
   stopGeneration: () => void;
   approveResponse: (response: string, agent: AiAgent) => Promise<void>;
@@ -51,6 +53,8 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [preloadedContext, setPreloadedContext] = useState('');
   const [isLoadingPreload, setIsLoadingPreload] = useState(false);
+  const [imageResponse, setImageResponse] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
   const [lastPromptId, setLastPromptId] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   
@@ -186,24 +190,207 @@ export function useAiBuilder(): UseAiBuilderReturn {
     setError(null);
     setSuccessMessage(null);
     setAiResponse('');
+    setImageResponse(null);
+    setImageError(null);
 
     try {
-      let response: Response;
-      try {
-        response = await fetch('/api/ai-builder', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userPrompt: request.userPrompt.trim(),
-          agentId: request.agentId,
-          previousAiResponse: request.previousAiResponse,
-          previousUserPrompt: request.previousUserPrompt,
-          annotations: request.annotations,
-        }),
-        signal: abortController.signal,
-      });
+      const agentId = request.agentId;
+      if (!agentId) {
+        throw new Error('agentId is required');
+      }
+
+      // If imageType is set and not "none", run both requests in parallel with Promise.allSettled
+      // UNLESS the agent is image-generator itself, in which case use the normal flow (no duplicate call)
+      const imageType = request.imageType || request.body?.imageType;
+      const isImageGeneratorAgent = agentId === 'image-generator';
+      
+      if (imageType && imageType !== 'none' && !isImageGeneratorAgent) {
+        // For non-image-generator agents with imageType, make both requests in parallel
+        // For image-generator agent, skip this and use the normal flow below
+        try {
+            const [mainResult, imageResult] = await Promise.allSettled([
+            // Main agent request
+            fetch(`/api/ai-builder/${agentId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userPrompt: request.userPrompt.trim(),
+                previousAiResponse: request.previousAiResponse,
+                previousUserPrompt: request.previousUserPrompt,
+                annotations: request.annotations,
+                body: request.body,
+                extra_body: request.extra_body,
+              }),
+              signal: abortController.signal,
+            }),
+            // Image generation request
+            fetch(`/api/ai-builder/image-generator`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userPrompt: request.userPrompt.trim(),
+                body: {
+                  imageType: imageType,
+                  prompt: request.userPrompt.trim(),
+                  ...(request.body || {}), // Include other body params if any
+                },
+                extra_body: {
+                  output_format: 'png',
+                  ...(request.extra_body || {}), // Include other extra params if any
+                },
+              }),
+              signal: abortController.signal,
+            }),
+          ]);
+
+          // Handle main agent response independently
+          if (mainResult.status === 'fulfilled') {
+            const response = mainResult.value;
+            try {
+              if (!response.ok) {
+                let errorText = '';
+                let errorData: any = null;
+                try {
+                  errorText = await response.text();
+                  try {
+                    errorData = JSON.parse(errorText);
+                  } catch {}
+                } catch {}
+                const errorMessage = errorData?.error || errorText || `HTTP ${response.status}: ${response.statusText}`;
+                setError(`Server Error (${response.status}): ${errorMessage}`);
+                setAiResponse('');
+                setTokenUsage(null);
+                setDuration(null);
+              } else {
+                const data = await response.json();
+                if (!data.success) {
+                  const errorMessage = data.error || 'Failed to get AI response';
+                  setError(`AI Builder Error: ${errorMessage}`);
+                  setAiResponse('');
+                  setTokenUsage(null);
+                  setDuration(null);
+                } else {
+                  const builderResponse: AiBuilderResponseData = data.data;
+                  setAiResponse(builderResponse.response);
+                  setTokenUsage(builderResponse.tokenUsage || null);
+                  setDuration(builderResponse.timing?.duration || null);
+                  setError(null);
+
+                  // Save prompt to history
+                  if (builderResponse.response && builderResponse.tokenUsage) {
+                    const username = user?.name || user?.email || 'anonymous';
+                    const pricing = builderResponse.tokenUsage.pricing;
+                    
+                    const savedPrompt = await createPrompt({
+                      username: user?.username || '',
+                      aiAgent: request.agentId,
+                      userPrompt: request.userPrompt.trim(),
+                      agentResponse: typeof builderResponse.response === 'string' 
+                        ? builderResponse.response 
+                        : JSON.stringify(builderResponse.response, null, 2),
+                      inputTokens: builderResponse.tokenUsage.prompt_tokens,
+                      inputPrice: pricing?.input_cost || 0,
+                      outputTokens: builderResponse.tokenUsage.completion_tokens,
+                      outputPrice: pricing?.output_cost || 0,
+                      totalTokens: builderResponse.tokenUsage.total_tokens,
+                      totalPrice: pricing?.total_cost || 0,
+                      responseTime: builderResponse.timing?.responseTime,
+                      duration: builderResponse.timing?.duration,
+                      referenceId: request.referenceId,
+                      annotations: request.annotations,
+                    });
+                    
+                    if (savedPrompt?.id) {
+                      setLastPromptId(savedPrompt.id);
+                    }
+                  }
+                }
+              }
+            } catch (err) {
+              if (!(err instanceof Error && err.name === 'AbortError')) {
+                const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+                setError(`Main Agent Error: ${errorMessage}`);
+                setAiResponse('');
+                setTokenUsage(null);
+                setDuration(null);
+              }
+            }
+          } else {
+            // Main request rejected
+            const errorMessage = mainResult.reason instanceof Error ? mainResult.reason.message : 'Unknown error';
+            setError(`Main Agent Error: ${errorMessage}`);
+            setAiResponse('');
+            setTokenUsage(null);
+            setDuration(null);
+          }
+
+        // Handle image generation response independently
+        if (imageResult.status === 'fulfilled') {
+          const response = imageResult.value;
+          try {
+            if (!response.ok) {
+              let errorText = '';
+              let errorData: any = null;
+              try {
+                errorText = await response.text();
+                try {
+                  errorData = JSON.parse(errorText);
+                } catch {}
+              } catch {}
+              const errorMessage = errorData?.error || errorText || `HTTP ${response.status}: ${response.statusText}`;
+              setImageError(`Image Generation Error (${response.status}): ${errorMessage}`);
+              setImageResponse(null);
+            } else {
+              const data = await response.json();
+              if (!data.success) {
+                const errorMessage = data.error || 'Failed to generate image';
+                setImageError(`Image Generation Error: ${errorMessage}`);
+                setImageResponse(null);
+              } else {
+                const builderResponse: AiBuilderResponseData = data.data;
+                setImageResponse(builderResponse.response);
+                setImageError(null);
+              }
+            }
+          } catch (err) {
+            if (!(err instanceof Error && err.name === 'AbortError')) {
+              const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+              setImageError(`Image Generation Error: ${errorMessage}`);
+              setImageResponse(null);
+            }
+          }
+        } else {
+          // Image request rejected
+          const errorMessage = imageResult.reason instanceof Error ? imageResult.reason.message : 'Unknown error';
+          setImageError(`Image Generation Error: ${errorMessage}`);
+          setImageResponse(null);
+        }
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        // Original single request flow when imageType is not set or is "none"
+        let response: Response;
+        try {
+          response = await fetch(`/api/ai-builder/${agentId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userPrompt: request.userPrompt.trim(),
+              previousAiResponse: request.previousAiResponse,
+              previousUserPrompt: request.previousUserPrompt,
+              annotations: request.annotations,
+              body: request.body,
+              extra_body: request.extra_body,
+            }),
+            signal: abortController.signal,
+          });
       } catch (fetchError) {
         // Handle network errors, CORS errors, etc.
         const errorMessage = fetchError instanceof Error ? fetchError.message : 'Unknown fetch error';
@@ -305,6 +492,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
           setLastPromptId(savedPrompt.id);
         }
       }
+      }
     } catch (err) {
       // Don't show error if request was aborted
       if (err instanceof Error && err.name === 'AbortError') {
@@ -340,6 +528,8 @@ export function useAiBuilder(): UseAiBuilderReturn {
       setAiResponse('');
       setTokenUsage(null);
       setDuration(null);
+      setImageResponse(null);
+      setImageError(null);
       abortControllerRef.current = null;
     }
   }, []);
@@ -572,6 +762,10 @@ export function useAiBuilder(): UseAiBuilderReturn {
     setAiResponse('');
     setTokenUsage(null);
     setDuration(null);
+    setError(null);
+    setSuccessMessage(null);
+    setImageResponse(null);
+    setImageError(null);
   }, []);
 
   const clearError = useCallback(() => {
@@ -594,6 +788,8 @@ export function useAiBuilder(): UseAiBuilderReturn {
     successMessage,
     preloadedContext,
     isLoadingPreload,
+    imageResponse,
+    imageError,
     generateResponse,
     stopGeneration,
     approveResponse,

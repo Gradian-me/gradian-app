@@ -5,7 +5,7 @@ import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { TextareaProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
 import { CopyContent } from './CopyContent';
-import { ProfessionalWritingModal } from '@/domains/professional-writing';
+import { ProfessionalWritingModal } from '@/gradian-ui/communication/professional-writing';
 import { IconRenderer } from '../../../shared/utils/icon-renderer';
 import { VoiceInputDialog } from '@/gradian-ui/communication/voice/components/VoiceInputDialog';
 import { Mic } from 'lucide-react';
@@ -216,7 +216,7 @@ export const MarkdownInput = forwardRef<FormElementRef, TextareaProps>(
               onChange?.(text);
               setIsVoiceDialogOpen(false);
             }}
-            autoStart={true}
+            autoStart={false}
           />
         )}
       </div>

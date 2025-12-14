@@ -174,7 +174,12 @@ const buildSelectionEntry = (
   }
 
   const title = getValueByRole(schema, item, 'title') || item.name || item.title || baseId;
-  const icon = getSingleValueByRole(schema, item, 'icon') || item.icon;
+  let icon = getSingleValueByRole(schema, item, 'icon') || item.icon;
+  
+  // Add default icon for users schema if missing
+  if (!icon && schema?.id === 'users') {
+    icon = 'User';
+  }
 
   let color: string | undefined;
   const statusValue = getSingleValueByRole(schema, item, 'status') ?? item.status;
@@ -184,6 +189,19 @@ const buildSelectionEntry = (
     if (statusOptions) {
       const statusMeta = getBadgeMetadata(statusValue, statusOptions as BadgeOption[]);
       color = statusMeta.color;
+    }
+  }
+  
+  // Add default color for users schema if missing
+  if (!color && schema?.id === 'users') {
+    color = 'blue';
+  }
+  
+  // Also check if color comes from role="color" field
+  if (!color) {
+    const colorValue = getSingleValueByRole(schema, item, 'color') || item.color;
+    if (colorValue) {
+      color = colorValue;
     }
   }
 

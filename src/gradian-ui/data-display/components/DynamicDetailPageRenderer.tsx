@@ -261,6 +261,30 @@ const getHeaderInfo = (schema: FormSchema, data: any) => {
 
   const statusOptions = statusField?.options;
 
+  // Entity Type handling (similar to status)
+  const entityTypeField = schema.fields?.find(f => f.role === 'entityType');
+  const hasEntityTypeGroup = Array.isArray(schema?.entityTypeGroup) && schema.entityTypeGroup.length > 0;
+  const rawEntityTypeValueFromField = entityTypeField ? data?.[entityTypeField.name] : undefined;
+  const normalizedEntityTypeOption =
+    normalizeOptionArray(rawEntityTypeValueFromField)[0] ??
+    normalizeOptionArray(data?.entityType)[0];
+  const entityTypeValueFromRole = getSingleValueByRole(schema, data, 'entityType');
+  const entityTypeIdentifier =
+    normalizedEntityTypeOption?.id ??
+    (typeof rawEntityTypeValueFromField === 'string' || typeof rawEntityTypeValueFromField === 'number'
+      ? String(rawEntityTypeValueFromField)
+      : undefined) ??
+    (typeof data?.entityType === 'string' || typeof data?.entityType === 'number'
+      ? String(data.entityType)
+      : undefined);
+  const entityTypeLabel =
+    normalizedEntityTypeOption?.label ??
+    (entityTypeValueFromRole && entityTypeValueFromRole.trim() !== '' ? entityTypeValueFromRole : undefined) ??
+    getPrimaryDisplayString(rawEntityTypeValueFromField) ??
+    getPrimaryDisplayString(data?.entityType) ??
+    entityTypeIdentifier ??
+    '';
+
   // Get person field (assignedTo)
   const personFieldDef = schema.fields?.find(field => field.role === 'person');
   const personValue = personFieldDef ? (data[personFieldDef.name] || data.assignedTo) : (data.assignedTo || null);
@@ -315,7 +339,16 @@ const getHeaderInfo = (schema: FormSchema, data: any) => {
       icon: normalizedStatusOption?.icon,
       label: statusLabel,
       value: statusIdentifier ?? statusLabel ?? '',
-    }
+    },
+    entityType: entityTypeLabel,
+    entityTypeMetadata: {
+      color: normalizedEntityTypeOption?.color ?? 'purple',
+      icon: normalizedEntityTypeOption?.icon ?? 'Tag',
+      label: entityTypeLabel,
+      value: entityTypeIdentifier ?? entityTypeLabel ?? '',
+    },
+    hasEntityTypeGroup,
+    entityTypeField,
   };
 };
 
@@ -580,7 +613,11 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     code: '',
     personField: null,
     statusOptions: undefined,
-    statusMetadata: undefined
+    statusMetadata: undefined,
+    entityType: '',
+    entityTypeMetadata: undefined,
+    hasEntityTypeGroup: false,
+    entityTypeField: undefined,
   };
   const headerStatusRoleValues = getArrayValuesByRole(schema, data, 'status');
   const headerStatusArray = headerStatusRoleValues.length > 0
@@ -607,6 +644,32 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
         }
       : getBadgeConfig(headerInfo.status, headerInfo.statusOptions);
   
+  // Helper function to safely convert color string to valid Badge variant
+  const getValidBadgeVariant = (
+    color: string | undefined
+  ): 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' | 'info' | 'gradient' | 'muted' | 'slate' | 'gray' | 'zinc' | 'neutral' | 'stone' | 'red' | 'orange' | 'amber' | 'yellow' | 'lime' | 'green' | 'emerald' | 'teal' | 'cyan' | 'sky' | 'blue' | 'indigo' | 'violet' | 'purple' | 'fuchsia' | 'pink' | 'rose' => {
+    const validVariants = [
+      'default', 'secondary', 'destructive', 'outline', 'success', 'warning', 'info', 'gradient', 'muted',
+      'slate', 'gray', 'zinc', 'neutral', 'stone', 'red', 'orange', 'amber', 'yellow', 'lime', 'green',
+      'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'
+    ] as const;
+    
+    if (color && validVariants.includes(color as any)) {
+      return color as typeof validVariants[number];
+    }
+    return 'purple';
+  };
+  
+  // Entity type badge config
+  const entityTypeBadgeConfig = headerInfo.entityTypeMetadata
+    ? {
+        value: headerInfo.entityTypeMetadata.value,
+        label: headerInfo.entityTypeMetadata.label ?? headerInfo.entityType,
+        icon: headerInfo.entityTypeMetadata.icon,
+        color: headerInfo.entityTypeMetadata.color ?? 'purple',
+      }
+    : null;
+  
   // Check if avatar field exists in schema
   const hasAvatarField = schema?.fields?.some(field => field.role === 'avatar') || false;
   const duedateFieldLabel = schema?.fields?.find(field => field.role === 'duedate')?.label || 'Due Date';
@@ -615,6 +678,11 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     Boolean(headerInfo.status && headerInfo.status.trim() !== '') ||
     Boolean(headerInfo.statusMetadata?.label) ||
     Boolean(badgeConfig?.label);
+
+  const hasEntityTypeBadge =
+    Boolean(headerInfo.entityType && headerInfo.entityType.trim() !== '') ||
+    Boolean(headerInfo.entityTypeMetadata?.label) ||
+    Boolean(entityTypeBadgeConfig?.label);
 
   useEffect(() => {
     if (typeof document === 'undefined') {
@@ -1146,7 +1214,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                     />
                   </div>
                 )}
-              {(hasRating || hasStatusBadge) && (
+              {(hasRating || hasStatusBadge || hasEntityTypeBadge) && (
                 <div className="flex items-end flex-col justify-end gap-2">
                   {hasRating && (
                     <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.15 }}>
@@ -1177,6 +1245,25 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       </Badge>
                     </motion.div>
                   ) : null}
+                  {hasEntityTypeBadge && entityTypeBadgeConfig ? (
+                    <motion.div
+                      initial={disableAnimation ? false : { opacity: 0, scale: 0.8, y: 5 }}
+                      animate={disableAnimation ? false : { opacity: 1, scale: 1, y: 0 }}
+                      transition={disableAnimation ? {} : {
+                        duration: 0.3,
+                        delay: 0.25,
+                        ease: [0.25, 0.46, 0.45, 0.94]
+                      }}
+                      whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05 }}
+                    >
+                      <Badge variant={getValidBadgeVariant(entityTypeBadgeConfig.color)}>
+                        {entityTypeBadgeConfig.icon && (
+                          <IconRenderer iconName={entityTypeBadgeConfig.icon} className="h-3 w-3 me-1" />
+                        )}
+                        {entityTypeBadgeConfig.label}
+                      </Badge>
+                    </motion.div>
+                  ) : null}
                 </div>
               )}
               </div>
@@ -1187,7 +1274,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
         </motion.div>
 
         {/* Quick Actions and Tags - Always on Top in Responsive View */}
-        {(quickActions.length > 0 || (hasStatusBadge && badgeConfig?.label)) && (
+        {(quickActions.length > 0 || (hasStatusBadge && badgeConfig?.label) || (hasEntityTypeBadge && entityTypeBadgeConfig?.label)) && (
           <motion.div
             initial={disableAnimation ? false : { opacity: 0, y: 20 }}
             animate={disableAnimation ? false : { opacity: 1, y: 0 }}
@@ -1208,9 +1295,10 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
             )}
 
             {/* Tags/Badges - Mobile */}
-            {hasStatusBadge && badgeConfig?.label && (
+            {((hasStatusBadge && badgeConfig?.label) || (hasEntityTypeBadge && entityTypeBadgeConfig?.label)) && (
               <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm p-4">
                 <div className="flex items-center gap-2 flex-wrap">
+                  {hasStatusBadge && badgeConfig?.label && (
                   <motion.div
                     initial={disableAnimation ? false : { opacity: 0, scale: 0.8, y: 5 }}
                     animate={disableAnimation ? false : { opacity: 1, scale: 1, y: 0 }}
@@ -1228,6 +1316,26 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       {badgeConfig.label}
                     </Badge>
                   </motion.div>
+                  )}
+                  {hasEntityTypeBadge && entityTypeBadgeConfig?.label && (
+                    <motion.div
+                      initial={disableAnimation ? false : { opacity: 0, scale: 0.8, y: 5 }}
+                      animate={disableAnimation ? false : { opacity: 1, scale: 1, y: 0 }}
+                      transition={disableAnimation ? {} : {
+                        duration: 0.3,
+                        delay: 0.25,
+                        ease: [0.25, 0.46, 0.45, 0.94]
+                      }}
+                      whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05 }}
+                    >
+                      <Badge variant={getValidBadgeVariant(entityTypeBadgeConfig.color)}>
+                        {entityTypeBadgeConfig.icon && (
+                          <IconRenderer iconName={entityTypeBadgeConfig.icon} className="h-3 w-3 me-1" />
+                        )}
+                        {entityTypeBadgeConfig.label}
+                      </Badge>
+                    </motion.div>
+                  )}
                   {hasRating && (
                     <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.15 }}>
                       <Rating
