@@ -54,6 +54,20 @@ Text Accuracy:
 - If numbers, dates, or specific terms are mentioned, display them accurately
 - Maintain the original meaning when translating to English
 
+Number Display Requirements:
+- All numbers must be displayed with maximum clarity and precision
+- Always include decimal points when numbers have decimal values (e.g., 98.5, not 98 or 99)
+- Always include appropriate units for numbers (e.g., %, USD, kg, etc.)
+- Use clear number formatting with proper spacing between numbers and units
+- Ensure numbers are large enough to read comfortably
+- Use consistent number formatting throughout the image
+- Display percentages with the % symbol clearly visible
+- Display currency values with currency symbols or abbreviations (e.g., $, USD, EUR)
+- Display measurements with proper unit abbreviations (e.g., kg, m, cm, ml, etc.)
+- Avoid truncating or rounding numbers unless explicitly requested
+- Maintain precision for decimal numbers (e.g., 16666.67 not 16667)
+- Use thousand separators for large numbers when appropriate (e.g., 2,500,000)
+
 Visual Hierarchy:
 - Use text size, weight, and color to create clear visual hierarchy
 - Important information should be more prominent
@@ -61,7 +75,7 @@ Visual Hierarchy:
 
 Watermark Requirement:
 - ALL images MUST include a minimal text watermark in the bottom right corner
-- The watermark text must be: "Powered by Gradian AI"
+- The watermark text must be: "Powered by Gradian AI" in one line
 - Use small, subtle font size (not too prominent, but readable)
 - Use a semi-transparent or low-contrast color that doesn't distract from the main content
 - Position it in the bottom right corner with appropriate padding from edges

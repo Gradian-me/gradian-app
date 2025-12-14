@@ -43,6 +43,39 @@ export function AiAgentDialog({
     includedFields?: string[];
   }>>([]);
   const [userPrompt, setUserPrompt] = useState<string>('');
+  const [processedBody, setProcessedBody] = useState<Record<string, any> | undefined>(undefined);
+  const [processedExtraBody, setProcessedExtraBody] = useState<Record<string, any> | undefined>(undefined);
+
+  // Process preset body and extra_body with dynamic context replacement
+  useEffect(() => {
+    if (!isOpen || !data || !schema) {
+      setProcessedBody(undefined);
+      setProcessedExtraBody(undefined);
+      return;
+    }
+
+    // Process body if provided
+    if (action.body) {
+      const processed = replaceDynamicContextInObject(action.body, {
+        formSchema: schema,
+        formData: data,
+      });
+      setProcessedBody(processed);
+    } else {
+      setProcessedBody(undefined);
+    }
+
+    // Process extra_body if provided
+    if (action.extra_body) {
+      const processed = replaceDynamicContextInObject(action.extra_body, {
+        formSchema: schema,
+        formData: data,
+      });
+      setProcessedExtraBody(processed);
+    } else {
+      setProcessedExtraBody(undefined);
+    }
+  }, [isOpen, data, schema, action.body, action.extra_body]);
 
   // Build preload routes from current item, selected sections, and action-defined routes
   useEffect(() => {
@@ -135,8 +168,17 @@ export function AiAgentDialog({
       const selectedData: Record<string, any> = {};
       action.selectedFields.forEach((fieldId) => {
         const field = schema.fields?.find(f => f.id === fieldId);
-        if (field && field.name && data[field.name] !== undefined) {
-          selectedData[field.name] = data[field.name];
+        if (field && field.name) {
+          // Field found in schema, use its name to access data
+          if (data[field.name] !== undefined) {
+            selectedData[field.name] = data[field.name];
+          }
+        } else {
+          // Field not found in schema (might be a computed field, dataPath, component renderer field, or data-only field)
+          // Use the fieldId directly as the field name to access data
+          if (data[fieldId] !== undefined) {
+            selectedData[fieldId] = data[fieldId];
+          }
         }
       });
 
@@ -172,8 +214,13 @@ export function AiAgentDialog({
       promptParts.push(`\nFull item data:\n\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``);
     }
 
+    // Concatenate additionalSystemPrompt if provided
+    if (action.additionalSystemPrompt) {
+      promptParts.push(`\n\n${action.additionalSystemPrompt}`);
+    }
+
     setUserPrompt(promptParts.join('\n'));
-  }, [isOpen, data, schema, action.selectedFields, action.selectedSections]);
+  }, [isOpen, data, schema, action.selectedFields, action.selectedSections, action.additionalSystemPrompt]);
 
   if (!agent) {
     return null;
@@ -198,6 +245,8 @@ export function AiAgentDialog({
         displayType={action.displayType || 'default'}
         runType={action.runType || 'manual'}
         agent={agent}
+        initialBody={processedBody}
+        initialExtraBody={processedExtraBody}
       />
     </Modal>
   );

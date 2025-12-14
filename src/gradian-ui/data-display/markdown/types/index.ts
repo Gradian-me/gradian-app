@@ -24,6 +24,11 @@ export interface MarkdownViewerProps {
    * Callback to provide extracted headings and active heading ID
    */
   onNavigationData?: (data: { headings: Array<{ id: string; text: string; level: number }>; activeHeadingId?: string }) => void;
+  /**
+   * AI Agent ID for enhancing markdown content (e.g., "professional-writing")
+   * When provided, shows an "Enhance with AI" button in the header
+   */
+  aiAgentId?: string;
 }
 
 export interface TableParseResult {

@@ -305,9 +305,16 @@ export interface QuickAction {
   payloadTemplate?: any;
   /**
    * Optional payload override for callApi/openFormDialog actions.
+   * For runAiAgent actions, this is passed as the 'body' parameter to the AI agent API.
    * Supports dynamic context replacement via {{formData.*}} and {{formSchema.*}}.
    */
   body?: any;
+  /**
+   * Optional extra body parameters for runAiAgent actions.
+   * This is passed as the 'extra_body' parameter to the AI agent API.
+   * Supports dynamic context replacement via {{formData.*}} and {{formSchema.*}}.
+   */
+  extra_body?: any;
   // Properties for runAiAgent action
   agentId?: string; // ID of the AI agent to run
   selectedFields?: string[]; // Array of field IDs to include in prompt

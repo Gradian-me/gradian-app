@@ -856,6 +856,46 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                               onChange={(value) => updateQuickAction(action.id, { additionalSystemPrompt: value })}
                             />
                           </div>
+                          <div>
+                            <Textarea
+                              config={{
+                                name: 'preset-body',
+                                label: 'Preset Body Parameters (optional)',
+                                placeholder: '{ "imageType": "comic-book" } or { "imageType": "{{formData.imageType}}" }',
+                                description: 'Preset parameters to pass to AI agent API. Supports {{formData.*}} and {{formSchema.*}} dynamic context replacement.',
+                              }}
+                              value={action.body ? JSON.stringify(action.body, null, 2) : ''}
+                              onChange={(value) => {
+                                try {
+                                  const parsed = value.trim() ? JSON.parse(value) : undefined;
+                                  updateQuickAction(action.id, { body: parsed });
+                                } catch {
+                                  // Ignore parse errors silently; user will fix JSON
+                                  updateQuickAction(action.id, { body: value as any });
+                                }
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <Textarea
+                              config={{
+                                name: 'preset-extra-body',
+                                label: 'Preset Extra Body Parameters (optional)',
+                                placeholder: '{ "output_format": "png" }',
+                                description: 'Preset extra_body parameters to pass to AI agent API. Supports {{formData.*}} and {{formSchema.*}} dynamic context replacement.',
+                              }}
+                              value={action.extra_body ? JSON.stringify(action.extra_body, null, 2) : ''}
+                              onChange={(value) => {
+                                try {
+                                  const parsed = value.trim() ? JSON.parse(value) : undefined;
+                                  updateQuickAction(action.id, { extra_body: parsed });
+                                } catch {
+                                  // Ignore parse errors silently; user will fix JSON
+                                  updateQuickAction(action.id, { extra_body: value as any });
+                                }
+                              }}
+                            />
+                          </div>
                         </>
                       )}
                                 </CardContent>

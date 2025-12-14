@@ -1278,6 +1278,40 @@
           "action": "goToUrl",
           "targetUrl": "/page/vendors",
           "passItemAsReference": true
+        },
+        {
+          "id": "create-comic-book",
+          "label": "Create Comic Book",
+          "icon": "Image",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "comic-book"
+          },
+          "selectedFields": [
+            "company-name",
+            "description"
+          ],
+          "additionalSystemPrompt": "Create a comic book style illustration based on the vendor information provided."
+        },
+        {
+          "id": "create-sketch",
+          "label": "Create Sketch",
+          "icon": "Pencil",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "sketch"
+          },
+          "selectedFields": [
+            "company-name",
+            "description",
+            "certifications",
+            "performanceMetrics"
+          ],
+          "additionalSystemPrompt": "Create a sketch-style illustration based on the vendor information provided."
         }
       ],
       "componentRenderers": [
