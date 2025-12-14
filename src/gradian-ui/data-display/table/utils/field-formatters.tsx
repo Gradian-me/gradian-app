@@ -503,6 +503,39 @@ export const formatFieldValue = (
     );
   }
 
+  if (field?.role === 'entityType') {
+    const entityTypeOptions = field.options || [];
+    const primaryOption = normalizedOptions[0];
+    const entityTypeValue = primaryOption?.id ?? String(
+      Array.isArray(value) ? value[0] : value
+    );
+    const badgeConfig = getBadgeConfig(entityTypeValue, entityTypeOptions);
+    // Get color from normalized option (which may have color from entity type items)
+    const badgeColor = primaryOption?.color || primaryOption?.normalized?.color || field.roleColor || badgeConfig.color;
+    const badgeIcon = primaryOption?.icon || primaryOption?.normalized?.icon || badgeConfig.icon;
+    const badgeLabel = primaryOption?.label || primaryOption?.normalized?.label || badgeConfig.label;
+    
+    // Check if badgeColor is a Tailwind color name (not a badge variant)
+    const isTailwindColor = badgeColor && !['default', 'primary', 'secondary', 'success', 'warning', 'danger', 'outline'].includes(badgeColor);
+    
+    return wrapWithForceIcon(
+      <div className="inline-flex items-center whitespace-nowrap">
+        <Badge
+          variant={isTailwindColor ? undefined : (mapBadgeColorToVariant(badgeColor) as any)}
+          color={isTailwindColor ? badgeColor : undefined}
+          size="sm"
+          className="inline-flex items-center gap-1.5"
+        >
+          {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
+          <span>{badgeLabel}</span>
+        </Badge>
+      </div>,
+      isForce,
+      field,
+      row
+    );
+  }
+
   if (field?.role === 'rating') {
     return (
       <div className="inline-flex items-center">

@@ -32,6 +32,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
 }) => {
   // Check if System Section should be shown
   const hasStatusGroup = Array.isArray(schema.statusGroup) && schema.statusGroup.length > 0;
+  const hasEntityTypeGroup = Array.isArray(schema.entityTypeGroup) && schema.entityTypeGroup.length > 0;
 
   const inactiveValue = values.inactive === true;
   const forceValue = values.isForce === true;
@@ -46,6 +47,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
   const hasAssignedToField = schema.allowDataAssignedTo === true;
   const hasDueDateField = schema.allowDataDueDate === true;
   const hasStatusField = hasStatusGroup === true;
+  const hasEntityTypeField = hasEntityTypeGroup === true;
   const hasParentField = schema.allowHierarchicalParent === true;
   const hasMultiCompaniesField = schema.canSelectMultiCompanies === true;
 
@@ -66,6 +68,24 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
     }
     return `/api/data/all-relations?schema=status-groups&direction=both&otherSchema=status-items&relationTypeId=HAS_STATUS_ITEM&id=${encodeURIComponent(String(statusGroupId))}`;
   }, [hasStatusGroup, schema.statusGroup]);
+
+  // Memoize the entity type sourceUrl to prevent it from changing on every render
+  // This ensures PickerInput doesn't reset when form values change
+  // Get entityTypeGroup ID directly from schema prop (more stable than dynamic context)
+  // NOTE: Must be called before any early returns to comply with Rules of Hooks
+  const entityTypeSourceUrl = useMemo(() => {
+    if (!hasEntityTypeGroup || !schema.entityTypeGroup || !Array.isArray(schema.entityTypeGroup) || schema.entityTypeGroup.length === 0) {
+      return '';
+    }
+    const entityTypeGroupId = schema.entityTypeGroup[0]?.id;
+    if (!entityTypeGroupId) {
+      // Fallback to dynamic context if schema doesn't have the ID
+      const contextId = extractFromDynamicContext('formSchema', 'entityTypeGroup.[0].id');
+      if (!contextId) return '';
+      return `/api/data/all-relations?schema=entity-type-groups&direction=both&otherSchema=entity-type-items&relationTypeId=HAS_ENTITY_TYPE_ITEM&id=${contextId}`;
+    }
+    return `/api/data/all-relations?schema=entity-type-groups&direction=both&otherSchema=entity-type-items&relationTypeId=HAS_ENTITY_TYPE_ITEM&id=${encodeURIComponent(String(entityTypeGroupId))}`;
+  }, [hasEntityTypeGroup, schema.entityTypeGroup]);
 
   // Memoize the status picker config to prevent PickerInput from resetting when config object reference changes
   // NOTE: Must be called before any early returns to comply with Rules of Hooks
@@ -89,6 +109,28 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
     },
   }), [statusSourceUrl]);
 
+  // Memoize the entity type picker config to prevent PickerInput from resetting when config object reference changes
+  // NOTE: Must be called before any early returns to comply with Rules of Hooks
+  const entityTypePickerConfig = useMemo(() => ({
+    name: 'entityType',
+    label: "Entity Type",
+    placeholder: 'Select entity type',
+    description: 'Entity type for this record from the configured entity type group.',
+    sourceUrl: entityTypeSourceUrl,
+    columnMap: {
+      response: { data: 'data.0.data' }, // Extract items from data[0].data array
+      item: {
+        id: 'id',
+        label: 'label',
+        icon: 'icon',
+        color: 'color',
+      },
+    },
+    metadata: {
+      allowMultiselect: false, // Entity type is always single-select
+    },
+  }), [entityTypeSourceUrl]);
+
   // Count available fields
   const availableFieldsCount = [
     hasInactiveField,
@@ -97,6 +139,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
     hasAssignedToField,
     hasDueDateField,
     hasStatusField,
+    hasEntityTypeField,
     hasParentField,
     hasMultiCompaniesField,
   ].filter(Boolean).length;
@@ -168,18 +211,26 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
             </div>
           )}
 
-          {(hasAssignedToField || hasDueDateField || hasStatusField) && (
+          {(hasAssignedToField || hasDueDateField || hasStatusField || hasEntityTypeField) && (
             <div className="pt-2">
               <div className={cn(
                 'grid gap-4',
                 // Dynamic grid columns based on available fields
-                (hasAssignedToField && hasDueDateField && hasStatusField) && 'grid-cols-1 md:grid-cols-3',
-                ((hasAssignedToField && hasDueDateField && !hasStatusField) || 
-                 (hasAssignedToField && !hasDueDateField && hasStatusField) ||
-                 (!hasAssignedToField && hasDueDateField && hasStatusField)) && 'grid-cols-1 md:grid-cols-2',
-                ((hasAssignedToField && !hasDueDateField && !hasStatusField) ||
-                 (!hasAssignedToField && hasDueDateField && !hasStatusField) ||
-                 (!hasAssignedToField && !hasDueDateField && hasStatusField)) && 'grid-cols-1'
+                (hasAssignedToField && hasDueDateField && hasStatusField && hasEntityTypeField) && 'grid-cols-1 md:grid-cols-4',
+                ((hasAssignedToField && hasDueDateField && hasStatusField && !hasEntityTypeField) ||
+                 (hasAssignedToField && hasDueDateField && !hasStatusField && hasEntityTypeField) ||
+                 (hasAssignedToField && !hasDueDateField && hasStatusField && hasEntityTypeField) ||
+                 (!hasAssignedToField && hasDueDateField && hasStatusField && hasEntityTypeField)) && 'grid-cols-1 md:grid-cols-3',
+                ((hasAssignedToField && hasDueDateField && !hasStatusField && !hasEntityTypeField) || 
+                 (hasAssignedToField && !hasDueDateField && hasStatusField && !hasEntityTypeField) ||
+                 (hasAssignedToField && !hasDueDateField && !hasStatusField && hasEntityTypeField) ||
+                 (!hasAssignedToField && hasDueDateField && hasStatusField && !hasEntityTypeField) ||
+                 (!hasAssignedToField && hasDueDateField && !hasStatusField && hasEntityTypeField) ||
+                 (!hasAssignedToField && !hasDueDateField && hasStatusField && hasEntityTypeField)) && 'grid-cols-1 md:grid-cols-2',
+                ((hasAssignedToField && !hasDueDateField && !hasStatusField && !hasEntityTypeField) ||
+                 (!hasAssignedToField && hasDueDateField && !hasStatusField && !hasEntityTypeField) ||
+                 (!hasAssignedToField && !hasDueDateField && hasStatusField && !hasEntityTypeField) ||
+                 (!hasAssignedToField && !hasDueDateField && !hasStatusField && hasEntityTypeField)) && 'grid-cols-1'
               )}>
                 {hasAssignedToField && (
                   <div className="space-y-2">
@@ -253,6 +304,35 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
                         }
                       }}
                       onBlur={() => onBlur('status')}
+                      disabled={disabled}
+                      className="w-full"
+                    />
+                  </div>
+                )}
+
+                {hasEntityTypeField && (
+                  <div className="space-y-2">
+                    <PickerInput
+                      key={`entity-type-picker-${entityTypeSourceUrl}`} // Stable key based on sourceUrl to prevent remounting
+                      config={entityTypePickerConfig}
+                      value={Array.isArray(values.entityType) ? values.entityType : (values.entityType ? [values.entityType] : [])}
+                      error={errors?.entityType}
+                      touched={typeof touched?.entityType === 'boolean' ? touched.entityType : undefined}
+                      required={true}
+                      onChange={(selections) => {
+                        // Store full normalized selections so we keep label/icon metadata in data
+                        // For single select (entityType), prevent clearing only if it's required
+                        // For multi-select, allow clearing but ensure we can still select after clearing
+                        if (Array.isArray(selections)) {
+                          // Always allow the change - don't block clearing
+                          // The validation will handle required field checking
+                          onChange('entityType', selections);
+                        } else {
+                          // Handle non-array values (shouldn't happen, but be safe)
+                          onChange('entityType', selections);
+                        }
+                      }}
+                      onBlur={() => onBlur('entityType')}
                       disabled={disabled}
                       className="w-full"
                     />

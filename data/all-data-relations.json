@@ -1039,5 +1039,198 @@
     "id": "01KC6217KXR0N5M4533FBPEYZZ",
     "createdAt": "2025-12-11T06:37:02.972Z",
     "updatedAt": "2025-12-11T06:37:02.972Z"
+  },
+  {
+    "id": "01KCDSTMJNGP82H90CDHJWT1EN",
+    "sourceSchema": "oox-analyzer",
+    "sourceId": "01KCDSTMH0XRHSME4ZEFYZ34PW",
+    "targetSchema": "users",
+    "targetId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "operator",
+    "createdAt": "2025-12-14T06:47:33.716Z",
+    "updatedAt": "2025-12-14T06:53:36.760Z"
+  },
+  {
+    "id": "01KCDSY120FWX864MC4B16YZK1",
+    "sourceSchema": "oox-analyzer",
+    "sourceId": "01KCDSTMH0XRHSME4ZEFYZ34PW",
+    "targetSchema": "users",
+    "targetId": "01KC3F76QSDY5P2XVP3T2E0DAD",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "virtual-assignedTo-oox-analyzer",
+    "createdAt": "2025-12-14T06:49:24.799Z",
+    "updatedAt": "2025-12-14T06:53:36.769Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDYYM7B28QEPXD97A1B8V5S",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZ001MAN0000000000000001",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZREL001MAN00000000000001",
+    "createdAt": "2025-12-14T08:20:00.000Z",
+    "updatedAt": "2025-12-14T08:20:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDYYM7B28QEPXD97A1B8V5S",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZ002MACHINE00000000002",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZREL002MACHINE00000000002",
+    "createdAt": "2025-12-14T08:20:00.000Z",
+    "updatedAt": "2025-12-14T08:20:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDYYM7B28QEPXD97A1B8V5S",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZ003MATERIAL0000000003",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZREL003MATERIAL00000000003",
+    "createdAt": "2025-12-14T08:20:00.000Z",
+    "updatedAt": "2025-12-14T08:20:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDYYM7B28QEPXD97A1B8V5S",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZ004METHOD000000000004",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZREL004METHOD000000000004",
+    "createdAt": "2025-12-14T08:20:00.000Z",
+    "updatedAt": "2025-12-14T08:20:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDYYM7B28QEPXD97A1B8V5S",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZ005MEASUREMENT0000005",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZREL005MEASUREMENT0000005",
+    "createdAt": "2025-12-14T08:20:00.000Z",
+    "updatedAt": "2025-12-14T08:20:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDYYM7B28QEPXD97A1B8V5S",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZ006MOTHERNATURE000006",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZREL006MOTHERNATURE000006",
+    "createdAt": "2025-12-14T08:20:00.000Z",
+    "updatedAt": "2025-12-14T08:20:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDZTASKGROUP0000000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZTASK001WORK000000000001",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZTASKREL001WORK00000000001",
+    "createdAt": "2025-12-14T08:30:00.000Z",
+    "updatedAt": "2025-12-14T08:30:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDZTASKGROUP0000000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZTASK002PERSONAL000000002",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZTASKREL002PERSONAL00000002",
+    "createdAt": "2025-12-14T08:30:00.000Z",
+    "updatedAt": "2025-12-14T08:30:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDZTASKGROUP0000000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZTASK003FAMILY00000000003",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZTASKREL003FAMILY00000000003",
+    "createdAt": "2025-12-14T08:30:00.000Z",
+    "updatedAt": "2025-12-14T08:30:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDZTASKGROUP0000000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZTASK004HEALTH0000000004",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZTASKREL004HEALTH0000000004",
+    "createdAt": "2025-12-14T08:30:00.000Z",
+    "updatedAt": "2025-12-14T08:30:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDZTASKGROUP0000000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZTASK005EDUCATION0000005",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZTASKREL005EDUCATION0000005",
+    "createdAt": "2025-12-14T08:30:00.000Z",
+    "updatedAt": "2025-12-14T08:30:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDZTASKGROUP0000000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZTASK006SHOPPING00000006",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZTASKREL006SHOPPING00000006",
+    "createdAt": "2025-12-14T08:30:00.000Z",
+    "updatedAt": "2025-12-14T08:30:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDZTASKGROUP0000000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZTASK007TRAVEL0000000007",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZTASKREL007TRAVEL0000000007",
+    "createdAt": "2025-12-14T08:30:00.000Z",
+    "updatedAt": "2025-12-14T08:30:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDZTASKGROUP0000000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZTASK008FINANCE000000008",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZTASKREL008FINANCE000000008",
+    "createdAt": "2025-12-14T08:30:00.000Z",
+    "updatedAt": "2025-12-14T08:30:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDZTASKGROUP0000000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZTASK009HOBBY00000000009",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZTASKREL009HOBBY00000000009",
+    "createdAt": "2025-12-14T08:30:00.000Z",
+    "updatedAt": "2025-12-14T08:30:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDZTASKGROUP0000000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZTASK010URGENT0000000010",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZTASKREL010URGENT0000000010",
+    "createdAt": "2025-12-14T08:30:00.000Z",
+    "updatedAt": "2025-12-14T08:30:00.000Z"
+  },
+  {
+    "id": "01KCE2SQCNCHD6E6NX9VV216JV",
+    "sourceSchema": "tasks",
+    "sourceId": "01KBSYN40BXYQ9JNGREYPQRH2P",
+    "targetSchema": "users",
+    "targetId": "01KBSTVK8P6Y3P4MW060HNNKB1",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "virtual-assignedTo-tasks",
+    "createdAt": "2025-12-14T09:24:21.012Z",
+    "updatedAt": "2025-12-14T09:27:11.059Z"
   }
 ]

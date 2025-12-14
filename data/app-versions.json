@@ -2942,5 +2942,67 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCE2T19VGC4VCN173VZNNXHV",
+    "timestamp": "2025-12-14T09:24:15.000Z",
+    "version": "1.26.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Entity Type in Data - Introduced new entity type system for improved data structure and management",
+        "priority": "High",
+        "affectedDomains": [
+          "data-management",
+          "entity-types"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new 'OOX Analyzer for Quality Control' AI agent in ai-agents.json, enhancing data analysis capabilities",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new 'Business Process Generator' AI agent in ai-agents.json, expanding automation capabilities",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented new entity type relations in all-data-relations.json and updated all-data.json to include entity type items, improving data structure",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "data-structure"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated DynamicActionButtons and DynamicCardRenderer components to support new entity type features, enhancing user interaction and data representation",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "ui",
+          "components"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved form handling in FormSystemSection and PickerInput components for better entity type management and user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

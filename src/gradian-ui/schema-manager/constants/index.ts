@@ -52,5 +52,6 @@ export const ROLES = [
   { value: 'tel', label: 'Phone' },
   { value: 'duedate', label: 'Due Date' },
   { value: 'code', label: 'Code' },
+  { value: 'entityType', label: 'Entity Type' },
 ] as const;
 

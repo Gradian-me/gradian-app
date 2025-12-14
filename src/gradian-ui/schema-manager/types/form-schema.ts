@@ -21,7 +21,7 @@ export interface FormField {
   inactive?: boolean;
   addToReferenceMetadata?: boolean;
   isSensitive?: boolean; // If true, field value will be encrypted before storage and decrypted for display
-  role?: 'title' | 'subtitle' | 'description' | 'image' | 'avatar' | 'icon' | 'rating' | 'badge' | 'status' | 'email' | 'location' | 'tel' | 'duedate' | 'code' | 'color' | 'person';
+  role?: 'title' | 'subtitle' | 'description' | 'image' | 'avatar' | 'icon' | 'rating' | 'badge' | 'status' | 'email' | 'location' | 'tel' | 'duedate' | 'code' | 'color' | 'person' | 'entityType';
   roleColor?: 'default' | 'secondary' | 'outline' | 'destructive' | 'gradient' | 'success' | 'warning' | 'info' | 'muted';
   validation?: {
     required?: boolean;
@@ -409,6 +409,12 @@ export interface FormSchema {
    * Stored as an array of selection objects (first item is the primary group).
    */
   statusGroup?: any[];
+  /**
+   * Optional entity type group configuration for this schema.
+   * When set, forms can show an entity type selector based on related entity type items.
+   * Stored as an array of selection objects (first item is the primary group).
+   */
+  entityTypeGroup?: any[];
   syncToDatabases?: string[]; // Array of database IDs to sync this schema to
   syncStrategy?: 'schema-only' | 'schema-and-data'; // Sync strategy: schema only or schema and data
   fields: FormField[]; // All fields at schema level, each with a sectionId

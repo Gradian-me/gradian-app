@@ -753,6 +753,15 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
+      "color": "purple",
+      "label": "Has Entity Type Item",
+      "description": "An entity type group contains one or more entity type items.",
+      "icon": "Tag",
+      "id": "HAS_ENTITY_TYPE_ITEM",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
       "label": "Has Field Value",
       "color": "zinc",
       "icon": "FormInput",
@@ -4028,8 +4037,7 @@
     {
       "assignedTo": [
         {
-          "id": "01KBSTVK8P6Y3P4MW060HNNKB1",
-          "label": "Ali Aminimehr"
+          "id": "01KBSTVK8P6Y3P4MW060HNNKB1"
         }
       ],
       "dueDate": "2025-12-09",
@@ -4044,7 +4052,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBSYN40BXYQ9JNGREYPQRH2P",
       "createdAt": "2025-12-06T13:47:07.147Z",
-      "updatedAt": "2025-12-06T13:47:07.147Z"
+      "updatedAt": "2025-12-14T09:27:11.102Z"
     }
   ],
   "change-procedure": [
@@ -4131,6 +4139,257 @@
       "id": "01KBW8Z924XKTEH1S2E9FPVFSD",
       "createdAt": "2025-12-07T11:25:54.629Z",
       "updatedAt": "2025-12-07T11:25:54.629Z"
+    }
+  ],
+  "oox-analyzer": [
+    {
+      "date": "2025-12-17",
+      "operator": [
+        {
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+        }
+      ],
+      "description": "During routine release testing of Drug Substance lot DS-25-0411, the SE-HPLC chromatogram showed an unexpected increase in high-molecular-weight (HMW) species at 4.1%, compared to the historical range of 1.2%–2.0%. The result remained within specification (<5.0%) but fell outside the established expectation window defined by method lifecycle data.\n\nBecause this deviation did not exceed specification but was uncharacteristic for this process stage, it was logged as an OOE event.",
+      "type": [
+        {
+          "id": "ooe",
+          "label": "Out of Expectation",
+          "icon": "Info",
+          "color": "yellow"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KCDSTMH0XRHSME4ZEFYZ34PW",
+      "createdAt": "2025-12-14T06:47:33.670Z",
+      "updatedAt": "2025-12-14T06:53:36.805Z",
+      "status": [
+        {
+          "id": "01KBHGVA9789N2GWB9XKT6RQ06",
+          "label": "In Progress",
+          "icon": "LucideClock8",
+          "color": "amber"
+        }
+      ],
+      "isForce": true,
+      "forceReason": "OOX of Deviation",
+      "assignedTo": [
+        {
+          "id": "01KC3F76QSDY5P2XVP3T2E0DAD"
+        }
+      ],
+      "dueDate": "2026-01-01",
+      "specifications": "Measured HMW %: 4.1%\n\nHistorical mean: 1.6%\n\nHistorical ±3SD range: 0.9% – 2.3%\n\nRelease specification limit: <5.0%\n\nRepeat injection: 4.0% (consistent with initial result)\n\nChromatogram shape: Slightly broadened HMW peak; no abnormal retention shifts",
+      "rootCauseAnalysis": "The result was:\n\nNot OOS → within specification\n\nNot OOT → method control samples were normal\n\nOOE → unexpected relative to historical product behavior\n\nTriggers for OOE classification:\n\nDeviation >3SD from established product trend\n\nNo corresponding upstream deviation identified at the time\n\nControl standard showed expected purity profile",
+      "preventiveActions": "4.1 Instrument & System Suitability Check\n\nSystem suitability parameters (resolution, tailing, theoretical plates) met acceptance criteria.\n\nColumn back-pressure normal.\n\nNo abnormal baseline drifts.\n→ Instrument performance ruled out.\n\n4.2 Reagent / Consumable Verification\n\nMobile-phase lot consistent with prior batches; no documented anomalies.\n\nColumn used had remaining validated lifetime and showed no prior performance drift.\n\nReference standard chromatogram matched historical pattern.\n→ Reagents and consumables unlikely contributors.\n\n4.3 Sample Handling Review\n\nSample logbook shows no delayed preparation or storage deviation.\n\nLabeling and chain-of-custody verified.\n\nDuplicate aliquot produced nearly identical profile (HMW 4.0%).\n→ Sample handling error not supported.\n\n4.4 Process and Manufacturing Data Review\n\nCorrelation explored with:\n\nTemperature trends during final purification\n\nShear exposure during filtration\n\nHold times prior to freezing\n\nGlycosylation consistency and charge variant profiles"
+    }
+  ],
+  "entity-type-groups": [
+    {
+      "related-companies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "title": "6M Types",
+      "incomplete": true,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KCDYYM7B28QEPXD97A1B8V5S",
+      "createdAt": "2025-12-14T08:17:07.312Z",
+      "updatedAt": "2025-12-14T08:17:07.312Z"
+    },
+    {
+      "related-companies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "title": "Task Types",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KCDZTASKGROUP0000000000001",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z"
+    }
+  ],
+  "entity-type-items": [
+    {
+      "label": "Man",
+      "icon": "User",
+      "color": "blue",
+      "incomplete": false,
+      "id": "01KCDZ001MAN0000000000000001",
+      "createdAt": "2025-12-14T08:20:00.000Z",
+      "updatedAt": "2025-12-14T08:20:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Machine",
+      "icon": "Cog",
+      "color": "slate",
+      "incomplete": false,
+      "id": "01KCDZ002MACHINE00000000002",
+      "createdAt": "2025-12-14T08:20:00.000Z",
+      "updatedAt": "2025-12-14T08:20:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Material",
+      "icon": "Package",
+      "color": "amber",
+      "incomplete": false,
+      "id": "01KCDZ003MATERIAL0000000003",
+      "createdAt": "2025-12-14T08:20:00.000Z",
+      "updatedAt": "2025-12-14T08:20:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Method",
+      "icon": "FileText",
+      "color": "purple",
+      "incomplete": false,
+      "id": "01KCDZ004METHOD000000000004",
+      "createdAt": "2025-12-14T08:20:00.000Z",
+      "updatedAt": "2025-12-14T08:20:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Measurement",
+      "icon": "Ruler",
+      "color": "emerald",
+      "incomplete": false,
+      "id": "01KCDZ005MEASUREMENT0000005",
+      "createdAt": "2025-12-14T08:20:00.000Z",
+      "updatedAt": "2025-12-14T08:20:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Mother Nature",
+      "icon": "TreePine",
+      "color": "green",
+      "incomplete": false,
+      "id": "01KCDZ006MOTHERNATURE000006",
+      "createdAt": "2025-12-14T08:20:00.000Z",
+      "updatedAt": "2025-12-14T08:20:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Work",
+      "icon": "Briefcase",
+      "color": "blue",
+      "incomplete": false,
+      "id": "01KCDZTASK001WORK000000000001",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Personal",
+      "icon": "User",
+      "color": "purple",
+      "incomplete": false,
+      "id": "01KCDZTASK002PERSONAL000000002",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Family",
+      "icon": "Users",
+      "color": "pink",
+      "incomplete": false,
+      "id": "01KCDZTASK003FAMILY00000000003",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Health",
+      "icon": "Heart",
+      "color": "red",
+      "incomplete": false,
+      "id": "01KCDZTASK004HEALTH0000000004",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Education",
+      "icon": "GraduationCap",
+      "color": "indigo",
+      "incomplete": false,
+      "id": "01KCDZTASK005EDUCATION0000005",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Shopping",
+      "icon": "ShoppingCart",
+      "color": "orange",
+      "incomplete": false,
+      "id": "01KCDZTASK006SHOPPING00000006",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Travel",
+      "icon": "Plane",
+      "color": "cyan",
+      "incomplete": false,
+      "id": "01KCDZTASK007TRAVEL0000000007",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Finance",
+      "icon": "DollarSign",
+      "color": "emerald",
+      "incomplete": false,
+      "id": "01KCDZTASK008FINANCE000000008",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Hobby",
+      "icon": "Palette",
+      "color": "violet",
+      "incomplete": false,
+      "id": "01KCDZTASK009HOBBY00000000009",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Urgent",
+      "icon": "AlertCircle",
+      "color": "red",
+      "incomplete": false,
+      "id": "01KCDZTASK010URGENT0000000010",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ]
 }

@@ -243,6 +243,8 @@ export interface ButtonProps extends BaseComponentProps {
   disabled?: boolean;
   loading?: boolean;
   type?: 'button' | 'submit' | 'reset';
+  href?: string;
+  canOpenInNewTab?: boolean;
 }
 
 // Input Component Types

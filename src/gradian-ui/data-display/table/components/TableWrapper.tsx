@@ -100,6 +100,11 @@ export function TableWrapper<T = any>({
       // Find the status field in schema to pass to formatter
       const statusField = schema.fields?.find((f: any) => f.name === 'status' || f.role === 'status');
       
+      // Create field object with options from statusGroup
+      const statusFieldWithOptions = statusField 
+        ? { ...statusField, options: statusField.options || schema.statusGroup }
+        : { id: 'status', name: 'status', role: 'status', options: schema.statusGroup };
+      
       additionalColumns.push({
         id: 'status',
         label: 'Status',
@@ -114,7 +119,39 @@ export function TableWrapper<T = any>({
           }
           // Use formatFieldValue to render status with pastel badge styling
           return formatFieldValue(
-            statusField || { id: 'status', name: 'status', role: 'status' },
+            statusFieldWithOptions,
+            value,
+            row
+          );
+        },
+      });
+    }
+
+    // Add entity type column if schema has entityTypeGroup
+    if (schema?.entityTypeGroup && Array.isArray(schema.entityTypeGroup) && schema.entityTypeGroup.length > 0) {
+      // Find the entityType field in schema to pass to formatter
+      const entityTypeField = schema.fields?.find((f: any) => f.name === 'entityType' || f.role === 'entityType');
+      
+      // Create field object with options from entityTypeGroup
+      const entityTypeFieldWithOptions = entityTypeField
+        ? { ...entityTypeField, options: entityTypeField.options || schema.entityTypeGroup }
+        : { id: 'entityType', name: 'entityType', role: 'entityType', options: schema.entityTypeGroup };
+      
+      additionalColumns.push({
+        id: 'entityType',
+        label: 'Entity Type',
+        accessor: (row: T) => (row as any)['entityType'],
+        sortable: false,
+        align: 'left',
+        maxWidth: 200,
+        allowWrap: true,
+        render: (value: any, row: T) => {
+          if (!value || (Array.isArray(value) && value.length === 0)) {
+            return <span className="text-gray-400 dark:text-gray-500 text-sm">—</span>;
+          }
+          // Use formatFieldValue to render entity type with pastel badge styling
+          return formatFieldValue(
+            entityTypeFieldWithOptions,
             value,
             row
           );
@@ -139,6 +176,34 @@ export function TableWrapper<T = any>({
       if (hiddenIds.size > 0) {
         baseColumns = baseColumns.filter((col) => !hiddenIds.has(col.id as string));
       }
+    }
+
+    // Ensure dueDate columns have the duedate role if schema allows due dates
+    if (schema?.allowDataDueDate) {
+      const dueDateField = schema.fields?.find((f: any) => f.name === 'dueDate' || (f.name === 'dueDate' && f.role === 'duedate'));
+      baseColumns = baseColumns.map((col) => {
+        // If this is a dueDate column, ensure it has the duedate role
+        if (col.id === 'dueDate' || col.field?.name === 'dueDate') {
+          const fieldWithRole = dueDateField || { 
+            id: 'dueDate', 
+            name: 'dueDate', 
+            role: 'duedate', 
+            component: 'date',
+            label: 'Due Date'
+          };
+          return {
+            ...col,
+            field: { ...(col.field || {}), ...fieldWithRole },
+            render: (value: any, row: T) => {
+              if (!value || value === '' || value === null || value === undefined) {
+                return <span className="text-gray-400 dark:text-gray-500 text-sm">—</span>;
+              }
+              return formatFieldValue(fieldWithRole, value, row);
+            },
+          };
+        }
+        return col;
+      });
     }
 
     // Add avatar column if schema has avatar/icon/color configuration
