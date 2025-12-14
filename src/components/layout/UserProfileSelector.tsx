@@ -14,6 +14,7 @@ import { useTheme } from 'next-themes';
 import { ProfileSelectorConfig } from '@/gradian-ui/layout/profile-selector/types';
 import { UserProfile } from '@/gradian-ui/shared/types';
 import { ensureFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
+import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
 
 interface UserProfileSelectorProps {
   config?: Partial<ProfileSelectorConfig>;
@@ -126,6 +127,9 @@ export function UserProfileSelector({
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
+      // Clear access token from memory
+      authTokenManager.clearAccessToken();
+      
       useUserStore.getState().clearUser();
       // Clean up any localStorage tokens if they exist (for migration purposes)
       if (typeof window !== 'undefined') {

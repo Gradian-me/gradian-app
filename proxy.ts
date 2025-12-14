@@ -440,15 +440,11 @@ export async function proxy(request: NextRequest) {
   try {
     const requireLogin = REQUIRE_LOGIN ?? false;
     const excludedRoutes = EXCLUDED_LOGIN_ROUTES ?? [];
-    const loginLocally = LOGIN_LOCALLY ?? false;
-    const ACCESS_TOKEN_COOKIE = AUTH_CONFIG?.ACCESS_TOKEN_COOKIE || 'access_token';
     const REFRESH_TOKEN_COOKIE = AUTH_CONFIG?.REFRESH_TOKEN_COOKIE || 'refresh_token';
-    const ACCESS_TOKEN_EXPIRY = AUTH_CONFIG?.ACCESS_TOKEN_EXPIRY || 3600;
 
     loggingCustom(LogType.LOGIN_LOG, 'debug', `Application variables: ${JSON.stringify({
       REQUIRE_LOGIN: requireLogin,
       EXCLUDED_LOGIN_ROUTES: excludedRoutes,
-      LOGIN_LOCALLY: loginLocally,
     })}`);
 
     if (!requireLogin) {
@@ -463,171 +459,77 @@ export async function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
+    // Middleware only handles route protection - token refresh is handled client-side
+    // Check if refresh token exists in HttpOnly cookie
     const cookies = request.headers.get('cookie');
     loggingCustom(LogType.LOGIN_LOG, 'debug', `Cookies: ${cookies ? 'Present' : 'Missing'}`);
-    loggingCustom(LogType.LOGIN_LOG, 'debug', `Cookie name: ${ACCESS_TOKEN_COOKIE}`);
 
     if (cookies) {
       const cookieNames = cookies.split(';').map(c => c.trim().split('=')[0]);
       loggingCustom(LogType.LOGIN_LOG, 'debug', `Available cookie names: ${cookieNames.join(', ')}`);
     }
 
-    const accessToken = extractTokenFromCookiesEdge(cookies, ACCESS_TOKEN_COOKIE);
-    loggingCustom(LogType.LOGIN_LOG, 'debug', `Access token: ${accessToken ? `${accessToken.substring(0, 20)}...` : 'Missing'}`);
+    const refreshToken = getRefreshTokenFromCookies(cookies, REFRESH_TOKEN_COOKIE);
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Refresh token: ${refreshToken ? `${refreshToken.substring(0, 20)}...` : 'Missing'}`);
 
-    let accessTokenValid = false;
-    if (accessToken) {
-      try {
-        const parts = accessToken.split('.');
-        if (parts.length === 3) {
-          const payload = parts[1];
-          let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-          while (base64.length % 4) {
-            base64 += '=';
-          }
-          const decoded = atob(base64);
-          const parsed = JSON.parse(decoded) as { exp?: number };
-
-          if (parsed.exp) {
-            const now = Math.floor(Date.now() / 1000);
-            accessTokenValid = parsed.exp > now;
-            loggingCustom(LogType.LOGIN_LOG, 'debug', `Access token expiration check: ${JSON.stringify({
-              exp: parsed.exp,
-              now,
-              valid: accessTokenValid,
-            })}`);
-          } else {
-            accessTokenValid = true;
-            loggingCustom(LogType.LOGIN_LOG, 'debug', 'Access token has no expiration claim, considering valid');
-          }
-        } else {
-          loggingCustom(LogType.LOGIN_LOG, 'warn', 'Access token has invalid format');
-        }
-      } catch (error) {
-        loggingCustom(LogType.LOGIN_LOG, 'warn', `Failed to decode access token: ${error instanceof Error ? error.message : String(error)}`);
-        accessTokenValid = false;
+    if (!refreshToken) {
+      const referer = request.headers.get('referer');
+      if (referer && referer.includes('/authentication/login')) {
+        loggingCustom(LogType.LOGIN_LOG, 'warn', 'Already redirected from login, allowing request to prevent loop');
+        return NextResponse.next();
       }
+      loggingCustom(LogType.LOGIN_LOG, 'info', 'No refresh token available, redirecting to login');
+      const loginUrl = new URL('/authentication/login', request.url);
+      const encryptedReturnUrl = encryptReturnUrl(pathname);
+      loginUrl.searchParams.set('returnUrl', encryptedReturnUrl);
+      loggingCustom(LogType.LOGIN_LOG, 'info', `Redirect URL: ${loginUrl.toString()}`);
+      return NextResponse.redirect(loginUrl);
     }
 
-    if (!accessToken || !accessTokenValid) {
-      loggingCustom(LogType.LOGIN_LOG, 'info', 'Access token missing or expired, checking for refresh token...');
-      const refreshToken = getRefreshTokenFromCookies(cookies, REFRESH_TOKEN_COOKIE);
-      loggingCustom(LogType.LOGIN_LOG, 'debug', `Refresh token: ${refreshToken ? `${refreshToken.substring(0, 20)}...` : 'Missing'}`);
-
-      if (!refreshToken) {
-        const referer = request.headers.get('referer');
-        if (referer && referer.includes('/authentication/login')) {
-          loggingCustom(LogType.LOGIN_LOG, 'warn', 'Already redirected from login, allowing request to prevent loop');
-          return NextResponse.next();
+    // Check refresh token expiration for logging only
+    // IMPORTANT: We don't reject expired tokens here because:
+    // 1. External services may rotate refresh tokens (one-time use)
+    // 2. New refresh token might be in Set-Cookie but not yet in browser cookies
+    // 3. Client-side will handle refresh token validation and refresh
+    let refreshTokenExpired = false;
+    try {
+      const parts = refreshToken.split('.');
+      if (parts.length === 3) {
+        const payload = parts[1];
+        let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4) {
+          base64 += '=';
         }
-        loggingCustom(LogType.LOGIN_LOG, 'info', 'No refresh token available, redirecting to login');
-        const loginUrl = new URL('/authentication/login', request.url);
-        const encryptedReturnUrl = encryptReturnUrl(pathname);
-        loginUrl.searchParams.set('returnUrl', encryptedReturnUrl);
-        loggingCustom(LogType.LOGIN_LOG, 'info', `Redirect URL: ${loginUrl.toString()}`);
-        return NextResponse.redirect(loginUrl);
-      }
+        const decoded = atob(base64);
+        const parsed = JSON.parse(decoded) as { exp?: number };
 
-      let refreshTokenValid = false;
-      try {
-        const parts = refreshToken.split('.');
-        if (parts.length === 3) {
-          const payload = parts[1];
-          let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-          while (base64.length % 4) {
-            base64 += '=';
-          }
-          const decoded = atob(base64);
-          const parsed = JSON.parse(decoded) as { exp?: number };
-
-          if (parsed.exp) {
-            const now = Math.floor(Date.now() / 1000);
-            refreshTokenValid = parsed.exp > now;
-            loggingCustom(LogType.LOGIN_LOG, 'debug', `Refresh token expiration check: ${JSON.stringify({
-              exp: parsed.exp,
-              now,
-              valid: refreshTokenValid,
-            })}`);
-          } else {
-            refreshTokenValid = true;
-            loggingCustom(LogType.LOGIN_LOG, 'debug', 'Refresh token has no expiration claim, considering valid');
-          }
+        if (parsed.exp) {
+          const now = Math.floor(Date.now() / 1000);
+          refreshTokenExpired = parsed.exp < now;
+          loggingCustom(LogType.LOGIN_LOG, 'debug', `Refresh token expiration check: ${JSON.stringify({
+            exp: parsed.exp,
+            now,
+            expired: refreshTokenExpired,
+            note: 'Allowing request even if expired - client will handle refresh',
+          })}`);
         } else {
-          loggingCustom(LogType.LOGIN_LOG, 'warn', 'Refresh token has invalid format');
-        }
-      } catch (error) {
-        loggingCustom(LogType.LOGIN_LOG, 'warn', `Failed to decode refresh token: ${error instanceof Error ? error.message : String(error)}`);
-        refreshTokenValid = false;
-      }
-
-      if (!refreshTokenValid) {
-        const referer = request.headers.get('referer');
-        if (referer && referer.includes('/authentication/login')) {
-          loggingCustom(LogType.LOGIN_LOG, 'warn', 'Already redirected from login, allowing request to prevent loop');
-          return NextResponse.next();
-        }
-        loggingCustom(LogType.LOGIN_LOG, 'info', 'Refresh token expired, redirecting to login');
-        const loginUrl = new URL('/authentication/login', request.url);
-        const encryptedReturnUrl = encryptReturnUrl(pathname);
-        loginUrl.searchParams.set('returnUrl', encryptedReturnUrl);
-        loggingCustom(LogType.LOGIN_LOG, 'info', `Redirect URL: ${loginUrl.toString()}`);
-        return NextResponse.redirect(loginUrl);
-      }
-
-      loggingCustom(LogType.LOGIN_LOG, 'info', 'Refresh token is valid, attempting to refresh access token...');
-      const refreshResult = await attemptTokenRefresh(refreshToken, loginLocally, request);
-
-      if (refreshResult.success) {
-        if (refreshResult.accessToken) {
-          loggingCustom(LogType.LOGIN_LOG, 'info', 'Token refresh successful, setting new access token');
-          const response = NextResponse.next();
-          // Use expiresIn from refresh response if available, otherwise use config default
-          const tokenMaxAge = refreshResult.expiresIn ?? ACCESS_TOKEN_EXPIRY;
-          response.cookies.set(ACCESS_TOKEN_COOKIE, refreshResult.accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: tokenMaxAge,
-            path: '/',
-          });
-          loggingCustom(LogType.LOGIN_LOG, 'info', `New access token cookie set with maxAge: ${tokenMaxAge}, allowing request`);
-          return response;
-        } else {
-          loggingCustom(LogType.LOGIN_LOG, 'info', 'External service confirmed access token is valid, allowing request');
-          return NextResponse.next();
+          loggingCustom(LogType.LOGIN_LOG, 'debug', 'Refresh token has no expiration claim');
         }
       } else {
-        const referer = request.headers.get('referer');
-        if (referer && referer.includes('/authentication/login')) {
-          loggingCustom(LogType.LOGIN_LOG, 'warn', 'Already redirected from login, allowing request to prevent loop');
-          return NextResponse.next();
-        }
-        loggingCustom(LogType.LOGIN_LOG, 'error', `========== TOKEN REFRESH FAILED - REDIRECTING TO LOGIN ==========`);
-        loggingCustom(LogType.LOGIN_LOG, 'error', `Refresh error: ${refreshResult.error || 'Unknown error'}`);
-        loggingCustom(LogType.LOGIN_LOG, 'error', `Request path: ${pathname}`);
-        loggingCustom(LogType.LOGIN_LOG, 'error', `Request method: ${request.method}`);
-        loggingCustom(LogType.LOGIN_LOG, 'error', `Request URL: ${request.url}`);
-        loggingCustom(LogType.LOGIN_LOG, 'error', `Referer: ${referer || 'none'}`);
-        loggingCustom(LogType.LOGIN_LOG, 'error', `User-Agent: ${request.headers.get('user-agent') || 'none'}`);
-        loggingCustom(LogType.LOGIN_LOG, 'info', 'Redirecting to login - preserving refresh_token cookie');
-        
-        // Create redirect response WITHOUT modifying cookies
-        // This ensures refresh_token cookie is preserved even when redirecting to login
-        const loginUrl = new URL('/authentication/login', request.url);
-        const encryptedReturnUrl = encryptReturnUrl(pathname);
-        loginUrl.searchParams.set('returnUrl', encryptedReturnUrl);
-        loggingCustom(LogType.LOGIN_LOG, 'info', `Redirect URL: ${loginUrl.toString()}`);
-        loggingCustom(LogType.LOGIN_LOG, 'info', `Redirect URL: ${loginUrl.toString()}`);
-        
-        // Return redirect without touching cookies - preserve existing cookies
-        // The refresh_token should remain intact for future refresh attempts
-        const redirectResponse = NextResponse.redirect(loginUrl);
-        // Explicitly do NOT delete or modify any cookies here
-        return redirectResponse;
+        loggingCustom(LogType.LOGIN_LOG, 'warn', 'Refresh token has invalid format, but allowing request (client will validate)');
       }
+    } catch (error) {
+      loggingCustom(LogType.LOGIN_LOG, 'warn', `Failed to decode refresh token: ${error instanceof Error ? error.message : String(error)}, but allowing request (client will validate)`);
     }
 
-    loggingCustom(LogType.LOGIN_LOG, 'info', 'Access token is valid, allowing request');
+    // Refresh token exists - allow request regardless of expiration
+    // Client-side API client will handle refresh token validation and refresh
+    // This prevents redirect loops when refresh tokens are rotated
+    if (refreshTokenExpired) {
+      loggingCustom(LogType.LOGIN_LOG, 'info', 'Refresh token exists but appears expired - allowing request (client will attempt refresh)');
+    } else {
+      loggingCustom(LogType.LOGIN_LOG, 'info', 'Refresh token exists and appears valid - allowing request');
+    }
     loggingCustom(LogType.LOGIN_LOG, 'info', '========== PROXY COMPLETED SUCCESSFULLY ==========');
     return NextResponse.next();
   } catch (error) {

@@ -11,6 +11,7 @@ import { TenantSelector } from '@/components/layout/TenantSelector';
 import { Logo } from '@/gradian-ui/layout/logo/components/Logo';
 import { toast } from 'sonner';
 import { decryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util';
+import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
 
 const ACCESS_TOKEN_COOKIE = AUTH_CONFIG?.ACCESS_TOKEN_COOKIE || 'access_token';
 
@@ -18,6 +19,12 @@ function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setUser } = useUserStore();
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Ensure client-side only rendering to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   const { selectedTenant } = useTenantStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,13 +40,20 @@ function LoginPageContent() {
     const encryptedReturnUrl = searchParams.get('returnUrl');
     if (encryptedReturnUrl) {
       console.log('[LOGIN] Found encrypted returnUrl in query params:', encryptedReturnUrl);
-      const decrypted = decryptReturnUrl(encryptedReturnUrl);
-      if (decrypted) {
-        console.log('[LOGIN] Successfully decrypted returnUrl:', decrypted);
-        setReturnUrl(decrypted);
-      } else {
-        console.warn('[LOGIN] Failed to decrypt returnUrl, using default');
-        console.warn('[LOGIN] Encrypted value was:', encryptedReturnUrl);
+      try {
+        const decrypted = decryptReturnUrl(encryptedReturnUrl);
+        if (decrypted) {
+          console.log('[LOGIN] Successfully decrypted returnUrl:', decrypted);
+          setReturnUrl(decrypted);
+        } else {
+          console.warn('[LOGIN] Failed to decrypt returnUrl (invalid/corrupted/expired), using default');
+          console.warn('[LOGIN] Encrypted value was:', encryptedReturnUrl);
+        }
+      } catch (error) {
+        // Error is already logged by decryptReturnUrl, just prevent crash
+        console.warn('[LOGIN] Exception during returnUrl decryption, using default:', {
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     } else {
       console.log('[LOGIN] No returnUrl found in query params');
@@ -222,9 +236,17 @@ function LoginPageContent() {
         return;
       }
 
-      // SECURITY: Tokens are stored in httpOnly cookies by the server
-      // Do not store tokens in localStorage as they are accessible to JavaScript
-      // and visible in browser DevTools. Cookies are automatically sent with requests.
+      // SECURITY: Access token stored in memory only (never in cookies/localStorage)
+      // Refresh token stored in HttpOnly cookie (handled by server, not accessible to JavaScript)
+      
+      console.log('[LOGIN] Storing access token in memory...');
+      // Store access token in memory (not in localStorage or cookies)
+      if (data.tokens?.accessToken) {
+        authTokenManager.setAccessToken(data.tokens.accessToken);
+        console.log('[LOGIN] Access token stored in memory');
+      } else {
+        console.warn('[LOGIN] No access token in response');
+      }
       
       console.log('[LOGIN] Cleaning up localStorage tokens...');
       // Clean up any existing tokens in localStorage for security
@@ -351,7 +373,8 @@ function LoginPageContent() {
 
   return (
     <>
-      {DEMO_MODE && (
+      {/* Only render TenantSelector on client to prevent hydration mismatch */}
+      {isMounted && DEMO_MODE && (
         <div className="fixed top-4 right-4 z-50 w-64">
           <TenantSelector placeholder="Select tenant" />
         </div>
