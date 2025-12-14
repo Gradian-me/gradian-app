@@ -6476,6 +6476,7 @@
           "id": "quick-action-1765695086645",
           "label": "Analyze OOX with AI",
           "action": "runAiAgent",
+          "componentType": "ai-agent-response",
           "variant": "default",
           "icon": "User",
           "agentId": "oox-analyzer-quality-control",

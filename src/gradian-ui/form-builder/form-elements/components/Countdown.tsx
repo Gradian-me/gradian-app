@@ -42,6 +42,39 @@ export const Countdown: React.FC<CountdownProps> = ({
   const [isExpired, setIsExpired] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // Helper function to normalize date-only values to end of day (23:59:59.999)
+  const normalizeToEndOfDay = (dateInput: Date | string): Date => {
+    let isDateOnly = false;
+    
+    if (typeof dateInput === 'string') {
+      // Check if the date string is date-only (no time component)
+      // Patterns: "YYYY-MM-DD", "YYYY/MM/DD", etc.
+      // Exclude strings with ISO time separator 'T', time separator ':', or space before time
+      const trimmedInput = dateInput.trim();
+      isDateOnly = !trimmedInput.includes('T') && 
+                   !trimmedInput.includes(':') && 
+                   (trimmedInput.length <= 10 || !trimmedInput.includes(' '));
+    } else {
+      // For Date objects, check if time is at midnight (00:00:00.000)
+      // This indicates it was likely created from a date-only string
+      isDateOnly = dateInput.getHours() === 0 && 
+                   dateInput.getMinutes() === 0 && 
+                   dateInput.getSeconds() === 0 && 
+                   dateInput.getMilliseconds() === 0;
+    }
+    
+    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+    
+    if (isDateOnly) {
+      // Set to end of day (23:59:59.999)
+      const normalized = new Date(date);
+      normalized.setHours(23, 59, 59, 999);
+      return normalized;
+    }
+    
+    return date;
+  };
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -52,7 +85,7 @@ export const Countdown: React.FC<CountdownProps> = ({
       
       if (countUp && startDate) {
         // Count up mode: calculate time from startDate to now
-        const start = new Date(startDate);
+        const start = normalizeToEndOfDay(startDate);
         const difference = now.getTime() - start.getTime();
 
         if (difference < 0) {
@@ -70,7 +103,8 @@ export const Countdown: React.FC<CountdownProps> = ({
         setTimeLeft({ days, hours, minutes, seconds });
       } else {
         // Count down mode: calculate time from now to expireDate
-        const expiry = new Date(expireDate);
+        // Normalize date-only values to end of day (23:59:59.999)
+        const expiry = normalizeToEndOfDay(expireDate);
         const difference = expiry.getTime() - now.getTime();
 
         if (difference <= 0) {
@@ -105,13 +139,17 @@ export const Countdown: React.FC<CountdownProps> = ({
     lg: 'text-base'
   };
 
+  // Normalize expireDate for display
+  const normalizedExpireDate = normalizeToEndOfDay(expireDate);
+  const normalizedStartDate = startDate ? normalizeToEndOfDay(startDate) : null;
+
   if (isExpired && !countUp) {
     return (
       <div className={`flex flex-col gap-1 ${className}`}>
         <div className="flex items-center gap-2 text-red-600">
           {showIcon && <AlertCircle className={`${size === 'sm' ? 'h-3 w-3' : size === 'md' ? 'h-4 w-4' : 'h-5 w-5'}`} />}
           <span className={`font-medium ${sizeClasses[size]}`}>
-            Expired on: {formatDate(new Date(expireDate), { 
+            Expired on: {formatDate(normalizedExpireDate, { 
               month: 'short', 
               day: 'numeric', 
               year: 'numeric',
@@ -193,7 +231,7 @@ export const Countdown: React.FC<CountdownProps> = ({
         <div className="flex items-end gap-1.5 text-gray-500">
           <Calendar className="h-3 w-3" />
           <span className={`${sizeClasses[size]}`}>
-            Expires: {formatDate(new Date(expireDate), { 
+            Expires: {formatDate(normalizedExpireDate, { 
               month: 'short', 
               day: 'numeric', 
               year: 'numeric',
@@ -202,11 +240,11 @@ export const Countdown: React.FC<CountdownProps> = ({
           </span>
         </div>
       )}
-      {countUp && startDate && (
+      {countUp && normalizedStartDate && (
         <div className="flex items-end gap-1.5 text-gray-500">
           <Calendar className="h-3 w-3" />
           <span className={`${sizeClasses[size]}`}>
-            Started: {formatDate(new Date(startDate), { 
+            Started: {formatDate(normalizedStartDate, { 
               month: 'short', 
               day: 'numeric', 
               year: 'numeric',

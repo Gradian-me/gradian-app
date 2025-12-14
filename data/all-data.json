@@ -4037,14 +4037,16 @@
     {
       "assignedTo": [
         {
-          "id": "01KBSTVK8P6Y3P4MW060HNNKB1"
+          "id": "01KC3FBM8YXB7V70SQMEBN0151"
         }
       ],
-      "dueDate": "2025-12-09",
+      "dueDate": "2025-12-23",
       "status": [
         {
-          "id": "01KBSVZHFGX0F3YKHV44J3H2QM",
-          "label": "Cancelled"
+          "id": "01KBSVZ9NT2Z23FXK7B1G7AYS8",
+          "label": "Completed",
+          "icon": "CheckCircle",
+          "color": "emerald"
         }
       ],
       "taskTitle": "تدتد",
@@ -4052,7 +4054,45 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBSYN40BXYQ9JNGREYPQRH2P",
       "createdAt": "2025-12-06T13:47:07.147Z",
-      "updatedAt": "2025-12-14T09:27:11.102Z"
+      "updatedAt": "2025-12-14T10:24:07.225Z",
+      "entityType": [
+        {
+          "id": "01KCDZTASK001WORK000000000001",
+          "label": "Work",
+          "icon": "Briefcase",
+          "color": "blue"
+        }
+      ]
+    },
+    {
+      "assignedTo": [
+        {
+          "id": "01KC3FBM8YXB7V70SQMEBN0151"
+        }
+      ],
+      "dueDate": "2025-12-17",
+      "status": [
+        {
+          "id": "01KBSVZ3N828YPGRXFDY84D15W",
+          "label": "In Progress",
+          "icon": "Loader",
+          "color": "blue"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCDZTASK001WORK000000000001",
+          "label": "Work",
+          "icon": "Briefcase",
+          "color": "blue"
+        }
+      ],
+      "taskTitle": "Check Security Checklists on Nest JS",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KCE9MJJRHMT2TN793NH33SYW",
+      "createdAt": "2025-12-14T11:23:52.289Z",
+      "updatedAt": "2025-12-14T11:23:52.375Z"
     }
   ],
   "change-procedure": [

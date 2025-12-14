@@ -11,6 +11,7 @@ import { Badge } from '../../../components/ui/badge';
 import { GridBuilder } from '../../layout/grid-builder';
 import { FormSchema, DetailPageSection } from '@/gradian-ui/schema-manager/types/form-schema';
 import { DynamicInfoCard } from './DynamicInfoCard';
+import { DynamicAiAgentResponseContainer } from './DynamicAiAgentResponseContainer';
 import { ComponentRenderer } from './ComponentRenderer';
 import { DynamicRepeatingTableViewer } from './DynamicRepeatingTableViewer';
 import { resolveFieldById } from '../../form-builder/form-elements/utils/field-resolver';
@@ -238,8 +239,16 @@ const getHeaderInfo = (schema: FormSchema, data: any) => {
   const rating = getSingleValueByRole(schema, data, 'rating') || data.rating || 0;
   const codeFieldExists = schema?.fields?.some(field => field.role === 'code');
   
-  // Get duedate value - check if it's a valid date
-  const duedateValue = getSingleValueByRole(schema, data, 'duedate', '') || data.duedate || data.expirationDate;
+  // Get duedate value - check by role 'duedate' OR by schema allowDataDueDate property OR direct data.dueDate/expirationDate
+  // Check both camelCase (dueDate) and lowercase (duedate) variations
+  const duedateField = schema?.fields?.find(f => f.role === 'duedate' || f.name === 'dueDate' || f.name === 'duedate');
+  const duedateValueFromRole = duedateField ? (data[duedateField.name] || data.dueDate || data.duedate) : null;
+  const duedateValue = duedateValueFromRole || 
+                       (schema?.allowDataDueDate ? (data.dueDate || data.duedate || null) : null) || 
+                       data.dueDate || 
+                       data.duedate || 
+                       data.expirationDate;
+  
   // Validate that duedate is a valid date value (not empty string, null, or undefined)
   // Check if it's a valid string or Date object, and if string, ensure it's not empty
   let duedate: string | Date | null = null;
@@ -412,6 +421,10 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   });
   const detailMetadata = schema.detailPageMetadata;
   const quickActions = detailMetadata?.quickActions || [];
+  // Extract ai-agent-response actions (these are rendered as separate card sections)
+  const aiAgentResponseActions = quickActions.filter(
+    (action) => action.componentType === 'ai-agent-response' && action.action === 'runAiAgent'
+  );
   
   const isFetchingRef = useRef(false);
   const [documentTitle, setDocumentTitle] = useState<string>('');
@@ -672,7 +685,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   
   // Check if avatar field exists in schema
   const hasAvatarField = schema?.fields?.some(field => field.role === 'avatar') || false;
-  const duedateFieldLabel = schema?.fields?.find(field => field.role === 'duedate')?.label || 'Due Date';
+  const duedateFieldLabel = schema?.fields?.find(field => field.role === 'duedate' || field.name === 'dueDate')?.label || 'Due Date';
   const hasRating = headerInfo.rating > 0;
   const hasStatusBadge =
     Boolean(headerInfo.status && headerInfo.status.trim() !== '') ||
@@ -1407,6 +1420,23 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                 </motion.div>
               )}
 
+              {/* AI Agent Response Containers */}
+              {aiAgentResponseActions.length > 0 && (
+                <div className={hasSidebarSections ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "grid grid-cols-1 gap-6"}>
+                  {aiAgentResponseActions.map((action, index) => (
+                    <div key={action.id}>
+                      <DynamicAiAgentResponseContainer
+                        action={action}
+                        schema={schema}
+                        data={data}
+                        index={index + mainComponents.length + sectionsForMain.length}
+                        disableAnimation={disableAnimation}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {/* Info Cards - Full Width when no sidebar, Two Column Grid when sidebar exists */}
               {sectionsForMain.length > 0 && (
                 <div className={hasSidebarSections ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "grid grid-cols-1 gap-6"}>
@@ -1422,7 +1452,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                           section={section}
                           schema={schema}
                           data={data}
-                          index={index + mainComponents.length}
+                          index={index + mainComponents.length + aiAgentResponseActions.length}
                           disableAnimation={disableAnimation}
                         />
                       </div>
@@ -1517,6 +1547,23 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
               </motion.div>
             )}
 
+            {/* AI Agent Response Containers */}
+            {aiAgentResponseActions.length > 0 && (
+              <div className="grid grid-cols-1 gap-6">
+                {aiAgentResponseActions.map((action, index) => (
+                  <div key={action.id}>
+                    <DynamicAiAgentResponseContainer
+                      action={action}
+                      schema={schema}
+                      data={data}
+                      index={index + mainComponents.length + sectionsForMain.length}
+                      disableAnimation={disableAnimation}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Info Cards - Full Width when no sidebar, Two Column Grid when sidebar exists */}
             {sectionsForMain.length > 0 && (
               <div className={hasSidebarSections ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "grid grid-cols-1 gap-6"}>
@@ -1533,7 +1580,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                         section={section}
                         schema={schema}
                         data={data}
-                        index={index + mainComponents.length}
+                        index={index + mainComponents.length + aiAgentResponseActions.length}
                         disableAnimation={disableAnimation}
                       />
                     </div>

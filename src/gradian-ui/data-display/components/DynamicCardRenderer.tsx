@@ -104,13 +104,15 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   const hasRatingField = schema?.fields?.some(field => field.role === 'rating') || false;
   const hasStatusField = schema?.fields?.some(field => field.role === 'status') || false || hasStatusGroup;
   const hasEntityTypeField = schema?.fields?.some(field => field.role === 'entityType') || false || hasEntityTypeGroup;
-  const hasDuedateField = schema?.fields?.some(field => field.role === 'duedate') || false;
-  const duedateFieldLabel = schema?.fields?.find(field => field.role === 'duedate')?.label || 'Due Date';
+  // Check for duedate field by role OR by schema allowDataDueDate property
+  const hasDuedateField = schema?.fields?.some(field => field.role === 'duedate') || schema?.allowDataDueDate || false;
+  const duedateFieldLabel = schema?.fields?.find(field => field.role === 'duedate' || field.name === 'dueDate' || field.name === 'duedate')?.label || 'Due Date';
   const hasCodeField = schema?.fields?.some(field => field.role === 'code') || false;
   const hasAvatarField = schema?.fields?.some(field => field.role === 'avatar') || false;
   const hasIconField = schema?.fields?.some(field => field.role === 'icon') || false;
   const hasColorField = schema?.fields?.some(field => field.role === 'color') || false;
-  const hasPersonField = schema?.fields?.some(field => field.role === 'person') || false;
+  // Check for person field by role OR by schema allowDataAssignedTo property
+  const hasPersonField = schema?.fields?.some(field => field.role === 'person') || schema?.allowDataAssignedTo || false;
 
   // Filter out performance section from cardMetadata
   const filteredSections = cardMetadata.filter(section =>
@@ -313,8 +315,15 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     handleNavigateToEntity(targetSchema, candidateId);
   };
 
-  // Get duedate value - check if it's a valid date
-  const duedateValue = getSingleValueByRole(schema, data, 'duedate', '') || data.duedate || data.expirationDate;
+  // Get duedate value - check by role 'duedate' OR by schema allowDataDueDate property OR direct data.dueDate/expirationDate
+  // Check both camelCase (dueDate) and lowercase (duedate) variations
+  const duedateFieldDef = schema?.fields?.find(field => field.role === 'duedate' || field.name === 'dueDate' || field.name === 'duedate');
+  const duedateValueFromRole = duedateFieldDef ? (data[duedateFieldDef.name] || data.dueDate || data.duedate) : null;
+  const duedateValue = duedateValueFromRole || 
+                       (schema?.allowDataDueDate ? (data.dueDate || data.duedate || null) : null) || 
+                       data.dueDate || 
+                       data.duedate || 
+                       data.expirationDate;
   // Validate that duedate is a valid date value (not empty string, null, or undefined)
   // Check if it's a valid string or Date object, and if string, ensure it's not empty
   let duedateField: string | Date | null = null;
@@ -330,9 +339,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     }
   }
 
-  // Get person value (assignedTo)
-  const personFieldDef = schema?.fields?.find(field => field.role === 'person');
-  const personValue = personFieldDef ? (data[personFieldDef.name] || data.assignedTo) : (data.assignedTo || null);
+  // Get person value (assignedTo) - check by role 'person' or by name 'assignedTo', or use schema.allowDataAssignedTo
+  const personFieldDef = schema?.fields?.find(field => field.role === 'person' || field.name === 'assignedTo');
+  const personValue = personFieldDef ? (data[personFieldDef.name] || data.assignedTo) : (schema?.allowDataAssignedTo ? (data.assignedTo || null) : null);
   let personField: any = null;
   if (personValue) {
     // Normalize person value
@@ -1035,7 +1044,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         <AvatarUser
                           user={cardConfig.personField}
                           avatarType="user"
-                          size="sm"
+                          size="md"
                           showDialog={true}
                         />
                         <span className="text-xs text-gray-600 dark:text-gray-400">{cardConfig.personField.label}</span>
