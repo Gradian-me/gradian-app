@@ -105,12 +105,22 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     
     try {
       // Try to parse as JSON if it looks like JSON
-      const trimmed = message.content.trim();
+      let trimmed = message.content.trim();
+      
+      // Handle escaped newlines in JSON strings (from chat.json storage)
+      // Replace literal \n with actual newlines for proper JSON parsing
       if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
-        return JSON.parse(trimmed);
+        // If the string contains escaped newlines, they're already escaped in the JSON
+        // JSON.parse should handle them correctly, but we need to ensure proper parsing
+        const parsed = JSON.parse(trimmed);
+        return parsed;
       }
       return message.content;
-    } catch {
+    } catch (error) {
+      // Log parsing errors for debugging
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to parse message content as JSON:', error, 'Content:', message.content?.substring(0, 200));
+      }
       return message.content;
     }
   }, [shouldRenderAgentContainer, message.content]);
@@ -288,10 +298,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     try {
         if (type === 'image') {
         let blob: Blob;
-        // Generate filename with Gradian prefix and ULID
-        const { ulid } = await import('ulid');
-        const imageUlid = ulid();
-        let filename = `Gradian_Image_${imageUlid}.png`;
+        let filename: string;
         
         if (data.b64_json) {
           // Convert base64 to blob
@@ -302,6 +309,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             bytes[i] = binaryString.charCodeAt(i);
           }
           blob = new Blob([bytes], { type: 'image/png' });
+          
+          // Generate filename with Gradian prefix and ULID for base64 images
+          const { ulid } = await import('ulid');
+          const imageUlid = ulid();
+          filename = `Gradian_Image_${imageUlid}.png`;
         } else if (data.url) {
           // Handle both absolute and relative URLs
           let fetchUrl = data.url;
@@ -310,11 +322,36 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             fetchUrl = window.location.origin + data.url;
           }
           
+          // Extract filename from URL, or generate one if not available
+          try {
+            const urlPath = new URL(fetchUrl).pathname;
+            const urlFilename = urlPath.split('/').pop() || '';
+            
+            // If URL contains a filename with extension, use it
+            if (urlFilename && urlFilename.includes('.') && urlFilename.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
+              filename = urlFilename;
+            } else if (urlFilename && urlFilename.startsWith('Gradian_Image_')) {
+              // If it's a Gradian_Image_ file without extension, add .png
+              filename = `${urlFilename}.png`;
+            } else {
+              // Generate new filename with Gradian prefix and ULID
+              const { ulid } = await import('ulid');
+              const imageUlid = ulid();
+              filename = `Gradian_Image_${imageUlid}.png`;
+            }
+          } catch {
+            // If URL parsing fails, generate filename
+            const { ulid } = await import('ulid');
+            const imageUlid = ulid();
+            filename = `Gradian_Image_${imageUlid}.png`;
+          }
+          
           // Fetch from URL
           const response = await fetch(fetchUrl);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch image: ${response.statusText}`);
+          }
           blob = await response.blob();
-          // Keep the Gradian_Image_ prefix format, don't override with URL filename
-          // The filename is already set with Gradian_Image_{ulid}.png format
         } else {
           return;
         }
@@ -501,11 +538,29 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
               {(() => {
                 // Render based on response format, similar to DynamicAiAgentResponseContainer
                 if (responseFormat === 'image') {
-                  const imageData = typeof parsedContent === 'object' && parsedContent?.image
-                    ? parsedContent.image
-                    : typeof parsedContent === 'string' && (parsedContent.startsWith('{') || parsedContent.startsWith('['))
-                    ? JSON.parse(parsedContent)?.image
-                    : null;
+                  let imageData: any = null;
+                  
+                  // Try to extract image data from parsed content
+                  if (typeof parsedContent === 'object' && parsedContent?.image) {
+                    imageData = parsedContent.image;
+                  } else if (typeof parsedContent === 'string' && (parsedContent.startsWith('{') || parsedContent.startsWith('['))) {
+                    try {
+                      const parsed = JSON.parse(parsedContent);
+                      imageData = parsed?.image || null;
+                    } catch (parseError) {
+                      if (process.env.NODE_ENV === 'development') {
+                        console.warn('Failed to parse image content:', parseError);
+                      }
+                    }
+                  }
+                  
+                  // Ensure URL has proper format (add extension if missing for Gradian_Image_ files)
+                  if (imageData?.url) {
+                    // If URL is a Gradian_Image_ file without extension, add .png
+                    if (imageData.url.includes('Gradian_Image_') && !imageData.url.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
+                      imageData.url = `${imageData.url}.png`;
+                    }
+                  }
                   
                   if (imageData && (imageData.url || imageData.b64_json)) {
                     return (

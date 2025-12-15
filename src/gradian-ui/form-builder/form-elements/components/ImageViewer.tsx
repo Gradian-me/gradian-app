@@ -139,12 +139,22 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
   let imageSrc: string;
   let useNextImage = true;
 
+  // Helper to fix URL if it's missing extension (for Gradian_Image_ files)
+  const fixImageUrl = (url: string): string => {
+    if (!url) return url;
+    // If URL is a Gradian_Image_ file without extension, add .png
+    if (url.includes('Gradian_Image_') && !url.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
+      return `${url}.png`;
+    }
+    return url;
+  };
+
   // Priority: saved URL > original URL > base64
   if (savedImageUrl && isValidUrl(savedImageUrl)) {
-    imageSrc = savedImageUrl;
+    imageSrc = fixImageUrl(savedImageUrl);
     useNextImage = true;
   } else if (hasImageUrl && isValidUrl(imageUrl!)) {
-    imageSrc = imageUrl!;
+    imageSrc = fixImageUrl(imageUrl!);
     useNextImage = true;
   } else if (hasBase64Content) {
     // Check if base64 content already has data URL prefix
