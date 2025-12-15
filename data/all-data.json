@@ -634,9 +634,17 @@
       "nationalId": "",
       "id": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdAt": "2025-11-03T12:30:16.678Z",
-      "updatedAt": "2025-11-03T12:44:20.602Z",
+      "updatedAt": "2025-12-15T12:42:56.632Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "related-companies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "name": "AryoGen",
@@ -649,9 +657,17 @@
       "nationalId": "",
       "id": "01K94V8K0RJS7D9K43F2VBTSVG",
       "createdAt": "2025-11-03T12:32:24.097Z",
-      "updatedAt": "2025-11-03T12:32:24.097Z",
+      "updatedAt": "2025-12-15T12:43:02.995Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "related-companies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "name": "NanoAlvand",
@@ -660,9 +676,15 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB85MPFBMS4GQ6KGA0EGJNGA",
       "createdAt": "2025-11-29T16:02:53.548Z",
-      "updatedAt": "2025-11-29T16:02:53.548Z",
+      "updatedAt": "2025-12-15T12:43:09.424Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "related-companies": [
+        {
+          "id": "01KB85MPFBMS4GQ6KGA0EGJNGA",
+          "label": "NanoAlvand"
+        }
+      ]
     },
     {
       "name": "Arvand Pharmed",
@@ -670,9 +692,15 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9VFNMVC92XF1JRND69S4Z9",
       "createdAt": "2025-11-30T07:43:51.973Z",
-      "updatedAt": "2025-11-30T07:43:51.974Z",
+      "updatedAt": "2025-12-15T12:43:15.013Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "related-companies": [
+        {
+          "id": "01KB9VFNMVC92XF1JRND69S4Z9",
+          "label": "Arvand Pharmed"
+        }
+      ]
     }
   ],
   "relation-types": [
@@ -2428,8 +2456,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-08T14:36:42.158Z",
-      "lastSynced": "2025-12-08T14:36:42.158Z",
+      "updatedAt": "2025-12-15T13:47:21.163Z",
+      "lastSynced": "2025-12-15T13:47:21.163Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2441,7 +2469,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 41 schemas: 41 succeeded, 0 failed (41 created, 0 updated)"
+      "lastSyncMessage": "Processed 5 schemas: 5 succeeded, 0 failed (0 created, 5 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -2468,7 +2496,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-08T14:36:49.973Z",
+      "updatedAt": "2025-12-15T13:48:12.499Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2478,7 +2506,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-08T14:36:49.973Z",
+      "lastSynced": "2025-12-15T13:48:12.499Z",
       "lastSyncMessage": "Generated relations for 41 out of 41 schemas"
     },
     {
@@ -2525,7 +2553,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-08T14:43:25.720Z",
+      "updatedAt": "2025-12-15T13:53:18.431Z",
       "category": [
         {
           "id": "production-integration",
@@ -2534,8 +2562,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-08T14:43:25.720Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 215, nodes updated: 5, edges created: 76, nodes failed: 0, edges failed: 0."
+      "lastSynced": "2025-12-15T13:53:18.431Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1, nodes updated: 8, edges created: 0, nodes failed: 0, edges failed: 0."
     }
   ],
   "databases": [
@@ -3775,6 +3803,15 @@
       "id": "01KBSR8J6EWGTQ6DPKGH5XR3VE",
       "createdAt": "2025-12-06T11:55:24.239Z",
       "updatedAt": "2025-12-06T11:55:24.239Z"
+    },
+    {
+      "label_fa": "تغییرات جزئی بدون تأثیر کیفی",
+      "label_en": "Minor Changes Without Quality Impact",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KCH4F85M3Q8BNTXH67GJTKS5",
+      "createdAt": "2025-12-15T13:51:18.204Z",
+      "updatedAt": "2025-12-15T13:51:18.205Z"
     }
   ],
   "change-subject-types": [

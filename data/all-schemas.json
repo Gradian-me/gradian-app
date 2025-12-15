@@ -1684,7 +1684,10 @@
     "showInNavigation": false,
     "icon": "Building2",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data",
+    "canSelectMultiCompanies": true
   },
   {
     "id": "relation-types",
@@ -4963,7 +4966,9 @@
     "allowDataInactive": true,
     "allowHierarchicalParent": true,
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "tenants",
@@ -5118,7 +5123,14 @@
     ],
     "showInNavigation": true,
     "icon": "Tag",
-    "schemaType": "business"
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ],
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "change-subject-types",
@@ -5966,7 +5978,8 @@
         "id": "01KCDZTASKGROUP0000000000001",
         "label": "Task Types"
       }
-    ]
+    ],
+    "applyToAllTenants": true
   },
   {
     "id": "attachments",

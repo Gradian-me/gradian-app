@@ -3431,5 +3431,41 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCGDATAMULTITENANT008",
+    "timestamp": "2025-12-15T13:51:18.204Z",
+    "version": "1.28.008",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Enhanced data structure in all-data.json to include related companies and additional fields for company entities, improving data organization and accessibility.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "companies"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated API routes to support multi-tenant and company filtering, optimizing data retrieval based on specified parameters.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "api",
+          "multi-tenancy",
+          "data-management"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved schema handling in route.ts and base.controller.ts to accommodate new filtering logic, ensuring relevant data is returned based on tenant and company context.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "routing",
+          "controllers"
+        ]
+      }
+    ]
   }
 ]

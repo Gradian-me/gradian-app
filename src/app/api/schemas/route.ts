@@ -129,7 +129,11 @@ export async function GET(request: NextRequest) {
     const hasTenantFilter = Array.isArray(tenantIds) && tenantIds.length > 0;
 
     const matchesTenantFilter = (schema: any) => {
+      // When no tenant filter is provided, all schemas are visible.
       if (!hasTenantFilter) return true;
+      // System schemas are always visible for any tenantIds/companyIds.
+      if (schema?.schemaType === 'system') return true;
+      // Non-system schemas: respect applyToAllTenants and relatedTenants configuration.
       if (schema?.applyToAllTenants) return true;
       const related = Array.isArray(schema?.relatedTenants)
         ? schema.relatedTenants

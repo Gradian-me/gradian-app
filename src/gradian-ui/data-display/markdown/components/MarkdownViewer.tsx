@@ -295,6 +295,11 @@ export function MarkdownViewer({
               rehypeKatex // Render math with KaTeX - automatically converts math nodes to KaTeX HTML
             ]}
             components={markdownComponents}
+            // SECURITY: Do not render raw HTML from markdown to prevent XSS
+            skipHtml={true}
+            // SECURITY: Protect against reverse tabnabbing and reduce link abuse
+            linkTarget="_blank"
+            linkRel="noopener noreferrer nofollow"
           >
             {displayContent}
           </ReactMarkdown>

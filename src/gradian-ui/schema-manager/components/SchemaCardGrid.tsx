@@ -121,27 +121,27 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
                   variant="ghost"
                   size="icon"
                   onClick={(e) => {
-                    // Handle Ctrl/Cmd+click to open in new tab
+                    // Handle Ctrl/Cmd+click to open in new tab securely
                     if (e.ctrlKey || e.metaKey) {
                       e.preventDefault();
-                      window.open(`/page/${schema.id}`, '_blank');
+                      window.open(`/page/${schema.id}`, '_blank', 'noopener,noreferrer');
                       return;
                     }
-                    // Regular click
+                    // Regular click opens in the current tab via callback
                     onView(schema);
                   }}
                   onMouseDown={(e) => {
-                    // Handle middle-click (button 1)
+                    // Handle middle-click (button 1) to open in new tab
                     if (e.button === 1) {
                       e.preventDefault();
-                      window.open(`/page/${schema.id}`, '_blank');
+                      window.open(`/page/${schema.id}`, '_blank', 'noopener,noreferrer');
                     }
                   }}
                   onAuxClick={(e) => {
-                    // Handle middle-click (auxiliary click)
+                    // Fallback for some browsers where middle-click triggers aux click
                     if (e.button === 1) {
                       e.preventDefault();
-                      window.open(`/page/${schema.id}`, '_blank');
+                      window.open(`/page/${schema.id}`, '_blank', 'noopener,noreferrer');
                     }
                   }}
                   className="h-7 w-7 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:text-violet-200 dark:hover:bg-violet-500/10"
@@ -153,9 +153,32 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => onEdit(schema)}
-                className="h-7 w-7 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:text-violet-200 dark:hover:bg-violet-500/10"
-                title="Edit Schema"
+                onClick={(e) => {
+                  // Handle Ctrl/Cmd+click to open schema editor in new tab
+                  if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    window.open(`/builder/schemas/${schema.id}`, '_blank', 'noopener,noreferrer');
+                    return;
+                  }
+                  // Regular click uses callback to navigate in current tab
+                  onEdit(schema);
+                }}
+                onMouseDown={(e) => {
+                  // Handle middle-click (button 1) to open schema editor in new tab
+                  if (e.button === 1) {
+                    e.preventDefault();
+                    window.open(`/builder/schemas/${schema.id}`, '_blank', 'noopener,noreferrer');
+                  }
+                }}
+                onAuxClick={(e) => {
+                  // Fallback for some browsers where middle-click triggers aux click
+                  if (e.button === 1) {
+                    e.preventDefault();
+                    window.open(`/builder/schemas/${schema.id}`, '_blank', 'noopener,noreferrer');
+                  }
+                }}
+                className="h-7 w-7 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:bg-violet-500/10 hover:bg-violet-50/80"
+                title="Edit Schema (Ctrl+Click or Middle-Click to open in new tab)"
               >
                 <PencilRuler className="h-3.5 w-3.5" />
               </Button>
