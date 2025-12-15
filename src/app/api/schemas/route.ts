@@ -136,8 +136,31 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const schemaId = searchParams.get('id');
     const schemaIdsParam = searchParams.get('schemaIds');
+    const tenantIdsParam = searchParams.get('tenantIds');
     const summaryParam = searchParams.get('summary');
     const isSummaryRequested = summaryParam === 'true' || summaryParam === '1';
+    const tenantIds = tenantIdsParam
+      ?.split(',')
+      .map((id) => id.trim())
+      .filter((id) => id.length > 0);
+    const hasTenantFilter = Array.isArray(tenantIds) && tenantIds.length > 0;
+
+    const matchesTenantFilter = (schema: any) => {
+      if (!hasTenantFilter) return true;
+      if (schema?.applyToAllTenants) return true;
+      const related = Array.isArray(schema?.relatedTenants)
+        ? schema.relatedTenants
+            .filter(Boolean)
+            .map((item: any) => {
+              if (typeof item === 'string') return item;
+              if (item?.id) return `${item.id}`;
+              return undefined;
+            })
+            .filter(Boolean) as string[]
+        : [];
+      if (related.length === 0) return false;
+      return related.some((id: string) => tenantIds.includes(id));
+    };
 
     // Load schemas (always fresh, no caching)
     const schemas = await loadSchemas();
@@ -159,7 +182,7 @@ export async function GET(request: NextRequest) {
 
       const matchedSchemas = uniqueSchemaIds
         .map((id) => schemas.find((s: any) => s.id === id))
-        .filter((schema): schema is any => Boolean(schema));
+        .filter((schema): schema is any => Boolean(schema) && matchesTenantFilter(schema));
       const responseData = isSummaryRequested
         ? matchedSchemas.map((schema) => buildSchemaSummary(schema))
         : matchedSchemas;
@@ -184,7 +207,7 @@ export async function GET(request: NextRequest) {
     if (schemaId) {
       const schema = schemas.find((s: any) => s.id === schemaId);
       
-      if (!schema) {
+      if (!schema || !matchesTenantFilter(schema)) {
         return NextResponse.json(
           { success: false, error: `Schema with ID "${schemaId}" not found` },
           { status: 404 }
@@ -206,9 +229,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Return all schemas with cache-busting headers
+    const filteredSchemas = hasTenantFilter ? schemas.filter(matchesTenantFilter) : schemas;
     const responseSchemas = isSummaryRequested
-      ? schemas.map((schema) => buildSchemaSummary(schema))
-      : schemas;
+      ? filteredSchemas.map((schema) => buildSchemaSummary(schema))
+      : filteredSchemas;
 
     return NextResponse.json({
       success: true,

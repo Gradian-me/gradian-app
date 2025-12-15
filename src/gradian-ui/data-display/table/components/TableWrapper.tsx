@@ -159,8 +159,52 @@ export function TableWrapper<T = any>({
       });
     }
 
+    // Add assigned to column if schema allows it
+    if (schema?.allowDataAssignedTo) {
+      // Find the assignedTo field in schema to pass to formatter
+      const assignedToField = schema.fields?.find((f: any) => f.name === 'assignedTo' || (f.role === 'person' && f.name === 'assignedTo'));
+      
+      // Create field object with person role - ensure role is explicitly set
+      const assignedToFieldWithRole = assignedToField
+        ? { ...assignedToField, role: 'person', name: 'assignedTo' }
+        : { id: 'assignedTo', name: 'assignedTo', role: 'person', component: 'picker', targetSchema: 'users', label: 'Assigned To' };
+      
+      additionalColumns.push({
+        id: 'assignedTo',
+        label: 'Assigned To',
+        accessor: (row: T) => (row as any)['assignedTo'],
+        sortable: false,
+        align: 'left',
+        maxWidth: 250,
+        allowWrap: true,
+        field: assignedToFieldWithRole,
+        render: (value: any, row: T) => {
+          if (!value || (Array.isArray(value) && value.length === 0)) {
+            return <span className="text-gray-400 dark:text-gray-500 text-sm">—</span>;
+          }
+          // Use formatFieldValue to render assigned to with avatar and label
+          return formatFieldValue(
+            assignedToFieldWithRole,
+            value,
+            row
+          );
+        },
+      });
+    }
+
     // Build a working copy of base columns and optionally hide icon/color when avatar column is present
     let baseColumns = [...columns];
+    
+    // Check if dueDate column already exists in baseColumns - if so, we'll remove it and add to additionalColumns in correct position
+    const dueDateColumnIndex = baseColumns.findIndex((col) => col.id === 'dueDate' || col.field?.name === 'dueDate');
+    let dueDateColumn: TableColumn<T> | null = null;
+    
+    if (dueDateColumnIndex !== -1) {
+      // Extract the existing dueDate column
+      dueDateColumn = baseColumns[dueDateColumnIndex];
+      // Remove it from baseColumns (we'll add it to additionalColumns in the correct position)
+      baseColumns = baseColumns.filter((_, index) => index !== dueDateColumnIndex);
+    }
 
     if (hasAvatarLikeConfig) {
       const iconFieldIds =
@@ -178,32 +222,46 @@ export function TableWrapper<T = any>({
       }
     }
 
-    // Ensure dueDate columns have the duedate role if schema allows due dates
+    // Add due date column if schema allows it (after assignedTo)
     if (schema?.allowDataDueDate) {
-      const dueDateField = schema.fields?.find((f: any) => f.name === 'dueDate' || (f.name === 'dueDate' && f.role === 'duedate'));
-      baseColumns = baseColumns.map((col) => {
-        // If this is a dueDate column, ensure it has the duedate role
-        if (col.id === 'dueDate' || col.field?.name === 'dueDate') {
-          const fieldWithRole = dueDateField || { 
+      const dueDateField = schema.fields?.find((f: any) => f.name === 'dueDate' || (f.role === 'duedate' && f.name === 'dueDate'));
+      
+      // Create field object with duedate role - ensure role is explicitly set
+      const dueDateFieldWithRole = dueDateField
+        ? { ...dueDateField, role: 'duedate', name: 'dueDate' }
+        : { 
             id: 'dueDate', 
             name: 'dueDate', 
             role: 'duedate', 
             component: 'date',
             label: 'Due Date'
           };
-          return {
-            ...col,
-            field: { ...(col.field || {}), ...fieldWithRole },
+      
+      // Use existing column if we extracted it, otherwise create a new one
+      const dueDateCol: TableColumn<T> = dueDateColumn || {
+        id: 'dueDate',
+        label: 'Due Date',
+        accessor: (row: T) => (row as any)['dueDate'],
+        sortable: false,
+        align: 'left',
+        maxWidth: 200,
+        allowWrap: true,
+      };
+      
+      // Ensure the column has the correct field and render function
+      additionalColumns.push({
+        ...dueDateCol,
+        field: dueDateFieldWithRole,
             render: (value: any, row: T) => {
               if (!value || value === '' || value === null || value === undefined) {
                 return <span className="text-gray-400 dark:text-gray-500 text-sm">—</span>;
               }
-              return formatFieldValue(fieldWithRole, value, row);
+          return formatFieldValue(dueDateFieldWithRole, value, row);
             },
-          };
-        }
-        return col;
       });
+    } else if (dueDateColumn) {
+      // If schema doesn't allow dueDate but we extracted a column, add it back to baseColumns
+      baseColumns.push(dueDateColumn);
     }
 
     // Add avatar column if schema has avatar/icon/color configuration

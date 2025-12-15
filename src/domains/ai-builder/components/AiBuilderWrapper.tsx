@@ -113,6 +113,7 @@ export function AiBuilderWrapper({
     setUserPrompt,
     aiResponse,
     tokenUsage,
+    videoUsage,
     duration,
     isLoading,
     isApproving,
@@ -589,6 +590,7 @@ export function AiBuilderWrapper({
               response={aiResponse}
               agent={selectedAgent}
               tokenUsage={tokenUsage}
+              videoUsage={videoUsage}
               duration={duration}
               isApproving={isApproving}
               isLoading={isLoading}

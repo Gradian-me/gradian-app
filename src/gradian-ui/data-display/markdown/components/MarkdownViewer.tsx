@@ -5,6 +5,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkSlug from 'remark-slug';
 import remarkAutolinkHeadings from 'remark-autolink-headings';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css'; // KaTeX styles for math rendering
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { EndLine } from '@/gradian-ui/layout/end-line/components/EndLine';
 import { createMarkdownComponents } from './MarkdownComponents';
@@ -27,7 +30,8 @@ export function MarkdownViewer({
   stickyHeadings = [],
   navigationHeadingLevels = [],
   onNavigationData,
-  aiAgentId
+  aiAgentId,
+  showEndLine = true
 }: MarkdownViewerProps) {
   const [viewMode, setViewMode] = useState<'editor' | 'preview' | 'raw'>('preview');
   const [headings, setHeadings] = useState<Array<{ id: string; text: string; level: number }>>([]);
@@ -263,7 +267,7 @@ export function MarkdownViewer({
             readOnly={false}
             className="w-full"
           />
-          <EndLine />
+          {showEndLine && <EndLine />}
         </div>
       ) : viewMode === 'raw' ? (
         <div className="my-4">
@@ -273,7 +277,7 @@ export function MarkdownViewer({
             programmingLanguage="markdown"
             title="Raw Markdown"
           />
-          <EndLine />
+          {showEndLine && <EndLine />}
         </div>
       ) : (
         <article 
@@ -286,13 +290,17 @@ export function MarkdownViewer({
             remarkPlugins={[
               remarkGfm,
               remarkSlug as any, // Type compatibility workaround
-              remarkAutolinkHeadings as any // Type compatibility workaround
+              remarkAutolinkHeadings as any, // Type compatibility workaround
+              remarkMath // Support for math syntax - parses $...$ and $$...$$
+            ]}
+            rehypePlugins={[
+              rehypeKatex // Render math with KaTeX - automatically converts math nodes to KaTeX HTML
             ]}
             components={markdownComponents}
           >
             {displayContent}
           </ReactMarkdown>
-          <EndLine />
+          {showEndLine && <EndLine />}
         </article>
       )}
       {aiAgentId && (

@@ -199,7 +199,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
           <CopyContent content={currentCode} />
         </div>
       </div>
-      <div className="overflow-hidden">
+      <div className="overflow-auto">
         {isEditable ? (
           <textarea
             ref={textareaRef}
@@ -236,21 +236,22 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
                   style={nightOwl}
                   showLineNumbers
                   startingLineNumber={1}
-                  wrapLines
-                  wrapLongLines
+                  wrapLines={false}
+                  wrapLongLines={false}
                   customStyle={{
                     margin: 0,
                     padding: '1rem',
                     fontSize: '0.875rem',
                     lineHeight: '1.5rem',
                     borderRadius: 0,
-                    backgroundColor: '#0E1424'
+                    backgroundColor: '#0E1424',
+                    overflowX: 'auto',
                   }}
                   codeTagProps={{
                     style: {
                       fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
-                      whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word'
+                      whiteSpace: 'pre',
+                      wordBreak: 'normal',
                     },
                   }}
                   lineNumberStyle={{

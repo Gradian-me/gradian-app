@@ -6,7 +6,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import type { AiAgent, AiBuilderResponseData, GeneratePromptRequest, TokenUsage, PreloadRouteResult } from '../types';
+import type { AiAgent, AiBuilderResponseData, GeneratePromptRequest, TokenUsage, VideoUsage, PreloadRouteResult } from '../types';
 import { useAiPrompts } from '@/domains/ai-prompts/hooks/useAiPrompts';
 import { useUserStore } from '@/stores/user.store';
 import {
@@ -22,6 +22,7 @@ interface UseAiBuilderReturn {
   setUserPrompt: (prompt: string) => void;
   aiResponse: string;
   tokenUsage: TokenUsage | null;
+  videoUsage: VideoUsage | null;
   duration: number | null;
   isLoading: boolean;
   isApproving: boolean;
@@ -48,6 +49,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const [userPrompt, setUserPrompt] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
+  const [videoUsage, setVideoUsage] = useState<VideoUsage | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
@@ -266,6 +268,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 setError(`Server Error (${response.status}): ${errorMessage}`);
                 setAiResponse('');
                 setTokenUsage(null);
+                setVideoUsage(null);
                 setDuration(null);
               } else {
                 const data = await response.json();
@@ -274,11 +277,13 @@ export function useAiBuilder(): UseAiBuilderReturn {
                   setError(`AI Builder Error: ${errorMessage}`);
                   setAiResponse('');
                   setTokenUsage(null);
+                  setVideoUsage(null);
                   setDuration(null);
                 } else {
                   const builderResponse: AiBuilderResponseData = data.data;
                   setAiResponse(builderResponse.response);
                   setTokenUsage(builderResponse.tokenUsage || null);
+                  setVideoUsage(builderResponse.videoUsage || null);
                   setDuration(builderResponse.timing?.duration || null);
                   setError(null);
 
@@ -318,6 +323,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 setError(`Main Agent Error: ${errorMessage}`);
                 setAiResponse('');
                 setTokenUsage(null);
+                setVideoUsage(null);
                 setDuration(null);
               }
             }
@@ -758,6 +764,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const clearResponse = useCallback(() => {
     setAiResponse('');
     setTokenUsage(null);
+    setVideoUsage(null);
     setDuration(null);
     setError(null);
     setSuccessMessage(null);
@@ -778,6 +785,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
     setUserPrompt,
     aiResponse,
     tokenUsage,
+    videoUsage,
     duration,
     isLoading,
     isApproving,

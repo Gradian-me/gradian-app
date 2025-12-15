@@ -785,6 +785,21 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                             </UiSelect>
                           </div>
                           <div>
+                            <Label className="text-sm font-medium text-gray-700 mb-2 block">Component Type</Label>
+                            <UiSelect
+                              value={action.componentType || 'button'}
+                              onValueChange={(value: 'button' | 'ai-agent-response') => updateQuickAction(action.id, { componentType: value })}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="button">Button</SelectItem>
+                                <SelectItem value="ai-agent-response">AI Agent Response Container</SelectItem>
+                              </SelectContent>
+                            </UiSelect>
+                          </div>
+                          <div>
                             <Label className="text-sm font-medium text-gray-700 mb-2 block">Selected Fields</Label>
                             <div className="max-h-48 overflow-y-auto border rounded-md p-3 space-y-2">
                               {availableFields.length === 0 ? (

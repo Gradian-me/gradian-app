@@ -52,5 +52,7 @@ export * from './components/TagInput';
 export * from './components/LanguageSelector';
 export * from './components/ForceIcon';
 export * from './components/QRCodeCanvas';
+export * from './components/ImageViewer';
+export * from './components/VideoViewer';
 export * from './hooks/useOptionsFromUrl';
 export * from './hooks/useOptionsFromSchemaOrUrl';

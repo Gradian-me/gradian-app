@@ -210,8 +210,8 @@ export function SchemaTableView({ schemas, onEdit, onView, onDelete, isLoading =
       minWidth: 150,
       render: (_value: any, row: FormSchema) => {
         return (
-          <code className={`text-xs px-2 py-1 rounded bg-violet-100 dark:bg-violet-300 ${
-            row.inactive ? 'text-gray-500 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'
+          <code className={`text-xs px-2 py-1 rounded bg-violet-100 dark:bg-violet-900/30 ${
+            row.inactive ? 'text-gray-500 dark:text-gray-500' : 'text-gray-700 dark:text-violet-200'
           }`}>
             {row.id}
           </code>

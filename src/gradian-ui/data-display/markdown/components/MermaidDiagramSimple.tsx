@@ -252,9 +252,9 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
         secondBkgColor: isDark ? '#374151' : '#f9fafb',
         textColor: isDark ? '#f3f4f6' : '#111827',
         edgeLabelBackground: isDark ? '#374151' : '#f3f4f6',
-        // Make nodes smaller
-        fontSize: '12px',
-        fontFamily: 'inherit',
+        // Use sans-serif font
+        fontSize: '13px',
+        fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         // Node dimensions
         nodeBorder: isDark ? '#a78bfa' : '#6d28d9',
         nodeBkg: isDark ? '#1f2937' : '#ffffff',
@@ -327,8 +327,8 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
             curve: 'basis', 
             useMaxWidth: true,
             nodeSpacing: 50,
-            rankSpacing: 20,
-            padding: 2
+            rankSpacing: 30,
+            padding: 10
           },
           sequence: { useMaxWidth: true, diagramMarginX: 10, diagramMarginY: 10 },
           gantt: { useMaxWidth: true },
@@ -403,10 +403,12 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
             #${svgId} .node ellipse,
             #${svgId} .node polygon,
             #${svgId} .node path {
-              font-size: 11px !important;
+              font-size: 13px !important;
+              font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
             }
             #${svgId} .nodeLabel {
-              font-size: 11px !important;
+              font-size: 13px !important;
+              font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
             }
             #${svgId} .nodeLabel tspan {
               word-wrap: break-word !important;
@@ -422,10 +424,11 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
               overflow-wrap: break-word !important;
               white-space: normal !important;
               text-align: center !important;
-              padding: 4px 8px !important;
-              line-height: 1.3 !important;
+              padding: 8px 12px !important;
+              line-height: 1.4 !important;
               display: block !important;
               box-sizing: border-box !important;
+              font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
             }
             #${svgId} .nodeLabel foreignObject > div > p {
               margin: 0 !important;
@@ -439,26 +442,34 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
               white-space: normal !important;
             }
             #${svgId} .edgeLabel {
-              font-size: 10px !important;
-              word-wrap: break-word !important;
-              overflow-wrap: break-word !important;
-            }
-            #${svgId} .cluster-label {
-              font-size: 12px !important;
-              word-wrap: break-word !important;
-              overflow-wrap: break-word !important;
-            }
-            #${svgId} text {
               font-size: 11px !important;
               word-wrap: break-word !important;
               overflow-wrap: break-word !important;
+              font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+            }
+            #${svgId} .cluster-label {
+              font-size: 13px !important;
+              word-wrap: break-word !important;
+              overflow-wrap: break-word !important;
+              font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+            }
+            #${svgId} text {
+              font-size: 13px !important;
+              word-wrap: break-word !important;
+              overflow-wrap: break-word !important;
+              font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
             }
             #${svgId} .node {
-              min-width: 60px !important;
+              min-width: 80px !important;
             }
             #${svgId} .node rect {
-              rx: 4px !important;
-              ry: 4px !important;
+              rx: 6px !important;
+              ry: 6px !important;
+            }
+            #${svgId} .nodeLabel foreignObject {
+              overflow: visible !important;
+              height: auto !important;
+              min-width: 80px !important;
             }
           `;
           document.head.appendChild(style);
@@ -481,14 +492,14 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
                 let requiredWidth: number;
                 
                 if (charCount <= 20) {
-                  // Short text: single line
-                  requiredWidth = Math.max(charCount * 7 + 32, 100);
+                  // Short text: single line (adjusted for 13px font)
+                  requiredWidth = Math.max(charCount * 8 + 40, 120);
                 } else if (charCount <= 40) {
                   // Medium text: allow 2 lines
-                  requiredWidth = Math.max(charCount * 3.5 + 32, 150);
+                  requiredWidth = Math.max(charCount * 4 + 40, 180);
                 } else {
                   // Long text: allow 3+ lines
-                  requiredWidth = Math.min(charCount * 2.5 + 32, 400);
+                  requiredWidth = Math.min(charCount * 3 + 40, 450);
                 }
                 
                 // Get current width
@@ -795,67 +806,60 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
     return () => observer.disconnect();
   }, [renderKey, cleanDiagram]);
 
-  // Render effect (runs when diagram or theme changes)
+  // Track last markdown loaded timestamp to detect changes
+  const lastMarkdownLoadedTimestampRef = useRef<number | undefined>(undefined);
+  
+  // Render effect (runs when diagram, theme, or markdown loading timestamp changes)
   useEffect(() => {
     if (!mountedRef.current || !renderKey || !cleanDiagram) {
       return;
     }
     
+    // Check if markdownLoadedTimestamp has changed
+    const markdownJustLoaded = markdownLoadedTimestamp && 
+      markdownLoadedTimestamp !== lastMarkdownLoadedTimestampRef.current;
+    
+    if (markdownJustLoaded) {
+      lastMarkdownLoadedTimestampRef.current = markdownLoadedTimestamp;
+      // Reset rendering state when markdown loads so we force a fresh render
+      lastRenderedDiagramRef.current = '';
+      lastRenderKeyRef.current = '';
+    }
+    
     // If container already has SVG content and diagram hasn't changed, preserve it
-    if (containerRef.current && 
+    // UNLESS markdown just loaded (which requires a refresh)
+    if (!markdownJustLoaded && 
+        containerRef.current && 
         containerRef.current.innerHTML && 
         containerRef.current.innerHTML.includes('<svg') &&
         cleanDiagram === lastRenderedDiagramRef.current &&
         renderKey === lastRenderKeyRef.current) {
-      // Already rendered, skip
+      // Already rendered and nothing changed, skip
       return;
     }
     
-    // Small delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      if (mountedRef.current && containerRef.current) {
-        renderDiagram();
-      }
-    }, 0);
+    // Use requestAnimationFrame to ensure DOM is ready, then a small delay for Mermaid initialization
+    let timerId: ReturnType<typeof setTimeout> | null = null;
+    const rafId = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        // Small delay to ensure Mermaid library is ready
+        timerId = setTimeout(() => {
+          if (mountedRef.current && containerRef.current) {
+            renderDiagram();
+          }
+          timerId = null;
+        }, 100); // Small delay to ensure all components are ready
+      });
+    });
     
-    return () => clearTimeout(timer);
-  }, [renderKey, cleanDiagram, renderDiagram]);
-
-  // Auto-refresh effect: refresh diagram 3 seconds after markdown is loaded
-  const markdownLoadedTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const lastMarkdownLoadedTimestampRef = useRef<number | undefined>(undefined);
-  
-  useEffect(() => {
-    if (!mountedRef.current || !cleanDiagram) {
-      return;
-    }
-
-    // If markdownLoadedTimestamp is provided and has changed, schedule refresh
-    if (markdownLoadedTimestamp && markdownLoadedTimestamp !== lastMarkdownLoadedTimestampRef.current) {
-      lastMarkdownLoadedTimestampRef.current = markdownLoadedTimestamp;
-      
-      // Clear any existing timer
-      if (markdownLoadedTimerRef.current) {
-        clearTimeout(markdownLoadedTimerRef.current);
-        markdownLoadedTimerRef.current = null;
-      }
-
-      // Schedule refresh 3 seconds after markdown is loaded
-      markdownLoadedTimerRef.current = setTimeout(() => {
-        if (mountedRef.current && containerRef.current && cleanDiagram && !isRenderingRef.current) {
-          handleRefresh();
-        }
-        markdownLoadedTimerRef.current = null;
-      }, 3000); // 3 seconds after markdown is loaded
-    }
-
     return () => {
-      if (markdownLoadedTimerRef.current) {
-        clearTimeout(markdownLoadedTimerRef.current);
-        markdownLoadedTimerRef.current = null;
+      cancelAnimationFrame(rafId);
+      if (timerId) {
+        clearTimeout(timerId);
+        timerId = null;
       }
     };
-  }, [markdownLoadedTimestamp, cleanDiagram, handleRefresh]);
+  }, [renderKey, cleanDiagram, renderDiagram, markdownLoadedTimestamp]);
 
   if (!isMounted) {
     return (

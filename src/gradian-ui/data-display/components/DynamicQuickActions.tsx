@@ -222,6 +222,15 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
     return null;
   }
 
+  // Filter out actions with componentType === 'ai-agent-response' (these are rendered separately)
+  const buttonActions = actions.filter(
+    (action) => action.componentType !== 'ai-agent-response'
+  );
+
+  if (buttonActions.length === 0) {
+    return null;
+  }
+
   return (
     <>
       <motion.div
@@ -233,7 +242,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
         <Card className="p-4">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-3">Quick Actions</h3>
           <div className="space-y-2">
-            {actions.map((action) => {
+            {buttonActions.map((action) => {
               const isLoading = loadingActionId === action.id;
               return (
                 <Button

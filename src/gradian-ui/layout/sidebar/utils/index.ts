@@ -2,12 +2,16 @@
 
 import {
   LayoutDashboard,
-  Calendar,
+  Home,
+  CalendarDays,
   BarChart3,
-  Database,
-  PencilRuler,
+  ShieldCheck,
+  Plug,
+  Network,
+  Brackets,
+  Wrench,
   Sparkles,
-  Share2,
+  MessageCircle,
   type LucideIcon,
 } from 'lucide-react';
 import { NavigationItem } from '../types';
@@ -17,13 +21,17 @@ import { AD_MODE } from '@/gradian-ui/shared/constants/application-variables';
  * Map menu icon string from menu-items schema to Lucide icon component
  */
 const iconMap: Record<string, LucideIcon> = {
+  Home,
   LayoutDashboard,
-  Calendar,
+  CalendarDays,
   BarChart3,
-  Database,
-  PencilRuler,
+  ShieldCheck,
+  Plug,
+  Network,
+  Brackets,
+  Wrench,
   Sparkles,
-  Share2,
+  MessageCircle,
 };
 
 /**
@@ -39,6 +47,8 @@ export function mapMenuItemsToNavigationItems(
   if (!Array.isArray(menuItems)) return [];
 
   const filtered = menuItems
+    // Preserve a stable index-based ordering independent of updatedAt
+    .map((item, idx) => ({ ...item, __sortIndex: item.sortIndex ?? idx }))
     .filter((item) => {
       if (!AD_MODE) return true;
       return !item.hideInAD;
@@ -75,6 +85,11 @@ export function mapMenuItemsToNavigationItems(
       }
       
       return matches;
+    })
+    .sort((a, b) => {
+      const aIdx = Number.isFinite(a.__sortIndex) ? a.__sortIndex : 0;
+      const bIdx = Number.isFinite(b.__sortIndex) ? b.__sortIndex : 0;
+      return aIdx - bIdx;
     })
     .map<NavigationItem>((item) => {
       const iconName: string | undefined = item.menuIcon;

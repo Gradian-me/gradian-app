@@ -5,10 +5,25 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
+// In-memory cache for agents
+let cachedAgents: any[] | null = null;
+let cachedSummaryAgents: any[] | null = null;
+let cacheTimestamp: number = 0;
+let summaryCacheTimestamp: number = 0;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 /**
- * Load AI agents (always fresh, no caching)
+ * Load AI agents with caching
  */
-async function loadAiAgents(): Promise<any[]> {
+async function loadAiAgents(useCache: boolean = true): Promise<any[]> {
+  const now = Date.now();
+  
+  // Return cached data if still valid
+  if (useCache && cachedAgents !== null && (now - cacheTimestamp) < CACHE_TTL) {
+    return cachedAgents;
+  }
+  
+  // Load fresh data
   const dataPath = path.join(process.cwd(), 'data', 'ai-agents.json');
   
   if (!fs.existsSync(dataPath)) {
@@ -26,29 +41,70 @@ async function loadAiAgents(): Promise<any[]> {
     }
     
     const parsed = JSON.parse(fileContents);
+    let agents: any[] = [];
     
     // Ensure we return an array
     if (Array.isArray(parsed)) {
-      return parsed;
-    }
-    
-    // If it's an object, try to extract an array from it
-    if (typeof parsed === 'object' && parsed !== null) {
+      agents = parsed;
+    } else if (typeof parsed === 'object' && parsed !== null) {
+      // If it's an object, try to extract an array from it
       if (Array.isArray(parsed.data)) {
-        return parsed.data;
-      }
-      // If it's an object with agent IDs as keys, convert to array
-      if (Object.keys(parsed).length > 0) {
-        return Object.values(parsed);
+        agents = parsed.data;
+      } else if (Object.keys(parsed).length > 0) {
+        // If it's an object with agent IDs as keys, convert to array
+        agents = Object.values(parsed);
       }
     }
     
-    console.warn(`[API] AI agents file contains invalid data format at: ${dataPath}`);
-    return [];
+    // Update cache with loaded data
+    if (useCache) {
+      cachedAgents = agents;
+      cacheTimestamp = Date.now();
+    }
+    
+    return agents;
   } catch (error) {
     console.error(`[API] Error parsing AI agents file at ${dataPath}:`, error);
     throw new Error(`Failed to parse AI agents file: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
+}
+
+/**
+ * Get summary agents with caching
+ */
+function getSummaryAgents(agents: any[]): any[] {
+  const now = Date.now();
+  
+  // Return cached summary if still valid
+  if (cachedSummaryAgents !== null && (now - summaryCacheTimestamp) < CACHE_TTL) {
+    return cachedSummaryAgents;
+  }
+  
+  // Generate summary
+  const summary = agents.map((agent: any) => ({
+    id: agent.id,
+    label: agent.label,
+    icon: agent.icon,
+    description: agent.description,
+    agentType: agent.agentType || 'chat',
+    renderComponents: Array.isArray(agent.renderComponents) ? agent.renderComponents : [],
+  }));
+  
+  // Cache it
+  cachedSummaryAgents = summary;
+  summaryCacheTimestamp = now;
+  
+  return summary;
+}
+
+/**
+ * Clear cache (useful after POST/PUT/DELETE operations)
+ */
+function clearCache() {
+  cachedAgents = null;
+  cachedSummaryAgents = null;
+  cacheTimestamp = 0;
+  summaryCacheTimestamp = 0;
 }
 
 /**
@@ -62,9 +118,10 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const agentId = searchParams.get('id');
     const agentIdsParam = searchParams.get('agentIds');
+    const summary = searchParams.get('summary') === 'true';
 
-    // Load agents (always fresh, no caching)
-    const agents = await loadAiAgents();
+    // Load agents (with caching)
+    const agents = await loadAiAgents(true);
     
     if (!agents || agents.length === 0) {
       return NextResponse.json(
@@ -81,9 +138,17 @@ export async function GET(request: NextRequest) {
         .filter(id => id.length > 0);
       const uniqueAgentIds = Array.from(new Set(agentIds));
 
-      const matchedAgents = uniqueAgentIds
+      let matchedAgents = uniqueAgentIds
         .map((id) => agents.find((a: any) => a.id === id))
         .filter((agent): agent is any => Boolean(agent));
+
+      // If summary mode, return only essential fields
+      if (summary) {
+        const allSummaryAgents = getSummaryAgents(agents);
+        matchedAgents = allSummaryAgents.filter((agent: any) => 
+          uniqueAgentIds.includes(agent.id)
+        );
+      }
 
       return NextResponse.json({
         success: true,
@@ -91,12 +156,13 @@ export async function GET(request: NextRequest) {
         meta: {
           requestedIds: uniqueAgentIds,
           returnedCount: matchedAgents.length,
+          summary,
         },
       }, {
         headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0',
+          'Cache-Control': summary 
+            ? 'public, s-maxage=300, stale-while-revalidate=600' 
+            : 'public, s-maxage=60, stale-while-revalidate=120',
         },
       });
     }
@@ -112,14 +178,52 @@ export async function GET(request: NextRequest) {
         );
       }
 
+      // If summary mode, return only essential fields
+      if (summary) {
+        const allSummaryAgents = getSummaryAgents(agents);
+        const summaryAgent = allSummaryAgents.find((a: any) => a.id === agentId);
+        
+        if (!summaryAgent) {
+          return NextResponse.json(
+            { success: false, error: `AI agent with ID "${agentId}" not found` },
+            { status: 404 }
+          );
+        }
+        
+        return NextResponse.json({
+          success: true,
+          data: summaryAgent,
+        }, {
+          headers: {
+            'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+          },
+        });
+      }
+
       return NextResponse.json({
         success: true,
         data: agent,
       }, {
         headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0',
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+        },
+      });
+    }
+
+      // If summary mode, return only essential fields for all agents
+    if (summary) {
+      const summaryAgents = getSummaryAgents(agents);
+
+      return NextResponse.json({
+        success: true,
+        data: summaryAgents,
+        meta: {
+          totalCount: summaryAgents.length,
+          summary: true,
+        },
+      }, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600', // 5 min cache, 10 min stale
         },
       });
     }
@@ -133,9 +237,7 @@ export async function GET(request: NextRequest) {
       },
     }, {
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
       },
     });
   } catch (error) {
@@ -248,6 +350,9 @@ export async function POST(request: NextRequest) {
     const agentsFilePath = path.join(process.cwd(), 'data', 'ai-agents.json');
     fs.writeFileSync(agentsFilePath, JSON.stringify(agents, null, 2), 'utf8');
 
+    // Clear cache after modification
+    clearCache();
+
     // Return created agents
     return NextResponse.json({
       success: true,
@@ -265,3 +370,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

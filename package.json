@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.26.000",
+  "version": "1.28.006",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -70,6 +70,7 @@
     "html2canvas": "^1.4.1",
     "jsonwebtoken": "^9.0.3",
     "jspdf": "^3.0.4",
+    "katex": "^0.16.27",
     "lucide-react": "^0.546.0",
     "mermaid": "^11.12.2",
     "next": "^16.0.10",
@@ -88,9 +89,11 @@
     "react-syntax-highlighter": "^16.1.0",
     "react-voice-visualizer": "^2.0.8",
     "recharts": "^3.5.1",
+    "rehype-katex": "^7.0.1",
     "remark": "^15.0.1",
     "remark-autolink-headings": "^7.0.1",
     "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
     "remark-parse": "^11.0.0",
     "remark-slug": "^7.0.1",
     "server-only": "^0.0.1",

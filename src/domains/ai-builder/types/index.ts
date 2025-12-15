@@ -9,8 +9,8 @@ export interface AiAgent {
   label: string;
   icon: string;
   description: string;
-  agentType?: 'chat' | 'image-generation' | 'voice-transcription'; // Type of AI agent
-  requiredOutputFormat: 'json' | 'string' | 'table';
+  agentType?: 'chat' | 'image-generation' | 'voice-transcription' | 'video-generation' | 'orchestrator'; // Type of AI agent
+  requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video';
   model?: string;
   systemPrompt?: string;
   loadingTextSwitches?: string | string[];
@@ -38,6 +38,16 @@ export interface AiAgent {
     route: string;
   };
   responseCards?: ResponseCardConfig[];
+  // Orchestrator-specific fields
+  orchestrationRules?: OrchestrationRule[];
+  complexityThreshold?: number; // 0-1, when to create todos (default: 0.5)
+}
+
+export interface OrchestrationRule {
+  condition: string; // Condition to evaluate (e.g., "if output contains 'summary'")
+  thenAgentId: string; // Agent to call if condition is true
+  thenAgentType?: string; // Optional agent type override
+  inputMapping?: Record<string, string>; // Map output fields to input fields
 }
 
 export interface TokenUsage {
@@ -54,10 +64,20 @@ export interface TokenUsage {
   } | null;
 }
 
+export interface VideoUsage {
+  duration_seconds: number;
+  estimated_cost?: {
+    unit: string;
+    irt: number;
+    exchange_rate: number;
+  } | null;
+}
+
 export interface AiBuilderResponseData {
   response: string;
-  format: 'json' | 'string' | 'table' | 'image';
+  format: 'json' | 'string' | 'table' | 'image' | 'video';
   tokenUsage: TokenUsage | null;
+  videoUsage?: VideoUsage | null; // Video usage (duration and cost) for video generation agents
   timing?: {
     responseTime: number; // Time to receive response in milliseconds
     duration: number; // Total duration in milliseconds
@@ -66,7 +86,7 @@ export interface AiBuilderResponseData {
     id: string;
     label: string;
     description: string;
-    requiredOutputFormat: 'json' | 'string' | 'table' | 'image';
+    requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video';
     nextAction: {
       label: string;
       icon?: string;

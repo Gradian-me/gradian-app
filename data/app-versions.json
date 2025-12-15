@@ -3004,5 +3004,432 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCEET0YWAQQSN26ZY40QGYKK",
+    "timestamp": "2025-12-14T16:23:59.000Z",
+    "version": "1.26.001",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Enhanced AI Agent Integration",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "data-display",
+          "quick-actions"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new AI agent response containers in DynamicDetailPageRenderer and DynamicQuickActions components for improved user interaction",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "quick-actions",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated Countdown component to normalize date handling for better accuracy",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "components"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved schema handling in TableWrapper and DynamicCardRenderer components to support new assignedTo and dueDate features, enhancing data representation and user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "form-builder",
+          "schema-manager"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCEVIDEOGENERATOR001",
+    "timestamp": "2025-12-14T20:00:00.000Z",
+    "version": "1.27.000",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Added new 'Video Generator' AI agent in ai-agents.json for video generation capabilities",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "video-generation"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated AiBuilderResponse and AiBuilderWrapper components to support video data rendering and usage metrics",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ui",
+          "data-display"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented video validation functions in ai-security-utils for improved input handling",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "security",
+          "validation"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Enhanced DynamicAiAgentResponseContainer to include video rendering logic, improving user interaction with video content",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "ai-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Created VideoViewer component for displaying generated videos with polling and progress tracking",
+        "priority": "High",
+        "affectedDomains": [
+          "form-builder",
+          "ui",
+          "video-generation"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented video generation API routes for status checking and content fetching",
+        "priority": "High",
+        "affectedDomains": [
+          "api",
+          "video-generation"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Added video usage metrics (duration and cost) display in AI builder response",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "analytics",
+          "ui"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCFKEBDE11GETDQ3B8TX62QG",
+    "timestamp": "2025-12-14T23:34:17.000Z",
+    "version": "1.28.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "CHATBOT + AI ORCHESTRATOR to handle ToDo execution plan + Mentions + Hashtags + Bot Selector",
+        "priority": "High",
+        "affectedDomains": [
+          "chat",
+          "ai-builder",
+          "orchestrator"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Introduced styles for hashtags and mentions in globals.css to improve chat message formatting",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated loadAiAgents function in route.ts to implement caching for improved performance",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "performance",
+          "api"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented summary mode for AI agents in useAiAgents hook to optimize data fetching",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "performance",
+          "hooks"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCFPNXJ2C7CFRKBAZYZFJV27",
+    "timestamp": "2025-12-15T00:30:29.000Z",
+    "version": "1.28.001",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated chat message handling to support temporary message creation when no existing message is found for todos",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "data-management"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new vendor data analysis feature in chat.json, including detailed performance metrics and compliance scores",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "data-management",
+          "analytics"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Simplified todos handling in useChat hook for improved clarity and efficiency",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "performance",
+          "hooks"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCG2W0BA8H1FZD1HN6C12MND",
+    "timestamp": "2025-12-15T04:03:49.000Z",
+    "version": "1.28.002",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated systemPrompt in ai-agents.json to improve clarity and detail of AI capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-agents",
+          "ai-builder",
+          "professional-writing"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new user message handling in chat.json for image generation requests, including updated timestamps",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "image-generation",
+          "data-management"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved image URL handling in route.ts and ImageViewer.tsx to support dynamic serving and ensure immediate availability of images. This update enhances user interaction with chat features and optimizes image processing capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "image-generation",
+          "api",
+          "ui",
+          "performance"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCG2Y8A41009HF2GM7E9GXWJ",
+    "timestamp": "2025-12-15T04:05:19.000Z",
+    "version": "1.28.003",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated systemPrompt in ai-agents.json to improve clarity and detail of AI capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-agents",
+          "ai-builder",
+          "professional-writing"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new user message handling in chat.json for image generation requests, including updated timestamps",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "image-generation",
+          "data-management"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved image URL handling in route.ts and ImageViewer.tsx to support dynamic serving and ensure immediate availability of images. This update enhances user interaction with chat features and optimizes image processing capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "image-generation",
+          "api",
+          "ui",
+          "performance"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCG7SG37Y4Q079D5NESYV7EN",
+    "timestamp": "2025-12-15T08:59:46.000Z",
+    "version": "1.28.004",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated descriptions for various AI agents in ai-agents.json to provide clearer usage guidelines and limitations",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "orchestrator"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new todo structure in chat.json for enhanced task management, including detailed parameters for agent interactions",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "todo-management",
+          "ai-builder"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved parameter handling in TodoEditDialog and TodoList components to streamline user input and ensure unique parameter selection",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "ui",
+          "form-builder"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCGCXTHWHSSPGN5EHT9TG68J",
+    "timestamp": "2025-12-15T10:29:57+0330",
+    "version": "1.28.005",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Implemented dependency-driven parameters in todo management, enabling automatic hydration from previous todo outputs during execution.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "orchestrator",
+          "todo-management"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced utility helpers for dependency output markers in todo-parameter-utils, allowing safe detection and creation of dependency-sourced values.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "utils"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated TodoEditDialog and TodoList to support dependency output toggling and improved parameter handling for agent inputs.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "ui",
+          "form-builder"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCGPAGINATION006",
+    "timestamp": "2025-12-15T12:00:00.000Z",
+    "version": "1.28.006",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Implemented pagination support in chat message retrieval, allowing users to fetch messages in slices based on page and limit parameters.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "api"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced pagination metadata in chat response for better user experience.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "api"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated ChatInterface and useChat hook to handle message loading and scrolling behavior more efficiently.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "ui",
+          "hooks"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCGCHATUPDATES007",
+    "timestamp": "2025-12-15T12:30:00.000Z",
+    "version": "1.28.007",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Improved chat message retrieval performance by optimizing data fetching strategies",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "performance",
+          "api"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new error handling mechanisms for chat message processing to enhance user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "error-handling",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated useChat hook to streamline message loading and improve overall efficiency",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "hooks",
+          "performance"
+        ]
+      }
+    ]
   }
 ]

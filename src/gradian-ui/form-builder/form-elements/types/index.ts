@@ -231,6 +231,7 @@ export interface BadgeProps extends BaseComponentProps {
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   color?: string; // Tailwind color name for pastel styling (e.g., 'violet', 'emerald', 'yellow', 'cyan')
+  tooltip?: string; // Tooltip text to display on hover
   children: React.ReactNode;
 }
 

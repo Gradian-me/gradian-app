@@ -1,7 +1,7 @@
 // Image Viewer Component
 // Displays images from URL or base64 content using Next.js Image component
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { FormElementProps } from '../types';
 import { cn } from '../../../shared/utils';
@@ -52,20 +52,121 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
   // Extract alt text
   const imageAlt = alt || config?.alt || config?.imageAlt || 'Generated image';
 
+  // State for saved image URL
+  const [savedImageUrl, setSavedImageUrl] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
   // Determine if we have a valid image source
   const hasImageUrl = imageUrl && typeof imageUrl === 'string' && imageUrl.length > 0;
   const hasBase64Content = base64Content && typeof base64Content === 'string' && base64Content.length > 0;
+
+  // Save base64 image to server if we have base64 but no URL
+  useEffect(() => {
+    if (hasBase64Content && !hasImageUrl && !savedImageUrl && !isSaving) {
+      setIsSaving(true);
+      const saveImage = async () => {
+        try {
+          // Prepare base64 string (add data URL prefix if needed)
+          let base64String = base64Content;
+          if (!base64String.startsWith('data:image/')) {
+            base64String = `data:image/png;base64,${base64String}`;
+          }
+          
+          // Extract just the base64 data (remove data URL prefix for API)
+          let base64Data = base64String;
+          if (base64Data.startsWith('data:image/')) {
+            base64Data = base64Data.split(',')[1] || base64Data;
+          }
+          
+          // Save image via API
+          const saveResponse = await fetch('/api/images/save', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              base64: base64String, // Send full data URL for API to parse
+              mimeType: 'image/png',
+            }),
+          });
+          
+          if (saveResponse.ok) {
+            const saveResult = await saveResponse.json();
+            if (saveResult.success && saveResult.url && typeof saveResult.url === 'string' && saveResult.url.trim().length > 0) {
+              setSavedImageUrl(saveResult.url);
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to save image:', error);
+          // Continue with base64 if save fails
+        } finally {
+          setIsSaving(false);
+        }
+      };
+      
+      saveImage();
+    }
+  }, [hasBase64Content, hasImageUrl, savedImageUrl, isSaving, base64Content]);
 
   // If no image source, return null
   if (!hasImageUrl && !hasBase64Content) {
     return null;
   }
 
-  // Prepare image source
+  // Helper function to validate if a string is a valid URL
+  const isValidUrl = (url: string): boolean => {
+    if (!url || typeof url !== 'string' || url.trim().length === 0) {
+      return false;
+    }
+    // Check if it's a relative URL (starts with /)
+    if (url.startsWith('/')) {
+      return true;
+    }
+    // Check if it's a data URL
+    if (url.startsWith('data:')) {
+      return true;
+    }
+    // Check if it's a valid absolute URL
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // Prepare image source - use saved URL if available, otherwise use original URL or base64
   let imageSrc: string;
   let useNextImage = true;
 
-  if (hasBase64Content) {
+  // Helper to fix URL if it's missing extension (for Gradian_Image_ files)
+  // Also converts public URLs to API routes for dynamic serving
+  const fixImageUrl = (url: string): string => {
+    if (!url) return url;
+    
+    // If URL is a Gradian_Image_ file without extension, add .png
+    if (url.includes('Gradian_Image_') && !url.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
+      url = `${url}.png`;
+    }
+    
+    // Convert public folder URLs to API routes for dynamic serving
+    // This ensures images are available immediately without rebuild
+    if (url.startsWith('/images/ai-generated/')) {
+      const filename = url.replace('/images/ai-generated/', '');
+      return `/api/images/${filename}`;
+    }
+    
+    return url;
+  };
+
+  // Priority: saved URL > original URL > base64
+  if (savedImageUrl && isValidUrl(savedImageUrl)) {
+    imageSrc = fixImageUrl(savedImageUrl);
+    useNextImage = true;
+  } else if (hasImageUrl && isValidUrl(imageUrl!)) {
+    imageSrc = fixImageUrl(imageUrl!);
+    useNextImage = true;
+  } else if (hasBase64Content) {
     // Check if base64 content already has data URL prefix
     if (base64Content.startsWith('data:image/')) {
       imageSrc = base64Content;
@@ -76,7 +177,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
     // Next.js Image doesn't support data URLs well, use regular img for base64
     useNextImage = false;
   } else {
-    imageSrc = imageUrl!;
+    return null;
   }
 
   const containerClasses = cn(
@@ -123,6 +224,28 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
   // Note: For external URLs, Next.js Image requires unoptimized or remotePatterns configuration
   // We'll use unoptimized for external URLs to avoid configuration issues
   const isExternalUrl = imageSrc.startsWith('http://') || imageSrc.startsWith('https://');
+  const isRelativeUrl = imageSrc.startsWith('/');
+  
+  // Validate imageSrc before passing to Next.js Image
+  if (!isValidUrl(imageSrc)) {
+    // If invalid URL, fall back to regular img tag
+    return (
+      <div className={containerClasses} style={containerStyle}>
+        <img
+          src={imageSrc}
+          alt={imageAlt}
+          className={cn(imageClasses, 'w-full h-full max-w-full max-h-full rounded-lg')}
+          style={{ objectFit, width: '100%', height: '100%', maxWidth: '100%', maxHeight: '100%' }}
+          onError={(e) => {
+            // Hide image on error
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+          }}
+          {...props}
+        />
+      </div>
+    );
+  }
   
   return (
     <div className={containerClasses} style={containerStyle}>
@@ -135,7 +258,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
         priority={priority}
         quality={quality}
         style={{ objectFit, width: '100%', height: '100%', maxWidth: '100%', maxHeight: '100%' }}
-        unoptimized={isExternalUrl} // Use unoptimized for external URLs
+        unoptimized={isExternalUrl || isRelativeUrl} // Use unoptimized for external and relative URLs
         onError={(e) => {
           // Hide image on error
           const target = e.target as HTMLImageElement;

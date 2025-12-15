@@ -70,8 +70,40 @@ export async function GET(
       );
     }
 
-    // Get schema to check if it's company-based
+    // Get schema to check if it's company-based and tenant visibility
     const schema = await getSchemaById(schemaId);
+    const tenantIdsParam = request.nextUrl.searchParams.get('tenantIds');
+    const tenantIds = tenantIdsParam
+      ?.split(',')
+      .map((id) => id.trim())
+      .filter((id) => id.length > 0);
+    const hasTenantFilter = Array.isArray(tenantIds) && tenantIds.length > 0;
+    const matchesTenantFilter = () => {
+      if (!hasTenantFilter) return true;
+      if (schema?.applyToAllTenants) return true;
+      const related = Array.isArray(schema?.relatedTenants)
+        ? schema.relatedTenants
+            .filter(Boolean)
+            .map((item: any) => {
+              if (typeof item === 'string') return item;
+              if (item?.id) return `${item.id}`;
+              return undefined;
+            })
+            .filter(Boolean) as string[]
+        : [];
+      if (related.length === 0) return false;
+      return related.some((id: string) => tenantIds.includes(id));
+    };
+    const hasSchemaAndDataSync = schema?.syncStrategy === 'schema-and-data';
+    if (hasTenantFilter && (!matchesTenantFilter() || !hasSchemaAndDataSync)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Schema "${schemaId}" is not available for the requested tenants or sync strategy.`,
+        },
+        { status: 404 }
+      );
+    }
     
     // Special handling for companies - use cached loader
     // Note: Companies don't have password fields, so no filtering needed
@@ -95,7 +127,7 @@ export async function GET(
 
     // Validate companyIds parameter for company-based schemas
     // If schema is company-based (isNotCompanyBased is not true), companyIds is required
-    if (!schema.isNotCompanyBased && schemaId !== 'companies') {
+    if (!schema.isNotCompanyBased && schemaId !== 'companies' && !hasTenantFilter) {
       const searchParams = request.nextUrl.searchParams;
       
       // Check for companyIds comma-separated string (companyIds=id1,id2)

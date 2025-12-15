@@ -174,9 +174,14 @@ export function getEdgeColor(color: string): string {
  * @returns Data URI string for the badge SVG
  */
 export function generateBadgeSvg(label: string, colorName: string): string {
-  const colorScheme = getNodeBackgroundColor(colorName);
+  const nodeBackgroundColor = getNodeBackgroundColor(colorName);
   const borderColor = getNodeBorderColor(colorName);
   const textColor = COLOR_MAP[colorName]?.text || '#1e293b';
+  
+  // Badge uses white/light background with border color for contrast
+  // This ensures the badge is readable against the pastel node background
+  const badgeBackground = '#ffffff'; // White background for maximum contrast
+  const badgeBorder = borderColor; // Use the border color for the badge border
   
   // Truncate label if too long
   const displayLabel = label.length > 10 ? label.substring(0, 9) + '…' : label;
@@ -206,8 +211,8 @@ export function generateBadgeSvg(label: string, colorName: string): string {
       </defs>
       <!-- Transparent background for positioning -->
       <rect x="0" y="0" width="${nodeWidth}" height="${nodeHeight}" fill="transparent"/>
-      <!-- Badge in top center - more rounded (rx=8), wider for better text display -->
-      <rect x="${badgeX}" y="${badgeY}" width="${badgeWidth}" height="${badgeHeight}" rx="8" fill="${colorScheme}" stroke="${borderColor}" stroke-width="1"/>
+      <!-- Badge in top center - white background with colored border for contrast -->
+      <rect x="${badgeX}" y="${badgeY}" width="${badgeWidth}" height="${badgeHeight}" rx="8" fill="${badgeBackground}" stroke="${badgeBorder}" stroke-width="1.5"/>
       <text x="${textX}" y="${badgeY + 10}" text-anchor="middle" class="badge-text">${displayLabel}</text>
     </svg>
   `.trim();

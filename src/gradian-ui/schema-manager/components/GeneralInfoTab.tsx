@@ -13,6 +13,26 @@ interface GeneralInfoTabProps {
 
 export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralInfoTabProps) {
   const schemaType = schema.schemaType ?? (schema.isSystemSchema ? 'system' : 'business');
+  const relatedTenantsDisplay = Array.isArray(schema.relatedTenants)
+    ? schema.relatedTenants.map((item: any) => {
+        if (!item) return item;
+        if (typeof item === 'string') return { id: item, label: item };
+        const label =
+          item.label ||
+          item.displayName ||
+          item.name ||
+          item.title ||
+          item.tenantName ||
+          item.companyName ||
+          item.code ||
+          `${item.id ?? ''}`.trim();
+        return {
+          ...item,
+          id: `${item.id ?? item.value ?? ''}`,
+          label: label || `${item.id ?? ''}`,
+        };
+      })
+    : schema.relatedTenants;
   return (
     <Card>
       <CardHeader>
@@ -148,7 +168,7 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
             />
           </div>
         </div>
-        <div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <PickerInput
             config={{
               name: 'status-group',
@@ -165,8 +185,6 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
             }}
             disabled={readonly}
           />
-        </div>
-        <div>
           <PickerInput
             config={{
               name: 'entity-type-group',
@@ -185,52 +203,87 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
           />
         </div>
         <div className="border-t pt-4 mt-4 border-gray-200 dark:border-gray-700">
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Server Sync Options</h3>
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Tenant Scope</h3>
           <div className="space-y-4">
-            <div>
+            <Switch
+              config={{
+                name: 'apply-to-all-tenants',
+                label: 'Apply to All Tenants',
+                description: 'When enabled, schema applies to every tenant and no tenant selection is required.',
+              }}
+              value={schema.applyToAllTenants || false}
+              onChange={(checked: boolean) =>
+                onUpdate({
+                  applyToAllTenants: checked,
+                  relatedTenants: checked ? undefined : schema.relatedTenants,
+                })
+              }
+              disabled={readonly}
+            />
+            {!schema.applyToAllTenants && (
               <PickerInput
                 config={{
-                  name: 'sync-to-databases',
-                  label: 'Sync To Servers',
-                  description: 'Select servers to sync this schema to',
-                  targetSchema: 'servers',
+                  name: 'related-tenants',
+                  label: 'Related Tenants',
+                  description: 'Select tenants using the popup picker',
+                  targetSchema: 'tenants',
                   metadata: {
                     allowMultiselect: true,
                   },
                 }}
-                value={schema.syncToDatabases || []}
+                value={relatedTenantsDisplay || []}
                 onChange={(value) => {
-                  // Normalize value to array of IDs
-                  const normalizedValue = Array.isArray(value) 
-                    ? value.map((item: any) => {
-                        if (typeof item === 'string') return item;
-                        if (item?.id) return item.id;
-                        return item;
-                      })
+                  const normalizedValue = Array.isArray(value)
+                    ? value
+                        .map((item: any) => {
+                          if (!item) return undefined;
+                          if (typeof item === 'string') {
+                            return { id: item, label: item };
+                          }
+                          if (item?.id) {
+                            const label =
+                              item.label ||
+                              item.displayName ||
+                              item.name ||
+                              item.title ||
+                              item.tenantName ||
+                              item.companyName ||
+                              item.code ||
+                              `${item.id}`;
+                            return {
+                              id: `${item.id}`,
+                              label,
+                              color: item.color,
+                              icon: item.icon,
+                            };
+                          }
+                          return undefined;
+                        })
+                        .filter(Boolean)
                     : [];
-                  onUpdate({ syncToDatabases: normalizedValue.length > 0 ? normalizedValue : undefined });
+                  onUpdate({
+                    relatedTenants: normalizedValue.length > 0 ? (normalizedValue as any) : undefined,
+                  });
                 }}
                 disabled={readonly}
               />
-            </div>
-            <div>
-              <FormSelect
-                config={{
-                  name: 'sync-strategy',
-                  label: 'Sync Strategy',
-                  description: 'Choose how to sync the schema to databases',
-                }}
-                value={schema.syncStrategy || 'schema-only'}
-                onValueChange={(value: 'schema-only' | 'schema-and-data') =>
-                  onUpdate({ syncStrategy: value })
-                }
-                options={[
-                  { id: 'schema-only', label: 'Sync Schema Only' },
-                  { id: 'schema-and-data', label: 'Sync Schema and Data' },
-                ]}
-                disabled={readonly}
-              />
-            </div>
+            )}
+            <FormSelect
+              config={{
+                name: 'sync-strategy',
+                label: 'Sync Strategy',
+                description: 'Choose how to sync the schema to databases',
+              }}
+              value={schema.syncStrategy || 'schema-only'}
+              onValueChange={(value: 'schema-only' | 'schema-and-data') =>
+                onUpdate({ syncStrategy: value })
+              }
+              options={[
+                { id: 'schema-only', label: 'Sync Schema Only' },
+                { id: 'schema-and-data', label: 'Sync Schema and Data' },
+              ]}
+              disabled={readonly}
+            />
           </div>
         </div>
       </CardContent>

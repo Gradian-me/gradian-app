@@ -289,6 +289,7 @@ export interface QuickAction {
   label: string;
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'gradient';
   icon?: string; // Icon name to display before the label
+  componentType?: 'button' | 'ai-agent-response'; // How the quick action is rendered (default: 'button')
   action: 'goToUrl' | 'openUrl' | 'openFormDialog' | 'openActionForm' | 'runAiAgent' | 'callApi';
   targetSchema?: string; // Required for openFormDialog action
   targetUrl?: string; // Required for goToUrl and openUrl actions
@@ -333,6 +334,11 @@ export interface QuickAction {
   }>; // Additional preload routes to fetch before running the agent
   displayType?: 'default' | 'hideForm' | 'showFooter'; // Control what parts of the form to show
   runType?: 'manual' | 'automatic'; // manual: user clicks "Do the Magic", automatic: auto-runs when dialog opens
+  /**
+   * Maximum height (in pixels) for the AI agent response container content.
+   * If set, the content will be scrollable. If null or 0, content will show in full without scrolling.
+   */
+  maxHeight?: number | null;
   /**
    * If true, will add encrypted skip_key from localStorage as query parameter to the API call
    * The middleware will decrypt this parameter before the request reaches the route handler
@@ -415,6 +421,18 @@ export interface FormSchema {
    * Stored as an array of selection objects (first item is the primary group).
    */
   entityTypeGroup?: any[];
+  /**
+   * Optional tenant scoping configuration. When applyToAllTenants is true,
+   * the form applies to every tenant and relatedTenants should be ignored.
+   * Otherwise, relatedTenants should contain tenant IDs selected via picker.
+   */
+  applyToAllTenants?: boolean;
+  relatedTenants?: Array<{
+    id: string;
+    label?: string;
+    color?: string;
+    icon?: string;
+  }>;
   syncToDatabases?: string[]; // Array of database IDs to sync this schema to
   syncStrategy?: 'schema-only' | 'schema-and-data'; // Sync strategy: schema only or schema and data
   fields: FormField[]; // All fields at schema level, each with a sectionId

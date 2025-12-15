@@ -7,22 +7,59 @@ export function extractLanguage(className?: string | string[]): string {
   if (!className) return '';
   
   const classNameStr = Array.isArray(className) ? className.join(' ') : String(className);
+  // Match language-xxx pattern (case insensitive)
   const match = /language-(\w+)/i.exec(classNameStr);
-  return match ? match[1].toLowerCase() : '';
+  if (match) {
+    return match[1].toLowerCase();
+  }
+  
+  // Also check for direct language class (some parsers use just the language name)
+  const directMatch = /\b(latex|math|katex|mermaid|cytoscape)\b/i.exec(classNameStr);
+  if (directMatch) {
+    return directMatch[1].toLowerCase();
+  }
+  
+  return '';
 }
 
 /**
  * Extract language from node properties (fallback)
  */
 export function extractLanguageFromNode(node: any): string {
-  if (!node?.properties?.className) return '';
+  if (!node) return '';
   
-  const nodeMatch = /language-(\w+)/i.exec(
-    Array.isArray(node.properties.className) 
+  // Check className in properties
+  if (node.properties?.className) {
+    const classNameStr = Array.isArray(node.properties.className) 
       ? node.properties.className.join(' ')
-      : String(node.properties.className)
-  );
-  return nodeMatch ? nodeMatch[1].toLowerCase() : '';
+      : String(node.properties.className);
+    
+    const nodeMatch = /language-(\w+)/i.exec(classNameStr);
+    if (nodeMatch) {
+      return nodeMatch[1].toLowerCase();
+    }
+    
+    // Also check for direct language class
+    const directMatch = /\b(latex|math|katex|mermaid|cytoscape)\b/i.exec(classNameStr);
+    if (directMatch) {
+      return directMatch[1].toLowerCase();
+    }
+  }
+  
+  // Check data.meta (some markdown parsers store language here)
+  if (node.data?.meta) {
+    const metaMatch = /language-(\w+)/i.exec(String(node.data.meta));
+    if (metaMatch) {
+      return metaMatch[1].toLowerCase();
+    }
+  }
+  
+  // Check lang property directly
+  if (node.properties?.lang) {
+    return String(node.properties.lang).toLowerCase();
+  }
+  
+  return '';
 }
 
 /**

@@ -18,17 +18,18 @@ import { TableWrapper } from '@/gradian-ui/data-display/table/components/TableWr
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';
 import { ImageViewer } from '@/gradian-ui/form-builder/form-elements/components/ImageViewer';
+import { VideoViewer } from '@/gradian-ui/form-builder/form-elements/components/VideoViewer';
 import { cn } from '@/gradian-ui/shared/utils';
 import { useAiResponseStore } from '@/stores/ai-response.store';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
-import type { AiAgent, TokenUsage, SchemaAnnotation, AnnotationItem } from '../types';
-import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import type { AiAgent, TokenUsage, VideoUsage, SchemaAnnotation, AnnotationItem } from '../types';
+import { cleanMarkdownResponse } from '../utils/ai-security-utils';
 
 interface AiBuilderResponseProps {
   response: string;
   agent: AiAgent | null;
   tokenUsage: TokenUsage | null;
+  videoUsage?: VideoUsage | null;
   duration: number | null;
   isApproving: boolean;
   isLoading?: boolean;
@@ -119,6 +120,7 @@ export function AiBuilderResponse({
   response,
   agent,
   tokenUsage,
+  videoUsage,
   duration,
   isApproving,
   isLoading = false,
@@ -340,7 +342,61 @@ export function AiBuilderResponse({
       // If parsing fails and it's not an image format agent, silently return null
       // Only log warning if it's an image format agent (unexpected error)
       if (isImageFormat) {
-        loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to parse image data: ${e instanceof Error ? e.message : String(e)}, Content: ${displayContent?.substring(0, 200)}`);
+        console.warn('Failed to parse image data:', e, 'Content:', displayContent?.substring(0, 200));
+      }
+      return null;
+    }
+  }, [agent?.requiredOutputFormat, displayContent]);
+  
+  // Parse video data if format is video
+  // Also detect video format from response content as fallback
+  const videoData = useMemo(() => {
+    if (!displayContent) {
+      return null;
+    }
+    
+    // Check if agent requires video format
+    const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
+    const isVideoFormat = agentFormatValue === 'video';
+    
+    // Only try to parse as JSON if:
+    // 1. Agent format is video, OR
+    // 2. Content looks like JSON (starts with '{' or '[')
+    const trimmedContent = displayContent.trim();
+    const looksLikeJson = trimmedContent.startsWith('{') || trimmedContent.startsWith('[');
+    
+    if (!isVideoFormat && !looksLikeJson) {
+      // Content is clearly not JSON (likely markdown or text), skip parsing
+      return null;
+    }
+    
+    try {
+      const parsed = JSON.parse(displayContent);
+      
+      // Check if response has video structure (fallback detection)
+      const hasVideoStructure = parsed && typeof parsed === 'object' && parsed.video && 
+        (parsed.video.video_id || parsed.video.url || parsed.video.file_path);
+      
+      // Only proceed if agent format is video OR if we detect video structure
+      if (!isVideoFormat && !hasVideoStructure) {
+        return null;
+      }
+      
+      // The response structure is: { video: { video_id, url, file_path, ... }, ... }
+      // Check if we have a video object with video_id, url, or file_path
+      if (parsed && typeof parsed === 'object' && parsed.video) {
+        const vid = parsed.video;
+        // Return video data if we have video_id, url, or file_path
+        if (vid && (vid.video_id || vid.url || vid.file_path)) {
+          return vid;
+        }
+      }
+      return null;
+    } catch (e) {
+      // If parsing fails and it's not a video format agent, silently return null
+      // Only log warning if it's a video format agent (unexpected error)
+      if (isVideoFormat) {
+        console.warn('Failed to parse video data:', e, 'Content:', displayContent?.substring(0, 200));
       }
       return null;
     }
@@ -352,6 +408,11 @@ export function AiBuilderResponse({
     return agentFormatValue === 'image' || !!imageData;
   }, [agent?.requiredOutputFormat, imageData]);
 
+  // Determine if we should render as video (agent format OR detected from content)
+  const shouldRenderVideo = useMemo(() => {
+    const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
+    return agentFormatValue === 'video' || !!videoData;
+  }, [agent?.requiredOutputFormat, videoData]);
 
   // Check if we should render as table
   const shouldRenderTable = agent?.requiredOutputFormat === 'table';
@@ -399,11 +460,11 @@ export function AiBuilderResponse({
   // Don't render if we have no content to display
   if (!displayContent || !displayContent.trim()) {
     // Still render parallel image and metrics if available
-    if (parallelImageData || (tokenUsage || duration !== null)) {
+    if (parallelImageData || (tokenUsage || videoUsage || duration !== null)) {
       return (
         <div className="space-y-4">
           {/* Token Usage & Pricing - MetricCard */}
-          {(tokenUsage || duration !== null) && (
+          {(tokenUsage || videoUsage || duration !== null) && (
             <MetricCard
               gradient="indigo"
               metrics={[
@@ -427,6 +488,40 @@ export function AiBuilderResponse({
                     format: 'currency' as const,
                     precision: 4,
                   },
+                ] : []),
+                ...(videoUsage ? [
+                  {
+                    id: 'video-duration',
+                    label: 'Video Duration',
+                    value: videoUsage.duration_seconds,
+                    unit: 's',
+                    icon: 'Video',
+                    iconColor: 'violet' as const,
+                    format: 'number' as const,
+                    precision: 2,
+                  },
+                  ...(videoUsage.estimated_cost ? [
+                    {
+                      id: 'video-cost',
+                      label: 'Video Cost',
+                      value: parseFloat(videoUsage.estimated_cost.unit || '0'),
+                      prefix: '$',
+                      icon: 'Coins',
+                      iconColor: 'pink' as const,
+                      format: 'currency' as const,
+                      precision: 4,
+                    },
+                    {
+                      id: 'video-cost-irt',
+                      label: 'Cost (IRT)',
+                      value: videoUsage.estimated_cost.irt,
+                      unit: 'IRT',
+                      icon: 'Banknote',
+                      iconColor: 'amber' as const,
+                      format: 'currency' as const,
+                      precision: 0,
+                    },
+                  ] : []),
                 ] : []),
                 ...(duration !== null ? [{
                   id: 'duration',
@@ -607,7 +702,7 @@ export function AiBuilderResponse({
             disabled={isApproving}
             variant="default"
             size="default"
-            className="h-10 shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+            className="h-10 shadow-sm bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
           >
             {isApproving ? (
               <>
@@ -630,7 +725,7 @@ export function AiBuilderResponse({
       </div>
 
       {/* Token Usage & Pricing - MetricCard */}
-      {(tokenUsage || duration !== null) && (
+      {(tokenUsage || videoUsage || duration !== null) && (
         <MetricCard
           gradient="indigo"
           metrics={[
@@ -654,6 +749,40 @@ export function AiBuilderResponse({
                 format: 'currency' as const,
                 precision: 4,
               },
+            ] : []),
+            ...(videoUsage ? [
+              {
+                id: 'video-duration',
+                label: 'Video Duration',
+                value: videoUsage.duration_seconds,
+                unit: 's',
+                icon: 'Video',
+                iconColor: 'violet' as const,
+                format: 'number' as const,
+                precision: 2,
+              },
+              ...(videoUsage.estimated_cost ? [
+                {
+                  id: 'video-cost',
+                  label: 'Video Cost',
+                  value: parseFloat(videoUsage.estimated_cost.unit || '0'),
+                  prefix: '$',
+                  icon: 'Coins',
+                  iconColor: 'pink' as const,
+                  format: 'currency' as const,
+                  precision: 4,
+                },
+                {
+                  id: 'video-cost-irt',
+                  label: 'Cost (IRT)',
+                  value: videoUsage.estimated_cost.irt,
+                  unit: 'IRT',
+                  icon: 'Banknote',
+                  iconColor: 'amber' as const,
+                  format: 'currency' as const,
+                  precision: 0,
+                },
+              ] : []),
             ] : []),
             ...(duration !== null ? [{
               id: 'duration',
@@ -1020,6 +1149,76 @@ export function AiBuilderResponse({
             />
           </div>
         )
+      ) : shouldRenderVideo ? (
+        videoData ? (
+          <div className="space-y-4">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    Generated Video
+                  </h3>
+                  {agent?.model && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs font-medium bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800"
+                    >
+                      {videoData.model || agent?.model}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-center items-center w-full">
+                <div className="w-full max-w-4xl">
+                  <VideoViewer
+                    videoId={videoData.video_id || undefined}
+                    sourceUrl={videoData.url || undefined}
+                    content={videoData.file_path || undefined}
+                    value={videoData}
+                    alt="AI Generated Video"
+                    className="w-full h-auto rounded-lg"
+                    controls={true}
+                    autoplay={false}
+                  />
+                </div>
+              </div>
+            </div>
+            <details className="text-sm">
+              <summary className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+                View Raw Response Data
+              </summary>
+              <div className="mt-2">
+                <CodeViewer
+                  code={displayContent}
+                  programmingLanguage="json"
+                  title="Raw Response Data"
+                  initialLineNumbers={10}
+                />
+              </div>
+            </details>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  Generated Video (Parsing Error)
+                </h3>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Unable to parse video data from response. Showing raw response:
+            </p>
+            <CodeViewer
+              code={displayContent}
+              programmingLanguage="json"
+              title="Raw Response Data"
+              initialLineNumbers={10}
+            />
+          </div>
+        )
       ) : shouldRenderTable && isValidTable && tableData.length > 0 ? (
         <div className="space-y-4">
           <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
@@ -1059,7 +1258,7 @@ export function AiBuilderResponse({
           <div className="w-full">
             <div className="p-4">
               <MarkdownViewer 
-                content={displayContent}
+                content={cleanMarkdownResponse(displayContent)}
                 showToggle={true}
                 isEditable={true}
                 onChange={handleContentChange}

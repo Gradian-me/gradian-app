@@ -3143,6 +3143,7 @@
     {
       "menuTitle": "Home",
       "menuIcon": "Home",
+      "sortIndex": 0,
       "hideInAD": false,
       "description": "Home",
       "menuUrl": "/",
@@ -3157,6 +3158,7 @@
     {
       "menuTitle": "Dashboard",
       "menuIcon": "LayoutDashboard",
+      "sortIndex": 1,
       "hideInAD": false,
       "description": "Main application dashboard",
       "menuUrl": "/dashboard",
@@ -3170,7 +3172,8 @@
     },
     {
       "menuTitle": "Tender Calendar",
-      "menuIcon": "Calendar",
+      "menuIcon": "CalendarDays",
+      "sortIndex": 2,
       "hideInAD": true,
       "description": "View tender deadlines and events",
       "menuUrl": "/calendar",
@@ -3185,10 +3188,11 @@
       "companies": []
     },
     {
-      "menuTitle": "Analytics",
+      "menuTitle": "Tender Analytics",
       "menuIcon": "BarChart3",
+      "sortIndex": 3,
       "hideInAD": false,
-      "description": "Analytics and KPIs",
+      "description": "Tender funnel and spend analytics",
       "menuUrl": "/analytics",
       "openInNewTab": false,
       "id": "01KBSIANALYTICS0000000000000",
@@ -3199,8 +3203,24 @@
       "companies": []
     },
     {
+      "menuTitle": "EQMS Analytics",
+      "menuIcon": "ShieldCheck",
+      "sortIndex": 4,
+      "hideInAD": false,
+      "description": "Quality and risk analytics dashboard",
+      "menuUrl": "/eqms-analytics",
+      "openInNewTab": false,
+      "id": "01KCEQMSANALYTICS0000000001",
+      "createdAt": "2025-12-15T12:00:00.000Z",
+      "updatedAt": "2025-12-15T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": []
+    },
+    {
       "menuTitle": "Integrations",
-      "menuIcon": "Database",
+      "menuIcon": "Plug",
+      "sortIndex": 5,
       "hideInAD": false,
       "description": "Manage integrations and servers",
       "menuUrl": "/integrations",
@@ -3216,7 +3236,8 @@
     },
     {
       "menuTitle": "Graph Designer",
-      "menuIcon": "Share2",
+      "menuIcon": "Network",
+      "sortIndex": 6,
       "hideInAD": false,
       "description": "Design and explore graphs",
       "menuUrl": "/builder/graphs",
@@ -3230,7 +3251,8 @@
     },
     {
       "menuTitle": "Schema Builder",
-      "menuIcon": "PencilRuler",
+      "menuIcon": "Brackets",
+      "sortIndex": 7,
       "hideInAD": false,
       "description": "Build and manage schemas",
       "menuUrl": "/builder/schemas",
@@ -3244,7 +3266,8 @@
     },
     {
       "menuTitle": "Builder",
-      "menuIcon": "FileCode",
+      "menuIcon": "Wrench",
+      "sortIndex": 8,
       "hideInAD": false,
       "description": "Form and schema builder",
       "menuUrl": "/builder",
@@ -3259,11 +3282,27 @@
     {
       "menuTitle": "AI Builder",
       "menuIcon": "Sparkles",
+      "sortIndex": 9,
       "hideInAD": false,
       "description": "AI-assisted builder",
       "menuUrl": "/ai-builder",
       "openInNewTab": false,
       "id": "01KBSIAIBUILDER0000000000000",
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": []
+    },
+    {
+      "menuTitle": "Chatbot",
+      "menuIcon": "MessageCircle",
+      "sortIndex": 10,
+      "hideInAD": false,
+      "description": "AI-powered conversations with agent orchestration",
+      "menuUrl": "/chat",
+      "openInNewTab": false,
+      "id": "01KBSICHATBOT0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
       "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -4037,14 +4076,16 @@
     {
       "assignedTo": [
         {
-          "id": "01KBSTVK8P6Y3P4MW060HNNKB1"
+          "id": "01KC3FBM8YXB7V70SQMEBN0151"
         }
       ],
-      "dueDate": "2025-12-09",
+      "dueDate": "2025-12-23",
       "status": [
         {
-          "id": "01KBSVZHFGX0F3YKHV44J3H2QM",
-          "label": "Cancelled"
+          "id": "01KBSVZ9NT2Z23FXK7B1G7AYS8",
+          "label": "Completed",
+          "icon": "CheckCircle",
+          "color": "emerald"
         }
       ],
       "taskTitle": "تدتد",
@@ -4052,7 +4093,45 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBSYN40BXYQ9JNGREYPQRH2P",
       "createdAt": "2025-12-06T13:47:07.147Z",
-      "updatedAt": "2025-12-14T09:27:11.102Z"
+      "updatedAt": "2025-12-14T10:24:07.225Z",
+      "entityType": [
+        {
+          "id": "01KCDZTASK001WORK000000000001",
+          "label": "Work",
+          "icon": "Briefcase",
+          "color": "blue"
+        }
+      ]
+    },
+    {
+      "assignedTo": [
+        {
+          "id": "01KC3FBM8YXB7V70SQMEBN0151"
+        }
+      ],
+      "dueDate": "2025-12-17",
+      "status": [
+        {
+          "id": "01KBSVZ3N828YPGRXFDY84D15W",
+          "label": "In Progress",
+          "icon": "Loader",
+          "color": "blue"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCDZTASK001WORK000000000001",
+          "label": "Work",
+          "icon": "Briefcase",
+          "color": "blue"
+        }
+      ],
+      "taskTitle": "Check Security Checklists on Nest JS",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KCE9MJJRHMT2TN793NH33SYW",
+      "createdAt": "2025-12-14T11:23:52.289Z",
+      "updatedAt": "2025-12-14T11:23:52.375Z"
     }
   ],
   "change-procedure": [

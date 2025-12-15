@@ -1231,6 +1231,29 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "virtual-assignedTo-tasks",
     "createdAt": "2025-12-14T09:24:21.012Z",
-    "updatedAt": "2025-12-14T09:27:11.059Z"
+    "updatedAt": "2025-12-14T10:24:07.169Z",
+    "inactive": true
+  },
+  {
+    "id": "01KCE5BZ1A4RWDMA73YNGRVXQA",
+    "sourceSchema": "tasks",
+    "sourceId": "01KBSYN40BXYQ9JNGREYPQRH2P",
+    "targetSchema": "users",
+    "targetId": "01KC3FBM8YXB7V70SQMEBN0151",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "virtual-assignedTo-tasks",
+    "createdAt": "2025-12-14T10:09:15.817Z",
+    "updatedAt": "2025-12-14T10:24:07.169Z"
+  },
+  {
+    "id": "01KCE9MJKZ5CVJN6AF99K4TVZ9",
+    "sourceSchema": "tasks",
+    "sourceId": "01KCE9MJJRHMT2TN793NH33SYW",
+    "targetSchema": "users",
+    "targetId": "01KC3FBM8YXB7V70SQMEBN0151",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "virtual-assignedTo-tasks",
+    "createdAt": "2025-12-14T11:23:52.319Z",
+    "updatedAt": "2025-12-14T11:23:52.319Z"
   }
 ]

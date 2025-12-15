@@ -11,6 +11,44 @@ Gradian provides two CDN scripts for embedding forms and tables:
 
 Both scripts are lightweight, standalone, and work in any HTML/JavaScript environment (React, Vue, Angular, vanilla JS, etc.).
 
+### Math Formula Example
+
+Here's an example of how mathematical formulas are rendered using KaTeX with LaTeX code blocks:
+
+**Display math** (using code blocks with `latex`, `math`, or `katex` language identifier):
+
+```latex
+\text{Award Conversion Rate} = \frac{\text{Awards}}{\text{Total Tenders}} \times 100\%
+```
+
+For example, if you have 8 awards out of 36 tenders:
+
+```latex
+\text{Conversion Rate} = \frac{8}{36} \times 100 = 22.22\%
+```
+
+**More complex example** with multiple calculations:
+
+```latex
+\begin{aligned}
+\text{April:} \quad & \frac{8}{36} \times 100 = 22.22\% \\
+\text{May:} \quad & \frac{10}{34} \times 100 = 29.41\% \\
+\text{June:} \quad & \frac{9}{32} \times 100 = 28.13\%
+\end{aligned}
+```
+
+**Matrix example**:
+
+```latex
+x^\top \Sigma^{-1} x
+```
+
+**Alternative language identifiers**: You can also use `math` or `katex` instead of `latex`:
+
+```math
+\int_{a}^{b} f(x) \, dx = F(b) - F(a)
+```
+
 ## Full Code To Copy To Your Project
 
 Copy this code to your project:

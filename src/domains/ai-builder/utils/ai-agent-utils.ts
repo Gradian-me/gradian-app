@@ -6,6 +6,8 @@
 import { processChatRequest } from './ai-chat-utils';
 import { processVoiceRequest } from './ai-voice-utils';
 import { processImageRequest } from './ai-image-utils';
+import { processVideoRequest } from './ai-video-utils';
+import { processOrchestratorRequest } from './ai-orchestrator-utils';
 import { getApiUrlForAgentType, AgentType } from './ai-agent-url';
 
 export type { AgentType };
@@ -57,7 +59,13 @@ export async function processAiAgent(
       return await processVoiceRequest(agent, requestData);
     
     case 'image-generation':
-      return await processImageRequest(agent, requestData);
+      return await processImageRequest(agent, requestData, baseUrl);
+    
+    case 'video-generation':
+      return await processVideoRequest(agent, requestData);
+    
+    case 'orchestrator':
+      return await processOrchestratorRequest(agent.id, requestData, baseUrl);
     
     default:
       return {

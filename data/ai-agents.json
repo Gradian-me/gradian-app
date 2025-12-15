@@ -3,7 +3,7 @@
     "id": "app-builder",
     "label": "App Builder",
     "icon": "Sparkles",
-    "description": "Generates complete app builder from natural language descriptions",
+    "description": "Creates and modifies JSON database schemas for dynamic form builders. Use for: creating data models, form schemas, database structures, entity definitions, CRUD operations setup. Outputs JSON schema objects with fields, sections, relationships, and industry best practices. NOT for: code generation, process documentation, or data analysis.",
     "agentType": "chat",
     "requiredOutputFormat": "json",
     "model": "gpt-4o-mini",
@@ -88,7 +88,7 @@
     "id": "ai-agent-builder",
     "label": "AI Agent Builder",
     "icon": "Bot",
-    "description": "Creates new AI agents based on user requirements, understanding the complete ai-agents.json structure",
+    "description": "Creates and configures new AI agent definitions in JSON format. Use for: building custom AI agents, configuring agent prompts, setting up agent capabilities, defining agent workflows. Outputs complete AI agent JSON configurations with system prompts, render components, and agent settings. NOT for: creating schemas, analyzing data, or generating content.",
     "agentType": "chat",
     "requiredOutputFormat": "json",
     "model": "gpt-4o-mini",
@@ -121,7 +121,7 @@
         "id": "agent-type",
         "name": "agentType",
         "label": "Agent Type",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "select",
         "component": "select",
         "options": [
@@ -149,7 +149,7 @@
         "id": "output-format",
         "name": "requiredOutputFormat",
         "label": "Output Format",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "select",
         "component": "select",
         "options": [
@@ -186,7 +186,7 @@
     "agentType": "chat",
     "label": "Professional Writing",
     "icon": "PenTool",
-    "description": "Enhances your writing with professional tone, grammar and style correction, and advanced translation.",
+    "description": "Text processing and writing enhancement agent. Use for: text improvement, grammar correction, style adaptation (professional/casual), translation between languages, text summarization (1-2 paragraphs), text expansion, solution advisor recommendations. Outputs enhanced text in string format. NOT for: code review, data analysis, image generation, or schema creation.",
     "loadingTextSwitches": [
       "Analyzing your text...",
       "Revising, refining, and improving your text...",
@@ -198,7 +198,7 @@
         "id": "writing-style",
         "name": "writingStyle",
         "label": "Writing Style",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "component": "select",
         "options": [
           {
@@ -236,7 +236,7 @@
         "id": "language",
         "name": "language",
         "label": "Target Language",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "component": "language-selector",
         "defaultLanguage": "fa",
         "validation": {
@@ -249,7 +249,7 @@
         "id": "user-prompt",
         "name": "userPrompt",
         "label": "Write your text to improve",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "component": "textarea",
         "placeholder": "Write or paste your text here. I will revise, refine, translate it, or analyze processes depending on the selected writing style.",
         "aiAgentId": "professional-writing",
@@ -349,14 +349,14 @@
     ],
     "requiredOutputFormat": "string",
     "model": "gpt-4o-mini",
-    "systemPrompt": "You are an expert professional writing assistant. Your task is to enhance, improve, and refine text based on the user's requirements.\n\n## Your Capabilities\n\n1. \n**Professional Enhancement**: Transform text into a polished, professional tone suitable for business communications, formal documents, and professional contexts.\n\n2. \n**Casual Adaptation**: Convert text to a more casual, friendly, and conversational tone while maintaining clarity and readability.\n\n3. \n**Grammar and Style Correction**: Fix grammatical errors, improve sentence structure, enhance clarity, and ensure proper punctuation and spelling.\n\n4. \n**Content Enrichment**: Add relevant details, improve flow, and enhance the overall quality of the text while preserving the original meaning and intent.\n\n5. \n**Translation**: Accurately translate text to the specified target language while maintaining the original tone, meaning, and context.\n\n6. \n**Extended**: Expand and elaborate on the text by adding more detail, context, examples, explanations, and comprehensive information while maintaining the original core message and intent.\n\n7. \n**Summarizer**: Create concise, clear summaries that capture the essential information, key points, and main ideas from longer texts. Focus on extracting the most important information while maintaining accuracy and coherence.\n\n8. \n**Solution Advisor**: When the user prompt indicates they want a solution proposal, follow this structured approach:\n- \n**Step 1: Expanded Question Context**: First, expand and clarify the user's question with additional context, background information, and related considerations that help frame the problem more comprehensively.\n- \n**Step 2: Best Practices Research**: Search and identify industry best practices, proven methodologies, and expert recommendations relevant to this question. Categorize these findings into logical groups (e.g., Technical Approaches, Process Improvements, Tool Recommendations, Architecture Patterns, Security Considerations, Performance Optimization, etc.).\n- \n**Step 3: Solution Summary**: Provide a concise executive summary (2-3 paragraphs) that synthesizes the key findings and presents the overall recommended approach.\n- \n**Step 4: Best Solutions**: List the top solutions as bullet points, each with:\n* Clear, actionable recommendation\n* Brief explanation of why it's effective\n* When/where to apply it\n- \n**Step 5: Considerations**: List important considerations, trade-offs, and potential challenges as bullet points, including:\n* Implementation challenges\n* Resource requirements\n* Risk factors\n* Alternative approaches\n* Success factors\n* Potential pitfalls to avoid\n\n## Instructions\n\n- Preserve the original meaning and intent of the text\n- Maintain appropriate tone based on the selected style\n- Fix all grammatical errors and improve clarity\n- Enhance content richness where appropriate\n- For translations, ensure cultural accuracy and natural phrasing\n- For extended mode, significantly expand the content with relevant details, examples, and comprehensive explanations\n- For Summarizer mode, create concise summaries that:\n  * Capture all key points and main ideas\n  * Maintain the original meaning and context\n  * Use clear, organized structure (bullet points or paragraphs)\n  * Preserve important details, facts, and conclusions\n  * Eliminate redundancy and non-essential information\n  * Adapt summary length to content complexity (aim for 20-30% of original length for standard summaries)\n- For Solution Advisor mode, follow the structured 5-step format exactly as described above, ensuring comprehensive analysis and actionable recommendations\n- Output only the enhanced/translated/summarized/solution text without meta-commentary\n- Do not add prefixes, suffixes, or meta-commentary to your response unless in Solution Advisor mode where the structure itself is the output"
+    "systemPrompt": "You are an expert professional writing assistant. Your task is to enhance, improve, and refine text based on the user's requirements.\n\n## Your Capabilities\n\n1. \n**Professional Enhancement**: Transform text into a polished, professional tone suitable for business communications, formal documents, and professional contexts.\n\n2. \n**Casual Adaptation**: Convert text to a more casual, friendly, and conversational tone while maintaining clarity and readability.\n\n3. \n**Grammar and Style Correction**: Fix grammatical errors, improve sentence structure, enhance clarity, and ensure proper punctuation and spelling.\n\n4. \n**Content Enrichment**: Add relevant details, improve flow, and enhance the overall quality of the text while preserving the original meaning and intent.\n\n5. \n**Translation**: Accurately translate text to the specified target language while maintaining the original tone, meaning, and context.\n\n6. \n**Extended**: Expand and elaborate on the text by adding more detail, context, examples, explanations, and comprehensive information while maintaining the original core message and intent.\n\n7. \n**Summarizer**: Create concise, clear summaries in one or two paragraphs that capture the essential information, key points, and main ideas from longer texts. Focus on extracting and preserving the most important context and information while maintaining accuracy and coherence. The summary should be contextually aware, preserving the most critical details based on the user's prompt and the original text's context.\n\n8. \n**Solution Advisor**: When the user prompt indicates they want a solution proposal, follow this structured approach:\n- \n**Step 1: Expanded Question Context**: First, expand and clarify the user's question with additional context, background information, and related considerations that help frame the problem more comprehensively.\n- \n**Step 2: Best Practices Research**: Search and identify industry best practices, proven methodologies, and expert recommendations relevant to this question. Categorize these findings into logical groups (e.g., Technical Approaches, Process Improvements, Tool Recommendations, Architecture Patterns, Security Considerations, Performance Optimization, etc.).\n- \n**Step 3: Solution Summary**: Provide a concise executive summary (2-3 paragraphs) that synthesizes the key findings and presents the overall recommended approach.\n- \n**Step 4: Best Solutions**: List the top solutions as bullet points, each with:\n* Clear, actionable recommendation\n* Brief explanation of why it's effective\n* When/where to apply it\n- \n**Step 5: Considerations**: List important considerations, trade-offs, and potential challenges as bullet points, including:\n* Implementation challenges\n* Resource requirements\n* Risk factors\n* Alternative approaches\n* Success factors\n* Potential pitfalls to avoid\n\n## Instructions\n\n- Preserve the original meaning and intent of the text\n- Maintain appropriate tone based on the selected style\n- Fix all grammatical errors and improve clarity\n- Enhance content richness where appropriate\n- For translations, ensure cultural accuracy and natural phrasing\n- For extended mode, significantly expand the content with relevant details, examples, and comprehensive explanations\n- For Summarizer mode, create concise summaries in one or two paragraphs that:\n  * Capture all key points and main ideas\n  * Maintain the original meaning and context\n  * Preserve the most important context based on the user's prompt and the original text\n  * Focus on extracting and retaining the most critical information relevant to the user's needs\n  * Use clear, organized paragraph structure (1-2 paragraphs total)\n  * Preserve important details, facts, and conclusions that are contextually significant\n  * Eliminate redundancy and non-essential information while ensuring critical context is maintained\n  * Adapt the summary to emphasize information most relevant to the user's specific prompt or question\n- For Solution Advisor mode, follow the structured 5-step format exactly as described above, ensuring comprehensive analysis and actionable recommendations\n- Output only the enhanced/translated/summarized/solution text without meta-commentary\n- Do not add prefixes, suffixes, or meta-commentary to your response unless in Solution Advisor mode where the structure itself is the output"
   },
   {
     "id": "performance-manager",
     "agentType": "chat",
     "label": "Performance Manager",
     "icon": "Target",
-    "description": "The best HR and process manager that knows all process relationships and how to improve employee performance",
+    "description": "HR performance management agent that generates employee KPI performance improvement plans. Use for: creating employee KPIs, performance reviews, employee development plans, HR performance metrics, role-based KPI generation. Outputs structured table format with KPIs, weights, formulas, and improvement notes. NOT for: process documentation, business process analysis, or general HR tasks.",
     "requiredOutputFormat": "table",
     "model": "gpt-4o-mini",
     "loadingTextSwitches": [
@@ -372,7 +372,7 @@
         "id": "employee-full-name",
         "name": "employeeFullName",
         "label": "Employee Full Name",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "text",
         "component": "text",
         "placeholder": "Enter employee's full name",
@@ -387,7 +387,7 @@
         "id": "employee-post-title",
         "name": "employeePostTitle",
         "label": "Employee Post Title",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "text",
         "component": "text",
         "placeholder": "Enter employee's job title/position",
@@ -529,7 +529,7 @@
     "agentType": "chat",
     "label": "Process Analyst",
     "icon": "Workflow",
-    "description": "Analyze and optimize processes with comprehensive analysis including flowcharts, KPIs, risks, and RACI matrices",
+    "description": "Business process documentation and analysis agent for GMP/ISO 9001 compliant process documentation. Use for: creating process documentation, process analysis, workflow documentation, process flow diagrams (Mermaid), process KPIs, RACI matrices, process risk assessment, GMP/ISO compliant procedures. Outputs comprehensive markdown process documents. NOT for: employee performance management, code review, or data analysis.",
     "requiredOutputFormat": "string",
     "model": "gpt-4o-mini",
     "loadingTextSwitches": [
@@ -545,7 +545,7 @@
         "id": "process-description",
         "name": "processDescription",
         "label": "Describe Your Process Vision",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "component": "textarea",
         "placeholder": "Share your process vision, challenges, and goals. Describe what you want to achieve, the current state, and any pain points or opportunities for improvement. Let AI help you transform your ideas into comprehensive process documentation.",
         "aiAgentId": "professional-writing",
@@ -560,7 +560,7 @@
         "id": "process-challenges",
         "name": "processChallenges",
         "label": "Process Challenges",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "component": "list-input",
         "placeholder": "Enter challenges faced by this process",
         "addButtonText": "Add Challenge"
@@ -569,7 +569,7 @@
         "id": "points-to-improve",
         "name": "pointsToImprove",
         "label": "Points You Want to Improve",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "component": "list-input",
         "placeholder": "Enter specific areas or aspects you want to improve",
         "addButtonText": "Add Improvement Point"
@@ -578,7 +578,7 @@
         "id": "output-language",
         "name": "outputLanguage",
         "label": "Output Language",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "component": "language-selector",
         "defaultLanguage": "en",
         "defaultValue": "en",
@@ -593,7 +593,7 @@
         "id": "included-sections",
         "name": "includedSections",
         "label": "Include Sections",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "component": "checkbox-list",
         "options": [
           {
@@ -704,7 +704,7 @@
     "agentType": "image-generation",
     "label": "Image Generator",
     "icon": "Image",
-    "description": "Generate images from text descriptions using AI",
+    "description": "AI image generation agent that creates images from text prompts. Use for: generating images, creating visual content, image creation from descriptions, sketch generation, infographic creation, creative image design. Supports multiple image types: sketch, standard, infographic, 3D model, creative, iconic, editorial, comic-book. Outputs image files (PNG/URL format). NOT for: video generation, text processing, or data analysis.",
     "requiredOutputFormat": "image",
     "model": "gemini-2.5-flash-image",
     "loadingTextSwitches": [
@@ -861,11 +861,107 @@
     ]
   },
   {
+    "id": "video-generator",
+    "agentType": "video-generation",
+    "label": "Video Generator",
+    "icon": "Video",
+    "description": "AI video generation agent that creates videos from text prompts. Use for: generating videos, creating video content, video creation from descriptions, video production. Supports reference images and custom durations (1-10 seconds). Outputs video files. NOT for: image generation, text processing, or data analysis.",
+    "requiredOutputFormat": "video",
+    "model": "veo-3.1-fast-generate-preview",
+    "loadingTextSwitches": [
+      "Analyzing your prompt...",
+      "Generating your video...",
+      "Processing frames...",
+      "Refining video details...",
+      "Finalizing the video..."
+    ],
+    "renderComponents": [
+      {
+        "id": "prompt",
+        "name": "prompt",
+        "label": "Video Description",
+        "sectionId": "body",
+        "component": "textarea",
+        "aiAgentId": "professional-writing",
+        "placeholder": "Describe the video you want to generate... Be creative and detailed!",
+        "validation": {
+          "required": true,
+          "minLength": 10
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "input_reference",
+        "name": "input_reference",
+        "label": "Reference Image (Optional)",
+        "sectionId": "body",
+        "component": "file-input",
+        "placeholder": "Upload an image to use as reference for video generation",
+        "accept": "image/*",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "size",
+        "name": "size",
+        "label": "Video Size",
+        "sectionId": "body",
+        "component": "select",
+        "defaultValue": "1280x720",
+        "options": [
+          {
+            "id": "1280x720",
+            "label": "1280x720 (HD)",
+            "icon": "Monitor",
+            "color": "default"
+          },
+          {
+            "id": "1920x1080",
+            "label": "1920x1080 (Full HD)",
+            "icon": "Monitor",
+            "color": "default"
+          },
+          {
+            "id": "1024x1024",
+            "label": "1024x1024 (Square)",
+            "icon": "Square",
+            "color": "default"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "seconds",
+        "name": "seconds",
+        "label": "Duration (seconds)",
+        "sectionId": "body",
+        "component": "number",
+        "placeholder": "Enter video duration in seconds (1-10)",
+        "defaultValue": "4",
+        "validation": {
+          "required": true,
+          "min": 1,
+          "max": 10
+        },
+        "colSpan": 1,
+        "order": 4
+      }
+    ]
+  },
+  {
     "id": "general-assistant",
     "agentType": "chat",
     "label": "General Assistant",
     "icon": "Brain",
-    "description": "Comprehensive business and data analyst that analyzes all available data to provide detailed insights, recommendations, and risk assessments",
+    "description": "Business intelligence and data analysis agent that analyzes preloaded system data comprehensively. Use for: analyzing existing schemas/data, business intelligence, system analysis, data relationship analysis, organizational insights, strategic recommendations, risk assessment of system data. Outputs comprehensive markdown analysis reports. NOT for: analyzing user-provided raw data, code review, or process documentation.",
     "requiredOutputFormat": "string",
     "model": "gpt-4o-mini",
     "loadingTextSwitches": [
@@ -881,7 +977,7 @@
         "id": "user-prompt",
         "name": "userPrompt",
         "label": "What would you like me to analyze?",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "component": "textarea",
         "aiAgentId": "professional-writing",
         "placeholder": "Describe what you want analyzed, any specific questions, areas of focus, or concerns. I will analyze all available data and provide comprehensive insights.",
@@ -900,7 +996,7 @@
     "agentType": "chat",
     "label": "Quality Assurance Analyst",
     "icon": "ShieldCheck",
-    "description": "Analyzes change or deviation descriptions using 6M model to identify root causes, generate comprehensive analysis, and provide solutions with regulatory compliance (GMP, GAMP, ISO9001, WHO)",
+    "description": "Quality assurance deviation analysis agent using 6M root cause analysis model. Use for: analyzing quality deviations, change investigations, non-conformance analysis, CAPA generation, pharmaceutical quality issues, regulatory compliance assessment (GMP/GAMP/ISO/WHO), root cause analysis with 6M model. Outputs comprehensive deviation analysis reports with regulatory references. NOT for: process documentation, employee performance, or general data analysis.",
     "requiredOutputFormat": "string",
     "model": "gpt-4o-mini",
     "loadingTextSwitches": [
@@ -918,7 +1014,7 @@
         "id": "user-prompt",
         "name": "userPrompt",
         "label": "Change or Deviation Description",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "component": "textarea",
         "placeholder": "Describe the change or deviation that occurred. Include details such as: what happened, when it occurred, where it was observed, who was involved, and any immediate observations. I will analyze this using the 6M model (Man, Machine, Mother Nature, Material, Method, Management) to identify root causes and provide comprehensive solutions.",
         "validation": {
@@ -941,7 +1037,7 @@
     "agentType": "chat",
     "label": "Code Review Agent",
     "icon": "Code",
-    "description": "Analyzes code for risks, pitfalls, and produces secure rewrites while adhering to best practices.",
+    "description": "Code review and security analysis agent for programming code. Use for: code review, security vulnerability detection, code quality analysis, code refactoring recommendations, secure code rewriting, static code analysis, identifying code risks and anti-patterns. Outputs detailed code review reports with secure rewrites. NOT for: text processing, data analysis, or schema creation.",
     "requiredOutputFormat": "string",
     "model": "gpt-4o-mini",
     "loadingTextSwitches": [
@@ -957,7 +1053,7 @@
         "id": "code-input",
         "name": "codeInput",
         "label": "Code to Review",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "textarea",
         "component": "textarea",
         "placeholder": "Paste the code you want reviewed here...",
@@ -981,7 +1077,7 @@
     "agentType": "voice-transcription",
     "label": "Voice Transcription",
     "icon": "Mic",
-    "description": "Transcribe audio recordings to text using advanced speech recognition",
+    "description": "Voice transcription agent that converts audio recordings to text. Use for: transcribing audio files, speech-to-text conversion, voice recording transcription, audio transcription. Outputs transcribed text in string format. NOT for: text processing, translation, or content generation.",
     "requiredOutputFormat": "string",
     "model": "gpt-4o-mini-transcribe",
     "responseFormat": "verbose_json",
@@ -996,7 +1092,7 @@
     "id": "presentation-slide-creator",
     "label": "Presentation Slide Creator",
     "icon": "FileText",
-    "description": "Generates structured presentation slides based on user input, detailing topics, slide count, and tone of voice.",
+    "description": "Presentation slide generation agent that creates structured slide content. Use for: creating presentation slides, generating slide content, presentation creation, slide deck generation. Outputs markdown-formatted slide content with titles, descriptions, and bullet points. NOT for: process documentation, data analysis, or code generation.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
     "model": "gpt-4o-mini",
@@ -1013,7 +1109,7 @@
         "id": "presentation-topic",
         "name": "presentationTopic",
         "label": "Presentation Topic",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "textarea",
         "component": "textarea",
         "placeholder": "Describe the topic you want the presentation to cover.",
@@ -1028,7 +1124,7 @@
         "id": "number-of-slides",
         "name": "numberOfSlides",
         "label": "Number of Slides",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "text",
         "component": "text",
         "placeholder": "Enter the desired number of slides.",
@@ -1043,7 +1139,7 @@
         "id": "tone-of-voice",
         "name": "toneOfVoice",
         "label": "Tone of Voice",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "select",
         "component": "select",
         "options": [
@@ -1106,7 +1202,7 @@
     "agentType": "chat",
     "label": "Data Analysis Expert",
     "icon": "BarChart",
-    "description": "Comprehensive data analysis with deep insights, strengths, weaknesses, risks, and actionable checklists",
+    "description": "Raw data analysis agent for user-provided data in any format (tables, JSON, CSV, text). Use for: analyzing raw data provided by user, numerical data analysis, statistical analysis, data pattern recognition, identifying data strengths/weaknesses, data risk assessment, generating data analysis reports with actionable checklists. Outputs comprehensive markdown data analysis reports. NOT for: analyzing system/preloaded data (use general-assistant), code review, or process documentation.",
     "requiredOutputFormat": "string",
     "model": "gpt-4o-mini",
     "loadingTextSwitches": [
@@ -1125,7 +1221,7 @@
         "id": "user-prompt",
         "name": "userPrompt",
         "label": "Data to Analyze",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "component": "textarea",
         "placeholder": "Paste your data here in any format (table, JSON, or plain text). I will analyze it comprehensively and provide insights, strengths, weaknesses, risks, and actionable checklists.",
         "validation": {
@@ -1142,7 +1238,7 @@
     "id": "oox-analyzer-quality-control",
     "label": "OOX Analyzer for Quality Control",
     "icon": "ClipboardList",
-    "description": "A systematic tool designed to assess Out Of Specification (OOS), Out Of Trend (OOT), and Out Of Expectation (OOE) incidents in pharmaceutical production and quality assurance processes.",
+    "description": "Pharmaceutical OOX (OOS/OOT/OOE) incident analysis agent for quality control. Use for: analyzing OOS/OOT/OOE incidents, pharmaceutical quality control incidents, quality deviation analysis in pharma, FMEA risk assessment, pharmaceutical compliance reporting. Outputs comprehensive OOX analysis reports with 6M root cause analysis. NOT for: general deviation analysis (use quality-assurance-analyst), process documentation, or employee performance.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
     "model": "gpt-4o-mini",
@@ -1159,7 +1255,7 @@
         "id": "incident-description",
         "name": "incidentDescription",
         "label": "Describe the OOX Incident",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "textarea",
         "component": "textarea",
         "placeholder": "Provide detailed descriptions of the OOX incident, including context and impact. Be specific.",
@@ -1174,7 +1270,7 @@
         "id": "oox-type",
         "name": "ooxType",
         "label": "Type of OOX Incident",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "select",
         "component": "select",
         "options": [
@@ -1201,7 +1297,7 @@
         "id": "action-steps",
         "name": "actionSteps",
         "label": "Proposed Actions",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "list-input",
         "component": "list-input",
         "placeholder": "List actions to address the incident.",
@@ -1225,7 +1321,7 @@
     "agentType": "chat",
     "label": "Business Process Generator",
     "icon": "GitBranch",
-    "description": "Transforms natural-language business process descriptions into formally correct, executable BPMN 2.0 XML definitions",
+    "description": "BPMN 2.0 XML generator that converts business process descriptions into executable BPMN workflow definitions. Use for: creating BPMN 2.0 XML files, workflow engine process definitions, executable business process models, Camunda/Flowable process creation, BPMN diagram generation. Outputs valid BPMN 2.0 XML that can be imported into workflow engines. NOT for: process documentation (use process-analyst), process analysis, or general process descriptions.",
     "requiredOutputFormat": "string",
     "model": "gpt-4o-mini",
     "loadingTextSwitches": [
@@ -1244,7 +1340,7 @@
         "id": "process-description",
         "name": "processDescription",
         "label": "Process Description",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "textarea",
         "component": "textarea",
         "placeholder": "Describe your business process in natural language. Include: actors, roles, tasks, decisions, approvals, and any branching logic. Be as detailed as possible.",
@@ -1260,7 +1356,7 @@
         "id": "process-steps",
         "name": "processSteps",
         "label": "Process Steps (Ordered List)",
-        "sectionId": "basic-info",
+        "sectionId": "body",
         "type": "list-input",
         "component": "list-input",
         "placeholder": "Enter process steps in order. Each step should be a clear action or decision point.",

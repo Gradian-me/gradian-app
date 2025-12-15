@@ -31,6 +31,8 @@ import ReactECharts from 'echarts-for-react';
 import { LoadingSpinner } from '@/gradian-ui/layout/components';
 import { CHART_ANIMATION_CONFIG, CHART_COLOR_PALETTE, createChartTheme } from '@/gradian-ui/shared/constants/chart-theme';
 import { useTheme } from 'next-themes';
+import { DynamicAiAgentResponseContainer } from '@/gradian-ui/data-display/components/DynamicAiAgentResponseContainer';
+import type { QuickAction, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 
 export default function AnalyticsPage() {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
@@ -734,25 +736,42 @@ export default function AnalyticsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.3 }}
             >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Insights Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
-                  <div>
-                    <p className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Cycle Time Improvement</p>
-                    <p>Average tender cycle time improved by 11 days over the past six months.</p>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Award Conversion</p>
-                    <p>62% of published tenders progressed to award stage, driven by improved supplier engagement.</p>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 dark:text-gray-100 mb-1">High-Value Awards</p>
-                    <p>Top three awards accounted for 45% of total tender value in the last quarter.</p>
-                  </div>
-                </CardContent>
-              </Card>
+              <DynamicAiAgentResponseContainer
+                action={{
+                  id: 'tender-analysis-insights',
+                  label: 'Insights Summary',
+                  action: 'runAiAgent',
+                  componentType: 'ai-agent-response',
+                  agentId: 'data-analysis-expert',
+                  runType: 'automatic',
+                  icon: 'BarChart',
+                  variant: 'default',
+                  maxHeight: 340,
+                  additionalSystemPrompt: `Analyze the following Tender Cycle Efficiency data and provide comprehensive insights as a data analyst. Focus on:
+- Cycle time trends and improvements
+- Award conversion rates and patterns
+- Performance metrics and efficiency gains
+- Key insights and actionable recommendations
+- Strengths, weaknesses, and risks
+- Areas for improvement
+
+Provide a concise but comprehensive analysis suitable for an insights summary card.`
+                } as QuickAction}
+                schema={{
+                  id: 'analytics',
+                  name: 'Analytics',
+                  singular_name: 'Analytics',
+                  plural_name: 'Analytics',
+                  fields: [],
+                  sections: []
+                } as FormSchema}
+                data={{
+                  id: 'tender-cycle-data',
+                  tenderCycleData: tenderCycleData
+                }}
+                disableAnimation={false}
+                index={1}
+              />
             </motion.div>
           </div>
         )}

@@ -84,7 +84,7 @@
     "type": "warning",
     "category": "tender",
     "priority": "high",
-    "isRead": false,
+    "isRead": true,
     "createdAt": "2024-12-10T07:30:00.000Z",
     "actionUrl": "/tenders/t-2024-003",
     "metadata": {
@@ -95,7 +95,8 @@
       "currency": "USD"
     },
     "updatedAt": "2025-11-04T13:04:12.043Z",
-    "interactionType": "canRead"
+    "interactionType": "canRead",
+    "readAt": "2025-12-14T11:29:04.414Z"
   },
   {
     "id": "6",

@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { MermaidDiagramSimple } from '../MermaidDiagramSimple';
 import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
@@ -34,8 +36,61 @@ export function CodeComponent({
   
   const codeContent = getCodeContent(children);
   
+  // Normalize language for case-insensitive matching
+  const normalizedLanguage = language?.toLowerCase();
+  
+  // Render LaTeX/Math code blocks with KaTeX
+  if (normalizedLanguage === 'latex' || normalizedLanguage === 'math' || normalizedLanguage === 'katex') {
+    const mathContent = codeContent.trim();
+    if (!mathContent) {
+      return null;
+    }
+    
+    let html: string;
+    try {
+      // Render with KaTeX
+      html = katex.renderToString(mathContent, {
+        throwOnError: false,
+        displayMode: !inline, // Block mode for code blocks, inline for inline code
+      });
+    } catch (error) {
+      // If KaTeX rendering fails, fall back to code display
+      console.warn('KaTeX rendering error:', error);
+      if (!inline && language) {
+        return (
+          <div className="my-4">
+            <CodeViewer
+              code={codeContent.replace(/\n$/, '')}
+              programmingLanguage={language}
+              title={language}
+            />
+          </div>
+        );
+      }
+      return null;
+    }
+    
+    if (inline) {
+      // Inline math
+      return (
+        <span 
+          className="katex-inline"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      );
+    } else {
+      // Block math
+      return (
+        <div 
+          className="my-4 katex-display"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      );
+    }
+  }
+  
   // Render Mermaid diagrams (case-insensitive check)
-  if (!inline && language === 'mermaid') {
+  if (!inline && normalizedLanguage === 'mermaid') {
     const diagram = codeContent.replace(/\n$/, '').trim();
     if (diagram) {
       return (
@@ -50,7 +105,7 @@ export function CodeComponent({
   }
   
   // Render Cytoscape graphs (case-insensitive check for 'cytoscape' or 'cytoscape json')
-  if (!inline && (language === 'cytoscape' || language === 'cytoscape json')) {
+  if (!inline && (normalizedLanguage === 'cytoscape' || normalizedLanguage === 'cytoscape json')) {
     const jsonContent = codeContent.replace(/\n$/, '').trim();
     if (jsonContent) {
       // Parse JSON and prepare data outside of JSX construction
