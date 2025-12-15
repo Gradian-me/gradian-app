@@ -82,11 +82,11 @@ export default function EqmsAnalyticsPage() {
     ];
 
     const edges: GraphEdgeData[] = [
-      { id: 'e1', source: 'cause-operator', target: 'dv-001', sourceSchema: 'cause', targetSchema: 'deviation', relationTypeId: 'causes' },
-      { id: 'e2', source: 'cause-maint', target: 'dv-001', sourceSchema: 'cause', targetSchema: 'deviation', relationTypeId: 'causes' },
-      { id: 'e3', source: 'cause-sop', target: 'dv-001', sourceSchema: 'cause', targetSchema: 'deviation', relationTypeId: 'causes' },
-      { id: 'e4', source: 'dv-001', target: 'action-cap', sourceSchema: 'deviation', targetSchema: 'action', relationTypeId: 'triggers' },
-      { id: 'e5', source: 'dv-001', target: 'action-corrective', sourceSchema: 'deviation', targetSchema: 'action', relationTypeId: 'triggers' },
+      { id: 'e1', source: 'cause-operator', target: 'dv-001', sourceId: 'cause-operator', targetId: 'dv-001', sourceSchema: 'cause', targetSchema: 'deviation', relationTypeId: 'causes' },
+      { id: 'e2', source: 'cause-maint', target: 'dv-001', sourceId: 'cause-maint', targetId: 'dv-001', sourceSchema: 'cause', targetSchema: 'deviation', relationTypeId: 'causes' },
+      { id: 'e3', source: 'cause-sop', target: 'dv-001', sourceId: 'cause-sop', targetId: 'dv-001', sourceSchema: 'cause', targetSchema: 'deviation', relationTypeId: 'causes' },
+      { id: 'e4', source: 'dv-001', target: 'action-cap', sourceId: 'dv-001', targetId: 'action-cap', sourceSchema: 'deviation', targetSchema: 'action', relationTypeId: 'triggers' },
+      { id: 'e5', source: 'dv-001', target: 'action-corrective', sourceId: 'dv-001', targetId: 'action-corrective', sourceSchema: 'deviation', targetSchema: 'action', relationTypeId: 'triggers' },
     ];
 
     const nodeTypes = [
