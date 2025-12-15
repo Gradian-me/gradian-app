@@ -14,6 +14,8 @@ import {
   FormLoadedMessage,
   validateMessageOrigin,
 } from '@/gradian-ui/form-builder/types/embed-messages';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface FormEmbedClientProps {
   allowedOrigins?: string[];
@@ -37,7 +39,7 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
       const decoded = decodeURIComponent(initialValuesParam);
       return JSON.parse(decoded);
     } catch (error) {
-      console.error('Failed to parse initialValues:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to parse initialValues: ${error instanceof Error ? error.message : String(error)}`);
       return undefined;
     }
   }, [initialValuesParam]);
@@ -72,20 +74,20 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
       const targetOrigin = originHint && originHint !== '*' ? originHint : undefined;
 
       if (!targetWindow) {
-        console.warn('[FormEmbed] No target window available for messaging');
+        loggingCustom(LogType.CLIENT_LOG, 'warn', '[FormEmbed] No target window available for messaging');
         return;
       }
 
       const originToUse = targetOrigin || (typeof window !== 'undefined' ? window.origin : undefined);
       if (!originToUse) {
-        console.warn('[FormEmbed] Unable to determine safe target origin; message not sent');
+        loggingCustom(LogType.CLIENT_LOG, 'warn', '[FormEmbed] Unable to determine safe target origin; message not sent');
         return;
       }
 
       try {
         targetWindow.postMessage(message, originToUse);
       } catch (error) {
-        console.error('[FormEmbed] Failed to send message:', error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `[FormEmbed] Failed to send message: ${error instanceof Error ? error.message : String(error)}`);
       }
     },
     [returnOrigin, allowedOrigins, isModalMode]
@@ -162,7 +164,7 @@ export function FormEmbedClient({ allowedOrigins }: FormEmbedClientProps) {
 
     const handleMessage = (event: MessageEvent) => {
       if (!isOriginAllowed(event.origin)) {
-        console.warn('[FormEmbed] Ignoring message from untrusted origin:', event.origin);
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `[FormEmbed] Ignoring message from untrusted origin: ${event.origin}`);
         return;
       }
       // Handle close message from parent modal

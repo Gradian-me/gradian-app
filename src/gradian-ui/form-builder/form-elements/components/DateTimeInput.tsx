@@ -5,6 +5,8 @@ import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { DateInputProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
 import { baseInputClasses, getLabelClasses, errorTextClasses } from '../utils/field-styles';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export const DateTimeInput = forwardRef<FormElementRef, DateInputProps>(
   (
@@ -68,7 +70,7 @@ export const DateTimeInput = forwardRef<FormElementRef, DateInputProps>(
     const fieldPlaceholder = placeholder || config?.placeholder;
 
     if (!config) {
-      console.error('DateTimeInput: config is required');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'DateTimeInput: config is required');
       return null;
     }
 

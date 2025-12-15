@@ -12,6 +12,8 @@ import { IconRenderer, isValidLucideIcon } from '@/gradian-ui/shared/utils/icon-
 import { CopyContent } from './CopyContent';
 import { PopupPicker } from './PopupPicker';
 import { ClipboardCopy } from 'lucide-react';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export interface IconInputProps extends TextInputProps {}
 
@@ -88,7 +90,7 @@ export const IconInput = forwardRef<FormElementRef, IconInputProps>(
     };
 
     if (!config) {
-      console.error('IconInput: config is required');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'IconInput: config is required');
       return null;
     }
 

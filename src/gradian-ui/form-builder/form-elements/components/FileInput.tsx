@@ -5,6 +5,8 @@ import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { FileInputProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
 import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export const FileInput = forwardRef<FormElementRef, FileInputProps>(
   (
@@ -87,7 +89,7 @@ export const FileInput = forwardRef<FormElementRef, FileInputProps>(
     const acceptTypes = accept || (config as any).accept || '*/*';
 
     if (!config) {
-      console.error('FileInput: config is required');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'FileInput: config is required');
       return null;
     }
 

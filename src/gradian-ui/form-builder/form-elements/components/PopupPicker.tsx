@@ -30,6 +30,8 @@ import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { AddButtonFull } from './AddButtonFull';
 import { EndLine } from '@/gradian-ui/layout';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { ColumnMapConfig, extractItemsFromPayload, extractMetaFromPayload, mapRequestParams } from '@/gradian-ui/shared/utils/column-mapper';
 import { useCompanyStore } from '@/stores/company.store';
 import { sortOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
@@ -368,7 +370,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
             setSchema(response.data);
           }
         } catch (err) {
-          console.error('Error fetching schema:', err);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching schema: ${err instanceof Error ? err.message : String(err)}`);
         }
       };
       fetchSchema();
@@ -936,7 +938,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       await onSelect([selectionEntry], [item]);
       onClose();
     } catch (error) {
-      console.error('Error in commitSingleSelection:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error in commitSingleSelection: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
@@ -1076,7 +1078,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       setPendingSelections(new Map());
       onClose();
     } catch (error) {
-      console.error('Error confirming selections:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error confirming selections: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsSubmitting(false);
     }

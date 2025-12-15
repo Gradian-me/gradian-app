@@ -6,6 +6,8 @@ import { SliderProps, FormElementRef } from '../types';
 import { cn } from '../../../shared/utils';
 import { Slider as UISlider } from '@/components/ui/slider';
 import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export const Slider = forwardRef<FormElementRef, SliderProps>(
   (
@@ -45,7 +47,7 @@ export const Slider = forwardRef<FormElementRef, SliderProps>(
     const clampedValue = Math.max(min, Math.min(max, sliderValue));
 
     if (!config) {
-      console.error('Slider: config is required');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'Slider: config is required');
       return null;
     }
 

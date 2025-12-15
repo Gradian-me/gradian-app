@@ -1,4 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export interface UseAudioRecorderReturn {
   isRecording: boolean;
@@ -90,7 +92,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       };
 
       mediaRecorder.onerror = (event) => {
-        console.error('MediaRecorder error:', event);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `MediaRecorder error: ${event instanceof Error ? event.message : String(event)}`);
         setError('Recording error occurred');
       };
 
@@ -99,7 +101,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       mediaRecorder.start(1000);
       setIsRecording(true);
     } catch (err) {
-      console.error('Error starting recording:', err);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error starting recording: ${err instanceof Error ? err.message : String(err)}`);
       
       // Provide more specific error messages based on error type
       let errorMessage = 'Failed to start recording. ';
@@ -175,7 +177,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
         // Don't stop tracks immediately - let MediaRecorder finish properly
         // Tracks will be stopped in the onstop callback
       } catch (error) {
-        console.error('Error stopping MediaRecorder:', error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Error stopping MediaRecorder: ${error instanceof Error ? error.message : String(error)}`);
         setIsRecording(false);
         // If stopping fails, stop tracks anyway
         stopAllTracks();
@@ -192,7 +194,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       try {
         mediaRecorderRef.current.stop();
       } catch (error) {
-        console.warn('Error stopping MediaRecorder:', error);
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `Error stopping MediaRecorder: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
     setIsRecording(false);

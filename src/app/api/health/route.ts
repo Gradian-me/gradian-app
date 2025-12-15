@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { config } from '@/lib/config';
 import fs from 'fs';
 import path from 'path';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 /**
  * Read and parse environment variables from .env file
@@ -46,7 +48,11 @@ function readEnvFile(envFilePath: string): Record<string, string> {
       }
     }
   } catch (error) {
-    console.error(`Error reading env file ${envFilePath}:`, error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error reading env file ${envFilePath}: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
   
   return envVars;

@@ -6,6 +6,8 @@ import { revalidatePath } from 'next/cache';
 
 import { isDemoModeEnabled, proxySchemaRequest } from '../utils';
 import { getAllReactQueryKeys } from '@/gradian-ui/shared/configs/cache-config';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 /**
  * Clear cache from schema-loader (server-side cache)
@@ -16,7 +18,11 @@ async function clearSchemaLoaderCache() {
     const { clearSchemaCache } = await import('@/gradian-ui/schema-manager/utils/schema-loader');
     clearSchemaCache();
   } catch (error) {
-    console.warn('Could not clear schema-loader cache:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `Could not clear schema-loader cache: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 
@@ -29,7 +35,11 @@ async function clearCompaniesLoaderCache() {
     const { clearCompaniesCache } = await import('@/gradian-ui/shared/utils/companies-loader');
     clearCompaniesCache();
   } catch (error) {
-    console.warn('Could not clear companies-loader cache:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `Could not clear companies-loader cache: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 
@@ -42,7 +52,11 @@ async function clearAllDataLoaderCaches() {
     const { clearAllCaches } = await import('@/gradian-ui/shared/utils/data-loader');
     clearAllCaches();
   } catch (error) {
-    console.warn('Could not clear data-loader caches:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `Could not clear data-loader caches: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 
@@ -54,7 +68,11 @@ async function clearSchemaRegistryCache() {
     const { clearSchemaCache } = await import('@/gradian-ui/schema-manager/utils/schema-registry.server');
     clearSchemaCache();
   } catch (error) {
-    console.warn('Could not clear schema-registry.server cache:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `Could not clear schema-registry.server cache: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 
@@ -67,7 +85,11 @@ async function clearApiRouteCaches() {
     // Note: clearSchemaCache is not exported from route.ts to avoid Next.js type conflicts
     // These are no-op functions anyway, so we can skip them
   } catch (error) {
-    console.warn('Could not clear [schema-id] route cache:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `Could not clear [schema-id] route cache: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 
   try {
@@ -75,7 +97,11 @@ async function clearApiRouteCaches() {
     // Note: clearSchemaCache is not exported from route.ts to avoid Next.js type conflicts
     // This is a no-op function anyway, so we can skip it
   } catch (error) {
-    console.warn('Could not clear schemas route cache:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `Could not clear schemas route cache: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 
@@ -99,7 +125,11 @@ async function revalidateSchemaPages() {
         // Revalidate layout to ensure all routes under this path are refreshed
         revalidatePath(`/page/${schemaId}`, 'layout');
       } catch (error) {
-        console.warn(`Could not revalidate page for schema ${schemaId}:`, error);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `Could not revalidate page for schema ${schemaId}: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
 
@@ -108,10 +138,18 @@ async function revalidateSchemaPages() {
       revalidatePath('/page', 'page');
       revalidatePath('/page', 'layout');
     } catch (error) {
-      console.warn('Could not revalidate base page route:', error);
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'warn',
+        `Could not revalidate base page route: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   } catch (error) {
-    console.warn('Could not revalidate schema pages:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `Could not revalidate schema pages: ${error instanceof Error ? error.message : String(error)}`,
+    );
     // Don't throw - cache clearing should still succeed even if revalidation fails
   }
 }
@@ -135,7 +173,11 @@ async function callRemoteClearCache(method: string = 'POST') {
   const baseUrl = process.env.URL_SCHEMA_CRUD?.replace(/\/+$/, '');
   
   if (!baseUrl) {
-    console.warn('URL_SCHEMA_CRUD not configured, skipping remote cache clear');
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      'URL_SCHEMA_CRUD not configured, skipping remote cache clear',
+    );
     return null;
   }
 
@@ -151,11 +193,19 @@ async function callRemoteClearCache(method: string = 'POST') {
       const result = await response.json();
       return result;
     } else {
-      console.warn(`Remote cache clear failed with status ${response.status}`);
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'warn',
+        `Remote cache clear failed with status ${response.status}`,
+      );
       return null;
     }
   } catch (error) {
-    console.warn('Failed to call remote clear-cache endpoint:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `Failed to call remote clear-cache endpoint: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return null;
   }
 }
@@ -174,7 +224,11 @@ export async function POST(request: NextRequest) {
   try {
     await clearLocalCaches();
   } catch (error) {
-    console.warn('Local cache clearing failed:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `Local cache clearing failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,
@@ -217,7 +271,11 @@ export async function GET(request: NextRequest) {
   try {
     await clearLocalCaches();
   } catch (error) {
-    console.warn('Local cache clearing failed:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `Local cache clearing failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,

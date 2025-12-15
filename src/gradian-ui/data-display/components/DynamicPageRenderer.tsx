@@ -36,6 +36,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { ImageText } from '../../form-builder/form-elements';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { useCompanies } from '@/gradian-ui/shared/hooks/use-companies';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { debounce } from '@/gradian-ui/shared/utils';
 import { toast } from 'sonner';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
@@ -227,14 +229,14 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     
     // Debug: Log schema info to help diagnose issues
     if (process.env.NODE_ENV === 'development') {
-      console.log('[DynamicPageRenderer] Schema check:', {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[DynamicPageRenderer] Schema check: ${JSON.stringify({
         schemaId: schema?.id,
         isNotCompanyBased: schema?.isNotCompanyBased,
         isNotCompanyBasedType: typeof schema?.isNotCompanyBased,
         isNotCompanyBasedValue: schema?.isNotCompanyBased,
         isCompanyBased,
         selectedCompany: selectedCompany?.id,
-      });
+      })}`);
     }
 
     if (isCompanyBased) {
@@ -311,7 +313,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               setCompanySchema(schemaResponse.data);
             }
           } catch (error) {
-            console.error('Error fetching companies schema:', error);
+            loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching companies schema: ${error instanceof Error ? error.message : String(error)}`);
           } finally {
             setIsLoadingCompanies(false);
           }
@@ -410,7 +412,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       setChangeParentPickerOpen(false);
       setEntityForParentChange(null);
     } catch (error) {
-      console.error('Failed to change parent:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to change parent: ${error instanceof Error ? error.message : String(error)}`);
       toast.error(error instanceof Error ? error.message : 'Failed to change parent');
     } finally {
       setIsSubmitting(false);
@@ -455,7 +457,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         fetchEntities(filters, { disableCache: true, page: currentPage, limit: pageSize });
       }
     } catch (error) {
-      console.error('Error deleting entity:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error deleting entity: ${error instanceof Error ? error.message : String(error)}`);
       setDeleteConfirmDialog({ open: false, entity: null });
     }
   }, [deleteConfirmDialog.entity, handleDeleteEntity, fetchEntities, buildFilters]);
@@ -492,7 +494,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   // Handle edit entity - set entity ID to trigger FormModal
   const handleEditEntity = useCallback(async (entity: any) => {
     if (!entity?.id || !schema?.id) {
-      console.error('Missing entity ID or schema ID for edit');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'Missing entity ID or schema ID for edit');
       return;
     }
     
@@ -502,7 +504,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       // Set entity ID to trigger FormModal component
       setEditEntityId(entity.id);
     } catch (error) {
-      console.error('Failed to open edit modal:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to open edit modal: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsEditLoading(prev => ({ ...prev, [entity.id]: false }));
     }
@@ -1032,7 +1034,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   window.open(action.targetUrl, '_blank', 'noopener,noreferrer');
                 } else if (action.action === 'openFormDialog' && action.targetSchema) {
                   // Handle form dialog opening - could be implemented later
-                  console.log('Open form dialog for schema:', action.targetSchema);
+                  loggingCustom(LogType.CLIENT_LOG, 'log', `Open form dialog for schema: ${action.targetSchema}`);
                 }
               };
 

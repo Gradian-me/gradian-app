@@ -15,6 +15,8 @@ import { ProfileSelectorConfig } from '@/gradian-ui/layout/profile-selector/type
 import { UserProfile } from '@/gradian-ui/shared/types';
 import { ensureFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
 import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface UserProfileSelectorProps {
   config?: Partial<ProfileSelectorConfig>;
@@ -125,7 +127,7 @@ export function UserProfileSelector({
         credentials: 'include', // Ensure cookies are sent
       });
     } catch (error) {
-      console.error('Logout error:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Logout error: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       // Clear access token from memory
       authTokenManager.clearAccessToken();

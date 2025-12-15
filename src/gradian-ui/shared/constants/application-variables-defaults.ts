@@ -18,6 +18,7 @@ export const DEFAULT_APPLICATION_VARIABLES = {
     EMAIL_LOG: true,
     LOGIN_LOG: true,
     INFRA_LOG: true,
+    CLIENT_LOG: true,
   },
   AUTH_CONFIG: {
     JWT_SECRET: 'your-default-secret-key-change-in-production',

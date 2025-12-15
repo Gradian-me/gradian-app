@@ -4,7 +4,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { refreshAccessToken, extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
-import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
+import { AUTH_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import {
   isServerDemoMode,
   buildAuthServiceUrl,
@@ -13,10 +14,10 @@ import {
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
-  console.log('[REFRESH_API] POST /api/auth/token/refresh - request received', {
+  loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] POST /api/auth/token/refresh - request received ${JSON.stringify({
     timestamp: new Date().toISOString(),
     hasBody: !!request.body,
-  });
+  })}`);
 
   try {
     const body = await request.json().catch(() => ({}));
@@ -40,18 +41,18 @@ export async function POST(request: NextRequest) {
       if (tokenToUse) tokenSource = 'cookie';
     }
 
-    console.log('[REFRESH_API] Refresh token source', {
+    loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Refresh token source ${JSON.stringify({
       hasToken: !!tokenToUse,
       source: tokenToUse ? tokenSource : 'none',
       tokenPreview: tokenToUse ? `${tokenToUse.substring(0, 20)}...` : null,
-    });
+    })}`);
 
     if (!tokenToUse) {
-      console.warn('[REFRESH_API] No refresh token found', {
+      loggingCustom(LogType.LOGIN_LOG, 'warn', `[REFRESH_API] No refresh token found ${JSON.stringify({
         checkedBody: true,
         checkedHeader: true,
         checkedCookies: true,
-      });
+      })}`);
       return NextResponse.json(
         {
           success: false,
@@ -64,14 +65,14 @@ export async function POST(request: NextRequest) {
     const useDemoMode = isServerDemoMode();
 
     if (useDemoMode) {
-      console.log('[REFRESH_API] Using local authentication (demo mode)');
+      loggingCustom(LogType.LOGIN_LOG, 'log', '[REFRESH_API] Using local authentication (demo mode)');
       // Local authentication - refresh using local token service
       const result = refreshAccessToken(tokenToUse);
 
       if (!result.success) {
-        console.error('[REFRESH_API] Local refresh failed', {
+        loggingCustom(LogType.LOGIN_LOG, 'error', `[REFRESH_API] Local refresh failed ${JSON.stringify({
           error: result.error,
-        });
+        })}`);
         return NextResponse.json(
           {
             success: false,
@@ -82,14 +83,14 @@ export async function POST(request: NextRequest) {
       }
 
       const duration = Date.now() - startTime;
-      console.log('[REFRESH_API] Local refresh SUCCESS', {
+      loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Local refresh SUCCESS ${JSON.stringify({
         hasAccessToken: !!result.accessToken,
         tokenLength: result.accessToken?.length || 0,
         expiresIn: AUTH_CONFIG.ACCESS_TOKEN_EXPIRY,
         duration: `${duration}ms`,
         responseFormat: 'accessToken in body (NOT in cookie)',
         clientStorage: 'MEMORY_ONLY',
-      });
+      })}`);
 
       // Return access token in response body only (not in cookie)
       // Client stores access token in memory only for security
@@ -103,15 +104,15 @@ export async function POST(request: NextRequest) {
         { status: 200 }
       );
     } else {
-      console.log('[REFRESH_API] Using external authentication service');
+      loggingCustom(LogType.LOGIN_LOG, 'log', '[REFRESH_API] Using external authentication service');
       // External authentication - proxy to external auth service
       const refreshUrl = buildAuthServiceUrl('/refresh');
       const headers = buildProxyHeaders(request);
 
-      console.log('[REFRESH_API] Calling external auth service', {
+      loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Calling external auth service ${JSON.stringify({
         url: refreshUrl,
         hasRefreshToken: !!tokenToUse,
-      });
+      })}`);
 
       const response = await fetch(refreshUrl, {
         method: 'POST',
@@ -123,18 +124,18 @@ export async function POST(request: NextRequest) {
       });
 
       const fetchDuration = Date.now() - startTime;
-      console.log('[REFRESH_API] External auth service response', {
+      loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] External auth service response ${JSON.stringify({
         status: response.status,
         ok: response.ok,
         duration: `${fetchDuration}ms`,
-      });
+      })}`);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Token refresh failed' }));
-        console.error('[REFRESH_API] External refresh failed', {
+        loggingCustom(LogType.LOGIN_LOG, 'error', `[REFRESH_API] External refresh failed ${JSON.stringify({
           status: response.status,
           error: errorData.error || errorData.message,
-        });
+        })}`);
         return NextResponse.json(
           {
             success: false,
@@ -153,10 +154,10 @@ export async function POST(request: NextRequest) {
       const refreshTokenExpiresIn = data?.tokens?.refreshTokenExpiresIn || data?.refreshTokenExpiresIn || AUTH_CONFIG.REFRESH_TOKEN_EXPIRY;
 
       if (!accessToken) {
-        console.error('[REFRESH_API] No access token in external response', {
+        loggingCustom(LogType.LOGIN_LOG, 'error', `[REFRESH_API] No access token in external response ${JSON.stringify({
           hasTokens: !!data?.tokens,
           hasAccessToken: !!data?.accessToken,
-        });
+        })}`);
         return NextResponse.json(
           {
             success: false,
@@ -167,7 +168,7 @@ export async function POST(request: NextRequest) {
       }
 
       const totalDuration = Date.now() - startTime;
-      console.log('[REFRESH_API] External refresh SUCCESS', {
+      loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] External refresh SUCCESS ${JSON.stringify({
         hasAccessToken: !!accessToken,
         hasRefreshToken: !!refreshToken,
         tokenLength: accessToken.length,
@@ -177,7 +178,7 @@ export async function POST(request: NextRequest) {
         duration: `${totalDuration}ms`,
         responseFormat: 'accessToken in body (NOT in cookie)',
         clientStorage: 'MEMORY_ONLY',
-      });
+      })}`);
 
       // Return access token in response body only (not in cookie)
       // Client stores access token in memory only for security
@@ -196,11 +197,11 @@ export async function POST(request: NextRequest) {
       // We MUST set the new refresh token cookie so it's available on next request/page reload
       // We set it manually to ensure correct domain/path attributes for our app
       if (refreshToken) {
-        console.log('[REFRESH_API] Setting refresh token cookie from response body', {
+        loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Setting refresh token cookie from response body ${JSON.stringify({
           tokenLength: refreshToken.length,
           cookieName: AUTH_CONFIG.REFRESH_TOKEN_COOKIE,
           maxAge: refreshTokenExpiresIn,
-        });
+        })}`);
         
         nextResponse.cookies.set(AUTH_CONFIG.REFRESH_TOKEN_COOKIE, refreshToken, {
           httpOnly: true,
@@ -211,20 +212,20 @@ export async function POST(request: NextRequest) {
           // Don't set Domain - let browser use current domain (works for localhost and production)
         });
         
-        console.log('[REFRESH_API] Refresh token cookie set successfully', {
+        loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Refresh token cookie set successfully ${JSON.stringify({
           cookieName: AUTH_CONFIG.REFRESH_TOKEN_COOKIE,
           maxAge: refreshTokenExpiresIn,
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'lax',
           path: '/',
-        });
+        })}`);
       } else {
-        console.warn('[REFRESH_API] WARNING: No refresh token in response body', {
+        loggingCustom(LogType.LOGIN_LOG, 'warn', `[REFRESH_API] WARNING: No refresh token in response body ${JSON.stringify({
           hasTokens: !!data?.tokens,
           hasRefreshToken: !!data?.refreshToken,
           responseKeys: Object.keys(data || {}),
-        });
+        })}`);
       }
 
       // Also forward Set-Cookie headers from external service as fallback
@@ -241,7 +242,7 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      console.log('[REFRESH_API] Forwarding Set-Cookie headers from external service (fallback)', {
+      loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Forwarding Set-Cookie headers from external service (fallback) ${JSON.stringify({
         count: allSetCookies.length,
         method: setCookieHeaders.length > 0 ? 'getSetCookie()' : 'get(set-cookie)',
         note: 'Refresh token already set from response body above',
@@ -257,7 +258,7 @@ export async function POST(request: NextRequest) {
             preview: c.substring(0, 100) + '...',
           };
         }),
-      });
+      })}`);
       
       // Forward other cookies (not refresh_token, as we set it manually above)
       allSetCookies.forEach((cookie) => {
@@ -268,9 +269,9 @@ export async function POST(request: NextRequest) {
         
         // Skip refresh_token cookie - we set it manually from response body with correct attributes
         if (isRefreshTokenCookie) {
-          console.log('[REFRESH_API] Skipping refresh_token from Set-Cookie (already set from response body)', {
+          loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Skipping refresh_token from Set-Cookie (already set from response body) ${JSON.stringify({
             reason: 'Manually set with correct domain/path attributes',
-          });
+          })}`);
           return;
         }
         
@@ -280,26 +281,26 @@ export async function POST(request: NextRequest) {
                           cookie.match(/^[^=]+=\s*;\s*Expires=/);
         
         if (isDeletion) {
-          console.log('[REFRESH_API] Skipping cookie deletion header');
+          loggingCustom(LogType.LOGIN_LOG, 'log', '[REFRESH_API] Skipping cookie deletion header');
           return;
         }
         
         // Forward other cookies (session tokens, etc.)
         nextResponse.headers.append('set-cookie', cookie);
-        console.log('[REFRESH_API] Forwarded Set-Cookie header (non-refresh-token)', {
+        loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Forwarded Set-Cookie header (non-refresh-token) ${JSON.stringify({
           cookieName,
-        });
+        })}`);
       });
 
       return nextResponse;
     }
   } catch (error) {
     const duration = Date.now() - startTime;
-    console.error('[REFRESH_API] Error during token refresh', {
+    loggingCustom(LogType.LOGIN_LOG, 'error', `[REFRESH_API] Error during token refresh ${JSON.stringify({
       error: error instanceof Error ? error.message : String(error),
       duration: `${duration}ms`,
       stack: error instanceof Error ? error.stack : undefined,
-    });
+    })}`);
     return NextResponse.json(
       {
         success: false,

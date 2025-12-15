@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
       applyTokenCookies(response, result.tokens);
       loggingCustom(LogType.LOGIN_LOG, 'debug', 'Token cookies applied');
       
-      console.log('[LOGIN_API] Login successful (Demo Mode)', {
+      loggingCustom(LogType.LOGIN_LOG, 'log', `[LOGIN_API] Login successful (Demo Mode) ${JSON.stringify({
         hasAccessToken: !!result.tokens?.accessToken,
         hasRefreshToken: !!result.tokens?.refreshToken,
         accessTokenStorage: 'RETURNED IN RESPONSE BODY (client stores in MEMORY)',
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
         accessTokenLength: result.tokens?.accessToken?.length || 0,
         refreshTokenInCookie: true,
         accessTokenInCookie: false,
-      });
+      })}`);
       
       loggingCustom(LogType.LOGIN_LOG, 'info', '========== LOGIN API COMPLETED SUCCESSFULLY (DEMO MODE) ==========');
       return response;
@@ -265,7 +265,7 @@ export async function POST(request: NextRequest) {
     forwardSetCookieHeaders(upstreamResponse, response);
     
     const accessToken = upstreamJson?.tokens?.accessToken;
-    console.log('[LOGIN_API] Login successful (External Auth)', {
+    loggingCustom(LogType.LOGIN_LOG, 'log', `[LOGIN_API] Login successful (External Auth) ${JSON.stringify({
       hasAccessToken: !!accessToken,
       hasRefreshToken: !!upstreamJson?.tokens?.refreshToken,
       accessTokenStorage: 'RETURNED IN RESPONSE BODY (client stores in MEMORY)',
@@ -273,7 +273,7 @@ export async function POST(request: NextRequest) {
       accessTokenLength: accessToken?.length || 0,
       refreshTokenInCookie: true,
       accessTokenInCookie: false,
-    });
+    })}`);
     
     loggingCustom(LogType.LOGIN_LOG, 'info', '========== LOGIN API COMPLETED SUCCESSFULLY (EXTERNAL AUTH) ==========');
     return response;

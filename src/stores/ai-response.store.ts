@@ -8,6 +8,8 @@ import {
   notifyEncryptedSessionStorageChange,
 } from '@/gradian-ui/shared/utils/session-storage-encrypted';
 import { getZustandDevToolsConfig } from '@/gradian-ui/shared/utils/zustand-devtools.util';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 const STORAGE_KEY = 'ai-response-store';
 const MAX_RESPONSES_PER_AGENT = 5; // Keep only the last 5 responses per agent/format
@@ -53,7 +55,7 @@ export const useAiResponseStore = create<AiResponseState>()(
       saveResponse: async (agentId, format, content, tokenUsage, duration) => {
         // Skip storing very large content (like base64 images) to prevent quota issues
         if (content.length > MAX_CONTENT_LENGTH) {
-          console.warn(`[ai-response-store] Content too large (${content.length} bytes), skipping storage to prevent quota issues`);
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-response-store] Content too large (${content.length} bytes), skipping storage to prevent quota issues`);
           // Clear the latest response entry for this agent/format to prevent showing stale cached data
           const latestKey = generateLatestKey(agentId, format);
           const state = get();
@@ -74,7 +76,7 @@ export const useAiResponseStore = create<AiResponseState>()(
             });
           } catch (error: any) {
             // Silently fail if storage is full - we're already skipping storage
-            console.warn('[ai-response-store] Failed to persist cleared latest response:', error);
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-response-store] Failed to persist cleared latest response: ${error instanceof Error ? error.message : String(error)}`);
           }
           
           // Don't update latestResponses when content is too large - return null to indicate no storage
@@ -142,7 +144,7 @@ export const useAiResponseStore = create<AiResponseState>()(
         } catch (error: any) {
           // Handle quota exceeded error by cleaning up more aggressively
           if (error?.name === 'QuotaExceededError' || error?.message?.includes('quota')) {
-            console.warn('[ai-response-store] Storage quota exceeded, cleaning up old responses...');
+            loggingCustom(LogType.CLIENT_LOG, 'warn', '[ai-response-store] Storage quota exceeded, cleaning up old responses...');
             
             // Clean up all but the latest response for each agent/format
             const cleanupState = get();
@@ -185,10 +187,10 @@ export const useAiResponseStore = create<AiResponseState>()(
                 latestResponses: retryState.latestResponses,
               });
             } catch (retryError) {
-              console.warn('[ai-response-store] Failed to persist after cleanup:', retryError);
+              loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-response-store] Failed to persist after cleanup: ${retryError instanceof Error ? retryError.message : String(retryError)}`);
             }
           } else {
-            console.warn('[ai-response-store] Failed to persist to encrypted storage:', error);
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-response-store] Failed to persist to encrypted storage: ${error instanceof Error ? error.message : String(error)}`);
           }
         }
 
@@ -221,7 +223,7 @@ export const useAiResponseStore = create<AiResponseState>()(
         updateResponse: async (key, content) => {
           // Skip storing very large content updates
           if (content.length > MAX_CONTENT_LENGTH) {
-            console.warn(`[ai-response-store] Content update too large (${content.length} bytes), skipping storage`);
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-response-store] Content update too large (${content.length} bytes), skipping storage`);
             return;
           }
 
@@ -257,9 +259,9 @@ export const useAiResponseStore = create<AiResponseState>()(
             });
           } catch (error: any) {
             if (error?.name === 'QuotaExceededError' || error?.message?.includes('quota')) {
-              console.warn('[ai-response-store] Storage quota exceeded during update, skipping update persistence');
+              loggingCustom(LogType.CLIENT_LOG, 'warn', '[ai-response-store] Storage quota exceeded during update, skipping update persistence');
             } else {
-              console.warn('[ai-response-store] Failed to persist update to encrypted storage:', error);
+              loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-response-store] Failed to persist update to encrypted storage: ${error instanceof Error ? error.message : String(error)}`);
             }
           }
         },
@@ -306,7 +308,7 @@ export const useAiResponseStore = create<AiResponseState>()(
               latestResponses: state.latestResponses,
             });
           } catch (error) {
-            console.warn('[ai-response-store] Failed to persist clear to encrypted storage:', error);
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-response-store] Failed to persist clear to encrypted storage: ${error instanceof Error ? error.message : String(error)}`);
           }
         },
 
@@ -331,7 +333,7 @@ export const useAiResponseStore = create<AiResponseState>()(
               latestResponses: {},
             });
           } catch (error) {
-            console.warn('[ai-response-store] Failed to persist clearAll to encrypted storage:', error);
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-response-store] Failed to persist clearAll to encrypted storage: ${error instanceof Error ? error.message : String(error)}`);
           }
         },
       }),
@@ -351,7 +353,7 @@ if (typeof window !== 'undefined') {
       }
     })
     .catch((error) => {
-      console.warn('[ai-response-store] Failed to load initial state:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-response-store] Failed to load initial state: ${error instanceof Error ? error.message : String(error)}`);
     });
 
   // Listen for changes from other tabs

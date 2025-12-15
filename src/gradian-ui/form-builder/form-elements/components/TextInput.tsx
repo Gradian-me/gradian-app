@@ -5,6 +5,8 @@ import { TextInputProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
 import { baseInputClasses, getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { CopyContent } from './CopyContent';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export const TextInput = forwardRef<FormElementRef, TextInputProps>(
   (
@@ -72,7 +74,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
     const fieldReadOnly = (config as any).readonly ?? (config as any).readOnly ?? false;
     
     if (!config) {
-      console.error('TextInput: config is required');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'TextInput: config is required');
       return null;
     }
 

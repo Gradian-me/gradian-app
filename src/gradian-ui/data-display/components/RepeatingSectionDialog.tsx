@@ -18,6 +18,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Plus, List } from 'lucide-react';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { cn } from '@/gradian-ui/shared/utils';
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
@@ -298,7 +300,7 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
         const successCount = results.length - failedResults.length;
 
         if (failedResults.length > 0) {
-          console.error('Failed to create one or more relations from picker:', failedResults);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to create one or more relations from picker: ${JSON.stringify(failedResults)}`);
           const errorMessages = failedResults
             .map((r) => r.error || 'Unknown error')
             .join(', ');
@@ -321,7 +323,7 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
         // Refresh the table data
         await refresh();
       } catch (error) {
-        console.error('Error creating relation from picker:', error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Error creating relation from picker: ${error instanceof Error ? error.message : String(error)}`);
         toast.error('Error creating relation', {
           description: error instanceof Error ? error.message : 'An unexpected error occurred.',
         });
@@ -352,7 +354,7 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
         });
 
         if (!relationResponse.success) {
-          console.error('Failed to delete relation:', relationResponse.error);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to delete relation: ${relationResponse.error}`);
         } else if (
           deleteType === 'itemAndRelation' &&
           targetId &&
@@ -364,13 +366,13 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
             method: 'DELETE',
           });
           if (!itemResponse.success) {
-            console.error('Failed to delete target item:', itemResponse.error);
+            loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to delete target item: ${itemResponse.error}`);
           }
         }
 
         await refresh();
       } catch (error) {
-        console.error('Error removing relation:', error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Error removing relation: ${error instanceof Error ? error.message : String(error)}`);
       } finally {
         setDeleteConfirmDialog({ open: false, relationId: null, targetId: null });
       }
@@ -539,12 +541,12 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
                   });
 
                   if (!relationResponse.success) {
-                    console.error('Failed to create relation for new item:', relationResponse.error);
+                    loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to create relation for new item: ${relationResponse.error}`);
                   } else {
                     await refresh();
                   }
                 } catch (error) {
-                  console.error('Error creating relation for new item:', error);
+                  loggingCustom(LogType.CLIENT_LOG, 'error', `Error creating relation for new item: ${error instanceof Error ? error.message : String(error)}`);
                 }
               }
             }}

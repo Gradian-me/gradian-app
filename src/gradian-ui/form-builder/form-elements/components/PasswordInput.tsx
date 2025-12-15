@@ -5,6 +5,8 @@ import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { TextInputProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
 import { Eye, EyeOff } from 'lucide-react';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export const PasswordInput = forwardRef<FormElementRef, TextInputProps>(
   (
@@ -71,7 +73,7 @@ export const PasswordInput = forwardRef<FormElementRef, TextInputProps>(
     const fieldPlaceholder = placeholder || config?.placeholder || 'Enter password';
 
     if (!config) {
-      console.error('PasswordInput: config is required');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'PasswordInput: config is required');
       return null;
     }
 

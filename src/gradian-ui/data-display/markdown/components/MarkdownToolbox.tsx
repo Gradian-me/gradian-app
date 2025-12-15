@@ -7,6 +7,8 @@ import { Eye, FileCode, FileDown, Loader2, Pencil, Sparkles } from 'lucide-react
 import { toast } from 'sonner';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/lib/utils';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export interface MarkdownToolboxProps {
   viewMode: 'editor' | 'preview' | 'raw';
@@ -39,7 +41,7 @@ export function MarkdownToolbox({
       await onExportPdf();
       toast.success('PDF exported successfully');
     } catch (error) {
-      console.error('PDF export error:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `PDF export error: ${error instanceof Error ? error.message : String(error)}`);
       toast.error('Failed to export PDF. Please try again.');
     } finally {
       setIsExporting(false);

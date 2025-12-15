@@ -6,7 +6,8 @@ import fs from 'fs';
 import path from 'path';
 
 import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData } from './utils';
-import { SCHEMA_SUMMARY_EXCLUDED_KEYS } from '@/gradian-ui/shared/constants/application-variables';
+import { SCHEMA_SUMMARY_EXCLUDED_KEYS, LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 
 const SCHEMA_SUMMARY_EXCLUDED_KEY_SET = new Set<string>(SCHEMA_SUMMARY_EXCLUDED_KEYS);
 const MAX_SCHEMA_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
@@ -54,7 +55,11 @@ function clearSchemaCache() {
  */
 async function loadSchemas(): Promise<any[]> {
   if (!fs.existsSync(SCHEMA_FILE_PATH)) {
-    console.warn(`[API] Schemas file not found at: ${SCHEMA_FILE_PATH}`);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `[API] Schemas file not found at: ${SCHEMA_FILE_PATH}`,
+    );
     return [];
   }
   
@@ -68,7 +73,11 @@ async function loadSchemas(): Promise<any[]> {
     
     // Check if file is empty or just whitespace
     if (!fileContents || fileContents.trim().length === 0) {
-      console.warn(`[API] Schemas file is empty at: ${SCHEMA_FILE_PATH}`);
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'warn',
+        `[API] Schemas file is empty at: ${SCHEMA_FILE_PATH}`,
+      );
       return [];
     }
     
@@ -90,10 +99,18 @@ async function loadSchemas(): Promise<any[]> {
       }
     }
     
-    console.warn(`[API] Schemas file contains invalid data format at: ${SCHEMA_FILE_PATH}`);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `[API] Schemas file contains invalid data format at: ${SCHEMA_FILE_PATH}`,
+    );
     return [];
   } catch (error) {
-    console.error(`[API] Error parsing schemas file at ${SCHEMA_FILE_PATH}:`, error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `[API] Error parsing schemas file at ${SCHEMA_FILE_PATH}: ${error instanceof Error ? error.message : String(error)}`,
+    );
     throw new Error(`Failed to parse schemas file: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
@@ -204,7 +221,11 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error loading schemas:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error loading schemas: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       { 
         success: false, 
@@ -238,7 +259,11 @@ export async function POST(request: NextRequest) {
             if (section.repeatingConfig) {
               const isString = typeof section.repeatingConfig === 'string';
               if (isString) {
-                console.warn(`[POST /api/schemas] repeatingConfig is still a string at ${path}sections[${idx}].repeatingConfig:`, section.repeatingConfig.substring(0, 100));
+                loggingCustom(
+                  LogType.INFRA_LOG,
+                  'warn',
+                  `[POST /api/schemas] repeatingConfig is still a string at ${path}sections[${idx}].repeatingConfig: ${section.repeatingConfig.substring(0, 100)}`,
+                );
               } else {
                 console.log(`[POST /api/schemas] repeatingConfig normalized at ${path}sections[${idx}].repeatingConfig`);
               }
@@ -351,11 +376,19 @@ export async function POST(request: NextRequest) {
         },
       }).catch((error) => {
         // Log but don't fail the request if cache clearing fails
-        console.warn('Failed to clear cache after schema creation:', error);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `Failed to clear cache after schema creation: ${error instanceof Error ? error.message : String(error)}`,
+        );
       });
     } catch (error) {
       // Log but don't fail the request if cache clearing fails
-      console.warn('Error clearing cache after schema creation:', error);
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'warn',
+        `Error clearing cache after schema creation: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     // Return single object if single was sent, array if array was sent
@@ -370,7 +403,11 @@ export async function POST(request: NextRequest) {
       message
     }, { status: 201 });
   } catch (error) {
-    console.error('Error creating schema:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error creating schema: ${error instanceof Error ? error.message : String(error)}`,
+    );
     
     // Handle JSON parsing errors
     if (error instanceof SyntaxError) {

@@ -3,6 +3,9 @@
  * Exports markdown content as PDF with A4 portrait formatting
  */
 
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+
 // Type declarations for external libraries
 type JsPDF = any;
 type Html2Canvas = any;
@@ -286,7 +289,7 @@ export async function exportMarkdownToPdf(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     // Log error for debugging (in production, use proper logging service)
     if (process.env.NODE_ENV === 'development') {
-      console.error('Error exporting PDF:', errorMessage);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error exporting PDF: ${errorMessage}`);
     }
     throw new Error('Failed to export PDF. Please try again.');
   }
@@ -337,7 +340,7 @@ function preprocessColorsForHtml2Canvas(element: HTMLElement): void {
           // Security: Don't log sensitive information
           // Silently continue if a property can't be processed
           if (process.env.NODE_ENV === 'development') {
-            console.warn(`Failed to process color property ${prop}`);
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to process color property ${prop}`);
           }
         }
       });
@@ -444,7 +447,7 @@ export async function exportMarkdownToPdfAdvanced(
     // Security: Don't expose internal error details
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     if (process.env.NODE_ENV === 'development') {
-      console.error('Error exporting PDF (advanced):', errorMessage);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error exporting PDF (advanced): ${errorMessage}`);
     }
     // Fallback to canvas-based export
     return exportMarkdownToPdf(element, options);

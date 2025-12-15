@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 import { useCompanyStore } from '@/stores/company.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useTheme } from 'next-themes';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface Company {
   id: string | number;
@@ -92,7 +94,7 @@ export function CompanySelector({
       setCompanies(mappedCompanies);
       setLoading(false);
     } catch (error) {
-      console.error('Error loading companies from tenant-store:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading companies from tenant-store: ${error instanceof Error ? error.message : String(error)}`);
       setCompanies([]);
       setLoading(false);
     }
@@ -145,7 +147,7 @@ export function CompanySelector({
 
   
   const handleCompanySelect = (company: Company) => {
-    console.log('Company selected:', company);
+    loggingCustom(LogType.CLIENT_LOG, 'log', `Company selected: ${JSON.stringify(company)}`);
     setSelectedCompany(company);
     // Set cookie for server-side access
     if (typeof document !== 'undefined') {

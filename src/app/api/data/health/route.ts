@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 const DATA_FILE = join(process.cwd(), 'data', 'health.json');
 const DATA_DIR = join(process.cwd(), 'data');
@@ -22,7 +24,11 @@ async function ensureDataFile(): Promise<void> {
       await writeFile(DATA_FILE, JSON.stringify(defaultServices, null, 2), 'utf-8');
     }
   } catch (error) {
-    console.error('Error ensuring data file:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error ensuring data file: ${error instanceof Error ? error.message : String(error)}`,
+    );
     // Continue anyway - will handle in read operations
   }
 }
@@ -42,7 +48,11 @@ async function readHealthServices(): Promise<any[]> {
       await ensureDataFile();
       return [];
     }
-    console.error('Error reading health services:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error reading health services: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return [];
   }
 }
@@ -79,7 +89,11 @@ export async function GET(request: NextRequest) {
       count: filteredServices.length
     });
   } catch (error) {
-    console.error('Error in GET /api/data/health:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error in GET /api/data/health: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,
@@ -147,7 +161,11 @@ export async function POST(request: NextRequest) {
       data: newService
     }, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/data/health:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error in POST /api/data/health: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,
@@ -206,7 +224,11 @@ export async function PUT(request: NextRequest) {
       data: healthServices[index]
     });
   } catch (error) {
-    console.error('Error in PUT /api/data/health:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error in PUT /api/data/health: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,
@@ -253,7 +275,11 @@ async function updateHealthServiceField(
       data: healthServices[index]
     };
   } catch (error) {
-    console.error(`Error updating ${field} for health service:`, error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error updating ${field} for health service: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return {
       success: false,
       error: error instanceof Error ? error.message : `Failed to update ${field}`
@@ -306,7 +332,11 @@ export async function PATCH(request: NextRequest) {
       data: result.data
     });
   } catch (error) {
-    console.error('Error in PATCH /api/data/health:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error in PATCH /api/data/health: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,
@@ -362,7 +392,11 @@ export async function DELETE(request: NextRequest) {
       message: `Health service "${id}" deleted successfully`
     });
   } catch (error) {
-    console.error('Error in DELETE /api/data/health:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error in DELETE /api/data/health: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,

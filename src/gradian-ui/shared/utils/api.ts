@@ -266,14 +266,14 @@ export class ApiClient {
       ? await authTokenManager.getValidAccessToken()
       : null;
     
-    console.log('[API_CLIENT] request() - token retrieval', {
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - token retrieval ${JSON.stringify({
       endpoint,
       isAuthEndpoint,
       isOnAuthPage,
       hasAccessToken: accessToken !== null,
       tokenPreview: accessToken ? `${accessToken.substring(0, 20)}...` : null,
       tokenStorage: 'MEMORY_ONLY (not in cookies)',
-    });
+    })}`);
     
     const requestConfig: RequestInit = {
       headers: {
@@ -287,11 +287,11 @@ export class ApiClient {
     // Add Authorization header if we have an access token
     if (accessToken) {
       (requestConfig.headers as Record<string, string>)['Authorization'] = `Bearer ${accessToken}`;
-      console.log('[API_CLIENT] request() - Authorization header added', {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - Authorization header added ${JSON.stringify({
         headerLength: `Bearer ${accessToken}`.length,
-      });
+      })}`);
     } else {
-      console.log('[API_CLIENT] request() - no Authorization header (no access token)');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[API_CLIENT] request() - no Authorization header (no access token)');
     }
 
     requestConfig.headers = appendFingerprintHeader(requestConfig.headers);
@@ -302,19 +302,19 @@ export class ApiClient {
 
       // Handle 401 Unauthorized - token expired or invalid
       if (response.status === 401 && retryOn401 && !isAuthEndpoint && isBrowserEnvironment()) {
-        console.log('[API_CLIENT] request() - 401 received, attempting token refresh and retry', {
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - 401 received, attempting token refresh and retry ${JSON.stringify({
           endpoint,
           hadAccessToken: accessToken !== null,
-        });
+        })}`);
         
         // Attempt to refresh token
         const newToken = await authTokenManager.handleUnauthorized();
         
         if (newToken) {
-          console.log('[API_CLIENT] request() - token refreshed, retrying request', {
+          loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - token refreshed, retrying request ${JSON.stringify({
             endpoint,
             newTokenLength: newToken.length,
-          });
+          })}`);
           
           // Retry original request with new token
           const retryConfig: RequestInit = {
@@ -326,11 +326,11 @@ export class ApiClient {
           };
           
           const retryResponse = await fetch(url, retryConfig);
-          console.log('[API_CLIENT] request() - retry response', {
+          loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - retry response ${JSON.stringify({
             endpoint,
             status: retryResponse.status,
             ok: retryResponse.ok,
-          });
+          })}`);
           
           // Parse retry response
           const contentType = retryResponse.headers.get('content-type') || '';
@@ -370,9 +370,9 @@ export class ApiClient {
 
           return responseWithStatus;
         } else {
-          console.warn('[API_CLIENT] request() - token refresh failed, user will be redirected to login', {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[API_CLIENT] request() - token refresh failed, user will be redirected to login ${JSON.stringify({
             endpoint,
-          });
+          })}`);
           // Refresh failed - user will be redirected to login by authTokenManager
           return {
             success: false,
@@ -525,7 +525,7 @@ export async function apiRequest<T>(
       : baseHeaders;  
 
   if (isDev && callerName) {
-    console.info(`[apiRequest] ${method} ${endpoint} invoked by ${callerName}`);
+    loggingCustom(LogType.CLIENT_LOG, 'info', `[apiRequest] ${method} ${endpoint} invoked by ${callerName}`);
   }
   
   const normalizedEndpoint = method === 'GET' ? normalizeEndpointWithParams(endpoint, options?.params) : endpoint;

@@ -5,6 +5,8 @@ import { existsSync } from 'fs';
 import { ulid } from 'ulid';
 import { AppVersion, VersionChange, Priority, ChangeType } from '@/domains/version-management/types';
 import { incrementVersion, compareVersions, parseVersion, formatVersion } from '@/domains/version-management/utils/version.utils';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 const DATA_FILE = join(process.cwd(), 'data', 'app-versions.json');
 const DATA_DIR = join(process.cwd(), 'data');
@@ -12,8 +14,8 @@ const PACKAGE_JSON_FILE = join(process.cwd(), 'package.json');
 
 // Debug: Log the resolved path (only in development)
 if (process.env.NODE_ENV === 'development') {
-  console.log('DATA_FILE path:', DATA_FILE);
-  console.log('Current working directory:', process.cwd());
+  loggingCustom(LogType.INFRA_LOG, 'log', `DATA_FILE path: ${DATA_FILE}`);
+  loggingCustom(LogType.INFRA_LOG, 'log', `Current working directory: ${process.cwd()}`);
 }
 
 /**
@@ -29,7 +31,11 @@ async function ensureDataFile(): Promise<void> {
       await writeFile(DATA_FILE, JSON.stringify([], null, 2), 'utf-8');
     }
   } catch (error) {
-    console.error('Error ensuring data file:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error ensuring data file: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 
@@ -42,7 +48,7 @@ async function readVersions(): Promise<AppVersion[]> {
     
     // Check if file exists
     if (!existsSync(DATA_FILE)) {
-      console.error(`Data file does not exist at: ${DATA_FILE}`);
+      loggingCustom(LogType.INFRA_LOG, 'error', `Data file does not exist at: ${DATA_FILE}`);
       return [];
     }
     
@@ -50,14 +56,14 @@ async function readVersions(): Promise<AppVersion[]> {
     
     // Check if file is empty
     if (!fileContent || fileContent.trim().length === 0) {
-      console.error(`Data file is empty at: ${DATA_FILE}`);
+      loggingCustom(LogType.INFRA_LOG, 'error', `Data file is empty at: ${DATA_FILE}`);
       return [];
     }
     
     const versions = JSON.parse(fileContent);
     
     if (!Array.isArray(versions)) {
-      console.error(`Data file does not contain an array. Got: ${typeof versions}`);
+      loggingCustom(LogType.INFRA_LOG, 'error', `Data file does not contain an array. Got: ${typeof versions}`);
       return [];
     }
     
@@ -67,8 +73,12 @@ async function readVersions(): Promise<AppVersion[]> {
       await ensureDataFile();
       return [];
     }
-    console.error('Error reading versions:', error);
-    console.error(`Attempted to read from: ${DATA_FILE}`);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error reading versions: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    loggingCustom(LogType.INFRA_LOG, 'error', `Attempted to read from: ${DATA_FILE}`);
     return [];
   }
 }
@@ -89,7 +99,11 @@ async function readPackageJson(): Promise<any> {
     const fileContent = await readFile(PACKAGE_JSON_FILE, 'utf-8');
     return JSON.parse(fileContent);
   } catch (error) {
-    console.error('Error reading package.json:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error reading package.json: ${error instanceof Error ? error.message : String(error)}`,
+    );
     throw error;
   }
 }
@@ -103,7 +117,11 @@ async function updatePackageJsonVersion(newVersion: string): Promise<void> {
     packageJson.version = newVersion;
     await writeFile(PACKAGE_JSON_FILE, JSON.stringify(packageJson, null, 2) + '\n', 'utf-8');
   } catch (error) {
-    console.error('Error updating package.json:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error updating package.json: ${error instanceof Error ? error.message : String(error)}`,
+    );
     throw error;
   }
 }
@@ -130,7 +148,11 @@ async function getCurrentVersion(): Promise<string> {
       }
     }
   } catch (error) {
-    console.error('Error reading package.json version:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error reading package.json version: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
   
   // Fallback: get latest version from versions file
@@ -213,7 +235,7 @@ function filterVersions(versions: AppVersion[], searchParams: URLSearchParams): 
 export async function GET(request: NextRequest) {
   try {
     const versions = await readVersions();
-    console.log(`Read ${versions.length} versions from file`);
+    loggingCustom(LogType.INFRA_LOG, 'log', `Read ${versions.length} versions from file`);
     
     const searchParams = request.nextUrl.searchParams;
     const filtered = filterVersions(versions, searchParams);
@@ -224,7 +246,11 @@ export async function GET(request: NextRequest) {
       count: filtered.length,
     });
   } catch (error) {
-    console.error('Error in GET /api/app/versions:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error in GET /api/app/versions: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,
@@ -312,7 +338,11 @@ export async function POST(request: NextRequest) {
       message: `Version ${newVersion} created successfully`,
     }, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/app/versions:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error in POST /api/app/versions: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,

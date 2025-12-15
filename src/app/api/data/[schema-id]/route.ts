@@ -10,6 +10,8 @@ import { isValidSchemaId, getSchemaById } from '@/gradian-ui/schema-manager/util
 import { loadAllCompanies, clearCompaniesCache } from '@/gradian-ui/shared/utils/companies-loader';
 import { isDemoModeEnabled, proxyDataRequest, enrichWithUsers, enrichEntitiesWithUsers } from '../utils';
 import { syncHasFieldValueRelationsForEntity, minimizePickerFieldValues, enrichEntitiesPickerFieldsFromRelations, enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 /**
  * Create controller instance for the given schema
@@ -83,7 +85,11 @@ export async function GET(
         });
       } catch (error) {
         // If cache fails, fall through to normal controller
-        console.warn('Companies cache load failed, using controller:', error);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `Companies cache load failed, using controller: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
 
@@ -147,7 +153,11 @@ export async function GET(
         return NextResponse.json(responseData, { status: response.status });
       } catch (error) {
         // If JSON parsing fails, return original response
-        console.warn('[GET /api/data] Failed to enrich response:', error);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `[GET /api/data] Failed to enrich response: ${error instanceof Error ? error.message : String(error)}`,
+        );
         return response;
       }
     }
@@ -192,7 +202,13 @@ export async function POST(
         body = await request.json();
       } catch (error) {
         // If body parsing fails, still try to proxy (might be empty body)
-        console.warn(`[POST /api/data/${schemaId}] Failed to parse request body, proxying with undefined body:`, error);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `[POST /api/data/${schemaId}] Failed to parse request body, proxying with undefined body: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
         body = undefined;
       }
       
@@ -202,7 +218,11 @@ export async function POST(
         method: 'POST',
       });
     } catch (error) {
-      console.error(`[POST /api/data/${schemaId}] Error proxying request:`, error);
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'error',
+        `[POST /api/data/${schemaId}] Error proxying request: ${error instanceof Error ? error.message : String(error)}`,
+      );
       return NextResponse.json(
         { 
           success: false, 
@@ -247,7 +267,11 @@ export async function POST(
             cleanedRequestBody = minimizeValues({ schema, data: requestBody });
           }
         } catch (error) {
-          console.warn('[POST /api/data] Failed to extract picker values:', error);
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'warn',
+            `[POST /api/data] Failed to extract picker values: ${error instanceof Error ? error.message : String(error)}`,
+          );
         }
       }
 
@@ -260,7 +284,11 @@ export async function POST(
       try {
         responseData = await response.json();
       } catch (error) {
-        console.warn('[POST /api/data] Failed to parse create response JSON:', error);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `[POST /api/data] Failed to parse create response JSON: ${error instanceof Error ? error.message : String(error)}`,
+        );
         responseData = null;
       }
 
@@ -296,7 +324,11 @@ export async function POST(
             responseData.data = minimizedEntity;
           }
         } catch (error) {
-          console.warn('[POST /api/data] Failed to sync HAS_FIELD_VALUE relations', error);
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'warn',
+            `[POST /api/data] Failed to sync HAS_FIELD_VALUE relations: ${error instanceof Error ? error.message : String(error)}`,
+          );
         }
       }
 
@@ -309,7 +341,11 @@ export async function POST(
           return NextResponse.json(responseData, { status: response.status });
         } catch (error) {
           // If JSON parsing fails, fall back to minimal response
-          console.warn('[POST /api/data] Failed to enrich response:', error);
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'warn',
+            `[POST /api/data] Failed to enrich response: ${error instanceof Error ? error.message : String(error)}`,
+          );
           return NextResponse.json(responseData, { status: response.status });
         }
       }

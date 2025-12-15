@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { hashPassword, verifyPassword, detectHashType } from '@/domains/auth/utils/password.util';
 import { readSchemaData, writeSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 type ChangePasswordRequestBody = {
   clientId?: string;
@@ -20,7 +22,11 @@ export async function POST(request: NextRequest) {
     const envSecretKey = process.env.SECRET_KEY ?? process.env.NEXT_PUBLIC_SECRET_KEY;
 
     if (!envClientId || !envSecretKey) {
-      console.error('[Password Change] CLIENT_ID or SECRET_KEY are missing from environment');
+      loggingCustom(
+        LogType.LOGIN_LOG,
+        'error',
+        '[Password Change] CLIENT_ID or SECRET_KEY are missing from environment',
+      );
       return NextResponse.json(
         {
           success: false,
@@ -134,7 +140,11 @@ export async function POST(request: NextRequest) {
       message: 'Password changed successfully',
     });
   } catch (error) {
-    console.error('Password change API error:', error);
+    loggingCustom(
+      LogType.LOGIN_LOG,
+      'error',
+      `Password change API error: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,

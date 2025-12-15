@@ -15,6 +15,9 @@
  * - Automatic retry: Queued requests retry after successful refresh
  */
 
+import { loggingCustom } from './logging-custom';
+import { LogType } from '../constants/application-variables';
+
 type QueuedRequest = {
   resolve: (token: string | null) => void;
   reject: (error: Error) => void;
@@ -39,11 +42,11 @@ class AuthTokenManager {
    */
   getAccessToken(): string | null {
     const hasToken = this.accessToken !== null;
-    console.log('[AUTH_TOKEN] getAccessToken()', {
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] getAccessToken() ${JSON.stringify({
       hasToken,
       tokenLength: this.accessToken?.length || 0,
       tokenPreview: this.accessToken ? `${this.accessToken.substring(0, 20)}...` : null,
-    });
+    })}`);
     return this.accessToken;
   }
 
@@ -71,14 +74,14 @@ class AuthTokenManager {
       }
     }
     
-    console.log('[AUTH_TOKEN] setAccessToken()', {
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] setAccessToken() ${JSON.stringify({
       hadToken,
       hasToken: token !== null,
       tokenLength: token?.length || 0,
       tokenPreview: token ? `${token.substring(0, 20)}...` : null,
       storage: 'MEMORY_ONLY (not in cookies/localStorage)',
       ...expirationInfo,
-    });
+    })}`);
   }
 
   /**
@@ -88,10 +91,10 @@ class AuthTokenManager {
   clearAccessToken(): void {
     const hadToken = this.accessToken !== null;
     this.accessToken = null;
-    console.log('[AUTH_TOKEN] clearAccessToken()', {
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] clearAccessToken() ${JSON.stringify({
       hadToken,
       reason: 'Token cleared from memory',
-    });
+    })}`);
   }
 
   /**
@@ -130,9 +133,9 @@ class AuthTokenManager {
       
       return parsed.exp || null;
     } catch (error) {
-      console.warn('[AUTH_TOKEN] Failed to decode token expiration', {
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `[AUTH_TOKEN] Failed to decode token expiration ${JSON.stringify({
         error: error instanceof Error ? error.message : String(error),
-      });
+      })}`);
       return null;
     }
   }
@@ -152,22 +155,22 @@ class AuthTokenManager {
     
     if (isExpired) {
       const expiredSecondsAgo = now - exp;
-      console.log('[AUTH_TOKEN] Token is expired', {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] Token is expired ${JSON.stringify({
         expirationTime: new Date(exp * 1000).toISOString(),
         currentTime: new Date(now * 1000).toISOString(),
         expiredSecondsAgo,
         exp,
         now,
-      });
+      })}`);
     } else {
       const expiresInSeconds = exp - now;
-      console.log('[AUTH_TOKEN] Token is valid', {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] Token is valid ${JSON.stringify({
         expirationTime: new Date(exp * 1000).toISOString(),
         currentTime: new Date(now * 1000).toISOString(),
         expiresInSeconds,
         exp,
         now,
-      });
+      })}`);
     }
 
     return isExpired;
@@ -179,35 +182,35 @@ class AuthTokenManager {
    * Queues concurrent requests while refresh is in progress
    */
   async refreshAccessToken(): Promise<string | null> {
-    console.log('[AUTH_TOKEN] refreshAccessToken() called', {
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] refreshAccessToken() called ${JSON.stringify({
       isOnLoginPage: this.isOnLoginPage(),
       hasRefreshPromise: this.refreshPromise !== null,
       isRefreshing: this.isRefreshing,
       queuedRequests: this.queuedRequests.length,
-    });
+    })}`);
 
     // Don't refresh if we're on login page (prevents redirect loops)
     if (this.isOnLoginPage()) {
-      console.log('[AUTH_TOKEN] refreshAccessToken() skipped - on login page');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] refreshAccessToken() skipped - on login page');
       return null;
     }
 
     // If refresh is already in progress, wait for it
     if (this.refreshPromise) {
-      console.log('[AUTH_TOKEN] refreshAccessToken() - waiting for existing refresh', {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] refreshAccessToken() - waiting for existing refresh ${JSON.stringify({
         queuedRequests: this.queuedRequests.length,
-      });
+      })}`);
       return this.refreshPromise;
     }
 
     // Prevent infinite refresh loops
     if (this.isRefreshing) {
-      console.log('[AUTH_TOKEN] refreshAccessToken() skipped - already refreshing');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] refreshAccessToken() skipped - already refreshing');
       return Promise.resolve(null);
     }
 
     this.isRefreshing = true;
-    console.log('[AUTH_TOKEN] refreshAccessToken() - starting new refresh');
+    loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] refreshAccessToken() - starting new refresh');
 
     // Create refresh promise that all concurrent requests will share
     this.refreshPromise = this.performRefresh();
@@ -215,11 +218,11 @@ class AuthTokenManager {
     try {
       const token = await this.refreshPromise;
       
-      console.log('[AUTH_TOKEN] refreshAccessToken() - refresh completed', {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] refreshAccessToken() - refresh completed ${JSON.stringify({
         success: token !== null,
         tokenLength: token?.length || 0,
         queuedRequestsResolved: this.queuedRequests.length,
-      });
+      })}`);
       
       // Resolve all queued requests with new token
       this.queuedRequests.forEach(({ resolve }) => {
@@ -230,10 +233,10 @@ class AuthTokenManager {
       return token;
     } catch (error) {
       const err = error instanceof Error ? error : new Error('Token refresh failed');
-      console.error('[AUTH_TOKEN] refreshAccessToken() - refresh failed', {
+      loggingCustom(LogType.CLIENT_LOG, 'error', `[AUTH_TOKEN] refreshAccessToken() - refresh failed ${JSON.stringify({
         error: err.message,
         queuedRequestsRejected: this.queuedRequests.length,
-      });
+      })}`);
       
       // Reject all queued requests
       this.queuedRequests.forEach(({ reject }) => {
@@ -248,7 +251,7 @@ class AuthTokenManager {
     } finally {
       this.refreshPromise = null;
       this.isRefreshing = false;
-      console.log('[AUTH_TOKEN] refreshAccessToken() - cleanup complete');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] refreshAccessToken() - cleanup complete');
     }
   }
 
@@ -258,10 +261,10 @@ class AuthTokenManager {
    */
   private async performRefresh(): Promise<string | null> {
     const startTime = Date.now();
-    console.log('[AUTH_TOKEN] performRefresh() - calling /api/auth/token/refresh', {
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] performRefresh() - calling /api/auth/token/refresh ${JSON.stringify({
       timestamp: new Date().toISOString(),
       refreshTokenSource: 'HttpOnly cookie (sent automatically with credentials: include)',
-    });
+    })}`);
 
     try {
       // Call refresh endpoint - refresh token is sent via HttpOnly cookie (withCredentials)
@@ -274,50 +277,50 @@ class AuthTokenManager {
       });
 
       const duration = Date.now() - startTime;
-      console.log('[AUTH_TOKEN] performRefresh() - response received', {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] performRefresh() - response received ${JSON.stringify({
         status: response.status,
         statusText: response.statusText,
         duration: `${duration}ms`,
         ok: response.ok,
-      });
+      })}`);
 
       if (!response.ok) {
         // Refresh failed - clear auth state
         this.clearAccessToken();
         
         if (response.status === 401 || response.status === 400) {
-          console.warn('[AUTH_TOKEN] performRefresh() - refresh failed (401/400)', {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[AUTH_TOKEN] performRefresh() - refresh failed (401/400) ${JSON.stringify({
             status: response.status,
             reason: 'Invalid or missing refresh token',
             action: 'Will redirect to login (if not already on login page)',
-          });
+          })}`);
           // Invalid or missing refresh token - redirect to login
           this.redirectToLogin();
           return null;
         }
         
         const errorMsg = `Token refresh failed: ${response.status} ${response.statusText}`;
-        console.error('[AUTH_TOKEN] performRefresh() - refresh failed', {
+        loggingCustom(LogType.CLIENT_LOG, 'error', `[AUTH_TOKEN] performRefresh() - refresh failed ${JSON.stringify({
           status: response.status,
           error: errorMsg,
-        });
+        })}`);
         throw new Error(errorMsg);
       }
 
       const data = await response.json();
-      console.log('[AUTH_TOKEN] performRefresh() - response parsed', {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] performRefresh() - response parsed ${JSON.stringify({
         success: data.success,
         hasAccessToken: !!data.accessToken,
         expiresIn: data.expiresIn,
         message: data.message,
-      });
+      })}`);
       
       if (!data.success || !data.accessToken) {
-        console.error('[AUTH_TOKEN] performRefresh() - invalid response', {
+        loggingCustom(LogType.CLIENT_LOG, 'error', `[AUTH_TOKEN] performRefresh() - invalid response ${JSON.stringify({
           success: data.success,
           hasAccessToken: !!data.accessToken,
           error: data.error,
-        });
+        })}`);
         this.clearAccessToken();
         this.redirectToLogin();
         return null;
@@ -325,12 +328,12 @@ class AuthTokenManager {
 
       // Store new access token in memory
       this.setAccessToken(data.accessToken);
-      console.log('[AUTH_TOKEN] performRefresh() - SUCCESS', {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] performRefresh() - SUCCESS ${JSON.stringify({
         tokenStored: true,
         storageLocation: 'MEMORY (not in cookies)',
         tokenLength: data.accessToken.length,
         expiresIn: data.expiresIn,
-      });
+      })}`);
       return data.accessToken;
     } catch (error) {
       const duration = Date.now() - startTime;
@@ -338,19 +341,19 @@ class AuthTokenManager {
       
       // Network errors or other failures
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        console.error('[AUTH_TOKEN] performRefresh() - network error', {
+        loggingCustom(LogType.CLIENT_LOG, 'error', `[AUTH_TOKEN] performRefresh() - network error ${JSON.stringify({
           error: error.message,
           duration: `${duration}ms`,
           action: 'Not redirecting - letting caller handle',
-        });
+        })}`);
         // Network error - don't redirect, let caller handle
         throw new Error('Network error during token refresh');
       }
       
-      console.error('[AUTH_TOKEN] performRefresh() - error', {
+      loggingCustom(LogType.CLIENT_LOG, 'error', `[AUTH_TOKEN] performRefresh() - error ${JSON.stringify({
         error: error instanceof Error ? error.message : String(error),
         duration: `${duration}ms`,
-      });
+      })}`);
       throw error;
     }
   }
@@ -365,16 +368,16 @@ class AuthTokenManager {
     const isOnLogin = this.isOnLoginPage();
     const hasToken = this.accessToken !== null;
     
-    console.log('[AUTH_TOKEN] getValidAccessToken() called', {
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] getValidAccessToken() called ${JSON.stringify({
       isOnLoginPage: isOnLogin,
       hasTokenInMemory: hasToken,
       hasRefreshPromise: this.refreshPromise !== null,
       queuedRequests: this.queuedRequests.length,
-    });
+    })}`);
 
     // Don't try to get token if we're on login page
     if (isOnLogin) {
-      console.log('[AUTH_TOKEN] getValidAccessToken() - skipped (on login page)');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] getValidAccessToken() - skipped (on login page)');
       return null;
     }
 
@@ -384,47 +387,47 @@ class AuthTokenManager {
       
       if (expired === true) {
         // Token is expired - clear it and refresh
-        console.log('[AUTH_TOKEN] getValidAccessToken() - token expired, clearing and refreshing', {
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] getValidAccessToken() - token expired, clearing and refreshing ${JSON.stringify({
           tokenLength: this.accessToken.length,
-        });
+        })}`);
         this.clearAccessToken();
         // Fall through to refresh logic below
       } else if (expired === false) {
         // Token is valid - return it
-        console.log('[AUTH_TOKEN] getValidAccessToken() - returning valid token from memory', {
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] getValidAccessToken() - returning valid token from memory ${JSON.stringify({
           tokenLength: this.accessToken.length,
           tokenPreview: `${this.accessToken.substring(0, 20)}...`,
-        });
+        })}`);
         return this.accessToken;
       } else {
         // Cannot determine expiration (invalid token format) - still return it
         // Server will reject if truly invalid and trigger 401 handling
-        console.warn('[AUTH_TOKEN] getValidAccessToken() - cannot determine expiration, returning token anyway', {
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `[AUTH_TOKEN] getValidAccessToken() - cannot determine expiration, returning token anyway ${JSON.stringify({
           tokenLength: this.accessToken.length,
-        });
+        })}`);
         return this.accessToken;
       }
     }
 
     // No token or token expired - check if refresh token exists
     if (!this.hasRefreshToken()) {
-      console.warn('[AUTH_TOKEN] getValidAccessToken() - no refresh token, redirecting to login');
+      loggingCustom(LogType.CLIENT_LOG, 'warn', '[AUTH_TOKEN] getValidAccessToken() - no refresh token, redirecting to login');
       this.redirectToLogin();
       return null;
     }
 
     // If refresh is in progress, queue this request
     if (this.refreshPromise) {
-      console.log('[AUTH_TOKEN] getValidAccessToken() - refresh in progress, queuing request', {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] getValidAccessToken() - refresh in progress, queuing request ${JSON.stringify({
         queuePosition: this.queuedRequests.length + 1,
-      });
+      })}`);
       return new Promise<string | null>((resolve, reject) => {
         this.queuedRequests.push({ resolve, reject });
       });
     }
 
     // Start refresh
-    console.log('[AUTH_TOKEN] getValidAccessToken() - no valid token, starting refresh');
+    loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] getValidAccessToken() - no valid token, starting refresh');
     return this.refreshAccessToken();
   }
 
@@ -433,17 +436,17 @@ class AuthTokenManager {
    * Returns new token if refresh succeeds, null otherwise
    */
   async handleUnauthorized(): Promise<string | null> {
-    console.log('[AUTH_TOKEN] handleUnauthorized() - 401 received, refreshing token');
+    loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] handleUnauthorized() - 401 received, refreshing token');
     
     // Clear stale token
     this.clearAccessToken();
     
     // Attempt refresh
     const newToken = await this.refreshAccessToken();
-    console.log('[AUTH_TOKEN] handleUnauthorized() - refresh result', {
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] handleUnauthorized() - refresh result ${JSON.stringify({
       success: newToken !== null,
       tokenLength: newToken?.length || 0,
-    });
+    })}`);
     return newToken;
   }
 

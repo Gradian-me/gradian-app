@@ -9,6 +9,8 @@ import React, { useMemo } from 'react';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/gradian-ui/shared/utils';
 import type { ResponseCardConfig } from '../types';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface ResponseCardViewerProps {
   response: string;
@@ -142,7 +144,7 @@ function extractCards(response: string, config: ResponseCardConfig[]): Array<{
 
     return cards;
   } catch (error) {
-    console.error('Error parsing response for cards:', error);
+    loggingCustom(LogType.CLIENT_LOG, 'error', `Error parsing response for cards: ${error instanceof Error ? error.message : String(error)}`);
     return [];
   }
 }

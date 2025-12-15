@@ -22,6 +22,8 @@ import { LanguageSelector } from "@/gradian-ui/form-builder/form-elements/compon
 import { CopyContent } from "@/gradian-ui/form-builder/form-elements/components/CopyContent";
 import { ButtonMinimal } from "@/gradian-ui/form-builder/form-elements/components/ButtonMinimal";
 import { MetricCard } from "@/gradian-ui/analytics/indicators/metric-card";
+import { loggingCustom } from "@/gradian-ui/shared/utils/logging-custom";
+import { LogType } from "@/gradian-ui/shared/constants/application-variables";
 
 const VoiceVisualizer = dynamic(
   () =>
@@ -107,9 +109,9 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
           setIsBlobLoaded(true);
         }, 100);
         
-        console.log('Audio blob loaded into visualizer:', recordedBlob.size, 'bytes', 'type:', recordedBlob.type);
+        loggingCustom(LogType.CLIENT_LOG, 'log', `Audio blob loaded into visualizer: ${recordedBlob.size} bytes, type: ${recordedBlob.type}`);
       } catch (error) {
-        console.warn('Failed to set preloaded audio blob:', error);
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to set preloaded audio blob: ${error instanceof Error ? error.message : String(error)}`);
         setIsBlobLoaded(false);
       }
     } else if (!recordedBlob) {
@@ -164,7 +166,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
       // Now start the actual recording
       await handleStartRecording();
     } catch (err) {
-      console.error('Permission request failed:', err);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Permission request failed: ${err instanceof Error ? err.message : String(err)}`);
       
       let errorMessage = '';
       let showHelp = false;
@@ -379,7 +381,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
         throw new Error(data.error || 'No transcription received');
       }
     } catch (error) {
-      console.error('Transcription error:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Transcription error: ${error instanceof Error ? error.message : String(error)}`);
       setTranscriptionError(
         error instanceof Error ? error.message : 'Failed to transcribe audio'
       );

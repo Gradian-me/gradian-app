@@ -174,7 +174,7 @@ const normalizeSchemaListResponse = (payload: unknown, context: NormalizeContext
         ? base.error
         : 'Unexpected response format from upstream schema service.';
     normalized.error = errorMessage;
-    console.warn('[schema-proxy] Unable to locate schema list array in upstream response.');
+    loggingCustom(LogType.INFRA_LOG, 'warn', '[schema-proxy] Unable to locate schema list array in upstream response.');
   }
 
   return normalized;
@@ -359,10 +359,10 @@ export const normalizeSchemaData = (data: any): any => {
       const result = normalizeSchemaData(parsed);
       // Log when we successfully parse a JSON string
       if (process.env.NODE_ENV === 'development') {
-        console.log('[normalizeSchemaData] Parsed JSON string to object:', {
+        loggingCustom(LogType.INFRA_LOG, 'log', `[normalizeSchemaData] Parsed JSON string to object: ${JSON.stringify({
           original: data.substring(0, 100),
           parsed: result
-        });
+        })}`);
       }
       return result;
     }
@@ -393,7 +393,7 @@ export const normalizeSchemaData = (data: any): any => {
         if (isJson && parsed !== undefined) {
           normalized[key] = normalizeSchemaData(parsed);
           if (process.env.NODE_ENV === 'development') {
-            console.log('[normalizeSchemaData] Normalized repeatingConfig from string to object');
+            loggingCustom(LogType.INFRA_LOG, 'log', '[normalizeSchemaData] Normalized repeatingConfig from string to object');
           }
         } else {
           // If it's not valid JSON, keep it as string (shouldn't happen, but handle gracefully)
@@ -417,7 +417,7 @@ export const proxySchemaRequest = async (
   const baseUrl = process.env.URL_SCHEMA_CRUD?.replace(/\/+$/, '');
 
   if (!baseUrl) {
-    console.error('URL_SCHEMA_CRUD environment variable is not defined.');
+    loggingCustom(LogType.INFRA_LOG, 'error', 'URL_SCHEMA_CRUD environment variable is not defined.');
     loggingCustom(
       LogType.CALL_BACKEND,
       'error',
@@ -722,7 +722,7 @@ export const proxySchemaRequest = async (
 
     return NextResponse.json(payload, { status: response.status });
   } catch (error) {
-    console.error('Failed to proxy schema request:', error);
+    loggingCustom(LogType.INFRA_LOG, 'error', `Failed to proxy schema request: ${error instanceof Error ? error.message : String(error)}`);
     loggingCustom(
       LogType.CALL_BACKEND,
       'error',

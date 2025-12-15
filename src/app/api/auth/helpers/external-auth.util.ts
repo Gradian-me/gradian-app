@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export function isServerDemoMode(): boolean {
   try {
@@ -9,7 +11,11 @@ export function isServerDemoMode(): boolean {
       (vars as any)?.LOGIN_LOCALLY ?? (vars as any)?.DEMO_MODE
     );
   } catch (error) {
-    console.warn('[auth] Failed to determine demo mode state:', error);
+    loggingCustom(
+      LogType.LOGIN_LOG,
+      'warn',
+      `[auth] Failed to determine demo mode state: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return true;
   }
 }

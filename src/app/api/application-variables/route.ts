@@ -3,6 +3,8 @@ import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { revalidatePath } from 'next/cache';
 import { clearApplicationVariablesCache, loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 const APPLICATION_VARIABLES_FILE = join(process.cwd(), 'data', 'application-variables.json');
 
@@ -187,7 +189,7 @@ export async function PUT(request: NextRequest) {
       // Also revalidate root pages that might use application variables
       revalidatePath('/', 'layout');
     } catch (error) {
-      console.warn('Could not revalidate application variables pages:', error);
+      loggingCustom(LogType.INFRA_LOG, 'warn', `Could not revalidate application variables pages: ${error instanceof Error ? error.message : String(error)}`);
       // Don't throw - cache clearing should still succeed even if revalidation fails
     }
 

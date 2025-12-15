@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { MarkdownViewer, MarkdownNavigation } from '@/gradian-ui/data-display/markdown';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface MarkdownPageClientProps {
   content: string;
@@ -27,21 +29,21 @@ export function MarkdownPageClient({
     headings: Array<{ id: string; text: string; level: number }>;
     activeHeadingId?: string;
   }) => {
-    console.log('📞 onNavigationData callback called with:', data);
+    loggingCustom(LogType.CLIENT_LOG, 'log', `📞 onNavigationData callback called with: ${JSON.stringify(data)}`);
     setNavigationData(data);
   }, []);
 
   // Debug: Check if headings are being extracted (only log once or when data actually changes)
   useEffect(() => {
     if (!hasLoggedRef.current || navigationData.headings.length > 0) {
-      console.log('=== Navigation Debug ===');
-      console.log('Navigation heading levels prop:', navigationHeadingLevels);
-      console.log('Navigation data:', navigationData);
-      console.log('Headings count:', navigationData.headings?.length || 0);
-      console.log('Headings:', navigationData.headings);
-      console.log('Active heading ID:', navigationData.activeHeadingId);
-      console.log('Will show navigation?', navigationData.headings && navigationData.headings.length > 0);
-      console.log('======================');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '=== Navigation Debug ===');
+      loggingCustom(LogType.CLIENT_LOG, 'log', `Navigation heading levels prop: ${JSON.stringify(navigationHeadingLevels)}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `Navigation data: ${JSON.stringify(navigationData)}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `Headings count: ${navigationData.headings?.length || 0}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `Headings: ${JSON.stringify(navigationData.headings)}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `Active heading ID: ${navigationData.activeHeadingId}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `Will show navigation? ${navigationData.headings && navigationData.headings.length > 0}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', '======================');
       hasLoggedRef.current = true;
     }
   }, [navigationData.headings.length, navigationHeadingLevels]);

@@ -643,18 +643,18 @@ export async function processImageRequest(
     
     // Log for debugging
     if (isDevelopment) {
-      console.log('[ai-image-utils] ===== IMAGE TYPE DETECTION =====');
-      console.log('[ai-image-utils] Request data body:', JSON.stringify(requestData.body, null, 2));
-      console.log('[ai-image-utils] bodyParams:', JSON.stringify(bodyParams, null, 2));
-      console.log('[ai-image-utils] promptParams:', JSON.stringify(promptParams, null, 2));
-      console.log('[ai-image-utils] formValues:', JSON.stringify(requestData.formValues, null, 2));
-      console.log('[ai-image-utils] Detected imageType:', imageType);
-      console.log('[ai-image-utils] imageTypePrompt exists:', !!imageTypePrompt);
-      console.log('[ai-image-utils] imageTypePrompt length:', imageTypePrompt?.length || 0);
-      console.log('[ai-image-utils] Available image types in IMAGE_TYPE_PROMPTS:', Object.keys(IMAGE_TYPE_PROMPTS));
-      console.log('[ai-image-utils] IMAGE_TYPE_PROMPTS[imageType]:', IMAGE_TYPE_PROMPTS[imageType] ? 'EXISTS' : 'NOT FOUND');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[ai-image-utils] ===== IMAGE TYPE DETECTION =====');
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] Request data body: ${JSON.stringify(requestData.body, null, 2)}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] bodyParams: ${JSON.stringify(bodyParams, null, 2)}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] promptParams: ${JSON.stringify(promptParams, null, 2)}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] formValues: ${JSON.stringify(requestData.formValues, null, 2)}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] Detected imageType: ${imageType}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] imageTypePrompt exists: ${!!imageTypePrompt}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] imageTypePrompt length: ${imageTypePrompt?.length || 0}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] Available image types in IMAGE_TYPE_PROMPTS: ${JSON.stringify(Object.keys(IMAGE_TYPE_PROMPTS))}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] IMAGE_TYPE_PROMPTS[imageType]: ${IMAGE_TYPE_PROMPTS[imageType] ? 'EXISTS' : 'NOT FOUND'}`);
       if (IMAGE_TYPE_PROMPTS[imageType]) {
-        console.log('[ai-image-utils] First 100 chars of imageTypePrompt:', IMAGE_TYPE_PROMPTS[imageType].substring(0, 100));
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] First 100 chars of imageTypePrompt: ${IMAGE_TYPE_PROMPTS[imageType].substring(0, 100)}`);
       }
     }
     
@@ -664,19 +664,19 @@ export async function processImageRequest(
       const originalPrompt = cleanPrompt;
       cleanPrompt = `${imageTypePrompt.trim()}\n\nUser Prompt: ${cleanPrompt}`;
       if (isDevelopment) {
-        console.log('[ai-image-utils] Applied image type prompt for', imageType);
-        console.log('[ai-image-utils] Image type prompt length:', imageTypePrompt.trim().length);
-        console.log('[ai-image-utils] Original prompt length:', originalPrompt.length);
-        console.log('[ai-image-utils] Final prompt length:', cleanPrompt.length);
-        console.log('[ai-image-utils] First 200 chars of final prompt:', cleanPrompt.substring(0, 200));
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] Applied image type prompt for ${imageType}`);
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] Image type prompt length: ${imageTypePrompt.trim().length}`);
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] Original prompt length: ${originalPrompt.length}`);
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] Final prompt length: ${cleanPrompt.length}`);
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] First 200 chars of final prompt: ${cleanPrompt.substring(0, 200)}`);
       }
     } else {
       // Log warning if imageType is set but no prompt found
       if (isDevelopment) {
         if (imageType && imageType !== 'standard' && imageType !== 'none') {
-          console.warn('[ai-image-utils] Image type is', imageType, 'but no prompt found in IMAGE_TYPE_PROMPTS');
-          console.warn('[ai-image-utils] Available image types:', Object.keys(IMAGE_TYPE_PROMPTS));
-          console.warn('[ai-image-utils] imageTypePrompt value:', imageTypePrompt);
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-image-utils] Image type is ${imageType} but no prompt found in IMAGE_TYPE_PROMPTS`);
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-image-utils] Available image types: ${JSON.stringify(Object.keys(IMAGE_TYPE_PROMPTS))}`);
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-image-utils] imageTypePrompt value: ${imageTypePrompt}`);
         }
       }
     }
@@ -772,7 +772,7 @@ export async function processImageRequest(
         const errorMessage = await parseErrorResponse(response);
         
         if (isDevelopment) {
-          console.error('Images API error:', errorMessage);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Images API error: ${errorMessage}`);
         }
 
         return {
@@ -796,7 +796,7 @@ export async function processImageRequest(
 
       // Log the response structure in development for debugging
       if (isDevelopment) {
-        console.log('Image API response structure:', JSON.stringify(data, null, 2).substring(0, 1000));
+        loggingCustom(LogType.CLIENT_LOG, 'log', `Image API response structure: ${JSON.stringify(data, null, 2).substring(0, 1000)}`);
       }
 
       // Extract image data - handle different possible response structures
@@ -908,7 +908,7 @@ export async function processImageRequest(
       // Handle timeout errors
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {
         if (isDevelopment) {
-          console.error('Request timeout in image generation API:', fetchError);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Request timeout in image generation API: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`);
         }
         return {
           success: false,
@@ -920,7 +920,7 @@ export async function processImageRequest(
     }
   } catch (error) {
     if (isDevelopment) {
-      console.error('Error in image generation request:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error in image generation request: ${error instanceof Error ? error.message : String(error)}`);
     }
     return {
       success: false,

@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { processAiAgent, AgentRequestData } from '@/domains/ai-builder/utils/ai-agent-utils';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 /**
  * Load AI agents from JSON file
@@ -178,7 +180,7 @@ export async function POST(
   } catch (error) {
     // Handle aborted requests or JSON parsing errors gracefully
     if (error instanceof SyntaxError) {
-      console.error('JSON parsing error in AI builder API:', error);
+      loggingCustom(LogType.INFRA_LOG, 'error', `JSON parsing error in AI builder API: ${error instanceof Error ? error.message : String(error)}`);
       return NextResponse.json(
         {
           success: false,
@@ -188,7 +190,7 @@ export async function POST(
       );
     }
 
-    console.error('Error in AI builder API:', error);
+    loggingCustom(LogType.INFRA_LOG, 'error', `Error in AI builder API: ${error instanceof Error ? error.message : String(error)}`);
     return NextResponse.json(
       {
         success: false,

@@ -4,6 +4,8 @@
  */
 
 import { encryptPayload, decryptPayload, type EncryptedPayload } from '@/gradian-ui/indexdb-manager/utils/crypto';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 const STORAGE_PREFIX = 'encrypted:';
 
@@ -18,7 +20,7 @@ export async function setEncryptedSessionStorage<T>(key: string, value: T): Prom
   try {
     const encrypted = await encryptPayload(value);
     if (!encrypted) {
-      console.warn(`[encrypted-session-storage] Failed to encrypt data for key: ${key}`);
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `[encrypted-session-storage] Failed to encrypt data for key: ${key}`);
       return false;
     }
 
@@ -27,7 +29,7 @@ export async function setEncryptedSessionStorage<T>(key: string, value: T): Prom
     
     // Check if the data is too large (sessionStorage typically has ~5-10MB limit)
     if (serialized.length > 4 * 1024 * 1024) { // 4MB threshold
-      console.warn(`[encrypted-session-storage] Data too large (${serialized.length} bytes) for key: ${key}, skipping storage`);
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `[encrypted-session-storage] Data too large (${serialized.length} bytes) for key: ${key}, skipping storage`);
       return false;
     }
 
@@ -36,11 +38,11 @@ export async function setEncryptedSessionStorage<T>(key: string, value: T): Prom
   } catch (error: any) {
     // Handle quota exceeded errors specifically
     if (error?.name === 'QuotaExceededError' || error?.message?.includes('quota')) {
-      console.error(`[encrypted-session-storage] Storage quota exceeded for key "${key}". Data size: ${JSON.stringify(value).length} bytes`);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `[encrypted-session-storage] Storage quota exceeded for key "${key}". Data size: ${JSON.stringify(value).length} bytes`);
       // Re-throw to allow caller to handle cleanup
       throw error;
     }
-    console.error(`[encrypted-session-storage] Error storing encrypted data for key "${key}":`, error);
+    loggingCustom(LogType.CLIENT_LOG, 'error', `[encrypted-session-storage] Error storing encrypted data for key "${key}": ${error instanceof Error ? error.message : String(error)}`);
     return false;
   }
 }
@@ -66,7 +68,7 @@ export async function getEncryptedSessionStorage<T>(key: string): Promise<T | nu
     
     return decrypted;
   } catch (error) {
-    console.error(`[encrypted-session-storage] Error retrieving encrypted data for key "${key}":`, error);
+    loggingCustom(LogType.CLIENT_LOG, 'error', `[encrypted-session-storage] Error retrieving encrypted data for key "${key}": ${error instanceof Error ? error.message : String(error)}`);
     return null;
   }
 }
@@ -119,7 +121,7 @@ export function onEncryptedSessionStorageChange(
           callback(decrypted);
         }
       } catch (error) {
-        console.error(`[encrypted-session-storage] Error handling storage change for key "${key}":`, error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `[encrypted-session-storage] Error handling storage change for key "${key}": ${error instanceof Error ? error.message : String(error)}`);
       }
     }
   };

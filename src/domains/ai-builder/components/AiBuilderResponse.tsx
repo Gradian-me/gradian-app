@@ -22,6 +22,8 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { useAiResponseStore } from '@/stores/ai-response.store';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
 import type { AiAgent, TokenUsage, SchemaAnnotation, AnnotationItem } from '../types';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface AiBuilderResponseProps {
   response: string;
@@ -285,7 +287,7 @@ export function AiBuilderResponse({
       }
       return null;
     } catch (e) {
-      console.warn('Failed to parse parallel image data:', e, 'Content:', imageResponse?.substring(0, 200));
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to parse parallel image data: ${e instanceof Error ? e.message : String(e)}, Content: ${imageResponse?.substring(0, 200)}`);
       return null;
     }
   }, [imageResponse]);
@@ -338,7 +340,7 @@ export function AiBuilderResponse({
       // If parsing fails and it's not an image format agent, silently return null
       // Only log warning if it's an image format agent (unexpected error)
       if (isImageFormat) {
-        console.warn('Failed to parse image data:', e, 'Content:', displayContent?.substring(0, 200));
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to parse image data: ${e instanceof Error ? e.message : String(e)}, Content: ${displayContent?.substring(0, 200)}`);
       }
       return null;
     }
@@ -509,7 +511,7 @@ export function AiBuilderResponse({
                         document.body.removeChild(a);
                         window.URL.revokeObjectURL(url);
                       } catch (error) {
-                        console.error('Error saving image:', error);
+                        loggingCustom(LogType.CLIENT_LOG, 'error', `Error saving image: ${error instanceof Error ? error.message : String(error)}`);
                       }
                     }}
                     className="h-8"
@@ -540,7 +542,7 @@ export function AiBuilderResponse({
                         
                         window.open(imageUrl, '_blank', 'noopener,noreferrer');
                       } catch (error) {
-                        console.error('Error opening image:', error);
+                        loggingCustom(LogType.CLIENT_LOG, 'error', `Error opening image: ${error instanceof Error ? error.message : String(error)}`);
                       }
                     }}
                     className="h-8"
@@ -736,7 +738,7 @@ export function AiBuilderResponse({
                     document.body.removeChild(a);
                     window.URL.revokeObjectURL(url);
                   } catch (error) {
-                    console.error('Error saving image:', error);
+                    loggingCustom(LogType.CLIENT_LOG, 'error', `Error saving image: ${error instanceof Error ? error.message : String(error)}`);
                   }
                 }}
                 className="h-8"
@@ -767,7 +769,7 @@ export function AiBuilderResponse({
                     
                     window.open(imageUrl, '_blank', 'noopener,noreferrer');
                   } catch (error) {
-                    console.error('Error opening image:', error);
+                    loggingCustom(LogType.CLIENT_LOG, 'error', `Error opening image: ${error instanceof Error ? error.message : String(error)}`);
                   }
                 }}
                 className="h-8"
@@ -898,7 +900,7 @@ export function AiBuilderResponse({
                         document.body.removeChild(a);
                         window.URL.revokeObjectURL(url);
                       } catch (error) {
-                        console.error('Error saving image:', error);
+                        loggingCustom(LogType.CLIENT_LOG, 'error', `Error saving image: ${error instanceof Error ? error.message : String(error)}`);
                       }
                     }}
                     className="h-8"
@@ -933,7 +935,7 @@ export function AiBuilderResponse({
                         // Open in new tab with data URL
                         window.open(imageUrl, '_blank', 'noopener,noreferrer');
                       } catch (error) {
-                        console.error('Error opening image:', error);
+                        loggingCustom(LogType.CLIENT_LOG, 'error', `Error opening image: ${error instanceof Error ? error.message : String(error)}`);
                       }
                     }}
                     className="h-8"

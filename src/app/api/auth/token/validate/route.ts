@@ -3,7 +3,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { validateToken, extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
-import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
+import { AUTH_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,7 +60,11 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Token validation API error:', error);
+    loggingCustom(
+      LogType.LOGIN_LOG,
+      'error',
+      `Token validation API error: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,
@@ -121,7 +126,11 @@ export async function GET(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Token validation API error:', error);
+    loggingCustom(
+      LogType.LOGIN_LOG,
+      'error',
+      `Token validation API error: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,

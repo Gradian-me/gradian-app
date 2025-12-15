@@ -8,6 +8,8 @@ import {
   readTwoFAEntries,
   writeTwoFAEntries,
 } from '../utils';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 const DEFAULT_TTL_SECONDS = 5 * 60;
 const MIN_REGEN_INTERVAL_MS = 10 * 1000;
@@ -35,7 +37,11 @@ export async function POST(request: Request) {
     const envSecretKey = process.env.SECRET_KEY;
 
     if (!envClientId || !envSecretKey) {
-      console.error('[2FA] CLIENT_ID or SECRET_KEY are missing from environment');
+      loggingCustom(
+        LogType.LOGIN_LOG,
+        'error',
+        '[2FA] CLIENT_ID or SECRET_KEY are missing from environment',
+      );
       return NextResponse.json(
         {
           success: false,
@@ -111,7 +117,11 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error('[2FA] Generate route error:', error);
+    loggingCustom(
+      LogType.LOGIN_LOG,
+      'error',
+      `[2FA] Generate route error: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,

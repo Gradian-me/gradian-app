@@ -15,6 +15,8 @@ import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/date-utils';
 import { NotificationDialog } from '@/domains/notifications/components/NotificationDialog';
 import { Notification as NotificationType } from '@/domains/notifications/types';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface NotificationsDropdownProps {
   initialCount?: number;
@@ -91,7 +93,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
           setNotifications(transformedNotifications);
         }
       } catch (error) {
-        console.error('Error fetching notifications:', error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching notifications: ${error instanceof Error ? error.message : String(error)}`);
         setNotifications([]);
         setNotificationCount(0);
       } finally {
@@ -147,7 +149,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
         setNotificationCount(totalUnreadCount);
       }
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error marking notification as read: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
@@ -174,7 +176,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
         );
       }
     } catch (error) {
-      console.error('Error acknowledging notification:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error acknowledging notification: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 
@@ -212,7 +214,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
         setNotificationCount(totalUnreadCount);
       }
     } catch (error) {
-      console.error('Error marking notification as unread:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error marking notification as unread: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
 

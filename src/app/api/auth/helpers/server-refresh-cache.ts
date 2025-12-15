@@ -1,3 +1,6 @@
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+
 /**
  * Server-side single-flight token refresh coordinator
  * 
@@ -86,11 +89,19 @@ function cleanupExpiredEntries(): void {
   
   keysToDelete.forEach(key => {
     recentRefreshResults.delete(key);
-    console.log(`[ServerRefreshCache] 🗑️ Cleaned up expired cache entry: ${key.substring(0, 50)}...`);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'log',
+      `[ServerRefreshCache] 🗑️ Cleaned up expired cache entry: ${key.substring(0, 50)}...`,
+    );
   });
   
   if (keysToDelete.length > 0) {
-    console.log(`[ServerRefreshCache] 🗑️ Cleaned up ${keysToDelete.length} expired cache entry/entries`);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'log',
+      `[ServerRefreshCache] 🗑️ Cleaned up ${keysToDelete.length} expired cache entry/entries`,
+    );
   }
 }
 
@@ -119,24 +130,48 @@ export function enqueueServerRefresh(
   // Use a more unique cache key to avoid collisions between old and new tokens
   const cacheKey = getCacheKey(refreshToken);
 
-  console.log(`[ServerRefreshCache] 🔍 Checking cache for token: ${cacheKey.substring(0, 50)}...`);
-  console.log(`[ServerRefreshCache] 📊 Cache stats: Ongoing promises: ${ongoingRefreshPromises.size}, Recent results: ${recentRefreshResults.size}`);
+  loggingCustom(
+    LogType.INFRA_LOG,
+    'log',
+    `[ServerRefreshCache] 🔍 Checking cache for token: ${cacheKey.substring(0, 50)}...`,
+  );
+  loggingCustom(
+    LogType.INFRA_LOG,
+    'log',
+    `[ServerRefreshCache] 📊 Cache stats: Ongoing promises: ${ongoingRefreshPromises.size}, Recent results: ${recentRefreshResults.size}`,
+  );
   
   // Log all cache keys for debugging
   if (recentRefreshResults.size > 0) {
     const allKeys = Array.from(recentRefreshResults.keys());
-    console.log(`[ServerRefreshCache] 🔑 All cached keys: ${allKeys.map(k => k.substring(0, 30) + '...').join(', ')}`);
-    console.log(`[ServerRefreshCache] 🔍 Looking for: ${cacheKey.substring(0, 30)}...`);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'log',
+      `[ServerRefreshCache] 🔑 All cached keys: ${allKeys.map(k => k.substring(0, 30) + '...').join(', ')}`,
+    );
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'log',
+      `[ServerRefreshCache] 🔍 Looking for: ${cacheKey.substring(0, 30)}...`,
+    );
     const keyMatches = allKeys.map(k => {
       const match = k === cacheKey;
       const age = recentRefreshResults.get(k) ? Date.now() - recentRefreshResults.get(k)!.timestamp : null;
       return match ? `✅ MATCH (age: ${age}ms)` : `❌ NO MATCH`;
     });
-    console.log(`[ServerRefreshCache] 🎯 Key comparison: ${keyMatches.join(', ')}`);
+    loggingCustom(LogType.INFRA_LOG, 'log', `[ServerRefreshCache] 🎯 Key comparison: ${keyMatches.join(', ')}`);
     
     // Also log the actual token being used (first 50 chars) for debugging
-    console.log(`[ServerRefreshCache] 🔑 Actual refresh token (first 50 chars): ${refreshToken.substring(0, 50)}...`);
-    console.log(`[ServerRefreshCache] 🔑 Cache key generated: ${cacheKey.substring(0, 50)}...`);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'log',
+      `[ServerRefreshCache] 🔑 Actual refresh token (first 50 chars): ${refreshToken.substring(0, 50)}...`,
+    );
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'log',
+      `[ServerRefreshCache] 🔑 Cache key generated: ${cacheKey.substring(0, 50)}...`,
+    );
   }
   
   // Step 1: Clean up expired entries (lazy cleanup - no setTimeout needed)
@@ -150,18 +185,34 @@ export function enqueueServerRefresh(
   const isResultValid = recentResult && resultAge !== null && resultAge < SUCCESS_CACHE_TTL;
   
   if (isResultValid) {
-    console.log(`[ServerRefreshCache] ✅ Found cached result (age: ${resultAge}ms) - reusing without calling refresh`);
-    console.log(`[ServerRefreshCache] 🚫 refreshFn() will NOT be called - returning cached result`);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'log',
+      `[ServerRefreshCache] ✅ Found cached result (age: ${resultAge}ms) - reusing without calling refresh`,
+    );
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'log',
+      `[ServerRefreshCache] 🚫 refreshFn() will NOT be called - returning cached result`,
+    );
     // Return the result - tokens will be in Set-Cookie headers, not from this cache
     return Promise.resolve(recentResult.result);
   }
   
   if (recentResult) {
-    console.log(`[ServerRefreshCache] ⚠️ Cached result expired (age: ${resultAge}ms, TTL: ${SUCCESS_CACHE_TTL}ms)`);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'log',
+      `[ServerRefreshCache] ⚠️ Cached result expired (age: ${resultAge}ms, TTL: ${SUCCESS_CACHE_TTL}ms)`,
+    );
     // Remove expired entry
     recentRefreshResults.delete(cacheKey);
   } else {
-    console.log(`[ServerRefreshCache] ℹ️ No cached result found for token: ${cacheKey.substring(0, 50)}...`);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'log',
+      `[ServerRefreshCache] ℹ️ No cached result found for token: ${cacheKey.substring(0, 50)}...`,
+    );
   }
   
   // Step 2: Check if a refresh is already in progress (single-flight pattern)
@@ -170,13 +221,25 @@ export function enqueueServerRefresh(
   // The promise will resolve with the result from the first refresh
   const existingPromise = ongoingRefreshPromises.get(cacheKey);
   if (existingPromise) {
-    console.log(`[ServerRefreshCache] ⏳ Refresh already in progress - waiting for it to complete`);
-    console.log(`[ServerRefreshCache] This request will reuse the result from the ongoing refresh (refreshFn will NOT be called again)`);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'log',
+      `[ServerRefreshCache] ⏳ Refresh already in progress - waiting for it to complete`,
+    );
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'log',
+      `[ServerRefreshCache] This request will reuse the result from the ongoing refresh (refreshFn will NOT be called again)`,
+    );
     return existingPromise;
   }
 
   // Create new refresh promise
-  console.log(`[ServerRefreshCache] Creating new refresh promise for token: ${cacheKey}...`);
+  loggingCustom(
+    LogType.INFRA_LOG,
+    'log',
+    `[ServerRefreshCache] Creating new refresh promise for token: ${cacheKey}...`,
+  );
   const refreshPromise = refreshFn()
     .then((result) => {
       // Store the result temporarily (for requests that come in before cookies are processed)
@@ -196,8 +259,16 @@ export function enqueueServerRefresh(
           result: resultWithOldToken,
           timestamp: Date.now(),
         });
-        console.log(`[ServerRefreshCache] ✅ Cached successful refresh result for OLD token: ${cacheKey.substring(0, 50)}...`);
-        console.log(`[ServerRefreshCache] Cache now has ${recentRefreshResults.size} entry/entries`);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'log',
+          `[ServerRefreshCache] ✅ Cached successful refresh result for OLD token: ${cacheKey.substring(0, 50)}...`,
+        );
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'log',
+          `[ServerRefreshCache] Cache now has ${recentRefreshResults.size} entry/entries`,
+        );
         
         // Also cache by the NEW refresh token (if provided)
         // This handles requests that come in with the new token before cookies are set
@@ -208,8 +279,16 @@ export function enqueueServerRefresh(
             result: resultWithOldToken,
             timestamp: Date.now(),
           });
-          console.log(`[ServerRefreshCache] ✅ Cached successful refresh result for NEW token: ${newTokenKey.substring(0, 50)}...`);
-          console.log(`[ServerRefreshCache] Entry will expire in ${SUCCESS_CACHE_TTL}ms (lazy cleanup on next access)`);
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'log',
+            `[ServerRefreshCache] ✅ Cached successful refresh result for NEW token: ${newTokenKey.substring(0, 50)}...`,
+          );
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'log',
+            `[ServerRefreshCache] Entry will expire in ${SUCCESS_CACHE_TTL}ms (lazy cleanup on next access)`,
+          );
         }
       }
       
@@ -220,12 +299,28 @@ export function enqueueServerRefresh(
       
       // Only log success if we actually have a token
       if (result.accessToken) {
-        console.log(`[ServerRefreshCache] ✅ Refresh completed successfully`);
-        console.log(`[ServerRefreshCache] Result cached for OLD token (will expire in ${SUCCESS_CACHE_TTL}ms, lazy cleanup)`);
-        console.log(`[ServerRefreshCache] Ongoing promises: ${ongoingRefreshPromises.size}, Cached results: ${recentRefreshResults.size}`);
+        loggingCustom(LogType.INFRA_LOG, 'log', `[ServerRefreshCache] ✅ Refresh completed successfully`);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'log',
+          `[ServerRefreshCache] Result cached for OLD token (will expire in ${SUCCESS_CACHE_TTL}ms, lazy cleanup)`,
+        );
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'log',
+          `[ServerRefreshCache] Ongoing promises: ${ongoingRefreshPromises.size}, Cached results: ${recentRefreshResults.size}`,
+        );
       } else {
-        console.log(`[ServerRefreshCache] ❌ Refresh completed but NO access token - refresh failed`);
-        console.log(`[ServerRefreshCache] Ongoing promises: ${ongoingRefreshPromises.size}, Cached results: ${recentRefreshResults.size}`);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'log',
+          `[ServerRefreshCache] ❌ Refresh completed but NO access token - refresh failed`,
+        );
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'log',
+          `[ServerRefreshCache] Ongoing promises: ${ongoingRefreshPromises.size}, Cached results: ${recentRefreshResults.size}`,
+        );
       }
       return result;
     })
@@ -233,7 +328,11 @@ export function enqueueServerRefresh(
       // On error, remove from ongoing promises so retry is possible
       // No setTimeout cleanup needed - using lazy cleanup instead
       ongoingRefreshPromises.delete(cacheKey);
-      console.log(`[ServerRefreshCache] ❌ Refresh failed with error, removed from ongoing promises: ${error instanceof Error ? error.message : String(error)}`);
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'log',
+        `[ServerRefreshCache] ❌ Refresh failed with error, removed from ongoing promises: ${error instanceof Error ? error.message : String(error)}`,
+      );
       throw error;
     });
 
@@ -254,6 +353,6 @@ export function clearRefreshCache(): void {
   ongoingRefreshPromises.clear();
   recentRefreshResults.clear();
   // No cleanup timers to clear - using lazy cleanup instead
-  console.log(`[ServerRefreshCache] 🗑️ Cache cleared manually`);
+  loggingCustom(LogType.INFRA_LOG, 'log', `[ServerRefreshCache] 🗑️ Cache cleared manually`);
 }
 

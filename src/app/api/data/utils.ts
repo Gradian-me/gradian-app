@@ -119,7 +119,7 @@ export async function enrichWithUsers(entity: any): Promise<any> {
     return enriched;
   } catch (error) {
     // If enrichment fails, return original entity
-    console.warn('[enrichWithUsers] Failed to enrich entity:', error);
+    loggingCustom(LogType.INFRA_LOG, 'warn', `[enrichWithUsers] Failed to enrich entity: ${error instanceof Error ? error.message : String(error)}`);
     return entity;
   }
 }
@@ -245,7 +245,7 @@ const normalizeDataListResponse = (payload: unknown, context: NormalizeContext) 
         ? base.error
         : 'Unexpected response format from upstream data service.';
     normalized.error = errorMessage;
-    console.warn('[data-proxy] Unable to locate data list array in upstream response.');
+    loggingCustom(LogType.INFRA_LOG, 'warn', '[data-proxy] Unable to locate data list array in upstream response.');
   }
 
   return normalized;
@@ -399,7 +399,7 @@ export const proxyDataRequest = async (
   const baseUrl = process.env.URL_DATA_CRUD?.replace(/\/+$/, '');
 
   if (!baseUrl) {
-    console.error('URL_DATA_CRUD environment variable is not defined.');
+    loggingCustom(LogType.INFRA_LOG, 'error', 'URL_DATA_CRUD environment variable is not defined.');
     loggingCustom(
       LogType.CALL_BACKEND,
       'error',
@@ -563,7 +563,7 @@ export const proxyDataRequest = async (
 
     return NextResponse.json(payload, { status: response.status });
   } catch (error) {
-    console.error('Failed to proxy data request:', error);
+    loggingCustom(LogType.INFRA_LOG, 'error', `Failed to proxy data request: ${error instanceof Error ? error.message : String(error)}`);
     loggingCustom(
       LogType.CALL_BACKEND,
       'error',

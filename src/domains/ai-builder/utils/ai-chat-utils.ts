@@ -50,7 +50,7 @@ function loadAiModels(): any[] {
     const resolvedPath = path.resolve(dataPath);
     const dataDir = path.resolve(process.cwd(), 'data');
     if (!resolvedPath.startsWith(dataDir)) {
-      console.error('Invalid models file path');
+      loggingCustom(LogType.INFRA_LOG, 'error', 'Invalid models file path');
       return [];
     }
     
@@ -65,7 +65,7 @@ function loadAiModels(): any[] {
     // Security: Use safe JSON parsing with size limits
     const parseResult = safeJsonParse(fileContents, 1 * 1024 * 1024); // 1MB max for models file
     if (!parseResult.success || !Array.isArray(parseResult.data)) {
-      console.error('Invalid models file format');
+      loggingCustom(LogType.INFRA_LOG, 'error', 'Invalid models file format');
       return [];
     }
     
@@ -73,7 +73,7 @@ function loadAiModels(): any[] {
     modelsCacheTime = now;
     return cachedModels;
   } catch (error) {
-    console.error('Error loading AI models:', error);
+    loggingCustom(LogType.INFRA_LOG, 'error', `Error loading AI models: ${error instanceof Error ? error.message : String(error)}`);
     return [];
   }
 }
@@ -190,7 +190,7 @@ export async function processChatRequest(
       try {
         preloadedContext = await preloadRoutes(agent.preloadRoutes, baseUrl);
       } catch (error) {
-        console.error('Error preloading routes:', error);
+        loggingCustom(LogType.INFRA_LOG, 'error', `Error preloading routes: ${error instanceof Error ? error.message : String(error)}`);
         // Continue even if preload fails
       }
     }
@@ -274,7 +274,7 @@ export async function processChatRequest(
         const errorMessage = await parseErrorResponse(response);
         
         if (isDevelopment) {
-          console.error('LLM API error:', errorMessage);
+          loggingCustom(LogType.INFRA_LOG, 'error', `LLM API error: ${errorMessage}`);
         }
 
         return {
@@ -370,7 +370,7 @@ export async function processChatRequest(
       // Handle timeout errors specifically
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {
         if (isDevelopment) {
-          console.error('Request timeout in AI chat request:', fetchError);
+          loggingCustom(LogType.INFRA_LOG, 'error', `Request timeout in AI chat request: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`);
         }
         return {
           success: false,
@@ -383,7 +383,7 @@ export async function processChatRequest(
     }
   } catch (error) {
     if (isDevelopment) {
-      console.error('Error in AI chat request:', error);
+      loggingCustom(LogType.INFRA_LOG, 'error', `Error in AI chat request: ${error instanceof Error ? error.message : String(error)}`);
     }
     return {
       success: false,
