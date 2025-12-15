@@ -3269,6 +3269,20 @@
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": []
+    },
+    {
+      "menuTitle": "Chatbot",
+      "menuIcon": "Bot",
+      "hideInAD": false,
+      "description": "AI-powered conversations with agent orchestration",
+      "menuUrl": "/chat",
+      "openInNewTab": false,
+      "id": "01KBSICHATBOT0000000000000",
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": []
     }
   ],
   "status-groups": [

@@ -9,7 +9,7 @@ export interface AiAgent {
   label: string;
   icon: string;
   description: string;
-  agentType?: 'chat' | 'image-generation' | 'voice-transcription' | 'video-generation'; // Type of AI agent
+  agentType?: 'chat' | 'image-generation' | 'voice-transcription' | 'video-generation' | 'orchestrator'; // Type of AI agent
   requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video';
   model?: string;
   systemPrompt?: string;
@@ -38,6 +38,16 @@ export interface AiAgent {
     route: string;
   };
   responseCards?: ResponseCardConfig[];
+  // Orchestrator-specific fields
+  orchestrationRules?: OrchestrationRule[];
+  complexityThreshold?: number; // 0-1, when to create todos (default: 0.5)
+}
+
+export interface OrchestrationRule {
+  condition: string; // Condition to evaluate (e.g., "if output contains 'summary'")
+  thenAgentId: string; // Agent to call if condition is true
+  thenAgentType?: string; // Optional agent type override
+  inputMapping?: Record<string, string>; // Map output fields to input fields
 }
 
 export interface TokenUsage {

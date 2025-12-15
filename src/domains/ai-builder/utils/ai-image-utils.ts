@@ -480,7 +480,8 @@ Diverse
  */
 export async function processImageRequest(
   agent: any,
-  requestData: AgentRequestData
+  requestData: AgentRequestData,
+  baseUrl?: string
 ): Promise<AgentResponse> {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -856,9 +857,46 @@ export async function processImageRequest(
         b64Data = null;
       }
       
+      // If we have base64 data but no URL, save it and get URL
+      let savedUrl: string | null = null;
+      if (b64Data && !imageData.url && baseUrl) {
+        try {
+          // Prepare base64 string (add data URL prefix if needed)
+          let base64String = b64Data;
+          if (!base64String.startsWith('data:image/')) {
+            const mimeType = imageData.mimeType || 'image/png';
+            base64String = `data:${mimeType};base64,${base64String}`;
+          }
+          
+          // Save image via API
+          const saveResponse = await fetch(`${baseUrl}/api/images/save`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              base64: base64String,
+              mimeType: imageData.mimeType || 'image/png',
+            }),
+          });
+          
+          if (saveResponse.ok) {
+            const saveResult = await saveResponse.json();
+            if (saveResult.success && saveResult.url) {
+              savedUrl = saveResult.url;
+            }
+          }
+        } catch (saveError) {
+          if (isDevelopment) {
+            console.warn('Failed to save image, will use base64:', saveError);
+          }
+          // Continue with base64 if save fails
+        }
+      }
+      
       const result = {
-        url: imageData.url || null,
-        b64_json: b64Data,
+        url: imageData.url || savedUrl || null,
+        b64_json: savedUrl ? null : b64Data, // Remove base64 if we have URL
         revised_prompt: imageData.revised_prompt || null,
         mimeType: imageData.mimeType || null,
       };

@@ -41,35 +41,18 @@ export function CodeComponent({
   
   // Render LaTeX/Math code blocks with KaTeX
   if (normalizedLanguage === 'latex' || normalizedLanguage === 'math' || normalizedLanguage === 'katex') {
+    const mathContent = codeContent.trim();
+    if (!mathContent) {
+      return null;
+    }
+    
+    let html: string;
     try {
-      const mathContent = codeContent.trim();
-      if (!mathContent) {
-        return null;
-      }
-      
       // Render with KaTeX
-      const html = katex.renderToString(mathContent, {
+      html = katex.renderToString(mathContent, {
         throwOnError: false,
         displayMode: !inline, // Block mode for code blocks, inline for inline code
       });
-      
-      if (inline) {
-        // Inline math
-        return (
-          <span 
-            className="katex-inline"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
-        );
-      } else {
-        // Block math
-        return (
-          <div 
-            className="my-4 katex-display"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
-        );
-      }
     } catch (error) {
       // If KaTeX rendering fails, fall back to code display
       console.warn('KaTeX rendering error:', error);
@@ -84,6 +67,25 @@ export function CodeComponent({
           </div>
         );
       }
+      return null;
+    }
+    
+    if (inline) {
+      // Inline math
+      return (
+        <span 
+          className="katex-inline"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      );
+    } else {
+      // Block math
+      return (
+        <div 
+          className="my-4 katex-display"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      );
     }
   }
   

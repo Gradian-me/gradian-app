@@ -29,6 +29,11 @@ export interface MarkdownViewerProps {
    * When provided, shows an "Enhance with AI" button in the header
    */
   aiAgentId?: string;
+  /**
+   * Whether to show the EndLine component at the bottom
+   * Defaults to true
+   */
+  showEndLine?: boolean;
 }
 
 export interface TableParseResult {

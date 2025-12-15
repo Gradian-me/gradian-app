@@ -3126,5 +3126,51 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCFKEBDE11GETDQ3B8TX62QG",
+    "timestamp": "2025-12-14T23:34:17.000Z",
+    "version": "1.28.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "CHATBOT + AI ORCHESTRATOR to handle ToDo execution plan + Mentions + Hashtags + Bot Selector",
+        "priority": "High",
+        "affectedDomains": [
+          "chat",
+          "ai-builder",
+          "orchestrator"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Introduced styles for hashtags and mentions in globals.css to improve chat message formatting",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated loadAiAgents function in route.ts to implement caching for improved performance",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "performance",
+          "api"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented summary mode for AI agents in useAiAgents hook to optimize data fetching",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "performance",
+          "hooks"
+        ]
+      }
+    ]
   }
 ]

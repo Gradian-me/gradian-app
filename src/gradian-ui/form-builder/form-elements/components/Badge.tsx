@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Badge as RadixBadge } from '../../../../components/ui/badge';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../../../../components/ui/tooltip';
 import { BadgeProps } from '../types';
 import { cn } from '../../../shared/utils';
 
@@ -40,6 +41,7 @@ export const Badge: React.FC<BadgeProps> = ({
   size = 'md',
   color,
   className,
+  tooltip,
   children,
   ...props
 }) => {
@@ -71,11 +73,33 @@ export const Badge: React.FC<BadgeProps> = ({
     className
   );
 
-  return (
+  const badgeContent = (
     <RadixBadge className={badgeClasses} {...props}>
       {children}
     </RadixBadge>
   );
+
+  // Wrap in tooltip if tooltip prop is provided
+  if (tooltip) {
+    return (
+      <TooltipProvider delayDuration={200}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {badgeContent}
+          </TooltipTrigger>
+          <TooltipContent 
+            side="top" 
+            sideOffset={4}
+            className="z-50"
+          >
+            {tooltip}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  return badgeContent;
 };
 
 Badge.displayName = 'Badge';

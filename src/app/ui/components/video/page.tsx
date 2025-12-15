@@ -39,6 +39,7 @@ function VideoPageContent() {
   const [isLoadingList, setIsLoadingList] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
   const [showList, setShowList] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   const fetchVideoList = async () => {
     setIsLoadingList(true);
@@ -90,6 +91,82 @@ function VideoPageContent() {
         return 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
     }
   };
+
+  useEffect(() => {
+    if (!videoId) return;
+
+    let isMounted = true;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+    let isFetching = false; // Flag to prevent concurrent requests
+
+    // Fetch video status for debugging - returns true if polling should stop
+    const fetchDebugInfo = async (): Promise<boolean> => {
+      // Don't start a new request if one is already in progress
+      if (isFetching || !isMounted) {
+        return false;
+      }
+
+      isFetching = true;
+
+      try {
+        const statusResponse = await fetch(`/api/videos/${videoId}`);
+        if (!isMounted) {
+          isFetching = false;
+          return true;
+        }
+
+        if (!statusResponse.ok) {
+          isFetching = false;
+          return true; // Stop polling on error
+        }
+
+        const statusData = await statusResponse.json();
+        if (!isMounted) {
+          isFetching = false;
+          return true;
+        }
+
+        if (statusData.success && statusData.data) {
+          setDebugInfo(statusData.data);
+          
+          // Stop polling if video is completed or failed
+          const status = statusData.data.status?.toLowerCase();
+          if (status === 'completed' || status === 'succeeded' || status === 'failed' || status === 'error') {
+            isFetching = false;
+            return true; // Stop polling
+          }
+        }
+
+        isFetching = false;
+        return false; // Continue polling
+      } catch (error) {
+        console.error('Error fetching video debug info:', error);
+        isFetching = false;
+        return true; // Stop polling on error
+      }
+    };
+
+    // Initial fetch
+    fetchDebugInfo();
+
+    // Set up polling interval (every 2 seconds)
+    intervalId = setInterval(() => {
+      fetchDebugInfo().then((shouldStop) => {
+        if (shouldStop && intervalId) {
+          clearInterval(intervalId);
+          intervalId = null;
+        }
+      });
+    }, 2000);
+
+    // Cleanup
+    return () => {
+      isMounted = false;
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [videoId]);
 
   if (!videoId) {
     return (
@@ -244,100 +321,6 @@ function VideoPageContent() {
       </MainLayout>
     );
   }
-
-  const [debugInfo, setDebugInfo] = useState<any>(null);
-
-  useEffect(() => {
-    if (!videoId) return;
-
-    let isMounted = true;
-    let intervalId: ReturnType<typeof setInterval> | null = null;
-    let isFetching = false; // Flag to prevent concurrent requests
-
-    // Fetch video status for debugging - returns true if polling should stop
-    const fetchDebugInfo = async (): Promise<boolean> => {
-      // Don't start a new request if one is already in progress
-      if (isFetching || !isMounted) {
-        return false;
-      }
-
-      isFetching = true;
-
-      try {
-        const statusResponse = await fetch(`/api/videos/${videoId}`);
-        if (!isMounted) {
-          isFetching = false;
-          return true;
-        }
-
-        if (statusResponse.ok) {
-          const statusData = await statusResponse.json();
-          if (isMounted && statusData.success && statusData.data) {
-            const videoData = statusData.data;
-            setDebugInfo(videoData);
-            
-            // Check if video is completed, failed, or has an error - stop polling immediately
-            const status = videoData.status;
-            const isComplete = status === 'completed' || status === 'succeeded';
-            const isFailed = status === 'failed' || status === 'error' || videoData.error;
-            
-            isFetching = false;
-            
-            // If completed or failed, stop polling immediately
-            if (isComplete || isFailed) {
-              return true; // Return true to stop polling
-            }
-          }
-        }
-      } catch (error) {
-        if (isMounted) {
-          console.error('Error fetching debug info:', error);
-        }
-      } finally {
-        isFetching = false;
-      }
-      return false; // Continue polling if status check failed or video not complete
-    };
-
-    // Initial fetch and start polling if needed
-    const initPolling = async () => {
-      const shouldStop = await fetchDebugInfo();
-      
-      // If video is already completed/failed, don't start polling at all
-      if (!isMounted || shouldStop) {
-        return;
-      }
-      
-      // Only start polling if video is still processing
-      if (intervalId) return; // Don't create duplicate intervals
-      
-      // Refresh debug info every 5 seconds (less frequent to avoid excessive calls)
-      intervalId = setInterval(async () => {
-        if (!isMounted || isFetching) {
-          return;
-        }
-
-        const shouldStop = await fetchDebugInfo();
-        if (shouldStop) {
-          if (intervalId) {
-            clearInterval(intervalId);
-            intervalId = null;
-          }
-        }
-      }, 5000);
-    };
-
-    initPolling();
-
-    return () => {
-      isMounted = false;
-      isFetching = false;
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
-    };
-  }, [videoId]);
 
   return (
     <MainLayout title="Video Viewer">

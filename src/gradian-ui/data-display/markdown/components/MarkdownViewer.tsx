@@ -28,7 +28,8 @@ export function MarkdownViewer({
   stickyHeadings = [],
   navigationHeadingLevels = [],
   onNavigationData,
-  aiAgentId
+  aiAgentId,
+  showEndLine = true
 }: MarkdownViewerProps) {
   const [viewMode, setViewMode] = useState<'editor' | 'preview' | 'raw'>('preview');
   const [headings, setHeadings] = useState<Array<{ id: string; text: string; level: number }>>([]);
@@ -264,7 +265,7 @@ export function MarkdownViewer({
             readOnly={false}
             className="w-full"
           />
-          <EndLine />
+          {showEndLine && <EndLine />}
         </div>
       ) : viewMode === 'raw' ? (
         <div className="my-4">
@@ -274,7 +275,7 @@ export function MarkdownViewer({
             programmingLanguage="markdown"
             title="Raw Markdown"
           />
-          <EndLine />
+          {showEndLine && <EndLine />}
         </div>
       ) : (
         <article 
@@ -297,7 +298,7 @@ export function MarkdownViewer({
           >
             {displayContent}
           </ReactMarkdown>
-          <EndLine />
+          {showEndLine && <EndLine />}
         </article>
       )}
       {aiAgentId && (

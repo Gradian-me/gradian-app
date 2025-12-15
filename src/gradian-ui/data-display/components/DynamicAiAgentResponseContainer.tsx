@@ -520,7 +520,6 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
         clearTimeout(autoExecuteTimeoutRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [agent, isLoadingAgent, hasExecuted, action.runType, aiResponse, executeAgent]);
 
   // Handle refresh

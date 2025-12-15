@@ -1,0 +1,1033 @@
+/**
+ * AI Orchestrator Utilities
+ * Handles orchestrator agent requests with complexity analysis, todo generation, and agent chaining
+ */
+
+import { AgentRequestData, AgentResponse } from './ai-agent-utils';
+import { processAiAgent } from './ai-agent-utils';
+import { getApiUrlForAgentType } from './ai-agent-url';
+import { sanitizePrompt, getApiKey, sanitizeErrorMessage, safeJsonParse } from './ai-security-utils';
+import { createAbortController, parseErrorResponse, buildTimingInfo } from './ai-common-utils';
+import type { Todo, AgentChainStep } from '@/domains/chat/types';
+import fs from 'fs';
+import path from 'path';
+
+// Cache for agents list
+let cachedAgents: any[] | null = null;
+let agentsCacheTime: number = 0;
+const AGENTS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Load AI agents from JSON file with caching
+ */
+function loadAiAgents(): any[] {
+  const now = Date.now();
+  
+  if (cachedAgents !== null && (now - agentsCacheTime) < AGENTS_CACHE_TTL) {
+    return cachedAgents;
+  }
+
+  try {
+    const dataPath = path.join(process.cwd(), 'data', 'ai-agents.json');
+    const resolvedPath = path.resolve(dataPath);
+    const dataDir = path.resolve(process.cwd(), 'data');
+    
+    if (!resolvedPath.startsWith(dataDir)) {
+      console.error('Invalid agents file path');
+      return [];
+    }
+    
+    if (!fs.existsSync(resolvedPath)) {
+      cachedAgents = [];
+      agentsCacheTime = now;
+      return cachedAgents;
+    }
+    
+    const fileContents = fs.readFileSync(resolvedPath, 'utf8');
+    const parseResult = safeJsonParse(fileContents, 10 * 1024 * 1024); // 10MB max
+    
+    if (!parseResult.success || !Array.isArray(parseResult.data)) {
+      console.error('Invalid agents file format');
+      return [];
+    }
+    
+    cachedAgents = parseResult.data;
+    agentsCacheTime = now;
+    return cachedAgents;
+  } catch (error) {
+    console.error('Error loading AI agents:', error);
+    return [];
+  }
+}
+
+/**
+ * Check if the user prompt is a general question/FAQ that should be answered directly
+ */
+async function isGeneralQuestion(
+  userPrompt: string,
+  availableAgents: any[]
+): Promise<{ isGeneral: boolean; response?: string }> {
+  const apiKeyResult = getApiKey();
+  if (!apiKeyResult.key) {
+    return { isGeneral: false };
+  }
+
+  const agentsList = availableAgents
+    .filter(a => a.id !== 'orchestrator')
+    .map(a => `- ${a.id}: ${a.label} - ${a.description}`)
+    .join('\n');
+
+  const detectionPrompt = `Analyze this user message and determine if it's a general question, FAQ, or informational request that should be answered directly without using specific agents.
+
+User Message: "${userPrompt}"
+
+Available Agents:
+${agentsList}
+
+Examples of general questions that should be answered directly:
+- "How can I ask a question?"
+- "What are your capabilities?"
+- "What can you do?"
+- "How does this work?"
+- "What agents are available?"
+- "How do I use the orchestrator?"
+- General explanations, help requests, or FAQ-style questions
+- Questions about the system itself or how to interact with it
+
+Examples that require agents:
+- "Summarize this text" (requires professional-writing agent)
+- "Generate an image of a cat" (requires image-generator agent)
+- "Analyze this process" (requires process-analyst agent)
+- Specific tasks that need agent execution
+
+Respond with JSON:
+{
+  "isGeneral": true/false,
+  "reasoning": "Brief explanation"
+}
+
+If isGeneral is true, I will answer the question directly. If false, proceed with agent analysis.`;
+
+  const messages = [
+    {
+      role: 'system' as const,
+      content: 'You are an expert at distinguishing between general informational questions and specific task requests that require agent execution.',
+    },
+    {
+      role: 'user' as const,
+      content: detectionPrompt,
+    },
+  ];
+
+  const apiUrl = getApiUrlForAgentType('chat');
+  const { controller, timeoutId } = createAbortController(15000); // 15 seconds
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKeyResult.key}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages,
+        temperature: 0.3,
+        max_tokens: 500,
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error detecting general question:', errorText);
+      return { isGeneral: false };
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
+    
+    // Extract JSON from response
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return { isGeneral: false };
+    }
+
+    const result = safeJsonParse(jsonMatch[0]);
+    if (!result.success) {
+      return { isGeneral: false };
+    }
+
+    const parsed = result.data as { isGeneral: boolean; reasoning?: string };
+    
+    if (parsed.isGeneral) {
+      // Answer the general question directly
+      const answerPrompt = `You are a helpful AI assistant that can answer general questions about the system, provide guidance, and explain capabilities.
+
+Available Agents:
+${agentsList}
+
+User Question: "${userPrompt}"
+
+Provide a helpful, clear, and concise answer to the user's question. If the question is about available agents or capabilities, mention the relevant agents. Be friendly and informative.
+
+IMPORTANT: At the end of your response, add 2-4 relevant hashtags that summarize the topic or category of your answer. Use hashtags like #help, #guidance, #capabilities, #faq, #agents, etc. Place them at the end of your response on a new line or inline if appropriate.`;
+
+      const answerMessages = [
+        {
+          role: 'system' as const,
+          content: `You are a helpful AI orchestrator assistant. You can answer general questions, provide guidance, explain how to use the system, and describe available capabilities.
+
+You have access to various specialized agents that can:
+- Generate content (text, images, videos)
+- Analyze data and processes
+- Transcribe audio
+- Review code
+- And much more
+
+When answering questions about capabilities, mention relevant agents. When answering general questions, be helpful and informative.
+
+IMPORTANT: At the end of your response, add 2-4 relevant hashtags that summarize the topic or category of your answer. Use hashtags like #help, #guidance, #capabilities, #faq, #agents, etc. Place them at the end of your response on a new line or inline if appropriate.`,
+        },
+        {
+          role: 'user' as const,
+          content: answerPrompt,
+        },
+      ];
+
+      // Create a new AbortController for the answer fetch
+      const { controller: answerController, timeoutId: answerTimeoutId } = createAbortController(30000); // 30 seconds
+
+      try {
+        const answerResponse = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKeyResult.key}`,
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: answerMessages,
+            temperature: 0.7,
+            max_tokens: 1000,
+          }),
+          signal: answerController.signal,
+        });
+
+        clearTimeout(answerTimeoutId);
+
+        if (answerResponse.ok) {
+          const answerData = await answerResponse.json();
+          const answerContent = answerData.choices?.[0]?.message?.content || '';
+          return { isGeneral: true, response: answerContent };
+        }
+      } catch (answerError: any) {
+        if (answerError.name !== 'AbortError') {
+          console.error('Error answering general question:', answerError);
+        }
+        // Fall through to return isGeneral: false if answer fails
+      }
+    }
+
+    return { isGeneral: false };
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      console.log('General question detection aborted');
+    } else {
+      console.error('Error detecting general question:', error);
+    }
+    return { isGeneral: false };
+  }
+}
+
+/**
+ * Analyze complexity of user request using LLM
+ */
+async function analyzeComplexity(
+  userPrompt: string,
+  availableAgents: any[],
+  systemPrompt?: string
+): Promise<{ complexity: number; needsTodos: boolean; suggestedAgents: string[]; noRelevantAgents?: boolean }> {
+  const apiKeyResult = getApiKey();
+  if (!apiKeyResult.key) {
+    throw new Error(apiKeyResult.error || 'LLM_API_KEY is not configured');
+  }
+
+  const agentsList = availableAgents
+    .filter(a => a.id !== 'orchestrator') // Exclude orchestrator itself
+    .map(a => {
+      // Extract renderComponents that have sectionId "body" or "extra"
+      const bodyFields = (a.renderComponents || []).filter((comp: any) => comp.sectionId === 'body');
+      const extraFields = (a.renderComponents || []).filter((comp: any) => comp.sectionId === 'extra');
+      
+      let agentInfo = `- ${a.id}: ${a.label} (${a.agentType || 'chat'}) - ${a.description}`;
+      
+      // Add form field information if available
+      if (bodyFields.length > 0 || extraFields.length > 0) {
+        agentInfo += '\n  Configurable options:';
+        if (bodyFields.length > 0) {
+          agentInfo += `\n    Body fields: ${bodyFields.map((f: any) => `${f.name} (${f.component})`).join(', ')}`;
+        }
+        if (extraFields.length > 0) {
+          agentInfo += `\n    Extra fields: ${extraFields.map((f: any) => `${f.name} (${f.component})`).join(', ')}`;
+        }
+      }
+      
+      return agentInfo;
+    })
+    .join('\n');
+
+  const analysisPrompt = `Analyze the complexity of this user request and determine if it requires multiple agents or a todo list.
+
+User Request: "${userPrompt}"
+
+Available Agents:
+${agentsList}
+
+CRITICAL: Only suggest agents that are ACTUALLY RELEVANT to the user's request. If the user's request doesn't match any available agent's capabilities, return an empty suggestedAgents array.
+
+Respond with a JSON object:
+{
+  "complexity": 0.0-1.0, // 0 = simple (single agent), 1 = very complex (multiple agents, todos needed)
+  "needsTodos": true/false, // Whether a todo list should be created
+  "suggestedAgents": ["agent-id-1", "agent-id-2"], // List of agent IDs that should be used. EMPTY ARRAY if no agents match the request.
+  "reasoning": "Brief explanation",
+  "noRelevantAgents": true/false // Set to true if no available agents can handle this request
+}
+
+Consider:
+- Simple requests (complexity < 0.3): Single agent, no todos
+- Medium requests (0.3-0.7): May need 2-3 agents, conditional chaining
+- Complex requests (> 0.7): Multiple agents, todos required, approval needed
+- If the request doesn't match any agent's capabilities, set noRelevantAgents: true and suggestedAgents: []`;
+
+  const messages = [
+    {
+      role: 'system' as const,
+      content: systemPrompt || 'You are an AI orchestration expert that analyzes request complexity.',
+    },
+    {
+      role: 'user' as const,
+      content: analysisPrompt,
+    },
+  ];
+
+  const apiUrl = getApiUrlForAgentType('chat');
+  const { controller, timeoutId } = createAbortController(30000); // 30 seconds
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKeyResult.key}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages,
+        temperature: 0.3,
+        response_format: { type: 'json_object' },
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorMessage = await parseErrorResponse(response);
+      throw new Error(errorMessage || 'Failed to analyze complexity');
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+
+    if (!content) {
+      throw new Error('No response content from complexity analysis');
+    }
+
+    // Extract JSON from content - handle markdown code blocks or plain JSON
+    let jsonContent = content.trim();
+    
+    // Try to extract JSON from markdown code blocks
+    const jsonBlockMatch = jsonContent.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
+    if (jsonBlockMatch) {
+      jsonContent = jsonBlockMatch[1];
+    } else {
+      // Try to find JSON object in the content
+      const jsonObjectMatch = jsonContent.match(/\{[\s\S]*\}/);
+      if (jsonObjectMatch) {
+        jsonContent = jsonObjectMatch[0];
+      }
+    }
+
+    const parsed = safeJsonParse(jsonContent, 10000);
+    if (!parsed.success) {
+      // Log the actual content for debugging
+      console.error('Failed to parse complexity analysis response. Content:', content.substring(0, 500));
+      console.error('Extracted JSON:', jsonContent.substring(0, 500));
+      console.error('Parse error:', parsed.error);
+      throw new Error(`Failed to parse complexity analysis response: ${parsed.error || 'Invalid JSON format'}`);
+    }
+
+    const analysis = parsed.data;
+    
+    // Filter suggested agents to only include those that actually exist
+    const validSuggestedAgents = Array.isArray(analysis.suggestedAgents) 
+      ? analysis.suggestedAgents.filter((agentId: string) => 
+          availableAgents.some(a => a.id === agentId && a.id !== 'orchestrator')
+        )
+      : [];
+    
+    return {
+      complexity: Math.min(1.0, Math.max(0.0, analysis.complexity || 0.5)),
+      needsTodos: analysis.needsTodos || analysis.complexity > 0.7,
+      suggestedAgents: validSuggestedAgents,
+      noRelevantAgents: analysis.noRelevantAgents === true || validSuggestedAgents.length === 0,
+    };
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Complexity analysis timeout');
+    }
+    throw error;
+  }
+}
+
+/**
+ * Generate todo list from user prompt and available agents
+ */
+async function generateTodoList(
+  userPrompt: string,
+  suggestedAgents: string[],
+  availableAgents: any[],
+  systemPrompt?: string
+): Promise<Todo[]> {
+  const apiKeyResult = getApiKey();
+  if (!apiKeyResult.key) {
+    throw new Error(apiKeyResult.error || 'LLM_API_KEY is not configured');
+  }
+
+  // If no suggested agents, return empty array
+  if (!suggestedAgents || suggestedAgents.length === 0) {
+    return [];
+  }
+
+  const agentsInfo = availableAgents
+    .filter(a => suggestedAgents.includes(a.id))
+    .map(a => {
+      // Extract renderComponents that have sectionId "body" or "extra"
+      const bodyFields = (a.renderComponents || []).filter((comp: any) => comp.sectionId === 'body');
+      const extraFields = (a.renderComponents || []).filter((comp: any) => comp.sectionId === 'extra');
+      
+      return {
+        id: a.id,
+        label: a.label,
+        type: a.agentType || 'chat',
+        description: a.description,
+        // Include form fields/options that can be configured
+        formFields: {
+          body: bodyFields.map((comp: any) => ({
+            id: comp.id,
+            name: comp.name,
+            label: comp.label,
+            component: comp.component,
+            options: comp.options || [],
+            defaultValue: comp.defaultValue,
+            placeholder: comp.placeholder,
+            description: comp.description,
+          })),
+          extra: extraFields.map((comp: any) => ({
+            id: comp.id,
+            name: comp.name,
+            label: comp.label,
+            component: comp.component,
+            options: comp.options || [],
+            defaultValue: comp.defaultValue,
+            placeholder: comp.placeholder,
+            description: comp.description,
+          })),
+        },
+      };
+    });
+
+  const todoPrompt = `Based on this user request, create a detailed todo list that breaks down the work into steps, each assigned to an appropriate agent.
+
+User Request: "${userPrompt}"
+
+Available Agents:
+${JSON.stringify(agentsInfo, null, 2)}
+
+IMPORTANT: Each agent may have formFields with body and extra sections. These represent configurable options for the agent.
+- Analyze the user request to determine appropriate values for these fields
+- For select fields, choose the most appropriate option based on the user's intent
+- For text fields, extract relevant values from the user prompt
+- Include these values in the "input" field of each todo
+
+Create a JSON array of todos:
+[
+  {
+    "title": "Step description",
+    "description": "Detailed description",
+    "agentId": "agent-id",
+    "agentType": "agent-type",
+    "dependencies": ["todo-id-1"], // Optional: IDs of todos that must complete first
+    "input": { // Optional: Configuration values extracted from user prompt
+      "body": { // Values for fields with sectionId "body"
+        "fieldName": "value" // e.g., "imageType": "sketch" if user wants a sketch
+      },
+      "extra_body": { // Values for fields with sectionId "extra"
+        "fieldName": "value"
+      }
+    }
+  }
+]
+
+Order todos logically. Each todo should be assigned to one of the available agents.
+When an agent has formFields, analyze the user request and include appropriate values in the "input" field.`;
+
+  const messages = [
+    {
+      role: 'system' as const,
+      content: systemPrompt || 'You are an AI orchestration expert that creates detailed todo lists for multi-agent workflows.',
+    },
+    {
+      role: 'user' as const,
+      content: todoPrompt,
+    },
+  ];
+
+  const apiUrl = getApiUrlForAgentType('chat');
+  const { controller, timeoutId } = createAbortController(30000);
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKeyResult.key}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages,
+        temperature: 0.3,
+        response_format: { type: 'json_object' },
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorMessage = await parseErrorResponse(response);
+      throw new Error(errorMessage || 'Failed to generate todos');
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+
+    if (!content) {
+      throw new Error('No response content from todo generation');
+    }
+
+    // Extract JSON from content - handle markdown code blocks or plain JSON
+    let jsonContent = content.trim();
+    
+    // Try to extract JSON from markdown code blocks first
+    const jsonBlockMatch = jsonContent.match(/```(?:json)?\s*(\{[\s\S]*\}|\[[\s\S]*\])\s*```/);
+    if (jsonBlockMatch) {
+      jsonContent = jsonBlockMatch[1];
+    } else {
+      // Try to find JSON array start (todos are usually arrays)
+      const arrayStart = jsonContent.indexOf('[');
+      const objectStart = jsonContent.indexOf('{');
+      
+      if (arrayStart !== -1 && (objectStart === -1 || arrayStart < objectStart)) {
+        // Extract from array start
+        jsonContent = jsonContent.substring(arrayStart);
+      } else if (objectStart !== -1) {
+        // Extract from object start
+        jsonContent = jsonContent.substring(objectStart);
+      }
+    }
+
+    // Helper function to fix incomplete JSON
+    const tryFixIncompleteJson = (json: string): string => {
+      let fixed = json.trim();
+      
+      // Remove incomplete property at the end (e.g., "ag" or incomplete strings)
+      // Pattern: incomplete property like "ag" without closing quote and value
+      fixed = fixed.replace(/,\s*"[^"]*$/, ''); // Remove incomplete quoted property name
+      fixed = fixed.replace(/,\s*"[^"]*"\s*:\s*"[^"]*$/, ''); // Remove incomplete property with value
+      fixed = fixed.replace(/,\s*"[^"]*"\s*:\s*[^,}\]]+$/, ''); // Remove incomplete property with incomplete value
+      
+      // Remove trailing incomplete string values
+      fixed = fixed.replace(/:\s*"[^"]*$/, ': ""'); // Replace incomplete string with empty string
+      
+      // Count brackets and braces to ensure they're balanced
+      const openBrackets = (fixed.match(/\[/g) || []).length;
+      const closeBrackets = (fixed.match(/\]/g) || []).length;
+      const openBraces = (fixed.match(/\{/g) || []).length;
+      const closeBraces = (fixed.match(/\}/g) || []).length;
+      
+      // Close incomplete objects/arrays (close braces first, then brackets)
+      for (let i = 0; i < openBraces - closeBraces; i++) {
+        fixed += '}';
+      }
+      for (let i = 0; i < openBrackets - closeBrackets; i++) {
+        fixed += ']';
+      }
+      
+      return fixed;
+    };
+
+    // Try parsing the extracted JSON
+    let parsed = safeJsonParse(jsonContent, 100000);
+    
+    // If parsing fails, try to fix incomplete JSON
+    if (!parsed.success) {
+      console.warn('Initial JSON parse failed, attempting to fix incomplete JSON...');
+      const fixedJson = tryFixIncompleteJson(jsonContent);
+      parsed = safeJsonParse(fixedJson, 100000);
+      
+      if (!parsed.success) {
+        // Log the actual content for debugging
+        console.error('Failed to parse todo generation response. Content length:', content.length);
+        console.error('Content preview:', content.substring(0, 1000));
+        console.error('Extracted JSON length:', jsonContent.length);
+        console.error('Extracted JSON preview:', jsonContent.substring(0, 1000));
+        console.error('Fixed JSON length:', fixedJson.length);
+        console.error('Fixed JSON preview:', fixedJson.substring(0, 1000));
+        console.error('Parse error:', parsed.error);
+        throw new Error(`Failed to parse todo generation response: ${parsed.error || 'Invalid JSON format'}`);
+      }
+    }
+
+    // Extract todos array (might be wrapped in an object)
+    const todosData = parsed.data;
+    const todosArray = Array.isArray(todosData) 
+      ? todosData 
+      : Array.isArray(todosData.todos) 
+        ? todosData.todos 
+        : [];
+
+    // Convert to Todo format with ULIDs
+    const { ulid } = await import('ulid');
+    const todosWithIds = todosArray.map((todo: any, index: number) => ({
+      id: ulid(),
+      title: todo.title || 'Untitled Todo',
+      description: todo.description,
+      status: 'pending' as const,
+      agentId: todo.agentId,
+      agentType: todo.agentType,
+      dependencies: todo.dependencies || [],
+      input: todo.input || undefined, // Preserve input field (body/extra_body configuration)
+      createdAt: new Date().toISOString(),
+    }));
+
+    // Normalize dependencies: convert step references (Step 1, Step 2, etc.) or indices to actual todo IDs or titles
+    return todosWithIds.map((todo: Todo, index: number) => {
+      if (!todo.dependencies || todo.dependencies.length === 0) {
+        return todo;
+      }
+
+      const normalizedDeps = todo.dependencies.map((dep: string) => {
+        // Check if dependency is a step reference (Step 1, Step 2, etc.)
+        const stepMatch = dep.match(/^Step\s*(\d+)$/i);
+        if (stepMatch) {
+          const stepIndex = parseInt(stepMatch[1], 10) - 1; // Convert to 0-based index
+          if (stepIndex >= 0 && stepIndex < todosWithIds.length) {
+            // Use the todo ID of the referenced step
+            return todosWithIds[stepIndex].id;
+          }
+        }
+
+        // Check if dependency is a numeric index (1, 2, 3, etc.)
+        const numMatch = dep.match(/^(\d+)$/);
+        if (numMatch) {
+          const depIndex = parseInt(numMatch[1], 10) - 1; // Convert to 0-based index
+          if (depIndex >= 0 && depIndex < todosWithIds.length) {
+            return todosWithIds[depIndex].id;
+          }
+        }
+
+        // Check if dependency matches a todo title
+        const matchingTodo = todosWithIds.find((t: Todo) => t.title === dep);
+        if (matchingTodo) {
+          return matchingTodo.id;
+        }
+
+        // Check if dependency is already a valid todo ID
+        const existingTodo = todosWithIds.find((t: Todo) => t.id === dep);
+        if (existingTodo) {
+          return dep; // Already a valid ID
+        }
+
+        // If no match found, return original (will be caught by validation)
+        return dep;
+      });
+
+      return {
+        ...todo,
+        dependencies: normalizedDeps,
+      };
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Todo generation timeout');
+    }
+    throw error;
+  }
+}
+
+/**
+ * Execute agent chain conditionally
+ */
+async function executeAgentChain(
+  todos: Todo[],
+  availableAgents: any[],
+  initialInput: string,
+  baseUrl?: string
+): Promise<{ todos: Todo[]; finalOutput: any }> {
+  let currentInput = initialInput;
+  const completedTodos = new Set<string>();
+
+  // Execute todos in dependency order
+  const executeTodo = async (todo: Todo): Promise<any> => {
+    // Check dependencies
+    if (todo.dependencies && todo.dependencies.length > 0) {
+      const unmetDeps = todo.dependencies.filter(dep => {
+        // Check if dependency is completed by ID or by title
+        const isCompletedById = completedTodos.has(dep);
+        if (isCompletedById) return false; // Dependency is met
+        
+        // Check if any completed todo has this title
+        const depTodo = todos.find(t => 
+          (t.id === dep || t.title === dep) && completedTodos.has(t.id)
+        );
+        return !depTodo; // Return true if unmet
+      });
+      if (unmetDeps.length > 0) {
+        throw new Error(`Todo ${todo.id} has unmet dependencies: ${unmetDeps.join(', ')}`);
+      }
+    }
+
+    const agent = availableAgents.find(a => a.id === todo.agentId);
+    if (!agent) {
+      throw new Error(`Agent ${todo.agentId} not found`);
+    }
+
+    // Store execution metadata in todo
+    const executedAt = new Date().toISOString();
+    todo.chainMetadata = {
+      input: currentInput,
+      executedAt,
+    };
+
+    try {
+      // Prepare request data with body/extra_body from todo input
+      const requestData: AgentRequestData = {
+        userPrompt: currentInput,
+      };
+
+      // If todo has input with body/extra_body, include them in the request
+      if (todo.input) {
+        if (todo.input.body) {
+          requestData.body = todo.input.body;
+        }
+        if (todo.input.extra_body) {
+          requestData.extra_body = todo.input.extra_body;
+        }
+      }
+
+      const result = await processAiAgent(agent, requestData, baseUrl);
+
+      if (!result.success) {
+        todo.status = 'cancelled';
+        todo.chainMetadata.error = result.error;
+        throw new Error(result.error || 'Agent execution failed');
+      }
+
+      // Extract token usage, duration, cost, and response format from result
+      const tokenUsage = result.data?.tokenUsage || null;
+      const cost = tokenUsage?.pricing?.total_cost || null;
+      const responseFormat = result.data?.format || agent.requiredOutputFormat || 'string';
+      const duration = result.data?.timing?.duration || null;
+
+      const output = result.data?.response || result.data;
+      currentInput = typeof output === 'string' 
+        ? output 
+        : JSON.stringify(output);
+      
+      completedTodos.add(todo.id);
+      todo.status = 'completed';
+      todo.completedAt = executedAt;
+      todo.output = output;
+      todo.chainMetadata.output = output;
+      todo.tokenUsage = tokenUsage;
+      todo.duration = duration;
+      todo.cost = cost;
+      todo.responseFormat = responseFormat;
+
+      return output;
+    } catch (error) {
+      todo.status = 'cancelled';
+      todo.chainMetadata.error = error instanceof Error ? error.message : 'Unknown error';
+      throw error;
+    }
+  };
+
+  // Topological sort of todos by dependencies
+  // Dependencies can be either IDs or titles, so check both
+  const sortedTodos = [...todos];
+  sortedTodos.sort((a, b) => {
+    // Check if a depends on b (by ID or title)
+    const aDependsOnB = a.dependencies?.some(dep => dep === b.id || dep === b.title);
+    // Check if b depends on a (by ID or title)
+    const bDependsOnA = b.dependencies?.some(dep => dep === a.id || dep === a.title);
+    
+    if (aDependsOnB) return 1;  // a should come after b
+    if (bDependsOnA) return -1; // b should come after a
+    return 0;
+  });
+
+  // Execute all todos
+  for (const todo of sortedTodos) {
+    if (todo.status === 'pending') {
+      await executeTodo(todo);
+    }
+  }
+
+  return {
+    todos,
+    finalOutput: currentInput,
+  };
+}
+
+/**
+ * Process orchestrator request
+ */
+export async function processOrchestratorRequest(
+  agentId: string,
+  requestData: AgentRequestData,
+  baseUrl?: string,
+  chatId?: string
+): Promise<AgentResponse> {
+  try {
+    if (!requestData.userPrompt) {
+      return {
+        success: false,
+        error: 'userPrompt is required',
+      };
+    }
+
+    const userPrompt = sanitizePrompt(requestData.userPrompt);
+    if (!userPrompt) {
+      return {
+        success: false,
+        error: 'Prompt cannot be empty after sanitization',
+      };
+    }
+
+    // Load available agents
+    const availableAgents = loadAiAgents();
+    const orchestratorAgent = availableAgents.find(a => a.id === agentId) || {
+      id: 'orchestrator',
+      label: 'Orchestrator',
+      agentType: 'orchestrator',
+      complexityThreshold: 0.5,
+    };
+
+    const complexityThreshold = orchestratorAgent.complexityThreshold || 0.5;
+
+    // Check if this is a general question that should be answered directly
+    const generalQuestionCheck = await isGeneralQuestion(userPrompt, availableAgents);
+    if (generalQuestionCheck.isGeneral && generalQuestionCheck.response) {
+      return {
+        success: true,
+        data: {
+          complexity: 0,
+          executionType: 'guidance',
+          response: generalQuestionCheck.response,
+        },
+      };
+    }
+
+    // Analyze complexity
+    const analysis = await analyzeComplexity(
+      userPrompt,
+      availableAgents,
+      orchestratorAgent.systemPrompt
+    );
+
+    // Check if no relevant agents were found
+    if (analysis.noRelevantAgents || analysis.suggestedAgents.length === 0) {
+      return {
+        success: true,
+        data: {
+          complexity: analysis.complexity,
+          executionType: 'guidance',
+          response: `I understand your request, but I don't have any agents that are specifically designed to handle this task.
+
+Could you please:
+1. Rephrase your request to align with available agent capabilities, or
+2. Be more specific about what you'd like to accomplish?
+
+I'm here to help once I understand how to best assist you with the available tools.
+
+#guidance #help #agents`,
+        },
+      };
+    }
+
+    // If simple request, execute directly with appropriate agent
+    if (analysis.complexity < complexityThreshold && analysis.suggestedAgents.length === 1) {
+      const agent = availableAgents.find(a => a.id === analysis.suggestedAgents[0]);
+      if (agent) {
+        const result = await processAiAgent(agent, requestData, baseUrl);
+        return {
+          ...result,
+          data: {
+            ...result.data,
+            complexity: analysis.complexity,
+            executionType: 'direct',
+            agentUsed: agent.id,
+          },
+        };
+      }
+    }
+
+    // Generate todos if needed
+    let todos: Todo[] = [];
+    if (analysis.needsTodos || analysis.complexity >= complexityThreshold) {
+      todos = await generateTodoList(
+        userPrompt,
+        analysis.suggestedAgents,
+        availableAgents,
+        orchestratorAgent.systemPrompt
+      );
+    }
+
+    // If todos were generated, return them for approval
+    // Otherwise, execute the chain directly
+    if (todos.length > 0) {
+      return {
+        success: true,
+        data: {
+          complexity: analysis.complexity,
+          executionType: 'todo_required',
+          todos,
+          suggestedAgents: analysis.suggestedAgents,
+          message: 'Todo list generated. Please approve to execute.',
+        },
+      };
+    }
+
+    // Execute agent chain if no todos (simple multi-agent case)
+    if (analysis.suggestedAgents.length > 1) {
+      // Create simple todos for execution
+      const { ulid } = await import('ulid');
+      const simpleTodos: Todo[] = analysis.suggestedAgents.map((agentId, index) => ({
+        id: ulid(),
+        title: `Execute with ${agentId}`,
+        agentId,
+        status: 'pending',
+        dependencies: index > 0 ? [analysis.suggestedAgents[index - 1]] : [],
+        createdAt: new Date().toISOString(),
+      }));
+
+      const chainResult = await executeAgentChain(simpleTodos, availableAgents, userPrompt, baseUrl);
+
+      return {
+        success: true,
+        data: {
+          complexity: analysis.complexity,
+          executionType: 'chain_executed',
+          todos: chainResult.todos,
+          finalOutput: chainResult.finalOutput,
+        },
+      };
+    }
+
+    // If we reach here but have no suggested agents, provide guidance
+    if (analysis.suggestedAgents.length === 0) {
+      return {
+        success: true,
+        data: {
+          complexity: analysis.complexity,
+          executionType: 'guidance',
+          response: `I understand your request, but I don't have any agents that are specifically designed to handle this task.
+
+Could you please:
+1. Rephrase your request to align with available agent capabilities, or
+2. Be more specific about what you'd like to accomplish?
+
+I'm here to help once I understand how to best assist you with the available tools.`,
+        },
+      };
+    }
+
+    // Fallback: use first suggested agent (should not reach here if validation is correct)
+    const fallbackAgent = availableAgents.find(a => a.id === analysis.suggestedAgents[0]);
+    
+    if (!fallbackAgent) {
+      return {
+        success: true,
+        data: {
+          complexity: analysis.complexity,
+          executionType: 'guidance',
+          response: `I apologize, but I couldn't find a suitable agent to handle your request.
+
+Please try rephrasing your request or be more specific about what you'd like to accomplish.`,
+        },
+      };
+    }
+
+    const result = await processAiAgent(fallbackAgent, requestData, baseUrl);
+    return {
+      ...result,
+      data: {
+        ...result.data,
+        complexity: analysis.complexity,
+        executionType: 'direct',
+        agentUsed: fallbackAgent.id,
+      },
+    };
+  } catch (error) {
+    console.error('Error in orchestrator:', error);
+    return {
+      success: false,
+      error: sanitizeErrorMessage(error),
+    };
+  }
+}
+
+/**
+ * Execute approved todos
+ */
+export async function executeApprovedTodos(
+  todos: Todo[],
+  availableAgents: any[],
+  initialInput: string,
+  baseUrl?: string
+): Promise<AgentResponse> {
+  try {
+    const chainResult = await executeAgentChain(todos, availableAgents, initialInput, baseUrl);
+
+    return {
+      success: true,
+      data: {
+        executionType: 'chain_executed',
+        todos: chainResult.todos,
+        finalOutput: chainResult.finalOutput,
+      },
+    };
+  } catch (error) {
+    console.error('Error executing approved todos:', error);
+    return {
+      success: false,
+      error: sanitizeErrorMessage(error),
+    };
+  }
+}
+
