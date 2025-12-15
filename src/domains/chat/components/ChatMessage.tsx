@@ -70,12 +70,13 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   // Check if message should render as DynamicAiAgentResponseContainer
   // Render for todo execution responses when responseFormat is specified
+  // Also render for image/video responses even without todoId
   const isTodoResponse = !!message.metadata?.todoId;
   const responseFormat = message.metadata?.responseFormat;
   const shouldRenderAgentContainer = isAssistant && 
-    isTodoResponse &&
     responseFormat && 
-    ['json', 'table', 'image', 'video', 'string'].includes(responseFormat);
+    ['json', 'table', 'image', 'video', 'string'].includes(responseFormat) &&
+    (isTodoResponse || responseFormat === 'image' || responseFormat === 'video');
 
   // For agent container, we need to create a mock action and schema
   // This is a simplified version - in production, you'd want to handle this more elegantly
@@ -100,8 +101,14 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   // Parse message content for DynamicAiAgentResponseContainer
   // If content is JSON string, parse it; otherwise use as-is
+  // Also check if content looks like an image/video response even if responseFormat isn't set
   const parsedContent = useMemo(() => {
-    if (!shouldRenderAgentContainer) return null;
+    // Parse if shouldRenderAgentContainer is true, OR if content looks like image/video JSON
+    const shouldParse = shouldRenderAgentContainer || 
+      (isAssistant && message.content && 
+       (message.content.trim().startsWith('{') || message.content.trim().startsWith('[')));
+    
+    if (!shouldParse) return null;
     
     try {
       // Try to parse as JSON if it looks like JSON
@@ -123,7 +130,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       }
       return message.content;
     }
-  }, [shouldRenderAgentContainer, message.content]);
+  }, [shouldRenderAgentContainer, isAssistant, message.content]);
 
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -533,11 +540,16 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 Thinking...
               </TextShimmerWave>
             </div>
-          ) : shouldRenderAgentContainer && parsedContent !== null ? (
+          ) : (shouldRenderAgentContainer || (responseFormat === 'image' || responseFormat === 'video')) && parsedContent !== null ? (
             <div className="w-full text-sm leading-relaxed">
               {(() => {
                 // Render based on response format, similar to DynamicAiAgentResponseContainer
-                if (responseFormat === 'image') {
+                // Also check if parsedContent has image/video structure even if responseFormat isn't set
+                const detectedFormat = responseFormat || 
+                  (parsedContent && typeof parsedContent === 'object' && parsedContent.image ? 'image' : null) ||
+                  (parsedContent && typeof parsedContent === 'object' && parsedContent.video ? 'video' : null);
+                
+                if (detectedFormat === 'image' || responseFormat === 'image') {
                   let imageData: any = null;
                   
                   // Try to extract image data from parsed content
@@ -555,10 +567,17 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   }
                   
                   // Ensure URL has proper format (add extension if missing for Gradian_Image_ files)
+                  // Convert public folder URLs to API routes for dynamic serving
                   if (imageData?.url) {
                     // If URL is a Gradian_Image_ file without extension, add .png
                     if (imageData.url.includes('Gradian_Image_') && !imageData.url.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
                       imageData.url = `${imageData.url}.png`;
+                    }
+                    
+                    // Convert public folder URLs to API routes for immediate availability
+                    if (imageData.url.startsWith('/images/ai-generated/')) {
+                      const filename = imageData.url.replace('/images/ai-generated/', '');
+                      imageData.url = `/api/images/${filename}`;
                     }
                   }
                   
@@ -597,7 +616,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   }
                 }
                 
-                if (responseFormat === 'video') {
+                if (detectedFormat === 'video' || responseFormat === 'video') {
                   const videoData = typeof parsedContent === 'object' && parsedContent?.video
                     ? parsedContent.video
                     : typeof parsedContent === 'string' && (parsedContent.startsWith('{') || parsedContent.startsWith('['))

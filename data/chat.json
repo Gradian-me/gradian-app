@@ -3,7 +3,7 @@
     "id": "01KCFQ64WGYG6B4FAQPMK7S0G2",
     "title": "create a process sop for devops and security, summ",
     "createdAt": "2025-12-15T00:39:54.003Z",
-    "updatedAt": "2025-12-15T00:40:50.019Z",
+    "updatedAt": "2025-12-15T01:01:24.144Z",
     "userId": "841",
     "messages": [
       {
@@ -269,10 +269,32 @@
           "todoTitle": "Generate Comic Book Image"
         },
         "createdAt": "2025-12-15T00:40:49.943Z"
+      },
+      {
+        "id": "01KCFRD62CVX7GWNAWXEDKS0R1",
+        "role": "user",
+        "content": "create sketch image of pharma biotech",
+        "createdAt": "2025-12-15T01:01:13.168Z"
+      },
+      {
+        "id": "01KCFRDGSF7SQZ3XCKFSN1GYTD",
+        "role": "assistant",
+        "content": "{\n  \"image\": {\n    \"url\": \"/images/ai-generated/Gradian_Image_01KCFRDGR2G090PNACFC3BGFVZ.png\",\n    \"b64_json\": null,\n    \"revised_prompt\": null,\n    \"mimeType\": null\n  },\n  \"format\": \"url\",\n  \"model\": \"gemini-2.5-flash-image\",\n  \"timing\": {\n    \"responseTime\": 8302,\n    \"duration\": 8302\n  }\n}",
+        "agentId": "image-generator",
+        "agentType": "chat",
+        "metadata": {
+          "complexity": 0.1,
+          "executionType": "direct",
+          "tokenUsage": null,
+          "duration": 8302,
+          "cost": null,
+          "responseFormat": "image"
+        },
+        "createdAt": "2025-12-15T01:01:24.144Z"
       }
     ],
     "selectedAgentId": null,
-    "lastMessage": "{\n  \"image\": {\n    \"url\": \"/images/ai-generated/Gradian_Image_01KCFQ7VEKBFH1GV2PX9ABNRYH.png\",\n    \"",
-    "lastMessageAt": "2025-12-15T00:40:49.943Z"
+    "lastMessage": "{\n  \"image\": {\n    \"url\": \"/images/ai-generated/Gradian_Image_01KCFRDGR2G090PNACFC3BGFVZ.png\",\n    \"",
+    "lastMessageAt": "2025-12-15T01:01:24.144Z"
   }
 ]

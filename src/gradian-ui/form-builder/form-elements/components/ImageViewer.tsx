@@ -140,12 +140,22 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
   let useNextImage = true;
 
   // Helper to fix URL if it's missing extension (for Gradian_Image_ files)
+  // Also converts public URLs to API routes for dynamic serving
   const fixImageUrl = (url: string): string => {
     if (!url) return url;
+    
     // If URL is a Gradian_Image_ file without extension, add .png
     if (url.includes('Gradian_Image_') && !url.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
-      return `${url}.png`;
+      url = `${url}.png`;
     }
+    
+    // Convert public folder URLs to API routes for dynamic serving
+    // This ensures images are available immediately without rebuild
+    if (url.startsWith('/images/ai-generated/')) {
+      const filename = url.replace('/images/ai-generated/', '');
+      return `/api/images/${filename}`;
+    }
+    
     return url;
   };
 

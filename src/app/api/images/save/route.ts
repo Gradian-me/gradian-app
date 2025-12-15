@@ -76,12 +76,15 @@ export async function POST(request: NextRequest) {
       const filePath = join(PUBLIC_IMAGES_DIR, filename);
       await writeFile(filePath, buffer);
       
-      // Return local URL (will be served by Next.js from public directory)
-      const localUrl = `/images/ai-generated/${filename}`;
+      // Return API route URL for dynamic serving (works immediately without rebuild)
+      // Fallback to public URL for compatibility
+      const apiUrl = `/api/images/${filename}`;
+      const publicUrl = `/images/ai-generated/${filename}`;
+      
       return NextResponse.json({
         success: true,
-        url: localUrl,
-        localPath: localUrl,
+        url: apiUrl, // Use API route for immediate availability
+        localPath: publicUrl, // Keep public path for reference
       });
     }
   } catch (error) {
