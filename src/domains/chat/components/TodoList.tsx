@@ -59,9 +59,6 @@ export interface TodoListProps {
   onExecute?: (todos: Todo[]) => Promise<void>;
   onTodosUpdate?: (todos: Todo[]) => void; // Callback to update todos in parent
   onTodoExecuted?: (todo: Todo, result: any) => Promise<void>; // Callback to add message after todo execution
-  onExecutionStart?: (title: string) => void; // Notify parent when execution starts
-  onExecutionEnd?: () => void; // Notify parent when execution ends
-  onRegisterStopHandler?: (handler: (() => void) | null) => void; // Provide a stop handler to parent
   isExecuting?: boolean;
   isExpanded?: boolean; // Whether the accordion is expanded
   showExecuteButton?: boolean; // Whether to show the Execute Plan button (only for latest plan)
@@ -97,9 +94,6 @@ export const TodoList: React.FC<TodoListProps> = ({
   onExecute,
   onTodosUpdate,
   onTodoExecuted,
-  onExecutionStart,
-  onExecutionEnd,
-  onRegisterStopHandler,
   isExecuting = false,
   isExpanded = true,
   showExecuteButton = true,
@@ -367,7 +361,6 @@ export const TodoList: React.FC<TodoListProps> = ({
 
       // Set executing state
       setExecutingTodoId(currentTodo.id);
-      onExecutionStart?.(currentTodo.title);
       const inProgressTodo = { ...currentTodo, status: 'in_progress' as const };
       workingTodos = workingTodos.map(t => t.id === currentTodo.id ? inProgressTodo : t);
       setLocalTodos(workingTodos);
@@ -432,7 +425,6 @@ export const TodoList: React.FC<TodoListProps> = ({
     if (onExecute) {
       await onExecute(workingTodos);
     }
-    onExecutionEnd?.();
   }, [chatId, initialInput, sortedTodos, onExecute, onTodosUpdate, onTodoExecuted, localTodos]);
 
   const handleApprove = () => {
@@ -447,16 +439,7 @@ export const TodoList: React.FC<TodoListProps> = ({
   const handleStopExecution = () => {
     cancelExecutionRef.current = true;
     setExecutingTodoId(null);
-    onExecutionEnd?.();
   };
-
-  // Provide stop handler to parent
-  React.useEffect(() => {
-    onRegisterStopHandler?.(handleStopExecution);
-    return () => {
-      onRegisterStopHandler?.(null);
-    };
-  }, [handleStopExecution, onRegisterStopHandler]);
 
   const handleShowResponse = (todo: Todo) => {
     setSelectedTodoForDialog(todo);
@@ -827,8 +810,8 @@ export const TodoList: React.FC<TodoListProps> = ({
 
       {/* Floating executing badge near chat input area */}
       {(isExecuting || executingTodoId) && executingTodoTitle && (
-        <div className="fixed bottom-28 right-4 z-30">
-          <div className="flex items-center gap-2 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-lg border border-violet-200 dark:border-violet-800 px-3 py-1.5">
+        <div className="fixed bottom-40 left-1/2 -translate-x-1/2 z-30">
+          <div className="flex items-center gap-2 rounded-full bg-white/95 dark:bg-gray-800/95 shadow-lg border border-violet-200 dark:border-violet-800 px-3 py-1.5">
             <div className="w-6 h-6 rounded-full border-2 border-violet-200 dark:border-violet-700 flex items-center justify-center">
               <Loader2 className="w-3.5 h-3.5 text-violet-600 dark:text-violet-300 animate-spin" />
             </div>
