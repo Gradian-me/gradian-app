@@ -3323,5 +3323,41 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCGCXTHWHSSPGN5EHT9TG68J",
+    "timestamp": "2025-12-15T10:29:57+0330",
+    "version": "1.28.005",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Implemented dependency-driven parameters in todo management, enabling automatic hydration from previous todo outputs during execution.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "orchestrator",
+          "todo-management"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced utility helpers for dependency output markers in todo-parameter-utils, allowing safe detection and creation of dependency-sourced values.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "utils"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated TodoEditDialog and TodoList to support dependency output toggling and improved parameter handling for agent inputs.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "ui",
+          "form-builder"
+        ]
+      }
+    ]
   }
 ]

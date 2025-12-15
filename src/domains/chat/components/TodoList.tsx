@@ -9,6 +9,7 @@ import { Check, X, Clock, Play, Loader2, Eye, Timer, AlertCircle, GripVertical, 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,6 +59,9 @@ export interface TodoListProps {
   onExecute?: (todos: Todo[]) => Promise<void>;
   onTodosUpdate?: (todos: Todo[]) => void; // Callback to update todos in parent
   onTodoExecuted?: (todo: Todo, result: any) => Promise<void>; // Callback to add message after todo execution
+  onExecutionStart?: (title: string) => void; // Notify parent when execution starts
+  onExecutionEnd?: () => void; // Notify parent when execution ends
+  onRegisterStopHandler?: (handler: (() => void) | null) => void; // Provide a stop handler to parent
   isExecuting?: boolean;
   isExpanded?: boolean; // Whether the accordion is expanded
   showExecuteButton?: boolean; // Whether to show the Execute Plan button (only for latest plan)
@@ -93,6 +97,9 @@ export const TodoList: React.FC<TodoListProps> = ({
   onExecute,
   onTodosUpdate,
   onTodoExecuted,
+  onExecutionStart,
+  onExecutionEnd,
+  onRegisterStopHandler,
   isExecuting = false,
   isExpanded = true,
   showExecuteButton = true,
@@ -111,6 +118,7 @@ export const TodoList: React.FC<TodoListProps> = ({
   const [overId, setOverId] = useState<string | null>(null);
   const [isGraphViewerOpen, setIsGraphViewerOpen] = useState(false);
   const { agents: aiAgents } = useAiAgents({ summary: true });
+  const cancelExecutionRef = React.useRef(false);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -119,11 +127,6 @@ export const TodoList: React.FC<TodoListProps> = ({
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-
-  // Update local todos when props change
-  React.useEffect(() => {
-    setLocalTodos(todos);
-  }, [todos]);
 
   // Normalize dependencies: convert step references (Step 1, Step 2, etc.) to actual todo IDs
   const normalizedTodos = React.useMemo(() => {
@@ -203,6 +206,36 @@ export const TodoList: React.FC<TodoListProps> = ({
       };
     });
   }, []);
+
+  // Update local todos when props change and ensure dependencies are initialized sequentially
+  React.useEffect(() => {
+    if (!todos || todos.length === 0) {
+      setLocalTodos(todos);
+      return;
+    }
+
+    // Build the expected dependency chain based on current order
+    const expectedTodos = updateDependenciesBasedOnOrder(todos);
+
+    // Check if incoming todos already match the expected dependency chain
+    const depsMatch = todos.every((todo, idx) => {
+      const expectedDeps = expectedTodos[idx]?.dependencies || [];
+      const currentDeps = todo.dependencies || [];
+      if (expectedDeps.length !== currentDeps.length) return false;
+      return expectedDeps.every((depId, depIdx) => currentDeps[depIdx] === depId);
+    });
+
+    if (depsMatch) {
+      setLocalTodos(todos);
+      return;
+    }
+
+    // If not aligned, normalize dependencies based on order and notify parent
+    setLocalTodos(expectedTodos);
+    if (onTodosUpdate) {
+      onTodosUpdate(expectedTodos);
+    }
+  }, [todos, updateDependenciesBasedOnOrder, onTodosUpdate]);
 
   // Handle drag end for reordering
   const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -301,8 +334,12 @@ export const TodoList: React.FC<TodoListProps> = ({
 
     // Start with current local todos
     let workingTodos = [...localTodos];
+    cancelExecutionRef.current = false;
 
     for (const todo of sortedTodos) {
+      if (cancelExecutionRef.current) {
+        break;
+      }
       // Check if dependencies are met
       if (todo.dependencies && todo.dependencies.length > 0) {
         const unmetDeps = todo.dependencies.filter(depId => !completedTodoIds.has(depId));
@@ -330,6 +367,7 @@ export const TodoList: React.FC<TodoListProps> = ({
 
       // Set executing state
       setExecutingTodoId(currentTodo.id);
+      onExecutionStart?.(currentTodo.title);
       const inProgressTodo = { ...currentTodo, status: 'in_progress' as const };
       workingTodos = workingTodos.map(t => t.id === currentTodo.id ? inProgressTodo : t);
       setLocalTodos(workingTodos);
@@ -394,6 +432,7 @@ export const TodoList: React.FC<TodoListProps> = ({
     if (onExecute) {
       await onExecute(workingTodos);
     }
+    onExecutionEnd?.();
   }, [chatId, initialInput, sortedTodos, onExecute, onTodosUpdate, onTodoExecuted, localTodos]);
 
   const handleApprove = () => {
@@ -404,6 +443,20 @@ export const TodoList: React.FC<TodoListProps> = ({
       executeTodosOneByOne();
     }
   };
+
+  const handleStopExecution = () => {
+    cancelExecutionRef.current = true;
+    setExecutingTodoId(null);
+    onExecutionEnd?.();
+  };
+
+  // Provide stop handler to parent
+  React.useEffect(() => {
+    onRegisterStopHandler?.(handleStopExecution);
+    return () => {
+      onRegisterStopHandler?.(null);
+    };
+  }, [handleStopExecution, onRegisterStopHandler]);
 
   const handleShowResponse = (todo: Todo) => {
     setSelectedTodoForDialog(todo);
@@ -526,6 +579,11 @@ export const TodoList: React.FC<TodoListProps> = ({
   }, [normalizedTodos]);
 
   const [localExpanded, setLocalExpanded] = useState(isExpanded);
+  const executingTodoTitle = React.useMemo(() => {
+    if (!executingTodoId) return null;
+    const t = localTodos.find((todo) => todo.id === executingTodoId);
+    return t?.title || null;
+  }, [executingTodoId, localTodos]);
   
   // Sync with prop changes
   React.useEffect(() => {
@@ -632,7 +690,12 @@ export const TodoList: React.FC<TodoListProps> = ({
                           ]}
                           gradient="blue"
                           layout="stack"
-                        />
+                          className="relative"
+                        >
+                          <div className="absolute top-3 right-3 text-blue-600 dark:text-blue-200">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          </div>
+                        </MetricCard>
                         <div className="mt-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                           <div className="flex items-start gap-3">
                             {getStatusIcon(todo)}
@@ -742,6 +805,17 @@ export const TodoList: React.FC<TodoListProps> = ({
                         )}
                       </Button>
                     )}
+                    {(isExecuting || executingTodoId) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleStopExecution}
+                        className="flex items-center gap-2"
+                      >
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Stop
+                      </Button>
+                    )}
                     </div>
                   </div>
                 )}
@@ -750,6 +824,20 @@ export const TodoList: React.FC<TodoListProps> = ({
           </AccordionItem>
         </Accordion>
       </motion.div>
+
+      {/* Floating executing badge near chat input area */}
+      {(isExecuting || executingTodoId) && executingTodoTitle && (
+        <div className="fixed bottom-28 right-4 z-30">
+          <div className="flex items-center gap-2 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-lg border border-violet-200 dark:border-violet-800 px-3 py-1.5">
+            <div className="w-6 h-6 rounded-full border-2 border-violet-200 dark:border-violet-700 flex items-center justify-center">
+              <Loader2 className="w-3.5 h-3.5 text-violet-600 dark:text-violet-300 animate-spin" />
+            </div>
+            <div className="text-sm font-medium text-gray-800 dark:text-gray-100">
+              Executing: <span className="font-semibold text-violet-700 dark:text-violet-300">{executingTodoTitle}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Response Dialog */}
       <TodoResponseDialog

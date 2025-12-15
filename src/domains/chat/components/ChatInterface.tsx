@@ -6,7 +6,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sidebar as SidebarIcon } from 'lucide-react';
+import { Sidebar as SidebarIcon, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -57,6 +57,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isExecutingTodos, setIsExecutingTodos] = useState(false);
+  const [isInlineExecuting, setIsInlineExecuting] = useState(false);
+  const [inlineExecutingTitle, setInlineExecutingTitle] = useState<string | null>(null);
+  const [todoStopHandler, setTodoStopHandler] = useState<(() => void) | null>(null);
   const executeAbortControllerRef = useRef<AbortController | null>(null);
   const [expandedExecutionPlans, setExpandedExecutionPlans] = useState<Set<string>>(new Set());
 
@@ -112,6 +115,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       executeAbortControllerRef.current.abort();
       setIsExecutingTodos(false);
       executeAbortControllerRef.current = null;
+    }
+
+    // Stop inline todo execution if active
+    if (isInlineExecuting && todoStopHandler) {
+      todoStopHandler();
+      setIsInlineExecuting(false);
+      setInlineExecutingTitle(null);
     }
   };
 
@@ -418,6 +428,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         }}
                         onTodoExecuted={handleTodoExecuted}
                         isExecuting={isExecutingTodos && isLatestExecutionPlan}
+                        onExecutionStart={(title) => {
+                          setIsInlineExecuting(true);
+                          setInlineExecutingTitle(title);
+                        }}
+                        onExecutionEnd={() => {
+                          setIsInlineExecuting(false);
+                          setInlineExecutingTitle(null);
+                        }}
+                        onRegisterStopHandler={(fn) => setTodoStopHandler(() => fn || null)}
                         isExpanded={isExpanded}
                         showExecuteButton={isLatestExecutionPlan}
                         onExpandedChange={(expanded) => {
@@ -439,6 +458,18 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               })}
               
               <div ref={messagesEndRef} />
+              {isInlineExecuting && inlineExecutingTitle && (
+                <div className="flex justify-center mt-2">
+                  <div className="flex items-center gap-2 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-lg border border-violet-200 dark:border-violet-800 px-3 py-1.5">
+                    <div className="w-6 h-6 rounded-full border-2 border-violet-200 dark:border-violet-700 flex items-center justify-center">
+                      <Loader2 className="w-3.5 h-3.5 text-violet-600 dark:text-violet-300 animate-spin" />
+                    </div>
+                    <div className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                      Executing: <span className="font-semibold text-violet-700 dark:text-violet-300">{inlineExecutingTitle}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -451,7 +482,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   onStop={handleStop}
                   selectedAgentId={currentChat.selectedAgentId}
                   isLoading={isLoading}
-                  isActive={isActive || isExecutingTodos}
+                  isActive={isActive || isExecutingTodos || isInlineExecuting}
                 />
               </div>
             )}

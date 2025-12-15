@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { loadChats, updateChatMessageTodos } from '@/domains/chat/utils/chat-storage.util';
 import { processAiAgent } from '@/domains/ai-builder/utils/ai-agent-utils';
 import type { Todo } from '@/domains/chat/types';
+import { isDependencyOutputValue } from '@/domains/chat/utils/todo-parameter-utils';
 
 /**
  * POST - Execute a single todo
@@ -81,13 +82,25 @@ export async function POST(
       userPrompt: initialInput,
     };
 
-    // If todo has input with body/extra_body, include them in the request
+    // Helper: replace dependency markers with the latest input (previous todo output)
+    const hydrateDependencyValues = (data: any) => {
+      if (!data || typeof data !== 'object') return data;
+      const cloned = Array.isArray(data) ? [...data] : { ...data };
+      Object.entries(cloned).forEach(([k, v]) => {
+        if (isDependencyOutputValue(v)) {
+          cloned[k] = initialInput;
+        }
+      });
+      return cloned;
+    };
+
+    // If todo has input with body/extra_body, include them in the request and hydrate any dependency markers
     if (todo.input) {
       if (todo.input.body) {
-        requestData.body = todo.input.body;
+        requestData.body = hydrateDependencyValues(todo.input.body);
       }
       if (todo.input.extra_body) {
-        requestData.extra_body = todo.input.extra_body;
+        requestData.extra_body = hydrateDependencyValues(todo.input.extra_body);
       }
     }
 

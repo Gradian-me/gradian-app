@@ -496,6 +496,12 @@ PARAMETER EXTRACTION:
   * Use the field "name" (not "id") as the key in the input object
   * For select fields, use the option "id" value (not the label)
 
+DEPENDENCY-DRIVEN PARAMETERS (AUTO-FILL FROM PREVIOUS TODO OUTPUT):
+- For text/textarea fields whose name suggests the main prompt (e.g., "prompt", "userPrompt", "processDescription", "processSteps", "processChallenges", "pointsToImprove", "presentationTopic", "incidentDescription", "codeInput", "description", "imageDescription", or other user-facing text fields):
+  * If the todo depends on a previous step and should consume the previous output, set the value to the object {"__fromDependency": true, "source": "previous-output"} instead of hardcoding user text.
+  * Use this especially for downstream steps in a chain so the UI switch is ON by default and the value is hydrated at execution time with the prior todo's output.
+  * If the step must use fresh user-provided text (e.g., first todo, or explicitly different input), set the explicit text value instead.
+
 Create a JSON array of todos:
 [
   {

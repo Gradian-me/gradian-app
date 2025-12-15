@@ -9,6 +9,23 @@ export interface TodoParameter {
   value: any;
   label?: string;
   section: 'body' | 'extra';
+  useDependencyOutput?: boolean;
+}
+
+const DEP_OUTPUT_MARKER_KEY = '__fromDependency';
+
+/**
+ * Check if a parameter value is marked to come from a dependency output
+ */
+export function isDependencyOutputValue(value: any): boolean {
+  return Boolean(value && typeof value === 'object' && value[DEP_OUTPUT_MARKER_KEY] === true);
+}
+
+/**
+ * Create a marker object that indicates the value should come from the previous dependency output
+ */
+export function createDependencyOutputValue() {
+  return { [DEP_OUTPUT_MARKER_KEY]: true, source: 'previous-output' };
 }
 
 /**
@@ -41,13 +58,14 @@ export function extractTodoParameters(todo: Todo, agent?: any): TodoParameter[] 
   // Extract body parameters
   if (todo.input.body && typeof todo.input.body === 'object') {
     Object.entries(todo.input.body).forEach(([key, value]) => {
-      if (value !== null && value !== undefined && value !== '') {
+      if (value !== null && value !== undefined && (value !== '' || isDependencyOutputValue(value))) {
         // If agent is provided, only include parameters that match renderComponents
         if (!agent || validParameterNames.size === 0 || validParameterNames.has(key)) {
           parameters.push({
             key,
             value,
             section: 'body',
+            useDependencyOutput: isDependencyOutputValue(value),
           });
         }
       }
@@ -57,13 +75,14 @@ export function extractTodoParameters(todo: Todo, agent?: any): TodoParameter[] 
   // Extract extra_body parameters
   if (todo.input.extra_body && typeof todo.input.extra_body === 'object') {
     Object.entries(todo.input.extra_body).forEach(([key, value]) => {
-      if (value !== null && value !== undefined && value !== '') {
+      if (value !== null && value !== undefined && (value !== '' || isDependencyOutputValue(value))) {
         // If agent is provided, only include parameters that match renderComponents
         if (!agent || validParameterNames.size === 0 || validParameterNames.has(key)) {
           parameters.push({
             key,
             value,
             section: 'extra',
+            useDependencyOutput: isDependencyOutputValue(value),
           });
         }
       }
@@ -77,6 +96,10 @@ export function extractTodoParameters(todo: Todo, agent?: any): TodoParameter[] 
  * Format parameter value for display
  */
 export function formatParameterValue(value: any): string {
+  if (isDependencyOutputValue(value)) {
+    return 'From previous output';
+  }
+
   if (value === null || value === undefined) {
     return '';
   }

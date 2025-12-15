@@ -19,7 +19,8 @@ import { FormElementFactory } from '@/gradian-ui/form-builder/form-elements';
 import { useAiAgents } from '@/domains/ai-builder';
 import type { Todo } from '../types';
 import { Plus, Trash2, X } from 'lucide-react';
-import { extractTodoParameters } from '../utils/todo-parameter-utils';
+import { extractTodoParameters, createDependencyOutputValue, isDependencyOutputValue } from '../utils/todo-parameter-utils';
+import { Switch } from '@/components/ui/switch';
 
 export interface TodoEditDialogProps {
   todo: Todo | null;
@@ -37,8 +38,24 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [agentId, setAgentId] = useState('');
-  const [parameters, setParameters] = useState<Array<{ id: string; fieldName: string; value: any; section: 'body' | 'extra' }>>([]);
+  const [parameters, setParameters] = useState<Array<{ id: string; fieldName: string; value: any; section: 'body' | 'extra'; useDependencyOutput?: boolean }>>([]);
   const { agents: aiAgents, loading: isLoadingAgents } = useAiAgents({ summary: true });
+
+  // Heuristic: fields that are typically the main prompt and can default to previous output
+  const isMainPromptField = React.useCallback((fieldName: string) => {
+    const name = fieldName?.toLowerCase?.() || '';
+    return [
+      'prompt',
+      'userprompt',
+      'processdescription',
+      'processsteps',
+      'processchallenges',
+      'pointstoimprove',
+      'presentationtopic',
+      'incidentdescription',
+      'codeinput',
+    ].includes(name);
+  }, []);
 
   // Get selected agent's renderComponents
   const selectedAgent = React.useMemo(() => {
@@ -105,6 +122,9 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
           fieldName: param.key,
           value: param.value,
           section: param.section,
+          useDependencyOutput: param.useDependencyOutput
+            || isDependencyOutputValue(param.value)
+            || (!param.value && isMainPromptField(param.key)),
         })));
       } else {
         // If no parameters exist but agent is selected, initialize empty array
@@ -143,6 +163,7 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
       fieldName: '',
       value: '',
       section: 'body',
+      useDependencyOutput: false,
     }]);
   };
 
@@ -150,12 +171,17 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
     setParameters(parameters.filter(p => p.id !== id));
   };
 
-  const handleParameterChange = (id: string, field: 'fieldName' | 'value' | 'section', newValue: any) => {
-    setParameters(parameters.map(p => {
+  const handleParameterChange = (id: string, field: 'fieldName' | 'value' | 'section' | 'useDependencyOutput', newValue: any) => {
+    setParameters((prev) => prev.map(p => {
       if (p.id !== id) return p;
       
       const updated = { ...p, [field]: newValue };
       
+      // When enabling dependency output, clear manual value in the same update
+      if (field === 'useDependencyOutput' && newValue === true) {
+        updated.value = '';
+      }
+
       // When fieldName changes, reset value and update section based on component
       if (field === 'fieldName' && newValue) {
         const comp = availableRenderComponents.find((c: any) => (c.name || c.id) === newValue);
@@ -167,6 +193,7 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
             updated.value = comp.defaultValue || '';
           }
           updated.section = comp.sectionId === 'extra' ? 'extra' : 'body';
+          updated.useDependencyOutput = false;
         } else {
           // If component not found, clear value
           updated.value = '';
@@ -183,11 +210,16 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
     // Build input object from parameters
     const input: any = { body: {}, extra_body: {} };
     parameters.forEach(param => {
-      if (param.fieldName && param.value !== null && param.value !== undefined && param.value !== '') {
+      if (!param.fieldName) return;
+
+      const valueToStore = param.useDependencyOutput ? createDependencyOutputValue() : param.value;
+      const hasValue = param.useDependencyOutput || (valueToStore !== null && valueToStore !== undefined && valueToStore !== '');
+
+      if (hasValue) {
         if (param.section === 'body') {
-          input.body[param.fieldName] = param.value;
+          input.body[param.fieldName] = valueToStore;
         } else {
-          input.extra_body[param.fieldName] = param.value;
+          input.extra_body[param.fieldName] = valueToStore;
         }
       }
     });
@@ -329,8 +361,24 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
                           />
                         </div>
                         
-                        {/* Value Input - using FormElementFactory */}
-                        {selectedComponent && param.fieldName && (
+                        {/* Dependency output toggle */}
+                        {selectedComponent && (
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={Boolean(param.useDependencyOutput)}
+                              onCheckedChange={(checked: boolean) => {
+                                handleParameterChange(param.id, 'useDependencyOutput', checked);
+                              }}
+                              id={`dep-switch-${param.id}`}
+                            />
+                            <label htmlFor={`dep-switch-${param.id}`} className="text-xs text-gray-700 dark:text-gray-300">
+                              Use previous todo output for this parameter
+                            </label>
+                          </div>
+                        )}
+
+                        {/* Value Input - using FormElementFactory (hidden when using dependency output) */}
+                        {selectedComponent && param.fieldName && !param.useDependencyOutput && (
                           <div className="text-sm">
                             <FormElementFactory
                               config={selectedComponent}
@@ -338,6 +386,13 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
                               onChange={(value: any) => handleParameterChange(param.id, 'value', value)}
                               disabled={false}
                             />
+                          </div>
+                        )}
+
+                        {/* Info when using dependency output */}
+                        {selectedComponent && param.useDependencyOutput && (
+                          <div className="text-xs text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 rounded-md px-2 py-1">
+                            This parameter will be auto-filled from the previous todo’s output during execution.
                           </div>
                         )}
                         
