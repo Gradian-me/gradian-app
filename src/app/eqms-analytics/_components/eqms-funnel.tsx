@@ -17,8 +17,9 @@ export default function EqmsFunnel({ data, theme, title = 'Process Funnel', show
     ...baseTheme,
     legend: {
       ...baseTheme.legend,
-      show: true,
+      show: showLegend,
       data: data.map(item => item.stage),
+      selectedMode: 'multiple',
       top: '6%',
       left: 'center',
       itemGap: 12,
@@ -46,6 +47,7 @@ export default function EqmsFunnel({ data, theme, title = 'Process Funnel', show
         max: data[0]?.value ?? 100,
         sort: 'descending',
         gap: 6,
+        name: title,
         label: {
           show: true,
           position: 'inside',

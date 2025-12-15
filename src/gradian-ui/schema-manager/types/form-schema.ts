@@ -421,6 +421,18 @@ export interface FormSchema {
    * Stored as an array of selection objects (first item is the primary group).
    */
   entityTypeGroup?: any[];
+  /**
+   * Optional tenant scoping configuration. When applyToAllTenants is true,
+   * the form applies to every tenant and relatedTenants should be ignored.
+   * Otherwise, relatedTenants should contain tenant IDs selected via picker.
+   */
+  applyToAllTenants?: boolean;
+  relatedTenants?: Array<{
+    id: string;
+    label?: string;
+    color?: string;
+    icon?: string;
+  }>;
   syncToDatabases?: string[]; // Array of database IDs to sync this schema to
   syncStrategy?: 'schema-only' | 'schema-and-data'; // Sync strategy: schema only or schema and data
   fields: FormField[]; // All fields at schema level, each with a sectionId

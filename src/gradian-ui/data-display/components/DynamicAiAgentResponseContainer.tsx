@@ -713,7 +713,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
           className="p-6"
           style={
             action.maxHeight && action.maxHeight > 0
-              ? { maxHeight: `${action.maxHeight}px`, overflowY: 'auto' }
+              ? { height: `${action.maxHeight}px`, overflowY: 'auto' }
               : undefined
           }
         >
