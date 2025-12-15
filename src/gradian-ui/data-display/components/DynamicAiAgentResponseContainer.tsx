@@ -528,7 +528,57 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     executeAgent();
   }, [executeAgent]);
 
-  // Show loading state while agent is loading
+  // For manual run type, avoid showing the orb while the agent metadata loads; show a disabled action instead
+  if (isLoadingAgent && (action.runType || 'manual') === 'manual') {
+    return (
+      <motion.div
+        initial={disableAnimation ? false : { opacity: 0, y: 20 }}
+        animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+        transition={disableAnimation ? {} : {
+          duration: 0.3,
+          delay: index * 0.1
+        }}
+        className={cn(className)}
+      >
+        <CardWrapper
+          config={{
+            id: action.id,
+            name: action.label,
+            styling: {
+              variant: 'default',
+              size: 'md'
+            }
+          }}
+          className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm"
+        >
+          <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4">
+            <div className="relative flex flex-col gap-1">
+              <CardTitle className="text-sm font-semibold text-white">{action.label}</CardTitle>
+              <div className="flex items-center gap-1.5 text-xs text-white/80">
+                <Sparkles className="h-3 w-3" />
+                <span>Powered by Gradian AI</span>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center min-h-[200px]">
+              <Button
+                disabled
+                size="default"
+                variant="secondary"
+                className="gap-2"
+              >
+                <RotateCcw className="h-4 w-4 animate-spin" />
+                Loading agent...
+              </Button>
+            </div>
+          </CardContent>
+        </CardWrapper>
+      </motion.div>
+    );
+  }
+
+  // Show loading state while agent is loading (auto-run)
   if (isLoadingAgent) {
     return (
       <motion.div
