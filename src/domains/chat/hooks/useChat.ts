@@ -485,38 +485,290 @@ export function useChat(): UseChatResult {
             
             // Check if todos are required
             if (responseData.executionType === 'todo_required' && responseData.todos) {
-          // Save todos to chat and show approval UI
-          const todosResponse = await fetch(`/api/chat/${currentChat.id}/todos`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ todos: responseData.todos }),
-            signal: abortController.signal,
-          });
+              // Set todos first so they're immediately visible
+              console.log('Setting todos:', responseData.todos);
+              setTodos(responseData.todos);
+              
+              // Add assistant message indicating todos were generated (this saves todos to message metadata)
+              const messageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  role: 'assistant',
+                  content: responseData.message || 'I\'ve created a plan. Please review and approve the todos to proceed.',
+                  agentId: agentId || 'orchestrator',
+                  metadata: {
+                    todos: responseData.todos,
+                    complexity: responseData.complexity,
+                    executionType: responseData.executionType,
+                  },
+                }),
+                signal: abortController.signal,
+              });
 
-          // Check if aborted
-          if (abortController.signal.aborted) {
-            return;
-          }
+              // Check if aborted
+              if (abortController.signal.aborted) {
+                return;
+              }
 
-          const todosResult = await todosResponse.json();
-          
-          if (todosResult.success && responseData.todos && responseData.todos.length > 0) {
-            // Set todos first so they're immediately visible
-            console.log('Setting todos:', responseData.todos);
-            setTodos(responseData.todos);
-            
-            // Add assistant message indicating todos were generated
-            const messageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
+              if (messageResponse.ok) {
+                const messageResult = await messageResponse.json();
+                if (messageResult.success) {
+                  console.log('Message added with todos:', messageResult.data);
+                  // Remove thinking message and add actual response
+                  setMessages((prev) => {
+                    const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
+                    return [...withoutThinking, messageResult.data];
+                  });
+                  // Update current chat
+                  setCurrentChat((prev) => prev ? {
+                    ...prev,
+                    lastMessage: messageResult.data.content.substring(0, 100),
+                    lastMessageAt: messageResult.data.createdAt,
+                    updatedAt: messageResult.data.createdAt,
+                  } : null);
+                }
+              }
+              
+              // Don't call loadChat here - we've already updated state
+              // Just update the chat list item
+              setChats((prev) => {
+                const filtered = prev.filter((chat) => chat.id !== currentChat.id);
+                const updatedChat = prev.find((chat) => chat.id === currentChat.id);
+                return [
+                  {
+                    ...(updatedChat || currentChat),
+                    lastMessage: responseData.message?.substring(0, 100) || 'New plan created',
+                    lastMessageAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  },
+                  ...filtered,
+                ];
+              });
+              
+              // Early return - don't reload chat since we've already updated everything
+              // Todos are already set and visible, message is added to state
+              setIsLoading(false);
+              setIsActive(false);
+              thinkingMessageIdRef.current = null;
+              abortControllerRef.current = null;
+              return;
+            } else if (responseData.executionType === 'chain_executed' && responseData.finalOutput) {
+              // Chain executed - use finalOutput only
+              const responseContent = responseData.finalOutput;
+
+              // Extract hashtags and mentions from response content if it's a string
+              const contentString = typeof responseContent === 'string' 
+                ? responseContent 
+                : JSON.stringify(responseContent, null, 2);
+              const hashtags = typeof responseContent === 'string' 
+                ? extractHashtags(responseContent) 
+                : [];
+              const mentions = typeof responseContent === 'string' 
+                ? extractMentions(responseContent) 
+                : [];
+
+              const assistantMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  role: 'assistant',
+                  content: contentString,
+                  agentId: agentId || 'orchestrator',
+                  hashtags: hashtags.length > 0 ? hashtags : undefined,
+                  mentions: mentions.length > 0 ? mentions : undefined,
+                  metadata: {
+                    complexity: responseData.complexity,
+                    executionType: responseData.executionType,
+                    todos: responseData.todos,
+                    responseFormat: typeof responseContent === 'string' ? 'string' : 'json',
+                  },
+                }),
+                signal: abortController.signal,
+              });
+
+              // Check if aborted
+              if (abortController.signal.aborted) {
+                return;
+              }
+
+              const assistantMessageResult = await assistantMessageResponse.json();
+
+              // Remove thinking message and add actual response
+              if (assistantMessageResult.success && assistantMessageResult.data) {
+                setMessages((prev) => {
+                  const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
+                  return [...withoutThinking, assistantMessageResult.data];
+                });
+              }
+
+              // Update todos if present
+              if (responseData.todos) {
+                setTodos(responseData.todos);
+              }
+
+              // Update chat list item without full refresh
+              setChats((prev) => {
+                const filtered = prev.filter((chat) => chat.id !== currentChat.id);
+                const updatedChat = prev.find((chat) => chat.id === currentChat.id);
+                return [
+                  {
+                    ...(updatedChat || currentChat),
+                    lastMessage: contentString.substring(0, 100) || 'Response received',
+                    lastMessageAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  },
+                  ...filtered,
+                ];
+              });
+
+              setIsLoading(false);
+              setIsActive(false);
+              thinkingMessageIdRef.current = null;
+              abortControllerRef.current = null;
+              return;
+            } else if (responseData.response && responseData.executionType !== 'chain_executed') {
+              // Direct execution (not chain) - use response
+              const responseContent = responseData.response;
+
+              // Extract hashtags and mentions from response content if it's a string
+              const contentString = typeof responseContent === 'string' 
+                ? responseContent 
+                : JSON.stringify(responseContent, null, 2);
+              const hashtags = typeof responseContent === 'string' 
+                ? extractHashtags(contentString) 
+                : [];
+              const mentions = typeof responseContent === 'string' 
+                ? extractMentions(contentString) 
+                : [];
+
+              const assistantMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  role: 'assistant',
+                  content: contentString,
+                  agentId: agentId || 'orchestrator',
+                  hashtags: hashtags.length > 0 ? hashtags : undefined,
+                  mentions: mentions.length > 0 ? mentions : undefined,
+                  metadata: {
+                    complexity: responseData.complexity,
+                    executionType: responseData.executionType,
+                    responseFormat: typeof responseContent === 'string' ? 'string' : 'json',
+                  },
+                }),
+                signal: abortController.signal,
+              });
+
+              // Check if aborted
+              if (abortController.signal.aborted) {
+                return;
+              }
+
+              const assistantMessageResult = await assistantMessageResponse.json();
+
+              // Remove thinking message and add actual response
+              if (assistantMessageResult.success && assistantMessageResult.data) {
+                setMessages((prev) => {
+                  const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
+                  return [...withoutThinking, assistantMessageResult.data];
+                });
+              }
+
+              // Update chat list item without full refresh
+              setChats((prev) => {
+                const filtered = prev.filter((chat) => chat.id !== currentChat.id);
+                const updatedChat = prev.find((chat) => chat.id === currentChat.id);
+                return [
+                  {
+                    ...(updatedChat || currentChat),
+                    lastMessage: contentString.substring(0, 100) || 'Response received',
+                    lastMessageAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  },
+                  ...filtered,
+                ];
+              });
+              
+              setIsLoading(false);
+              setIsActive(false);
+              thinkingMessageIdRef.current = null;
+              abortControllerRef.current = null;
+              return;
+            } else {
+              // Regular agent response
+              const responseContent = responseData.response;
+              const responseFormat = responseData.format || 'string';
+
+              const assistantMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  role: 'assistant',
+                  content: typeof responseContent === 'string' 
+                    ? responseContent 
+                    : JSON.stringify(responseContent, null, 2),
+                  agentId: agentId,
+                  metadata: {
+                    responseFormat,
+                    tokenUsage: responseData.tokenUsage,
+                    timing: responseData.timing,
+                  },
+                }),
+                signal: abortController.signal,
+              });
+
+              // Check if aborted
+              if (abortController.signal.aborted) {
+                return;
+              }
+
+              const assistantMessageResult = await assistantMessageResponse.json();
+
+              // Remove thinking message and add actual response
+              if (assistantMessageResult.success && assistantMessageResult.data) {
+                setMessages((prev) => {
+                  const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
+                  return [...withoutThinking, assistantMessageResult.data];
+                });
+              }
+
+              // Update chat list item without full refresh
+              const responseContentString = typeof responseContent === 'string' 
+                ? responseContent 
+                : JSON.stringify(responseContent, null, 2);
+              setChats((prev) => {
+                const filtered = prev.filter((chat) => chat.id !== currentChat.id);
+                const updatedChat = prev.find((chat) => chat.id === currentChat.id);
+                return [
+                  {
+                    ...(updatedChat || currentChat),
+                    lastMessage: responseContentString.substring(0, 100) || 'Response received',
+                    lastMessageAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  },
+                  ...filtered,
+                ];
+              });
+            }
+          } else {
+            // Regular agent response (non-orchestrator)
+            const responseContent = responseData.response;
+            const responseFormat = responseData.format || 'string';
+
+            const assistantMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 role: 'assistant',
-                content: responseData.message || 'I\'ve created a plan. Please review and approve the todos to proceed.',
-                agentId: agentId || 'orchestrator',
+                content: typeof responseContent === 'string' 
+                  ? responseContent 
+                  : JSON.stringify(responseContent, null, 2),
+                agentId: agentId,
                 metadata: {
-                  todos: responseData.todos,
-                  complexity: responseData.complexity,
-                  executionType: responseData.executionType,
+                  responseFormat,
+                  tokenUsage: responseData.tokenUsage,
+                  timing: responseData.timing,
                 },
               }),
               signal: abortController.signal,
@@ -527,250 +779,34 @@ export function useChat(): UseChatResult {
               return;
             }
 
-            if (messageResponse.ok) {
-              const messageResult = await messageResponse.json();
-              if (messageResult.success) {
-                console.log('Message added with todos:', messageResult.data);
-                // Remove thinking message and add actual response
-                setMessages((prev) => {
-                  const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
-                  return [...withoutThinking, messageResult.data];
-                });
-                // Update current chat
-                setCurrentChat((prev) => prev ? {
-                  ...prev,
-                  lastMessage: messageResult.data.content.substring(0, 100),
-                  lastMessageAt: messageResult.data.createdAt,
-                  updatedAt: messageResult.data.createdAt,
-                } : null);
-              }
+            const assistantMessageResult = await assistantMessageResponse.json();
+
+            // Remove thinking message and add actual response
+            if (assistantMessageResult.success && assistantMessageResult.data) {
+              setMessages((prev) => {
+                const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
+                return [...withoutThinking, assistantMessageResult.data];
+              });
             }
-            
-            // Don't call loadChat here - we've already updated state
-            // Just update the chat list item
+
+            // Update chat list item without full refresh
+            const responseContentString = typeof responseContent === 'string' 
+              ? responseContent 
+              : JSON.stringify(responseContent, null, 2);
             setChats((prev) => {
               const filtered = prev.filter((chat) => chat.id !== currentChat.id);
               const updatedChat = prev.find((chat) => chat.id === currentChat.id);
               return [
                 {
                   ...(updatedChat || currentChat),
-                  lastMessage: responseData.message?.substring(0, 100) || 'New plan created',
+                  lastMessage: responseContentString.substring(0, 100) || 'Response received',
                   lastMessageAt: new Date().toISOString(),
                   updatedAt: new Date().toISOString(),
                 },
                 ...filtered,
               ];
             });
-            
-            // Early return - don't reload chat since we've already updated everything
-            // Todos are already set and visible, message is added to state
-            setIsLoading(false);
-            setIsActive(false);
-            thinkingMessageIdRef.current = null;
-            abortControllerRef.current = null;
-            return;
-          } else {
-            console.warn('Todos not saved successfully or empty:', { todosResult, todos: responseData.todos });
           }
-        } else if (responseData.executionType === 'chain_executed' && responseData.finalOutput) {
-          // Chain executed - use finalOutput only
-          const responseContent = responseData.finalOutput;
-
-          // Extract hashtags and mentions from response content if it's a string
-          const contentString = typeof responseContent === 'string' 
-            ? responseContent 
-            : JSON.stringify(responseContent, null, 2);
-          const hashtags = typeof responseContent === 'string' 
-            ? extractHashtags(responseContent) 
-            : [];
-          const mentions = typeof responseContent === 'string' 
-            ? extractMentions(responseContent) 
-            : [];
-
-          const assistantMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              role: 'assistant',
-              content: contentString,
-              agentId: agentId || 'orchestrator',
-              hashtags: hashtags.length > 0 ? hashtags : undefined,
-              mentions: mentions.length > 0 ? mentions : undefined,
-              metadata: {
-                complexity: responseData.complexity,
-                executionType: responseData.executionType,
-                todos: responseData.todos,
-                responseFormat: typeof responseContent === 'string' ? 'string' : 'json',
-              },
-            }),
-            signal: abortController.signal,
-          });
-
-          // Check if aborted
-          if (abortController.signal.aborted) {
-            return;
-          }
-
-          const assistantMessageResult = await assistantMessageResponse.json();
-
-          // Remove thinking message and add actual response
-          if (assistantMessageResult.success && assistantMessageResult.data) {
-            setMessages((prev) => {
-              const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
-              return [...withoutThinking, assistantMessageResult.data];
-            });
-          }
-
-          // Update todos if present
-          if (responseData.todos) {
-            setTodos(responseData.todos);
-          }
-
-          // Update chat list item without full refresh
-          setChats((prev) => {
-            const filtered = prev.filter((chat) => chat.id !== currentChat.id);
-            const updatedChat = prev.find((chat) => chat.id === currentChat.id);
-            return [
-              {
-                ...(updatedChat || currentChat),
-                lastMessage: contentString.substring(0, 100) || 'Response received',
-                lastMessageAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              },
-              ...filtered,
-            ];
-          });
-
-          setIsLoading(false);
-          setIsActive(false);
-          thinkingMessageIdRef.current = null;
-          abortControllerRef.current = null;
-          return;
-        } else if (responseData.response && responseData.executionType !== 'chain_executed') {
-          // Direct execution (not chain) - use response
-          const responseContent = responseData.response;
-
-          // Extract hashtags and mentions from response content if it's a string
-          const contentString = typeof responseContent === 'string' 
-            ? responseContent 
-            : JSON.stringify(responseContent, null, 2);
-          const hashtags = typeof responseContent === 'string' 
-            ? extractHashtags(contentString) 
-            : [];
-          const mentions = typeof responseContent === 'string' 
-            ? extractMentions(contentString) 
-            : [];
-
-          const assistantMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              role: 'assistant',
-              content: contentString,
-              agentId: agentId || 'orchestrator',
-              hashtags: hashtags.length > 0 ? hashtags : undefined,
-              mentions: mentions.length > 0 ? mentions : undefined,
-              metadata: {
-                complexity: responseData.complexity,
-                executionType: responseData.executionType,
-                responseFormat: typeof responseContent === 'string' ? 'string' : 'json',
-              },
-            }),
-            signal: abortController.signal,
-          });
-
-          // Check if aborted
-          if (abortController.signal.aborted) {
-            return;
-          }
-
-          const assistantMessageResult = await assistantMessageResponse.json();
-
-          // Remove thinking message and add actual response
-          if (assistantMessageResult.success && assistantMessageResult.data) {
-            setMessages((prev) => {
-              const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
-              return [...withoutThinking, assistantMessageResult.data];
-            });
-          }
-
-          // Update chat list item without full refresh
-          setChats((prev) => {
-            const filtered = prev.filter((chat) => chat.id !== currentChat.id);
-            const updatedChat = prev.find((chat) => chat.id === currentChat.id);
-            return [
-              {
-                ...(updatedChat || currentChat),
-                lastMessage: contentString.substring(0, 100) || 'Response received',
-                lastMessageAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              },
-              ...filtered,
-            ];
-          });
-          
-          setIsLoading(false);
-          setIsActive(false);
-          thinkingMessageIdRef.current = null;
-          abortControllerRef.current = null;
-          return;
-        }
-      } else {
-        // Regular agent response
-        const responseContent = responseData.response;
-        const responseFormat = responseData.format || 'string';
-
-        const assistantMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            role: 'assistant',
-            content: typeof responseContent === 'string' 
-              ? responseContent 
-              : JSON.stringify(responseContent, null, 2),
-            agentId: agentId,
-            metadata: {
-              responseFormat,
-              tokenUsage: responseData.tokenUsage,
-              timing: responseData.timing,
-            },
-          }),
-          signal: abortController.signal,
-        });
-
-        // Check if aborted
-        if (abortController.signal.aborted) {
-          return;
-        }
-
-        const assistantMessageResult = await assistantMessageResponse.json();
-
-        // Remove thinking message and add actual response
-        if (assistantMessageResult.success && assistantMessageResult.data) {
-          setMessages((prev) => {
-            const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
-            return [...withoutThinking, assistantMessageResult.data];
-          });
-        }
-
-        // Update chat list item without full refresh
-        const responseContentString = typeof responseContent === 'string' 
-          ? responseContent 
-          : JSON.stringify(responseContent, null, 2);
-        setChats((prev) => {
-          const filtered = prev.filter((chat) => chat.id !== currentChat.id);
-          const updatedChat = prev.find((chat) => chat.id === currentChat.id);
-          return [
-            {
-              ...(updatedChat || currentChat),
-              lastMessage: responseContentString.substring(0, 100) || 'Response received',
-              lastMessageAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            },
-            ...filtered,
-          ];
-        });
-      }
     } catch (err) {
       // Check if error is due to abort
       if (err instanceof Error && err.name === 'AbortError') {
