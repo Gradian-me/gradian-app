@@ -3,10 +3,10 @@
 
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sidebar as SidebarIcon, Loader2 } from 'lucide-react';
+import { Sidebar as SidebarIcon, Loader2, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -39,6 +39,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     chats,
     currentChat,
     messages,
+    messagesPagination,
+    loadMoreMessages,
     todos,
     isLoading,
     isRefreshingChats,
@@ -57,11 +59,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isExecutingTodos, setIsExecutingTodos] = useState(false);
-  const [isInlineExecuting, setIsInlineExecuting] = useState(false);
-  const [inlineExecutingTitle, setInlineExecutingTitle] = useState<string | null>(null);
-  const [todoStopHandler, setTodoStopHandler] = useState<(() => void) | null>(null);
   const executeAbortControllerRef = useRef<AbortController | null>(null);
   const [expandedExecutionPlans, setExpandedExecutionPlans] = useState<Set<string>>(new Set());
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const prevChatIdRef = useRef<string | null>(null);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
 
   // Select chat from URL on mount or when URL changes
   useEffect(() => {
@@ -70,10 +72,71 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, [chatIdFromUrl, currentChat?.id, selectChat]);
 
-  // Auto-scroll to bottom when messages change
+  // Auto-scroll to bottom when switching chats or loading new messages for current chat
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const isChatChanged = currentChat?.id && currentChat.id !== prevChatIdRef.current;
+    if (isChatChanged) {
+      prevChatIdRef.current = currentChat?.id ?? null;
+      requestAnimationFrame(() => {
+        messagesContainerRef.current?.scrollTo({ top: messagesContainerRef.current.scrollHeight, behavior: 'smooth' });
+      });
+      return;
+    }
+    // If new messages arrive and the user is near the bottom, keep at bottom
+    const container = messagesContainerRef.current;
+    if (container) {
+      const nearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 120;
+      if (nearBottom) {
+        requestAnimationFrame(() => {
+          container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        });
+      }
+    }
+  }, [messages, currentChat]);
+
+  // Load more messages when scrolling near the top (infinite scroll)
+  const handleMessagesScroll = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (!container || !messages || messages.length === 0) return;
+    if (container.scrollTop < 80) {
+      void loadMoreMessages();
+    }
+
+    // Show scroll-to-bottom button when not near bottom
+    const nearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 120;
+    setShowScrollToBottom(!nearBottom);
+  }, [messages, loadMoreMessages]);
+
+  const smoothScrollToBottom = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    // Cancel any pending animation by using a flag on the element
+    const start = container.scrollTop;
+    const end = container.scrollHeight - container.clientHeight;
+    const distance = end - start;
+    if (distance <= 0) return;
+
+    const duration = 600;
+    const startTime = performance.now();
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const step = (now: number) => {
+      const elapsed = now - startTime;
+      const t = Math.min(1, elapsed / duration);
+      const eased = easeOutCubic(t);
+      container.scrollTop = start + distance * eased;
+      if (t < 1) {
+        requestAnimationFrame(step);
+      }
+    };
+
+    requestAnimationFrame(step);
+  }, []);
+
+  const handleScrollToBottom = useCallback(() => {
+    smoothScrollToBottom();
+  }, [smoothScrollToBottom]);
 
   // Auto-expand the latest execution plan when messages change
   // New execution plans are expanded by default, previous ones are collapsed
@@ -117,12 +180,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       executeAbortControllerRef.current = null;
     }
 
-    // Stop inline todo execution if active
-    if (isInlineExecuting && todoStopHandler) {
-      todoStopHandler();
-      setIsInlineExecuting(false);
-      setInlineExecutingTitle(null);
-    }
   };
 
   const handleCreateNewChat = async () => {
@@ -282,7 +339,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             animate={{ width: 320, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="overflow-hidden flex-shrink-0"
+            className="overflow-hidden shrink-0"
           >
             <div className="w-80 h-full">
               <ChatList
@@ -329,7 +386,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div
+          className="flex-1 overflow-y-auto p-4 relative"
+          ref={messagesContainerRef}
+          onScroll={handleMessagesScroll}
+        >
           {error && (
             <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm">
               {error}
@@ -428,15 +489,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         }}
                         onTodoExecuted={handleTodoExecuted}
                         isExecuting={isExecutingTodos && isLatestExecutionPlan}
-                        onExecutionStart={(title) => {
-                          setIsInlineExecuting(true);
-                          setInlineExecutingTitle(title);
-                        }}
-                        onExecutionEnd={() => {
-                          setIsInlineExecuting(false);
-                          setInlineExecutingTitle(null);
-                        }}
-                        onRegisterStopHandler={(fn) => setTodoStopHandler(() => fn || null)}
                         isExpanded={isExpanded}
                         showExecuteButton={isLatestExecutionPlan}
                         onExpandedChange={(expanded) => {
@@ -458,34 +510,51 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               })}
               
               <div ref={messagesEndRef} />
-              {isInlineExecuting && inlineExecutingTitle && (
-                <div className="flex justify-center mt-2">
-                  <div className="flex items-center gap-2 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-lg border border-violet-200 dark:border-violet-800 px-3 py-1.5">
-                    <div className="w-6 h-6 rounded-full border-2 border-violet-200 dark:border-violet-700 flex items-center justify-center">
-                      <Loader2 className="w-3.5 h-3.5 text-violet-600 dark:text-violet-300 animate-spin" />
-                    </div>
-                    <div className="text-sm font-medium text-gray-800 dark:text-gray-100">
-                      Executing: <span className="font-semibold text-violet-700 dark:text-violet-300">{inlineExecutingTitle}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           )}
+
+          {/* Scroll to Bottom floating control (relative to messages area) */}
+          <AnimatePresence>
+            {showScrollToBottom && (
+              <motion.div
+                initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 12, scale: 0.96 }}
+                transition={{ duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="pointer-events-none sticky bottom-1 inset-x-0 z-40 flex justify-center"
+              >
+                <button
+                  type="button"
+                  onClick={handleScrollToBottom}
+                  className={cn(
+                    'pointer-events-auto flex items-center gap-2 rounded-full px-3 py-2',
+                    'bg-white/95 dark:bg-gray-800/95 border border-violet-200 dark:border-violet-800',
+                    'shadow-2xl hover:shadow-xl transition-all duration-200',
+                    'text-sm font-medium text-gray-800 dark:text-gray-100'
+                  )}
+                >
+                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-violet-50 dark:bg-violet-900/40 border border-violet-200 dark:border-violet-700 text-violet-600 dark:text-violet-200">
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                  Go to bottom
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-            {/* Input Area */}
-            {currentChat && (
-              <div className="border-t border-gray-200 dark:border-gray-800 p-4">
-                <ChatInput
-                  onSend={handleSendMessage}
-                  onStop={handleStop}
-                  selectedAgentId={currentChat.selectedAgentId}
-                  isLoading={isLoading}
-                  isActive={isActive || isExecutingTodos || isInlineExecuting}
-                />
-              </div>
-            )}
+        {/* Input Area */}
+        {currentChat && (
+          <div className="border-t border-gray-200 dark:border-gray-800 p-4">
+            <ChatInput
+              onSend={handleSendMessage}
+              onStop={handleStop}
+              selectedAgentId={currentChat.selectedAgentId}
+              isLoading={isLoading}
+              isActive={isActive || isExecutingTodos}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ export default function ChatDetailPage() {
       subtitle="AI-powered conversations with agent orchestration"
       icon="MessageSquare"
       showEndLine={false}
+      hidePadding={true}
     >
       <div className="h-[calc(100vh-10rem)]">
         <ChatInterface showChatList={true} />

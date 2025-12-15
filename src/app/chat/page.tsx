@@ -14,7 +14,7 @@ export default function ChatPage() {
       icon="MessageSquare"
       showEndLine={false}
     >
-      <div className="h-[calc(100vh-10rem)]">
+      <div className="h-[calc(100vh-9rem)]">
         <ChatInterface showChatList={true} />
       </div>
     </MainLayout>

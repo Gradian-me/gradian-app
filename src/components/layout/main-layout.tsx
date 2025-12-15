@@ -28,6 +28,7 @@ import type { HeaderConfig } from '@/gradian-ui/layout/header';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useTheme } from 'next-themes';
 import { useDialogContext } from '@/gradian-ui/shared/contexts/DialogContext';
+import { cn } from '@/gradian-ui/shared/utils';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -43,6 +44,7 @@ interface MainLayoutProps {
   navigationSchemas?: FormSchema[];
   customHeaderActions?: React.ReactNode;
   showEndLine?: boolean;
+  hidePadding?: boolean;
 }
 
 const DESKTOP_BREAKPOINT = 768;
@@ -84,6 +86,7 @@ export function MainLayout({
   navigationSchemas,
   customHeaderActions,
   showEndLine = true,
+  hidePadding = false,
 }: MainLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -526,7 +529,10 @@ export function MainLayout({
           initial={!hasMountedBefore ? { opacity: 0, y: 10 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="flex-1 overflow-y-auto p-2 md:p-4 lg:p-6 bg-gray-50 dark:bg-gray-900"
+          className={cn(
+            "flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900",
+            hidePadding ? "p-0" : "p-2 md:p-4 lg:p-6"
+          )}
           data-scroll-container="main-content"
         >
           <div className="max-w-9xl mx-auto w-full h-full">

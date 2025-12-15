@@ -8,11 +8,30 @@ import { useUserStore } from '@/stores/user.store';
 import { extractHashtags, extractMentions } from '../utils/text-utils';
 import type { Chat, ChatMessage, AddMessageRequest, Todo } from '../types';
 
+// Ensure unique messages by id while preserving order (earlier entries first)
+const dedupeMessagesById = (items: ChatMessage[]): ChatMessage[] => {
+  const seen = new Set<string>();
+  const result: ChatMessage[] = [];
+  for (const msg of items) {
+    if (!msg?.id) continue;
+    if (seen.has(msg.id)) continue;
+    seen.add(msg.id);
+    result.push(msg);
+  }
+  return result;
+};
+
 export interface UseChatResult {
   chats: Chat[];
   currentChat: Chat | null;
   messages: ChatMessage[];
   todos: Todo[];
+  messagesPagination: {
+    page: number;
+    limit: number;
+    totalMessages: number;
+    hasMore: boolean;
+  };
   isLoading: boolean;
   isRefreshingChats: boolean; // True when refreshing chat list
   isLoadingChat: boolean; // True when loading/switching to a specific chat
@@ -26,6 +45,7 @@ export interface UseChatResult {
   refreshChats: () => Promise<void>;
   addMessage: (message: ChatMessage) => void; // Add message directly without reloading
   updateMessageTodos: (messageId: string, todos: Todo[]) => void; // Update todos in a specific message
+  loadMoreMessages: () => Promise<void>; // Load older messages (pagination)
 }
 
 export function useChat(): UseChatResult {
@@ -33,6 +53,12 @@ export function useChat(): UseChatResult {
   const [currentChat, setCurrentChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [messagesPagination, setMessagesPagination] = useState({
+    page: 1,
+    limit: 20,
+    totalMessages: 0,
+    hasMore: false,
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshingChats, setIsRefreshingChats] = useState(false); // Separate state for chat list refresh
   const [isLoadingChat, setIsLoadingChat] = useState(false); // Separate state for loading/switching chats
@@ -78,20 +104,39 @@ export function useChat(): UseChatResult {
   }, [userId]);
 
   // Load chat by ID (optimized - doesn't set loading state if it's just updating messages)
-  const loadChat = useCallback(async (chatId: string, setLoading: boolean = true): Promise<Chat | null> => {
+  const loadChat = useCallback(async (chatId: string, options?: { setLoading?: boolean; page?: number; limit?: number }): Promise<Chat | null> => {
+    const setLoading = options?.setLoading ?? true;
+    const page = options?.page ?? 1;
+    const limit = options?.limit ?? 20;
     if (setLoading) {
       setIsLoadingChat(true); // Use isLoadingChat for chat switching
     }
     setError(null);
 
     try {
-      const response = await fetch(`/api/chat/${chatId}`);
+      const response = await fetch(`/api/chat/${chatId}?page=${page}&limit=${limit}`);
       const result = await response.json();
 
       if (result.success) {
         const chat = result.data;
         setCurrentChat(chat);
-        setMessages(chat.messages || []);
+        const deduped = dedupeMessagesById(chat.messages || []);
+        setMessages(deduped);
+        if (chat.pagination) {
+          setMessagesPagination({
+            page: chat.pagination.page,
+            limit: chat.pagination.limit,
+            totalMessages: chat.pagination.totalMessages,
+            hasMore: Boolean(chat.pagination.hasMore),
+          });
+        } else {
+          setMessagesPagination({
+            page,
+            limit,
+            totalMessages: deduped.length,
+            hasMore: false,
+          });
+        }
         
         // Extract todos from latest message metadata
         // Sort by createdAt descending to get the most recent message with todos
@@ -124,8 +169,43 @@ export function useChat(): UseChatResult {
 
   // Select chat
   const selectChat = useCallback((chatId: string) => {
-    loadChat(chatId);
+    loadChat(chatId, { setLoading: true, page: 1, limit: 20 });
   }, [loadChat]);
+
+  // Load older messages (pagination: page+1 retrieves the previous slice)
+  const loadMoreMessages = useCallback(async () => {
+    if (!currentChat) return;
+    if (!messagesPagination.hasMore) return;
+    const nextPage = messagesPagination.page + 1;
+    try {
+      const response = await fetch(`/api/chat/${currentChat.id}?page=${nextPage}&limit=${messagesPagination.limit}`);
+      const result = await response.json();
+      if (result.success && result.data) {
+        const chat = result.data;
+        const older = chat.messages || [];
+        setMessages((prev) => {
+          const combined = [...older, ...prev];
+          return dedupeMessagesById(combined);
+        });
+        if (chat.pagination) {
+          setMessagesPagination({
+            page: chat.pagination.page,
+            limit: chat.pagination.limit,
+            totalMessages: chat.pagination.totalMessages,
+            hasMore: Boolean(chat.pagination.hasMore),
+          });
+        } else {
+          setMessagesPagination((prev) => ({
+            ...prev,
+            page: nextPage,
+            hasMore: false,
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Error loading more messages:', err);
+    }
+  }, [currentChat, messagesPagination]);
 
   // Create new chat
   const createNewChat = useCallback(async (): Promise<Chat | null> => {
@@ -284,6 +364,10 @@ export function useChat(): UseChatResult {
         },
       };
       setMessages((prev) => [...prev, thinkingMessage]);
+      setMessagesPagination((prev) => ({
+        ...prev,
+        totalMessages: prev.totalMessages + 1,
+      }));
 
       // Determine which API to call
       // Use orchestrator if no agent is selected, or if explicitly orchestrator
@@ -325,6 +409,10 @@ export function useChat(): UseChatResult {
         setError(aiResult.error || 'Failed to get AI response');
         // Remove thinking message on error
         setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageId));
+        setMessagesPagination((prev) => ({
+          ...prev,
+          totalMessages: Math.max(0, prev.totalMessages - 1),
+        }));
         thinkingMessageIdRef.current = null;
         setIsLoading(false);
         setIsActive(false);
@@ -388,6 +476,10 @@ export function useChat(): UseChatResult {
                     const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
                     return [...withoutThinking, messageResult.data];
                   });
+                  setMessagesPagination((prev) => ({
+                    ...prev,
+                    totalMessages: prev.totalMessages + (thinkingMessageId ? 0 : 1),
+                  }));
                   // Update current chat
                   setCurrentChat((prev) => prev ? {
                     ...prev,
@@ -600,6 +692,10 @@ export function useChat(): UseChatResult {
                   const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
                   return [...withoutThinking, assistantMessageResult.data];
                 });
+              setMessagesPagination((prev) => ({
+                ...prev,
+                totalMessages: prev.totalMessages + (thinkingMessageId ? 0 : 1),
+              }));
               }
 
               // Update todos if present
@@ -673,6 +769,10 @@ export function useChat(): UseChatResult {
                   const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
                   return [...withoutThinking, assistantMessageResult.data];
                 });
+              setMessagesPagination((prev) => ({
+                ...prev,
+                totalMessages: prev.totalMessages + (thinkingMessageId ? 0 : 1),
+              }));
               }
 
               // Update chat list item without full refresh
@@ -731,6 +831,10 @@ export function useChat(): UseChatResult {
                   const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
                   return [...withoutThinking, assistantMessageResult.data];
                 });
+              setMessagesPagination((prev) => ({
+                ...prev,
+                totalMessages: prev.totalMessages + (thinkingMessageId ? 0 : 1),
+              }));
               }
 
               // Update chat list item without full refresh
@@ -787,6 +891,10 @@ export function useChat(): UseChatResult {
                 const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
                 return [...withoutThinking, assistantMessageResult.data];
               });
+              setMessagesPagination((prev) => ({
+                ...prev,
+                totalMessages: prev.totalMessages + (thinkingMessageId ? 0 : 1),
+              }));
             }
 
             // Update chat list item without full refresh
@@ -892,6 +1000,7 @@ export function useChat(): UseChatResult {
         chats,
         currentChat,
         messages,
+    messagesPagination,
         todos,
         isLoading,
         isRefreshingChats,
@@ -906,6 +1015,7 @@ export function useChat(): UseChatResult {
         refreshChats,
         addMessage,
         updateMessageTodos,
+    loadMoreMessages,
       };
 }
 

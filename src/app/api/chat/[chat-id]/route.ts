@@ -7,6 +7,10 @@ import type { UpdateChatRequest } from '@/domains/chat/types';
 
 /**
  * GET - Get chat by ID
+ * Supports pagination via query params:
+ *   - page (1-based, default 1)
+ *   - limit (default 20)
+ * Returns messages slice plus pagination metadata.
  */
 export async function GET(
   request: NextRequest,
@@ -31,9 +35,31 @@ export async function GET(
       );
     }
 
+    // Pagination: default to last 20 messages
+    const searchParams = request.nextUrl.searchParams;
+    const pageParam = searchParams.get('page');
+    const limitParam = searchParams.get('limit');
+    const page = Math.max(1, parseInt(pageParam || '1', 10) || 1);
+    const limit = Math.max(1, parseInt(limitParam || '20', 10) || 20);
+
+    const totalMessages = chat.messages.length;
+    const end = totalMessages - (page - 1) * limit;
+    const start = Math.max(0, end - limit);
+    const pagedMessages = chat.messages.slice(start, end);
+    const hasMore = start > 0;
+
     return NextResponse.json({
       success: true,
-      data: chat,
+      data: {
+        ...chat,
+        messages: pagedMessages,
+        pagination: {
+          page,
+          limit,
+          totalMessages,
+          hasMore,
+        },
+      },
     });
   } catch (error) {
     console.error('Error in GET /api/chat/[chat-id]:', error);
