@@ -87,6 +87,7 @@ function getSummaryAgents(agents: any[]): any[] {
     icon: agent.icon,
     description: agent.description,
     agentType: agent.agentType || 'chat',
+    renderComponents: Array.isArray(agent.renderComponents) ? agent.renderComponents : [],
   }));
   
   // Cache it

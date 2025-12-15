@@ -3286,5 +3286,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCG7SG37Y4Q079D5NESYV7EN",
+    "timestamp": "2025-12-15T08:59:46.000Z",
+    "version": "1.28.004",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated descriptions for various AI agents in ai-agents.json to provide clearer usage guidelines and limitations",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "orchestrator"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new todo structure in chat.json for enhanced task management, including detailed parameters for agent interactions",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "todo-management",
+          "ai-builder"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved parameter handling in TodoEditDialog and TodoList components to streamline user input and ensure unique parameter selection",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "ui",
+          "form-builder"
+        ]
+      }
+    ]
   }
 ]

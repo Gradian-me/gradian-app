@@ -112,7 +112,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     
     try {
       // Try to parse as JSON if it looks like JSON
-      let trimmed = message.content.trim();
+      const trimmed = message.content.trim();
       
       // Handle escaped newlines in JSON strings (from chat.json storage)
       // Replace literal \n with actual newlines for proper JSON parsing
@@ -377,7 +377,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         // Generate filename with Gradian prefix and ULID
         const { ulid } = await import('ulid');
         const videoUlid = ulid();
-        let filename = `Gradian_Video_${videoUlid}.mp4`;
+        const filename = `Gradian_Video_${videoUlid}.mp4`;
         
         if (data.url) {
           // Fetch from URL
@@ -521,7 +521,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 size="sm"
                 className="cursor-default"
               >
-                {message.agentId}
+                {message.metadata?.todoTitle ? `${message.metadata.todoTitle} • ${message.agentId}` : message.agentId}
               </Badge>
             </div>
           )}

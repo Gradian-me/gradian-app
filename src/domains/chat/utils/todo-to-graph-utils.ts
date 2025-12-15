@@ -30,18 +30,19 @@ export interface TodoGraphData {
 
 /**
  * Get status color based on todo status
+ * Uses Tailwind color names for sharp pastel colors
  */
 function getStatusColor(status: Todo['status']): string {
   switch (status) {
     case 'completed':
-      return '#10b981'; // emerald-500
+      return 'emerald'; // Sharp pastel green
     case 'in_progress':
-      return '#3b82f6'; // blue-500
+      return 'sky'; // Sharp pastel blue
     case 'cancelled':
-      return '#ef4444'; // red-500
+      return 'rose'; // Sharp pastel red
     case 'pending':
     default:
-      return '#6b7280'; // gray-500
+      return 'slate'; // Sharp pastel gray
   }
 }
 
@@ -165,30 +166,31 @@ export function todosToGraphData(todos: Todo[]): TodoGraphData {
     }
   });
 
-  // Define node types for different statuses
+  // Define node types for different statuses with Tailwind color names
+  // Using sharp pastel colors with good contrast
   const nodeTypes = [
     {
       id: 'todo-pending',
       label: 'Pending',
-      color: '#6b7280', // gray-500
+      color: 'slate', // Sharp pastel gray
       icon: 'clock',
     },
     {
       id: 'todo-in-progress',
       label: 'In Progress',
-      color: '#3b82f6', // blue-500
+      color: 'sky', // Sharp pastel blue
       icon: 'loader-2',
     },
     {
       id: 'todo-completed',
       label: 'Completed',
-      color: '#10b981', // emerald-500
+      color: 'emerald', // Sharp pastel green
       icon: 'check-circle',
     },
     {
       id: 'todo-cancelled',
       label: 'Cancelled',
-      color: '#ef4444', // red-500
+      color: 'rose', // Sharp pastel red
       icon: 'x-circle',
     },
   ];
@@ -198,7 +200,7 @@ export function todosToGraphData(todos: Todo[]): TodoGraphData {
     {
       id: 'depends-on',
       label: 'Depends On',
-      color: '#6b7280', // gray-500
+      color: 'slate', // Sharp pastel gray
       icon: 'arrow-right',
     },
   ];
@@ -208,7 +210,7 @@ export function todosToGraphData(todos: Todo[]): TodoGraphData {
     {
       id: 'todo-node',
       label: 'Todo',
-      color: '#6b7280', // gray-500 (default, will be overridden by nodeType)
+      color: 'slate', // Default, will be overridden by nodeType
       icon: 'list-todo',
     },
   ];

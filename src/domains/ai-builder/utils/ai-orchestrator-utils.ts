@@ -458,11 +458,43 @@ User Request: "${userPrompt}"
 Available Agents:
 ${JSON.stringify(agentsInfo, null, 2)}
 
-IMPORTANT: Each agent may have formFields with body and extra sections. These represent configurable options for the agent.
-- Analyze the user request to determine appropriate values for these fields
-- For select fields, choose the most appropriate option based on the user's intent
-- For text fields, extract relevant values from the user prompt
-- Include these values in the "input" field of each todo
+CRITICAL RULE - NO CONSECUTIVE SAME AGENT:
+- NEVER create two consecutive todos that use the same agentId
+- If multiple tasks would require the same agent, combine them into a SINGLE todo with a comprehensive, well-crafted user prompt that covers all aspects
+- Create a better, more detailed user prompt that encompasses all related tasks for that agent
+- This ensures efficient execution and avoids redundant agent calls
+- Example: Instead of two "professional-writing" todos, create one todo with a combined prompt like "First, summarize the document, then translate it to Spanish, ensuring the summary is clear and the translation is accurate"
+
+CRITICAL: Each agent has renderComponents (formFields) that represent configurable parameters. You MUST analyze the user request and extract appropriate parameter values.
+
+KEYWORD DETECTION RULES (PRIORITY ORDER - CHECK IN THIS ORDER):
+1. IMAGE GENERATION (HIGHEST PRIORITY):
+   - If user mentions "sketch", "sketch image", "drawing", "pencil drawing", "create sketch", "generate sketch", "sketch of", "visual sketch" → MUST use "image-generator" agent with "imageType": "sketch"
+   - If user mentions "image", "generate image", "create image", "picture" → use "image-generator" agent
+   - For image-generator: detect image types like "infographic", "3d-model", "creative", "iconic", "editorial", "comic-book" and set "imageType" accordingly
+   - CRITICAL: "sketch" keyword ALWAYS means image generation, NOT process analysis. Use "image-generator" agent, NOT "process-analyst"
+
+2. WRITING/TRANSLATION:
+   - If user mentions "summarize", "summary", "summarizer" → use professional-writing agent with "writingStyle": "summarizer"
+   - If user mentions "translate", "translation" → use professional-writing agent with "writingStyle": "translate"
+   - If user mentions "extended", "expand", "elaborate" → use professional-writing agent with "writingStyle": "extended"
+   - If user mentions "professional", "formal" → use professional-writing agent with "writingStyle": "professional"
+   - If user mentions "casual", "informal" → use professional-writing agent with "writingStyle": "casual"
+   - If user mentions "solution", "advisor", "best practices" → use professional-writing agent with "writingStyle": "solution-advisor"
+
+3. OTHER AGENTS:
+   - For any agent: extract text values from user prompt for text/textarea fields
+   - For select fields: match user intent to available options and use the option "id" value
+
+PARAMETER EXTRACTION:
+- Analyze the user request carefully to identify which parameters should be set
+- For each agent's formFields, determine if the user's request implies specific values
+- Extract values from the user prompt that match field names or options
+- Set parameters in the "input" field structure:
+  * Fields with sectionId "body" → go in "input.body"
+  * Fields with sectionId "extra" → go in "input.extra_body"
+  * Use the field "name" (not "id") as the key in the input object
+  * For select fields, use the option "id" value (not the label)
 
 Create a JSON array of todos:
 [
@@ -471,10 +503,10 @@ Create a JSON array of todos:
     "description": "Detailed description",
     "agentId": "agent-id",
     "agentType": "agent-type",
-    "dependencies": ["todo-id-1"], // Optional: IDs of todos that must complete first
-    "input": { // Optional: Configuration values extracted from user prompt
+    "dependencies": ["previous-todo-id"], // REQUIRED: Each todo (except the first) must depend on the previous todo in the array
+    "input": { // REQUIRED when agent has formFields - extract from user prompt
       "body": { // Values for fields with sectionId "body"
-        "fieldName": "value" // e.g., "imageType": "sketch" if user wants a sketch
+        "fieldName": "value" // Use field "name" as key, e.g., "imageType": "sketch", "writingStyle": "summarizer"
       },
       "extra_body": { // Values for fields with sectionId "extra"
         "fieldName": "value"
@@ -483,13 +515,134 @@ Create a JSON array of todos:
   }
 ]
 
+DEPENDENCY RULES (CRITICAL):
+- The FIRST todo in the array should have "dependencies": [] (empty array)
+- Each SUBSEQUENT todo MUST have "dependencies": ["id-of-previous-todo"]
+- Dependencies must reference the actual "id" field of the previous todo in the array
+- Example: If first todo has id "todo-1", second todo should have "dependencies": ["todo-1"]
+- This creates a sequential execution chain where each todo waits for the previous one
+
 Order todos logically. Each todo should be assigned to one of the available agents.
-When an agent has formFields, analyze the user request and include appropriate values in the "input" field.`;
+CRITICAL: Check that no two consecutive todos have the same agentId. If they would, combine them into one todo with a comprehensive prompt.
+ALWAYS include "input" field with appropriate parameters when the agent has formFields and the user request implies specific values.
+CRITICAL: When user mentions "sketch" or "sketch image", ALWAYS use "image-generator" agent, NOT "process-analyst".`;
 
   const messages = [
     {
       role: 'system' as const,
-      content: systemPrompt || 'You are an AI orchestration expert that creates detailed todo lists for multi-agent workflows.',
+      content: systemPrompt || `You are an AI orchestration expert that creates detailed todo lists for multi-agent workflows.
+
+## CRITICAL RULES
+
+### 1. NO CONSECUTIVE SAME AGENT
+Never create consecutive todos with the same agentId. If multiple tasks require the same agent, combine them into a single todo with a comprehensive, well-crafted user prompt that covers all related aspects.
+
+### 2. DEPENDENCIES ARE REQUIRED
+Each todo (except the first) MUST have dependencies set to the previous todo's ID. The first todo has empty dependencies [].
+
+### 3. AGENT SELECTION RULES (PRIORITY ORDER)
+
+**CRITICAL: Always read agent descriptions carefully. Each agent has a specific purpose and output format.**
+
+#### A. IMAGE/VIDEO GENERATION (HIGHEST PRIORITY)
+- **Keywords**: "sketch", "sketch image", "drawing", "pencil drawing", "create sketch", "generate sketch", "visual sketch", "image", "generate image", "create image", "picture", "visual", "infographic", "3d model", "creative image", "iconic", "editorial", "comic book"
+- **Agent**: "image-generator"
+- **Output**: Image files (PNG/URL)
+- **CRITICAL**: "sketch" ALWAYS means visual artwork/image generation, NEVER process analysis. Use "image-generator", NOT "process-analyst"
+- **For videos**: "video", "generate video", "create video" → use "video-generator"
+
+#### B. TEXT PROCESSING/WRITING
+- **Keywords**: "summarize", "summary", "summarizer", "translate", "translation", "improve text", "enhance writing", "grammar", "professional writing", "casual writing", "extended", "expand text", "solution advisor"
+- **Agent**: "professional-writing"
+- **Output**: Enhanced text (string format)
+- **NOT for**: Code review, data analysis, or schema creation
+
+#### C. CODE REVIEW
+- **Keywords**: "code review", "review code", "analyze code", "code security", "code quality", "refactor code", "secure code"
+- **Agent**: "code-review-agent"
+- **Output**: Code review report with secure rewrites
+- **NOT for**: Text processing, data analysis, or schema creation
+
+#### D. DATA ANALYSIS
+- **Keywords**: "analyze data", "data analysis", "analyze this data", "data insights", "statistical analysis", "data patterns"
+- **Context**: If user provides raw data (tables, JSON, CSV) → use "data-analysis-expert"
+- **Context**: If analyzing preloaded system data → use "general-assistant"
+- **Output**: Data analysis reports (markdown)
+
+#### E. SCHEMA CREATION
+- **Keywords**: "create schema", "database schema", "form schema", "data model", "entity", "create form", "app builder"
+- **Agent**: "app-builder"
+- **Output**: JSON schema objects
+- **NOT for**: Process documentation, code generation, or data analysis
+
+#### F. PROCESS DOCUMENTATION
+- **Keywords**: "process documentation", "process analysis", "workflow", "process flow", "procedure", "SOP", "GMP process", "ISO process"
+- **Agent**: "process-analyst"
+- **Output**: Process documentation (markdown with Mermaid diagrams)
+- **NOT for**: Employee performance, code review, or BPMN XML generation
+
+#### G. BPMN WORKFLOW GENERATION
+- **Keywords**: "BPMN", "workflow engine", "executable process", "Camunda", "Flowable", "process definition", "BPMN XML"
+- **Agent**: "business-process-generator"
+- **Output**: BPMN 2.0 XML
+- **NOT for**: Process documentation (use process-analyst)
+
+#### H. EMPLOYEE PERFORMANCE
+- **Keywords**: "employee KPI", "performance review", "employee performance", "KPI generation", "performance metrics"
+- **Agent**: "performance-manager"
+- **Output**: Table format with KPIs
+- **NOT for**: Process documentation or general HR tasks
+
+#### I. QUALITY DEVIATION ANALYSIS
+- **Keywords**: "deviation", "non-conformance", "quality issue", "CAPA", "root cause analysis", "6M model", "GMP deviation", "pharmaceutical quality"
+- **Agent**: "quality-assurance-analyst"
+- **Output**: Deviation analysis report
+- **NOT for**: Process documentation or employee performance
+
+#### J. OOX PHARMACEUTICAL ANALYSIS
+- **Keywords**: "OOS", "OOT", "OOE", "out of specification", "out of trend", "out of expectation", "pharmaceutical OOX"
+- **Agent**: "oox-analyzer-quality-control"
+- **Output**: OOX analysis report
+- **NOT for**: General deviation analysis (use quality-assurance-analyst)
+
+#### K. VOICE TRANSCRIPTION
+- **Keywords**: "transcribe", "audio to text", "speech to text", "voice transcription", "audio transcription"
+- **Agent**: "voice-transcription"
+- **Output**: Transcribed text
+
+#### L. PRESENTATION SLIDES
+- **Keywords**: "presentation", "slides", "slide deck", "presentation slides"
+- **Agent**: "presentation-slide-creator"
+- **Output**: Slide content (markdown)
+
+#### M. AI AGENT CREATION
+- **Keywords**: "create AI agent", "build agent", "new agent", "agent configuration"
+- **Agent**: "ai-agent-builder"
+- **Output**: AI agent JSON configuration
+
+#### N. GENERAL BUSINESS ANALYSIS
+- **Keywords**: "analyze system", "business analysis", "system insights", "organizational analysis" (when analyzing preloaded data)
+- **Agent**: "general-assistant"
+- **Output**: Business analysis report (markdown)
+
+### 4. AGENT SELECTION DECISION PROCESS
+
+1. **Check keywords in user request** - Match against agent descriptions and keywords above
+2. **Read agent descriptions** - Each agent description clearly states "Use for:" and "NOT for:"
+3. **Consider output format** - Match required output (JSON, string, table, image, video) to agent capabilities
+4. **Priority order** - Image/video generation has highest priority, then specific domain agents, then general agents
+5. **When in doubt** - Re-read agent descriptions. Each description explicitly states use cases and exclusions.
+
+### 5. EXAMPLES OF CORRECT AGENT SELECTION
+
+- "create a sketch of a cat" → image-generator (imageType: "sketch")
+- "sketch image of a building" → image-generator (imageType: "sketch")
+- "analyze this process" → process-analyst (process documentation)
+- "summarize this text" → professional-writing (writingStyle: "summarizer")
+- "review this code" → code-review-agent
+- "create employee KPIs" → performance-manager
+- "analyze this data table" → data-analysis-expert
+- "create a schema for products" → app-builder`,
     },
     {
       role: 'user' as const,
@@ -625,53 +778,65 @@ When an agent has formFields, analyze the user request and include appropriate v
       createdAt: new Date().toISOString(),
     }));
 
-    // Normalize dependencies: convert step references (Step 1, Step 2, etc.) or indices to actual todo IDs or titles
-    return todosWithIds.map((todo: Todo, index: number) => {
-      if (!todo.dependencies || todo.dependencies.length === 0) {
-        return todo;
+    // Post-process todos: Fix dependencies (agent selection is handled by improved system prompt)
+    const processedTodos = todosWithIds.map((todo: Todo, index: number) => {
+      // Fix dependencies: If empty or invalid, set based on order
+      let dependencies: string[] = [];
+      if (index > 0) {
+        // Each todo should depend on the previous one
+        dependencies = [todosWithIds[index - 1].id];
       }
 
-      const normalizedDeps = todo.dependencies.map((dep: string) => {
-        // Check if dependency is a step reference (Step 1, Step 2, etc.)
-        const stepMatch = dep.match(/^Step\s*(\d+)$/i);
-        if (stepMatch) {
-          const stepIndex = parseInt(stepMatch[1], 10) - 1; // Convert to 0-based index
-          if (stepIndex >= 0 && stepIndex < todosWithIds.length) {
-            // Use the todo ID of the referenced step
-            return todosWithIds[stepIndex].id;
+      // If dependencies were provided, try to normalize them
+      if (todo.dependencies && todo.dependencies.length > 0) {
+        const normalizedDeps = todo.dependencies.map((dep: string) => {
+          // Check if dependency is a step reference (Step 1, Step 2, etc.)
+          const stepMatch = dep.match(/^Step\s*(\d+)$/i);
+          if (stepMatch) {
+            const stepIndex = parseInt(stepMatch[1], 10) - 1; // Convert to 0-based index
+            if (stepIndex >= 0 && stepIndex < todosWithIds.length) {
+              return todosWithIds[stepIndex].id;
+            }
           }
-        }
 
-        // Check if dependency is a numeric index (1, 2, 3, etc.)
-        const numMatch = dep.match(/^(\d+)$/);
-        if (numMatch) {
-          const depIndex = parseInt(numMatch[1], 10) - 1; // Convert to 0-based index
-          if (depIndex >= 0 && depIndex < todosWithIds.length) {
-            return todosWithIds[depIndex].id;
+          // Check if dependency is a numeric index (1, 2, 3, etc.)
+          const numMatch = dep.match(/^(\d+)$/);
+          if (numMatch) {
+            const depIndex = parseInt(numMatch[1], 10) - 1; // Convert to 0-based index
+            if (depIndex >= 0 && depIndex < todosWithIds.length) {
+              return todosWithIds[depIndex].id;
+            }
           }
-        }
 
-        // Check if dependency matches a todo title
-        const matchingTodo = todosWithIds.find((t: Todo) => t.title === dep);
-        if (matchingTodo) {
-          return matchingTodo.id;
-        }
+          // Check if dependency matches a todo title
+          const matchingTodo = todosWithIds.find((t: Todo) => t.title === dep);
+          if (matchingTodo) {
+            return matchingTodo.id;
+          }
 
-        // Check if dependency is already a valid todo ID
-        const existingTodo = todosWithIds.find((t: Todo) => t.id === dep);
-        if (existingTodo) {
-          return dep; // Already a valid ID
-        }
+          // Check if dependency is already a valid todo ID
+          const existingTodo = todosWithIds.find((t: Todo) => t.id === dep);
+          if (existingTodo) {
+            return dep; // Already a valid ID
+          }
 
-        // If no match found, return original (will be caught by validation)
-        return dep;
-      });
+          // If no match found, return original (will be caught by validation)
+          return dep;
+        }).filter((dep): dep is string => Boolean(dep));
+        
+        // Use normalized dependencies if valid, otherwise use order-based
+        if (normalizedDeps.length > 0) {
+          dependencies = normalizedDeps;
+        }
+      }
 
       return {
         ...todo,
-        dependencies: normalizedDeps,
+        dependencies,
       };
     });
+
+    return processedTodos;
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
       throw new Error('Todo generation timeout');

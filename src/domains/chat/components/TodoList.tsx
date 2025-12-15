@@ -24,6 +24,8 @@ import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card';
 import { TodoResponseDialog } from './TodoResponseDialog';
 import { TodoEditDialog } from './TodoEditDialog';
 import { TodoGraphViewerDialog } from './TodoGraphViewerDialog';
+import { extractTodoParameters, formatParameterValue, getParameterLabel } from '../utils/todo-parameter-utils';
+import { useAiAgents } from '@/domains/ai-builder';
 import { ButtonMinimal } from '@/gradian-ui/form-builder/form-elements';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
@@ -108,6 +110,7 @@ export const TodoList: React.FC<TodoListProps> = ({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const [isGraphViewerOpen, setIsGraphViewerOpen] = useState(false);
+  const { agents: aiAgents } = useAiAgents({ summary: true });
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -181,6 +184,26 @@ export const TodoList: React.FC<TodoListProps> = ({
     setOverId(over ? (over.id as string) : null);
   }, []);
 
+  // Helper function to update dependencies for all todos based on current order
+  const updateDependenciesBasedOnOrder = useCallback((todos: Todo[]): Todo[] => {
+    return todos.map((todo, index) => {
+      // First todo has no dependencies
+      if (index === 0) {
+        return {
+          ...todo,
+          dependencies: [],
+        };
+      }
+      
+      // Each todo depends on the previous todo in the current order
+      const previousTodo = todos[index - 1];
+      return {
+        ...todo,
+        dependencies: previousTodo ? [previousTodo.id] : [],
+      };
+    });
+  }, []);
+
   // Handle drag end for reordering
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
@@ -196,23 +219,8 @@ export const TodoList: React.FC<TodoListProps> = ({
       if (oldIndex !== -1 && newIndex !== -1) {
         const reorderedTodos = arrayMove(localTodos, oldIndex, newIndex);
         
-        // Update dependencies: each todo should depend on the previous todo in the new order
-        const updatedTodos = reorderedTodos.map((todo, index) => {
-          // First todo has no dependencies
-          if (index === 0) {
-            return {
-              ...todo,
-              dependencies: [],
-            };
-          }
-          
-          // Each todo depends on the previous todo
-          const previousTodo = reorderedTodos[index - 1];
-          return {
-            ...todo,
-            dependencies: previousTodo ? [previousTodo.id] : [],
-          };
-        });
+        // Update dependencies for ALL todos based on the new order
+        const updatedTodos = updateDependenciesBasedOnOrder(reorderedTodos);
         
         setLocalTodos(updatedTodos);
         
@@ -222,7 +230,7 @@ export const TodoList: React.FC<TodoListProps> = ({
         }
       }
     }
-  }, [localTodos, onTodosUpdate]);
+  }, [localTodos, onTodosUpdate, updateDependenciesBasedOnOrder]);
 
   // Handle todo edit
   const handleEditTodo = useCallback((todo: Todo) => {
@@ -251,7 +259,12 @@ export const TodoList: React.FC<TodoListProps> = ({
   const handleConfirmDelete = useCallback(() => {
     if (!todoToDelete) return;
     
-    const updatedTodos = localTodos.filter(t => t.id !== todoToDelete.id);
+    // Remove the deleted todo
+    const todosAfterDelete = localTodos.filter(t => t.id !== todoToDelete.id);
+    
+    // Update dependencies for ALL remaining todos based on the new order
+    const updatedTodos = updateDependenciesBasedOnOrder(todosAfterDelete);
+    
     setLocalTodos(updatedTodos);
     
     // Update parent
@@ -261,7 +274,7 @@ export const TodoList: React.FC<TodoListProps> = ({
     
     setIsDeleteDialogOpen(false);
     setTodoToDelete(null);
-  }, [todoToDelete, localTodos, onTodosUpdate]);
+  }, [todoToDelete, localTodos, onTodosUpdate, updateDependenciesBasedOnOrder]);
 
   // Topological sort todos by dependencies (only for execution, not for display)
   const sortedTodos = React.useMemo(() => {
@@ -581,7 +594,10 @@ export const TodoList: React.FC<TodoListProps> = ({
                 items={normalizedTodos.map(t => t.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <div className="space-y-1.5">
+                <div className={cn(
+                  "space-y-1.5",
+                  activeId && "cursor-grabbing"
+                )}>
                   <AnimatePresence>
                     {normalizedTodos.map((todo, index) => {
                   const isCompleted = todo.status === 'completed';
@@ -657,7 +673,7 @@ export const TodoList: React.FC<TodoListProps> = ({
                     <React.Fragment key={todo.id}>
                       {/* Drop indicator line above the item when dragging over it */}
                       {activeId && overId === todo.id && activeId !== todo.id && (
-                        <div className="h-0.5 bg-violet-500 dark:bg-violet-400 rounded-full mx-2 my-1 animate-pulse" />
+                        <div className="h-0.5 bg-violet-500 dark:bg-violet-400 rounded-full mx-2 my-1 animate-pulse cursor-move" />
                       )}
                       <SortableTodoItem
                         todo={todo}
@@ -670,6 +686,7 @@ export const TodoList: React.FC<TodoListProps> = ({
                         onShowResponse={handleShowResponse}
                         formatDuration={formatDuration}
                         isOver={overId === todo.id && activeId !== todo.id}
+                        aiAgents={aiAgents}
                       />
                     </React.Fragment>
                   );
@@ -692,39 +709,39 @@ export const TodoList: React.FC<TodoListProps> = ({
                       View Graph
                     </Button>
                     <div className="flex items-center gap-2">
-                      {onReject && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={onReject}
-                          disabled={isExecuting || executingTodoId !== null}
-                          className="flex items-center gap-2"
-                        >
-                          <X className="w-4 h-4" />
-                          Reject
-                        </Button>
-                      )}
-                      {(onApprove || onExecute) && (
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={handleApprove}
-                          disabled={isExecuting || executingTodoId !== null || !canExecute}
-                          className="flex items-center gap-2"
-                        >
-                          {(isExecuting || executingTodoId !== null) ? (
-                            <>
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              Executing...
-                            </>
-                          ) : (
-                            <>
-                              <Play className="w-4 h-4" />
-                              Execute Plan
-                            </>
-                          )}
-                        </Button>
-                      )}
+                    {onReject && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onReject}
+                        disabled={isExecuting || executingTodoId !== null}
+                        className="flex items-center gap-2"
+                      >
+                        <X className="w-4 h-4" />
+                        Reject
+                      </Button>
+                    )}
+                    {(onApprove || onExecute) && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={handleApprove}
+                        disabled={isExecuting || executingTodoId !== null || !canExecute}
+                        className="flex items-center gap-2"
+                      >
+                        {(isExecuting || executingTodoId !== null) ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Executing...
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-4 h-4" />
+                            Execute Plan
+                          </>
+                        )}
+                      </Button>
+                    )}
                     </div>
                   </div>
                 )}
@@ -789,6 +806,7 @@ interface SortableTodoItemProps {
   onShowResponse: (todo: Todo) => void;
   formatDuration: (ms: number) => string;
   isOver?: boolean; // Whether this item is being dragged over
+  aiAgents?: any[]; // AI agents for parameter label resolution
 }
 
 const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
@@ -802,6 +820,7 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
   onShowResponse,
   formatDuration,
   isOver = false,
+  aiAgents = [],
 }) => {
   const {
     attributes,
@@ -836,8 +855,9 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
           : isBlocked
           ? 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 opacity-60'
           : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700',
-        isDragging && 'ring-2 ring-violet-200 dark:ring-violet-800',
-        isOver && !isDragging && 'border-violet-400 dark:border-violet-500 bg-violet-50/50 dark:bg-violet-900/20 ring-1 ring-violet-300 dark:ring-violet-700'
+        isDragging && 'ring-2 ring-violet-200 dark:ring-violet-800 cursor-grabbing',
+        isOver && !isDragging && 'border-violet-400 dark:border-violet-500 bg-violet-50/50 dark:bg-violet-900/20 ring-1 ring-violet-300 dark:ring-violet-700 cursor-move',
+        !isCompleted && todo.status !== 'in_progress' && !isDragging && 'hover:cursor-move'
       )}
     >
       {/* Drag Handle */}
@@ -845,7 +865,8 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 transition-colors p-0 shrink-0 dark:text-gray-500 dark:hover:text-gray-400 mt-0.5"
+          className="cursor-grab active:cursor-grabbing hover:cursor-grab text-gray-400 hover:text-gray-600 transition-colors p-0 shrink-0 dark:text-gray-500 dark:hover:text-gray-400 mt-0.5 touch-none"
+          style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
         >
           <GripVertical className="h-3.5 w-3.5" />
         </button>
@@ -888,7 +909,7 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
             )}
             {/* Action Buttons - Show on hover */}
             {!isCompleted && todo.status !== 'in_progress' && (
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-1 opacity-30 group-hover:opacity-100 transition-opacity">
                 <ButtonMinimal
                   icon={Edit2}
                   title="Edit todo"
@@ -917,6 +938,39 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
             {todo.description}
           </p>
         )}
+        {/* Parameter Badges */}
+        {(() => {
+          // Find the agent for this todo to filter parameters based on renderComponents
+          const todoAgent = todo.agentId ? aiAgents.find(a => a.id === todo.agentId) : null;
+          const parameters = extractTodoParameters(todo, todoAgent);
+          if (parameters.length === 0) return null;
+          
+          return (
+            <div className="mt-1 flex flex-wrap gap-1">
+              {parameters.map((param) => {
+                const label = getParameterLabel(todo.agentId, param.key, aiAgents);
+                const value = formatParameterValue(param.value);
+                const displayText = value.length > 20 ? `${value.substring(0, 20)}...` : value;
+                
+                return (
+                  <Badge
+                    key={`${param.section}-${param.key}`}
+                    variant="outline"
+                    className={cn(
+                      'text-[10px] px-1.5 py-0 h-4',
+                      'bg-blue-50 dark:bg-blue-950/30',
+                      'border-blue-200 dark:border-blue-800',
+                      'text-blue-700 dark:text-blue-300'
+                    )}
+                    title={`${label}: ${value}`}
+                  >
+                    {label}: {displayText}
+                  </Badge>
+                );
+              })}
+            </div>
+          );
+        })()}
         {todo.dependencies && todo.dependencies.length > 0 && (
           <div className="mt-0.5 text-[10px] text-gray-500 dark:text-gray-500">
             Depends on: {todo.dependencies.length} step{todo.dependencies.length !== 1 ? 's' : ''}

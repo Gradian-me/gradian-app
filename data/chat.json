@@ -296,5 +296,85 @@
     "selectedAgentId": null,
     "lastMessage": "{\n  \"image\": {\n    \"url\": \"/images/ai-generated/Gradian_Image_01KCFRDGR2G090PNACFC3BGFVZ.png\",\n    \"",
     "lastMessageAt": "2025-12-15T01:01:24.144Z"
+  },
+  {
+    "id": "01KCG63BM74KVJNZPVA6EYJH0T",
+    "title": "review this code and give me detailed report for t",
+    "createdAt": "2025-12-15T05:00:31.256Z",
+    "updatedAt": "2025-12-15T05:07:38.133Z",
+    "userId": "841",
+    "messages": [
+      {
+        "id": "01KCG6FD6X4XX3EYX9JHWK9TTB",
+        "role": "user",
+        "content": "review this code and give me detailed report for that, also create a deviation for that, then create sketch for the process export async function processImageRequest(\n  agent: any,\n  requestData: AgentRequestData,\n  baseUrl?: string\n): Promise<AgentResponse> {\n  const isDevelopment = process.env.NODE_ENV === 'development';\n\n\n  try {\n    // Security: Validate agent configuration\n    const agentValidation = validateAgentConfig(agent);\n    if (!agentValidation.valid) {\n      return {\n        success: false,\n        error: agentValidation.error || 'Invalid agent configuration',\n      };\n    }\n\n\n    // Security: Get API key with validation\n    const apiKeyResult = getApiKey();\n    if (!apiKeyResult.key) {\n      return {\n        success: false,\n        error: apiKeyResult.error || 'LLM_API_KEY is not configured',\n      };\n    }\n    const apiKey = apiKeyResult.key;\n\n\n    // Use body and extra_body from requestData if provided, otherwise calculate from formValues\n    let bodyParams: Record<string, any> = {};\n    let extraParams: Record<string, any> = {};\n    let promptParams: Record<string, any> = {};\n\n\n    if (requestData.body || requestData.extra_body) {\n      // Use provided body and extra_body\n      bodyParams = requestData.body || {};\n      extraParams = requestData.extra_body || {};\n     \n      // If formValues are provided, extract prompt params from fields that are not body/extra\n      if (requestData.formValues) {\n        const allParams = extractParametersBySectionId(agent, requestData.formValues);\n        promptParams = allParams.prompt;\n      }\n    } else {\n      // Fallback: If formValues are not provided but userPrompt is, parse userPrompt to extract formValues\n      let parsedFormValues = requestData.formValues;\n      if (!parsedFormValues && requestData.userPrompt) {\n        parsedFormValues = parseUserPromptToFormValues(agent, requestData.userPrompt);\n      }\n\n\n      // Extract parameters from formValues based on sectionId\n      if (parsedFormValues) {\n        const params = extractParametersBySectionId(agent, parsedFormValues);\n        bodyParams = params.body;\n        extraParams = params.extra;\n        promptParams = params.prompt;\n      }\n    }",
+        "createdAt": "2025-12-15T05:07:06.098Z"
+      },
+      {
+        "id": "01KCG6GCGG9Q8FSZRPPX638JKP",
+        "role": "assistant",
+        "content": "Todo list generated. Please approve to execute.",
+        "agentId": "orchestrator",
+        "metadata": {
+          "todos": [
+            {
+              "id": "01KCG6GCDVCB50JVRVFZGH7J86",
+              "title": "Code Review",
+              "description": "Analyze the provided code for risks, pitfalls, and adherence to best practices. Provide a detailed report on the findings and suggest secure rewrites if necessary.",
+              "status": "pending",
+              "agentId": "code-review-agent",
+              "agentType": "chat",
+              "dependencies": [],
+              "input": {
+                "body": {
+                  "code": "export async function processImageRequest(\n  agent: any,\n  requestData: AgentRequestData,\n  baseUrl?: string\n): Promise<AgentResponse> {\n  const isDevelopment = process.env.NODE_ENV === 'development';\n\n  try {\n    // Security: Validate agent configuration\n    const agentValidation = validateAgentConfig(agent);\n    if (!agentValidation.valid) {\n      return {\n        success: false,\n        error: agentValidation.error || 'Invalid agent configuration',\n      };\n    }\n\n    // Security: Get API key with validation\n    const apiKeyResult = getApiKey();\n    if (!apiKeyResult.key) {\n      return {\n        success: false,\n        error: apiKeyResult.error || 'LLM_API_KEY is not configured',\n      };\n    }\n    const apiKey = apiKeyResult.key;\n\n    // Use body and extra_body from requestData if provided, otherwise calculate from formValues\n    let bodyParams: Record<string, any> = {};\n    let extraParams: Record<string, any> = {};\n    let promptParams: Record<string, any> = {};\n\n    if (requestData.body || requestData.extra_body) {\n      // Use provided body and extra_body\n      bodyParams = requestData.body || {};\n      extraParams = requestData.extra_body || {};\n      \n      // If formValues are provided, extract prompt params from fields that are not body/extra\n      if (requestData.formValues) {\n        const allParams = extractParametersBySectionId(agent, requestData.formValues);\n        promptParams = allParams.prompt;\n      }\n    } else {\n      // Fallback: If formValues are not provided but userPrompt is, parse userPrompt to extract formValues\n      let parsedFormValues = requestData.formValues;\n      if (!parsedFormValues && requestData.userPrompt) {\n        parsedFormValues = parseUserPromptToFormValues(agent, requestData.userPrompt);\n      }\n\n      // Extract parameters from formValues based on sectionId\n      if (parsedFormValues) {\n        const params = extractParametersBySectionId(agent, parsedFormValues);\n        bodyParams = params.body;\n        extraParams = params.extra;\n        promptParams = params.prompt;\n      }\n    }"
+                },
+                "extra_body": {}
+              },
+              "createdAt": "2025-12-15T05:07:38.047Z"
+            },
+            {
+              "id": "01KCG6GCDZMXX5499XX4MY18FS",
+              "title": "Deviation Report Creation",
+              "description": "Using the findings from the code review, create a detailed deviation report that identifies any discrepancies or issues found in the code. Utilize the 6M model to analyze the root causes and suggest improvements.",
+              "status": "pending",
+              "agentId": "quality-assurance-analyst",
+              "agentType": "chat",
+              "dependencies": [],
+              "input": {
+                "body": {
+                  "findings": "Detailed findings from the code review will be provided here."
+                },
+                "extra_body": {}
+              },
+              "createdAt": "2025-12-15T05:07:38.050Z"
+            },
+            {
+              "id": "01KCG6GCE2SCG2DZ6R3K0KQ7T1",
+              "title": "Process Sketch Creation",
+              "description": "Create a sketch to visually represent the process outlined in the code. The sketch should include key components and flow of the process to aid in understanding.",
+              "status": "pending",
+              "agentId": "process-analyst",
+              "agentType": "chat",
+              "dependencies": [],
+              "input": {
+                "body": {
+                  "imageType": "sketch",
+                  "description": "Sketch representing the process of handling image requests as described in the provided code."
+                },
+                "extra_body": {}
+              },
+              "createdAt": "2025-12-15T05:07:38.052Z"
+            }
+          ],
+          "complexity": 0.8,
+          "executionType": "todo_required"
+        },
+        "createdAt": "2025-12-15T05:07:38.133Z"
+      }
+    ],
+    "selectedAgentId": null,
+    "lastMessage": "Todo list generated. Please approve to execute.",
+    "lastMessageAt": "2025-12-15T05:07:38.133Z"
   }
 ]

@@ -4,7 +4,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { ArrowUp, Paperclip, X, Sparkles } from 'lucide-react';
+import { ArrowUp, Paperclip, X, Sparkles, Square } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Select } from '@/gradian-ui/form-builder/form-elements/components/Select';
 import { Switch } from '@/components/ui/switch';
@@ -621,23 +621,30 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                   <button
                     type="button"
                     className={cn(
-                      'rounded-lg w-10 h-10 flex items-center justify-center shadow-sm',
-                      'bg-gradient-to-r from-red-600 to-red-700',
-                      'hover:from-red-700 hover:to-red-800',
-                      'focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-red-500',
-                      'text-white',
-                      'transition-all duration-200'
+                      'rounded-full w-10 h-10 flex items-center justify-center shadow-sm relative',
+                      'bg-white dark:bg-gray-800',
+                      'border-2 border-gray-200 dark:border-gray-700',
+                      'hover:bg-gray-50 dark:hover:bg-gray-700',
+                      'focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-gray-500',
+                      'text-gray-700 dark:text-gray-300',
+                      'transition-all duration-200',
+                      'overflow-visible'
                     )}
                     aria-label="Stop"
                     onClick={onStop}
                   >
-                    <X className="w-4 h-4" />
+                    {/* Spinning border animation */}
+                    <div 
+                      className="absolute inset-0 rounded-full border-2 border-transparent border-t-violet-500 dark:border-t-violet-400 animate-spin pointer-events-none" 
+                      style={{ animationDuration: '2s' }}
+                    />
+                    <Square className="w-4 h-4 relative z-10 fill-current" />
                   </button>
                 ) : (
                   <button
                     type="button"
                     className={cn(
-                      'rounded-lg w-10 h-10 flex items-center justify-center shadow-sm',
+                      'rounded-full w-10 h-10 flex items-center justify-center shadow-sm',
                       'bg-gradient-to-r from-violet-600 to-purple-600',
                       'hover:from-violet-700 hover:to-purple-700',
                       'focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-violet-500',
