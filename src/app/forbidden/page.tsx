@@ -1,27 +1,27 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { MainLayout } from '@/components/layout/main-layout';
-import { AccessDenied } from '@/gradian-ui/schema-manager/components/AccessDenied';
+import Link from 'next/link';
 
 export default function ForbiddenPage() {
-  const router = useRouter();
-
   return (
-    <MainLayout
-      title="Access Forbidden"
-      subtitle="You don't have permission to access this page."
-    >
-      <AccessDenied
-        title="Access Forbidden"
-        description="This page is only available in development mode."
-        helperText="This page is restricted to development environments only."
-        onGoBack={() => router.push('/apps')}
-        showGoBackButton={true}
-        showHomeButton={true}
-        homeHref="/apps"
-      />
-    </MainLayout>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
+      <div className="max-w-md w-full text-center space-y-4">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
+          Access Forbidden
+        </h1>
+        <p className="text-sm text-gray-600 dark:text-gray-300">
+          You don&apos;t have permission to access this page, or it is only available in development mode.
+        </p>
+        <div className="pt-2">
+          <Link
+            href="/apps"
+            className="inline-flex items-center px-4 py-2 rounded-md bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+          >
+            Go to Apps
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
 

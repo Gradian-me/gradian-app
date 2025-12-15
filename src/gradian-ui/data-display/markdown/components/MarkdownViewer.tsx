@@ -214,6 +214,30 @@ export function MarkdownViewer({
     return createMarkdownComponents(levels, markdownLoadedTimestamp);
   }, [stickyHeadingsKey, markdownLoadedTimestamp]);
 
+  // SECURITY: enforce safe link behavior (no reverse tabnabbing, reduced link abuse)
+  const secureMarkdownComponents = useMemo(() => {
+    const baseComponents = markdownComponents || {};
+
+    return {
+      ...baseComponents,
+      a: (props: any) => {
+        const { href, children, ...rest } = props || {};
+        const BaseAnchor = (baseComponents as any).a || 'a';
+
+        return (
+          <BaseAnchor
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            {...rest}
+          >
+            {children}
+          </BaseAnchor>
+        );
+      },
+    };
+  }, [markdownComponents]);
+
   // PDF export handler
   const handleExportPdf = useCallback(async () => {
     if (!markdownContentRef.current || viewMode !== 'preview') {
@@ -294,12 +318,9 @@ export function MarkdownViewer({
             rehypePlugins={[
               rehypeKatex // Render math with KaTeX - automatically converts math nodes to KaTeX HTML
             ]}
-            components={markdownComponents}
+            components={secureMarkdownComponents}
             // SECURITY: Do not render raw HTML from markdown to prevent XSS
             skipHtml={true}
-            // SECURITY: Protect against reverse tabnabbing and reduce link abuse
-            linkTarget="_blank"
-            linkRel="noopener noreferrer nofollow"
           >
             {displayContent}
           </ReactMarkdown>

@@ -48,8 +48,8 @@ export default function SchemaEditorPage({ params }: { params: Promise<{ 'schema
   const [isReloading, setIsReloading] = useState(false);
 
   useEffect(() => {
-    params.then((resolvedParams) => {
-      setSchemaId(resolvedParams['schema-id']);
+    params.then((resolved) => {
+      setSchemaId(resolved['schema-id']);
     });
   }, [params]);
 

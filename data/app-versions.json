@@ -3467,5 +3467,40 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCGDATAMULTITENANT009",
+    "timestamp": "2025-12-15T16:00:00.000Z",
+    "version": "1.28.009",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Enhanced all-data.json and all-schemas.json to include related companies and additional fields, improving data organization.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "schemas",
+          "companies"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated integration handling in IntegrationsPage to preserve item order based on explicit indices, enhancing user experience.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "integrations",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved ForbiddenPage layout for better accessibility and user interaction.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

@@ -256,7 +256,33 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         />
       );
     
-    case 'textarea':
+    case 'textarea': {
+      // Dynamically adjust textarea rows based on content, unless an explicit rows value is provided
+      const explicitRows =
+        (config as any)?.rows ?? (restProps as any)?.rows ?? undefined;
+
+      const value = restProps.value;
+      const hasValue =
+        typeof value === 'string'
+          ? value.trim().length > 0
+          : value !== undefined && value !== null;
+
+      // Count visible lines in the current value (for strings)
+      const lineCount =
+        typeof value === 'string'
+          ? value.split('\n').length
+          : 0;
+
+      // Default to 5 rows when empty.
+      // Only expand to 8 rows when there is content AND more than 8 lines,
+      // otherwise keep the smaller default height.
+      const resolvedRows =
+        explicitRows !== undefined
+          ? explicitRows
+          : hasValue && lineCount > 8
+            ? 8
+            : 5;
+
       return (
         <Textarea 
           config={config} 
@@ -264,9 +290,10 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           canCopy={canCopy} 
           enableVoiceInput={enableVoiceInput} 
           loadingTextSwitches={loadingTextSwitches}
-          rows={(config as any)?.rows || (restProps as any)?.rows || 5}
+          rows={resolvedRows}
         />
       );
+    }
     
     case 'markdown-input':
     case 'markdown':

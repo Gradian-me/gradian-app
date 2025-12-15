@@ -1159,10 +1159,11 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       return (
         <>
       <Card className={cn(
-        'border border-gray-200 rounded-2xl bg-gray-50/50',
-        'dark:border-gray-700 dark:bg-gray-800',
+        // Match System Section background & border by default
+        'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
-        styling?.variant === 'card' && 'shadow-sm bg-white dark:bg-gray-800/50 dark:border-gray-700',
+        // Keep card variant shadows/borders but do not override background color
+        styling?.variant === 'card' && 'shadow-sm dark:border-gray-700',
         'overflow-visible' // Allow dropdowns to overflow the card
       )}>
             <CardHeader 
@@ -1672,9 +1673,11 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     return (
       <>
       <Card className={cn(
-        'border border-gray-200 rounded-2xl bg-gray-50/50',
-        styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent',
-        styling?.variant === 'card' && 'shadow-sm bg-white',
+        // Match System Section background & border by default
+        'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
+        styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
+        // Keep card variant shadows/borders but do not override background color
+        styling?.variant === 'card' && 'shadow-sm dark:border-gray-700',
         'overflow-visible' // Allow dropdowns to overflow the card
       )}>
         <CardHeader 
@@ -1915,10 +1918,11 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   return (
     <>
       <Card className={cn(
+        // Match System Section background & border by default
         'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
-        'dark:border-gray-700 dark:bg-gray-800',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
-        styling?.variant === 'card' && 'shadow-sm bg-white dark:bg-gray-800/50 dark:border-gray-700',
+        // Keep card variant shadows/borders but do not override background color
+        styling?.variant === 'card' && 'shadow-sm dark:border-gray-700',
         'overflow-visible' // Allow dropdowns to overflow the card
       )}>
         <CardHeader 

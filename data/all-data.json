@@ -2456,8 +2456,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-15T13:47:21.163Z",
-      "lastSynced": "2025-12-15T13:47:21.163Z",
+      "updatedAt": "2025-12-15T15:11:25.085Z",
+      "lastSynced": "2025-12-15T15:11:25.085Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2469,7 +2469,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 5 schemas: 5 succeeded, 0 failed (0 created, 5 updated)"
+      "lastSyncMessage": "Processed 37 schemas: 37 succeeded, 0 failed (0 created, 37 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -2496,7 +2496,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-15T13:48:12.499Z",
+      "updatedAt": "2025-12-15T15:09:56.384Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2506,8 +2506,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-15T13:48:12.499Z",
-      "lastSyncMessage": "Generated relations for 41 out of 41 schemas"
+      "lastSynced": "2025-12-15T15:09:56.384Z",
+      "lastSyncMessage": "Generated relations for 43 out of 43 schemas"
     },
     {
       "title": "Graph Data Sync Production",
@@ -2553,7 +2553,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-15T13:53:18.431Z",
+      "updatedAt": "2025-12-15T14:56:34.271Z",
       "category": [
         {
           "id": "production-integration",
@@ -2562,8 +2562,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-15T13:53:18.431Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1, nodes updated: 8, edges created: 0, nodes failed: 0, edges failed: 0."
+      "lastSynced": "2025-12-15T14:56:34.271Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 3, nodes updated: 25, edges created: 0, nodes failed: 0, edges failed: 0."
     }
   ],
   "databases": [
@@ -4328,6 +4328,20 @@
       "id": "01KCDZTASKGROUP0000000000001",
       "createdAt": "2025-12-14T08:30:00.000Z",
       "updatedAt": "2025-12-14T08:30:00.000Z"
+    },
+    {
+      "related-companies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "title": "Process Types",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KCPROCESSTYPES00000000001",
+      "createdAt": "2025-12-15T00:00:00.000Z",
+      "updatedAt": "2025-12-15T00:00:00.000Z"
     }
   ],
   "entity-type-items": [
@@ -4506,6 +4520,30 @@
       "updatedAt": "2025-12-14T08:30:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Operational",
+      "icon": "Cog",
+      "color": "emerald",
+      "incomplete": false,
+      "id": "01KCPROCESSITEMOPERATIONAL0001",
+      "createdAt": "2025-12-15T00:00:00.000Z",
+      "updatedAt": "2025-12-15T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Supportive",
+      "icon": "LifeBuoy",
+      "color": "blue",
+      "incomplete": false,
+      "id": "01KCPROCESSITEMSUPPORTIVE0002",
+      "createdAt": "2025-12-15T00:00:00.000Z",
+      "updatedAt": "2025-12-15T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
-  ]
+  ],
+  "process-mappings": [],
+  "guidelines": []
 }

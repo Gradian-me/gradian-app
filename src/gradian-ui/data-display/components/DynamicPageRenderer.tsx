@@ -1390,7 +1390,10 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   : `Get started by adding your first ${singularName.toLowerCase()}.`
               }
               action={
-                <Button onClick={handleOpenCreateModal}>
+                <Button
+                  onClick={handleOpenCreateModal}
+                  className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
+                >
                   <Plus className="h-4 w-4 me-2" />
                   Add {singularName}
                 </Button>

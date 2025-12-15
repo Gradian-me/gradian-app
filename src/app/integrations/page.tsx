@@ -97,7 +97,13 @@ const IntegrationCompaniesPicker: React.FC<IntegrationCompaniesPickerProps> = ({
         onClose={handleClose}
         schemaId="companies"
         onSelect={async (selections, _raw) => {
-          await handleSelect(selections.map((s) => ({ id: s.id, label: s.label })));
+          await handleSelect(
+            selections.map((s) => ({
+              id: String(s.id),
+              // Ensure label is always a string to satisfy type requirements
+              label: s.label ?? String(s.id),
+            }))
+          );
           handleClose();
         }}
         title="Select companies"
@@ -253,6 +259,8 @@ interface Integration {
   title: string;
   description: string;
   icon: string;
+  // Optional explicit ordering index from /api/data/integrations
+  index?: number;
   color?: string;
   lastSynced: string;
   lastSyncMessage?: string;
@@ -300,16 +308,53 @@ export default function IntegrationsPage() {
 
   const fetchIntegrations = async () => {
     try {
-      const response = await apiRequest<Integration[] | { data?: Integration[]; items?: Integration[] }>('/api/data/integrations', {
-        method: 'GET',
-      });
-      
+      const response = await apiRequest<Integration[] | { data?: Integration[]; items?: Integration[] }>(
+        '/api/data/integrations',
+        {
+          method: 'GET',
+        }
+      );
+
       if (response.success && response.data) {
         // Handle both array response and wrapped response
-        const data = Array.isArray(response.data) 
-          ? response.data 
+        const data = Array.isArray(response.data)
+          ? response.data
           : ((response.data as any)?.data || (response.data as any)?.items || []);
-        setIntegrations(data);
+
+        // Preserve original order from the first load by assigning a stable index per integration ID.
+        // This prevents items from jumping position when the backend changes sort order (e.g., by updatedAt/lastSynced).
+        setIntegrations((prev) => {
+          // If no previous data, assign index based on initial array order
+          if (!prev || prev.length === 0) {
+            return data.map((item: Integration, idx: number) => ({
+              ...item,
+              index: idx,
+            }));
+          }
+
+          // Reuse existing index when possible; assign new indices at the end for new items
+          const existingIndexById = new Map<string, number>();
+          prev.forEach((item: Integration & { index?: number }) => {
+            if (typeof item.index === 'number') {
+              existingIndexById.set(item.id, item.index);
+            }
+          });
+
+          let nextIndex =
+            prev.reduce(
+              (max, item) => (typeof item.index === 'number' && item.index > max ? item.index : max),
+              -1
+            ) + 1;
+
+          return data.map((item: Integration) => {
+            const existingIndex = existingIndexById.get(item.id);
+            if (typeof existingIndex === 'number') {
+              return { ...item, index: existingIndex };
+            }
+            const assignedIndex = nextIndex++;
+            return { ...item, index: assignedIndex };
+          });
+        });
       } else {
         console.error('Failed to fetch integrations:', response.error);
       }
@@ -737,7 +782,24 @@ export default function IntegrationsPage() {
       groups[categoryKey].push(integration);
     });
     
-    return groups;
+    // Ensure items in each group are ordered by their explicit index from /api/data/integrations (if provided)
+    const orderedGroups: Record<string, Integration[]> = {};
+    Object.keys(groups).forEach((key) => {
+      const items = groups[key];
+      // If no item has an index, keep original API order
+      if (!items.some((item) => typeof item.index === 'number')) {
+        orderedGroups[key] = items;
+        return;
+      }
+
+      orderedGroups[key] = [...items].sort((a, b) => {
+        const ai = typeof a.index === 'number' ? a.index : Number.MAX_SAFE_INTEGER;
+        const bi = typeof b.index === 'number' ? b.index : Number.MAX_SAFE_INTEGER;
+        return ai - bi;
+      });
+    });
+
+    return orderedGroups;
   }, [filteredIntegrations]);
 
   // Get category display name
