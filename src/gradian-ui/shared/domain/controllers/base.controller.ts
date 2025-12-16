@@ -65,7 +65,26 @@ export class BaseController<T extends BaseEntity> {
     // Backward compatibility: Handle single companyId (will be converted to companyIds array in repository)
     // Add any other query params as filters (excluding params we've already handled)
     searchParams.forEach((value, key) => {
-      if (!['search', 'status', 'category', 'includeIds', 'excludeIds', 'includeIds[]', 'excludeIds[]', 'companyIds', 'companyId', 'sortArray', 'sortBy', 'sortOrder', 'page', 'limit'].includes(key)) {
+      if (
+        ![
+          'search',
+          'status',
+          'category',
+          'includeIds',
+          'excludeIds',
+          'includeIds[]',
+          'excludeIds[]',
+          'companyIds',
+          'companyId',
+          'tenantIds', // Used at schema visibility layer, not as a data field filter
+          'tenantId',
+          'sortArray',
+          'sortBy',
+          'sortOrder',
+          'page',
+          'limit',
+        ].includes(key)
+      ) {
         filters[key] = value;
       }
     });

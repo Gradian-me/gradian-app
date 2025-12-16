@@ -400,8 +400,19 @@ async function fetchIntegrationFromApi(id: string): Promise<IntegrationEntity | 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, tenantId } = body;
-    loggingCustom(LogType.INTEGRATION_LOG, 'debug', `POST /api/integrations/sync - Received request with id: ${id}, tenantId: ${tenantId || 'not provided'}`);
+    const { id, tenantId, tenantIds, companyIds } = body as {
+      id?: string;
+      tenantId?: string | number;
+      tenantIds?: string;
+      companyIds?: string;
+    };
+    loggingCustom(
+      LogType.INTEGRATION_LOG,
+      'debug',
+      `POST /api/integrations/sync - Received request with id: ${id}, tenantId: ${
+        tenantId || 'not provided'
+      }, tenantIds: ${tenantIds || 'not provided'}, companyIds: ${companyIds || 'not provided'}`,
+    );
     
     // Extract authorization header from incoming request
     let authHeader = request.headers.get('authorization');
@@ -519,6 +530,16 @@ export async function POST(request: NextRequest) {
 
     const tenantDomainForHeader =
       integration.isTenantBased === true ? resolveTenantDomainFromId(tenantId) : null;
+
+    // Build query parameters for tenant and company scoping (for source routes that support it)
+    const tenantIdsParam = typeof tenantIds === 'string' && tenantIds.trim().length > 0
+      ? tenantIds.trim()
+      : tenantId
+      ? String(tenantId)
+      : undefined;
+    const companyIdsParam = typeof companyIds === 'string' && companyIds.trim().length > 0
+      ? companyIds.trim()
+      : undefined;
     
     if (integration.isTenantBased) {
       if (tenantDomainForHeader) {
@@ -636,8 +657,28 @@ export async function POST(request: NextRequest) {
         }
         
         // Convert to absolute URL if needed
-        const sourceUrl = getApiUrl(resolvedSourceRoute);
-        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Source URL (resolved): ${sourceUrl}`);
+        let sourceUrl = getApiUrl(resolvedSourceRoute);
+        // Append tenantIds and companyIds as query parameters when provided
+        try {
+          const urlObj = new URL(sourceUrl);
+          if (tenantIdsParam) {
+            urlObj.searchParams.set('tenantIds', tenantIdsParam);
+          }
+          if (companyIdsParam) {
+            urlObj.searchParams.set('companyIds', companyIdsParam);
+          }
+          sourceUrl = urlObj.toString();
+        } catch (urlError) {
+          loggingCustom(
+            LogType.INTEGRATION_LOG,
+            'warn',
+            `Failed to append tenantIds/companyIds to source URL (${sourceUrl}): ${
+              urlError instanceof Error ? urlError.message : String(urlError)
+            }`,
+          );
+        }
+
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Source URL (resolved with filters): ${sourceUrl}`);
         const sourceResponse = await fetch(sourceUrl, sourceFetchOptions);
         
         if (!sourceResponse.ok) {

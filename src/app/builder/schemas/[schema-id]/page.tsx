@@ -48,8 +48,8 @@ export default function SchemaEditorPage({ params }: { params: Promise<{ 'schema
   const [isReloading, setIsReloading] = useState(false);
 
   useEffect(() => {
-    params.then((resolvedParams) => {
-      setSchemaId(resolvedParams['schema-id']);
+    params.then((resolved) => {
+      setSchemaId(resolved['schema-id']);
     });
   }, [params]);
 
@@ -161,6 +161,11 @@ export default function SchemaEditorPage({ params }: { params: Promise<{ 'schema
       setIsReloading(false);
     }
   };
+
+  // Don't render until schemaId is resolved from params
+  if (!schemaId) {
+    return null;
+  }
 
   return (
     <SchemaBuilderEditor

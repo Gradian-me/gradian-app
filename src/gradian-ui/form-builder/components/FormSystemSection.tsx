@@ -152,7 +152,9 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
   return (
     <Card className={cn(
       'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
-      'overflow-visible'
+      'overflow-visible',
+      // When placed inside a grid layout (e.g. 2-column forms), make the system section span 2 columns
+      'md:col-span-2'
     )}>
       <CardHeader className="pb-4 px-6 pt-4">
         <CardTitle className="text-base font-medium text-gray-900 dark:text-gray-100">
@@ -213,25 +215,12 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
 
           {(hasAssignedToField || hasDueDateField || hasStatusField || hasEntityTypeField) && (
             <div className="pt-2">
-              <div className={cn(
-                'grid gap-4',
-                // Dynamic grid columns based on available fields
-                (hasAssignedToField && hasDueDateField && hasStatusField && hasEntityTypeField) && 'grid-cols-1 md:grid-cols-4',
-                ((hasAssignedToField && hasDueDateField && hasStatusField && !hasEntityTypeField) ||
-                 (hasAssignedToField && hasDueDateField && !hasStatusField && hasEntityTypeField) ||
-                 (hasAssignedToField && !hasDueDateField && hasStatusField && hasEntityTypeField) ||
-                 (!hasAssignedToField && hasDueDateField && hasStatusField && hasEntityTypeField)) && 'grid-cols-1 md:grid-cols-3',
-                ((hasAssignedToField && hasDueDateField && !hasStatusField && !hasEntityTypeField) || 
-                 (hasAssignedToField && !hasDueDateField && hasStatusField && !hasEntityTypeField) ||
-                 (hasAssignedToField && !hasDueDateField && !hasStatusField && hasEntityTypeField) ||
-                 (!hasAssignedToField && hasDueDateField && hasStatusField && !hasEntityTypeField) ||
-                 (!hasAssignedToField && hasDueDateField && !hasStatusField && hasEntityTypeField) ||
-                 (!hasAssignedToField && !hasDueDateField && hasStatusField && hasEntityTypeField)) && 'grid-cols-1 md:grid-cols-2',
-                ((hasAssignedToField && !hasDueDateField && !hasStatusField && !hasEntityTypeField) ||
-                 (!hasAssignedToField && hasDueDateField && !hasStatusField && !hasEntityTypeField) ||
-                 (!hasAssignedToField && !hasDueDateField && hasStatusField && !hasEntityTypeField) ||
-                 (!hasAssignedToField && !hasDueDateField && !hasStatusField && hasEntityTypeField)) && 'grid-cols-1'
-              )}>
+              <div
+                className={cn(
+                  // Always use a 2-column layout on md+ screens so fields wrap into two rows when there are 4 items
+                  'grid grid-cols-1 md:grid-cols-2 gap-4'
+                )}
+              >
                 {hasAssignedToField && (
                   <div className="space-y-2">
                     <PickerInput

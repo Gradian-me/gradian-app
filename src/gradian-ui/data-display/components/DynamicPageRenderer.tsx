@@ -40,6 +40,7 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { debounce } from '@/gradian-ui/shared/utils';
 import { toast } from 'sonner';
+import { buildHierarchyTree } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { TableWrapper, TableConfig, buildTableColumns, TableColumn } from '@/gradian-ui/data-display/table';
 import { DynamicPagination } from './DynamicPagination';
@@ -171,7 +172,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState<number | 'all'>(10);
+  const [pageSize, setPageSize] = useState<number | 'all'>(25);
 
   // Use the dynamic entity hook for entity management
   const {
@@ -449,8 +450,43 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     if (!deleteConfirmDialog.entity) return;
 
     try {
-      await handleDeleteEntity(deleteConfirmDialog.entity);
+      // When in hierarchy view, delete the selected entity AND all of its descendants
+      if (viewMode === 'hierarchy' && Array.isArray(entities) && entities.length > 0) {
+        const { nodeMap } = buildHierarchyTree(entities);
+        const rootId = String(deleteConfirmDialog.entity.id ?? '');
+
+        if (rootId && nodeMap.has(rootId)) {
+          const collectDescendants = (id: string, acc: Set<string>) => {
+            if (acc.has(id)) return;
+            acc.add(id);
+            const node = nodeMap.get(id);
+            if (!node) return;
+            for (const child of node.children) {
+              collectDescendants(child.id, acc);
+            }
+          };
+
+          const idsToDelete = new Set<string>();
+          collectDescendants(rootId, idsToDelete);
+
+          // Execute deletions sequentially to preserve existing delete logic and error handling
+          for (const id of idsToDelete) {
+            const entityToDelete = entities.find((e) => String(e.id) === id);
+            if (entityToDelete) {
+              await handleDeleteEntity(entityToDelete);
+            }
+          }
+        } else {
+          // Fallback: if we can't resolve hierarchy, delete only the selected entity
+          await handleDeleteEntity(deleteConfirmDialog.entity);
+        }
+      } else {
+        // Non‑hierarchy views: delete only the selected entity
+        await handleDeleteEntity(deleteConfirmDialog.entity);
+      }
+
       setDeleteConfirmDialog({ open: false, entity: null });
+
       // Refresh entities after deletion with current filters
       const filters = buildFilters();
       if (filters) {
@@ -460,11 +496,11 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       loggingCustom(LogType.CLIENT_LOG, 'error', `Error deleting entity: ${error instanceof Error ? error.message : String(error)}`);
       setDeleteConfirmDialog({ open: false, entity: null });
     }
-  }, [deleteConfirmDialog.entity, handleDeleteEntity, fetchEntities, buildFilters]);
+  }, [deleteConfirmDialog.entity, handleDeleteEntity, fetchEntities, buildFilters, viewMode, entities, currentPage, pageSize]);
 
   const lastFiltersRef = useRef<string>('');
   const lastPageRef = useRef<number>(1);
-  const lastPageSizeRef = useRef<number | 'all'>(10);
+  const lastPageSizeRef = useRef<number | 'all'>(25);
 
   // Fetch whenever derived filters or pagination change (includes initial mount and company/filter updates)
   useEffect(() => {
@@ -871,7 +907,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       data: filteredEntities,
       pagination: {
         enabled: false, // Disabled - pagination is shown in page header
-        pageSize: 10,
+        pageSize: 25,
         showPageSizeSelector: true,
         pageSizeOptions: [10, 25, 50, 100, 'all'],
         alwaysShow: false,
@@ -1392,7 +1428,10 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   : `Get started by adding your first ${singularName.toLowerCase()}.`
               }
               action={
-                <Button onClick={handleOpenCreateModal}>
+                <Button
+                  onClick={handleOpenCreateModal}
+                  className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
+                >
                   <Plus className="h-4 w-4 me-2" />
                   Add {singularName}
                 </Button>

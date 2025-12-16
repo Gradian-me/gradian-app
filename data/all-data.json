@@ -634,9 +634,17 @@
       "nationalId": "",
       "id": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdAt": "2025-11-03T12:30:16.678Z",
-      "updatedAt": "2025-11-03T12:44:20.602Z",
+      "updatedAt": "2025-12-15T12:42:56.632Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "related-companies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "name": "AryoGen",
@@ -649,9 +657,17 @@
       "nationalId": "",
       "id": "01K94V8K0RJS7D9K43F2VBTSVG",
       "createdAt": "2025-11-03T12:32:24.097Z",
-      "updatedAt": "2025-11-03T12:32:24.097Z",
+      "updatedAt": "2025-12-15T12:43:02.995Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "related-companies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "name": "NanoAlvand",
@@ -660,9 +676,15 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB85MPFBMS4GQ6KGA0EGJNGA",
       "createdAt": "2025-11-29T16:02:53.548Z",
-      "updatedAt": "2025-11-29T16:02:53.548Z",
+      "updatedAt": "2025-12-15T12:43:09.424Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "related-companies": [
+        {
+          "id": "01KB85MPFBMS4GQ6KGA0EGJNGA",
+          "label": "NanoAlvand"
+        }
+      ]
     },
     {
       "name": "Arvand Pharmed",
@@ -670,9 +692,15 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9VFNMVC92XF1JRND69S4Z9",
       "createdAt": "2025-11-30T07:43:51.973Z",
-      "updatedAt": "2025-11-30T07:43:51.974Z",
+      "updatedAt": "2025-12-15T12:43:15.013Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "related-companies": [
+        {
+          "id": "01KB9VFNMVC92XF1JRND69S4Z9",
+          "label": "Arvand Pharmed"
+        }
+      ]
     }
   ],
   "relation-types": [
@@ -1413,6 +1441,7 @@
       "lastName": "Administrator",
       "email": "admin@gradian.me",
       "postTitle": "Admin",
+      "authenticationType": "form-based",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1438,6 +1467,7 @@
       "lastName": "Abidi",
       "postTitle": "CAO",
       "company": "CinnaGen",
+      "authenticationType": "form-based",
       "status": [
         {
           "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
@@ -1465,6 +1495,7 @@
       "lastName": "Goudarzi",
       "email": "goudarziar@aryogen.com",
       "postTitle": "Quality Assurance Manager",
+      "authenticationType": "form-based",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSMDRHJTDY7SFEY6VWK2HEK",
@@ -1487,6 +1518,7 @@
       "firstName": "Ali",
       "lastName": "Aminimehr",
       "email": "aminimehra@aryogen.com",
+      "authenticationType": "form-based",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSTVK8P6Y3P4MW060HNNKB1",
@@ -1502,6 +1534,7 @@
       "email": "vaziril@aryogen.com",
       "postTitle": "QA Deputy",
       "company": "AryoGen",
+      "authenticationType": "form-based",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBZ64EBC9SWWTCCYKEMGK21E",
@@ -1533,6 +1566,7 @@
       "lastName": "Rezaeifard",
       "email": "rezaeifardh@cinnagen.com",
       "postTitle": "Backend Developer",
+      "authenticationType": "active-directory",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KC3F76QSDY5P2XVP3T2E0DAD",
@@ -1554,6 +1588,7 @@
       "lastName": "Mirghasemi",
       "email": "ghasemimas@cinnagen.com",
       "postTitle": "Backend Developer",
+      "authenticationType": "active-directory",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KC3FBM8YXB7V70SQMEBN0151",
@@ -2428,8 +2463,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-08T14:36:42.158Z",
-      "lastSynced": "2025-12-08T14:36:42.158Z",
+      "updatedAt": "2025-12-15T15:11:25.085Z",
+      "lastSynced": "2025-12-15T15:11:25.085Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2441,7 +2476,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 41 schemas: 41 succeeded, 0 failed (41 created, 0 updated)"
+      "lastSyncMessage": "Processed 37 schemas: 37 succeeded, 0 failed (0 created, 37 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -2468,7 +2503,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-08T14:36:49.973Z",
+      "updatedAt": "2025-12-15T15:09:56.384Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2478,8 +2513,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-08T14:36:49.973Z",
-      "lastSyncMessage": "Generated relations for 41 out of 41 schemas"
+      "lastSynced": "2025-12-15T15:09:56.384Z",
+      "lastSyncMessage": "Generated relations for 43 out of 43 schemas"
     },
     {
       "title": "Graph Data Sync Production",
@@ -2525,7 +2560,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-08T14:43:25.720Z",
+      "updatedAt": "2025-12-15T14:56:34.271Z",
       "category": [
         {
           "id": "production-integration",
@@ -2534,8 +2569,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-08T14:43:25.720Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 215, nodes updated: 5, edges created: 76, nodes failed: 0, edges failed: 0."
+      "lastSynced": "2025-12-15T14:56:34.271Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 3, nodes updated: 25, edges created: 0, nodes failed: 0, edges failed: 0."
     }
   ],
   "databases": [
@@ -3775,6 +3810,15 @@
       "id": "01KBSR8J6EWGTQ6DPKGH5XR3VE",
       "createdAt": "2025-12-06T11:55:24.239Z",
       "updatedAt": "2025-12-06T11:55:24.239Z"
+    },
+    {
+      "label_fa": "تغییرات جزئی بدون تأثیر کیفی",
+      "label_en": "Minor Changes Without Quality Impact",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KCH4F85M3Q8BNTXH67GJTKS5",
+      "createdAt": "2025-12-15T13:51:18.204Z",
+      "updatedAt": "2025-12-15T13:51:18.205Z"
     }
   ],
   "change-subject-types": [
@@ -4269,28 +4313,56 @@
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
         }
       ],
       "title": "6M Types",
-      "incomplete": true,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KCDYYM7B28QEPXD97A1B8V5S",
       "createdAt": "2025-12-14T08:17:07.312Z",
-      "updatedAt": "2025-12-14T08:17:07.312Z"
+      "updatedAt": "2025-12-15T16:53:35.922Z",
+      "entity-type-items-section": []
     },
     {
       "related-companies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
         }
       ],
       "title": "Task Types",
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KCDZTASKGROUP0000000000001",
       "createdAt": "2025-12-14T08:30:00.000Z",
-      "updatedAt": "2025-12-14T08:30:00.000Z"
+      "updatedAt": "2025-12-15T16:53:26.906Z",
+      "entity-type-items-section": []
+    },
+    {
+      "related-companies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "title": "Process Types",
+      "incomplete": true,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KCPROCESSTYPES00000000001",
+      "createdAt": "2025-12-15T00:00:00.000Z",
+      "updatedAt": "2025-12-15T16:53:11.207Z"
     }
   ],
   "entity-type-items": [
@@ -4469,6 +4541,3553 @@
       "updatedAt": "2025-12-14T08:30:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Operational",
+      "icon": "Activity",
+      "color": "emerald",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KCHEZ7VQEP2MWZXAM5T411E7",
+      "createdAt": "2025-12-15T16:54:47.935Z",
+      "updatedAt": "2025-12-15T16:54:47.935Z"
+    },
+    {
+      "label": "Supportive",
+      "icon": "Archive",
+      "color": "amber",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+      "createdAt": "2025-12-15T16:55:37.366Z",
+      "updatedAt": "2025-12-15T16:55:37.366Z"
+    },
+    {
+      "label": "Administrative",
+      "icon": "Award",
+      "color": "slate",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+      "createdAt": "2025-12-15T16:56:22.116Z",
+      "updatedAt": "2025-12-15T16:56:22.116Z"
+    }
+  ],
+  "process-mappings": [
+    {
+      "id": "AGNSGBBCMF6KLIG55YM4WBHMKA",
+      "parent": null,
+      "code": "6",
+      "title": "Manage Human Capital",
+      "description": "Attract, develop, and retain workforce.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMIRTZNARNTTKRHD7UE",
+      "parent": "AGNSGBBCMF6KLIG55YM4WBHMKA",
+      "code": "6.1",
+      "title": "Develop and Manage Human Resources",
+      "description": "Define HR strategy and policies.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMK3K5NU6RNIAI66QOA",
+      "parent": "AGNSGBBCMIRTZNARNTTKRHD7UE",
+      "code": "6.1.1",
+      "title": "Develop HR Strategy",
+      "description": "Set human capital strategy.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMJVNRUMA3KCAHT74L4",
+      "parent": "AGNSGBBCMF6KLIG55YM4WBHMKA",
+      "code": "6.2",
+      "title": "Acquire and Develop Talent",
+      "description": "Recruit and build workforce capability.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMJE5DVQBTAWDWTZKRA",
+      "parent": "AGNSGBBCMJVNRUMA3KCAHT74L4",
+      "code": "6.2.1",
+      "title": "Recruit and Hire Employees",
+      "description": "Source and select talent.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMK5WSLPVZSCSWOJ4QM",
+      "parent": "AGNSGBBCMF6KLIG55YM4WBHMKA",
+      "code": "6.3",
+      "title": "Manage Employee Performance",
+      "description": "Drive performance and development.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMIVKZGNTMADQRXKQGI",
+      "parent": "AGNSGBBCMK5WSLPVZSCSWOJ4QM",
+      "code": "6.3.1",
+      "title": "Manage Performance and Development",
+      "description": "Evaluate and develop employees.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMLIHXLPZBEC6WVOVPA",
+      "parent": "AGNSGBBCMF6KLIG55YM4WBHMKA",
+      "code": "6.4",
+      "title": "Manage Compensation and Benefits",
+      "description": "Reward and retain employees.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMKFGMKS2NURZMQPXZQ",
+      "parent": "AGNSGBBCMLIHXLPZBEC6WVOVPA",
+      "code": "6.4.1",
+      "title": "Administer Compensation and Benefits",
+      "description": "Manage payroll and benefits.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMLWL6YRICQ3G6LV2JY",
+      "parent": "AGNSGBBCMF6KLIG55YM4WBHMKA",
+      "code": "6.5",
+      "title": "Manage Employee Relations",
+      "description": "Maintain employee engagement.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMLN4BD7ZKSQLYNH5FY",
+      "parent": "AGNSGBBCMLWL6YRICQ3G6LV2JY",
+      "code": "6.5.1",
+      "title": "Handle Employee Relations Issues",
+      "description": "Resolve employee issues.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMLB2V3ZVMBGFRNXLCE",
+      "parent": null,
+      "code": "7",
+      "title": "Manage Information Technology",
+      "description": "Enable digital and IT capabilities.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMI2RHMZKO4JLXRR27A",
+      "parent": "AGNSGBBCMLB2V3ZVMBGFRNXLCE",
+      "code": "7.1",
+      "title": "Develop IT Strategy",
+      "description": "Align IT with business needs.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMJBLQP2DC624LUJCHE",
+      "parent": "AGNSGBBCMI2RHMZKO4JLXRR27A",
+      "code": "7.1.1",
+      "title": "Define IT Architecture and Roadmap",
+      "description": "Set IT direction.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMIEPCJEYLKYVFNJT7Q",
+      "parent": "AGNSGBBCMLB2V3ZVMBGFRNXLCE",
+      "code": "7.2",
+      "title": "Develop and Maintain Systems",
+      "description": "Build and enhance IT systems.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMKKUARP4N66L4GZJOU",
+      "parent": "AGNSGBBCMIEPCJEYLKYVFNJT7Q",
+      "code": "7.2.1",
+      "title": "Develop and Enhance Applications",
+      "description": "Deliver IT solutions.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMKDKB3L5WMEN2K5J24",
+      "parent": "AGNSGBBCMLB2V3ZVMBGFRNXLCE",
+      "code": "7.3",
+      "title": "Deliver IT Services",
+      "description": "Operate IT services.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMKYF5WLXWZ6CFAQIZM",
+      "parent": "AGNSGBBCMKDKB3L5WMEN2K5J24",
+      "code": "7.3.1",
+      "title": "Operate and Support IT Services",
+      "description": "Run IT operations.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMJMBAFWHCF2ZWELGCE",
+      "parent": null,
+      "code": "8",
+      "title": "Manage Financial Resources",
+      "description": "Plan and control financial performance.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMK3LYUIWNRZVHLLJTQ",
+      "parent": "AGNSGBBCMJMBAFWHCF2ZWELGCE",
+      "code": "8.1",
+      "title": "Plan and Budget",
+      "description": "Define financial plans.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMKZENOMDJV2AXBIKMI",
+      "parent": "AGNSGBBCMK3LYUIWNRZVHLLJTQ",
+      "code": "8.1.1",
+      "title": "Develop Budgets and Forecasts",
+      "description": "Prepare financial plans.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMLMZQ7XYBMFK6LHSGQ",
+      "parent": "AGNSGBBCMJMBAFWHCF2ZWELGCE",
+      "code": "8.2",
+      "title": "Perform Accounting",
+      "description": "Record and report finances.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMI5TLV57XTYROEK5UU",
+      "parent": "AGNSGBBCMLMZQ7XYBMFK6LHSGQ",
+      "code": "8.2.1",
+      "title": "Record Financial Transactions",
+      "description": "Maintain accounting records.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMLNYTMZRAGP3BPW46Y",
+      "parent": "AGNSGBBCMJMBAFWHCF2ZWELGCE",
+      "code": "8.3",
+      "title": "Manage Treasury",
+      "description": "Manage cash and funding.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMLQSVHKVDMMRQD5CSM",
+      "parent": "AGNSGBBCMLNYTMZRAGP3BPW46Y",
+      "code": "8.3.1",
+      "title": "Manage Cash and Investments",
+      "description": "Control liquidity.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMIL46XNCVLVRKYBD7I",
+      "parent": null,
+      "code": "9",
+      "title": "Manage Risk, Compliance, and Quality",
+      "description": "Ensure compliance and risk control.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMIRVDWLJQR4266MKOI",
+      "parent": "AGNSGBBCMIL46XNCVLVRKYBD7I",
+      "code": "9.1",
+      "title": "Manage Enterprise Risk",
+      "description": "Identify and mitigate risks.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMI6AVYKACIKMLUSWMA",
+      "parent": "AGNSGBBCMIRVDWLJQR4266MKOI",
+      "code": "9.1.1",
+      "title": "Identify and Assess Risk",
+      "description": "Perform risk assessments.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMLP2W6ZRESX6UPIELE",
+      "parent": "AGNSGBBCMIL46XNCVLVRKYBD7I",
+      "code": "9.2",
+      "title": "Manage Quality",
+      "description": "Ensure product and process quality.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMMIZAYBYQEVU7ELEEM",
+      "parent": "AGNSGBBCMLP2W6ZRESX6UPIELE",
+      "code": "9.2.1",
+      "title": "Operate Quality Management System",
+      "description": "Maintain QMS.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMOSYI7KV3ZXPXB3ZVI",
+      "parent": "AGNSGBBCMIL46XNCVLVRKYBD7I",
+      "code": "9.3",
+      "title": "Ensure Regulatory Compliance",
+      "description": "Meet regulatory requirements.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMM27LQYTBYB7OKUAAU",
+      "parent": "AGNSGBBCMOSYI7KV3ZXPXB3ZVI",
+      "code": "9.3.1",
+      "title": "Manage Regulatory Compliance",
+      "description": "Ensure regulatory adherence.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMN4XQDODXIRLXJ3QJU",
+      "parent": null,
+      "code": "10",
+      "title": "Manage External Relationships",
+      "description": "Manage suppliers and partners.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMMXYYCAMENXFTHH644",
+      "parent": "AGNSGBBCMN4XQDODXIRLXJ3QJU",
+      "code": "10.1",
+      "title": "Manage Suppliers",
+      "description": "Source and manage suppliers.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMNCBFNIH5LDDFAJV6M",
+      "parent": "AGNSGBBCMMXYYCAMENXFTHH644",
+      "code": "10.1.1",
+      "title": "Evaluate and Select Suppliers",
+      "description": "Assess suppliers.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMO43DJP566F7KGAMGY",
+      "parent": "AGNSGBBCMN4XQDODXIRLXJ3QJU",
+      "code": "10.2",
+      "title": "Manage Partners",
+      "description": "Manage strategic partners.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMNDXFVK2V7UJTTWB4A",
+      "parent": "AGNSGBBCMO43DJP566F7KGAMGY",
+      "code": "10.2.1",
+      "title": "Manage Alliances and Partnerships",
+      "description": "Oversee partnerships.",
+      "entityType": [
+        {
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMPE3BD75PIBJ24B6IU",
+      "parent": null,
+      "code": "11",
+      "title": "Manage Legal and Ethics",
+      "description": "Provide legal governance.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMP2ARYUM42XVZIZHXQ",
+      "parent": "AGNSGBBCMPE3BD75PIBJ24B6IU",
+      "code": "11.1",
+      "title": "Provide Legal Services",
+      "description": "Deliver legal support.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMNWFBUMLQQIRCWWQHE",
+      "parent": "AGNSGBBCMP2ARYUM42XVZIZHXQ",
+      "code": "11.1.1",
+      "title": "Provide Legal Advice",
+      "description": "Support business legally.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMNEMF67OLPMSDULCXI",
+      "parent": "AGNSGBBCMPE3BD75PIBJ24B6IU",
+      "code": "11.2",
+      "title": "Manage Ethics and Compliance",
+      "description": "Ensure ethical conduct.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMMY2JWGUQ646H6GY34",
+      "parent": "AGNSGBBCMNEMF67OLPMSDULCXI",
+      "code": "11.2.1",
+      "title": "Manage Ethics Programs",
+      "description": "Oversee ethics.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMSOD5Z3ROF23G6XAT4",
+      "parent": null,
+      "code": "12",
+      "title": "Manage Enterprise Performance",
+      "description": "Drive performance management.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMQEE75CFXB55W25XJE",
+      "parent": "AGNSGBBCMSOD5Z3ROF23G6XAT4",
+      "code": "12.1",
+      "title": "Measure Performance",
+      "description": "Track KPIs.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMQAQHAQWVCWA6J7WTE",
+      "parent": "AGNSGBBCMQEE75CFXB55W25XJE",
+      "code": "12.1.1",
+      "title": "Define and Monitor KPIs",
+      "description": "Measure results.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMQNAAXZHINR3JE7XZA",
+      "parent": "AGNSGBBCMSOD5Z3ROF23G6XAT4",
+      "code": "12.2",
+      "title": "Improve Performance",
+      "description": "Optimize operations.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMRFVQBQ7PK6OQSZLGE",
+      "parent": "AGNSGBBCMQNAAXZHINR3JE7XZA",
+      "code": "12.2.1",
+      "title": "Execute Continuous Improvement",
+      "description": "Improve processes.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMREFA6YTWR52EIZWSA",
+      "parent": null,
+      "code": "13",
+      "title": "Manage Change and Innovation",
+      "description": "Enable transformation.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMR5MSQBW6FABSBOCTM",
+      "parent": "AGNSGBBCMREFA6YTWR52EIZWSA",
+      "code": "13.1",
+      "title": "Manage Change",
+      "description": "Drive change.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMRFSMMOXI4QEIZVOUU",
+      "parent": "AGNSGBBCMR5MSQBW6FABSBOCTM",
+      "code": "13.1.1",
+      "title": "Plan and Execute Change",
+      "description": "Implement change.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMTIP7B7IVY2E7FBWBI",
+      "parent": "AGNSGBBCMREFA6YTWR52EIZWSA",
+      "code": "13.2",
+      "title": "Manage Innovation",
+      "description": "Develop innovations.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    },
+    {
+      "id": "AGNSGBBCMQ3QZPFHNMCOJLAGSM",
+      "parent": "AGNSGBBCMTIP7B7IVY2E7FBWBI",
+      "code": "13.2.1",
+      "title": "Develop and Manage Innovation Pipeline",
+      "description": "Innovate systematically.",
+      "entityType": [
+        {
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate"
+        }
+      ]
+    }
+  ],
+  "guidelines": [
+    {
+      "id": "01KCHCHX8100000000000002F8",
+      "code": "WHO-TRS1011-Annex3",
+      "title": "Annex 3 – Guidelines on procedures and data requirements for changes to approved biotherapeutic products",
+      "parent": null
+    },
+    {
+      "id": "01KCHCHX8400000000000002HB",
+      "code": "A1",
+      "title": "Appendix 1: Reporting categories and suggested review timelines",
+      "parent": "01KCHCHX8100000000000002F8"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HC",
+      "code": "A2",
+      "title": "Appendix 2: Changes to the drug substance",
+      "parent": "01KCHCHX8100000000000002F8"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HD",
+      "code": "A2.T1.1",
+      "title": "Change to a drug substance manufacturing facility: Note: For the purpose of this change, manufacturing refers to unit operations in the manufacturing process of the drug substance and is not intended to refer to quality control testing, storage or transportati",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HE",
+      "code": "A2.T1.1.p1",
+      "title": "The proposed facility is an approved drug substance facility for biotherapeutics (for the same company/marketing authorization holder).",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HF",
+      "code": "A2.T1.1.p2",
+      "title": "Any changes to the manufacturing process and/or controls are considered either moderate or minor (for example, duplication of product line).",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HG",
+      "code": "A2.T1.1.p3",
+      "title": "The new facility/suite is under the same quality assurance/quality control oversight.",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HH",
+      "code": "A2.T1.1.p4",
+      "title": "The proposed change does not involve additional containment requirements.",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HJ",
+      "code": "A2.T1.1.p5",
+      "title": "There should remain at least one site/manufacturer, as previously authorized, performing the same function as the one(s) to be deleted.",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HK",
+      "code": "A2.T1.1.p6",
+      "title": "The deletion should not be due to critical deficiencies in manufacturing (for example, recurrent out-of-specification events, environmental monitoring failures, etc.).",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HM",
+      "code": "A2.T1.1.p7",
+      "title": "Evidence of GMP compliance of the facility.",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HN",
+      "code": "A2.T1.1.p8",
+      "title": "Name, address and responsibilities (for example, fermentation, purification) of the proposed facility.",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HP",
+      "code": "A2.T1.1.p9",
+      "title": "Summary of the process validation studies and results. Annex 3",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HQ",
+      "code": "A2.T1.1.p10",
+      "title": "Comparability of the pre-change and post-change drug substance with respect to physicochemical properties, biological activity, purity, impurities and contaminants, as appropriate. Nonclinical and/or clinical bridging studies may be required if quality data al",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HR",
+      "code": "A2.T1.1.p11",
+      "title": "Justification for the classification of any manufacturing process and/or control changes as moderate or minor.",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HS",
+      "code": "A2.T1.1.p12",
+      "title": "Description of the batches and summary of in-process control and release testing results as quantitative data, in a comparative tabular format, for at least three consecutive commercial-scale batches of the pre-change and post-change drug substance. Comparativ",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8400000000000002HT",
+      "code": "A2.T1.1.p13",
+      "title": "Comparative pre-change and post-change test results for the manufacturer’s characterized key stability-indicating attributes for at least three commercial-scale drug substance batches produced with the proposed changes and stored under accelerated and/or stres",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8500000000000002HV",
+      "code": "A2.T1.1.p14",
+      "title": "Updated post-approval stability protocol. 9. Information describing the change-over procedures for shared product-contact equipment and the segregation procedures, as applicable. If no revisions, the manufacturer should state that no changes were made to the c",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8500000000000002HW",
+      "code": "A2.T1.1.p15",
+      "title": "Cleaning procedures (including data in a summary validation report and the cleaning protocol for the introduction of new products, as applicable) demonstrating lack of carry-over or cross-contamination. WHO Technical Report Series, No. 1011, 2018WHO Expert Com",
+      "parent": "01KCHCHX8400000000000002HD"
+    },
+    {
+      "id": "01KCHCHX8500000000000002HX",
+      "code": "A2.T1.2",
+      "title": "Change to the cell banks: Note: New cell substrates that are unrelated to the licensed master cell bank (MCB) or pre-MCB material may require a new application for marketing authorization or licence application. a. Adaptation of an MCB into a None 1, 2, 5–8, 1",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002HY",
+      "code": "A2.T1.3",
+      "title": "Change in the cell bank manufacturing site",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002HZ",
+      "code": "A2.T1.4",
+      "title": "Change in the cell bank testing/storage site",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002J0",
+      "code": "A2.T1.5",
+      "title": "Change in the cell bank qualification protocol 1 2–4 1, 2, 5–8 Moderate 1, 2 Minor None 1, 2, 9 Moderate 5, 7 None 6 9 3, 4 4 Minor Moderate Minor",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002J1",
+      "code": "A2.T1.5.p1",
+      "title": "The new MCB is generated from the original clone or from a pre-approved MCB and is grown in the same culture medium.",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002J2",
+      "code": "A2.T1.5.p2",
+      "title": "The new cell bank is generated from a pre-approved MCB.",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002J3",
+      "code": "A2.T1.5.p3",
+      "title": "The new cell bank is at the pre-approved passage level.",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002J4",
+      "code": "A2.T1.5.p4",
+      "title": "The new cell bank is released according to a pre-approved protocol/process or as described in the original licence.",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002J5",
+      "code": "A2.T1.5.p5",
+      "title": "No changes have been made to the tests/acceptance criteria used for the release of the cell bank.",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002J6",
+      "code": "A2.T1.5.p6",
+      "title": "The protocol is considered more stringent (that is, addition of new tests or narrowing of acceptance criteria).",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002J7",
+      "code": "A2.T1.5.p7",
+      "title": "No changes have been made to the storage conditions used for the cell bank, and the transport conditions of the cell bank have been validated.",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002J8",
+      "code": "A2.T1.5.p8",
+      "title": "Qualification of the cell bank according to guidelines considered acceptable by 2. the NRA. Information on the characterization and testing of the MCB/WCB, and cells from the end-of-production passage or post-production passage.",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002J9",
+      "code": "A2.T1.5.p9",
+      "title": "Justification of the change to the cell bank qualification protocol.",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JA",
+      "code": "A2.T1.5.p10",
+      "title": "Updated cell bank qualification protocol. Annex 3",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JB",
+      "code": "A2.T1.5.p11",
+      "title": "Comparability of the pre-change and post-change drug substance with respect to physicochemical properties, biological activity, purity, impurities and contaminants, as appropriate. Nonclinical and/or clinical bridging studies may occasionally be required when",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JC",
+      "code": "A2.T1.5.p12",
+      "title": "Description of the batches and summary of in-process and release testing results as quantitative data, in a comparative tabular format, for at least three consecutive commercial-scale batches of the drug substance derived from the new cell bank. Matrixing, bra",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JD",
+      "code": "A2.T1.5.p13",
+      "title": "Comparative pre-change and post-change test results for the manufacturer’s characterized key stability-indicating attributes for at least three commercial-scale drug substance batches produced with the proposed changes and stored under accelerated and/or stres",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JE",
+      "code": "A2.T1.5.p14",
+      "title": "Updated post-approval stability protocol.",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JF",
+      "code": "A2.T1.5.p15",
+      "title": "Evidence that the new company/facility is GMP-compliant.",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JG",
+      "code": "A2.T1.5.p16",
+      "title": "Supporting nonclinical and clinical data or a request for a waiver of in vivo studies with justification. WHO Technical Report Series, No. 1011, 2018WHO Expert Committee on Biological Standardization Sixty-eighth report Description of change Conditions to be f",
+      "parent": "01KCHCHX8500000000000002J0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JH",
+      "code": "A2.T1.6",
+      "title": "Change to the fermentation or cell culture process: a. A critical change (a change with high potential to have an impact on the quality of the drug substance or drug product; for example, incorporation of disposable bioreactor technology) None 1–7, 9, 11 Major",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JJ",
+      "code": "A2.T1.7",
+      "title": "Change to the purification process, involving the following: a. A critical change (a change with high potential to have an impact on the quality of the drug substance or drug product, for example, a change that could potentially have an impact on the viral cle",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JK",
+      "code": "A2.T1.8",
+      "title": "Change in scale of the manufacturing process: a. At the cell culture stage 3, 9–11 2, 3, 5–7, 9, 11 Moderate b. At the purification stage 1, 2, 4, 6 2, 5–7, 9, 11 Moderate",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JM",
+      "code": "A2.T1.8.p1",
+      "title": "Introduction of reprocessing 12, 13 8, 10, 11, 13 Minor steps",
+      "parent": "01KCHCHX8500000000000002JK"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JN",
+      "code": "A2.T1.8.p2",
+      "title": "Addition of a new holding step or change in the parameters of an approved holding step None 5, 14 Moderate 1 HPLC = high-performance liquid chromatography. WHO Technical Report Series, No. 1011, 2018WHO Expert Committee on Biological Standardization Sixty-eigh",
+      "parent": "01KCHCHX8500000000000002JK"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JP",
+      "code": "A2.T1.8.p3",
+      "title": "The change does not have an impact on the viral clearance data or the chemical nature of an inactivating agent.",
+      "parent": "01KCHCHX8500000000000002JK"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JQ",
+      "code": "A2.T1.2",
+      "title": "There is no change in the drug substance specification outside the approved limits.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JR",
+      "code": "A2.T1.3",
+      "title": "There is no change in the drug substance impurity profile outside the approved limits.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JS",
+      "code": "A2.T1.3.p1",
+      "title": "The change is not necessitated by recurring events arising during manufacture or because of stability concerns.",
+      "parent": "01KCHCHX8500000000000002JR"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JT",
+      "code": "A2.T1.3.p2",
+      "title": "The change does not affect the purification process.",
+      "parent": "01KCHCHX8500000000000002JR"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JV",
+      "code": "A2.T1.6",
+      "title": "The change in scale is linear with respect to the proportionality of production parameters and materials.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JW",
+      "code": "A2.T1.6.p1",
+      "title": "The new fermentation train is identical to the approved fermentation train(s).",
+      "parent": "01KCHCHX8500000000000002JV"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JX",
+      "code": "A2.T1.8",
+      "title": "There is no change in the approved in vitro cell age.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JY",
+      "code": "A2.T1.8.p1",
+      "title": "The change is not expected to have an impact on the quality, safety or efficacy of the final product.",
+      "parent": "01KCHCHX8500000000000002JX"
+    },
+    {
+      "id": "01KCHCHX8500000000000002JZ",
+      "code": "A2.T1.10",
+      "title": "There is no change in the proportionality of the raw materials (that is, the change in scale is linear).",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002K0",
+      "code": "A2.T1.11",
+      "title": "The change in scale involves the use of the same bioreactor (that is, it does not involve the use of a larger bioreactor).",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8500000000000002K1",
+      "code": "A2.T1.11.p1",
+      "title": "The need for reprocessing is not due to recurrent deviations from the validated process, and the root cause triggering reprocessing is identified.",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002K2",
+      "code": "A2.T1.11.p2",
+      "title": "The proposed reprocessing steps have been shown to have no impact on product quality.",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002K3",
+      "code": "A2.T1.11.p3",
+      "title": "Justification for the classification of the change(s) as critical, moderate or noncritical in terms of its impact on the quality of the drug substance.",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8500000000000002K4",
+      "code": "A2.T1.11.p4",
+      "title": "Flow diagram (including process and in-process controls) of the proposed 3. manufacturing process(es) and a brief narrative description of the proposed manufacturing process(es). If the change results in an increase in the number of population doublings or sub",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8600000000000002K5",
+      "code": "A2.T1.11.p5",
+      "title": "For drug substance obtained from, or manufactured with, reagents obtained from sources that are at risk of transmitting bovine spongiform encephalopathy/ transmissible spongiform encephalopathy (BSE/TSE) agents (for example, ruminant origin), information and e",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8600000000000002K6",
+      "code": "A2.T1.11.p6",
+      "title": "Process validation results. Annex 3",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8600000000000002K7",
+      "code": "A2.T1.11.p7",
+      "title": "Comparability of the pre-change and post-change drug substance with respect to physicochemical properties, biological activity, purity, impurities and contaminants, as appropriate. Nonclinical and/or clinical bridging studies may occasionally be required when",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8600000000000002K8",
+      "code": "A2.T1.11.p8",
+      "title": "Description of the batches and summary of in-process and release testing results as quantitative data, in a comparative tabular format, for at least three consecutive commercial-scale batches of the pre-change and post-change drug substance. Comparative pre-ch",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8600000000000002K9",
+      "code": "A2.T1.11.p9",
+      "title": "Description of the batches and summary of in-process and release testing results as quantitative data, in a comparative tabular format, for one commercial-scale batch of the pre-change and post-change drug substance. Comparative pre- change test results do not",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KA",
+      "code": "A2.T1.11.p10",
+      "title": "Comparative pre-change and post-change test results for the manufacturer’s characterized key stability-indicating attributes for at least three commercial-scale drug substance batches produced with the proposed changes and stored under accelerated and/or stres",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KB",
+      "code": "A2.T1.11.p11",
+      "title": "Comparative pre-change and post-change test results for the manufacturer’s characterized key stability-indicating attributes with at least one commercial-scale drug substance batch produced with the proposed changes under real-time/ real-temperature testing co",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KC",
+      "code": "A2.T1.11.p12",
+      "title": "Updated post-approval stability protocol and stability commitment to place the first commercial-scale batch of the drug product manufactured using the post- change drug substance into the stability programme.",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KD",
+      "code": "A2.T1.11.p13",
+      "title": "Information assessing the risk with respect to potential contamination with adventitious agents (for example, impact on viral clearance studies and BSE/TSE risk) (7).",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KE",
+      "code": "A2.T1.11.p14",
+      "title": "Data describing the root cause triggering the reprocessing, as well as validation data (for example, extended hold-times, resistance to additional mechanical stress) to help prevent the reprocessing from having an impact on the drug substance.",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KF",
+      "code": "A2.T1.11.p15",
+      "title": "Demonstration that the new or revised holding step has no negative impact on the quality of the drug substance (data from one commercial-scale or scientifically justified representative drug substance batch should be provided). Description of change Conditions",
+      "parent": "01KCHCHX8500000000000002K0"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KG",
+      "code": "A2.T1.11",
+      "title": "Change in equipment used in the drug substance manufacturing process, involving the following: Note: New bioreactor technology (for example, a change from stainless steel bioreactor to disposable bioreactor) is excluded from this table and should be filed acco",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KH",
+      "code": "A2.T1.11.p1",
+      "title": "The site is approved as a multi-product facility.",
+      "parent": "01KCHCHX8600000000000002KG"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KJ",
+      "code": "A2.T1.11.p2",
+      "title": "The change has no impact on the risk of cross-contamination and is supported by validated cleaning procedures.",
+      "parent": "01KCHCHX8600000000000002KG"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KK",
+      "code": "A2.T1.3",
+      "title": "The manufacturing process is not impacted by the change in product-contact equipment.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KM",
+      "code": "A2.T1.3.p1",
+      "title": "The change has no impact on product quality.",
+      "parent": "01KCHCHX8600000000000002KK"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KN",
+      "code": "A2.T1.3.p2",
+      "title": "Re-qualification of the equipment follows the original qualification protocol. Information on the in-process control testing.",
+      "parent": "01KCHCHX8600000000000002KK"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KP",
+      "code": "A2.T1.3.p3",
+      "title": "Process validation study reports.",
+      "parent": "01KCHCHX8600000000000002KK"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KQ",
+      "code": "A2.T1.3.p4",
+      "title": "Description of the batches and summary of results as quantitative data, in a comparative tabular format, for one commercial-scale batch of the drug substance produced with the approved and proposed product contact equipment/material. Batch data on the next two",
+      "parent": "01KCHCHX8600000000000002KK"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KR",
+      "code": "A2.T1.12",
+      "title": "Change in specification for the materials, involving the following: a. Narrowing of the approved 1–3, 5 1–4 Minor specification limits for starting materials/ intermediates b. Widening of the approved specification limits for starting materials/ intermediates",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KS",
+      "code": "A2.T1.13",
+      "title": "Change in supplier of raw materials of biological origin (for example, fetal calf serum, insulin, trypsin)",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KT",
+      "code": "A2.T1.14",
+      "title": "Change in source of raw materials of biological origin (for example, bovine trypsin to porcine trypsin) None 3–7 None 8 None 8 1–3, 5, 7 Moderate 3–6 Minor 4, 6, 9, 10 Moderate 4, 6 Minor 4, 7, 9, 10 Moderate 4, 7 Minor",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KV",
+      "code": "A2.T2.1",
+      "title": "The change in specification for the materials is within the approved limits.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KW",
+      "code": "A2.T2.1.p1",
+      "title": "The grade of the materials is the same or is of higher quality, where appropriate.",
+      "parent": "01KCHCHX8600000000000002KV"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KX",
+      "code": "A2.T2.3",
+      "title": "There is no change in the drug substance specification outside the approved limits.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KY",
+      "code": "A2.T2.4",
+      "title": "There is no change in the impurity profile of the drug substance outside the approved limits.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8600000000000002KZ",
+      "code": "A2.T2.4.p1",
+      "title": "The change has no significant effect on the overall quality of the drug substance and/or drug product and there are no changes to the cell banks.",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8600000000000002M0",
+      "code": "A2.T2.4.p2",
+      "title": "The change is not necessitated by recurring events arising during manufacture or because of stability concerns. Annex 3",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8600000000000002M1",
+      "code": "A2.T2.4.p3",
+      "title": "The test does not concern a critical attribute (for example, content, impurity, any critical physical characteristics or microbial purity).",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8600000000000002M2",
+      "code": "A2.T2.4.p4",
+      "title": "The change is for compendial raw materials of biological origin (excluding human plasma-derived materials).",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8600000000000002M3",
+      "code": "A2.T2.4.p5",
+      "title": "Revised information on the quality and controls of the materials (for example, raw materials, starting materials, solvents, reagents and catalysts) used in the manufacture of the post-change drug substance.",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8600000000000002M4",
+      "code": "A2.T2.4.p6",
+      "title": "Updated drug substance specification, if changed.",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8600000000000002M5",
+      "code": "A2.T2.4.p7",
+      "title": "Copies or summaries of analytical procedures if new analytical procedures are used.",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8600000000000002M6",
+      "code": "A2.T2.4.p8",
+      "title": "For drug substance obtained from, or manufactured with, reagents obtained from sources that are at risk of transmitting bovine spongiform encephalopathy/ transmissible spongiform encephalopathy (BSE/TSE) agents (for example, ruminant origin), information and e",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8700000000000002M7",
+      "code": "A2.T2.4.p9",
+      "title": "Comparative table or description, where applicable, of pre-change and post- change in-process tests/limits.",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8700000000000002M8",
+      "code": "A2.T2.4.p10",
+      "title": "Description of the batches and summary of in-process and release testing results as quantitative data, in a comparative tabular format, for one commercial-scale batch of the pre-change and post-change drug substance. Comparative pre- change test results do not",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8700000000000002M9",
+      "code": "A2.T2.4.p11",
+      "title": "Description of the batches and summary of in-process and release testing results as quantitative data, in a comparative tabular format, for three consecutive commercial-scale batches of the pre-change and post-change drug substance. Comparative pre-change test",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MA",
+      "code": "A2.T2.4.p12",
+      "title": "Justification/risk assessment showing that the attribute is non-significant. 9. Information assessing the risk with respect to potential contamination with adventitious agents (for example, impact on viral clearance studies and BSE/TSE risk) (7).",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MB",
+      "code": "A2.T2.4.p13",
+      "title": "Information demonstrating suitability of the auxiliary materials/reagents of both sources through the comparability of the drug substance. WHO Technical Report Series, No. 1011, 2018WHO Expert Committee on Biological Standardization Sixty-eighth report Descrip",
+      "parent": "01KCHCHX8600000000000002KY"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MC",
+      "code": "A2.T2.15",
+      "title": "Change to in-process tests and/or acceptance criteria applied during manufacture of the drug substance, involving the following: 1, 4 a. Narrowing of approved in- 1, 3, 6, 7 Minor process limits b. Addition of new in-process 2, 3, 6 1–5, 8 Minor test and limit",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MD",
+      "code": "A2.T2.16",
+      "title": "Change in the in-process controls testing site Note: Transfer of in-process control testing to a different facility within a GMP-compliant site is not considered to be a reportable change but is treated as a minor GMP change and is reviewed during inspections.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8700000000000002ME",
+      "code": "A2.T3.1",
+      "title": "No change in the drug substance specification outside the approved limits.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MF",
+      "code": "A2.T3.2",
+      "title": "No change in the impurity profile of the drug substance outside the approved limits.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MG",
+      "code": "A2.T3.2.p1",
+      "title": "The change is not necessitated by recurring events arising during manufacture or because of stability concerns.",
+      "parent": "01KCHCHX8700000000000002MF"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MH",
+      "code": "A2.T3.2.p2",
+      "title": "The test does not concern a critical attribute (for example, content, impurity, any critical physical characteristics or microbial purity).",
+      "parent": "01KCHCHX8700000000000002MF"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MJ",
+      "code": "A2.T3.2.p3",
+      "title": "The replaced analytical procedure maintains or tightens precision, accuracy, specificity and sensitivity, if applicable.",
+      "parent": "01KCHCHX8700000000000002MF"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MK",
+      "code": "A2.T3.6",
+      "title": "No change in the approved in-process controls outside the approved limits.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MM",
+      "code": "A2.T3.6.p1",
+      "title": "The test procedure remains the same, or changes in the test procedure are minor. Annex 3",
+      "parent": "01KCHCHX8700000000000002MK"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MN",
+      "code": "A2.T3.6.p2",
+      "title": "Revised information on the controls performed at critical steps of the manufacturing process and on intermediates of the proposed drug substance.",
+      "parent": "01KCHCHX8700000000000002MK"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MP",
+      "code": "A2.T3.6.p3",
+      "title": "Updated drug substance specification, if changed.",
+      "parent": "01KCHCHX8700000000000002MK"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MQ",
+      "code": "A2.T3.6.p4",
+      "title": "Copies or summaries of analytical procedures if new analytical procedures are used.",
+      "parent": "01KCHCHX8700000000000002MK"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MR",
+      "code": "A2.T3.6.p5",
+      "title": "Comparative table or description, where applicable, of pre-change and post- change in-process tests/limits.",
+      "parent": "01KCHCHX8700000000000002MK"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MS",
+      "code": "A2.T3.6.p6",
+      "title": "Description of the batches and summary of in-process and release testing results as quantitative data, in a comparative tabular format, for one commercial-scale batch of the pre-change and post-change drug substance. Comparative pre- change test results do not",
+      "parent": "01KCHCHX8700000000000002MK"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MT",
+      "code": "A2.T3.6.p7",
+      "title": "Description of the batches and summary of in-process and release testing results as quantitative data, in a comparative tabular format, for three consecutive commercial-scale batches of the pre-change and post-change drug substance. Comparative pre-change test",
+      "parent": "01KCHCHX8700000000000002MK"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MV",
+      "code": "A2.T3.6.p8",
+      "title": "Justification/risk assessment showing that the attribute is non-significant.",
+      "parent": "01KCHCHX8700000000000002MK"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MW",
+      "code": "A2.T3.6.p9",
+      "title": "Justification for the new in-process test and limits.",
+      "parent": "01KCHCHX8700000000000002MK"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MX",
+      "code": "A2.T3.6.p10",
+      "title": "Evidence that the new company/facility is GMP-compliant. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8700000000000002MK"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MY",
+      "code": "A2.T3.17",
+      "title": "Change in the approved design space, involving the following: a. Establishment of a new None 1 design space b. Expansion of the approved None design space c. Reduction in the approved design space (any change that reduces or limits the range of parameters used",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8700000000000002MZ",
+      "code": "A2.T3.17.p1",
+      "title": "The reduction in design space is not necessitated by recurring problems arising during manufacture.",
+      "parent": "01KCHCHX8700000000000002MY"
+    },
+    {
+      "id": "01KCHCHX8700000000000002N0",
+      "code": "A2.T3.17.p2",
+      "title": "Manufacturing development data to support the establishment of, or changes to, the design space. Control of the drug substance Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8700000000000002MY"
+    },
+    {
+      "id": "01KCHCHX8700000000000002N1",
+      "code": "A2.T3.18",
+      "title": "Change affecting the quality control (release and stability) testing of the drug substance, involving the following: Note: Transfer of testing to a different facility within a GMP-compliant site is not considered to be a reportable change but is treated as a m",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8700000000000002N2",
+      "code": "A2.T3.18.p1",
+      "title": "The transferred quality control test is not a potency assay or bioassay.",
+      "parent": "01KCHCHX8700000000000002N1"
+    },
+    {
+      "id": "01KCHCHX8700000000000002N3",
+      "code": "A2.T3.18.p2",
+      "title": "No changes are made to the test method.",
+      "parent": "01KCHCHX8700000000000002N1"
+    },
+    {
+      "id": "01KCHCHX8700000000000002N4",
+      "code": "A2.T3.18.p3",
+      "title": "The transfer is within a facility approved in the current marketing authorization for the performance of other tests.",
+      "parent": "01KCHCHX8700000000000002N1"
+    },
+    {
+      "id": "01KCHCHX8700000000000002N5",
+      "code": "A2.T3.18.p4",
+      "title": "Evidence that the new company/facility is GMP-compliant. Annex 3 Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8700000000000002N1"
+    },
+    {
+      "id": "01KCHCHX8700000000000002N6",
+      "code": "A2.T3.19",
+      "title": "Change in the standard/monograph (that is, specifications) claimed for the drug substance, involving the following: a. A change from a None 1–5 Moderate pharmacopoeial standard/ monograph to an in-house standard b. A change from an in-house 1–4 1–3 Minor stand",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8700000000000002N7",
+      "code": "A2.T3.20",
+      "title": "Change in the specifications for the drug substance in order to comply with an updated pharmacopoeial standard/monograph 1, 2 1, 2 Minor",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8700000000000002N8",
+      "code": "A2.T3.20.p1",
+      "title": "The change is made exclusively in order to comply with a pharmacopoeial monograph.",
+      "parent": "01KCHCHX8700000000000002N7"
+    },
+    {
+      "id": "01KCHCHX8700000000000002N9",
+      "code": "A2.T3.2",
+      "title": "There is no change in drug substance specifications outside the approved ranges.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8700000000000002NA",
+      "code": "A2.T3.2.p1",
+      "title": "There is no deletion of tests or relaxation of acceptance criteria of the approved specifications, except to comply with a pharmacopoeial standard/monograph.",
+      "parent": "01KCHCHX8700000000000002N9"
+    },
+    {
+      "id": "01KCHCHX8700000000000002NB",
+      "code": "A2.T3.2.p2",
+      "title": "There are no deletions or changes to any analytical procedures, except to comply with a pharmacopoeial standard/monograph.",
+      "parent": "01KCHCHX8700000000000002N9"
+    },
+    {
+      "id": "01KCHCHX8700000000000002NC",
+      "code": "A2.T3.2.p3",
+      "title": "Revised drug product labelling information, as applicable.",
+      "parent": "01KCHCHX8700000000000002N9"
+    },
+    {
+      "id": "01KCHCHX8700000000000002ND",
+      "code": "A2.T3.2.p4",
+      "title": "Updated copy of the proposed drug substance specifications.",
+      "parent": "01KCHCHX8700000000000002N9"
+    },
+    {
+      "id": "01KCHCHX8700000000000002NE",
+      "code": "A2.T3.2.p5",
+      "title": "Where an in-house analytical procedure is used and a pharmacopoeial standard/ monograph is claimed, results of an equivalency study between the in-house and pharmacopoeial methods.",
+      "parent": "01KCHCHX8700000000000002N9"
+    },
+    {
+      "id": "01KCHCHX8700000000000002NF",
+      "code": "A2.T3.2.p6",
+      "title": "Copies or summaries of validation reports if new analytical procedures are used.",
+      "parent": "01KCHCHX8700000000000002N9"
+    },
+    {
+      "id": "01KCHCHX8700000000000002NG",
+      "code": "A2.T3.2.p7",
+      "title": "Justification of specifications with data. WHO Technical Report Series, No. 1011, 2018WHO Expert Committee on Biological Standardization Sixty-eighth report Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8700000000000002N9"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NH",
+      "code": "A2.T3.21",
+      "title": "Changes in the control strategy of the drug substance, involving the following: a. Change from end-product testing to upstream controls for some test(s) (for example, real-time release testing, process analytical technology) b. Addition of a new critical quali",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NJ",
+      "code": "A2.T3.21.p1",
+      "title": "Updated copy of the proposed drug substance specifications.",
+      "parent": "01KCHCHX8800000000000002NH"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NK",
+      "code": "A2.T3.21.p2",
+      "title": "Copies or summaries of analytical procedures if new analytical procedures are used.",
+      "parent": "01KCHCHX8800000000000002NH"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NM",
+      "code": "A2.T3.21.p3",
+      "title": "Copies or summaries of validation reports if new analytical procedures are used to monitor the new CQA at release.",
+      "parent": "01KCHCHX8800000000000002NH"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NN",
+      "code": "A2.T3.21.p4",
+      "title": "Justification and supporting data for each proposed change to the control strategy. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8800000000000002NH"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NP",
+      "code": "A2.T3.22",
+      "title": "Change in the specification/analytical procedure used to release the drug substance, involving the following: a. Deletion of a test b. Addition of a test c. Replacement of an analytical procedure d. Changes to an approved analytical procedure None 1–3 None 5,",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NQ",
+      "code": "A2.T3.22.p1",
+      "title": "The change does not result from unexpected events arising during manufacture (for example, new unqualified impurity, change in total impurity limits).",
+      "parent": "01KCHCHX8800000000000002NP"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NR",
+      "code": "A2.T3.2",
+      "title": "There is no change in the limits/acceptance criteria outside the approved limits for the approved assays used at release/ stability.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NS",
+      "code": "A2.T3.2.p1",
+      "title": "The addition of the test is not intended to monitor new impurity species.",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NT",
+      "code": "A2.T3.2.p2",
+      "title": "The method of analysis is the same and is based on the same analytical technique or principle (for example, change in column length or temperature, but not a different type of column or method) and no new impurities are detected.",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NV",
+      "code": "A2.T3.2.p3",
+      "title": "The modified analytical procedure maintains or improves performance parameters of the method.",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NW",
+      "code": "A2.T3.2.p4",
+      "title": "The change does not concern potency-testing.",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NX",
+      "code": "A2.T3.2.p5",
+      "title": "Acceptance criteria for residual solvent are within recognized or approved acceptance limits (for example, within ICH limits for a Class 3 residual solvent, or pharmacopoeial requirements).",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NY",
+      "code": "A2.T3.2.p6",
+      "title": "The change is from one pharmacopoeial assay to another pharmacopoeial assay or the marketing application holder has demonstrated an increased understanding of the relationship between method parameters and method performance defined by a systematic development",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002NZ",
+      "code": "A2.T3.2.p7",
+      "title": "Updated drug substance specifications.",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002P0",
+      "code": "A2.T3.2.p8",
+      "title": "Copies or summaries of analytical procedures if new analytical procedures are used.",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002P1",
+      "code": "A2.T3.2.p9",
+      "title": "Validation/qualification results if new analytical procedures are used.",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002P2",
+      "code": "A2.T3.2.p10",
+      "title": "Comparative results demonstrating that the approved and proposed analytical procedures are equivalent.",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002P3",
+      "code": "A2.T3.2.p11",
+      "title": "Justification for the proposed drug substance specification (for example, tests, acceptance criteria or analytical procedures).",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002P4",
+      "code": "A2.T3.2.p12",
+      "title": "Documented evidence that consistency of quality is maintained. WHO Technical Report Series, No. 1011, 2018WHO Expert Committee on Biological Standardization Sixty-eighth report Reference standards or materials Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002P5",
+      "code": "A2.T3.2.p13",
+      "title": "Replacement of a primary None reference standard",
+      "parent": "01KCHCHX8800000000000002NR"
+    },
+    {
+      "id": "01KCHCHX8800000000000002P6",
+      "code": "A2.T3.24",
+      "title": "Change of the reference None 1, 2 1, 2 Reporting category Moderate Moderate standard from pharmacopoeial or international standard to in-house (no relationship with international standard)",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8800000000000002P7",
+      "code": "A2.T3.25",
+      "title": "Change of the reference standard from in-house (no relationship with international standard) to pharmacopoeial or international standard",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8800000000000002P8",
+      "code": "A2.T3.25.p1",
+      "title": "Qualification of a new batch of reference standard against the approved reference standard (including qualification of a new batch of a secondary reference standard against the approved primary standard)",
+      "parent": "01KCHCHX8800000000000002P7"
+    },
+    {
+      "id": "01KCHCHX8800000000000002P9",
+      "code": "A2.T3.27",
+      "title": "Change to reference standard qualification protocol 3 1 1, 2 Minor 1, 2 Minor None 3, 4 Moderate",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PA",
+      "code": "A2.T3.27.p1",
+      "title": "Extension of the reference 2 5 Minor standard shelf-life or re-test period",
+      "parent": "01KCHCHX8800000000000002P9"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PB",
+      "code": "A2.T3.27.p2",
+      "title": "Qualification of the new reference standard is in accordance with an approved protocol.",
+      "parent": "01KCHCHX8800000000000002P9"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PC",
+      "code": "A2.T3.27.p3",
+      "title": "The extension of the shelf-life of the reference standard is in accordance with an approved protocol.",
+      "parent": "01KCHCHX8800000000000002P9"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PD",
+      "code": "A2.T3.27.p4",
+      "title": "The reference standard is used for a physicochemical test. Annex 3",
+      "parent": "01KCHCHX8800000000000002P9"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PE",
+      "code": "A2.T4.1",
+      "title": "Justification for the change in reference standard. 2. Information demonstrating qualification of the proposed reference standards or materials (for example, source, characterization, certificate of analysis, comparability data).",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PF",
+      "code": "A2.T4.1.p1",
+      "title": "Justification of the change to the reference standard qualification protocol.",
+      "parent": "01KCHCHX8800000000000002PE"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PG",
+      "code": "A2.T4.1.p2",
+      "title": "Updated reference standard qualification protocol.",
+      "parent": "01KCHCHX8800000000000002PE"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PH",
+      "code": "A2.T4.1.p3",
+      "title": "Summary of stability testing and results to support the extension of reference standard shelf-life. Drug substance container closure system Description of change",
+      "parent": "01KCHCHX8800000000000002PE"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PJ",
+      "code": "A2.T4.29",
+      "title": "Change in the primary container closure system(s) for the storage and shipment of the drug substance Conditions to be fulfilled",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PK",
+      "code": "A2.T4.29.p1",
+      "title": "The proposed container closure system is at least equivalent to the approved container closure system with respect to its relevant properties (including results of transportation or compatibility studies, if appropriate).",
+      "parent": "01KCHCHX8800000000000002PJ"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PM",
+      "code": "A2.T4.29.p2",
+      "title": "Updated dossier sections describing information on the proposed container closure system (for example, description, composition, materials of construction of primary packaging components, specifications).",
+      "parent": "01KCHCHX8800000000000002PJ"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PN",
+      "code": "A2.T4.29.p3",
+      "title": "Data demonstrating the suitability of the container closure system (for example, extractable/leachable testing) and compliance with pharmacopoeial standards, if applicable.",
+      "parent": "01KCHCHX8800000000000002PJ"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PP",
+      "code": "A2.T4.29.p4",
+      "title": "Results demonstrating that the proposed container closure system is at least equivalent to the approved container closure system with respect to its relevant properties (for example, results of transportation or compatibility studies, and extractable/leachable",
+      "parent": "01KCHCHX8800000000000002PJ"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PQ",
+      "code": "A2.T4.29.p5",
+      "title": "Comparative pre-change and post-change test results for the manufacturer’s characterized key stability-indicating parameters with commercial-scale drug substance material using several container batches (for example, three different batches) produced with the",
+      "parent": "01KCHCHX8800000000000002PJ"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PR",
+      "code": "A2.T4.29.p6",
+      "title": "Comparative table of pre-change and post-change specifications of the container closure system. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8800000000000002PJ"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PS",
+      "code": "A2.T4.30",
+      "title": "Change in the supplier for a primary container closure, involving the following: a. Replacement or addition of a supplier b. Deletion of a supplier None 1, 2 None 1–3 None None Moderate Minor Minor",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PT",
+      "code": "A2.T5.1",
+      "title": "There is no change in the type of container closure, the materials of construction or the sterilization process for a sterile container closure component.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PV",
+      "code": "A2.T5.2",
+      "title": "There is no change in the specifications of the container closure component outside the approved ranges.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8800000000000002PW",
+      "code": "A2.T5.2.p1",
+      "title": "Data demonstrating the suitability of the container closure system (for example, 2. extractable/leachable testing). Information on the proposed container closure system (for example, description, materials of construction of primary packaging components, speci",
+      "parent": "01KCHCHX8800000000000002PV"
+    },
+    {
+      "id": "01KCHCHX8900000000000002PX",
+      "code": "A2.T5.2.p2",
+      "title": "Test results that cover a minimum of 6 months in real-time/real-temperature conditions should also be provided. A possibility of 3 months of real-time data could be acceptable if properly justified (for example, it can be proven that the relevant effect, if pr",
+      "parent": "01KCHCHX8800000000000002PV"
+    },
+    {
+      "id": "01KCHCHX8900000000000002PY",
+      "code": "A2.T5.31",
+      "title": "Change in the specification/analytical procedure of the primary container closure system for the drug substance, involving the following: a. Deletion of a test b. Addition of a test c. Replacement of an analytical procedure d. Minor changes to an analytical pr",
+      "parent": "01KCHCHX8400000000000002HC",
+      "conditions": [
+        {
+          "id": "item-1765862511783-kqg6i59u6",
+          "label": ""
+        }
+      ],
+      "supportingData": [
+        {
+          "id": "item-1765862512772-iuu9c3d1y",
+          "label": ""
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "updatedAt": "2025-12-16T05:21:55.889Z"
+    },
+    {
+      "id": "01KCHCHX8900000000000002PZ",
+      "code": "A2.T5.31.p1",
+      "title": "The deleted test has been demonstrated to be redundant compared to the remaining tests or is no longer a pharmacopoeial requirement.",
+      "parent": "01KCHCHX8900000000000002PY"
+    },
+    {
+      "id": "01KCHCHX8900000000000002Q0",
+      "code": "A2.T5.31.p2",
+      "title": "The change to the specification does not affect the functional properties of the container closure component and does not result in a potential impact on the performance of the drug substance.",
+      "parent": "01KCHCHX8900000000000002PY"
+    },
+    {
+      "id": "01KCHCHX8900000000000002Q1",
+      "code": "A2.T5.31.p3",
+      "title": "The change is not necessitated by unexpected recurring events arising during manufacture of the primary container closure system or because of stability concerns.",
+      "parent": "01KCHCHX8900000000000002PY"
+    },
+    {
+      "id": "01KCHCHX8900000000000002Q2",
+      "code": "A2.T5.4",
+      "title": "There is no change in the acceptance criteria outside the approved limits.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8900000000000002Q3",
+      "code": "A2.T5.4.p1",
+      "title": "The new analytical procedure is of the same type. WHO Technical Report Series, No. 1011, 2018WHO Expert Committee on Biological Standardization Sixty-eighth report",
+      "parent": "01KCHCHX8900000000000002Q2"
+    },
+    {
+      "id": "01KCHCHX8900000000000002Q4",
+      "code": "A2.T5.4.p2",
+      "title": "Results of method validation demonstrate that the new or modified analytical procedure is at least equivalent to the approved analytical procedure.",
+      "parent": "01KCHCHX8900000000000002Q2"
+    },
+    {
+      "id": "01KCHCHX8900000000000002Q5",
+      "code": "A2.T5.4.p3",
+      "title": "The new or modified analytical procedure maintains or tightens precision, accuracy, specificity or sensitivity.",
+      "parent": "01KCHCHX8900000000000002Q2"
+    },
+    {
+      "id": "01KCHCHX8900000000000002Q6",
+      "code": "A2.T5.4.p4",
+      "title": "The change is within the range of approved acceptance criteria.",
+      "parent": "01KCHCHX8900000000000002Q2"
+    },
+    {
+      "id": "01KCHCHX8900000000000002Q7",
+      "code": "A2.T5.4.p5",
+      "title": "Updated copy of the proposed specification for the primary container closure system.",
+      "parent": "01KCHCHX8900000000000002Q2"
+    },
+    {
+      "id": "01KCHCHX8900000000000002Q8",
+      "code": "A2.T5.4.p6",
+      "title": "Rationale for the change.",
+      "parent": "01KCHCHX8900000000000002Q2"
+    },
+    {
+      "id": "01KCHCHX8900000000000002Q9",
+      "code": "A2.T5.4.p7",
+      "title": "Description of the analytical procedure and, if applicable, validation data. Stability Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8900000000000002Q2"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QA",
+      "code": "A2.T5.32",
+      "title": "Change in the shelf-life of the drug substance or for a stored intermediate of the drug substance, involving the following: 1–5 a. Extension None Moderate b. Reduction 1–4 None 5 1, 2, 5 Minor 1–5 2–4 Moderate Minor",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QB",
+      "code": "A2.T5.32.p1",
+      "title": "There are no changes to the container closure system in direct contact with the drug substance with the potential of impact on the drug substance, or to the recommended storage conditions of the drug substance.",
+      "parent": "01KCHCHX8900000000000002QA"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QC",
+      "code": "A2.T5.32.p2",
+      "title": "Full long-term stability data are available covering the proposed shelf-life and are based on stability data generated on at least three commercial-scale batches.",
+      "parent": "01KCHCHX8900000000000002QA"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QD",
+      "code": "A2.T5.32.p3",
+      "title": "Stability data were generated in accordance with the approved stability protocol.",
+      "parent": "01KCHCHX8900000000000002QA"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QE",
+      "code": "A2.T5.32.p4",
+      "title": "Significant changes were not observed in the stability data.",
+      "parent": "01KCHCHX8900000000000002QA"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QF",
+      "code": "A2.T5.32.p5",
+      "title": "The reduction in the shelf-life is not necessitated by recurring events arising during manufacture or because of stability concerns (Note: Problems arising during manufacturing or stability concerns should be reported for evaluation).",
+      "parent": "01KCHCHX8900000000000002QA"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QG",
+      "code": "A2.T5.32.p6",
+      "title": "Summary of stability testing and results (for example, studies conducted, protocols used, results obtained).",
+      "parent": "01KCHCHX8900000000000002QA"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QH",
+      "code": "A2.T5.32.p7",
+      "title": "Proposed storage conditions and shelf-life, as appropriate.",
+      "parent": "01KCHCHX8900000000000002QA"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QJ",
+      "code": "A2.T5.32.p8",
+      "title": "Updated post-approval stability protocol and stability commitment. Annex 3",
+      "parent": "01KCHCHX8900000000000002QA"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QK",
+      "code": "A2.T5.32.p9",
+      "title": "Justification for the change to the post-approval stability protocol or stability commitment.",
+      "parent": "01KCHCHX8900000000000002QA"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QM",
+      "code": "A2.T5.32.p10",
+      "title": "Results of stability testing (that is, full real-time/real-temperature stability data covering the proposed shelf-life generated on stability testing of at least three commercial-scale batches unless otherwise justified). For intermediates, data to show that t",
+      "parent": "01KCHCHX8900000000000002QA"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QN",
+      "code": "A2.T5.33",
+      "title": "Change in the post-approval stability protocol of the drug substance, involving the following: a. Substantial change to the post-approval stability protocol or stability commitment, such as deletion of a test, replacement of an analytical procedure or change i",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QP",
+      "code": "A2.T5.33.p1",
+      "title": "The addition of test(s) is not due to stability concerns or to the identification of new impurities.",
+      "parent": "01KCHCHX8900000000000002QN"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QQ",
+      "code": "A2.T5.33.p2",
+      "title": "Deletion of time point(s) is made in accordance with relevant guidelines (for example, (6)). WHO Technical Report Series, No. 1011, 2018WHO Expert Committee on Biological Standardization Sixty-eighth report",
+      "parent": "01KCHCHX8900000000000002QN"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QR",
+      "code": "A2.T5.33.p3",
+      "title": "Copies or summaries of analytical procedures if new analytical procedures are used.",
+      "parent": "01KCHCHX8900000000000002QN"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QS",
+      "code": "A2.T5.33.p4",
+      "title": "Validation results if new analytical procedures are used.",
+      "parent": "01KCHCHX8900000000000002QN"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QT",
+      "code": "A2.T5.33.p5",
+      "title": "Proposed storage conditions and/or shelf-life, as appropriate.",
+      "parent": "01KCHCHX8900000000000002QN"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QV",
+      "code": "A2.T5.33.p6",
+      "title": "Updated post-approval stability protocol including justification for the changes, 5. and stability commitment. If applicable, stability-testing results to support the change to the post-approval stability protocol or stability commitment (for example, data to",
+      "parent": "01KCHCHX8900000000000002QN"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QW",
+      "code": "A2.T5.34",
+      "title": "Change in the storage conditions for the drug substance, involving the following: a. Addition or change to storage conditions for the drug substance (for example, widening or narrowing of a temperature criterion) b. Addition of a cautionary statement c. Deleti",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QX",
+      "code": "A2.T5.34.p1",
+      "title": "The change is not necessitated by recurring events arising during manufacture or because of stability concerns.",
+      "parent": "01KCHCHX8900000000000002QW"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QY",
+      "code": "A2.T5.34.p2",
+      "title": "The change consists in the narrowing of a temperature criterion within the approved ranges.",
+      "parent": "01KCHCHX8900000000000002QW"
+    },
+    {
+      "id": "01KCHCHX8900000000000002QZ",
+      "code": "A2.T5.34.p3",
+      "title": "Proposed storage conditions and shelf-life.",
+      "parent": "01KCHCHX8900000000000002QW"
+    },
+    {
+      "id": "01KCHCHX8900000000000002R0",
+      "code": "A2.T5.34.p4",
+      "title": "Updated post-approval stability protocol and stability commitment.",
+      "parent": "01KCHCHX8900000000000002QW"
+    },
+    {
+      "id": "01KCHCHX8900000000000002R1",
+      "code": "A2.T5.3",
+      "title": "Justification of the change in the storage conditions/cautionary statement.",
+      "parent": "01KCHCHX8400000000000002HC"
+    },
+    {
+      "id": "01KCHCHX8900000000000002R2",
+      "code": "A2.T5.3.p1",
+      "title": "Results of stability testing (that is, full real-time/real-temperature stability data covering the proposed shelf-life generated on one commercial-scale batch).",
+      "parent": "01KCHCHX8900000000000002R1"
+    },
+    {
+      "id": "01KCHCHX8900000000000002R3",
+      "code": "A2.T5.3.p2",
+      "title": "Results of stability testing (that is, full real time/real temperature stability data covering the proposed shelf-life generated on at least three commercial-scale batches). Annex 3",
+      "parent": "01KCHCHX8900000000000002R1"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002R4",
+      "code": "A3",
+      "title": "Appendix 3: Changes to the drug product",
+      "parent": "01KCHCHX8100000000000002F8"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002R5",
+      "code": "A3.T1.35",
+      "title": "Change in the description or composition of the drug product, involving the following: a. Addition of a dosage form or None 1–10 Major change in the formulation (for example, lyophilized powder to liquid, change in the amount of excipient, new diluent for lyop",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002R6",
+      "code": "A3.T1.35.p1",
+      "title": "No changes are classified as major in the manufacturing process to accommodate the new fill volume.",
+      "parent": "01KCHCHX8A00000000000002R5"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002R7",
+      "code": "A3.T1.2",
+      "title": "No change in the dose is recommended.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002R8",
+      "code": "A3.T1.3",
+      "title": "The change involves narrowing the fill volume while maintaining the lower limit of extractable volume.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002R9",
+      "code": "A3.T1.3.p1",
+      "title": "The new concentration is bracketed by existing approved concentrations.",
+      "parent": "01KCHCHX8A00000000000002R8"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RA",
+      "code": "A3.T1.3.p2",
+      "title": "More than two concentrations are already approved (that is, linear PK/PD profile of the product from at least three different concentrations over the bracketed range has been demonstrated and the two extreme concentrations of the bracketed range have been show",
+      "parent": "01KCHCHX8A00000000000002R8"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RB",
+      "code": "A3.T1.3.p3",
+      "title": "Revised drug product labelling information, as applicable.",
+      "parent": "01KCHCHX8A00000000000002R8"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RC",
+      "code": "A3.T1.3.p4",
+      "title": "Characterization data demonstrating comparability of the new dosage form and/ or formulation.",
+      "parent": "01KCHCHX8A00000000000002R8"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RD",
+      "code": "A3.T1.3.p5",
+      "title": "Description and composition of the dosage form if there are changes to the composition or dose.",
+      "parent": "01KCHCHX8A00000000000002R8"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RE",
+      "code": "A3.T1.3.p6",
+      "title": "Discussion of the components of the drug product, as appropriate (for example, choice of excipients, compatibility of drug substance and excipients, leachates, compatibility with new container closure system). Information on the batch formula, manufacturing pr",
+      "parent": "01KCHCHX8A00000000000002R8"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RF",
+      "code": "A3.T1.3.p7",
+      "title": "Control of excipients if new excipients are proposed (for example, specification). 7. Information on specification, analytical procedures (if new analytical methods are used), validation of analytical procedures (if new analytical methods are used), batch anal",
+      "parent": "01KCHCHX8A00000000000002R8"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RG",
+      "code": "A3.T1.3.p8",
+      "title": "Comparative pre-change and post-change test results for the manufacturer’s characterized key stability-indicating attributes for at least three commercial-scale drug product batches produced with the proposed changes and stored under accelerated and/or stress",
+      "parent": "01KCHCHX8A00000000000002R8"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RH",
+      "code": "A3.T1.3.p9",
+      "title": "Supporting clinical data or a justification for why such studies are not needed. WHO Technical Report Series, No. 1011, 2018WHO Expert Committee on Biological Standardization Sixty-eighth report Description and composition of the drug product: change to a dilu",
+      "parent": "01KCHCHX8A00000000000002R8"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RJ",
+      "code": "A3.T1.36",
+      "title": "Change to the diluent, involving the following: a. Change in manufacturing None process b. Replacement of or addition to the source of a diluent c. Change in facility used to manufacture a diluent (same company) 1, 3 None 1–3 1, 2 1–5 1–4 1–6 1–3 1, 3, 5 Moder",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RK",
+      "code": "A3.T1.36.p1",
+      "title": "The diluent is water for injection or a salt solution (including buffered salt solutions) – that is, it does not include an ingredient with a functional activity such as a preservative, and there is no change to its composition.",
+      "parent": "01KCHCHX8A00000000000002RJ"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RM",
+      "code": "A3.T1.2",
+      "title": "After reconstitution, there is no change in the drug product specification outside the approved limits.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RN",
+      "code": "A3.T1.2.p1",
+      "title": "The proposed diluent is commercially available in the country/jurisdiction of the NRA.",
+      "parent": "01KCHCHX8A00000000000002RM"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RP",
+      "code": "A3.T1.2.p2",
+      "title": "The addition of the diluent filling line is in an approved filling facility.",
+      "parent": "01KCHCHX8A00000000000002RM"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RQ",
+      "code": "A3.T1.2.p3",
+      "title": "Flow diagram (including process and in-process controls) of the proposed manufacturing process(es) and a brief narrative description of the proposed manufacturing process(es).",
+      "parent": "01KCHCHX8A00000000000002RM"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RR",
+      "code": "A3.T1.2.p4",
+      "title": "Updated copy of the proposed specification for the diluent.",
+      "parent": "01KCHCHX8A00000000000002RM"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RS",
+      "code": "A3.T1.2.p5",
+      "title": "Description of the batches and summary of results as quantitative data, in a comparative tabular format, for at least three consecutive commercial-scale batches of the approved and proposed diluent. Comparative test results for the approved diluent do not need",
+      "parent": "01KCHCHX8A00000000000002RM"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RT",
+      "code": "A3.T1.2.p6",
+      "title": "Updated stability data on the product reconstituted with the new diluent.",
+      "parent": "01KCHCHX8A00000000000002RM"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RV",
+      "code": "A3.T1.2.p7",
+      "title": "Evidence that the facility is GMP-compliant.",
+      "parent": "01KCHCHX8A00000000000002RM"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RW",
+      "code": "A3.T1.2.p8",
+      "title": "Revised drug product labelling information, as applicable. Annex 3 Manufacture Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8A00000000000002RM"
+    },
+    {
+      "id": "01KCHCHX8A00000000000002RX",
+      "code": "A3.T1.37",
+      "title": "Change in the approved design space, involving the following: a. Establishment of a new None 1 design space b. Expansion of the approved None design space c. Reduction in the approved design space (any change that reduces or limits the range of parameters used",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002RY",
+      "code": "A3.T1.38",
+      "title": "Change involving a drug product manufacturer/ manufacturing facility, involving the following: None 1–5 1–7 Major 1–3, 5–8 Moderate None 9, 10 Moderate 2, 3 1–3 Minor a. Replacement or addition of a manufacturing facility for the drug product (including formul",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002RZ",
+      "code": "A3.T1.38.p1",
+      "title": "The proposed facility is an approved formulation/filling facility (for the same company/marketing authorization holder).",
+      "parent": "01KCHCHX8B00000000000002RY"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002S0",
+      "code": "A3.T1.2",
+      "title": "There is no change in the composition, manufacturing process and drug product specification.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002S1",
+      "code": "A3.T1.3",
+      "title": "There is no change in the container/closure system and storage conditions.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002S2",
+      "code": "A3.T1.3.p1",
+      "title": "The same validated manufacturing process at critical steps (that is, compounding and filling) is used.",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002S3",
+      "code": "A3.T1.3.p2",
+      "title": "The newly introduced product is in the same family of product(s), or in the same therapeutic classification, as the products already approved at the site, and also uses the same filling process/equipment.",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002S4",
+      "code": "A3.T1.3.p3",
+      "title": "There should remain at least one site/manufacturer, as previously authorized, performing the same function as the one(s) to be deleted.",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002S5",
+      "code": "A3.T1.3.p4",
+      "title": "The deletion should not be due to critical deficiencies in manufacturing (for example, recurrent out-of-specification events, environmental monitoring failures, etc.).",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002S6",
+      "code": "A3.T1.3.p5",
+      "title": "Name, address and responsibilities (for example, formulation, filling, primary/ secondary packaging) of the proposed production facility involved in manufacturing and testing.",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002S7",
+      "code": "A3.T1.3.p6",
+      "title": "Evidence that the facility is GMP-compliant.",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002S8",
+      "code": "A3.T1.3.p7",
+      "title": "Confirmation that the description of the manufacturing process of the drug product has not changed (other than the change in facility), or submission of supporting data on the revised description of the manufacturing process if the process has changed.",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002S9",
+      "code": "A3.T1.3.p8",
+      "title": "Comparative description of the manufacturing process, if different from the approved process, and information on the controls performed at critical steps of the manufacturing process and on the intermediate of the proposed final product.",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SA",
+      "code": "A3.T1.3.p9",
+      "title": "Summary of the process validation studies and results.",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SB",
+      "code": "A3.T1.3.p10",
+      "title": "Description of the batches and summary of in-process control and release testing results as quantitative data, in a comparative tabular format, for at least three consecutive commercial-scale batches of the pre-change and post-change drug product. Comparative",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SC",
+      "code": "A3.T1.3.p11",
+      "title": "Comparative pre-change and post-change test results for the manufacturer’s characterized key stability-indicating attributes for at least three commercial-scale drug product batches produced with the proposed changes and stored under accelerated and/or stress",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SD",
+      "code": "A3.T1.3.p12",
+      "title": "Rationale for considering the proposed formulation/filling facility as equivalent. Information describing the change-over procedures for shared product-contact 9. equipment and the segregation procedures, as applicable. If there are no revisions, the manufactu",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SE",
+      "code": "A3.T1.3.p13",
+      "title": "Cleaning procedures (including data in a summary validation report and the cleaning protocol for the introduction of new products, as applicable) demonstrating lack of carry-over or cross-contamination. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8B00000000000002S1"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SF",
+      "code": "A3.T1.39",
+      "title": "Change in the drug product manufacturing process, involving the following: a. Scale-up of the manufacturing process at the formulation/filling stage b. Addition or replacement of equipment (for example, formulation tank, filter housing, filling line and head,",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SG",
+      "code": "A3.T1.39.p1",
+      "title": "The proposed scale uses similar/comparable equipment to the approved equipment. Note: Change in equipment size is not considered as using similar/ comparable equipment.",
+      "parent": "01KCHCHX8B00000000000002SF"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SH",
+      "code": "A3.T1.39.p2",
+      "title": "Any changes to the manufacturing process and/or to the in-process controls are only those necessitated by the change in batch size (for example, the same formulation, controls and standard operating procedures are utilized).",
+      "parent": "01KCHCHX8B00000000000002SF"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SJ",
+      "code": "A3.T1.39.p3",
+      "title": "The change should not be a result of recurring events that have arisen during manufacture or because of stability concerns.",
+      "parent": "01KCHCHX8B00000000000002SF"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SK",
+      "code": "A3.T1.4",
+      "title": "There is no change in the principle of the sterilization procedures of the drug product.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SM",
+      "code": "A3.T1.4.p1",
+      "title": "Replacement of equipment with equivalent equipment; the change is considered “like for like” (that is, in terms of product contact material, equipment size and operating principles).",
+      "parent": "01KCHCHX8B00000000000002SK"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SN",
+      "code": "A3.T1.4.p2",
+      "title": "The site is approved as a multi-product facility.",
+      "parent": "01KCHCHX8B00000000000002SK"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SP",
+      "code": "A3.T1.4.p3",
+      "title": "The change has no impact on the risk of cross-contamination and is supported by validated cleaning procedures.",
+      "parent": "01KCHCHX8B00000000000002SK"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SQ",
+      "code": "A3.T1.4.p4",
+      "title": "The change does not affect the lyophilization step.",
+      "parent": "01KCHCHX8B00000000000002SK"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SR",
+      "code": "A3.T1.4.p5",
+      "title": "Description of the manufacturing process, if different from the approved process, and information on the controls performed at critical steps of the manufacturing process and on the intermediate of the proposed drug product. Information on the in-process contr",
+      "parent": "01KCHCHX8B00000000000002SK"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SS",
+      "code": "A3.T1.4.p6",
+      "title": "Process validation results (for example, media fills), as appropriate.",
+      "parent": "01KCHCHX8B00000000000002SK"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002ST",
+      "code": "A3.T1.4.p7",
+      "title": "Description of the batches and summary of in-process control and release testing results as quantitative data, in a comparative tabular format, for at least three consecutive commercial-scale batches of the pre-change and post-change drug product. Comparative",
+      "parent": "01KCHCHX8B00000000000002SK"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SV",
+      "code": "A3.T1.4.p8",
+      "title": "Comparative pre-change and post-change test results for the manufacturer’s characterized key stability-indicating attributes for at least three commercial-scale drug product batches produced with the proposed changes and stored under accelerated and/or stress",
+      "parent": "01KCHCHX8B00000000000002SK"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SW",
+      "code": "A3.T1.4.p9",
+      "title": "The rationale for regarding the equipment as similar/comparable, as applicable. Information describing the change-over procedures for the shared product- 9. contact equipment. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8B00000000000002SK"
+    },
+    {
+      "id": "01KCHCHX8B00000000000002SX",
+      "code": "A3.T1.40",
+      "title": "Change in the controls (in-process tests and/or acceptance criteria) applied during the manufacturing process or on intermediates, involving the following: 2, 3, 7 a. Narrowing of approved in- Minor 1, 4 process limits b. Addition of new in-process 2, 3, 6 1–5",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002SY",
+      "code": "A3.T1.41",
+      "title": "Change in in-process controls testing site Note: Transfer of in-process control testing to a different facility within a GMP-compliant site is not considered to be a reportable change but is treated as a minor GMP change and reviewed during inspections.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002SZ",
+      "code": "A3.T2.1",
+      "title": "There is no change in drug product specification outside the approved limits.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002T0",
+      "code": "A3.T2.2",
+      "title": "There is no change in the impurity profile of the drug product outside the approved limits.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002T1",
+      "code": "A3.T2.2.p1",
+      "title": "The change is not necessitated by recurring events arising during manufacture or because of stability concerns.",
+      "parent": "01KCHCHX8C00000000000002T0"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002T2",
+      "code": "A3.T2.2.p2",
+      "title": "The test does not concern a critical attribute (for example, content, impurities, any critical physical characteristics or microbial purity).",
+      "parent": "01KCHCHX8C00000000000002T0"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002T3",
+      "code": "A3.T2.2.p3",
+      "title": "The replaced analytical procedure maintains or improves precision, accuracy, specificity and sensitivity, if applicable.",
+      "parent": "01KCHCHX8C00000000000002T0"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002T4",
+      "code": "A3.T2.6",
+      "title": "There is no change in the in-process control limits outside the approved limits.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002T5",
+      "code": "A3.T2.6.p1",
+      "title": "The test procedure remains the same, or changes in the test procedure are minor.",
+      "parent": "01KCHCHX8C00000000000002T4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002T6",
+      "code": "A3.T2.6.p2",
+      "title": "Revised information on the controls performed at critical steps of the manufacturing process and on intermediates of the proposed drug substance.",
+      "parent": "01KCHCHX8C00000000000002T4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002T7",
+      "code": "A3.T2.6.p3",
+      "title": "Updated drug product specification if changed.",
+      "parent": "01KCHCHX8C00000000000002T4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002T8",
+      "code": "A3.T2.6.p4",
+      "title": "Copies or summaries of analytical procedures if new analytical procedures are used.",
+      "parent": "01KCHCHX8C00000000000002T4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002T9",
+      "code": "A3.T2.6.p5",
+      "title": "Comparative table or description, where applicable, of current and proposed in-process tests.",
+      "parent": "01KCHCHX8C00000000000002T4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TA",
+      "code": "A3.T2.6.p6",
+      "title": "Description of the batches and summary of in-process control and release testing results as quantitative data, in a comparative tabular format, for one commercial- scale batch of the pre-change and post-change drug product (certificates of analysis should be p",
+      "parent": "01KCHCHX8C00000000000002T4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TB",
+      "code": "A3.T2.6.p7",
+      "title": "Description of the batches and summary of in-process control and release testing results as quantitative data, in a comparative tabular format, for at least three consecutive commercial-scale batches of the pre-change and post-change drug product (certificates",
+      "parent": "01KCHCHX8C00000000000002T4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TC",
+      "code": "A3.T2.6.p8",
+      "title": "Justification/risk assessment showing that the attribute is non-significant.",
+      "parent": "01KCHCHX8C00000000000002T4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TD",
+      "code": "A3.T2.6.p9",
+      "title": "Justification for the new in-process test and limits.",
+      "parent": "01KCHCHX8C00000000000002T4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TE",
+      "code": "A3.T2.6.p10",
+      "title": "Evidence that the new company/facility is GMP-compliant. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8C00000000000002T4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TF",
+      "code": "A3.T2.42",
+      "title": "Change in the specification/analytical procedure used to release the excipient, involving the following: 5, 8 4 1–3 None 1, 3 1–3 1, 2 1, 2 Minor Minor Minor Minor None 1, 2 Minor a. Deletion of a test b. Addition of a test c. Replacement of an analytical proc",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TG",
+      "code": "A3.T2.42.p1",
+      "title": "Results of method validation demonstrate that the proposed analytical procedure is at least equivalent to the approved analytical procedure.",
+      "parent": "01KCHCHX8C00000000000002TF"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TH",
+      "code": "A3.T2.42.p2",
+      "title": "The replaced analytical procedure maintains or improves precision, accuracy, specificity and sensitivity.",
+      "parent": "01KCHCHX8C00000000000002TF"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TJ",
+      "code": "A3.T2.42.p3",
+      "title": "The change is within the range of approved acceptance criteria or has been made to reflect the new pharmacopoeial monograph specification for the excipient. WHO Technical Report Series, No. 1011, 2018WHO Expert Committee on Biological Standardization Sixty-eig",
+      "parent": "01KCHCHX8C00000000000002TF"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TK",
+      "code": "A3.T2.42.p4",
+      "title": "Acceptance criteria for residual solvents are within recognized or approved acceptance limits (for example, within ICH limits for a Class 3 residual solvent or pharmacopoeial requirements).",
+      "parent": "01KCHCHX8C00000000000002TF"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TM",
+      "code": "A3.T2.42.p5",
+      "title": "The deleted test has been demonstrated to be redundant compared to the remaining tests or is no longer a pharmacopoeial requirement.",
+      "parent": "01KCHCHX8C00000000000002TF"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TN",
+      "code": "A3.T2.42.p6",
+      "title": "The analytical procedure remains the same, or changes in the test procedure are minor.",
+      "parent": "01KCHCHX8C00000000000002TF"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TP",
+      "code": "A3.T2.42.p7",
+      "title": "The change does not result from unexpected events arising during manufacture (for example, new unqualified impurity, change in total impurity limits).",
+      "parent": "01KCHCHX8C00000000000002TF"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TQ",
+      "code": "A3.T2.42.p8",
+      "title": "An alternative test analytical procedure is already authorized for the specification attribute/test and this procedure has not been added through a minor change submission.",
+      "parent": "01KCHCHX8C00000000000002TF"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TR",
+      "code": "A3.T2.42.p9",
+      "title": "Updated excipient specification.",
+      "parent": "01KCHCHX8C00000000000002TF"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TS",
+      "code": "A3.T2.42.p10",
+      "title": "Where an in-house analytical procedure is used and a recognized compendial standard is claimed, results of an equivalency study between the in-house and compendial methods.",
+      "parent": "01KCHCHX8C00000000000002TF"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TT",
+      "code": "A3.T2.42.p11",
+      "title": "Justification of the proposed excipient specification (for example, demonstration of the suitability of the monograph to control the excipient and potential impact on the performance of the drug product). Description of change",
+      "parent": "01KCHCHX8C00000000000002TF"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TV",
+      "code": "A3.T2.43",
+      "title": "Change in the standard/ monograph (that is, specifications) claimed for the excipient Conditions to be fulfilled",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TW",
+      "code": "A3.T2.43.p1",
+      "title": "The change is from a House standard to a pharmacopoeial standard/monograph.",
+      "parent": "01KCHCHX8C00000000000002TV"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TX",
+      "code": "A3.T2.43.p2",
+      "title": "The change is made exclusively to comply with a pharmacopoeial standard/ monograph.",
+      "parent": "01KCHCHX8C00000000000002TV"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TY",
+      "code": "A3.T2.43.p3",
+      "title": "There is no change to the specifications for the functional properties of the excipient outside the approved ranges, and no change that results in a potential impact on the performance of the drug product.",
+      "parent": "01KCHCHX8C00000000000002TV"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002TZ",
+      "code": "A3.T2.43.p4",
+      "title": "There is no deletion of tests or relaxation of acceptance criteria of the approved specifications, except to comply with a pharmacopoeial standard/monograph.",
+      "parent": "01KCHCHX8C00000000000002TV"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002V0",
+      "code": "A3.T2.43.p5",
+      "title": "There is no deletion or change to any analytical procedures, except to comply with a pharmacopoeial standard/monograph. Annex 3",
+      "parent": "01KCHCHX8C00000000000002TV"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002V1",
+      "code": "A3.T2.43.p6",
+      "title": "Updated excipient specifications.",
+      "parent": "01KCHCHX8C00000000000002TV"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002V2",
+      "code": "A3.T2.43.p7",
+      "title": "Where a House analytical procedure is used and a pharmacopoeial/compendial standard/monograph is claimed, results of an equivalency study between the House and compendial methods.",
+      "parent": "01KCHCHX8C00000000000002TV"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002V3",
+      "code": "A3.T2.43.p8",
+      "title": "Justification of the proposed excipient specifications (for example, demonstration of the suitability of the monograph to control the excipient and potential impact on the performance of the drug product).",
+      "parent": "01KCHCHX8C00000000000002TV"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002V4",
+      "code": "A3.T2.43.p9",
+      "title": "A declaration that consistency of quality and of the production process of the excipient is maintained. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8C00000000000002TV"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002V5",
+      "code": "A3.T2.44",
+      "title": "Change in the source of an None 2–7 Major excipient from a vegetable or synthetic source to a human or animal source that may pose a TSE or viral risk",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002V6",
+      "code": "A3.T2.45",
+      "title": "Change in the source of an None 1, 3, 5, 6 Moderate excipient from a TSE risk (for example, animal) source to a vegetable or synthetic source",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002V7",
+      "code": "A3.T2.45.p1",
+      "title": "Replacement in the source of an excipient from a TSE risk source to a different TSE risk source (for example, different animal source, different country of origin) 5, 6 2–7 Minor",
+      "parent": "01KCHCHX8C00000000000002V6"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002V8",
+      "code": "A3.T2.47",
+      "title": "Change in manufacture of a None biological excipient",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002V9",
+      "code": "A3.T2.48",
+      "title": "Change in supplier for a plasma-derived excipient (for example, human serum albumin) 2 1, 2 None 3, 4 2–7 2–7 2–7 3–8 Major Moderate Minor Major 5, 6, 9 Moderate WHO Technical Report Series, No. 1011, 2018WHO Expert Committee on Biological Standardization Sixt",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002VA",
+      "code": "A3.T2.49",
+      "title": "Change in supplier for an excipient of non-biological origin or of biological origin (excluding plasma-derived excipient)",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002VB",
+      "code": "A3.T2.50",
+      "title": "Change in excipient testing site Note: Transfer of testing to a different facility within a GMP- compliant site is not considered to be a reportable change but is treated as a minor GMP change and is reviewed during inspections.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002VC",
+      "code": "A3.T2.50.p1",
+      "title": "There is no change to the specification of the excipient or drug product outside the approved limits.",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002VD",
+      "code": "A3.T2.50.p2",
+      "title": "The change does not concern a human plasma-derived excipient.",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002VE",
+      "code": "A3.T2.50.p3",
+      "title": "The human plasma-derived excipient from the new supplier is an approved medicinal product and no manufacturing changes were made by the supplier of the new excipient since its last approval in the country/jurisdiction of the NRA.",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002VF",
+      "code": "A3.T2.50.p4",
+      "title": "The excipient does not influence the structure/conformation of the active ingredient.",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8C00000000000002VG",
+      "code": "A3.T2.50.p5",
+      "title": "The TSE risk source is covered by a TSE certificate of suitability and is of the same or lower TSE risk as the previously approved material (7).",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VH",
+      "code": "A3.T2.50.p6",
+      "title": "Any new excipient does not require the assessment of viral safety data.",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VJ",
+      "code": "A3.T2.50.p7",
+      "title": "Declaration from the manufacturer of the excipient that the excipient is entirely of vegetable or synthetic origin.",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VK",
+      "code": "A3.T2.50.p8",
+      "title": "Details of the source of the excipient (for example, animal species, country of 3. 4. origin) and the steps undertaken during processing to minimize the risk of TSE exposure (7). Information demonstrating comparability in terms of physicochemical properties, a",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VM",
+      "code": "A3.T2.50.p9",
+      "title": "Description of the batches and summary of results as quantitative data, in a comparative tabular format, for at least three commercial-scale batches of the proposed excipient. Annex 3",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VN",
+      "code": "A3.T2.50.p10",
+      "title": "Comparative pre-change and post-change test results for the manufacturer’s characterized key stability-indicating attributes for at least three commercial-scale drug product batches produced with the proposed changes and stored under accelerated and/or stress",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VP",
+      "code": "A3.T2.50.p11",
+      "title": "Complete manufacturing and clinical safety data to support the use of the proposed human plasma-derived excipient.",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VQ",
+      "code": "A3.T2.50.p12",
+      "title": "A letter from the supplier certifying that no changes were made to the plasma- derived excipient compared to the currently approved corresponding medicinal product.",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VR",
+      "code": "A3.T2.50.p13",
+      "title": "Evidence that the new company/facility is GMP-compliant. Control of the drug product Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8C00000000000002VB"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VS",
+      "code": "A3.T2.51",
+      "title": "Change affecting the quality control testing of the drug product (release and stability), involving the following: Note: Transfer of testing to a different facility within a GMP-compliant site is not considered to be a reportable change but is treated as a min",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VT",
+      "code": "A3.T2.51.p1",
+      "title": "The transferred quality control test is not a potency assay or bioassay.",
+      "parent": "01KCHCHX8D00000000000002VS"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VV",
+      "code": "A3.T2.51.p2",
+      "title": "There are no changes to the test method.",
+      "parent": "01KCHCHX8D00000000000002VS"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VW",
+      "code": "A3.T2.51.p3",
+      "title": "The transfer is within a facility approved in the current marketing authorization for the performance of other tests.",
+      "parent": "01KCHCHX8D00000000000002VS"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VX",
+      "code": "A3.T2.51.p4",
+      "title": "Evidence that the new company/facility is GMP-compliant. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8D00000000000002VS"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VY",
+      "code": "A3.T2.52",
+      "title": "Change in the standard/monograph (that is, specifications) claimed for the drug product, involving the following: a. A change from a None 1–5 Moderate pharmacopoeial standard/ monograph to an in-house standard b. A change from an in-house 1–4 1–3 Minor standar",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002VZ",
+      "code": "A3.T2.53",
+      "title": "Change in the specifications for the drug product to comply with an updated pharmacopoeial standard/ monograph 1, 2 1–3 Minor Annex 3",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002W0",
+      "code": "A3.T2.53.p1",
+      "title": "The change is made exclusively to comply with a pharmacopoeial monograph.",
+      "parent": "01KCHCHX8D00000000000002VZ"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002W1",
+      "code": "A3.T2.2",
+      "title": "There is no change in drug product specifications outside the approved ranges.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002W2",
+      "code": "A3.T2.2.p1",
+      "title": "There is no deletion of tests or relaxation of acceptance criteria of the approved specifications, except to comply with a pharmacopoeial standard/monograph.",
+      "parent": "01KCHCHX8D00000000000002W1"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002W3",
+      "code": "A3.T2.2.p2",
+      "title": "There is no deletion or change to any analytical procedures, except to comply with a pharmacopoeial standard/monograph.",
+      "parent": "01KCHCHX8D00000000000002W1"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002W4",
+      "code": "A3.T2.2.p3",
+      "title": "Revised drug product labelling information, as applicable.",
+      "parent": "01KCHCHX8D00000000000002W1"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002W5",
+      "code": "A3.T2.2.p4",
+      "title": "An updated copy of the proposed drug product specifications.",
+      "parent": "01KCHCHX8D00000000000002W1"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002W6",
+      "code": "A3.T2.2.p5",
+      "title": "Where an in-house analytical procedure is used and a pharmacopoeial standard/ monograph is claimed, results of an equivalency study between the in-house and pharmacopoeial methods.",
+      "parent": "01KCHCHX8D00000000000002W1"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002W7",
+      "code": "A3.T2.2.p6",
+      "title": "Copies or summaries of validation reports if new analytical procedures are used.",
+      "parent": "01KCHCHX8D00000000000002W1"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002W8",
+      "code": "A3.T2.2.p7",
+      "title": "Justification of specifications with data. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8D00000000000002W1"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002W9",
+      "code": "A3.T2.54",
+      "title": "Changes in the control strategy of the drug product, involving the following: a. Change from end-product None 1–3, 5 Major testing to upstream controls for some test(s) (for example, real-time release testing, process analytical technology) b. Addition of a ne",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002WA",
+      "code": "A3.T2.54.p1",
+      "title": "An updated copy of the proposed drug product specifications.",
+      "parent": "01KCHCHX8D00000000000002W9"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002WB",
+      "code": "A3.T2.54.p2",
+      "title": "Copies or summaries of analytical procedures if new analytical procedures are used.",
+      "parent": "01KCHCHX8D00000000000002W9"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002WC",
+      "code": "A3.T2.54.p3",
+      "title": "Copies or summaries of validation reports if new analytical procedures are used to monitor the new critical quality attribute at release.",
+      "parent": "01KCHCHX8D00000000000002W9"
+    },
+    {
+      "id": "01KCHCHX8D00000000000002WD",
+      "code": "A3.T2.54.p4",
+      "title": "Justification and supporting data for each proposed change to the control strategy. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8D00000000000002W9"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WE",
+      "code": "A3.T2.55",
+      "title": "Change in the specification/analytical procedure used to release the drug product, involving the following: a. Deletion of a test analytical None 1, 6, 7 Moderate procedure and/or an acceptance criterion b. Addition of a test c. Replacement of an analytical pr",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WF",
+      "code": "A3.T2.55.p1",
+      "title": "There is no change to the limits/acceptance criteria outside the approved limits for the approved assays used at release/ stability.",
+      "parent": "01KCHCHX8E00000000000002WE"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WG",
+      "code": "A3.T2.55.p2",
+      "title": "The additional test is not intended to monitor new impurity species.",
+      "parent": "01KCHCHX8E00000000000002WE"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WH",
+      "code": "A3.T2.3",
+      "title": "The method of analysis is the same (for example, a change in column length or temperature, but not a different type of column or method) and no new impurities are detected.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WJ",
+      "code": "A3.T2.3.p1",
+      "title": "The modified analytical procedure maintains or improves the performance parameters of the method.",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WK",
+      "code": "A3.T2.3.p2",
+      "title": "The change does not concern potency-testing. Annex 3",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WM",
+      "code": "A3.T2.3.p3",
+      "title": "Acceptance criteria for residual solvents are within recognized or approved acceptance limits (for example, within ICH limits for a Class 3 residual solvent, or pharmacopoeial requirements).",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WN",
+      "code": "A3.T2.3.p4",
+      "title": "The change does not result from unexpected events arising during manufacture (for example, new unqualified impurity, or impurity content outside the approved limits).",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WP",
+      "code": "A3.T2.3.p5",
+      "title": "The change is from a pharmacopoeial assay to another pharmacopoeial assay or the marketing application holder has demonstrated an increased understanding of the relationship between method parameters and method performance defined by a systematic development a",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WQ",
+      "code": "A3.T2.3.p6",
+      "title": "An updated copy of the proposed drug product specification.",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WR",
+      "code": "A3.T2.3.p7",
+      "title": "Copies or summaries of analytical procedures if new analytical procedures are used.",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WS",
+      "code": "A3.T2.3.p8",
+      "title": "Validation/qualification results if new analytical procedures are used.",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WT",
+      "code": "A3.T2.3.p9",
+      "title": "Comparative results demonstrating that the approved and proposed analytical procedures are equivalent.",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WV",
+      "code": "A3.T2.3.p10",
+      "title": "Justification for the change to the analytical procedure (for example, demonstration of the suitability of the analytical procedure in monitoring the drug product, including the degradation products) or for the change to the specification (for example, demonst",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WW",
+      "code": "A3.T2.3.p11",
+      "title": "Justification for the deletion of the test (for example, demonstration of the suitability of the revised specification in controlling the final product).",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WX",
+      "code": "A3.T2.3.p12",
+      "title": "Documented evidence that consistency of quality and of the production process is maintained. Reference standards Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WY",
+      "code": "A3.T2.3.p13",
+      "title": "Replacement of a primary None reference standard",
+      "parent": "01KCHCHX8E00000000000002WH"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002WZ",
+      "code": "A3.T2.57",
+      "title": "Change of the reference None 1, 2 1, 2 standards from a pharmacopoeial or international standard to in-house (no relationship with international standard) Reporting category Moderate Moderate WHO Technical Report Series, No. 1011, 2018WHO Expert Committee on B",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002X0",
+      "code": "A3.T2.58",
+      "title": "Change of the reference standard from in-house (no relationship with international standard) to a pharmacopoeial or international standard",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002X1",
+      "code": "A3.T2.58.p1",
+      "title": "Qualification of a new batch of reference standard against the approved reference standard (including qualification of a new batch of a secondary reference standard against the approved primary standard)",
+      "parent": "01KCHCHX8E00000000000002X0"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002X2",
+      "code": "A3.T2.60",
+      "title": "Change to the reference standard qualification protocol Conditions to be fulfilled",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002X3",
+      "code": "A3.T2.60.p1",
+      "title": "Extension of the reference 2 5 Minor standard shelf-life or re-test period",
+      "parent": "01KCHCHX8E00000000000002X2"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002X4",
+      "code": "A3.T2.60.p2",
+      "title": "The qualification of a new standard is carried out in accordance with an approved protocol.",
+      "parent": "01KCHCHX8E00000000000002X2"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002X5",
+      "code": "A3.T2.60.p3",
+      "title": "The extension of the shelf-life of the reference standard is carried out in accordance with an approved protocol.",
+      "parent": "01KCHCHX8E00000000000002X2"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002X6",
+      "code": "A3.T2.60.p4",
+      "title": "The reference standard is used for a physicochemical test.",
+      "parent": "01KCHCHX8E00000000000002X2"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002X7",
+      "code": "A3.T3.1",
+      "title": "Revised product labelling to reflect the change in reference standard, as applicable.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002X8",
+      "code": "A3.T3.1.p1",
+      "title": "Qualification data of the proposed reference standards or materials (for example, source, characterization, certificate of analysis).",
+      "parent": "01KCHCHX8E00000000000002X7"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002X9",
+      "code": "A3.T3.1.p2",
+      "title": "Justification of the change to the reference standard qualification protocol.",
+      "parent": "01KCHCHX8E00000000000002X7"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002XA",
+      "code": "A3.T3.1.p3",
+      "title": "Updated reference standard qualification protocol.",
+      "parent": "01KCHCHX8E00000000000002X7"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002XB",
+      "code": "A3.T3.1.p4",
+      "title": "Summary of stability testing and results or retest data to support the extension of the reference standard shelf-life. Annex 3 Drug product container closure system Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8E00000000000002X7"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002XC",
+      "code": "A3.T3.1.p5",
+      "title": "Modification of a primary container closure system (for example, new coating, adhesive, stopper, type of glass) Note: The addition of a new container closure system (for example, addition of a pre-filled syringe where the currently approved presentation is onl",
+      "parent": "01KCHCHX8E00000000000002X7"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002XD",
+      "code": "A3.T3.63",
+      "title": "Change from a reusable None 1, 3, 6 Moderate container to a disposable container with no changes in product contact material (for example, change from reusable pen to disposable pen)",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002XE",
+      "code": "A3.T3.63.p1",
+      "title": "Deletion of a container None 1 Minor closure system Note: The NRA should be notified of the deletion of a container closure system, and product labelling information should be updated, as appropriate.",
+      "parent": "01KCHCHX8E00000000000002XD"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002XF",
+      "code": "A3.T4.1",
+      "title": "There is no change in the type of container closure or materials of construction.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002XG",
+      "code": "A3.T4.2",
+      "title": "There is no change in the shape or dimensions of the container closure.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8E00000000000002XH",
+      "code": "A3.T4.2.p1",
+      "title": "The change is made only to improve the quality of the container and does not modify the product contact material (for example, increased thickness of the glass vial without changing interior dimensions).",
+      "parent": "01KCHCHX8E00000000000002XG"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XJ",
+      "code": "A3.T4.2.p2",
+      "title": "The modified part is not in contact with the drug product. WHO Technical Report Series, No. 1011, 2018WHO Expert Committee on Biological Standardization Sixty-eighth report",
+      "parent": "01KCHCHX8E00000000000002XG"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XK",
+      "code": "A3.T4.2.p3",
+      "title": "Revised product labelling information, as appropriate.",
+      "parent": "01KCHCHX8E00000000000002XG"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XM",
+      "code": "A3.T4.2.p4",
+      "title": "For sterilized products, process validation results, unless otherwise justified.",
+      "parent": "01KCHCHX8E00000000000002XG"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XN",
+      "code": "A3.T4.2.p5",
+      "title": "Update dossier containing information on the proposed container closure system, as appropriate (for example, description, materials of construction of primary packaging components).",
+      "parent": "01KCHCHX8E00000000000002XG"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XP",
+      "code": "A3.T4.2.p6",
+      "title": "Results demonstrating protection against leakage, no leaching of undesirable substance, compatibility with the product, and results from the toxicity and biological reactivity tests.",
+      "parent": "01KCHCHX8E00000000000002XG"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XQ",
+      "code": "A3.T4.2.p7",
+      "title": "Summary of release testing results as quantitative data, in a comparative tabular format, for at least three consecutive commercial-scale batches of the pre-change and post-change drug product. Comparative pre-change test results do not need to be generated co",
+      "parent": "01KCHCHX8E00000000000002XG"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XR",
+      "code": "A3.T4.2.p8",
+      "title": "Comparative pre-change and post-change test results for the manufacturer’s characterized key stability-indicating attributes for at least three commercial-scale drug product batches produced (unless otherwise justified) with the proposed changes and stored und",
+      "parent": "01KCHCHX8E00000000000002XG"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XS",
+      "code": "A3.T4.65",
+      "title": "Change in the supplier for a primary container closure component, involving the following: a. Replacement or addition of a 1, 2 1, 2 Minor supplier Note: A change in container closure system involving new materials of construction, shape or dimensions would re",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XT",
+      "code": "A3.T5.1",
+      "title": "There is no change in the type of container closure, materials of construction, shape and dimensions, or in the sterilization process for a sterile container closure component.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XV",
+      "code": "A3.T5.2",
+      "title": "There is no change in the specification of the container closure component outside the approved acceptance criteria.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XW",
+      "code": "A3.T5.2.p1",
+      "title": "Letter from the marketing authorization holder certifying that there are no changes to the container closure system.",
+      "parent": "01KCHCHX8F00000000000002XV"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XX",
+      "code": "A3.T5.2.p2",
+      "title": "Certificate of analysis, or equivalent, for the container provided by the new supplier and comparison with the certificate of analysis, or equivalent, for the approved container. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8F00000000000002XV"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XY",
+      "code": "A3.T5.66",
+      "title": "Change in the specification used to release a primary container closure component or functional secondary container closure component, involving the following: a. Deletion of a test b. Addition of a test c. Replacement of an analytical procedure d. Minor chang",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002XZ",
+      "code": "A3.T5.66.p1",
+      "title": "The deleted test has been demonstrated to be redundant compared to the remaining tests or is no longer a pharmacopoeial requirement.",
+      "parent": "01KCHCHX8F00000000000002XY"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002Y0",
+      "code": "A3.T5.66.p2",
+      "title": "The change to the specification does not affect the functional properties of the container closure component and does not have a potential impact on the performance of the drug product.",
+      "parent": "01KCHCHX8F00000000000002XY"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002Y1",
+      "code": "A3.T5.66.p3",
+      "title": "The change is not necessitated by recurring events arising during manufacture or because of stability concerns.",
+      "parent": "01KCHCHX8F00000000000002XY"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002Y2",
+      "code": "A3.T5.66.p4",
+      "title": "There is no change to the acceptance criteria outside the approved limits.",
+      "parent": "01KCHCHX8F00000000000002XY"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002Y3",
+      "code": "A3.T5.66.p5",
+      "title": "The new analytical procedure is of the same type.",
+      "parent": "01KCHCHX8F00000000000002XY"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002Y4",
+      "code": "A3.T5.66.p6",
+      "title": "Results of method validation demonstrate that the new or modified analytical procedure is at least equivalent to the approved analytical procedure.",
+      "parent": "01KCHCHX8F00000000000002XY"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002Y5",
+      "code": "A3.T5.66.p7",
+      "title": "The new or modified analytical procedure maintains or improves precision, accuracy, specificity and sensitivity.",
+      "parent": "01KCHCHX8F00000000000002XY"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002Y6",
+      "code": "A3.T5.66.p8",
+      "title": "The change is within the range of approved acceptance criteria.",
+      "parent": "01KCHCHX8F00000000000002XY"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002Y7",
+      "code": "A3.T5.66.p9",
+      "title": "An updated copy of the proposed specification for the primary or functional secondary container closure component.",
+      "parent": "01KCHCHX8F00000000000002XY"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002Y8",
+      "code": "A3.T5.2",
+      "title": "Rationale for the change in specification for a primary container closure component.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002Y9",
+      "code": "A3.T5.2.p1",
+      "title": "Description of the analytical procedure and, if applicable, validation data. Stability Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8F00000000000002Y8"
+    },
+    {
+      "id": "01KCHCHX8F00000000000002YA",
+      "code": "A3.T5.67",
+      "title": "Change in the shelf-life of the drug product, involving the following: a. Extension (includes extension of shelf-life of the drug product as packaged for sale, and hold-time after opening and after dilution or reconstitution) None 1–5 Moderate Annex 3",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YB",
+      "code": "A3.T5.67.p1",
+      "title": "Updated product labelling information, as appropriate.",
+      "parent": "01KCHCHX8F00000000000002YA"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YC",
+      "code": "A3.T5.67.p2",
+      "title": "Proposed storage conditions and shelf-life, as appropriate.",
+      "parent": "01KCHCHX8F00000000000002YA"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YD",
+      "code": "A3.T5.67.p3",
+      "title": "Updated post-approval stability protocol.",
+      "parent": "01KCHCHX8F00000000000002YA"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YE",
+      "code": "A3.T5.67.p4",
+      "title": "Justification of the change to the post-approval stability protocol or stability commitment.",
+      "parent": "01KCHCHX8F00000000000002YA"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YF",
+      "code": "A3.T5.67.p5",
+      "title": "Results of stability testing under real-time/real-temperature conditions covering the proposed shelf-life generated on at least three commercial-scale batches unless otherwise justified. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8F00000000000002YA"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YG",
+      "code": "A3.T5.68",
+      "title": "Change in the post-approval stability protocol of the drug product, involving the following: a. Substantial change to the post- approval stability protocol or stability commitment, such as deletion of a test, replacement of an analytical procedure, or change i",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YH",
+      "code": "A3.T5.68.p1",
+      "title": "The addition of the test(s) is not due to stability concerns or to the identification of new impurities.",
+      "parent": "01KCHCHX8G00000000000002YG"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YJ",
+      "code": "A3.T5.68.p2",
+      "title": "Deletion of time point(s) is done according to relevant guidelines (for example, (6)).",
+      "parent": "01KCHCHX8G00000000000002YG"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YK",
+      "code": "A3.T5.68.p3",
+      "title": "The method used to demonstrate the integrity of the container/closure system has already been approved as part of a previous application related to the drug product.",
+      "parent": "01KCHCHX8G00000000000002YG"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YM",
+      "code": "A3.T5.68.p4",
+      "title": "Copies or summaries of analytical procedures if new analytical procedures are used.",
+      "parent": "01KCHCHX8G00000000000002YG"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YN",
+      "code": "A3.T5.68.p5",
+      "title": "Validation results if new analytical procedures are used.",
+      "parent": "01KCHCHX8G00000000000002YG"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YP",
+      "code": "A3.T5.68.p6",
+      "title": "Proposed storage conditions and or shelf-life, as appropriate.",
+      "parent": "01KCHCHX8G00000000000002YG"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YQ",
+      "code": "A3.T5.68.p7",
+      "title": "Updated post-approval stability protocol, including justification for the change, and stability commitment.",
+      "parent": "01KCHCHX8G00000000000002YG"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YR",
+      "code": "A3.T5.68.p8",
+      "title": "Comparative results demonstrating that the approved and proposed analytical procedures are equivalent. Description of change Conditions to be fulfilled",
+      "parent": "01KCHCHX8G00000000000002YG"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YS",
+      "code": "A3.T5.69",
+      "title": "Change in the labelled storage conditions for the drug product or the diluted or reconstituted biotherapeutic products, involving the following: a. Addition or change of None 1–4, 6 Moderate storage condition(s) for the drug product, diluted or reconstituted d",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YT",
+      "code": "A3.T5.69.p1",
+      "title": "Revised product labelling information, as applicable.",
+      "parent": "01KCHCHX8G00000000000002YS"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YV",
+      "code": "A3.T5.69.p2",
+      "title": "Proposed storage conditions and shelf-life.",
+      "parent": "01KCHCHX8G00000000000002YS"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YW",
+      "code": "A3.T5.69.p3",
+      "title": "Updated post-approval stability protocol and stability commitment.",
+      "parent": "01KCHCHX8G00000000000002YS"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YX",
+      "code": "A3.T5.4",
+      "title": "Justification of the change in the labelled storage conditions/cautionary statement.",
+      "parent": "01KCHCHX8A00000000000002R4"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YY",
+      "code": "A3.T5.4.p1",
+      "title": "Results of stability testing under appropriate stability conditions covering the proposed shelf-life, generated on one commercial-scale batch unless otherwise justified.",
+      "parent": "01KCHCHX8G00000000000002YX"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002YZ",
+      "code": "A3.T5.4.p2",
+      "title": "Results of stability testing under appropriate conditions covering the proposed shelf-life, generated on at least three commercial-scale batches unless otherwise justified.",
+      "parent": "01KCHCHX8G00000000000002YX"
+    },
+    {
+      "id": "01KCHCHX8G00000000000002Z0",
+      "code": "A4",
+      "title": "Appendix 4: Safety, efficacy and product labelling information changes",
+      "parent": "01KCHCHX8100000000000002F8"
+    },
+    {
+      "id": "01KCHT99300000000000000000",
+      "code": "WHO-TRS993-ANNEX4",
+      "title": "Guidelines on procedures and data requirements for changes to approved vaccines",
+      "parent": null
+    },
+    {
+      "id": "01KCHT99300000000000000001",
+      "code": "1",
+      "title": "Introduction",
+      "parent": "01KCHT99300000000000000000"
+    },
+    {
+      "id": "01KCHT99300000000000000002",
+      "code": "2",
+      "title": "Scope",
+      "parent": "01KCHT99300000000000000000"
+    },
+    {
+      "id": "01KCHT99300000000000000003",
+      "code": "3",
+      "title": "Terminology",
+      "parent": "01KCHT99300000000000000000"
+    },
+    {
+      "id": "01KCHT99300000000000000004",
+      "code": "4",
+      "title": "General principles",
+      "parent": "01KCHT99300000000000000000"
+    },
+    {
+      "id": "01KCHT99300000000000000005",
+      "code": "5",
+      "title": "Reporting categories for changes",
+      "parent": "01KCHT99300000000000000000"
+    },
+    {
+      "id": "01KCHT99300000000000000006",
+      "code": "5.1",
+      "title": "Major changes",
+      "parent": "01KCHT99300000000000000005"
+    },
+    {
+      "id": "01KCHT99300000000000000007",
+      "code": "5.2",
+      "title": "Moderate changes",
+      "parent": "01KCHT99300000000000000005"
+    },
+    {
+      "id": "01KCHT99300000000000000008",
+      "code": "5.3",
+      "title": "Minor changes",
+      "parent": "01KCHT99300000000000000005"
+    },
+    {
+      "id": "01KCHT99300000000000000009",
+      "code": "6",
+      "title": "Procedures",
+      "parent": "01KCHT99300000000000000000"
+    },
+    {
+      "id": "01KCHT99300000000000000010",
+      "code": "7",
+      "title": "Appendix 1: Reporting categories and timelines",
+      "parent": "01KCHT99300000000000000000"
+    },
+    {
+      "id": "01KCHT99300000000000000011",
+      "code": "8",
+      "title": "Appendix 2: Changes to vaccine antigen",
+      "parent": "01KCHT99300000000000000000"
+    },
+    {
+      "id": "01KCHT99300000000000000012",
+      "code": "9",
+      "title": "Appendix 3: Changes to adjuvants and excipients",
+      "parent": "01KCHT99300000000000000000"
+    },
+    {
+      "id": "01KCHT99300000000000000013",
+      "code": "10",
+      "title": "Appendix 4: Labelling changes",
+      "parent": "01KCHT99300000000000000000"
     }
   ]
 }

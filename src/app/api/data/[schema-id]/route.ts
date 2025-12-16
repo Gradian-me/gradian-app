@@ -105,16 +105,29 @@ export async function GET(
       );
     }
     
-    // Special handling for companies - use cached loader
-    // Note: Companies don't have password fields, so no filtering needed
-    // Companies schema is always not company-based (it doesn't filter by itself)
+    // Special handling for companies - use cached loader when no company filters are applied.
+    // Note: Companies don't have password fields, so no filtering needed at field level.
+    // Companies schema is always not company-based (it doesn't filter by itself).
     if (schemaId === 'companies') {
       try {
-        const companies = await loadAllCompanies();
-        return NextResponse.json({
-          success: true,
-          data: companies,
-        });
+        const searchParams = request.nextUrl.searchParams;
+        const companyIdsString = searchParams.get('companyIds');
+        const companyId = searchParams.get('companyId');
+        const hasCompanyFilter = Boolean(
+          (companyIdsString && companyIdsString.trim().length > 0) ||
+          (companyId && companyId.trim().length > 0)
+        );
+
+        // If no company filter is specified, return all companies from cache for maximum performance.
+        if (!hasCompanyFilter) {
+          const companies = await loadAllCompanies();
+          return NextResponse.json({
+            success: true,
+            data: companies,
+          });
+        }
+        // If companyIds / companyId is present, fall through to normal controller path
+        // so that standard repository filtering (including related-companies logic) is applied.
       } catch (error) {
         // If cache fails, fall through to normal controller
         loggingCustom(

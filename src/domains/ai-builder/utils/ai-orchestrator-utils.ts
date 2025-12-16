@@ -914,9 +914,11 @@ async function executeAgentChain(
       const result = await processAiAgent(agent, requestData, baseUrl);
 
       if (!result.success) {
-        todo.status = 'cancelled';
-        todo.chainMetadata.error = result.error;
-        throw new Error(result.error || 'Agent execution failed');
+        const errorMessage = result.error || 'Agent execution failed';
+        todo.status = 'failed';
+        todo.output = errorMessage; // Save error as output for tooltip
+        todo.chainMetadata.error = errorMessage;
+        throw new Error(errorMessage);
       }
 
       // Extract token usage, duration, cost, and response format from result
@@ -942,8 +944,10 @@ async function executeAgentChain(
 
       return output;
     } catch (error) {
-      todo.status = 'cancelled';
-      todo.chainMetadata.error = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      todo.status = 'failed';
+      todo.output = errorMessage; // Save error as output for tooltip
+      todo.chainMetadata.error = errorMessage;
       throw error;
     }
   };

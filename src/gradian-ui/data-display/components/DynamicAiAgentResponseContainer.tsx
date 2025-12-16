@@ -249,7 +249,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
       data: tableData,
       pagination: {
         enabled: tableData.length > 10,
-        pageSize: 10,
+        pageSize: 25,
         showPageSizeSelector: true,
         pageSizeOptions: [10, 25, 50, 100],
       },

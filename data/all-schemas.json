@@ -460,7 +460,7 @@
           "tableProperties": {
             "sortingEnabled": true,
             "paginationEnabled": true,
-            "paginationPageSize": 10,
+            "paginationPageSize": 25,
             "cardColumns": 2
           },
           "colSpan": 2,
@@ -1684,7 +1684,10 @@
     "showInNavigation": false,
     "icon": "Building2",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data",
+    "canSelectMultiCompanies": true
   },
   {
     "id": "relation-types",
@@ -2848,6 +2851,28 @@
         "required": false,
         "colSpan": 1,
         "order": 6
+      },
+      {
+        "id": "authentication-type",
+        "name": "authenticationType",
+        "label": "Authentication Type",
+        "sectionId": "basic-information",
+        "component": "toggle-group",
+        "placeholder": "Select authentication type",
+        "defaultValue": "active-directory",
+        "required": false,
+        "colSpan": 1,
+        "order": 7,
+        "options": [
+          {
+            "id": "form-based",
+            "label": "Form-Based"
+          },
+          {
+            "id": "active-directory",
+            "label": "Active Directory"
+          }
+        ]
       }
     ],
     "sections": [
@@ -2871,7 +2896,8 @@
             "last-name",
             "email",
             "post-title",
-            "company"
+            "company",
+            "authentication-type"
           ]
         }
       ],
@@ -4226,7 +4252,7 @@
     ],
     "showInNavigation": false,
     "icon": "Tags",
-    "isNotCompanyBased": false,
+    "isNotCompanyBased": true,
     "canSelectMultiCompanies": true,
     "schemaType": "system"
   },
@@ -4963,7 +4989,9 @@
     "allowDataInactive": true,
     "allowHierarchicalParent": true,
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "tenants",
@@ -5118,7 +5146,14 @@
     ],
     "showInNavigation": true,
     "icon": "Tag",
-    "schemaType": "business"
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ],
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "change-subject-types",
@@ -5168,7 +5203,13 @@
     ],
     "showInNavigation": true,
     "icon": "FolderTree",
-    "schemaType": "business"
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ]
   },
   {
     "id": "change-management",
@@ -5214,7 +5255,8 @@
         "placeholder": "Enter change title",
         "validation": {
           "required": true,
-          "minLength": 1
+          "minLength": 1,
+          "maxLength": 255
         },
         "colSpan": 2,
         "order": 3,
@@ -5247,21 +5289,6 @@
         },
         "colSpan": 2,
         "order": 5
-      },
-      {
-        "id": "change-classification",
-        "name": "changeManagementTypes",
-        "label": "Change Classification",
-        "sectionId": "change-information",
-        "component": "picker",
-        "placeholder": "Click to select change management type",
-        "description": "Select change management type from popup picker",
-        "targetSchema": "change-classifications",
-        "validation": {
-          "required": false
-        },
-        "colSpan": 1,
-        "order": 6
       },
       {
         "id": "change-subject-types",
@@ -5331,6 +5358,21 @@
         },
         "colSpan": 2,
         "order": 4
+      },
+      {
+        "id": "change-classification",
+        "name": "changeManagementTypes",
+        "label": "Change Classification",
+        "sectionId": "qa-analysis",
+        "component": "picker",
+        "placeholder": "Click to select change management type",
+        "description": "Select change management type from popup picker",
+        "targetSchema": "change-classifications",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 6
       },
       {
         "id": "change-procedure",
@@ -5565,7 +5607,13 @@
         "label": "Change Management Status"
       }
     ],
-    "schemaType": "business"
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ]
   },
   {
     "id": "quality-assurance-analysis",
@@ -5640,7 +5688,13 @@
     ],
     "showInNavigation": false,
     "icon": "FileCheck",
-    "schemaType": "business"
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ]
   },
   {
     "id": "qa-guideline-analysis",
@@ -5709,7 +5763,13 @@
     ],
     "showInNavigation": false,
     "icon": "FileText",
-    "schemaType": "business"
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ]
   },
   {
     "id": "change-categories",
@@ -5853,7 +5913,13 @@
     ],
     "showInNavigation": false,
     "icon": "FileText",
-    "schemaType": "business"
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ]
   },
   {
     "id": "change-procedure",
@@ -5900,9 +5966,15 @@
         "columns": 2
       }
     ],
-    "showInNavigation": false,
+    "showInNavigation": true,
     "icon": "FileCode",
-    "schemaType": "business"
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ]
   },
   {
     "id": "tasks",
@@ -5966,7 +6038,8 @@
         "id": "01KCDZTASKGROUP0000000000001",
         "label": "Task Types"
       }
-    ]
+    ],
+    "applyToAllTenants": true
   },
   {
     "id": "attachments",
@@ -6296,7 +6369,8 @@
           "passSkipKey": true
         }
       ]
-    }
+    },
+    "applyToAllTenants": true
   },
   {
     "id": "oox-analyzer",
@@ -6532,5 +6606,199 @@
         }
       ]
     }
+  },
+  {
+    "id": "process-mappings",
+    "description": "Define and manage process mappings with hierarchical parent-child relationships.",
+    "singular_name": "Process Mapping",
+    "plural_name": "Process Mappings",
+    "icon": "GitBranch",
+    "fields": [
+      {
+        "id": "process-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter process title",
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "process-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Describe the process, inputs, outputs, and responsibilities",
+        "role": "description",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "parent-process",
+        "name": "parent",
+        "label": "Parent Process",
+        "sectionId": "hierarchy",
+        "component": "picker",
+        "placeholder": "Select parent process (optional)",
+        "description": "Use this to build hierarchical process maps (e.g. Level 1 → Level 2 → Level 3).",
+        "targetSchema": "process-mappings",
+        "allowMultiselect": false,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 0,
+        "inactive": true
+      },
+      {
+        "id": "field-1765814967501",
+        "name": "code",
+        "label": "Code",
+        "sectionId": "basic-information",
+        "component": "text",
+        "order": 2,
+        "placeholder": "Enter the code for the process",
+        "role": "code"
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Core process metadata (title and description).",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "hierarchy",
+        "title": "Hierarchy",
+        "description": "Configure parent-child relationships between processes.",
+        "initialState": "expanded",
+        "columns": 1,
+        "inactive": true
+      }
+    ],
+    "showInNavigation": true,
+    "schemaType": "business",
+    "allowHierarchicalParent": true,
+    "entityTypeGroup": [
+      {
+        "id": "01KCPROCESSTYPES00000000001",
+        "label": "Process Types"
+      }
+    ]
+  },
+  {
+    "id": "guidelines",
+    "description": "Register and manage QA/technical guidelines with codes, editions, and publish years.",
+    "singular_name": "Guideline",
+    "plural_name": "Guidelines",
+    "icon": "BookOpenCheck",
+    "allowHierarchicalParent": true,
+    "fields": [
+      {
+        "id": "title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter guideline title",
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 3
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "code",
+        "name": "code",
+        "label": "Code",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter guideline code (e.g., WHO-TRS-1011)",
+        "role": "code",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Describe the guideline scope, purpose, and key points",
+        "role": "description",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "conditions",
+        "name": "conditions",
+        "label": "Conditions",
+        "sectionId": "conditions",
+        "component": "list-input",
+        "placeholder": "Enter conditions",
+        "validation": {
+          "required": false
+        },
+        "order": 4
+      },
+      {
+        "id": "supporting-data",
+        "name": "supportingData",
+        "label": "Supporting Data",
+        "sectionId": "supporting-data",
+        "component": "list-input",
+        "placeholder": "Enter supporting data",
+        "validation": {
+          "required": false
+        },
+        "order": 5
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Core metadata about the guideline.",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "conditions",
+        "title": "Conditions",
+        "description": "Conditions for the guideline.",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "supporting-data",
+        "title": "Supporting Data",
+        "description": "Supporting data for the guideline.",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": true,
+    "schemaType": "business"
   }
 ]

@@ -126,7 +126,7 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
 
   const sortingEnabled = tableProps.sortingEnabled ?? true;
   const paginationEnabled = tableProps.paginationEnabled ?? (sectionData.length > 10);
-  const paginationPageSize = tableProps.paginationPageSize || 10;
+  const paginationPageSize = tableProps.paginationPageSize || 25;
   const alwaysShowPagination = tableProps.alwaysShowPagination ?? false;
   const isLoading = isLoadingRelations || (isRelationBased && isLoadingTargetSchema);
 

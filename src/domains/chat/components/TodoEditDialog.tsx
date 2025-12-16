@@ -71,6 +71,11 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
   // Get available renderComponents for parameter selection
   const availableRenderComponents = React.useMemo(() => {
     if (!selectedAgent || !selectedAgent.renderComponents) return [];
+    // Ensure renderComponents is an array
+    if (!Array.isArray(selectedAgent.renderComponents)) {
+      console.warn('[TodoEditDialog] renderComponents is not an array:', selectedAgent.renderComponents);
+      return [];
+    }
     // Filter for form field components (not preload route references) with sectionId 'body' or 'extra'
     const components = selectedAgent.renderComponents.filter((comp: any) => {
       // Must be a form field component (has 'name' property, not a preload route reference with 'route' property)
@@ -95,7 +100,7 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
 
   // Get available renderComponents that haven't been selected yet (for uniqueness)
   const getAvailableComponentsForSelection = React.useCallback((currentParamId: string) => {
-    if (!availableRenderComponents) return [];
+    if (!availableRenderComponents || !Array.isArray(availableRenderComponents)) return [];
     const selectedFieldNames = parameters
       .filter(p => p.id !== currentParamId && p.fieldName)
       .map(p => p.fieldName);
@@ -184,7 +189,9 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
 
       // When fieldName changes, reset value and update section based on component
       if (field === 'fieldName' && newValue) {
-        const comp = availableRenderComponents.find((c: any) => (c.name || c.id) === newValue);
+        const comp = Array.isArray(availableRenderComponents) 
+          ? availableRenderComponents.find((c: any) => (c.name || c.id) === newValue)
+          : null;
         if (comp) {
           // For select components, use the first option's id as default if no defaultValue
           if (comp.component === 'select' && comp.options && comp.options.length > 0) {
@@ -306,7 +313,7 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
           </div>
           
           {/* Parameters Section - Show if agent is selected and has renderComponents */}
-          {selectedAgent && availableRenderComponents.length > 0 ? (
+          {selectedAgent && Array.isArray(availableRenderComponents) && availableRenderComponents.length > 0 ? (
             <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
               <div className="flex items-center justify-between mb-3">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -325,10 +332,14 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
               </div>
               <div className="space-y-2">
                 {parameters.map((param) => {
-                  const selectedComponent = availableRenderComponents.find(
-                    (comp: any) => (comp.name || comp.id) === param.fieldName
-                  );
+                  const selectedComponent = Array.isArray(availableRenderComponents) 
+                    ? availableRenderComponents.find(
+                        (comp: any) => (comp.name || comp.id) === param.fieldName
+                      )
+                    : null;
                   const availableComponents = getAvailableComponentsForSelection(param.id);
+                  // Ensure availableComponents is always an array
+                  const safeAvailableComponents = Array.isArray(availableComponents) ? availableComponents : [];
                   
                   return (
                     <div key={param.id} className="flex items-start gap-2 p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-800/50">
@@ -345,13 +356,13 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
                             }}
                             options={[
                               { id: '', label: 'Select a field...', icon: 'Plus' },
-                              ...availableComponents.map((comp: any) => ({
+                              ...safeAvailableComponents.map((comp: any) => ({
                                 id: comp.name || comp.id,
                                 label: comp.label || comp.name || comp.id,
                                 icon: comp.icon,
                               })),
                               // Show current selection even if it's already selected (for editing)
-                              ...(param.fieldName && !availableComponents.find((c: any) => (c.name || c.id) === param.fieldName) ? [{
+                              ...(param.fieldName && !safeAvailableComponents.find((c: any) => (c.name || c.id) === param.fieldName) ? [{
                                 id: param.fieldName,
                                 label: selectedComponent?.label || param.fieldName,
                                 icon: selectedComponent?.icon,
@@ -422,7 +433,7 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
                 )}
               </div>
             </div>
-          ) : selectedAgent && availableRenderComponents.length === 0 ? (
+          ) : selectedAgent && Array.isArray(availableRenderComponents) && availableRenderComponents.length === 0 ? (
             <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
               <p className="text-xs text-gray-500 dark:text-gray-400 text-center py-2">
                 Selected agent "{selectedAgent.label}" has no configurable parameters (no renderComponents with sectionId 'body' or 'extra').

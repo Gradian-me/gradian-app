@@ -3431,5 +3431,160 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCGDATAMULTITENANT008",
+    "timestamp": "2025-12-15T13:51:18.204Z",
+    "version": "1.28.008",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Enhanced data structure in all-data.json to include related companies and additional fields for company entities, improving data organization and accessibility.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "companies"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated API routes to support multi-tenant and company filtering, optimizing data retrieval based on specified parameters.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "api",
+          "multi-tenancy",
+          "data-management"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved schema handling in route.ts and base.controller.ts to accommodate new filtering logic, ensuring relevant data is returned based on tenant and company context.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "routing",
+          "controllers"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCGDATAMULTITENANT009",
+    "timestamp": "2025-12-15T16:00:00.000Z",
+    "version": "1.28.009",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Enhanced all-data.json and all-schemas.json to include related companies and additional fields, improving data organization.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "schemas",
+          "companies"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated integration handling in IntegrationsPage to preserve item order based on explicit indices, enhancing user experience.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "integrations",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved ForbiddenPage layout for better accessibility and user interaction.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout",
+          "ui"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCHIERARCHYRESP001",
+    "timestamp": "2025-12-15T18:00:00.000Z",
+    "version": "1.29.000",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Enhanced all-data.json to include new related companies and process types, improving data organization.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "companies",
+          "process-types"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated all-schemas.json to add new fields for conditions and supporting data, enhancing schema flexibility.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schemas",
+          "schema-manager",
+          "conditions"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved DynamicCardDialog and DynamicCardRenderer components for better responsiveness and user experience.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "ui",
+          "components"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "WHO-TRS1011-Annex3 Document Hierarchy and APQC PCF structures were added to the system.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "documentation",
+          "process-types",
+          "data-management"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCUPDATEMINOR001",
+    "timestamp": "2025-12-16T07:06:04.000Z",
+    "version": "1.30.000",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Enhanced all-data.json to include new related companies and process types, improving data organization",
+        "priority": "High",
+        "affectedDomains": [
+          "data-management",
+          "companies",
+          "process-types"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated all-schemas.json to add new fields for conditions and supporting data, enhancing schema flexibility",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schemas",
+          "schema-manager",
+          "conditions"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved DynamicCardDialog and DynamicCardRenderer components for better responsiveness and user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "ui",
+          "components"
+        ]
+      }
+    ]
   }
 ]

@@ -79,20 +79,40 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
       });
     }
 
-    // Handle companyIds filter - filter by multiple company IDs
+    // Handle companyIds filter - filter by multiple company IDs.
+    // SECURITY / MULTI-TENANCY:
+    // - Filter is based ONLY on "related-companies" metadata when present.
+    // - Entities without "related-companies" are not filtered out by companyIds.
     if (filters.companyIds) {
       const companyIds = Array.isArray(filters.companyIds)
         ? filters.companyIds
         : typeof filters.companyIds === 'string'
           ? filters.companyIds.split(',').map(id => id.trim())
           : [];
+
       if (companyIds.length > 0) {
         // Normalize companyIds: trim and filter empty strings
-        const normalizedCompanyIds = companyIds.map(id => String(id).trim()).filter(id => id.length > 0);
+        const normalizedCompanyIds = companyIds
+          .map((id) => String(id).trim())
+          .filter((id) => id.length > 0);
+
         if (normalizedCompanyIds.length > 0) {
           filtered = filtered.filter((entity: any) => {
-            const entityCompanyId = entity.companyId ? String(entity.companyId).trim() : null;
-            return entityCompanyId && normalizedCompanyIds.includes(entityCompanyId);
+            // If entity has "related-companies" metadata, use it as primary filter source.
+            const relatedCompanies = entity['related-companies'];
+            if (Array.isArray(relatedCompanies) && relatedCompanies.length > 0) {
+              const relatedIds = relatedCompanies
+                .map((item: any) => (item && item.id ? String(item.id).trim() : null))
+                .filter((id: string | null): id is string => !!id);
+
+              if (relatedIds.length > 0) {
+                return relatedIds.some((id) => normalizedCompanyIds.includes(id));
+              }
+            }
+
+            // If no related-companies metadata, do NOT filter this entity out based on companyIds.
+            // It is treated as global or not company-scoped.
+            return true;
           });
         }
       }

@@ -12,6 +12,7 @@ import { existsSync } from 'fs';
 import { readAllData, writeAllData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
 import { readAllRelations, writeAllRelations } from '@/gradian-ui/shared/domain/utils/relations-storage.util';
 import { handleDomainError } from '@/gradian-ui/shared/domain/errors/domain.errors';
+import { getSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
 import type { GraphNodeData, GraphEdgeData } from '@/domains/graph-designer/types';
 
 // Route segment config to optimize performance
@@ -83,6 +84,9 @@ export async function GET(request: NextRequest) {
     const includedSchemaIdsParam = searchParams.get('includedSchemaIds');
     const excludedSchemaIdsParam = searchParams.get('excludedSchemaIds');
     const graphTypeParam = searchParams.get('graphType');
+    const tenantIdsParam = searchParams.get('tenantIds');
+    const companyIdsParam = searchParams.get('companyIds');
+    const singleCompanyIdParam = searchParams.get('companyId');
     
     const includedSchemaIds = includedSchemaIdsParam 
       ? includedSchemaIdsParam.split(',').map(id => id.trim()).filter(Boolean)
@@ -91,6 +95,25 @@ export async function GET(request: NextRequest) {
     const excludedSchemaIds = excludedSchemaIdsParam
       ? excludedSchemaIdsParam.split(',').map(id => id.trim()).filter(Boolean)
       : [];
+
+    // Multi-tenant support: parse tenantIds for schema visibility filtering
+    const tenantIds = tenantIdsParam
+      ? tenantIdsParam.split(',').map(id => id.trim()).filter(Boolean)
+      : [];
+    const hasTenantFilter = tenantIds.length > 0;
+
+    // Company scoping: parse companyIds (supports companyIds and legacy companyId)
+    const parsedCompanyIds: string[] = [];
+    if (companyIdsParam) {
+      parsedCompanyIds.push(
+        ...companyIdsParam.split(',').map((id) => id.trim()).filter(Boolean),
+      );
+    }
+    if (singleCompanyIdParam) {
+      parsedCompanyIds.push(singleCompanyIdParam.trim());
+    }
+    const companyIds = Array.from(new Set(parsedCompanyIds)).filter(Boolean);
+    const hasCompanyFilter = companyIds.length > 0;
     
     // Validate graphType parameter
     const graphType = graphTypeParam?.toLowerCase();
@@ -111,12 +134,15 @@ export async function GET(request: NextRequest) {
     // Read all relations
     const allRelations = readAllRelations();
 
+    // Track which schemas are tenant-visible for edge-level filtering
+    const tenantVisibleSchemas = new Set<string>();
+
     // Build nodes array
     const nodes: any[] = [];
     
     // Iterate through all schemas in the data
     for (const [schemaId, entities] of Object.entries(allData)) {
-      // Apply schema filtering
+      // Apply explicit schema include/exclude filtering first
       if (includedSchemaIds && !includedSchemaIds.includes(schemaId)) {
         continue;
       }
@@ -125,9 +151,66 @@ export async function GET(request: NextRequest) {
         continue;
       }
 
-      // Add each entity as a node with schemaId
+      // Multi-tenant schema visibility filtering (mirrors /api/data behavior)
+      if (hasTenantFilter) {
+        try {
+          const schema = await getSchemaById(schemaId);
+          const matchesTenantFilter = () => {
+            if (!hasTenantFilter) return true;
+            if (schema?.applyToAllTenants) return true;
+            const related = Array.isArray(schema?.relatedTenants)
+              ? schema.relatedTenants
+                  .filter(Boolean)
+                  .map((item: any) => {
+                    if (typeof item === 'string') return item;
+                    if (item?.id) return `${item.id}`;
+                    return undefined;
+                  })
+                  .filter(Boolean) as string[]
+              : [];
+            if (related.length === 0) return false;
+            return related.some((id: string) => tenantIds.includes(id));
+          };
+          const hasSchemaAndDataSync = schema?.syncStrategy === 'schema-and-data';
+          if (!matchesTenantFilter() || !hasSchemaAndDataSync) {
+            continue;
+          }
+          // Schema is visible for the requested tenants
+          tenantVisibleSchemas.add(schemaId);
+        } catch {
+          // If schema can't be loaded, skip this schema entirely when tenant filter is applied
+          continue;
+        }
+      } else {
+        // When no tenant filter is applied, treat schema as visible by default
+        tenantVisibleSchemas.add(schemaId);
+      }
+
+      // Add each entity as a node with schemaId, applying companyIds scoping when requested
       if (Array.isArray(entities)) {
-        for (const entity of entities) {
+        const typedEntities = entities as any[];
+        const scopedEntities = hasCompanyFilter
+          ? typedEntities.filter((entity: any) => {
+              // Filter ONLY by related-companies (array of { id, label })
+              const relatedCompanies = entity['related-companies'];
+              if (Array.isArray(relatedCompanies) && relatedCompanies.length > 0) {
+                const relatedIds = relatedCompanies
+                  .map((item: any) =>
+                    item && item.id ? String(item.id).trim() : null,
+                  )
+                  .filter((id: string | null): id is string => !!id);
+                if (relatedIds.length > 0) {
+                  return relatedIds.some((id) => companyIds.includes(id));
+                }
+                // If related-companies is present but has no valid IDs, treat as not scoped
+                return false;
+              }
+              // If no related-companies metadata, do not filter this entity by companyIds (treat as global)
+              return true;
+            })
+          : typedEntities;
+
+        for (const entity of scopedEntities) {
           nodes.push({
             ...entity,
             schemaId: schemaId,
@@ -136,10 +219,37 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Precompute node lookup for edge filtering: only keep edges whose endpoints are present as nodes
+    const nodeKeySet = new Set(
+      nodes
+        .map((node: any) =>
+          node && node.id != null && node.schemaId
+            ? `${node.schemaId}:${String(node.id)}`
+            : null,
+        )
+        .filter((key: string | null): key is string => !!key),
+    );
+
     // Build edges array
     const edges: any[] = [];
     
     for (const relation of allRelations) {
+      // Ensure both source and target schemas are tenant-visible (when tenantIds are provided)
+      if (
+        hasTenantFilter &&
+        (!tenantVisibleSchemas.has(relation.sourceSchema) ||
+          !tenantVisibleSchemas.has(relation.targetSchema))
+      ) {
+        continue;
+      }
+
+      const sourceKey = `${relation.sourceSchema}:${String(relation.sourceId)}`;
+      const targetKey = `${relation.targetSchema}:${String(relation.targetId)}`;
+      // Only include edges where both endpoints are present as nodes after filtering
+      if (!nodeKeySet.has(sourceKey) || !nodeKeySet.has(targetKey)) {
+        continue;
+      }
+
       // Check if source or target schema matches includedSchemaIds
       // If includedSchemaIds is provided, include edge if EITHER sourceSchema OR targetSchema is in the list
       const sourceMatches = !includedSchemaIds || includedSchemaIds.includes(relation.sourceSchema);

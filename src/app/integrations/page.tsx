@@ -34,7 +34,7 @@ import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
-import { Select } from '@/gradian-ui/form-builder/form-elements';
+import { Select, PopupPicker } from '@/gradian-ui/form-builder/form-elements';
 
 // Card-specific Tenant Selector Component (uses local state, not global store)
 interface CardTenantSelectorProps {
@@ -50,6 +50,71 @@ interface Tenant {
   domain?: string;
   [key: string]: any;
 }
+
+interface IntegrationCompaniesPickerProps {
+  integrationId: string;
+  selectedCompanies: Array<{ id: string; label: string }>;
+  onCompaniesChange: (companies: Array<{ id: string; label: string }>) => void;
+}
+
+const IntegrationCompaniesPicker: React.FC<IntegrationCompaniesPickerProps> = ({
+  integrationId,
+  selectedCompanies,
+  onCompaniesChange,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+
+  const handleSelect = async (selections: Array<{ id: string; label: string }>) => {
+    onCompaniesChange(selections);
+  };
+
+  const label =
+    selectedCompanies.length === 0
+      ? 'All companies'
+      : selectedCompanies.length === 1
+        ? selectedCompanies[0].label
+        : `${selectedCompanies.length} companies selected`;
+
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        Companies (optional)
+      </label>
+      <button
+        type="button"
+        onClick={handleOpen}
+        className="inline-flex items-center justify-between w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-900 dark:text-gray-100 shadow-sm hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+      >
+        <span className="truncate text-left">{label}</span>
+        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">Change</span>
+      </button>
+
+      <PopupPicker
+        isOpen={isOpen}
+        onClose={handleClose}
+        schemaId="companies"
+        onSelect={async (selections, _raw) => {
+          await handleSelect(
+            selections.map((s) => ({
+              id: String(s.id),
+              // Ensure label is always a string to satisfy type requirements
+              label: s.label ?? String(s.id),
+            }))
+          );
+          handleClose();
+        }}
+        title="Select companies"
+        description="Select one or more companies to scope this integration."
+        allowMultiselect
+        selectedIds={selectedCompanies.map((c) => c.id)}
+        showAddButton={false}
+      />
+    </div>
+  );
+};
 
 const CardTenantSelector: React.FC<CardTenantSelectorProps> = ({ integrationId, selectedTenant, onTenantChange }) => {
   const [tenants, setTenants] = useState<Tenant[]>([]);
@@ -194,6 +259,8 @@ interface Integration {
   title: string;
   description: string;
   icon: string;
+  // Optional explicit ordering index from /api/data/integrations
+  index?: number;
   color?: string;
   lastSynced: string;
   lastSyncMessage?: string;
@@ -202,6 +269,8 @@ interface Integration {
   sourceRoute?: string;
   sourceMethod?: 'GET' | 'POST';
   sourceDataPath?: string;
+  // Optional: whether integration supports scoping by related companies
+  isCompanyScoped?: boolean;
   category?: string | { label?: string; value?: string; id?: string; icon?: string; color?: string } | Array<{ label?: string; value?: string; id?: string; icon?: string; color?: string }>;
   isTenantBased?: boolean;
 }
@@ -220,6 +289,7 @@ export default function IntegrationsPage() {
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   // Store selected tenant per integration card (keyed by integration ID)
   const [cardTenants, setCardTenants] = useState<Record<string, { id: string | number; name: string; domain?: string; [key: string]: any } | null>>({});
+  const [cardCompanies, setCardCompanies] = useState<Record<string, Array<{ id: string; label: string }>>>({});
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState<Set<string>>(new Set());
   const [syncResponse, setSyncResponse] = useState<Record<string, EmailTemplateSyncResponse | string | null>>({});
@@ -238,16 +308,53 @@ export default function IntegrationsPage() {
 
   const fetchIntegrations = async () => {
     try {
-      const response = await apiRequest<Integration[] | { data?: Integration[]; items?: Integration[] }>('/api/data/integrations', {
-        method: 'GET',
-      });
-      
+      const response = await apiRequest<Integration[] | { data?: Integration[]; items?: Integration[] }>(
+        '/api/data/integrations',
+        {
+          method: 'GET',
+        }
+      );
+
       if (response.success && response.data) {
         // Handle both array response and wrapped response
-        const data = Array.isArray(response.data) 
-          ? response.data 
+        const data = Array.isArray(response.data)
+          ? response.data
           : ((response.data as any)?.data || (response.data as any)?.items || []);
-        setIntegrations(data);
+
+        // Preserve original order from the first load by assigning a stable index per integration ID.
+        // This prevents items from jumping position when the backend changes sort order (e.g., by updatedAt/lastSynced).
+        setIntegrations((prev) => {
+          // If no previous data, assign index based on initial array order
+          if (!prev || prev.length === 0) {
+            return data.map((item: Integration, idx: number) => ({
+              ...item,
+              index: idx,
+            }));
+          }
+
+          // Reuse existing index when possible; assign new indices at the end for new items
+          const existingIndexById = new Map<string, number>();
+          prev.forEach((item: Integration & { index?: number }) => {
+            if (typeof item.index === 'number') {
+              existingIndexById.set(item.id, item.index);
+            }
+          });
+
+          let nextIndex =
+            prev.reduce(
+              (max, item) => (typeof item.index === 'number' && item.index > max ? item.index : max),
+              -1
+            ) + 1;
+
+          return data.map((item: Integration) => {
+            const existingIndex = existingIndexById.get(item.id);
+            if (typeof existingIndex === 'number') {
+              return { ...item, index: existingIndex };
+            }
+            const assignedIndex = nextIndex++;
+            return { ...item, index: assignedIndex };
+          });
+        });
       } else {
         console.error('Failed to fetch integrations:', response.error);
       }
@@ -373,6 +480,7 @@ export default function IntegrationsPage() {
 
   const handleSync = async (integration: Integration) => {
     const cardTenant = cardTenants[integration.id];
+    const companiesForCard = cardCompanies[integration.id] || [];
     if (integration.isTenantBased && !cardTenant) {
       toast.error('Please select a tenant before syncing this integration.');
       return;
@@ -391,6 +499,8 @@ export default function IntegrationsPage() {
         body: {
           id: integration.id,
           tenantId: cardTenant ? cardTenant.id : undefined,
+          tenantIds: cardTenant ? String(cardTenant.id) : undefined,
+          companyIds: companiesForCard.length > 0 ? companiesForCard.map((c) => c.id).join(',') : undefined,
         },
       });
 
@@ -672,7 +782,24 @@ export default function IntegrationsPage() {
       groups[categoryKey].push(integration);
     });
     
-    return groups;
+    // Ensure items in each group are ordered by their explicit index from /api/data/integrations (if provided)
+    const orderedGroups: Record<string, Integration[]> = {};
+    Object.keys(groups).forEach((key) => {
+      const items = groups[key];
+      // If no item has an index, keep original API order
+      if (!items.some((item) => typeof item.index === 'number')) {
+        orderedGroups[key] = items;
+        return;
+      }
+
+      orderedGroups[key] = [...items].sort((a, b) => {
+        const ai = typeof a.index === 'number' ? a.index : Number.MAX_SAFE_INTEGER;
+        const bi = typeof b.index === 'number' ? b.index : Number.MAX_SAFE_INTEGER;
+        return ai - bi;
+      });
+    });
+
+    return orderedGroups;
   }, [filteredIntegrations]);
 
   // Get category display name
@@ -1118,7 +1245,7 @@ export default function IntegrationsPage() {
                       
                       {/* Tenant Selector for tenant-based integrations */}
                       {integration.isTenantBased && (
-                        <div className="mb-3">
+                        <div className="mb-3 space-y-3">
                           <CardTenantSelector
                             integrationId={integration.id}
                             selectedTenant={cardTenants[integration.id]}
@@ -1126,6 +1253,18 @@ export default function IntegrationsPage() {
                               setCardTenants(prev => ({
                                 ...prev,
                                 [integration.id]: tenant,
+                              }));
+                            }}
+                          />
+
+                          {/* Optional related companies picker after tenant */}
+                          <IntegrationCompaniesPicker
+                            integrationId={integration.id}
+                            selectedCompanies={cardCompanies[integration.id] || []}
+                            onCompaniesChange={(companies) => {
+                              setCardCompanies((prev) => ({
+                                ...prev,
+                                [integration.id]: companies,
                               }));
                             }}
                           />
