@@ -3502,5 +3502,89 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCHIERARCHYRESP001",
+    "timestamp": "2025-12-15T18:00:00.000Z",
+    "version": "1.29.000",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Enhanced all-data.json to include new related companies and process types, improving data organization.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "companies",
+          "process-types"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated all-schemas.json to add new fields for conditions and supporting data, enhancing schema flexibility.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schemas",
+          "schema-manager",
+          "conditions"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved DynamicCardDialog and DynamicCardRenderer components for better responsiveness and user experience.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "ui",
+          "components"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "WHO-TRS1011-Annex3 Document Hierarchy and APQC PCF structures were added to the system.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "documentation",
+          "process-types",
+          "data-management"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCUPDATEMINOR001",
+    "timestamp": "2025-12-16T07:06:04.000Z",
+    "version": "1.30.000",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Enhanced all-data.json to include new related companies and process types, improving data organization",
+        "priority": "High",
+        "affectedDomains": [
+          "data-management",
+          "companies",
+          "process-types"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated all-schemas.json to add new fields for conditions and supporting data, enhancing schema flexibility",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schemas",
+          "schema-manager",
+          "conditions"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved DynamicCardDialog and DynamicCardRenderer components for better responsiveness and user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "ui",
+          "components"
+        ]
+      }
+    ]
   }
 ]

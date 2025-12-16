@@ -38,7 +38,7 @@ function getStatusColor(status: Todo['status']): string {
       return 'emerald'; // Sharp pastel green
     case 'in_progress':
       return 'sky'; // Sharp pastel blue
-    case 'cancelled':
+    case 'failed':
       return 'rose'; // Sharp pastel red
     case 'pending':
     default:
@@ -55,7 +55,7 @@ function getStatusIcon(status: Todo['status']): string {
       return 'check-circle';
     case 'in_progress':
       return 'loader-2';
-    case 'cancelled':
+    case 'failed':
       return 'x-circle';
     case 'pending':
     default:
@@ -87,7 +87,7 @@ function normalizeDependencies(todo: Todo, allTodos: Todo[]): string[] {
 /**
  * Convert todos to graph nodes and edges
  */
-export function todosToGraphData(todos: Todo[]): TodoGraphData {
+export function todosToGraphData(todos: Todo[], executingTodoId?: string | null): TodoGraphData {
   // Normalize todos - convert step references to actual IDs
   const normalizedTodos = todos.map((todo) => ({
     ...todo,
@@ -96,20 +96,25 @@ export function todosToGraphData(todos: Todo[]): TodoGraphData {
 
   // Create nodes from todos
   const nodes: GraphNodeData[] = normalizedTodos.map((todo) => {
-    const statusColor = getStatusColor(todo.status);
-    const statusIcon = getStatusIcon(todo.status);
+    // Check if this todo is currently executing (even if status hasn't been updated yet)
+    const isExecuting = executingTodoId === todo.id || todo.status === 'in_progress';
+    const effectiveStatus = isExecuting ? 'in_progress' : todo.status;
+    
+    const statusColor = getStatusColor(effectiveStatus);
+    const statusIcon = getStatusIcon(effectiveStatus);
     
     // Map status to nodeType ID for proper styling
+    // Use nodeTypeId as schemaId so graph viewer can style it correctly
     let nodeTypeId = 'todo-pending';
-    switch (todo.status) {
+    switch (effectiveStatus) {
       case 'completed':
         nodeTypeId = 'todo-completed';
         break;
       case 'in_progress':
         nodeTypeId = 'todo-in-progress';
         break;
-      case 'cancelled':
-        nodeTypeId = 'todo-cancelled';
+      case 'failed':
+        nodeTypeId = 'todo-failed';
         break;
       default:
         nodeTypeId = 'todo-pending';
@@ -117,12 +122,13 @@ export function todosToGraphData(todos: Todo[]): TodoGraphData {
 
     return {
       id: todo.id,
-      schemaId: 'todo-node', // We'll create a custom schema for todos
+      schemaId: nodeTypeId, // Use nodeTypeId as schemaId for proper styling
       title: todo.title,
-      incomplete: todo.status !== 'completed',
+      incomplete: effectiveStatus !== 'completed',
       parentId: null,
       payload: {
-        status: todo.status,
+        status: effectiveStatus,
+        originalStatus: todo.status, // Keep original status for reference
         description: todo.description,
         agentId: todo.agentId,
         agentType: todo.agentType,
@@ -132,6 +138,7 @@ export function todosToGraphData(todos: Todo[]): TodoGraphData {
         nodeTypeId, // Add nodeTypeId to payload for reference
         createdAt: todo.createdAt,
         completedAt: todo.completedAt,
+        isExecuting, // Flag to indicate if currently executing
       },
     };
   });
@@ -188,8 +195,8 @@ export function todosToGraphData(todos: Todo[]): TodoGraphData {
       icon: 'check-circle',
     },
     {
-      id: 'todo-cancelled',
-      label: 'Cancelled',
+      id: 'todo-failed',
+      label: 'Failed',
       color: 'rose', // Sharp pastel red
       icon: 'x-circle',
     },
@@ -205,13 +212,31 @@ export function todosToGraphData(todos: Todo[]): TodoGraphData {
     },
   ];
 
-  // Define schema for todos
+  // Define schemas for todos - include all node types as schemas for proper styling
   const schemas = [
     {
-      id: 'todo-node',
-      label: 'Todo',
-      color: 'slate', // Default, will be overridden by nodeType
-      icon: 'list-todo',
+      id: 'todo-pending',
+      label: 'Todo (Pending)',
+      color: 'slate',
+      icon: 'clock',
+    },
+    {
+      id: 'todo-in-progress',
+      label: 'Todo (In Progress)',
+      color: 'sky',
+      icon: 'loader-2',
+    },
+    {
+      id: 'todo-completed',
+      label: 'Todo (Completed)',
+      color: 'emerald',
+      icon: 'check-circle',
+    },
+    {
+      id: 'todo-failed',
+      label: 'Todo (Failed)',
+      color: 'rose',
+      icon: 'x-circle',
     },
   ];
 

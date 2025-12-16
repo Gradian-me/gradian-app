@@ -13,7 +13,7 @@ export function useTable<T = any>({ config, onStateChange }: UseTableOptions<T>)
   const [state, setState] = useState<TableState>(() => {
     const initialState: TableState = {
       page: 1,
-      pageSize: config.pagination?.pageSize || 10,
+      pageSize: config.pagination?.pageSize || 25,
       sortBy: config.sorting?.defaultSort?.columnId || null,
       sortDirection: config.sorting?.defaultSort?.direction || 'asc',
       selectedRows: new Set(),

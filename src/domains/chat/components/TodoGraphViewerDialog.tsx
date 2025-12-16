@@ -20,12 +20,14 @@ export interface TodoGraphViewerDialogProps {
   todos: Todo[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  executingTodoId?: string | null; // ID of currently executing todo
 }
 
 export function TodoGraphViewerDialog({
   todos,
   open,
   onOpenChange,
+  executingTodoId = null,
 }: TodoGraphViewerDialogProps) {
   const graphData = React.useMemo(() => {
     if (todos.length === 0) {
@@ -37,8 +39,8 @@ export function TodoGraphViewerDialog({
         schemas: [],
       };
     }
-    return todosToGraphData(todos);
-  }, [todos]);
+    return todosToGraphData(todos, executingTodoId);
+  }, [todos, executingTodoId]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

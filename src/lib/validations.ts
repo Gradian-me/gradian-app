@@ -333,7 +333,7 @@ export const notificationSchema = z.object({
 // Pagination schemas
 export const paginationSchema = z.object({
   page: z.number().min(1).default(1),
-  limit: z.number().min(1).max(100).default(10),
+  limit: z.number().min(1).max(100).default(25),
   search: z.string().optional(),
   sortBy: z.string().optional(),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),

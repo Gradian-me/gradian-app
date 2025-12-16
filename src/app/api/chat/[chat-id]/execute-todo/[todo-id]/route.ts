@@ -110,10 +110,30 @@ export async function POST(
     const calculatedDuration = Date.now() - startTime;
 
     if (!result.success) {
+      // Mark todo as failed when execution fails
+      const errorMessage = result.error || 'Failed to execute todo';
+      const failedTodo: Todo = {
+        ...todo,
+        status: 'failed' as const,
+        output: errorMessage, // Save error as output for tooltip
+        chainMetadata: {
+          input: initialInput,
+          executedAt: new Date().toISOString(),
+          error: errorMessage,
+        },
+      };
+
+      // Update todos in the chat message metadata
+      const updatedTodos = todos.map(t => t.id === todoId ? failedTodo : t);
+      updateChatMessageTodos(chatId, updatedTodos);
+
       return NextResponse.json(
         {
           success: false,
           error: result.error || 'Failed to execute todo',
+          data: {
+            todo: failedTodo,
+          },
         },
         { status: 500 }
       );

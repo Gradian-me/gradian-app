@@ -45,8 +45,8 @@ export const DataDisplayWrapper: React.FC<DataDisplayWrapperProps> = ({
     filters: {},
     pagination: {
       currentPage: 1,
-      pageSize: pagination.pageSize || 10,
-      totalPages: Math.ceil(data.length / (pagination.pageSize || 10)),
+      pageSize: pagination.pageSize || 25,
+      totalPages: Math.ceil(data.length / (pagination.pageSize || 25)),
       totalItems: data.length,
     },
     selection: [],

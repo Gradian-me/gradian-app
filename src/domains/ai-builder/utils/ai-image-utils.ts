@@ -800,6 +800,23 @@ export async function processImageRequest(
         console.log('Image API response structure:', JSON.stringify(data, null, 2).substring(0, 1000));
       }
 
+      // Check for error in response first
+      if (data.error) {
+        return {
+          success: false,
+          error: `Image generation API error: ${typeof data.error === 'string' ? data.error : JSON.stringify(data.error)}`,
+        };
+      }
+
+      // Check if data.data is explicitly an empty array (common failure case)
+      if (data.data && Array.isArray(data.data) && data.data.length === 0) {
+        const errorMessage = data.message || data.error_message || 'Image generation returned empty data array. The API may have failed to generate the image.';
+        return {
+          success: false,
+          error: errorMessage,
+        };
+      }
+
       // Extract image data - handle different possible response structures
       // Try multiple possible locations for image data
       let imageData: any = null;

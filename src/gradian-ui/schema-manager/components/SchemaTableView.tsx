@@ -227,7 +227,7 @@ export function SchemaTableView({ schemas, onEdit, onView, onDelete, isLoading =
       data: schemas,
       pagination: {
         enabled: schemas.length > 10,
-        pageSize: 10,
+        pageSize: 25,
         showPageSizeSelector: true,
         pageSizeOptions: [5, 10, 25, 50],
         alwaysShow: false,

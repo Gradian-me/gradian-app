@@ -535,11 +535,11 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                 "flex justify-between mb-2 w-full",
                 isInDialog 
                   ? "flex-col sm:flex-row gap-2 sm:gap-3 sm:space-x-3" 
-                  : "flex-row space-x-3 flex-nowrap"
+                  : "flex-row gap-3 flex-wrap"
               )}>
                 <div className={cn(
                   "flex items-center gap-2",
-                  isInDialog ? "w-full sm:flex-1 min-w-0" : "flex-1 min-w-0 truncate"
+                  isInDialog ? "w-full sm:flex-1 min-w-0" : "flex-1 min-w-0"
                 )}>
                   {(hasAvatarField || hasIconField || hasColorField) && (
                     <motion.div
@@ -560,15 +560,16 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <motion.div
-                        className="flex items-center gap-1.5 flex-1 min-w-0 pe-2"
+                        className="flex items-center gap-1.5 flex-1 min-w-0 pe-2 flex-wrap"
                         initial={disableAnimation ? false : { opacity: 0, x: 5 }}
                         animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                         transition={disableAnimation ? {} : { duration: 0.3 }}
                         whileHover={{ x: 2, transition: { duration: 0.15, delay: 0 } }}
                       >
+                        <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} />
                         <motion.h3
                           className={cn(
-                            "font-semibold text-gray-900 dark:text-gray-50 transition-colors duration-100 truncate flex-1 min-w-0",
+                            "font-semibold text-gray-900 dark:text-gray-50 transition-colors duration-100 flex-1 min-w-0 break-words",
                             isInDialog 
                               ? "text-sm sm:text-base" 
                               : "text-md",
@@ -576,30 +577,17 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                           )}
                           whileHover={isInDialog ? undefined : { x: 2, transition: { duration: 0.15, delay: 0 } }}
                         >
-                          <span className="inline-flex items-center gap-1.5">
-                            <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} />
-                            {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
-                            <span
-                              onClick={(e) => e.stopPropagation()}
-                              onMouseDown={(e) => e.stopPropagation()}
-                              onKeyDown={(e) => e.stopPropagation()}
-                              className="ms-1"
-                            >
-                              <CopyContent content={cardConfig.title} />
-                            </span>
-                          </span>
+                          {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
                         </motion.h3>
-                      </motion.div>
-                      {/* Code Badge */}
-                      {hasCodeField && cardConfig.codeField && (
-                        <motion.div
-                          initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
-                          animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
-                          transition={disableAnimation ? {} : { duration: 0.2 }}
+                        <span
+                          onClick={(e) => e.stopPropagation()}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onKeyDown={(e) => e.stopPropagation()}
+                          className="shrink-0"
                         >
-                          <CodeBadge code={cardConfig.codeField} />
-                        </motion.div>
-                      )}
+                          <CopyContent content={cardConfig.title} />
+                        </span>
+                      </motion.div>
                       {/* Incomplete Badge */}
                       {cardConfig.isIncomplete && (
                         <motion.div
@@ -629,13 +617,24 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     )}
                   </div>
                 </div>
-                {(hasRatingField || hasStatusField || hasEntityTypeField) && (
+                {(hasCodeField || hasRatingField || hasStatusField || hasEntityTypeField) && (
                   <div className={cn(
                     "flex gap-2",
                     isInDialog 
                       ? "flex-row sm:flex-col items-start sm:items-end w-full sm:w-auto sm:shrink-0" 
                       : "flex-col items-end shrink-0"
                   )}>
+                    {/* Code Badge */}
+                    {hasCodeField && cardConfig.codeField && (
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
+                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                        transition={disableAnimation ? {} : { duration: 0.2 }}
+                        whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05, transition: { duration: 0.1, delay: 0 } }}
+                      >
+                        <CodeBadge code={cardConfig.codeField} />
+                      </motion.div>
+                    )}
                     {/* Rating */}
                     {hasRatingField && (
                       <motion.div
@@ -873,14 +872,15 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
             </>
           ) : (
             // List view layout
-            <div className="flex items-center space-x-4 w-full flex-wrap gap-2 justify-between">
-              <div className="flex items-center gap-2">
+            <div className="flex items-start space-x-4 w-full flex-wrap gap-2 justify-between">
+              <div className="flex items-start gap-2 flex-1 min-w-0">
                 {(hasAvatarField || hasIconField || hasColorField) && (
                   <motion.div
                     initial={disableAnimation ? false : { opacity: 0, scale: 0.8 }}
                     animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
                     transition={disableAnimation ? {} : { duration: 0.3 }}
                     whileHover={disableAnimation ? undefined : { scale: 1.01, transition: { type: "spring", stiffness: 300, damping: 30 } }}
+                    className="shrink-0"
                   >
                     <RoleBasedAvatar
                       schema={schema}
@@ -892,13 +892,14 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   </motion.div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
+                  <div className="flex items-start gap-1.5 flex-wrap w-full">
+                    <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} className="shrink-0" />
                     <motion.h3
                       initial={disableAnimation ? false : { opacity: 0, x: 5 }}
                       animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                       transition={disableAnimation ? {} : { duration: 0.3 }}
                       className={cn(
-                        "text-base font-semibold text-gray-900 dark:text-gray-200 truncate flex-1 min-w-0",
+                        "text-base font-semibold text-gray-900 dark:text-gray-200 break-words flex-1 min-w-0",
                         !disableAnimation && "group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors duration-100"
                       )}
                       whileHover={disableAnimation ? undefined : {
@@ -906,29 +907,16 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         transition: { type: "spring", stiffness: 400, damping: 25 }
                       }}
                     >
-                      <span className="inline-flex items-center gap-1.5">
-                        <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} />
-                        {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
-                        <span
-                          onClick={(e) => e.stopPropagation()}
-                          onMouseDown={(e) => e.stopPropagation()}
-                          onKeyDown={(e) => e.stopPropagation()}
-                          className="ms-1"
-                        >
-                          <CopyContent content={cardConfig.title} />
-                        </span>
-                      </span>
+                      {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
                     </motion.h3>
-                    {/* Code Badge */}
-                    {hasCodeField && cardConfig.codeField && (
-                      <motion.div
-                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
-                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
-                        transition={disableAnimation ? {} : { duration: 0.2 }}
-                      >
-                        <CodeBadge code={cardConfig.codeField} />
-                      </motion.div>
-                    )}
+                    <span
+                      onClick={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                      className="shrink-0"
+                    >
+                      <CopyContent content={cardConfig.title} />
+                    </span>
                     {/* Incomplete Badge */}
                     {cardConfig.isIncomplete && (
                       <motion.div
@@ -1027,8 +1015,8 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   </div>
                 </div>
               </div>
-              {(hasRatingField || hasStatusField || hasEntityTypeField || hasDuedateField || hasPersonField) && (
-                <div className="flex flex-row items-center justify-between space-y-1 ms-auto gap-2">
+              {(hasCodeField || hasRatingField || hasStatusField || hasEntityTypeField || hasDuedateField || hasPersonField) && (
+                <div className="flex flex-row items-center justify-between space-y-1 ms-auto gap-2 shrink-0">
                   <div className="flex items-center gap-2">
                     {hasPersonField && cardConfig.personField && (
                       <motion.div
@@ -1071,6 +1059,20 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     )}
                   </div>
                   <div className="flex items-end gap-2 flex-col">
+                    {/* Code Badge */}
+                    {hasCodeField && cardConfig.codeField && (
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
+                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                        transition={disableAnimation ? {} : { duration: 0.2 }}
+                        whileHover={disableAnimation ? undefined : {
+                          scale: 1.01,
+                          transition: { type: "spring", stiffness: 300, damping: 30 }
+                        }}
+                      >
+                        <CodeBadge code={cardConfig.codeField} />
+                      </motion.div>
+                    )}
                     {hasRatingField && (
                       <motion.div
                         initial={disableAnimation ? false : { opacity: 0, y: -10 }}

@@ -88,10 +88,15 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} data-test-id="dynamic-card-dialog">
       <DialogContent 
         className={cn(
-          "w-[95vw] sm:w-full",
-          "min-h-[50vh] max-h-[90vh]",
-          "max-w-full sm:max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl",
+          // Width & max-width: full‑bleed on small screens, constrained on larger
+          "w-full max-w-full sm:max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl",
+          // Height: near full‑screen on mobile, scrollable content
+          "max-h-[90vh]",
+          // Make mobile dialog feel like a full‑screen sheet
+          "rounded-none sm:rounded-2xl",
+          // Internal scrolling instead of viewport overflow
           "overflow-y-auto",
+          // Responsive padding so content fits on small heights
           "p-2 sm:p-4 md:p-6",
           className
         )} 

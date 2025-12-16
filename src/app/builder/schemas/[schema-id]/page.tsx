@@ -162,6 +162,11 @@ export default function SchemaEditorPage({ params }: { params: Promise<{ 'schema
     }
   };
 
+  // Don't render until schemaId is resolved from params
+  if (!schemaId) {
+    return null;
+  }
+
   return (
     <SchemaBuilderEditor
       schemaId={schemaId}

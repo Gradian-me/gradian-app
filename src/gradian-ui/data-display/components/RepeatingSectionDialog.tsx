@@ -196,7 +196,7 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
       data: sectionData,
       pagination: {
         enabled: sectionData.length > 10,
-        pageSize: 10,
+        pageSize: 25,
         showPageSizeSelector: true,
         pageSizeOptions: [5, 10, 25, 50],
         alwaysShow: false,

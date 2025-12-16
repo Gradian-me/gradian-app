@@ -460,7 +460,7 @@
           "tableProperties": {
             "sortingEnabled": true,
             "paginationEnabled": true,
-            "paginationPageSize": 10,
+            "paginationPageSize": 25,
             "cardColumns": 2
           },
           "colSpan": 2,
@@ -2851,6 +2851,28 @@
         "required": false,
         "colSpan": 1,
         "order": 6
+      },
+      {
+        "id": "authentication-type",
+        "name": "authenticationType",
+        "label": "Authentication Type",
+        "sectionId": "basic-information",
+        "component": "toggle-group",
+        "placeholder": "Select authentication type",
+        "defaultValue": "active-directory",
+        "required": false,
+        "colSpan": 1,
+        "order": 7,
+        "options": [
+          {
+            "id": "form-based",
+            "label": "Form-Based"
+          },
+          {
+            "id": "active-directory",
+            "label": "Active Directory"
+          }
+        ]
       }
     ],
     "sections": [
@@ -2874,7 +2896,8 @@
             "last-name",
             "email",
             "post-title",
-            "company"
+            "company",
+            "authentication-type"
           ]
         }
       ],
@@ -4229,7 +4252,7 @@
     ],
     "showInNavigation": false,
     "icon": "Tags",
-    "isNotCompanyBased": false,
+    "isNotCompanyBased": true,
     "canSelectMultiCompanies": true,
     "schemaType": "system"
   },
@@ -6594,7 +6617,7 @@
       {
         "id": "process-title",
         "name": "title",
-        "label": "Process Title",
+        "label": "Title",
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter process title",
@@ -6604,7 +6627,7 @@
           "minLength": 2
         },
         "colSpan": 1,
-        "order": 0
+        "order": 1
       },
       {
         "id": "process-description",
@@ -6618,7 +6641,7 @@
           "required": false
         },
         "colSpan": 2,
-        "order": 1
+        "order": 3
       },
       {
         "id": "parent-process",
@@ -6639,8 +6662,8 @@
       },
       {
         "id": "field-1765814967501",
-        "name": "processCode",
-        "label": "Process Code",
+        "name": "code",
+        "label": "Code",
         "sectionId": "basic-information",
         "component": "text",
         "order": 2,
@@ -6667,7 +6690,13 @@
     ],
     "showInNavigation": true,
     "schemaType": "business",
-    "allowHierarchicalParent": true
+    "allowHierarchicalParent": true,
+    "entityTypeGroup": [
+      {
+        "id": "01KCPROCESSTYPES00000000001",
+        "label": "Process Types"
+      }
+    ]
   },
   {
     "id": "guidelines",
@@ -6690,7 +6719,7 @@
           "minLength": 3
         },
         "colSpan": 2,
-        "order": 0
+        "order": 1
       },
       {
         "id": "code",
@@ -6705,7 +6734,7 @@
           "minLength": 2
         },
         "colSpan": 1,
-        "order": 1
+        "order": 2
       },
       {
         "id": "description",
@@ -6719,7 +6748,31 @@
           "required": false
         },
         "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "conditions",
+        "name": "conditions",
+        "label": "Conditions",
+        "sectionId": "conditions",
+        "component": "list-input",
+        "placeholder": "Enter conditions",
+        "validation": {
+          "required": false
+        },
         "order": 4
+      },
+      {
+        "id": "supporting-data",
+        "name": "supportingData",
+        "label": "Supporting Data",
+        "sectionId": "supporting-data",
+        "component": "list-input",
+        "placeholder": "Enter supporting data",
+        "validation": {
+          "required": false
+        },
+        "order": 5
       }
     ],
     "sections": [
@@ -6727,6 +6780,20 @@
         "id": "basic-information",
         "title": "Basic Information",
         "description": "Core metadata about the guideline.",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "conditions",
+        "title": "Conditions",
+        "description": "Conditions for the guideline.",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "supporting-data",
+        "title": "Supporting Data",
+        "description": "Supporting data for the guideline.",
         "initialState": "expanded",
         "columns": 2
       }

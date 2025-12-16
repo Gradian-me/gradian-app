@@ -19,6 +19,7 @@ import { EntityMetadata } from '../components/CreateUpdateDetail';
 import { Avatar } from '@/gradian-ui/form-builder/form-elements/components/Avatar';
 import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
 import { AvatarUser } from '../components/AvatarUser';
+import { CodeBadge } from '@/gradian-ui/form-builder/form-elements/components/CodeBadge';
 
 export interface HierarchyViewProps {
   schema: FormSchema;
@@ -116,6 +117,15 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
   const hasStatusField = Boolean(statusFieldDef);
   const statusValue = statusFieldDef ? entity?.[statusFieldDef.name] : entity?.status;
   
+  // Get code field
+  const hasCodeField = schema?.fields?.some(field => field.role === 'code') || false;
+  const codeFieldValue = getSingleValueByRole(schema, entity, 'code');
+  
+  // Check for avatar, icon, or color fields
+  const hasAvatarField = schema?.fields?.some(field => field.role === 'avatar') || false;
+  const hasIconField = schema?.fields?.some(field => field.role === 'icon') || false;
+  const hasColorField = schema?.fields?.some(field => field.role === 'color') || false;
+  
   // Get person field (assignedTo)
   const hasPersonField = schema?.fields?.some(field => field.role === 'person') || false;
   const personFieldDef = schema?.fields?.find(field => field.role === 'person');
@@ -157,7 +167,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
   }
 
   return (
-    <div className="space-y-1">
+    <div className="mb-2">
       <motion.div
         layout
         variants={cardVariants}
@@ -170,13 +180,13 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
         <Card
           className={cn(
             'border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/70 shadow-sm hover:shadow-md transition-all duration-200',
-            'flex items-center justify-between gap-2',
+            'flex items-center justify-between gap-2 flex-wrap',
             onView && 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800'
           )}
           onClick={onView ? () => onView(entity) : undefined}
         >
-          <CardContent className="flex items-center gap-3 p-3 flex-1 min-w-0">
-            <div className="flex items-center gap-2 min-w-0">
+          <CardContent className="flex items-start gap-3 p-3 flex-1 min-w-0">
+            <div className="flex items-start gap-2 min-w-0 flex-1">
               <button
                 type="button"
                 onClick={(e) => {
@@ -184,7 +194,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                   onToggle(node.id);
                 }}
                 className={cn(
-                  'h-6 w-6 flex items-center justify-center rounded-md border text-gray-500 dark:text-gray-400',
+                  'h-6 w-6 flex items-center justify-center rounded-md border text-gray-500 dark:text-gray-400 shrink-0',
                   'border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/60',
                   !hasChildren && 'opacity-40 cursor-default'
                 )}
@@ -200,19 +210,29 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                   <span className="h-1 w-1 rounded-full bg-gray-400" />
                 )}
               </button>
-              <RoleBasedAvatar
-                schema={schema}
-                data={entity}
-                size="sm"
-                showBorder={true}
-                showShadow={false}
-                defaultColor="violet"
-                className="shrink-0"
-              />
+              {(hasAvatarField || hasIconField || hasColorField) && (
+                <RoleBasedAvatar
+                  schema={schema}
+                  data={entity}
+                  size="sm"
+                  showBorder={true}
+                  showShadow={false}
+                  defaultColor="violet"
+                  className="shrink-0"
+                />
+              )}
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                    {renderHighlightedText(String(title), highlightQuery)}
+                <div className="flex items-start gap-2 flex-wrap">
+                  {/* Code badge and title in flex column */}
+                  <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                    {hasCodeField && codeFieldValue && (
+                      <div className="shrink-0">
+                        <CodeBadge code={codeFieldValue} />
+                      </div>
+                    )}
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100 break-words">
+                      {renderHighlightedText(String(title), highlightQuery)}
+                    </div>
                   </div>
                   {hasStatusField && statusFieldDef && statusValue && (
                     <div className="shrink-0">
@@ -257,7 +277,10 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
               </div>
             </div>
           </CardContent>
-          <div className="pe-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+          <div className={cn(
+            "pe-2 flex gap-2 shrink-0",
+            "flex-col sm:flex-row items-center justify-center"
+          )} onClick={(e) => e.stopPropagation()}>
             <DynamicActionButtons
               variant="minimal"
               actions={[
@@ -291,7 +314,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
             animate="expanded"
             exit="collapsed"
             transition={{ duration: 0.18, ease: 'easeInOut' }}
-            className="ps-6 border-l border-dashed border-gray-200 dark:border-gray-700"
+            className="mt-2 ps-6 border-l border-dashed border-gray-200 dark:border-gray-700"
           >
             {node.children.map((child, idx) => (
               <HierarchyNodeCard
@@ -431,7 +454,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
     const showNested = depth < 2 && index % 3 === 0;
     
     return (
-      <div className="space-y-1">
+      <div className={cn("space-y-1", depth === 0 && "mb-4")}>
         <Card className="border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/70 shadow-sm">
           <CardContent className="flex items-center gap-3 p-3">
             <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -450,7 +473,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
           </CardContent>
         </Card>
         {showNested && (
-          <div className="ps-6 border-l border-dashed border-gray-200 dark:border-gray-700">
+          <div className="mt-2 ps-6 border-l border-dashed border-gray-200 dark:border-gray-700">
             <HierarchySkeleton depth={depth + 1} index={index} />
           </div>
         )}
@@ -459,12 +482,12 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="text-xs text-gray-500 dark:text-gray-400">
         Hierarchy view • {isLoading ? 'Loading...' : `${items?.length || 0} item(s)`}
       </div>
 
-      <div className="space-y-2">
+      <div>
         {isLoading ? (
           // Show skeleton loaders
           Array.from({ length: 3 }).map((_, index) => (

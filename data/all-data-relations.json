@@ -1255,5 +1255,35 @@
     "fieldId": "virtual-assignedTo-tasks",
     "createdAt": "2025-12-14T11:23:52.319Z",
     "updatedAt": "2025-12-14T11:23:52.319Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCPROCESSTYPES00000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCHEZ7VQEP2MWZXAM5T411E7",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCHEZ7Y10YEJG2SFNNDWFCGN",
+    "createdAt": "2025-12-15T16:54:48.001Z",
+    "updatedAt": "2025-12-15T16:54:48.001Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCPROCESSTYPES00000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCHF0R4PZBCATTGHQ58JMPY6",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCHF0R745M5K897GCE5F3HWD",
+    "createdAt": "2025-12-15T16:55:37.444Z",
+    "updatedAt": "2025-12-15T16:55:37.444Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCPROCESSTYPES00000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCHF23V3D6MKMCJBW3WJXZX7",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCHF23WBNVP0ZNP1TXHP3SP9",
+    "createdAt": "2025-12-15T16:56:22.155Z",
+    "updatedAt": "2025-12-15T16:56:22.155Z"
   }
 ]

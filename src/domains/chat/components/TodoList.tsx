@@ -49,6 +49,8 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Todo } from '../types';
+import { TextShimmerWave } from '@/components/ui/text-shimmer-wave';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 export interface TodoListProps {
   todos: Todo[];
@@ -404,16 +406,38 @@ export const TodoList: React.FC<TodoListProps> = ({
           }
         } else {
           console.error('Failed to execute todo:', result.error);
-          // Mark as failed
-          const cancelledTodo = { ...currentTodo, status: 'cancelled' as const };
-          workingTodos = workingTodos.map(t => t.id === currentTodo.id ? cancelledTodo : t);
+          // Mark as failed and save error
+          const errorMessage = result.error || 'Failed to execute todo';
+          const failedTodo = { 
+            ...currentTodo, 
+            status: 'failed' as const,
+            output: errorMessage, // Save error as output for tooltip
+            chainMetadata: {
+              ...currentTodo.chainMetadata,
+              input: currentInput,
+              executedAt: new Date().toISOString(),
+              error: errorMessage,
+            },
+          };
+          workingTodos = workingTodos.map(t => t.id === currentTodo.id ? failedTodo : t);
           setLocalTodos(workingTodos);
           break; // Stop execution on error
         }
       } catch (error) {
         console.error('Error executing todo:', error);
-        const cancelledTodo = { ...currentTodo, status: 'cancelled' as const };
-        workingTodos = workingTodos.map(t => t.id === currentTodo.id ? cancelledTodo : t);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        const failedTodo = { 
+          ...currentTodo, 
+          status: 'failed' as const,
+          output: errorMessage, // Save error as output for tooltip
+          chainMetadata: {
+            ...currentTodo.chainMetadata,
+            input: currentInput,
+            executedAt: new Date().toISOString(),
+            error: errorMessage,
+          },
+        };
+        workingTodos = workingTodos.map(t => t.id === currentTodo.id ? failedTodo : t);
         setLocalTodos(workingTodos);
         break; // Stop execution on error
       } finally {
@@ -458,9 +482,9 @@ export const TodoList: React.FC<TodoListProps> = ({
     const allCompleted = localTodos.every(t => t.status === 'completed');
     if (allCompleted) return 'completed';
     
-    // Check if any todo is cancelled/failed
-    const hasFailed = localTodos.some(t => t.status === 'cancelled');
-    if (hasFailed) return 'cancelled';
+    // Check if any todo is failed
+    const hasFailed = localTodos.some(t => t.status === 'failed');
+    if (hasFailed) return 'failed';
     
     // Default to pending
     return 'pending';
@@ -488,7 +512,7 @@ export const TodoList: React.FC<TodoListProps> = ({
             <Loader2 className="w-3 h-3 text-white animate-spin" />
           </div>
         );
-      case 'cancelled':
+      case 'failed':
         return (
           <div className="shrink-0 w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
             <X className="w-3 h-3 text-white" />
@@ -510,7 +534,7 @@ export const TodoList: React.FC<TodoListProps> = ({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-          className="flex-shrink-0"
+          className="shrink-0"
         >
           <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
             <Check className="w-3 h-3 text-white" />
@@ -519,16 +543,54 @@ export const TodoList: React.FC<TodoListProps> = ({
       );
     }
     
+    if (todo.status === 'failed') {
+      // Get error message from chainMetadata.error first, then output, then default
+      // If output is a string and looks like an error message, use it
+      const errorFromOutput = typeof todo.output === 'string' 
+        ? todo.output 
+        : null;
+      const errorMessage = todo.chainMetadata?.error || errorFromOutput || 'Execution failed';
+      
+      const iconElement = (
+        <div className="shrink-0 w-5 h-5 rounded-full bg-red-500 flex items-center justify-center cursor-help">
+          <X className="w-3 h-3 text-white" />
+        </div>
+      );
+
+      // Always show tooltip for failed todos (even if message is generic)
+      return (
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {iconElement}
+            </TooltipTrigger>
+            <TooltipContent 
+              side="right" 
+              sideOffset={8}
+              className="z-50 max-w-xs"
+            >
+              <div className="space-y-1">
+                <p className="font-semibold text-xs">Error</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300 whitespace-pre-wrap wrap-break-word">
+                  {errorMessage}
+                </p>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    }
+    
     if (todo.status === 'in_progress' || executingTodoId === todo.id) {
       return (
-        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+        <div className="shrink-0 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
           <Loader2 className="w-3 h-3 text-white animate-spin" />
         </div>
       );
     }
 
     return (
-      <div className="flex-shrink-0 w-5 h-5 rounded-full border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center">
+      <div className="shrink-0 w-5 h-5 rounded-full border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center">
         <Clock className="w-2.5 h-2.5 text-gray-400" />
       </div>
     );
@@ -650,71 +712,6 @@ export const TodoList: React.FC<TodoListProps> = ({
                     }
                   );
 
-                  // MetricCard style for executing todos
-                  if (isExecuting) {
-                    return (
-                      <motion.div
-                        key={todo.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 20 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <MetricCard
-                          metrics={[
-                            {
-                              id: 'status',
-                              label: 'Status',
-                              value: 'Executing...',
-                              icon: 'Loader2',
-                              iconColor: 'blue' as const,
-                              format: 'custom' as const,
-                            },
-                          ]}
-                          gradient="blue"
-                          layout="stack"
-                          className="relative"
-                        >
-                          <div className="absolute top-3 right-3 text-blue-600 dark:text-blue-200">
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          </div>
-                        </MetricCard>
-                        <div className="mt-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                          <div className="flex items-start gap-3">
-                            {getStatusIcon(todo)}
-                            <div className="flex-1 min-w-0">
-                              {/* Agent ID Badge - on top of title */}
-                              {todo.agentId && (
-                                <div className="mb-1.5">
-                                  <Badge 
-                                    variant="outline" 
-                                    className={cn(
-                                      'text-xs font-medium',
-                                      'bg-violet-50 dark:bg-violet-950/30',
-                                      'border-violet-200 dark:border-violet-800',
-                                      'text-violet-700 dark:text-violet-300',
-                                      'hover:bg-violet-100 dark:hover:bg-violet-950/50'
-                                    )}
-                                  >
-                                    {todo.agentId}
-                                  </Badge>
-                                </div>
-                              )}
-                              <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                {todo.title}
-                              </h4>
-                              {todo.description && (
-                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                  {todo.description}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  }
-
                   return (
                     <React.Fragment key={todo.id}>
                       {/* Drop indicator line above the item when dragging over it */}
@@ -733,6 +730,7 @@ export const TodoList: React.FC<TodoListProps> = ({
                         formatDuration={formatDuration}
                         isOver={overId === todo.id && activeId !== todo.id}
                         aiAgents={aiAgents}
+                        executingTodoId={executingTodoId}
                       />
                     </React.Fragment>
                   );
@@ -778,7 +776,9 @@ export const TodoList: React.FC<TodoListProps> = ({
                         {(isExecuting || executingTodoId !== null) ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            Executing...
+                            <TextShimmerWave as="span" duration={1.5} className="text-sm">
+                              Executing...
+                            </TextShimmerWave>
                           </>
                         ) : (
                           <>
@@ -815,8 +815,11 @@ export const TodoList: React.FC<TodoListProps> = ({
             <div className="w-6 h-6 rounded-full border-2 border-violet-200 dark:border-violet-700 flex items-center justify-center">
               <Loader2 className="w-3.5 h-3.5 text-violet-600 dark:text-violet-300 animate-spin" />
             </div>
-            <div className="text-sm font-medium text-gray-800 dark:text-gray-100">
-              Executing: <span className="font-semibold text-violet-700 dark:text-violet-300">{executingTodoTitle}</span>
+            <div className="text-sm font-medium text-gray-800 dark:text-gray-100 flex items-center gap-1">
+              <TextShimmerWave as="span" duration={1.5} className="text-sm">
+                Executing:
+              </TextShimmerWave>
+              <span className="font-semibold text-violet-700 dark:text-violet-300">{executingTodoTitle}</span>
             </div>
           </div>
         </div>
@@ -842,6 +845,7 @@ export const TodoList: React.FC<TodoListProps> = ({
         todos={localTodos}
         open={isGraphViewerOpen}
         onOpenChange={setIsGraphViewerOpen}
+        executingTodoId={executingTodoId}
       />
 
       {/* Delete Confirmation Dialog */}
@@ -878,6 +882,7 @@ interface SortableTodoItemProps {
   formatDuration: (ms: number) => string;
   isOver?: boolean; // Whether this item is being dragged over
   aiAgents?: any[]; // AI agents for parameter label resolution
+  executingTodoId?: string | null; // ID of currently executing todo
 }
 
 const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
@@ -892,6 +897,7 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
   formatDuration,
   isOver = false,
   aiAgents = [],
+  executingTodoId = null,
 }) => {
   const {
     attributes,
@@ -945,21 +951,39 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
       
       {getStatusIcon(todo)}
       <div className="flex-1 min-w-0">
-        {/* Agent ID Badge - on top of title */}
-        {todo.agentId && (
-          <div className="mb-0.5">
-            <Badge 
-              variant="outline" 
-              className={cn(
-                'text-[10px] font-medium px-1.5 py-0 h-4',
-                'bg-violet-50 dark:bg-violet-950/30',
-                'border-violet-200 dark:border-violet-800',
-                'text-violet-700 dark:text-violet-300',
-                'hover:bg-violet-100 dark:hover:bg-violet-950/50'
-              )}
-            >
-              {todo.agentId}
-            </Badge>
+        {/* Agent ID Badge and Executing Badge - on top of title */}
+        {(todo.agentId || (executingTodoId === todo.id || todo.status === 'in_progress')) && (
+          <div className="mb-0.5 flex items-center gap-1.5 flex-wrap">
+            {todo.agentId && (
+              <Badge 
+                variant="outline" 
+                className={cn(
+                  'text-[10px] font-medium px-1.5 py-0 h-4',
+                  'bg-violet-50 dark:bg-violet-950/30',
+                  'border-violet-200 dark:border-violet-800',
+                  'text-violet-700 dark:text-violet-300',
+                  'hover:bg-violet-100 dark:hover:bg-violet-950/50'
+                )}
+              >
+                {todo.agentId}
+              </Badge>
+            )}
+            {(executingTodoId === todo.id || todo.status === 'in_progress') && (
+              <Badge 
+                variant="outline" 
+                className={cn(
+                  'text-[10px] font-medium px-1.5 py-0 h-4',
+                  'bg-blue-50 dark:bg-blue-950/30',
+                  'border-blue-200 dark:border-blue-800',
+                  'text-blue-700 dark:text-blue-300',
+                  'hover:bg-blue-100 dark:hover:bg-blue-950/50'
+                )}
+              >
+                <TextShimmerWave as="span" duration={1.5} className="text-[10px]">
+                  Executing
+                </TextShimmerWave>
+              </Badge>
+            )}
           </div>
         )}
         <div className="flex items-center justify-between mb-0.5">

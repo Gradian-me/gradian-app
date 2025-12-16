@@ -45,7 +45,7 @@ export interface Todo {
   id: string; // ULID
   title: string;
   description?: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
   agentId: string; // Which agent will handle this todo
   agentType?: string; // Type of agent (e.g., 'professional-writing', 'image-generator')
   dependencies?: string[]; // Array of todo IDs that must complete first

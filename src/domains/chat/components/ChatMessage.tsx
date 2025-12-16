@@ -142,12 +142,28 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   // Check if this is a thinking message
   const isThinking = message.metadata?.isThinking || false;
 
-  // Check if content is long (more than 500 characters)
-  const isLongContent = cleanContent.length > 500;
-  const shouldTruncate = isLongContent && !isExpanded;
-  const displayContent = shouldTruncate 
-    ? cleanContent.substring(0, 500) + '...' 
-    : cleanContent;
+  // Check if content is long (more than 500 characters or has multiple paragraphs)
+  // For markdown, we'll use height-based truncation instead of character-based
+  const isLongContent = cleanContent.length > 500 || cleanContent.split('\n\n').length > 3;
+  const [contentHeight, setContentHeight] = useState<number | null>(null);
+  const maxCollapsedHeight = 300; // Maximum height in pixels when collapsed
+  
+  // Measure content height after render
+  useEffect(() => {
+    if (markdownContentRef.current && !shouldRenderAgentContainer) {
+      // Use a small delay to ensure markdown is fully rendered
+      const timer = setTimeout(() => {
+        if (markdownContentRef.current) {
+          const height = markdownContentRef.current.scrollHeight;
+          setContentHeight(height);
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [cleanContent, shouldRenderAgentContainer, isExpanded]);
+  
+  const shouldTruncate = isLongContent && !isExpanded && (contentHeight === null || contentHeight > maxCollapsedHeight);
+  const displayContent = cleanContent; // Always show full content, truncate with CSS
   
   // Post-process markdown to add hashtag/mention styling
   useEffect(() => {
@@ -726,7 +742,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                       data: tableData,
                       pagination: {
                         enabled: tableData.length > 10,
-                        pageSize: 10,
+                        pageSize: 25,
                         showPageSizeSelector: true,
                         pageSizeOptions: [10, 25, 50, 100],
                       },
@@ -781,7 +797,14 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             )}>
               <div 
                 ref={markdownContentRef}
-                className="chat-message-content text-sm leading-relaxed"
+                className={cn(
+                  "chat-message-content text-sm leading-relaxed relative transition-all duration-300 ease-in-out",
+                  shouldTruncate ? "overflow-hidden" : ""
+                )}
+                style={shouldTruncate 
+                  ? { maxHeight: `${maxCollapsedHeight}px` } 
+                  : { maxHeight: contentHeight ? `${contentHeight + 10}px` : '10000px' }
+                }
               >
                 <MarkdownViewer 
                   content={displayContent}
@@ -789,8 +812,36 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   isEditable={false}
                   showEndLine={false}
                 />
+                {/* Gradient fade overlay when truncated */}
+                {shouldTruncate && (
+                  <>
+                    {isUser ? (
+                      <div 
+                        className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none"
+                        style={{
+                          background: 'linear-gradient(to bottom, transparent, rgba(139, 92, 246, 0.95))',
+                        }}
+                      />
+                    ) : (
+                      <>
+                        <div 
+                          className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none dark:hidden"
+                          style={{
+                            background: 'linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 1))',
+                          }}
+                        />
+                        <div 
+                          className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none hidden dark:block"
+                          style={{
+                            background: 'linear-gradient(to bottom, transparent, rgba(17, 24, 39, 0.95), rgba(17, 24, 39, 1))',
+                          }}
+                        />
+                      </>
+                    )}
+                  </>
+                )}
               </div>
-              {isLongContent && (
+              {isLongContent && (contentHeight === null || contentHeight > maxCollapsedHeight) && (
                 <div className="mt-2 flex justify-end">
                   <button
                     onClick={() => setIsExpanded(!isExpanded)}
