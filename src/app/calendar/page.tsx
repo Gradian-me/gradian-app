@@ -176,7 +176,7 @@ export default function CalendarPage() {
 
   if (loading) {
     return (
-      <MainLayout title="Tender Calendar">
+      <MainLayout title="Tender Calendar" icon="CalendarDays">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
         </div>
@@ -185,7 +185,7 @@ export default function CalendarPage() {
   }
 
   return (
-    <MainLayout title="Tender Calendar">
+    <MainLayout title="Tender Calendar" icon="CalendarDays">
       <div className="space-y-6">
         {/* Calendar Header */}
         <motion.div

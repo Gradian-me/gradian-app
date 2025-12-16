@@ -41,7 +41,7 @@ export const useVersions = (): UseVersionsReturn => {
       if (filters.sortBy) queryParams.append('sortBy', filters.sortBy);
       if (filters.sortOrder) queryParams.append('sortOrder', filters.sortOrder);
       
-      const url = `/api/app/versions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      const url = `/api/builders/versions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
       const response = await apiRequest<AppVersion[]>(url, {
         method: 'GET',
       });
@@ -82,7 +82,7 @@ export const useVersions = (): UseVersionsReturn => {
         return priorityOrder[change.priority] > priorityOrder[max] ? change.priority : max;
       }, priority);
       
-      const response = await apiRequest<AppVersion>('/api/app/versions', {
+      const response = await apiRequest<AppVersion>('/api/builders/versions', {
         method: 'POST',
         body: {
           changes,

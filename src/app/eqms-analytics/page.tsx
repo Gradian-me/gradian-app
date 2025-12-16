@@ -164,7 +164,7 @@ export default function EqmsAnalyticsPage() {
   }, [chartTheme]);
 
   return (
-    <MainLayout title="EQMS Analytics">
+    <MainLayout title="EQMS Analytics" icon="ShieldCheck">
       <div className="space-y-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

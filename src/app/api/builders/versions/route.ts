@@ -249,7 +249,7 @@ export async function GET(request: NextRequest) {
     loggingCustom(
       LogType.INFRA_LOG,
       'error',
-      `Error in GET /api/app/versions: ${error instanceof Error ? error.message : String(error)}`,
+      `Error in GET /api/builders/versions: ${error instanceof Error ? error.message : String(error)}`,
     );
     return NextResponse.json(
       {
@@ -341,7 +341,7 @@ export async function POST(request: NextRequest) {
     loggingCustom(
       LogType.INFRA_LOG,
       'error',
-      `Error in POST /api/app/versions: ${error instanceof Error ? error.message : String(error)}`,
+      `Error in POST /api/builders/versions: ${error instanceof Error ? error.message : String(error)}`,
     );
     return NextResponse.json(
       {

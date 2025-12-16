@@ -30,6 +30,7 @@ export interface HierarchyViewProps {
   onDelete: (entity: any) => void;
   onChangeParent?: (entity: any) => void;
   onView?: (entity: any) => void; // Callback for viewing entity details (opens card dialog)
+  onViewDetail?: (entity: any) => void; // Callback for navigating to detail page (view button)
   expandAllTrigger?: number;
   collapseAllTrigger?: number;
   isLoading?: boolean; // Loading state for skeleton display
@@ -74,7 +75,8 @@ interface HierarchyNodeProps {
   onEdit: (entity: any) => void;
   onDelete: (entity: any) => void;
   onChangeParent?: (entity: any) => void;
-  onView?: (entity: any) => void; // Callback for viewing entity details
+  onView?: (entity: any) => void; // Callback for viewing entity details (opens card dialog)
+  onViewDetail?: (entity: any) => void; // Callback for navigating to detail page (view button)
   highlightQuery: string;
   index: number;
   schema: FormSchema;
@@ -92,6 +94,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
   onDelete,
   onChangeParent,
   onView,
+  onViewDetail,
   highlightQuery,
   index,
   schema,
@@ -286,15 +289,25 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
             <DynamicActionButtons
               variant="minimal"
               actions={[
-                ...(onView ? [{
+                ...(onViewDetail || onView ? [{
                   type: 'view' as const,
-                  onClick: () => onView(entity),
+                  onClick: () => {
+                    // Prefer onViewDetail (navigate to detail page) over onView (open dialog)
+                    if (onViewDetail) {
+                      onViewDetail(entity);
+                    } else if (onView) {
+                      onView(entity);
+                    }
+                  },
                 }] : []),
                 ...(onEdit ? [{
                   type: 'edit' as const,
-                  onClick: () => onEdit(entity),
+                  onClick: () => {
+                    onEdit(entity);
+                  },
                 }] : []),
               ]}
+              stopPropagation={true}
             />
             <HierarchyActionsMenu
               onAddChild={() => onAddChild(entity)}
@@ -330,6 +343,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                 onDelete={onDelete}
                 onChangeParent={onChangeParent}
                 onView={onView}
+                onViewDetail={onViewDetail}
                 highlightQuery={highlightQuery}
                 index={index + idx + 1}
                 schema={schema}
@@ -353,6 +367,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
   onDelete,
   onChangeParent,
   onView,
+  onViewDetail,
   expandAllTrigger,
   collapseAllTrigger,
   isLoading = false,
@@ -513,6 +528,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
               onDelete={onDelete}
               onChangeParent={onChangeParent}
               onView={onView}
+              onViewDetail={onViewDetail}
               highlightQuery={normalizedSearch}
               index={index}
               schema={schema}

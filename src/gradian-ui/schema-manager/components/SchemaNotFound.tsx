@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FileQuestion, ArrowLeft, Home, RefreshCw, Loader2 } from 'lucide-react';
+import { FileQuestion, ArrowLeft, Home, RefreshCw, Loader2, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -124,7 +124,7 @@ export function SchemaNotFound({
                 {showHomeButton && (
                   <Link href={homeHref}>
                     <Button className="flex items-center space-x-2 bg-violet-600 hover:bg-violet-700">
-                      <Home className="h-4 w-4" />
+                      <LayoutDashboard className="h-4 w-4" />
                       <span>Go to Apps</span>
                     </Button>
                   </Link>

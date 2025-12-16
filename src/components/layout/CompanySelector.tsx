@@ -73,19 +73,19 @@ export function CompanySelector({
       // If not in store, read directly from localStorage
       let relatedCompanies: Array<{ id: string; label: string }> = [];
       
-      if (tenant && tenant['related-companies']) {
-        relatedCompanies = tenant['related-companies'];
+      if (tenant && tenant['relatedCompanies']) {
+        relatedCompanies = tenant['relatedCompanies'];
       } else if (typeof window !== 'undefined') {
         const tenantStoreData = localStorage.getItem('tenant-store');
         if (tenantStoreData) {
           const parsed = JSON.parse(tenantStoreData);
-          if (parsed?.state?.selectedTenant?.['related-companies']) {
-            relatedCompanies = parsed.state.selectedTenant['related-companies'];
+          if (parsed?.state?.selectedTenant?.['relatedCompanies']) {
+            relatedCompanies = parsed.state.selectedTenant['relatedCompanies'];
           }
         }
       }
 
-      // Map related-companies to Company format (label -> name)
+      // Map relatedCompanies to Company format (label -> name)
       const mappedCompanies: Company[] = relatedCompanies.map((company) => ({
         id: company.id,
         name: company.label,

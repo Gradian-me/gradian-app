@@ -498,7 +498,7 @@
       "status": "ACTIVE",
       "rating": 5,
       "incomplete": false,
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
@@ -533,7 +533,7 @@
       ],
       "status": "ACTIVE",
       "rating": 5,
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
@@ -637,7 +637,7 @@
       "updatedAt": "2025-12-15T12:42:56.632Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
@@ -660,7 +660,7 @@
       "updatedAt": "2025-12-15T12:43:02.995Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
           "label": "AryoGen"
@@ -679,7 +679,7 @@
       "updatedAt": "2025-12-15T12:43:09.424Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01KB85MPFBMS4GQ6KGA0EGJNGA",
           "label": "NanoAlvand"
@@ -695,7 +695,7 @@
       "updatedAt": "2025-12-15T12:43:15.013Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01KB9VFNMVC92XF1JRND69S4Z9",
           "label": "Arvand Pharmed"
@@ -2182,10 +2182,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-08T14:08:40.345Z",
+      "updatedAt": "2025-12-16T14:23:52.395Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-12-08T14:08:40.345Z",
+      "lastSynced": "2025-12-16T14:23:52.395Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2198,7 +2198,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 41 schemas: 41 succeeded, 0 failed (41 created, 0 updated)"
+      "lastSyncMessage": "Processed 46 schemas: 46 succeeded, 0 failed (46 created, 0 updated)"
     },
     {
       "color": "blue",
@@ -2225,8 +2225,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-08T14:08:44.087Z",
-      "lastSynced": "2025-12-08T14:08:44.087Z",
+      "updatedAt": "2025-12-16T14:23:56.935Z",
+      "lastSynced": "2025-12-16T14:23:56.935Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2239,7 +2239,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Generated relations for 41 out of 41 schemas",
+      "lastSyncMessage": "Generated relations for 46 out of 46 schemas",
       "sourceRoute": []
     },
     {
@@ -2286,9 +2286,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-08T14:08:59.953Z",
+      "updatedAt": "2025-12-16T14:24:19.954Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-08T14:08:59.953Z",
+      "lastSynced": "2025-12-16T14:24:19.954Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2299,7 +2299,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 218, nodes updated: 5, edges created: 101, nodes failed: 0, edges failed: 0.",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1136, nodes updated: 6, edges created: 112, nodes failed: 0, edges failed: 0.",
       "isTenantBased": false
     },
     {
@@ -3191,14 +3191,14 @@
       "companies": []
     },
     {
-      "menuTitle": "Dashboard",
-      "menuIcon": "LayoutDashboard",
+      "menuTitle": "AI Builder",
+      "menuIcon": "Sparkles",
       "sortIndex": 1,
       "hideInAD": false,
-      "description": "Main application dashboard",
-      "menuUrl": "/dashboard",
+      "description": "AI-assisted builder",
+      "menuUrl": "/ai-builder",
       "openInNewTab": false,
-      "id": "01KBSIDASHBOARD0000000000000",
+      "id": "01KBSIAIBUILDER0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
       "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -3206,31 +3206,29 @@
       "companies": []
     },
     {
-      "menuTitle": "Tender Calendar",
-      "menuIcon": "CalendarDays",
+      "menuTitle": "Chatbot",
+      "menuIcon": "BotMessageSquare",
       "sortIndex": 2,
-      "hideInAD": true,
-      "description": "View tender deadlines and events",
-      "menuUrl": "/calendar",
+      "hideInAD": false,
+      "description": "AI-powered conversations with agent orchestration",
+      "menuUrl": "/chat",
       "openInNewTab": false,
-      "id": "01KBSITENDERCALENDAR00000000",
+      "id": "01KBSICHATBOT0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T11:01:55.621Z",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": []
     },
     {
-      "menuTitle": "Tender Analytics",
-      "menuIcon": "BarChart3",
+      "menuTitle": "Builder",
+      "menuIcon": "LayoutPanelLeft",
       "sortIndex": 3,
       "hideInAD": false,
-      "description": "Tender funnel and spend analytics",
-      "menuUrl": "/analytics",
+      "description": "Form and schema builder",
+      "menuUrl": "/builder",
       "openInNewTab": false,
-      "id": "01KBSIANALYTICS0000000000000",
+      "id": "01KBSIBUILDER000000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
       "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -3238,16 +3236,16 @@
       "companies": []
     },
     {
-      "menuTitle": "EQMS Analytics",
-      "menuIcon": "ShieldCheck",
+      "menuTitle": "Schema Builder",
+      "menuIcon": "Brackets",
       "sortIndex": 4,
       "hideInAD": false,
-      "description": "Quality and risk analytics dashboard",
-      "menuUrl": "/eqms-analytics",
+      "description": "Build and manage schemas",
+      "menuUrl": "/builder/schemas",
       "openInNewTab": false,
-      "id": "01KCEQMSANALYTICS0000000001",
-      "createdAt": "2025-12-15T12:00:00.000Z",
-      "updatedAt": "2025-12-15T12:00:00.000Z",
+      "id": "01KBSISCHEMABUILDER000000000",
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": []
@@ -3270,9 +3268,24 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": "Graph Designer",
-      "menuIcon": "Network",
+      "menuTitle": "Dashboard",
+      "menuIcon": "LayoutDashboard",
       "sortIndex": 6,
+      "hideInAD": false,
+      "description": "Main application dashboard",
+      "menuUrl": "/dashboard",
+      "openInNewTab": false,
+      "id": "01KBSIDASHBOARD0000000000000",
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": []
+    },
+    {
+      "menuTitle": "Graph Designer",
+      "menuIcon": "Waypoints",
+      "sortIndex": 7,
       "hideInAD": false,
       "description": "Design and explore graphs",
       "menuUrl": "/builder/graphs",
@@ -3285,44 +3298,31 @@
       "companies": []
     },
     {
-      "menuTitle": "Schema Builder",
-      "menuIcon": "Brackets",
-      "sortIndex": 7,
-      "hideInAD": false,
-      "description": "Build and manage schemas",
-      "menuUrl": "/builder/schemas",
-      "openInNewTab": false,
-      "id": "01KBSISCHEMABUILDER000000000",
-      "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "companies": []
-    },
-    {
-      "menuTitle": "Builder",
-      "menuIcon": "Wrench",
+      "menuTitle": "Tender Calendar",
+      "menuIcon": "CalendarDays",
       "sortIndex": 8,
-      "hideInAD": false,
-      "description": "Form and schema builder",
-      "menuUrl": "/builder",
+      "hideInAD": true,
+      "description": "View tender deadlines and events",
+      "menuUrl": "/calendar",
       "openInNewTab": false,
-      "id": "01KBSIBUILDER000000000000000",
+      "id": "01KBSITENDERCALENDAR00000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-01T11:01:55.621Z",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": []
     },
     {
-      "menuTitle": "AI Builder",
-      "menuIcon": "Sparkles",
+      "menuTitle": "Tender Analytics",
+      "menuIcon": "BarChart3",
       "sortIndex": 9,
       "hideInAD": false,
-      "description": "AI-assisted builder",
-      "menuUrl": "/ai-builder",
+      "description": "Tender funnel and spend analytics",
+      "menuUrl": "/analytics",
       "openInNewTab": false,
-      "id": "01KBSIAIBUILDER0000000000000",
+      "id": "01KBSIANALYTICS0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
       "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -3330,16 +3330,16 @@
       "companies": []
     },
     {
-      "menuTitle": "Chatbot",
-      "menuIcon": "MessageCircle",
+      "menuTitle": "EQMS Analytics",
+      "menuIcon": "ShieldCheck",
       "sortIndex": 10,
       "hideInAD": false,
-      "description": "AI-powered conversations with agent orchestration",
-      "menuUrl": "/chat",
+      "description": "Quality and risk analytics dashboard",
+      "menuUrl": "/eqms-analytics",
       "openInNewTab": false,
-      "id": "01KBSICHATBOT0000000000000",
-      "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "id": "01KCEQMSANALYTICS0000000001",
+      "createdAt": "2025-12-15T12:00:00.000Z",
+      "updatedAt": "2025-12-15T12:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": []
@@ -3347,7 +3347,7 @@
   ],
   "status-groups": [
     {
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
@@ -3368,7 +3368,7 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
@@ -3383,7 +3383,7 @@
       "status-items-section": []
     },
     {
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
@@ -3398,7 +3398,7 @@
       "status-items-section": []
     },
     {
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
           "label": "AryoGen"
@@ -3412,7 +3412,7 @@
       "updatedAt": "2025-12-06T12:15:23.388Z"
     },
     {
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
           "label": "AryoGen"
@@ -3711,7 +3711,7 @@
       "title": "Supply Chain Management",
       "dbname": "gradian_scm",
       "domain": "https://scm.cinnagen.com",
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
@@ -3722,13 +3722,14 @@
         }
       ],
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBFBAZR3K04CS80DMHGPHMHF",
       "createdAt": "2025-12-02T10:57:07.958Z",
-      "updatedAt": "2025-12-02T10:57:07.958Z"
+      "updatedAt": "2025-12-16T12:16:51.634Z",
+      "defaultDomain": "cinnagen.com"
     },
     {
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
           "label": "AryoGen"
@@ -3739,13 +3740,14 @@
       "domain": "https://aryogen.cinnagen.com",
       "dbname": "gradian_aryogen",
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBFBD109G6CYRT7RA04TMMXC",
       "createdAt": "2025-12-02T10:58:14.677Z",
-      "updatedAt": "2025-12-02T10:58:14.677Z"
+      "updatedAt": "2025-12-16T12:16:43.862Z",
+      "defaultDomain": "aryogen.ir"
     },
     {
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
@@ -3756,10 +3758,11 @@
       "domain": "http://cg-gr-api-dev-1.cinnagen.com",
       "dbname": "gradian_genora",
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBFBGV9151FQN481NB2CT4MX",
       "createdAt": "2025-12-02T11:00:19.878Z",
-      "updatedAt": "2025-12-02T11:00:19.878Z"
+      "updatedAt": "2025-12-16T12:16:33.873Z",
+      "defaultDomain": "cinnagen.com"
     }
   ],
   "routes": [],
@@ -4309,7 +4312,7 @@
   ],
   "entity-type-groups": [
     {
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
@@ -4328,7 +4331,7 @@
       "entity-type-items-section": []
     },
     {
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
@@ -4347,7 +4350,7 @@
       "entity-type-items-section": []
     },
     {
-      "related-companies": [
+      "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"

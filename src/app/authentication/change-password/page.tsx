@@ -6,11 +6,14 @@ import { Eye, EyeOff, LockIcon, UserIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useUserStore } from '@/stores/user.store';
+import { useTenantStore } from '@/stores/tenant.store';
+import { normalizeUsernameToEmail } from '@/domains/auth/utils/username-email.util';
 import { AuthenticationLayout, GlassInputWrapper } from '@/components/authentication';
 
 export default function ChangePasswordPage() {
   const router = useRouter();
   const storeUser = useUserStore((state) => state.user);
+  const { selectedTenant } = useTenantStore();
 
   const [username, setUsername] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -83,6 +86,27 @@ export default function ChangePasswordPage() {
 
     try {
       setIsLoading(true);
+      
+      // Fetch full tenant data if we have tenant ID but no defaultDomain
+      let tenantWithDefaultDomain = selectedTenant;
+      if (selectedTenant?.id && !selectedTenant?.defaultDomain) {
+        try {
+          const tenantResponse = await fetch(`/api/data/tenants/${selectedTenant.id}`);
+          if (tenantResponse.ok) {
+            const tenantData = await tenantResponse.json();
+            if (tenantData.success && tenantData.data) {
+              tenantWithDefaultDomain = tenantData.data;
+            }
+          }
+        } catch (error) {
+          // Continue with existing tenant data if fetch fails
+          console.warn('Failed to fetch tenant data:', error);
+        }
+      }
+      
+      // Normalize username to email using tenant's defaultDomain
+      const normalizedEmail = normalizeUsernameToEmail(trimmedUsername, tenantWithDefaultDomain || null);
+      
       const response = await fetch('/api/auth/password/change', {
         method: 'POST',
         headers: {
@@ -91,7 +115,7 @@ export default function ChangePasswordPage() {
         body: JSON.stringify({
           clientId,
           secretKey,
-          username: trimmedUsername,
+          username: normalizedEmail,
           currentPassword,
           newPassword,
         }),

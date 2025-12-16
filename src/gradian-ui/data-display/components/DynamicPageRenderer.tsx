@@ -1199,6 +1199,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             onDelete={handleDeleteWithConfirmation}
             onChangeParent={handleChangeParent}
             onView={handleViewEntity}
+            onViewDetail={handleViewDetailPage}
             expandAllTrigger={hierarchyExpandToken}
             collapseAllTrigger={hierarchyCollapseToken}
             isLoading={isLoading}
@@ -1538,7 +1539,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               ];
             }
 
-            // Pre-fill related-companies for company-based schemas that support multi-company
+            // Pre-fill relatedCompanies for company-based schemas that support multi-company
             const isCompanyBased = schema?.isNotCompanyBased !== true;
             if (
               schema?.canSelectMultiCompanies &&
@@ -1546,7 +1547,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               selectedCompany &&
               selectedCompany.id !== -1
             ) {
-              base['related-companies'] = [
+              base['relatedCompanies'] = [
                 {
                   id: String(selectedCompany.id),
                   label:

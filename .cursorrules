@@ -4,7 +4,7 @@
 
 ### Automatic Version Creation on Commits
 
-When making commits, automatically create a new version entry by calling the `/api/app/versions` POST endpoint with the following structure:
+When making commits, automatically create a new version entry by calling the `/api/builder/versions` POST endpoint with the following structure:
 
 **Required Fields:**
 - `changes`: Array of change objects, each containing:
@@ -54,5 +54,5 @@ When committing, include version information in the commit message or use the AP
 
 ### Manual Version Creation
 
-For manual version creation, use the `/app/versions` page or call the API directly with the desired changes array.
+For manual version creation, use the `/builder/versions` page or call the API directly with the desired changes array.
 

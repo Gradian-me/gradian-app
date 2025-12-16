@@ -81,8 +81,8 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
 
     // Handle companyIds filter - filter by multiple company IDs.
     // SECURITY / MULTI-TENANCY:
-    // - Filter is based ONLY on "related-companies" metadata when present.
-    // - Entities without "related-companies" are not filtered out by companyIds.
+    // - Filter is based ONLY on "relatedCompanies" metadata when present.
+    // - Entities without "relatedCompanies" are not filtered out by companyIds.
     if (filters.companyIds) {
       const companyIds = Array.isArray(filters.companyIds)
         ? filters.companyIds
@@ -98,8 +98,8 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
 
         if (normalizedCompanyIds.length > 0) {
           filtered = filtered.filter((entity: any) => {
-            // If entity has "related-companies" metadata, use it as primary filter source.
-            const relatedCompanies = entity['related-companies'];
+            // If entity has "relatedCompanies" metadata, use it as primary filter source.
+            const relatedCompanies = entity['relatedCompanies'];
             if (Array.isArray(relatedCompanies) && relatedCompanies.length > 0) {
               const relatedIds = relatedCompanies
                 .map((item: any) => (item && item.id ? String(item.id).trim() : null))
@@ -110,7 +110,7 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
               }
             }
 
-            // If no related-companies metadata, do NOT filter this entity out based on companyIds.
+            // If no relatedCompanies metadata, do NOT filter this entity out based on companyIds.
             // It is treated as global or not company-scoped.
             return true;
           });

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { PencilRuler, LayoutList, Trash2, Layers, Type } from 'lucide-react';
+import { PencilRuler, LayoutList, Trash2 } from 'lucide-react';
 import { FormSchema } from '../types';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
@@ -39,11 +39,7 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
   const animationDelay = Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX);
   const isInactive = schema.inactive;
   const isActionForm = schema.schemaType === 'action-form';
-  const sectionCount = schema.sectionsCount ?? schema.sections?.length ?? 0;
-  const fieldCount = schema.fieldsCount ?? schema.fields?.length ?? 0;
-  const showSections = sectionCount > 0;
-  const showFields = fieldCount > 0;
-  const showStats = showSections || showFields;
+  const showStats = false;
 
   return (
     <motion.div
@@ -194,28 +190,7 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
             </div>
           </div>
         </CardHeader>
-        {showStats && (
-          <CardContent className="relative z-10 pt-2 px-4 pb-4">
-            <div
-              className={`flex items-center gap-4 text-xs ${
-                isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500 dark:text-gray-400'
-              }`}
-            >
-              {showSections && (
-                <div className="flex items-center gap-1.5">
-                  <Layers className="h-3.5 w-3.5" />
-                  <span>{sectionCount} Sections</span>
-                </div>
-              )}
-              {showFields && (
-                <div className="flex items-center gap-1.5">
-                  <Type className="h-3.5 w-3.5" />
-                  <span>{fieldCount} Fields</span>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        )}
+        {showStats && null}
       </Card>
     </motion.div>
   );

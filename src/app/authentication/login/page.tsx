@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SignInPage } from '@/components/ui/sign-in';
 import { ensureFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
+import { normalizeUsernameToEmail } from '@/domains/auth/utils/username-email.util';
 import { useUserStore } from '@/stores/user.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { DEMO_MODE, AUTH_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
@@ -80,17 +81,17 @@ function LoginPageContent() {
 
     try {
       const formData = new FormData(event.currentTarget);
-      const email = formData.get('email') as string;
+      const emailInput = formData.get('email') as string;
       const password = formData.get('password') as string;
 
       loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Form data extracted: ${JSON.stringify({
-        email: email ? `${email.substring(0, 3)}***` : 'missing',
+        emailInput: emailInput ? `${emailInput.substring(0, 3)}***` : 'missing',
         password: password ? '***' : 'missing',
-        hasEmail: !!email,
+        hasEmail: !!emailInput,
         hasPassword: !!password,
       })}`);
 
-      if (!email || !password) {
+      if (!emailInput || !password) {
         const errorMessage = 'Please enter both email and password';
         loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Validation failed: ${errorMessage}`);
         setError(errorMessage);
@@ -105,6 +106,29 @@ function LoginPageContent() {
       if (fingerprintValue) {
         setFingerprint(fingerprintValue);
       }
+
+      // Fetch full tenant data if we have tenant ID but no defaultDomain
+      let tenantWithDefaultDomain = selectedTenant;
+      if (selectedTenant?.id && !selectedTenant?.defaultDomain) {
+        try {
+          loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Fetching full tenant data for ID: ${selectedTenant.id}`);
+          const tenantResponse = await fetch(`/api/data/tenants/${selectedTenant.id}`);
+          if (tenantResponse.ok) {
+            const tenantData = await tenantResponse.json();
+            if (tenantData.success && tenantData.data) {
+              tenantWithDefaultDomain = tenantData.data;
+              loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Tenant data fetched: ${JSON.stringify({ id: tenantData.data.id, defaultDomain: tenantData.data.defaultDomain })}`);
+            }
+          }
+        } catch (error) {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN] Failed to fetch tenant data: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+
+      // Normalize username to email using tenant's defaultDomain
+      const email = normalizeUsernameToEmail(emailInput, tenantWithDefaultDomain || null);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Normalized email: ${email.includes('@') ? `${email.substring(0, 3)}***@${email.split('@')[1]}` : email}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Original input: ${emailInput}, Tenant defaultDomain: ${tenantWithDefaultDomain?.defaultDomain || 'not set'}`);
 
       // Derive tenant domain from explicit selection or current host (sent as X-Tenant-Domain)
       const currentHost =
@@ -136,7 +160,7 @@ function LoginPageContent() {
           'x-fingerprint': headers['x-fingerprint'] ? `${headers['x-fingerprint'].substring(0, 8)}***` : undefined,
         },
         body: {
-          emailOrUsername: email,
+          emailOrUsername: email.includes('@') ? `${email.substring(0, 3)}***@${email.split('@')[1]}` : email,
           password: '***MASKED***',
           deviceFingerprint: fingerprintValue ? `${fingerprintValue.substring(0, 8)}***` : null,
         },

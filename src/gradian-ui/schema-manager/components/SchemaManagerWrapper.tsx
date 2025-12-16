@@ -19,10 +19,12 @@ import {
   FormTabsList,
   FormTabsTrigger,
   FormTabsContent,
+  Select,
 } from '@/gradian-ui/form-builder/form-elements';
 import { MessageBox } from '@/gradian-ui/layout/message-box';
 import { DynamicFilterPane } from '@/gradian-ui/shared/components';
 import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
+import { DynamicPagination } from '@/gradian-ui/data-display/components/DynamicPagination';
 import { useSchemaManagerPage } from '../hooks/useSchemaManagerPage';
 import { FormSchema } from '../types';
 
@@ -34,6 +36,12 @@ export function SchemaManagerWrapper() {
     refreshing,
     searchQuery,
     setSearchQuery,
+    tenantFilter,
+    setTenantFilter,
+    syncStrategyFilter,
+    setSyncStrategyFilter,
+    tenantOptions,
+    syncStrategyOptions,
     activeTab,
     setActiveTab,
     showInactive,
@@ -41,6 +49,12 @@ export function SchemaManagerWrapper() {
     viewMode,
     setViewMode,
     filteredSchemas,
+    paginatedSchemas,
+    currentPage,
+    pageSize,
+    totalPages,
+    handlePageChange,
+    handlePageSizeChange,
     schemas,
     systemSchemas,
     businessSchemas,
@@ -142,7 +156,7 @@ export function SchemaManagerWrapper() {
   return (
     <MainLayout 
       title="Schema Builder"
-      icon="PencilRuler" subtitle="Create and manage dynamic form schemas">
+      icon="Brackets" subtitle="Create and manage dynamic form schemas">
       <div className="space-y-6">
         {messages && ((messages.messages && messages.messages.length > 0) || messages.message) && !createDialogOpen && (
           <MessageBox
@@ -223,8 +237,8 @@ export function SchemaManagerWrapper() {
             </FormTabsTrigger>
           </FormTabsList>
 
-          <div className="flex gap-2 mt-4 items-center">
-            <div className="flex-1">
+          <div className="flex gap-2 mt-4 items-center flex-wrap lg:flex-nowrap">
+            <div className="flex-1 min-w-[200px] max-w-[400px]">
               <SearchInput
                 config={{ name: 'search', placeholder: 'Search schemas...' }}
                 value={searchQuery}
@@ -233,18 +247,41 @@ export function SchemaManagerWrapper() {
                 className="[&_input]:h-10"
               />
             </div>
-            {schemas.some(s => s.inactive) && (
-              <div className="flex items-center border border-gray-300 rounded-lg px-3 h-10">
-                <Switch
-                  config={{ 
-                    name: 'show-inactive', 
-                    label: 'Show Inactive Schemas'
-                  }}
-                  checked={showInactive}
-                  onChange={setShowInactive}
-                />
-              </div>
-            )}
+            <div className="w-[150px] shrink-0 [&>div]:w-full [&>div]:m-0">
+              <Select
+                config={{
+                  name: 'tenant-filter',
+                  placeholder: 'All Tenants',
+                }}
+                options={[
+                  { id: '', label: 'All Tenants' },
+                  { id: 'all-tenants', label: 'Apply to all tenants' },
+                  ...tenantOptions,
+                ]}
+                value={tenantFilter ?? ''}
+                onValueChange={(val: string) => setTenantFilter(val || undefined)}
+                size="md"
+                className="w-full m-0"
+              />
+            </div>
+            <div className="w-[150px] shrink-0 [&>div]:w-full [&>div]:m-0">
+              <Select
+                config={{
+                  name: 'sync-strategy-filter',
+                  placeholder: 'Any sync',
+                }}
+                options={[
+                  { id: '', label: 'Any' },
+                  ...syncStrategyOptions,
+                ]}
+                value={syncStrategyFilter ?? ''}
+                onValueChange={(val: 'schema-only' | 'schema-and-data' | '') =>
+                  setSyncStrategyFilter(val || undefined)
+                }
+                size="md"
+                className="w-full m-0"
+              />
+            </div>
             <div className="border border-gray-300 dark:border-gray-500 rounded-md h-10 flex items-center shrink-0">
               <ViewSwitcher
                 currentView={viewMode}
@@ -257,12 +294,39 @@ export function SchemaManagerWrapper() {
               size="icon"
               onClick={handleRefresh}
               disabled={loading || refreshing}
-              className="h-10 w-10"
+              className="h-10 w-10 shrink-0"
               title="Refresh"
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
+            {schemas.some(s => s.inactive) && (
+              <div className="flex items-center border border-gray-300 dark:border-gray-500 rounded-lg px-3 h-10 shrink-0 whitespace-nowrap">
+                <Switch
+                  config={{ 
+                    name: 'show-inactive', 
+                    label: 'Show Inactive Schemas'
+                  }}
+                  checked={showInactive}
+                  onChange={setShowInactive}
+                />
+              </div>
+            )}
           </div>
+
+          {filteredSchemas.length > 0 && (
+            <div className="mt-4 border-b border-gray-200 dark:border-gray-700">
+              <DynamicPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredSchemas.length}
+                pageSize={pageSize}
+                pageSizeOptions={[10, 25, 50, 100, 'all']}
+                showPageSizeSelector={true}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+              />
+            </div>
+          )}
 
           <FormTabsContent value="system" className="mt-4">
             {loading ? (
@@ -279,10 +343,10 @@ export function SchemaManagerWrapper() {
               ) : (
                 <SchemaCardSkeletonGrid />
               )
-            ) : filteredSchemas.length > 0 ? (
+            ) : paginatedSchemas.length > 0 ? (
               viewMode === 'table' ? (
                 <SchemaTableView
-                  schemas={filteredSchemas}
+                  schemas={paginatedSchemas}
                   onEdit={handleEditSchema}
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}
@@ -290,14 +354,14 @@ export function SchemaManagerWrapper() {
                 />
               ) : viewMode === 'list' ? (
                 <SchemaListView
-                  schemas={filteredSchemas}
+                  schemas={paginatedSchemas}
                   onEdit={handleEditSchema}
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}
                 />
               ) : (
                 <SchemaCardGrid
-                  schemas={filteredSchemas}
+                  schemas={paginatedSchemas}
                   onEdit={handleEditSchema}
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}
@@ -323,10 +387,10 @@ export function SchemaManagerWrapper() {
               ) : (
                 <SchemaCardSkeletonGrid />
               )
-            ) : filteredSchemas.length > 0 ? (
+            ) : paginatedSchemas.length > 0 ? (
               viewMode === 'table' ? (
                 <SchemaTableView
-                  schemas={filteredSchemas}
+                  schemas={paginatedSchemas}
                   onEdit={handleEditSchema}
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}
@@ -334,14 +398,14 @@ export function SchemaManagerWrapper() {
                 />
               ) : viewMode === 'list' ? (
                 <SchemaListView
-                  schemas={filteredSchemas}
+                  schemas={paginatedSchemas}
                   onEdit={handleEditSchema}
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}
                 />
               ) : (
                 <SchemaCardGrid
-                  schemas={filteredSchemas}
+                  schemas={paginatedSchemas}
                   onEdit={handleEditSchema}
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}
@@ -366,10 +430,10 @@ export function SchemaManagerWrapper() {
               ) : (
                 <SchemaCardSkeletonGrid />
               )
-            ) : filteredSchemas.length > 0 ? (
+            ) : paginatedSchemas.length > 0 ? (
               viewMode === 'table' ? (
                 <SchemaTableView
-                  schemas={filteredSchemas}
+                  schemas={paginatedSchemas}
                   onEdit={handleEditSchema}
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}
@@ -377,14 +441,14 @@ export function SchemaManagerWrapper() {
                 />
               ) : viewMode === 'list' ? (
                 <SchemaListView
-                  schemas={filteredSchemas}
+                  schemas={paginatedSchemas}
                   onEdit={handleEditSchema}
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}
                 />
               ) : (
                 <SchemaCardGrid
-                  schemas={filteredSchemas}
+                  schemas={paginatedSchemas}
                   onEdit={handleEditSchema}
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}

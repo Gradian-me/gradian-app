@@ -6,12 +6,13 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/gradian-ui/shared/utils';
 import { URL_HOME } from '@/gradian-ui/shared/constants/application-variables';
-import { Home, QrCode } from 'lucide-react';
+import { Home, LayoutDashboard, QrCode } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ShareButton } from './ShareButton';
+import Dashboard from '@/app/dashboard/page';
 
 // Dynamically import QRCodeDialog to avoid SSR issues with HTMLCanvasElement
 const QRCodeDialog = dynamic(
@@ -80,7 +81,7 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
           title="Go to Apps"
         >
           <Link href={URL_HOME} aria-label="Go to Apps">
-            <Home className="h-4 w-4" />
+            <LayoutDashboard className="h-4 w-4" />
           </Link>
         </Button>
       )}

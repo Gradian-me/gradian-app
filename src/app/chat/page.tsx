@@ -11,7 +11,7 @@ export default function ChatPage() {
     <MainLayout
       title="Chat"
       subtitle="AI-powered conversations with agent orchestration"
-      icon="MessageSquare"
+      icon="MessageCircle"
       showEndLine={false}
     >
       <div className="h-[calc(100vh-9rem)]">

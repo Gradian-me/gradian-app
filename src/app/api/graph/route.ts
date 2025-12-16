@@ -191,8 +191,8 @@ export async function GET(request: NextRequest) {
         const typedEntities = entities as any[];
         const scopedEntities = hasCompanyFilter
           ? typedEntities.filter((entity: any) => {
-              // Filter ONLY by related-companies (array of { id, label })
-              const relatedCompanies = entity['related-companies'];
+              // Filter ONLY by relatedCompanies (array of { id, label })
+              const relatedCompanies = entity['relatedCompanies'];
               if (Array.isArray(relatedCompanies) && relatedCompanies.length > 0) {
                 const relatedIds = relatedCompanies
                   .map((item: any) =>
@@ -202,10 +202,10 @@ export async function GET(request: NextRequest) {
                 if (relatedIds.length > 0) {
                   return relatedIds.some((id) => companyIds.includes(id));
                 }
-                // If related-companies is present but has no valid IDs, treat as not scoped
+                // If relatedCompanies is present but has no valid IDs, treat as not scoped
                 return false;
               }
-              // If no related-companies metadata, do not filter this entity by companyIds (treat as global)
+              // If no relatedCompanies metadata, do not filter this entity by companyIds (treat as global)
               return true;
             })
           : typedEntities;

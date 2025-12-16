@@ -34,11 +34,12 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
       })
     : schema.relatedTenants;
   return (
-    <Card>
+    <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 overflow-visible">
       <CardHeader>
         <CardTitle>Schema Information</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <TextInput
             config={{ name: 'schema-id', label: 'Schema ID' }}
@@ -49,13 +50,23 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
           />
         </div>
         <div>
-          <Textarea
-            config={{ name: 'schema-description', label: 'Description' }}
-            value={schema.description || ''}
-            onChange={(value) => onUpdate({ description: value })}
-            rows={3}
+            <FormSelect
+              config={{ name: 'schema-type', label: 'Schema Type' }}
+              value={schema.schemaType || (schema.isSystemSchema ? 'system' : 'business')}
+              onValueChange={(value: 'system' | 'business' | 'action-form') =>
+                onUpdate({
+                  schemaType: value,
+                  isSystemSchema: value === 'system' ? true : value === 'business' ? false : undefined,
+                })
+              }
+              options={[
+                { id: 'system', label: 'System' },
+                { id: 'business', label: 'Business' },
+                { id: 'action-form', label: 'Action Form' },
+              ]}
             disabled={readonly}
           />
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -75,33 +86,32 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
             />
           </div>
         </div>
+        <div>
+          <Textarea
+            config={{ name: 'schema-description', label: 'Description' }}
+            value={schema.description || ''}
+            onChange={(value) => onUpdate({ description: value })}
+            rows={3}
+            disabled={readonly}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-2 items-center">
         <IconInput
           config={{ name: 'schema-icon', label: 'Icon' }}
           value={schema.icon || ''}
           onChange={(value) => onUpdate({ icon: value })}
           disabled={readonly}
         />
-        <div className="grid grid-cols-2 gap-4">
+          <Switch
+            config={{ name: 'inactive-schema', label: 'Inactive' }}
+            value={schema.inactive || false}
+            onChange={(checked: boolean) => onUpdate({ inactive: checked })}
+            disabled={readonly}
+          />
           <Switch
             config={{ name: 'show-in-navigation', label: 'Show in Navigation' }}
             value={schema.showInNavigation || false}
             onChange={(checked: boolean) => onUpdate({ showInNavigation: checked })}
-            disabled={readonly}
-          />
-          <FormSelect
-            config={{ name: 'schema-type', label: 'Schema Type' }}
-            value={schemaType}
-            onValueChange={(value: 'system' | 'business' | 'action-form') =>
-              onUpdate({
-                schemaType: value,
-                isSystemSchema: value === 'system' ? true : value === 'business' ? false : undefined,
-              })
-            }
-            options={[
-              { id: 'system', label: 'System' },
-              { id: 'business', label: 'Business' },
-              { id: 'action-form', label: 'Action Form' },
-            ]}
             disabled={readonly}
           />
           <Switch
@@ -121,9 +131,13 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
             disabled={readonly}
           />
           <Switch
-            config={{ name: 'inactive-schema', label: 'Inactive' }}
-            value={schema.inactive || false}
-            onChange={(checked: boolean) => onUpdate({ inactive: checked })}
+            config={{
+              name: 'allow-data-related-tenants',
+              label: 'Allow Data Related Tenants',
+              description: 'Allow linking records of this schema to multiple tenants in System Section',
+            }}
+            value={schema.allowDataRelatedTenants || false}
+            onChange={(checked: boolean) => onUpdate({ allowDataRelatedTenants: checked })}
             disabled={readonly}
           />
         </div>

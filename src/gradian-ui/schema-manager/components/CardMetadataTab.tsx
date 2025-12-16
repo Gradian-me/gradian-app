@@ -182,7 +182,7 @@ export function CardMetadataTab({ schema, onUpdate }: CardMetadataTabProps) {
 
   return (
     <div className="space-y-4">
-      <Card>
+      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 overflow-visible">
         <CardHeader>
           <div className="flex items-center gap-2">
             <CardTitle>Card Metadata</CardTitle>

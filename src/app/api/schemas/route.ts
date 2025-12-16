@@ -31,6 +31,12 @@ function buildSchemaSummary<T extends Record<string, any>>(schema: T): T {
     return acc;
   }, {});
 
+  // Always surface tenant scope + sync strategy in summaries so the builder table can show them.
+  summary.applyToAllTenants = schema.applyToAllTenants ?? false;
+  summary.relatedTenants = Array.isArray(schema.relatedTenants) ? schema.relatedTenants : [];
+  summary.syncStrategy = schema.syncStrategy ?? 'schema-only';
+  summary.syncToDatabases = Array.isArray(schema.syncToDatabases) ? schema.syncToDatabases : [];
+
   if (typeof fieldsCount === 'number') {
     summary.fieldsCount = fieldsCount;
   }

@@ -49,7 +49,7 @@ export function TableWrapper<T = any>({
   highlightQuery,
   schema,
 }: TableWrapperProps<T>) {
-  // Add dynamic columns for related-companies and status if schema supports them
+  // Add dynamic columns for relatedCompanies and status if schema supports them
   const enhancedColumns = useMemo(() => {
     const additionalColumns: TableColumn<T>[] = [];
 
@@ -61,12 +61,12 @@ export function TableWrapper<T = any>({
 
     const hasAvatarLikeConfig = Boolean(avatarField || iconField || colorField);
 
-    // Add related-companies column if schema has canSelectMultiCompanies
+    // Add relatedCompanies column if schema has canSelectMultiCompanies
     if (schema?.canSelectMultiCompanies) {
       additionalColumns.push({
-        id: 'related-companies',
+        id: 'relatedCompanies',
         label: 'Related Companies',
-        accessor: (row: T) => (row as any)['related-companies'],
+        accessor: (row: T) => (row as any)['relatedCompanies'],
         sortable: false,
         align: 'left',
         maxWidth: 300,
@@ -79,8 +79,8 @@ export function TableWrapper<T = any>({
           return (
             <BadgeViewer
               field={{
-                id: 'related-companies',
-                name: 'related-companies',
+                id: 'relatedCompanies',
+                name: 'relatedCompanies',
                 component: 'picker',
                 targetSchema: 'companies',
               } as any}

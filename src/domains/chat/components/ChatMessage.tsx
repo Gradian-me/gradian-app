@@ -94,7 +94,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     singular_name: 'Chat Message',
     plural_name: 'Chat Messages',
     description: 'AI generated response',
-    icon: 'MessageSquare',
+    icon: 'BotMessageSquare',
     fields: [],
     sections: [],
   };

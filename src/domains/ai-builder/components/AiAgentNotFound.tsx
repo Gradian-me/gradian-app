@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Bot, ArrowLeft, Home, RefreshCw, Loader2 } from 'lucide-react';
+import { Bot, ArrowLeft, Home, RefreshCw, Loader2, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -124,8 +124,8 @@ export function AiAgentNotFound({
                 {showHomeButton && (
                   <Link href={homeHref}>
                     <Button className="flex items-center space-x-2 bg-violet-600 hover:bg-violet-700">
-                      <Home className="h-4 w-4" />
-                      <span>Go to AI Agents</span>
+                      <LayoutDashboard className="h-4 w-4" />
+                      <span>Go to Apps</span>
                     </Button>
                   </Link>
                 )}

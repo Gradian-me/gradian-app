@@ -515,8 +515,8 @@ export const BadgeViewer: React.FC<BadgeViewerProps> = ({
 
   // Check if this is for related companies
   const isRelatedCompanies = 
-    field.name === 'related-companies' || 
-    field.id === 'related-companies' ||
+    field.name === 'relatedCompanies' || 
+    field.id === 'relatedCompanies' ||
     (field.targetSchema === 'companies' && field.role === 'badge');
 
   return (

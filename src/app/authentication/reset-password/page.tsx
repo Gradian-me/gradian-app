@@ -12,12 +12,15 @@ import {
   InputOTPSlot,
 } from '@/gradian-ui/form-builder/form-elements/components/OTPInput';
 import { AuthenticationLayout, GlassInputWrapper } from '@/components/authentication';
+import { useTenantStore } from '@/stores/tenant.store';
+import { normalizeUsernameToEmail } from '@/domains/auth/utils/username-email.util';
 
 const OTP_LENGTH = 6;
 
 function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { selectedTenant } = useTenantStore();
   const [username, setUsername] = useState('');
   const [userId, setUserId] = useState('');
   const [otp, setOtp] = useState('');
@@ -99,13 +102,33 @@ function ResetPasswordContent() {
     try {
       setIsLoading(true);
 
+      // Fetch full tenant data if we have tenant ID but no defaultDomain
+      let tenantWithDefaultDomain = selectedTenant;
+      if (selectedTenant?.id && !selectedTenant?.defaultDomain) {
+        try {
+          const tenantResponse = await fetch(`/api/data/tenants/${selectedTenant.id}`);
+          if (tenantResponse.ok) {
+            const tenantData = await tenantResponse.json();
+            if (tenantData.success && tenantData.data) {
+              tenantWithDefaultDomain = tenantData.data;
+            }
+          }
+        } catch (error) {
+          // Continue with existing tenant data if fetch fails
+          console.warn('Failed to fetch tenant data:', error);
+        }
+      }
+
+      // Normalize username to email using tenant's defaultDomain
+      const normalizedEmail = normalizeUsernameToEmail(trimmedUsername, tenantWithDefaultDomain || null);
+
       const response = await fetch('/api/auth/password/reset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: trimmedUsername,
+          username: normalizedEmail,
           code: trimmedOtp,
           password,
           confirmPassword,
@@ -138,7 +161,27 @@ function ResetPasswordContent() {
 
   const handleResendCode = async () => {
     const trimmedUsername = username.trim();
-    const resolvedUserId = userId || trimmedUsername;
+    
+    // Fetch full tenant data if we have tenant ID but no defaultDomain
+    let tenantWithDefaultDomain = selectedTenant;
+    if (selectedTenant?.id && !selectedTenant?.defaultDomain) {
+      try {
+        const tenantResponse = await fetch(`/api/data/tenants/${selectedTenant.id}`);
+        if (tenantResponse.ok) {
+          const tenantData = await tenantResponse.json();
+          if (tenantData.success && tenantData.data) {
+            tenantWithDefaultDomain = tenantData.data;
+          }
+        }
+      } catch (error) {
+        // Continue with existing tenant data if fetch fails
+        console.warn('Failed to fetch tenant data:', error);
+      }
+    }
+    
+    // Normalize username to email using tenant's defaultDomain
+    const normalizedEmail = normalizeUsernameToEmail(trimmedUsername, tenantWithDefaultDomain || null);
+    const resolvedUserId = userId || normalizedEmail;
 
     if (!resolvedUserId) {
       const message = 'Enter your username or email before requesting a code.';

@@ -114,14 +114,14 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 
           <form className="space-y-5" onSubmit={onSignIn}>
             <div className="animate-element animate-delay-300 flex flex-col gap-2">
-              <label className="hidden md:block text-sm font-medium text-muted-foreground">Email Address</label>
+              <label className="hidden md:block text-sm font-medium text-muted-foreground">Email or Username</label>
               <GlassInputWrapper>
                 <UserIcon className="w-5 h-5 text-muted-foreground ms-2 shrink-0" />
                 <input
                   name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="Enter your email address"
+                  type="text"
+                  autoComplete="username"
+                  placeholder="Enter your email or username"
                   className="flex-1 bg-transparent text-sm p-4 rounded-2xl focus:outline-none"
                   value={formValues.email}
                   onChange={handleInputChange}

@@ -112,7 +112,7 @@ export const TodoResponseDialog: React.FC<TodoResponseDialogProps> = ({
     singular_name: 'Todo Response',
     plural_name: 'Todo Responses',
     description: 'AI generated response for todo',
-    icon: 'MessageSquare',
+    icon: 'BotMessageSquare',
     fields: [],
     sections: [],
   };

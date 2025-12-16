@@ -127,7 +127,7 @@ export async function GET(
           });
         }
         // If companyIds / companyId is present, fall through to normal controller path
-        // so that standard repository filtering (including related-companies logic) is applied.
+        // so that standard repository filtering (including relatedCompanies logic) is applied.
       } catch (error) {
         // If cache fails, fall through to normal controller
         loggingCustom(

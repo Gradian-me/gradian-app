@@ -54,10 +54,14 @@ export const useSchemaManagerPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<SchemaTab>('system');
   const [showInactive, setShowInactive] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table' | 'hierarchy'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table' | 'hierarchy'>('table');
+  const [tenantFilter, setTenantFilter] = useState<string | undefined>(undefined);
+  const [syncStrategyFilter, setSyncStrategyFilter] = useState<'schema-only' | 'schema-and-data' | undefined>(undefined);
   const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState>({ open: false, schema: null });
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [messages, setMessages] = useState<MessagesResponse | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState<number | 'all'>(25);
 
   // Use schemas from React Query cache
   const schemas = fetchedSchemas;
@@ -160,13 +164,113 @@ export const useSchemaManagerPage = () => {
       const pluralName = schema.plural_name?.toLowerCase() || '';
       const singularName = schema.singular_name?.toLowerCase() || '';
       const schemaId = schema.id?.toLowerCase() || '';
-      return (
+      const matchesSearch =
         pluralName.includes(query) ||
         singularName.includes(query) ||
-        schemaId.includes(query)
-      );
+        schemaId.includes(query);
+
+      if (!matchesSearch) return false;
+
+      // Tenant filter
+      if (tenantFilter) {
+        if (tenantFilter === 'all-tenants') {
+          if (!schema.applyToAllTenants) return false;
+        } else {
+          const relatedIds = Array.isArray(schema.relatedTenants)
+            ? schema.relatedTenants
+                .map((t: any) => (typeof t === 'string' ? t : t?.id))
+                .filter(Boolean)
+                .map(String)
+            : [];
+          if (!relatedIds.includes(tenantFilter)) {
+            return false;
+          }
+        }
+      }
+
+      // Sync strategy filter
+      if (
+        syncStrategyFilter &&
+        (schema.syncStrategy || 'schema-only') !== syncStrategyFilter
+      ) {
+        return false;
+      }
+
+      return true;
     });
-  }, [actionFormSchemas, activeTab, businessSchemas, searchQuery, showInactive, systemSchemas]);
+  }, [
+    actionFormSchemas,
+    activeTab,
+    businessSchemas,
+    searchQuery,
+    showInactive,
+    systemSchemas,
+    tenantFilter,
+    syncStrategyFilter,
+  ]);
+
+  // Reset page to 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, tenantFilter, syncStrategyFilter, showInactive, activeTab]);
+
+  // Paginate filtered schemas
+  const paginatedSchemas = useMemo(() => {
+    if (pageSize === 'all') {
+      return filteredSchemas;
+    }
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    return filteredSchemas.slice(start, end);
+  }, [filteredSchemas, currentPage, pageSize]);
+
+  const totalPages = useMemo(() => {
+    if (pageSize === 'all') return 1;
+    return Math.ceil(filteredSchemas.length / pageSize);
+  }, [filteredSchemas.length, pageSize]);
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+  }, []);
+
+  const handlePageSizeChange = useCallback((newPageSize: number | 'all') => {
+    setPageSize(newPageSize);
+    setCurrentPage(1);
+  }, []);
+
+  const tenantOptions = useMemo(() => {
+    const seen = new Map<string, string>();
+    schemas.forEach((schema) => {
+      (schema.relatedTenants || []).forEach((t: any) => {
+        const id = typeof t === 'string' ? t : t?.id;
+        if (!id) return;
+        const label =
+          (typeof t === 'string' ? t : t?.label) ||
+          t?.displayName ||
+          t?.name ||
+          t?.tenantName ||
+          t?.companyName ||
+          t?.code ||
+          `${id}`;
+        if (!seen.has(String(id))) {
+          seen.set(String(id), String(label));
+        }
+      });
+    });
+    return Array.from(seen.entries()).map(([id, label]) => ({ id, label }));
+  }, [schemas]);
+
+  const syncStrategyOptions = useMemo(() => {
+    const values = new Set<string>();
+    schemas.forEach((s) => {
+      const v = s.syncStrategy || 'schema-only';
+      values.add(v);
+    });
+    return Array.from(values).map((id) => ({
+      id,
+      label: id === 'schema-and-data' ? 'Schema & data' : 'Schema only',
+    }));
+  }, [schemas]);
 
   const invalidateSchemaQueryCaches = useCallback(async () => {
     await Promise.all([
@@ -374,6 +478,8 @@ export const useSchemaManagerPage = () => {
             : resolvedSchemaType === 'business'
               ? false
               : undefined,
+        // System schemas automatically apply to all tenants
+        applyToAllTenants: resolvedSchemaType === 'system' ? true : undefined,
         isNotCompanyBased,
         allowDataInactive,
         allowDataForce,
@@ -445,6 +551,12 @@ export const useSchemaManagerPage = () => {
     refreshing,
     searchQuery,
     setSearchQuery,
+    tenantFilter,
+    setTenantFilter,
+    syncStrategyFilter,
+    setSyncStrategyFilter,
+    tenantOptions,
+    syncStrategyOptions,
     activeTab,
     setActiveTab,
     showInactive,
@@ -452,6 +564,12 @@ export const useSchemaManagerPage = () => {
     viewMode,
     setViewMode,
     filteredSchemas,
+    paginatedSchemas,
+    currentPage,
+    pageSize,
+    totalPages,
+    handlePageChange,
+    handlePageSizeChange,
     systemSchemas,
     businessSchemas,
     actionFormSchemas,

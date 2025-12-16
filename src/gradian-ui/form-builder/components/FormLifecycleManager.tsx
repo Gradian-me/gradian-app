@@ -614,15 +614,15 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       }
     });
 
-    // Custom validation: related-companies is required for company-based schemas
+    // Custom validation: relatedCompanies is required for company-based schemas
     if (schema.canSelectMultiCompanies && schema.isNotCompanyBased !== true) {
-      const relatedCompanies = state.values['related-companies'];
+      const relatedCompanies = state.values['relatedCompanies'];
       const hasRelated =
         Array.isArray(relatedCompanies) ? relatedCompanies.length > 0 : Boolean(relatedCompanies);
 
       if (!hasRelated) {
         const errorMessage = 'Please select at least one related company.';
-        newErrors['related-companies'] = errorMessage;
+        newErrors['relatedCompanies'] = errorMessage;
         isValid = false;
       }
     }

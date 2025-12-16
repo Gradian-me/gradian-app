@@ -18,7 +18,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   const displaySubtitle = brand?.subtitle || 'Trust Your Decisions';
 
   return (
-    <div className={cn("flex items-center justify-center p-2 border-b border-gray-700", className)}>
+    <div className={cn("flex items-center justify-center h-16 border-b border-gray-700 px-4", className)}>
       <AnimatePresence mode="wait">
         {isCollapsed && !isMobile ? (
           <motion.div

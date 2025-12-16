@@ -50,6 +50,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
   const hasEntityTypeField = hasEntityTypeGroup === true;
   const hasParentField = schema.allowHierarchicalParent === true;
   const hasMultiCompaniesField = schema.canSelectMultiCompanies === true;
+  const hasMultiTenantsField = schema.allowDataRelatedTenants === true;
 
   // Memoize the status sourceUrl to prevent it from changing on every render
   // This ensures PickerInput doesn't reset when form values change
@@ -142,6 +143,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
     hasEntityTypeField,
     hasParentField,
     hasMultiCompaniesField,
+    hasMultiTenantsField,
   ].filter(Boolean).length;
 
   // Hide system section if no fields are available
@@ -368,7 +370,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
             <div className="space-y-2">
               <PickerInput
                 config={{
-                  name: 'related-companies',
+                  name: 'relatedCompanies',
                   label: "Related Companies",
                   placeholder: 'Select related companies (optional)',
                   targetSchema: 'companies',
@@ -378,15 +380,43 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
                       : 'Choose one or more companies related to this record. Required for company-based schemas.',
                   allowMultiselect: true,
                 }}
-                value={values['related-companies']}
-                error={errors?.['related-companies']}
-                touched={typeof touched?.['related-companies'] === 'boolean' ? touched['related-companies'] : undefined}
+                value={values['relatedCompanies']}
+                error={errors?.['relatedCompanies']}
+                touched={typeof touched?.['relatedCompanies'] === 'boolean' ? touched['relatedCompanies'] : undefined}
                 required={true}
                 onChange={(selections) => {
                   // Store full normalized selections so we keep label/icon metadata in data
-                  onChange('related-companies', selections);
+                  onChange('relatedCompanies', selections);
                 }}
-                onBlur={() => onBlur('related-companies')}
+                onBlur={() => onBlur('relatedCompanies')}
+                disabled={disabled}
+                className="w-full"
+              />
+            </div>
+          )}
+
+          {schema.allowDataRelatedTenants && (
+            <div className="space-y-2">
+              <PickerInput
+                config={{
+                  name: 'relatedTenants',
+                  label: "Related Tenants",
+                  placeholder: 'Select related tenants (optional)',
+                  targetSchema: 'tenants',
+                  description: 'Choose one or more tenants related to this record (optional).',
+                  metadata: {
+                    allowMultiselect: true,
+                  },
+                }}
+                value={values['relatedTenants']}
+                error={errors?.['relatedTenants']}
+                touched={typeof touched?.['relatedTenants'] === 'boolean' ? touched['relatedTenants'] : undefined}
+                required={false}
+                onChange={(selections) => {
+                  // Store full normalized selections so we keep label/icon metadata in data
+                  onChange('relatedTenants', selections);
+                }}
+                onBlur={() => onBlur('relatedTenants')}
                 disabled={disabled}
                 className="w-full"
               />

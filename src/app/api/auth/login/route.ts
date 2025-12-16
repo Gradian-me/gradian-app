@@ -192,12 +192,39 @@ export async function POST(request: NextRequest) {
     }
 
     loggingCustom(LogType.LOGIN_LOG, 'info', 'Sending request to external auth service...');
+    
+    // Validate request body before sending
+    if (!proxyBody.emailOrUsername || !proxyBody.password) {
+      loggingCustom(LogType.LOGIN_LOG, 'error', 'Invalid proxy body - missing emailOrUsername or password');
+      return NextResponse.json(
+        { success: false, error: 'Invalid authentication request' },
+        { status: 400 }
+      );
+    }
+    
+    if (!proxyBody.appId) {
+      loggingCustom(LogType.LOGIN_LOG, 'error', 'Invalid proxy body - missing appId');
+      return NextResponse.json(
+        { success: false, error: 'Authentication service configuration error' },
+        { status: 500 }
+      );
+    }
+    
     const fetchStartTime = Date.now();
-    const upstreamResponse = await fetch(authServiceUrl, {
-      method: 'POST',
-      headers: proxyHeaders,
-      body: JSON.stringify(proxyBody),
-    });
+    let upstreamResponse: Response;
+    try {
+      upstreamResponse = await fetch(authServiceUrl, {
+        method: 'POST',
+        headers: proxyHeaders,
+        body: JSON.stringify(proxyBody),
+      });
+    } catch (fetchError) {
+      loggingCustom(LogType.LOGIN_LOG, 'error', `Failed to connect to external auth service: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`);
+      return NextResponse.json(
+        { success: false, error: 'Unable to connect to authentication service' },
+        { status: 503 }
+      );
+    }
     const fetchDuration = Date.now() - fetchStartTime;
     loggingCustom(LogType.LOGIN_LOG, 'info', `External auth service response: ${JSON.stringify({
       duration: `${fetchDuration}ms`,
@@ -231,8 +258,14 @@ export async function POST(request: NextRequest) {
           upstreamJson?.message ||
           `Authentication service responded with status ${upstreamResponse.status}`,
       };
+      
+      // Forward cookies even on error responses (external service may set session cookies)
+      const errorNextResponse = NextResponse.json(errorResponse, { status: upstreamResponse.status });
+      loggingCustom(LogType.LOGIN_LOG, 'debug', 'Forwarding set-cookie headers from external auth (error response)...');
+      forwardSetCookieHeaders(upstreamResponse, errorNextResponse);
+      
       loggingCustom(LogType.LOGIN_LOG, 'error', `Response (${upstreamResponse.status} - External Auth): ${JSON.stringify(errorResponse, null, 2)}`);
-      return NextResponse.json(errorResponse, { status: upstreamResponse.status });
+      return errorNextResponse;
     }
 
     // Log response (mask tokens for security)

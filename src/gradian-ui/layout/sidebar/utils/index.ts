@@ -2,37 +2,11 @@
 
 import {
   LayoutDashboard,
-  Home,
-  CalendarDays,
-  BarChart3,
-  ShieldCheck,
-  Plug,
-  Network,
-  Brackets,
-  Wrench,
-  Sparkles,
-  MessageCircle,
   type LucideIcon,
 } from 'lucide-react';
 import { NavigationItem } from '../types';
 import { AD_MODE } from '@/gradian-ui/shared/constants/application-variables';
-
-/**
- * Map menu icon string from menu-items schema to Lucide icon component
- */
-const iconMap: Record<string, LucideIcon> = {
-  Home,
-  LayoutDashboard,
-  CalendarDays,
-  BarChart3,
-  ShieldCheck,
-  Plug,
-  Network,
-  Brackets,
-  Wrench,
-  Sparkles,
-  MessageCircle,
-};
+import { getIconComponent, isValidLucideIcon } from '@/gradian-ui/shared/utils/icon-renderer';
 
 /**
  * Transform menu-items API data into sidebar NavigationItem[]
@@ -93,13 +67,17 @@ export function mapMenuItemsToNavigationItems(
     })
     .map<NavigationItem>((item) => {
       const iconName: string | undefined = item.menuIcon;
-      const Icon = iconName && iconMap[iconName] ? iconMap[iconName] : LayoutDashboard;
+      // Use IconRenderer's getIconComponent to dynamically load any Lucide icon
+      // Falls back to LayoutDashboard if icon is not found or invalid
+      const Icon = iconName && isValidLucideIcon(iconName) 
+        ? getIconComponent(iconName) 
+        : LayoutDashboard;
 
       return {
         id: item.id,
         name: item.menuTitle ?? 'Menu Item',
         href: item.menuUrl ?? '/',
-        icon: Icon,
+        icon: Icon as LucideIcon,
       };
     });
 

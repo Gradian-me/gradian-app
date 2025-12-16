@@ -374,14 +374,14 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <MainLayout title="Analytics & Reporting">
+      <MainLayout title="Analytics & Reporting" icon="BarChart3">
         <LoadingSpinner centered containerClassName="h-64" />
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout title="Analytics & Reporting">
+    <MainLayout title="Analytics & Reporting" icon="BarChart3">
       <div className="space-y-6">
         {/* Header with Export Button */}
         <motion.div

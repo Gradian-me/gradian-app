@@ -8,11 +8,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/stores/user.store';
 import { cn } from '@/lib/utils';
-import { Plus, MessageSquare, Clock, RefreshCw } from 'lucide-react';
+import { Plus, BotMessageSquare, Clock, RefreshCw } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
 import type { Chat } from '../types';
 import { CardWrapper, CardContent } from '@/gradian-ui/data-display/card/components/CardWrapper';
+import { Button } from '@/gradian-ui/form-builder/form-elements';
 
 export interface ChatListProps {
   chats: Chat[];
@@ -45,33 +46,21 @@ export const ChatList: React.FC<ChatListProps> = ({
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={onCreateNewChat}
-            className={cn(
-              'flex-1 flex items-center gap-2 px-4 py-2 rounded-lg',
-              'border border-gray-300 dark:border-gray-600',
-              'bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800',
-              'text-gray-700 dark:text-gray-300 font-medium transition-colors',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500'
-            )}
+            variant="outline"
+            className="flex-1 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             New Chat
-          </button>
+          </Button>
           {onRefresh && (
-            <button
+            <Button
               onClick={onRefresh}
               disabled={isLoading}
-              className={cn(
-                'flex items-center justify-center w-10 h-10 rounded-lg',
-                'border border-gray-300 dark:border-gray-600',
-                'bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800',
-                'text-gray-700 dark:text-gray-300 transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500',
-                'disabled:opacity-50 disabled:cursor-not-allowed'
-              )}
-              title="Refresh chat list"
-              aria-label="Refresh chat list"
+              variant="outline"
+              size="sm"
+              className="w-10 h-10 p-0 flex items-center justify-center"
             >
               <RefreshCw 
                 className={cn(
@@ -79,7 +68,7 @@ export const ChatList: React.FC<ChatListProps> = ({
                   isLoading && 'animate-spin'
                 )} 
               />
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -111,7 +100,7 @@ export const ChatList: React.FC<ChatListProps> = ({
           </div>
         ) : chats.length === 0 ? (
           <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-            <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <BotMessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">No chats yet</p>
             <p className="text-xs mt-1">Start a new conversation</p>
           </div>
@@ -128,7 +117,7 @@ export const ChatList: React.FC<ChatListProps> = ({
                     exit={{ opacity: 0, x: -10 }}
                     onClick={() => handleSelectChat(chat.id)}
                     className={cn(
-                      'w-full text-left p-3 rounded-lg transition-all',
+                      'w-full text-start p-1 my-1 bg-gray-50 dark:bg-gray-800 rounded-lg transition-all',
                       'hover:bg-gray-100 dark:hover:bg-gray-800',
                       isSelected 
                         ? 'bg-violet-50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-800/50' 
@@ -142,7 +131,7 @@ export const ChatList: React.FC<ChatListProps> = ({
                           ? 'bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300'
                           : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
                       )}>
-                        <MessageSquare className="w-5 h-5" />
+                        <BotMessageSquare className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">

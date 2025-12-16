@@ -302,7 +302,7 @@ export function SchemaBuilderEditor({
 
   if (loading) {
     return (
-      <MainLayout title={title || 'Loading Schema...'} subtitle={subtitle} icon="PencilRuler">
+      <MainLayout title={title || 'Loading Schema...'} subtitle={subtitle} icon="Brackets">
         <div className="space-y-6 max-w-7xl mx-auto">
           {/* Action Buttons Skeleton */}
           <div className="flex items-center justify-between gap-4">
@@ -366,7 +366,7 @@ export function SchemaBuilderEditor({
 
   if (loadError) {
     return (
-      <MainLayout title={title || 'Schema Not Found'} subtitle={subtitle} icon="PencilRuler" showEndLine={false}>
+      <MainLayout title={title || 'Schema Not Found'} subtitle={subtitle} icon="Brackets" showEndLine={false}>
         <SchemaNotFound
           onGoBack={onBack}
           showGoBackButton={!!onBack}
@@ -386,7 +386,7 @@ export function SchemaBuilderEditor({
     <MainLayout 
       title={title || (schema.singular_name ? `Edit ${schema.singular_name}` : `Editing: ${schema.plural_name}`)} 
       subtitle={subtitle}
-      icon="PencilRuler"
+      icon="Brackets"
     >
       <div className="space-y-6 max-w-7xl mx-auto">
         {/* Display API response messages if available */}

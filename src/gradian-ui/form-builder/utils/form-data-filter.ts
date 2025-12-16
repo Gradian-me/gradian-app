@@ -105,8 +105,8 @@ export function filterFormDataForSubmission(
   const cleaned: FormData = {};
 
   // Metadata fields that should always be preserved (not in schema but needed for backend)
-  // System section fields: inactive, isForce, forceReason, parent (hierarchical), related-companies (multi-company link), status (status from status group), entityType (entity type from entity type group), assignedTo, dueDate
-  const metadataFields = new Set(['incomplete', 'sections', 'inactive', 'isForce', 'forceReason', 'parent', 'related-companies', 'status', 'entityType', 'assignedTo', 'dueDate']);
+  // System section fields: inactive, isForce, forceReason, parent (hierarchical), relatedCompanies (multi-company link), relatedTenants (multi-tenant link), status (status from status group), entityType (entity type from entity type group), assignedTo, dueDate
+  const metadataFields = new Set(['incomplete', 'sections', 'inactive', 'isForce', 'forceReason', 'parent', 'relatedCompanies', 'relatedTenants', 'status', 'entityType', 'assignedTo', 'dueDate']);
 
   Object.keys(formData).forEach(key => {
     const value = formData[key];

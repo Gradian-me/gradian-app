@@ -914,7 +914,7 @@ export default function IntegrationsPage() {
   const errorCount = integrations.filter(i => i.lastSynced && (Date.now() - new Date(i.lastSynced).getTime()) / (1000 * 60 * 60 * 24) > 7).length;
 
   return (
-    <MainLayout title="Integrations">
+    <MainLayout title="Integrations" icon="Plug">
       <div className="space-y-6">
         {/* Header */}
         <motion.div

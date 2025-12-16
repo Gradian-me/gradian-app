@@ -408,6 +408,12 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     }
   }
 
+  // Truncate title for card/grid view (max 150 characters)
+  const MAX_TITLE_LENGTH = 150;
+  const truncatedTitle = viewMode === 'grid' && title.length > MAX_TITLE_LENGTH
+    ? `${title.substring(0, MAX_TITLE_LENGTH).trim()}...`
+    : title;
+
 
   // Check if entity is incomplete
   const isIncomplete = data.incomplete === true;
@@ -417,7 +423,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   const forceReason = data.forceReason || '';
 
   const cardConfig = {
-    title,
+    title: viewMode === 'grid' ? truncatedTitle : title, // Use truncated title for grid view
     subtitle,
     avatarField: getSingleValueByRole(schema, data, 'avatar', data.name) || data.name || 'V',
     statusField: normalizedStatusMetadata.value,
@@ -569,13 +575,14 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} />
                         <motion.h3
                           className={cn(
-                            "font-semibold text-gray-900 dark:text-gray-50 transition-colors duration-100 flex-1 min-w-0 break-words",
+                            "font-semibold text-gray-900 dark:text-gray-50 transition-colors duration-100 flex-1 min-w-0",
                             isInDialog 
-                              ? "text-sm sm:text-base" 
-                              : "text-md",
+                              ? "text-sm sm:text-base break-words" 
+                              : "text-md break-words line-clamp-3",
                             !isInDialog && "group-hover:text-violet-800 dark:group-hover:text-violet-300"
                           )}
                           whileHover={isInDialog ? undefined : { x: 2, transition: { duration: 0.15, delay: 0 } }}
+                          title={title} // Show full title on hover
                         >
                           {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
                         </motion.h3>
@@ -903,13 +910,14 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                       transition={disableAnimation ? {} : { duration: 0.3 }}
                       className={cn(
-                        "text-base font-semibold text-gray-900 dark:text-gray-200 break-words flex-1 min-w-0",
+                        "text-base font-semibold text-gray-900 dark:text-gray-200 break-words flex-1 min-w-0 line-clamp-3",
                         !disableAnimation && "group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors duration-100"
                       )}
                       whileHover={disableAnimation ? undefined : {
                         x: 2,
                         transition: { type: "spring", stiffness: 400, damping: 25 }
                       }}
+                      title={title} // Show full title on hover
                     >
                       {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
                     </motion.h3>

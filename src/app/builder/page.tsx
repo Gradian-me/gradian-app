@@ -199,7 +199,7 @@ export default function BuilderPage() {
     <MainLayout
       title="Builder"
       subtitle="Configure and manage your application"
-      icon="Settings"
+      icon="LayoutPanelLeft"
     >
       <div className="space-y-8 pb-6">
         {/* Header Description */}

@@ -227,7 +227,7 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
   return (
     <MainLayout
       title="Graph Designer"
-      icon="Workflow"
+      icon="Waypoints"
       subtitle="Design and manage data relationship graphs."
       showActionButtons={false}
     >

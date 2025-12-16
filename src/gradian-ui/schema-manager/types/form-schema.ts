@@ -391,9 +391,15 @@ export interface FormSchema {
   /**
    * When true, shows a multi-company selector in the System Section so
    * records of this schema can be linked to multiple companies.
-   * Selected companies are stored in the `related-companies` field of data.
+   * Selected companies are stored in the `relatedCompanies` field of data.
    */
   canSelectMultiCompanies?: boolean;
+  /**
+   * When true, shows a multi-tenant selector in the System Section so
+   * records of this schema can be linked to multiple tenants.
+   * Selected tenants are stored in the `relatedTenants` field of data.
+   */
+  allowDataRelatedTenants?: boolean;
   inactive?: boolean;
   allowDataInactive?: boolean;
   allowDataForce?: boolean;

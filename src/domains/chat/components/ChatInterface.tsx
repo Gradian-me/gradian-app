@@ -18,7 +18,7 @@ import { useChat } from '../hooks/useChat';
 import { executeApprovedTodos } from '@/domains/ai-builder/utils/ai-orchestrator-utils';
 import { EmptyState } from '@/gradian-ui/data-display/components/EmptyState';
 import { extractHashtags, extractMentions } from '../utils/text-utils';
-import { MessageSquare, Plus } from 'lucide-react';
+import { BotMessageSquare, Plus } from 'lucide-react';
 import type { Chat, Todo } from '../types';
 
 export interface ChatInterfaceProps {
@@ -422,7 +422,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           ) : !currentChat ? (
             <div className="flex items-center justify-center h-full">
               <EmptyState
-                icon={<MessageSquare className="h-12 w-12 text-gray-400" />}
+                icon={<BotMessageSquare className="h-12 w-12 text-gray-400" />}
                 title="Start a conversation"
                 description="Select a chat from the sidebar or create a new one to begin."
                 action={

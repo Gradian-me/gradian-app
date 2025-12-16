@@ -109,7 +109,7 @@ export function SectionsTab({
   }, [safeSections, showInactiveSections]);
 
   return (
-    <Card>
+    <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 overflow-visible">
       <CardHeader className="pb-4">
         <div className="flex justify-between items-center gap-3 flex-wrap">
           <div className="flex items-center gap-3 flex-wrap">

@@ -94,26 +94,76 @@ export function buildProxyHeaders(request: NextRequest): HeadersInit {
 }
 
 export function forwardSetCookieHeaders(upstream: Response, downstream: NextResponse): void {
-  const headers = upstream.headers as Headers & { getSetCookie?: () => string[] };
-  const setCookieValues =
-    headers.getSetCookie?.() ??
-    ((headers as any).raw?.()['set-cookie'] as string[] | undefined) ??
-    (headers.get('set-cookie') ? [headers.get('set-cookie') as string] : undefined);
-
-  if (setCookieValues?.length) {
-    setCookieValues.forEach((cookie) => {
-      if (cookie) {
-        // Filter out cookie deletion headers (cookies with empty value or expires in past)
-        // Only forward cookies that are being set, not deleted
-        const isDeletion = cookie.includes('Max-Age=0') || 
-                           cookie.includes('Expires=Thu, 01 Jan 1970') ||
-                           cookie.match(/^[^=]+=\s*;\s*Expires=/);
-        
-        if (!isDeletion) {
-          downstream.headers.append('set-cookie', cookie);
-        }
+  try {
+    const headers = upstream.headers as Headers & { getSetCookie?: () => string[] };
+    
+    // Try multiple methods to get set-cookie headers (different fetch implementations)
+    let setCookieValues: string[] | undefined;
+    
+    // Method 1: Standard getSetCookie() method (Node.js 18+)
+    if (typeof headers.getSetCookie === 'function') {
+      try {
+        setCookieValues = headers.getSetCookie();
+      } catch (e) {
+        loggingCustom(LogType.LOGIN_LOG, 'debug', `getSetCookie() failed: ${e instanceof Error ? e.message : String(e)}`);
       }
-    });
+    }
+    
+    // Method 2: Check for raw headers (some fetch implementations)
+    if (!setCookieValues && (headers as any).raw) {
+      try {
+        const rawHeaders = (headers as any).raw();
+        setCookieValues = rawHeaders['set-cookie'] as string[] | undefined;
+      } catch (e) {
+        loggingCustom(LogType.LOGIN_LOG, 'debug', `raw() failed: ${e instanceof Error ? e.message : String(e)}`);
+      }
+    }
+    
+    // Method 3: Get all set-cookie headers manually
+    if (!setCookieValues) {
+      const allSetCookies: string[] = [];
+      headers.forEach((value, key) => {
+        if (key.toLowerCase() === 'set-cookie') {
+          allSetCookies.push(value);
+        }
+      });
+      if (allSetCookies.length > 0) {
+        setCookieValues = allSetCookies;
+      }
+    }
+
+    if (setCookieValues?.length) {
+      loggingCustom(LogType.LOGIN_LOG, 'debug', `Forwarding ${setCookieValues.length} cookie(s) from external auth service`);
+      setCookieValues.forEach((cookie, index) => {
+        if (cookie && cookie.trim()) {
+          // Filter out cookie deletion headers (cookies with empty value or expires in past)
+          // Only forward cookies that are being set, not deleted
+          const isDeletion = cookie.includes('Max-Age=0') || 
+                             cookie.includes('Expires=Thu, 01 Jan 1970') ||
+                             cookie.match(/^[^=]+=\s*;\s*Expires=/);
+          
+          if (!isDeletion) {
+            // Normalize cookie: ensure proper domain/path attributes for cross-domain scenarios
+            // Remove domain attribute if it's set to external service domain (let browser handle it)
+            const normalizedCookie = cookie;
+            try {
+              // If cookie has Domain attribute pointing to external service, we might need to adjust it
+              // For now, forward as-is and let the browser handle domain restrictions
+              downstream.headers.append('set-cookie', normalizedCookie);
+              loggingCustom(LogType.LOGIN_LOG, 'debug', `Forwarded cookie ${index + 1}: ${normalizedCookie.substring(0, 50)}...`);
+            } catch (cookieError) {
+              loggingCustom(LogType.LOGIN_LOG, 'warn', `Failed to forward cookie ${index + 1}: ${cookieError instanceof Error ? cookieError.message : String(cookieError)}`);
+            }
+          } else {
+            loggingCustom(LogType.LOGIN_LOG, 'debug', `Skipping cookie deletion header: ${cookie.substring(0, 50)}...`);
+          }
+        }
+      });
+    } else {
+      loggingCustom(LogType.LOGIN_LOG, 'debug', 'No set-cookie headers found in external auth response');
+    }
+  } catch (error) {
+    loggingCustom(LogType.LOGIN_LOG, 'error', `Error forwarding set-cookie headers: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 

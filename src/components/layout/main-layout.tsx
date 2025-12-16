@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { GoToTop, Header, ModeToggle } from '@/gradian-ui/layout';
 import { Sidebar } from '@/gradian-ui/layout/sidebar';
 import { EndLine } from '@/gradian-ui/layout/end-line/components/EndLine';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import dynamic from 'next/dynamic';
 
 // Dynamically import PageActionButtons to avoid SSR issues with HTMLCanvasElement
@@ -363,17 +364,25 @@ export function MainLayout({
             {title}
           </h1>
           {isAdmin && editSchemaPath && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onMouseDown={handleEditSchemaMouseDown}
-              onClick={handleEditSchemaClick}
-              className="hidden md:inline-flex h-8 w-8 p-0 hover:bg-violet-50 dark:hover:bg-violet-500/10 hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
-              aria-label="Edit schema"
-              title="Edit schema (Middle-click to view page in new tab)"
-            >
-              <PencilRuler className="h-4 w-4" />
-            </Button>
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onMouseDown={handleEditSchemaMouseDown}
+                    onClick={handleEditSchemaClick}
+                    className="hidden md:inline-flex h-8 w-8 p-0 hover:bg-violet-50 dark:hover:bg-violet-500/10 hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
+                    aria-label="Edit schema"
+                  >
+                    <PencilRuler className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Edit schema (Middle-click to view page in new tab)</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </motion.div>
         {subtitle && (
@@ -397,14 +406,72 @@ export function MainLayout({
           {customHeaderActions}
         </div>
       )}
-      <div className="hidden lg:flex items-center space-x-4">
-        <DemoModeBadge />
-        <CompanySelector />
-        {DEMO_MODE && <TenantSelector />}
-        <ModeToggle />
-        <NotificationsDropdown initialCount={5} />
-        <UserProfileSelector theme={profileTheme} />
-      </div>
+      <TooltipProvider delayDuration={200}>
+        <div className="hidden lg:flex items-center space-x-4">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <DemoModeBadge />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{DEMO_MODE ? 'Demo Mode' : 'Live Mode'}</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <CompanySelector />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Select Company</p>
+            </TooltipContent>
+          </Tooltip>
+          {DEMO_MODE && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <TenantSelector />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Select Tenant</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <ModeToggle />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Toggle theme</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <NotificationsDropdown initialCount={5} />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Notifications</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <UserProfileSelector theme={profileTheme} />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>User Profile</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </TooltipProvider>
       <div className="flex lg:hidden items-center space-x-2">
         {customHeaderActions && (
           <div className="flex items-center me-2">

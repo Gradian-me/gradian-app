@@ -3576,14 +3576,14 @@
         ]
       },
       {
-      "changeType": "refactor",
-      "description": "Improved DynamicCardDialog and DynamicCardRenderer components for better responsiveness and user experience",
-      "priority": "Medium",
-      "affectedDomains": [
-      "data-display",
-      "ui",
-      "components"
-      ]
+        "changeType": "refactor",
+        "description": "Improved DynamicCardDialog and DynamicCardRenderer components for better responsiveness and user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "ui",
+          "components"
+        ]
       }
     ]
   },
@@ -3610,6 +3610,60 @@
           "data-display",
           "logging",
           "debugging"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCSCHEMAFILTERS002",
+    "timestamp": "2025-12-16T08:10:00.000Z",
+    "version": "1.30.002",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated schema management components to include new fields for sync strategy and tenant filtering, improving data organization and user interaction",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "data-management",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Simplified schema card and list views by removing unnecessary statistics display, enhancing overall UI clarity",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "data-display",
+          "ui"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCVERSIONENDPOINT003",
+    "timestamp": "2025-12-16T16:39:26.000Z",
+    "version": "1.30.003",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated version management documentation to reflect correct API endpoint for version creation",
+        "priority": "Medium",
+        "affectedDomains": [
+          "version-management",
+          "documentation",
+          "api"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Changed references from 'related-companies' to 'relatedCompanies' across various files for consistency",
+        "priority": "Medium",
+        "affectedDomains": [
+          "codebase",
+          "data-management",
+          "schema-manager"
         ]
       }
     ]

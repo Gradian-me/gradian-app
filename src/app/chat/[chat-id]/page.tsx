@@ -11,7 +11,7 @@ export default function ChatDetailPage() {
     <MainLayout
       title="Chat"
       subtitle="AI-powered conversations with agent orchestration"
-      icon="MessageSquare"
+      icon="BotMessageSquare"
       showEndLine={false}
       hidePadding={true}
     >

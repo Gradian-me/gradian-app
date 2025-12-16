@@ -71,7 +71,8 @@
     "showInNavigation": false,
     "icon": "Database",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "external-nodes",
@@ -177,7 +178,8 @@
     "showInNavigation": false,
     "icon": "ExternalLink",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "inquiries",
@@ -1516,7 +1518,8 @@
     "showInNavigation": false,
     "isNotCompanyBased": true,
     "canSelectMultiCompanies": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "companies",
@@ -1829,7 +1832,8 @@
     "showInNavigation": false,
     "icon": "Link2",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "quotations",
@@ -2466,7 +2470,8 @@
     "showInNavigation": false,
     "icon": "AppWindow",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "user-roles",
@@ -2646,7 +2651,8 @@
     "showInNavigation": false,
     "icon": "UserCircle",
     "allowDataInactive": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "business-areas",
@@ -2748,7 +2754,8 @@
     "showInNavigation": false,
     "icon": "Folder",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "users",
@@ -2921,7 +2928,8 @@
         "label": "User Status"
       }
     ],
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "servers",
@@ -3117,7 +3125,8 @@
     "showInNavigation": false,
     "icon": "Server",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "url-repositories",
@@ -3373,7 +3382,8 @@
     "showInNavigation": false,
     "icon": "Link",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "integrations",
@@ -3657,7 +3667,8 @@
     "showInNavigation": false,
     "icon": "Settings",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "databases",
@@ -3952,7 +3963,8 @@
     "showInNavigation": false,
     "icon": "Database",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "tags",
@@ -4038,7 +4050,8 @@
     "showInNavigation": false,
     "icon": "Tag",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "status-items",
@@ -4118,7 +4131,8 @@
     "icon": "CircleDot",
     "allowDataInactive": true,
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "entity-type-items",
@@ -4198,7 +4212,8 @@
     "icon": "Tag",
     "allowDataInactive": true,
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "entity-type-groups",
@@ -4254,7 +4269,8 @@
     "icon": "Tags",
     "isNotCompanyBased": true,
     "canSelectMultiCompanies": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "status-groups",
@@ -4310,7 +4326,8 @@
     "icon": "Layers",
     "isNotCompanyBased": false,
     "canSelectMultiCompanies": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "logical-operators",
@@ -4438,7 +4455,8 @@
     "showInNavigation": false,
     "icon": "Code",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "aggregation-types",
@@ -4731,7 +4749,8 @@
     "showInNavigation": false,
     "icon": "Shield",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "app-access-policies",
@@ -4845,7 +4864,8 @@
     "showInNavigation": false,
     "icon": "Lock",
     "isNotCompanyBased": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "menu-items",
@@ -4995,7 +5015,7 @@
   },
   {
     "id": "tenants",
-    "description": "Manage tenant information including name, title, domain, and database configuration",
+    "description": "Manage tenant information including name, title, domain, default domain, and database configuration",
     "singular_name": "Tenant",
     "plural_name": "Tenants",
     "cardMetadata": [
@@ -5007,6 +5027,7 @@
           "tenant-name",
           "tenant-title",
           "tenant-domain",
+          "tenant-default-domain",
           "tenant-dbname"
         ]
       }
@@ -5053,6 +5074,17 @@
         "order": 3
       },
       {
+        "id": "tenant-default-domain",
+        "name": "defaultDomain",
+        "label": "Default Domain",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter default domain (e.g., example.com)",
+        "required": false,
+        "colSpan": 1,
+        "order": 4
+      },
+      {
         "id": "tenant-dbname",
         "name": "dbname",
         "label": "Database Name",
@@ -5064,7 +5096,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 4
+        "order": 5
       }
     ],
     "sections": [
@@ -5087,6 +5119,7 @@
             "tenant-name",
             "tenant-title",
             "tenant-domain",
+            "tenant-default-domain",
             "tenant-dbname"
           ]
         }
@@ -5097,7 +5130,8 @@
     "allowDataInactive": true,
     "isNotCompanyBased": true,
     "canSelectMultiCompanies": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "change-classifications",
@@ -6147,7 +6181,8 @@
     ],
     "showInNavigation": false,
     "icon": "Paperclip",
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "attachment-folders",
@@ -6211,7 +6246,8 @@
     ],
     "showInNavigation": false,
     "icon": "FolderTree",
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "sync-strategies",
@@ -6278,7 +6314,8 @@
     "isNotCompanyBased": true,
     "canSelectMultiCompanies": false,
     "allowDataInactive": true,
-    "schemaType": "system"
+    "schemaType": "system",
+    "applyToAllTenants": true
   },
   {
     "id": "reset-password-form",
@@ -6769,12 +6806,13 @@
         "name": "supportingData",
         "label": "Supporting Data",
         "sectionId": "supporting-data",
-        "component": "list-input",
+        "component": "textarea",
         "placeholder": "Enter supporting data",
         "validation": {
           "required": false
         },
-        "order": 5
+        "order": 5,
+        "colSpan": 2
       }
     ],
     "sections": [
@@ -6790,17 +6828,29 @@
         "title": "Conditions",
         "description": "Conditions for the guideline.",
         "initialState": "expanded",
-        "columns": 2
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "addFields",
+          "minItems": 0
+        }
       },
       {
         "id": "supporting-data",
         "title": "Supporting Data",
         "description": "Supporting data for the guideline.",
         "initialState": "expanded",
-        "columns": 2
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "addFields",
+          "minItems": 0
+        }
       }
     ],
     "showInNavigation": true,
-    "schemaType": "business"
+    "schemaType": "business",
+    "syncStrategy": "schema-and-data",
+    "applyToAllTenants": true
   }
 ]
