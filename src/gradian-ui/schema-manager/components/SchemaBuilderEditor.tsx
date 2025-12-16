@@ -20,6 +20,7 @@ import { FormAlert } from '@/components/ui/form-alert';
 import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 interface SchemaBuilderEditorProps {
   schemaId?: string;
@@ -93,10 +94,12 @@ export function SchemaBuilderEditor({
       onClearResponse?.();
       await saveSchema(schemaId, schema);
       setOriginalSchema(JSON.parse(JSON.stringify(schema))); // Update original schema
+      toast.success('Schema saved successfully');
       // FormAlert will only show if MessageBoxContainer doesn't have messages
       // The MessageBoxContainer will handle API response messages if they exist
     } catch (error) {
       console.error('Error saving schema:', error);
+      toast.error('Error saving schema');
       // Show error feedback if no API response messages are available
       if (!apiResponse?.messages && !apiResponse?.message) {
         setSaveFeedback({ type: 'error', message: 'Error saving schema' });
@@ -300,7 +303,7 @@ export function SchemaBuilderEditor({
   if (loading) {
     return (
       <MainLayout title={title || 'Loading Schema...'} subtitle={subtitle} icon="PencilRuler">
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-7xl mx-auto">
           {/* Action Buttons Skeleton */}
           <div className="flex items-center justify-between gap-4">
             <Skeleton className="h-9 w-24 rounded-md" />
@@ -385,7 +388,7 @@ export function SchemaBuilderEditor({
       subtitle={subtitle}
       icon="PencilRuler"
     >
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-7xl mx-auto">
         {/* Display API response messages if available */}
         {apiResponse && (
           <MessageBoxContainer

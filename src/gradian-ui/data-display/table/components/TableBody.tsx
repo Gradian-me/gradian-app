@@ -72,6 +72,11 @@ export function TableBody<T = any>({
     }
 
     if (React.isValidElement(node)) {
+      // Avoid double-highlighting content that already handles its own highlighting (like CodeBadge)
+      const elementType: any = node.type;
+      if (elementType && (elementType.displayName === 'CodeBadge' || elementType.name === 'CodeBadge')) {
+        return node;
+      }
       const props = node.props as { children?: React.ReactNode };
       const highlightedChildren = React.Children.map(
         props.children,

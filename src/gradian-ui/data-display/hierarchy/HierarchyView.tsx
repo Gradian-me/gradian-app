@@ -239,7 +239,9 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                       {formatFieldValue(
                         statusFieldDef,
                         statusValue,
-                        entity
+                        entity,
+                        true,
+                        highlightQuery
                       )}
                     </div>
                   )}

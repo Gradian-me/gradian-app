@@ -106,7 +106,8 @@ export const formatFieldValue = (
   field: any,
   value: any,
   row?: any,
-  showForceIcon: boolean = true
+  showForceIcon: boolean = true,
+  highlightQuery?: string
 ): React.ReactNode => {
   // Check if row has isForce flag - only show for title role fields
   const isForce = showForceIcon && row?.isForce === true && field?.role === 'title';
@@ -550,7 +551,7 @@ export const formatFieldValue = (
       return <span className="text-gray-400">—</span>;
     }
     return wrapWithForceIcon(
-      <CodeBadge code={value} />,
+      <CodeBadge code={value} highlightQuery={highlightQuery} />,
       isForce,
       field,
       row

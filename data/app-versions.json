@@ -3576,13 +3576,40 @@
         ]
       },
       {
-        "changeType": "refactor",
-        "description": "Improved DynamicCardDialog and DynamicCardRenderer components for better responsiveness and user experience",
+      "changeType": "refactor",
+      "description": "Improved DynamicCardDialog and DynamicCardRenderer components for better responsiveness and user experience",
+      "priority": "Medium",
+      "affectedDomains": [
+      "data-display",
+      "ui",
+      "components"
+      ]
+      }
+    ]
+  },
+  {
+    "id": "01KCHIGHLIGHTSEARCH001",
+    "timestamp": "2025-12-16T07:10:00.000Z",
+    "version": "1.30.001",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated DynamicCardRenderer, DynamicInfoCard, DynamicPageRenderer, HierarchyView, TableBody, TableWrapper, and field-formatters components to support highlighting search queries, improving user experience",
         "priority": "Medium",
         "affectedDomains": [
           "data-display",
           "ui",
-          "components"
+          "search"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Integrated logging functionality in DynamicPageRenderer for better debugging and tracking of filtered entities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "logging",
+          "debugging"
         ]
       }
     ]

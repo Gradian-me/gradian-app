@@ -632,7 +632,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         transition={disableAnimation ? {} : { duration: 0.2 }}
                         whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05, transition: { duration: 0.1, delay: 0 } }}
                       >
-                        <CodeBadge code={cardConfig.codeField} />
+                        <CodeBadge code={cardConfig.codeField} highlightQuery={normalizedHighlightQuery} />
                       </motion.div>
                     )}
                     {/* Rating */}
@@ -666,7 +666,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                             component: 'picker',
                           },
                           rawStatusValueFromField || data?.status,
-                          data
+                          data,
+                          true,
+                          normalizedHighlightQuery
                         )}
                       </motion.div>
                     )}
@@ -686,7 +688,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                             component: 'picker',
                           },
                           rawEntityTypeValueFromField || data?.entityType,
-                          data
+                          data,
+                          true,
+                          normalizedHighlightQuery
                         )}
                       </motion.div>
                     )}
@@ -1070,7 +1074,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                           transition: { type: "spring", stiffness: 300, damping: 30 }
                         }}
                       >
-                        <CodeBadge code={cardConfig.codeField} />
+                        <CodeBadge code={cardConfig.codeField} highlightQuery={normalizedHighlightQuery} />
                       </motion.div>
                     )}
                     {hasRatingField && (
@@ -1108,7 +1112,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                             component: 'picker',
                           },
                           rawStatusValueFromField || data?.status,
-                          data
+                          data,
+                          true,
+                          normalizedHighlightQuery
                         )}
                       </motion.div>
                     )}
@@ -1130,7 +1136,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                             component: 'picker',
                           },
                           rawEntityTypeValueFromField || data?.entityType,
-                          data
+                          data,
+                          true,
+                          normalizedHighlightQuery
                         )}
                       </motion.div>
                     )}

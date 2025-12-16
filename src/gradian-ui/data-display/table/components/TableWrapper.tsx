@@ -121,7 +121,9 @@ export function TableWrapper<T = any>({
           return formatFieldValue(
             statusFieldWithOptions,
             value,
-            row
+            row,
+            true,
+            highlightQuery
           );
         },
       });
@@ -153,7 +155,9 @@ export function TableWrapper<T = any>({
           return formatFieldValue(
             entityTypeFieldWithOptions,
             value,
-            row
+            row,
+            true,
+            highlightQuery
           );
         },
       });
@@ -186,7 +190,9 @@ export function TableWrapper<T = any>({
           return formatFieldValue(
             assignedToFieldWithRole,
             value,
-            row
+            row,
+            true,
+            highlightQuery
           );
         },
       });
@@ -256,7 +262,7 @@ export function TableWrapper<T = any>({
               if (!value || value === '' || value === null || value === undefined) {
                 return <span className="text-gray-400 dark:text-gray-500 text-sm">—</span>;
               }
-          return formatFieldValue(dueDateFieldWithRole, value, row);
+          return formatFieldValue(dueDateFieldWithRole, value, row, true, highlightQuery);
             },
       });
     } else if (dueDateColumn) {
@@ -320,7 +326,7 @@ export function TableWrapper<T = any>({
 
     // If no additional columns, return as is
     return baseColumns;
-  }, [columns, schema]);
+  }, [columns, schema, highlightQuery]);
 
   // Update tableConfig with enhanced columns
   const enhancedTableConfig = useMemo(() => ({

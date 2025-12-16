@@ -2,6 +2,7 @@
 // Main hook for managing schema builder state and operations
 
 import { useState, useCallback } from 'react';
+import { toast } from 'sonner';
 import { FormSchema, FormField, FormSection } from '../types/form-schema';
 import { config as appConfig } from '../../../lib/config';
 import { 
@@ -74,12 +75,14 @@ export function useSchemaBuilder(
         }
       }
       setState(prev => ({ ...prev, saving: false }));
+      toast.success('Schema saved successfully');
     } catch (error) {
       setState(prev => ({
         ...prev,
         saving: false,
         error: error instanceof Error ? error.message : 'Failed to save schema',
       }));
+      toast.error('Failed to save schema. Please review your changes or try again.');
       throw error;
     }
   }, [state.schema, config]);
@@ -108,11 +111,13 @@ export function useSchemaBuilder(
           throw new Error(result.error || 'Failed to set schema inactive');
         }
       }
+      toast.success('Schema has been set inactive.');
     } catch (error) {
       setState(prev => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Failed to set schema inactive',
       }));
+      toast.error('Failed to update schema status. Please try again.');
       throw error;
     }
   }, [state.schema, config]);

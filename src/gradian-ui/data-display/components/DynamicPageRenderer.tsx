@@ -562,12 +562,13 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     if (debouncedSearchTerm && debouncedSearchTerm.trim() !== '') {
       const searchLower = debouncedSearchTerm.toLowerCase();
       
-      return entities.filter((entity: any) => {
-        // Search across common text fields dynamically
+      const result = entities.filter((entity: any) => {
+        // Search across common text fields dynamically (including generic 'code' field)
         const searchableFields = [
           'name', 'title', 'email', 'phone', 'description',
           'productName', 'requestId', 'batchNumber', 'productSku',
-          'companyName', 'tenderTitle', 'projectName'
+          'companyName', 'tenderTitle', 'projectName',
+          'code' // allows schemas like 'guidelines' that primarily use a code identifier
         ];
         
         return searchableFields.some(field => {
@@ -578,10 +579,36 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           return false;
         });
       });
+
+      // #region agent log
+      if (typeof window !== 'undefined') {
+        fetch('http://127.0.0.1:7242/ingest/ba766868-541f-4cbf-b3ec-9cc846e38aa4', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: 'debug-session',
+            runId: 'pre-fix',
+            hypothesisId: 'H1',
+            location: 'DynamicPageRenderer.tsx:filteredEntities',
+            message: 'Filtered entities after search',
+            data: {
+              schemaId: schema?.id,
+              entityName,
+              searchLower,
+              totalEntities: entities.length,
+              filteredCount: result.length,
+            },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {});
+      }
+      // #endregion
+
+      return result;
     }
     
     return entities;
-  }, [entities, debouncedSearchTerm]);
+  }, [entities, debouncedSearchTerm, entityName, schema?.id]);
 
   // Collapse all hierarchy nodes when search is cleared
   const prevSearchRef = React.useRef<string>('');
@@ -1413,6 +1440,32 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
+            {/* #region agent log */}
+            {typeof window !== 'undefined' && searchTermLocal && (
+              (() => {
+                fetch('http://127.0.0.1:7242/ingest/ba766868-541f-4cbf-b3ec-9cc846e38aa4', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    sessionId: 'debug-session',
+                    runId: 'pre-fix',
+                    hypothesisId: 'H3',
+                    location: 'DynamicPageRenderer.tsx:emptyState',
+                    message: 'Empty state rendered with zero filtered entities',
+                    data: {
+                      schemaId: schema?.id,
+                      entityName,
+                      searchTerm: searchTermLocal,
+                      totalEntities: entities?.length ?? 0,
+                      filteredCount: filteredEntities.length,
+                    },
+                    timestamp: Date.now(),
+                  }),
+                }).catch(() => {});
+                return null;
+              })()
+            )}
+            {/* #endregion */}
             <EmptyState
               icon={
                 schema.icon ? (

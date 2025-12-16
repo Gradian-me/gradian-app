@@ -260,7 +260,7 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                   </label>
                   <div className="flex items-center gap-2">
                     <div className="text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word flex-1">
-                      {formatFieldValue(field, field.value, data, false)}
+                    {formatFieldValue(field, field.value, data, false)}
                     </div>
                     {field.canCopy && field.value && field.value !== '' && (
                       <div

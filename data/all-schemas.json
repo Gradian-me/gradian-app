@@ -6755,12 +6755,14 @@
         "name": "conditions",
         "label": "Conditions",
         "sectionId": "conditions",
-        "component": "list-input",
+        "component": "textarea",
         "placeholder": "Enter conditions",
         "validation": {
           "required": false
         },
-        "order": 4
+        "order": 4,
+        "colSpan": 2,
+        "role": "title"
       },
       {
         "id": "supporting-data",
