@@ -6612,7 +6612,7 @@
     "description": "Define and manage process mappings with hierarchical parent-child relationships.",
     "singular_name": "Process Mapping",
     "plural_name": "Process Mappings",
-    "icon": "GitBranch",
+    "icon": "Workflow",
     "fields": [
       {
         "id": "process-title",

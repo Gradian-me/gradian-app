@@ -4575,782 +4575,6092 @@
   ],
   "process-mappings": [
     {
-      "id": "AGNSGBBCMF6KLIG55YM4WBHMKA",
+      "code": "1",
+      "title": "Develop Vision and Strategy",
+      "id": "01JGFJJZ00DE3B4WZZ6KYE37BB",
       "parent": null,
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.1",
+      "title": "Define the business concept and long-term vision",
+      "id": "01JGFJJZ00P1F28HV2P7J75FM9",
+      "parent": "01JGFJJZ00DE3B4WZZ6KYE37BB",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.1.1",
+      "title": "Assess the external environment",
+      "id": "01JGFJJZ00RNTJS4RNHAGBS1ZM",
+      "parent": "01JGFJJZ00P1F28HV2P7J75FM9",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.1.2",
+      "title": "Survey market and determine customer needs and wants",
+      "id": "01JGFJJZ00GF8C9YEXR24TPP73",
+      "parent": "01JGFJJZ00P1F28HV2P7J75FM9",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.1.3",
+      "title": "Assess the internal environment",
+      "id": "01JGFJJZ0085C7X8BH7MXZ2BD3",
+      "parent": "01JGFJJZ00P1F28HV2P7J75FM9",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.1.4",
+      "title": "Establish strategic vision",
+      "id": "01JGFJJZ00PE4ZTTAX1WBJBN94",
+      "parent": "01JGFJJZ00P1F28HV2P7J75FM9",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.1.5",
+      "title": "Conduct organization restructuring opportunities",
+      "id": "01JGFJJZ004C3DXATTQG15QKFA",
+      "parent": "01JGFJJZ00P1F28HV2P7J75FM9",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.2",
+      "title": "Develop business strategy",
+      "id": "01JGFJJZ00EYP336ZY35WY5NWS",
+      "parent": "01JGFJJZ00DE3B4WZZ6KYE37BB",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.2.1",
+      "title": "Develop overall mission statement",
+      "id": "01JGFJJZ0041K219JQY76CHBVJ",
+      "parent": "01JGFJJZ00EYP336ZY35WY5NWS",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.2.2",
+      "title": "Define and evaluate strategic options to achieve the mission",
+      "id": "01JGFJJZ003V2FNC6RVNFAZVW2",
+      "parent": "01JGFJJZ00EYP336ZY35WY5NWS",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.2.3",
+      "title": "Set/Develop long-term enterprise strategy",
+      "id": "01JGFJJZ00RHZNP65RMGRED65S",
+      "parent": "01JGFJJZ00EYP336ZY35WY5NWS",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.2.4",
+      "title": "Coordinate and align cross-functional and process strategies",
+      "id": "01JGFJJZ0063SZNPP3Z7CBDJ58",
+      "parent": "01JGFJJZ00EYP336ZY35WY5NWS",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.2.5",
+      "title": "Create organizational design",
+      "id": "01JGFJJZ0019EQ399G4KCXD90G",
+      "parent": "01JGFJJZ00EYP336ZY35WY5NWS",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.2.6",
+      "title": "Develop and set organizational objectives",
+      "id": "01JGFJJZ007KYXESFEPP76DT63",
+      "parent": "01JGFJJZ00EYP336ZY35WY5NWS",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.2.7",
+      "title": "Formulate business unit strategies",
+      "id": "01JGFJJZ00WW8NY8PS7J762Y17",
+      "parent": "01JGFJJZ00EYP336ZY35WY5NWS",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.2.8",
+      "title": "Develop customer experience strategy",
+      "id": "01JGFJJZ00X2DTSF7V2WKC2QH6",
+      "parent": "01JGFJJZ00EYP336ZY35WY5NWS",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.2.9",
+      "title": "Communicate strategies internally and externally",
+      "id": "01JGFJJZ00JXJDT9XREKD6X81H",
+      "parent": "01JGFJJZ00EYP336ZY35WY5NWS",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.3",
+      "title": "Develop and measure strategic initiatives",
+      "id": "01JGFJJZ00KGCKRR2ATZF98AB1",
+      "parent": "01JGFJJZ00DE3B4WZZ6KYE37BB",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.3.1",
+      "title": "Develop strategic initiatives",
+      "id": "01JGFJJZ000Q34SDN98XJ13XE1",
+      "parent": "01JGFJJZ00KGCKRR2ATZF98AB1",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.3.2",
+      "title": "Evaluate strategic initiatives",
+      "id": "01JGFJJZ00FC9X5BSVCHWGG337",
+      "parent": "01JGFJJZ00KGCKRR2ATZF98AB1",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.3.3",
+      "title": "Select strategic initiatives",
+      "id": "01JGFJJZ00MPW3G4WPT9CEC6SA",
+      "parent": "01JGFJJZ00KGCKRR2ATZF98AB1",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.3.4",
+      "title": "Establish high-level measures",
+      "id": "01JGFJJZ00V3BKRNREGW131NGA",
+      "parent": "01JGFJJZ00KGCKRR2ATZF98AB1",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.3.5",
+      "title": "Execute strategic initiatives",
+      "id": "01JGFJJZ000DR92TG3RRBYQKW0",
+      "parent": "01JGFJJZ00KGCKRR2ATZF98AB1",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.3.6",
+      "title": "Review execution of strategic initiatives",
+      "id": "01JGFJJZ00G4XJ67S83SAXKBTY",
+      "parent": "01JGFJJZ00KGCKRR2ATZF98AB1",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.3.7",
+      "title": "Refine strategic initiatives and project plans as needed",
+      "id": "01JGFJJZ001YQZKYBJJ929XVHJ",
+      "parent": "01JGFJJZ00KGCKRR2ATZF98AB1",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.4",
+      "title": "Develop and maintain business models",
+      "id": "01JGFJJZ003AA8Y6T3EKTE7W15",
+      "parent": "01JGFJJZ00DE3B4WZZ6KYE37BB",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.4.1",
+      "title": "Develop business models",
+      "id": "01JGFJJZ00Y2V74CGTH544YKD8",
+      "parent": "01JGFJJZ003AA8Y6T3EKTE7W15",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.4.2",
+      "title": "Maintain business models",
+      "id": "01JGFJJZ00HV2T2YQR4XFTZ2PW",
+      "parent": "01JGFJJZ003AA8Y6T3EKTE7W15",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "1.4.3",
+      "title": "Establish business model governance",
+      "id": "01JGFJJZ00WP5YMY62HZHXXM6X",
+      "parent": "01JGFJJZ003AA8Y6T3EKTE7W15",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "2",
+      "title": "Develop and Manage Products and Services",
+      "id": "01JGFJJZ00THSNWEH6BRBEXR1Z",
+      "parent": null,
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.1",
+      "title": "Govern and manage product/service development program",
+      "id": "01JGFJJZ00NNWCZ87ATDFZKM6P",
+      "parent": "01JGFJJZ00THSNWEH6BRBEXR1Z",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.1.1",
+      "title": "Manage product and service portfolio",
+      "id": "01JGFJJZ006PJ6MH1DXYM2S8V2",
+      "parent": "01JGFJJZ00NNWCZ87ATDFZKM6P",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.1.2",
+      "title": "Manage product and service life cycle",
+      "id": "01JGFJJZ007ZY87K2YWT1587RY",
+      "parent": "01JGFJJZ00NNWCZ87ATDFZKM6P",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.1.3",
+      "title": "Manage patents, copyrights, and regulatory requirements",
+      "id": "01JGFJJZ000VGSVTPPKQ61DF2Q",
+      "parent": "01JGFJJZ00NNWCZ87ATDFZKM6P",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.1.4",
+      "title": "Manage product and service master data",
+      "id": "01JGFJJZ00CYR47QV0E9C1029P",
+      "parent": "01JGFJJZ00NNWCZ87ATDFZKM6P",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.2",
+      "title": "Generate and define new product/service ideas",
+      "id": "01JGFJJZ00J5109GJZ7WA4VQP3",
+      "parent": "01JGFJJZ00THSNWEH6BRBEXR1Z",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.2.1",
+      "title": "Perform discovery research",
+      "id": "01JGFJJZ00T0E4X6ZH1VB3W3F0",
+      "parent": "01JGFJJZ00J5109GJZ7WA4VQP3",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.2.2",
+      "title": "Generate new product/service concepts",
+      "id": "01JGFJJZ0091FAY5XBVM8477AT",
+      "parent": "01JGFJJZ00J5109GJZ7WA4VQP3",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.2.3",
+      "title": "Define product/service development requirements",
+      "id": "01JGFJJZ00TXQQ3FV2K0V2BEYS",
+      "parent": "01JGFJJZ00J5109GJZ7WA4VQP3",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.3",
+      "title": "Develop products and services",
+      "id": "01JGFJJZ00GXRTDG21EJVZE6FB",
+      "parent": "01JGFJJZ00THSNWEH6BRBEXR1Z",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.3.1",
+      "title": "Design and prototype products and services",
+      "id": "01JGFJJZ00834YNEYSF04RDFE8",
+      "parent": "01JGFJJZ00GXRTDG21EJVZE6FB",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.3.2",
+      "title": "Test market for new or revised products and services",
+      "id": "01JGFJJZ00V6WXYMV68NQ9SSH4",
+      "parent": "01JGFJJZ00GXRTDG21EJVZE6FB",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "2.3.3",
+      "title": "Prepare for production/service delivery",
+      "id": "01JGFJJZ0000Q0CBC0NXRXQARQ",
+      "parent": "01JGFJJZ00GXRTDG21EJVZE6FB",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3",
+      "title": "Market and Sell Products and Services",
+      "id": "01JGFJJZ009R3M11B2QVDRPR6E",
+      "parent": null,
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.1",
+      "title": "Understand markets, customers, and capabilities",
+      "id": "01JGFJJZ006QQWDQPMW4ZJKA6R",
+      "parent": "01JGFJJZ009R3M11B2QVDRPR6E",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.1.1",
+      "title": "Perform customer and market intelligence analysis",
+      "id": "01JGFJJZ0026V6TC1JC1YBDQWB",
+      "parent": "01JGFJJZ006QQWDQPMW4ZJKA6R",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.1.2",
+      "title": "Evaluate and prioritize market opportunities",
+      "id": "01JGFJJZ0074F4PQTV6AZ0NRMC",
+      "parent": "01JGFJJZ006QQWDQPMW4ZJKA6R",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.2",
+      "title": "Develop marketing strategy",
+      "id": "01JGFJJZ0064TX5NRVZXVVWJ1R",
+      "parent": "01JGFJJZ009R3M11B2QVDRPR6E",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.2.1",
+      "title": "Define offering and customer value proposition",
+      "id": "01JGFJJZ0066QNKJ8CD7XR1W8E",
+      "parent": "01JGFJJZ0064TX5NRVZXVVWJ1R",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.2.2",
+      "title": "Define pricing strategy",
+      "id": "01JGFJJZ00KPRH5TTG9Y3G3FEV",
+      "parent": "01JGFJJZ0064TX5NRVZXVVWJ1R",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.2.3",
+      "title": "Define and manage channel strategy",
+      "id": "01JGFJJZ005N67CRDQCWQG60SF",
+      "parent": "01JGFJJZ0064TX5NRVZXVVWJ1R",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.2.4",
+      "title": "Analyze and manage channel performance",
+      "id": "01JGFJJZ00TG649BKZD5B5SJRD",
+      "parent": "01JGFJJZ0064TX5NRVZXVVWJ1R",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.2.5",
+      "title": "Develop marketing communication strategy",
+      "id": "01JGFJJZ009HHERKBN0XRD6XHE",
+      "parent": "01JGFJJZ0064TX5NRVZXVVWJ1R",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.2.6",
+      "title": "Design and manage customer loyalty program",
+      "id": "01JGFJJZ00ASYWEDYWFJ9XKKWQ",
+      "parent": "01JGFJJZ0064TX5NRVZXVVWJ1R",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.3",
+      "title": "Develop and manage marketing plans",
+      "id": "01JGFJJZ00HJ9BXFBM0GRAY6WN",
+      "parent": "01JGFJJZ009R3M11B2QVDRPR6E",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.3.1",
+      "title": "Establish goals, objectives, and measures for products/services by channel/segment",
+      "id": "01JGFJJZ006M939AXC5FR80X6Z",
+      "parent": "01JGFJJZ00HJ9BXFBM0GRAY6WN",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.3.2",
+      "title": "Establish marketing budgets",
+      "id": "01JGFJJZ00JE93JVRZTP836RDC",
+      "parent": "01JGFJJZ00HJ9BXFBM0GRAY6WN",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.3.3",
+      "title": "Develop and manage pricing",
+      "id": "01JGFJJZ00JYGG43QXXBQCWCW0",
+      "parent": "01JGFJJZ00HJ9BXFBM0GRAY6WN",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.3.4",
+      "title": "Develop and manage promotional activities",
+      "id": "01JGFJJZ00PFYF6NEB5D8KRE54",
+      "parent": "01JGFJJZ00HJ9BXFBM0GRAY6WN",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.3.5",
+      "title": "Track customer management measures",
+      "id": "01JGFJJZ009SQG2MKSX3WHKKM5",
+      "parent": "01JGFJJZ00HJ9BXFBM0GRAY6WN",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.3.6",
+      "title": "Analyze and respond to customer insight",
+      "id": "01JGFJJZ00D2Q3YW0N1SAV1FWG",
+      "parent": "01JGFJJZ00HJ9BXFBM0GRAY6WN",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.3.7",
+      "title": "Develop and manage packaging strategy",
+      "id": "01JGFJJZ00Y0Y0XD2ZF0B391CG",
+      "parent": "01JGFJJZ00HJ9BXFBM0GRAY6WN",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.3.8",
+      "title": "Develop go-to-market strategy",
+      "id": "01JGFJJZ008RV019PSH6PJWW48",
+      "parent": "01JGFJJZ00HJ9BXFBM0GRAY6WN",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.3.9",
+      "title": "Manage product marketing material",
+      "id": "01JGFJJZ00FEFWSMJ6R8NKAEBS",
+      "parent": "01JGFJJZ00HJ9BXFBM0GRAY6WN",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.4",
+      "title": "Develop sales strategy",
+      "id": "01JGFJJZ00EBBKVEA4SXPSMQRH",
+      "parent": "01JGFJJZ009R3M11B2QVDRPR6E",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.4.1",
+      "title": "Develop sales forecast",
+      "id": "01JGFJJZ00VA8BVJ4KHXYCKS2M",
+      "parent": "01JGFJJZ00EBBKVEA4SXPSMQRH",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.4.2",
+      "title": "Develop sales partner/alliance relationships",
+      "id": "01JGFJJZ000WY4XT77B00W23P2",
+      "parent": "01JGFJJZ00EBBKVEA4SXPSMQRH",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.4.3",
+      "title": "Establish overall sales budgets",
+      "id": "01JGFJJZ00G00F2FKY5F5VKXYE",
+      "parent": "01JGFJJZ00EBBKVEA4SXPSMQRH",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.4.4",
+      "title": "Establish sales goals and measures",
+      "id": "01JGFJJZ006YMTA3AD85S2EHXD",
+      "parent": "01JGFJJZ00EBBKVEA4SXPSMQRH",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.4.5",
+      "title": "Establish customer management measures",
+      "id": "01JGFJJZ00C0TQRKRD88S4NEXX",
+      "parent": "01JGFJJZ00EBBKVEA4SXPSMQRH",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.5",
+      "title": "Develop and manage sales plans",
+      "id": "01JGFJJZ00H8CSP4GCYG0DD71G",
+      "parent": "01JGFJJZ009R3M11B2QVDRPR6E",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.5.1",
+      "title": "Manage leads/opportunities",
+      "id": "01JGFJJZ0062R9NNWVVE3VD75R",
+      "parent": "01JGFJJZ00H8CSP4GCYG0DD71G",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.5.2",
+      "title": "Manage customers and accounts",
+      "id": "01JGFJJZ00TS9ZCEYEQ0EEAKH4",
+      "parent": "01JGFJJZ00H8CSP4GCYG0DD71G",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.5.3",
+      "title": "Develop and manage sales proposals, bids, and quotes",
+      "id": "01JGFJJZ00GY0G7HJ5XTD7HF6B",
+      "parent": "01JGFJJZ00H8CSP4GCYG0DD71G",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.5.4",
+      "title": "Manage sales orders",
+      "id": "01JGFJJZ00MGHZJZMMN03TVZKG",
+      "parent": "01JGFJJZ00H8CSP4GCYG0DD71G",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.5.5",
+      "title": "Manage sales partners and alliances",
+      "id": "01JGFJJZ00ZE5G5F11RF37B1NW",
+      "parent": "01JGFJJZ00H8CSP4GCYG0DD71G",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.5.6",
+      "title": "Perform sales at physical outlets",
+      "id": "01JGFJJZ004NVB4XYSEP0V4ZC0",
+      "parent": "01JGFJJZ00H8CSP4GCYG0DD71G",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.5.7",
+      "title": "Perform field sales",
+      "id": "01JGFJJZ00Q8T8Q7H208F6WRZ5",
+      "parent": "01JGFJJZ00H8CSP4GCYG0DD71G",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "3.5.8",
+      "title": "Perform digital sales",
+      "id": "01JGFJJZ006F1C4610CYGSH7V2",
+      "parent": "01JGFJJZ00H8CSP4GCYG0DD71G",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4",
+      "title": "Manage Supply Chain for Physical Products",
+      "id": "01JGFJJZ009CH7EXYMVMFWC73F",
+      "parent": null,
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.1",
+      "title": "Plan for and align supply chain resources",
+      "id": "01JGFJJZ00X5WSABD03SCFTJZY",
+      "parent": "01JGFJJZ009CH7EXYMVMFWC73F",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.1.1",
+      "title": "Develop production and materials strategies",
+      "id": "01JGFJJZ00V8268XZ6876TN0Z8",
+      "parent": "01JGFJJZ00X5WSABD03SCFTJZY",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.1.2",
+      "title": "Manage demand for products",
+      "id": "01JGFJJZ00VBHGYECPKZQ34YGV",
+      "parent": "01JGFJJZ00X5WSABD03SCFTJZY",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.1.3",
+      "title": "Create materials plan",
+      "id": "01JGFJJZ00A3FWJ9MMV0JN48CH",
+      "parent": "01JGFJJZ00X5WSABD03SCFTJZY",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.1.4",
+      "title": "Create and manage master production schedule",
+      "id": "01JGFJJZ00GZR1RVM3R9VTWPXF",
+      "parent": "01JGFJJZ00X5WSABD03SCFTJZY",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.1.5",
+      "title": "Plan distribution requirements",
+      "id": "01JGFJJZ00ZNMJMCFNZKBZJE86",
+      "parent": "01JGFJJZ00X5WSABD03SCFTJZY",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.1.6",
+      "title": "Establish distribution planning constraints",
+      "id": "01JGFJJZ00J41N55FRNKRS5JWW",
+      "parent": "01JGFJJZ00X5WSABD03SCFTJZY",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.1.7",
+      "title": "Review distribution planning policies",
+      "id": "01JGFJJZ0042XSYGMA0PY1VY2C",
+      "parent": "01JGFJJZ00X5WSABD03SCFTJZY",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.1.8",
+      "title": "Develop quality standards and procedures",
+      "id": "01JGFJJZ00GBPCH9X4EQYDE1C8",
+      "parent": "01JGFJJZ00X5WSABD03SCFTJZY",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.2",
+      "title": "Procure materials and services",
+      "id": "01JGFJJZ00549AMWMWJWXQTT52",
+      "parent": "01JGFJJZ009CH7EXYMVMFWC73F",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.2.1",
+      "title": "Provide sourcing governance and perform category management",
+      "id": "01JGFJJZ00TWGWTT74M666QM66",
+      "parent": "01JGFJJZ00549AMWMWJWXQTT52",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.2.2",
+      "title": "Select suppliers and develop/maintain contracts",
+      "id": "01JGFJJZ00E367071J5EQ0ZMWV",
+      "parent": "01JGFJJZ00549AMWMWJWXQTT52",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.2.3",
+      "title": "Order materials and services",
+      "id": "01JGFJJZ00JE1BZPH2SX9P9XDW",
+      "parent": "01JGFJJZ00549AMWMWJWXQTT52",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.2.4",
+      "title": "Manage suppliers",
+      "id": "01JGFJJZ000DD15ZMPTCA1MC5D",
+      "parent": "01JGFJJZ00549AMWMWJWXQTT52",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.3",
+      "title": "Produce/Assemble/Test product",
+      "id": "01JGFJJZ00SW6DNB9K0FVF8C7N",
+      "parent": "01JGFJJZ009CH7EXYMVMFWC73F",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.3.1",
+      "title": "Schedule production",
+      "id": "01JGFJJZ0010JN19E92HD8HVYK",
+      "parent": "01JGFJJZ00SW6DNB9K0FVF8C7N",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.3.2",
+      "title": "Produce/Assemble product",
+      "id": "01JGFJJZ003XD817B4KGKW4X8R",
+      "parent": "01JGFJJZ00SW6DNB9K0FVF8C7N",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.3.3",
+      "title": "Perform quality testing",
+      "id": "01JGFJJZ00DXA4E849VJQ0SQXG",
+      "parent": "01JGFJJZ00SW6DNB9K0FVF8C7N",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.3.4",
+      "title": "Maintain production records and manage lot traceability",
+      "id": "01JGFJJZ00E4EFDHC7J76SQZQ0",
+      "parent": "01JGFJJZ00SW6DNB9K0FVF8C7N",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.4",
+      "title": "Manage logistics and warehousing",
+      "id": "01JGFJJZ00KSPWSWMHSX4FMZKP",
+      "parent": "01JGFJJZ009CH7EXYMVMFWC73F",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.4.1",
+      "title": "Provide logistics governance",
+      "id": "01JGFJJZ00RHJGR4G8068K1KW7",
+      "parent": "01JGFJJZ00KSPWSWMHSX4FMZKP",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.4.2",
+      "title": "Plan and manage inbound material flow",
+      "id": "01JGFJJZ00194HC94FXN4H1V0J",
+      "parent": "01JGFJJZ00KSPWSWMHSX4FMZKP",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.4.3",
+      "title": "Operate warehousing",
+      "id": "01JGFJJZ00HYDA0CNE87E9SBFV",
+      "parent": "01JGFJJZ00KSPWSWMHSX4FMZKP",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "4.4.4",
+      "title": "Operate outbound transportation",
+      "id": "01JGFJJZ00FBS5S3CH9E62TZWE",
+      "parent": "01JGFJJZ00KSPWSWMHSX4FMZKP",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "5",
+      "title": "Deliver Services",
+      "id": "01JGFJJZ00XWPH4ZF3FEA2QAPG",
+      "parent": null,
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "5.1",
+      "title": "Establish service delivery governance and strategies",
+      "id": "01JGFJJZ00EW35SPMFW5AHGWDT",
+      "parent": "01JGFJJZ00XWPH4ZF3FEA2QAPG",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "5.1.1",
+      "title": "Establish service delivery governance",
+      "id": "01JGFJJZ009K7C7ZA7XS8P55H8",
+      "parent": "01JGFJJZ00EW35SPMFW5AHGWDT",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "5.1.2",
+      "title": "Develop service delivery strategies",
+      "id": "01JGFJJZ009ZA6PDZ9QDCEA3WW",
+      "parent": "01JGFJJZ00EW35SPMFW5AHGWDT",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "5.2",
+      "title": "Manage service delivery resources",
+      "id": "01JGFJJZ00DHN4CKPA4C0SHMGC",
+      "parent": "01JGFJJZ00XWPH4ZF3FEA2QAPG",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "5.2.1",
+      "title": "Manage service delivery resource demand",
+      "id": "01JGFJJZ003K97V20P3S963XQG",
+      "parent": "01JGFJJZ00DHN4CKPA4C0SHMGC",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "5.2.2",
+      "title": "Create and manage resource plan",
+      "id": "01JGFJJZ0054MHVM74BNEGXN0Z",
+      "parent": "01JGFJJZ00DHN4CKPA4C0SHMGC",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "5.2.3",
+      "title": "Enable service delivery resources",
+      "id": "01JGFJJZ00F8CSRZ7X39HRKWGK",
+      "parent": "01JGFJJZ00DHN4CKPA4C0SHMGC",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "5.3",
+      "title": "Deliver service to customer",
+      "id": "01JGFJJZ00YN7HX2WT7085JVQG",
+      "parent": "01JGFJJZ00XWPH4ZF3FEA2QAPG",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "5.3.1",
+      "title": "Initiate service delivery",
+      "id": "01JGFJJZ005PCY0XHVDH92164B",
+      "parent": "01JGFJJZ00YN7HX2WT7085JVQG",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "5.3.2",
+      "title": "Execute service delivery",
+      "id": "01JGFJJZ00WBEN64ZV601NJ8NS",
+      "parent": "01JGFJJZ00YN7HX2WT7085JVQG",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
+      "code": "5.3.3",
+      "title": "Complete service delivery",
+      "id": "01JGFJJZ00YE0ZVWWKTSNNRDNQ",
+      "parent": "01JGFJJZ00YN7HX2WT7085JVQG",
+      "entityType": [
+        {
+          "label": "Operational",
+          "icon": "Activity",
+          "color": "emerald",
+          "id": "01KCHEZ7VQEP2MWZXAM5T411E7"
+        }
+      ]
+    },
+    {
       "code": "6",
-      "title": "Manage Human Capital",
-      "description": "Attract, develop, and retain workforce.",
+      "title": "Manage Customer Service",
+      "id": "01JGFJJZ00WZVC04BQDT6VFK9K",
+      "parent": null,
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMIRTZNARNTTKRHD7UE",
-      "parent": "AGNSGBBCMF6KLIG55YM4WBHMKA",
       "code": "6.1",
-      "title": "Develop and Manage Human Resources",
-      "description": "Define HR strategy and policies.",
+      "title": "Develop customer service strategy",
+      "id": "01JGFJJZ00AYC7B2XWGCYZ16YE",
+      "parent": "01JGFJJZ00WZVC04BQDT6VFK9K",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMK3K5NU6RNIAI66QOA",
-      "parent": "AGNSGBBCMIRTZNARNTTKRHD7UE",
       "code": "6.1.1",
-      "title": "Develop HR Strategy",
-      "description": "Set human capital strategy.",
+      "title": "Define customer service requirements across the enterprise",
+      "id": "01JGFJJZ00ZY9403SNNWRDM3JQ",
+      "parent": "01JGFJJZ00AYC7B2XWGCYZ16YE",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMJVNRUMA3KCAHT74L4",
-      "parent": "AGNSGBBCMF6KLIG55YM4WBHMKA",
+      "code": "6.1.2",
+      "title": "Define customer service experience",
+      "id": "01JGFJJZ00PXFHHT6M35BGC4ZH",
+      "parent": "01JGFJJZ00AYC7B2XWGCYZ16YE",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.1.3",
+      "title": "Define and manage customer service channel strategy",
+      "id": "01JGFJJZ00V2ATWCZFY2X0SHFC",
+      "parent": "01JGFJJZ00AYC7B2XWGCYZ16YE",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.1.4",
+      "title": "Define customer service policies and procedures",
+      "id": "01JGFJJZ00BMM1RMKWM5K19S77",
+      "parent": "01JGFJJZ00AYC7B2XWGCYZ16YE",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.1.5",
+      "title": "Establish target service level for each customer segment",
+      "id": "01JGFJJZ00GX1W6GK9YJQS3B9D",
+      "parent": "01JGFJJZ00AYC7B2XWGCYZ16YE",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.1.6",
+      "title": "Define warranty claims",
+      "id": "01JGFJJZ00CC5PACJ6C7WD8F52",
+      "parent": "01JGFJJZ00AYC7B2XWGCYZ16YE",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.1.7",
+      "title": "Develop recall strategy",
+      "id": "01JGFJJZ00JRNGPSZ87QC6GS2V",
+      "parent": "01JGFJJZ00AYC7B2XWGCYZ16YE",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "6.2",
-      "title": "Acquire and Develop Talent",
-      "description": "Recruit and build workforce capability.",
+      "title": "Plan and manage customer service contacts",
+      "id": "01JGFJJZ00D7FW31Z2WVCGF82M",
+      "parent": "01JGFJJZ00WZVC04BQDT6VFK9K",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMJE5DVQBTAWDWTZKRA",
-      "parent": "AGNSGBBCMJVNRUMA3KCAHT74L4",
       "code": "6.2.1",
-      "title": "Recruit and Hire Employees",
-      "description": "Source and select talent.",
+      "title": "Plan and manage customer service work force",
+      "id": "01JGFJJZ00E1TA75KTQ7ZEA44R",
+      "parent": "01JGFJJZ00D7FW31Z2WVCGF82M",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMK5WSLPVZSCSWOJ4QM",
-      "parent": "AGNSGBBCMF6KLIG55YM4WBHMKA",
+      "code": "6.2.2",
+      "title": "Manage customer service problems, requests, and inquiries",
+      "id": "01JGFJJZ002Z9RDAP000BABD8Y",
+      "parent": "01JGFJJZ00D7FW31Z2WVCGF82M",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.2.3",
+      "title": "Manage customer complaints",
+      "id": "01JGFJJZ00TQF6GJ6R6G06EJ1K",
+      "parent": "01JGFJJZ00D7FW31Z2WVCGF82M",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.2.4",
+      "title": "Process returns",
+      "id": "01JGFJJZ00ESR7S63NNWQH020P",
+      "parent": "01JGFJJZ00D7FW31Z2WVCGF82M",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.2.5",
+      "title": "Report incidents and risks to regulatory bodies",
+      "id": "01JGFJJZ00VSYC98A6RKP4YHC6",
+      "parent": "01JGFJJZ00D7FW31Z2WVCGF82M",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "6.3",
-      "title": "Manage Employee Performance",
-      "description": "Drive performance and development.",
+      "title": "Service products after sales",
+      "id": "01JGFJJZ00JWE4GZ33H6R6XSPK",
+      "parent": "01JGFJJZ00WZVC04BQDT6VFK9K",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMIVKZGNTMADQRXKQGI",
-      "parent": "AGNSGBBCMK5WSLPVZSCSWOJ4QM",
       "code": "6.3.1",
-      "title": "Manage Performance and Development",
-      "description": "Evaluate and develop employees.",
+      "title": "Register products",
+      "id": "01JGFJJZ008TPPSNRQC3D1FTY9",
+      "parent": "01JGFJJZ00JWE4GZ33H6R6XSPK",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMLIHXLPZBEC6WVOVPA",
-      "parent": "AGNSGBBCMF6KLIG55YM4WBHMKA",
+      "code": "6.3.2",
+      "title": "Process warranty claims",
+      "id": "01JGFJJZ00EFX1WPY78DHVSPTA",
+      "parent": "01JGFJJZ00JWE4GZ33H6R6XSPK",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.3.3",
+      "title": "Manage supplier recovery",
+      "id": "01JGFJJZ00KW6S5MW3BJC3TKJQ",
+      "parent": "01JGFJJZ00JWE4GZ33H6R6XSPK",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.3.4",
+      "title": "Service products",
+      "id": "01JGFJJZ00WXSTXSDM5CWRM9QG",
+      "parent": "01JGFJJZ00JWE4GZ33H6R6XSPK",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "6.4",
-      "title": "Manage Compensation and Benefits",
-      "description": "Reward and retain employees.",
+      "title": "Manage product recalls and regulatory audits",
+      "id": "01JGFJJZ009XP88GC4TAYPA85P",
+      "parent": "01JGFJJZ00WZVC04BQDT6VFK9K",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMKFGMKS2NURZMQPXZQ",
-      "parent": "AGNSGBBCMLIHXLPZBEC6WVOVPA",
       "code": "6.4.1",
-      "title": "Administer Compensation and Benefits",
-      "description": "Manage payroll and benefits.",
+      "title": "Initiate recall",
+      "id": "01JGFJJZ00XASKM7FT9FD64CKV",
+      "parent": "01JGFJJZ009XP88GC4TAYPA85P",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMLWL6YRICQ3G6LV2JY",
-      "parent": "AGNSGBBCMF6KLIG55YM4WBHMKA",
+      "code": "6.4.2",
+      "title": "Assess the likelihood and consequences of occurrence of any hazards",
+      "id": "01JGFJJZ00EJJSCCC446DV84RK",
+      "parent": "01JGFJJZ009XP88GC4TAYPA85P",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.4.3",
+      "title": "Manage recall related communications",
+      "id": "01JGFJJZ00ESNM9M7RG7BRD65R",
+      "parent": "01JGFJJZ009XP88GC4TAYPA85P",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.4.4",
+      "title": "Submit regulatory reports",
+      "id": "01JGFJJZ00Z0M4Y2BK59TSFMGC",
+      "parent": "01JGFJJZ009XP88GC4TAYPA85P",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.4.5",
+      "title": "Monitor and audit recall effectiveness",
+      "id": "01JGFJJZ00BK4AXXYW8FBH6MGM",
+      "parent": "01JGFJJZ009XP88GC4TAYPA85P",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.4.6",
+      "title": "Manage recall termination",
+      "id": "01JGFJJZ00VG3S38VP9SW4HC80",
+      "parent": "01JGFJJZ009XP88GC4TAYPA85P",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "6.5",
-      "title": "Manage Employee Relations",
-      "description": "Maintain employee engagement.",
+      "title": "Evaluate customer service operations and customer satisfaction",
+      "id": "01JGFJJZ00M8QEMJBBSR0N9WQ2",
+      "parent": "01JGFJJZ00WZVC04BQDT6VFK9K",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMLN4BD7ZKSQLYNH5FY",
-      "parent": "AGNSGBBCMLWL6YRICQ3G6LV2JY",
       "code": "6.5.1",
-      "title": "Handle Employee Relations Issues",
-      "description": "Resolve employee issues.",
+      "title": "Measure customer satisfaction with customer problems, requests, and inquiries handling",
+      "id": "01JGFJJZ00BYE7ZR0Z8R79Z1H0",
+      "parent": "01JGFJJZ00M8QEMJBBSR0N9WQ2",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMLB2V3ZVMBGFRNXLCE",
-      "parent": null,
+      "code": "6.5.2",
+      "title": "Measure customer satisfaction with customer- complaint handling and resolution",
+      "id": "01JGFJJZ007D752H8AZ2M7GKY8",
+      "parent": "01JGFJJZ00M8QEMJBBSR0N9WQ2",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.5.3",
+      "title": "Measure customer satisfaction with products and services",
+      "id": "01JGFJJZ00M44NFGZS0T8HBTTN",
+      "parent": "01JGFJJZ00M8QEMJBBSR0N9WQ2",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.5.4",
+      "title": "Evaluate and manage warranty performance",
+      "id": "01JGFJJZ00TPFH9VH6YY1GCJSH",
+      "parent": "01JGFJJZ00M8QEMJBBSR0N9WQ2",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "6.5.5",
+      "title": "Evaluate recall performance",
+      "id": "01JGFJJZ0052T0XJ2XW6P85EMH",
+      "parent": "01JGFJJZ00M8QEMJBBSR0N9WQ2",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "7",
-      "title": "Manage Information Technology",
-      "description": "Enable digital and IT capabilities.",
+      "title": "Develop and Manage Human Capital",
+      "id": "01JGFJJZ00F416K6Z45J58WHQV",
+      "parent": null,
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMI2RHMZKO4JLXRR27A",
-      "parent": "AGNSGBBCMLB2V3ZVMBGFRNXLCE",
       "code": "7.1",
-      "title": "Develop IT Strategy",
-      "description": "Align IT with business needs.",
+      "title": "Develop and manage human resources planning, policies, and strategies",
+      "id": "01JGFJJZ00EWJ4980DR88NKTZV",
+      "parent": "01JGFJJZ00F416K6Z45J58WHQV",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMJBLQP2DC624LUJCHE",
-      "parent": "AGNSGBBCMI2RHMZKO4JLXRR27A",
       "code": "7.1.1",
-      "title": "Define IT Architecture and Roadmap",
-      "description": "Set IT direction.",
+      "title": "Develop human resources strategy",
+      "id": "01JGFJJZ00YBZGRR7P2EKQSQQP",
+      "parent": "01JGFJJZ00EWJ4980DR88NKTZV",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMIEPCJEYLKYVFNJT7Q",
-      "parent": "AGNSGBBCMLB2V3ZVMBGFRNXLCE",
+      "code": "7.1.2",
+      "title": "Develop and implement workforce strategy and policies",
+      "id": "01JGFJJZ0069Y783XG6C2JHD6X",
+      "parent": "01JGFJJZ00EWJ4980DR88NKTZV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.1.3",
+      "title": "Monitor and update strategy, plans, and policies",
+      "id": "01JGFJJZ00J9251PJ7SQY3BXPX",
+      "parent": "01JGFJJZ00EWJ4980DR88NKTZV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.1.4",
+      "title": "Develop competency management models",
+      "id": "01JGFJJZ00J5YPYPFK1M9E603D",
+      "parent": "01JGFJJZ00EWJ4980DR88NKTZV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "7.2",
-      "title": "Develop and Maintain Systems",
-      "description": "Build and enhance IT systems.",
+      "title": "Recruit, source, and select employees",
+      "id": "01JGFJJZ0033PG3546XDXT3CJ2",
+      "parent": "01JGFJJZ00F416K6Z45J58WHQV",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMKKUARP4N66L4GZJOU",
-      "parent": "AGNSGBBCMIEPCJEYLKYVFNJT7Q",
       "code": "7.2.1",
-      "title": "Develop and Enhance Applications",
-      "description": "Deliver IT solutions.",
+      "title": "Manage employee requisitions",
+      "id": "01JGFJJZ00ZP8VXY5VTC8XA8TA",
+      "parent": "01JGFJJZ0033PG3546XDXT3CJ2",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMKDKB3L5WMEN2K5J24",
-      "parent": "AGNSGBBCMLB2V3ZVMBGFRNXLCE",
+      "code": "7.2.2",
+      "title": "Recruit/Source candidates",
+      "id": "01JGFJJZ003Q8EHW2VWBVEH751",
+      "parent": "01JGFJJZ0033PG3546XDXT3CJ2",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.2.3",
+      "title": "Screen and select candidates",
+      "id": "01JGFJJZ00AHPVFK258SHP29TJ",
+      "parent": "01JGFJJZ0033PG3546XDXT3CJ2",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.2.4",
+      "title": "Manage new hire/re-hire",
+      "id": "01JGFJJZ00CRJ7GJCKCZJ045E9",
+      "parent": "01JGFJJZ0033PG3546XDXT3CJ2",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.2.5",
+      "title": "Manage applicant information",
+      "id": "01JGFJJZ00M7ZVYV406DG1QDT2",
+      "parent": "01JGFJJZ0033PG3546XDXT3CJ2",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "7.3",
-      "title": "Deliver IT Services",
-      "description": "Operate IT services.",
+      "title": "Manage employee onboarding, training, and development",
+      "id": "01JGFJJZ007Q7V0319P5D40BD6",
+      "parent": "01JGFJJZ00F416K6Z45J58WHQV",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMKYF5WLXWZ6CFAQIZM",
-      "parent": "AGNSGBBCMKDKB3L5WMEN2K5J24",
       "code": "7.3.1",
-      "title": "Operate and Support IT Services",
-      "description": "Run IT operations.",
+      "title": "Manage employee orientation and deployment",
+      "id": "01JGFJJZ00F2Z5703QGEVE3KG8",
+      "parent": "01JGFJJZ007Q7V0319P5D40BD6",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMJMBAFWHCF2ZWELGCE",
-      "parent": null,
+      "code": "7.3.2",
+      "title": "Manage employee performance",
+      "id": "01JGFJJZ0023DJYP00Z3BFMS97",
+      "parent": "01JGFJJZ007Q7V0319P5D40BD6",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.3.3",
+      "title": "Manage employee career development",
+      "id": "01JGFJJZ00PYP6HBWEA5D8ESH5",
+      "parent": "01JGFJJZ007Q7V0319P5D40BD6",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.3.4",
+      "title": "Develop and train employees",
+      "id": "01JGFJJZ002XCDPVFK757GBQ2Y",
+      "parent": "01JGFJJZ007Q7V0319P5D40BD6",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.4",
+      "title": "Manage employee relations",
+      "id": "01JGFJJZ00VQPW6SVHBSC82290",
+      "parent": "01JGFJJZ00F416K6Z45J58WHQV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.4.1",
+      "title": "Manage labor relations",
+      "id": "01JGFJJZ003QRY5FKPVKV51W3P",
+      "parent": "01JGFJJZ00VQPW6SVHBSC82290",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.4.2",
+      "title": "Manage collective bargaining process",
+      "id": "01JGFJJZ00FGT8TX158KWBA5K2",
+      "parent": "01JGFJJZ00VQPW6SVHBSC82290",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.4.3",
+      "title": "Manage labor management partnerships",
+      "id": "01JGFJJZ00D0GSXR5130N2N2V5",
+      "parent": "01JGFJJZ00VQPW6SVHBSC82290",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.4.4",
+      "title": "Manage employee grievances",
+      "id": "01JGFJJZ007KQ0PXBP94073MTK",
+      "parent": "01JGFJJZ00VQPW6SVHBSC82290",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.4.5",
+      "title": "Monitor legal and regulatory environment",
+      "id": "01JGFJJZ008M0V2RJZVG38HZDF",
+      "parent": "01JGFJJZ00VQPW6SVHBSC82290",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.5",
+      "title": "Reward and retain employees",
+      "id": "01JGFJJZ00RH4NV9TGJQ34QX70",
+      "parent": "01JGFJJZ00F416K6Z45J58WHQV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.5.1",
+      "title": "Develop and manage reward, recognition, and motivation programs",
+      "id": "01JGFJJZ00GEDK06XDJN6MNTTG",
+      "parent": "01JGFJJZ00RH4NV9TGJQ34QX70",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.5.2",
+      "title": "Manage and administer benefits",
+      "id": "01JGFJJZ00PR37D4WG5S4F2S63",
+      "parent": "01JGFJJZ00RH4NV9TGJQ34QX70",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.5.3",
+      "title": "Manage employee assistance and retention",
+      "id": "01JGFJJZ00J7SYW3D26VKRVP7W",
+      "parent": "01JGFJJZ00RH4NV9TGJQ34QX70",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.5.4",
+      "title": "Administer payroll",
+      "id": "01JGFJJZ002G2AGANKXR7F650A",
+      "parent": "01JGFJJZ00RH4NV9TGJQ34QX70",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.6",
+      "title": "Redeploy and retire employees",
+      "id": "01JGFJJZ007F3QQYB5B3M18FFV",
+      "parent": "01JGFJJZ00F416K6Z45J58WHQV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.6.1",
+      "title": "Manage promotion and demotion process",
+      "id": "01JGFJJZ00WXJPRSRTWBDKRK89",
+      "parent": "01JGFJJZ007F3QQYB5B3M18FFV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.6.2",
+      "title": "Manage separation",
+      "id": "01JGFJJZ00PVMGE883ZS8Z6539",
+      "parent": "01JGFJJZ007F3QQYB5B3M18FFV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.6.3",
+      "title": "Manage retirement",
+      "id": "01JGFJJZ00W7SPMVZE7N0F8TSX",
+      "parent": "01JGFJJZ007F3QQYB5B3M18FFV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.6.4",
+      "title": "Manage leave of absence",
+      "id": "01JGFJJZ00JE86G8KKDZ9RCM67",
+      "parent": "01JGFJJZ007F3QQYB5B3M18FFV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.6.5",
+      "title": "Develop and implement employee outplacement",
+      "id": "01JGFJJZ00BT4GX11EVEV6DGP7",
+      "parent": "01JGFJJZ007F3QQYB5B3M18FFV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.6.6",
+      "title": "Manage workforce scheduling",
+      "id": "01JGFJJZ004ZHG8J5672DJ112G",
+      "parent": "01JGFJJZ007F3QQYB5B3M18FFV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.6.7",
+      "title": "Relocate employees and manage assignments",
+      "id": "01JGFJJZ00298EZCAHCXBQG2FZ",
+      "parent": "01JGFJJZ007F3QQYB5B3M18FFV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.7",
+      "title": "Manage employee information and analytics",
+      "id": "01JGFJJZ001C60EN22C9DNW89Q",
+      "parent": "01JGFJJZ00F416K6Z45J58WHQV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.7.1",
+      "title": "Manage reporting processes",
+      "id": "01JGFJJZ0021R2CTBNS10C2HJ2",
+      "parent": "01JGFJJZ001C60EN22C9DNW89Q",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.7.2",
+      "title": "Manage employee inquiry process",
+      "id": "01JGFJJZ00XY8D5NBGG7ZPAERZ",
+      "parent": "01JGFJJZ001C60EN22C9DNW89Q",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.7.3",
+      "title": "Manage and maintain employee data",
+      "id": "01JGFJJZ00HX9KQJTC92ECM564",
+      "parent": "01JGFJJZ001C60EN22C9DNW89Q",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.7.4",
+      "title": "Manage human resource information systems HRIS",
+      "id": "01JGFJJZ00J89JHZHG5E095BRV",
+      "parent": "01JGFJJZ001C60EN22C9DNW89Q",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.7.5",
+      "title": "Develop and manage employee measures",
+      "id": "01JGFJJZ009XJQD202N2DSX1KZ",
+      "parent": "01JGFJJZ001C60EN22C9DNW89Q",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.7.6",
+      "title": "Develop and manage time and attendance systems",
+      "id": "01JGFJJZ002Z1V06K4FXZ2P88Y",
+      "parent": "01JGFJJZ001C60EN22C9DNW89Q",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.7.7",
+      "title": "Develop workforce analytics",
+      "id": "01JGFJJZ00TW4AE5F96RCKNMNG",
+      "parent": "01JGFJJZ001C60EN22C9DNW89Q",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.7.8",
+      "title": "Implement workforce analytics",
+      "id": "01JGFJJZ008VSYMT6YWGR15Z5D",
+      "parent": "01JGFJJZ001C60EN22C9DNW89Q",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.7.9",
+      "title": "Manage/Collect employee suggestions and perform employee research",
+      "id": "01JGFJJZ00H5C3KFDZT6D99MDD",
+      "parent": "01JGFJJZ001C60EN22C9DNW89Q",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.8",
+      "title": "Manage employee communication",
+      "id": "01JGFJJZ003N2B8Q1712Y1FJSW",
+      "parent": "01JGFJJZ00F416K6Z45J58WHQV",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.8.1",
+      "title": "Develop employee communication plan",
+      "id": "01JGFJJZ00NBSKTRW75QDHTAF7",
+      "parent": "01JGFJJZ003N2B8Q1712Y1FJSW",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.8.2",
+      "title": "Conduct employee engagement surveys",
+      "id": "01JGFJJZ00T51ZN2FGXNKVKQRR",
+      "parent": "01JGFJJZ003N2B8Q1712Y1FJSW",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "7.8.3",
+      "title": "Deliver employee communications",
+      "id": "01JGFJJZ00EG00DETVHH65GVQM",
+      "parent": "01JGFJJZ003N2B8Q1712Y1FJSW",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "8",
-      "title": "Manage Financial Resources",
-      "description": "Plan and control financial performance.",
+      "title": "Manage Information Technology (IT)",
+      "id": "01JGFJJZ005HH44CPDT8GQE4MM",
+      "parent": null,
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
-          "label": "Administrative",
-          "icon": "Award",
-          "color": "slate"
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMK3LYUIWNRZVHLLJTQ",
-      "parent": "AGNSGBBCMJMBAFWHCF2ZWELGCE",
       "code": "8.1",
-      "title": "Plan and Budget",
-      "description": "Define financial plans.",
+      "title": "Develop and manage IT customer relationships",
+      "id": "01JGFJJZ00EXCZJK0MKZ7J7AW5",
+      "parent": "01JGFJJZ005HH44CPDT8GQE4MM",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
-          "label": "Administrative",
-          "icon": "Award",
-          "color": "slate"
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMKZENOMDJV2AXBIKMI",
-      "parent": "AGNSGBBCMK3LYUIWNRZVHLLJTQ",
       "code": "8.1.1",
-      "title": "Develop Budgets and Forecasts",
-      "description": "Prepare financial plans.",
+      "title": "Understand IT customer needs",
+      "id": "01JGFJJZ000MDMSDR7FJFRGWMP",
+      "parent": "01JGFJJZ00EXCZJK0MKZ7J7AW5",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
-          "label": "Administrative",
-          "icon": "Award",
-          "color": "slate"
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMLMZQ7XYBMFK6LHSGQ",
-      "parent": "AGNSGBBCMJMBAFWHCF2ZWELGCE",
+      "code": "8.1.2",
+      "title": "Identify IT customer transformation needs",
+      "id": "01JGFJJZ00KB4KQM9T2T60VSBK",
+      "parent": "01JGFJJZ00EXCZJK0MKZ7J7AW5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.1.3",
+      "title": "Plan and communicate IT services",
+      "id": "01JGFJJZ00YHW4TM93GHH4KF70",
+      "parent": "01JGFJJZ00EXCZJK0MKZ7J7AW5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.1.4",
+      "title": "Provide IT transformation guidance",
+      "id": "01JGFJJZ003SZA2P9GHSKR7XG2",
+      "parent": "01JGFJJZ00EXCZJK0MKZ7J7AW5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.1.5",
+      "title": "Develop and manage IT service levels",
+      "id": "01JGFJJZ00RRYHPEFF036QN4PR",
+      "parent": "01JGFJJZ00EXCZJK0MKZ7J7AW5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.1.6",
+      "title": "Manage IT customer relationships",
+      "id": "01JGFJJZ00S33M796QWFKV2Q5Y",
+      "parent": "01JGFJJZ00EXCZJK0MKZ7J7AW5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.1.7",
+      "title": "Analyze service performance",
+      "id": "01JGFJJZ00P8BEJCT7BBZYP0HH",
+      "parent": "01JGFJJZ00EXCZJK0MKZ7J7AW5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "8.2",
-      "title": "Perform Accounting",
-      "description": "Record and report finances.",
+      "title": "Develop and manage IT business strategy",
+      "id": "01JGFJJZ00GGZ513NV21A23EYY",
+      "parent": "01JGFJJZ005HH44CPDT8GQE4MM",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
-          "label": "Administrative",
-          "icon": "Award",
-          "color": "slate"
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMI5TLV57XTYROEK5UU",
-      "parent": "AGNSGBBCMLMZQ7XYBMFK6LHSGQ",
       "code": "8.2.1",
-      "title": "Record Financial Transactions",
-      "description": "Maintain accounting records.",
+      "title": "Define business technology and governance strategy",
+      "id": "01JGFJJZ005NJ4AKVXRCBKJ7TE",
+      "parent": "01JGFJJZ00GGZ513NV21A23EYY",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
-          "label": "Administrative",
-          "icon": "Award",
-          "color": "slate"
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMLNYTMZRAGP3BPW46Y",
-      "parent": "AGNSGBBCMJMBAFWHCF2ZWELGCE",
+      "code": "8.2.2",
+      "title": "Manage IT portfolio strategy",
+      "id": "01JGFJJZ00A2TGTJYFPNJQCTJJ",
+      "parent": "01JGFJJZ00GGZ513NV21A23EYY",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.2.3",
+      "title": "Define and maintain enterprise architecture",
+      "id": "01JGFJJZ00BRYM8B3FP1B36DES",
+      "parent": "01JGFJJZ00GGZ513NV21A23EYY",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.2.4",
+      "title": "Define IT service management strategy",
+      "id": "01JGFJJZ00ATSK37F4HNX4K9VJ",
+      "parent": "01JGFJJZ00GGZ513NV21A23EYY",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.2.5",
+      "title": "Control IT management system",
+      "id": "01JGFJJZ009JTZF7VGX2X0QBWE",
+      "parent": "01JGFJJZ00GGZ513NV21A23EYY",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.2.6",
+      "title": "Manage IT value portfolio",
+      "id": "01JGFJJZ00Q7DCWV6Q4YGWX709",
+      "parent": "01JGFJJZ00GGZ513NV21A23EYY",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.2.7",
+      "title": "Define and manage technology innovation",
+      "id": "01JGFJJZ00SW6ZCCBR6ZJJ490G",
+      "parent": "01JGFJJZ00GGZ513NV21A23EYY",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "8.3",
-      "title": "Manage Treasury",
-      "description": "Manage cash and funding.",
+      "title": "Develop and manage IT resilience and risk",
+      "id": "01JGFJJZ0003E1S0SC32GV67M8",
+      "parent": "01JGFJJZ005HH44CPDT8GQE4MM",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
-          "label": "Administrative",
-          "icon": "Award",
-          "color": "slate"
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMLQSVHKVDMMRQD5CSM",
-      "parent": "AGNSGBBCMLNYTMZRAGP3BPW46Y",
       "code": "8.3.1",
-      "title": "Manage Cash and Investments",
-      "description": "Control liquidity.",
+      "title": "Develop IT compliance, risk, and security strategy",
+      "id": "01JGFJJZ00NSKRAAJM71060275",
+      "parent": "01JGFJJZ0003E1S0SC32GV67M8",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
-          "label": "Administrative",
-          "icon": "Award",
-          "color": "slate"
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMIL46XNCVLVRKYBD7I",
-      "parent": null,
+      "code": "8.3.2",
+      "title": "Develop IT resilience strategy",
+      "id": "01JGFJJZ00S35B7CDXRFGBK3KB",
+      "parent": "01JGFJJZ0003E1S0SC32GV67M8",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.3.3",
+      "title": "Control IT risk, compliance, and security",
+      "id": "01JGFJJZ0013TVHJR6HJPG4W5A",
+      "parent": "01JGFJJZ0003E1S0SC32GV67M8",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.3.4",
+      "title": "Plan and manage IT continuity",
+      "id": "01JGFJJZ00B7MHEZYXW56WASS7",
+      "parent": "01JGFJJZ0003E1S0SC32GV67M8",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.3.5",
+      "title": "Develop and manage IT security, privacy, and data protection",
+      "id": "01JGFJJZ00633HRC5Q3GGT92AZ",
+      "parent": "01JGFJJZ0003E1S0SC32GV67M8",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.3.6",
+      "title": "Conduct and analyze IT compliance assessments",
+      "id": "01JGFJJZ000GM8H838Y2H5MEGF",
+      "parent": "01JGFJJZ0003E1S0SC32GV67M8",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.3.7",
+      "title": "Develop and execute IT resilience and continuity operations",
+      "id": "01JGFJJZ00VSXD6VVZZ36FCZD2",
+      "parent": "01JGFJJZ0003E1S0SC32GV67M8",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.3.8",
+      "title": "Manage IT user identity and authorization",
+      "id": "01JGFJJZ00S170HDEZF1V564RW",
+      "parent": "01JGFJJZ0003E1S0SC32GV67M8",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.4",
+      "title": "Manage information",
+      "id": "01JGFJJZ002RY843CNES0J13K4",
+      "parent": "01JGFJJZ005HH44CPDT8GQE4MM",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.4.1",
+      "title": "Define business information and analytics strategy",
+      "id": "01JGFJJZ008GW6CXM4K45YB5SK",
+      "parent": "01JGFJJZ002RY843CNES0J13K4",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.4.2",
+      "title": "Define and maintain business information architecture",
+      "id": "01JGFJJZ00PZJK0ECXTMXGN1ZB",
+      "parent": "01JGFJJZ002RY843CNES0J13K4",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.4.3",
+      "title": "Define and execute business information lifecycle planning and control",
+      "id": "01JGFJJZ00ZYHZPZ054595KEPR",
+      "parent": "01JGFJJZ002RY843CNES0J13K4",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.4.4",
+      "title": "Manage business information",
+      "id": "01JGFJJZ0055KAVX4H6GDC0Y4H",
+      "parent": "01JGFJJZ002RY843CNES0J13K4",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.5",
+      "title": "Develop and manage services/solutions",
+      "id": "01JGFJJZ00SHQJN987YTGZFQHD",
+      "parent": "01JGFJJZ005HH44CPDT8GQE4MM",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.5.1",
+      "title": "Develop service/solution and integration strategy",
+      "id": "01JGFJJZ00291RVXV1Q0Y4P5YN",
+      "parent": "01JGFJJZ00SHQJN987YTGZFQHD",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.5.2",
+      "title": "Manage service/solution lifecycle planning",
+      "id": "01JGFJJZ003MH4HMDW6HW3YVWW",
+      "parent": "01JGFJJZ00SHQJN987YTGZFQHD",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.5.3",
+      "title": "Develop and manage service/solution architecture",
+      "id": "01JGFJJZ009H6WYJ04MSZTR4XW",
+      "parent": "01JGFJJZ00SHQJN987YTGZFQHD",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.5.4",
+      "title": "Execute IT service/solution creation and testing",
+      "id": "01JGFJJZ00C8HF8PYA2NPEHMFX",
+      "parent": "01JGFJJZ00SHQJN987YTGZFQHD",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.5.5",
+      "title": "Perform service/solution maintenance and testing",
+      "id": "01JGFJJZ00CE1T0BWFG51VNZ8Y",
+      "parent": "01JGFJJZ00SHQJN987YTGZFQHD",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.6",
+      "title": "Deploy services/solutions",
+      "id": "01JGFJJZ00DQ2GMBYKXY1M65CP",
+      "parent": "01JGFJJZ005HH44CPDT8GQE4MM",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.6.1",
+      "title": "Develop and manage service/solution deployment strategy",
+      "id": "01JGFJJZ00BTJP04N0XAKG5C8N",
+      "parent": "01JGFJJZ00DQ2GMBYKXY1M65CP",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.6.2",
+      "title": "Plan service and solution implementation",
+      "id": "01JGFJJZ00RBCT2MJJ520NMEG3",
+      "parent": "01JGFJJZ00DQ2GMBYKXY1M65CP",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.6.3",
+      "title": "Manage change deployment control",
+      "id": "01JGFJJZ00853S7377ERJKEQWG",
+      "parent": "01JGFJJZ00DQ2GMBYKXY1M65CP",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.6.4",
+      "title": "Implement technology solutions",
+      "id": "01JGFJJZ000YGPDCJPS40XGQB9",
+      "parent": "01JGFJJZ00DQ2GMBYKXY1M65CP",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.6.5",
+      "title": "Perform service and solution rollout",
+      "id": "01JGFJJZ00TY98AQ3W89FFWY1P",
+      "parent": "01JGFJJZ00DQ2GMBYKXY1M65CP",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.7",
+      "title": "Create and manage support services/solutions",
+      "id": "01JGFJJZ00GWCWHEEP7HJ4VWX5",
+      "parent": "01JGFJJZ005HH44CPDT8GQE4MM",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.7.1",
+      "title": "Define and establish service delivery strategy",
+      "id": "01JGFJJZ00M88M75HRYQRFY4CH",
+      "parent": "01JGFJJZ00GWCWHEEP7HJ4VWX5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.7.2",
+      "title": "Define and develop service support strategy",
+      "id": "01JGFJJZ0013Y810D3NP73AVCY",
+      "parent": "01JGFJJZ00GWCWHEEP7HJ4VWX5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.7.3",
+      "title": "Plan and manage service delivery control",
+      "id": "01JGFJJZ00YRN5PEM7DRD2S236",
+      "parent": "01JGFJJZ00GWCWHEEP7HJ4VWX5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.7.4",
+      "title": "Develop and manage infrastructure resource planning",
+      "id": "01JGFJJZ009EVVSZPTTWQ19G07",
+      "parent": "01JGFJJZ00GWCWHEEP7HJ4VWX5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.7.5",
+      "title": "Define service support planning",
+      "id": "01JGFJJZ00ET2CYVJNQAH7EKMK",
+      "parent": "01JGFJJZ00GWCWHEEP7HJ4VWX5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.7.6",
+      "title": "Develop and manage service delivery operations",
+      "id": "01JGFJJZ00TEAQKGFS44N8T9Q1",
+      "parent": "01JGFJJZ00GWCWHEEP7HJ4VWX5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.7.7",
+      "title": "Manage infrastructure resource administration",
+      "id": "01JGFJJZ003BBKWMRRF06V0C6P",
+      "parent": "01JGFJJZ00GWCWHEEP7HJ4VWX5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "8.7.8",
+      "title": "Operate IT user support",
+      "id": "01JGFJJZ00DMFKMYZZQ70TF2A1",
+      "parent": "01JGFJJZ00GWCWHEEP7HJ4VWX5",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "9",
-      "title": "Manage Risk, Compliance, and Quality",
-      "description": "Ensure compliance and risk control.",
+      "title": "Manage Financial Resources",
+      "id": "01JGFJJZ0035C1W9YYFKPG1ZRW",
+      "parent": null,
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMIRVDWLJQR4266MKOI",
-      "parent": "AGNSGBBCMIL46XNCVLVRKYBD7I",
       "code": "9.1",
-      "title": "Manage Enterprise Risk",
-      "description": "Identify and mitigate risks.",
+      "title": "Perform planning and management accounting",
+      "id": "01JGFJJZ0024WMQXSGFYF58ZY2",
+      "parent": "01JGFJJZ0035C1W9YYFKPG1ZRW",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMI6AVYKACIKMLUSWMA",
-      "parent": "AGNSGBBCMIRVDWLJQR4266MKOI",
       "code": "9.1.1",
-      "title": "Identify and Assess Risk",
-      "description": "Perform risk assessments.",
+      "title": "Perform planning/budgeting/forecasting",
+      "id": "01JGFJJZ00MFA4KQWSM1H6TCFW",
+      "parent": "01JGFJJZ0024WMQXSGFYF58ZY2",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMLP2W6ZRESX6UPIELE",
-      "parent": "AGNSGBBCMIL46XNCVLVRKYBD7I",
+      "code": "9.1.2",
+      "title": "Perform cost accounting and control",
+      "id": "01JGFJJZ006VNYG42CK7143ZD9",
+      "parent": "01JGFJJZ0024WMQXSGFYF58ZY2",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.1.3",
+      "title": "Perform cost management",
+      "id": "01JGFJJZ005SDE1JCK33SX63CE",
+      "parent": "01JGFJJZ0024WMQXSGFYF58ZY2",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.1.4",
+      "title": "Evaluate and manage financial performance",
+      "id": "01JGFJJZ00A3JS0C64GNG403P5",
+      "parent": "01JGFJJZ0024WMQXSGFYF58ZY2",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "9.2",
-      "title": "Manage Quality",
-      "description": "Ensure product and process quality.",
+      "title": "Perform revenue accounting",
+      "id": "01JGFJJZ00SF6212F2X4HMM6SR",
+      "parent": "01JGFJJZ0035C1W9YYFKPG1ZRW",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMMIZAYBYQEVU7ELEEM",
-      "parent": "AGNSGBBCMLP2W6ZRESX6UPIELE",
       "code": "9.2.1",
-      "title": "Operate Quality Management System",
-      "description": "Maintain QMS.",
+      "title": "Process customer credit",
+      "id": "01JGFJJZ004CCMRZ33D49RYECW",
+      "parent": "01JGFJJZ00SF6212F2X4HMM6SR",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMOSYI7KV3ZXPXB3ZVI",
-      "parent": "AGNSGBBCMIL46XNCVLVRKYBD7I",
+      "code": "9.2.2",
+      "title": "Invoice customer",
+      "id": "01JGFJJZ003SEBF04EKAQGWBQD",
+      "parent": "01JGFJJZ00SF6212F2X4HMM6SR",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.2.3",
+      "title": "Process accounts receivable (AR)",
+      "id": "01JGFJJZ009F0568J3RTKMG3DB",
+      "parent": "01JGFJJZ00SF6212F2X4HMM6SR",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.2.4",
+      "title": "Manage and process collections",
+      "id": "01JGFJJZ00R2NQDRMNCX8PDRCD",
+      "parent": "01JGFJJZ00SF6212F2X4HMM6SR",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.2.5",
+      "title": "Manage and process adjustments/deductions",
+      "id": "01JGFJJZ00A7K4QXJG58ETC07V",
+      "parent": "01JGFJJZ00SF6212F2X4HMM6SR",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "9.3",
-      "title": "Ensure Regulatory Compliance",
-      "description": "Meet regulatory requirements.",
+      "title": "Perform general accounting and reporting",
+      "id": "01JGFJJZ00C2HQ1M3DMWYN2VKA",
+      "parent": "01JGFJJZ0035C1W9YYFKPG1ZRW",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMM27LQYTBYB7OKUAAU",
-      "parent": "AGNSGBBCMOSYI7KV3ZXPXB3ZVI",
       "code": "9.3.1",
-      "title": "Manage Regulatory Compliance",
-      "description": "Ensure regulatory adherence.",
+      "title": "Manage financial policies and procedures",
+      "id": "01JGFJJZ0022X76WMG6YQHH8G5",
+      "parent": "01JGFJJZ00C2HQ1M3DMWYN2VKA",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
           "label": "Supportive",
           "icon": "Archive",
-          "color": "amber"
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMN4XQDODXIRLXJ3QJU",
-      "parent": null,
+      "code": "9.3.2",
+      "title": "Perform general accounting",
+      "id": "01JGFJJZ00D6N1H8V33T8C9ARG",
+      "parent": "01JGFJJZ00C2HQ1M3DMWYN2VKA",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.3.3",
+      "title": "Perform fixed-asset accounting",
+      "id": "01JGFJJZ00J2HJ3M7XMZBPW9W1",
+      "parent": "01JGFJJZ00C2HQ1M3DMWYN2VKA",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.3.4",
+      "title": "Perform financial reporting",
+      "id": "01JGFJJZ00RPS5YKPZV04QDTSX",
+      "parent": "01JGFJJZ00C2HQ1M3DMWYN2VKA",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.4",
+      "title": "Manage fixed-asset project accounting",
+      "id": "01JGFJJZ005DJ0C8APFMN9JM1A",
+      "parent": "01JGFJJZ0035C1W9YYFKPG1ZRW",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.4.1",
+      "title": "Perform capital planning and project approval",
+      "id": "01JGFJJZ0028NQG1BREAGBYRBG",
+      "parent": "01JGFJJZ005DJ0C8APFMN9JM1A",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.4.2",
+      "title": "Perform capital project accounting",
+      "id": "01JGFJJZ005Y4GVM9GDG2S8FR0",
+      "parent": "01JGFJJZ005DJ0C8APFMN9JM1A",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.5",
+      "title": "Process payroll",
+      "id": "01JGFJJZ00W2R40HQVZF4PYD1Q",
+      "parent": "01JGFJJZ0035C1W9YYFKPG1ZRW",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.5.1",
+      "title": "Report time",
+      "id": "01JGFJJZ0071Z96D72DE45750Y",
+      "parent": "01JGFJJZ00W2R40HQVZF4PYD1Q",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.5.2",
+      "title": "Manage pay",
+      "id": "01JGFJJZ00FVR4X2JYA3HSH7DM",
+      "parent": "01JGFJJZ00W2R40HQVZF4PYD1Q",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.5.3",
+      "title": "Manage and process payroll taxes",
+      "id": "01JGFJJZ009EJYEP6EDG03KKBP",
+      "parent": "01JGFJJZ00W2R40HQVZF4PYD1Q",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.6",
+      "title": "Process accounts payable and expense reimbursements",
+      "id": "01JGFJJZ005X9H0ZS0TNQAHXVS",
+      "parent": "01JGFJJZ0035C1W9YYFKPG1ZRW",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.6.1",
+      "title": "Process accounts payable (AP)",
+      "id": "01JGFJJZ00SZKC6FCZ4237HND2",
+      "parent": "01JGFJJZ005X9H0ZS0TNQAHXVS",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.6.2",
+      "title": "Process expense reimbursements",
+      "id": "01JGFJJZ00EQBHBCTXBP5S8YGC",
+      "parent": "01JGFJJZ005X9H0ZS0TNQAHXVS",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.6.3",
+      "title": "Manage corporate credit cards",
+      "id": "01JGFJJZ00Z13NA2V2P2JNXH83",
+      "parent": "01JGFJJZ005X9H0ZS0TNQAHXVS",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.7",
+      "title": "Manage treasury operations",
+      "id": "01JGFJJZ001RJRCEZ6ZXADSK11",
+      "parent": "01JGFJJZ0035C1W9YYFKPG1ZRW",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.7.1",
+      "title": "Manage treasury policies and procedures",
+      "id": "01JGFJJZ009XK44X30GBE0976J",
+      "parent": "01JGFJJZ001RJRCEZ6ZXADSK11",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.7.2",
+      "title": "Manage cash",
+      "id": "01JGFJJZ00BB7ZZAQT0WNW1595",
+      "parent": "01JGFJJZ001RJRCEZ6ZXADSK11",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.7.3",
+      "title": "Manage in-house bank accounts",
+      "id": "01JGFJJZ0032R7CGK43N199BNP",
+      "parent": "01JGFJJZ001RJRCEZ6ZXADSK11",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.7.4",
+      "title": "Manage debt and investment",
+      "id": "01JGFJJZ00NXFTPTCNF19MVGB0",
+      "parent": "01JGFJJZ001RJRCEZ6ZXADSK11",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.7.5",
+      "title": "Monitor and execute risk and hedging transactions",
+      "id": "01JGFJJZ00Y8RH68QSB6KMCQMV",
+      "parent": "01JGFJJZ001RJRCEZ6ZXADSK11",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.7.6",
+      "title": "Manage financial fraud/dispute cases",
+      "id": "01JGFJJZ009KEGASATSJVTCYAR",
+      "parent": "01JGFJJZ001RJRCEZ6ZXADSK11",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.8",
+      "title": "Manage internal controls",
+      "id": "01JGFJJZ00ZMK3YMEJ767J46DQ",
+      "parent": "01JGFJJZ0035C1W9YYFKPG1ZRW",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.8.1",
+      "title": "Establish internal controls, policies, and procedures",
+      "id": "01JGFJJZ00Z2PG025EWJCAVKGT",
+      "parent": "01JGFJJZ00ZMK3YMEJ767J46DQ",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.8.2",
+      "title": "Operate controls and monitor compliance with internal controls policies and procedures",
+      "id": "01JGFJJZ00RK2209B969REKR3H",
+      "parent": "01JGFJJZ00ZMK3YMEJ767J46DQ",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.8.3",
+      "title": "Report on internal controls compliance",
+      "id": "01JGFJJZ00Y2JRHP96SPR1QRE5",
+      "parent": "01JGFJJZ00ZMK3YMEJ767J46DQ",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.9",
+      "title": "Manage taxes",
+      "id": "01JGFJJZ003DE1BMVQYQMD0780",
+      "parent": "01JGFJJZ0035C1W9YYFKPG1ZRW",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.9.1",
+      "title": "Develop tax strategy and plan",
+      "id": "01JGFJJZ009C124V8RJC67ZZVA",
+      "parent": "01JGFJJZ003DE1BMVQYQMD0780",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.9.2",
+      "title": "Process taxes",
+      "id": "01JGFJJZ00N55BA5T081D5XFWM",
+      "parent": "01JGFJJZ003DE1BMVQYQMD0780",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.10",
+      "title": "Manage international funds/consolidation",
+      "id": "01JGFJJZ00E0X3P955ZKXCGHZQ",
+      "parent": "01JGFJJZ0035C1W9YYFKPG1ZRW",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.10.1",
+      "title": "Monitor international rates",
+      "id": "01JGFJJZ007VMZ0EBEH6Y5W7F9",
+      "parent": "01JGFJJZ00E0X3P955ZKXCGHZQ",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.10.2",
+      "title": "Manage transactions",
+      "id": "01JGFJJZ003F3TC0GZC04M0SAZ",
+      "parent": "01JGFJJZ00E0X3P955ZKXCGHZQ",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.10.3",
+      "title": "Monitor currency exposure/hedge currency",
+      "id": "01JGFJJZ007R4N0YFS2YQJ808P",
+      "parent": "01JGFJJZ00E0X3P955ZKXCGHZQ",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.10.4",
+      "title": "Report results",
+      "id": "01JGFJJZ007E1YYGZS5N9ZYWN7",
+      "parent": "01JGFJJZ00E0X3P955ZKXCGHZQ",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.11",
+      "title": "Perform global trade services",
+      "id": "01JGFJJZ003WXYE3EGBR33404A",
+      "parent": "01JGFJJZ0035C1W9YYFKPG1ZRW",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.11.1",
+      "title": "Screen sanctioned party list",
+      "id": "01JGFJJZ001AA12C0MBHQMJ5MR",
+      "parent": "01JGFJJZ003WXYE3EGBR33404A",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.11.2",
+      "title": "Control exports and imports",
+      "id": "01JGFJJZ0044HM9FKZRB0T7Z1G",
+      "parent": "01JGFJJZ003WXYE3EGBR33404A",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.11.3",
+      "title": "Classify products",
+      "id": "01JGFJJZ00HCVA2K0ND7WBJXV2",
+      "parent": "01JGFJJZ003WXYE3EGBR33404A",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.11.4",
+      "title": "Perform currency conversion",
+      "id": "01JGFJJZ000BGC315VKXB2RYW6",
+      "parent": "01JGFJJZ003WXYE3EGBR33404A",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.11.5",
+      "title": "Calculate duty",
+      "id": "01JGFJJZ00ZAZH8JAC2MY083N9",
+      "parent": "01JGFJJZ003WXYE3EGBR33404A",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.11.6",
+      "title": "Communicate with customs",
+      "id": "01JGFJJZ002PPT7KE5SDP6PENW",
+      "parent": "01JGFJJZ003WXYE3EGBR33404A",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.11.7",
+      "title": "Document trade",
+      "id": "01JGFJJZ001XGTH3Z44PC66WHB",
+      "parent": "01JGFJJZ003WXYE3EGBR33404A",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.11.8",
+      "title": "Process trade preferences",
+      "id": "01JGFJJZ0059CNG86HQMWA253B",
+      "parent": "01JGFJJZ003WXYE3EGBR33404A",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.11.9",
+      "title": "Handle restitution",
+      "id": "01JGFJJZ006YJH7AKKWMK92C7M",
+      "parent": "01JGFJJZ003WXYE3EGBR33404A",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
+      "code": "9.11.10",
+      "title": "Prepare letter of credit",
+      "id": "01JGFJJZ00AFNMPCJEZV9X8N3P",
+      "parent": "01JGFJJZ003WXYE3EGBR33404A",
+      "entityType": [
+        {
+          "label": "Supportive",
+          "icon": "Archive",
+          "color": "amber",
+          "id": "01KCHF0R4PZBCATTGHQ58JMPY6"
+        }
+      ]
+    },
+    {
       "code": "10",
-      "title": "Manage External Relationships",
-      "description": "Manage suppliers and partners.",
+      "title": "Acquire, Construct, and Manage Assets",
+      "id": "01JGFJJZ00992DR59P882AG3Z8",
+      "parent": null,
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
-          "label": "Supportive",
-          "icon": "Archive",
-          "color": "amber"
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMMXYYCAMENXFTHH644",
-      "parent": "AGNSGBBCMN4XQDODXIRLXJ3QJU",
       "code": "10.1",
-      "title": "Manage Suppliers",
-      "description": "Source and manage suppliers.",
+      "title": "Plan and acquire assets",
+      "id": "01JGFJJZ00BB9TAWW5809HRNFS",
+      "parent": "01JGFJJZ00992DR59P882AG3Z8",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
-          "label": "Supportive",
-          "icon": "Archive",
-          "color": "amber"
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMNCBFNIH5LDDFAJV6M",
-      "parent": "AGNSGBBCMMXYYCAMENXFTHH644",
       "code": "10.1.1",
-      "title": "Evaluate and Select Suppliers",
-      "description": "Assess suppliers.",
+      "title": "Develop property strategy and long term vision",
+      "id": "01JGFJJZ00FJXJ1RV9BCFK8V4J",
+      "parent": "01JGFJJZ00BB9TAWW5809HRNFS",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
-          "label": "Supportive",
-          "icon": "Archive",
-          "color": "amber"
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMO43DJP566F7KGAMGY",
-      "parent": "AGNSGBBCMN4XQDODXIRLXJ3QJU",
+      "code": "10.1.2",
+      "title": "Plan facility",
+      "id": "01JGFJJZ00KDY8AMN3R3ZPPW11",
+      "parent": "01JGFJJZ00BB9TAWW5809HRNFS",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.1.3",
+      "title": "Provide workspace and facilities",
+      "id": "01JGFJJZ00N2ETV9RBV5XM86YS",
+      "parent": "01JGFJJZ00BB9TAWW5809HRNFS",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.1.4",
+      "title": "Manage facilities operations",
+      "id": "01JGFJJZ00ZZTH6MT9ZSKGGRFD",
+      "parent": "01JGFJJZ00BB9TAWW5809HRNFS",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
       "code": "10.2",
-      "title": "Manage Partners",
-      "description": "Manage strategic partners.",
+      "title": "Design and construct assets",
+      "id": "01JGFJJZ00Z3YCYZEVG588QY2Z",
+      "parent": "01JGFJJZ00992DR59P882AG3Z8",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
-          "label": "Supportive",
-          "icon": "Archive",
-          "color": "amber"
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMNDXFVK2V7UJTTWB4A",
-      "parent": "AGNSGBBCMO43DJP566F7KGAMGY",
       "code": "10.2.1",
-      "title": "Manage Alliances and Partnerships",
-      "description": "Oversee partnerships.",
+      "title": "Manage capital program for assets",
+      "id": "01JGFJJZ00XCYD57XJ70FKZ25Y",
+      "parent": "01JGFJJZ00Z3YCYZEVG588QY2Z",
       "entityType": [
         {
-          "id": "01KCHF0R4PZBCATTGHQ58JMPY6",
-          "label": "Supportive",
-          "icon": "Archive",
-          "color": "amber"
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMPE3BD75PIBJ24B6IU",
-      "parent": null,
+      "code": "10.2.2",
+      "title": "Design and plan asset construction",
+      "id": "01JGFJJZ00YYTZ3KJ29MTXM8VJ",
+      "parent": "01JGFJJZ00Z3YCYZEVG588QY2Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.2.3",
+      "title": "Schedule and perform construction work",
+      "id": "01JGFJJZ00895MZBEQGWV15K03",
+      "parent": "01JGFJJZ00Z3YCYZEVG588QY2Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.2.4",
+      "title": "Manage asset construction",
+      "id": "01JGFJJZ0036SMEJ28PHMP4EXQ",
+      "parent": "01JGFJJZ00Z3YCYZEVG588QY2Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.3",
+      "title": "Maintain assets",
+      "id": "01JGFJJZ009WVB42GJYST991RH",
+      "parent": "01JGFJJZ00992DR59P882AG3Z8",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.3.1",
+      "title": "Plan asset maintenance",
+      "id": "01JGFJJZ00H5YKDBG6CKW31461",
+      "parent": "01JGFJJZ009WVB42GJYST991RH",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.3.2",
+      "title": "Manage asset maintenance",
+      "id": "01JGFJJZ00PX6PEEGFRTK7HBQE",
+      "parent": "01JGFJJZ009WVB42GJYST991RH",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.3.3",
+      "title": "Perform asset maintenance",
+      "id": "01JGFJJZ006RVFXD0RVBQ91YP6",
+      "parent": "01JGFJJZ009WVB42GJYST991RH",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.4",
+      "title": "Manage asset end-of-life",
+      "id": "01JGFJJZ00FPBCBBEM94WTM31Z",
+      "parent": "01JGFJJZ00992DR59P882AG3Z8",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.4.1",
+      "title": "Develop exit strategy",
+      "id": "01JGFJJZ00PSVGVZ2SP891P7WJ",
+      "parent": "01JGFJJZ00FPBCBBEM94WTM31Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.4.2",
+      "title": "Decommission productive assets",
+      "id": "01JGFJJZ00G4XFJFY42B18X9MC",
+      "parent": "01JGFJJZ00FPBCBBEM94WTM31Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.4.3",
+      "title": "Perform sale or trade",
+      "id": "01JGFJJZ00AA51H91GXM2HVZXE",
+      "parent": "01JGFJJZ00FPBCBBEM94WTM31Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.4.4",
+      "title": "Manage take-back centers",
+      "id": "01JGFJJZ00FKXGD48338QRBDTJ",
+      "parent": "01JGFJJZ00FPBCBBEM94WTM31Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.4.5",
+      "title": "Dismantle assets",
+      "id": "01JGFJJZ00DXGQ579JQRH1B379",
+      "parent": "01JGFJJZ00FPBCBBEM94WTM31Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.4.6",
+      "title": "Track parts",
+      "id": "01JGFJJZ00EYS5AZ1PS44VS4A1",
+      "parent": "01JGFJJZ00FPBCBBEM94WTM31Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.4.7",
+      "title": "Recycle parts",
+      "id": "01JGFJJZ006V0DZRHQXGH7VP8X",
+      "parent": "01JGFJJZ00FPBCBBEM94WTM31Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.4.8",
+      "title": "Ship hazardous material",
+      "id": "01JGFJJZ00C4HD0BBE5QSDY9GP",
+      "parent": "01JGFJJZ00FPBCBBEM94WTM31Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.4.9",
+      "title": "Provide government reporting",
+      "id": "01JGFJJZ00DP04R8SFBBPTXDFY",
+      "parent": "01JGFJJZ00FPBCBBEM94WTM31Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.4.10",
+      "title": "Perform abandonment",
+      "id": "01JGFJJZ00YRD70NMMBR1D9K21",
+      "parent": "01JGFJJZ00FPBCBBEM94WTM31Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "10.4.11",
+      "title": "Perform waste and hazardous goods management",
+      "id": "01JGFJJZ00RV24SJFG0W1V2AT2",
+      "parent": "01JGFJJZ00FPBCBBEM94WTM31Z",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
       "code": "11",
-      "title": "Manage Legal and Ethics",
-      "description": "Provide legal governance.",
+      "title": "Manage Enterprise Risk, Compliance, Remediation, and Resiliency",
+      "id": "01JGFJJZ009Z42P9NESD3X51MC",
+      "parent": null,
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
           "label": "Administrative",
           "icon": "Award",
-          "color": "slate"
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMP2ARYUM42XVZIZHXQ",
-      "parent": "AGNSGBBCMPE3BD75PIBJ24B6IU",
       "code": "11.1",
-      "title": "Provide Legal Services",
-      "description": "Deliver legal support.",
+      "title": "Manage enterprise risk",
+      "id": "01JGFJJZ00H3FCMYS5P2RTPCJK",
+      "parent": "01JGFJJZ009Z42P9NESD3X51MC",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
           "label": "Administrative",
           "icon": "Award",
-          "color": "slate"
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMNWFBUMLQQIRCWWQHE",
-      "parent": "AGNSGBBCMP2ARYUM42XVZIZHXQ",
       "code": "11.1.1",
-      "title": "Provide Legal Advice",
-      "description": "Support business legally.",
+      "title": "Establish the enterprise risk framework and policies",
+      "id": "01JGFJJZ0074G3HWCA53XXJ40A",
+      "parent": "01JGFJJZ00H3FCMYS5P2RTPCJK",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
           "label": "Administrative",
           "icon": "Award",
-          "color": "slate"
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMNEMF67OLPMSDULCXI",
-      "parent": "AGNSGBBCMPE3BD75PIBJ24B6IU",
+      "code": "11.1.2",
+      "title": "Oversee and coordinate enterprise risk management activities",
+      "id": "01JGFJJZ006MY7QF4KA38WXMEW",
+      "parent": "01JGFJJZ00H3FCMYS5P2RTPCJK",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.1.3",
+      "title": "Manage business unit and function risk",
+      "id": "01JGFJJZ00MWEWVHCTQJAAVGQF",
+      "parent": "01JGFJJZ00H3FCMYS5P2RTPCJK",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
       "code": "11.2",
-      "title": "Manage Ethics and Compliance",
-      "description": "Ensure ethical conduct.",
+      "title": "Manage compliance",
+      "id": "01JGFJJZ000E662V2R0D7CAXZE",
+      "parent": "01JGFJJZ009Z42P9NESD3X51MC",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
           "label": "Administrative",
           "icon": "Award",
-          "color": "slate"
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMMY2JWGUQ646H6GY34",
-      "parent": "AGNSGBBCMNEMF67OLPMSDULCXI",
       "code": "11.2.1",
-      "title": "Manage Ethics Programs",
-      "description": "Oversee ethics.",
+      "title": "Establish compliance framework and policies",
+      "id": "01JGFJJZ00C6N5D7Q0TJMN16PV",
+      "parent": "01JGFJJZ000E662V2R0D7CAXZE",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
           "label": "Administrative",
           "icon": "Award",
-          "color": "slate"
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMSOD5Z3ROF23G6XAT4",
-      "parent": null,
+      "code": "11.2.2",
+      "title": "Manage regulatory compliance",
+      "id": "01JGFJJZ00P5J0XJ97S53QPT45",
+      "parent": "01JGFJJZ000E662V2R0D7CAXZE",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.3",
+      "title": "Manage remediation efforts",
+      "id": "01JGFJJZ00KYQQY4VNG4TCHGXD",
+      "parent": "01JGFJJZ009Z42P9NESD3X51MC",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.3.1",
+      "title": "Create remediation plans",
+      "id": "01JGFJJZ00HCBKM9BDEA5WVQS5",
+      "parent": "01JGFJJZ00KYQQY4VNG4TCHGXD",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.3.2",
+      "title": "Contact and confer with experts",
+      "id": "01JGFJJZ00DAY1QVTXK6C69BVR",
+      "parent": "01JGFJJZ00KYQQY4VNG4TCHGXD",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.3.3",
+      "title": "Identify/dedicate resources",
+      "id": "01JGFJJZ009MH5JBCACTPW4TZ1",
+      "parent": "01JGFJJZ00KYQQY4VNG4TCHGXD",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.3.4",
+      "title": "Investigate legal aspects",
+      "id": "01JGFJJZ00R0A7ZFF1JYNSNP83",
+      "parent": "01JGFJJZ00KYQQY4VNG4TCHGXD",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.3.5",
+      "title": "Investigate damage cause",
+      "id": "01JGFJJZ00W97GPNZRGD0X0WC0",
+      "parent": "01JGFJJZ00KYQQY4VNG4TCHGXD",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.3.6",
+      "title": "Amend or create policy",
+      "id": "01JGFJJZ00TBZ2M60J0F8DKW47",
+      "parent": "01JGFJJZ00KYQQY4VNG4TCHGXD",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.4",
+      "title": "Manage business resiliency",
+      "id": "01JGFJJZ00MDF6WYMBBWX4MFKA",
+      "parent": "01JGFJJZ009Z42P9NESD3X51MC",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.4.1",
+      "title": "Develop the business resilience strategy",
+      "id": "01JGFJJZ00EGEAG7JPNDQVKQCJ",
+      "parent": "01JGFJJZ00MDF6WYMBBWX4MFKA",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.4.2",
+      "title": "Perform continuous business operations planning",
+      "id": "01JGFJJZ00FJSWEB61FKZJ6E6C",
+      "parent": "01JGFJJZ00MDF6WYMBBWX4MFKA",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.4.3",
+      "title": "Test continuous business operations",
+      "id": "01JGFJJZ0043EQB6QQA53B3PE8",
+      "parent": "01JGFJJZ00MDF6WYMBBWX4MFKA",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.4.4",
+      "title": "Maintain continuous business operations",
+      "id": "01JGFJJZ000Z7F2PXR113XE27T",
+      "parent": "01JGFJJZ00MDF6WYMBBWX4MFKA",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "11.4.5",
+      "title": "Share knowledge of specific risks across other parts of the organization",
+      "id": "01JGFJJZ001AD6DYBPDRTBMJ14",
+      "parent": "01JGFJJZ00MDF6WYMBBWX4MFKA",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
       "code": "12",
-      "title": "Manage Enterprise Performance",
-      "description": "Drive performance management.",
-      "entityType": [
-        {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
-          "label": "Administrative",
-          "icon": "Award",
-          "color": "slate"
-        }
-      ]
-    },
-    {
-      "id": "AGNSGBBCMQEE75CFXB55W25XJE",
-      "parent": "AGNSGBBCMSOD5Z3ROF23G6XAT4",
-      "code": "12.1",
-      "title": "Measure Performance",
-      "description": "Track KPIs.",
-      "entityType": [
-        {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
-          "label": "Administrative",
-          "icon": "Award",
-          "color": "slate"
-        }
-      ]
-    },
-    {
-      "id": "AGNSGBBCMQAQHAQWVCWA6J7WTE",
-      "parent": "AGNSGBBCMQEE75CFXB55W25XJE",
-      "code": "12.1.1",
-      "title": "Define and Monitor KPIs",
-      "description": "Measure results.",
-      "entityType": [
-        {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
-          "label": "Administrative",
-          "icon": "Award",
-          "color": "slate"
-        }
-      ]
-    },
-    {
-      "id": "AGNSGBBCMQNAAXZHINR3JE7XZA",
-      "parent": "AGNSGBBCMSOD5Z3ROF23G6XAT4",
-      "code": "12.2",
-      "title": "Improve Performance",
-      "description": "Optimize operations.",
-      "entityType": [
-        {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
-          "label": "Administrative",
-          "icon": "Award",
-          "color": "slate"
-        }
-      ]
-    },
-    {
-      "id": "AGNSGBBCMRFVQBQ7PK6OQSZLGE",
-      "parent": "AGNSGBBCMQNAAXZHINR3JE7XZA",
-      "code": "12.2.1",
-      "title": "Execute Continuous Improvement",
-      "description": "Improve processes.",
-      "entityType": [
-        {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
-          "label": "Administrative",
-          "icon": "Award",
-          "color": "slate"
-        }
-      ]
-    },
-    {
-      "id": "AGNSGBBCMREFA6YTWR52EIZWSA",
+      "title": "Manage External Relationships",
+      "id": "01JGFJJZ00DD8X8CEZBNZH875Y",
       "parent": null,
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.1",
+      "title": "Build investor relationships",
+      "id": "01JGFJJZ00CEG37H1AWD8DY9E3",
+      "parent": "01JGFJJZ00DD8X8CEZBNZH875Y",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.1.1",
+      "title": "Plan, build, and manage lender relations",
+      "id": "01JGFJJZ007JD6J9GEPCF10DMB",
+      "parent": "01JGFJJZ00CEG37H1AWD8DY9E3",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.1.2",
+      "title": "Plan, build, and manage analyst relations",
+      "id": "01JGFJJZ00BQRQB02SFJE1VBB6",
+      "parent": "01JGFJJZ00CEG37H1AWD8DY9E3",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.1.3",
+      "title": "Communicate with shareholders",
+      "id": "01JGFJJZ00ZZJGCF6A3T1D4574",
+      "parent": "01JGFJJZ00CEG37H1AWD8DY9E3",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.2",
+      "title": "Manage government and industry relationships",
+      "id": "01JGFJJZ004RPE2PWF8PR2BPPF",
+      "parent": "01JGFJJZ00DD8X8CEZBNZH875Y",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.2.1",
+      "title": "Manage government relations",
+      "id": "01JGFJJZ009AX76Y5DAZTZ5STT",
+      "parent": "01JGFJJZ004RPE2PWF8PR2BPPF",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.2.2",
+      "title": "Manage relations with quasi-government bodies",
+      "id": "01JGFJJZ00KE9Y6KP06DMR3VK1",
+      "parent": "01JGFJJZ004RPE2PWF8PR2BPPF",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.2.3",
+      "title": "Manage relations with trade or industry groups",
+      "id": "01JGFJJZ00Y6D4Z8Z9VYEN9H4A",
+      "parent": "01JGFJJZ004RPE2PWF8PR2BPPF",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.2.4",
+      "title": "Manage lobby activities",
+      "id": "01JGFJJZ008V9SS525EMKS4YQ9",
+      "parent": "01JGFJJZ004RPE2PWF8PR2BPPF",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.3",
+      "title": "Manage relations with board of directors",
+      "id": "01JGFJJZ00SH5KXE1FBTWPSFTV",
+      "parent": "01JGFJJZ00DD8X8CEZBNZH875Y",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.3.1",
+      "title": "Report financial results",
+      "id": "01JGFJJZ001VBSC6BAV7XVC7EW",
+      "parent": "01JGFJJZ00SH5KXE1FBTWPSFTV",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.3.2",
+      "title": "Report audit findings",
+      "id": "01JGFJJZ003YMAYZMJEDQ2AGMD",
+      "parent": "01JGFJJZ00SH5KXE1FBTWPSFTV",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.4",
+      "title": "Manage legal and ethical issues",
+      "id": "01JGFJJZ0016NMT426DB6GDC46",
+      "parent": "01JGFJJZ00DD8X8CEZBNZH875Y",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.4.1",
+      "title": "Create ethics policies",
+      "id": "01JGFJJZ00T3MC3R1SDH0F6230",
+      "parent": "01JGFJJZ0016NMT426DB6GDC46",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.4.2",
+      "title": "Manage corporate governance policies",
+      "id": "01JGFJJZ00PDNZ1R0PSTTJ9VVW",
+      "parent": "01JGFJJZ0016NMT426DB6GDC46",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.4.3",
+      "title": "Develop and perform preventive law programs",
+      "id": "01JGFJJZ00RKR6PGM335CHZRFA",
+      "parent": "01JGFJJZ0016NMT426DB6GDC46",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.4.4",
+      "title": "Ensure compliance",
+      "id": "01JGFJJZ007ZBAR811AEA3GBSQ",
+      "parent": "01JGFJJZ0016NMT426DB6GDC46",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.4.5",
+      "title": "Manage outside counsel",
+      "id": "01JGFJJZ00DHJVH0FGKMPV8J0H",
+      "parent": "01JGFJJZ0016NMT426DB6GDC46",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.4.6",
+      "title": "Protect intellectual property",
+      "id": "01JGFJJZ002BAP3JMM17D51TVP",
+      "parent": "01JGFJJZ0016NMT426DB6GDC46",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.4.7",
+      "title": "Resolve disputes and litigations",
+      "id": "01JGFJJZ000E0XA3PTG7AFX8DV",
+      "parent": "01JGFJJZ0016NMT426DB6GDC46",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.4.8",
+      "title": "Provide legal advice/counseling",
+      "id": "01JGFJJZ00C9SAYBEJ2QWP1WKM",
+      "parent": "01JGFJJZ0016NMT426DB6GDC46",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.4.9",
+      "title": "Negotiate and document agreements/contracts",
+      "id": "01JGFJJZ002V8GN4ZKE160HNFY",
+      "parent": "01JGFJJZ0016NMT426DB6GDC46",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.5",
+      "title": "Manage public relations program",
+      "id": "01JGFJJZ00Q41CRHAGGE12K9RG",
+      "parent": "01JGFJJZ00DD8X8CEZBNZH875Y",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.5.1",
+      "title": "Manage community relations",
+      "id": "01JGFJJZ00C95K7E88BDMW1TPP",
+      "parent": "01JGFJJZ00Q41CRHAGGE12K9RG",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.5.2",
+      "title": "Manage media relations",
+      "id": "01JGFJJZ0007SV8WXRDM67JF98",
+      "parent": "01JGFJJZ00Q41CRHAGGE12K9RG",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.5.3",
+      "title": "Promote political stability",
+      "id": "01JGFJJZ00T9ZHARKVR298E3FT",
+      "parent": "01JGFJJZ00Q41CRHAGGE12K9RG",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.5.4",
+      "title": "Create press releases",
+      "id": "01JGFJJZ00MRX7PRWNEX3T2JB4",
+      "parent": "01JGFJJZ00Q41CRHAGGE12K9RG",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "12.5.5",
+      "title": "Issue press releases",
+      "id": "01JGFJJZ004X9JP9H5M2Z239XF",
+      "parent": "01JGFJJZ00Q41CRHAGGE12K9RG",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
       "code": "13",
-      "title": "Manage Change and Innovation",
-      "description": "Enable transformation.",
+      "title": "Develop and Manage Business Capabilities",
+      "id": "01JGFJJZ007ZDT6QR4VJ64CAC6",
+      "parent": null,
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
           "label": "Administrative",
           "icon": "Award",
-          "color": "slate"
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMR5MSQBW6FABSBOCTM",
-      "parent": "AGNSGBBCMREFA6YTWR52EIZWSA",
       "code": "13.1",
-      "title": "Manage Change",
-      "description": "Drive change.",
+      "title": "Manage business processes",
+      "id": "01JGFJJZ0041CVAJKDTFF9MW1Y",
+      "parent": "01JGFJJZ007ZDT6QR4VJ64CAC6",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
           "label": "Administrative",
           "icon": "Award",
-          "color": "slate"
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMRFSMMOXI4QEIZVOUU",
-      "parent": "AGNSGBBCMR5MSQBW6FABSBOCTM",
       "code": "13.1.1",
-      "title": "Plan and Execute Change",
-      "description": "Implement change.",
+      "title": "Establish and maintain process management governance",
+      "id": "01JGFJJZ00ZRJ14TP8FSEANDYK",
+      "parent": "01JGFJJZ0041CVAJKDTFF9MW1Y",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
           "label": "Administrative",
           "icon": "Award",
-          "color": "slate"
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMTIP7B7IVY2E7FBWBI",
-      "parent": "AGNSGBBCMREFA6YTWR52EIZWSA",
+      "code": "13.1.2",
+      "title": "Define and manage process frameworks",
+      "id": "01JGFJJZ006V2WMZ2N2G8R2BV4",
+      "parent": "01JGFJJZ0041CVAJKDTFF9MW1Y",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.1.3",
+      "title": "Define processes",
+      "id": "01JGFJJZ003RQH99MKNAB25YK8",
+      "parent": "01JGFJJZ0041CVAJKDTFF9MW1Y",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.1.4",
+      "title": "Manage process performance",
+      "id": "01JGFJJZ0085FCM1VXSFZ1KSFC",
+      "parent": "01JGFJJZ0041CVAJKDTFF9MW1Y",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.1.5",
+      "title": "Improve processes",
+      "id": "01JGFJJZ00XWSG809WPBHJN104",
+      "parent": "01JGFJJZ0041CVAJKDTFF9MW1Y",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
       "code": "13.2",
-      "title": "Manage Innovation",
-      "description": "Develop innovations.",
+      "title": "Manage portfolio, program, and project",
+      "id": "01JGFJJZ00E6PSDTNFE06QKGWV",
+      "parent": "01JGFJJZ007ZDT6QR4VJ64CAC6",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
           "label": "Administrative",
           "icon": "Award",
-          "color": "slate"
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     },
     {
-      "id": "AGNSGBBCMQ3QZPFHNMCOJLAGSM",
-      "parent": "AGNSGBBCMTIP7B7IVY2E7FBWBI",
       "code": "13.2.1",
-      "title": "Develop and Manage Innovation Pipeline",
-      "description": "Innovate systematically.",
+      "title": "Manage portfolio",
+      "id": "01JGFJJZ0099XEF8EMDN9BXMJD",
+      "parent": "01JGFJJZ00E6PSDTNFE06QKGWV",
       "entityType": [
         {
-          "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
           "label": "Administrative",
           "icon": "Award",
-          "color": "slate"
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.2.2",
+      "title": "Manage programs",
+      "id": "01JGFJJZ00NTNMTETXHB1Y5919",
+      "parent": "01JGFJJZ00E6PSDTNFE06QKGWV",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.2.3",
+      "title": "Manage projects",
+      "id": "01JGFJJZ00RZ4EPB4EC3Z81V3G",
+      "parent": "01JGFJJZ00E6PSDTNFE06QKGWV",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.3",
+      "title": "Manage enterprise quality",
+      "id": "01JGFJJZ007A3D12G848QGEET0",
+      "parent": "01JGFJJZ007ZDT6QR4VJ64CAC6",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.3.1",
+      "title": "Establish quality requirements",
+      "id": "01JGFJJZ00ANJNTR601JEHDZYT",
+      "parent": "01JGFJJZ007A3D12G848QGEET0",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.3.2",
+      "title": "Evaluate performance to requirements",
+      "id": "01JGFJJZ00R01BHQC15RG6HJPK",
+      "parent": "01JGFJJZ007A3D12G848QGEET0",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.3.3",
+      "title": "Manage non-conformance",
+      "id": "01JGFJJZ00BQB47DZ2WEKDYMJM",
+      "parent": "01JGFJJZ007A3D12G848QGEET0",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.3.4",
+      "title": "Implement and maintain the enterprise quality management system (EQMS)",
+      "id": "01JGFJJZ00A9N5N42MY25VHGGN",
+      "parent": "01JGFJJZ007A3D12G848QGEET0",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.4",
+      "title": "Manage change",
+      "id": "01JGFJJZ00PTWSTQVW44C8088G",
+      "parent": "01JGFJJZ007ZDT6QR4VJ64CAC6",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.4.1",
+      "title": "Plan for change",
+      "id": "01JGFJJZ005M9SV97WFGYW73RN",
+      "parent": "01JGFJJZ00PTWSTQVW44C8088G",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.4.2",
+      "title": "Design the change",
+      "id": "01JGFJJZ004532ANJTPFVMY0DH",
+      "parent": "01JGFJJZ00PTWSTQVW44C8088G",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.4.3",
+      "title": "Implement change",
+      "id": "01JGFJJZ00K5KGH8PD8GG2HAG9",
+      "parent": "01JGFJJZ00PTWSTQVW44C8088G",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.4.4",
+      "title": "Sustain improvement",
+      "id": "01JGFJJZ00C7AFW9ER49ERZRED",
+      "parent": "01JGFJJZ00PTWSTQVW44C8088G",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.5",
+      "title": "Develop and manage enterprise-wide knowledge management (KM) capability",
+      "id": "01JGFJJZ0097EM17CZQ6VHHNRF",
+      "parent": "01JGFJJZ007ZDT6QR4VJ64CAC6",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.5.1",
+      "title": "Develop KM strategy",
+      "id": "01JGFJJZ00BYX792YZR6Z8KC7C",
+      "parent": "01JGFJJZ0097EM17CZQ6VHHNRF",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.5.2",
+      "title": "Assess KM capabilities",
+      "id": "01JGFJJZ00CBG1KJ0J9FN7ZZP4",
+      "parent": "01JGFJJZ0097EM17CZQ6VHHNRF",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.5.3",
+      "title": "Design and implement KM capabilities",
+      "id": "01JGFJJZ00EYEJ9DMBPN811VX3",
+      "parent": "01JGFJJZ0097EM17CZQ6VHHNRF",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.5.4",
+      "title": "Evolve and sustain KM capabilities",
+      "id": "01JGFJJZ00EYK6MBV23GB98KVF",
+      "parent": "01JGFJJZ0097EM17CZQ6VHHNRF",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.6",
+      "title": "Measure and benchmark",
+      "id": "01JGFJJZ00GJJBGSHD99R9XNDB",
+      "parent": "01JGFJJZ007ZDT6QR4VJ64CAC6",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.6.1",
+      "title": "Define and manage organizational performance strategy",
+      "id": "01JGFJJZ0000ZD031G8YQDJZVV",
+      "parent": "01JGFJJZ00GJJBGSHD99R9XNDB",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.6.2",
+      "title": "Benchmark performance",
+      "id": "01JGFJJZ0028DKSB0SM29Z4GN4",
+      "parent": "01JGFJJZ00GJJBGSHD99R9XNDB",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.6.3",
+      "title": "Evaluate performance",
+      "id": "01JGFJJZ00TVBDYFJ9CCV03QW8",
+      "parent": "01JGFJJZ00GJJBGSHD99R9XNDB",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.7",
+      "title": "Develop, manage, and deliver analytics",
+      "id": "01JGFJJZ00MMKXEQYQC3X8R00J",
+      "parent": "01JGFJJZ007ZDT6QR4VJ64CAC6",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.7.1",
+      "title": "Identify needs from stakeholders",
+      "id": "01JGFJJZ00KT292R93DTZNJZ1T",
+      "parent": "01JGFJJZ00MMKXEQYQC3X8R00J",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.7.2",
+      "title": "Scope analytics project",
+      "id": "01JGFJJZ001KFET2V83Q06VG8X",
+      "parent": "01JGFJJZ00MMKXEQYQC3X8R00J",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.7.3",
+      "title": "Develop and manage hypotheses",
+      "id": "01JGFJJZ002Q74WBB6A72T3S4F",
+      "parent": "01JGFJJZ00MMKXEQYQC3X8R00J",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.7.4",
+      "title": "Collect data",
+      "id": "01JGFJJZ00C3MNMTAHQ63G313H",
+      "parent": "01JGFJJZ00MMKXEQYQC3X8R00J",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.7.5",
+      "title": "Prepare data",
+      "id": "01JGFJJZ009JZM64J36G0891AM",
+      "parent": "01JGFJJZ00MMKXEQYQC3X8R00J",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.7.6",
+      "title": "Analyze data",
+      "id": "01JGFJJZ009MYHMD5TG1HVQA4G",
+      "parent": "01JGFJJZ00MMKXEQYQC3X8R00J",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.7.7",
+      "title": "Create data models",
+      "id": "01JGFJJZ000R7R6V3MCP5PGDXP",
+      "parent": "01JGFJJZ00MMKXEQYQC3X8R00J",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.7.8",
+      "title": "Review data models with stakeholders",
+      "id": "01JGFJJZ0053K7M8F80NNV6VM8",
+      "parent": "01JGFJJZ00MMKXEQYQC3X8R00J",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.7.9",
+      "title": "Refine data models",
+      "id": "01JGFJJZ00QKKQD209FR0Q211E",
+      "parent": "01JGFJJZ00MMKXEQYQC3X8R00J",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.7.10",
+      "title": "Report on analysis",
+      "id": "01JGFJJZ009BWKM2T43EFHMQ0A",
+      "parent": "01JGFJJZ00MMKXEQYQC3X8R00J",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.7.11",
+      "title": "Identify remedial actions",
+      "id": "01JGFJJZ00QJ1C8GHHBCD0ARAM",
+      "parent": "01JGFJJZ00MMKXEQYQC3X8R00J",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.8",
+      "title": "Manage environmental health and safety (EHS)",
+      "id": "01JGFJJZ00X6CNDV9FK96DJZQT",
+      "parent": "01JGFJJZ007ZDT6QR4VJ64CAC6",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.8.1",
+      "title": "Determine environmental health and safety impacts",
+      "id": "01JGFJJZ00G9KYS6Z0CXHRNZNX",
+      "parent": "01JGFJJZ00X6CNDV9FK96DJZQT",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.8.2",
+      "title": "Develop EHS program",
+      "id": "01JGFJJZ00JRXD49SZ9Y4BHDYF",
+      "parent": "01JGFJJZ00X6CNDV9FK96DJZQT",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.8.3",
+      "title": "Monitor and manage EHS program",
+      "id": "01JGFJJZ00MKBPY7DECY91WEAP",
+      "parent": "01JGFJJZ00X6CNDV9FK96DJZQT",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.9",
+      "title": "Manage sustainability",
+      "id": "01JGFJJZ006JXQNZTDJ5HA6Y3C",
+      "parent": "01JGFJJZ007ZDT6QR4VJ64CAC6",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.9.1",
+      "title": "Develop sustainability capability",
+      "id": "01JGFJJZ00GM0ZCK8M3FCFFGPK",
+      "parent": "01JGFJJZ006JXQNZTDJ5HA6Y3C",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
+        }
+      ]
+    },
+    {
+      "code": "13.9.2",
+      "title": "Manage sustainability capability",
+      "id": "01JGFJJZ00BWXEMXT1PFSN91BP",
+      "parent": "01JGFJJZ006JXQNZTDJ5HA6Y3C",
+      "entityType": [
+        {
+          "label": "Administrative",
+          "icon": "Award",
+          "color": "slate",
+          "id": "01KCHF23V3D6MKMCJBW3WJXZX7"
         }
       ]
     }

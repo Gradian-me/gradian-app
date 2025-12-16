@@ -125,4 +125,67 @@ export const getAncestorIds = (nodeMap: Map<string, HierarchyNode>, nodeId: stri
   return ancestors;
 };
 
+/**
+ * Check if a node or any of its descendants (recursive) are in the matched set.
+ * This is used to determine if a node should be visible in search results.
+ */
+export const hasMatchingDescendant = (
+  node: HierarchyNode,
+  matchedIds: Set<string>,
+  visited: Set<string> = new Set()
+): boolean => {
+  // Avoid infinite loops in case of cycles
+  if (visited.has(node.id)) {
+    return false;
+  }
+  visited.add(node.id);
+
+  // If this node matches, return true
+  if (matchedIds.has(node.id)) {
+    return true;
+  }
+
+  // Recursively check all children
+  for (const child of node.children) {
+    if (hasMatchingDescendant(child, matchedIds, visited)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+/**
+ * Filter a hierarchy tree to only include nodes that match or have matching descendants.
+ * Returns a new filtered tree structure.
+ */
+export const filterHierarchyTree = (
+  nodes: HierarchyNode[],
+  matchedIds: Set<string>
+): HierarchyNode[] => {
+  if (matchedIds.size === 0) {
+    return nodes;
+  }
+
+  const filterNode = (node: HierarchyNode): HierarchyNode | null => {
+    // Check if this node or any descendant matches
+    if (!hasMatchingDescendant(node, matchedIds)) {
+      return null;
+    }
+
+    // Recursively filter children
+    const filteredChildren = node.children
+      .map(filterNode)
+      .filter((child): child is HierarchyNode => child !== null);
+
+    // Return a new node with filtered children
+    return {
+      ...node,
+      children: filteredChildren,
+    };
+  };
+
+  return nodes.map(filterNode).filter((node): node is HierarchyNode => node !== null);
+};
+
 

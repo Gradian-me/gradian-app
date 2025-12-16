@@ -10,7 +10,7 @@ import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { getSingleValueByRole, getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { cn } from '@/gradian-ui/shared/utils';
-import { HierarchyNode, buildHierarchyTree, getAncestorIds, getParentIdFromEntity } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
+import { HierarchyNode, buildHierarchyTree, getAncestorIds, getParentIdFromEntity, filterHierarchyTree } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
 import { HierarchyActionsMenu } from './HierarchyActionsMenu';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -227,7 +227,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                   <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                     {hasCodeField && codeFieldValue && (
                       <div className="shrink-0">
-                        <CodeBadge code={codeFieldValue} />
+                        <CodeBadge code={codeFieldValue} highlightQuery={highlightQuery} />
                       </div>
                     )}
                     <div className="text-sm font-medium text-gray-900 dark:text-gray-100 break-words">
@@ -371,15 +371,20 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
       const candidateFields = [
         getValueByRole(schema as any, data, 'title'),
         getSingleValueByRole(schema as any, data, 'subtitle', data.email),
+        getSingleValueByRole(schema as any, data, 'code'),
         data.name,
         data.title,
         data.email,
         data.description,
+        data.code,
       ];
 
       if (
         candidateFields.some(
           (val) => typeof val === 'string' && val.toLowerCase().includes(normalizedSearch)
+        ) ||
+        candidateFields.some(
+          (val) => typeof val === 'number' && String(val).toLowerCase().includes(normalizedSearch)
         )
       ) {
         matches.add(node.id);
@@ -444,8 +449,8 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
   const effectiveRoots = useMemo(() => {
     if (!normalizedSearch || matchedIds.size === 0) return roots;
 
-    // When searching, keep all roots but hierarchy visibility is controlled by highlight + expansion
-    return roots;
+    // When searching, filter to only show nodes that match or are ancestors of matches
+    return filterHierarchyTree(roots, matchedIds);
   }, [roots, normalizedSearch, matchedIds]);
 
   // Skeleton component for hierarchy cards
