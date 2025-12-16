@@ -20,6 +20,7 @@ import {
 import { ArrowLeft, Save, RefreshCw } from 'lucide-react';
 import { LogType, FORBIDDEN_ROUTES_PRODUCTION } from '@/gradian-ui/shared/constants/application-variables';
 import { Skeleton } from '@/components/ui/skeleton';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 
 interface ApplicationVariablesData {
   LOG_CONFIG: Record<string, boolean>;
@@ -104,7 +105,7 @@ export default function ApplicationVariablesPage() {
             router.push(`/authentication/login?returnUrl=${encryptedReturnUrl}`);
           }
         } catch (error) {
-          console.error('Error checking authentication:', error);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Error checking authentication: ${error instanceof Error ? error.message : String(error)}`);
           // On error, redirect to login
           const encryptedReturnUrl = encryptReturnUrl(window.location.pathname);
           router.push(`/authentication/login?returnUrl=${encryptedReturnUrl}`);
@@ -130,7 +131,7 @@ export default function ApplicationVariablesPage() {
       }
     } catch (error) {
       toast.error('Failed to load application variables');
-      console.error('Error fetching application variables:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching application variables: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setLoading(false);
     }
@@ -175,7 +176,7 @@ export default function ApplicationVariablesPage() {
       }
     } catch (error) {
       toast.error('Failed to update application variables');
-      console.error('Error updating application variables:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error updating application variables: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setSaving(false);
     }

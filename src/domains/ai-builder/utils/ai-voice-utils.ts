@@ -148,7 +148,7 @@ export async function processVoiceRequest(
         const errorMessage = await parseErrorResponse(response);
         
         if (isDevelopment) {
-          console.error('Voice transcription API error:', errorMessage);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Voice transcription API error: ${errorMessage}`);
         }
 
         return {
@@ -312,7 +312,7 @@ export async function processVoiceRequest(
       // Handle timeout errors
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {
         if (isDevelopment) {
-          console.error('Request timeout in voice transcription API:', fetchError);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Request timeout in voice transcription API: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`);
         }
         return {
           success: false,
@@ -324,7 +324,7 @@ export async function processVoiceRequest(
     }
   } catch (error) {
     if (isDevelopment) {
-      console.error('Error in voice transcription request:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error in voice transcription request: ${error instanceof Error ? error.message : String(error)}`);
     }
     return {
       success: false,

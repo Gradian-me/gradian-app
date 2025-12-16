@@ -10,6 +10,8 @@ import {
 import { hashPassword } from '@/domains/auth/utils/password.util';
 import { readSchemaData, writeSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
 import { decryptSkipKeyFromRequest } from '@/gradian-ui/shared/utils/route-skip-key-decrypt';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 type ResetPasswordRequestBody = {
   username?: string;
@@ -172,7 +174,11 @@ export async function POST(request: NextRequest) {
       message: 'Password reset successfully',
     });
   } catch (error) {
-    console.error('[Auth] Password reset error:', error);
+    loggingCustom(
+      LogType.LOGIN_LOG,
+      'error',
+      `[Auth] Password reset error: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,

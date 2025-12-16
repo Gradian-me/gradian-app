@@ -25,6 +25,8 @@ import { ArrowLeft } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { extractParametersBySectionId } from '@/domains/ai-builder/utils/ai-shared-utils';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export default function AiBuilderPromptPage() {
   const params = useParams();
@@ -103,7 +105,7 @@ export default function AiBuilderPromptPage() {
           }
         }
       } catch (err) {
-        console.error('Error loading prompt:', err);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading prompt: ${err instanceof Error ? err.message : String(err)}`);
       } finally {
         setLoadingPrompt(false);
       }
@@ -124,7 +126,7 @@ export default function AiBuilderPromptPage() {
           }
         }
       } catch (err) {
-        console.error('Failed to load agents:', err);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to load agents: ${err instanceof Error ? err.message : String(err)}`);
       }
     };
     loadAgents();
@@ -148,7 +150,7 @@ export default function AiBuilderPromptPage() {
           }
         }
       } catch (err) {
-        console.error('Failed to load users:', err);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to load users: ${err instanceof Error ? err.message : String(err)}`);
       }
     };
     loadUsers();
@@ -297,7 +299,7 @@ export default function AiBuilderPromptPage() {
 
   const handleApplyAnnotations = useCallback(async (annotationsList: SchemaAnnotation[]) => {
     if (!selectedAgentId) {
-      console.error('No agent selected');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'No agent selected');
       alert('No AI agent selected. Please select an agent first.');
       return;
     }
@@ -306,13 +308,13 @@ export default function AiBuilderPromptPage() {
     const promptToUse = previousUserPrompt || userPrompt;
 
     if (!responseToUse) {
-      console.error('Missing AI response');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'Missing AI response');
       alert('No AI response available. Please generate a response first.');
       return;
     }
 
     if (!promptToUse) {
-      console.error('Missing user prompt');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'Missing user prompt');
       alert('No user prompt available. Please enter a prompt first.');
       return;
     }
@@ -335,7 +337,7 @@ export default function AiBuilderPromptPage() {
         previousUserPrompt: promptToUse,
       });
     } catch (error) {
-      console.error('Error generating response with annotations:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error generating response with annotations: ${error instanceof Error ? error.message : String(error)}`);
       setIsApplyingAnnotations(false);
       alert('Failed to generate response. Please try again.');
     }
@@ -554,7 +556,7 @@ export default function AiBuilderPromptPage() {
               <SchemaFormWrapper
                 schema={previewSchema.schema}
                 onSubmit={async () => {
-                  console.log('Preview mode - form submission disabled');
+                  loggingCustom(LogType.CLIENT_LOG, 'log', 'Preview mode - form submission disabled');
                 }}
                 onReset={() => {}}
                 onCancel={handleFormModalClose}

@@ -7,6 +7,8 @@ import { cn, validateField } from '../../../shared/utils';
 import { ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CopyContent } from './CopyContent';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export const URLInput = forwardRef<FormElementRef, TextInputProps>(
   (
@@ -85,7 +87,7 @@ export const URLInput = forwardRef<FormElementRef, TextInputProps>(
     const hasValue = value && typeof value === 'string' && value.trim() !== '';
 
     if (!config) {
-      console.error('URLInput: config is required');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'URLInput: config is required');
       return null;
     }
 

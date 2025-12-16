@@ -8,6 +8,8 @@ import { TextInput, Textarea, Select, NameInput, ConfirmationMessage, Switch, Nu
 import { AiAgent } from '../../../types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { fetchFormComponents } from '@/gradian-ui/schema-manager/utils/component-registry-client';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface RenderComponentsTabProps {
   agent: AiAgent;
@@ -28,7 +30,7 @@ export function RenderComponentsTab({ agent, onUpdate, readonly = false }: Rende
         const components = await fetchFormComponents();
         setAvailableComponents(components);
       } catch (error) {
-        console.error('Failed to load components:', error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to load components: ${error instanceof Error ? error.message : String(error)}`);
       } finally {
         setComponentsLoading(false);
       }

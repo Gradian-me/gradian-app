@@ -15,6 +15,8 @@ import { toast } from 'sonner';
 import { filterFormDataForSubmission } from '../utils/form-data-filter';
 import { syncParentRelation } from '@/gradian-ui/shared/utils/parent-relation.util';
 import { replaceDynamicContext } from '../utils/dynamic-context-replacer';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 /**
  * Reconstruct RegExp objects from serialized schema
@@ -167,7 +169,7 @@ async function applyHasFieldValueRelationsToEntity(params: {
 
     return updatedEntity;
   } catch (error) {
-    console.warn('[useFormModal] Failed to apply HAS_FIELD_VALUE relations to entity', error);
+    loggingCustom(LogType.CLIENT_LOG, 'warn', `[useFormModal] Failed to apply HAS_FIELD_VALUE relations to entity: ${error instanceof Error ? error.message : String(error)}`);
     return entity;
   }
 }
@@ -388,7 +390,7 @@ export function useFormModal(
         try {
           schemaSource = getInitialSchema(schemaId) ?? null;
         } catch (error) {
-          console.warn('getInitialSchema threw an error, falling back to API fetch.', error);
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `getInitialSchema threw an error, falling back to API fetch: ${error instanceof Error ? error.message : String(error)}`);
           schemaSource = null;
         }
       }
@@ -429,7 +431,7 @@ export function useFormModal(
           try {
             entitySource = getInitialEntityData(schemaId, editEntityId) ?? null;
           } catch (error) {
-            console.warn('getInitialEntityData threw an error, falling back to API fetch.', error);
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `getInitialEntityData threw an error, falling back to API fetch: ${error instanceof Error ? error.message : String(error)}`);
             entitySource = null;
           }
         }
@@ -444,7 +446,7 @@ export function useFormModal(
           if (!entityResult.success || !entityResult.data) {
             // Handle error gracefully instead of throwing
             const errorMessage = entityResult.error || `Entity not found: ${editEntityId}`;
-            console.error('Failed to load entity:', errorMessage);
+            loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to load entity: ${errorMessage}`);
             setLoadError(errorMessage);
             setIsLoading(false);
             return; // Exit early without opening the modal
@@ -476,7 +478,7 @@ export function useFormModal(
 
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to load form';
-      console.error(`Error opening ${modalMode} modal:`, err);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error opening ${modalMode} modal: ${err instanceof Error ? err.message : String(err)}`);
       setLoadError(errorMsg);
     } finally {
       setIsLoading(false);
@@ -502,12 +504,12 @@ export function useFormModal(
    */
   const handleSubmit = useCallback(async (formData: Record<string, any>) => {
     if (!targetSchema) {
-      console.error('No target schema available for submission');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'No target schema available for submission');
       return;
     }
 
     if (mode === 'edit' && !entityId) {
-      console.error('No entity ID available for edit submission');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'No entity ID available for edit submission');
       return;
     }
 
@@ -668,7 +670,7 @@ export function useFormModal(
                 });
               }
             } catch (error) {
-              console.warn('[useFormModal] Failed to sync hierarchical parent relation', error);
+              loggingCustom(LogType.CLIENT_LOG, 'warn', `[useFormModal] Failed to sync hierarchical parent relation: ${error instanceof Error ? error.message : String(error)}`);
             }
           }
 
@@ -692,7 +694,7 @@ export function useFormModal(
         }
       } else {
         const action = mode === 'edit' ? 'update' : 'create';
-        console.error(`Failed to ${action} ${targetSchema.name}:`, result.error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to ${action} ${targetSchema.name}: ${result.error}`);
         
         // If both error and message exist, show error on top and message in FormAlert
         if (result.error && result.message) {
@@ -710,7 +712,7 @@ export function useFormModal(
       setIsSubmitting(false);
     } catch (error) {
       const action = mode === 'edit' ? 'update' : 'create';
-      console.error(`Error ${action}ing ${targetSchema.name}:`, error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error ${action}ing ${targetSchema.name}: ${error instanceof Error ? error.message : String(error)}`);
       setFormError(error instanceof Error ? error.message : `Failed to ${action} ${targetSchema.name}. Please try again.`);
       setFormMessage(null);
       setFormErrorStatusCode(undefined);

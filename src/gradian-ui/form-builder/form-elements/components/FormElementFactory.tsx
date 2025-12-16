@@ -3,6 +3,8 @@
 import React from 'react';
 import { FormElementConfig, FormElementProps, ToggleGroupOption } from '../types';
 import { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { TextInput } from './TextInput';
 import { Textarea } from './Textarea';
 import { MarkdownInput } from './MarkdownInput';
@@ -98,7 +100,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   }
 
   if (!config) {
-    console.error('FormElementFactory: config or field is required', props);
+    loggingCustom(LogType.CLIENT_LOG, 'error', `FormElementFactory: config or field is required ${JSON.stringify(props)}`);
     return null;
   }
 
@@ -228,11 +230,11 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     case 'multi-select':
       // Debug: Verify component type is being matched
       if (process.env.NODE_ENV === 'development') {
-        console.log('[FormElementFactory] Rendering MultiSelect component', {
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[FormElementFactory] Rendering MultiSelect component ${JSON.stringify({
           elementType,
           hasOptions: !!config.options,
           optionsCount: config.options?.length || 0,
-        });
+        })}`);
       }
       return (
         <MultiSelect
@@ -597,7 +599,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       );
     
     default:
-      console.warn(`Unknown form element type: ${elementType}`, config);
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `Unknown form element type: ${elementType} ${JSON.stringify(config)}`);
       return <UnknownControl config={config} componentType={elementType} {...commonProps} />;
   }
 };

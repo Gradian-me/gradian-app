@@ -10,6 +10,8 @@ import { isValidSchemaId, getSchemaById } from '@/gradian-ui/schema-manager/util
 import { clearCompaniesCache } from '@/gradian-ui/shared/utils/companies-loader';
 import { isDemoModeEnabled, proxyDataRequest, enrichWithUsers } from '../../utils';
 import { syncHasFieldValueRelationsForEntity, minimizePickerFieldValues, enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 /**
  * Create controller instance for the given schema
@@ -83,7 +85,11 @@ export async function GET(
         return NextResponse.json(responseData, { status: response.status });
       } catch (error) {
         // If JSON parsing fails, return original response
-        console.warn('[GET /api/data/:id] Failed to enrich response:', error);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `[GET /api/data/:id] Failed to enrich response: ${error instanceof Error ? error.message : String(error)}`,
+        );
         return response;
       }
     }
@@ -134,7 +140,11 @@ export async function PUT(
     try {
       requestBody = await request.json();
     } catch (error) {
-      console.warn('[PUT /api/data/:id] Failed to parse request body:', error);
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'warn',
+        `[PUT /api/data/:id] Failed to parse request body: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     // In demo mode, extract picker values and minimize them in request body before saving
@@ -152,7 +162,11 @@ export async function PUT(
           requestBody = minimizeValues({ schema, data: requestBody });
         }
       } catch (error) {
-        console.warn('[PUT /api/data/:id] Failed to extract picker values:', error);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `[PUT /api/data/:id] Failed to extract picker values: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
 
@@ -171,7 +185,11 @@ export async function PUT(
     try {
       responseData = await response.json();
     } catch (error) {
-      console.warn('[PUT /api/data/:id] Failed to parse update response JSON:', error);
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'warn',
+        `[PUT /api/data/:id] Failed to parse update response JSON: ${error instanceof Error ? error.message : String(error)}`,
+      );
       responseData = null;
     }
     
@@ -207,7 +225,11 @@ export async function PUT(
           responseData.data = minimizedEntity;
         }
       } catch (error) {
-        console.warn('[PUT /api/data/:id] Failed to sync HAS_FIELD_VALUE relations', error);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `[PUT /api/data/:id] Failed to sync HAS_FIELD_VALUE relations: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
     
@@ -218,11 +240,15 @@ export async function PUT(
           responseData.data = await enrichWithUsers(responseData.data);
         }
         return NextResponse.json(responseData, { status: response.status });
-      } catch (error) {
-        // If JSON parsing fails, fall back to minimal response
-        console.warn('[PUT /api/data/:id] Failed to enrich response:', error);
-        return NextResponse.json(responseData, { status: response.status });
-      }
+        } catch (error) {
+          // If JSON parsing fails, fall back to minimal response
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'warn',
+            `[PUT /api/data/:id] Failed to enrich response: ${error instanceof Error ? error.message : String(error)}`,
+          );
+          return NextResponse.json(responseData, { status: response.status });
+        }
     }
 
     if (responseData) {

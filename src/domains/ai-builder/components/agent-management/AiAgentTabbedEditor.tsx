@@ -21,6 +21,8 @@ import { toast } from 'sonner';
 import { Save, ArrowLeft, RotateCcw, RefreshCw, Trash2 } from 'lucide-react';
 import { AiAgentNotFound } from '../AiAgentNotFound';
 import { useRouter } from 'next/navigation';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface AiAgentTabbedEditorProps {
   agentId: string;
@@ -61,7 +63,7 @@ export function AiAgentTabbedEditor({
       setAgent(data);
       setOriginalAgent(JSON.parse(JSON.stringify(data)));
     } catch (error) {
-      console.error('Error loading agent:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading agent: ${error instanceof Error ? error.message : String(error)}`);
       setAgent(null);
       setOriginalAgent(null);
       setApiResponse({
@@ -87,7 +89,7 @@ export function AiAgentTabbedEditor({
         message: 'AI agent saved successfully',
       });
     } catch (error) {
-      console.error('Error saving agent:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error saving agent: ${error instanceof Error ? error.message : String(error)}`);
       const errorMessage = error instanceof Error ? error.message : 'Failed to save AI agent';
       toast.error(errorMessage);
       setApiResponse({
@@ -107,7 +109,7 @@ export function AiAgentTabbedEditor({
       toast.success('AI agent deleted successfully');
       if (onBack) onBack();
     } catch (error) {
-      console.error('Error deleting agent:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error deleting agent: ${error instanceof Error ? error.message : String(error)}`);
       toast.error(error instanceof Error ? error.message : 'Failed to delete AI agent');
     }
   };

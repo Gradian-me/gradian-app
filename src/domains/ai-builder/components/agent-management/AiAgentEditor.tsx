@@ -14,6 +14,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { AiAgentNotFound } from '../AiAgentNotFound';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface AiAgentEditorProps {
   agentId: string;
@@ -56,7 +58,7 @@ export function AiAgentEditor({
       setOriginalAgent(JSON.parse(JSON.stringify(data)));
       setJsonValue(JSON.stringify(data, null, 2));
     } catch (error) {
-      console.error('Error loading agent:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading agent: ${error instanceof Error ? error.message : String(error)}`);
       setAgent(null);
       setOriginalAgent(null);
       setJsonValue('');
@@ -106,7 +108,7 @@ export function AiAgentEditor({
         message: 'AI agent saved successfully',
       });
     } catch (error) {
-      console.error('Error saving agent:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error saving agent: ${error instanceof Error ? error.message : String(error)}`);
       const errorMessage = error instanceof Error ? error.message : 'Failed to save AI agent';
       toast.error(errorMessage);
       setApiResponse({
@@ -126,7 +128,7 @@ export function AiAgentEditor({
       toast.success('AI agent deleted successfully');
       router.push('/builder/ai-agents');
     } catch (error) {
-      console.error('Error deleting agent:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error deleting agent: ${error instanceof Error ? error.message : String(error)}`);
       toast.error(error instanceof Error ? error.message : 'Failed to delete AI agent');
     }
   };

@@ -5,6 +5,8 @@ import { SearchInputProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
 import { Search } from 'lucide-react';
 import { baseInputClasses, getLabelClasses, errorTextClasses } from '../utils/field-styles';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export const SearchInput = forwardRef<FormElementRef, SearchInputProps>(
   (
@@ -78,7 +80,7 @@ export const SearchInput = forwardRef<FormElementRef, SearchInputProps>(
     const fieldPlaceholder = (config as any).placeholder || placeholder || 'Search...';
     
     if (!config) {
-      console.error('SearchInput: config is required');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'SearchInput: config is required');
       return null;
     }
 

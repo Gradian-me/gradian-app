@@ -11,6 +11,8 @@ import {
 } from '../types';
 import { formatRelationType } from '../utils';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 async function fetchSchemaClient(schemaId: string): Promise<FormSchema | null> {
   const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);
@@ -141,7 +143,7 @@ export function useRepeatingTableData(
                   }
                   return null;
                 } catch (error) {
-                  console.error(`Error fetching schema ${targetId}:`, error);
+                  loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching schema ${targetId}: ${error instanceof Error ? error.message : String(error)}`);
                   return null;
                 }
               });
@@ -197,7 +199,7 @@ export function useRepeatingTableData(
                     }
                     return null;
                   } catch (error) {
-                    console.error(`Error fetching entity ${targetId}:`, error);
+                    loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching entity ${targetId}: ${error instanceof Error ? error.message : String(error)}`);
                     return null;
                   }
                 });
@@ -211,7 +213,7 @@ export function useRepeatingTableData(
               }
             }
           } catch (error) {
-            console.error('Error in fallback entity fetch:', error);
+            loggingCustom(LogType.CLIENT_LOG, 'error', `Error in fallback entity fetch: ${error instanceof Error ? error.message : String(error)}`);
           }
         }
 
@@ -256,7 +258,7 @@ export function useRepeatingTableData(
                       };
                     }
                   } catch (error) {
-                    console.error(`Error resolving picker field ${field.name}:`, error);
+                    loggingCustom(LogType.CLIENT_LOG, 'error', `Error resolving picker field ${field.name}: ${error instanceof Error ? error.message : String(error)}`);
                   }
                 })
             );
@@ -294,7 +296,7 @@ export function useRepeatingTableData(
                   }
                   return null;
                 } catch (error) {
-                  console.error(`Error fetching schema ${targetId}:`, error);
+                  loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching schema ${targetId}: ${error instanceof Error ? error.message : String(error)}`);
                   return null;
                 }
               });
@@ -341,7 +343,7 @@ export function useRepeatingTableData(
                     }
                     return null;
                   } catch (error) {
-                    console.error(`Error fetching entity ${targetId}:`, error);
+                    loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching entity ${targetId}: ${error instanceof Error ? error.message : String(error)}`);
                     return null;
                   }
                 });
@@ -394,7 +396,7 @@ export function useRepeatingTableData(
                             };
                           }
                         } catch (error) {
-                          console.error(`Error resolving picker field ${field.name}:`, error);
+                          loggingCustom(LogType.CLIENT_LOG, 'error', `Error resolving picker field ${field.name}: ${error instanceof Error ? error.message : String(error)}`);
                         }
                       })
                   );
@@ -411,7 +413,7 @@ export function useRepeatingTableData(
               setRelationDirections(new Set());
             }
           } catch (error) {
-            console.error('Error in fallback entity fetch:', error);
+            loggingCustom(LogType.CLIENT_LOG, 'error', `Error in fallback entity fetch: ${error instanceof Error ? error.message : String(error)}`);
             setRelatedEntities([]);
             setRelationDirections(new Set());
           }
@@ -421,7 +423,7 @@ export function useRepeatingTableData(
         }
       }
     } catch (error) {
-      console.error('Error fetching relations:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching relations: ${error instanceof Error ? error.message : String(error)}`);
       setRelatedEntities([]);
       setRelationDirections(new Set());
     } finally {

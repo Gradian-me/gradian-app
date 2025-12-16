@@ -19,7 +19,8 @@ import { SchemaFormWrapper } from '@/gradian-ui/form-builder/components/FormLife
 import { ListInput } from '@/gradian-ui/form-builder/form-elements';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
 import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
-import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
+import { DEMO_MODE, LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AiBuilderLoadingIndicator } from './AiBuilderLoadingIndicator';
@@ -376,7 +377,7 @@ export function AiBuilderWrapper({
 
   const handleApplyAnnotations = useCallback(async (annotationsList: SchemaAnnotation[]) => {
     if (!selectedAgentId) {
-      console.error('No agent selected');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'No agent selected');
       return;
     }
     
@@ -411,7 +412,7 @@ export function AiBuilderWrapper({
         previousUserPrompt: promptToUse,
       });
     } catch (error) {
-      console.error('Error generating response with annotations:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error generating response with annotations: ${error instanceof Error ? error.message : String(error)}`);
       setIsApplyingAnnotations(false);
       alert('Failed to generate response. Please try again.');
     }
@@ -623,7 +624,7 @@ export function AiBuilderWrapper({
             <SchemaFormWrapper
               schema={previewSchema.schema}
               onSubmit={async () => {
-                console.log('Preview mode - form submission disabled');
+                loggingCustom(LogType.CLIENT_LOG, 'log', 'Preview mode - form submission disabled');
               }}
               onReset={() => {}}
               onCancel={handleFormModalClose}

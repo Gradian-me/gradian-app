@@ -13,6 +13,8 @@ import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { replaceDynamicContext, replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 import { AiAgentDialog } from '@/domains/ai-builder/components/AiAgentDialog';
 import { getEncryptedSkipKey } from '@/gradian-ui/shared/utils/skip-key-storage';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export interface DynamicQuickActionsProps {
   actions: QuickAction[];
@@ -97,7 +99,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
         setTargetSchemaId(action.targetSchema);
         setFormAction(action);
       } catch (error) {
-        console.error(`Failed to load schema for action ${action.id}:`, error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to load schema for action ${action.id}: ${error instanceof Error ? error.message : String(error)}`);
       } finally {
         setTimeout(() => {
           setLoadingActionId(null);
@@ -115,11 +117,11 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
             setAgentForDialog(data.data);
             setAiAgentAction(action);
           } else {
-            console.error('Failed to load agent:', data.error);
+            loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to load agent: ${data.error}`);
           }
         })
         .catch(err => {
-          console.error('Error loading agent:', err);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading agent: ${err instanceof Error ? err.message : String(err)}`);
         })
         .finally(() => {
           setLoadingAgent(false);
@@ -137,7 +139,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
               referenceData = latest.data;
             }
           } catch (err) {
-            console.warn('Failed to fetch latest reference data, falling back to provided data', err);
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to fetch latest reference data, falling back to provided data: ${err instanceof Error ? err.message : String(err)}`);
           }
         }
 
@@ -174,34 +176,34 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
                 ...(typeof body === 'object' && body !== null ? body : {}),
                 skip_key: encryptedSkipKey,
               };
-              console.log('[DynamicQuickActions] Added encrypted skip_key to request body:', {
+              loggingCustom(LogType.CLIENT_LOG, 'log', `[DynamicQuickActions] Added encrypted skip_key to request body: ${JSON.stringify({
                 endpoint,
                 method,
                 hasSkipKey: !!body.skip_key,
                 skipKeyType: typeof body.skip_key,
-              });
+              })}`);
             } else {
               // Add to query parameter for GET/DELETE requests (use URL-encoded string)
               const url = new URL(endpoint, window.location.origin);
               url.searchParams.set('skip_key', encryptedSkipKey as string); // Type assertion: encodeForUrl=true returns string
               endpoint = url.pathname + url.search;
-              console.log('[DynamicQuickActions] Added encrypted skip_key to query params:', {
+              loggingCustom(LogType.CLIENT_LOG, 'log', `[DynamicQuickActions] Added encrypted skip_key to query params: ${JSON.stringify({
                 endpoint,
                 method,
-              });
+              })}`);
             }
           } else {
-            console.warn('[DynamicQuickActions] passSkipKey is true but encrypted skip key is not available. Make sure NEXT_PUBLIC_SKIP_KEY is set and initializeSkipKeyStorage() has been called.');
+            loggingCustom(LogType.CLIENT_LOG, 'warn', '[DynamicQuickActions] passSkipKey is true but encrypted skip key is not available. Make sure NEXT_PUBLIC_SKIP_KEY is set and initializeSkipKeyStorage() has been called.');
           }
         }
         
         // Debug: Log final body before sending
         if (action.passSkipKey && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
-          console.log('[DynamicQuickActions] Final body before apiRequest:', {
+          loggingCustom(LogType.CLIENT_LOG, 'log', `[DynamicQuickActions] Final body before apiRequest: ${JSON.stringify({
             hasSkipKey: !!(body && typeof body === 'object' && 'skip_key' in body),
             bodyKeys: body && typeof body === 'object' ? Object.keys(body) : [],
             bodyStringified: JSON.stringify(body),
-          });
+          })}`);
         }
         
         await apiRequest(endpoint, {
@@ -209,7 +211,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
           body,
         });
       } catch (error) {
-        console.error(`Failed to call API for action ${action.id}:`, error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to call API for action ${action.id}: ${error instanceof Error ? error.message : String(error)}`);
       } finally {
         setLoadingActionId(null);
       }

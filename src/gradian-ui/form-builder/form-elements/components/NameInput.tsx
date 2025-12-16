@@ -3,6 +3,8 @@ import { CheckCircle } from 'lucide-react';
 import { cn, validateField } from '../../../shared/utils';
 import { FormElementRef, NameInputProps } from '../types';
 import { CopyContent } from './CopyContent';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 const allowedPattern = /^[a-z0-9_-]+$/;
 
@@ -101,7 +103,7 @@ export const NameInput = forwardRef<FormElementRef, NameInputProps>(
     );
 
     if (!config) {
-      console.error('NameInput: config is required');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'NameInput: config is required');
       return null;
     }
 

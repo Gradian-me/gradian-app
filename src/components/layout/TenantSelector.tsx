@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useTheme } from 'next-themes';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface Tenant {
   id: string | number;
@@ -75,7 +77,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
           setTenants(data);
         }
       } catch (err) {
-        console.error('Error loading tenants:', err);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading tenants: ${err instanceof Error ? err.message : String(err)}`);
         setTenants([]);
       } finally {
         setLoading(false);
@@ -112,7 +114,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
         };
         localStorage.setItem('tenant-store', JSON.stringify(stateToSave));
       } catch (error) {
-        console.warn('Failed to manually save tenant to localStorage:', error);
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to manually save tenant to localStorage: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
     

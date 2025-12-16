@@ -6,11 +6,13 @@ import { SignInPage } from '@/components/ui/sign-in';
 import { ensureFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
 import { useUserStore } from '@/stores/user.store';
 import { useTenantStore } from '@/stores/tenant.store';
-import { DEMO_MODE, AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
+import { DEMO_MODE, AUTH_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { TenantSelector } from '@/components/layout/TenantSelector';
 import { Logo } from '@/gradian-ui/layout/logo/components/Logo';
 import { toast } from 'sonner';
 import { decryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util';
+import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 
 const ACCESS_TOKEN_COOKIE = AUTH_CONFIG?.ACCESS_TOKEN_COOKIE || 'access_token';
 
@@ -18,6 +20,12 @@ function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setUser } = useUserStore();
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Ensure client-side only rendering to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   const { selectedTenant } = useTenantStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,32 +40,39 @@ function LoginPageContent() {
     // Decrypt returnUrl from query parameters
     const encryptedReturnUrl = searchParams.get('returnUrl');
     if (encryptedReturnUrl) {
-      console.log('[LOGIN] Found encrypted returnUrl in query params:', encryptedReturnUrl);
-      const decrypted = decryptReturnUrl(encryptedReturnUrl);
-      if (decrypted) {
-        console.log('[LOGIN] Successfully decrypted returnUrl:', decrypted);
-        setReturnUrl(decrypted);
-      } else {
-        console.warn('[LOGIN] Failed to decrypt returnUrl, using default');
-        console.warn('[LOGIN] Encrypted value was:', encryptedReturnUrl);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Found encrypted returnUrl in query params: ${encryptedReturnUrl}`);
+      try {
+        const decrypted = decryptReturnUrl(encryptedReturnUrl);
+        if (decrypted) {
+          loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Successfully decrypted returnUrl: ${decrypted}`);
+          setReturnUrl(decrypted);
+        } else {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', '[LOGIN] Failed to decrypt returnUrl (invalid/corrupted/expired), using default');
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN] Encrypted value was: ${encryptedReturnUrl}`);
+        }
+      } catch (error) {
+        // Error is already logged by decryptReturnUrl, just prevent crash
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN] Exception during returnUrl decryption, using default: ${JSON.stringify({
+          error: error instanceof Error ? error.message : String(error),
+        })}`);
       }
     } else {
-      console.log('[LOGIN] No returnUrl found in query params');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] No returnUrl found in query params');
     }
 
-    console.log('[LOGIN] Page loaded, initializing fingerprint...');
+    loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Page loaded, initializing fingerprint...');
     ensureFingerprintCookie()
       .then((value) => {
-        console.log('[LOGIN] Fingerprint initialized:', value);
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Fingerprint initialized: ${value}`);
         setFingerprint(value);
       })
       .catch((err) => {
-        console.warn('[LOGIN] Fingerprint init failed:', err);
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN] Fingerprint init failed: ${err instanceof Error ? err.message : String(err)}`);
       });
   }, [searchParams]);
 
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
-    console.log('[LOGIN] ========== LOGIN PROCESS STARTED ==========');
+    loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] ========== LOGIN PROCESS STARTED ==========');
     setError(null);
     setErrorDetails(null);
     event.preventDefault();
@@ -68,25 +83,25 @@ function LoginPageContent() {
       const email = formData.get('email') as string;
       const password = formData.get('password') as string;
 
-      console.log('[LOGIN] Form data extracted:', {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Form data extracted: ${JSON.stringify({
         email: email ? `${email.substring(0, 3)}***` : 'missing',
         password: password ? '***' : 'missing',
         hasEmail: !!email,
         hasPassword: !!password,
-      });
+      })}`);
 
       if (!email || !password) {
         const errorMessage = 'Please enter both email and password';
-        console.log('[LOGIN] Validation failed:', errorMessage);
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Validation failed: ${errorMessage}`);
         setError(errorMessage);
         toast.error(errorMessage);
         setIsLoading(false);
         return;
       }
 
-      console.log('[LOGIN] Getting fingerprint...');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Getting fingerprint...');
       const fingerprintValue = (await ensureFingerprintCookie()) ?? fingerprint;
-      console.log('[LOGIN] Fingerprint value:', fingerprintValue);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Fingerprint value: ${fingerprintValue}`);
       if (fingerprintValue) {
         setFingerprint(fingerprintValue);
       }
@@ -96,9 +111,9 @@ function LoginPageContent() {
         typeof window !== 'undefined' ? window.location.host : null;
       const sanitizedHost = currentHost?.replace(/[^a-zA-Z0-9\.\-:]/g, '');
       const tenantDomain = selectedTenant?.domain || sanitizedHost || null;
-      console.log('[LOGIN] Tenant domain:', tenantDomain);
-      console.log('[LOGIN] Selected tenant:', selectedTenant);
-      console.log('[LOGIN] Current host:', currentHost);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Tenant domain: ${tenantDomain}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Selected tenant: ${JSON.stringify(selectedTenant)}`);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Current host: ${currentHost}`);
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -112,7 +127,7 @@ function LoginPageContent() {
         deviceFingerprint: fingerprintValue,
       };
 
-      console.log('[LOGIN] Request details:', {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Request details: ${JSON.stringify({
         url: '/api/auth/login',
         method: 'POST',
         headers: {
@@ -125,13 +140,13 @@ function LoginPageContent() {
           password: '***MASKED***',
           deviceFingerprint: fingerprintValue ? `${fingerprintValue.substring(0, 8)}***` : null,
         },
-      });
+      })}`);
 
       let response: Response;
       let data: any;
       
       try {
-        console.log('[LOGIN] Sending fetch request to /api/auth/login...');
+        loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Sending fetch request to /api/auth/login...');
         const fetchStartTime = Date.now();
         
         response = await fetch('/api/auth/login', {
@@ -141,33 +156,33 @@ function LoginPageContent() {
         });
 
         const fetchDuration = Date.now() - fetchStartTime;
-        console.log('[LOGIN] Fetch completed:', {
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Fetch completed: ${JSON.stringify({
           duration: `${fetchDuration}ms`,
           status: response.status,
           statusText: response.statusText,
           ok: response.ok,
           headers: Object.fromEntries(response.headers.entries()),
-        });
+        })}`);
 
         // Clone response to read as text if JSON parsing fails
         const responseClone = response.clone();
         
         try {
-          console.log('[LOGIN] Parsing response as JSON...');
+          loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Parsing response as JSON...');
           data = await response.json();
-          console.log('[LOGIN] Response data received:', {
+          loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Response data received: ${JSON.stringify({
             success: data.success,
             hasUser: !!data.user,
             hasTokens: !!data.tokens,
             message: data.message,
             error: data.error,
             fullData: JSON.stringify(data, null, 2),
-          });
+          })}`);
         } catch (jsonError) {
-          console.error('[LOGIN] Failed to parse response as JSON:', jsonError);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `[LOGIN] Failed to parse response as JSON: ${jsonError instanceof Error ? jsonError.message : String(jsonError)}`);
           // If JSON parsing fails, read as text
           const text = await responseClone.text().catch(() => 'Unable to read response');
-          console.log('[LOGIN] Response as text:', text);
+          loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Response as text: ${text}`);
           const errorMessage = `Login failed with status ${response.status}`;
           const details = `Status: ${response.status} ${response.statusText}\n\nResponse body:\n${text}`;
           setError(errorMessage);
@@ -178,7 +193,7 @@ function LoginPageContent() {
         }
 
         if (!response.ok || !data.success) {
-          console.error('[LOGIN] Login failed:', {
+          loggingCustom(LogType.CLIENT_LOG, 'error', `[LOGIN] Login failed: ${JSON.stringify({
             responseOk: response.ok,
             dataSuccess: data.success,
             status: response.status,
@@ -186,7 +201,7 @@ function LoginPageContent() {
             error: data.error,
             message: data.message,
             fullResponse: data,
-          });
+          })}`);
           const errorMessage = data.error || `Login failed with status ${response.status}`;
           const details = [
             `Status: ${response.status} ${response.statusText}`,
@@ -201,15 +216,15 @@ function LoginPageContent() {
           return;
         }
 
-        console.log('[LOGIN] Login successful!');
+        loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Login successful!');
       } catch (fetchError) {
         // Network error or fetch failed
-        console.error('[LOGIN] Fetch error occurred:', {
+        loggingCustom(LogType.CLIENT_LOG, 'error', `[LOGIN] Fetch error occurred: ${JSON.stringify({
           error: fetchError,
           message: fetchError instanceof Error ? fetchError.message : String(fetchError),
           stack: fetchError instanceof Error ? fetchError.stack : undefined,
           name: fetchError instanceof Error ? fetchError.name : undefined,
-        });
+        })}`);
         const errorMessage = 'Network error: Failed to connect to the server';
         const details = [
           `Error: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`,
@@ -222,31 +237,39 @@ function LoginPageContent() {
         return;
       }
 
-      // SECURITY: Tokens are stored in httpOnly cookies by the server
-      // Do not store tokens in localStorage as they are accessible to JavaScript
-      // and visible in browser DevTools. Cookies are automatically sent with requests.
+      // SECURITY: Access token stored in memory only (never in cookies/localStorage)
+      // Refresh token stored in HttpOnly cookie (handled by server, not accessible to JavaScript)
       
-      console.log('[LOGIN] Cleaning up localStorage tokens...');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Storing access token in memory...');
+      // Store access token in memory (not in localStorage or cookies)
+      if (data.tokens?.accessToken) {
+        authTokenManager.setAccessToken(data.tokens.accessToken);
+        loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Access token stored in memory');
+      } else {
+        loggingCustom(LogType.CLIENT_LOG, 'warn', '[LOGIN] No access token in response');
+      }
+      
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Cleaning up localStorage tokens...');
       // Clean up any existing tokens in localStorage for security
       if (typeof window !== 'undefined') {
         try {
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
-          console.log('[LOGIN] localStorage tokens cleared');
+          loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] localStorage tokens cleared');
         } catch (error) {
-          console.warn('[LOGIN] Failed to clear tokens from localStorage:', error);
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN] Failed to clear tokens from localStorage: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
 
       if (data.user) {
-        console.log('[LOGIN] Setting user in store:', {
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Setting user in store: ${JSON.stringify({
           id: data.user.id,
           email: data.user.email,
           username: data.user.username,
           name: data.user.name,
           role: data.user.role,
           hasAvatar: !!data.user.avatar,
-        });
+        })}`);
         setUser({
           id: data.user.id,
           email: data.user.email,
@@ -259,12 +282,12 @@ function LoginPageContent() {
           createdAt: new Date(),
           updatedAt: new Date(),
         });
-        console.log('[LOGIN] User set in store successfully');
+        loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] User set in store successfully');
       } else {
-        console.warn('[LOGIN] No user data in response');
+        loggingCustom(LogType.CLIENT_LOG, 'warn', '[LOGIN] No user data in response');
       }
 
-      console.log('[LOGIN] Showing success toast...');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Showing success toast...');
       toast.success(data.message || 'Login successful!');
       
       // Get returnUrl from searchParams directly (in case state wasn't updated yet)
@@ -272,29 +295,29 @@ function LoginPageContent() {
       let redirectTo = '/';
       
       if (encryptedReturnUrl) {
-        console.log('[LOGIN] Attempting to decrypt returnUrl from searchParams:', encryptedReturnUrl);
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Attempting to decrypt returnUrl from searchParams: ${encryptedReturnUrl}`);
         const decrypted = decryptReturnUrl(encryptedReturnUrl);
         if (decrypted) {
-          console.log('[LOGIN] Successfully decrypted returnUrl:', decrypted);
+          loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Successfully decrypted returnUrl: ${decrypted}`);
           redirectTo = decrypted;
         } else {
-          console.warn('[LOGIN] Failed to decrypt returnUrl, using default');
+          loggingCustom(LogType.CLIENT_LOG, 'warn', '[LOGIN] Failed to decrypt returnUrl, using default');
         }
       } else if (returnUrl) {
         // Fallback to state if searchParams doesn't have it
-        console.log('[LOGIN] Using returnUrl from state:', returnUrl);
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Using returnUrl from state: ${returnUrl}`);
         redirectTo = returnUrl;
       }
       
-      console.log('[LOGIN] Final redirect destination:', redirectTo);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Final redirect destination: ${redirectTo}`);
       
       // Prevent redirect loop - if redirecting to login page, go to home instead
       if (redirectTo.startsWith('/authentication/login') || redirectTo === '/authentication') {
-        console.warn('[LOGIN] Redirect destination is login page, redirecting to home instead');
+        loggingCustom(LogType.CLIENT_LOG, 'warn', '[LOGIN] Redirect destination is login page, redirecting to home instead');
         redirectTo = '/';
       }
       
-      console.log('[LOGIN] Waiting for auth cookies to be set before redirecting...');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Waiting for auth cookies to be set before redirecting...');
       
       // Wait longer to ensure cookies are set by the browser and available for the next request
       // Keep isLoading true during this time so button stays disabled
@@ -304,11 +327,11 @@ function LoginPageContent() {
       if (typeof document !== 'undefined') {
         const cookies = document.cookie;
         const hasAuthCookie = cookies.includes('access_token=') || cookies.includes(ACCESS_TOKEN_COOKIE + '=');
-        console.log('[LOGIN] Auth cookie check:', hasAuthCookie ? 'Found' : 'Not found (may be httpOnly)');
-        console.log('[LOGIN] All cookies:', cookies ? cookies.split(';').map(c => c.trim().split('=')[0]).join(', ') : 'None');
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Auth cookie check: ${hasAuthCookie ? 'Found' : 'Not found (may be httpOnly)'}`);
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] All cookies: ${cookies ? cookies.split(';').map(c => c.trim().split('=')[0]).join(', ') : 'None'}`);
       }
       
-      console.log('[LOGIN] Redirecting to:', redirectTo);
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Redirecting to: ${redirectTo}`);
       
       // Use router.replace to navigate while preserving cookies
       // This ensures cookies are sent with the navigation
@@ -317,16 +340,16 @@ function LoginPageContent() {
       
       // Don't set isLoading to false - keep button disabled during redirect
       // The page will navigate away, so state will reset
-      console.log('[LOGIN] ========== LOGIN PROCESS COMPLETED SUCCESSFULLY ==========');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] ========== LOGIN PROCESS COMPLETED SUCCESSFULLY ==========');
     } catch (error) {
-      console.error('[LOGIN] ========== LOGIN ERROR OCCURRED ==========');
-      console.error('[LOGIN] Error details:', {
+      loggingCustom(LogType.CLIENT_LOG, 'error', '[LOGIN] ========== LOGIN ERROR OCCURRED ==========');
+      loggingCustom(LogType.CLIENT_LOG, 'error', `[LOGIN] Error details: ${JSON.stringify({
         error,
         message: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         name: error instanceof Error ? error.name : undefined,
         cause: error instanceof Error ? error.cause : undefined,
-      });
+      })}`);
       const errorMessage = error instanceof Error ? error.message : 'An error occurred during login. Please try again.';
       const details = [
         `Error: ${errorMessage}`,
@@ -337,7 +360,7 @@ function LoginPageContent() {
       setErrorDetails(details);
       toast.error(errorMessage);
       setIsLoading(false);
-      console.error('[LOGIN] ========== LOGIN PROCESS ENDED WITH ERROR ==========');
+      loggingCustom(LogType.CLIENT_LOG, 'error', '[LOGIN] ========== LOGIN PROCESS ENDED WITH ERROR ==========');
     }
   };
 
@@ -351,7 +374,8 @@ function LoginPageContent() {
 
   return (
     <>
-      {DEMO_MODE && (
+      {/* Only render TenantSelector on client to prevent hydration mismatch */}
+      {isMounted && DEMO_MODE && (
         <div className="fixed top-4 right-4 z-50 w-64">
           <TenantSelector placeholder="Select tenant" />
         </div>

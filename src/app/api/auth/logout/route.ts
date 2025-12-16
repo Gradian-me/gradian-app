@@ -2,7 +2,7 @@
 // Logs out user by clearing tokens
 
 import { NextRequest, NextResponse } from 'next/server';
-import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
+import { AUTH_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
 import {
   buildAuthServiceUrl,
   buildProxyHeaders,
@@ -10,6 +10,7 @@ import {
   getAuthServiceAppId,
   isServerDemoMode,
 } from '@/app/api/auth/helpers/external-auth.util';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 
 export async function POST(request: NextRequest) {
   try {
@@ -73,7 +74,11 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Logout API error:', error);
+    loggingCustom(
+      LogType.LOGIN_LOG,
+      'error',
+      `Logout API error: ${error instanceof Error ? error.message : String(error)}`,
+    );
 
     if (error instanceof Error && error.message.includes('URL_AUTHENTICATION')) {
       return NextResponse.json(

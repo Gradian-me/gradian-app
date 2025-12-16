@@ -19,6 +19,8 @@ import { getExternalNodes } from '@/gradian-ui/shared/domain/utils/external-node
 import { getSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
 import { BaseRepository } from '@/gradian-ui/shared/domain/repositories/base.repository';
 import { getValueByRole, getSingleValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 /**
  * GET - Query relations
@@ -147,7 +149,13 @@ export async function GET(request: NextRequest) {
             const entityMap = new Map(allEntities.map((e: any) => [e.id, e]));
             schemaEntityMap.set(schemaId, entityMap);
           } catch (error) {
-            console.warn(`[GET /api/relations] Failed to batch fetch schema ${schemaId}:`, error);
+            loggingCustom(
+              LogType.INFRA_LOG,
+              'warn',
+              `[GET /api/relations] Failed to batch fetch schema ${schemaId}: ${
+                error instanceof Error ? error.message : String(error)
+              }`,
+            );
           }
         })
       );
@@ -207,7 +215,13 @@ export async function GET(request: NextRequest) {
             targetData,
           };
         } catch (error) {
-          console.warn(`[GET /api/relations] Failed to enrich relation ${rel.id}:`, error);
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'warn',
+            `[GET /api/relations] Failed to enrich relation ${rel.id}: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          );
           return rel;
         }
       });

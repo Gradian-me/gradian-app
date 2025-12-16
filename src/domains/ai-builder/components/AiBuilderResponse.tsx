@@ -289,7 +289,7 @@ export function AiBuilderResponse({
       }
       return null;
     } catch (e) {
-      console.warn('Failed to parse parallel image data:', e, 'Content:', imageResponse?.substring(0, 200));
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to parse parallel image data: ${e instanceof Error ? e.message : String(e)}, Content: ${imageResponse?.substring(0, 200)}`);
       return null;
     }
   }, [imageResponse]);
@@ -606,7 +606,7 @@ export function AiBuilderResponse({
                         document.body.removeChild(a);
                         window.URL.revokeObjectURL(url);
                       } catch (error) {
-                        console.error('Error saving image:', error);
+                        loggingCustom(LogType.CLIENT_LOG, 'error', `Error saving image: ${error instanceof Error ? error.message : String(error)}`);
                       }
                     }}
                     className="h-8"
@@ -637,7 +637,7 @@ export function AiBuilderResponse({
                         
                         window.open(imageUrl, '_blank', 'noopener,noreferrer');
                       } catch (error) {
-                        console.error('Error opening image:', error);
+                        loggingCustom(LogType.CLIENT_LOG, 'error', `Error opening image: ${error instanceof Error ? error.message : String(error)}`);
                       }
                     }}
                     className="h-8"
@@ -867,7 +867,7 @@ export function AiBuilderResponse({
                     document.body.removeChild(a);
                     window.URL.revokeObjectURL(url);
                   } catch (error) {
-                    console.error('Error saving image:', error);
+                    loggingCustom(LogType.CLIENT_LOG, 'error', `Error saving image: ${error instanceof Error ? error.message : String(error)}`);
                   }
                 }}
                 className="h-8"
@@ -898,7 +898,7 @@ export function AiBuilderResponse({
                     
                     window.open(imageUrl, '_blank', 'noopener,noreferrer');
                   } catch (error) {
-                    console.error('Error opening image:', error);
+                    loggingCustom(LogType.CLIENT_LOG, 'error', `Error opening image: ${error instanceof Error ? error.message : String(error)}`);
                   }
                 }}
                 className="h-8"
@@ -1029,7 +1029,7 @@ export function AiBuilderResponse({
                         document.body.removeChild(a);
                         window.URL.revokeObjectURL(url);
                       } catch (error) {
-                        console.error('Error saving image:', error);
+                        loggingCustom(LogType.CLIENT_LOG, 'error', `Error saving image: ${error instanceof Error ? error.message : String(error)}`);
                       }
                     }}
                     className="h-8"
@@ -1064,7 +1064,7 @@ export function AiBuilderResponse({
                         // Open in new tab with data URL
                         window.open(imageUrl, '_blank', 'noopener,noreferrer');
                       } catch (error) {
-                        console.error('Error opening image:', error);
+                        loggingCustom(LogType.CLIENT_LOG, 'error', `Error opening image: ${error instanceof Error ? error.message : String(error)}`);
                       }
                     }}
                     className="h-8"

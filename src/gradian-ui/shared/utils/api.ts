@@ -12,6 +12,7 @@ import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { toast } from 'sonner';
 import { getFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
 import { useTenantStore } from '@/stores/tenant.store';
+import { authTokenManager } from './auth-token-manager';
 
 // Helper function to resolve API endpoint URL
 // IMPORTANT: Always use relative URLs so requests go through Next.js API routes
@@ -244,25 +245,143 @@ export class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    retryOn401: boolean = true
   ): Promise<ApiResponse<T>> {
     // Resolve the endpoint URL based on demo mode configuration
     const resolvedEndpoint = resolveApiUrl(endpoint);
     const url = `${this.baseURL}${resolvedEndpoint}`;
+    
+    // Skip auth for refresh endpoint and login to prevent loops
+    const isAuthEndpoint = endpoint.includes('/api/auth/token/refresh') || 
+                          endpoint.includes('/api/auth/login') ||
+                          endpoint.includes('/api/auth/logout');
+    
+    // Don't try to get token if we're on login/auth pages (prevents redirect loops)
+    const isOnAuthPage = isBrowserEnvironment() && 
+      (typeof window !== 'undefined' && window.location.pathname.startsWith('/authentication/'));
+    
+    // Get access token from memory (only in browser, not on auth pages or auth endpoints)
+    const accessToken = isBrowserEnvironment() && !isAuthEndpoint && !isOnAuthPage
+      ? await authTokenManager.getValidAccessToken()
+      : null;
+    
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - token retrieval ${JSON.stringify({
+      endpoint,
+      isAuthEndpoint,
+      isOnAuthPage,
+      hasAccessToken: accessToken !== null,
+      tokenPreview: accessToken ? `${accessToken.substring(0, 20)}...` : null,
+      tokenStorage: 'MEMORY_ONLY (not in cookies)',
+    })}`);
     
     const requestConfig: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
+      credentials: 'include', // Required to send HttpOnly cookies (refresh token)
       ...options,
     };
+
+    // Add Authorization header if we have an access token
+    if (accessToken) {
+      (requestConfig.headers as Record<string, string>)['Authorization'] = `Bearer ${accessToken}`;
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - Authorization header added ${JSON.stringify({
+        headerLength: `Bearer ${accessToken}`.length,
+      })}`);
+    } else {
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[API_CLIENT] request() - no Authorization header (no access token)');
+    }
 
     requestConfig.headers = appendFingerprintHeader(requestConfig.headers);
     requestConfig.headers = appendTenantDomainHeader(requestConfig.headers);
 
     try {
       const response = await fetch(url, requestConfig);
+
+      // Handle 401 Unauthorized - token expired or invalid
+      if (response.status === 401 && retryOn401 && !isAuthEndpoint && isBrowserEnvironment()) {
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - 401 received, attempting token refresh and retry ${JSON.stringify({
+          endpoint,
+          hadAccessToken: accessToken !== null,
+        })}`);
+        
+        // Attempt to refresh token
+        const newToken = await authTokenManager.handleUnauthorized();
+        
+        if (newToken) {
+          loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - token refreshed, retrying request ${JSON.stringify({
+            endpoint,
+            newTokenLength: newToken.length,
+          })}`);
+          
+          // Retry original request with new token
+          const retryConfig: RequestInit = {
+            ...requestConfig,
+            headers: {
+              ...requestConfig.headers,
+              'Authorization': `Bearer ${newToken}`,
+            },
+          };
+          
+          const retryResponse = await fetch(url, retryConfig);
+          loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - retry response ${JSON.stringify({
+            endpoint,
+            status: retryResponse.status,
+            ok: retryResponse.ok,
+          })}`);
+          
+          // Parse retry response
+          const contentType = retryResponse.headers.get('content-type') || '';
+          let parsed: any = null;
+          try {
+            if (contentType.includes('application/json')) {
+              parsed = await retryResponse.json();
+            } else {
+              const text = await retryResponse.text();
+              parsed = text ? { message: text } : {};
+            }
+          } catch (parseErr) {
+            parsed = { message: 'Unable to parse response body' };
+          }
+
+          const responseWithStatus: ApiResponse<T> = {
+            ...(parsed || {}),
+            statusCode: retryResponse.status,
+          };
+
+          if (!retryResponse.ok) {
+            const errorMessage = parsed?.error || parsed?.message || '';
+            const suppressToast = endpoint.includes('/api/integrations/sync');
+            if (isConnectionError(null, retryResponse.status) || isConnectionError({ message: errorMessage })) {
+              showConnectionErrorToast(undefined, suppressToast);
+            }
+            
+            return {
+              success: false,
+              error: errorMessage || `HTTP error! status: ${retryResponse.status}`,
+              statusCode: retryResponse.status,
+              data: null as any,
+              messages: parsed?.messages,
+              message: typeof parsed?.message === 'string' ? parsed.message : undefined,
+            };
+          }
+
+          return responseWithStatus;
+        } else {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[API_CLIENT] request() - token refresh failed, user will be redirected to login ${JSON.stringify({
+            endpoint,
+          })}`);
+          // Refresh failed - user will be redirected to login by authTokenManager
+          return {
+            success: false,
+            error: 'Authentication required',
+            statusCode: 401,
+            data: null as any,
+          };
+        }
+      }
 
       // Safely parse response; don't assume JSON
       const contentType = response.headers.get('content-type') || '';
@@ -406,7 +525,7 @@ export async function apiRequest<T>(
       : baseHeaders;  
 
   if (isDev && callerName) {
-    console.info(`[apiRequest] ${method} ${endpoint} invoked by ${callerName}`);
+    loggingCustom(LogType.CLIENT_LOG, 'info', `[apiRequest] ${method} ${endpoint} invoked by ${callerName}`);
   }
   
   const normalizedEndpoint = method === 'GET' ? normalizeEndpointWithParams(endpoint, options?.params) : endpoint;

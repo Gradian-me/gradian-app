@@ -13,6 +13,8 @@ import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import type { AiAgent } from '../types';
 import { replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export interface AiAgentDialogProps {
   isOpen: boolean;
@@ -140,7 +142,7 @@ export function AiAgentDialog({
         
         // Log if dynamic replacement might have failed (for debugging)
         if (JSON.stringify(processed).includes('{{')) {
-          console.warn('Some dynamic context variables may not have been replaced in preload route:', processed);
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `Some dynamic context variables may not have been replaced in preload route: ${JSON.stringify(processed)}`);
         }
         
         return processed;

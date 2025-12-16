@@ -7,6 +7,8 @@ import { cn, validateField } from '../../../shared/utils';
 import { Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CopyContent } from './CopyContent';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export const EmailInput = forwardRef<FormElementRef, TextInputProps>(
   (
@@ -80,7 +82,7 @@ export const EmailInput = forwardRef<FormElementRef, TextInputProps>(
     const hasValue = value && typeof value === 'string' && value.trim() !== '';
 
     if (!config) {
-      console.error('EmailInput: config is required');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'EmailInput: config is required');
       return null;
     }
 

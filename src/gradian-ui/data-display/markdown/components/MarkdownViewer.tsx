@@ -19,6 +19,8 @@ import { useMarkdownScrollSpy } from '../hooks/useMarkdownScrollSpy';
 import { MarkdownViewerProps } from '../types';
 import { exportMarkdownToPdf } from '../utils/pdfExport';
 import { ProfessionalWritingModal } from '@/gradian-ui/communication/professional-writing';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export function MarkdownViewer({ 
   content, 
@@ -95,8 +97,8 @@ export function MarkdownViewer({
     extractHeadings(contentKey, levels)
       .then((extracted) => {
         if (!cancelled) {
-          console.log('✅ Extracted headings:', extracted.length, 'headings');
-          console.log('Extracted heading IDs:', extracted.map(h => `#${h.id}`));
+          loggingCustom(LogType.CLIENT_LOG, 'log', `✅ Extracted headings: ${extracted.length} headings`);
+          loggingCustom(LogType.CLIENT_LOG, 'log', `Extracted heading IDs: ${extracted.map(h => `#${h.id}`).join(', ')}`);
           
           // Only update if headings actually changed
           setHeadings((prevHeadings) => {
@@ -117,9 +119,9 @@ export function MarkdownViewer({
               });
               const missing = found.filter(f => !f.found);
               if (missing.length > 0) {
-                console.warn('⚠️ Some heading IDs not found in DOM:', missing.map(m => `#${m.id}`));
+                loggingCustom(LogType.CLIENT_LOG, 'warn', `⚠️ Some heading IDs not found in DOM: ${missing.map(m => `#${m.id}`).join(', ')}`);
               } else {
-                console.log('✅ All heading IDs found in DOM');
+                loggingCustom(LogType.CLIENT_LOG, 'log', '✅ All heading IDs found in DOM');
               }
             }
           }, 1000);
@@ -127,7 +129,7 @@ export function MarkdownViewer({
       })
       .catch((error) => {
         if (!cancelled) {
-          console.error('❌ Error extracting headings:', error);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `❌ Error extracting headings: ${error instanceof Error ? error.message : String(error)}`);
           setHeadings((prev) => prev.length > 0 ? [] : prev);
         }
       });
@@ -250,7 +252,7 @@ export function MarkdownViewer({
         title: 'Markdown Document',
       });
     } catch (error) {
-      console.error('PDF export error:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `PDF export error: ${error instanceof Error ? error.message : String(error)}`);
       throw error;
     }
   }, [viewMode]);

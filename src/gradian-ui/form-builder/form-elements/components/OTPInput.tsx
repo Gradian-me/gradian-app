@@ -4,6 +4,8 @@ import { CircularProgress } from '@/gradian-ui/analytics/indicators/kpi-list/com
 import type { FormElementRef } from '../types';
 import type { OTPInputProps } from '../types';
 import { validateField } from '@/gradian-ui/shared/utils';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 // Context to coordinate OTP slots
 type InputOTPContextValue = {
@@ -155,7 +157,7 @@ const InputOTPPrimitive = React.forwardRef<HTMLDivElement, InputOTPPrimitiveProp
         setRemainingTime(resendDuration);
         setIsCounting(true);
       } catch (error) {
-        console.error('[OTPInput] Resend error:', error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `[OTPInput] Resend error: ${error instanceof Error ? error.message : String(error)}`);
       } finally {
         setResendLoading(false);
       }

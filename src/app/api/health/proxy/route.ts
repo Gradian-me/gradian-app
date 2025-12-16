@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 /**
  * Health Check Proxy Endpoint
@@ -128,7 +130,11 @@ export async function GET(request: NextRequest) {
       );
     }
   } catch (error) {
-    console.error('Error in health proxy:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error in health proxy: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       {
         success: false,

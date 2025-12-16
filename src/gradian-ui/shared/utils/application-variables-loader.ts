@@ -164,6 +164,8 @@ export function loadApplicationVariables(): ApplicationVariablesData {
     cachedVariables = data;
     return data;
   } catch (error) {
+    // Server-only file - console.error is appropriate here for server-side logging
+    // In production, this should be routed to a proper server logging service
     console.error('Error loading application variables:', error);
     // Return defaults on error
     const defaultData = getDefaultData();

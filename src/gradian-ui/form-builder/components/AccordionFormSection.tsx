@@ -18,6 +18,8 @@ import { FormModal } from './FormModal';
 import { Rating, PopupPicker, ConfirmationMessage, AddButtonFull, CodeBadge, Badge } from '../form-elements';
 import { Skeleton } from '../../../components/ui/skeleton';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { getInitials, getBadgeConfig, mapBadgeColorToVariant } from '../../data-display/utils';
 import { getPrimaryDisplayString } from '../../data-display/utils/value-display';
 import { NormalizedOption } from '../form-elements/utils/option-normalizer';
@@ -141,7 +143,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             setTargetSchemaData(response.data);
           }
         } catch (error) {
-          console.error('Error fetching target schema:', error);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching target schema: ${error instanceof Error ? error.message : String(error)}`);
         }
       };
       fetchTargetSchema();
@@ -225,7 +227,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 const entityResponse = await apiRequest<any>(`/api/data/${targetSchema}/${relation.targetId}`);
                 return entityResponse.success && entityResponse.data ? entityResponse.data : null;
                 } catch (error) {
-                  console.error(`Error fetching related entity ${relation.targetId}:`, error);
+                  loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching related entity ${relation.targetId}: ${error instanceof Error ? error.message : String(error)}`);
                   return null;
                 }
               })
@@ -237,7 +239,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         setRelatedEntities(resolvedEntities);
       }
     } catch (error) {
-      console.error('Error fetching relations:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching relations: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsLoadingRelations(false);
     }
@@ -487,7 +489,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           });
           
           if (!itemResponse.success) {
-            console.error('Failed to delete target item:', itemResponse.error);
+            loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to delete target item: ${itemResponse.error}`);
             // Relation was deleted but item deletion failed - still refresh to show updated state
           }
         }
@@ -497,7 +499,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       }
       setDeleteConfirmDialog({ open: false, relationId: null });
     } catch (error) {
-      console.error('Error removing relation:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error removing relation: ${error instanceof Error ? error.message : String(error)}`);
       setDeleteConfirmDialog({ open: false, relationId: null });
     }
   };
@@ -596,7 +598,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       const successCount = results.length - failedResults.length;
 
       if (failedResults.length > 0) {
-        console.error('Failed to create one or more relations from picker:', failedResults);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to create one or more relations from picker: ${JSON.stringify(failedResults)}`);
         const errorMessages = failedResults
           .map((r) => r.error || 'Unknown error')
           .join(', ');
@@ -619,7 +621,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       // Refresh relations to show updated data
         await fetchRelations();
     } catch (error) {
-      console.error('Error creating relation from picker:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error creating relation from picker: ${error instanceof Error ? error.message : String(error)}`);
       toast.error('Error creating relation', {
         description: error instanceof Error ? error.message : 'An unexpected error occurred.',
       });
@@ -735,12 +737,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               });
               
               if (!itemResponse.success) {
-                console.error('Failed to delete target item:', itemResponse.error);
+                loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to delete target item: ${itemResponse.error}`);
               }
             }
           }
         } catch (error) {
-          console.error('Error removing relation for N.A:', error);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Error removing relation for N.A: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
       

@@ -26,9 +26,8 @@ const applyTokenCookies = (response: NextResponse, tokens?: any): void => {
 
   const baseOptions = getCookieBaseOptions(typeof tokens.expiresIn === 'number' ? tokens.expiresIn : undefined);
 
-  if (tokens.accessToken) {
-    response.cookies.set(AUTH_CONFIG.ACCESS_TOKEN_COOKIE, tokens.accessToken, baseOptions);
-  }
+  // Access token is NOT stored in cookie - client stores in memory only
+  // Only refresh token is stored in HttpOnly cookie for security
 
   if (tokens.refreshToken) {
     response.cookies.set(AUTH_CONFIG.REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
@@ -111,10 +110,16 @@ export async function POST(request: NextRequest) {
       }
 
       // Create response with user data and tokens
+      // Access token is returned in response body (client stores in memory)
+      // Refresh token is set in HttpOnly cookie (not accessible to JavaScript)
       const responseData = {
         success: true,
         user: result.user,
-        tokens: result.tokens ? { ...result.tokens, accessToken: '***MASKED***', refreshToken: '***MASKED***' } : undefined,
+        tokens: result.tokens ? { 
+          ...result.tokens, 
+          accessToken: result.tokens.accessToken, // Return access token in body
+          refreshToken: '***MASKED***' // Refresh token is in HttpOnly cookie, not in response
+        } : undefined,
         message: result.message || 'Login successful',
       };
       loggingCustom(LogType.LOGIN_LOG, 'info', `Response (200 - Demo Mode): ${JSON.stringify(responseData, null, 2)}`);
@@ -123,15 +128,29 @@ export async function POST(request: NextRequest) {
         {
           success: true,
           user: result.user,
-          tokens: result.tokens,
+          tokens: result.tokens ? {
+            accessToken: result.tokens.accessToken, // Return access token for client to store in memory
+            // refreshToken is NOT returned - it's in HttpOnly cookie
+          } : undefined,
           message: result.message || 'Login successful',
         },
         { status: 200 }
       );
 
-      loggingCustom(LogType.LOGIN_LOG, 'debug', 'Applying token cookies...');
+      loggingCustom(LogType.LOGIN_LOG, 'debug', 'Applying token cookies (refresh token only)...');
       applyTokenCookies(response, result.tokens);
       loggingCustom(LogType.LOGIN_LOG, 'debug', 'Token cookies applied');
+      
+      loggingCustom(LogType.LOGIN_LOG, 'log', `[LOGIN_API] Login successful (Demo Mode) ${JSON.stringify({
+        hasAccessToken: !!result.tokens?.accessToken,
+        hasRefreshToken: !!result.tokens?.refreshToken,
+        accessTokenStorage: 'RETURNED IN RESPONSE BODY (client stores in MEMORY)',
+        refreshTokenStorage: 'SET IN HTTPONLY COOKIE (not accessible to JavaScript)',
+        accessTokenLength: result.tokens?.accessToken?.length || 0,
+        refreshTokenInCookie: true,
+        accessTokenInCookie: false,
+      })}`);
+      
       loggingCustom(LogType.LOGIN_LOG, 'info', '========== LOGIN API COMPLETED SUCCESSFULLY (DEMO MODE) ==========');
       return response;
     }
@@ -227,11 +246,35 @@ export async function POST(request: NextRequest) {
     } : { success: true };
     loggingCustom(LogType.LOGIN_LOG, 'info', `Response (${upstreamResponse.status} - External Auth): ${JSON.stringify(sanitizedResponse, null, 2)}`);
 
-    const response = NextResponse.json(upstreamJson ?? { success: true }, { status: upstreamResponse.status });
-    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Applying token cookies from external auth...');
+    // Return access token in response body (client stores in memory)
+    // Refresh token is set in HttpOnly cookie via forwardSetCookieHeaders
+    const responseData = upstreamJson ? {
+      success: upstreamJson.success,
+      user: upstreamJson.user,
+      tokens: upstreamJson.tokens ? {
+        accessToken: upstreamJson.tokens.accessToken, // Return access token for client to store in memory
+        // refreshToken is NOT returned - it's in HttpOnly cookie
+      } : undefined,
+      message: upstreamJson.message,
+    } : { success: true };
+    
+    const response = NextResponse.json(responseData, { status: upstreamResponse.status });
+    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Applying token cookies from external auth (refresh token only)...');
     applyTokenCookies(response, upstreamJson?.tokens);
     loggingCustom(LogType.LOGIN_LOG, 'debug', 'Forwarding set-cookie headers from external auth...');
     forwardSetCookieHeaders(upstreamResponse, response);
+    
+    const accessToken = upstreamJson?.tokens?.accessToken;
+    loggingCustom(LogType.LOGIN_LOG, 'log', `[LOGIN_API] Login successful (External Auth) ${JSON.stringify({
+      hasAccessToken: !!accessToken,
+      hasRefreshToken: !!upstreamJson?.tokens?.refreshToken,
+      accessTokenStorage: 'RETURNED IN RESPONSE BODY (client stores in MEMORY)',
+      refreshTokenStorage: 'SET IN HTTPONLY COOKIE via Set-Cookie headers (not accessible to JavaScript)',
+      accessTokenLength: accessToken?.length || 0,
+      refreshTokenInCookie: true,
+      accessTokenInCookie: false,
+    })}`);
+    
     loggingCustom(LogType.LOGIN_LOG, 'info', '========== LOGIN API COMPLETED SUCCESSFULLY (EXTERNAL AUTH) ==========');
     return response;
   } catch (error) {

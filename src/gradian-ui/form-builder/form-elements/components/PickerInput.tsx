@@ -15,6 +15,8 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export interface PickerInputProps {
   config: any;
@@ -131,7 +133,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
             setTargetSchema(response.data);
           }
         } catch (err) {
-          console.error('Error fetching target schema:', err);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching target schema: ${err instanceof Error ? err.message : String(err)}`);
         } finally {
           setIsLoadingSchema(false);
         }
@@ -183,7 +185,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                     }
                   }
                 } catch (err) {
-                  console.warn('Error fetching item from sourceUrl for icon/color:', err);
+                  loggingCustom(LogType.CLIENT_LOG, 'warn', `Error fetching item from sourceUrl for icon/color: ${err instanceof Error ? err.message : String(err)}`);
                 }
                 
                 // Fallback: use what we have
@@ -221,7 +223,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                   }
                 }
               } catch (err) {
-                console.warn('Error fetching item from sourceUrl:', err);
+                loggingCustom(LogType.CLIENT_LOG, 'warn', `Error fetching item from sourceUrl: ${err instanceof Error ? err.message : String(err)}`);
               }
               setSelectedItem({ id: resolvedId });
             } else {
@@ -275,7 +277,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
 
         setSelectedItem({ id: resolvedId });
       } catch (err) {
-        console.error('Error fetching selected item:', err);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching selected item: ${err instanceof Error ? err.message : String(err)}`);
       }
     };
 
@@ -301,7 +303,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
         // Single select: ignore empty selections, preserve current value
         // If we have a last valid selection, restore it
         if (lastValidSelection && lastValidSelection.length > 0) {
-          console.warn('[PickerInput] Ignoring empty selection for single-select, preserving last valid selection');
+          loggingCustom(LogType.CLIENT_LOG, 'warn', '[PickerInput] Ignoring empty selection for single-select, preserving last valid selection');
         }
         setIsPickerOpen(false);
         return;

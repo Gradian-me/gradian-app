@@ -17,6 +17,8 @@ import { MoreVertical } from 'lucide-react';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { replaceDynamicContext, replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 import { DynamicQuickActions } from '@/gradian-ui/data-display/components/DynamicQuickActions';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 const EXCLUDED_TITLE_ROLES = new Set(['code', 'subtitle', 'description']);
 
@@ -205,14 +207,14 @@ export const FormModal: React.FC<FormModalProps> = ({
             ...(typeof payload === 'object' && payload !== null ? payload : {}),
             skip_key: encryptedSkipKey, // This will be an object {ciphertext, iv} that gets properly stringified
           };
-          console.log('[FormModal] Added encrypted skip_key to action form payload:', {
+          loggingCustom(LogType.CLIENT_LOG, 'log', `[FormModal] Added encrypted skip_key to action form payload: ${JSON.stringify({
             endpoint: qa.submitRoute,
             method,
             hasSkipKey: !!payload.skip_key,
             skipKeyType: typeof payload.skip_key,
-          });
+          })}`);
         } else {
-          console.warn('[FormModal] passSkipKey is true but encrypted skip key is not available.');
+          loggingCustom(LogType.CLIENT_LOG, 'warn', '[FormModal] passSkipKey is true but encrypted skip key is not available.');
         }
       }
     }

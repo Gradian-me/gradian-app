@@ -6,6 +6,8 @@ import { NumberInputProps, FormElementRef } from '../types';
 import { cn, validateField, formatNumber } from '../../../shared/utils';
 import { CopyContent } from './CopyContent';
 import { baseInputClasses, getLabelClasses, errorTextClasses } from '../utils/field-styles';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
   (
@@ -159,7 +161,7 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
     const fieldPlaceholder = placeholder || config?.placeholder || 'Enter number';
 
     if (!config) {
-      console.error('NumberInput: config is required');
+      loggingCustom(LogType.CLIENT_LOG, 'error', 'NumberInput: config is required');
       return null;
     }
 

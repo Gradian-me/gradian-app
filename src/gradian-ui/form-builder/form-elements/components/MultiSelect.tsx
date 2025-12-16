@@ -11,6 +11,8 @@ import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
 import { getIconComponent } from '@/gradian-ui/shared/utils/icon-renderer';
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export interface MultiSelectFormOption {
   id?: string;
@@ -270,12 +272,12 @@ export const MultiSelect: React.FC<MultiSelectWithBadgesProps> = ({
 
   // Debug: Log component rendering
   if (process.env.NODE_ENV === 'development') {
-    console.log('[MultiSelect] Rendering with:', {
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[MultiSelect] Rendering with: ${JSON.stringify({
       normalizedOptionsCount: Array.isArray(normalizedOptions) ? normalizedOptions.length : 0,
       multiSelectValue,
       hasConfig: !!config,
       optionsFromConfig: config?.options?.length || 0,
-    });
+    })}`);
   }
 
   return (

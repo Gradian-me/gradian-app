@@ -8,6 +8,8 @@ import path from 'path';
 import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData } from '../utils';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
 import { clearCache as clearSharedSchemaCache } from '@/gradian-ui/shared/utils/data-loader';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 const MAX_SCHEMA_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
 const SCHEMA_FILE_PATH = path.join(process.cwd(), 'data', 'all-schemas.json');
@@ -178,7 +180,11 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error loading schema:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error loading schema: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       { 
         success: false, 
@@ -259,7 +265,11 @@ export async function PUT(
       data: schemas[schemaIndex]
     });
   } catch (error) {
-    console.error('Error updating schema:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error updating schema: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       { 
         success: false, 
@@ -333,7 +343,11 @@ export async function DELETE(
           writeAllData(allData);
         }
       } catch (dataError) {
-        console.warn(`Failed to delete data for schema ${schemaId}:`, dataError);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `Failed to delete data for schema ${schemaId}: ${dataError instanceof Error ? dataError.message : String(dataError)}`,
+        );
       }
 
       // 2. Delete all relations involving this schema (as source or target)
@@ -344,7 +358,11 @@ export async function DELETE(
         );
         writeAllRelations(filteredRelations);
       } catch (relationError) {
-        console.warn(`Failed to delete relations for schema ${schemaId}:`, relationError);
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `Failed to delete relations for schema ${schemaId}: ${relationError instanceof Error ? relationError.message : String(relationError)}`,
+        );
       }
 
       // 3. Remove the schema itself
@@ -396,7 +414,11 @@ export async function DELETE(
         : `Schema "${schemaId}" deleted successfully`
     });
   } catch (error) {
-    console.error('Error deleting schema:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error deleting schema: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return NextResponse.json(
       { 
         success: false, 

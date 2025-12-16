@@ -49,7 +49,7 @@ const mergeInitialValuesWithDefaults = (
   
   // Ensure schema has fields array
   if (!schema?.fields || !Array.isArray(schema.fields)) {
-    console.warn('[mergeInitialValuesWithDefaults] Schema fields is missing or not an array:', { schemaId: schema?.id });
+    loggingCustom(LogType.CLIENT_LOG, 'warn', `[mergeInitialValuesWithDefaults] Schema fields is missing or not an array: ${JSON.stringify({ schemaId: schema?.id })}`);
     return mergedValues;
   }
   
@@ -100,7 +100,7 @@ const ensureRepeatingItemIds = (
   
   // Ensure schema has sections array
   if (!schema?.sections || !Array.isArray(schema.sections)) {
-    console.warn('[ensureRepeatingItemIds] Schema sections is missing or not an array:', { schemaId: schema?.id });
+    loggingCustom(LogType.CLIENT_LOG, 'warn', `[ensureRepeatingItemIds] Schema sections is missing or not an array: ${JSON.stringify({ schemaId: schema?.id })}`);
     return newValues;
   }
   
@@ -201,7 +201,7 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
         
         // If item at index doesn't have required structure, ensure it has an ID
         if (!newArray[index].id) {
-          console.warn(`[FormReducer] Item at index ${index} missing id, adding one`);
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[FormReducer] Item at index ${index} missing id, adding one`);
           newArray[index] = {
             ...newArray[index],
             id: ulid()
@@ -214,7 +214,7 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
           [fieldName]: action.value,
         };
         
-        console.log(`[FormReducer] Updating repeating section item:`, {
+        loggingCustom(LogType.CLIENT_LOG, 'log', `[FormReducer] Updating repeating section item: ${JSON.stringify({
           sectionId,
           itemIndex: index,
           fieldName,
@@ -222,7 +222,7 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
           itemId: newArray[index].id,
           before: currentArray[index],
           after: newArray[index],
-        });
+        })}`);
         
         return {
           ...state,
@@ -235,10 +235,10 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
       }
       
       // Regular field update
-      console.log(`[FormReducer] Updating regular field:`, {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[FormReducer] Updating regular field: ${JSON.stringify({
         fieldName: action.fieldName,
         value: action.value,
-      });
+      })}`);
       
       return {
         ...state,
@@ -702,7 +702,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                 relationCounts[section.id] = 0;
               }
             } catch (error) {
-              console.error(`Error fetching relations count for section ${section.id}:`, error);
+              loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching relations count for section ${section.id}: ${error instanceof Error ? error.message : String(error)}`);
               relationCounts[section.id] = 0;
             }
           });
@@ -857,7 +857,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
               relationCounts[section.id] = 0;
             }
           } catch (error) {
-            console.error(`Error fetching relations count for section ${section.id}:`, error);
+            loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching relations count for section ${section.id}: ${error instanceof Error ? error.message : String(error)}`);
             relationCounts[section.id] = 0;
           }
         });
@@ -1564,7 +1564,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                 });
                 
                 if (!relationResponse.success) {
-                  console.error('Failed to create relation:', relationResponse.error);
+                  loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to create relation: ${relationResponse.error}`);
                   // Could show an error message here
                 } else {
                   loggingCustom(LogType.FORM_DATA, 'info', 'Relation created successfully');
@@ -1572,7 +1572,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                   setRefreshRelationsTrigger(prev => prev + 1);
                 }
               } catch (error) {
-                console.error('Error creating relation:', error);
+                loggingCustom(LogType.CLIENT_LOG, 'error', `Error creating relation: ${error instanceof Error ? error.message : String(error)}`);
               }
             }
             

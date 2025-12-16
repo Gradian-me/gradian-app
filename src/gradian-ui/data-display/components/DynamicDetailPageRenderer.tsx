@@ -29,6 +29,8 @@ import { FormModal } from '../../form-builder';
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Skeleton } from '../../../components/ui/skeleton';
 import Link from 'next/link';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { RepeatingTableRendererConfig } from '@/gradian-ui/schema-manager/types/form-schema';
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';
@@ -545,7 +547,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
 
         setRelatedSchemas(uncoveredSchemas);
       } catch (error) {
-        console.error('Error fetching related schemas:', error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching related schemas: ${error instanceof Error ? error.message : String(error)}`);
         setRelatedSchemas([]);
       } finally {
         setIsLoadingAutoTables(false);
@@ -598,7 +600,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
           });
         }
       } catch (error) {
-        console.error('Error preloading related schemas:', error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Error preloading related schemas: ${error instanceof Error ? error.message : String(error)}`);
       }
     };
 
@@ -1663,7 +1665,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
             try {
               await onRefreshData();
             } catch (error) {
-              console.error('Failed to refresh entity data after edit:', error);
+              loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to refresh entity data after edit: ${error instanceof Error ? error.message : String(error)}`);
             }
           }
           }}

@@ -4,6 +4,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 /**
  * Load notifications from notifications.json file
@@ -17,7 +19,11 @@ function loadNotifications(): any[] {
       return Array.isArray(notifications) ? notifications : [];
     }
   } catch (error) {
-    console.error('Error reading notifications.json:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error reading notifications.json: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
   
   return [];
@@ -31,7 +37,11 @@ function saveNotifications(notifications: any[]): void {
     const notificationsPath = path.join(process.cwd(), 'data', 'notifications.json');
     fs.writeFileSync(notificationsPath, JSON.stringify(notifications, null, 2), 'utf-8');
   } catch (error) {
-    console.error('Error saving notifications:', error);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error saving notifications: ${error instanceof Error ? error.message : String(error)}`,
+    );
     throw error;
   }
 }

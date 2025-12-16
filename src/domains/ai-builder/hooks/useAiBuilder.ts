@@ -14,6 +14,8 @@ import {
   formatPreloadRouteResult,
   type PreloadRoute,
 } from '@/gradian-ui/shared/utils/preload-routes';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface UseAiBuilderReturn {
   userPrompt: string;
@@ -166,7 +168,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
       
       setPreloadedContext(context);
     } catch (error) {
-      console.error('Error loading preload routes:', error);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading preload routes: ${error instanceof Error ? error.message : String(error)}`);
       setPreloadedContext('');
     } finally {
       setIsLoadingPreload(false);
@@ -513,12 +515,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
         setDuration(null);
         
         // Log detailed error for debugging
-        console.error('AI Builder Error:', {
-          error: err,
-          message: errorMessage,
-          agentId: request.agentId,
-          userPrompt: request.userPrompt.substring(0, 64) + '...',
-        });
+        loggingCustom(LogType.CLIENT_LOG, 'error', `AI Builder Error: ${errorMessage}, agentId: ${request.agentId}, userPrompt: ${request.userPrompt.substring(0, 64)}...`);
       }
     } finally {
       setIsLoading(false);
@@ -745,7 +742,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
           method: 'GET',
           cache: 'no-store',
         }).catch(err => {
-          console.warn('Failed to refresh schemas:', err);
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to refresh schemas: ${err instanceof Error ? err.message : String(err)}`);
         });
       }
       

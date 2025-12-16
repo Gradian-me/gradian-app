@@ -1,6 +1,8 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export type TwoFAEntry = {
   userId: string;
@@ -34,7 +36,11 @@ export async function readTwoFAEntries(): Promise<TwoFAEntry[]> {
       }));
     }
   } catch (error) {
-    console.error('[2FA] Failed to read entries:', error);
+    loggingCustom(
+      LogType.LOGIN_LOG,
+      'error',
+      `[2FA] Failed to read entries: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
   return [];
 }
