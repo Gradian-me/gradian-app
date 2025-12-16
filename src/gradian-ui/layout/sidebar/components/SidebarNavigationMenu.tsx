@@ -59,8 +59,18 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
   const selectedCompany = useCompanyStore((state) => state.selectedCompany);
   // Compute companyId from selectedCompany
   const companyId = selectedCompany && selectedCompany.id !== -1 ? selectedCompany.id : null;
+  
+  // Track the last companyId that was used to load items
+  const lastLoadedCompanyIdRef = React.useRef<number | string | null>(null);
+  // Track if items have been loaded at least once
+  const hasLoadedRef = React.useRef<boolean>(false);
 
   useEffect(() => {
+    // Only reload if companyId actually changed, or if we haven't loaded yet
+    if (hasLoadedRef.current && lastLoadedCompanyIdRef.current === companyId) {
+      return; // Skip reload if companyId hasn't changed
+    }
+
     let isMounted = true;
 
     async function loadMenuItems() {
@@ -84,6 +94,8 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
         if (isMounted) {
           setItems(mapped);
           setIsLoading(false);
+          lastLoadedCompanyIdRef.current = companyId;
+          hasLoadedRef.current = true;
         }
       } catch {
         // Silently ignore errors and leave items as-is

@@ -9,12 +9,13 @@ import { ChatInterface } from '@/domains/chat/components/ChatInterface';
 export default function ChatPage() {
   return (
     <MainLayout
-      title="Chat"
+      title="Chatbot"
       subtitle="AI-powered conversations with agent orchestration"
-      icon="MessageCircle"
+      icon="BotMessageSquare"
+      hidePadding={true}
       showEndLine={false}
     >
-      <div className="h-[calc(100vh-9rem)]">
+      <div className="h-full w-full">
         <ChatInterface showChatList={true} />
       </div>
     </MainLayout>

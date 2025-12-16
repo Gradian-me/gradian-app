@@ -69,18 +69,29 @@ export function formatTime(date: Date | string): string {
 }
 
 /**
- * Creates a formatted "Created" label with relative time and full date on hover
+ * Creates a formatted "Created" label with relative time and full date for tooltip
  * @param date - The date to format
- * @returns Object with display text and hover title
+ * @returns Object with display text and tooltip text
+ * @example
+ * const label = formatCreatedLabel(new Date());
+ * // Use with Tooltip component:
+ * <Tooltip>
+ *   <TooltipTrigger>{label.display}</TooltipTrigger>
+ *   <TooltipContent>{label.tooltip}</TooltipContent>
+ * </Tooltip>
  */
 export function formatCreatedLabel(date: Date | string): {
   display: string;
+  tooltip: string;
+  /** @deprecated Use `tooltip` instead. Kept for backward compatibility. */
   title: string;
 } {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
+  const tooltipText = formatFullDate(dateObj);
   return {
     display: formatRelativeTime(dateObj),
-    title: formatFullDate(dateObj),
+    tooltip: tooltipText,
+    title: tooltipText, // Backward compatibility
   };
 }
 

@@ -441,6 +441,12 @@ export interface FormSchema {
   }>;
   syncToDatabases?: string[]; // Array of database IDs to sync this schema to
   syncStrategy?: 'schema-only' | 'schema-and-data'; // Sync strategy: schema only or schema and data
+  statistics?: {
+    hasPartition?: boolean;
+    isIndexed?: boolean;
+    records?: number;
+    size?: number; // in megabytes
+  };
   fields: FormField[]; // All fields at schema level, each with a sectionId
   sections: FormSection[]; // Sections no longer contain fields
   fieldsCount?: number;

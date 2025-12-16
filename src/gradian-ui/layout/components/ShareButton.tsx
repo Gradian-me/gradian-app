@@ -4,6 +4,7 @@
 import React from 'react';
 import { Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/gradian-ui/shared/utils';
 
 export interface ShareButtonProps {
@@ -60,15 +61,24 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
   };
 
   return (
-    <Button
-      onClick={handleShare}
-      disabled={disabled}
-      variant={variant}
-      className={cn(sizeClasses[size], 'p-0', className)}
-      title="Share"
-    >
-      <Share2 className="h-4 w-4" />
-    </Button>
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            onClick={handleShare}
+            disabled={disabled}
+            variant={variant}
+            className={cn(sizeClasses[size], 'p-0', className)}
+            aria-label="Share"
+          >
+            <Share2 className="h-4 w-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Share</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 

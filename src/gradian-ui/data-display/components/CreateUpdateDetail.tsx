@@ -260,7 +260,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
               >
                 <span>
                   {createdByName ? `Created By ${createdByName}` : 'Created'}
-                  {createdFullDate ? ` . ${createdFullDate}` : createdLabel?.title ? ` . ${createdLabel.title}` : ''}
+                  {createdFullDate ? ` . ${createdFullDate}` : createdLabel?.tooltip ? ` . ${createdLabel.tooltip}` : ''}
                 </span>
               </TooltipContent>
             </Tooltip>
@@ -333,7 +333,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                 >
                   <span>
                     {createdByName ? `Created By ${createdByName}` : 'Created'}
-                    {createdFullDate ? ` . ${createdFullDate}` : createdLabel?.title ? ` . ${createdLabel.title}` : ''}
+                    {createdFullDate ? ` . ${createdFullDate}` : createdLabel?.tooltip ? ` . ${createdLabel.tooltip}` : ''}
                   </span>
                 </TooltipContent>
               </Tooltip>

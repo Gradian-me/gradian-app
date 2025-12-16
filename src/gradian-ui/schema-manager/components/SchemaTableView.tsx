@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { TableWrapper, TableConfig, TableColumn } from '@/gradian-ui/data-display/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { PencilRuler, LayoutList, Trash2, Database, Users2 } from 'lucide-react';
+import { PencilRuler, LayoutList, Trash2, Database, Users2, Circle, Hash, FileText } from 'lucide-react';
 import { FormSchema } from '../types';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 
@@ -14,9 +14,21 @@ interface SchemaTableViewProps {
   onView: (schema: FormSchema) => void;
   onDelete: (schema: FormSchema) => void;
   isLoading?: boolean;
+  /**
+   * When true, show statistics (partition/index/records) instead of description
+   * when statistics are available on the schema.
+   */
+  showStatistics?: boolean;
 }
 
-export function SchemaTableView({ schemas, onEdit, onView, onDelete, isLoading = false }: SchemaTableViewProps) {
+export function SchemaTableView({
+  schemas,
+  onEdit,
+  onView,
+  onDelete,
+  isLoading = false,
+  showStatistics = false,
+}: SchemaTableViewProps) {
   const tableColumns = useMemo<TableColumn<FormSchema>[]>(() => [
     {
       id: 'actions',
@@ -149,21 +161,6 @@ export function SchemaTableView({ schemas, onEdit, onView, onDelete, isLoading =
       },
     },
     {
-      id: 'singular_name',
-      label: 'Singular Name',
-      accessor: 'singular_name',
-      sortable: true,
-      align: 'left',
-      minWidth: 150,
-      render: (_value: any, row: FormSchema) => {
-        return (
-          <span className={row.inactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'}>
-            {row.singular_name || '-'}
-          </span>
-        );
-      },
-    },
-    {
       id: 'relatedTenants',
       label: 'Tenants',
       accessor: 'relatedTenants',
@@ -233,11 +230,53 @@ export function SchemaTableView({ schemas, onEdit, onView, onDelete, isLoading =
     {
       id: 'description',
       label: 'Description',
-      accessor: 'description',
+      accessor: (row: FormSchema) => {
+        // For sorting: use records count if statistics are available, otherwise use description
+        if (row.statistics?.records !== undefined) {
+          return row.statistics.records;
+        }
+        return row.description || '';
+      },
       sortable: true,
       align: 'left',
       minWidth: 200,
       render: (_value: any, row: FormSchema) => {
+        // Show statistics if enabled and available, otherwise show description
+        if (showStatistics && row.statistics) {
+          const stats = row.statistics as { hasPartition?: boolean; isIndexed?: boolean; records?: number; size?: number };
+          return (
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Records count - First for sorting */}
+              <div className="flex items-center gap-1.5" title={`${stats.records || 0} records`}>
+                <FileText className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                <span className="text-xs text-gray-600 dark:text-gray-400">{stats.records ?? 0}</span>
+              </div>
+              {/* Size in MB */}
+              {stats.size !== undefined && (
+                <div className="flex items-center gap-1.5" title={`${stats.size} MB`}>
+                  <Database className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                  <span className="text-xs text-gray-600 dark:text-gray-400">{stats.size.toFixed(2)} MB</span>
+                </div>
+              )}
+              {/* Partition indicator */}
+              <div className="flex items-center gap-1.5" title={stats.hasPartition ? 'Has Partition' : 'No Partition'}>
+                <Circle 
+                  className={`h-3 w-3 ${stats.hasPartition ? 'fill-emerald-500 text-emerald-500' : 'fill-slate-200 text-slate-200 dark:fill-slate-700 dark:text-slate-700'}`} 
+                />
+                <span className="text-xs text-gray-600 dark:text-gray-400">Partition</span>
+              </div>
+              {/* Index indicator */}
+              <div className="flex items-center gap-1.5" title={stats.isIndexed ? 'Indexed' : 'Not Indexed'}>
+                <Hash 
+                  className={`h-3.5 w-3.5 ${stats.isIndexed ? 'text-blue-500' : 'text-slate-300 dark:text-slate-600'}`} 
+                />
+                <Circle 
+                  className={`h-3 w-3 ${stats.isIndexed ? 'fill-blue-500 text-blue-500' : 'fill-slate-200 text-slate-200 dark:fill-slate-700 dark:text-slate-700'}`} 
+                />
+              </div>
+            </div>
+          );
+        }
         return (
           <span className={`text-sm line-clamp-2 ${row.inactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-400'}`}>
             {row.description || '-'}
@@ -262,7 +301,7 @@ export function SchemaTableView({ schemas, onEdit, onView, onDelete, isLoading =
         );
       },
     },
-  ], [onEdit, onView, onDelete]);
+  ], [onEdit, onView, onDelete, showStatistics]);
 
   const tableConfig: TableConfig<FormSchema> = useMemo(
     () => ({

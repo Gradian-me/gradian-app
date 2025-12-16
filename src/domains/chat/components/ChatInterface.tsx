@@ -3,7 +3,7 @@
 
 'use client';
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sidebar as SidebarIcon, Loader2, ChevronDown } from 'lucide-react';
@@ -66,9 +66,20 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
 
   // Select chat from URL on mount or when URL changes
+  // Only update if URL chat ID is different from current chat
+  // Use a ref to track the last processed chat-id to avoid unnecessary reloads
+  const lastProcessedChatIdRef = useRef<string | null>(null);
   useEffect(() => {
-    if (chatIdFromUrl && chatIdFromUrl !== currentChat?.id) {
+    if (chatIdFromUrl && chatIdFromUrl !== currentChat?.id && chatIdFromUrl !== lastProcessedChatIdRef.current) {
+      lastProcessedChatIdRef.current = chatIdFromUrl;
+      // Clear expanded execution plans when switching chats
+      setExpandedExecutionPlans(new Set());
+      // Only load messages for the new chat, don't refresh the entire chat list
       selectChat(chatIdFromUrl);
+    }
+    // Reset ref when chat is successfully loaded
+    if (currentChat?.id === chatIdFromUrl) {
+      lastProcessedChatIdRef.current = chatIdFromUrl;
     }
   }, [chatIdFromUrl, currentChat?.id, selectChat]);
 
@@ -386,7 +397,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
 
         {/* Messages Area */}
+        {/* Key prop ensures React updates this container when chat changes */}
         <div
+          key={currentChat?.id || 'no-chat'}
           className="flex-1 overflow-y-auto p-4 relative"
           ref={messagesContainerRef}
           onScroll={handleMessagesScroll}

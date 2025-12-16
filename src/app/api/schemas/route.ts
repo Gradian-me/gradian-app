@@ -8,13 +8,14 @@ import path from 'path';
 import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData } from './utils';
 import { SCHEMA_SUMMARY_EXCLUDED_KEYS, LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { calculateSchemaStatistics } from '@/gradian-ui/schema-manager/utils/schema-statistics-utils';
 
 const SCHEMA_SUMMARY_EXCLUDED_KEY_SET = new Set<string>(SCHEMA_SUMMARY_EXCLUDED_KEYS);
 const MAX_SCHEMA_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
 const SCHEMA_FILE_PATH = path.join(process.cwd(), 'data', 'all-schemas.json');
 const SCHEMA_FILE_TMP_PATH = path.join(process.cwd(), 'data', 'all-schemas.tmp.json');
 
-function buildSchemaSummary<T extends Record<string, any>>(schema: T): T {
+function buildSchemaSummary<T extends Record<string, any>>(schema: T, includeStatistics: boolean = false): T {
   if (!schema || typeof schema !== 'object' || Array.isArray(schema)) {
     return schema;
   }
@@ -43,6 +44,46 @@ function buildSchemaSummary<T extends Record<string, any>>(schema: T): T {
 
   if (typeof sectionsCount === 'number') {
     summary.sectionsCount = sectionsCount;
+  }
+
+  // Include statistics if requested
+  if (includeStatistics) {
+    const schemaId = schema.id as string;
+    if (schemaId) {
+      try {
+        // Calculate records and size from all-data.json
+        const calculatedStats = calculateSchemaStatistics(schemaId);
+        
+        // Merge with existing statistics (preserve hasPartition and isIndexed from schema if available)
+        summary.statistics = {
+          hasPartition: schema.statistics?.hasPartition ?? false,
+          isIndexed: schema.statistics?.isIndexed ?? false,
+          records: calculatedStats.records,
+          size: calculatedStats.size, // in megabytes
+        };
+      } catch (error) {
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `[API] Failed to calculate statistics for schema "${schemaId}": ${error instanceof Error ? error.message : String(error)}`,
+        );
+        // Fallback to defaults if calculation fails
+        summary.statistics = schema.statistics || {
+          hasPartition: false,
+          isIndexed: false,
+          records: 0,
+          size: 0, // in megabytes
+        };
+      }
+    } else {
+      // Fallback if no schema ID
+      summary.statistics = schema.statistics || {
+        hasPartition: false,
+        isIndexed: false,
+        records: 0,
+        size: 0, // in megabytes
+      };
+    }
   }
 
   return summary as T;
@@ -145,6 +186,17 @@ export async function GET(request: NextRequest) {
     const tenantIdsParam = searchParams.get('tenantIds');
     const summaryParam = searchParams.get('summary');
     const isSummaryRequested = summaryParam === 'true' || summaryParam === '1';
+    const includeStatisticsParam = searchParams.get('includeStatistics');
+    const includeStatistics = includeStatisticsParam === 'true' || includeStatisticsParam === '1';
+    
+    // Log for debugging
+    if (includeStatistics) {
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'info',
+        `[API] /api/schemas called with includeStatistics=true`,
+      );
+    }
     const tenantIds = tenantIdsParam
       ?.split(',')
       .map((id) => id.trim())
@@ -194,7 +246,7 @@ export async function GET(request: NextRequest) {
         .map((id) => schemas.find((s: any) => s.id === id))
         .filter((schema): schema is any => Boolean(schema) && matchesTenantFilter(schema));
       const responseData = isSummaryRequested
-        ? matchedSchemas.map((schema) => buildSchemaSummary(schema))
+        ? matchedSchemas.map((schema) => buildSchemaSummary(schema, includeStatistics))
         : matchedSchemas;
 
       return NextResponse.json({
@@ -224,7 +276,7 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      const responseSchema = isSummaryRequested ? buildSchemaSummary(schema) : schema;
+      const responseSchema = isSummaryRequested ? buildSchemaSummary(schema, includeStatistics) : schema;
 
       return NextResponse.json({
         success: true,
@@ -241,7 +293,7 @@ export async function GET(request: NextRequest) {
     // Return all schemas with cache-busting headers
     const filteredSchemas = hasTenantFilter ? schemas.filter(matchesTenantFilter) : schemas;
     const responseSchemas = isSummaryRequested
-      ? filteredSchemas.map((schema) => buildSchemaSummary(schema))
+      ? filteredSchemas.map((schema) => buildSchemaSummary(schema, includeStatistics))
       : filteredSchemas;
 
     return NextResponse.json({

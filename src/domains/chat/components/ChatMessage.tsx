@@ -18,6 +18,7 @@ import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/
 import { TextShimmerWave } from '@/components/ui/text-shimmer-wave';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/gradian-ui/form-builder/form-elements/components/Badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useUserStore } from '@/stores/user.store';
 import { useLanguageStore } from '@/stores/language.store';
 import { formatRelativeTime, formatTime } from '@/gradian-ui/shared/utils/date-utils';
@@ -134,7 +135,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isStringExpanded, setIsStringExpanded] = useState(false);
   const markdownContentRef = useRef<HTMLDivElement>(null);
+  const stringContentRef = useRef<HTMLDivElement>(null);
+  const [stringContentHeight, setStringContentHeight] = useState<number | null>(null);
 
   // Get raw content for copying (without HTML processing)
   const rawContent = message.content || '';
@@ -161,6 +165,27 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       return () => clearTimeout(timer);
     }
   }, [cleanContent, shouldRenderAgentContainer, isExpanded]);
+  
+  // Measure string content height for assistant messages with responseFormat === 'string'
+  const isStringMessage = isAssistant && responseFormat === 'string' && shouldRenderAgentContainer;
+  const stringContent = isStringMessage && parsedContent 
+    ? (typeof parsedContent === 'string' ? parsedContent : JSON.stringify(parsedContent, null, 2))
+    : '';
+  const isStringLong = stringContent.length > 500 || stringContent.split('\n\n').length > 3;
+  
+  useEffect(() => {
+    if (stringContentRef.current && isStringMessage) {
+      const timer = setTimeout(() => {
+        if (stringContentRef.current) {
+          const height = stringContentRef.current.scrollHeight;
+          setStringContentHeight(height);
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [stringContent, isStringMessage, isStringExpanded]);
+  
+  const shouldTruncateString = isStringLong && !isStringExpanded && (stringContentHeight === null || stringContentHeight > 300);
   
   const shouldTruncate = isLongContent && !isExpanded && (contentHeight === null || contentHeight > maxCollapsedHeight);
   const displayContent = cleanContent; // Always show full content, truncate with CSS
@@ -770,12 +795,46 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 
                 if (responseFormat === 'string') {
                   return (
-                    <MarkdownViewer 
-                      content={typeof parsedContent === 'string' ? parsedContent : JSON.stringify(parsedContent, null, 2)}
-                      showToggle={false}
-                      isEditable={false}
-                      showEndLine={false}
-                    />
+                    <div className="relative">
+                      <div 
+                        ref={stringContentRef}
+                        className={cn(
+                          "chat-message-content text-sm leading-relaxed relative transition-all duration-300 ease-in-out",
+                          shouldTruncateString ? "overflow-hidden" : ""
+                        )}
+                        style={shouldTruncateString 
+                          ? { maxHeight: '300px' } 
+                          : { maxHeight: stringContentHeight ? `${stringContentHeight + 10}px` : '10000px' }
+                        }
+                      >
+                        <MarkdownViewer 
+                          content={stringContent}
+                          showToggle={false}
+                          isEditable={false}
+                          showEndLine={false}
+                        />
+                      </div>
+                      {isStringLong && (stringContentHeight === null || stringContentHeight > 300) && (
+                        <div className="mt-2 flex justify-end">
+                          <button
+                            onClick={() => setIsStringExpanded(!isStringExpanded)}
+                            className={cn(
+                              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg',
+                              'text-xs font-medium transition-all',
+                              'border',
+                              'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            )}
+                          >
+                            <span>{isStringExpanded ? 'Show less' : 'Show more'}</span>
+                            {isStringExpanded ? (
+                              <ChevronUp className="w-3.5 h-3.5" />
+                            ) : (
+                              <ChevronDown className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   );
                 }
                 
@@ -812,34 +871,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   isEditable={false}
                   showEndLine={false}
                 />
-                {/* Gradient fade overlay when truncated */}
-                {shouldTruncate && (
-                  <>
-                    {isUser ? (
-                      <div 
-                        className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none"
-                        style={{
-                          background: 'linear-gradient(to bottom, transparent, rgba(139, 92, 246, 0.95))',
-                        }}
-                      />
-                    ) : (
-                      <>
-                        <div 
-                          className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none dark:hidden"
-                          style={{
-                            background: 'linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 1))',
-                          }}
-                        />
-                        <div 
-                          className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none hidden dark:block"
-                          style={{
-                            background: 'linear-gradient(to bottom, transparent, rgba(17, 24, 39, 0.95), rgba(17, 24, 39, 1))',
-                          }}
-                        />
-                      </>
-                    )}
-                  </>
-                )}
               </div>
               {isLongContent && (contentHeight === null || contentHeight > maxCollapsedHeight) && (
                 <div className="mt-2 flex justify-end">
@@ -884,10 +915,19 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
               </Badge>
             )}
             {message.createdAt && (
-              <span className="flex items-center gap-1" title={formatTime(message.createdAt)}>
-                <Clock className="w-3 h-3" />
-                {formatRelativeTime(message.createdAt)}
-              </span>
+              <TooltipProvider delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="flex items-center gap-1 cursor-default">
+                      <Clock className="w-3 h-3" />
+                      {formatRelativeTime(message.createdAt)}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{formatTime(message.createdAt)}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </div>
         )}

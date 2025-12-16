@@ -49,7 +49,12 @@ const transformMessages = (apiMessages: any[]): Message[] => {
 
 export const useSchemaManagerPage = () => {
   const queryClient = useQueryClient();
-  const { schemas: fetchedSchemas, isLoading, error: schemasError, refetch: refetchSchemas } = useSchemas({ summary: true });
+  const [showStatistics, setShowStatistics] = useState(false);
+  const { schemas: fetchedSchemas, isLoading, error: schemasError, refetch: refetchSchemas } = useSchemas({ 
+    summary: true,
+    includeStatistics: showStatistics,
+    enabled: true,
+  });
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<SchemaTab>('system');
@@ -77,6 +82,24 @@ export const useSchemaManagerPage = () => {
       });
     }
   }, [schemasError]);
+
+  // Force refetch when showStatistics changes to ensure fresh data with/without statistics
+  useEffect(() => {
+    console.log(`[SchemaManager] Statistics switch changed to: ${showStatistics}`);
+    // Invalidate all schema summary queries (with and without statistics)
+    queryClient.invalidateQueries({ 
+      queryKey: SCHEMAS_SUMMARY_QUERY_KEY,
+      exact: false, // Invalidate all queries that start with this key
+    });
+    // Remove the old query from cache to force a fresh fetch
+    queryClient.removeQueries({ 
+      queryKey: SCHEMAS_SUMMARY_QUERY_KEY,
+      exact: false,
+    });
+    // Refetch the schemas with the new statistics flag
+    console.log(`[SchemaManager] Refetching schemas with includeStatistics=${showStatistics}`);
+    refetchSchemas();
+  }, [showStatistics, queryClient, refetchSchemas]);
 
   const normalizeSchemaType = useCallback((schema: FormSchema): 'system' | 'business' | 'action-form' => {
     if (schema.schemaType) return schema.schemaType;
@@ -294,11 +317,15 @@ export const useSchemaManagerPage = () => {
       // Force-refresh summary cache so IndexedDB stores the latest snapshot
       try {
         await clearSchemaCache(undefined, SCHEMA_SUMMARY_CACHE_KEY);
+        const params: Record<string, string> = {
+          summary: 'true',
+          cacheBust: Date.now().toString(),
+        };
+        if (showStatistics) {
+          params.includeStatistics = 'true';
+        }
         await apiRequest<FormSchema[]>('/api/schemas', {
-          params: {
-            summary: 'true',
-            cacheBust: Date.now().toString(),
-          },
+          params,
           callerName: 'SchemaManagerRefresh',
         });
       } catch (cacheError) {
@@ -313,7 +340,7 @@ export const useSchemaManagerPage = () => {
     } finally {
       setRefreshing(false);
     }
-  }, [invalidateSchemaQueryCaches, refetchSchemas]);
+  }, [invalidateSchemaQueryCaches, refetchSchemas, showStatistics]);
 
   const openDeleteDialog = useCallback((schema: FormSchema) => {
     setDeleteDialog({ open: true, schema });
@@ -587,5 +614,7 @@ export const useSchemaManagerPage = () => {
     handleCreate,
     messages,
     clearMessages: () => setMessages(null),
+    showStatistics,
+    setShowStatistics,
   };
 };

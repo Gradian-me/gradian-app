@@ -3,7 +3,7 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/stores/user.store';
@@ -25,7 +25,7 @@ export interface ChatListProps {
   className?: string;
 }
 
-export const ChatList: React.FC<ChatListProps> = ({
+const ChatListComponent: React.FC<ChatListProps> = ({
   chats,
   selectedChatId,
   onSelectChat,
@@ -37,8 +37,12 @@ export const ChatList: React.FC<ChatListProps> = ({
   const router = useRouter();
 
   const handleSelectChat = (chatId: string) => {
+    // Use replace to avoid building up history when switching chats
+    // This prevents back button from going through all chat switches
+    // Next.js App Router handles client-side navigation automatically
+    router.replace(`/chat/${chatId}`);
+    // Call onSelectChat after navigation to ensure state is in sync
     onSelectChat(chatId);
-    router.push(`/chat/${chatId}`);
   };
 
   return (
@@ -126,7 +130,7 @@ export const ChatList: React.FC<ChatListProps> = ({
                   >
                     <div className="flex items-start gap-3">
                       <div className={cn(
-                        'flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-colors',
+                        'shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-colors',
                         isSelected
                           ? 'bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300'
                           : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
@@ -175,5 +179,6 @@ export const ChatList: React.FC<ChatListProps> = ({
   );
 };
 
-ChatList.displayName = 'ChatList';
+ChatListComponent.displayName = 'ChatList';
+export const ChatList = memo(ChatListComponent);
 

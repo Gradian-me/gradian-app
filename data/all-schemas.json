@@ -1450,7 +1450,13 @@
     },
     "showInNavigation": false,
     "icon": "User",
-    "schemaType": "business"
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+        "label": "Supply Chain Management"
+      }
+    ]
   },
   {
     "id": "contacts",
@@ -6733,7 +6739,14 @@
         "id": "01KCPROCESSTYPES00000000001",
         "label": "Process Types"
       }
-    ]
+    ],
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ],
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "guidelines",

@@ -30,6 +30,7 @@ import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useTheme } from 'next-themes';
 import { useDialogContext } from '@/gradian-ui/shared/contexts/DialogContext';
 import { cn } from '@/gradian-ui/shared/utils';
+import { useLayoutContext, LayoutProvider } from '@/gradian-ui/layout/contexts/LayoutContext';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -73,7 +74,7 @@ const getInitialSidebarState = (): boolean => {
   return stored === 'true';
 };
 
-export function MainLayout({ 
+function MainLayoutContent({ 
   children, 
   title,
   subtitle,
@@ -124,7 +125,14 @@ export function MainLayout({
   const prevSidebarWidthRef = useRef<number | null>(sidebarWidth);
   const { selectedCompany } = useCompanyStore();
   const { closeAllDialogs, hasOpenDialogs, registerDialog, unregisterDialog } = useDialogContext();
+  const { isMaximized, setTitle, setIcon } = useLayoutContext();
   const pageTitle = title ? `${title} | Gradian` : 'Gradian';
+
+  // Update layout context with title and icon
+  useEffect(() => {
+    setTitle(title);
+    setIcon(icon);
+  }, [title, icon, setTitle, setIcon]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -351,18 +359,33 @@ export function MainLayout({
         <motion.div
           initial={{ opacity: 0, x: 5 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
+          transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="flex items-center gap-2 min-w-0"
         >
           {icon && (
-            <IconRenderer
-              iconName={icon}
-              className="h-5 w-5 md:h-6 md:w-6 text-violet-600 dark:text-violet-300 shrink-0"
-            />
+            <motion.div
+              initial={{ opacity: 0, rotate: -180, scale: 0 }}
+              animate={{ opacity: 1, rotate: 0, scale: 1 }}
+              transition={{
+                duration: 0.4,
+                delay: 0.1,
+                ease: [0.34, 1.56, 0.64, 1],
+              }}
+            >
+              <IconRenderer
+                iconName={icon}
+                className="h-5 w-5 md:h-6 md:w-6 text-violet-600 dark:text-violet-300 shrink-0"
+              />
+            </motion.div>
           )}
-          <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-gray-100 truncate min-w-0">
+          <motion.h1
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.15 }}
+            className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-gray-100 truncate min-w-0"
+          >
             {title}
-          </h1>
+          </motion.h1>
           {isAdmin && editSchemaPath && (
             <TooltipProvider delayDuration={200}>
               <Tooltip>
@@ -512,7 +535,14 @@ export function MainLayout({
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-950 relative">
       {/* Desktop Sidebar - Fixed Position */}
-      <div className="hidden md:block fixed left-0 top-0 h-full z-30">
+      {/* Keep sidebar mounted but hidden when maximized to preserve state */}
+      <div 
+        className={cn(
+          "fixed left-0 top-0 h-full z-30",
+          isMaximized ? "hidden" : "hidden md:block"
+        )}
+        key="sidebar-container" // Stable key to prevent remounting
+      >
         <Sidebar 
           isCollapsed={isSidebarCollapsed} 
           onToggle={toggleSidebar}
@@ -565,23 +595,25 @@ export function MainLayout({
       {/* Main Content - Adjust margin based on sidebar width */}
       <motion.div 
         className="flex-1 flex flex-col min-h-0"
-        initial={{ marginLeft: sidebarWidth }}
+        initial={{ marginLeft: isMaximized ? 0 : sidebarWidth }}
         animate={{ 
-          marginLeft: sidebarWidth
+          marginLeft: isMaximized ? 0 : sidebarWidth
         }}
         transition={{ 
           duration: shouldAnimateSidebar ? 0.3 : 0,
           ease: "easeOut" 
         }}
-        style={mainContentStyle}
+        style={isMaximized ? { width: '100%', minWidth: 0 } : mainContentStyle}
       >
         {/* Header */}
-        <Header
-          config={headerConfig}
-          brandContent={headerBrandContent}
-          actionsContent={headerActionsContent}
-          className="bg-white/90 border-b border-gray-200 dark:bg-gray-900/80 dark:border-gray-700 backdrop-blur-sm"
-        />
+        {!isMaximized && (
+          <Header
+            config={headerConfig}
+            brandContent={headerBrandContent}
+            actionsContent={headerActionsContent}
+            className="bg-white/90 border-b border-gray-200 dark:bg-gray-900/80 dark:border-gray-700 backdrop-blur-sm"
+          />
+        )}
 
         {/* Page Action Buttons - Top of page */}
         {showActionButtons && (
@@ -591,8 +623,9 @@ export function MainLayout({
         )}
 
         {/* Page Content */}
+        {/* Use stable key for chat pages to prevent remounting when chat-id changes */}
         <motion.main
-          key={pathname}
+          key={pathname?.startsWith('/chat/') ? '/chat/[chat-id]' : pathname}
           initial={!hasMountedBefore ? { opacity: 0, y: 10 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
@@ -612,5 +645,13 @@ export function MainLayout({
         <GoToTop scrollContainerSelector="[data-scroll-container='main-content']" threshold={100} />
       </motion.div>
     </div>
+  );
+}
+
+export function MainLayout(props: MainLayoutProps) {
+  return (
+    <LayoutProvider>
+      <MainLayoutContent {...props} />
+    </LayoutProvider>
   );
 }

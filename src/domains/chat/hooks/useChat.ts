@@ -167,10 +167,13 @@ export function useChat(): UseChatResult {
     }
   }, []);
 
-  // Select chat
+  // Select chat - only loads messages for the selected chat, doesn't refresh chat list
   const selectChat = useCallback((chatId: string) => {
+    // Only load if it's a different chat
+    if (currentChat?.id !== chatId) {
     loadChat(chatId, { setLoading: true, page: 1, limit: 20 });
-  }, [loadChat]);
+    }
+  }, [loadChat, currentChat?.id]);
 
   // Load older messages (pagination: page+1 retrieves the previous slice)
   const loadMoreMessages = useCallback(async () => {
@@ -989,9 +992,11 @@ export function useChat(): UseChatResult {
     setTodos(todos);
   }, []);
 
-  // Initial load
+  // Initial load - only on mount, not on every route change
+  const hasLoadedChatsRef = useRef(false);
   useEffect(() => {
-    if (userId) {
+    if (userId && !hasLoadedChatsRef.current) {
+      hasLoadedChatsRef.current = true;
       refreshChats();
     }
   }, [userId, refreshChats]);

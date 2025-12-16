@@ -821,7 +821,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                     collisionPadding={8}
                   >
                     <span>
-                      Created {createdLabel.title}
+                      Created {createdLabel.tooltip}
                       {createdByName ? ` by ${createdByName}` : ''}
                     </span>
                   </TooltipContent>

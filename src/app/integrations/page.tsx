@@ -1,40 +1,37 @@
 'use client';
 
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SyncButton } from '@/gradian-ui/form-builder/form-elements';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
-import { apiRequest } from '@/gradian-ui/shared/utils/api';
-import { extractDomainFromRoute } from '@/gradian-ui/shared/utils/url-utils';
+import { PopupPicker, SearchInput, Select } from '@/gradian-ui/form-builder/form-elements';
 import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
-import { 
-  CheckCircle, 
-  AlertCircle, 
-  Clock,
-  Settings,
+import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
+import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
+import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { extractDomainFromRoute } from '@/gradian-ui/shared/utils/url-utils';
+import { motion } from 'framer-motion';
+import {
   Activity,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  HeartPulse,
+  MessageCircle,
   Plus,
   RefreshCw,
-  HeartPulse,
-  Trash2,
-  Search,
-  MessageCircle
+  Settings,
+  Trash2
 } from 'lucide-react';
-import { SearchInput } from '@/gradian-ui/form-builder/form-elements';
+import { useRouter } from 'next/navigation';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
-import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
-import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
-import { Select, PopupPicker } from '@/gradian-ui/form-builder/form-elements';
 
 // Card-specific Tenant Selector Component (uses local state, not global store)
 interface CardTenantSelectorProps {

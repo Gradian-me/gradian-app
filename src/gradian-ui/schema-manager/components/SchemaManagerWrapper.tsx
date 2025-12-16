@@ -72,6 +72,8 @@ export function SchemaManagerWrapper() {
     handleCreate,
     messages,
     clearMessages,
+    showStatistics,
+    setShowStatistics,
   } = useSchemaManagerPage();
 
   const handleViewSchema = (schema: FormSchema) => router.push(`/page/${schema.id}`);
@@ -211,7 +213,7 @@ export function SchemaManagerWrapper() {
             >
               <Settings className="h-4 w-4" />
               <span className="truncate">System Schemas</span>
-              <Badge variant="secondary" className="ms-1 shrink-0 bg-violet-200 dark:bg-violet-500/20 dark:text-violet-100">
+              <Badge variant="secondary" className="ms-1 shrink-0 bg-violet-200 text-violet-800 hover:bg-violet-300 dark:bg-violet-500/20 dark:text-violet-100 dark:hover:bg-violet-500/30 transition-colors">
                 {systemSchemasCount}
               </Badge>
             </FormTabsTrigger>
@@ -221,7 +223,7 @@ export function SchemaManagerWrapper() {
             >
               <Building2 className="h-4 w-4" />
               <span className="truncate">Business Schemas</span>
-              <Badge variant="secondary" className="ms-1 shrink-0 bg-violet-200 dark:bg-violet-500/20 dark:text-violet-100">
+              <Badge variant="secondary" className="ms-1 shrink-0 bg-violet-200 text-violet-800 hover:bg-violet-300 dark:bg-violet-500/20 dark:text-violet-100 dark:hover:bg-violet-500/30 transition-colors">
                 {businessSchemasCount}
               </Badge>
             </FormTabsTrigger>
@@ -231,7 +233,7 @@ export function SchemaManagerWrapper() {
             >
               <Zap className="h-4 w-4" />
               <span className="truncate">Action Forms</span>
-              <Badge variant="secondary" className="ms-1 shrink-0 bg-violet-200 dark:bg-violet-500/20 dark:text-violet-100">
+              <Badge variant="secondary" className="ms-1 shrink-0 bg-violet-200 text-violet-800 hover:bg-violet-300 dark:bg-violet-500/20 dark:text-violet-100 dark:hover:bg-violet-500/30 transition-colors">
                 {actionFormSchemasCount}
               </Badge>
             </FormTabsTrigger>
@@ -280,6 +282,16 @@ export function SchemaManagerWrapper() {
                 }
                 size="md"
                 className="w-full m-0"
+              />
+            </div>
+            <div className="flex items-center border border-gray-300 dark:border-gray-500 rounded-lg px-3 h-10 shrink-0 whitespace-nowrap">
+              <Switch
+                config={{ 
+                  name: 'show-statistics', 
+                  label: 'Statistics'
+                }}
+                checked={showStatistics}
+                onChange={setShowStatistics}
               />
             </div>
             <div className="border border-gray-300 dark:border-gray-500 rounded-md h-10 flex items-center shrink-0">
@@ -351,6 +363,7 @@ export function SchemaManagerWrapper() {
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}
                   isLoading={false}
+                  showStatistics={showStatistics}
                 />
               ) : viewMode === 'list' ? (
                 <SchemaListView
@@ -395,6 +408,7 @@ export function SchemaManagerWrapper() {
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}
                   isLoading={false}
+                  showStatistics={showStatistics}
                 />
               ) : viewMode === 'list' ? (
                 <SchemaListView
@@ -438,6 +452,7 @@ export function SchemaManagerWrapper() {
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}
                   isLoading={false}
+                  showStatistics={showStatistics}
                 />
               ) : viewMode === 'list' ? (
                 <SchemaListView

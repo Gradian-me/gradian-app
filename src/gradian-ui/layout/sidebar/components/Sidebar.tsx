@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../../../shared/utils';
 import { SidebarProps } from '../types';
@@ -11,7 +11,7 @@ import { UserProfileSelector } from '@/components/layout/UserProfileSelector';
 import { ModeToggle } from '../../mode-toggle/components/ModeToggle';
 import { SidebarNavigationMenu } from './SidebarNavigationMenu';
 
-export const Sidebar: React.FC<SidebarProps> = ({
+const SidebarComponent: React.FC<SidebarProps> = ({
   isCollapsed,
   onToggle,
   isMobile = false,
@@ -109,5 +109,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   );
 };
 
-Sidebar.displayName = 'Sidebar';
+SidebarComponent.displayName = 'Sidebar';
+export const Sidebar = memo(SidebarComponent);
 

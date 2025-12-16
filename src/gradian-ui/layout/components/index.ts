@@ -3,6 +3,7 @@
 export * from './ShareButton';
 export * from './PageActionButtons';
 export * from './QRCodeDialog';
+export * from './MaximizeButton';
 export * from './LoadingSkeleton';
 export * from './LoadingSpinner';
 export { WelcomeCard } from './WelcomeCard';

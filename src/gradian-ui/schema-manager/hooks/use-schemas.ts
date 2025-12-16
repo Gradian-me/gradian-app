@@ -17,21 +17,36 @@ interface UseSchemasOptions {
   enabled?: boolean;
   initialData?: FormSchema[];
   summary?: boolean;
+  includeStatistics?: boolean;
 }
 
 export function useSchemas(options?: UseSchemasOptions) {
-  const { enabled, initialData, summary } = options || {};
+  const { enabled, initialData, summary, includeStatistics } = options || {};
   const isSummary = summary === true;
-  const apiPath = isSummary ? '/api/schemas?summary=true' : '/api/schemas';
-  const queryKey = isSummary ? SCHEMAS_SUMMARY_QUERY_KEY : SCHEMAS_QUERY_KEY;
+  const includeStats = includeStatistics === true;
+  const queryParams: Record<string, string> = {};
+  if (isSummary) {
+    queryParams.summary = 'true';
+  }
+  if (includeStats) {
+    queryParams.includeStatistics = 'true';
+  }
+  const apiPath = '/api/schemas';
+  const queryKey = isSummary 
+    ? includeStats 
+      ? [...SCHEMAS_SUMMARY_QUERY_KEY, 'with-statistics'] 
+      : SCHEMAS_SUMMARY_QUERY_KEY 
+    : SCHEMAS_QUERY_KEY;
   const cacheConfig = getCacheConfigByPath(apiPath);
   
   const { data, isLoading, error, refetch } = useQuery({
     queryKey,
     queryFn: async () => {
-      console.log(`[REACT_QUERY] 🔄 Fetching ${isSummary ? 'schema summaries' : 'schemas'} from API...`);
+      console.log(`[REACT_QUERY] 🔄 Fetching ${isSummary ? 'schema summaries' : 'schemas'}${includeStats ? ' with statistics' : ''} from API...`);
+      console.log(`[REACT_QUERY] Query params:`, queryParams);
       // Use /api/schemas directly (apiRequest will handle it correctly via resolveApiUrl)
       const response = await apiRequest<FormSchema[]>(apiPath, {
+        params: Object.keys(queryParams).length > 0 ? queryParams : undefined,
         disableCache: false, // Use cache for better performance
       });
       if (!response.success || !response.data) {
@@ -49,7 +64,7 @@ export function useSchemas(options?: UseSchemasOptions) {
 
       const list = normalizeSchemas(response.data);
       const cacheTime = cacheConfig.staleTime ?? 10 * 60 * 1000;
-      console.log(`[REACT_QUERY] ✅ Fetched ${list.length} ${isSummary ? 'schema summaries' : 'schemas'}${isSummary ? ' (no cache)' : ` - Caching for ${Math.round(cacheTime / 1000)}s`}`);
+      console.log(`[REACT_QUERY] ✅ Fetched ${list.length} ${isSummary ? 'schema summaries' : 'schemas'}${includeStats ? ' with statistics' : ''}${isSummary ? ' (no cache)' : ` - Caching for ${Math.round(cacheTime / 1000)}s`}`);
       return list;
     },
     enabled: enabled !== false,
@@ -61,7 +76,8 @@ export function useSchemas(options?: UseSchemasOptions) {
     refetchOnReconnect: false, // Don't refetch on reconnect
     retry: 1, // Only retry once on failure
     retryDelay: 1000, // Wait 1 second before retrying
-    placeholderData: (previousData) => previousData, // Use previous data as placeholder
+    // Don't use placeholderData when query key changes - we want fresh data
+    placeholderData: includeStats ? undefined : (previousData) => previousData,
   });
 
   return {

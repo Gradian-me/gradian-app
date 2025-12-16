@@ -301,7 +301,7 @@
     "id": "01KCG63BM74KVJNZPVA6EYJH0T",
     "title": "review this code and give me detailed report for t",
     "createdAt": "2025-12-15T05:00:31.256Z",
-    "updatedAt": "2025-12-15T05:07:38.133Z",
+    "updatedAt": "2025-12-16T14:36:01.126Z",
     "userId": "841",
     "messages": [
       {
@@ -340,7 +340,9 @@
               "status": "pending",
               "agentId": "quality-assurance-analyst",
               "agentType": "chat",
-              "dependencies": [],
+              "dependencies": [
+                "01KCG6GCDVCB50JVRVFZGH7J86"
+              ],
               "input": {
                 "body": {
                   "findings": "Detailed findings from the code review will be provided here."
@@ -356,7 +358,9 @@
               "status": "pending",
               "agentId": "process-analyst",
               "agentType": "chat",
-              "dependencies": [],
+              "dependencies": [
+                "01KCG6GCDZMXX5499XX4MY18FS"
+              ],
               "input": {
                 "body": {
                   "imageType": "sketch",

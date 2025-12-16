@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useRef } from 'react';
 import { cn } from '../../../shared/utils';
 import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
 import { useSchemas } from '@/gradian-ui/schema-manager/hooks/use-schemas';
@@ -37,10 +37,36 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
     const stored = localStorage.getItem(ACCORDION_STATE_KEY);
     return stored === 'open' ? 'applications' : undefined;
   });
+  
+  // Track previous pathname to detect route changes within chat
+  const prevPathnameRef = useRef<string | null>(null);
+  const isRouteChangeWithinChat = React.useMemo(() => {
+    const prev = prevPathnameRef.current;
+    const current = pathname || null;
+    const wasChatRoute = prev?.startsWith('/chat');
+    const isChatRoute = current?.startsWith('/chat');
+    return wasChatRoute && isChatRoute && prev !== current;
+  }, [pathname]);
+  
+  // Update pathname ref after render
+  React.useEffect(() => {
+    prevPathnameRef.current = pathname || null;
+  }, [pathname]);
+  
   const { schemas: allSchemas, isLoading, refetch } = useSchemas({
     initialData: initialSchemas,
     summary: true,
   });
+  
+  // Prevent refetch when switching between chat routes (use cached data)
+  const shouldRefetchRef = useRef(true);
+  React.useEffect(() => {
+    if (isRouteChangeWithinChat) {
+      shouldRefetchRef.current = false;
+    } else {
+      shouldRefetchRef.current = true;
+    }
+  }, [isRouteChangeWithinChat]);
 
   // Only render Accordion after client-side mount to avoid hydration mismatch
   useEffect(() => {
@@ -61,10 +87,14 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   }, [isCollapsed, isMobile, accordionValue]);
 
   // Listen for cache clear events and refetch schemas
+  // Only refetch if not switching between chat routes
   useEffect(() => {
     const handleCacheClear = () => {
-      // Refetch schemas when cache is cleared
-      refetch();
+      // Only refetch if we're not switching between chat routes
+      // When switching chats, use cached data instead
+      if (!isRouteChangeWithinChat) {
+        refetch();
+      }
     };
 
     // Listen for custom cache clear event
@@ -72,7 +102,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
     
     // Listen for storage events (from other tabs/windows)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'react-query-cache-cleared') {
+      if (e.key === 'react-query-cache-cleared' && !isRouteChangeWithinChat) {
         refetch();
       }
     };
@@ -82,7 +112,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
       window.removeEventListener('react-query-cache-clear', handleCacheClear);
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [refetch]);
+  }, [refetch, isRouteChangeWithinChat]);
 
   // Filter schemas that have showInNavigation enabled
   const schemas = useMemo(() => {
