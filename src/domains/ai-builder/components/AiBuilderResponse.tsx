@@ -24,6 +24,8 @@ import { useAiResponseStore } from '@/stores/ai-response.store';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
 import type { AiAgent, TokenUsage, VideoUsage, SchemaAnnotation, AnnotationItem } from '../types';
 import { cleanMarkdownResponse } from '../utils/ai-security-utils';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface AiBuilderResponseProps {
   response: string;
