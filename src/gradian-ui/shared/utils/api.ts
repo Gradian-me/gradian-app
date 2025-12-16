@@ -12,7 +12,7 @@ import { LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { toast } from 'sonner';
 import { getFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
 import { useTenantStore } from '@/stores/tenant.store';
-import { authTokenManager } from './auth-token-manager';
+import { authTokenManager, RateLimitError } from './auth-token-manager';
 
 // Helper function to resolve API endpoint URL
 // IMPORTANT: Always use relative URLs so requests go through Next.js API routes
@@ -308,78 +308,96 @@ export class ApiClient {
         })}`);
         
         // Attempt to refresh token
-        const newToken = await authTokenManager.handleUnauthorized();
-        
-        if (newToken) {
-          loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - token refreshed, retrying request ${JSON.stringify({
-            endpoint,
-            newTokenLength: newToken.length,
-          })}`);
+        try {
+          const newToken = await authTokenManager.handleUnauthorized();
           
-          // Retry original request with new token
-          const retryConfig: RequestInit = {
-            ...requestConfig,
-            headers: {
-              ...requestConfig.headers,
-              'Authorization': `Bearer ${newToken}`,
-            },
-          };
-          
-          const retryResponse = await fetch(url, retryConfig);
-          loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - retry response ${JSON.stringify({
-            endpoint,
-            status: retryResponse.status,
-            ok: retryResponse.ok,
-          })}`);
-          
-          // Parse retry response
-          const contentType = retryResponse.headers.get('content-type') || '';
-          let parsed: any = null;
-          try {
-            if (contentType.includes('application/json')) {
-              parsed = await retryResponse.json();
-            } else {
-              const text = await retryResponse.text();
-              parsed = text ? { message: text } : {};
-            }
-          } catch (parseErr) {
-            parsed = { message: 'Unable to parse response body' };
-          }
-
-          const responseWithStatus: ApiResponse<T> = {
-            ...(parsed || {}),
-            statusCode: retryResponse.status,
-          };
-
-          if (!retryResponse.ok) {
-            const errorMessage = parsed?.error || parsed?.message || '';
-            const suppressToast = endpoint.includes('/api/integrations/sync');
-            if (isConnectionError(null, retryResponse.status) || isConnectionError({ message: errorMessage })) {
-              showConnectionErrorToast(undefined, suppressToast);
-            }
+          if (newToken) {
+            loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - token refreshed, retrying request ${JSON.stringify({
+              endpoint,
+              newTokenLength: newToken.length,
+            })}`);
             
+            // Retry original request with new token
+            const retryConfig: RequestInit = {
+              ...requestConfig,
+              headers: {
+                ...requestConfig.headers,
+                'Authorization': `Bearer ${newToken}`,
+              },
+            };
+            
+            const retryResponse = await fetch(url, retryConfig);
+            loggingCustom(LogType.CLIENT_LOG, 'log', `[API_CLIENT] request() - retry response ${JSON.stringify({
+              endpoint,
+              status: retryResponse.status,
+              ok: retryResponse.ok,
+            })}`);
+            
+            // Parse retry response
+            const contentType = retryResponse.headers.get('content-type') || '';
+            let parsed: any = null;
+            try {
+              if (contentType.includes('application/json')) {
+                parsed = await retryResponse.json();
+              } else {
+                const text = await retryResponse.text();
+                parsed = text ? { message: text } : {};
+              }
+            } catch (parseErr) {
+              parsed = { message: 'Unable to parse response body' };
+            }
+
+            const responseWithStatus: ApiResponse<T> = {
+              ...(parsed || {}),
+              statusCode: retryResponse.status,
+            };
+
+            if (!retryResponse.ok) {
+              const errorMessage = parsed?.error || parsed?.message || '';
+              const suppressToast = endpoint.includes('/api/integrations/sync');
+              if (isConnectionError(null, retryResponse.status) || isConnectionError({ message: errorMessage })) {
+                showConnectionErrorToast(undefined, suppressToast);
+              }
+              
+              return {
+                success: false,
+                error: errorMessage || `HTTP error! status: ${retryResponse.status}`,
+                statusCode: retryResponse.status,
+                data: null as any,
+                messages: parsed?.messages,
+                message: typeof parsed?.message === 'string' ? parsed.message : undefined,
+              };
+            }
+
+            return responseWithStatus;
+          } else {
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `[API_CLIENT] request() - token refresh failed, user will be redirected to login ${JSON.stringify({
+              endpoint,
+            })}`);
+            // Refresh failed - user will be redirected to login by authTokenManager
             return {
               success: false,
-              error: errorMessage || `HTTP error! status: ${retryResponse.status}`,
-              statusCode: retryResponse.status,
+              error: 'Authentication required',
+              statusCode: 401,
               data: null as any,
-              messages: parsed?.messages,
-              message: typeof parsed?.message === 'string' ? parsed.message : undefined,
             };
           }
-
-          return responseWithStatus;
-        } else {
-          loggingCustom(LogType.CLIENT_LOG, 'warn', `[API_CLIENT] request() - token refresh failed, user will be redirected to login ${JSON.stringify({
-            endpoint,
-          })}`);
-          // Refresh failed - user will be redirected to login by authTokenManager
-          return {
-            success: false,
-            error: 'Authentication required',
-            statusCode: 401,
-            data: null as any,
-          };
+        } catch (error) {
+          // Handle rate limit errors specifically
+          if (error instanceof RateLimitError) {
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `[API_CLIENT] request() - rate limit error during token refresh ${JSON.stringify({
+              endpoint,
+              error: error.message,
+            })}`);
+            return {
+              success: false,
+              error: error.message,
+              statusCode: 429,
+              data: null as any,
+            };
+          }
+          // Re-throw other errors
+          throw error;
         }
       }
 

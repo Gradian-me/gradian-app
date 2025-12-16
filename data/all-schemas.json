@@ -1839,7 +1839,8 @@
     "icon": "Link2",
     "isNotCompanyBased": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "quotations",
@@ -2477,7 +2478,8 @@
     "icon": "AppWindow",
     "isNotCompanyBased": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "user-roles",
@@ -2761,7 +2763,8 @@
     "icon": "Folder",
     "isNotCompanyBased": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "users",
@@ -4138,7 +4141,8 @@
     "allowDataInactive": true,
     "isNotCompanyBased": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "entity-type-items",
@@ -4219,7 +4223,8 @@
     "allowDataInactive": true,
     "isNotCompanyBased": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "entity-type-groups",
@@ -4276,7 +4281,8 @@
     "isNotCompanyBased": true,
     "canSelectMultiCompanies": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "status-groups",
@@ -4333,7 +4339,8 @@
     "isNotCompanyBased": false,
     "canSelectMultiCompanies": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "logical-operators",
@@ -4462,7 +4469,8 @@
     "icon": "Code",
     "isNotCompanyBased": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "aggregation-types",
@@ -5193,7 +5201,7 @@
         "label": "AryoGen"
       }
     ],
-    "syncStrategy": "schema-and-data"
+    "syncStrategy": "schema-only"
   },
   {
     "id": "change-subject-types",
@@ -5866,7 +5874,7 @@
         "label": "AryoGen"
       }
     ],
-    "syncStrategy": "schema-and-data"
+    "syncStrategy": "schema-only"
   },
   {
     "id": "related-documents",
@@ -6746,7 +6754,8 @@
         "label": "AryoGen"
       }
     ],
-    "syncStrategy": "schema-and-data"
+    "syncStrategy": "schema-and-data",
+    "applyToAllTenants": false
   },
   {
     "id": "guidelines",
@@ -6864,6 +6873,12 @@
     "showInNavigation": true,
     "schemaType": "business",
     "syncStrategy": "schema-and-data",
-    "applyToAllTenants": true
+    "applyToAllTenants": false,
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ]
   }
 ]

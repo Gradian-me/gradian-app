@@ -79,7 +79,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
     // Reset ref when chat is successfully loaded
     if (currentChat?.id === chatIdFromUrl) {
-      lastProcessedChatIdRef.current = chatIdFromUrl;
+      lastProcessedChatIdRef.current = chatIdFromUrl ?? null;
     }
   }, [chatIdFromUrl, currentChat?.id, selectChat]);
 

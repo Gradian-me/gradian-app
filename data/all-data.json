@@ -2463,8 +2463,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-15T15:11:25.085Z",
-      "lastSynced": "2025-12-15T15:11:25.085Z",
+      "updatedAt": "2025-12-16T15:56:08.622Z",
+      "lastSynced": "2025-12-16T15:56:08.622Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2476,7 +2476,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 37 schemas: 37 succeeded, 0 failed (0 created, 37 updated)"
+      "lastSyncMessage": "Processed 39 schemas: 36 succeeded, 3 failed (0 created, 36 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -2503,7 +2503,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-15T15:09:56.384Z",
+      "updatedAt": "2025-12-16T15:56:17.792Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2513,8 +2513,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-15T15:09:56.384Z",
-      "lastSyncMessage": "Generated relations for 43 out of 43 schemas"
+      "lastSynced": "2025-12-16T15:56:17.792Z",
+      "lastSyncMessage": "Generated relations for 45 out of 45 schemas"
     },
     {
       "title": "Graph Data Sync Production",
@@ -2560,7 +2560,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-15T14:56:34.271Z",
+      "updatedAt": "2025-12-16T15:57:13.120Z",
       "category": [
         {
           "id": "production-integration",
@@ -2569,8 +2569,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-15T14:56:34.271Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 3, nodes updated: 25, edges created: 0, nodes failed: 0, edges failed: 0."
+      "lastSynced": "2025-12-16T15:57:13.120Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 911, nodes updated: 85, edges created: 44, nodes failed: 0, edges failed: 0."
     }
   ],
   "databases": [

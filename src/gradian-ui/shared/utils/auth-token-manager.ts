@@ -23,6 +23,18 @@ type QueuedRequest = {
   reject: (error: Error) => void;
 };
 
+/**
+ * Custom error class for rate limiting
+ * Allows API client to distinguish rate limit errors from auth errors
+ */
+export class RateLimitError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'RateLimitError';
+    Object.setPrototypeOf(this, RateLimitError.prototype);
+  }
+}
+
 class AuthTokenManager {
   // Access token stored in memory only (never persisted)
   private accessToken: string | null = null;
@@ -35,6 +47,11 @@ class AuthTokenManager {
   
   // Flag to prevent infinite refresh loops
   private isRefreshing: boolean = false;
+  
+  // Rate limiting: track when we last received 429 and cooldown period
+  private lastRateLimitError: number | null = null;
+  private rateLimitCooldownMs: number = 60000; // 60 seconds default cooldown
+  private rateLimitRetryCount: number = 0;
 
   /**
    * Get current access token from memory
@@ -288,6 +305,48 @@ class AuthTokenManager {
         // Refresh failed - clear auth state
         this.clearAccessToken();
         
+        // Handle 429 Too Many Requests with exponential backoff
+        if (response.status === 429) {
+          const now = Date.now();
+          const timeSinceLast429 = this.lastRateLimitError ? now - this.lastRateLimitError : Infinity;
+          
+          // If we're still in cooldown period, don't retry
+          if (this.lastRateLimitError && timeSinceLast429 < this.rateLimitCooldownMs) {
+            const remainingCooldown = Math.ceil((this.rateLimitCooldownMs - timeSinceLast429) / 1000);
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `[AUTH_TOKEN] performRefresh() - rate limited, still in cooldown ${JSON.stringify({
+              status: response.status,
+              remainingCooldownSeconds: remainingCooldown,
+              retryCount: this.rateLimitRetryCount,
+              action: 'Will wait before retrying',
+            })}`);
+            
+            // Don't throw - return null to prevent further retries
+            // The calling code should handle this gracefully
+            return null;
+          }
+          
+          // Update rate limit tracking
+          this.lastRateLimitError = now;
+          this.rateLimitRetryCount += 1;
+          
+          // Exponential backoff: increase cooldown with each retry (max 5 minutes)
+          this.rateLimitCooldownMs = Math.min(
+            300000, // 5 minutes max
+            Math.pow(2, Math.min(this.rateLimitRetryCount, 6)) * 1000 // 2^retryCount seconds, capped at 2^6 = 64 seconds base
+          );
+          
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[AUTH_TOKEN] performRefresh() - rate limited (429) ${JSON.stringify({
+            status: response.status,
+            retryCount: this.rateLimitRetryCount,
+            cooldownSeconds: Math.ceil(this.rateLimitCooldownMs / 1000),
+            action: 'Will wait before retrying',
+          })}`);
+          
+          // Don't throw - return null to prevent cascading failures
+          // The error will be logged but won't cause infinite retry loops
+          return null;
+        }
+        
         if (response.status === 401 || response.status === 400) {
           loggingCustom(LogType.CLIENT_LOG, 'warn', `[AUTH_TOKEN] performRefresh() - refresh failed (401/400) ${JSON.stringify({
             status: response.status,
@@ -328,6 +387,12 @@ class AuthTokenManager {
 
       // Store new access token in memory
       this.setAccessToken(data.accessToken);
+      
+      // Reset rate limit tracking on successful refresh
+      this.lastRateLimitError = null;
+      this.rateLimitRetryCount = 0;
+      this.rateLimitCooldownMs = 60000; // Reset to default
+      
       loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] performRefresh() - SUCCESS ${JSON.stringify({
         tokenStored: true,
         storageLocation: 'MEMORY (not in cookies)',
@@ -434,6 +499,7 @@ class AuthTokenManager {
   /**
    * Handle 401 response by refreshing token and retrying request
    * Returns new token if refresh succeeds, null otherwise
+   * Throws RateLimitError if refresh fails due to rate limiting (429)
    */
   async handleUnauthorized(): Promise<string | null> {
     loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] handleUnauthorized() - 401 received, refreshing token');
@@ -441,8 +507,32 @@ class AuthTokenManager {
     // Clear stale token
     this.clearAccessToken();
     
+    // Check if we're in rate limit cooldown before attempting refresh
+    if (this.lastRateLimitError) {
+      const now = Date.now();
+      const timeSinceLast429 = now - this.lastRateLimitError;
+      if (timeSinceLast429 < this.rateLimitCooldownMs) {
+        const remainingCooldown = Math.ceil((this.rateLimitCooldownMs - timeSinceLast429) / 1000);
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `[AUTH_TOKEN] handleUnauthorized() - rate limit cooldown active ${JSON.stringify({
+          remainingCooldownSeconds: remainingCooldown,
+        })}`);
+        throw new RateLimitError(`Too many requests. Please wait ${remainingCooldown} seconds before retrying.`);
+      }
+    }
+    
     // Attempt refresh
     const newToken = await this.refreshAccessToken();
+    
+    // If refresh returned null and we have a recent rate limit error, throw RateLimitError
+    if (newToken === null && this.lastRateLimitError) {
+      const now = Date.now();
+      const timeSinceLast429 = now - this.lastRateLimitError;
+      if (timeSinceLast429 < this.rateLimitCooldownMs) {
+        const remainingCooldown = Math.ceil((this.rateLimitCooldownMs - timeSinceLast429) / 1000);
+        throw new RateLimitError(`Too many requests. Please wait ${remainingCooldown} seconds before retrying.`);
+      }
+    }
+    
     loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] handleUnauthorized() - refresh result ${JSON.stringify({
       success: newToken !== null,
       tokenLength: newToken?.length || 0,

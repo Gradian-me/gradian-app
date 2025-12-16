@@ -353,10 +353,22 @@ export default function IntegrationsPage() {
           });
         });
       } else {
-        console.error('Failed to fetch integrations:', response.error);
+        const errorMessage = response.error || 'Failed to fetch integrations';
+        console.error('Failed to fetch integrations:', errorMessage);
+        
+        // Show user-friendly error message for rate limiting
+        if (response.statusCode === 429) {
+          toast.error(errorMessage || 'Too many requests. Please wait a moment and try again.');
+        }
       }
     } catch (error) {
-      console.error('Error fetching integrations:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error fetching integrations';
+      console.error('Error fetching integrations:', errorMessage);
+      
+      // Show user-friendly error message
+      if (errorMessage.includes('Too many requests') || errorMessage.includes('429')) {
+        toast.error('Too many requests. Please wait a moment and try again.');
+      }
     } finally {
       setLoading(false);
       setIsRefreshing(false);
