@@ -5,6 +5,7 @@ import { Eye, EyeOff, LockIcon, UserIcon, ChevronDown, ChevronUp } from 'lucide-
 import { AuthenticationLayout, GlassInputWrapper } from '@/components/authentication';
 import { ModeToggle } from '@/gradian-ui/layout';
 import { Button } from '@/components/ui/button';
+import { TextShimmerWave } from '@/components/ui/text-shimmer-wave';
 
 interface SignInPageProps {
   title?: React.ReactNode;
@@ -167,9 +168,15 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             <button 
               type="submit" 
               disabled={isSubmitDisabled}
-              className="animate-element animate-delay-600 w-full rounded-2xl bg-violet-500 dark:bg-violet-600 py-4 font-medium text-white hover:bg-violet-600 dark:hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="animate-element animate-delay-600 w-full rounded-2xl bg-violet-500 dark:bg-violet-600 py-4 font-medium text-white hover:bg-violet-600 dark:hover:bg-violet-700 transition-all cursor-pointer disabled:opacity-60 disabled:bg-violet-400 dark:disabled:bg-violet-700/50 disabled:hover:bg-violet-400 dark:disabled:hover:bg-violet-700/50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? (
+                <TextShimmerWave duration={1.5} spread={1.2}>
+                  Signing in...
+                </TextShimmerWave>
+              ) : (
+                'Sign In'
+              )}
             </button>
           </form>
 

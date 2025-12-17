@@ -3669,36 +3669,38 @@
     ]
   },
   {
-    "id": "01KCCHATUPDATES004",
-    "timestamp": "2025-12-16T18:35:55.000Z",
-    "version": "1.30.004",
+    "id": "01KCTENANTFILTER005",
+    "timestamp": "2025-12-17T00:00:00.000Z",
+    "version": "1.30.005",
     "changes": [
       {
         "changeType": "enhance",
-        "description": "Updated chat.json to reflect new message timestamps and dependencies for improved message tracking",
+        "description": "Updated all-data.json and all-schemas.json to include related tenants and updated timestamps for various components, improving data organization and accessibility.",
         "priority": "Medium",
         "affectedDomains": [
-          "chat",
-          "message-tracking"
-        ]
-      },
-      {
-        "changeType": "refactor",
-        "description": "Modified route.ts to include optional statistics in schema summaries, enhancing API flexibility",
-        "priority": "Medium",
-        "affectedDomains": [
-          "api",
-          "schema-manager"
+          "data-management",
+          "schemas",
+          "multi-tenancy"
         ]
       },
       {
         "changeType": "add",
-        "description": "Enhanced ChatPage layout with updated titles and icons for better user experience",
+        "description": "Implemented allowDataRelatedTenants flag in API routes to enable tenant-based data filtering, enhancing data security and visibility.",
+        "priority": "High",
+        "affectedDomains": [
+          "api",
+          "multi-tenancy",
+          "security"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Modified base.controller.ts and base.repository.ts to support tenant filtering based on related tenants, improving multi-tenancy handling.",
         "priority": "Medium",
         "affectedDomains": [
-          "chat",
-          "ui",
-          "layout"
+          "controllers",
+          "repositories",
+          "multi-tenancy"
         ]
       }
     ]

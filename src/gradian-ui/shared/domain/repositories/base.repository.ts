@@ -125,9 +125,61 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
       });
     }
 
-    // Apply any other custom filters (excluding companyId/companyIds which we've already handled)
+    // Handle tenantIds filter - filter by multiple tenant IDs.
+    // SECURITY / MULTI-TENANCY:
+    // - Only applies when schema has allowDataRelatedTenants: true (passed as filter.allowDataRelatedTenants)
+    // - Filter is based ONLY on "relatedTenants" metadata when present.
+    // - Entities without "relatedTenants" are visible to all tenants (not filtered out).
+    if (filters.tenantIds && filters.allowDataRelatedTenants === true) {
+      const tenantIds = Array.isArray(filters.tenantIds)
+        ? filters.tenantIds
+        : typeof filters.tenantIds === 'string'
+          ? filters.tenantIds.split(',').map(id => id.trim())
+          : [];
+
+      if (tenantIds.length > 0) {
+        // Normalize tenantIds: trim and filter empty strings
+        const normalizedTenantIds = tenantIds
+          .map((id) => String(id).trim())
+          .filter((id) => id.length > 0);
+
+        if (normalizedTenantIds.length > 0) {
+          filtered = filtered.filter((entity: any) => {
+            // If entity has "relatedTenants" metadata, use it as primary filter source.
+            const relatedTenants = entity['relatedTenants'];
+            
+            // If relatedTenants is empty/undefined/null, entity is visible to all tenants
+            if (!relatedTenants || !Array.isArray(relatedTenants) || relatedTenants.length === 0) {
+              return true;
+            }
+
+            // If relatedTenants has values, check if any tenant ID matches
+            const relatedIds = relatedTenants
+              .map((item: any) => {
+                if (typeof item === 'string') {
+                  return String(item).trim();
+                }
+                if (item && item.id) {
+                  return String(item.id).trim();
+                }
+                return null;
+              })
+              .filter((id: string | null): id is string => !!id);
+
+            if (relatedIds.length > 0) {
+              return relatedIds.some((id) => normalizedTenantIds.includes(id));
+            }
+
+            // If relatedTenants exists but has no valid IDs, treat as visible to all
+            return true;
+          });
+        }
+      }
+    }
+
+    // Apply any other custom filters (excluding companyId/companyIds/tenantIds/allowDataRelatedTenants which we've already handled)
     Object.keys(filters).forEach(key => {
-      if (!['search', 'status', 'category', 'page', 'limit', 'sortBy', 'sortOrder', 'includeIds', 'excludeIds', 'companyId', 'companyIds'].includes(key)) {
+      if (!['search', 'status', 'category', 'page', 'limit', 'sortBy', 'sortOrder', 'includeIds', 'excludeIds', 'companyId', 'companyIds', 'tenantIds', 'allowDataRelatedTenants'].includes(key)) {
         filtered = filtered.filter((entity: any) => entity[key] === filters[key]);
       }
     });

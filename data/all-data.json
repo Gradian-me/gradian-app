@@ -3801,8 +3801,14 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBFBAZR3K04CS80DMHGPHMHF",
       "createdAt": "2025-12-02T10:57:07.958Z",
-      "updatedAt": "2025-12-16T12:16:51.634Z",
-      "defaultDomain": "cinnagen.com"
+      "updatedAt": "2025-12-17T07:12:20.289Z",
+      "defaultDomain": "cinnagen.com",
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
     },
     {
       "relatedCompanies": [
@@ -3819,8 +3825,14 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBFBD109G6CYRT7RA04TMMXC",
       "createdAt": "2025-12-02T10:58:14.677Z",
-      "updatedAt": "2025-12-16T12:16:43.862Z",
-      "defaultDomain": "aryogen.ir"
+      "updatedAt": "2025-12-17T07:12:30.775Z",
+      "defaultDomain": "aryogen.ir",
+      "relatedTenants": [
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        }
+      ]
     },
     {
       "relatedCompanies": [
@@ -3837,8 +3849,14 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBFBGV9151FQN481NB2CT4MX",
       "createdAt": "2025-12-02T11:00:19.878Z",
-      "updatedAt": "2025-12-16T12:16:33.873Z",
-      "defaultDomain": "cinnagen.com"
+      "updatedAt": "2025-12-17T07:23:43.828Z",
+      "defaultDomain": "cinnagen.com",
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ]
     }
   ],
   "routes": [],

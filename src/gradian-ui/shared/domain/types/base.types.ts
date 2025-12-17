@@ -20,6 +20,7 @@ export interface FilterParams {
   status?: string;
   category?: string;
   tenantIds?: string | string[];
+  allowDataRelatedTenants?: boolean;
   [key: string]: any;
 }
 

@@ -5146,7 +5146,9 @@
     "isNotCompanyBased": true,
     "canSelectMultiCompanies": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "allowDataRelatedTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "change-classifications",

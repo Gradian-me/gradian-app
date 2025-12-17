@@ -169,8 +169,23 @@ export async function GET(
       }
     }
 
+    // Add allowDataRelatedTenants flag to query params if schema supports it
+    // This enables tenant-based data filtering in the repository
+    const allowDataRelatedTenants = schema?.allowDataRelatedTenants === true;
+    let requestToUse = request;
+    if (allowDataRelatedTenants && tenantIds && tenantIds.length > 0) {
+      const url = new URL(request.url);
+      url.searchParams.set('allowDataRelatedTenants', 'true');
+      // Create a new request with updated URL
+      requestToUse = new NextRequest(url, {
+        method: request.method,
+        headers: request.headers,
+        body: request.body,
+      });
+    }
+
     const controller = await createController(schemaId);
-    const response = await controller.getAll(request);
+    const response = await controller.getAll(requestToUse);
     
     // Enrich response with user objects and picker field data from relations in demo mode
     if (isDemoModeEnabled()) {

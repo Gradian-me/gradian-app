@@ -66,35 +66,85 @@ export async function GET(
       );
     }
 
+    // Get schema to check allowDataRelatedTenants flag
+    const schema = await getSchemaById(schemaId);
+    const tenantIdsParam = request.nextUrl.searchParams.get('tenantIds');
+    const tenantIds = tenantIdsParam
+      ?.split(',')
+      .map((id) => id.trim())
+      .filter((id) => id.length > 0);
+    const allowDataRelatedTenants = schema?.allowDataRelatedTenants === true;
+
     const controller = await createController(schemaId);
     const response = await controller.getById(id);
     
-    // Enrich response with user objects and picker field data from relations in demo mode
-    if (isDemoModeEnabled()) {
-      try {
-        const responseData = await response.json();
-        if (responseData && responseData.success && responseData.data && typeof responseData.data === 'object') {
-          // Enrich with users first
-          responseData.data = await enrichWithUsers(responseData.data);
-          // Then enrich picker fields from relations
-          responseData.data = await enrichEntityPickerFieldsFromRelations({
-            schemaId,
-            entity: responseData.data,
-          });
+    // Parse response once for tenant filtering and enrichment
+    let responseData: any = null;
+    try {
+      responseData = await response.json();
+    } catch (error) {
+      // If JSON parsing fails, return original response
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'warn',
+        `[GET /api/data/:id] Failed to parse response: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      return response;
+    }
+    
+    // Apply tenant filtering for single entity if schema supports it
+    if (allowDataRelatedTenants && tenantIds && tenantIds.length > 0 && responseData && responseData.success && responseData.data) {
+      const entity = responseData.data;
+      const relatedTenants = entity['relatedTenants'];
+      
+      // If entity has relatedTenants, check if current tenant is included
+      if (relatedTenants && Array.isArray(relatedTenants) && relatedTenants.length > 0) {
+        const relatedIds = relatedTenants
+          .map((item: any) => {
+            if (typeof item === 'string') {
+              return String(item).trim();
+            }
+            if (item && item.id) {
+              return String(item.id).trim();
+            }
+            return null;
+          })
+          .filter((id: string | null): id is string => !!id);
+
+        const normalizedTenantIds = tenantIds.map((id) => String(id).trim());
+        const isVisible = relatedIds.some((id) => normalizedTenantIds.includes(id));
+        
+        if (!isVisible) {
+          // Entity is not visible to the requested tenants
+          return NextResponse.json(
+            { success: false, error: 'Entity not found or not accessible for the requested tenants' },
+            { status: 404 }
+          );
         }
-        return NextResponse.json(responseData, { status: response.status });
+      }
+      // If relatedTenants is empty/undefined, entity is visible to all (no filtering needed)
+    }
+    
+    // Enrich response with user objects and picker field data from relations in demo mode
+    if (isDemoModeEnabled() && responseData && responseData.success && responseData.data && typeof responseData.data === 'object') {
+      try {
+        // Enrich with users first
+        responseData.data = await enrichWithUsers(responseData.data);
+        // Then enrich picker fields from relations
+        responseData.data = await enrichEntityPickerFieldsFromRelations({
+          schemaId,
+          entity: responseData.data,
+        });
       } catch (error) {
-        // If JSON parsing fails, return original response
         loggingCustom(
           LogType.INFRA_LOG,
           'warn',
           `[GET /api/data/:id] Failed to enrich response: ${error instanceof Error ? error.message : String(error)}`,
         );
-        return response;
       }
     }
     
-    return response;
+    return NextResponse.json(responseData, { status: response.status });
   } catch (error) {
     return NextResponse.json(
       { 
@@ -135,6 +185,69 @@ export async function PUT(
       );
     }
 
+    // Get schema to check allowDataRelatedTenants flag
+    const schema = await getSchemaById(schemaId);
+    const tenantIdsParam = request.nextUrl.searchParams.get('tenantIds');
+    const tenantIds = tenantIdsParam
+      ?.split(',')
+      .map((id) => id.trim())
+      .filter((id) => id.length > 0);
+    const allowDataRelatedTenants = schema?.allowDataRelatedTenants === true;
+
+    // Check tenant visibility before allowing update
+    if (allowDataRelatedTenants && tenantIds && tenantIds.length > 0) {
+      const controller = await createController(schemaId);
+      const getResponse = await controller.getById(id);
+      
+      try {
+        const getResponseData = await getResponse.json();
+        if (getResponseData && getResponseData.success && getResponseData.data) {
+          const entity = getResponseData.data;
+          const relatedTenants = entity['relatedTenants'];
+          
+          // If entity has relatedTenants, check if current tenant is included
+          if (relatedTenants && Array.isArray(relatedTenants) && relatedTenants.length > 0) {
+            const relatedIds = relatedTenants
+              .map((item: any) => {
+                if (typeof item === 'string') {
+                  return String(item).trim();
+                }
+                if (item && item.id) {
+                  return String(item.id).trim();
+                }
+                return null;
+              })
+              .filter((id: string | null): id is string => !!id);
+
+            const normalizedTenantIds = tenantIds.map((id) => String(id).trim());
+            const isVisible = relatedIds.some((id) => normalizedTenantIds.includes(id));
+            
+            if (!isVisible) {
+              // Entity is not visible to the requested tenants
+              return NextResponse.json(
+                { success: false, error: 'Entity not found or not accessible for the requested tenants' },
+                { status: 404 }
+              );
+            }
+          }
+          // If relatedTenants is empty/undefined, entity is visible to all (no filtering needed)
+        } else if (!getResponseData || !getResponseData.success) {
+          // Entity not found
+          return NextResponse.json(
+            { success: false, error: 'Entity not found' },
+            { status: 404 }
+          );
+        }
+      } catch (error) {
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `[PUT /api/data/:id] Failed to check tenant visibility: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        // Continue with update if visibility check fails (fail open for now)
+      }
+    }
+
     // Read request body BEFORE passing to controller (body can only be read once)
     let requestBody: any = {};
     try {
@@ -152,7 +265,7 @@ export async function PUT(
     let pickerValues: Record<string, any> = {};
     if (isDemoModeEnabled()) {
       try {
-        const schema = await getSchemaById(schemaId);
+        // Schema already loaded above, reuse it
         if (schema) {
           // Extract picker field values before minimizing them
           const { extractPickerFieldValues, minimizePickerFieldValues: minimizeValues } = await import('@/gradian-ui/shared/domain/utils/field-value-relations.util');
@@ -210,7 +323,7 @@ export async function PUT(
         });
         
         // Update entity with minimized picker values (keep IDs for tracing)
-        const schema = await getSchemaById(schemaId);
+        // Schema already loaded above, reuse it
         if (schema) {
           const minimizedEntity = minimizePickerFieldValues({
             schema,
@@ -240,15 +353,15 @@ export async function PUT(
           responseData.data = await enrichWithUsers(responseData.data);
         }
         return NextResponse.json(responseData, { status: response.status });
-        } catch (error) {
-          // If JSON parsing fails, fall back to minimal response
-          loggingCustom(
-            LogType.INFRA_LOG,
-            'warn',
-            `[PUT /api/data/:id] Failed to enrich response: ${error instanceof Error ? error.message : String(error)}`,
-          );
-          return NextResponse.json(responseData, { status: response.status });
-        }
+      } catch (error) {
+        // If JSON parsing fails, fall back to minimal response
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `[PUT /api/data/:id] Failed to enrich response: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        return NextResponse.json(responseData, { status: response.status });
+      }
     }
 
     if (responseData) {

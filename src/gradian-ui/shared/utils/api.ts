@@ -88,8 +88,8 @@ const headersToObject = (headers?: HeadersInit): Record<string, string> => {
 };
 
 /**
- * Extracts the tenant domain from the tenant store or falls back to current URL hostname
- * Returns the domain (e.g., "cms.cinnagen.com" from tenant store or window.location.hostname)
+ * Extracts the tenant domain from the tenant store or falls back to Host header (hostname)
+ * Returns the domain from tenant store if tenant is selected, otherwise uses window.location.hostname
  */
 const getTenantDomain = (): string | undefined => {
   if (!isBrowserEnvironment()) {
@@ -101,12 +101,12 @@ const getTenantDomain = (): string | undefined => {
     const tenantStore = useTenantStore.getState();
     const selectedTenant = tenantStore.selectedTenant;
     
-    // If tenant is selected and has a domain, use it
-    if (selectedTenant && selectedTenant.domain && selectedTenant.domain.trim().length > 0) {
+    // If tenant is selected (not null and not -1) and has a domain, use it
+    if (selectedTenant && selectedTenant.id !== -1 && selectedTenant.domain && selectedTenant.domain.trim().length > 0) {
       return selectedTenant.domain.trim();
     }
     
-    // Fall back to window.location.hostname if no tenant is selected or tenant has no domain
+    // Fall back to window.location.hostname (from Host header) if no tenant is selected
     const hostname = window.location.hostname;
     return hostname || undefined;
   } catch {
@@ -517,6 +517,105 @@ export class ApiClient {
 export const apiClient = new ApiClient();
 
 /**
+ * Get tenantIds and companyIds from stores for automatic inclusion in API requests
+ * Only works in browser environment
+ * Uses dynamic import to avoid circular dependencies and ensure stores are available
+ */
+async function getContextParams(): Promise<{ tenantIds?: string; companyIds?: string }> {
+  if (!isBrowserEnvironment()) {
+    return {};
+  }
+
+  try {
+    const params: { tenantIds?: string; companyIds?: string } = {};
+
+    // Get tenantId from tenant store
+    try {
+      const tenantStoreModule = await import('@/stores/tenant.store');
+      const tenantStore = tenantStoreModule.useTenantStore.getState();
+      const tenantId = tenantStore.getTenantId();
+      if (tenantId && tenantId !== -1) {
+        params.tenantIds = String(tenantId);
+      }
+    } catch (error) {
+      // Silently fail if tenant store is not available
+    }
+
+    // Get companyId from company store
+    try {
+      const companyStoreModule = await import('@/stores/company.store');
+      const companyStore = companyStoreModule.useCompanyStore.getState();
+      const companyId = companyStore.getCompanyId();
+      if (companyId && companyId !== -1) {
+        params.companyIds = String(companyId);
+      }
+    } catch (error) {
+      // Silently fail if company store is not available
+    }
+
+    return params;
+  } catch (error) {
+    return {};
+  }
+}
+
+/**
+ * Automatically append tenantIds and companyIds to /api/data/* endpoints
+ */
+async function enrichDataEndpoint(
+  endpoint: string,
+  existingParams?: Record<string, any>,
+  callerName?: string
+): Promise<{ endpoint: string; params?: Record<string, any> }> {
+  // Only enrich /api/data/* endpoints
+  if (!endpoint.startsWith('/api/data/') && !endpoint.includes('/api/data/')) {
+    return { endpoint, params: existingParams };
+  }
+
+  const isDev = isDevEnvironment();
+
+  // In development, allow the TenantSelector to see all tenants by NOT auto-injecting
+  // tenantIds/companyIds for the tenants collection endpoint. This is scoped specifically
+  // to the TenantSelector caller so other consumers (e.g. tenants listing page) still
+  // receive tenant/company scoping.
+  if (
+    isDev &&
+    callerName === 'TenantSelector' &&
+    (endpoint === '/api/data/tenants' || endpoint.startsWith('/api/data/tenants?'))
+  ) {
+    return { endpoint, params: existingParams };
+  }
+
+  const contextParams = await getContextParams();
+  if (!contextParams.tenantIds && !contextParams.companyIds) {
+    return { endpoint, params: existingParams };
+  }
+
+  // Extract existing params from endpoint URL if present
+  const [baseEndpoint, queryString] = endpoint.split('?');
+  const urlParams: Record<string, any> = {};
+  if (queryString) {
+    const searchParams = new URLSearchParams(queryString);
+    searchParams.forEach((value, key) => {
+      urlParams[key] = value;
+    });
+  }
+
+  // Merge: URL params -> existing params -> context params (context params take precedence)
+  // Only add context params if they're not already present
+  const mergedParams = {
+    ...urlParams,
+    ...existingParams,
+    // Only add tenantIds/companyIds from context if not already in params
+    ...(contextParams.tenantIds && !existingParams?.tenantIds && !urlParams.tenantIds && { tenantIds: contextParams.tenantIds }),
+    ...(contextParams.companyIds && !existingParams?.companyIds && !urlParams.companyIds && { companyIds: contextParams.companyIds }),
+  };
+
+  // Return base endpoint without query string (normalizeEndpointWithParams will add it back)
+  return { endpoint: baseEndpoint, params: mergedParams };
+}
+
+/**
  * Generic API request function for easy usage
  * @param endpoint - The API endpoint
  * @param options - Request options (method, body, headers, etc.)
@@ -546,7 +645,15 @@ export async function apiRequest<T>(
     loggingCustom(LogType.CLIENT_LOG, 'info', `[apiRequest] ${method} ${endpoint} invoked by ${callerName}`);
   }
   
-  const normalizedEndpoint = method === 'GET' ? normalizeEndpointWithParams(endpoint, options?.params) : endpoint;
+  // Enrich /api/data/* endpoints with tenantIds and companyIds
+  const { endpoint: enrichedEndpoint, params: enrichedParams } = await enrichDataEndpoint(
+    endpoint,
+    options?.params,
+    callerName
+  );
+  
+  // Use normalizeEndpointWithParams for all methods to properly handle existing query params
+  const normalizedEndpoint = normalizeEndpointWithParams(enrichedEndpoint, enrichedParams);
 
   let cacheStrategyContext: CacheStrategyContext | null = null;
   let cacheStrategyPreResult: CacheStrategyPreResult<any> | null = null;
@@ -587,25 +694,34 @@ export async function apiRequest<T>(
 
     switch (method) {
       case 'GET': {
-        const endpointForRequest = cacheStrategyPreResult?.overrideEndpoint ?? endpoint;
+        const endpointForRequest = cacheStrategyPreResult?.overrideEndpoint ?? normalizedEndpoint;
+        // If endpoint already has query params (from normalizeEndpointWithParams), don't pass params to apiClient.get()
+        // apiClient.get() will add them again, causing duplicates
+        const hasQueryParams = endpointForRequest.includes('?');
         const paramsForRequest =
           cacheStrategyPreResult?.overrideEndpoint !== undefined
             ? cacheStrategyPreResult.overrideParams
-            : options?.params;
+            : hasQueryParams
+            ? undefined // Don't pass params if endpoint already has query string
+            : enrichedParams; // Only pass params if endpoint doesn't have query string yet
         response = await apiClient.get<T>(endpointForRequest, paramsForRequest, requestHeaders);
         break;
       }
       case 'POST':
-        response = await apiClient.post<T>(endpoint, options?.body, requestHeaders);
+        // normalizedEndpoint already has query params properly merged
+        response = await apiClient.post<T>(normalizedEndpoint, options?.body, requestHeaders);
         break;
       case 'PUT':
-        response = await apiClient.put<T>(endpoint, options?.body, requestHeaders);
+        // normalizedEndpoint already has query params properly merged
+        response = await apiClient.put<T>(normalizedEndpoint, options?.body, requestHeaders);
         break;
       case 'PATCH':
-        response = await apiClient.patch<T>(endpoint, options?.body, requestHeaders);
+        // normalizedEndpoint already has query params properly merged
+        response = await apiClient.patch<T>(normalizedEndpoint, options?.body, requestHeaders);
         break;
       case 'DELETE':
-        response = await apiClient.delete<T>(endpoint, requestHeaders);
+        // normalizedEndpoint already has query params properly merged
+        response = await apiClient.delete<T>(normalizedEndpoint, requestHeaders);
         break;
       default:
         throw new Error(`Unsupported HTTP method: ${method}`);

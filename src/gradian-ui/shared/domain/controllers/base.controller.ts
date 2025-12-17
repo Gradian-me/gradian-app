@@ -62,6 +62,21 @@ export class BaseController<T extends BaseEntity> {
       }
     }
 
+    // Handle tenantIds - comma-separated string format: tenantIds=id1,id2
+    // Used for data filtering based on relatedTenants field when schema has allowDataRelatedTenants: true
+    if (searchParams.has('tenantIds')) {
+      const tenantIdsParam = searchParams.get('tenantIds');
+      if (tenantIdsParam) {
+        filters.tenantIds = tenantIdsParam.split(',').map(id => id.trim()).filter(id => id.length > 0);
+      }
+    }
+
+    // Handle allowDataRelatedTenants flag - enables tenant-based data filtering
+    if (searchParams.has('allowDataRelatedTenants')) {
+      const allowDataRelatedTenantsParam = searchParams.get('allowDataRelatedTenants');
+      filters.allowDataRelatedTenants = allowDataRelatedTenantsParam === 'true';
+    }
+
     // Backward compatibility: Handle single companyId (will be converted to companyIds array in repository)
     // Add any other query params as filters (excluding params we've already handled)
     searchParams.forEach((value, key) => {
@@ -76,8 +91,9 @@ export class BaseController<T extends BaseEntity> {
           'excludeIds[]',
           'companyIds',
           'companyId',
-          'tenantIds', // Used at schema visibility layer, not as a data field filter
+          'tenantIds',
           'tenantId',
+          'allowDataRelatedTenants',
           'sortArray',
           'sortBy',
           'sortOrder',

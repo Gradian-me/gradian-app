@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '../../../shared/utils';
 import { SidebarNavigationDynamic } from './SidebarNavigationDynamic';
 import { AnimatePresence } from 'framer-motion';
+import { apiRequest } from '@/gradian-ui/shared/utils/api';
 
 type SidebarNavigationMenuProps = Pick<
   SidebarProps,
@@ -76,18 +77,20 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
     async function loadMenuItems() {
       setIsLoading(true);
       try {
-        const res = await fetch('/api/data/menu-items');
-        if (!res.ok) {
+        // Use apiRequest which automatically includes tenantIds and companyIds
+        const response = await apiRequest<any[]>('/api/data/menu-items');
+        
+        if (!response.success || !response.data) {
           if (isMounted) {
             setIsLoading(false);
           }
           return;
         }
-        const json = await res.json();
-        const rawItems = Array.isArray(json?.data)
-          ? json.data
-          : Array.isArray(json?.results)
-          ? json.results
+
+        const rawItems = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray((response.data as any)?.results)
+          ? (response.data as any).results
           : [];
 
         const mapped = mapMenuItemsToNavigationItems(rawItems, companyId);

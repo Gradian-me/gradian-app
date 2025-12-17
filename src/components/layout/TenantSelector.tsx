@@ -67,7 +67,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
       try {
         const response = await apiRequest<Tenant[] | { data?: Tenant[]; items?: Tenant[] }>(
           '/api/data/tenants',
-          { method: 'GET' }
+          { method: 'GET', callerName: 'TenantSelector' }
         );
 
         if (response.success && response.data) {
