@@ -125,7 +125,7 @@ const CardTenantSelector: React.FC<CardTenantSelectorProps> = ({ integrationId, 
       try {
         const response = await apiRequest<Tenant[] | { data?: Tenant[]; items?: Tenant[] }>(
           '/api/data/tenants',
-          { method: 'GET' }
+          { method: 'GET', callerName: 'IntegrationsCardTenantSelector' }
         );
 
         if (response.success && response.data) {

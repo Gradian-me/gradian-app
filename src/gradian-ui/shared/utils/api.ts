@@ -574,13 +574,13 @@ async function enrichDataEndpoint(
 
   const isDev = isDevEnvironment();
 
-  // In development, allow the TenantSelector to see all tenants by NOT auto-injecting
-  // tenantIds/companyIds for the tenants collection endpoint. This is scoped specifically
-  // to the TenantSelector caller so other consumers (e.g. tenants listing page) still
-  // receive tenant/company scoping.
+  // In development, allow specific callers (TenantSelector components, integration cards)
+  // to see all tenants by NOT auto-injecting tenantIds/companyIds for the tenants
+  // collection endpoint. Other consumers (e.g. tenants listing pages) still receive
+  // tenant/company scoping.
   if (
     isDev &&
-    callerName === 'TenantSelector' &&
+    (callerName === 'TenantSelector' || callerName === 'IntegrationsCardTenantSelector') &&
     (endpoint === '/api/data/tenants' || endpoint.startsWith('/api/data/tenants?'))
   ) {
     return { endpoint, params: existingParams };
