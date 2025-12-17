@@ -59,18 +59,18 @@ build:
     - docker info | grep -i "registry\|mirror" || echo "No registry mirror configured"
     - echo "📥 Attempting to pull base image from Docker Hub..."
     - |
-      if ! timeout 30 docker pull node:20-slim; then
+      if ! timeout 30 docker pull node:25.2.1-slim; then
         echo "⚠️ Cannot reach Docker Hub. Trying GitLab registry..."
         # Try to pull from GitLab registry if base image was pre-pushed
-        if docker pull "$CI_REGISTRY/library/node:20-slim" 2>/dev/null; then
+        if docker pull "$CI_REGISTRY/library/node:25.2.1-slim" 2>/dev/null; then
           echo "✅ Found base image in GitLab registry, tagging for build..."
-          docker tag "$CI_REGISTRY/library/node:20-slim" node:20-slim
+          docker tag "$CI_REGISTRY/library/node:25.2.1-slim" node:25.2.1-slim
         else
           echo "❌ Base image not available in GitLab registry either."
           echo ""
           echo "💡 SOLUTIONS:"
           echo "   1. Configure a Docker registry mirror on the GitLab runner"
-          echo "   2. Pre-push base image: docker pull node:20-slim && docker tag node:20-slim $CI_REGISTRY/library/node:20-slim && docker push $CI_REGISTRY/library/node:20-slim"
+          echo "   2. Pre-push base image: docker pull node:25.2.1-slim && docker tag node:25.2.1-slim $CI_REGISTRY/library/node:25.2.1-slim && docker push $CI_REGISTRY/library/node:25.2.1-slim"
           echo "   3. Fix network/DNS access to Docker Hub (registry-1.docker.io)"
           echo "   4. Contact infrastructure team to allow Docker Hub access"
           exit 1

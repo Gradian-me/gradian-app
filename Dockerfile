@@ -40,7 +40,7 @@ RUN npm run build
 # =============================================================================
 # Production stage
 # =============================================================================
-FROM reg.cinnagen.com:8083/node:20-slim AS runner
+FROM reg.cinnagen.com:8083/node:25.2.1-slim AS runner
 
 WORKDIR /app
 
