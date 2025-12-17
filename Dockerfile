@@ -1,7 +1,7 @@
 # =============================================================================
 # Build stage
 # =============================================================================
-FROM reg.cinnagen.com:8083/node:20-slim AS builder
+FROM reg.cinnagen.com:8083/node:25.2.1-slim AS builder
 
 # Accept build-time env vars needed for client bundle
 ARG NEXT_PUBLIC_ENCRYPTION_KEY
