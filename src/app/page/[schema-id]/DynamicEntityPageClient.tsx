@@ -129,10 +129,10 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
   }, [queryClient, reconstructedNavigationSchemas]);
   
   // Track if we've fetched for this schemaId to avoid multiple fetches
-  const hasFetchedRef = useRef<string | null>(null);
-  const isSchemaReadyRef = useRef<boolean>(false);
-  const isInitialFetchRef = useRef<boolean>(true); // Track if this is the initial fetch
-  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+  // Use state instead of refs to trigger re-renders when values change
+  const [hasFetched, setHasFetched] = React.useState<string | null>(null);
+  const [isSchemaReady, setIsSchemaReady] = React.useState<boolean>(false);
+  const [isInitialFetch, setIsInitialFetch] = React.useState<boolean>(true); // Track if this is the initial fetch
   
   // Always fetch fresh schema data on page load to avoid stale cache issues
   // Clear cache first, then fetch to ensure we get the latest schema
@@ -155,15 +155,14 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
     }
     
     // Skip if we already fetched for this schemaId and it's ready
-    if (hasFetchedRef.current === schemaId && isSchemaReadyRef.current) {
-      isInitialFetchRef.current = false; // Mark as no longer initial fetch
+    if (hasFetched === schemaId && isSchemaReady) {
+      setIsInitialFetch(false); // Mark as no longer initial fetch
       return;
     }
     
     // Mark as fetched before async operation
-    hasFetchedRef.current = schemaId;
-    isSchemaReadyRef.current = false; // Reset ready state when starting new fetch
-    forceUpdate(); // Trigger re-render
+    setHasFetched(schemaId);
+    setIsSchemaReady(false); // Reset ready state when starting new fetch
     
     // Clear cache first to ensure fresh fetch
     queryClient.removeQueries({ queryKey: ['schemas', schemaId] });
@@ -175,23 +174,21 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
     refetchSchemaRef.current({ cancelRefetch: false })
       .then(() => {
         // Mark schema as ready after refetch completes
-        isSchemaReadyRef.current = true;
-        isInitialFetchRef.current = false; // Mark as no longer initial fetch
-        forceUpdate(); // Trigger re-render
+        setIsSchemaReady(true);
+        setIsInitialFetch(false); // Mark as no longer initial fetch
       })
       .catch(() => {
         // Even on error, mark as ready to prevent blocking
-        isSchemaReadyRef.current = true;
-        isInitialFetchRef.current = false; // Mark as no longer initial fetch
-        forceUpdate(); // Trigger re-render
+        setIsSchemaReady(true);
+        setIsInitialFetch(false); // Mark as no longer initial fetch
       });
-  }, [schemaId, queryClient]); // Only depend on schemaId and queryClient
+  }, [schemaId, queryClient]); // Only depend on schemaId and queryClient - state is checked inside
 
   // Listen for React Query cache clear events - invalidate cache and refresh router
   useEffect(() => {
     const handleCacheClear = async () => {
       // Reset fetch tracking to allow fresh fetch after cache clear
-      hasFetchedRef.current = null;
+      setHasFetched(null);
       // Invalidate React Query cache for this schema
       await queryClient.invalidateQueries({ queryKey: ['schemas', schemaId] });
       // Remove the cached data to force a fresh fetch
@@ -210,7 +207,7 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
     const handleStorageChange = async (e: StorageEvent) => {
       if (e.key === 'react-query-cache-cleared') {
         // Reset fetch tracking to allow fresh fetch after cache clear
-        hasFetchedRef.current = null;
+        setHasFetched(null);
         // Invalidate and remove cached data
         await queryClient.invalidateQueries({ queryKey: ['schemas', schemaId] });
         queryClient.removeQueries({ queryKey: ['schemas', schemaId] });
@@ -238,8 +235,8 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
   // IMPORTANT: This check must be AFTER all hooks are called
   // Wait if: we're on initial fetch OR we've initiated a fetch for this schemaId AND it's not ready yet
   const shouldWaitForSchema = 
-    isInitialFetchRef.current ||
-    (hasFetchedRef.current === schemaId && !isSchemaReadyRef.current);
+    isInitialFetch ||
+    (hasFetched === schemaId && !isSchemaReady);
   
   if (shouldWaitForSchema) {
     // Schema fetch is in progress, wait for it to complete before rendering

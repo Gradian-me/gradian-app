@@ -84,7 +84,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
             hasAutoSelectedRef.current = true;
             const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
             // Try to find tenant matching current domain
-            const domainMatch = data.find((tenant) => 
+            const domainMatch = data.find((tenant: Tenant) => 
               tenant.domain && hostname.includes(tenant.domain)
             );
             const tenantToSelect = domainMatch || data[0];

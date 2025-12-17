@@ -39,19 +39,20 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   });
   
   // Track previous pathname to detect route changes within chat
-  const prevPathnameRef = useRef<string | null>(null);
+  // Use state instead of ref to avoid accessing refs during render
+  const [prevPathname, setPrevPathname] = React.useState<string | null>(null);
   const prevIsCollapsedRef = useRef<boolean>(isCollapsed);
   const isRouteChangeWithinChat = React.useMemo(() => {
-    const prev = prevPathnameRef.current;
+    const prev = prevPathname;
     const current = pathname || null;
     const wasChatRoute = prev?.startsWith('/chat');
     const isChatRoute = current?.startsWith('/chat');
     return wasChatRoute && isChatRoute && prev !== current;
-  }, [pathname]);
+  }, [pathname, prevPathname]);
   
-  // Update pathname ref after render
+  // Update pathname state after render
   React.useEffect(() => {
-    prevPathnameRef.current = pathname || null;
+    setPrevPathname(pathname || null);
   }, [pathname]);
 
   // When sidebar is opened (transition from collapsed -> expanded), auto-open Applications accordion
