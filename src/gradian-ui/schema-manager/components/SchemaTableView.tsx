@@ -401,8 +401,7 @@ export function SchemaTableView({
       align: 'left',
       minWidth: 140,
       render: (_value: any, row: FormSchema) => {
-        const stats = row.statistics as { maxUpdatedAt?: string | null } | undefined;
-        const maxUpdatedAt = stats?.maxUpdatedAt;
+        const maxUpdatedAt = row.statistics?.maxUpdatedAt;
         
         // Format maxUpdatedAt for display with friendly relative time
         const formatDate = (dateString: string | null | undefined): string => {

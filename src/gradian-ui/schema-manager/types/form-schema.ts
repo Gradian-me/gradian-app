@@ -442,6 +442,7 @@ export interface FormSchema {
   syncToDatabases?: string[]; // Array of database IDs to sync this schema to
   syncStrategy?: 'schema-only' | 'schema-and-data'; // Sync strategy: schema only or schema and data
   statistics?: {
+    maxUpdatedAt?: string | null;
     hasPartition?: boolean;
     isIndexed?: boolean;
     records?: number;
