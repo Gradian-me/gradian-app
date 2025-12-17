@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { DynamicPageRenderer } from '@/gradian-ui/data-display/components/DynamicPageRenderer';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -128,25 +128,75 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
     });
   }, [queryClient, reconstructedNavigationSchemas]);
   
-  // Use React Query to fetch and cache schema
-  // Use initial schema from server as initialData to populate React Query cache
-  // This ensures the cache is populated with server-side data, avoiding unnecessary fetches
-  const { schema: fetchedSchema, refetch: refetchSchema } = useSchemaById(schemaId, {
-    enabled: false, // We'll trigger a manual refresh to guarantee fresh data
-    initialData: reconstructedInitialSchema, // Populate cache with server-side data
+  // Track if we've fetched for this schemaId to avoid multiple fetches
+  const hasFetchedRef = useRef<string | null>(null);
+  const isSchemaReadyRef = useRef<boolean>(false);
+  const isInitialFetchRef = useRef<boolean>(true); // Track if this is the initial fetch
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+  
+  // Always fetch fresh schema data on page load to avoid stale cache issues
+  // Clear cache first, then fetch to ensure we get the latest schema
+  const { schema: fetchedSchema, isLoading: isSchemaLoading, refetch: refetchSchema } = useSchemaById(schemaId, {
+    enabled: true, // Enable query to allow refetch
+    initialData: reconstructedInitialSchema, // Use server data as fallback
   });
   
-  // Use fetched schema if available, otherwise use initial schema from server
-  // Always prefer the latest initialSchema from server after refresh
-  const schema = fetchedSchema || reconstructedInitialSchema;
+  // Track refetch function in ref
+  const refetchSchemaRef = useRef(refetchSchema);
+  useEffect(() => {
+    refetchSchemaRef.current = refetchSchema;
+  }, [refetchSchema]);
+  
+  // Always fetch fresh schema data when page loads or schemaId changes
+  useEffect(() => {
+    if (!schemaId) {
+      return;
+    }
+    
+    // Skip if we already fetched for this schemaId and it's ready
+    if (hasFetchedRef.current === schemaId && isSchemaReadyRef.current) {
+      isInitialFetchRef.current = false; // Mark as no longer initial fetch
+      return;
+    }
+    
+    // Mark as fetched before async operation
+    hasFetchedRef.current = schemaId;
+    isSchemaReadyRef.current = false; // Reset ready state when starting new fetch
+    forceUpdate(); // Trigger re-render
+    
+    // Clear cache first to ensure fresh fetch
+    queryClient.removeQueries({ queryKey: ['schemas', schemaId] });
+    
+    // Invalidate to mark as stale
+    queryClient.invalidateQueries({ queryKey: ['schemas', schemaId] });
+    
+    // Fetch fresh schema data and wait for it to complete
+    refetchSchemaRef.current({ cancelRefetch: false })
+      .then(() => {
+        // Mark schema as ready after refetch completes
+        isSchemaReadyRef.current = true;
+        isInitialFetchRef.current = false; // Mark as no longer initial fetch
+        forceUpdate(); // Trigger re-render
+      })
+      .catch(() => {
+        // Even on error, mark as ready to prevent blocking
+        isSchemaReadyRef.current = true;
+        isInitialFetchRef.current = false; // Mark as no longer initial fetch
+        forceUpdate(); // Trigger re-render
+      });
+  }, [schemaId, queryClient]); // Only depend on schemaId and queryClient
 
   // Listen for React Query cache clear events - invalidate cache and refresh router
   useEffect(() => {
     const handleCacheClear = async () => {
+      // Reset fetch tracking to allow fresh fetch after cache clear
+      hasFetchedRef.current = null;
       // Invalidate React Query cache for this schema
       await queryClient.invalidateQueries({ queryKey: ['schemas', schemaId] });
       // Remove the cached data to force a fresh fetch
       queryClient.removeQueries({ queryKey: ['schemas', schemaId] });
+      // Trigger fresh fetch
+      void refetchSchema();
       // Force router refresh to get fresh server-side data
       // This will cause the server component to re-render with fresh schema data
       router.refresh();
@@ -158,9 +208,13 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
     // Listen for storage events (from other tabs/windows)
     const handleStorageChange = async (e: StorageEvent) => {
       if (e.key === 'react-query-cache-cleared') {
+        // Reset fetch tracking to allow fresh fetch after cache clear
+        hasFetchedRef.current = null;
         // Invalidate and remove cached data
         await queryClient.invalidateQueries({ queryKey: ['schemas', schemaId] });
         queryClient.removeQueries({ queryKey: ['schemas', schemaId] });
+        // Trigger fresh fetch
+        void refetchSchema();
         // Force router refresh to get fresh server-side data
         router.refresh();
       }
@@ -172,20 +226,24 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
       window.removeEventListener('react-query-cache-clear', handleCacheClear as EventListener);
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [schemaId, queryClient, router]);
+  }, [schemaId, queryClient, router, refetchSchema]);
 
-  // Trigger one fresh fetch per schema visit to ensure the client has the latest schema definition
-  const lastFetchedSchemaIdRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (!schemaId) {
-      return;
-    }
-    if (lastFetchedSchemaIdRef.current === schemaId) {
-      return;
-    }
-    lastFetchedSchemaIdRef.current = schemaId;
-    void refetchSchema();
-  }, [schemaId, refetchSchema]);
+  // Use fetched schema if available, otherwise use initial schema from server
+  // Always prefer the latest fetchedSchema over initialSchema
+  const schema = fetchedSchema || reconstructedInitialSchema;
+  
+  // Don't render DynamicPageRenderer until schema refetch is complete
+  // This ensures data fetch happens AFTER schema fetch completes
+  // IMPORTANT: This check must be AFTER all hooks are called
+  // Wait if: we're on initial fetch OR we've initiated a fetch for this schemaId AND it's not ready yet
+  const shouldWaitForSchema = 
+    isInitialFetchRef.current ||
+    (hasFetchedRef.current === schemaId && !isSchemaReadyRef.current);
+  
+  if (shouldWaitForSchema) {
+    // Schema fetch is in progress, wait for it to complete before rendering
+    return null;
+  }
 
   // Serialize schema for client component
   const serializedSchema = serializeSchema(schema);

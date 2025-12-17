@@ -8,6 +8,7 @@ import { NormalizedOption, normalizeOptionArray } from '../utils/option-normaliz
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
+import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
 
 const isBadgeVariant = (color?: string): color is keyof typeof BADGE_SELECTED_VARIANT_CLASSES => {
   if (!color) return false;
@@ -25,15 +26,15 @@ const isTailwindClasses = (color?: string): boolean => {
 };
 
 const BADGE_SELECTED_VARIANT_CLASSES: Record<string, string> = {
-  default: 'data-[state=on]:border-violet-300 data-[state=on]:bg-violet-200 data-[state=on]:text-violet-800',
-  secondary: 'data-[state=on]:border-gray-300 data-[state=on]:bg-gray-200 data-[state=on]:text-gray-800',
-  destructive: 'data-[state=on]:border-red-300 data-[state=on]:bg-red-200 data-[state=on]:text-red-800',
-  success: 'data-[state=on]:border-emerald-300 data-[state=on]:bg-emerald-200 data-[state=on]:text-emerald-800',
-  warning: 'data-[state=on]:border-amber-300 data-[state=on]:bg-amber-200 data-[state=on]:text-amber-800',
-  info: 'data-[state=on]:border-sky-300 data-[state=on]:bg-sky-200 data-[state=on]:text-sky-800',
-  outline: 'data-[state=on]:border-violet-300 data-[state=on]:bg-violet-200 data-[state=on]:text-violet-800',
-  gradient: 'data-[state=on]:border-violet-300 data-[state=on]:bg-violet-200 data-[state=on]:text-violet-800',
-  muted: 'data-[state=on]:border-gray-300 data-[state=on]:bg-gray-200 data-[state=on]:text-gray-800',
+  default: 'data-[state=on]:border-violet-400 data-[state=on]:bg-gradient-to-r data-[state=on]:from-violet-500 data-[state=on]:to-purple-600 data-[state=on]:text-white data-[state=on]:shadow-md dark:data-[state=on]:border-violet-500 dark:data-[state=on]:from-violet-600 dark:data-[state=on]:to-purple-700 dark:data-[state=on]:shadow-lg',
+  secondary: 'data-[state=on]:border-gray-400 data-[state=on]:bg-gray-200 data-[state=on]:text-gray-800 dark:data-[state=on]:border-gray-600 dark:data-[state=on]:bg-gray-700 dark:data-[state=on]:text-gray-100',
+  destructive: 'data-[state=on]:border-red-400 data-[state=on]:bg-gradient-to-r data-[state=on]:from-red-500 data-[state=on]:to-red-600 data-[state=on]:text-white data-[state=on]:shadow-md dark:data-[state=on]:border-red-500 dark:data-[state=on]:from-red-600 dark:data-[state=on]:to-red-700 dark:data-[state=on]:shadow-lg',
+  success: 'data-[state=on]:border-emerald-400 data-[state=on]:bg-gradient-to-r data-[state=on]:from-emerald-500 data-[state=on]:to-emerald-600 data-[state=on]:text-white data-[state=on]:shadow-md dark:data-[state=on]:border-emerald-500 dark:data-[state=on]:from-emerald-600 dark:data-[state=on]:to-emerald-700 dark:data-[state=on]:shadow-lg',
+  warning: 'data-[state=on]:border-amber-400 data-[state=on]:bg-gradient-to-r data-[state=on]:from-amber-500 data-[state=on]:to-amber-600 data-[state=on]:text-white data-[state=on]:shadow-md dark:data-[state=on]:border-amber-500 dark:data-[state=on]:from-amber-600 dark:data-[state=on]:to-amber-700 dark:data-[state=on]:shadow-lg',
+  info: 'data-[state=on]:border-sky-400 data-[state=on]:bg-gradient-to-r data-[state=on]:from-sky-500 data-[state=on]:to-sky-600 data-[state=on]:text-white data-[state=on]:shadow-md dark:data-[state=on]:border-sky-500 dark:data-[state=on]:from-sky-600 dark:data-[state=on]:to-sky-700 dark:data-[state=on]:shadow-lg',
+  outline: 'data-[state=on]:border-violet-400 data-[state=on]:bg-gradient-to-r data-[state=on]:from-violet-500 data-[state=on]:to-purple-600 data-[state=on]:text-white data-[state=on]:shadow-md dark:data-[state=on]:border-violet-500 dark:data-[state=on]:from-violet-600 dark:data-[state=on]:to-purple-700 dark:data-[state=on]:shadow-lg',
+  gradient: 'data-[state=on]:border-violet-400 data-[state=on]:bg-gradient-to-r data-[state=on]:from-violet-500 data-[state=on]:to-purple-600 data-[state=on]:text-white data-[state=on]:shadow-md dark:data-[state=on]:border-violet-500 dark:data-[state=on]:from-violet-600 dark:data-[state=on]:to-purple-700 dark:data-[state=on]:shadow-lg',
+  muted: 'data-[state=on]:border-gray-400 data-[state=on]:bg-gray-200 data-[state=on]:text-gray-800 dark:data-[state=on]:border-gray-600 dark:data-[state=on]:bg-gray-700 dark:data-[state=on]:text-gray-100',
 };
 
 const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
@@ -207,10 +208,16 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
     };
 
     const rootClasses = cn(
-      'flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-white/60 p-2',
+      'flex flex-wrap gap-2 rounded-xl border p-2 shadow-sm transition-all duration-200',
+      // Light mode
+      'border-gray-200 bg-white/80 backdrop-blur-sm',
+      // Dark mode
+      'dark:border-gray-700 dark:bg-gray-800/60 dark:backdrop-blur-sm',
+      // Orientation
       resolvedOrientation === 'vertical' && 'flex-col',
+      // States
       disabled && 'opacity-60 pointer-events-none cursor-not-allowed',
-      error && 'border-red-500',
+      error && 'border-red-500 dark:border-red-600',
       className
     );
 
@@ -240,10 +247,22 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
           value={option.id}
           disabled={disabled || option.disabled}
           className={cn(
-            'gap-2 rounded-xl px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 data-[state=on]:bg-violet-200 data-[state=on]:border-violet-300 data-[state=on]:text-violet-800 data-[state=on]:font-semibold',
+            'gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200',
+            // Light mode - default
+            'text-gray-700 border-gray-200 bg-white shadow-sm',
+            'hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 hover:shadow-md',
+            // Light mode - selected
+            'data-[state=on]:bg-gradient-to-r data-[state=on]:from-violet-500 data-[state=on]:to-purple-600 data-[state=on]:border-violet-400 data-[state=on]:text-white data-[state=on]:shadow-md data-[state=on]:font-semibold',
+            // Dark mode - default
+            'dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800/50',
+            'dark:hover:border-violet-500 dark:hover:bg-gray-700 dark:hover:text-violet-300 dark:hover:shadow-lg',
+            // Dark mode - selected
+            'dark:data-[state=on]:bg-gradient-to-r dark:data-[state=on]:from-violet-600 dark:data-[state=on]:to-purple-700 dark:data-[state=on]:border-violet-500 dark:data-[state=on]:text-white dark:data-[state=on]:shadow-lg',
+            // Active press effect
+            'active:scale-[0.98]',
             sizeClasses[size],
             customClasses,
-            error && 'ring-1 ring-red-200'
+            error && 'ring-1 ring-red-200 dark:ring-red-600'
           )}
           style={style}
           onFocus={onFocus}
@@ -272,19 +291,20 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
             onValueChange: handleMultipleChange,
           };
 
+    const fieldName = config?.name || 'toggle-group';
+    
     return (
       <div className="w-full space-y-2">
         {hasLabel && (
-          <div
-            className={cn(
-              'flex items-center justify-between gap-2 text-xs font-medium',
-              error ? 'text-red-700' : 'text-gray-700',
-              required && 'after:content-["*"] after:ms-1 after:text-red-500'
-            )}
-          >
-            <span>{config?.label}</span>
+          <div className="flex items-center justify-between gap-2">
+            <label
+              htmlFor={fieldName}
+              className={getLabelClasses({ error: Boolean(error), required, disabled })}
+            >
+              {config?.label}
+            </label>
             {config?.helper && (
-              <span className="text-xs font-normal text-gray-500">{config.helper}</span>
+              <span className="text-xs font-normal text-gray-500 dark:text-gray-400">{config.helper}</span>
             )}
           </div>
         )}
@@ -315,10 +335,10 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
           </ToggleGroupRoot>
         )}
         {config?.description && (
-          <p className="text-xs text-gray-500">{config.description}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{config.description}</p>
         )}
         {error && (
-          <p className="text-sm text-red-600" role="alert">
+          <p className={errorTextClasses} role="alert">
             {error}
           </p>
         )}

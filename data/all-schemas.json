@@ -2876,17 +2876,23 @@
         "component": "toggle-group",
         "placeholder": "Select authentication type",
         "defaultValue": "active-directory",
-        "required": false,
+        "validation": {
+          "required": true
+        },
         "colSpan": 1,
         "order": 7,
         "options": [
           {
             "id": "form-based",
-            "label": "Form-Based"
+            "label": "Form-Based",
+            "icon": "User",
+            "color": "cyan"
           },
           {
             "id": "active-directory",
-            "label": "Active Directory"
+            "label": "Active Directory",
+            "icon": "Server",
+            "color": "success"
           }
         ]
       }

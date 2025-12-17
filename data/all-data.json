@@ -1595,6 +1595,28 @@
       "id": "01KC3FBM8YXB7V70SQMEBN0151",
       "createdAt": "2025-12-10T06:32:11.814Z",
       "updatedAt": "2025-12-10T06:32:11.814Z"
+    },
+    {
+      "company": "CinnaGen",
+      "authenticationType": [],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "username": "nourish",
+      "firstName": "Shafigh",
+      "lastName": "Nouri",
+      "email": "nourish@cinnagen.com",
+      "postTitle": "QC Analyst",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KCPC8YBMRYB3X846103R11MH",
+      "createdAt": "2025-12-17T14:43:52.319Z",
+      "updatedAt": "2025-12-17T14:43:52.319Z"
     }
   ],
   "purchaseOrders": [],

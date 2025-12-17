@@ -57,8 +57,8 @@ export const DynamicFilterPane = ({
           className="h-9 sm:h-10 w-full"
         />
       </div>
-      <div className="flex flex-row gap-1.5 sm:gap-2 items-center w-full lg:w-auto">
-        <Button variant="outline" size="sm" className="h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap">
+      <div className="flex flex-row gap-1.5 sm:gap-2 items-center w-full lg:w-auto flex-wrap">
+        <Button variant="outline" size="sm" className="hidden h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap">
           <Filter className="h-4 w-4 sm:me-2" />
           <span className="hidden sm:inline">Filters</span>
         </Button>

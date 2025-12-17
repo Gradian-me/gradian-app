@@ -568,15 +568,39 @@ async function getContextParams(): Promise<{ tenantIds?: string; companyIds?: st
 }
 
 /**
- * Automatically append tenantIds and companyIds to /api/data/* endpoints
+ * Get user ID from user store for automatic inclusion in POST/PUT/PATCH requests
+ * Only works in browser environment
+ * Uses dynamic import to avoid circular dependencies and ensure stores are available
+ */
+async function getUserId(): Promise<string | null> {
+  if (!isBrowserEnvironment()) {
+    return null;
+  }
+
+  try {
+    const userStoreModule = await import('@/stores/user.store');
+    const userStore = userStoreModule.useUserStore.getState();
+    const userId = userStore.getUserId();
+    return userId || null;
+  } catch (error) {
+    // Silently fail if user store is not available
+    return null;
+  }
+}
+
+/**
+ * Automatically append tenantIds and companyIds to /api/data/* and /api/schemas/* endpoints
  */
 async function enrichDataEndpoint(
   endpoint: string,
   existingParams?: Record<string, any>,
   callerName?: string
 ): Promise<{ endpoint: string; params?: Record<string, any> }> {
-  // Only enrich /api/data/* endpoints
-  if (!endpoint.startsWith('/api/data/') && !endpoint.includes('/api/data/')) {
+  // Only enrich /api/data/* and /api/schemas/* endpoints
+  const isDataEndpoint = endpoint.startsWith('/api/data/') || endpoint.includes('/api/data/');
+  const isSchemaEndpoint = endpoint.startsWith('/api/schemas/') || endpoint.includes('/api/schemas/');
+  
+  if (!isDataEndpoint && !isSchemaEndpoint) {
     return { endpoint, params: existingParams };
   }
 
@@ -661,7 +685,7 @@ export async function apiRequest<T>(
     loggingCustom(LogType.CLIENT_LOG, 'info', `[apiRequest] ${method} ${endpoint} invoked by ${callerName}`);
   }
   
-  // Enrich /api/data/* endpoints with tenantIds and companyIds
+  // Enrich /api/data/* and /api/schemas/* endpoints with tenantIds and companyIds
   const { endpoint: enrichedEndpoint, params: enrichedParams } = await enrichDataEndpoint(
     endpoint,
     options?.params,
@@ -705,6 +729,47 @@ export async function apiRequest<T>(
 
   const requestHeaders = headersWithCaller ? { headers: headersWithCaller } : undefined;
 
+  // Enrich request body with user ID for POST/PUT/PATCH requests to /api/data/* endpoints
+  let enrichedBody = options?.body;
+  const isDataEndpoint = normalizedEndpoint.startsWith('/api/data/') || normalizedEndpoint.includes('/api/data/');
+  const isMutationMethod = method === 'POST' || method === 'PUT' || method === 'PATCH';
+  
+  if (isDataEndpoint && isMutationMethod && enrichedBody !== undefined) {
+    try {
+      const userId = await getUserId();
+      if (userId) {
+        // Handle array of entities (bulk create/update)
+        if (Array.isArray(enrichedBody)) {
+          enrichedBody = enrichedBody.map((item) => {
+            if (item && typeof item === 'object' && !Array.isArray(item)) {
+              // For POST: add createdBy, for PUT/PATCH: add updatedBy
+              if (method === 'POST') {
+                return { ...item, createdBy: userId };
+              } else {
+                return { ...item, updatedBy: userId };
+              }
+            }
+            return item;
+          });
+        } else if (enrichedBody && typeof enrichedBody === 'object' && !Array.isArray(enrichedBody)) {
+          // Handle single entity
+          if (method === 'POST') {
+            enrichedBody = { ...enrichedBody, createdBy: userId };
+          } else {
+            enrichedBody = { ...enrichedBody, updatedBy: userId };
+          }
+        }
+      }
+    } catch (error) {
+      // Silently fail if user ID enrichment fails - don't break the request
+      loggingCustom(
+        LogType.CLIENT_LOG,
+        'warn',
+        `[apiRequest] Failed to enrich body with user ID: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
   try {
     let response: ApiResponse<T>;
 
@@ -725,15 +790,15 @@ export async function apiRequest<T>(
       }
       case 'POST':
         // normalizedEndpoint already has query params properly merged
-        response = await apiClient.post<T>(normalizedEndpoint, options?.body, requestHeaders);
+        response = await apiClient.post<T>(normalizedEndpoint, enrichedBody, requestHeaders);
         break;
       case 'PUT':
         // normalizedEndpoint already has query params properly merged
-        response = await apiClient.put<T>(normalizedEndpoint, options?.body, requestHeaders);
+        response = await apiClient.put<T>(normalizedEndpoint, enrichedBody, requestHeaders);
         break;
       case 'PATCH':
         // normalizedEndpoint already has query params properly merged
-        response = await apiClient.patch<T>(normalizedEndpoint, options?.body, requestHeaders);
+        response = await apiClient.patch<T>(normalizedEndpoint, enrichedBody, requestHeaders);
         break;
       case 'DELETE':
         // normalizedEndpoint already has query params properly merged

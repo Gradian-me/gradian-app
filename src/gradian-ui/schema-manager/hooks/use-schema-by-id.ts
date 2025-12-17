@@ -25,7 +25,11 @@ export function useSchemaById(
       if (!schemaId) {
         throw new Error('Schema ID is required');
       }
-      const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);
+      // Add cache-busting timestamp to ensure fresh data
+      const timestamp = Date.now();
+      const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}?_t=${timestamp}`, {
+        disableCache: true, // Disable IndexedDB cache for this request
+      });
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to fetch schema');
       }
@@ -34,12 +38,12 @@ export function useSchemaById(
     },
     enabled: options?.enabled !== false && !!schemaId,
     initialData: options?.initialData, // Populate cache with initial data (e.g., from SSR)
-    staleTime: cacheConfig.staleTime ?? 10 * 60 * 1000,
+    staleTime: 0, // Always consider data stale to allow fresh fetches
     gcTime: cacheConfig.gcTime ?? 30 * 60 * 1000,
-    refetchOnMount: false, // Don't refetch on mount if data exists in cache
+    refetchOnMount: false, // Don't auto-refetch on mount - let the component control when to fetch
     refetchOnWindowFocus: false, // Don't refetch on window focus
     refetchOnReconnect: false, // Don't refetch on reconnect
-    retry: 1, // Only retry once on failure
+    retry: 2, // Retry twice on failure
     retryDelay: 1000, // Wait 1 second before retrying
   });
 
