@@ -89,7 +89,8 @@ const headersToObject = (headers?: HeadersInit): Record<string, string> => {
 
 /**
  * Extracts the tenant domain from the tenant store or falls back to Host header (hostname)
- * Returns the domain from tenant store if tenant is selected, otherwise uses window.location.hostname
+ * In production: Always uses window.location.hostname (Host header)
+ * In development: Uses tenant store domain if tenant is selected, otherwise falls back to hostname
  */
 const getTenantDomain = (): string | undefined => {
   if (!isBrowserEnvironment()) {
@@ -97,7 +98,15 @@ const getTenantDomain = (): string | undefined => {
   }
   
   try {
-    // Try to get domain from tenant store first
+    const isDev = isDevEnvironment();
+    const hostname = window.location.hostname;
+    
+    // In production, always use the hostname (Host header)
+    if (!isDev) {
+      return hostname || undefined;
+    }
+    
+    // In development, try to get domain from tenant store first
     const tenantStore = useTenantStore.getState();
     const selectedTenant = tenantStore.selectedTenant;
     
@@ -107,7 +116,6 @@ const getTenantDomain = (): string | undefined => {
     }
     
     // Fall back to window.location.hostname (from Host header) if no tenant is selected
-    const hostname = window.location.hostname;
     return hostname || undefined;
   } catch {
     // Fallback to window.location.hostname on error
