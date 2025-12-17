@@ -1285,5 +1285,16 @@
     "id": "01KCHF23WBNVP0ZNP1TXHP3SP9",
     "createdAt": "2025-12-15T16:56:22.155Z",
     "updatedAt": "2025-12-15T16:56:22.155Z"
+  },
+  {
+    "id": "01KCNNAX92YPFYQ9PEGY0YH1CV",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K9720G4M9G75V3YWB9PGKBTM",
+    "targetSchema": "vendors",
+    "targetId": "01K9OP000000000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-17T08:02:59.489Z",
+    "updatedAt": "2025-12-17T08:02:59.489Z"
   }
 ]

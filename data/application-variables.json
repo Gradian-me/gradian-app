@@ -1,17 +1,17 @@
 {
   "LOG_CONFIG": {
-    "FORM_DATA": true,
+    "FORM_DATA": false,
     "REQUEST_BODY": true,
     "REQUEST_RESPONSE": true,
-    "AI_BODY_LOG": true,
-    "AI_RESPONSE_LOG": true,
-    "SCHEMA_LOADER": true,
+    "AI_BODY_LOG": false,
+    "AI_RESPONSE_LOG": false,
+    "SCHEMA_LOADER": false,
     "CALL_BACKEND": true,
     "INDEXDB_CACHE": true,
     "INTEGRATION_LOG": true,
     "GRAPH_LOG": true,
     "EMAIL_LOG": true,
-    "LOGIN_LOG": true,
+    "LOGIN_LOG": false,
     "INFRA_LOG": true,
     "CLIENT_LOG": true
   },
