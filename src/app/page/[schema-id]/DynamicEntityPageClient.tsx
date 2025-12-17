@@ -136,8 +136,9 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
   
   // Always fetch fresh schema data on page load to avoid stale cache issues
   // Clear cache first, then fetch to ensure we get the latest schema
+  // Disable automatic fetching - we'll manually trigger it in useEffect
   const { schema: fetchedSchema, isLoading: isSchemaLoading, refetch: refetchSchema } = useSchemaById(schemaId, {
-    enabled: true, // Enable query to allow refetch
+    enabled: false, // Disable automatic fetch - we'll manually trigger it
     initialData: reconstructedInitialSchema, // Use server data as fallback
   });
   
