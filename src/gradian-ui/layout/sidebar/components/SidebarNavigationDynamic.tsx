@@ -207,7 +207,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                 {schemas.map((schema, index) => {
                   const active = isActive(schema.id);
                   const schemaItem = (
-                    <Link href={`/page/${schema.id}`}>
+                    <Link href={`/page/${schema.id}`} prefetch={false}>
                       <motion.div
                         initial={{ opacity: 0, x:-1, y: 0}}
                         animate={{ opacity: 1, x:0, y: 0}}

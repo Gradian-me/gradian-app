@@ -95,7 +95,9 @@ export async function GET(
       return related.some((id: string) => tenantIds.includes(id));
     };
     const hasSchemaAndDataSync = schema?.syncStrategy === 'schema-and-data';
-    if (hasTenantFilter && (!matchesTenantFilter() || !hasSchemaAndDataSync)) {
+    // If schema applies to all tenants, allow access regardless of sync strategy
+    // Otherwise, require both tenant match AND schema-and-data sync strategy when tenant filter is present
+    if (hasTenantFilter && !schema?.applyToAllTenants && (!matchesTenantFilter() || !hasSchemaAndDataSync)) {
       return NextResponse.json(
         {
           success: false,
@@ -177,11 +179,22 @@ export async function GET(
       const url = new URL(request.url);
       url.searchParams.set('allowDataRelatedTenants', 'true');
       // Create a new request with updated URL
+      // IMPORTANT: Preserve all headers including Authorization
+      const headers = new Headers(request.headers);
       requestToUse = new NextRequest(url, {
         method: request.method,
-        headers: request.headers,
+        headers: headers,
         body: request.body,
       });
+      // Log Authorization header preservation
+      const authHeader = headers.get('authorization') || headers.get('Authorization');
+      if (authHeader) {
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'debug',
+          `[GET /api/data/${schemaId}] Authorization header preserved in new request (length: ${authHeader.length})`
+        );
+      }
     }
 
     const controller = await createController(schemaId);

@@ -548,6 +548,15 @@ export const proxySchemaRequest = async (
   }
 
   const headers = new Headers(request.headers);
+  
+  // Log incoming Authorization header for debugging
+  const incomingAuthHeader = request.headers.get('authorization') || request.headers.get('Authorization');
+  loggingCustom(
+    LogType.CALL_BACKEND,
+    'debug',
+    `[proxySchemaRequest] Incoming Authorization header: ${incomingAuthHeader ? 'present' : 'missing'} ${incomingAuthHeader ? `(length: ${incomingAuthHeader.length})` : ''}`
+  );
+  
   // Remove hop-by-hop headers that shouldn't be forwarded
   // These headers are connection-specific and cause issues in Docker/proxy environments
   headers.delete('host');
@@ -577,7 +586,8 @@ export const proxySchemaRequest = async (
 
   // Extract authorization token and ensure it's in Bearer format
   // Backend APIs require Authorization: Bearer <token> header
-  let authHeader = headers.get('authorization');
+  // Check both lowercase and capitalized versions
+  let authHeader = headers.get('authorization') || headers.get('Authorization');
   let authToken: string | null = null;
 
   // Try to extract token from Authorization header if present
@@ -611,11 +621,16 @@ export const proxySchemaRequest = async (
   // Set Authorization header if we have a token
   if (authHeader) {
     headers.set('authorization', authHeader);
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'info',
+      `[proxySchemaRequest] Authorization header set for backend request (length: ${authHeader.length})`
+    );
   } else {
     loggingCustom(
       LogType.CALL_BACKEND,
       'error',
-      `WARNING: No Authorization header available for backend schema request`
+      `[proxySchemaRequest] WARNING: No Authorization header available for backend schema request to ${targetUrl}`
     );
   }
 

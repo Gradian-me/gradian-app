@@ -3704,5 +3704,34 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCZPROXYAUTHLOGGING006",
+    "timestamp": "2025-12-17T17:22:59.000Z",
+    "version": "1.30.006",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Added logging for incoming and outgoing Authorization headers in proxyDataRequest and proxySchemaRequest functions to improve debugging capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "api",
+          "logging",
+          "debugging",
+          "auth"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated tenant filter logic in GET route to clarify access conditions based on schema settings. This update enhances security and debugging visibility across the API",
+        "priority": "Medium",
+        "affectedDomains": [
+          "api",
+          "multi-tenancy",
+          "security",
+          "schema-manager"
+        ]
+      }
+    ]
   }
 ]

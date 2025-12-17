@@ -48,7 +48,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
             const Icon = item.icon;
             
             const content = (
-              <Link href={item.href} onClick={() => onItemClick?.(item)}>
+              <Link href={item.href} prefetch={false} onClick={() => onItemClick?.(item)}>
                 <motion.div
                   initial={!hasMounted ? { opacity: 0, y: 6, scale: 0.98 } : false}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
