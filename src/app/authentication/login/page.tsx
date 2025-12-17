@@ -7,6 +7,7 @@ import { ensureFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie
 import { normalizeUsernameToEmail } from '@/domains/auth/utils/username-email.util';
 import { useUserStore } from '@/stores/user.store';
 import { useTenantStore } from '@/stores/tenant.store';
+import { useMenuItemsStore } from '@/stores/menu-items.store';
 import { DEMO_MODE, AUTH_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { TenantSelector } from '@/components/layout/TenantSelector';
 import { Logo } from '@/gradian-ui/layout/logo/components/Logo';
@@ -307,6 +308,14 @@ function LoginPageContent() {
           updatedAt: new Date(),
         });
         loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] User set in store successfully');
+        
+        // Clear menu items cache on login to ensure fresh data
+        try {
+          useMenuItemsStore.getState().clearMenuItems();
+          loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Menu items cache cleared');
+        } catch (error) {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN] Failed to clear menu items cache: ${error instanceof Error ? error.message : String(error)}`);
+        }
       } else {
         loggingCustom(LogType.CLIENT_LOG, 'warn', '[LOGIN] No user data in response');
       }

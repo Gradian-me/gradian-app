@@ -124,6 +124,13 @@ function ReactQueryCacheClearHandler() {
       } catch (error) {
         console.warn('[schema-cache] Failed to clear companies IndexedDB cache:', error);
       }
+      // Clear menu items cache
+      try {
+        const { useMenuItemsStore } = await import('@/stores/menu-items.store');
+        useMenuItemsStore.getState().clearMenuItems();
+      } catch (error) {
+        console.warn('[menu-items-cache] Failed to clear menu items cache:', error);
+      }
       // Clear ALL React Query caches first
       await queryClient.clear();
       // Then invalidate and refetch all queries for the specified keys
@@ -150,6 +157,13 @@ function ReactQueryCacheClearHandler() {
           await clearCompaniesCache();
         } catch (error) {
           console.warn('[schema-cache] Failed to clear companies cache from storage event:', error);
+        }
+        // Clear menu items cache
+        try {
+          const { useMenuItemsStore } = await import('@/stores/menu-items.store');
+          useMenuItemsStore.getState().clearMenuItems();
+        } catch (error) {
+          console.warn('[menu-items-cache] Failed to clear menu items cache from storage event:', error);
         }
         // Clear ALL React Query caches first
         await queryClient.clear();

@@ -5,6 +5,7 @@ import { SidebarNavigation } from './SidebarNavigation';
 import { mapMenuItemsToNavigationItems } from '../utils';
 import type { SidebarProps } from '../types';
 import { useCompanyStore } from '@/stores/company.store';
+import { useMenuItemsStore } from '@/stores/menu-items.store';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '../../../shared/utils';
@@ -61,6 +62,9 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
   // Compute companyId from selectedCompany
   const companyId = selectedCompany && selectedCompany.id !== -1 ? selectedCompany.id : null;
   
+  // Get menu items store
+  const menuItemsStore = useMenuItemsStore();
+  
   // Track the last companyId that was used to load items
   const lastLoadedCompanyIdRef = React.useRef<number | string | null>(null);
   // Track if items have been loaded at least once
@@ -75,6 +79,21 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
     let isMounted = true;
 
     async function loadMenuItems() {
+      // Check cache first
+      const cachedItems = menuItemsStore.getMenuItems(companyId);
+      if (cachedItems && cachedItems.length > 0) {
+        // Use cached items
+        const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId);
+        if (isMounted) {
+          setItems(mapped);
+          setIsLoading(false);
+          lastLoadedCompanyIdRef.current = companyId;
+          hasLoadedRef.current = true;
+        }
+        return;
+      }
+
+      // Cache miss or stale - fetch from API
       setIsLoading(true);
       try {
         // Use apiRequest which automatically includes tenantIds and companyIds
@@ -92,6 +111,9 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
           : Array.isArray((response.data as any)?.results)
           ? (response.data as any).results
           : [];
+
+        // Store in cache
+        menuItemsStore.setMenuItems(rawItems, companyId);
 
         const mapped = mapMenuItemsToNavigationItems(rawItems, companyId);
         if (isMounted) {
@@ -113,7 +135,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [companyId, selectedCompany]);
+  }, [companyId, selectedCompany, menuItemsStore]);
 
   if (isLoading) {
     return (
