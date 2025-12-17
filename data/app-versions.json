@@ -3760,5 +3760,33 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCTENANTSELECTOR008",
+    "timestamp": "2025-12-17T16:53:47.000Z",
+    "version": "1.30.008",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "Modified timestamps in all-data.json to reflect the latest sync operations",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "sync"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved CompanySelector and TenantSelector components to handle company and tenant loading more effectively, including fallback to API and auto-selection based on domain. This update enhances data accuracy and user experience across the application",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout",
+          "tenant-management",
+          "companies",
+          "ui",
+          "user-experience"
+        ]
+      }
+    ]
   }
 ]

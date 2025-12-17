@@ -62,42 +62,69 @@ export function CompanySelector({
     setIsMounted(true);
   }, []);
 
-  // Load companies from tenant-store in localStorage
+  // Load companies from tenant-store in localStorage, with fallback to API
   useEffect(() => {
     if (!isMounted) return;
 
-    try {
-      // Try to get from Zustand store first
-      const tenant = selectedTenant;
-      
-      // If not in store, read directly from localStorage
-      let relatedCompanies: Array<{ id: string; label: string }> = [];
-      
-      if (tenant && tenant['relatedCompanies']) {
-        relatedCompanies = tenant['relatedCompanies'];
-      } else if (typeof window !== 'undefined') {
-        const tenantStoreData = localStorage.getItem('tenant-store');
-        if (tenantStoreData) {
-          const parsed = JSON.parse(tenantStoreData);
-          if (parsed?.state?.selectedTenant?.['relatedCompanies']) {
-            relatedCompanies = parsed.state.selectedTenant['relatedCompanies'];
+    const loadCompanies = async () => {
+      try {
+        // Try to get from Zustand store first
+        const tenant = selectedTenant;
+        
+        // If not in store, read directly from localStorage
+        let relatedCompanies: Array<{ id: string; label: string }> = [];
+        
+        if (tenant && tenant['relatedCompanies']) {
+          relatedCompanies = tenant['relatedCompanies'];
+        } else if (typeof window !== 'undefined') {
+          const tenantStoreData = localStorage.getItem('tenant-store');
+          if (tenantStoreData) {
+            const parsed = JSON.parse(tenantStoreData);
+            if (parsed?.state?.selectedTenant?.['relatedCompanies']) {
+              relatedCompanies = parsed.state.selectedTenant['relatedCompanies'];
+            }
           }
         }
+
+        // If we have relatedCompanies from tenant, use them
+        if (relatedCompanies && relatedCompanies.length > 0) {
+          // Map relatedCompanies to Company format (label -> name)
+          const mappedCompanies: Company[] = relatedCompanies.map((company) => ({
+            id: company.id,
+            name: company.label,
+          }));
+
+          setCompanies(mappedCompanies);
+          setLoading(false);
+          return;
+        }
+
+        // Fallback: Fetch companies directly from API if tenant doesn't have relatedCompanies
+        loggingCustom(LogType.CLIENT_LOG, 'info', 'Tenant does not have relatedCompanies, fetching companies from API');
+        
+        const { apiRequest } = await import('@/gradian-ui/shared/utils/api');
+        const response = await apiRequest<Company[] | { data?: Company[]; items?: Company[] }>(
+          '/api/data/companies',
+          { method: 'GET', callerName: 'CompanySelector' }
+        );
+
+        if (response.success && response.data) {
+          const data = Array.isArray(response.data)
+            ? response.data
+            : ((response.data as any)?.data || (response.data as any)?.items || []);
+          setCompanies(data);
+        } else {
+          setCompanies([]);
+        }
+      } catch (error) {
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading companies: ${error instanceof Error ? error.message : String(error)}`);
+        setCompanies([]);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      // Map relatedCompanies to Company format (label -> name)
-      const mappedCompanies: Company[] = relatedCompanies.map((company) => ({
-        id: company.id,
-        name: company.label,
-      }));
-
-      setCompanies(mappedCompanies);
-      setLoading(false);
-    } catch (error) {
-      loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading companies from tenant-store: ${error instanceof Error ? error.message : String(error)}`);
-      setCompanies([]);
-      setLoading(false);
-    }
+    void loadCompanies();
   }, [isMounted, selectedTenant]);
 
   // Set default company when companies are loaded

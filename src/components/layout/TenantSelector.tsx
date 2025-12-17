@@ -30,6 +30,7 @@ interface TenantSelectorProps {
   variant?: 'light' | 'dark' | 'auto';
   fullWidth?: boolean;
   showLogo?: 'none' | 'sidebar-avatar' | 'full';
+  hidden?: boolean; // If true, component is invisible but still fetches and sets tenants
 }
 
 export const TenantSelector: React.FC<TenantSelectorProps> = ({
@@ -38,6 +39,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
   variant = 'auto',
   fullWidth = false,
   showLogo = 'full',
+  hidden = false,
 }) => {
   const router = useRouter();
   const { selectedTenant, setSelectedTenant } = useTenantStore();
@@ -46,6 +48,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
   const [isMounted, setIsMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const hasAutoSelectedRef = useRef(false);
   const { resolvedTheme } = useTheme();
   const computedVariant =
     variant === 'auto'
@@ -75,6 +78,36 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
             ? response.data
             : ((response.data as any)?.data || (response.data as any)?.items || []);
           setTenants(data);
+          
+          // In hidden mode, auto-select tenant based on domain or first tenant (only once)
+          if (hidden && data.length > 0 && !selectedTenant && !hasAutoSelectedRef.current) {
+            hasAutoSelectedRef.current = true;
+            const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+            // Try to find tenant matching current domain
+            const domainMatch = data.find((tenant) => 
+              tenant.domain && hostname.includes(tenant.domain)
+            );
+            const tenantToSelect = domainMatch || data[0];
+            if (tenantToSelect) {
+              const fullTenant: Tenant = {
+                ...tenantToSelect,
+                domain: tenantToSelect.domain || '',
+              };
+              setSelectedTenant(fullTenant);
+              // Save to localStorage
+              if (typeof window !== 'undefined') {
+                try {
+                  const stateToSave = {
+                    state: { selectedTenant: fullTenant },
+                    version: 0
+                  };
+                  localStorage.setItem('tenant-store', JSON.stringify(stateToSave));
+                } catch (error) {
+                  loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to save tenant to localStorage: ${error instanceof Error ? error.message : String(error)}`);
+                }
+              }
+            }
+          }
         }
       } catch (err) {
         loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading tenants: ${err instanceof Error ? err.message : String(err)}`);
@@ -85,7 +118,14 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
     };
 
     void fetchTenants();
-  }, [isMounted]);
+  }, [isMounted, hidden, selectedTenant, setSelectedTenant]);
+  
+  // Reset auto-selection ref when hidden prop changes
+  useEffect(() => {
+    if (!hidden) {
+      hasAutoSelectedRef.current = false;
+    }
+  }, [hidden]);
 
   const handleTenantSelect = async (tenant: Tenant | null) => {
     if (!tenant) {
@@ -177,6 +217,11 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
     isDarkVariant ? "bg-gray-700" : "bg-gray-200"
   );
   const menuItemBaseClasses = "relative flex cursor-pointer select-none items-center rounded-lg px-2 py-1.5 text-sm outline-none transition-colors";
+
+  // If hidden, return null but still allow effects to run (they handle fetching and setting tenant)
+  if (hidden) {
+    return null;
+  }
 
   if (!isMounted || loading) {
     return (

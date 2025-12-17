@@ -615,11 +615,12 @@ async function enrichDataEndpoint(
     return { endpoint, params: existingParams };
   }
 
-  // In development, allow the main TenantSelector component to see all tenants by
+  // Allow the main TenantSelector component to see all tenants by
   // NOT auto-injecting tenantIds/companyIds for the tenants collection endpoint.
+  // This applies in both development and production to ensure the tenant selector
+  // can always see all available tenants.
   // Other consumers (e.g. tenants listing pages) still receive tenant/company scoping.
   if (
-    isDev &&
     callerName === 'TenantSelector' &&
     (endpoint === '/api/data/tenants' || endpoint.startsWith('/api/data/tenants?'))
   ) {
@@ -674,7 +675,8 @@ export async function apiRequest<T>(
 ): Promise<ApiResponse<T>> {
   const method = options?.method || 'GET';
   const isDev = isDevEnvironment();
-  const callerName = isDev ? options?.callerName || extractCallerFromStack() || 'unknown' : undefined;
+  // Always use callerName if provided, even in production (for special handling like TenantSelector)
+  const callerName = options?.callerName || (isDev ? extractCallerFromStack() || 'unknown' : undefined);
   const baseHeaders = options?.headers ? { ...options.headers } : undefined;
   const headersWithCaller =
     isDev && callerName

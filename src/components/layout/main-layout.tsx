@@ -451,7 +451,8 @@ function MainLayoutContent({
               <p>Select Company</p>
             </TooltipContent>
           </Tooltip>
-          {DEMO_MODE && (
+          {/* Always render TenantSelector: visible in DEMO_MODE, hidden in production but still functional */}
+          {DEMO_MODE ? (
             <Tooltip>
               <TooltipTrigger asChild>
                 <div>
@@ -462,6 +463,8 @@ function MainLayoutContent({
                 <p>Select Tenant</p>
               </TooltipContent>
             </Tooltip>
+          ) : (
+            <TenantSelector hidden={true} />
           )}
           <Tooltip>
             <TooltipTrigger asChild>
