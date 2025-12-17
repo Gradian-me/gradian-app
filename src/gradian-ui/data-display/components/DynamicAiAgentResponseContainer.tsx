@@ -24,6 +24,8 @@ import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/t
 import { VoicePoweredOrb } from '@/components/ui/voice-powered-orb';
 import { TextSwitcher } from '@/components/ui/text-switcher';
 import { cleanMarkdownResponse } from '@/domains/ai-builder/utils/ai-security-utils';
+import { Badge } from '@/components/ui/badge';
+import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 export interface DynamicAiAgentResponseContainerProps {
   action: QuickAction;
@@ -268,6 +270,8 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
       bordered: false,
     };
   }, [tableColumns, tableData]);
+
+  const showModelBadge = LOG_CONFIG[LogType.AI_MODEL_LOG] === true;
 
   // Load agent on mount
   useEffect(() => {
@@ -554,9 +558,17 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
           <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4">
             <div className="relative flex flex-col gap-1">
               <CardTitle className="text-sm font-semibold text-white">{action.label}</CardTitle>
-              <div className="flex items-center gap-1.5 text-xs text-white/80">
+              <div className="flex items-center gap-2 text-xs text-white/80">
                 <Sparkles className="h-3 w-3" />
                 <span>Powered by Gradian AI</span>
+                {showModelBadge && agent?.model && (
+                  <Badge
+                    variant="outline"
+                    className="ml-1 text-[0.65rem] font-medium border-white/50 text-white bg-white/10"
+                  >
+                    {agent.model}
+                  </Badge>
+                )}
               </div>
             </div>
           </CardHeader>

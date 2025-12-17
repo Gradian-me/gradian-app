@@ -5,6 +5,7 @@
     "REQUEST_RESPONSE": true,
     "AI_BODY_LOG": false,
     "AI_RESPONSE_LOG": false,
+    "AI_MODEL_LOG": false,
     "SCHEMA_LOADER": false,
     "CALL_BACKEND": true,
     "INDEXDB_CACHE": true,

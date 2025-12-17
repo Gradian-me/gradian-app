@@ -10,6 +10,7 @@ export const DEFAULT_APPLICATION_VARIABLES = {
     REQUEST_RESPONSE: true,
     AI_BODY_LOG: true,
     AI_RESPONSE_LOG: true,
+    AI_MODEL_LOG: false,
     SCHEMA_LOADER: true,
     CALL_BACKEND: true,
     INDEXDB_CACHE: true,

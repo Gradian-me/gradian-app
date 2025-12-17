@@ -14,7 +14,7 @@ import { cn, validateField } from '@/gradian-ui/shared/utils';
 import { Sparkles, Loader2, Square, History, RotateCcw, PencilRuler } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
+import { DEMO_MODE, LOG_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { PromptPreviewSheet } from './PromptPreviewSheet';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
@@ -261,6 +261,9 @@ export function AiBuilderForm({
 }: AiBuilderFormProps) {
   // Get selected agent
   const selectedAgent = agents.find(agent => agent.id === selectedAgentId);
+
+  // Feature flag: show model badge only when AI_MODEL_LOG is enabled
+  const showModelBadge = LOG_CONFIG[LogType.AI_MODEL_LOG] === true;
 
   // Check if agent has string output format
   const isStringOutput = selectedAgent?.requiredOutputFormat === 'string';
@@ -990,9 +993,9 @@ export function AiBuilderForm({
             
             {/* Footer Section with Model Badge and Buttons */}
             {showFooter && (
-              <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 md:gap-2 pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
-                {/* Model Badge on Left */}
-                {selectedAgent?.model && (
+              <div className="flex flex-col md:flex-row justify-end items-stretch md:items-center gap-3 md:gap-2 pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
+                {/* Model Badge */}
+                {showModelBadge && selectedAgent?.model && (
                   <Badge 
                     className={cn(
                       'shrink-0 self-start',
@@ -1005,7 +1008,7 @@ export function AiBuilderForm({
                   </Badge>
                 )}
                 
-                {/* Buttons on Right */}
+                {/* Buttons */}
                 <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto">
                   {onSheetOpenChange && (
                     <>

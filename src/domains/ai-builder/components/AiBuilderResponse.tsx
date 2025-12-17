@@ -25,7 +25,7 @@ import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/t
 import type { AiAgent, TokenUsage, VideoUsage, SchemaAnnotation, AnnotationItem } from '../types';
 import { cleanMarkdownResponse } from '../utils/ai-security-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
 
 interface AiBuilderResponseProps {
   response: string;
@@ -141,6 +141,7 @@ export function AiBuilderResponse({
   const headingRef = useRef<HTMLHeadingElement>(null);
   const prevIsLoadingRef = useRef<boolean>(isLoading);
   const lastResponseRef = useRef<string>('');
+  const showModelBadge = LOG_CONFIG[LogType.AI_MODEL_LOG] === true;
   
   // Get agent format
   const agentFormat = useMemo(() => {
@@ -1249,11 +1250,19 @@ export function AiBuilderResponse({
       ) : agent?.requiredOutputFormat === 'string' ? (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center">
-            <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-2" />
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-1" />
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                 AI Generated Content
               </h3>
+              {showModelBadge && agent?.model && (
+                <Badge
+                  variant="outline"
+                  className="ml-1 text-xs font-medium bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800"
+                >
+                  {agent.model}
+                </Badge>
+              )}
             </div>
             <CopyContent content={displayContent} />
           </div>
@@ -1272,7 +1281,11 @@ export function AiBuilderResponse({
         <CodeViewer
           code={displayContent}
           programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}
-          title="AI Generated Content"
+          title={
+            showModelBadge && agent?.model
+              ? `AI Generated Content · ${agent.model}`
+              : 'AI Generated Content'
+          }
           initialLineNumbers={10}
         />
       )}

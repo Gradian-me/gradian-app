@@ -127,7 +127,22 @@ const AppListItem: React.FC<AppListItemProps> = ({
             <Button
               size="icon"
               className="h-8 w-8 rounded-full border border-violet-200/70 bg-white/80 text-violet-600 shadow-sm transition-all hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 hover:shadow-md group-hover:-translate-y-0.5 dark:border-violet-500/50 dark:bg-gray-900/80 dark:text-violet-200 dark:hover:bg-violet-500/10"
-              onClick={() => onOpen(schema)}
+              onClick={(e) => {
+                // Middle-click (button === 1) or Ctrl/Cmd+click opens in new tab
+                if (e.button === 1 || e.ctrlKey || e.metaKey) {
+                  e.preventDefault();
+                  window.open(`/page/${schema.id}`, '_blank', 'noopener,noreferrer');
+                } else {
+                  onOpen(schema);
+                }
+              }}
+              onMouseDown={(e) => {
+                // Handle middle-click (button === 1)
+                if (e.button === 1) {
+                  e.preventDefault();
+                  window.open(`/page/${schema.id}`, '_blank', 'noopener,noreferrer');
+                }
+              }}
             >
               <Sparkles className="h-3.5 w-3.5" />
             </Button>
@@ -196,7 +211,22 @@ const AppListItem: React.FC<AppListItemProps> = ({
       <Button
         size="icon"
         className="relative z-10 h-8 w-8 rounded-full border border-violet-200/70 bg-white/80 text-violet-600 shadow-sm transition-all hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 hover:shadow-md group-hover:-translate-y-0.5 dark:border-violet-500/50 dark:bg-gray-900/80 dark:text-violet-200 dark:hover:bg-violet-500/10"
-        onClick={() => onOpen(schema)}
+        onClick={(e) => {
+          // Middle-click (button === 1) or Ctrl/Cmd+click opens in new tab
+          if (e.button === 1 || e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            window.open(`/page/${schema.id}`, '_blank', 'noopener,noreferrer');
+          } else {
+            onOpen(schema);
+          }
+        }}
+        onMouseDown={(e) => {
+          // Handle middle-click (button === 1)
+          if (e.button === 1) {
+            e.preventDefault();
+            window.open(`/page/${schema.id}`, '_blank', 'noopener,noreferrer');
+          }
+        }}
       >
         <Sparkles className="h-3.5 w-3.5" />
       </Button>
