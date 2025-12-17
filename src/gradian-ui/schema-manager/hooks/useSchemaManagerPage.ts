@@ -49,7 +49,8 @@ const transformMessages = (apiMessages: any[]): Message[] => {
 
 export const useSchemaManagerPage = () => {
   const queryClient = useQueryClient();
-  const [showStatistics, setShowStatistics] = useState(false);
+  // Default to showing statistics when the Schema Builder page is opened
+  const [showStatistics, setShowStatistics] = useState(true);
   const { schemas: fetchedSchemas, isLoading, error: schemasError, refetch: refetchSchemas } = useSchemas({ 
     summary: true,
     includeStatistics: showStatistics,
