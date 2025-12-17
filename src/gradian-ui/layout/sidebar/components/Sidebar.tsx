@@ -10,6 +10,7 @@ import { CompanySelector } from '@/components/layout/CompanySelector';
 import { UserProfileSelector } from '@/components/layout/UserProfileSelector';
 import { ModeToggle } from '../../mode-toggle/components/ModeToggle';
 import { SidebarNavigationMenu } from './SidebarNavigationMenu';
+import { APP_VERSION } from '../../../shared/constants/app-version';
 
 const SidebarComponent: React.FC<SidebarProps> = ({
   isCollapsed,
@@ -103,6 +104,13 @@ const SidebarComponent: React.FC<SidebarProps> = ({
               <ModeToggle />
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Version Footer */}
+      {(!isCollapsed || isMobile) && (
+        <div className="border-t border-gray-800 px-4 py-2">
+          <p className="text-xs text-gray-500 text-center">v{APP_VERSION}</p>
         </div>
       )}
     </motion.div>
