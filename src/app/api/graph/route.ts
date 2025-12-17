@@ -152,9 +152,10 @@ export async function GET(request: NextRequest) {
       }
 
       // Multi-tenant schema visibility filtering (mirrors /api/data behavior)
+      let schema: any = null;
       if (hasTenantFilter) {
         try {
-          const schema = await getSchemaById(schemaId);
+          schema = await getSchemaById(schemaId);
           const matchesTenantFilter = () => {
             if (!hasTenantFilter) return true;
             if (schema?.applyToAllTenants) return true;
@@ -184,12 +185,20 @@ export async function GET(request: NextRequest) {
       } else {
         // When no tenant filter is applied, treat schema as visible by default
         tenantVisibleSchemas.add(schemaId);
+        // Still load schema for entity-level filtering if needed
+        try {
+          schema = await getSchemaById(schemaId);
+        } catch {
+          // If schema can't be loaded, continue without entity-level tenant filtering
+        }
       }
 
-      // Add each entity as a node with schemaId, applying companyIds scoping when requested
+      // Add each entity as a node with schemaId, applying companyIds and tenantIds scoping when requested
       if (Array.isArray(entities)) {
         const typedEntities = entities as any[];
-        const scopedEntities = hasCompanyFilter
+        
+        // First, apply company filtering if requested
+        let scopedEntities = hasCompanyFilter
           ? typedEntities.filter((entity: any) => {
               // Filter ONLY by relatedCompanies (array of { id, label })
               const relatedCompanies = entity['relatedCompanies'];
@@ -209,6 +218,49 @@ export async function GET(request: NextRequest) {
               return true;
             })
           : typedEntities;
+
+        // Then, apply tenant filtering if schema supports it and tenantIds are provided
+        if (hasTenantFilter && schema) {
+          const allowDataRelatedTenants = schema?.allowDataRelatedTenants === true;
+          
+          if (allowDataRelatedTenants) {
+            const normalizedTenantIds = tenantIds
+              .map((id) => String(id).trim())
+              .filter((id) => id.length > 0);
+
+            if (normalizedTenantIds.length > 0) {
+              scopedEntities = scopedEntities.filter((entity: any) => {
+                // If entity has "relatedTenants" metadata, use it as primary filter source.
+                const relatedTenants = entity['relatedTenants'];
+                
+                // If relatedTenants is empty/undefined/null, entity is visible to all tenants
+                if (!relatedTenants || !Array.isArray(relatedTenants) || relatedTenants.length === 0) {
+                  return true;
+                }
+
+                // If relatedTenants has values, check if any tenant ID matches
+                const relatedIds = relatedTenants
+                  .map((item: any) => {
+                    if (typeof item === 'string') {
+                      return String(item).trim();
+                    }
+                    if (item && item.id) {
+                      return String(item.id).trim();
+                    }
+                    return null;
+                  })
+                  .filter((id: string | null): id is string => !!id);
+
+                if (relatedIds.length > 0) {
+                  return relatedIds.some((id) => normalizedTenantIds.includes(id));
+                }
+
+                // If relatedTenants exists but has no valid IDs, treat as visible to all
+                return true;
+              });
+            }
+          }
+        }
 
         for (const entity of scopedEntities) {
           nodes.push({
