@@ -60,6 +60,7 @@ function buildSchemaSummary<T extends Record<string, any>>(schema: T, includeSta
           isIndexed: schema.statistics?.isIndexed ?? false,
           records: calculatedStats.records,
           size: calculatedStats.size, // in megabytes
+          maxUpdatedAt: calculatedStats.maxUpdatedAt, // ISO date string or null
         };
       } catch (error) {
         loggingCustom(
@@ -73,6 +74,7 @@ function buildSchemaSummary<T extends Record<string, any>>(schema: T, includeSta
           isIndexed: false,
           records: 0,
           size: 0, // in megabytes
+          maxUpdatedAt: null,
         };
       }
     } else {
@@ -82,6 +84,7 @@ function buildSchemaSummary<T extends Record<string, any>>(schema: T, includeSta
         isIndexed: false,
         records: 0,
         size: 0, // in megabytes
+        maxUpdatedAt: null,
       };
     }
   }

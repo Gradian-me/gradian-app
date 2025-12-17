@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { TableWrapper, TableConfig, TableColumn } from '@/gradian-ui/data-display/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { PencilRuler, LayoutList, Trash2, Database, Users2, Circle, Hash, FileText } from 'lucide-react';
+import { PencilRuler, LayoutList, Trash2, Database, Users2, Circle, Hash, FileText, Clock } from 'lucide-react';
 import { FormSchema } from '../types';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 
@@ -243,7 +243,108 @@ export function SchemaTableView({
       render: (_value: any, row: FormSchema) => {
         // Show statistics if enabled and available, otherwise show description
         if (showStatistics && row.statistics) {
-          const stats = row.statistics as { hasPartition?: boolean; isIndexed?: boolean; records?: number; size?: number };
+          const stats = row.statistics as { hasPartition?: boolean; isIndexed?: boolean; records?: number; size?: number; maxUpdatedAt?: string | null };
+          
+          // Format maxUpdatedAt for display with friendly relative time
+          const formatDate = (dateString: string | null | undefined): string => {
+            if (!dateString) return 'N/A';
+            try {
+              const date = new Date(dateString);
+              if (isNaN(date.getTime())) return 'N/A';
+              
+              const now = new Date();
+              const diffMs = now.getTime() - date.getTime();
+              
+              // Handle future dates - show absolute date
+              if (diffMs < 0) {
+                return date.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                });
+              }
+              
+              const diffSeconds = Math.floor(diffMs / 1000);
+              const diffMinutes = Math.floor(diffSeconds / 60);
+              const diffHours = Math.floor(diffMinutes / 60);
+              const diffDays = Math.floor(diffHours / 24);
+              const diffWeeks = Math.floor(diffDays / 7);
+              
+              // Calculate months more accurately
+              const yearsDiff = now.getFullYear() - date.getFullYear();
+              const monthsDiff = now.getMonth() - date.getMonth();
+              const daysDiff = now.getDate() - date.getDate();
+              let totalMonths = yearsDiff * 12 + monthsDiff;
+              // Adjust if the day hasn't passed yet this month
+              if (daysDiff < 0) {
+                totalMonths -= 1;
+              }
+              
+              // Calculate years
+              const diffYears = Math.floor(totalMonths / 12);
+              
+              // Show relative time - ensure consistent friendly format
+              if (diffSeconds < 60) {
+                return 'Just now';
+              } else if (diffMinutes < 60) {
+                return `${diffMinutes} ${diffMinutes === 1 ? 'minute' : 'minutes'} ago`;
+              } else if (diffHours < 24) {
+                return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
+              } else if (diffDays < 7) {
+                return `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`;
+              } else if (diffWeeks < 4) {
+                return `${diffWeeks} ${diffWeeks === 1 ? 'week' : 'weeks'} ago`;
+              } else if (totalMonths > 0 && totalMonths < 12) {
+                return `${totalMonths} ${totalMonths === 1 ? 'month' : 'months'} ago`;
+              } else if (diffYears > 0 && diffYears < 2) {
+                return `${diffYears} ${diffYears === 1 ? 'year' : 'years'} ago`;
+              } else if (diffYears >= 2) {
+                // Only show absolute date for dates 2+ years old
+                return date.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                });
+              } else {
+                // Fallback: if totalMonths is 0 or negative but we have days, show days/weeks
+                if (diffDays >= 7) {
+                  return `${diffWeeks} ${diffWeeks === 1 ? 'week' : 'weeks'} ago`;
+                } else if (diffDays > 0) {
+                  return `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`;
+                } else {
+                  // Last resort: show absolute date
+                  return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  });
+                }
+              }
+            } catch {
+              return 'N/A';
+            }
+          };
+          
+          // Format full date for tooltip
+          const formatFullDate = (dateString: string | null | undefined): string => {
+            if (!dateString) return 'N/A';
+            try {
+              const date = new Date(dateString);
+              if (isNaN(date.getTime())) return 'N/A';
+              // Format as: "MMM DD, YYYY at HH:MM AM/PM" (e.g., "Jan 15, 2024 at 2:30 PM")
+              return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+              });
+            } catch {
+              return 'N/A';
+            }
+          };
+          
           return (
             <div className="flex items-center gap-3 flex-wrap">
               {/* Records count - First for sorting */}
@@ -285,6 +386,154 @@ export function SchemaTableView({
       },
     },
     {
+      id: 'maxUpdatedAt',
+      label: 'Last Updated',
+      accessor: (row: FormSchema) => {
+        // For sorting: use timestamp if maxUpdatedAt is available
+        const maxUpdatedAt = row.statistics?.maxUpdatedAt;
+        if (maxUpdatedAt) {
+          const date = new Date(maxUpdatedAt);
+          return isNaN(date.getTime()) ? 0 : date.getTime();
+        }
+        return 0; // Put items without maxUpdatedAt at the end
+      },
+      sortable: true,
+      align: 'left',
+      minWidth: 140,
+      render: (_value: any, row: FormSchema) => {
+        const stats = row.statistics as { maxUpdatedAt?: string | null } | undefined;
+        const maxUpdatedAt = stats?.maxUpdatedAt;
+        
+        // Format maxUpdatedAt for display with friendly relative time
+        const formatDate = (dateString: string | null | undefined): string => {
+          if (!dateString) return 'N/A';
+          try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return 'N/A';
+            
+            const now = new Date();
+            const diffMs = now.getTime() - date.getTime();
+            
+            // Handle future dates - show as "in X time" format
+            if (diffMs < 0) {
+              const absDiffMs = Math.abs(diffMs);
+              const absDiffSeconds = Math.floor(absDiffMs / 1000);
+              const absDiffMinutes = Math.floor(absDiffSeconds / 60);
+              const absDiffHours = Math.floor(absDiffMinutes / 60);
+              const absDiffDays = Math.floor(absDiffHours / 24);
+              
+              if (absDiffDays < 7) {
+                return `in ${absDiffDays} ${absDiffDays === 1 ? 'day' : 'days'}`;
+              } else {
+                // For future dates more than a week away, show absolute date
+                return date.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                });
+              }
+            }
+            
+            const diffSeconds = Math.floor(diffMs / 1000);
+            const diffMinutes = Math.floor(diffSeconds / 60);
+            const diffHours = Math.floor(diffMinutes / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            const diffWeeks = Math.floor(diffDays / 7);
+            
+            // Calculate months more accurately
+            const yearsDiff = now.getFullYear() - date.getFullYear();
+            const monthsDiff = now.getMonth() - date.getMonth();
+            const daysDiff = now.getDate() - date.getDate();
+            let totalMonths = yearsDiff * 12 + monthsDiff;
+            // Adjust if the day hasn't passed yet this month
+            if (daysDiff < 0) {
+              totalMonths -= 1;
+            }
+            
+            // Calculate years
+            const diffYears = Math.floor(totalMonths / 12);
+            
+            // Show relative time - always use friendly format for past dates
+            if (diffSeconds < 60) {
+              return 'Just now';
+            } else if (diffMinutes < 60) {
+              return `${diffMinutes} ${diffMinutes === 1 ? 'minute' : 'minutes'} ago`;
+            } else if (diffHours < 24) {
+              return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
+            } else if (diffDays < 7) {
+              return `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`;
+            } else if (diffWeeks < 4) {
+              return `${diffWeeks} ${diffWeeks === 1 ? 'week' : 'weeks'} ago`;
+            } else if (totalMonths > 0 && totalMonths < 12) {
+              return `${totalMonths} ${totalMonths === 1 ? 'month' : 'months'} ago`;
+            } else if (diffYears > 0 && diffYears < 2) {
+              return `${diffYears} ${diffYears === 1 ? 'year' : 'years'} ago`;
+            } else if (diffYears >= 2) {
+              // Only show absolute date for dates 2+ years old
+              return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              });
+            } else {
+              // Fallback: if totalMonths is 0 or negative but we have days, show days/weeks
+              if (diffDays >= 7) {
+                return `${diffWeeks} ${diffWeeks === 1 ? 'week' : 'weeks'} ago`;
+              } else if (diffDays > 0) {
+                return `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`;
+              } else {
+                // Last resort: show absolute date
+                return date.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                });
+              }
+            }
+          } catch {
+            return 'N/A';
+          }
+        };
+        
+        // Format full date for tooltip
+        const formatFullDate = (dateString: string | null | undefined): string => {
+          if (!dateString) return 'N/A';
+          try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return 'N/A';
+            // Format as: "MMM DD, YYYY at HH:MM AM/PM" (e.g., "Jan 15, 2024 at 2:30 PM")
+            return date.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+            });
+          } catch {
+            return 'N/A';
+          }
+        };
+        
+        if (maxUpdatedAt !== undefined && maxUpdatedAt !== null) {
+          return (
+            <div className="flex items-center gap-1.5" title={formatFullDate(maxUpdatedAt)}>
+              <Clock className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+              <span className={`text-xs ${row.inactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-400'}`}>
+                {formatDate(maxUpdatedAt)}
+              </span>
+            </div>
+          );
+        }
+        
+        return (
+          <span className="text-xs text-gray-400 dark:text-gray-500">
+            N/A
+          </span>
+        );
+      },
+    },
+    {
       id: 'id',
       label: 'Schema ID',
       accessor: 'id',
@@ -317,6 +566,12 @@ export function SchemaTableView({
       },
       sorting: {
         enabled: true,
+        ...(showStatistics && {
+          defaultSort: {
+            columnId: 'maxUpdatedAt',
+            direction: 'desc',
+          },
+        }),
       },
       filtering: {
         enabled: false,
@@ -332,7 +587,7 @@ export function SchemaTableView({
       hoverable: true,
       bordered: true,
     }),
-    [schemas, tableColumns, isLoading]
+    [schemas, tableColumns, isLoading, showStatistics]
   );
 
   return (
