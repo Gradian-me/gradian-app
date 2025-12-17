@@ -198,6 +198,40 @@ export function TableWrapper<T = any>({
       });
     }
 
+    // Add related tenants column if schema allows it
+    if (schema?.allowDataRelatedTenants) {
+      additionalColumns.push({
+        id: 'relatedTenants',
+        label: 'Related Tenants',
+        accessor: (row: T) => (row as any)['relatedTenants'],
+        sortable: false,
+        align: 'left',
+        maxWidth: 300,
+        allowWrap: true,
+        render: (value: any) => {
+          if (!value || (Array.isArray(value) && value.length === 0)) {
+            return <span className="text-gray-400 dark:text-gray-500 text-sm">—</span>;
+          }
+          const normalized = normalizeOptionArray(value);
+          return (
+            <BadgeViewer
+              field={{
+                id: 'relatedTenants',
+                name: 'relatedTenants',
+                component: 'picker',
+                targetSchema: 'tenants',
+              } as any}
+              value={normalized}
+              badgeVariant="outline"
+              enforceVariant={false}
+              animate={true}
+              maxBadges={3}
+            />
+          );
+        },
+      });
+    }
+
     // Build a working copy of base columns and optionally hide icon/color when avatar column is present
     let baseColumns = [...columns];
     

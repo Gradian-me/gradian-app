@@ -5025,7 +5025,8 @@
     "isNotCompanyBased": true,
     "schemaType": "system",
     "applyToAllTenants": true,
-    "syncStrategy": "schema-and-data"
+    "syncStrategy": "schema-and-data",
+    "allowDataRelatedTenants": true
   },
   {
     "id": "tenants",

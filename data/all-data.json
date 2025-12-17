@@ -3200,10 +3200,18 @@
       "openInNewTab": false,
       "id": "01KBSIAIBUILDER0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-17T05:52:37.634Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "companies": []
+      "companies": [],
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
       "menuTitle": "Chatbot",
@@ -3215,10 +3223,18 @@
       "openInNewTab": false,
       "id": "01KBSICHATBOT0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-17T05:53:03.379Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "companies": []
+      "companies": [],
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
       "menuTitle": "Builder",
@@ -3230,10 +3246,18 @@
       "openInNewTab": false,
       "id": "01KBSIBUILDER000000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-17T05:53:10.038Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "companies": []
+      "companies": [],
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
       "menuTitle": "Schema Builder",
@@ -3245,10 +3269,18 @@
       "openInNewTab": false,
       "id": "01KBSISCHEMABUILDER000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-17T05:53:19.727Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "companies": []
+      "companies": [],
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
       "menuTitle": "Integrations",
@@ -3260,12 +3292,18 @@
       "openInNewTab": false,
       "id": "01KBSIINTEGRATIONS0000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-07T08:48:48.045Z",
+      "updatedAt": "2025-12-17T05:52:15.007Z",
       "companies": [],
       "incomplete": false,
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ]
     },
     {
       "menuTitle": "Dashboard",
@@ -3277,10 +3315,18 @@
       "openInNewTab": false,
       "id": "01KBSIDASHBOARD0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-17T05:53:34.012Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "companies": []
+      "companies": [],
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
       "menuTitle": "Graph Designer",
@@ -3292,10 +3338,18 @@
       "openInNewTab": false,
       "id": "01KBSIGRAPHDESIGNER000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-17T05:53:39.278Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "companies": []
+      "companies": [],
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
       "menuTitle": "Tender Calendar",
@@ -3307,12 +3361,18 @@
       "openInNewTab": false,
       "id": "01KBSITENDERCALENDAR00000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T11:01:55.621Z",
+      "updatedAt": "2025-12-17T05:52:27.729Z",
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "companies": []
+      "companies": [],
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ]
     },
     {
       "menuTitle": "Tender Analytics",
@@ -3324,10 +3384,18 @@
       "openInNewTab": false,
       "id": "01KBSIANALYTICS0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2025-12-17T05:53:45.192Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "companies": []
+      "companies": [],
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
       "menuTitle": "EQMS Analytics",
@@ -3339,10 +3407,18 @@
       "openInNewTab": false,
       "id": "01KCEQMSANALYTICS0000000001",
       "createdAt": "2025-12-15T12:00:00.000Z",
-      "updatedAt": "2025-12-15T12:00:00.000Z",
+      "updatedAt": "2025-12-17T05:51:58.259Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "companies": []
+      "companies": [],
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     }
   ],
   "status-groups": [

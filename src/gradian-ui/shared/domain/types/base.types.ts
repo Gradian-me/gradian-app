@@ -19,6 +19,7 @@ export interface FilterParams {
   search?: string;
   status?: string;
   category?: string;
+  tenantIds?: string | string[];
   [key: string]: any;
 }
 
