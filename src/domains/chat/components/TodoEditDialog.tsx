@@ -211,8 +211,11 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
     }));
   };
 
-  const handleSave = () => {
-    if (!todo) return;
+  const handleSave = async () => {
+    if (!title.trim()) {
+      // Title is required
+      return;
+    }
     
     // Build input object from parameters
     const input: any = { body: {}, extra_body: {} };
@@ -236,15 +239,34 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
       ? input 
       : undefined;
     
-    const updatedTodo: Todo = {
-      ...todo,
-      title: title.trim(),
-      description: description.trim() || undefined,
-      agentId: agentId || 'orchestrator',
-      input: finalInput,
-    };
+    // If creating a new todo (todo is null), generate ID and createdAt
+    if (!todo) {
+      const { ulid } = await import('ulid');
+      const newTodo: Todo = {
+        id: ulid(),
+        title: title.trim(),
+        description: description.trim() || undefined,
+        status: 'pending',
+        agentId: agentId || 'orchestrator',
+        agentType: agentId ? aiAgents.find(a => a.id === agentId)?.agentType : undefined,
+        dependencies: [], // Will be set by parent based on order
+        input: finalInput,
+        createdAt: new Date().toISOString(),
+      };
+      onSave(newTodo);
+    } else {
+      // Updating existing todo
+      const updatedTodo: Todo = {
+        ...todo,
+        title: title.trim(),
+        description: description.trim() || undefined,
+        agentId: agentId || 'orchestrator',
+        agentType: agentId ? aiAgents.find(a => a.id === agentId)?.agentType : todo.agentType,
+        input: finalInput,
+      };
+      onSave(updatedTodo);
+    }
     
-    onSave(updatedTodo);
     onOpenChange(false);
   };
 
@@ -254,19 +276,23 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
       setTitle(todo.title || '');
       setDescription(todo.description || '');
       setAgentId(todo.agentId || '');
+    } else {
+      // Reset to empty for new todo
+      setTitle('');
+      setDescription('');
+      setAgentId('');
+      setParameters([]);
     }
     onOpenChange(false);
   };
-
-  if (!todo) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-full sm:max-w-4xl max-w-[95vw] h-[90vh] max-h-[90vh] !flex !flex-col">
         <DialogHeader className="shrink-0">
-          <DialogTitle>Edit Todo</DialogTitle>
+          <DialogTitle>{todo ? 'Edit Todo' : 'Add Todo'}</DialogTitle>
           <DialogDescription>
-            Update the todo details and select an agent to handle it.
+            {todo ? 'Update the todo details and select an agent to handle it.' : 'Create a new todo and select an agent to handle it.'}
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="flex-1 min-h-0">
@@ -453,7 +479,7 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={!title.trim()}>
-            Save Changes
+            {todo ? 'Save Changes' : 'Add Todo'}
           </Button>
         </DialogFooter>
       </DialogContent>

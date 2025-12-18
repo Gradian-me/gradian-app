@@ -32,7 +32,7 @@ export default function EqmsInsightCard({ agentId, title, payload, prompt, runTy
         runType,
         icon: 'Sparkles',
         variant: 'default',
-        maxHeight: 360,
+        maxHeight: 400,
         additionalSystemPrompt: prompt,
       } as QuickAction}
       schema={schema}

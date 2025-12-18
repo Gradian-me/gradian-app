@@ -746,7 +746,7 @@ export default function AnalyticsPage() {
                   runType: 'automatic',
                   icon: 'BarChart',
                   variant: 'default',
-                  maxHeight: 340,
+                  maxHeight: 400,
                   additionalSystemPrompt: `Analyze the following Tender Cycle Efficiency data and provide comprehensive insights as a data analyst. Focus on:
 - Cycle time trends and improvements
 - Award conversion rates and patterns

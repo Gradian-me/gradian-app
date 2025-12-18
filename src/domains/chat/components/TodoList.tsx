@@ -5,7 +5,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X, Clock, Play, Loader2, Eye, Timer, AlertCircle, GripVertical, Edit2, Trash2, Network } from 'lucide-react';
+import { Check, X, Clock, Play, Loader2, Eye, Timer, AlertCircle, GripVertical, Edit2, Trash2, Network, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -261,14 +261,31 @@ export const TodoList: React.FC<TodoListProps> = ({
 
   // Handle save edited todo
   const handleSaveEditedTodo = useCallback((updatedTodo: Todo) => {
-    const updatedTodos = localTodos.map(t => t.id === updatedTodo.id ? updatedTodo : t);
-    setLocalTodos(updatedTodos);
+    // Check if this is a new todo (doesn't exist in localTodos)
+    const isNewTodo = !localTodos.find(t => t.id === updatedTodo.id);
     
-    // Update parent
-    if (onTodosUpdate) {
-      onTodosUpdate(updatedTodos);
+    if (isNewTodo) {
+      // Add new todo to the end of the list
+      const todosWithNew = [...localTodos, updatedTodo];
+      // Update dependencies based on new order
+      const updatedTodos = updateDependenciesBasedOnOrder(todosWithNew);
+      setLocalTodos(updatedTodos);
+      
+      // Update parent
+      if (onTodosUpdate) {
+        onTodosUpdate(updatedTodos);
+      }
+    } else {
+      // Update existing todo
+      const updatedTodos = localTodos.map(t => t.id === updatedTodo.id ? updatedTodo : t);
+      setLocalTodos(updatedTodos);
+      
+      // Update parent
+      if (onTodosUpdate) {
+        onTodosUpdate(updatedTodos);
+      }
     }
-  }, [localTodos, onTodosUpdate]);
+  }, [localTodos, onTodosUpdate, updateDependenciesBasedOnOrder]);
 
   // Handle todo delete
   const handleDeleteTodo = useCallback((todo: Todo) => {
@@ -678,6 +695,22 @@ export const TodoList: React.FC<TodoListProps> = ({
             </AccordionTrigger>
             <AccordionContent className="px-0 pb-0">
               <div className="p-2">
+                {/* Add Todo Button */}
+                <div className="mb-2 flex justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setEditingTodo(null);
+                      setIsEditDialogOpen(true);
+                    }}
+                    disabled={isExecuting || executingTodoId !== null}
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Todo
+                  </Button>
+                </div>
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}

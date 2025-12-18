@@ -85,6 +85,7 @@ export function SystemPromptTab({ agent, onUpdate, readonly = false }: SystemPro
       onOpenChange={setIsPreviewOpen}
       systemPrompt={agent.systemPrompt || ''}
       requiredOutputFormat={agent.requiredOutputFormat}
+      agentType={agent.agentType}
     />
     </>
   );

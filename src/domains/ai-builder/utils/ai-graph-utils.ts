@@ -29,7 +29,7 @@ import {
  * Includes industry best practices, 6M root cause analysis, and decision builder capabilities
  * Note: Current date/time is provided via GENERAL_SYSTEM_PROMPT
  */
-const GRAPH_GENERATION_PROMPT = `You are an Advanced Graph Structure Intelligence Model with deep expertise in industry best practices, root cause analysis, and decision-making frameworks.
+export const GRAPH_GENERATION_PROMPT = `You are an Advanced Graph Structure Intelligence Model with deep expertise in industry best practices, root cause analysis, and decision-making frameworks.
 
 ## YOUR CORE CAPABILITIES
 
@@ -83,13 +83,24 @@ const GRAPH_GENERATION_PROMPT = `You are an Advanced Graph Structure Intelligenc
 
 2. **6M Root Cause Analysis**:
    - When root cause analysis is mentioned or implied, systematically apply 6M framework
+   - **CRITICAL: Deviation Node Structure**:
+     * Deviation nodes MUST have "parentId: null" (they are NOT parents of other nodes)
+     * Deviation nodes are separate, standalone nodes that represent the problem/issue
+     * Use edges (not parent-child relationships) to connect causes to deviations
    - Create nodes for each relevant 6M category:
      * schemaId: "cause" with nodeTypeId indicating the 6M category (e.g., "cause-man", "cause-machine", "cause-method")
      * Payload should include: type (man/machine/material/method/measurement/environment), category, impact, severity
-   - Show relationships between 6M categories (e.g., "affects", "exacerbates", "contributes-to")
-   - Map all causes to the main problem/deviation/issue
-   - Create action nodes that address the causes
-   - Use relation types: "causes", "affects", "exacerbates", "contributes-to", "triggers"
+     * **CRITICAL: Root cause nodes MUST have "parentId: null"** (they are NOT children of deviation)
+   - Show relationships between 6M categories using edges:
+     * Root causes can affect each other first (e.g., "cause-man" → "cause-machine" with relationTypeId: "affects" or "exacerbates")
+     * Then root causes affect the deviation (e.g., "cause-man" → "deviation" with relationTypeId: "causes")
+     * This creates a more accurate causal chain: causes can interact, then collectively cause the deviation
+   - Map all causes to the main problem/deviation/issue using edges (NOT parent-child relationships)
+   - Create action nodes that address the causes:
+     * Action nodes should have "parentId: null" (or parentId pointing to the specific cause they address, but NOT the deviation)
+     * Use edges to connect actions to causes or deviation (e.g., "action" → "cause" with relationTypeId: "addresses")
+   - Use relation types: "causes", "affects", "exacerbates", "contributes-to", "triggers", "addresses"
+   - **IMPORTANT**: For deviation/root cause analysis graphs, prefer edge-based relationships over parent-child hierarchy. Use parentId only for true hierarchical structures (like decision trees), not for causal relationships.
 
 3. **Decision Builder Nodes**:
    - For decision scenarios, create decision nodes with:
@@ -214,6 +225,12 @@ VALIDATION RULES:
 - Nodes with the same schemaId must have different nodeTypeId values to differentiate them
 - Payload should contain relevant domain-specific data
 - Node titles should be descriptive and meaningful
+- **CRITICAL: For deviation/root cause analysis graphs**:
+  * Deviation nodes MUST have "parentId: null" (they are NOT parents)
+  * Root cause nodes (schemaId: "cause") MUST have "parentId: null" (they are NOT children of deviation)
+  * Action nodes (schemaId: "action") MUST have "parentId: null" (they are NOT children of deviation or causes)
+  * Use edges to show relationships: causes → deviation (relationTypeId: "causes"), causes → causes (relationTypeId: "affects"/"exacerbates"), actions → causes/deviation (relationTypeId: "addresses")
+  * DO NOT use parent-child hierarchy for deviation/root cause analysis - use edge-based relationships instead
 
 EXAMPLES OF GOOD GRAPH STRUCTURES:
 
@@ -240,10 +257,17 @@ EXAMPLES OF GOOD GRAPH STRUCTURES:
 ## EXAMPLES
 
 **6M Root Cause Analysis Example**:
-- Main node: Deviation/Issue (schemaId: "deviation")
-- Cause nodes: Man causes (schemaId: "cause", nodeTypeId: "cause-man"), Machine causes (nodeTypeId: "cause-machine"), Method causes (nodeTypeId: "cause-method"), etc.
-- Action nodes: Immediate, Corrective, Preventive actions (schemaId: "action")
-- Edges: All causes → deviation (relationTypeId: "causes"), Deviation → actions (relationTypeId: "triggers")
+- Main node: Deviation/Issue (schemaId: "deviation", parentId: null) - NOT a parent node
+- Cause nodes: Man causes (schemaId: "cause", nodeTypeId: "cause-man", parentId: null), Machine causes (nodeTypeId: "cause-machine", parentId: null), Method causes (nodeTypeId: "cause-method", parentId: null), etc.
+  * All cause nodes have parentId: null (they are NOT children of deviation)
+- Action nodes: Immediate, Corrective, Preventive actions (schemaId: "action", parentId: null)
+  * Action nodes have parentId: null (they are NOT children of deviation or causes)
+- Edges (NOT parent-child relationships):
+  * Root causes can affect each other: "cause-man" → "cause-machine" (relationTypeId: "affects" or "exacerbates")
+  * Root causes cause deviation: "cause-man" → "deviation" (relationTypeId: "causes"), "cause-machine" → "deviation" (relationTypeId: "causes")
+  * Actions address causes: "action" → "cause-man" (relationTypeId: "addresses")
+  * Actions address deviation: "action-immediate" → "deviation" (relationTypeId: "addresses")
+- **Key Point**: Use edges to show relationships, NOT parent-child hierarchy. Deviation is a separate node connected via edges.
 
 **Decision Tree Example**:
 - Decision node: Main decision point (schemaId: "decision")
@@ -315,6 +339,31 @@ function validateGraphStructure(graphData: any): { valid: boolean; error?: strin
     }
     if (node.incomplete === undefined) {
       return { valid: false, error: `Node ${node.id} must have incomplete field` };
+    }
+    
+    // Validate nodeTypeId in payload
+    if (!node.payload || typeof node.payload !== 'object' || !node.payload.nodeTypeId) {
+      return { valid: false, error: `Node ${node.id} ("${node.title || 'unnamed'}") is missing 'nodeTypeId' in its payload.` };
+    }
+    
+    // Validate deviation/root cause analysis structure
+    // For deviation nodes: must have parentId: null
+    if (node.schemaId === 'deviation' && node.parentId !== null) {
+      return { valid: false, error: `Deviation node ${node.id} ("${node.title || 'unnamed'}") must have parentId: null. Deviation nodes should not be parents of other nodes. Use edges to show relationships instead.` };
+    }
+    // For cause nodes: must have parentId: null (not children of deviation)
+    if (node.schemaId === 'cause' && node.parentId !== null) {
+      const parentNode = graphData.nodes.find((n: any) => n.id === node.parentId);
+      if (parentNode && parentNode.schemaId === 'deviation') {
+        return { valid: false, error: `Cause node ${node.id} ("${node.title || 'unnamed'}") must have parentId: null. Root cause nodes should not be children of deviation nodes. Use edges to show causal relationships instead (e.g., cause → deviation with relationTypeId: "causes").` };
+      }
+    }
+    // For action nodes: should have parentId: null (or at most point to a cause, not deviation)
+    if (node.schemaId === 'action' && node.parentId !== null) {
+      const parentNode = graphData.nodes.find((n: any) => n.id === node.parentId);
+      if (parentNode && parentNode.schemaId === 'deviation') {
+        return { valid: false, error: `Action node ${node.id} ("${node.title || 'unnamed'}") should not have deviation as parent. Use edges to show relationships instead (e.g., action → deviation with relationTypeId: "addresses").` };
+      }
     }
   }
 
