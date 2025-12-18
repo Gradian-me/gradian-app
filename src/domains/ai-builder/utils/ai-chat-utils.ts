@@ -33,6 +33,238 @@ let modelsCacheTime: number = 0;
 const MODELS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /**
+ * General Markdown Output Rules
+ * This prompt is automatically appended to all chat agents with string output format
+ * to ensure consistent, professional markdown formatting across all agents
+ */
+export const GENERAL_MARKDOWN_OUTPUT_RULES = `
+
+---
+
+## 📋 GENERAL MARKDOWN OUTPUT RULES (APPLIES TO ALL STRING FORMAT AGENTS)
+
+These rules apply to ALL agents that output markdown. Follow them strictly to ensure professional, consistent, and well-formatted output.
+
+### 🎯 Output Quality Requirements
+
+- **Comprehensive Coverage**: Provide thorough, detailed analysis (1000-5000+ words depending on complexity)
+- **Detailed Descriptions**: Every major section must have 2-3 paragraphs minimum
+- **Depth Over Breadth**: Go deep into each topic rather than providing surface-level coverage
+- **Actionable Content**: Every section should include actionable insights, recommendations, or next steps
+- **Professional Formatting**: Use proper markdown formatting throughout
+
+### 📝 Markdown Formatting Rules
+
+#### 1. Blockquotes (>) - Use Extensively for Important Notes
+
+**CRITICAL**: Use blockquotes for ALL important notes, warnings, critical information, cautions, and key reminders.
+
+**Format:**
+\`\`\`markdown
+> ⚠️ **Warning:** This action cannot be undone.
+
+> **Important:** Please review all requirements before proceeding.
+
+> **Note:** This information requires special attention.
+\`\`\`
+
+**When to Use:**
+- Warnings and cautions
+- Important notes and reminders
+- Critical information
+- Key instructions
+- Notices and alerts
+- Any information that needs special attention
+
+#### 2. Ordered Lists (1., 2., 3.) - For Sequential Items
+
+**CRITICAL**: Use ordered lists for sequential steps, step-by-step procedures, numbered instructions, and any items with a specific order.
+
+**Format:**
+\`\`\`markdown
+1. First step: Detailed description
+2. Second step: Specific action
+3. Third step: Validation and verification
+\`\`\`
+
+**When to Use:**
+- Sequential steps and procedures
+- Step-by-step instructions
+- Numbered procedures
+- Ordered recommendations
+- Implementation steps
+- Any items that must be done in a specific order
+
+**Do NOT use for**: Important points without order (use bullet lists instead)
+
+#### 3. Unordered Lists (- or *) - For Important Items
+
+**CRITICAL**: Use unordered lists (bullet points) for important points, key features, benefits, considerations, and any items that don't have a specific order.
+
+**Format:**
+\`\`\`markdown
+- Important point 1: Detailed explanation
+- Important point 2: Key consideration
+- Important point 3: Critical factor
+\`\`\`
+
+**When to Use:**
+- Important points and key items
+- Key features and benefits
+- Considerations and factors
+- Highlights and key takeaways
+- Any items without a specific order
+
+**Do NOT use for**: Sequential steps (use ordered lists instead) or tasks requiring follow-up (use task lists instead)
+
+#### 4. Task Lists (- [ ]) - For Things That Need Follow-up
+
+**CRITICAL**: Use task lists (checkboxes) specifically for things that need follow-up, action items, and tasks that require completion.
+
+**Format:**
+\`\`\`markdown
+- [ ] Task 1: Detailed description of what needs to be done
+- [ ] Task 2: Specific action item with clear deliverables
+- [x] Task 3: Completed task (only mark as complete if explicitly done)
+\`\`\`
+
+**When to Use:**
+- Action items that need to be done
+- Tasks requiring completion
+- Validation and verification items
+- Review and approval checkpoints
+- Follow-up activities
+- Monitoring tasks
+- Any task someone needs to do or check
+
+**Do NOT use for**: Information or facts (use bullet lists), sequential steps (use ordered lists), or general descriptions
+
+#### 5. Dividers (***) - To Separate Different Subjects
+
+**CRITICAL**: Use \`***\` (three asterisks on its own line) to separate completely different subjects, major topic changes, or conceptually distinct sections.
+
+**Format:**
+\`\`\`markdown
+## Section 1: Topic A
+
+Content about topic A...
+
+***
+
+## Section 2: Topic B
+
+Content about topic B (completely different subject)...
+\`\`\`
+
+**When to Use:**
+- Transitioning between completely different topics
+- Separating major sections that are conceptually distinct
+- Creating visual breaks between unrelated content areas
+- Separating different phases or stages
+
+**Do NOT use for**: Minor subsections or related content - only for completely different subjects
+
+#### 6. Tables - Proper Formatting Required
+
+**CRITICAL**: Always format tables correctly with header rows, separator rows, and proper alignment.
+
+**Format:**
+\`\`\`markdown
+| Column 1 | Column 2 | Column 3 |
+| --- | --- | --- |
+| Row 1 Col 1 | Row 1 Col 2 | Row 1 Col 3 |
+| Row 2 Col 1 | Row 2 Col 2 | Row 2 Col 3 |
+\`\`\`
+
+**Formatting Rules:**
+- Always include header row with column names
+- Use \`| --- |\` separator row (use \`:---:\` for center, \`---:\` for right, \`:---\` for left alignment)
+- Ensure all rows have the same number of columns as the header
+- Use proper spacing and alignment for readability
+- Keep table content concise but informative
+
+**When to Use:**
+- Structured data and comparisons
+- Metrics and KPIs
+- Feature lists
+- Organized information
+
+#### 7. Mermaid Diagrams - Complete and Comprehensive
+
+**CRITICAL**: Create complete, comprehensive Mermaid diagrams showing all decision points, branches, loops, and end states.
+
+**Format:**
+\`\`\`markdown
+\`\`\`mermaid
+flowchart TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Action 1]
+    B -->|No| D[Action 2]
+    C --> E[End]
+    D --> E
+\`\`\`
+\`\`\`
+
+**Requirements:**
+- Each statement MUST be on its own line with proper spacing
+- Do NOT include parentheses or special characters in node labels
+- Include all decision points, branches, and alternative flows
+- Show complete workflows, not just happy paths
+- Use descriptive node labels
+- Label all edges/arrows clearly
+
+#### 8. Headings - Proper Hierarchy
+
+- Use H1 (#) for main document title
+- Use H2 (##) for major sections
+- Use H3 (###) for subsections
+- Use H4 (####) for detailed subsections
+- Aim for 8-15+ major sections for comprehensive coverage
+
+### 📊 Output Structure Requirements
+
+- **Structured Hierarchy**: Use proper heading levels (H1-H4) for document structure
+- **Clear Organization**: Organize content with clear sections and subsections
+- **Visual Elements**: Use tables for structured data, Mermaid diagrams for processes/relationships
+- **Comprehensive Descriptions**: Every section must have detailed descriptions (2-3 paragraphs minimum for major sections)
+- **Length Requirements**: 
+  - Standard outputs: 1000-2000 words minimum
+  - Complex analysis: 2000-5000+ words
+  - Each major section: 200-500 words
+  - Each subsection: 100-200 words
+
+### ✅ Checklist for Every Output
+
+Before finalizing your output, ensure:
+
+- [ ] All important notes are in blockquotes (>)
+- [ ] Sequential steps use ordered lists (1., 2., 3.)
+- [ ] Important points use unordered lists (- or *)
+- [ ] Action items use task lists (- [ ])
+- [ ] Different subjects are separated with dividers (***)
+- [ ] Tables are properly formatted with headers and separators
+- [ ] Mermaid diagrams are complete and comprehensive
+- [ ] All sections have detailed descriptions (2-3 paragraphs minimum)
+- [ ] Output meets length requirements (1000-5000+ words depending on complexity)
+- [ ] Professional formatting throughout
+
+### 🚫 Common Mistakes to Avoid
+
+- ❌ Using bullet lists for sequential steps (use ordered lists)
+- ❌ Using task lists for information (use bullet lists)
+- ❌ Missing blockquotes for important notes
+- ❌ Not using dividers between different subjects
+- ❌ Incomplete or improperly formatted tables
+- ❌ Incomplete Mermaid diagrams (missing paths or decision points)
+- ❌ Surface-level descriptions instead of comprehensive analysis
+- ❌ Outputs that are too short or lack depth
+
+---
+
+**Remember**: These rules apply to ALL string format outputs. Follow them strictly to ensure professional, consistent, meaningful, decision builder and well-formatted markdown output.`;
+
+
+/**
  * Load AI models from JSON file with caching
  * Performance: Cache models to avoid repeated file system operations
  */
@@ -197,7 +429,12 @@ export async function processChatRequest(
     }
 
     // Prepare system prompt with preloaded context
-    const systemPrompt = (agent.systemPrompt || '') + preloadedContext;
+    let systemPrompt = (agent.systemPrompt || '') + preloadedContext;
+    
+    // Append general markdown output rules for string format agents
+    if (agent.requiredOutputFormat === 'string') {
+      systemPrompt = systemPrompt + GENERAL_MARKDOWN_OUTPUT_RULES;
+    }
 
     // Format annotations in TOON-like format and add to user prompt
     let finalUserPrompt = userPrompt;

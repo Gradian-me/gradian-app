@@ -49,12 +49,7 @@ export const IS_PRODUCTION = typeof process !== 'undefined'
  */
 export const DEMO_MODE: boolean = (() => {
   if (typeof process === 'undefined') return false;
-  
-  // In production, always disable demo mode
-  if (process.env.NODE_ENV === 'production') {
-    return false;
-  }
-  
+   
   const value = process.env.NEXT_PUBLIC_DEMO_MODE;
   return toBoolean(value, false);
 })();

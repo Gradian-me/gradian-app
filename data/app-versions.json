@@ -3847,5 +3847,32 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCROUTINGPLAN001",
+    "timestamp": "2025-12-18T22:27:19.000Z",
+    "version": "1.31.001",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Introduced a new AI agent configuration for the Routing Plan Analyzer, which analyzes Points of Interest (POIs) for optimal routing based on demand, risk, and visit constraints. This includes a comprehensive system prompt, loading messages, and a structured output format.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "routing"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated ai-prompts.json to include user prompts and agent responses for the new agent, improving the overall functionality and user experience.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-prompts",
+          "user-experience"
+        ]
+      }
+    ]
   }
 ]

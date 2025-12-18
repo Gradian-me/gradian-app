@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Loader2, Eye } from 'lucide-react';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown';
+import { GENERAL_MARKDOWN_OUTPUT_RULES } from '../utils/ai-chat-utils';
 
 interface PromptPreviewSheetProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ interface PromptPreviewSheetProps {
   disabled?: boolean;
   extraBody?: Record<string, any>;
   bodyParams?: Record<string, any>;
+  requiredOutputFormat?: string;
 }
 
 export function PromptPreviewSheet({
@@ -37,12 +39,18 @@ export function PromptPreviewSheet({
   disabled = false,
   extraBody,
   bodyParams,
+  requiredOutputFormat,
 }: PromptPreviewSheetProps) {
   const hasPrompt = systemPrompt || userPrompt.trim();
   const hasExtraBody = extraBody && Object.keys(extraBody).length > 0;
   const hasBodyParams = bodyParams && Object.keys(bodyParams).length > 0;
   // Enable preview if there's a prompt OR if there are body/extra params (for image generation, etc.)
   const canPreview = hasPrompt || hasBodyParams || hasExtraBody;
+  
+  // Append general markdown rules for string format agents in preview
+  const previewSystemPrompt = requiredOutputFormat === 'string' 
+    ? (systemPrompt || '') + GENERAL_MARKDOWN_OUTPUT_RULES
+    : systemPrompt;
 
   return (
     <>
@@ -62,6 +70,11 @@ export function PromptPreviewSheet({
             <SheetTitle>Prompt Sent to LLM</SheetTitle>
             <SheetDescription>
               This is the prompt that is being sent (or was sent) to the Language Model. You can preview it at any time, including during generation.
+              {requiredOutputFormat === 'string' && (
+                <span className="block mt-1 text-xs text-blue-600 dark:text-blue-400">
+                  Note: General markdown output rules are automatically appended for string format agents.
+                </span>
+              )}
             </SheetDescription>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
@@ -104,10 +117,10 @@ export function PromptPreviewSheet({
                         Loading preloaded context...
                       </div>
                     </div>
-                  ) : systemPrompt ? (
+                  ) : previewSystemPrompt ? (
                     <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                       <MarkdownViewer 
-                        content={systemPrompt}
+                        content={previewSystemPrompt}
                         showToggle={false}
                       />
                     </div>

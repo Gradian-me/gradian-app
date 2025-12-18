@@ -1095,6 +1095,7 @@ export function AiBuilderForm({
                             disabled={!userPrompt.trim() || disabled}
                             extraBody={Object.keys(params.extra).length > 0 ? params.extra : undefined}
                             bodyParams={Object.keys(params.body).length > 0 ? params.body : undefined}
+                            requiredOutputFormat={selectedAgent?.requiredOutputFormat}
                           />
                         );
                       })()}
