@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     const replaceAll = requestBody.replaceAll ?? true; // Default to true: delete all existing variables before syncing
 
     // Read .env.prod file
-    const envFilePath = join(process.cwd(), '.env.produdtion');
+    const envFilePath = join(process.cwd(), '.env.production');
     let envFileContent: string;
 
     try {

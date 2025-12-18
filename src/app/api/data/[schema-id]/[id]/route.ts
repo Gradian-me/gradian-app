@@ -54,8 +54,8 @@ export async function GET(
   const targetPath = `/api/data/${schemaId}/${id}${request.nextUrl.search}`;
 
   if (!isDemoModeEnabled()) {
-    // Special handling for tenants: try backend first, fallback to local if backend fails
-    if (schemaId === 'tenants') {
+    // Special handling for tenants and integrations: try backend first, fallback to local if backend fails
+    if (schemaId === 'tenants' || schemaId === 'integrations') {
       // Try to proxy to backend first
       const proxyResponse = await proxyDataRequest(request, targetPath);
       
@@ -64,7 +64,7 @@ export async function GET(
         return proxyResponse;
       }
       
-      // If backend returns 404 or 5xx error, try to fallback to local tenant file
+      // If backend returns 404 or 5xx error, try to fallback to local file
       if (proxyResponse.status === 404 || (proxyResponse.status >= 500 && proxyResponse.status < 600)) {
         try {
           // Clone the response to read it without consuming the original
@@ -76,29 +76,29 @@ export async function GET(
             // If response is not JSON, treat as error
           }
           
-          // If backend explicitly says tenant not found or returns 404, try local fallback
+          // If backend explicitly says not found or returns 404, try local fallback
           if (proxyResponse.status === 404 || (proxyData && proxyData.success === false)) {
             loggingCustom(
               LogType.INFRA_LOG,
               'warn',
-              `[Tenant API] Backend returned ${proxyResponse.status} for tenant "${id}", attempting local fallback`
+              `[${schemaId === 'tenants' ? 'Tenant' : 'Integration'} API] Backend returned ${proxyResponse.status} for ${schemaId} "${id}", attempting local fallback`
             );
             
-            // Fallback to local tenant file
+            // Fallback to local file
             try {
               const { readSchemaData } = await import('@/gradian-ui/shared/domain/utils/data-storage.util');
-              const tenants = readSchemaData<any>('tenants');
-              const tenant = tenants.find((t: any) => String(t.id) === String(id));
+              const items = readSchemaData<any>(schemaId);
+              const item = items.find((t: any) => String(t.id) === String(id));
               
-              if (tenant) {
+              if (item) {
                 loggingCustom(
                   LogType.INFRA_LOG,
                   'info',
-                  `[Tenant API] Found tenant "${id}" in local fallback`
+                  `[${schemaId === 'tenants' ? 'Tenant' : 'Integration'} API] Found ${schemaId} "${id}" in local fallback`
                 );
                 return NextResponse.json({
                   success: true,
-                  data: tenant
+                  data: item
                 }, {
                   headers: {
                     'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -110,14 +110,14 @@ export async function GET(
                 loggingCustom(
                   LogType.INFRA_LOG,
                   'warn',
-                  `[Tenant API] Tenant "${id}" not found in local fallback either`
+                  `[${schemaId === 'tenants' ? 'Tenant' : 'Integration'} API] ${schemaId} "${id}" not found in local fallback either`
                 );
               }
             } catch (loadError) {
               loggingCustom(
                 LogType.INFRA_LOG,
                 'error',
-                `[Tenant API] Failed to load local tenants for fallback: ${loadError instanceof Error ? loadError.message : String(loadError)}`
+                `[${schemaId === 'tenants' ? 'Tenant' : 'Integration'} API] Failed to load local ${schemaId} for fallback: ${loadError instanceof Error ? loadError.message : String(loadError)}`
               );
             }
           }
@@ -126,7 +126,7 @@ export async function GET(
           loggingCustom(
             LogType.INFRA_LOG,
             'warn',
-            `[Tenant API] Fallback failed for tenant "${id}": ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`
+            `[${schemaId === 'tenants' ? 'Tenant' : 'Integration'} API] Fallback failed for ${schemaId} "${id}": ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`
           );
         }
       }
@@ -135,7 +135,7 @@ export async function GET(
       return proxyResponse;
     }
     
-    // For non-tenant schemas, proxy directly without fallback
+    // For other schemas, proxy directly without fallback
     return proxyDataRequest(request, targetPath);
   }
 

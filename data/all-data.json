@@ -2575,8 +2575,8 @@
       ],
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-12-17T16:39:48.027Z",
-      "lastSynced": "2025-12-17T16:39:48.027Z",
+      "updatedAt": "2025-12-18T21:30:21.410Z",
+      "lastSynced": "2025-12-18T21:30:21.410Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2589,7 +2589,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Replaced all variables: deleted 20, created 21",
+      "lastSyncMessage": "Failed to read .env.prod file: ENOENT: no such file or directory, open 'C:\\Mahyar\\NextJS Projects\\gradian-app\\.env.production'",
       "sourceRoute": []
     },
     {
