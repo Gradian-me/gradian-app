@@ -16,7 +16,7 @@
  */
 
 import { loggingCustom } from './logging-custom';
-import { LogType } from '../constants/application-variables';
+import { LogType, REQUIRE_LOGIN } from '../constants/application-variables';
 
 type QueuedRequest = {
   resolve: (token: string | null) => void;
@@ -204,7 +204,14 @@ class AuthTokenManager {
       hasRefreshPromise: this.refreshPromise !== null,
       isRefreshing: this.isRefreshing,
       queuedRequests: this.queuedRequests.length,
+      requireLogin: REQUIRE_LOGIN,
     })}`);
+
+    // If REQUIRE_LOGIN is false, skip refresh token handling
+    if (!REQUIRE_LOGIN) {
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] refreshAccessToken() skipped - REQUIRE_LOGIN is false');
+      return null;
+    }
 
     // Don't refresh if we're on login page (prevents redirect loops)
     if (this.isOnLoginPage()) {
@@ -438,7 +445,14 @@ class AuthTokenManager {
       hasTokenInMemory: hasToken,
       hasRefreshPromise: this.refreshPromise !== null,
       queuedRequests: this.queuedRequests.length,
+      requireLogin: REQUIRE_LOGIN,
     })}`);
+
+    // If REQUIRE_LOGIN is false, skip token handling
+    if (!REQUIRE_LOGIN) {
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] getValidAccessToken() - skipped (REQUIRE_LOGIN is false)');
+      return null;
+    }
 
     // Don't try to get token if we're on login page
     if (isOnLogin) {
@@ -502,7 +516,15 @@ class AuthTokenManager {
    * Throws RateLimitError if refresh fails due to rate limiting (429)
    */
   async handleUnauthorized(): Promise<string | null> {
-    loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] handleUnauthorized() - 401 received, refreshing token');
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] handleUnauthorized() - 401 received ${JSON.stringify({
+      requireLogin: REQUIRE_LOGIN,
+    })}`);
+    
+    // If REQUIRE_LOGIN is false, skip refresh token handling
+    if (!REQUIRE_LOGIN) {
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] handleUnauthorized() - skipped (REQUIRE_LOGIN is false)');
+      return null;
+    }
     
     // Clear stale token
     this.clearAccessToken();

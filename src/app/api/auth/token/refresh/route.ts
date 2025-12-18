@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { refreshAccessToken, extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
 import { AUTH_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
 import {
   isServerDemoMode,
   buildAuthServiceUrl,
@@ -18,6 +19,24 @@ export async function POST(request: NextRequest) {
     timestamp: new Date().toISOString(),
     hasBody: !!request.body,
   })}`);
+
+  // If REQUIRE_LOGIN is false, skip refresh token handling
+  const vars = loadApplicationVariables();
+  const requireLogin = vars.REQUIRE_LOGIN ?? false;
+  
+  if (!requireLogin) {
+    loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] REQUIRE_LOGIN is false, skipping refresh token handling ${JSON.stringify({
+      requireLogin: false,
+      action: 'Returning success without token refresh',
+    })}`);
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Login not required - refresh token handling skipped',
+      },
+      { status: 200 }
+    );
+  }
 
   try {
     const body = await request.json().catch(() => ({}));
