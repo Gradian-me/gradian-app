@@ -273,8 +273,48 @@ export function AiBuilderResponse({
       'iconic': 'Iconic',
       'editorial': 'Editorial',
       'random': 'Random',
+      'blueprint': 'Blueprint',
+      'vector-illustration': 'Vector Illustration',
+      'architectural': 'Architectural',
+      'isometric': 'Isometric',
+      'portrait': 'Portrait',
+      'fashion': 'Fashion',
+      'product-photography': 'Product Photography',
+      'landscape': 'Landscape',
+      'tilt-shift': 'Tilt-Shift',
+      'cinematic': 'Cinematic',
+      'polaroid': 'Polaroid',
+      'lego-style': 'Lego Style',
+      'disney': 'Disney',
+      'mindmap': 'Mindmap',
+      'timeline': 'Timeline',
+      'dashboard': 'Dashboard',
+      'negative-space': 'Negative Space',
+      'abstract': 'Abstract',
+      'retro': 'Retro',
+      'poster': 'Poster',
+      'photocopy': 'Photocopy',
+      'newspaper': 'Newspaper',
+      'collage': 'Collage',
+      'paper-craft': 'Paper Craft',
+      'mockup': 'Mockup',
+      'persian': 'Persian',
+      'hollywood-movie': 'Hollywood Movie',
+      'new-york': 'New York',
+      'cyberpunk': 'Cyberpunk',
+      'retro-miami': 'Retro Miami',
     };
     return labels[type] || type.charAt(0).toUpperCase() + type.slice(1);
+  };
+
+  // Helper function to format imageType for use in filenames
+  const formatImageTypeForFilename = (type?: string): string => {
+    if (!type || type === 'none' || type === 'standard') return '';
+    // Convert kebab-case to PascalCase for filename (e.g., "hollywood-movie" -> "HollywoodMovie")
+    return type
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join('');
   };
 
   // Parse image data from imageResponse prop (parallel image generation)
@@ -650,7 +690,10 @@ export function AiBuilderResponse({
                       try {
                         let blob: Blob;
                         const timestamp = Date.now();
-                        const filename = `Gradian_Image_${timestamp}.png`;
+                        const imageTypeSuffix = formatImageTypeForFilename(imageType);
+                        const filename = imageTypeSuffix 
+                          ? `Gradian_Image_${imageTypeSuffix}_${timestamp}.png`
+                          : `Gradian_Image_${timestamp}.png`;
                         
                         if (parallelImageData.b64_json) {
                           const base64String = parallelImageData.b64_json.startsWith('data:image/')
@@ -921,7 +964,10 @@ export function AiBuilderResponse({
                   try {
                     let blob: Blob;
                     const timestamp = Date.now();
-                    const filename = `Gradian_Image_${timestamp}.png`;
+                    const imageTypeSuffix = formatImageTypeForFilename(imageType);
+                    const filename = imageTypeSuffix 
+                      ? `Gradian_Image_${imageTypeSuffix}_${timestamp}.png`
+                      : `Gradian_Image_${timestamp}.png`;
                     
                     if (parallelImageData.b64_json) {
                       const base64String = parallelImageData.b64_json.startsWith('data:image/')
@@ -1076,9 +1122,12 @@ export function AiBuilderResponse({
                     onClick={async () => {
                       try {
                         let blob: Blob;
-                        // Generate filename with timestamp: Gradian_Image_{time}.png
+                        // Generate filename with timestamp and image type: Gradian_Image_{type}_{time}.png
                         const timestamp = Date.now();
-                        const filename = `Gradian_Image_${timestamp}.png`;
+                        const imageTypeSuffix = formatImageTypeForFilename(imageType);
+                        const filename = imageTypeSuffix 
+                          ? `Gradian_Image_${imageTypeSuffix}_${timestamp}.png`
+                          : `Gradian_Image_${timestamp}.png`;
                         
                         if (imageData.b64_json) {
                           // Handle base64 image

@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Eye } from 'lucide-react';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown';
 import { GENERAL_MARKDOWN_OUTPUT_RULES } from '../utils/ai-chat-utils';
+import { IMAGE_TYPE_PROMPTS } from '../utils/ai-image-utils';
 
 interface PromptPreviewSheetProps {
   isOpen: boolean;
@@ -47,10 +48,25 @@ export function PromptPreviewSheet({
   // Enable preview if there's a prompt OR if there are body/extra params (for image generation, etc.)
   const canPreview = hasPrompt || hasBodyParams || hasExtraBody;
   
+  // For image generation, use image type prompt if imageType is specified
+  let effectiveSystemPrompt = systemPrompt || '';
+  if (requiredOutputFormat === 'image' && bodyParams?.imageType) {
+    const imageType = bodyParams.imageType;
+    if (imageType && imageType !== 'none' && imageType !== 'standard') {
+      const imageTypePrompt = IMAGE_TYPE_PROMPTS[imageType] || IMAGE_TYPE_PROMPTS[imageType.toLowerCase()] || '';
+      if (imageTypePrompt) {
+        effectiveSystemPrompt = imageTypePrompt;
+      }
+    } else if (imageType === 'standard' || !imageType || imageType === 'none') {
+      // Use general image prompt for standard/none
+      effectiveSystemPrompt = IMAGE_TYPE_PROMPTS.standard || '';
+    }
+  }
+  
   // Append general markdown rules for string format agents in preview
   const previewSystemPrompt = requiredOutputFormat === 'string' 
-    ? (systemPrompt || '') + GENERAL_MARKDOWN_OUTPUT_RULES
-    : systemPrompt;
+    ? effectiveSystemPrompt + GENERAL_MARKDOWN_OUTPUT_RULES
+    : effectiveSystemPrompt;
 
   return (
     <>

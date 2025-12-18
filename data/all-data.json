@@ -2575,8 +2575,8 @@
       ],
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-12-18T21:30:21.410Z",
-      "lastSynced": "2025-12-18T21:30:21.410Z",
+      "updatedAt": "2025-12-18T21:34:53.920Z",
+      "lastSynced": "2025-12-18T21:34:53.920Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2589,7 +2589,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Failed to read .env.prod file: ENOENT: no such file or directory, open 'C:\\Mahyar\\NextJS Projects\\gradian-app\\.env.production'",
+      "lastSyncMessage": "Replaced all variables: deleted 20, created 25",
       "sourceRoute": []
     },
     {
@@ -2628,8 +2628,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-18T12:40:57.116Z",
-      "lastSynced": "2025-12-18T12:40:57.116Z",
+      "updatedAt": "2025-12-18T21:58:59.624Z",
+      "lastSynced": "2025-12-18T21:58:59.624Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2668,7 +2668,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-18T12:41:10.915Z",
+      "updatedAt": "2025-12-18T21:59:06.169Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2678,7 +2678,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-18T12:41:10.915Z",
+      "lastSynced": "2025-12-18T21:59:06.169Z",
       "lastSyncMessage": "Generated relations for 39 out of 39 schemas"
     },
     {
@@ -2725,7 +2725,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-18T12:43:56.567Z",
+      "updatedAt": "2025-12-18T21:59:36.899Z",
       "category": [
         {
           "id": "production-integration",
@@ -2734,7 +2734,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-18T12:43:56.567Z",
+      "lastSynced": "2025-12-18T21:59:36.899Z",
       "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 994, edges created: 44, nodes failed: 0, edges failed: 0."
     }
   ],
