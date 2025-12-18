@@ -7,6 +7,7 @@ import { processChatRequest } from './ai-chat-utils';
 import { processVoiceRequest } from './ai-voice-utils';
 import { processImageRequest } from './ai-image-utils';
 import { processVideoRequest } from './ai-video-utils';
+import { processGraphRequest } from './ai-graph-utils';
 import { processOrchestratorRequest } from './ai-orchestrator-utils';
 import { getApiUrlForAgentType, AgentType } from './ai-agent-url';
 
@@ -53,6 +54,10 @@ export async function processAiAgent(
 
   switch (agentType) {
     case 'chat':
+      // Check if chat agent requires graph output format
+      if (agent.requiredOutputFormat === 'graph') {
+        return await processGraphRequest(agent, requestData, baseUrl);
+      }
       return await processChatRequest(agent, requestData, baseUrl);
     
     case 'voice-transcription':
@@ -63,6 +68,9 @@ export async function processAiAgent(
     
     case 'video-generation':
       return await processVideoRequest(agent, requestData);
+    
+    case 'graph-generation':
+      return await processGraphRequest(agent, requestData, baseUrl);
     
     case 'orchestrator':
       return await processOrchestratorRequest(agent.id, requestData, baseUrl);

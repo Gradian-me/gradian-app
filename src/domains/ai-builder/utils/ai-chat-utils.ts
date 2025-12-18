@@ -9,7 +9,9 @@ import { AgentRequestData, AgentResponse } from './ai-agent-utils';
 import { getApiUrlForAgentType } from './ai-agent-url';
 import { validateAgentFormFields, buildStandardizedPrompt } from './prompt-builder';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { LogType, LOG_CONFIG } from '@/gradian-ui/shared/configs/log-config';
+import { getGeneralSystemPrompt } from './ai-general-utils';
+import { truncateText } from '@/domains/chat/utils/text-utils';
 import {
   sanitizePrompt,
   getApiKey,
@@ -24,10 +26,8 @@ import {
   buildTimingInfo,
   validateAgentConfig,
 } from './ai-common-utils';
-import fs from 'fs';
-import path from 'path';
 
-// Performance: Cache AI models to avoid repeated file reads
+// Performance: Cache AI models to avoid repeated API calls
 let cachedModels: any[] | null = null;
 let modelsCacheTime: number = 0;
 const MODELS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -265,10 +265,11 @@ Before finalizing your output, ensure:
 
 
 /**
- * Load AI models from JSON file with caching
- * Performance: Cache models to avoid repeated file system operations
+ * Load AI models from API route with caching
+ * Performance: Cache models to avoid repeated API calls
+ * Works on both client and server side
  */
-function loadAiModels(): any[] {
+async function loadAiModels(): Promise<any[]> {
   const now = Date.now();
   
   // Return cached models if still valid
@@ -277,55 +278,65 @@ function loadAiModels(): any[] {
   }
 
   try {
-    const dataPath = path.join(process.cwd(), 'data', 'ai-models.json');
+    // Determine API base URL
+    const baseUrl = typeof window !== 'undefined' 
+      ? window.location.origin 
+      : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     
-    // Security: Validate path to prevent directory traversal
-    const resolvedPath = path.resolve(dataPath);
-    const dataDir = path.resolve(process.cwd(), 'data');
-    if (!resolvedPath.startsWith(dataDir)) {
-      loggingCustom(LogType.INFRA_LOG, 'error', 'Invalid models file path');
-      return [];
+    const apiUrl = `${baseUrl}/api/ai-models`;
+    
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // Add cache control for client-side requests
+      cache: 'default',
+    });
+
+    if (!response.ok) {
+      loggingCustom(LogType.INFRA_LOG, 'warn', `Failed to load AI models: ${response.status} ${response.statusText}`);
+      cachedModels = [];
+      modelsCacheTime = now;
+      return cachedModels;
     }
+
+    const result = await response.json();
     
-    if (!fs.existsSync(resolvedPath)) {
+    if (!result.success || !Array.isArray(result.data)) {
+      loggingCustom(LogType.INFRA_LOG, 'warn', 'Invalid AI models API response format');
       cachedModels = [];
       modelsCacheTime = now;
       return cachedModels;
     }
     
-    const fileContents = fs.readFileSync(resolvedPath, 'utf8');
-    
-    // Security: Use safe JSON parsing with size limits
-    const parseResult = safeJsonParse(fileContents, 1 * 1024 * 1024); // 1MB max for models file
-    if (!parseResult.success || !Array.isArray(parseResult.data)) {
-      loggingCustom(LogType.INFRA_LOG, 'error', 'Invalid models file format');
-      return [];
-    }
-    
-    cachedModels = parseResult.data;
+    const models = result.data || [];
+    cachedModels = models;
+    modelsCacheTime = now;
+    return models;
+  } catch (error) {
+    loggingCustom(LogType.INFRA_LOG, 'error', `Error loading AI models from API: ${error instanceof Error ? error.message : String(error)}`);
+    cachedModels = [];
     modelsCacheTime = now;
     return cachedModels;
-  } catch (error) {
-    loggingCustom(LogType.INFRA_LOG, 'error', `Error loading AI models: ${error instanceof Error ? error.message : String(error)}`);
-    return [];
   }
 }
 
 /**
  * Calculate pricing for token usage
  */
-function calculatePricing(
+async function calculatePricing(
   modelId: string,
   promptTokens: number,
   completionTokens: number
-): {
+): Promise<{
   inputPricePer1M: number;
   outputPricePer1M: number;
   inputPrice: number;
   outputPrice: number;
   totalPrice: number;
-} | null {
-  const models = loadAiModels();
+} | null> {
+  const models = await loadAiModels();
   const model = models.find((m: any) => m.id === modelId);
 
   if (!model || !model.pricing) {
@@ -428,8 +439,8 @@ export async function processChatRequest(
       }
     }
 
-    // Prepare system prompt with preloaded context
-    let systemPrompt = (agent.systemPrompt || '') + preloadedContext;
+    // Prepare system prompt with general system prompt (date/time context) and preloaded context
+    let systemPrompt = getGeneralSystemPrompt() + (agent.systemPrompt || '') + preloadedContext;
     
     // Append general markdown output rules for string format agents
     if (agent.requiredOutputFormat === 'string') {
@@ -521,14 +532,52 @@ export async function processChatRequest(
         };
       }
 
+      // Check content-type header (only for successful responses)
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json') && !contentType.includes('text/json')) {
+        // Response is not JSON - might be wrong endpoint or misconfigured
+        const responseText = await response.text();
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'error',
+          `LLM API returned non-JSON content. Content-Type: ${contentType}. Response preview: ${truncateText(responseText, 500)}`
+        );
+        return {
+          success: false,
+          error: `AI service returned unexpected content type (${contentType}). Please check API endpoint configuration.`,
+        };
+      }
+
       // Security: Use safe JSON parsing
       const responseText = await response.text();
+      
+      // Check if response looks like markdown instead of JSON (even if content-type says JSON)
+      const trimmedText = responseText.trim();
+      if (trimmedText.startsWith('#') || trimmedText.startsWith('###') || (trimmedText.startsWith('```') && !trimmedText.includes('choices'))) {
+        // Response appears to be markdown, not JSON - this shouldn't happen with OpenAI API
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'error',
+          `LLM API returned markdown instead of JSON. Response preview: ${truncateText(trimmedText, 200)}`
+        );
+        return {
+          success: false,
+          error: 'AI service returned invalid response format (markdown instead of JSON). The API may be misconfigured or returning an error page.',
+        };
+      }
+      
       const parseResult = safeJsonParse(responseText);
       
       if (!parseResult.success || !parseResult.data) {
+        // Log the actual response for debugging
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'error',
+          `Failed to parse LLM API response. Error: ${parseResult.error}. Response preview: ${truncateText(responseText, 500)}`
+        );
         return {
           success: false,
-          error: parseResult.error || 'Invalid response format from AI service',
+          error: parseResult.error || 'Invalid response format from AI service. The API may have returned an error page or unexpected format.',
         };
       }
 
@@ -537,6 +586,16 @@ export async function processChatRequest(
       // Performance: Use shared timing utility
       const timing = buildTimingInfo(startTime);
       const aiResponseContent = data.choices?.[0]?.message?.content || '';
+
+      // Log AI response if enabled
+      if (LOG_CONFIG[LogType.AI_RESPONSE_LOG]) {
+        const responsePreview = truncateText(aiResponseContent, 1000);
+        loggingCustom(
+          LogType.AI_RESPONSE_LOG,
+          'info',
+          `AI Response from ${model} (${timing.duration}ms):\n${responsePreview}`
+        );
+      }
 
       if (!aiResponseContent) {
         return {
@@ -551,7 +610,7 @@ export async function processChatRequest(
       const totalTokens = data.usage?.total_tokens || 0;
 
       // Calculate pricing
-      const pricing = calculatePricing(model, promptTokens, completionTokens);
+      const pricing = await calculatePricing(model, promptTokens, completionTokens);
 
       const tokenUsage = data.usage
         ? {

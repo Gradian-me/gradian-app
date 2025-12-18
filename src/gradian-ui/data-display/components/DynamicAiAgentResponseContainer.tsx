@@ -20,6 +20,7 @@ import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { TableWrapper } from '@/gradian-ui/data-display/table/components/TableWrapper';
 import { ImageViewer } from '@/gradian-ui/form-builder/form-elements/components/ImageViewer';
 import { VideoViewer } from '@/gradian-ui/form-builder/form-elements/components/VideoViewer';
+import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
 import { VoicePoweredOrb } from '@/components/ui/voice-powered-orb';
 import { TextSwitcher } from '@/components/ui/text-switcher';
@@ -228,6 +229,36 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
     return agentFormatValue === 'video' || !!videoData;
   }, [agent?.requiredOutputFormat, videoData]);
+
+  // Parse graph data if format is graph
+  const graphData = useMemo(() => {
+    if (!aiResponse || !agent) return null;
+    
+    const agentFormatValue = agent.requiredOutputFormat as string | undefined;
+    const isGraphFormat = agentFormatValue === 'graph';
+    
+    if (!isGraphFormat) return null;
+    
+    try {
+      const parsed = JSON.parse(aiResponse);
+      // Check if response has graph structure
+      if (parsed && typeof parsed === 'object') {
+        const graph = parsed.graph || parsed;
+        if (graph && typeof graph === 'object' && 
+            Array.isArray(graph.nodes) && Array.isArray(graph.edges)) {
+          return graph;
+        }
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  }, [aiResponse, agent]);
+
+  const shouldRenderGraph = useMemo(() => {
+    const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
+    return agentFormatValue === 'graph' || !!graphData;
+  }, [agent?.requiredOutputFormat, graphData]);
 
   const shouldRenderTable = agent?.requiredOutputFormat === 'table';
   const { data: tableData, isValid: isValidTable } = useMemo(() => {
@@ -807,6 +838,28 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
                         autoplay={false}
                       />
                     </div>
+                  </div>
+                ) : (
+                  <CodeViewer
+                    code={aiResponse}
+                    programmingLanguage="json"
+                    title="AI Generated Content"
+                    initialLineNumbers={10}
+                  />
+                )
+              ) : shouldRenderGraph ? (
+                graphData ? (
+                  <div className="w-full h-[600px] min-h-[400px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <GraphViewer
+                      data={{
+                        nodes: graphData.nodes || [],
+                        edges: graphData.edges || [],
+                        nodeTypes: graphData.nodeTypes,
+                        relationTypes: graphData.relationTypes,
+                        schemas: graphData.schemas,
+                      }}
+                      height="100%"
+                    />
                   </div>
                 ) : (
                   <CodeViewer

@@ -4,7 +4,7 @@
  * These URLs can be overridden via environment variables
  */
 
-export type AgentType = 'chat' | 'voice-transcription' | 'image-generation' | 'video-generation' | 'orchestrator';
+export type AgentType = 'chat' | 'voice-transcription' | 'image-generation' | 'video-generation' | 'graph-generation' | 'orchestrator';
 
 export interface AiAgentUrlConfig {
   LLM_API_URL: string;
@@ -47,6 +47,7 @@ export function getApiUrlForAgentType(agentType: AgentType): string {
     'voice-transcription': urls.LLM_VOICE_TRANSCRIBE_URL,
     'image-generation': urls.LLM_IMAGE_GENERATION_URL,
     'video-generation': urls.LLM_VIDEO_GENERATION_URL,
+    'graph-generation': urls.LLM_API_URL, // Graph generation uses chat API
     'orchestrator': urls.LLM_API_URL, // Orchestrator uses chat API
   };
 

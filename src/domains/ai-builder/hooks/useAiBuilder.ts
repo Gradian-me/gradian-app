@@ -17,6 +17,7 @@ import {
 } from '@/gradian-ui/shared/utils/preload-routes';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { truncateText } from '@/domains/chat/utils/text-utils';
 
 interface UseAiBuilderReturn {
   userPrompt: string;
@@ -253,6 +254,17 @@ export function useAiBuilder(): UseAiBuilderReturn {
             }),
           ]);
 
+          // Helper function to check if image generation succeeded
+          // Note: This checks the promise result, but actual success is determined after parsing
+          const checkImageSucceeded = (): boolean => {
+            if (imageResult.status === 'rejected') return false;
+            if (imageResult.status === 'fulfilled') {
+              const imgResponse = imageResult.value;
+              return imgResponse.ok;
+            }
+            return false;
+          };
+
           // Handle main agent response independently
           if (mainResult.status === 'fulfilled') {
             const response = mainResult.value;
@@ -267,16 +279,62 @@ export function useAiBuilder(): UseAiBuilderReturn {
                   } catch {}
                 } catch {}
                 const errorMessage = errorData?.error || errorText || `HTTP ${response.status}: ${response.statusText}`;
-                setError(`Server Error (${response.status}): ${errorMessage}`);
+                // Only set error if image generation also failed - otherwise show image
+                if (!checkImageSucceeded()) {
+                  setError(`Server Error (${response.status}): ${errorMessage}`);
+                } else {
+                  setError(null); // Image succeeded, don't show error
+                }
                 setAiResponse('');
                 setTokenUsage(null);
                 setVideoUsage(null);
                 setDuration(null);
               } else {
-                const data = await response.json();
+                // Try to parse as JSON, but handle non-JSON responses gracefully
+                let data: any;
+                try {
+                  const responseText = await response.text();
+                  try {
+                    data = JSON.parse(responseText);
+                  } catch (parseError) {
+                    // If response is not JSON, it might be a direct error response
+                    // Check if image generation succeeded - if so, don't show error
+                    if (!checkImageSucceeded()) {
+                      const errorMatch = responseText.match(/error["\s:]+([^"}\n]+)/i);
+                      const errorMessage = errorMatch ? errorMatch[1] : 'Invalid response format (not JSON)';
+                      setError(`Response Parse Error: ${errorMessage}`);
+                    } else {
+                      setError(null); // Image succeeded, don't show error
+                    }
+                    setAiResponse('');
+                    setTokenUsage(null);
+                    setVideoUsage(null);
+                    setDuration(null);
+                    return; // Exit early, don't try to process invalid response
+                  }
+                } catch (readError) {
+                  // If we can't read the response at all
+                  if (!checkImageSucceeded()) {
+                    const errorMessage = readError instanceof Error ? readError.message : 'Failed to read response';
+                    setError(`Response Read Error: ${errorMessage}`);
+                  } else {
+                    setError(null);
+                  }
+                  setAiResponse('');
+                  setTokenUsage(null);
+                  setVideoUsage(null);
+                  setDuration(null);
+                  return;
+                }
+                
                 if (!data.success) {
                   const errorMessage = data.error || 'Failed to get AI response';
-                  setError(`AI Builder Error: ${errorMessage}`);
+                  // Only set error if image generation also failed
+                  if (!checkImageSucceeded()) {
+                    setError(`AI Builder Error: ${errorMessage}`);
+                  } else {
+                    setError(null); // Image succeeded, don't show error
+                  }
                   setAiResponse('');
                   setTokenUsage(null);
                   setVideoUsage(null);
@@ -322,7 +380,12 @@ export function useAiBuilder(): UseAiBuilderReturn {
             } catch (err) {
               if (!(err instanceof Error && err.name === 'AbortError')) {
                 const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
-                setError(`Main Agent Error: ${errorMessage}`);
+                // Only set error if image generation also failed
+                if (!checkImageSucceeded()) {
+                  setError(`Main Agent Error: ${errorMessage}`);
+                } else {
+                  setError(null); // Image succeeded, don't show error
+                }
                 setAiResponse('');
                 setTokenUsage(null);
                 setVideoUsage(null);
@@ -332,9 +395,15 @@ export function useAiBuilder(): UseAiBuilderReturn {
           } else {
             // Main request rejected
             const errorMessage = mainResult.reason instanceof Error ? mainResult.reason.message : 'Unknown error';
-            setError(`Main Agent Error: ${errorMessage}`);
+            // Only set error if image generation also failed
+            if (!checkImageSucceeded()) {
+              setError(`Main Agent Error: ${errorMessage}`);
+            } else {
+              setError(null); // Image succeeded, don't show error
+            }
             setAiResponse('');
             setTokenUsage(null);
+            setVideoUsage(null);
             setDuration(null);
           }
 
@@ -355,7 +424,27 @@ export function useAiBuilder(): UseAiBuilderReturn {
               setImageError(`Image Generation Error (${response.status}): ${errorMessage}`);
               setImageResponse(null);
             } else {
-              const data = await response.json();
+              // Try to parse as JSON, but handle non-JSON responses gracefully
+              let data: any;
+              try {
+                const responseText = await response.text();
+                try {
+                  data = JSON.parse(responseText);
+                } catch (parseError) {
+                  // If response is not JSON, it might be a direct error response
+                  const errorMatch = responseText.match(/error["\s:]+([^"}\n]+)/i);
+                  const errorMessage = errorMatch ? errorMatch[1] : 'Invalid response format (not JSON)';
+                  setImageError(`Image Response Parse Error: ${errorMessage}`);
+                  setImageResponse(null);
+                  return; // Exit early
+                }
+              } catch (readError) {
+                const errorMessage = readError instanceof Error ? readError.message : 'Failed to read response';
+                setImageError(`Image Response Read Error: ${errorMessage}`);
+                setImageResponse(null);
+                return;
+              }
+              
               if (!data.success) {
                 const errorMessage = data.error || 'Failed to generate image';
                 setImageError(`Image Generation Error: ${errorMessage}`);
@@ -517,7 +606,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
         setDuration(null);
         
         // Log detailed error for debugging
-        loggingCustom(LogType.CLIENT_LOG, 'error', `AI Builder Error: ${errorMessage}, agentId: ${request.agentId}, userPrompt: ${request.userPrompt.substring(0, 64)}...`);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `AI Builder Error: ${errorMessage}, agentId: ${request.agentId}, userPrompt: ${truncateText(request.userPrompt, 64, '...')}`);
       }
     } finally {
       setIsLoading(false);

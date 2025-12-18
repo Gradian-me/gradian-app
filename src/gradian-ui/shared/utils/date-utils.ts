@@ -143,3 +143,20 @@ export function formatDateTimeWithFallback(
   }
 }
 
+/**
+ * Gets the current date and time in format: yyyy-MM-dd HH:mm:ss.ms
+ * Useful for AI prompts and time-related analytics
+ * @returns Formatted date/time string (e.g., "2025-01-22 14:30:45.123")
+ */
+export function getCurrentDateTime(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
+}
+

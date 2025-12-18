@@ -198,3 +198,25 @@ export function processTextWithMarkdownHashtagsAndMentions(text: string): string
   return processed;
 }
 
+/**
+ * Truncate text to a specified length and append truncation indicator
+ * @param text - The text to truncate
+ * @param maxLength - Maximum number of characters (default: 1000)
+ * @param truncationIndicator - Text to append when truncated (default: "... (truncated)")
+ * @returns Truncated text with indicator if text exceeds maxLength, otherwise original text
+ * 
+ * @example
+ * truncateText("Very long text...", 10) // "Very long ... (truncated)"
+ * truncateText("Short", 10) // "Short"
+ */
+export function truncateText(
+  text: string,
+  maxLength: number = 1000,
+  truncationIndicator: string = '... (truncated)'
+): string {
+  if (!text || text.length <= maxLength) {
+    return text;
+  }
+  return text.substring(0, maxLength) + truncationIndicator;
+}
+

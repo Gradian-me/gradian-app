@@ -8,6 +8,7 @@ import { processAiAgent } from './ai-agent-utils';
 import { getApiUrlForAgentType } from './ai-agent-url';
 import { sanitizePrompt, getApiKey, sanitizeErrorMessage, safeJsonParse } from './ai-security-utils';
 import { createAbortController, parseErrorResponse, buildTimingInfo } from './ai-common-utils';
+import { getGeneralSystemPrompt } from './ai-general-utils';
 import type { Todo, AgentChainStep } from '@/domains/chat/types';
 import fs from 'fs';
 import path from 'path';
@@ -111,7 +112,7 @@ If isGeneral is true, I will answer the question directly. If false, proceed wit
   const messages = [
     {
       role: 'system' as const,
-      content: 'You are an expert at distinguishing between general informational questions and specific task requests that require agent execution.',
+      content: getGeneralSystemPrompt() + 'You are an expert at distinguishing between general informational questions and specific task requests that require agent execution.',
     },
     {
       role: 'user' as const,
@@ -178,7 +179,7 @@ IMPORTANT: At the end of your response, add 2-4 relevant hashtags that summarize
       const answerMessages = [
         {
           role: 'system' as const,
-          content: `You are a helpful AI orchestrator assistant. You can answer general questions, provide guidance, explain how to use the system, and describe available capabilities.
+          content: getGeneralSystemPrompt() + `You are a helpful AI orchestrator assistant. You can answer general questions, provide guidance, explain how to use the system, and describe available capabilities.
 
 You have access to various specialized agents that can:
 - Generate content (text, images, videos)
@@ -306,7 +307,7 @@ Consider:
   const messages = [
     {
       role: 'system' as const,
-      content: systemPrompt || 'You are an AI orchestration expert that analyzes request complexity.',
+      content: getGeneralSystemPrompt() + (systemPrompt || 'You are an AI orchestration expert that analyzes request complexity.'),
     },
     {
       role: 'user' as const,
@@ -474,6 +475,14 @@ KEYWORD DETECTION RULES (PRIORITY ORDER - CHECK IN THIS ORDER):
    - For image-generator: detect image types like "infographic", "3d-model", "creative", "iconic", "editorial", "comic-book" and set "imageType" accordingly
    - CRITICAL: "sketch" keyword ALWAYS means image generation, NOT process analysis. Use "image-generator" agent, NOT "process-analyst"
 
+1.5. GRAPH GENERATION (HIGH PRIORITY - AFTER IMAGE):
+   - If user mentions "graph", "create graph", "generate graph", "graph visualization", "relationship graph", "entity graph", "dependency graph" → use "graph-generator" agent
+   - If user mentions "root cause analysis", "6M", "6M model", "root cause", "cause and effect", "fishbone", "Ishikawa" → use "graph-generator" agent (applies 6M framework)
+   - If user mentions "decision tree", "decision graph", "decision builder", "decision flow", "decision analysis" → use "graph-generator" agent
+   - If user mentions "entity relationship", "ER diagram", "relationship mapping", "entity mapping", "system relationships" → use "graph-generator" agent
+   - If user mentions "process flow graph", "workflow graph", "process visualization" → use "graph-generator" agent
+   - For graph-generator: The agent will automatically apply 6M framework for root cause analysis, decision trees for decisions, and entity mapping for relationships
+
 2. WRITING/TRANSLATION:
    - If user mentions "summarize", "summary", "summarizer" → use professional-writing agent with "writingStyle": "summarizer"
    - If user mentions "translate", "translation" → use professional-writing agent with "writingStyle": "translate"
@@ -497,7 +506,7 @@ PARAMETER EXTRACTION:
   * For select fields, use the option "id" value (not the label)
 
 DEPENDENCY-DRIVEN PARAMETERS (AUTO-FILL FROM PREVIOUS TODO OUTPUT):
-- For text/textarea fields whose name suggests the main prompt (e.g., "prompt", "userPrompt", "processDescription", "processSteps", "processChallenges", "pointsToImprove", "presentationTopic", "incidentDescription", "codeInput", "description", "imageDescription", or other user-facing text fields):
+- For text/textarea fields whose name suggests the main prompt (e.g., "prompt", "userPrompt", "processDescription", "processSteps", "processChallenges", "pointsToImprove", "presentationTopic", "incidentDescription", "codeInput", "description", "imageDescription", "graphDescription", or other user-facing text fields):
   * If the todo depends on a previous step and should consume the previous output, set the value to the object {"__fromDependency": true, "source": "previous-output"} instead of hardcoding user text.
   * Use this especially for downstream steps in a chain so the UI switch is ON by default and the value is hydrated at execution time with the prior todo's output.
   * If the step must use fresh user-provided text (e.g., first todo, or explicitly different input), set the explicit text value instead.
@@ -536,7 +545,7 @@ CRITICAL: When user mentions "sketch" or "sketch image", ALWAYS use "image-gener
   const messages = [
     {
       role: 'system' as const,
-      content: systemPrompt || `You are an AI orchestration expert that creates detailed todo lists for multi-agent workflows.
+      content: getGeneralSystemPrompt() + (systemPrompt || `You are an AI orchestration expert that creates detailed todo lists for multi-agent workflows.
 
 ## CRITICAL RULES
 
@@ -556,6 +565,17 @@ Each todo (except the first) MUST have dependencies set to the previous todo's I
 - **Output**: Image files (PNG/URL)
 - **CRITICAL**: "sketch" ALWAYS means visual artwork/image generation, NEVER process analysis. Use "image-generator", NOT "process-analyst"
 - **For videos**: "video", "generate video", "create video" → use "video-generator"
+
+#### A.5. GRAPH GENERATION (HIGH PRIORITY - AFTER IMAGE/VIDEO)
+- **Keywords**: "graph", "create graph", "generate graph", "graph visualization", "relationship graph", "entity graph", "dependency graph", "root cause analysis", "6M", "6M model", "root cause", "cause and effect", "fishbone", "Ishikawa", "decision tree", "decision graph", "decision builder", "decision flow", "decision analysis", "entity relationship", "ER diagram", "relationship mapping", "entity mapping", "system relationships", "process flow graph", "workflow graph", "process visualization"
+- **Agent**: "graph-generator"
+- **Output**: Graph data with nodes and edges (graph format)
+- **Capabilities**: 
+  * Automatically applies 6M root cause analysis framework when root cause analysis is mentioned
+  * Creates decision trees for decision-making scenarios
+  * Maps entity relationships for complex systems
+  * Compares with industry best practices
+- **NOT for**: Image generation, video generation, or text processing
 
 #### B. TEXT PROCESSING/WRITING
 - **Keywords**: "summarize", "summary", "summarizer", "translate", "translation", "improve text", "enhance writing", "grammar", "professional writing", "casual writing", "extended", "expand text", "solution advisor"
@@ -600,10 +620,11 @@ Each todo (except the first) MUST have dependencies set to the previous todo's I
 - **NOT for**: Process documentation or general HR tasks
 
 #### I. QUALITY DEVIATION ANALYSIS
-- **Keywords**: "deviation", "non-conformance", "quality issue", "CAPA", "root cause analysis", "6M model", "GMP deviation", "pharmaceutical quality"
+- **Keywords**: "deviation", "non-conformance", "quality issue", "CAPA", "GMP deviation", "pharmaceutical quality" (when user wants text report)
 - **Agent**: "quality-assurance-analyst"
-- **Output**: Deviation analysis report
-- **NOT for**: Process documentation or employee performance
+- **Output**: Deviation analysis report (markdown)
+- **NOT for**: Process documentation, employee performance, or graph visualization
+- **CRITICAL**: If user wants "root cause analysis graph" or "6M graph" or "visualize root causes", use "graph-generator" instead
 
 #### J. OOX PHARMACEUTICAL ANALYSIS
 - **Keywords**: "OOS", "OOT", "OOE", "out of specification", "out of trend", "out of expectation", "pharmaceutical OOX"
@@ -643,12 +664,16 @@ Each todo (except the first) MUST have dependencies set to the previous todo's I
 
 - "create a sketch of a cat" → image-generator (imageType: "sketch")
 - "sketch image of a building" → image-generator (imageType: "sketch")
+- "create a root cause analysis graph for quality deviation" → graph-generator (applies 6M framework)
+- "generate a 6M analysis graph" → graph-generator (applies 6M framework)
+- "create a decision tree for product launch" → graph-generator (creates decision tree)
+- "map entity relationships in supply chain" → graph-generator (entity relationship mapping)
 - "analyze this process" → process-analyst (process documentation)
 - "summarize this text" → professional-writing (writingStyle: "summarizer")
 - "review this code" → code-review-agent
 - "create employee KPIs" → performance-manager
 - "analyze this data table" → data-analysis-expert
-- "create a schema for products" → app-builder`,
+- "create a schema for products" → app-builder`),
     },
     {
       role: 'user' as const,

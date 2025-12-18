@@ -11,6 +11,7 @@ import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/Ma
 import { DynamicAiAgentResponseContainer } from '@/gradian-ui/data-display/components/DynamicAiAgentResponseContainer';
 import { ImageViewer } from '@/gradian-ui/form-builder/form-elements/components/ImageViewer';
 import { VideoViewer } from '@/gradian-ui/form-builder/form-elements/components/VideoViewer';
+import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
 import { TableWrapper } from '@/gradian-ui/data-display/table/components/TableWrapper';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
@@ -76,8 +77,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   const responseFormat = message.metadata?.responseFormat;
   const shouldRenderAgentContainer = isAssistant && 
     responseFormat && 
-    ['json', 'table', 'image', 'video', 'string'].includes(responseFormat) &&
-    (isTodoResponse || responseFormat === 'image' || responseFormat === 'video');
+    ['json', 'table', 'image', 'video', 'graph', 'string'].includes(responseFormat) &&
+    (isTodoResponse || responseFormat === 'image' || responseFormat === 'video' || responseFormat === 'graph');
 
   // For agent container, we need to create a mock action and schema
   // This is a simplified version - in production, you'd want to handle this more elegantly
@@ -322,7 +323,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   // Check if message contains image or video
   const hasImageOrVideo = shouldRenderAgentContainer && 
-    (responseFormat === 'image' || responseFormat === 'video');
+    (responseFormat === 'image' || responseFormat === 'video' || responseFormat === 'graph');
 
   // Get complexity for orchestrator messages
   const complexity = message.metadata?.complexity;
@@ -581,14 +582,15 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 Thinking...
               </TextShimmerWave>
             </div>
-          ) : (shouldRenderAgentContainer || (responseFormat === 'image' || responseFormat === 'video')) && parsedContent !== null ? (
+          ) : (shouldRenderAgentContainer || (responseFormat === 'image' || responseFormat === 'video' || responseFormat === 'graph')) && parsedContent !== null ? (
             <div className="w-full text-sm leading-relaxed">
               {(() => {
                 // Render based on response format, similar to DynamicAiAgentResponseContainer
-                // Also check if parsedContent has image/video structure even if responseFormat isn't set
+                // Also check if parsedContent has image/video/graph structure even if responseFormat isn't set
                 const detectedFormat = responseFormat || 
                   (parsedContent && typeof parsedContent === 'object' && parsedContent.image ? 'image' : null) ||
-                  (parsedContent && typeof parsedContent === 'object' && parsedContent.video ? 'video' : null);
+                  (parsedContent && typeof parsedContent === 'object' && parsedContent.video ? 'video' : null) ||
+                  (parsedContent && typeof parsedContent === 'object' && parsedContent.graph ? 'graph' : null);
                 
                 if (detectedFormat === 'image' || responseFormat === 'image') {
                   let imageData: any = null;
@@ -697,6 +699,46 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                         >
                           <Download className="w-4 h-4 text-gray-700 dark:text-gray-300" />
                         </button>
+                      </div>
+                    );
+                  }
+                }
+                
+                if (detectedFormat === 'graph' || responseFormat === 'graph') {
+                  let graphData: any = null;
+                  
+                  // Try to extract graph data from parsed content
+                  if (typeof parsedContent === 'object') {
+                    graphData = parsedContent.graph || parsedContent;
+                  } else if (typeof parsedContent === 'string' && (parsedContent.startsWith('{') || parsedContent.startsWith('['))) {
+                    try {
+                      const parsed = JSON.parse(parsedContent);
+                      graphData = parsed?.graph || parsed;
+                    } catch (parseError) {
+                      if (process.env.NODE_ENV === 'development') {
+                        console.warn('Failed to parse graph content:', parseError);
+                      }
+                    }
+                  }
+                  
+                  if (graphData && Array.isArray(graphData.nodes) && Array.isArray(graphData.edges)) {
+                    return (
+                      <div className={cn(
+                        "flex justify-center items-center w-full relative",
+                        isAssistant && message.agentId && "pt-12"
+                      )}>
+                        <div className="w-full h-[600px] min-h-[400px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                          <GraphViewer
+                            data={{
+                              nodes: graphData.nodes || [],
+                              edges: graphData.edges || [],
+                              nodeTypes: graphData.nodeTypes,
+                              relationTypes: graphData.relationTypes,
+                              schemas: graphData.schemas,
+                            }}
+                            height="100%"
+                          />
+                        </div>
                       </div>
                     );
                   }

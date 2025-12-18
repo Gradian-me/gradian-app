@@ -14,7 +14,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown';
-import { GENERAL_MARKDOWN_OUTPUT_RULES } from '../../../utils/ai-chat-utils';
+import { GENERAL_MARKDOWN_OUTPUT_RULES } from '../../utils/ai-chat-utils';
 
 interface SystemPromptPreviewSheetProps {
   isOpen: boolean;

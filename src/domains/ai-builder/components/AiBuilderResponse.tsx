@@ -19,6 +19,7 @@ import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';
 import { ImageViewer } from '@/gradian-ui/form-builder/form-elements/components/ImageViewer';
 import { VideoViewer } from '@/gradian-ui/form-builder/form-elements/components/VideoViewer';
+import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
 import { cn } from '@/gradian-ui/shared/utils';
 import { useAiResponseStore } from '@/stores/ai-response.store';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
@@ -26,6 +27,7 @@ import type { AiAgent, TokenUsage, VideoUsage, SchemaAnnotation, AnnotationItem 
 import { cleanMarkdownResponse } from '../utils/ai-security-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
+import { truncateText } from '@/domains/chat/utils/text-utils';
 
 interface AiBuilderResponseProps {
   response: string;
@@ -146,12 +148,12 @@ export function AiBuilderResponse({
   // Get agent format
   const agentFormat = useMemo(() => {
     if (!agent?.requiredOutputFormat) return 'string';
-    return agent.requiredOutputFormat as 'string' | 'json' | 'table' | 'image';
+    return agent.requiredOutputFormat as 'string' | 'json' | 'table' | 'image' | 'video' | 'graph';
   }, [agent?.requiredOutputFormat]);
   
-  // Use 'json' format for storage if agent format is 'image' (store may not support 'image' yet)
+  // Use 'json' format for storage if agent format is 'image' or 'graph' (store may not support these yet)
   const storageFormat = useMemo(() => {
-    return agentFormat === 'image' ? 'json' : agentFormat;
+    return (agentFormat === 'image' || agentFormat === 'graph' || agentFormat === 'video') ? 'json' : agentFormat;
   }, [agentFormat]);
   
   // Reactively get latest response from store using selector
@@ -164,13 +166,14 @@ export function AiBuilderResponse({
     return state.responses[storageKey] || null;
   });
   
-  // Use stored content if available, otherwise use response
-  // For image-generator agent, always use the current response (don't use stored content)
-  const displayContent = useMemo(() => {
-    // Skip using stored content for image-generator agent to avoid showing stale cached responses
-    if (agent?.id === 'image-generator' || agentFormat === 'image') {
-      return (response && response.trim()) || '';
-    }
+    // Use stored content if available, otherwise use response
+    // For image-generator, graph-generator, and video-generator agents, always use the current response (don't use stored content)
+    const displayContent = useMemo(() => {
+      // Skip using stored content for image/graph/video generators to avoid showing stale cached responses
+      if (agent?.id === 'image-generator' || agent?.id === 'graph-generator' || agent?.id === 'video-generator' || 
+          agentFormat === 'image' || agentFormat === 'graph' || agentFormat === 'video') {
+        return (response && response.trim()) || '';
+      }
     
     if (latestResponse?.content && latestResponse.content.trim()) {
       return latestResponse.content;
@@ -281,18 +284,35 @@ export function AiBuilderResponse({
     }
     
     try {
+      // imageResponse is a JSON string that needs to be parsed
       const parsed = JSON.parse(imageResponse);
       
-      // The response structure is: { image: { url, b64_json, revised_prompt }, format, ... }
+      // The response structure from ai-image-utils is: { image: { url, b64_json, revised_prompt }, format, ... }
+      // But it might also be the raw API response: { created, data: [{ b64_json, url }] }
+      let img: any = null;
+      
+      // Structure 1: Processed response from ai-image-utils (has image property)
       if (parsed && typeof parsed === 'object' && parsed.image) {
-        const img = parsed.image;
-        if (img && (img.url || img.b64_json)) {
-          return img;
-        }
+        img = parsed.image;
       }
+      // Structure 2: Raw API response (has data array)
+      else if (parsed && typeof parsed === 'object' && parsed.data && Array.isArray(parsed.data) && parsed.data.length > 0) {
+        img = parsed.data[0];
+      }
+      // Structure 3: Direct image object
+      else if (parsed && typeof parsed === 'object' && (parsed.url || parsed.b64_json)) {
+        img = parsed;
+      }
+      
+      if (img && (img.url || img.b64_json)) {
+        return img;
+      }
+      
+      // Log for debugging
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `Parallel image data structure not recognized. Keys: ${Object.keys(parsed || {}).join(', ')}`);
       return null;
     } catch (e) {
-      loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to parse parallel image data: ${e instanceof Error ? e.message : String(e)}, Content: ${imageResponse?.substring(0, 200)}`);
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to parse parallel image data: ${e instanceof Error ? e.message : String(e)}, Content: ${truncateText(imageResponse || '', 200)}`);
       return null;
     }
   }, [imageResponse]);
@@ -345,7 +365,7 @@ export function AiBuilderResponse({
       // If parsing fails and it's not an image format agent, silently return null
       // Only log warning if it's an image format agent (unexpected error)
       if (isImageFormat) {
-        console.warn('Failed to parse image data:', e, 'Content:', displayContent?.substring(0, 200));
+        console.warn('Failed to parse image data:', e, 'Content:', truncateText(displayContent || '', 200));
       }
       return null;
     }
@@ -399,7 +419,7 @@ export function AiBuilderResponse({
       // If parsing fails and it's not a video format agent, silently return null
       // Only log warning if it's a video format agent (unexpected error)
       if (isVideoFormat) {
-        console.warn('Failed to parse video data:', e, 'Content:', displayContent?.substring(0, 200));
+        console.warn('Failed to parse video data:', e, 'Content:', truncateText(displayContent || '', 200));
       }
       return null;
     }
@@ -416,6 +436,40 @@ export function AiBuilderResponse({
     const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
     return agentFormatValue === 'video' || !!videoData;
   }, [agent?.requiredOutputFormat, videoData]);
+
+  // Parse graph data if format is graph
+  const graphData = useMemo(() => {
+    if (!displayContent) return null;
+    const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
+    const isGraphFormat = agentFormatValue === 'graph';
+    
+    if (!isGraphFormat) return null;
+    
+    try {
+      const parsed = JSON.parse(displayContent);
+      // Check if response has graph structure
+      if (parsed && typeof parsed === 'object') {
+        // Handle both direct graph structure and wrapped structure
+        const graph = parsed.graph || parsed;
+        if (graph && typeof graph === 'object' && 
+            Array.isArray(graph.nodes) && Array.isArray(graph.edges)) {
+          return graph;
+        }
+      }
+    } catch (e) {
+      // Silently fail if not JSON or invalid structure
+      if (isGraphFormat) {
+        console.warn('Failed to parse graph data:', e);
+      }
+    }
+    return null;
+  }, [agent?.requiredOutputFormat, displayContent]);
+
+  // Determine if we should render as graph
+  const shouldRenderGraph = useMemo(() => {
+    const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
+    return agentFormatValue === 'graph' || !!graphData;
+  }, [agent?.requiredOutputFormat, graphData]);
 
   // Check if we should render as table
   const shouldRenderTable = agent?.requiredOutputFormat === 'table';
@@ -462,8 +516,8 @@ export function AiBuilderResponse({
 
   // Don't render if we have no content to display
   if (!displayContent || !displayContent.trim()) {
-    // Still render parallel image and metrics if available
-    if (parallelImageData || (tokenUsage || videoUsage || duration !== null)) {
+    // Still render parallel image, image errors, and metrics if available
+    if (parallelImageData || imageError || (tokenUsage || videoUsage || duration !== null)) {
       return (
         <div className="space-y-4">
           {/* Token Usage & Pricing - MetricCard */}
@@ -542,6 +596,23 @@ export function AiBuilderResponse({
                 text: 'Powered by Gradian AI • Efficient & Cost-Effective',
               }}
             />
+          )}
+
+          {/* Image Error Display */}
+          {imageError && !parallelImageData && (
+            <div className="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                  <h3 className="text-sm font-semibold text-orange-900 dark:text-orange-100">
+                    Image Generation Warning
+                  </h3>
+                </div>
+              </div>
+              <p className="text-sm text-orange-700 dark:text-orange-300">
+                {imageError}
+              </p>
+            </div>
           )}
 
           {/* Parallel Image */}
@@ -663,6 +734,16 @@ export function AiBuilderResponse({
                   />
                 </div>
               </div>
+              {imageError && (
+                <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                  <p className="text-xs font-medium text-red-700 dark:text-red-300 mb-1">
+                    Image Generation Warning
+                  </p>
+                  <p className="text-sm text-red-600 dark:text-red-400">
+                    {imageError}
+                  </p>
+                </div>
+              )}
               {parallelImageData.revised_prompt && (
                 <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
                   <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
@@ -1247,6 +1328,89 @@ export function AiBuilderResponse({
             </div>
           </details>
         </div>
+      ) : shouldRenderGraph ? (
+        graphData ? (
+          <div className="space-y-4">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    Generated Graph
+                  </h3>
+                  {agent?.model && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs font-medium bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800"
+                    >
+                      {agent.model}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              <div className="w-full h-[600px] min-h-[400px] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+                <GraphViewer
+                  data={{
+                    nodes: graphData.nodes || [],
+                    edges: graphData.edges || [],
+                    nodeTypes: graphData.nodeTypes,
+                    relationTypes: graphData.relationTypes,
+                    schemas: graphData.schemas,
+                  }}
+                  height="100%"
+                />
+              </div>
+            </div>
+            <details className="text-sm">
+              <summary className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+                View Raw Graph Data
+              </summary>
+              <div className="mt-2">
+                <CodeViewer
+                  code={JSON.stringify(graphData, null, 2)}
+                  programmingLanguage="json"
+                  title="Raw Graph Data"
+                  initialLineNumbers={10}
+                />
+              </div>
+            </details>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <h3 className="text-sm font-semibold text-red-900 dark:text-red-100">
+                  Graph Generation Error
+                </h3>
+              </div>
+            </div>
+            {displayContent && displayContent.trim() ? (
+              <>
+                <p className="text-sm text-red-700 dark:text-red-300 mb-4">
+                  Unable to parse graph data from response. The response may contain an error or invalid format.
+                </p>
+                <details className="text-sm">
+                  <summary className="cursor-pointer text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-100 mb-2">
+                    View Error Details
+                  </summary>
+                  <div className="mt-2">
+                    <CodeViewer
+                      code={displayContent}
+                      programmingLanguage="json"
+                      title="Error Response"
+                      initialLineNumbers={10}
+                    />
+                  </div>
+                </details>
+              </>
+            ) : (
+              <p className="text-sm text-red-700 dark:text-red-300">
+                No response received from graph generation service. Please check the API configuration and try again.
+              </p>
+            )}
+          </div>
+        )
       ) : agent?.requiredOutputFormat === 'string' ? (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">

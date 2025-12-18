@@ -9,8 +9,8 @@ export interface AiAgent {
   label: string;
   icon: string;
   description: string;
-  agentType?: 'chat' | 'image-generation' | 'voice-transcription' | 'video-generation' | 'orchestrator'; // Type of AI agent
-  requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video';
+  agentType?: 'chat' | 'image-generation' | 'voice-transcription' | 'video-generation' | 'graph-generation' | 'orchestrator'; // Type of AI agent
+  requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph';
   model?: string;
   systemPrompt?: string;
   loadingTextSwitches?: string | string[];
@@ -75,7 +75,7 @@ export interface VideoUsage {
 
 export interface AiBuilderResponseData {
   response: string;
-  format: 'json' | 'string' | 'table' | 'image' | 'video';
+  format: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph';
   tokenUsage: TokenUsage | null;
   videoUsage?: VideoUsage | null; // Video usage (duration and cost) for video generation agents
   timing?: {
@@ -86,7 +86,7 @@ export interface AiBuilderResponseData {
     id: string;
     label: string;
     description: string;
-    requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video';
+    requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph';
     nextAction: {
       label: string;
       icon?: string;

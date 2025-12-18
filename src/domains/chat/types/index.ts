@@ -31,7 +31,7 @@ export interface ChatMessage {
 export interface ChatMessageMetadata {
   todos?: Todo[];
   tokenUsage?: TokenUsage;
-  responseFormat?: 'json' | 'string' | 'table' | 'image' | 'video';
+  responseFormat?: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph';
   isThinking?: boolean;
   complexity?: number; // Complexity score (0.0-1.0) from orchestrator analysis
   todoId?: string; // ID of the todo that generated this response
@@ -56,7 +56,7 @@ export interface Todo {
   tokenUsage?: TokenUsage; // Token usage from agent execution
   duration?: number; // Duration in milliseconds
   cost?: number; // Cost in currency (e.g., USD)
-  responseFormat?: 'json' | 'string' | 'table' | 'image' | 'video'; // Response format from agent
+  responseFormat?: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph'; // Response format from agent
   chainMetadata?: {
     input: any; // Input passed to the agent
     executedAt: string; // ISO string - when the todo was executed

@@ -18,6 +18,7 @@ import { TodoEditDialog } from './TodoEditDialog';
 import { TodoGraphViewerDialog } from './TodoGraphViewerDialog';
 import { extractTodoParameters, formatParameterValue, getParameterLabel } from '../utils/todo-parameter-utils';
 import { useAiAgents } from '@/domains/ai-builder';
+import { truncateText } from '../utils/text-utils';
 import { ButtonMinimal } from '@/gradian-ui/form-builder/form-elements';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
@@ -1049,7 +1050,7 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
               {parameters.map((param) => {
                 const label = getParameterLabel(todo.agentId, param.key, aiAgents);
                 const value = formatParameterValue(param.value);
-                const displayText = value.length > 20 ? `${value.substring(0, 20)}...` : value;
+                const displayText = truncateText(value, 20, '...');
                 
                 return (
                   <Badge

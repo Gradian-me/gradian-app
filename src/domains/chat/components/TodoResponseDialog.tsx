@@ -14,6 +14,7 @@ import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card/compon
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';
 import { DynamicAiAgentResponseContainer } from '@/gradian-ui/data-display/components/DynamicAiAgentResponseContainer';
 import { ImageViewer } from '@/gradian-ui/form-builder/form-elements/components/ImageViewer';
+import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
 import type { Todo } from '../types';
 import type { QuickAction, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 
@@ -140,7 +141,7 @@ export const TodoResponseDialog: React.FC<TodoResponseDialogProps> = ({
           {/* Response Content */}
           {output && (
             <div className="mt-4">
-              {shouldRenderAgentContainer && responseFormat !== 'image' ? (
+              {shouldRenderAgentContainer && responseFormat !== 'image' && responseFormat !== 'graph' ? (
                 <DynamicAiAgentResponseContainer
                   action={agentAction}
                   schema={agentSchema}
@@ -175,6 +176,30 @@ export const TodoResponseDialog: React.FC<TodoResponseDialogProps> = ({
                   >
                     Your browser does not support the video tag.
                   </video>
+                </div>
+              ) : responseFormat === 'graph' ? (
+                <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                  <div className="w-full h-[600px] min-h-[400px]">
+                    <GraphViewer
+                      data={
+                        typeof output === 'object' && output && 'graph' in output
+                          ? (output as any).graph
+                          : typeof output === 'object' && output && Array.isArray((output as any).nodes)
+                          ? output
+                          : typeof output === 'string'
+                          ? (() => {
+                              try {
+                                const parsed = JSON.parse(output);
+                                return parsed.graph || parsed;
+                              } catch {
+                                return { nodes: [], edges: [] };
+                              }
+                            })()
+                          : { nodes: [], edges: [] }
+                      }
+                      height="100%"
+                    />
+                  </div>
                 </div>
               ) : (
                 <div className="prose prose-sm dark:prose-invert max-w-none">
