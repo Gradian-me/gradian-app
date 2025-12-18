@@ -143,8 +143,6 @@ export async function decryptSkipKey(encryptedSkipKey: string): Promise<string |
       }
     }
     
-    console.log('[decrypt-skip-key] Successfully decrypted skip key, length:', decryptedString.length);
-    
     return decryptedString;
   } catch (error) {
     console.error('[decrypt-skip-key] Failed to decrypt skip key:', error);

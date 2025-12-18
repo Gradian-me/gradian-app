@@ -3,7 +3,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { validateToken, extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
-import { AUTH_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 
 export async function POST(request: NextRequest) {

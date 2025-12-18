@@ -10,16 +10,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
 import { CardWrapper, CardHeader, CardTitle, CardContent } from '@/gradian-ui/data-display/card/components/CardWrapper';
 import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card';
 import { TodoResponseDialog } from './TodoResponseDialog';
@@ -849,22 +840,35 @@ export const TodoList: React.FC<TodoListProps> = ({
       />
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Todo</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete "{todoToDelete?.title}"? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setTodoToDelete(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} className="bg-red-600 hover:bg-red-700">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationMessage
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={(open) => {
+          setIsDeleteDialogOpen(open);
+          if (!open) {
+            setTodoToDelete(null);
+          }
+        }}
+        title="Delete Todo"
+        message={`Are you sure you want to delete "${todoToDelete?.title}"? This action cannot be undone.`}
+        variant="destructive"
+        size="md"
+        buttons={[
+          {
+            label: 'Cancel',
+            variant: 'outline',
+            action: () => {
+              setIsDeleteDialogOpen(false);
+              setTodoToDelete(null);
+            },
+          },
+          {
+            label: 'Delete',
+            variant: 'destructive',
+            icon: 'Trash2',
+            action: handleConfirmDelete,
+          },
+        ]}
+      />
     </>
   );
 };

@@ -18,6 +18,7 @@ const updateLastChecked = async (serviceId: string): Promise<void> => {
         field: 'lastChecked',
         timestamp,
       },
+      callerName: 'useHealth.updateLastChecked',
     });
   } catch (error) {
     // Silently fail - don't interrupt health check flow
@@ -38,6 +39,7 @@ export const updateLastEmailSent = async (serviceId: string): Promise<void> => {
         field: 'lastEmailSent',
         timestamp,
       },
+      callerName: 'useHealth.updateLastEmailSent',
     });
   } catch (error) {
     // Silently fail - don't interrupt email sending flow
@@ -319,22 +321,14 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
   const [testUnhealthyServices, setTestUnhealthyServices] = useState<Set<string>>(new Set());
   const [isDemoMode, setIsDemoMode] = useState(false);
 
-  // Fetch demo mode from API
+  // Get demo mode from environment config
   useEffect(() => {
-    const fetchDemoMode = async () => {
-      try {
-        const response = await fetch('/api/application-variables');
-        const result = await response.json();
-        
-        if (result.success && result.data?.DEMO_MODE !== undefined) {
-          setIsDemoMode(result.data.DEMO_MODE);
-        }
-      } catch (error) {
-        console.error('Error fetching demo mode:', error);
-      }
-    };
-
-    fetchDemoMode();
+    // Import DEMO_MODE directly from config (client-safe)
+    import('@/gradian-ui/shared/configs/env-config').then(({ DEMO_MODE }) => {
+      setIsDemoMode(DEMO_MODE);
+    }).catch((error) => {
+      console.error('Error loading demo mode:', error);
+    });
   }, []);
 
   // Fetch services from API

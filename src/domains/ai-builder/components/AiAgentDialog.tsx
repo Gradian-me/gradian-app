@@ -14,7 +14,7 @@ import type { AiAgent } from '../types';
 import { replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export interface AiAgentDialogProps {
   isOpen: boolean;

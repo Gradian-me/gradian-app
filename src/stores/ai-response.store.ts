@@ -9,7 +9,7 @@ import {
 } from '@/gradian-ui/shared/utils/session-storage-encrypted';
 import { getZustandDevToolsConfig } from '@/gradian-ui/shared/utils/zustand-devtools.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 const STORAGE_KEY = 'ai-response-store';
 const MAX_RESPONSES_PER_AGENT = 5; // Keep only the last 5 responses per agent/format

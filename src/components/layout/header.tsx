@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { CompanySelector } from './CompanySelector';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { UserProfileSelector } from './UserProfileSelector';
+import { ENABLE_NOTIFICATION } from '@/gradian-ui/shared/configs/env-config';
 import { TestDropdown } from './TestDropdown';
 import { useTheme } from 'next-themes';
 
@@ -47,7 +48,7 @@ export function Header({
           <CompanySelector />
 
           {/* Notifications Component */}
-          <NotificationsDropdown initialCount={3} />
+          {ENABLE_NOTIFICATION && <NotificationsDropdown initialCount={3} />}
 
           {/* User Profile Component */}
           <UserProfileSelector theme={profileTheme} />

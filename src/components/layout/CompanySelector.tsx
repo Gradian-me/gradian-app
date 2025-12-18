@@ -12,7 +12,7 @@ import { useCompanyStore } from '@/stores/company.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useTheme } from 'next-themes';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface Company {
   id: string | number;
@@ -27,6 +27,7 @@ interface CompanySelectorProps {
   variant?: 'light' | 'dark' | 'auto';
   fullWidth?: boolean;
   showLogo?: 'none' | 'sidebar-avatar' | 'full';
+  onOpenChange?: (open: boolean) => void; // Notify parent when dropdown menu opens/closes
 }
 
 export function CompanySelector({
@@ -35,6 +36,7 @@ export function CompanySelector({
   variant = 'auto',
   fullWidth = false,
   showLogo = 'full',
+  onOpenChange,
 }: CompanySelectorProps) {
   const { selectedCompany, setSelectedCompany } = useCompanyStore();
   const { selectedTenant } = useTenantStore();
@@ -239,10 +241,7 @@ export function CompanySelector({
   );
   const menuItemBaseClasses = "relative flex cursor-pointer select-none items-center rounded-lg px-2 py-1.5 text-sm outline-none transition-colors";
 
-  // Hide component if there's only one company (it's automatically selected)
-  if (isMounted && !loading && companies.length === 1) {
-    return null;
-  }
+  // Note: CompanySelector is always shown, even with a single company, to provide visual feedback
 
   if (!isMounted || loading) {
     return (
@@ -327,7 +326,13 @@ export function CompanySelector({
           />
         </div>
       )}
-      <DropdownMenuPrimitive.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+      <DropdownMenuPrimitive.Root
+        open={isMenuOpen}
+        onOpenChange={(open) => {
+          setIsMenuOpen(open);
+          onOpenChange?.(open);
+        }}
+      >
           <DropdownMenuPrimitive.Trigger asChild className={fullWidth ? "w-full" : "min-w-44"}>
             <Button 
               variant="outline" 

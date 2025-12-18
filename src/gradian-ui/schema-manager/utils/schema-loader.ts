@@ -7,9 +7,9 @@ import 'server-only';
 import { FormSchema, FormField } from '../types/form-schema';
 import { config } from '@/lib/config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { loadData, loadDataById, clearCache as clearDataCache } from '@/gradian-ui/shared/utils/data-loader';
-import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
+import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import fs from 'fs';
 import path from 'path';
 
@@ -212,14 +212,7 @@ export async function loadAllSchemas(): Promise<FormSchema[]> {
     apiPath.startsWith('https://localhost');
   
   // Check demo mode - only read from file if demo mode is enabled
-  let isDemoMode = true; // Default to true for safety
-  try {
-    // Use loadApplicationVariables directly (same as isDemoModeEnabled but without API dependency)
-    const vars = loadApplicationVariables();
-    isDemoMode = vars.DEMO_MODE;
-  } catch {
-    // If loader fails, assume demo mode is true (safe default)
-  }
+  const isDemoMode = DEMO_MODE;
   
   const shouldReadFromFile = isServerRuntime && isLocalApiPath && isDemoMode;
 
@@ -326,15 +319,7 @@ export async function loadSchemaById(schemaId: string): Promise<FormSchema | nul
   
   // Check demo mode - if false, always use API (which will proxy to external backend)
   // If true, try filesystem first for performance, then fall back to API
-  let shouldTryFilesystem = false;
-  try {
-    // Use loadApplicationVariables directly (same as isDemoModeEnabled but without API dependency)
-    const vars = loadApplicationVariables();
-    shouldTryFilesystem = vars.DEMO_MODE;
-  } catch {
-    // If loader fails, assume demo mode is true (safe default for filesystem reads)
-    shouldTryFilesystem = true;
-  }
+  const shouldTryFilesystem = DEMO_MODE;
   
   // Try filesystem first only if demo mode is enabled
   if (shouldTryFilesystem) {

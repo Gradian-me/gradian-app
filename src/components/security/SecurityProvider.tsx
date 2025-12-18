@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { initializeSecurity } from '@/gradian-ui/shared/utils/security.util';
 import { initializeSkipKeyStorage } from '@/gradian-ui/shared/utils/skip-key-storage';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 /**
  * SecurityProvider - Initializes security measures on client-side

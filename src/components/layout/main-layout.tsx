@@ -20,11 +20,12 @@ import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { CompanySelector } from './CompanySelector';
 import { TenantSelector } from './TenantSelector';
+import { OrganizationSettings } from './OrganizationSettings';
 import { useCompanyStore } from '@/stores/company.store';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { UserProfileSelector } from './UserProfileSelector';
 import { DemoModeBadge } from './DemoModeBadge';
-import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
+import { DEMO_MODE, ENABLE_NOTIFICATION } from '@/gradian-ui/shared/configs/env-config';
 import type { HeaderConfig } from '@/gradian-ui/layout/header';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useTheme } from 'next-themes';
@@ -127,6 +128,7 @@ function MainLayoutContent({
   const { closeAllDialogs, hasOpenDialogs, registerDialog, unregisterDialog } = useDialogContext();
   const { isMaximized, setTitle, setIcon } = useLayoutContext();
   const pageTitle = title ? `${title} | Gradian` : 'Gradian';
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   // Update layout context with title and icon
   useEffect(() => {
@@ -441,31 +443,8 @@ function MainLayoutContent({
               <p>{DEMO_MODE ? 'Demo Mode' : 'Live Mode'}</p>
             </TooltipContent>
           </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <CompanySelector />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Select Company</p>
-            </TooltipContent>
-          </Tooltip>
-          {/* Always render TenantSelector: visible in DEMO_MODE, hidden in production but still functional */}
-          {DEMO_MODE ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div>
-                  <TenantSelector />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Select Tenant</p>
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <TenantSelector hidden={true} />
-          )}
+          {/* Organization settings button that wraps tenant & company selection */}
+          <OrganizationSettings />
           <Tooltip>
             <TooltipTrigger asChild>
               <div>
@@ -476,20 +455,25 @@ function MainLayoutContent({
               <p>Toggle theme</p>
             </TooltipContent>
           </Tooltip>
-          <Tooltip>
+          {ENABLE_NOTIFICATION && (
+            <Tooltip key="notifications-tooltip">
+              <TooltipTrigger asChild>
+                <div suppressHydrationWarning data-component="notifications-dropdown">
+                  <NotificationsDropdown initialCount={5} />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Notifications</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+          <Tooltip key="user-profile-tooltip" open={isUserMenuOpen ? false : undefined}>
             <TooltipTrigger asChild>
-              <div>
-                <NotificationsDropdown initialCount={5} />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Notifications</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <UserProfileSelector theme={profileTheme} />
+              <div suppressHydrationWarning data-component="user-profile-selector">
+                <UserProfileSelector
+                  theme={profileTheme}
+                  onMenuOpenChange={setIsUserMenuOpen}
+                />
               </div>
             </TooltipTrigger>
             <TooltipContent>

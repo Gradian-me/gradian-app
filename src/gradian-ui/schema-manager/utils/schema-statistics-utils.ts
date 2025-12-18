@@ -22,7 +22,6 @@ export function calculateSchemaRecords(schemaId: string): number {
   try {
     const data = readSchemaData(schemaId);
     const count = Array.isArray(data) ? data.length : 0;
-    console.log(`[schema-statistics] Schema "${schemaId}" - Data type: ${Array.isArray(data) ? 'array' : typeof data}, Count: ${count}`);
     return count;
   } catch (error) {
     console.error(`[schema-statistics] Failed to calculate records for schema "${schemaId}":`, error);
@@ -55,7 +54,6 @@ export function calculateSchemaSize(schemaId: string): number {
     // Round to 2 decimal places
     const roundedSize = Math.round(sizeInMB * 100) / 100;
     if (roundedSize > 0) {
-      console.log(`[schema-statistics] Schema "${schemaId}" size: ${roundedSize} MB`);
     }
     return roundedSize;
   } catch (error) {
@@ -119,9 +117,6 @@ export function calculateMaxUpdatedAt(schemaId: string): string | null {
       }
     }
 
-    if (maxDateString) {
-      console.log(`[schema-statistics] Schema "${schemaId}" maxUpdatedAt: ${maxDateString}`);
-    }
     return maxDateString;
   } catch (error) {
     console.error(`[schema-statistics] Failed to calculate maxUpdatedAt for schema "${schemaId}":`, error);
@@ -139,11 +134,9 @@ export function calculateSchemaStatistics(schemaId: string): {
   size: number; // in megabytes
   maxUpdatedAt: string | null; // ISO date string or null
 } {
-  console.log(`[schema-statistics] Calculating statistics for schema: "${schemaId}"`);
   const records = calculateSchemaRecords(schemaId);
   const size = calculateSchemaSize(schemaId);
   const maxUpdatedAt = calculateMaxUpdatedAt(schemaId);
-  console.log(`[schema-statistics] Schema "${schemaId}" - Records: ${records}, Size: ${size} MB, MaxUpdatedAt: ${maxUpdatedAt || 'N/A'}`);
   return {
     records,
     size,

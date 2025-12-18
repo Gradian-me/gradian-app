@@ -6,6 +6,9 @@ import { SchemaBuilderEditor } from '@/gradian-ui/schema-manager';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { Message } from '@/gradian-ui/layout/message-box';
 import { config } from '@/lib/config';
+import { ENABLE_BUILDER } from '@/gradian-ui/shared/configs/env-config';
+import { AccessDenied } from '@/gradian-ui/schema-manager/components/AccessDenied';
+import { MainLayout } from '@/components/layout/main-layout';
 
 /**
  * Transform API response messages to MessageBox format
@@ -46,12 +49,37 @@ export default function SchemaEditorPage({ params }: { params: Promise<{ 'schema
   const [loadError, setLoadError] = useState<string | null>(null);
   const [apiResponse, setApiResponse] = useState<any>(null);
   const [isReloading, setIsReloading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // All hooks must be called before any conditional returns
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     params.then((resolved) => {
       setSchemaId(resolved['schema-id']);
     });
   }, [params]);
+
+  // Conditional returns after all hooks
+  if (!mounted) {
+    return null;
+  }
+
+  if (!ENABLE_BUILDER) {
+    return (
+      <MainLayout title="Access Denied" subtitle="The builder is disabled in this environment." icon="OctagonMinus">
+        <AccessDenied
+          title="Access to Schema Builder is Disabled"
+          description="The schema builder is not available in this environment."
+          helperText="If you believe you should have access, please contact your system administrator."
+          homeHref="/apps"
+          showGoBackButton={false}
+        />
+      </MainLayout>
+    );
+  }
 
   const fetchSchema = async (id: string): Promise<FormSchema> => {
     const cacheBust = Date.now().toString();

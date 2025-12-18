@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { CopyContent } from './CopyContent';
 import { baseInputClasses, getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export const PhoneInput = forwardRef<FormElementRef, TextInputProps>(
   (

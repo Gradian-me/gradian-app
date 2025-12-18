@@ -9,7 +9,7 @@ import { SchemaFormWrapper } from './FormLifecycleManager';
 import { GoToTopForm } from '../form-elements/go-to-top-form';
 import { cn } from '@/gradian-ui/shared/utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { getActionConfig, getSingularName, isEditMode } from '../utils/action-config';
 import { toast } from 'sonner';

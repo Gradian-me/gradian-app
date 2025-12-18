@@ -1448,7 +1448,7 @@
         }
       ]
     },
-    "showInNavigation": false,
+    "showInNavigation": true,
     "icon": "User",
     "schemaType": "business",
     "relatedTenants": [
@@ -2944,7 +2944,9 @@
       }
     ],
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data",
+    "allowDataRelatedTenants": true
   },
   {
     "id": "servers",
@@ -5565,12 +5567,12 @@
     "detailPageMetadata": {
       "quickActions": [
         {
-          "id": "quality-assurance-analysis-ai",
-          "label": "Quality Assurance Analysis",
+          "id": "change-management-analyst-pharma-biotech",
+          "label": "Change Management Analyst",
           "icon": "Brain",
           "variant": "gradient",
           "action": "runAiAgent",
-          "agentId": "quality-assurance-analyst",
+          "agentId": "change-management-analyst-pharma-biotech",
           "selectedFields": [
             "change-title",
             "change-description",
@@ -5588,7 +5590,7 @@
             "qa-analysis",
             "change-conclusion"
           ],
-          "additionalSystemPrompt": "Analyze this change management record from a quality assurance perspective. Provide comprehensive analysis including risk assessment, compliance evaluation, and recommendations based on GMP, ISO 9001, and pharmaceutical quality standards.",
+          "additionalSystemPrompt": "Analyze this change management record from a change management analyst perspective. Provide comprehensive analysis including risk assessment, compliance evaluation, and recommendations based on GMP, WHO guidelines, ISO 9001, and pharmaceutical quality standards.",
           "displayType": "hideForm",
           "runType": "automatic"
         },

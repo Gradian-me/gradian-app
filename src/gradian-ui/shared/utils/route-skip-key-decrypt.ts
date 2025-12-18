@@ -22,12 +22,7 @@ export async function decryptSkipKeyValue(skipKeyValue: string | Record<string, 
     if (skipKeyValue.ciphertext && skipKeyValue.iv) {
       // It's an encrypted payload object, convert to JSON string and decrypt
       const jsonString = JSON.stringify(skipKeyValue);
-      console.log('[decryptSkipKeyValue] Converting object to JSON string for decryption');
       const decrypted = await decryptSkipKey(jsonString);
-      console.log('[decryptSkipKeyValue] Decryption result:', {
-        success: !!decrypted,
-        length: decrypted?.length || 0,
-      });
       return decrypted;
     }
     // Not an encrypted payload object

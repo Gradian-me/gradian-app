@@ -13,7 +13,7 @@ import { CopyContent } from './CopyContent';
 import { PopupPicker } from './PopupPicker';
 import { ClipboardCopy } from 'lucide-react';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export interface IconInputProps extends TextInputProps {}
 

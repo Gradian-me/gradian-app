@@ -3,8 +3,8 @@
 
 import 'server-only';
 import { loggingCustom } from './logging-custom';
-import { LogType } from '../constants/application-variables';
-import { loadApplicationVariables } from './application-variables-loader';
+import { LogType } from '../configs/log-config';
+import { DEMO_MODE } from '../configs/env-config';
 import { readSchemaData } from '../domain/utils/data-storage.util';
 import { getRelationsBySchemaAndId } from '../domain/utils/relations-storage.util';
 
@@ -103,19 +103,7 @@ function extractUrlAddress(targetRoute: any): string | null {
  * Check if server is in demo mode (uses local data store)
  */
 function isServerDemoMode(): boolean {
-  try {
-    const vars = loadApplicationVariables();
-    return Boolean(vars?.DEMO_MODE);
-  } catch (error) {
-    loggingCustom(
-      LogType.INTEGRATION_LOG,
-      'warn',
-      `Failed to read application variables for demo mode detection: ${
-        error instanceof Error ? error.message : String(error)
-      }`
-    );
-    return true; // Default to demo mode if we can't determine
-  }
+  return Boolean(DEMO_MODE);
 }
 
 /**

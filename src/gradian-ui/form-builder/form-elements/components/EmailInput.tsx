@@ -8,7 +8,7 @@ import { Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CopyContent } from './CopyContent';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export const EmailInput = forwardRef<FormElementRef, TextInputProps>(
   (

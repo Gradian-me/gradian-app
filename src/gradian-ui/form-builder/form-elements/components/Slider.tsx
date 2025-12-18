@@ -7,7 +7,7 @@ import { cn } from '../../../shared/utils';
 import { Slider as UISlider } from '@/components/ui/slider';
 import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export const Slider = forwardRef<FormElementRef, SliderProps>(
   (

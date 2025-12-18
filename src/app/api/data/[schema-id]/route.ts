@@ -11,7 +11,7 @@ import { loadAllCompanies, clearCompaniesCache } from '@/gradian-ui/shared/utils
 import { isDemoModeEnabled, proxyDataRequest, enrichWithUsers, enrichEntitiesWithUsers } from '../utils';
 import { syncHasFieldValueRelationsForEntity, minimizePickerFieldValues, enrichEntitiesPickerFieldsFromRelations, enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 /**
  * Create controller instance for the given schema
@@ -55,6 +55,87 @@ export async function GET(
   const targetPath = `/api/data/${schemaId}${request.nextUrl.search}`;
 
   if (!isDemoModeEnabled()) {
+    // Special handling for tenants: try backend first, fallback to local if backend fails
+    if (schemaId === 'tenants') {
+      // Try to proxy to backend first
+      const proxyResponse = await proxyDataRequest(request, targetPath);
+      
+      // If backend returns success (2xx), return it immediately
+      if (proxyResponse.status >= 200 && proxyResponse.status < 300) {
+        return proxyResponse;
+      }
+      
+      // If backend returns 404 or 5xx error, try to fallback to local tenant file
+      if (proxyResponse.status === 404 || (proxyResponse.status >= 500 && proxyResponse.status < 600)) {
+        try {
+          // Clone the response to read it without consuming the original
+          const clonedResponse = proxyResponse.clone();
+          let proxyData: any = null;
+          try {
+            proxyData = await clonedResponse.json();
+          } catch {
+            // If response is not JSON, treat as error
+          }
+          
+          // If backend explicitly says tenants not found or returns 404, try local fallback
+          if (proxyResponse.status === 404 || (proxyData && proxyData.success === false)) {
+            loggingCustom(
+              LogType.INFRA_LOG,
+              'warn',
+              `[Tenant API] Backend returned ${proxyResponse.status} for tenants, attempting local fallback`
+            );
+            
+            // Fallback to local tenant file
+            try {
+              const { readSchemaData } = await import('@/gradian-ui/shared/domain/utils/data-storage.util');
+              const tenants = readSchemaData<any>('tenants');
+              
+              if (tenants && tenants.length > 0) {
+                loggingCustom(
+                  LogType.INFRA_LOG,
+                  'info',
+                  `[Tenant API] Found ${tenants.length} tenant(s) in local fallback`
+                );
+                return NextResponse.json({
+                  success: true,
+                  data: tenants
+                }, {
+                  headers: {
+                    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0',
+                  },
+                });
+              } else {
+                loggingCustom(
+                  LogType.INFRA_LOG,
+                  'warn',
+                  `[Tenant API] No tenants found in local fallback either`
+                );
+              }
+            } catch (loadError) {
+              loggingCustom(
+                LogType.INFRA_LOG,
+                'error',
+                `[Tenant API] Failed to load local tenants for fallback: ${loadError instanceof Error ? loadError.message : String(loadError)}`
+              );
+            }
+          }
+        } catch (fallbackError) {
+          // If fallback fails, log and return original proxy response
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'warn',
+            `[Tenant API] Fallback failed: ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`
+          );
+        }
+      }
+      
+      // Return proxy response (either success or error)
+      return proxyResponse;
+    }
+    
+    // For non-tenant schemas, proxy directly without fallback
     return proxyDataRequest(request, targetPath);
   }
 
@@ -70,6 +151,14 @@ export async function GET(
       );
     }
 
+    // Get hostname to check if we're on localhost
+    const hostHeader = request.headers.get('host');
+    const xForwardedHost = request.headers.get('x-forwarded-host');
+    const nextUrlHostname = request.nextUrl?.hostname;
+    const rawHost = xForwardedHost || hostHeader || nextUrlHostname || '';
+    const normalizedHost = rawHost.trim().toLowerCase().split(':')[0];
+    const isLocalhost = normalizedHost === 'localhost' || normalizedHost === '127.0.0.1' || normalizedHost.startsWith('localhost:');
+
     // Get schema to check if it's company-based and tenant visibility
     const schema = await getSchemaById(schemaId);
     const tenantIdsParam = request.nextUrl.searchParams.get('tenantIds');
@@ -78,6 +167,25 @@ export async function GET(
       .map((id) => id.trim())
       .filter((id) => id.length > 0);
     const hasTenantFilter = Array.isArray(tenantIds) && tenantIds.length > 0;
+
+    // Require tenantIds always when host is not localhost (for all data endpoints)
+    if (!isLocalhost) {
+      if (!tenantIdsParam || tenantIdsParam.trim().length === 0) {
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `[API] /api/data/${schemaId} called without tenantIds on non-localhost host: ${normalizedHost}`,
+        );
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'tenantIds parameter is required on non-localhost hosts',
+            message: 'The tenantIds query parameter must be provided to filter data by tenant.',
+          },
+          { status: 400 }
+        );
+      }
+    }
     const matchesTenantFilter = () => {
       if (!hasTenantFilter) return true;
       if (schema?.applyToAllTenants) return true;

@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn, resolveLocalizedField } from '@/gradian-ui/shared/utils';
+import { Badge as FormBadge } from '@/gradian-ui/form-builder/form-elements/components/Badge';
 import { useUserStore } from '@/stores/user.store';
 import { useLanguageStore } from '@/stores/language.store';
 import { useTheme } from 'next-themes';
@@ -16,13 +17,14 @@ import { UserProfile } from '@/gradian-ui/shared/types';
 import { ensureFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
 import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface UserProfileSelectorProps {
   config?: Partial<ProfileSelectorConfig>;
   onProfileSelect?: (profile: UserProfile) => void;
   className?: string;
   theme?: 'light' | 'dark';
+  onMenuOpenChange?: (open: boolean) => void; // Notify parent when profile menu opens/closes
 }
 
 export function UserProfileSelector({
@@ -30,42 +32,47 @@ export function UserProfileSelector({
   onProfileSelect,
   className,
   theme,
+  onMenuOpenChange,
 }: UserProfileSelectorProps) {
-  const user = useUserStore((state) => state.user);
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const language = useLanguageStore((state) => state.language || 'en');
   const { resolvedTheme } = useTheme();
+  
+  // Access user store normally - but ensure we always render placeholder until mounted
+  // This prevents hydration mismatch because server and client both render placeholder initially
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const computedVariant =
-    theme ??
-    (isMounted && resolvedTheme === 'dark'
-      ? 'dark'
-      : 'light');
+  // Use theme prop if provided, otherwise default to light to avoid hydration mismatch
+  // Only use resolvedTheme after mount to ensure server/client consistency
+  const computedVariant = theme ?? (isMounted && resolvedTheme === 'dark' ? 'dark' : 'light');
   const isDarkVariant = computedVariant === 'dark';
   const fullWidth = config?.layout?.fullWidth ?? false;
 
+  // Only compute user-dependent values after mount to avoid hydration mismatch
+  // Before mount, these will return empty/default values
   const firstName = useMemo(
-    () => (user ? resolveLocalizedField(user.name, language, 'en') : ''),
-    [user, language]
+    () => (isMounted && user ? resolveLocalizedField(user.name, language, 'en') : ''),
+    [isMounted, user, language]
   );
   const lastName = useMemo(
-    () => (user ? resolveLocalizedField(user.lastname, language, 'en') : ''),
-    [user, language]
+    () => (isMounted && user ? resolveLocalizedField(user.lastname, language, 'en') : ''),
+    [isMounted, user, language]
   );
   const displayName = useMemo(() => {
-    if (!user) return '';
+    if (!isMounted || !user) return '';
     const combined = `${firstName} ${lastName}`.trim();
     return combined || firstName || lastName || user.email || 'User';
-  }, [user, firstName, lastName]);
+  }, [isMounted, user, firstName, lastName]);
 
   const initials = useMemo(() => {
+    if (!isMounted) return '--';
     const source = displayName || user?.email || 'User';
     return source
       .split(' ')
@@ -73,7 +80,9 @@ export function UserProfileSelector({
       .join('')
       .substring(0, 2)
       .toUpperCase();
-  }, [displayName, user]);
+  }, [isMounted, displayName, user]);
+
+  const isAdmin = isMounted && user?.role === 'admin';
 
   const triggerClasses = cn(
     'flex h-10 items-center space-x-2 rounded-xl border transition-colors outline-none ring-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0',
@@ -199,23 +208,82 @@ export function UserProfileSelector({
     },
   ];
 
-  return (
-    <DropdownMenuPrimitive.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-      <DropdownMenuPrimitive.Trigger asChild className={fullWidth ? 'w-full' : undefined}>
+  // Don't render user profile until mounted to avoid hydration mismatch
+  // On server and initial client render, always render a placeholder
+  // This ensures server and client render the same initial content
+  if (!isMounted) {
+    return (
+      <div suppressHydrationWarning>
         <Button
           variant="outline"
           size="sm"
-          className={triggerClasses}
-          ref={triggerRef}
-          aria-label="Open user menu"
+          className="flex h-10 items-center space-x-2 rounded-xl border border-violet-200 bg-white text-violet-700 transition-colors outline-none ring-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-violet-50 hover:border-violet-300"
+          type="button"
+          aria-label="User profile"
+          disabled
+          suppressHydrationWarning
         >
+          <Avatar className="h-8 w-8 border border-gray-100 rounded-full bg-violet-100 text-violet-800 shrink-0">
+            <AvatarFallback className="bg-violet-100 text-violet-800 text-xs">
+              --
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col text-left leading-tight max-w-[140px] overflow-hidden">
+            <span className="text-sm font-semibold truncate" suppressHydrationWarning>
+              Loading...
+            </span>
+          </div>
+        </Button>
+      </div>
+    );
+  }
+
+  // After mount, check for user and render accordingly
+  // If no user, show login button with static classes to avoid hydration mismatch
+  if (!user) {
+    return (
+      <div suppressHydrationWarning>
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex h-10 items-center space-x-2 rounded-xl border border-violet-200 bg-white text-violet-700 transition-colors outline-none ring-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-violet-50 hover:border-violet-300"
+          type="button"
+          onClick={() => router.push('/authentication/login')}
+          aria-label="Login"
+          suppressHydrationWarning
+        >
+          Login
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div suppressHydrationWarning>
+      <DropdownMenuPrimitive.Root
+        open={isMenuOpen}
+        onOpenChange={(open) => {
+          setIsMenuOpen(open);
+          onMenuOpenChange?.(open);
+        }}
+      >
+        <DropdownMenuPrimitive.Trigger asChild className={fullWidth ? 'w-full' : undefined}>
+          <Button
+            variant="outline"
+            size="sm"
+            className={triggerClasses}
+            ref={triggerRef}
+            aria-label="Open user menu"
+            type="button"
+            suppressHydrationWarning
+          >
           <Avatar
             className={cn(
               'h-8 w-8 border rounded-full bg-violet-100 text-violet-800 shrink-0',
               isDarkVariant ? 'border-gray-700' : 'border-gray-100'
             )}
           >
-            {user.avatar ? (
+            {user?.avatar ? (
               <AvatarImage
                 src={user.avatar}
                 alt={displayName}
@@ -234,8 +302,8 @@ export function UserProfileSelector({
             <span className="text-sm font-semibold truncate" title={displayName}>
               {displayName}
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 truncate" title={user.email}>
-              {user.email}
+            <span className="text-xs text-gray-500 dark:text-gray-400 truncate" title={user?.email || ''}>
+              {user?.email || ''}
             </span>
           </div>
           <ChevronDown
@@ -263,9 +331,22 @@ export function UserProfileSelector({
                 }}
               >
                 <div className="px-3 py-2">
-                  <p className="text-sm font-semibold truncate" title={displayName}>
-                    {displayName}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold truncate" title={displayName}>
+                      {displayName}
+                    </p>
+                    {isAdmin && (
+                      <FormBadge
+                        variant="outline"
+                        size="sm"
+                        color="violet"
+                        tooltip="Administrator access"
+                        className="shrink-0"
+                      >
+                        Admin
+                      </FormBadge>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate" title={user.email}>
                     {user.email}
                   </p>
@@ -314,6 +395,7 @@ export function UserProfileSelector({
         </AnimatePresence>
       </DropdownMenuPrimitive.Portal>
     </DropdownMenuPrimitive.Root>
+    </div>
   );
 }
 

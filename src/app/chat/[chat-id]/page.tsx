@@ -15,7 +15,7 @@ export default function ChatDetailPage() {
       showEndLine={false}
       hidePadding={true}
     >
-      <div className="h-[calc(100vh-10rem)]">
+      <div className="h-full">
         <ChatInterface showChatList={true} />
       </div>
     </MainLayout>

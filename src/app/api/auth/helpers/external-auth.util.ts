@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { LOGIN_LOCALLY, DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 
 export function isServerDemoMode(): boolean {
   try {
-    const vars = loadApplicationVariables();
     // For auth flows, prefer LOGIN_LOCALLY flag; fall back to DEMO_MODE for backward compatibility
-    return Boolean(
-      (vars as any)?.LOGIN_LOCALLY ?? (vars as any)?.DEMO_MODE
-    );
+    return Boolean(LOGIN_LOCALLY ?? DEMO_MODE);
   } catch (error) {
     loggingCustom(
       LogType.LOGIN_LOG,

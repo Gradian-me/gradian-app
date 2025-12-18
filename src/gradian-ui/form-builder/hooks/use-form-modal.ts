@@ -16,7 +16,7 @@ import { filterFormDataForSubmission } from '../utils/form-data-filter';
 import { syncParentRelation } from '@/gradian-ui/shared/utils/parent-relation.util';
 import { replaceDynamicContext } from '../utils/dynamic-context-replacer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 /**
  * Reconstruct RegExp objects from serialized schema
@@ -441,6 +441,7 @@ export function useFormModal(
           const apiEndpoint = `/api/data/${schemaId}/${editEntityId}`;
           const entityResult = await apiRequest(apiEndpoint, {
             method: 'GET',
+            callerName: 'useFormModal.loadEntity',
           });
 
           if (!entityResult.success || !entityResult.data) {

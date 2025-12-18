@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link as LinkIcon } from 'lucide-react';
+import { Link as LinkIcon, Check, X } from 'lucide-react';
 import { formatCurrency, formatDate, formatNumber } from '@/gradian-ui/shared/utils';
 import { BadgeViewer } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
 import type { BadgeItem } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
@@ -292,6 +292,24 @@ export const formatFieldValue = (
 
   const displayType = field?.component || 'text';
   const componentType = (field?.component || '').toString().toLowerCase();
+
+  // Handle checkbox and switch fields - show as checked/unchecked icon
+  if (displayType === 'checkbox' || displayType === 'switch' || componentType === 'checkbox' || componentType === 'switch') {
+    const isChecked = value === true || value === 'true' || value === 1 || value === '1' || value === 'checked' || value === 'on';
+    
+    return wrapWithForceIcon(
+      <div className="inline-flex items-center">
+        {isChecked ? (
+          <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+        ) : (
+          <X className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+        )}
+      </div>,
+      isForce,
+      field,
+      row
+    );
+  }
 
   // Handle password fields - show masked value
   if (displayType === 'password' || componentType === 'password') {

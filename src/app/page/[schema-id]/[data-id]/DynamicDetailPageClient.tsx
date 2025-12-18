@@ -301,13 +301,6 @@ export function DynamicDetailPageClient({
                             resolvedData[resolvedKey] = resolvedEntityWithId;
                           }
                           
-                          console.log(`[DetailPage] Resolved picker field ${field.name}:`, {
-                            fieldName: field.name,
-                            value,
-                            resolvedKey,
-                            resolvedLabel,
-                            resolvedEntityId: resolvedEntity.id,
-                          });
                         }
                       } catch (error) {
                         console.error(`Error resolving picker field ${field.name}:`, error);

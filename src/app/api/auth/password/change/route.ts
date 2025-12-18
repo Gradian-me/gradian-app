@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { hashPassword, verifyPassword, detectHashType } from '@/domains/auth/utils/password.util';
 import { readSchemaData, writeSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 type ChangePasswordRequestBody = {
   clientId?: string;

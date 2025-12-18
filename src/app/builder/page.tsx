@@ -28,6 +28,8 @@ import {
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
+import { ENABLE_BUILDER } from '@/gradian-ui/shared/configs/env-config';
+import { AccessDenied } from '@/gradian-ui/schema-manager/components/AccessDenied';
 
 // Icon mapping
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
@@ -123,9 +125,14 @@ interface BuilderOption {
 
 export default function BuilderPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [isClearingCache, setIsClearingCache] = useState(false);
   const [builderOptions, setBuilderOptions] = useState<BuilderOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchBuilders = async () => {

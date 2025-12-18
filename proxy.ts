@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { encryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util';
 import { extractTokenFromCookiesEdge } from '@/gradian-ui/shared/utils/edge-token-validation.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { decryptSkipKey } from '@/gradian-ui/shared/utils/decrypt-skip-key';
+import { LOGIN_LOCALLY } from '@/gradian-ui/shared/configs/env-config';
 import {
   EXCLUDED_LOGIN_ROUTES,
-  LOGIN_LOCALLY,
   AUTH_CONFIG,
   FORBIDDEN_ROUTES_PRODUCTION,
-} from '@/gradian-ui/shared/constants/application-variables';
+} from '@/gradian-ui/shared/configs/auth-config';
 
 /**
  * Edge-compatible: Build authentication service URL

@@ -33,14 +33,6 @@ export function MarkdownNavigation({
       const absoluteTop = rect.top + window.scrollY;
       const offsetPosition = absoluteTop - headerOffset;
 
-      console.log(`Scrolling to heading #${id}`, { 
-        rectTop: rect.top,
-        absoluteTop,
-        offsetPosition, 
-        headerOffset,
-        scrollY: window.scrollY 
-      });
-
       // Scroll to the element
       window.scrollTo({
         top: Math.max(0, offsetPosition),

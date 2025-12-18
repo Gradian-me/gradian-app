@@ -8,7 +8,9 @@ import { normalizeUsernameToEmail } from '@/domains/auth/utils/username-email.ut
 import { useUserStore } from '@/stores/user.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useMenuItemsStore } from '@/stores/menu-items.store';
-import { DEMO_MODE, AUTH_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
+import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { TenantSelector } from '@/components/layout/TenantSelector';
 import { Logo } from '@/gradian-ui/layout/logo/components/Logo';
 import { toast } from 'sonner';

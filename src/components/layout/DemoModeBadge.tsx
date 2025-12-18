@@ -1,6 +1,6 @@
 'use client';
 
-import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
+import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { Badge } from '@/components/ui/badge';
 
 export function DemoModeBadge() {

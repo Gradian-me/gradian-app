@@ -12,7 +12,7 @@ import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-
 import { getIconComponent } from '@/gradian-ui/shared/utils/icon-renderer';
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export interface MultiSelectFormOption {
   id?: string;

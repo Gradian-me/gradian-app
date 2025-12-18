@@ -1,10 +1,10 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { ShieldX, ArrowLeft, Home, RefreshCw, Loader2, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { motion } from 'framer-motion';
+import { ArrowLeft, LayoutDashboard, Loader2, OctagonMinus, RefreshCw } from 'lucide-react';
+import Link from 'next/link';
 
 import { AccessCheckResult } from '@/gradian-ui/shared/utils/access-control';
 
@@ -65,7 +65,7 @@ export function AccessDenied({
             >
               <div className="absolute inset-0 bg-red-100 rounded-full blur-md opacity-50" />
               <div className="relative bg-gradient-to-br from-red-50 to-red-50 p-8 rounded-full w-32 h-32 flex items-center justify-center">
-                <ShieldX className="h-16 w-16 text-red-600" strokeWidth={1.5} />
+                <OctagonMinus className="h-16 w-16 text-red-600" strokeWidth={1.5} />
               </div>
             </motion.div>
 

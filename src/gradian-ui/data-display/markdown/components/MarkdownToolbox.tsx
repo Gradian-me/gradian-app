@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/lib/utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export interface MarkdownToolboxProps {
   viewMode: 'editor' | 'preview' | 'raw';

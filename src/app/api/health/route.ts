@@ -3,7 +3,7 @@ import { config } from '@/lib/config';
 import fs from 'fs';
 import path from 'path';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 /**
  * Read and parse environment variables from .env file
@@ -66,7 +66,7 @@ function getEnvVarsFromFile(): Record<string, string> {
   const nodeEnv = process.env.NODE_ENV || '';
   const isProd = nodeEnv.toLowerCase() === 'prod' || nodeEnv.toLowerCase() === 'production';
   
-  const envFileName = isProd ? '.env.prod' : '.env';
+  const envFileName = isProd ? '.env.production' : '.env';
   const envFilePath = path.join(process.cwd(), envFileName);
   
   return readEnvFile(envFilePath);
@@ -188,7 +188,7 @@ export async function GET() {
       const envCheckStartTime = Date.now();
       const nodeEnv = process.env.NODE_ENV || '';
       const isProd = nodeEnv.toLowerCase() === 'prod' || nodeEnv.toLowerCase() === 'production';
-      const envFileName = isProd ? '.env.prod' : '.env';
+      const envFileName = isProd ? '.env.production' : '.env';
       const envFilePath = path.join(process.cwd(), envFileName);
       
       // Get environment variables from the appropriate .env file

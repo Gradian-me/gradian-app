@@ -5,7 +5,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { NavigationItem } from '../types';
-import { AD_MODE } from '@/gradian-ui/shared/constants/application-variables';
+import { AD_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { getIconComponent, isValidLucideIcon } from '@/gradian-ui/shared/utils/icon-renderer';
 
 /**
@@ -47,16 +47,6 @@ export function mapMenuItemsToNavigationItems(
         return String(c.id) === normalizedCompanyId;
       });
       
-      // Debug logging for Integrations menu item
-      if (item.menuTitle === 'Integrations' || item.menuUrl === '/integrations') {
-        console.log('[Menu Filter] Integrations item:', {
-          menuTitle: item.menuTitle,
-          companyId,
-          normalizedCompanyId,
-          companies: companies.map((c: any) => ({ id: c?.id, label: c?.label })),
-          matches,
-        });
-      }
       
       return matches;
     })
@@ -80,18 +70,6 @@ export function mapMenuItemsToNavigationItems(
         icon: Icon as LucideIcon,
       };
     });
-
-  // Debug logging
-  console.log('[Menu Filter] Results:', {
-    totalItems: menuItems.length,
-    filteredCount: filtered.length,
-    companyId,
-    items: filtered.map((item: any) => ({
-      title: item.menuTitle,
-      url: item.menuUrl,
-      companies: item.companies?.map((c: any) => c?.id) || [],
-    })),
-  });
 
   return filtered;
 }

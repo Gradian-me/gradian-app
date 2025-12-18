@@ -6,7 +6,7 @@ import 'server-only';
 
 import { cookies, headers as nextHeaders } from 'next/headers';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
 
 // Cache storage structure

@@ -50,7 +50,6 @@ export async function applySchemaDefaults(
         processedData[fieldName] === '')
     ) {
       processedData[fieldName] = defaultValue;
-      console.log(`[DEFAULTS] Applied default value "${defaultValue}" to field "${fieldName}"`);
     }
   });
 

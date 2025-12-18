@@ -22,7 +22,7 @@ import { Save, ArrowLeft, RotateCcw, RefreshCw, Trash2 } from 'lucide-react';
 import { AiAgentNotFound } from '../AiAgentNotFound';
 import { useRouter } from 'next/navigation';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface AiAgentTabbedEditorProps {
   agentId: string;

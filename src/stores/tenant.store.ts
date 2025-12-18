@@ -11,6 +11,9 @@ interface Tenant {
 }
 
 interface TenantState {
+  tenants: Tenant[];
+  setTenants: (tenants: Tenant[]) => void;
+  clearTenants: () => void;
   selectedTenant: Tenant | null;
   setSelectedTenant: (tenant: Tenant | null) => void;
   clearSelectedTenant: () => void;
@@ -21,6 +24,19 @@ export const useTenantStore = create<TenantState>()(
   devtools(
     persist(
       (set, get) => ({
+        tenants: [],
+
+        setTenants: (tenants: Tenant[]) => {
+          const sanitizedTenants = Array.isArray(tenants)
+            ? (sanitizeNestedData(tenants) as Tenant[])
+            : [];
+          set({ tenants: sanitizedTenants }, false, 'setTenants');
+        },
+
+        clearTenants: () => {
+          set({ tenants: [] }, false, 'clearTenants');
+        },
+
         selectedTenant: null,
 
         setSelectedTenant: (tenant: Tenant | null) => {

@@ -98,4 +98,19 @@ export const DELIVERY_TERMS = [
   { value: 'EXW', label: 'EXW (Ex Works)' },
 ] as const;
 
-export * from './application-variables';
+// Re-export from config files
+export { AUTH_CONFIG, EXCLUDED_LOGIN_ROUTES, FORBIDDEN_ROUTES_PRODUCTION } from '../configs/auth-config';
+export { UI_PARAMS, URL_HOME } from '../configs/ui-config';
+export { LOG_CONFIG, LogType } from '../configs/log-config';
+export { SCHEMA_SUMMARY_EXCLUDED_KEYS } from '../configs/general-config';
+export { 
+  DEMO_MODE, 
+  DEMO_MODE_PARAMS, 
+  LOGIN_LOCALLY, 
+  LOGIN_LOCALLY_PARAMS, 
+  AD_MODE, 
+  AD_MODE_PARAMS, 
+  REQUIRE_LOGIN,
+  IS_DEV,
+  IS_PRODUCTION
+} from '../configs/env-config';

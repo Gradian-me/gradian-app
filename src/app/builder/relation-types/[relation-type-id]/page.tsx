@@ -7,6 +7,8 @@ import { ArrowLeft } from 'lucide-react';
 import { DynamicDetailPageClient } from '@/app/page/[schema-id]/[data-id]/DynamicDetailPageClient';
 import { useEffect, useState } from 'react';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { ENABLE_BUILDER } from '@/gradian-ui/shared/configs/env-config';
+import { AccessDenied } from '@/gradian-ui/schema-manager/components/AccessDenied';
 
 /**
  * Process schema to convert string patterns to RegExp
@@ -45,6 +47,11 @@ export default function RelationTypeDetailPage({ params }: { params: PageProps['
   const [schema, setSchema] = useState<FormSchema | null>(null);
   const [relationTypeId, setRelationTypeId] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -74,6 +81,24 @@ export default function RelationTypeDetailPage({ params }: { params: PageProps['
     }
     loadData();
   }, [params]);
+
+  if (!mounted) {
+    return null;
+  }
+
+  if (!ENABLE_BUILDER) {
+    return (
+      <MainLayout title="Access Denied" subtitle="The builder is disabled in this environment." icon="OctagonMinus">
+        <AccessDenied
+          title="Access to Relation Types Builder is Disabled"
+          description="The relation types builder is not available in this environment."
+          helperText="If you believe you should have access, please contact your system administrator."
+          homeHref="/apps"
+          showGoBackButton={false}
+        />
+      </MainLayout>
+    );
+  }
 
   if (loading) {
     return (

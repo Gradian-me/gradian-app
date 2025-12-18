@@ -30,7 +30,7 @@ import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Skeleton } from '../../../components/ui/skeleton';
 import Link from 'next/link';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { RepeatingTableRendererConfig } from '@/gradian-ui/schema-manager/types/form-schema';
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';

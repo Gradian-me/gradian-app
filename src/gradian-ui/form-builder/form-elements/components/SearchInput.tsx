@@ -6,7 +6,7 @@ import { cn, validateField } from '../../../shared/utils';
 import { Search } from 'lucide-react';
 import { baseInputClasses, getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export const SearchInput = forwardRef<FormElementRef, SearchInputProps>(
   (

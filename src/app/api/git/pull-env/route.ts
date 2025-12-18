@@ -3,7 +3,7 @@ import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import axios from 'axios';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface PullEnvRequestBody {
   outputFile?: string; // Default: '.env'

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
-import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { readSchemaData, writeSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
 import { extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
 import { addAudienceToToken } from '@/domains/auth/utils/jwt.util';
-import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
+import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 // system-token.util is server-only - import directly
 import { getSystemTokenForTargetRoute, getAudienceIdFromTargetRoute } from '@/gradian-ui/shared/utils/system-token.util';
 import { enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
@@ -66,19 +66,7 @@ function extractDataByPath(data: any, path: string): any {
 type IntegrationEntity = Record<string, any>;
 
 function isServerDemoMode(): boolean {
-  try {
-    const vars = loadApplicationVariables();
-    return Boolean(vars?.DEMO_MODE);
-  } catch (error) {
-    loggingCustom(
-      LogType.INTEGRATION_LOG,
-      'warn',
-      `Failed to read application variables for demo mode detection: ${
-        error instanceof Error ? error.message : String(error)
-      }`
-    );
-    return true;
-  }
+  return Boolean(DEMO_MODE);
 }
 
 /**

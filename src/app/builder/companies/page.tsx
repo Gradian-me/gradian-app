@@ -7,6 +7,8 @@ import { ArrowLeft } from 'lucide-react';
 import { DynamicPageRenderer } from '@/gradian-ui/data-display/components/DynamicPageRenderer';
 import { useEffect, useRef, useState } from 'react';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { ENABLE_BUILDER } from '@/gradian-ui/shared/configs/env-config';
+import { AccessDenied } from '@/gradian-ui/schema-manager/components/AccessDenied';
 
 /**
  * Process schema to convert string patterns to RegExp
@@ -36,9 +38,14 @@ function processSchema(schema: any): FormSchema {
 
 export default function CompaniesBuilderPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [schema, setSchema] = useState<FormSchema | null>(null);
   const [loading, setLoading] = useState(true);
   const hasFetchedRef = useRef(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (hasFetchedRef.current) {
@@ -71,6 +78,24 @@ export default function CompaniesBuilderPage() {
 
     loadSchema();
   }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
+  if (!ENABLE_BUILDER) {
+    return (
+      <MainLayout title="Access Denied" subtitle="The builder is disabled in this environment." icon="OctagonMinus">
+        <AccessDenied
+          title="Access to Companies Builder is Disabled"
+          description="The companies builder is not available in this environment."
+          helperText="If you believe you should have access, please contact your system administrator."
+          homeHref="/apps"
+          showGoBackButton={false}
+        />
+      </MainLayout>
+    );
+  }
 
   if (loading) {
     return (

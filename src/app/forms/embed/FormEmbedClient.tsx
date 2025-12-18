@@ -15,7 +15,7 @@ import {
   validateMessageOrigin,
 } from '@/gradian-ui/form-builder/types/embed-messages';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface FormEmbedClientProps {
   allowedOrigins?: string[];

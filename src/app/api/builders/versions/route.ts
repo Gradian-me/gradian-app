@@ -6,7 +6,7 @@ import { ulid } from 'ulid';
 import { AppVersion, VersionChange, Priority, ChangeType } from '@/domains/version-management/types';
 import { incrementVersion, compareVersions, parseVersion, formatVersion } from '@/domains/version-management/utils/version.utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 const DATA_FILE = join(process.cwd(), 'data', 'app-versions.json');
 const DATA_DIR = join(process.cwd(), 'data');

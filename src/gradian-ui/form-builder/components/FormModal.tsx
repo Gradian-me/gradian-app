@@ -18,7 +18,7 @@ import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { replaceDynamicContext, replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 import { DynamicQuickActions } from '@/gradian-ui/data-display/components/DynamicQuickActions';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 const EXCLUDED_TITLE_ROLES = new Set(['code', 'subtitle', 'description']);
 
@@ -231,6 +231,7 @@ export const FormModal: React.FC<FormModalProps> = ({
     await apiRequest(endpoint, {
       method,
       body: payload,
+      callerName: 'FormModal.customActionSubmit',
     });
   }, [referenceEntityData]);
 

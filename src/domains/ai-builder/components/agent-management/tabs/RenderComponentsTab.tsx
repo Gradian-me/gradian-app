@@ -9,7 +9,7 @@ import { AiAgent } from '../../../types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { fetchFormComponents } from '@/gradian-ui/schema-manager/utils/component-registry-client';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface RenderComponentsTabProps {
   agent: AiAgent;

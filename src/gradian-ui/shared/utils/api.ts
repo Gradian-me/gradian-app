@@ -8,7 +8,7 @@ import {
   type CacheStrategyContext,
 } from '@/gradian-ui/indexdb-manager/cache-strategies';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType, LOG_CONFIG } from '@/gradian-ui/shared/configs/log-config';
 import { toast } from 'sonner';
 import { getFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
 import { useTenantStore } from '@/stores/tenant.store';
@@ -188,18 +188,84 @@ const isConnectionError = (error: any, statusCode?: number): boolean => {
 };
 
 /**
+ * Extracts server name/URL from endpoint or error
+ * - For full URLs: uses the hostname
+ * - For relative /api/schemas and /api/data: uses URL_SCHEMA_CRUD / URL_DATA_CRUD
+ */
+const extractServerName = (endpoint?: string, error?: any): string | undefined => {
+  // Try to extract from endpoint if it's a full URL
+  if (endpoint && (endpoint.startsWith('http://') || endpoint.startsWith('https://'))) {
+    try {
+      const url = new URL(endpoint);
+      return url.hostname || url.host;
+    } catch {
+      // ignore and fall through
+    }
+  }
+
+  // For relative endpoints, map to backend URLs from env (prefer NEXT_PUBLIC_* so it's available in client bundle)
+  const schemaUrl = process.env.NEXT_PUBLIC_URL_SCHEMA_CRUD || process.env.URL_SCHEMA_CRUD;
+  const dataUrl = process.env.NEXT_PUBLIC_URL_DATA_CRUD || process.env.URL_DATA_CRUD;
+
+  if (endpoint && endpoint.includes('/api/schemas') && schemaUrl) {
+    try {
+      const url = new URL(schemaUrl);
+      return url.hostname || url.host;
+    } catch {
+      // ignore
+    }
+  }
+
+  if (endpoint && endpoint.includes('/api/data') && dataUrl) {
+    try {
+      const url = new URL(dataUrl);
+      return url.hostname || url.host;
+    } catch {
+      // ignore
+    }
+  }
+  
+  // Try to extract from error message if it contains a URL
+  if (error?.message) {
+    const urlMatch = error.message.match(/https?:\/\/([^\s\/]+)/i);
+    if (urlMatch && urlMatch[1]) {
+      return urlMatch[1];
+    }
+  }
+  
+  // Try to extract from error cause if available
+  if (error?.cause) {
+    if (typeof error.cause === 'string') {
+      const urlMatch = error.cause.match(/https?:\/\/([^\s\/]+)/i);
+      if (urlMatch && urlMatch[1]) {
+        return urlMatch[1];
+      }
+    }
+  }
+  
+  return undefined;
+};
+
+/**
  * Shows a connection error toast notification (only on client side)
- * @param serverName - Optional server/integration name to include in the error message
+ * @param endpoint - Optional endpoint URL to extract server name from
+ * @param error - Optional error object to extract server name from
  * @param suppress - If true, don't show the toast (useful when caller will show a more specific toast)
  */
-const showConnectionErrorToast = (serverName?: string, suppress: boolean = false): void => {
+const showConnectionErrorToast = (endpoint?: string, error?: any, suppress: boolean = false): void => {
   if (suppress || !isBrowserEnvironment()) {
     return;
   }
   
+  // Only extract and show endpoint/server name if ENDPOINT_LOG is enabled
+  const shouldShowEndpoint = LOG_CONFIG[LogType.ENDPOINT_LOG];
+  const serverName = shouldShowEndpoint ? extractServerName(endpoint, error) : undefined;
+  const endpointPath = shouldShowEndpoint && endpoint && !serverName ? endpoint : undefined;
   const description = serverName 
     ? `Unable to connect to the server "${serverName}". Please check your connection and try again.`
-    : 'Unable to connect to the server. Please check your connection and try again.';
+    : endpointPath
+      ? `Unable to connect to the endpoint "${endpointPath}". Please check your connection and try again.`
+      : 'Unable to connect to the server. Please check your connection and try again.';
   
   toast.error('Connection is out', {
     description,
@@ -432,7 +498,7 @@ export class ApiClient {
         const errorMessage = parsed?.error || parsed?.message || '';
         const suppressToast = endpoint.includes('/api/integrations/sync');
         if (isConnectionError(null, response.status) || isConnectionError({ message: errorMessage })) {
-          showConnectionErrorToast(undefined, suppressToast);
+          showConnectionErrorToast(endpoint, { message: errorMessage }, suppressToast);
         }
         
         return {
@@ -451,7 +517,7 @@ export class ApiClient {
       // Suppress generic toast for integration sync - it will show a specific toast with domain
       const suppressToast = endpoint.includes('/api/integrations/sync');
       if (isConnectionError(error)) {
-        showConnectionErrorToast(undefined, suppressToast);
+        showConnectionErrorToast(endpoint, error, suppressToast);
       }
       
       // If it's a network error, we don't have a status code

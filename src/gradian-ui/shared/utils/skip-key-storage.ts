@@ -78,12 +78,6 @@ export function getEncryptedSkipKey(encodeForUrl: boolean = false): string | Rec
       return null;
     }
 
-    console.log('[skip-key-storage] Retrieved encrypted skip key:', {
-      encodeForUrl,
-      hasCiphertext: !!parsed.ciphertext,
-      hasIv: !!parsed.iv,
-    });
-
     // For body: return as object (will be properly JSON.stringify'd by apiRequest)
     // For URL: return as URL-encoded JSON string
     if (encodeForUrl) {

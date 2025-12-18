@@ -16,7 +16,7 @@ import { formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/da
 import { NotificationDialog } from '@/domains/notifications/components/NotificationDialog';
 import { Notification as NotificationType } from '@/domains/notifications/types';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface NotificationsDropdownProps {
   initialCount?: number;
@@ -52,6 +52,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
       try {
         const response = await apiRequest<Notification[]>('/api/notifications', {
           method: 'GET',
+          callerName: 'NotificationsDropdown.fetchNotifications',
         });
 
         if (response.success && response.data) {
@@ -119,7 +120,8 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
     try {
       await apiRequest(`/api/notifications/${notificationId}`, {
         method: 'PUT',
-        body: { isRead: true, readAt: new Date().toISOString() }
+        body: { isRead: true, readAt: new Date().toISOString() },
+        callerName: 'NotificationsDropdown.markAsRead',
       });
       
       // Update local state
@@ -141,6 +143,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
       // Refetch notifications to get updated unread count
       const response = await apiRequest<NotificationType[]>('/api/notifications', {
         method: 'GET',
+        callerName: 'NotificationsDropdown.refreshAfterRead',
       });
       
       if (response.success && response.data) {
@@ -157,7 +160,8 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
     try {
       await apiRequest(`/api/notifications/${notificationId}`, {
         method: 'PUT',
-        body: { acknowledgedAt: new Date().toISOString() }
+        body: { acknowledgedAt: new Date().toISOString() },
+        callerName: 'NotificationsDropdown.acknowledge',
       });
       
       // Update local state
@@ -184,7 +188,8 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
     try {
       await apiRequest(`/api/notifications/${notificationId}`, {
         method: 'PUT',
-        body: { isRead: false }
+        body: { isRead: false },
+        callerName: 'NotificationsDropdown.markAsUnread',
       });
       
       // Update local state
@@ -206,6 +211,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
       // Refetch notifications to get updated unread count
       const response = await apiRequest<NotificationType[]>('/api/notifications', {
         method: 'GET',
+        callerName: 'NotificationsDropdown.refreshAfterUnread',
       });
       
       if (response.success && response.data) {
@@ -273,29 +279,26 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
 
   if (!isMounted) {
     return (
-      <Button 
-        variant="outline" 
-        size="icon" 
-        className="relative rounded-xl"
-        aria-label="Notifications"
-        disabled
-      >
-        <Bell className="h-5 w-5" />
-        {notificationCount > 0 && (
-          <Badge 
-            variant="destructive" 
-            className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs p-0"
-          >
-            {notificationCount}
-          </Badge>
-        )}
-      </Button>
+      <div suppressHydrationWarning data-notifications-dropdown="placeholder">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="relative rounded-xl"
+          aria-label="Notifications"
+          disabled
+          type="button"
+          suppressHydrationWarning
+        >
+          <Bell className="h-5 w-5" />
+          {/* Don't show badge count until mounted to avoid hydration mismatch */}
+        </Button>
+      </div>
     );
   }
 
   return (
-    <>
-    <DropdownMenuPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
+    <div suppressHydrationWarning data-notifications-dropdown="active">
+      <DropdownMenuPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuPrimitive.Trigger asChild>
           <Button 
             variant="outline" 
@@ -447,6 +450,6 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
       onAcknowledge={handleAcknowledge}
       onMarkAsUnread={handleMarkAsUnread}
     />
-  </>
+    </div>
   );
 }

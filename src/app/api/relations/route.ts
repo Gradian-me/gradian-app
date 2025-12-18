@@ -20,7 +20,7 @@ import { getSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry
 import { BaseRepository } from '@/gradian-ui/shared/domain/repositories/base.repository';
 import { getValueByRole, getSingleValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 /**
  * GET - Query relations

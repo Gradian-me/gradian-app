@@ -14,7 +14,7 @@ import { cn } from '../../../shared/utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Badge } from '../../../../components/ui/badge';
 import { motion } from 'framer-motion';
-import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
+import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { extractFirstId, normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';
 import { ChevronDown } from 'lucide-react';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';

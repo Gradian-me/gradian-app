@@ -54,7 +54,6 @@ export async function processSensitiveFields(
       // Check if already encrypted
       if (isEncryptedValue(fieldValue)) {
         // Field is already encrypted, skip
-        console.log(`[SENSITIVE_FIELD] Field ${fieldName} is already encrypted, skipping`);
         continue;
       }
 
@@ -64,7 +63,6 @@ export async function processSensitiveFields(
         
         if (encryptedValue) {
           processedData[fieldName] = encryptedValue;
-          console.log(`[SENSITIVE_FIELD] Successfully encrypted field ${fieldName}`);
         } else {
           console.error(`[SENSITIVE_FIELD] Encryption returned null for field ${fieldName}`);
           // Don't update the field if encryption failed - keep original value

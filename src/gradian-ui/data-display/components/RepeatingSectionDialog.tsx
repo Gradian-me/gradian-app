@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, Plus, List } from 'lucide-react';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { cn } from '@/gradian-ui/shared/utils';
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
@@ -286,9 +286,10 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
               sourceSchema: schema.id,
               sourceId: currentEntityId,
               targetSchema: targetSchemaId,
-              targetId: targetId,
+              targetId,
               relationTypeId: repeatingConfig.relationTypeId,
             },
+            callerName: 'RepeatingSectionDialog.createRelationsFromPicker',
           })
         );
 
@@ -351,6 +352,7 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
         // Delete relation first
         const relationResponse = await apiRequest(`/api/relations/${relationId}`, {
           method: 'DELETE',
+          callerName: 'RepeatingSectionDialog.removeRelation',
         });
 
         if (!relationResponse.success) {
@@ -364,6 +366,7 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
           // If configured, also delete the target item (skip for schemas catalog)
           const itemResponse = await apiRequest(`/api/data/${targetSchemaId}/${targetId}`, {
             method: 'DELETE',
+            callerName: 'RepeatingSectionDialog.removeRelation.deleteTarget',
           });
           if (!itemResponse.success) {
             loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to delete target item: ${itemResponse.error}`);

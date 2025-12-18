@@ -244,6 +244,7 @@ export function useCreateModal(
       const result = await apiRequest(apiEndpoint, {
         method: 'POST',
         body: enrichedData,
+        callerName: 'useCreateModal.createEntity',
       });
 
       if (result.success) {

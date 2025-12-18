@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/gradian-ui/shared/utils';
-import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
+import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 
 export type LoadingSkeletonVariant = 
   | 'card'

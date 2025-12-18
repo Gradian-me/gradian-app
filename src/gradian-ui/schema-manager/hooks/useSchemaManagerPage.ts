@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormSchema } from '../types';
 import {
   CreateSchemaPayload,
@@ -13,6 +13,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { clearSchemaCache } from '@/gradian-ui/indexdb-manager/schema-cache';
 import { SCHEMA_SUMMARY_CACHE_KEY } from '@/gradian-ui/indexdb-manager/types';
+import { useTenantStore } from '@/stores/tenant.store';
 
 /**
  * Transform API response messages to MessageBox format
@@ -51,10 +52,12 @@ export const useSchemaManagerPage = () => {
   const queryClient = useQueryClient();
   // Default to showing statistics when the Schema Builder page is opened
   const [showStatistics, setShowStatistics] = useState(true);
+  const tenantId = useTenantStore((state) => state.getTenantId());
   const { schemas: fetchedSchemas, isLoading, error: schemasError, refetch: refetchSchemas } = useSchemas({ 
     summary: true,
     includeStatistics: showStatistics,
     enabled: true,
+    tenantIds: tenantId ? String(tenantId) : undefined,
   });
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,6 +71,9 @@ export const useSchemaManagerPage = () => {
   const [messages, setMessages] = useState<MessagesResponse | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState<number | 'all'>(25);
+  
+  // Track initial mount to skip first tenant change effect
+  const isInitialMountRef = useRef(true);
 
   // Use schemas from React Query cache
   const schemas = fetchedSchemas;
@@ -86,7 +92,6 @@ export const useSchemaManagerPage = () => {
 
   // Force refetch when showStatistics changes to ensure fresh data with/without statistics
   useEffect(() => {
-    console.log(`[SchemaManager] Statistics switch changed to: ${showStatistics}`);
     // Invalidate all schema summary queries (with and without statistics)
     queryClient.invalidateQueries({ 
       queryKey: SCHEMAS_SUMMARY_QUERY_KEY,
@@ -98,9 +103,73 @@ export const useSchemaManagerPage = () => {
       exact: false,
     });
     // Refetch the schemas with the new statistics flag
-    console.log(`[SchemaManager] Refetching schemas with includeStatistics=${showStatistics}`);
     refetchSchemas();
   }, [showStatistics, queryClient, refetchSchemas]);
+
+  // Force refetch when tenantId changes to ensure schemas are filtered correctly
+  useEffect(() => {
+    // Skip on initial mount to avoid unnecessary refetch
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      return;
+    }
+
+    if (tenantId !== undefined) {
+      // Invalidate all schema queries to clear old tenant's data
+      queryClient.invalidateQueries({ 
+        queryKey: SCHEMAS_SUMMARY_QUERY_KEY,
+        exact: false,
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: SCHEMAS_QUERY_KEY,
+        exact: false,
+      });
+      // Remove old queries to force fresh fetch with new tenant
+      queryClient.removeQueries({ 
+        queryKey: SCHEMAS_SUMMARY_QUERY_KEY,
+        exact: false,
+      });
+      queryClient.removeQueries({ 
+        queryKey: SCHEMAS_QUERY_KEY,
+        exact: false,
+      });
+      // Refetch schemas with new tenant filter
+      refetchSchemas();
+    }
+  }, [tenantId, queryClient, refetchSchemas]);
+
+  // Listen for cache clear events and refetch schemas
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleCacheClear = () => {
+      // Invalidate and refetch schemas when cache is cleared
+      queryClient.invalidateQueries({ 
+        queryKey: SCHEMAS_SUMMARY_QUERY_KEY,
+        exact: false,
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: SCHEMAS_QUERY_KEY,
+        exact: false,
+      });
+      refetchSchemas();
+    };
+
+    // Listen for React Query cache clear event
+    window.addEventListener('react-query-cache-clear', handleCacheClear);
+    // Listen for storage events (cross-tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'react-query-cache-cleared') {
+        handleCacheClear();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('react-query-cache-clear', handleCacheClear);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [queryClient, refetchSchemas]);
 
   const normalizeSchemaType = useCallback((schema: FormSchema): 'system' | 'business' | 'action-form' => {
     if (schema.schemaType) return schema.schemaType;
@@ -324,6 +393,9 @@ export const useSchemaManagerPage = () => {
         };
         if (showStatistics) {
           params.includeStatistics = 'true';
+        }
+        if (tenantId) {
+          params.tenantIds = String(tenantId);
         }
         await apiRequest<FormSchema[]>('/api/schemas', {
           params,

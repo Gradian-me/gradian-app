@@ -48,6 +48,7 @@ export function RelationActionCell({
       setIsDeleting(true);
       const response = await apiRequest(`/api/relations/${relationId}`, {
         method: 'DELETE',
+        callerName: 'RelationActionCell.deleteRelation',
       });
 
       if (!response.success) {

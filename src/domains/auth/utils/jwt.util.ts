@@ -2,7 +2,7 @@
 // Handles creation, verification, and refresh of JWT tokens
 
 import jwt from 'jsonwebtoken';
-import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
+import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 import { JWTPayload, AuthTokens } from '../types';
 
 /**

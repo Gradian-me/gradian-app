@@ -6,7 +6,7 @@
 import { AgentRequestData, AgentResponse } from './ai-agent-utils';
 import { getApiUrlForAgentType } from './ai-agent-url';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import {
   getApiKey,
   sanitizeErrorMessage,

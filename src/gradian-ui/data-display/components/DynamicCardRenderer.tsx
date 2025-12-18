@@ -16,7 +16,7 @@ import { BadgeViewer, BadgeRenderer } from '../../form-builder/form-elements/uti
 import { getFieldsByRole } from '../../form-builder/form-elements/utils/field-resolver';
 import { DynamicActionButtons } from './DynamicActionButtons';
 import { DynamicMetricRenderer } from './DynamicMetricRenderer';
-import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
+import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { CopyContent } from '../../form-builder/form-elements/components/CopyContent';
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';
 import type { BadgeItem } from '../../form-builder/form-elements/utils/badge-viewer';

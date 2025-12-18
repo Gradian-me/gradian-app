@@ -4,7 +4,7 @@ import { cn, validateField } from '../../../shared/utils';
 import { FormElementRef, NameInputProps } from '../types';
 import { CopyContent } from './CopyContent';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 const allowedPattern = /^[a-z0-9_-]+$/;
 

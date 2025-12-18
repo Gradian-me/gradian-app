@@ -7,7 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import { processAiAgent, AgentRequestData } from '@/domains/ai-builder/utils/ai-agent-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 /**
  * Load AI agents from JSON file

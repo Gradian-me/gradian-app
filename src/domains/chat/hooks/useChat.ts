@@ -580,8 +580,6 @@ export function useChat(): UseChatResult {
             
             // Check if todos are required
             if (responseData.executionType === 'todo_required' && responseData.todos) {
-              // Set todos first so they're immediately visible
-              console.log('Setting todos:', responseData.todos);
               setTodos(responseData.todos);
               
               // Add assistant message indicating todos were generated (this saves todos to message metadata)
@@ -609,7 +607,6 @@ export function useChat(): UseChatResult {
               if (messageResponse.ok) {
                 const messageResult = await messageResponse.json();
                 if (messageResult.success) {
-                  console.log('Message added with todos:', messageResult.data);
                   // Remove thinking message and add actual response
                   setMessages((prev) => {
                     const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);

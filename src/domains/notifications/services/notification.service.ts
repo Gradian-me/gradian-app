@@ -67,7 +67,8 @@ async function getNotificationsFromAPI(filters?: NotificationFilters, currentUse
       '/api/notifications',
       {
         method: 'GET',
-        params
+        params,
+        callerName: 'NotificationService.getNotifications'
       }
     );
 
@@ -205,7 +206,8 @@ export class NotificationService {
         `/api/notifications/${notificationId}`,
         {
           method: 'PUT',
-          body: { isRead: true, readAt: new Date().toISOString() }
+          body: { isRead: true, readAt: new Date().toISOString() },
+          callerName: 'NotificationService.markAsRead'
         }
       );
 
@@ -223,7 +225,8 @@ export class NotificationService {
         `/api/notifications/${notificationId}`,
         {
           method: 'PUT',
-          body: { acknowledgedAt: new Date().toISOString() }
+          body: { acknowledgedAt: new Date().toISOString() },
+          callerName: 'NotificationService.acknowledge'
         }
       );
 
@@ -243,7 +246,8 @@ export class NotificationService {
         `/api/notifications/${notificationId}`,
         {
           method: 'PUT',
-          body: { isRead: false }
+          body: { isRead: false },
+          callerName: 'NotificationService.markAsUnread'
         }
       );
 

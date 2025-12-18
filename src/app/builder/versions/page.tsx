@@ -17,8 +17,11 @@ import { useVersions } from '@/domains/version-management/hooks/useVersions';
 import { VersionCard } from '@/domains/version-management/components/VersionCard';
 import { VersionList } from '@/domains/version-management/components/VersionList';
 import { ChangeType, Priority } from '@/domains/version-management/types';
+import { ENABLE_BUILDER } from '@/gradian-ui/shared/configs/env-config';
+import { AccessDenied } from '@/gradian-ui/schema-manager/components/AccessDenied';
 
 export default function VersionsPage() {
+  const [mounted, setMounted] = React.useState(false);
   const {
     versions,
     loading,
@@ -31,6 +34,10 @@ export default function VersionsPage() {
   } = useVersions();
 
   const [refreshing, setRefreshing] = React.useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Set document title
   useEffect(() => {
@@ -52,6 +59,24 @@ export default function VersionsPage() {
     // Filtering is done on the server, but we can add client-side filtering here if needed
     return versions;
   }, [versions]);
+
+  if (!mounted) {
+    return null;
+  }
+
+  if (!ENABLE_BUILDER) {
+    return (
+      <MainLayout title="Access Denied" subtitle="The builder is disabled in this environment." icon="OctagonMinus">
+        <AccessDenied
+          title="Access to Versions Builder is Disabled"
+          description="The versions builder is not available in this environment."
+          helperText="If you believe you should have access, please contact your system administrator."
+          homeHref="/apps"
+          showGoBackButton={false}
+        />
+      </MainLayout>
+    );
+  }
 
   const handleRefresh = async () => {
     try {

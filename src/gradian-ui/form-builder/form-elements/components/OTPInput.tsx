@@ -5,7 +5,7 @@ import type { FormElementRef } from '../types';
 import type { OTPInputProps } from '../types';
 import { validateField } from '@/gradian-ui/shared/utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 // Context to coordinate OTP slots
 type InputOTPContextValue = {

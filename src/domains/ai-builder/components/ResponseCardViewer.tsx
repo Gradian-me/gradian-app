@@ -10,7 +10,7 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/gradian-ui/shared/utils';
 import type { ResponseCardConfig } from '../types';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface ResponseCardViewerProps {
   response: string;

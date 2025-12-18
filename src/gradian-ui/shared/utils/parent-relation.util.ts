@@ -42,6 +42,7 @@ export const syncParentRelation = async ({
       try {
         await apiRequest(`/api/relations/${encodeURIComponent(rel.id)}`, {
           method: 'DELETE',
+          callerName: 'syncParentRelation.deleteExisting',
         });
       } catch (error) {
         console.warn('[syncParentRelation] Failed to delete relation', rel.id, error);
@@ -63,6 +64,7 @@ export const syncParentRelation = async ({
         targetId: String(childId),
         relationTypeId: RELATION_TYPE_ID,
       },
+      callerName: 'syncParentRelation.createRelation',
     });
   } catch (error) {
     console.warn('[syncParentRelation] Failed to sync parent relation', {

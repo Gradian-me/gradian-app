@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { hashCode, markExpired, readTwoFAEntries, timingSafeMatch, writeTwoFAEntries } from '../utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 type ValidateRequestBody = {
   userId?: string;

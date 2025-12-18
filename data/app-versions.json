@@ -3788,5 +3788,64 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCENABLEBUILDERCONFIG001",
+    "timestamp": "2025-12-18T00:00:00.000Z",
+    "version": "1.31.000",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "MAJOR: Removed legacy application-variables.json and application-variables-defaults.ts files, migrating configuration into typed config modules and environment variables for clearer, safer configuration management.",
+        "priority": "High",
+        "affectedDomains": [
+          "configuration",
+          "application-variables",
+          "infrastructure"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Enhanced multiple components and hooks across the application to consume the new config structure, improving performance, maintainability, and clarity.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "codebase",
+          "performance",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Added OrganizationSettings control in the header that exposes tenant and company selectors in a unified popover with tooltips, improving organization context visibility.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout",
+          "tenant-management",
+          "companies",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved schema and tenant fallback logic for API routes in non-demo/live modes, adding safer local fallbacks when backend schemas or tenants are unavailable.",
+        "priority": "High",
+        "affectedDomains": [
+          "api",
+          "schema-manager",
+          "tenant-management",
+          "resilience"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced ENABLE_BUILDER environment flag to centrally control access to /builder and all nested builder routes for safer production deployments.",
+        "priority": "High",
+        "affectedDomains": [
+          "configuration",
+          "security",
+          "builder"
+        ]
+      }
+    ]
   }
 ]

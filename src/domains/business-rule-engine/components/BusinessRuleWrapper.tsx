@@ -67,8 +67,6 @@ export function BusinessRuleWrapper({
       if (onSave) {
         await onSave(rule);
       } else {
-        // Default save behavior - just log for now
-        console.log('Saving rule:', rule);
         toast.success('Rule saved successfully');
       }
     } catch (error) {

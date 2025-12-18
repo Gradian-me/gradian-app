@@ -4,7 +4,7 @@ import React from 'react';
 import { FormElementConfig, FormElementProps, ToggleGroupOption } from '../types';
 import { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { TextInput } from './TextInput';
 import { Textarea } from './Textarea';
 import { MarkdownInput } from './MarkdownInput';

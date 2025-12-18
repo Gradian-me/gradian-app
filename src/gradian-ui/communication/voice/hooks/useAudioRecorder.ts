@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export interface UseAudioRecorderReturn {
   isRecording: boolean;

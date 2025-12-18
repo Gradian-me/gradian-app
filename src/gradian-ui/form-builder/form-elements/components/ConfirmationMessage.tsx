@@ -126,7 +126,7 @@ export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
           )}
         </DialogHeader>
         
-        <div className="py-4 text-gray-700">
+        <div className="py-4 text-gray-700 dark:text-gray-300">
           {typeof message === 'string' ? (
             <p className="text-sm leading-relaxed">{message}</p>
           ) : (

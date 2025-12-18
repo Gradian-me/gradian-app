@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { isDemoModeEnabled, proxySchemaRequest } from '../utils';
 import { getAllReactQueryKeys } from '@/gradian-ui/shared/configs/cache-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 /**
  * Clear cache from schema-loader (server-side cache)
@@ -211,13 +211,19 @@ async function callRemoteClearCache(method: string = 'POST') {
 }
 
 /**
- * POST - Clear all caches (schemas, companies, and all data-loader caches)
+ * POST - Clear all caches (schemas, companies, menu items, stores, and all data-loader caches)
  * Example: POST /api/schemas/clear-cache
  * 
  * This route always runs on the current server to clear local caches.
  * If DEMO_MODE is false, it also calls the remote API's clear-cache endpoint.
  * 
- * Note: React Query caches are cleared client-side via custom event dispatch.
+ * Clears:
+ * - Server-side caches (schema-loader, companies-loader, data-loader, schema-registry)
+ * - React Query caches (client-side via custom event dispatch)
+ * - IndexedDB caches (client-side via custom event dispatch)
+ * - Menu items store (client-side via custom event dispatch)
+ * - Company store (client-side via custom event dispatch)
+ * - Tenant store tenants list (client-side via custom event dispatch)
  */
 export async function POST(request: NextRequest) {
   // Always clear local caches first (this route always runs on current server)
@@ -264,7 +270,13 @@ export async function POST(request: NextRequest) {
  * This route always runs on the current server to clear local caches.
  * If DEMO_MODE is false, it also calls the remote API's clear-cache endpoint.
  * 
- * Note: React Query caches are cleared client-side via custom event dispatch.
+ * Clears:
+ * - Server-side caches (schema-loader, companies-loader, data-loader, schema-registry)
+ * - React Query caches (client-side via custom event dispatch)
+ * - IndexedDB caches (client-side via custom event dispatch)
+ * - Menu items store (client-side via custom event dispatch)
+ * - Company store (client-side via custom event dispatch)
+ * - Tenant store tenants list (client-side via custom event dispatch)
  */
 export async function GET(request: NextRequest) {
   // Always clear local caches first (this route always runs on current server)

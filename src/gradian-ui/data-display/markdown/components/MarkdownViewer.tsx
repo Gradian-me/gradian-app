@@ -20,7 +20,7 @@ import { MarkdownViewerProps } from '../types';
 import { exportMarkdownToPdf } from '../utils/pdfExport';
 import { ProfessionalWritingModal } from '@/gradian-ui/communication/professional-writing';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export function MarkdownViewer({ 
   content, 

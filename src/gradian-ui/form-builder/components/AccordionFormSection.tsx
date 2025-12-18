@@ -19,12 +19,12 @@ import { Rating, PopupPicker, ConfirmationMessage, AddButtonFull, CodeBadge, Bad
 import { Skeleton } from '../../../components/ui/skeleton';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { getInitials, getBadgeConfig, mapBadgeColorToVariant } from '../../data-display/utils';
 import { getPrimaryDisplayString } from '../../data-display/utils/value-display';
 import { NormalizedOption } from '../form-elements/utils/option-normalizer';
 import { BadgeViewer } from '../form-elements/utils/badge-viewer';
-import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
+import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -479,6 +479,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       // First, delete the relation
       const relationResponse = await apiRequest(`/api/relations/${relationId}`, {
         method: 'DELETE',
+        callerName: 'AccordionFormSection.removeRelation',
       });
       
       if (relationResponse.success) {
@@ -486,6 +487,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         if (deleteType === 'itemAndRelation' && relation && targetSchema) {
           const itemResponse = await apiRequest(`/api/data/${targetSchema}/${relation.targetId}`, {
             method: 'DELETE',
+            callerName: 'AccordionFormSection.removeRelation.deleteTarget',
           });
           
           if (!itemResponse.success) {
@@ -578,17 +580,18 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
 
       // Create relation operations
       const operations = toCreateIds.map((targetId) =>
-            apiRequest('/api/relations', {
-              method: 'POST',
-              body: {
-                sourceSchema: sourceSchemaId,
-                sourceId: currentEntityId,
-                targetSchema: targetSchema,
-            targetId: targetId,
-                relationTypeId: relationTypeId,
-              },
-            })
-          );
+        apiRequest('/api/relations', {
+          method: 'POST',
+          body: {
+            sourceSchema: sourceSchemaId,
+            sourceId: currentEntityId,
+            targetSchema: targetSchema,
+            targetId,
+            relationTypeId,
+          },
+          callerName: 'AccordionFormSection.createRelationsFromPicker',
+        })
+      );
 
       // Execute all operations
       const results = await Promise.all(operations);

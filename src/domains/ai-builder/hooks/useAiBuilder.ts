@@ -9,13 +9,14 @@ import { useState, useRef, useCallback } from 'react';
 import type { AiAgent, AiBuilderResponseData, GeneratePromptRequest, TokenUsage, VideoUsage, PreloadRouteResult } from '../types';
 import { useAiPrompts } from '@/domains/ai-prompts/hooks/useAiPrompts';
 import { useUserStore } from '@/stores/user.store';
+import { useTenantStore } from '@/stores/tenant.store';
 import {
   extractDataByPath,
   formatPreloadRouteResult,
   type PreloadRoute,
 } from '@/gradian-ui/shared/utils/preload-routes';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface UseAiBuilderReturn {
   userPrompt: string;
@@ -46,6 +47,7 @@ interface UseAiBuilderReturn {
  * Hook to manage AI builder state and operations
  */
 export function useAiBuilder(): UseAiBuilderReturn {
+  const tenantId = useTenantStore((state) => state.getTenantId());
   const [userPrompt, setUserPrompt] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
@@ -738,7 +740,8 @@ export function useAiBuilder(): UseAiBuilderReturn {
         window.localStorage.removeItem('react-query-cache-cleared');
         
         // Force refresh the schemas endpoint
-        fetch('/api/schemas?summary=true&cacheBust=' + Date.now(), {
+        const tenantParam = tenantId ? `&tenantIds=${encodeURIComponent(String(tenantId))}` : '';
+        fetch(`/api/schemas?summary=true${tenantParam}&cacheBust=${Date.now()}`, {
           method: 'GET',
           cache: 'no-store',
         }).catch(err => {

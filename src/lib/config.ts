@@ -1,5 +1,5 @@
-// Import DEMO_MODE from application variables
-import { DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
+// Import DEMO_MODE from env config
+import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 
 // Helper function to check if demo mode is enabled
 // For config object initialization, uses static value (evaluated at import time)

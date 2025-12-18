@@ -181,7 +181,7 @@ export function MarkdownEditor({
                       const markdown = getCurrentContent();
                       
                       // Only call onChange if content actually changed to avoid infinite loops
-                      if (onChangeRef.current && markdown !== contentRef.current) {
+                      if (process.env.NODE_ENV === 'development' && onChangeRef.current && markdown !== contentRef.current) {
                         console.log('Auto-save: Content changed, length:', markdown.length);
                         // Update contentRef before calling onChange
                         contentRef.current = markdown;
@@ -366,13 +366,10 @@ export function MarkdownEditor({
         currentContent = contentRef.current || content || '';
       }
 
-      console.log('Save: Retrieved content length:', currentContent?.length || 0);
-
       // Update content ref
       contentRef.current = currentContent;
       lastSavedContentRef.current = currentContent;
 
-      console.log('Save: Calling onChange with content length:', currentContent.length);
       
       // Call onChange to update store immediately
       if (onChangeRef.current) {

@@ -11,8 +11,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useMemo, useEffect, useState, useRef } from 'react';
 import { cn } from '../../../shared/utils';
-import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
+import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { useSchemas } from '@/gradian-ui/schema-manager/hooks/use-schemas';
+import { useTenantStore } from '@/stores/tenant.store';
 
 interface SidebarNavigationDynamicProps {
   isCollapsed: boolean;
@@ -30,6 +31,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   initialSchemas,
 }) => {
   const pathname = usePathname();
+  const tenantId = useTenantStore((state) => state.getTenantId());
   const [isMounted, setIsMounted] = useState(false);
   // Persist accordion state across route changes
   const [accordionValue, setAccordionValue] = useState<string | undefined>(() => {
@@ -67,6 +69,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   const { schemas: allSchemas, isLoading, refetch } = useSchemas({
     initialData: initialSchemas,
     summary: true,
+    tenantIds: tenantId ? String(tenantId) : undefined,
   });
   
   // Prevent refetch when switching between chat routes (use cached data)

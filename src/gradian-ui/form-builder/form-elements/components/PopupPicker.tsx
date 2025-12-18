@@ -11,7 +11,7 @@ import {
 import { getInitials } from '@/gradian-ui/form-builder/form-elements/utils/avatar-utils';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '@/gradian-ui/shared/utils';
-import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
+import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronRight, List, Loader2, RefreshCw } from 'lucide-react';
@@ -31,7 +31,7 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { AddButtonFull } from './AddButtonFull';
 import { EndLine } from '@/gradian-ui/layout';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { ColumnMapConfig, extractItemsFromPayload, extractMetaFromPayload, mapRequestParams } from '@/gradian-ui/shared/utils/column-mapper';
 import { useCompanyStore } from '@/stores/company.store';
 import { sortOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';

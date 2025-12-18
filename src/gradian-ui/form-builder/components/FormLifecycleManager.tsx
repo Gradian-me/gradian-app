@@ -11,7 +11,7 @@ import {
   FormState,
   FormWrapperProps
 } from '@/gradian-ui/schema-manager/types/form-schema';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { cn, validateField as validateFieldUtil } from '@/gradian-ui/shared/utils';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
@@ -1561,6 +1561,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                     targetId: targetEntityId,
                     relationTypeId: relationModalState.relationTypeId,
                   },
+                  callerName: 'FormLifecycleManager.createRelationFromModal',
                 });
                 
                 if (!relationResponse.success) {

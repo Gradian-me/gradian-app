@@ -186,7 +186,7 @@ export const createEntityUIHook = <T extends Record<string, any>>(
         const confirmed = window.confirm(
           `Are you sure you want to delete ${entity.name || entity.title || 'this item'}?`
         );
-        if (confirmed) {
+        if (process.env.NODE_ENV === 'development' && confirmed) {
           // Default delete behavior
           console.log(`Delete ${entityName}:`, entity.id);
         }

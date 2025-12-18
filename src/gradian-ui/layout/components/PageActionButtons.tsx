@@ -6,7 +6,7 @@
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/gradian-ui/shared/utils';
-import { URL_HOME } from '@/gradian-ui/shared/constants/application-variables';
+import { URL_HOME } from '@/gradian-ui/shared/configs/ui-config';
 import { LayoutDashboard, QrCode } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';

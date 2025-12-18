@@ -6,6 +6,7 @@ import { getCacheConfig } from '@/gradian-ui/shared/configs/cache-config';
 import { clearSchemaCache } from '@/gradian-ui/indexdb-manager/schema-cache';
 import { clearCompaniesCache } from '@/gradian-ui/indexdb-manager/companies-cache';
 import { toast } from 'sonner';
+import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 
 // Get default cache configuration from config file
 const defaultCacheConfig = getCacheConfig('schemas');
@@ -53,10 +54,84 @@ const isConnectionError = (error: any): boolean => {
   return false;
 };
 
-const notifyConnectionError = (error: unknown) => {
+/**
+ * Extracts server name/URL from React Query error or query
+ */
+const extractServerNameFromQuery = (error: any, query?: any): string | undefined => {
+  // Try to extract from error message if it contains a URL
+  if (error?.message) {
+    const urlMatch = error.message.match(/https?:\/\/([^\s\/]+)/i);
+    if (urlMatch && urlMatch[1]) {
+      return urlMatch[1];
+    }
+  }
+  
+  // Try to extract from error cause if available
+  if (error?.cause) {
+    if (typeof error.cause === 'string') {
+      const urlMatch = error.cause.match(/https?:\/\/([^\s\/]+)/i);
+      if (urlMatch && urlMatch[1]) {
+        return urlMatch[1];
+      }
+    }
+  }
+  
+  // Try to extract from queryKey if available (React Query stores endpoint in queryKey)
+  const queryKey = query?.queryKey || error?.queryKey;
+  if (queryKey && Array.isArray(queryKey)) {
+    const endpoint = queryKey.find((key: any) => typeof key === 'string' && (key.startsWith('http') || key.startsWith('/api')));
+    if (endpoint) {
+      try {
+        if (endpoint.startsWith('http')) {
+          const url = new URL(endpoint);
+          return url.hostname || url.host;
+        }
+        // For relative endpoints, map to backend URLs from env
+        if (endpoint.includes('/api/schemas')) {
+          const schemaUrl = process.env.NEXT_PUBLIC_URL_SCHEMA_CRUD || process.env.URL_SCHEMA_CRUD;
+          if (schemaUrl) {
+            const url = new URL(schemaUrl);
+            return url.hostname || url.host;
+          }
+        }
+        if (endpoint.includes('/api/data')) {
+          const dataUrl = process.env.NEXT_PUBLIC_URL_DATA_CRUD || process.env.URL_DATA_CRUD;
+          if (dataUrl) {
+            const url = new URL(dataUrl);
+            return url.hostname || url.host;
+          }
+        }
+      } catch {
+        // ignore and fall through
+      }
+    }
+  }
+  
+  // Try to extract from meta if available
+  if (error?.meta?.endpoint || query?.meta?.endpoint) {
+    try {
+      const endpoint = error?.meta?.endpoint || query?.meta?.endpoint;
+      if (endpoint && endpoint.startsWith('http')) {
+        const url = new URL(endpoint);
+        return url.hostname || url.host;
+      }
+    } catch {}
+  }
+  
+  return undefined;
+};
+
+const notifyConnectionError = (error: unknown, query?: any) => {
   if (isConnectionError(error)) {
+    // Only extract and show server name if ENDPOINT_LOG is enabled
+    const shouldShowEndpoint = LOG_CONFIG[LogType.ENDPOINT_LOG];
+    const serverName = shouldShowEndpoint ? extractServerNameFromQuery(error, query) : undefined;
+    const description = serverName 
+      ? `Unable to connect to the server "${serverName}". Please check your connection and try again.`
+      : 'Unable to connect to the server. Please check your connection and try again.';
+    
     toast.error('Connection is out', {
-      description: 'Unable to connect to the server. Please check your connection and try again.',
+      description,
       duration: 5000,
     });
   }
@@ -66,10 +141,10 @@ const notifyConnectionError = (error: unknown) => {
 function makeQueryClient() {
   return new QueryClient({
     queryCache: new QueryCache({
-      onError: notifyConnectionError,
+      onError: (error, query) => notifyConnectionError(error, query),
     }),
     mutationCache: new MutationCache({
-      onError: notifyConnectionError,
+      onError: (error, _variables, _context, mutation) => notifyConnectionError(error, mutation),
     }),
     defaultOptions: {
       queries: {
@@ -131,6 +206,21 @@ function ReactQueryCacheClearHandler() {
       } catch (error) {
         console.warn('[menu-items-cache] Failed to clear menu items cache:', error);
       }
+      // Clear company store
+      try {
+        const { useCompanyStore } = await import('@/stores/company.store');
+        useCompanyStore.getState().clearSelectedCompany();
+      } catch (error) {
+        console.warn('[company-store] Failed to clear company store:', error);
+      }
+      // Clear tenant store (but keep selected tenant - only clear tenants list)
+      try {
+        const { useTenantStore } = await import('@/stores/tenant.store');
+        useTenantStore.getState().clearTenants();
+        // Note: We don't clear selectedTenant as it's needed for filtering
+      } catch (error) {
+        console.warn('[tenant-store] Failed to clear tenant store:', error);
+      }
       // Clear ALL React Query caches first
       await queryClient.clear();
       // Then invalidate and refetch all queries for the specified keys
@@ -164,6 +254,21 @@ function ReactQueryCacheClearHandler() {
           useMenuItemsStore.getState().clearMenuItems();
         } catch (error) {
           console.warn('[menu-items-cache] Failed to clear menu items cache from storage event:', error);
+        }
+        // Clear company store
+        try {
+          const { useCompanyStore } = await import('@/stores/company.store');
+          useCompanyStore.getState().clearSelectedCompany();
+        } catch (error) {
+          console.warn('[company-store] Failed to clear company store from storage event:', error);
+        }
+        // Clear tenant store (but keep selected tenant - only clear tenants list)
+        try {
+          const { useTenantStore } = await import('@/stores/tenant.store');
+          useTenantStore.getState().clearTenants();
+          // Note: We don't clear selectedTenant as it's needed for filtering
+        } catch (error) {
+          console.warn('[tenant-store] Failed to clear tenant store from storage event:', error);
         }
         // Clear ALL React Query caches first
         await queryClient.clear();
@@ -204,4 +309,5 @@ export function QueryProvider({ children }: { children: ReactNode }) {
     </QueryClientProvider>
   );
 }
+
 

@@ -3,7 +3,7 @@ import { readFile } from 'fs/promises';
 import { join } from 'path';
 import axios from 'axios';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface VariableOptions {
   protected?: boolean;
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     const replaceAll = requestBody.replaceAll ?? true; // Default to true: delete all existing variables before syncing
 
     // Read .env.prod file
-    const envFilePath = join(process.cwd(), '.env.prod');
+    const envFilePath = join(process.cwd(), '.env.produdtion');
     let envFileContent: string;
 
     try {

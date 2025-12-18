@@ -5,7 +5,7 @@
 
 import { cookies, headers } from 'next/headers';
 import { validateToken, extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
-import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
+import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 import { User } from '@/types';
 
 /**

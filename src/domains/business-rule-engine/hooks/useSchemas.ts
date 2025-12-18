@@ -1,6 +1,7 @@
 // Hook to fetch schemas from API
 
 import { useQuery } from '@tanstack/react-query';
+import { useTenantStore } from '@/stores/tenant.store';
 
 export interface Schema {
   id: string;
@@ -22,11 +23,13 @@ export interface Schema {
 const SCHEMAS_QUERY_KEY = ['business-rules', 'schemas'] as const;
 
 export function useSchemas() {
+  const tenantId = useTenantStore((state) => state.getTenantId());
   const { data: schemas = [], isLoading, error, refetch } = useQuery({
-    queryKey: SCHEMAS_QUERY_KEY,
+    queryKey: [...SCHEMAS_QUERY_KEY, tenantId ? String(tenantId) : 'all-tenants'],
     queryFn: async () => {
       // Fetch full schemas (without summary) to get fields for conditions
-      const response = await fetch('/api/schemas');
+      const tenantParam = tenantId ? `?tenantIds=${encodeURIComponent(String(tenantId))}` : '';
+      const response = await fetch(`/api/schemas${tenantParam}`);
       if (!response.ok) {
         throw new Error('Failed to fetch schemas');
       }

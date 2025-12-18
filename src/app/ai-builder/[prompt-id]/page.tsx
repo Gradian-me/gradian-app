@@ -26,7 +26,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { extractParametersBySectionId } from '@/domains/ai-builder/utils/ai-shared-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export default function AiBuilderPromptPage() {
   const params = useParams();

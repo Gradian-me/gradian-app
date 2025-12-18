@@ -1,6 +1,6 @@
 import type { GraphEdgeData, GraphNodeData } from '../types';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 /**
  * Edge validation result

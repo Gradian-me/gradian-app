@@ -7,7 +7,8 @@ import path from 'path';
 import { UserSettings, SettingsUpdate } from '@/domains/settings/types';
 import { mergeWithDefaults, getDefaultUserSettings } from '@/domains/settings/utils/defaults';
 import { validateToken, extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
-import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
+import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
+import { REQUIRE_LOGIN } from '@/gradian-ui/shared/configs/env-config';
 
 /**
  * Extract userId from JWT token in request
@@ -113,7 +114,12 @@ function saveUserSettings(userId: string, settings: UserSettings): void {
 export async function GET(request: NextRequest) {
   try {
     // Get userId from JWT token
-    const userId = getUserIdFromToken(request);
+    let userId = getUserIdFromToken(request);
+
+    // If REQUIRE_LOGIN is false, allow anonymous settings using a shared demo user
+    if (!userId && !REQUIRE_LOGIN) {
+      userId = 'anonymous-demo-user';
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -161,8 +167,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Get userId from JWT token
-    const userId = getUserIdFromToken(request);
+    let userId = getUserIdFromToken(request);
     const body = await request.json();
+
+    // If REQUIRE_LOGIN is false, allow anonymous settings using a shared demo user
+    if (!userId && !REQUIRE_LOGIN) {
+      userId = 'anonymous-demo-user';
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -219,8 +230,13 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     // Get userId from JWT token
-    const userId = getUserIdFromToken(request);
+    let userId = getUserIdFromToken(request);
     const updates: SettingsUpdate = await request.json();
+
+    // If REQUIRE_LOGIN is false, allow anonymous settings using a shared demo user
+    if (!userId && !REQUIRE_LOGIN) {
+      userId = 'anonymous-demo-user';
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -297,7 +313,12 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     // Get userId from JWT token
-    const userId = getUserIdFromToken(request);
+    let userId = getUserIdFromToken(request);
+
+    // If REQUIRE_LOGIN is false, allow anonymous settings using a shared demo user
+    if (!userId && !REQUIRE_LOGIN) {
+      userId = 'anonymous-demo-user';
+    }
 
     if (!userId) {
       return NextResponse.json(

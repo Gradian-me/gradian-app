@@ -7,7 +7,7 @@ import { AiBuilderWrapper } from '@/domains/ai-builder/components/AiBuilderWrapp
 import { Button } from '@/components/ui/button';
 import { Bot, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export default function AiBuilderPage() {
   const showModelBadge = LOG_CONFIG[LogType.AI_MODEL_LOG] === true;

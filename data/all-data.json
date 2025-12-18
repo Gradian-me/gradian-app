@@ -1442,14 +1442,35 @@
       "lastName": "Administrator",
       "email": "admin@gradian.me",
       "postTitle": "Admin",
-      "authenticationType": "form-based",
+      "authenticationType": [
+        {
+          "id": "form-based",
+          "label": "Form-Based",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBF8N88CG4YPK6VDNQAE420Z",
       "createdAt": "2025-01-01T10:10:10.000Z",
-      "updatedAt": "2025-01-01T10:10:10.000Z",
+      "updatedAt": "2025-12-18T11:51:34.275Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "841",
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        },
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        },
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
     },
     {
       "username": "abidim",
@@ -1460,7 +1481,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "createdAt": "2025-11-05T15:49:06.366Z",
-      "updatedAt": "2025-12-01T16:30:26.026Z",
+      "updatedAt": "2025-12-18T11:51:40.058Z",
       "avatarUrl": "https://media.licdn.com/dms/image/v2/D4D03AQFqEf1NfTjObg/profile-displayphoto-crop_800_800/B4DZlbvgWeJMAM-/0/1758180806291?e=1764201600&v=beta&t=9qdjZhqjahZqjMh_oT9QKsjgz6bbTb5Bw0BvmXu9Rag",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$lJUuCAnQyRK7q2GbUEpgQg$yoNrrPCRDTJNwVj9aDDDZ0c4reiBNGcfSHEZ6Hennqg",
       "hashType": "argon2",
@@ -1468,7 +1489,14 @@
       "lastName": "Abidi",
       "postTitle": "CAO",
       "company": "CinnaGen",
-      "authenticationType": "form-based",
+      "authenticationType": [
+        {
+          "id": "form-based",
+          "label": "Form-Based",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
       "status": [
         {
           "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
@@ -1479,7 +1507,21 @@
       ],
       "incomplete": false,
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "841",
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        },
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        },
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
     },
     {
       "company": "AryoGen",
@@ -1496,14 +1538,28 @@
       "lastName": "Goudarzi",
       "email": "goudarziar@aryogen.com",
       "postTitle": "Quality Assurance Manager",
-      "authenticationType": "form-based",
+      "authenticationType": [
+        {
+          "id": "form-based",
+          "label": "Form-Based",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSMDRHJTDY7SFEY6VWK2HEK",
       "createdAt": "2025-12-06T10:48:20.285Z",
-      "updatedAt": "2025-12-08T14:33:19.454Z",
+      "updatedAt": "2025-12-18T11:51:51.090Z",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$6FMxlYRqKjO7dE6Pd6LUFA$QrrLBt+KmmX7Oc7SjDxSRAF9IZJ81XQexsv3ZUBFmqA",
-      "hashType": "argon2"
+      "hashType": "argon2",
+      "relatedTenants": [
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        }
+      ],
+      "updatedBy": "841"
     },
     {
       "company": "AryoGen",
@@ -1519,14 +1575,28 @@
       "firstName": "Ali",
       "lastName": "Aminimehr",
       "email": "aminimehra@aryogen.com",
-      "authenticationType": "form-based",
+      "authenticationType": [
+        {
+          "id": "form-based",
+          "label": "Form-Based",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSTVK8P6Y3P4MW060HNNKB1",
       "createdAt": "2025-12-06T12:40:45.079Z",
-      "updatedAt": "2025-12-08T14:33:00.161Z",
+      "updatedAt": "2025-12-18T11:51:45.789Z",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$bAwGvyQyORW6Acrt3OcPuQ$h8/UhXDl2FBP55sdXjeAP846VlsKIxQa+SepjJ+43IM",
-      "hashType": "argon2"
+      "hashType": "argon2",
+      "relatedTenants": [
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        }
+      ],
+      "updatedBy": "841"
     },
     {
       "username": "vaziril",
@@ -1535,12 +1605,19 @@
       "email": "vaziril@aryogen.com",
       "postTitle": "QA Deputy",
       "company": "AryoGen",
-      "authenticationType": "form-based",
+      "authenticationType": [
+        {
+          "id": "form-based",
+          "label": "Form-Based",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBZ64EBC9SWWTCCYKEMGK21E",
       "createdAt": "2025-12-08T14:34:01.460Z",
-      "updatedAt": "2025-12-10T06:53:58.427Z",
+      "updatedAt": "2025-12-18T11:52:30.449Z",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$gGbYpp66WV8vRbM6uoX56g$Vw83f/KKDMndrgUwFY+wl6PAQuSwFqFohNkyua4Tbqo",
       "hashType": "argon2",
       "status": [
@@ -1550,7 +1627,14 @@
           "icon": "CheckCheck",
           "color": "emerald"
         }
-      ]
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        }
+      ],
+      "updatedBy": "841"
     },
     {
       "company": "CinnaGen",
@@ -1567,12 +1651,34 @@
       "lastName": "Rezaeifard",
       "email": "rezaeifardh@cinnagen.com",
       "postTitle": "Backend Developer",
-      "authenticationType": "active-directory",
+      "authenticationType": [
+        {
+          "id": "active-directory",
+          "label": "Active Directory",
+          "icon": "Server",
+          "color": "success"
+        }
+      ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KC3F76QSDY5P2XVP3T2E0DAD",
       "createdAt": "2025-12-10T06:29:46.883Z",
-      "updatedAt": "2025-12-10T06:29:46.883Z"
+      "updatedAt": "2025-12-18T11:51:56.015Z",
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        },
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        },
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "updatedBy": "841"
     },
     {
       "company": "CinnaGen",
@@ -1589,16 +1695,45 @@
       "lastName": "Mirghasemi",
       "email": "ghasemimas@cinnagen.com",
       "postTitle": "Backend Developer",
-      "authenticationType": "active-directory",
+      "authenticationType": [
+        {
+          "id": "active-directory",
+          "label": "Active Directory",
+          "icon": "Server",
+          "color": "success"
+        }
+      ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KC3FBM8YXB7V70SQMEBN0151",
       "createdAt": "2025-12-10T06:32:11.814Z",
-      "updatedAt": "2025-12-10T06:32:11.814Z"
+      "updatedAt": "2025-12-18T11:52:20.920Z",
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        },
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        },
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "updatedBy": "841"
     },
     {
       "company": "CinnaGen",
-      "authenticationType": [],
+      "authenticationType": [
+        {
+          "id": "active-directory",
+          "label": "Active Directory",
+          "icon": "Server",
+          "color": "success"
+        }
+      ],
       "status": [
         {
           "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
@@ -1616,7 +1751,14 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KCPC8YBMRYB3X846103R11MH",
       "createdAt": "2025-12-17T14:43:52.319Z",
-      "updatedAt": "2025-12-17T14:43:52.319Z"
+      "updatedAt": "2025-12-18T11:49:22.902Z",
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "updatedBy": "841"
     }
   ],
   "purchaseOrders": [],
@@ -2486,8 +2628,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-17T15:54:51.996Z",
-      "lastSynced": "2025-12-17T15:54:51.996Z",
+      "updatedAt": "2025-12-18T12:40:57.116Z",
+      "lastSynced": "2025-12-18T12:40:57.116Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2499,7 +2641,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 39 schemas: 39 succeeded, 0 failed (39 created, 0 updated)"
+      "lastSyncMessage": "Processed 39 schemas: 38 succeeded, 1 failed (0 created, 38 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -2526,7 +2668,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-17T15:54:57.960Z",
+      "updatedAt": "2025-12-18T12:41:10.915Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2536,7 +2678,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-17T15:54:57.960Z",
+      "lastSynced": "2025-12-18T12:41:10.915Z",
       "lastSyncMessage": "Generated relations for 39 out of 39 schemas"
     },
     {
@@ -2583,7 +2725,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-17T15:55:33.987Z",
+      "updatedAt": "2025-12-18T12:43:56.567Z",
       "category": [
         {
           "id": "production-integration",
@@ -2592,8 +2734,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-17T15:55:33.987Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 983, nodes updated: 4, edges created: 44, nodes failed: 0, edges failed: 0."
+      "lastSynced": "2025-12-18T12:43:56.567Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 994, edges created: 44, nodes failed: 0, edges failed: 0."
     }
   ],
   "databases": [

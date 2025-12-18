@@ -25,7 +25,7 @@ import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/t
 import type { AiAgent, TokenUsage, VideoUsage, SchemaAnnotation, AnnotationItem } from '../types';
 import { cleanMarkdownResponse } from '../utils/ai-security-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface AiBuilderResponseProps {
   response: string;

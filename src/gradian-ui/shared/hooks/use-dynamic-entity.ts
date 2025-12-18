@@ -196,6 +196,7 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
     try {
       const response = await apiRequest(`${apiEndpoint}/${id}`, {
         method: 'DELETE',
+        callerName: 'useDynamicEntity.deleteEntity',
       });
       
       if (response.success) {

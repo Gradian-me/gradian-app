@@ -2,7 +2,8 @@
 // Logs out user by clearing tokens
 
 import { NextRequest, NextResponse } from 'next/server';
-import { AUTH_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import {
   buildAuthServiceUrl,
   buildProxyHeaders,

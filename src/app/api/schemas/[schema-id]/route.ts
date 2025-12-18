@@ -9,7 +9,7 @@ import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData } from '../u
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
 import { clearCache as clearSharedSchemaCache } from '@/gradian-ui/shared/utils/data-loader';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 const MAX_SCHEMA_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
 const SCHEMA_FILE_PATH = path.join(process.cwd(), 'data', 'all-schemas.json');

@@ -199,6 +199,7 @@ export function useEditModal(
       const apiEndpoint = `/api/data/${schemaId}/${editEntityId}`;
       const entityResult = await apiRequest(apiEndpoint, {
         method: 'GET',
+        callerName: 'useEditModal.loadEntity',
       });
 
       if (!entityResult.success || !entityResult.data) {

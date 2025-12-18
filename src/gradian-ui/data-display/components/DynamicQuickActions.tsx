@@ -14,7 +14,7 @@ import { replaceDynamicContext, replaceDynamicContextInObject } from '@/gradian-
 import { AiAgentDialog } from '@/domains/ai-builder/components/AiAgentDialog';
 import { getEncryptedSkipKey } from '@/gradian-ui/shared/utils/skip-key-storage';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export interface DynamicQuickActionsProps {
   actions: QuickAction[];
@@ -134,7 +134,10 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
         let referenceData = data;
         if (schema?.id && data?.id) {
           try {
-            const latest = await apiRequest(`/api/data/${schema.id}/${data.id}`, { method: 'GET' });
+            const latest = await apiRequest(`/api/data/${schema.id}/${data.id}`, {
+              method: 'GET',
+              callerName: 'DynamicQuickActions.refreshReference',
+            });
             if (latest.success && latest.data) {
               referenceData = latest.data;
             }
@@ -209,6 +212,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
         await apiRequest(endpoint, {
           method,
           body,
+          callerName: 'DynamicQuickActions.callApiAction',
         });
       } catch (error) {
         loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to call API for action ${action.id}: ${error instanceof Error ? error.message : String(error)}`);

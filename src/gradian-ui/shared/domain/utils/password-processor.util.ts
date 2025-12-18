@@ -70,7 +70,6 @@ export async function processPasswordFields(
             processedData.hashType = hashType;
           }
           
-          console.log(`[PASSWORD] Successfully hashed password for field ${fieldName}`);
           // Mark that password was successfully hashed
           processedData._passwordHashed = true;
         } catch (error) {
@@ -87,7 +86,6 @@ export async function processPasswordFields(
         processedData._passwordHashed = true; // Mark as processed
       } else if (isAlreadyHashed) {
         // Password is already hashed, keep it as is
-        console.log(`[PASSWORD] Password for field ${fieldName} is already hashed, skipping`);
         processedData._passwordHashed = true; // Mark as processed (no change needed)
       }
     }

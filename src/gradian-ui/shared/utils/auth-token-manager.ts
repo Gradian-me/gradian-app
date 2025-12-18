@@ -16,7 +16,8 @@
  */
 
 import { loggingCustom } from './logging-custom';
-import { LogType, REQUIRE_LOGIN } from '../constants/application-variables';
+import { LogType } from '../configs/log-config';
+import { REQUIRE_LOGIN } from '../configs/env-config';
 
 type QueuedRequest = {
   resolve: (token: string | null) => void;

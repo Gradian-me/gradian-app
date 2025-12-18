@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { SearchInput } from '@/gradian-ui/form-builder/form-elements';
-import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
+import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { useSchemas } from '@/gradian-ui/schema-manager/hooks/use-schemas';
@@ -26,6 +26,7 @@ import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { cn } from '@/gradian-ui/shared/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTenantStore } from '@/stores/tenant.store';
 
 type AppViewMode = 'grid' | 'list';
 
@@ -305,6 +306,7 @@ export function AppListWrapper() {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const language = useLanguageStore((state) => state.language || 'en');
+  const tenantId = useTenantStore((state) => state.getTenantId());
   const [isMounted, setIsMounted] = useState(false);
   
   // Ensure component is mounted before enabling the query
@@ -312,9 +314,10 @@ export function AppListWrapper() {
     setIsMounted(true);
   }, []);
 
-  const { schemas, isLoading, refetch } = useSchemas({ 
+  const { schemas, isLoading, error, refetch } = useSchemas({ 
     summary: true,
-    enabled: isMounted 
+    enabled: isMounted,
+    tenantIds: tenantId ? String(tenantId) : undefined,
   });
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -377,7 +380,12 @@ export function AppListWrapper() {
     if (!isMounted) return;
     try {
       setRefreshing(true);
-      await refetch();
+      const result = await refetch();
+      if (result.error) {
+        console.error('Failed to refresh apps:', result.error);
+      }
+    } catch (error) {
+      console.error('Error refreshing apps:', error);
     } finally {
       if (isMounted) {
         setRefreshing(false);

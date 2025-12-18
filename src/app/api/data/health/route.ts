@@ -3,7 +3,7 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 const DATA_FILE = join(process.cwd(), 'data', 'health.json');
 const DATA_DIR = join(process.cwd(), 'data');

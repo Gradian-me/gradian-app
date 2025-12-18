@@ -11,7 +11,7 @@ import { clearCompaniesCache } from '@/gradian-ui/shared/utils/companies-loader'
 import { isDemoModeEnabled, proxyDataRequest, enrichWithUsers } from '../../utils';
 import { syncHasFieldValueRelationsForEntity, minimizePickerFieldValues, enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 /**
  * Create controller instance for the given schema
@@ -54,6 +54,88 @@ export async function GET(
   const targetPath = `/api/data/${schemaId}/${id}${request.nextUrl.search}`;
 
   if (!isDemoModeEnabled()) {
+    // Special handling for tenants: try backend first, fallback to local if backend fails
+    if (schemaId === 'tenants') {
+      // Try to proxy to backend first
+      const proxyResponse = await proxyDataRequest(request, targetPath);
+      
+      // If backend returns success (2xx), return it immediately
+      if (proxyResponse.status >= 200 && proxyResponse.status < 300) {
+        return proxyResponse;
+      }
+      
+      // If backend returns 404 or 5xx error, try to fallback to local tenant file
+      if (proxyResponse.status === 404 || (proxyResponse.status >= 500 && proxyResponse.status < 600)) {
+        try {
+          // Clone the response to read it without consuming the original
+          const clonedResponse = proxyResponse.clone();
+          let proxyData: any = null;
+          try {
+            proxyData = await clonedResponse.json();
+          } catch {
+            // If response is not JSON, treat as error
+          }
+          
+          // If backend explicitly says tenant not found or returns 404, try local fallback
+          if (proxyResponse.status === 404 || (proxyData && proxyData.success === false)) {
+            loggingCustom(
+              LogType.INFRA_LOG,
+              'warn',
+              `[Tenant API] Backend returned ${proxyResponse.status} for tenant "${id}", attempting local fallback`
+            );
+            
+            // Fallback to local tenant file
+            try {
+              const { readSchemaData } = await import('@/gradian-ui/shared/domain/utils/data-storage.util');
+              const tenants = readSchemaData<any>('tenants');
+              const tenant = tenants.find((t: any) => String(t.id) === String(id));
+              
+              if (tenant) {
+                loggingCustom(
+                  LogType.INFRA_LOG,
+                  'info',
+                  `[Tenant API] Found tenant "${id}" in local fallback`
+                );
+                return NextResponse.json({
+                  success: true,
+                  data: tenant
+                }, {
+                  headers: {
+                    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0',
+                  },
+                });
+              } else {
+                loggingCustom(
+                  LogType.INFRA_LOG,
+                  'warn',
+                  `[Tenant API] Tenant "${id}" not found in local fallback either`
+                );
+              }
+            } catch (loadError) {
+              loggingCustom(
+                LogType.INFRA_LOG,
+                'error',
+                `[Tenant API] Failed to load local tenants for fallback: ${loadError instanceof Error ? loadError.message : String(loadError)}`
+              );
+            }
+          }
+        } catch (fallbackError) {
+          // If fallback fails, log and return original proxy response
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'warn',
+            `[Tenant API] Fallback failed for tenant "${id}": ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`
+          );
+        }
+      }
+      
+      // Return proxy response (either success or error)
+      return proxyResponse;
+    }
+    
+    // For non-tenant schemas, proxy directly without fallback
     return proxyDataRequest(request, targetPath);
   }
 

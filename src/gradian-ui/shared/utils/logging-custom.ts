@@ -1,4 +1,4 @@
-import { LogType, LOG_CONFIG } from '../constants/application-variables';
+import { LogType, LOG_CONFIG } from '../configs/log-config';
 
 type LogLevel = 'log' | 'info' | 'warn' | 'error' | 'debug';
 
@@ -92,4 +92,3 @@ export const loggingCustom = (logType: LogType, level: LogLevel, message: string
       console.log(formattedMessage);
   }
 };
-

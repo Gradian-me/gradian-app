@@ -326,9 +326,6 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
               typeof dataRecord[fieldName] === 'string' ? dataRecord[fieldName].length : 0;
             const hashedLength =
               typeof processed[fieldName] === 'string' ? processed[fieldName].length : 0;
-            console.log(
-              `[PASSWORD] Password updated for ${fieldName} - original length: ${originalLength}, hashed length: ${hashedLength}`
-            );
           } else if (processed[fieldName] === undefined && fieldName in dataRecord) {
             // Password was removed during processing (hashing failed), don't update it
             delete processedData[fieldName];

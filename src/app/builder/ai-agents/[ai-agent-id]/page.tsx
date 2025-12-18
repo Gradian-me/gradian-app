@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { AiAgentTabbedEditor } from '@/domains/ai-builder/components/agent-management/AiAgentTabbedEditor';
 import { AiAgent } from '@/domains/ai-builder/types';
 import { Message } from '@/gradian-ui/layout/message-box';
+import { ENABLE_BUILDER } from '@/gradian-ui/shared/configs/env-config';
+import { AccessDenied } from '@/gradian-ui/schema-manager/components/AccessDenied';
+import { MainLayout } from '@/components/layout/main-layout';
 
 /**
  * Transform API response messages to MessageBox format
@@ -36,12 +39,35 @@ const transformMessages = (apiMessages: any[]): Message[] => {
 export default function AiAgentEditorPage({ params }: { params: Promise<{ 'ai-agent-id': string }> }) {
   const router = useRouter();
   const [agentId, setAgentId] = useState<string>('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     params.then((resolvedParams) => {
       setAgentId(resolvedParams['ai-agent-id']);
     });
   }, [params]);
+
+  if (!mounted) {
+    return null;
+  }
+
+  if (!ENABLE_BUILDER) {
+    return (
+      <MainLayout title="Access Denied" subtitle="The builder is disabled in this environment." icon="OctagonMinus">
+        <AccessDenied
+          title="Access to AI Agents Builder is Disabled"
+          description="The AI agents builder is not available in this environment."
+          helperText="If you believe you should have access, please contact your system administrator."
+          homeHref="/apps"
+          showGoBackButton={false}
+        />
+      </MainLayout>
+    );
+  }
 
   const fetchAgent = async (id: string): Promise<AiAgent> => {
     const cacheBust = Date.now().toString();

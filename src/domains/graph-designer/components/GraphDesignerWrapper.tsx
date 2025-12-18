@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 import { MainLayout } from '@/components/layout/main-layout';
 import { useSchemas as useSchemaSummaries } from '@/gradian-ui/schema-manager/hooks/use-schemas';
+import { useTenantStore } from '@/stores/tenant.store';
 import { FormModal } from '@/gradian-ui/form-builder';
 import { ConfirmationMessage, PopupPicker } from '@/gradian-ui/form-builder/form-elements';
 import { getValueByRole } from '@/gradian-ui/data-display/utils';
@@ -37,7 +38,11 @@ export interface GraphDesignerWrapperProps {
 
 export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
   const { viewMode = false, graphData } = props;
-  const { schemas, isLoading, refetch } = useSchemaSummaries({ summary: true });
+  const tenantId = useTenantStore((state) => state.getTenantId());
+  const { schemas, isLoading, refetch } = useSchemaSummaries({ 
+    summary: true,
+    tenantIds: tenantId ? String(tenantId) : undefined,
+  });
   const normalizeSchemaType = useCallback(
     (schema: any): 'system' | 'business' | 'action-form' =>
       schema?.schemaType ? schema.schemaType : schema?.isSystemSchema === true ? 'system' : 'business',
@@ -394,16 +399,6 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
             if (!extractedTitle || extractedTitle.trim() === '') {
               extractedTitle = String(entityId);
             }
-            
-            // Debug: log what we're getting (can be removed later)
-            console.log('Node update after form save:', {
-              nodeId: activeNodeForForm.id,
-              entityId,
-              extractedTitle,
-              incomplete: false,
-              hasTitleRole: schema?.fields?.some((field) => field.role === 'title'),
-              dataKeys: Object.keys(data as any).slice(0, 10), // First 10 keys for debugging
-            });
             
             // Check if this entity ID (nodeId) is already linked to another node in the graph
             const duplicateNode = nodes.find(

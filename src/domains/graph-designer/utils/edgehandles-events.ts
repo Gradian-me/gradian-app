@@ -3,7 +3,7 @@ import type { GraphNodeData, GraphEdgeData } from '../types';
 import { validateEdgeCreation } from './edge-handling';
 import { extractNodeDataFromElement } from './node-data-extractor';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 /**
  * Configuration for edgehandles event handlers

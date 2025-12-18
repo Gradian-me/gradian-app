@@ -16,6 +16,8 @@ import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { extractDomainFromRoute } from '@/gradian-ui/shared/utils/url-utils';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { motion } from 'framer-motion';
 import {
   Activity,
@@ -353,7 +355,7 @@ export default function IntegrationsPage() {
         });
       } else {
         const errorMessage = response.error || 'Failed to fetch integrations';
-        console.error('Failed to fetch integrations:', errorMessage);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to fetch integrations: ${errorMessage}`);
         
         // Show user-friendly error message for rate limiting
         if (response.statusCode === 429) {
@@ -362,7 +364,7 @@ export default function IntegrationsPage() {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error fetching integrations';
-      console.error('Error fetching integrations:', errorMessage);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching integrations: ${errorMessage}`);
       
       // Show user-friendly error message
       if (errorMessage.includes('Too many requests') || errorMessage.includes('429')) {
@@ -663,8 +665,8 @@ export default function IntegrationsPage() {
         }
       }
     } catch (error) {
-      console.error('Sync error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Sync failed';
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Sync error: ${errorMessage}`);
       
       // Check if it's a connection error
       const isConnectionErr = error instanceof Error && (
@@ -907,14 +909,14 @@ export default function IntegrationsPage() {
     if (sortedCategories.length > 0) {
       // Create a new array to ensure state update
       const allCategories = [...sortedCategories];
-      console.log('[Integrations] Expanding all categories:', allCategories);
+      loggingCustom(LogType.CLIENT_LOG, 'info', `[Integrations] Expanding all categories: ${JSON.stringify(allCategories)}`);
       setExpandedCategories(allCategories);
     }
   }, [sortedCategories]);
 
   const handleCollapseAll = useCallback(() => {
     // Create a new empty array to ensure state update
-    console.log('[Integrations] Collapsing all categories');
+    loggingCustom(LogType.CLIENT_LOG, 'info', '[Integrations] Collapsing all categories');
     setExpandedCategories([]);
   }, []);
 
@@ -1184,7 +1186,7 @@ export default function IntegrationsPage() {
               type="multiple" 
               value={expandedCategories}
               onValueChange={(value) => {
-                console.log('[Integrations] Accordion value changed:', value);
+                loggingCustom(LogType.CLIENT_LOG, 'info', `[Integrations] Accordion value changed: ${JSON.stringify(value)}`);
                 setExpandedCategories(value);
               }}
               className="space-y-4"
@@ -1229,7 +1231,15 @@ export default function IntegrationsPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
                           >
-              <Card className="hover:shadow-lg transition-shadow duration-200">
+              <Card className={`hover:shadow-lg transition-shadow duration-200 ${syncing.has(integration.id) ? 'relative overflow-visible' : ''}`}>
+                {syncing.has(integration.id) && (
+                  <div className="absolute -top-2 -right-2 z-10">
+                    <span className="flex h-4 w-4">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-4 w-4 bg-yellow-500"></span>
+                    </span>
+                  </div>
+                )}
                 <CardContent className="p-4 h-full">
                   <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                     <div className="flex-1 min-w-0 w-full">
@@ -1237,8 +1247,14 @@ export default function IntegrationsPage() {
                         {(() => {
                           const iconColors = getIconColorClasses(integration.color);
                           return (
-                            <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${iconColors.bg}`}>
+                            <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 relative ${iconColors.bg}`}>
                               <IconRenderer iconName={integration.icon} className={`h-6 w-6 ${iconColors.text}`} />
+                              {syncing.has(integration.id) && (
+                                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                                </span>
+                              )}
                             </div>
                           );
                         })()}

@@ -31,8 +31,11 @@ import { DEFAULT_TEMPLATE_HTML, extractPlaceholders, renderWithValues, normalize
 import type { EmailTemplate, PlaceholderValues } from './types';
 import { Send } from 'lucide-react';
 import { Email } from '@/gradian-ui/communication';
+import { ENABLE_BUILDER } from '@/gradian-ui/shared/configs/env-config';
+import { AccessDenied } from '@/gradian-ui/schema-manager/components/AccessDenied';
 
 export default function EmailTemplateBuilderPage() {
+  const [mounted, setMounted] = useState(false);
   const {
     templates,
     isLoading,
@@ -63,6 +66,10 @@ export default function EmailTemplateBuilderPage() {
   } | null>(null);
   
   const { sendEmail: sendEmailRequest, loading: isSendingEmail } = Email.useSendEmail();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     setSelectedTemplateId((current) => {
@@ -152,6 +159,35 @@ export default function EmailTemplateBuilderPage() {
     if (!workingTemplate?.id) return '';
     return `/api/email-templates/${workingTemplate.id}`;
   }, [workingTemplate?.id]);
+
+  const renderedJson = useMemo(() => {
+    if (!workingTemplate) return '';
+    return JSON.stringify({
+      templateId: workingTemplate.id,
+      to: testEmailTo,
+      cc: testEmailCc.length > 0 ? testEmailCc : undefined,
+      bcc: testEmailBcc.length > 0 ? testEmailBcc : undefined,
+      placeholders: placeholderValues,
+    }, null, 2);
+  }, [workingTemplate, testEmailTo, testEmailCc, testEmailBcc, placeholderValues]);
+
+  if (!mounted) {
+    return null;
+  }
+
+  if (!ENABLE_BUILDER) {
+    return (
+      <MainLayout title="Access Denied" subtitle="The builder is disabled in this environment." icon="OctagonMinus">
+        <AccessDenied
+          title="Access to Email Templates Builder is Disabled"
+          description="The email templates builder is not available in this environment."
+          helperText="If you believe you should have access, please contact your system administrator."
+          homeHref="/apps"
+          showGoBackButton={false}
+        />
+      </MainLayout>
+    );
+  }
 
   const handleTemplateFieldChange = <K extends keyof EmailTemplate>(field: K, value: EmailTemplate[K]) => {
     if (!workingTemplate) return;
@@ -309,17 +345,6 @@ export default function EmailTemplateBuilderPage() {
       });
     }
   };
-
-  const renderedJson = useMemo(() => {
-    if (!workingTemplate) return '';
-    return JSON.stringify({
-      templateId: workingTemplate.id,
-      to: testEmailTo,
-      cc: testEmailCc.length > 0 ? testEmailCc : undefined,
-      bcc: testEmailBcc.length > 0 ? testEmailBcc : undefined,
-      templateData: placeholderValues,
-    }, null, 2);
-  }, [workingTemplate, testEmailTo, testEmailCc, testEmailBcc, placeholderValues]);
 
   const renderEmptyState = () => (
     <Card>

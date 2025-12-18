@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { PencilRuler, Trash2, Sparkles, Code } from 'lucide-react';
 import { AiAgent } from '../../types';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
+import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 
 interface AiAgentListViewProps {
   agents: AiAgent[];

@@ -19,7 +19,8 @@ import { SchemaFormWrapper } from '@/gradian-ui/form-builder/components/FormLife
 import { ListInput } from '@/gradian-ui/form-builder/form-elements';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
 import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
-import { DEMO_MODE, LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';

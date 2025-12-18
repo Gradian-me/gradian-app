@@ -6,7 +6,7 @@ import { TextInputProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
 import { Eye, EyeOff } from 'lucide-react';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export const PasswordInput = forwardRef<FormElementRef, TextInputProps>(
   (

@@ -6,7 +6,8 @@ import fs from 'fs';
 import path from 'path';
 
 import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData } from './utils';
-import { SCHEMA_SUMMARY_EXCLUDED_KEYS, LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { SCHEMA_SUMMARY_EXCLUDED_KEYS } from '@/gradian-ui/shared/configs/general-config';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { calculateSchemaStatistics } from '@/gradian-ui/schema-manager/utils/schema-statistics-utils';
 
@@ -178,12 +179,52 @@ function writeSchemasAtomically(schemas: any[]): void {
  * - GET /api/schemas?id=vendors - returns only vendors schema
  */
 export async function GET(request: NextRequest) {
-  if (!isDemoModeEnabled()) {
-    return proxySchemaRequest(request, `/api/schemas${request.nextUrl.search}`);
-  }
+  const searchParams = request.nextUrl.searchParams;
 
   try {
-    const searchParams = request.nextUrl.searchParams;
+    // In live mode, first try to proxy to backend with all query params preserved.
+    // If backend is unavailable (404 or 5xx), fall back to local schemas.json using
+    // the same query params (id, schemaIds, tenantIds, summary, includeStatistics, etc.).
+    if (!isDemoModeEnabled()) {
+      const targetPath = `/api/schemas${request.nextUrl.search}`;
+      const proxyResponse = await proxySchemaRequest(request, targetPath);
+
+      // If backend returns success (2xx), return it immediately
+      if (proxyResponse.status >= 200 && proxyResponse.status < 300) {
+        return proxyResponse;
+      }
+
+      // If backend returns 404 or 5xx error, log and try local fallback
+      if (proxyResponse.status === 404 || (proxyResponse.status >= 500 && proxyResponse.status < 600)) {
+        try {
+          const cloned = proxyResponse.clone();
+          let proxyData: any = null;
+          try {
+            proxyData = await cloned.json();
+          } catch {
+            // Non‑JSON or empty body – just treat as generic error
+          }
+
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'warn',
+            `[API] /api/schemas backend returned ${proxyResponse.status} (summary=${searchParams.get('summary')}, includeStatistics=${searchParams.get('includeStatistics')}, tenantIds=${searchParams.get('tenantIds') || 'none'}) – attempting local fallback from filesystem`
+          );
+          // Fall through to local filesystem logic below
+        } catch (fallbackError) {
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'warn',
+            `[API] /api/schemas fallback preparation failed: ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`,
+          );
+          // If fallback setup fails, return original proxy response
+          return proxyResponse;
+        }
+      } else {
+        // Non‑404/5xx errors (e.g. 401/403/422) should propagate from backend
+        return proxyResponse;
+      }
+    }
     const schemaId = searchParams.get('id');
     const schemaIdsParam = searchParams.get('schemaIds');
     const tenantIdsParam = searchParams.get('tenantIds');
@@ -191,6 +232,33 @@ export async function GET(request: NextRequest) {
     const isSummaryRequested = summaryParam === 'true' || summaryParam === '1';
     const includeStatisticsParam = searchParams.get('includeStatistics');
     const includeStatistics = includeStatisticsParam === 'true' || includeStatisticsParam === '1';
+    
+    // Get hostname to check if we're on localhost
+    const hostHeader = request.headers.get('host');
+    const xForwardedHost = request.headers.get('x-forwarded-host');
+    const nextUrlHostname = request.nextUrl?.hostname;
+    const rawHost = xForwardedHost || hostHeader || nextUrlHostname || '';
+    const normalizedHost = rawHost.trim().toLowerCase().split(':')[0];
+    const isLocalhost = normalizedHost === 'localhost' || normalizedHost === '127.0.0.1' || normalizedHost.startsWith('localhost:');
+    
+    // Require tenantIds always when host is not localhost
+    if (!isLocalhost) {
+      if (!tenantIdsParam || tenantIdsParam.trim().length === 0) {
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `[API] /api/schemas called without tenantIds on non-localhost host: ${normalizedHost}`,
+        );
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'tenantIds parameter is required on non-localhost hosts',
+            message: 'The tenantIds query parameter must be provided to filter schemas by tenant.',
+          },
+          { status: 400 }
+        );
+      }
+    }
     
     // Log for debugging
     if (includeStatistics) {
@@ -354,7 +422,11 @@ export async function POST(request: NextRequest) {
                   `[POST /api/schemas] repeatingConfig is still a string at ${path}sections[${idx}].repeatingConfig: ${section.repeatingConfig.substring(0, 100)}`,
                 );
               } else {
-                console.log(`[POST /api/schemas] repeatingConfig normalized at ${path}sections[${idx}].repeatingConfig`);
+                loggingCustom(
+                  LogType.INFRA_LOG,
+                  'info',
+                  `[POST /api/schemas] repeatingConfig normalized at ${path}sections[${idx}].repeatingConfig`,
+                );
               }
             }
           });

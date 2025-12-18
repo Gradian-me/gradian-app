@@ -5,7 +5,7 @@
  */
 
 import { loggingCustom } from './logging-custom';
-import { LogType } from '../constants/application-variables';
+import { LogType } from '../configs/log-config';
 
 /**
  * Encrypt/encode a return URL for use in query parameters

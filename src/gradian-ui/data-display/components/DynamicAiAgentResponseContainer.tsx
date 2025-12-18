@@ -25,7 +25,7 @@ import { VoicePoweredOrb } from '@/components/ui/voice-powered-orb';
 import { TextSwitcher } from '@/components/ui/text-switcher';
 import { cleanMarkdownResponse } from '@/domains/ai-builder/utils/ai-security-utils';
 import { Badge } from '@/components/ui/badge';
-import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export interface DynamicAiAgentResponseContainerProps {
   action: QuickAction;

@@ -5,7 +5,7 @@ import {
 import { Email } from '@/gradian-ui/communication';
 import type { SendEmailResponse } from '@/gradian-ui/communication/email/types';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
@@ -19,7 +19,7 @@ const errorResponse = (message: string, status = 500) =>
  */
 async function loadEnvProd(): Promise<void> {
   try {
-    const envProdPath = join(process.cwd(), '.env.prod');
+    const envProdPath = join(process.cwd(), '.env.production');
     const envContent = await readFile(envProdPath, 'utf-8');
     
     // Parse .env file format (key=value, support quotes)

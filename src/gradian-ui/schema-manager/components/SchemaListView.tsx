@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { PencilRuler, LayoutList, Trash2 } from 'lucide-react';
 import { FormSchema } from '../types';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { UI_PARAMS } from '@/gradian-ui/shared/constants/application-variables';
+import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 
 interface SchemaListViewProps {
   schemas: FormSchema[];

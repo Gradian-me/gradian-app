@@ -12,7 +12,7 @@ import {
 import { formatRelationType } from '../utils';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 async function fetchSchemaClient(schemaId: string): Promise<FormSchema | null> {
   const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);

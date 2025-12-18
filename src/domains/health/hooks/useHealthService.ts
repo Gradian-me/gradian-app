@@ -117,10 +117,12 @@ export const useHealthService = (): UseHealthServiceReturn => {
         ? await apiRequest(`/api/data/health`, {
             method: 'PUT',
             body: serviceData,
+            callerName: 'useHealthService.saveService.update',
           })
         : await apiRequest(`/api/data/health`, {
             method: 'POST',
             body: serviceData,
+            callerName: 'useHealthService.saveService.create',
           });
 
       if (response.success) {
@@ -146,6 +148,7 @@ export const useHealthService = (): UseHealthServiceReturn => {
     try {
       const response = await apiRequest(`/api/data/health?id=${serviceId}`, {
         method: 'DELETE',
+        callerName: 'useHealthService.deleteService',
       });
 
       if (response.success) {

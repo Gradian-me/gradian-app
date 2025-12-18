@@ -13,7 +13,11 @@ import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useTheme } from 'next-themes';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { useQueryClient } from '@tanstack/react-query';
+import { SCHEMAS_QUERY_KEY, SCHEMAS_SUMMARY_QUERY_KEY } from '@/gradian-ui/schema-manager/hooks/use-schemas';
+import { clearSchemaCache } from '@/gradian-ui/indexdb-manager/schema-cache';
+import { SCHEMA_SUMMARY_CACHE_KEY, SCHEMA_CACHE_KEY } from '@/gradian-ui/indexdb-manager/types';
 
 interface Tenant {
   id: string | number;
@@ -30,7 +34,9 @@ interface TenantSelectorProps {
   variant?: 'light' | 'dark' | 'auto';
   fullWidth?: boolean;
   showLogo?: 'none' | 'sidebar-avatar' | 'full';
-  hidden?: boolean; // If true, component is invisible but still fetches and sets tenants
+  hidden?: boolean; // If true, enables fallback to first tenant when no domain match is found (legacy prop, mainly for backward compatibility)
+  disabled?: boolean; // If true, show selector but disable interaction (read-only)
+  onOpenChange?: (open: boolean) => void; // Notify parent when dropdown menu opens/closes
 }
 
 export const TenantSelector: React.FC<TenantSelectorProps> = ({
@@ -40,10 +46,13 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
   fullWidth = false,
   showLogo = 'full',
   hidden = false,
+  disabled = false,
+  onOpenChange,
 }) => {
   const router = useRouter();
-  const { selectedTenant, setSelectedTenant } = useTenantStore();
-  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const queryClient = useQueryClient();
+  const { selectedTenant, setSelectedTenant, tenants: storeTenants, setTenants: setStoreTenants } = useTenantStore();
+  const [tenants, setTenants] = useState<Tenant[]>(() => storeTenants || []);
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -68,6 +77,13 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
     const fetchTenants = async () => {
       setLoading(true);
       try {
+        // If we already have tenants in the store, use them and avoid another network call
+        if (storeTenants && storeTenants.length > 0) {
+          setTenants(storeTenants);
+          setLoading(false);
+          return;
+        }
+
         const response = await apiRequest<Tenant[] | { data?: Tenant[]; items?: Tenant[] }>(
           '/api/data/tenants',
           { method: 'GET', callerName: 'TenantSelector' }
@@ -78,34 +94,100 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
             ? response.data
             : ((response.data as any)?.data || (response.data as any)?.items || []);
           setTenants(data);
+          setStoreTenants(data);
           
-          // In hidden mode, auto-select tenant based on domain or first tenant (only once)
-          if (hidden && data.length > 0 && !selectedTenant && !hasAutoSelectedRef.current) {
-            hasAutoSelectedRef.current = true;
-            const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
-            // Try to find tenant matching current domain
-            const domainMatch = data.find((tenant: Tenant) => 
-              tenant.domain && hostname.includes(tenant.domain)
+          // Validate that the currently selected tenant still exists in the fetched list
+          if (selectedTenant) {
+            const tenantStillExists = data.some((tenant: Tenant) => 
+              tenant.id === selectedTenant.id
             );
-            const tenantToSelect = domainMatch || data[0];
-            if (tenantToSelect) {
-              const fullTenant: Tenant = {
-                ...tenantToSelect,
-                domain: tenantToSelect.domain || '',
-              };
-              setSelectedTenant(fullTenant);
-              // Save to localStorage
-              if (typeof window !== 'undefined') {
-                try {
-                  const stateToSave = {
-                    state: { selectedTenant: fullTenant },
-                    version: 0
-                  };
-                  localStorage.setItem('tenant-store', JSON.stringify(stateToSave));
-                } catch (error) {
-                  loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to save tenant to localStorage: ${error instanceof Error ? error.message : String(error)}`);
+            if (!tenantStillExists) {
+              // Selected tenant no longer exists, clear it
+              loggingCustom(LogType.CLIENT_LOG, 'info', `Selected tenant "${selectedTenant.name || selectedTenant.id}" no longer exists, clearing selection`);
+              setSelectedTenant(null);
+            }
+          }
+          
+          // Auto-select tenant based on domain matching on initial load (only if no tenant is selected)
+          // Skip auto-selection if hostname is localhost
+          if (data.length > 0 && !selectedTenant && !hasAutoSelectedRef.current) {
+            hasAutoSelectedRef.current = true;
+            const hostname = typeof window !== 'undefined' ? window.location.hostname.toLowerCase() : '';
+            
+            // Skip auto-selection for localhost
+            const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('localhost:');
+            
+            if (!isLocalhost) {
+              // Normalize hostname: remove port if present
+              const normalizedHostname = hostname.split(':')[0];
+              
+              // Try to find tenant matching current domain (exact match or subdomain match)
+              const domainMatch = data.find((tenant: Tenant) => {
+                if (!tenant.domain) return false;
+                const tenantDomain = tenant.domain.toLowerCase().trim();
+                
+                // Remove http:// or https:// if present
+                const cleanDomain = tenantDomain.replace(/^https?:\/\//, '').split('/')[0].split(':')[0];
+                
+                // Exact match
+                if (normalizedHostname === cleanDomain) return true;
+                
+                // Subdomain match: hostname ends with .domain (e.g., app.example.com matches example.com)
+                if (normalizedHostname.endsWith('.' + cleanDomain)) return true;
+                
+                return false;
+              });
+              
+              if (domainMatch) {
+                const fullTenant: Tenant = {
+                  ...domainMatch,
+                  domain: domainMatch.domain || '',
+                };
+                loggingCustom(LogType.CLIENT_LOG, 'info', `Auto-selected tenant "${fullTenant.name || fullTenant.id}" based on domain match: ${normalizedHostname} matches ${domainMatch.domain}`);
+                setSelectedTenant(fullTenant);
+                // Save to localStorage
+                if (typeof window !== 'undefined') {
+                  try {
+                    const stateToSave = {
+                      state: { selectedTenant: fullTenant },
+                      version: 0
+                    };
+                    localStorage.setItem('tenant-store', JSON.stringify(stateToSave));
+                  } catch (error) {
+                    loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to save tenant to localStorage: ${error instanceof Error ? error.message : String(error)}`);
+                  }
+                }
+              } else {
+                // Fallback to first tenant if no domain match and hidden prop is true (legacy behavior)
+                // Otherwise, leave tenant unselected for user to choose manually
+                if (hidden) {
+                  const firstTenant = data[0];
+                  if (firstTenant) {
+                    const fullTenant: Tenant = {
+                      ...firstTenant,
+                      domain: firstTenant.domain || '',
+                    };
+                    loggingCustom(LogType.CLIENT_LOG, 'info', `No domain match found for ${normalizedHostname}, selecting first tenant (hidden mode fallback)`);
+                    setSelectedTenant(fullTenant);
+                    // Save to localStorage
+                    if (typeof window !== 'undefined') {
+                      try {
+                        const stateToSave = {
+                          state: { selectedTenant: fullTenant },
+                          version: 0
+                        };
+                        localStorage.setItem('tenant-store', JSON.stringify(stateToSave));
+                      } catch (error) {
+                        loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to save tenant to localStorage: ${error instanceof Error ? error.message : String(error)}`);
+                      }
+                    }
+                  }
+                } else {
+                  loggingCustom(LogType.CLIENT_LOG, 'info', `No domain match found for ${normalizedHostname}, leaving tenant unselected`);
                 }
               }
+            } else {
+              loggingCustom(LogType.CLIENT_LOG, 'info', 'Hostname is localhost, skipping tenant auto-selection');
             }
           }
         }
@@ -118,9 +200,25 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
     };
 
     void fetchTenants();
-  }, [isMounted, hidden, selectedTenant, setSelectedTenant]);
+    // Only depend on isMounted and hidden - don't re-fetch when selectedTenant changes
+  }, [isMounted, hidden, storeTenants]);
   
-  // Reset auto-selection ref when hidden prop changes
+  // Separate effect to validate selected tenant when it changes (but don't re-fetch)
+  useEffect(() => {
+    if (!isMounted || tenants.length === 0 || !selectedTenant) return;
+    
+    // Validate that the selected tenant still exists in the tenants list
+    const tenantStillExists = tenants.some((tenant: Tenant) => 
+      tenant.id === selectedTenant.id
+    );
+    if (!tenantStillExists) {
+      // Selected tenant no longer exists, clear it
+      loggingCustom(LogType.CLIENT_LOG, 'info', `Selected tenant "${selectedTenant.name || selectedTenant.id}" no longer exists in fetched list, clearing selection`);
+      setSelectedTenant(null);
+    }
+  }, [isMounted, tenants, selectedTenant, setSelectedTenant]);
+  
+  // Reset auto-selection ref when hidden prop changes (allows re-attempting auto-selection)
   useEffect(() => {
     if (!hidden) {
       hasAutoSelectedRef.current = false;
@@ -158,12 +256,83 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
       }
     }
     
-    // Refresh all pages when tenant changes
+    // Clear schema cache when tenant changes (both React Query and IndexedDB)
+    try {
+      loggingCustom(LogType.CLIENT_LOG, 'info', 'Clearing schema cache due to tenant change');
+      
+      // Call the clear-cache API route to clear server-side caches
+      try {
+        const clearCacheResponse = await fetch('/api/schemas/clear-cache', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (clearCacheResponse.ok) {
+          const result = await clearCacheResponse.json();
+          loggingCustom(LogType.CLIENT_LOG, 'info', `Server-side cache cleared: ${result.message || 'success'}`);
+        } else {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `Server-side cache clear returned status ${clearCacheResponse.status}`);
+        }
+      } catch (apiError) {
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to call clear-cache API: ${apiError instanceof Error ? apiError.message : String(apiError)}`);
+      }
+      
+      // Clear IndexedDB cache (this is persistent storage)
+      try {
+        await Promise.all([
+          clearSchemaCache(undefined, SCHEMA_CACHE_KEY),
+          clearSchemaCache(undefined, SCHEMA_SUMMARY_CACHE_KEY),
+        ]);
+        loggingCustom(LogType.CLIENT_LOG, 'info', 'IndexedDB schema cache cleared');
+      } catch (indexedDbError) {
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to clear IndexedDB schema cache: ${indexedDbError instanceof Error ? indexedDbError.message : String(indexedDbError)}`);
+      }
+      
+      // Invalidate all schema queries (this marks them as stale and triggers refetch)
+      await Promise.all([
+        queryClient.invalidateQueries({ 
+          queryKey: SCHEMAS_SUMMARY_QUERY_KEY,
+          exact: false, // Invalidate all queries that start with this key (including tenant-specific ones)
+        }),
+        queryClient.invalidateQueries({ 
+          queryKey: SCHEMAS_QUERY_KEY,
+          exact: false, // Invalidate all queries that start with this key (including tenant-specific ones)
+        }),
+      ]);
+      
+      // Remove all schema queries from React Query cache to force fresh fetch
+      queryClient.removeQueries({ 
+        queryKey: SCHEMAS_SUMMARY_QUERY_KEY,
+        exact: false,
+      });
+      queryClient.removeQueries({ 
+        queryKey: SCHEMAS_QUERY_KEY,
+        exact: false,
+      });
+      
+      // Dispatch event to notify other components about cache clear
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('react-query-cache-clear', { 
+          detail: { queryKeys: ['schemas', 'schemas-summary'] } 
+        }));
+        // Also trigger storage event for other tabs
+        window.localStorage.setItem('react-query-cache-cleared', JSON.stringify(['schemas', 'schemas-summary']));
+        window.localStorage.removeItem('react-query-cache-cleared');
+      }
+      
+      loggingCustom(LogType.CLIENT_LOG, 'info', 'Schema cache cleared successfully (Server + React Query + IndexedDB)');
+    } catch (error) {
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to clear schema cache: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    
+    // Wait a bit more to ensure cache clearing operations complete
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Refresh router to update server components without full page reload
+    // This preserves scroll position, pagination, and other client state
     router.refresh();
-    // Also reload the page to ensure all components get fresh data
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
   };
 
   const getTenantName = (tenant?: Tenant | null) => {
@@ -217,11 +386,6 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
     isDarkVariant ? "bg-gray-700" : "bg-gray-200"
   );
   const menuItemBaseClasses = "relative flex cursor-pointer select-none items-center rounded-lg px-2 py-1.5 text-sm outline-none transition-colors";
-
-  // If hidden, return null but still allow effects to run (they handle fetching and setting tenant)
-  if (hidden) {
-    return null;
-  }
 
   if (!isMounted || loading) {
     return (
@@ -293,6 +457,59 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
     );
   }
 
+  // Read-only / disabled mode: show current tenant but prevent opening menu
+  if (disabled) {
+    return (
+      <div className={cn("flex items-center space-x-2", fullWidth && "w-full", className)}>
+        {selectedTenant?.logo && showLogo === 'full' && (
+          <div className="relative h-10 w-30 overflow-hidden">
+            <Image 
+              src={selectedTenant.logo} 
+              alt={selectedTenant.title || selectedTenant.name}
+              fill
+              className="object-contain"
+              unoptimized
+            />
+          </div>
+        )}
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className={triggerBaseClasses}
+          aria-label="Tenant selection is disabled in live mode"
+          disabled
+        >
+          <Avatar 
+            fallback={tenantInitials}
+            size={showLogo === 'sidebar-avatar' ? 'xs' : 'sm'}
+            variant="primary"
+            className={cn(
+              "border",
+              avatarBorderClass,
+              showLogo === 'sidebar-avatar' ? "h-8 w-8" : ""
+            )}
+            src={showLogo === 'sidebar-avatar' ? selectedTenant?.logo : undefined}
+          />
+          <span
+            className={cn(
+              "text-sm font-medium line-clamp-1 whitespace-nowrap overflow-hidden text-ellipsis text-start",
+              isDarkVariant ? "text-gray-300" : "text-gray-700 dark:text-gray-300",
+              fullWidth ? "flex-1" : ""
+            )}
+          >
+            {getTenantName(selectedTenant) || placeholder}
+          </span>
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 shrink-0",
+              chevronColorClass,
+            )}
+          />
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("flex items-center space-x-2", fullWidth && "w-full", className)}>
       {selectedTenant?.logo && showLogo === 'full' && (
@@ -306,7 +523,13 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
           />
         </div>
       )}
-      <DropdownMenuPrimitive.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+      <DropdownMenuPrimitive.Root
+        open={isMenuOpen}
+        onOpenChange={(open) => {
+          setIsMenuOpen(open);
+          onOpenChange?.(open);
+        }}
+      >
         <DropdownMenuPrimitive.Trigger asChild className={fullWidth ? "w-full" : "min-w-44"}>
           <Button 
             variant="outline" 

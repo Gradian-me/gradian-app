@@ -16,7 +16,7 @@ import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-
 import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export interface PickerInputProps {
   config: any;

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { LogType, DEMO_MODE } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
 import { extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
-import { AUTH_CONFIG } from '@/gradian-ui/shared/constants/application-variables';
+import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 
 const TRUTHY_VALUES = new Set(['true', '1', 'yes', 'on']);
 const SCHEMA_ROUTE_PREFIX = '/api/schemas';
@@ -65,10 +65,9 @@ export const isDemoModeEnabled = (): boolean => {
   // On server, use the loader to get fresh values from the file system
   if (typeof window === 'undefined') {
     try {
-      const vars = loadApplicationVariables();
-      return vars.DEMO_MODE;
+      return DEMO_MODE;
     } catch {
-      // Fallback to static value if loader fails
+      // Fallback to static value
       return DEMO_MODE;
     }
   }

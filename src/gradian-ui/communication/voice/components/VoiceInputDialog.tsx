@@ -23,7 +23,7 @@ import { CopyContent } from "@/gradian-ui/form-builder/form-elements/components/
 import { ButtonMinimal } from "@/gradian-ui/form-builder/form-elements/components/ButtonMinimal";
 import { MetricCard } from "@/gradian-ui/analytics/indicators/metric-card";
 import { loggingCustom } from "@/gradian-ui/shared/utils/logging-custom";
-import { LogType } from "@/gradian-ui/shared/constants/application-variables";
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 const VoiceVisualizer = dynamic(
   () =>

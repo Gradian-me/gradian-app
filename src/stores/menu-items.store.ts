@@ -63,11 +63,10 @@ export const useMenuItemsStore = create<MenuItemsState>()(
           // Return cached items only if:
           // 1. We have items cached
           // 2. The companyId matches (or both are null)
-          // 3. Cache is not stale
+          // Note: we intentionally ignore staleness here to avoid unnecessary refetches.
           if (
             state.menuItems.length > 0 &&
-            state.companyId === companyId &&
-            !state.isStale()
+            state.companyId === companyId
           ) {
             return state.menuItems;
           }

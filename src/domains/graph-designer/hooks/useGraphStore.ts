@@ -7,7 +7,7 @@ import type { GraphEdgeData, GraphNodeData, GraphRecord } from '../types';
 import { createEdgeData, validateEdgeCreation, normalizeEdgeData } from '../utils/edge-handling';
 import { saveGraphRecord } from '../utils/graph-db';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/constants/application-variables';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export interface UseGraphStoreResult {
   graph: GraphRecord | null;

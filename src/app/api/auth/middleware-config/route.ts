@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { loadApplicationVariables } from '@/gradian-ui/shared/utils/application-variables-loader';
+import { REQUIRE_LOGIN, LOGIN_LOCALLY } from '@/gradian-ui/shared/configs/env-config';
+import { EXCLUDED_LOGIN_ROUTES, AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 
 // Cache the config for a short time to avoid hitting the file system on every request
 let cachedConfig: {
@@ -27,14 +28,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Load fresh config
-    const vars = loadApplicationVariables();
     const config = {
-      REQUIRE_LOGIN: vars.REQUIRE_LOGIN ?? false,
-      EXCLUDED_LOGIN_ROUTES: vars.EXCLUDED_LOGIN_ROUTES ?? [],
-      LOGIN_LOCALLY: vars.LOGIN_LOCALLY ?? false,
-      ACCESS_TOKEN_COOKIE: vars.AUTH_CONFIG?.ACCESS_TOKEN_COOKIE || 'access_token',
-      REFRESH_TOKEN_COOKIE: vars.AUTH_CONFIG?.REFRESH_TOKEN_COOKIE || 'refresh_token',
-      ACCESS_TOKEN_EXPIRY: vars.AUTH_CONFIG?.ACCESS_TOKEN_EXPIRY || 3600,
+      REQUIRE_LOGIN: REQUIRE_LOGIN ?? false,
+      EXCLUDED_LOGIN_ROUTES: EXCLUDED_LOGIN_ROUTES ?? [],
+      LOGIN_LOCALLY: LOGIN_LOCALLY ?? false,
+      ACCESS_TOKEN_COOKIE: AUTH_CONFIG.ACCESS_TOKEN_COOKIE,
+      REFRESH_TOKEN_COOKIE: AUTH_CONFIG.REFRESH_TOKEN_COOKIE,
+      ACCESS_TOKEN_EXPIRY: AUTH_CONFIG.ACCESS_TOKEN_EXPIRY,
     };
 
     // Update cache
