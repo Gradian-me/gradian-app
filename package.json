@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.32.003",
+  "version": "1.32.004",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
