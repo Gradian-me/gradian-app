@@ -8,7 +8,6 @@ import { defaultSidebarConfig } from '../configs';
 import { SidebarHeader } from './SidebarHeader';
 import { CompanySelector } from '@/components/layout/CompanySelector';
 import { UserProfileSelector } from '@/components/layout/UserProfileSelector';
-import { ModeToggle } from '../../mode-toggle/components/ModeToggle';
 import { SidebarNavigationMenu } from './SidebarNavigationMenu';
 import { APP_VERSION } from '../../../shared/constants/app-version';
 
@@ -100,9 +99,6 @@ const SidebarComponent: React.FC<SidebarProps> = ({
                 },
               }}
             />
-            <div className="shrink-0">
-              <ModeToggle />
-            </div>
           </div>
         </div>
       )}

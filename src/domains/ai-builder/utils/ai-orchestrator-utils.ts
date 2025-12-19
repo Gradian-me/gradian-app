@@ -888,21 +888,50 @@ async function executeAgentChain(
   let currentInput = initialInput;
   const completedTodos = new Set<string>();
 
+  // Validate all dependencies exist before execution
+  const validateDependencies = () => {
+    const todoMap = new Map<string, Todo>();
+    todos.forEach(t => {
+      todoMap.set(t.id, t);
+      if (t.title) todoMap.set(t.title, t);
+    });
+
+    for (const todo of todos) {
+      if (todo.dependencies && todo.dependencies.length > 0) {
+        for (const dep of todo.dependencies) {
+          if (!todoMap.has(dep)) {
+            throw new Error(`Todo ${todo.id} has invalid dependency: ${dep} (dependency does not exist)`);
+          }
+        }
+      }
+    }
+  };
+
+  // Validate dependencies first
+  validateDependencies();
+
   // Execute todos in dependency order
   const executeTodo = async (todo: Todo): Promise<any> => {
     // Check dependencies
     if (todo.dependencies && todo.dependencies.length > 0) {
-      const unmetDeps = todo.dependencies.filter(dep => {
-        // Check if dependency is completed by ID or by title
-        const isCompletedById = completedTodos.has(dep);
-        if (isCompletedById) return false; // Dependency is met
+      const unmetDeps: string[] = [];
+      
+      for (const dep of todo.dependencies) {
+        // Check if dependency is completed by ID
+        if (completedTodos.has(dep)) {
+          continue; // Dependency is met
+        }
         
-        // Check if any completed todo has this title
-        const depTodo = todos.find(t => 
-          (t.id === dep || t.title === dep) && completedTodos.has(t.id)
-        );
-        return !depTodo; // Return true if unmet
-      });
+        // Check if any todo with matching ID or title is completed
+        const depTodo = todos.find(t => (t.id === dep || t.title === dep));
+        if (depTodo && completedTodos.has(depTodo.id)) {
+          continue; // Dependency is met
+        }
+        
+        // Dependency is unmet
+        unmetDeps.push(dep);
+      }
+      
       if (unmetDeps.length > 0) {
         throw new Error(`Todo ${todo.id} has unmet dependencies: ${unmetDeps.join(', ')}`);
       }
@@ -977,19 +1006,64 @@ async function executeAgentChain(
     }
   };
 
-  // Topological sort of todos by dependencies
+  // Topological sort of todos by dependencies using Kahn's algorithm
   // Dependencies can be either IDs or titles, so check both
-  const sortedTodos = [...todos];
-  sortedTodos.sort((a, b) => {
-    // Check if a depends on b (by ID or title)
-    const aDependsOnB = a.dependencies?.some(dep => dep === b.id || dep === b.title);
-    // Check if b depends on a (by ID or title)
-    const bDependsOnA = b.dependencies?.some(dep => dep === a.id || dep === a.title);
-    
-    if (aDependsOnB) return 1;  // a should come after b
-    if (bDependsOnA) return -1; // b should come after a
-    return 0;
+  const todoMap = new Map<string, Todo>();
+  todos.forEach(t => {
+    todoMap.set(t.id, t);
+    if (t.title) todoMap.set(t.title, t);
   });
+
+  // Build dependency graph
+  const inDegree = new Map<string, number>();
+  const graph = new Map<string, string[]>();
+  
+  todos.forEach(todo => {
+    inDegree.set(todo.id, 0);
+    graph.set(todo.id, []);
+  });
+
+  todos.forEach(todo => {
+    if (todo.dependencies && todo.dependencies.length > 0) {
+      todo.dependencies.forEach(dep => {
+        const depTodo = todoMap.get(dep);
+        if (depTodo) {
+          const current = inDegree.get(todo.id) || 0;
+          inDegree.set(todo.id, current + 1);
+          const depList = graph.get(depTodo.id) || [];
+          depList.push(todo.id);
+          graph.set(depTodo.id, depList);
+        }
+      });
+    }
+  });
+
+  // Kahn's algorithm for topological sort
+  const sortedTodos: Todo[] = [];
+  const queue: Todo[] = todos.filter(t => (inDegree.get(t.id) || 0) === 0);
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    sortedTodos.push(current);
+    
+    const dependents = graph.get(current.id) || [];
+    dependents.forEach(depId => {
+      const currentInDegree = inDegree.get(depId) || 0;
+      inDegree.set(depId, currentInDegree - 1);
+      if (currentInDegree - 1 === 0) {
+        const depTodo = todos.find(t => t.id === depId);
+        if (depTodo) queue.push(depTodo);
+      }
+    });
+  }
+
+  // Check for circular dependencies
+  if (sortedTodos.length !== todos.length) {
+    const unsortedIds = todos
+      .filter(t => !sortedTodos.some(st => st.id === t.id))
+      .map(t => t.id);
+    throw new Error(`Circular dependency detected. Affected todos: ${unsortedIds.join(', ')}`);
+  }
 
   // Execute all todos
   for (const todo of sortedTodos) {

@@ -17,6 +17,7 @@ import { ShareButton } from './ShareButton';
 import { MaximizeButton } from './MaximizeButton';
 import { useLayoutContext } from '../contexts/LayoutContext';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { ModeToggle } from '../mode-toggle';
 
 // Dynamically import QRCodeDialog to avoid SSR issues with HTMLCanvasElement
 const QRCodeDialog = dynamic(
@@ -147,6 +148,24 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
       {/* Right side / inline actions */}
       <div className={cn('flex items-center gap-2', isInline && 'justify-end')}>
         <MaximizeButton layout={isInline ? 'inline' : 'default'} />
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <ModeToggle
+                  className={cn(
+                    isInline
+                      ? 'h-11 w-11 p-0 rounded-xl'
+                      : 'h-10 w-10 p-0 rounded-lg',
+                  )}
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Toggle theme</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         {showQRCode && (
           <TooltipProvider delayDuration={200}>
             <Tooltip>

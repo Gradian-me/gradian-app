@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Bell, PanelLeftOpen, PencilRuler, Plus } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { GoToTop, Header, ModeToggle } from '@/gradian-ui/layout';
+import { GoToTop, Header } from '@/gradian-ui/layout';
 import { Sidebar } from '@/gradian-ui/layout/sidebar';
 import { EndLine } from '@/gradian-ui/layout/end-line/components/EndLine';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -445,16 +445,6 @@ function MainLayoutContent({
           </Tooltip>
           {/* Organization settings button that wraps tenant & company selection */}
           <OrganizationSettings />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <ModeToggle />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Toggle theme</p>
-            </TooltipContent>
-          </Tooltip>
           {ENABLE_NOTIFICATION && (
             <Tooltip key="notifications-tooltip">
               <TooltipTrigger asChild>
