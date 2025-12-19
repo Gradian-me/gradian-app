@@ -319,8 +319,10 @@ export function AiBuilderForm({
       }
 
       // Skip fields with sectionId "body" or "extra" - these go in body/extra_body, not in prompt
-      // Exception: include "prompt" field in userPrompt for display purposes, even if it has sectionId "body"
-      const isPromptField = (field.name === 'prompt' || field.id === 'prompt');
+      // Exception: include "prompt" or "userPrompt" fields in userPrompt for display purposes, even if they have sectionId "body"
+      const isPromptField = (field.name === 'prompt' || field.id === 'prompt' || 
+                            field.name === 'userPrompt' || field.id === 'user-prompt' ||
+                            field.name === 'user-prompt');
       if ((field.sectionId === 'body' || field.sectionId === 'extra') && !isPromptField) {
         return;
       }
@@ -573,6 +575,32 @@ export function AiBuilderForm({
       return newFormValues;
     });
   }, [selectedLanguage]); // Only depend on selectedLanguage
+
+  // Build initial prompt when component mounts with formValues
+  // This ensures prompt is built even when language is 'en' and no onChange event occurs
+  // This is especially important for 'en' because no language instruction is added, so the prompt
+  // relies entirely on form field values
+  const hasBuiltInitialPromptRef = useRef(false);
+  const prevAgentIdForInitialBuildRef = useRef<string | undefined>(selectedAgentId);
+  useEffect(() => {
+    // Only build on initial mount or when agent changes
+    const isAgentChange = prevAgentIdForInitialBuildRef.current !== selectedAgentId;
+    if (isAgentChange) {
+      prevAgentIdForInitialBuildRef.current = selectedAgentId;
+      hasBuiltInitialPromptRef.current = false; // Reset for new agent
+    }
+    
+    // Build prompt when agent/formFields are ready and formValues exist
+    // This is critical for 'en' language where no language instruction is added
+    if (!hasBuiltInitialPromptRef.current && selectedAgent && formFields.length > 0 && Object.keys(formValues).length > 0) {
+      hasBuiltInitialPromptRef.current = true;
+      // Build prompt from current formValues
+      const initialPrompt = buildConcatenatedPrompt(formValues);
+      // Always update to ensure prompt is set, even if empty (for 'en' language case)
+      // This ensures the preview can show the current state
+      onPromptChange(initialPrompt);
+    }
+  }, [selectedAgentId, selectedAgent, formFields.length, formValues, buildConcatenatedPrompt, onPromptChange]);
 
   // Sync userPrompt with formValues when userPrompt changes externally
   // This handles external updates to userPrompt (e.g., from parent component)
@@ -1122,7 +1150,7 @@ export function AiBuilderForm({
                             systemPrompt={systemPrompt}
                             userPrompt={userPrompt}
                             isLoadingPreload={isLoadingPreload}
-                            disabled={!userPrompt.trim() || disabled}
+                            disabled={disabled}
                             extraBody={Object.keys(params.extra).length > 0 ? params.extra : undefined}
                             bodyParams={Object.keys(params.body).length > 0 ? params.body : undefined}
                             requiredOutputFormat={selectedAgent?.requiredOutputFormat}

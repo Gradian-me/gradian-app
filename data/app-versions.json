@@ -3990,5 +3990,32 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCIPREVIEWFIX003",
+    "timestamp": "2025-12-19T10:21:19+0330",
+    "version": "1.32.003",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated AiBuilderForm to include userPrompt field handling for better prompt display logic and added initial prompt building on component mount to improve user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Modified PromptPreviewSheet to conditionally render user prompt content, ensuring clarity when no user prompt is provided. This update enhances the overall functionality and usability of the AI builder components",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ui",
+          "form-builder"
+        ]
+      }
+    ]
   }
 ]
