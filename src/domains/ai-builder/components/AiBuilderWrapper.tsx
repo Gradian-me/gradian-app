@@ -124,6 +124,7 @@ export function AiBuilderWrapper({
     isLoadingPreload,
     imageResponse,
     imageError,
+    graphWarnings,
     lastPromptId: hookLastPromptId,
     generateResponse,
     stopGeneration,
@@ -579,7 +580,7 @@ export function AiBuilderWrapper({
       )}
 
       <AnimatePresence mode="wait">
-        {aiResponse && selectedAgent ? (
+        {(aiResponse || imageResponse || (error && selectedAgent && (selectedAgent.id === 'graph-generator' || selectedAgent.requiredOutputFormat === 'graph'))) && selectedAgent ? (
           <motion.div
             key="ai-response"
             initial={{ opacity: 0, y: 20 }}
@@ -588,7 +589,7 @@ export function AiBuilderWrapper({
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
             <AiBuilderResponse
-              response={aiResponse}
+              response={aiResponse || ''}
               agent={selectedAgent}
               tokenUsage={tokenUsage}
               videoUsage={videoUsage}
@@ -606,6 +607,7 @@ export function AiBuilderWrapper({
               imageError={imageError}
               imageType={currentImageType}
               imageModel={imageModel}
+              graphWarnings={graphWarnings}
             />
           </motion.div>
         ) : null}

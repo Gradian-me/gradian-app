@@ -82,6 +82,7 @@ export interface AiBuilderResponseData {
     responseTime: number; // Time to receive response in milliseconds
     duration: number; // Total duration in milliseconds
   };
+  warnings?: string[]; // Warnings for graph validation issues (non-blocking)
   agent: {
     id: string;
     label: string;

@@ -368,14 +368,14 @@ export function AiBuilderForm({
           // Try to find description from field options
           const option = field.options.find(
             (opt: any) => opt.id === normalizedOption.id || opt.value === normalizedOption.value
-          );
+          ) as any;
           if (option?.description) {
             formattedValue += `\n\n${option.description}`;
           }
         }
       } else if (field.component === 'select') {
         // For select with string/number value, find the option label
-        const option = field.options?.find((opt: any) => opt.id === fieldValue || opt.value === fieldValue);
+        const option = field.options?.find((opt: any) => opt.id === fieldValue || opt.value === fieldValue) as any;
         formattedValue = option?.label || String(fieldValue);
         
         // Append option description if available
@@ -400,7 +400,7 @@ export function AiBuilderForm({
           // Try to find description from field options
           const option = field.options.find(
             (opt: any) => opt.id === (fieldValue as any).id || opt.value === (fieldValue as any).value
-          );
+          ) as any;
           if (option?.description) {
             formattedValue += `\n\n${option.description}`;
           }
@@ -1174,6 +1174,7 @@ export function AiBuilderForm({
                         const params = selectedAgent && formValues 
                           ? extractParametersBySectionId(selectedAgent, formValues)
                           : { body: {}, extra: {}, prompt: {} };
+                        const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
                         return (
                           <PromptPreviewSheet
                             isOpen={isSheetOpen}
@@ -1185,6 +1186,9 @@ export function AiBuilderForm({
                             extraBody={Object.keys(params.extra).length > 0 ? params.extra : undefined}
                             bodyParams={Object.keys(params.body).length > 0 ? params.body : undefined}
                             requiredOutputFormat={selectedAgent?.requiredOutputFormat}
+                            agent={selectedAgent}
+                            formValues={formValues}
+                            baseUrl={baseUrl}
                           />
                         );
                       })()}

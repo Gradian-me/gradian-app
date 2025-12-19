@@ -7,6 +7,7 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { Select } from '@/gradian-ui/form-builder/form-elements/components/Select';
+import { formatJsonForMarkdown } from '@/gradian-ui/shared/utils/text-utils';
 
 interface CodeViewerProps {
   code: string;
@@ -77,7 +78,47 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
   };
 
   // Use editableCode when editable, otherwise use code prop
-  const currentCode = isEditable ? editableCode : code;
+  const rawCode = isEditable ? editableCode : code;
+
+  // Automatically format JSON when language is 'json' to ensure proper indentation
+  // Only format if the JSON is valid and not a template (contains actual values, not type hints)
+  const currentCode = useMemo(() => {
+    if (programmingLanguage?.toLowerCase() === 'json' && rawCode) {
+      try {
+        // Check if it's a template/example JSON (contains unquoted type hints like "number", "string" as values)
+        // These should not be formatted as they're not valid JSON
+        const trimmed = rawCode.trim();
+        const looksLikeTemplate = /:\s*(number|string|boolean|object|array)(\s|,|\n|$)/i.test(trimmed);
+        
+        if (looksLikeTemplate) {
+          // This is likely a template/example, don't format it
+          return rawCode;
+        }
+        
+        // Try to format using the utility function
+        const formatted = formatJsonForMarkdown(rawCode);
+        
+        // Only use formatted version if it's different and valid
+        // If formatting failed or returned the same, use original
+        if (formatted !== rawCode && formatted.length > 0) {
+          // Verify the formatted version is valid JSON
+          try {
+            JSON.parse(formatted);
+            return formatted;
+          } catch {
+            // Formatted version is invalid, use original
+            return rawCode;
+          }
+        }
+        
+        return rawCode;
+      } catch {
+        // If formatting fails, return original code
+        return rawCode;
+      }
+    }
+    return rawCode;
+  }, [rawCode, programmingLanguage]);
 
   // Count lines in code
   const totalLines = useMemo(() => {

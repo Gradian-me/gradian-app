@@ -4043,5 +4043,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCW6RRKND2TWGS0CR0C0HJWX",
+    "timestamp": "2025-12-20T00:32:54+0330",
+    "version": "1.33.000",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated ai-agents.json to improve schema editing capabilities with refined system prompts and user prompts",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "schema-manager"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Modified component registry to streamline component IDs for better consistency",
+        "priority": "Medium",
+        "affectedDomains": [
+          "component-registry",
+          "form-builder"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced centralized API calling utilities for AI agents, enhancing error handling and response parsing",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "api",
+          "utils",
+          "error-handling"
+        ]
+      }
+    ]
   }
 ]

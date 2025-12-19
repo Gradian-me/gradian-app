@@ -48,6 +48,7 @@ interface AiBuilderResponseProps {
   imageError?: string | null;
   imageType?: string; // The type of image that was generated (e.g., "infographic", "sketch", "creative")
   imageModel?: string; // The model used for image generation (e.g., "gemini-2.5-flash-image")
+  graphWarnings?: string[]; // Warnings for graph validation issues
 }
 
 // Utility function to generate table columns from JSON data
@@ -139,6 +140,7 @@ export function AiBuilderResponse({
   imageError,
   imageType,
   imageModel,
+  graphWarnings = [],
 }: AiBuilderResponseProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const prevIsLoadingRef = useRef<boolean>(isLoading);
@@ -478,15 +480,23 @@ export function AiBuilderResponse({
   }, [agent?.requiredOutputFormat, videoData]);
 
   // Parse graph data if format is graph
+  // Also check for graph errors in the response
   const graphData = useMemo(() => {
     if (!displayContent) return null;
     const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
-    const isGraphFormat = agentFormatValue === 'graph';
+    const isGraphFormat = agentFormatValue === 'graph' || agent?.id === 'graph-generator';
     
     if (!isGraphFormat) return null;
     
     try {
       const parsed = JSON.parse(displayContent);
+      
+      // Check if this is an error response
+      if (parsed && typeof parsed === 'object' && parsed.error && !parsed.success) {
+        // Return null to trigger error display, but mark it as a graph error
+        return { _isError: true, error: parsed.error };
+      }
+      
       // Check if response has graph structure
       if (parsed && typeof parsed === 'object') {
         // Handle both direct graph structure and wrapped structure
@@ -503,13 +513,36 @@ export function AiBuilderResponse({
       }
     }
     return null;
-  }, [agent?.requiredOutputFormat, displayContent]);
+  }, [agent?.requiredOutputFormat, agent?.id, displayContent]);
+  
+  // Check if graphData is actually an error
+  const isGraphError = graphData && typeof graphData === 'object' && (graphData as any)._isError === true;
+  const actualGraphData = isGraphError ? null : graphData;
 
   // Determine if we should render as graph
+  // Show graph section if: agent is graph format OR we have graph data OR we have an error response for graph agent
   const shouldRenderGraph = useMemo(() => {
     const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
-    return agentFormatValue === 'graph' || !!graphData;
-  }, [agent?.requiredOutputFormat, graphData]);
+    const isGraphAgent = agentFormatValue === 'graph' || agent?.id === 'graph-generator';
+    
+    // Check if displayContent contains a graph error
+    let hasGraphError = false;
+    if (displayContent && displayContent.trim()) {
+      try {
+        const parsed = JSON.parse(displayContent);
+        if (parsed && typeof parsed === 'object' && parsed.error && !parsed.success) {
+          // If it's a graph agent or the error doesn't specify an agentId, show graph error
+          if (isGraphAgent || !parsed.agentId || parsed.agentId === 'graph-generator') {
+            hasGraphError = true;
+          }
+        }
+      } catch {
+        // Not JSON, ignore
+      }
+    }
+    
+    return isGraphAgent || !!graphData || hasGraphError;
+  }, [agent?.requiredOutputFormat, agent?.id, graphData, displayContent]);
 
   // Check if we should render as table
   const shouldRenderTable = agent?.requiredOutputFormat === 'table';
@@ -638,14 +671,14 @@ export function AiBuilderResponse({
             />
           )}
 
-          {/* Image Error Display */}
+          {/* Image Error Display - Show even if there's a successful graph response */}
           {imageError && !parallelImageData && (
-            <div className="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20 p-6">
+            <div className="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20 p-6 mb-4">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                   <h3 className="text-sm font-semibold text-orange-900 dark:text-orange-100">
-                    Image Generation Warning
+                    Image Generation Error
                   </h3>
                 </div>
               </div>
@@ -1378,7 +1411,7 @@ export function AiBuilderResponse({
           </details>
         </div>
       ) : shouldRenderGraph ? (
-        graphData ? (
+        actualGraphData ? (
           <div className="space-y-4">
             <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -1400,29 +1433,82 @@ export function AiBuilderResponse({
               <div className="w-full h-[600px] min-h-[400px] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
                 <GraphViewer
                   data={{
-                    nodes: graphData.nodes || [],
-                    edges: graphData.edges || [],
-                    nodeTypes: graphData.nodeTypes,
-                    relationTypes: graphData.relationTypes,
-                    schemas: graphData.schemas,
+                    nodes: actualGraphData.nodes || [],
+                    edges: actualGraphData.edges || [],
+                    nodeTypes: actualGraphData.nodeTypes,
+                    relationTypes: actualGraphData.relationTypes,
+                    schemas: actualGraphData.schemas,
                   }}
                   height="100%"
                 />
               </div>
             </div>
+            
+            {/* Graph Validation Warnings */}
+            {graphWarnings && graphWarnings.length > 0 && (
+              <div className="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20 p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                  <h3 className="text-sm font-semibold text-orange-900 dark:text-orange-100">
+                    Graph Validation Warnings
+                  </h3>
+                </div>
+                <div className="space-y-2">
+                  {graphWarnings.map((warning, index) => (
+                    <p key={index} className="text-sm text-orange-700 dark:text-orange-300">
+                      • {warning}
+                    </p>
+                  ))}
+                </div>
+                <p className="text-xs text-orange-600 dark:text-orange-400 mt-3">
+                  Note: The graph is displayed despite these warnings. Please review and ensure all nodes are properly connected.
+                </p>
+              </div>
+            )}
+            
             <details className="text-sm">
               <summary className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
                 View Raw Graph Data
               </summary>
               <div className="mt-2">
                 <CodeViewer
-                  code={JSON.stringify(graphData, null, 2)}
+                  code={JSON.stringify(actualGraphData, null, 2)}
                   programmingLanguage="json"
                   title="Raw Graph Data"
                   initialLineNumbers={10}
                 />
               </div>
             </details>
+          </div>
+        ) : isGraphError ? (
+          // Show graph error with the error message from graphData
+          <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-6 mb-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <h3 className="text-sm font-semibold text-red-900 dark:text-red-100">
+                  Graph Generation Error
+                </h3>
+              </div>
+            </div>
+            <p className="text-sm text-red-700 dark:text-red-300 mb-4 font-medium">
+              {(graphData as any)?.error || 'Graph generation failed'}
+            </p>
+            {displayContent && displayContent.trim() && (
+              <details className="text-sm">
+                <summary className="cursor-pointer text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-100 mb-2">
+                  View Full Error Details
+                </summary>
+                <div className="mt-2">
+                  <CodeViewer
+                    code={displayContent}
+                    programmingLanguage="json"
+                    title="Error Response"
+                    initialLineNumbers={10}
+                  />
+                </div>
+              </details>
+            )}
           </div>
         ) : (
           <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-6">
@@ -1436,22 +1522,56 @@ export function AiBuilderResponse({
             </div>
             {displayContent && displayContent.trim() ? (
               <>
-                <p className="text-sm text-red-700 dark:text-red-300 mb-4">
-                  Unable to parse graph data from response. The response may contain an error or invalid format.
-                </p>
-                <details className="text-sm">
-                  <summary className="cursor-pointer text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-100 mb-2">
-                    View Error Details
-                  </summary>
-                  <div className="mt-2">
-                    <CodeViewer
-                      code={displayContent}
-                      programmingLanguage="json"
-                      title="Error Response"
-                      initialLineNumbers={10}
-                    />
-                  </div>
-                </details>
+                {(() => {
+                  try {
+                    const parsed = JSON.parse(displayContent);
+                    if (parsed && typeof parsed === 'object' && parsed.error) {
+                      // Show error message from API response
+                      return (
+                        <>
+                          <p className="text-sm text-red-700 dark:text-red-300 mb-4 font-medium">
+                            {parsed.error}
+                          </p>
+                          <details className="text-sm">
+                            <summary className="cursor-pointer text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-100 mb-2">
+                              View Full Error Details
+                            </summary>
+                            <div className="mt-2">
+                              <CodeViewer
+                                code={displayContent}
+                                programmingLanguage="json"
+                                title="Error Response"
+                                initialLineNumbers={10}
+                              />
+                            </div>
+                          </details>
+                        </>
+                      );
+                    }
+                  } catch {
+                    // Not JSON, fall through to default error message
+                  }
+                  return (
+                    <>
+                      <p className="text-sm text-red-700 dark:text-red-300 mb-4">
+                        Unable to parse graph data from response. The response may contain an error or invalid format.
+                      </p>
+                      <details className="text-sm">
+                        <summary className="cursor-pointer text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-100 mb-2">
+                          View Error Details
+                        </summary>
+                        <div className="mt-2">
+                          <CodeViewer
+                            code={displayContent}
+                            programmingLanguage="json"
+                            title="Error Response"
+                            initialLineNumbers={10}
+                          />
+                        </div>
+                      </details>
+                    </>
+                  );
+                })()}
               </>
             ) : (
               <p className="text-sm text-red-700 dark:text-red-300">

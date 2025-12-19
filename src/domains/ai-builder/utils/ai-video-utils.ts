@@ -4,7 +4,6 @@
  */
 
 import { AgentRequestData, AgentResponse } from './ai-agent-utils';
-import { getApiUrlForAgentType } from './ai-agent-url';
 import { extractParametersBySectionId, parseUserPromptToFormValues } from './ai-shared-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -24,6 +23,7 @@ import {
   buildTimingInfo,
   validateAgentConfig,
 } from './ai-common-utils';
+import { getApiUrlForAgentType } from './ai-agent-url';
 
 /**
  * Process video generation request
@@ -44,15 +44,6 @@ export async function processVideoRequest(
       };
     }
 
-    // Security: Get API key with validation
-    const apiKeyResult = getApiKey();
-    if (!apiKeyResult.key) {
-      return {
-        success: false,
-        error: apiKeyResult.error || 'LLM_API_KEY is not configured',
-      };
-    }
-    const apiKey = apiKeyResult.key;
 
     // Use body and extra_body from requestData if provided, otherwise calculate from formValues
     let bodyParams: Record<string, any> = {};
@@ -280,9 +271,18 @@ export async function processVideoRequest(
         contentType = 'application/json';
       }
 
+      // Get API key
+      const apiKeyResult = getApiKey();
+      if (!apiKeyResult.key) {
+        return {
+          success: false,
+          error: apiKeyResult.error || 'LLM_API_KEY is not configured',
+        };
+      }
+
       // Call Videos API
       const headers: HeadersInit = {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKeyResult.key}`,
       };
 
       // Only set Content-Type for JSON, not for FormData (browser will set it automatically with boundary)

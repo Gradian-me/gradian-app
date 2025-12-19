@@ -34,6 +34,7 @@ interface UseAiBuilderReturn {
   isLoadingPreload: boolean;
   imageResponse: string | null;
   imageError: string | null;
+  graphWarnings: string[]; // Warnings for graph validation issues
   generateResponse: (request: GeneratePromptRequest) => Promise<void>;
   stopGeneration: () => void;
   approveResponse: (response: string, agent: AiAgent) => Promise<void>;
@@ -62,6 +63,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const [isLoadingPreload, setIsLoadingPreload] = useState(false);
   const [imageResponse, setImageResponse] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [graphWarnings, setGraphWarnings] = useState<string[]>([]);
   const [lastPromptId, setLastPromptId] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   
@@ -542,6 +544,13 @@ export function useAiBuilder(): UseAiBuilderReturn {
         const errorMessage = errorData?.error || errorText || `HTTP ${response.status}: ${response.statusText}`;
         const detailedError = `Server Error (${response.status}): ${errorMessage}\n\nPossible causes:\n• API endpoint is not available\n• Server is experiencing issues\n• Request format is invalid\n• Authentication/authorization failed`;
         
+        // For graph/image/video agents, preserve error details in response for better error display
+        const agentFormat = request.agentId === 'graph-generator' || request.agentId === 'image-generator' || request.agentId === 'video-generator';
+        if (agentFormat && errorMessage) {
+          // Store error as JSON so it can be displayed in the response component
+          setAiResponse(JSON.stringify({ error: errorMessage, success: false, status: response.status }, null, 2));
+        }
+        
         throw new Error(detailedError);
       }
 
@@ -555,6 +564,14 @@ export function useAiBuilder(): UseAiBuilderReturn {
       if (!data.success) {
         const errorMessage = data.error || 'Failed to get AI response';
         const detailedError = `AI Builder Error: ${errorMessage}\n\nThis could be due to:\n• AI service is unavailable\n• Invalid request parameters\n• Rate limiting or quota exceeded\n• Model configuration issues`;
+        
+        // For graph/image/video agents, preserve error details in response for better error display
+        const agentFormat = request.agentId === 'graph-generator' || request.agentId === 'image-generator' || request.agentId === 'video-generator';
+        if (agentFormat && data.error) {
+          // Store error as JSON so it can be displayed in the response component
+          setAiResponse(JSON.stringify({ error: data.error, success: false }, null, 2));
+        }
+        
         throw new Error(detailedError);
       }
 
@@ -562,6 +579,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
       setAiResponse(builderResponse.response);
       setTokenUsage(builderResponse.tokenUsage || null);
       setDuration(builderResponse.timing?.duration || null);
+      setGraphWarnings(builderResponse.warnings || []);
 
       // Save prompt to history
       if (builderResponse.response && builderResponse.tokenUsage) {
@@ -596,12 +614,34 @@ export function useAiBuilder(): UseAiBuilderReturn {
       // Don't show error if request was aborted
       if (err instanceof Error && err.name === 'AbortError') {
         setError(null);
-        setAiResponse('');
+        // Only clear response if no other successful response exists
+        if (!imageResponse) {
+          setAiResponse('');
+        }
       } else {
         // Preserve detailed error message
         const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
         setError(errorMessage);
-        setAiResponse('');
+        
+        // For graph/image/video agents, preserve error in response for display
+        // Don't clear aiResponse if it contains a successful response from another agent
+        const isGraphImageVideoAgent = request.agentId === 'graph-generator' || 
+                                       request.agentId === 'image-generator' || 
+                                       request.agentId === 'video-generator';
+        
+        if (isGraphImageVideoAgent) {
+          // Store error as JSON in response so it can be displayed in the response component
+          // Only overwrite if current response is empty or also an error
+          if (!aiResponse || aiResponse.trim() === '' || aiResponse.includes('"error"')) {
+            setAiResponse(JSON.stringify({ error: errorMessage, success: false, agentId: request.agentId }, null, 2));
+          }
+        } else {
+          // For other agents, clear response only if no image response exists
+          if (!imageResponse) {
+            setAiResponse('');
+          }
+        }
+        
         setTokenUsage(null);
         setDuration(null);
         
@@ -624,6 +664,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
       setDuration(null);
       setImageResponse(null);
       setImageError(null);
+      setGraphWarnings([]);
       abortControllerRef.current = null;
     }
   }, []);
@@ -862,6 +903,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
     setSuccessMessage(null);
     setImageResponse(null);
     setImageError(null);
+    setGraphWarnings([]);
   }, []);
 
   const clearError = useCallback(() => {
@@ -887,6 +929,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
     isLoadingPreload,
     imageResponse,
     imageError,
+    graphWarnings,
     generateResponse,
     stopGeneration,
     approveResponse,

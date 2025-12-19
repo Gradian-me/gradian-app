@@ -15,6 +15,7 @@ import { replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/d
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { formatJsonForMarkdown } from '@/gradian-ui/shared/utils/text-utils';
 
 export interface AiAgentDialogProps {
   isOpen: boolean;
@@ -185,7 +186,9 @@ export function AiAgentDialog({
       });
 
       if (Object.keys(selectedData).length > 0) {
-        promptParts.push(`\nSelected fields data:\n\`\`\`json\n${JSON.stringify(selectedData, null, 2)}\n\`\`\``);
+        // Format JSON with proper indentation
+        const formattedJson = formatJsonForMarkdown(selectedData);
+        promptParts.push(`\nSelected fields data:\n\`\`\`json\n${formattedJson}\n\`\`\``);
       }
     }
 
@@ -204,7 +207,9 @@ export function AiAgentDialog({
           });
 
           if (Object.keys(sectionData).length > 0) {
-            promptParts.push(`\n${section.title || sectionId} section data:\n\`\`\`json\n${JSON.stringify(sectionData, null, 2)}\n\`\`\``);
+            // Format JSON with proper indentation
+            const formattedJson = formatJsonForMarkdown(sectionData);
+            promptParts.push(`\n${section.title || sectionId} section data:\n\`\`\`json\n${formattedJson}\n\`\`\``);
           }
         }
       });
@@ -213,7 +218,9 @@ export function AiAgentDialog({
     // If no specific fields/sections selected, include all data
     if ((!action.selectedFields || action.selectedFields.length === 0) &&
         (!action.selectedSections || action.selectedSections.length === 0)) {
-      promptParts.push(`\nFull item data:\n\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``);
+      // Format JSON with proper indentation
+      const formattedJson = formatJsonForMarkdown(data);
+      promptParts.push(`\nFull item data:\n\`\`\`json\n${formattedJson}\n\`\`\``);
     }
 
     // Concatenate additionalSystemPrompt if provided

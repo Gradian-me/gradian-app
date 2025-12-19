@@ -277,49 +277,36 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
     }
   };
 
-  if (!isMounted) {
-    return (
-      <div suppressHydrationWarning data-notifications-dropdown="placeholder">
-        <Button 
-          variant="outline" 
-          size="icon" 
-          className="relative rounded-xl"
-          aria-label="Notifications"
-          disabled
-          type="button"
-          suppressHydrationWarning
-        >
-          <Bell className="h-5 w-5" />
-          {/* Don't show badge count until mounted to avoid hydration mismatch */}
-        </Button>
-      </div>
-    );
-  }
-
+  // Always render the same structure to avoid hydration mismatch
+  // Use the same wrapper div and DropdownMenuPrimitive structure for both placeholder and actual
   return (
-    <div suppressHydrationWarning data-notifications-dropdown="active">
-      <DropdownMenuPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
-        <DropdownMenuPrimitive.Trigger asChild>
+    <div suppressHydrationWarning data-notifications-dropdown={isMounted ? "active" : "placeholder"}>
+      <DropdownMenuPrimitive.Root open={isMounted ? isOpen : false} onOpenChange={isMounted ? setIsOpen : undefined}>
+        <DropdownMenuPrimitive.Trigger asChild disabled={!isMounted}>
           <Button 
             variant="outline" 
             size="icon" 
             className="relative rounded-xl"
             aria-label="Notifications"
+            disabled={!isMounted}
+            type="button"
+            suppressHydrationWarning
           >
-          <Bell className="h-5 w-5" />
-          {notificationCount > 0 && (
-            <Badge 
-              variant="destructive" 
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs p-0"
-            >
-              {notificationCount}
-            </Badge>
-          )}
-        </Button>
-      </DropdownMenuPrimitive.Trigger>
+            <Bell className="h-5 w-5" />
+            {isMounted && notificationCount > 0 && (
+              <Badge 
+                variant="destructive" 
+                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs p-0"
+              >
+                {notificationCount}
+              </Badge>
+            )}
+          </Button>
+        </DropdownMenuPrimitive.Trigger>
       
-      <DropdownMenuPrimitive.Portal>
-        <DropdownMenuPrimitive.Content
+      {isMounted && (
+        <DropdownMenuPrimitive.Portal>
+          <DropdownMenuPrimitive.Content
           className={cn(
             "z-50 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-0 text-gray-900 dark:text-gray-200 shadow-lg",
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -435,21 +422,24 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
             </Button>
           </div>
         </DropdownMenuPrimitive.Content>
-      </DropdownMenuPrimitive.Portal>
+        </DropdownMenuPrimitive.Portal>
+      )}
     </DropdownMenuPrimitive.Root>
     
     {/* Notification Dialog */}
-    <NotificationDialog
-      notification={selectedNotification}
-      isOpen={isDialogOpen}
-      onClose={() => {
-        setIsDialogOpen(false);
-        setSelectedNotification(null);
-      }}
-      onMarkAsRead={handleMarkAsRead}
-      onAcknowledge={handleAcknowledge}
-      onMarkAsUnread={handleMarkAsUnread}
-    />
+    {isMounted && (
+      <NotificationDialog
+        notification={selectedNotification}
+        isOpen={isDialogOpen}
+        onClose={() => {
+          setIsDialogOpen(false);
+          setSelectedNotification(null);
+        }}
+        onMarkAsRead={handleMarkAsRead}
+        onAcknowledge={handleAcknowledge}
+        onMarkAsUnread={handleMarkAsUnread}
+      />
+    )}
     </div>
   );
 }

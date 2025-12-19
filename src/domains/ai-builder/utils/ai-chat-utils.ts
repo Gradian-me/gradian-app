@@ -3,29 +3,22 @@
  * Handles chat completion requests
  */
 
-import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
-import { preloadRoutes } from '@/gradian-ui/shared/utils/preload-routes';
 import { AgentRequestData, AgentResponse } from './ai-agent-utils';
-import { getApiUrlForAgentType } from './ai-agent-url';
 import { validateAgentFormFields, buildStandardizedPrompt } from './prompt-builder';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType, LOG_CONFIG } from '@/gradian-ui/shared/configs/log-config';
-import { getGeneralSystemPrompt } from './ai-general-utils';
 import { truncateText } from '@/domains/chat/utils/text-utils';
 import {
   sanitizePrompt,
-  getApiKey,
   sanitizeErrorMessage,
-  safeJsonParse,
   validateAgentId,
-  cleanMarkdownResponse,
 } from './ai-security-utils';
 import {
-  createAbortController,
-  parseErrorResponse,
-  buildTimingInfo,
   validateAgentConfig,
 } from './ai-common-utils';
+import { buildSystemPrompt } from './prompt-concatenation-utils';
+import { callChatApi } from './ai-api-caller';
+import { extractParametersBySectionId } from './ai-shared-utils';
 
 // Performance: Cache AI models to avoid repeated API calls
 let cachedModels: any[] | null = null;
@@ -418,34 +411,16 @@ export async function processChatRequest(
       };
     }
 
-    // Security: Get API key with validation
-    const apiKeyResult = getApiKey();
-    if (!apiKeyResult.key) {
-      return {
-        success: false,
-        error: apiKeyResult.error || 'LLM_API_KEY is not configured',
-      };
-    }
-    const apiKey = apiKeyResult.key;
-
-    // Preload routes if configured
-    let preloadedContext = '';
-    if (agent.preloadRoutes && Array.isArray(agent.preloadRoutes) && agent.preloadRoutes.length > 0 && baseUrl) {
-      try {
-        preloadedContext = await preloadRoutes(agent.preloadRoutes, baseUrl);
-      } catch (error) {
-        loggingCustom(LogType.INFRA_LOG, 'error', `Error preloading routes: ${error instanceof Error ? error.message : String(error)}`);
-        // Continue even if preload fails
-      }
-    }
-
-    // Prepare system prompt with general system prompt (date/time context) and preloaded context
-    let systemPrompt = getGeneralSystemPrompt() + (agent.systemPrompt || '') + preloadedContext;
+    // Extract bodyParams from requestData if available (for direct API calls)
+    const bodyParams = requestData.body || {};
     
-    // Append general markdown output rules for string format agents
-    if (agent.requiredOutputFormat === 'string') {
-      systemPrompt = systemPrompt + GENERAL_MARKDOWN_OUTPUT_RULES;
-    }
+    // Build system prompt using centralized utility (handles preload routes internally)
+    const { systemPrompt } = await buildSystemPrompt({
+      agent,
+      formValues: requestData.formValues,
+      bodyParams,
+      baseUrl,
+    });
 
     // Format annotations in TOON-like format and add to user prompt
     let finalUserPrompt = userPrompt;
@@ -467,220 +442,66 @@ export async function processChatRequest(
       finalUserPrompt = userPrompt + modificationRequest;
     }
 
-    // Prepare messages for LLM API
-    const messages = [
-      {
-        role: 'system' as const,
-        content: systemPrompt,
-      },
-      {
-        role: 'user' as const,
-        content: finalUserPrompt,
-      },
-    ];
-
     // Get model from agent config or use default
     const model = agent.model || 'gpt-4o-mini';
 
-    // Get API URL based on agent type
-    const apiUrl = getApiUrlForAgentType('chat');
+    // Call chat API using centralized utility
+    const apiResult = await callChatApi({
+      agent,
+      systemPrompt,
+      userPrompt: finalUserPrompt,
+      model,
+      responseFormat: (agent.requiredOutputFormat === 'json' || agent.requiredOutputFormat === 'table')
+        ? { type: 'json_object' }
+        : undefined,
+    });
 
-    // Track timing
-    const startTime = Date.now();
-
-    // Performance: Use shared AbortController utility
-    const { controller, timeoutId } = createAbortController(120000); // 120 seconds
-
-    try {
-      // Build request body
-      const requestBody = {
-        model,
-        messages,
-      };
-
-      // Log request body
-      loggingCustom(
-        LogType.AI_BODY_LOG,
-        'info',
-        `Chat Completion Request to ${apiUrl}: ${JSON.stringify(requestBody, null, 2)}`
-      );
-
-      // Call LLM API
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        // Security: Use shared error parsing utility
-        const errorMessage = await parseErrorResponse(response);
-        
-        if (isDevelopment) {
-          loggingCustom(LogType.INFRA_LOG, 'error', `LLM API error: ${errorMessage}`);
-        }
-
-        return {
-          success: false,
-          error: sanitizeErrorMessage(errorMessage, isDevelopment),
-        };
-      }
-
-      // Check content-type header (only for successful responses)
-      const contentType = response.headers.get('content-type') || '';
-      if (!contentType.includes('application/json') && !contentType.includes('text/json')) {
-        // Response is not JSON - might be wrong endpoint or misconfigured
-        const responseText = await response.text();
-        loggingCustom(
-          LogType.INFRA_LOG,
-          'error',
-          `LLM API returned non-JSON content. Content-Type: ${contentType}. Response preview: ${truncateText(responseText, 500)}`
-        );
-        return {
-          success: false,
-          error: `AI service returned unexpected content type (${contentType}). Please check API endpoint configuration.`,
-        };
-      }
-
-      // Security: Use safe JSON parsing
-      const responseText = await response.text();
-      
-      // Check if response looks like markdown instead of JSON (even if content-type says JSON)
-      const trimmedText = responseText.trim();
-      if (trimmedText.startsWith('#') || trimmedText.startsWith('###') || (trimmedText.startsWith('```') && !trimmedText.includes('choices'))) {
-        // Response appears to be markdown, not JSON - this shouldn't happen with OpenAI API
-        loggingCustom(
-          LogType.INFRA_LOG,
-          'error',
-          `LLM API returned markdown instead of JSON. Response preview: ${truncateText(trimmedText, 200)}`
-        );
-        return {
-          success: false,
-          error: 'AI service returned invalid response format (markdown instead of JSON). The API may be misconfigured or returning an error page.',
-        };
-      }
-      
-      const parseResult = safeJsonParse(responseText);
-      
-      if (!parseResult.success || !parseResult.data) {
-        // Log the actual response for debugging
-        loggingCustom(
-          LogType.INFRA_LOG,
-          'error',
-          `Failed to parse LLM API response. Error: ${parseResult.error}. Response preview: ${truncateText(responseText, 500)}`
-        );
-        return {
-          success: false,
-          error: parseResult.error || 'Invalid response format from AI service. The API may have returned an error page or unexpected format.',
-        };
-      }
-
-      const data = parseResult.data;
-
-      // Performance: Use shared timing utility
-      const timing = buildTimingInfo(startTime);
-      const aiResponseContent = data.choices?.[0]?.message?.content || '';
-
-      // Log AI response if enabled
-      if (LOG_CONFIG[LogType.AI_RESPONSE_LOG]) {
-        const responsePreview = truncateText(aiResponseContent, 1000);
-        loggingCustom(
-          LogType.AI_RESPONSE_LOG,
-          'info',
-          `AI Response from ${model} (${timing.duration}ms):\n${responsePreview}`
-        );
-      }
-
-      if (!aiResponseContent) {
-        return {
-          success: false,
-          error: 'No response content from AI',
-        };
-      }
-
-      // Extract token usage information
-      const promptTokens = data.usage?.prompt_tokens || 0;
-      const completionTokens = data.usage?.completion_tokens || 0;
-      const totalTokens = data.usage?.total_tokens || 0;
-
-      // Calculate pricing
-      const pricing = await calculatePricing(model, promptTokens, completionTokens);
-
-      const tokenUsage = data.usage
-        ? {
-            prompt_tokens: promptTokens,
-            completion_tokens: completionTokens,
-            total_tokens: totalTokens,
-            pricing: pricing
-              ? {
-                  input_price_per_1m: pricing.inputPricePer1M || 0,
-                  output_price_per_1m: pricing.outputPricePer1M || 0,
-                  input_cost: pricing.inputPrice,
-                  output_cost: pricing.outputPrice,
-                  total_cost: pricing.totalPrice,
-                  model_id: model,
-                }
-              : null,
-          }
-        : null;
-
-      // Extract JSON if required output format is JSON
-      let processedResponse = aiResponseContent;
-      if (agent.requiredOutputFormat === 'json' || agent.requiredOutputFormat === 'table') {
-        const extractedJson = extractJson(aiResponseContent);
-        if (extractedJson) {
-          processedResponse = extractedJson;
-        } else {
-          // If JSON extraction failed but format is required, return error
-          return {
-            success: false,
-            error: 'Failed to extract valid JSON from AI response',
-          };
-        }
-      } else if (agent.requiredOutputFormat === 'string') {
-        // Clean markdown response by removing meta-commentary prefixes (like "markdown" keywords)
-        processedResponse = cleanMarkdownResponse(aiResponseContent);
-      }
-
+    if (!apiResult.success) {
       return {
-        success: true,
-        data: {
-          response: processedResponse,
-          format: agent.requiredOutputFormat === 'table' ? 'json' : agent.requiredOutputFormat || 'string',
-          tokenUsage,
-          timing,
-          agent: {
-            id: agent.id,
-            label: agent.label,
-            description: agent.description,
-            requiredOutputFormat: agent.requiredOutputFormat,
-            nextAction: agent.nextAction,
-          },
-        },
+        success: false,
+        error: apiResult.error || 'API call failed',
       };
-    } catch (fetchError) {
-      clearTimeout(timeoutId);
-
-      // Handle timeout errors specifically
-      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        if (isDevelopment) {
-          loggingCustom(LogType.INFRA_LOG, 'error', `Request timeout in AI chat request: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`);
-        }
-        return {
-          success: false,
-          error: sanitizeErrorMessage('Request timeout', isDevelopment),
-        };
-      }
-
-      // Re-throw to be caught by outer catch
-      throw fetchError;
     }
+
+    // Calculate pricing for token usage
+    const pricing = await calculatePricing(
+      model,
+      apiResult.tokenUsage?.prompt_tokens || 0,
+      apiResult.tokenUsage?.completion_tokens || 0
+    );
+
+    const tokenUsage = apiResult.tokenUsage
+      ? {
+          ...apiResult.tokenUsage,
+          pricing: pricing
+            ? {
+                input_price_per_1m: pricing.inputPricePer1M || 0,
+                output_price_per_1m: pricing.outputPricePer1M || 0,
+                input_cost: pricing.inputPrice,
+                output_cost: pricing.outputPrice,
+                total_cost: pricing.totalPrice,
+                model_id: model,
+              }
+            : null,
+        }
+      : null;
+
+    return {
+      success: true,
+      data: {
+        response: apiResult.data,
+        format: agent.requiredOutputFormat === 'table' ? 'json' : agent.requiredOutputFormat || 'string',
+        tokenUsage,
+        timing: apiResult.timing,
+        agent: {
+          id: agent.id,
+          label: agent.label,
+          description: agent.description,
+          requiredOutputFormat: agent.requiredOutputFormat,
+          nextAction: agent.nextAction,
+        },
+      },
+    };
   } catch (error) {
     if (isDevelopment) {
       loggingCustom(LogType.INFRA_LOG, 'error', `Error in AI chat request: ${error instanceof Error ? error.message : String(error)}`);

@@ -100,8 +100,10 @@ export function formatArrayFieldToToon(
 
   const displayLabel = formatFieldName(fieldLabel);
   
+  // Wrap TOON format in markdown code block to preserve formatting and prevent markdown parsing
+  // Use 'text' language identifier to ensure proper whitespace handling and wrapping
   // Prepend the friendly label name above the TOON format
-  return `${displayLabel}:\n${toonResult}`;
+  return `${displayLabel}:\n\n\`\`\`text\n${toonResult}\n\`\`\``;
 }
 
 /**

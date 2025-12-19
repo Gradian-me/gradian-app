@@ -300,7 +300,7 @@
     }
   },
   {
-    "id": "date-time-input",
+    "id": "datetime",
     "label": "DateTimeInput",
     "color": "lime",
     "icon": "Clock",
@@ -751,7 +751,7 @@
     "componentValue": "radio"
   },
   {
-    "id": "file-input",
+    "id": "file",
     "label": "FileInput",
     "color": "zinc",
     "icon": "Paperclip",

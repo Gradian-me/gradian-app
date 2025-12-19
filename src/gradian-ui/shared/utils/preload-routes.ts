@@ -1,7 +1,7 @@
 // Preload Routes Utility
 // Handles parallel API calls for preloading data before LLM requests
 
-import { cleanText, formatToToon } from './text-utils';
+import { cleanText, formatToToon, formatJsonForMarkdown } from './text-utils';
 
 export interface PreloadRoute {
   route: string;
@@ -316,7 +316,7 @@ export function formatPreloadRouteResult(
     );
     
     return `## ${cleanText(result.title)}\n${cleanText(result.description)}\n\n` +
-      `Data from ${result.route}:\n\`\`\`\n${toonFormatted}\n\`\`\`\n`;
+      `Data from ${result.route}:\n\`\`\`text\n${toonFormatted}\n\`\`\`\n`;
   } else if (outputFormat === 'string') {
     // String format - filter data if includedFields is provided
     let dataToFormat = result.data;
@@ -340,8 +340,11 @@ export function formatPreloadRouteResult(
       dataToFormat = filterFields(result.data, route.includedFields);
     }
     
+    // Format JSON with proper indentation using utility function
+    const formattedJson = formatJsonForMarkdown(dataToFormat);
+    
     return `## ${cleanText(result.title)}\n${cleanText(result.description)}\n\n` +
-      `Data from ${result.route}:\n\`\`\`json\n${JSON.stringify(dataToFormat, null, 2)}\n\`\`\`\n`;
+      `Data from ${result.route}:\n\`\`\`json\n${formattedJson}\n\`\`\`\n`;
   }
 }
 

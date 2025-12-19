@@ -5,7 +5,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -16,57 +16,84 @@ import {
 import { Button } from '@/components/ui/button';
 import { Loader2, Eye } from 'lucide-react';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown';
-import { GENERAL_MARKDOWN_OUTPUT_RULES } from '../utils/ai-chat-utils';
-import { IMAGE_TYPE_PROMPTS } from '../utils/ai-image-utils';
+import { buildSystemPrompt } from '../utils/prompt-concatenation-utils';
+import { formatJsonForMarkdown } from '@/gradian-ui/shared/utils/text-utils';
 
 interface PromptPreviewSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  systemPrompt: string;
+  systemPrompt?: string; // Legacy prop, will be built from agent if not provided
   userPrompt: string;
-  isLoadingPreload: boolean;
+  isLoadingPreload?: boolean; // Legacy prop, will be determined by buildSystemPrompt
   disabled?: boolean;
   extraBody?: Record<string, any>;
   bodyParams?: Record<string, any>;
   requiredOutputFormat?: string;
+  // New props for centralized prompt building
+  agent?: any;
+  formValues?: Record<string, any>;
+  baseUrl?: string;
 }
 
 export function PromptPreviewSheet({
   isOpen,
   onOpenChange,
-  systemPrompt,
+  systemPrompt: legacySystemPrompt,
   userPrompt,
-  isLoadingPreload,
+  isLoadingPreload: legacyIsLoadingPreload,
   disabled = false,
   extraBody,
   bodyParams,
   requiredOutputFormat,
+  agent,
+  formValues,
+  baseUrl,
 }: PromptPreviewSheetProps) {
-  const hasPrompt = systemPrompt || userPrompt.trim();
+  const [builtSystemPrompt, setBuiltSystemPrompt] = useState<string>(legacySystemPrompt || '');
+  const [isLoadingPreload, setIsLoadingPreload] = useState<boolean>(legacyIsLoadingPreload || false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Ensure we're mounted before building prompt to avoid hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Build system prompt using centralized utility if agent is provided
+  // Only run after mount to ensure server/client consistency
+  useEffect(() => {
+    if (!isMounted) return;
+    
+    if (agent) {
+      setIsLoadingPreload(true);
+      buildSystemPrompt({
+        agent,
+        formValues,
+        bodyParams,
+        baseUrl: baseUrl || (typeof window !== 'undefined' ? window.location.origin : ''),
+      })
+        .then((result) => {
+          // buildSystemPrompt returns { systemPrompt: string, isLoadingPreload: boolean }
+          setBuiltSystemPrompt(result.systemPrompt || '');
+          setIsLoadingPreload(result.isLoadingPreload || false);
+        })
+        .catch((error) => {
+          console.error('Error building system prompt:', error);
+          setBuiltSystemPrompt(legacySystemPrompt || '');
+          setIsLoadingPreload(false);
+        });
+    } else {
+      // Fallback to legacy systemPrompt if agent is not provided
+      setBuiltSystemPrompt(legacySystemPrompt || '');
+      setIsLoadingPreload(legacyIsLoadingPreload || false);
+    }
+  }, [isMounted, agent, formValues, bodyParams, baseUrl, legacySystemPrompt, legacyIsLoadingPreload]);
+
+  const effectiveSystemPrompt = builtSystemPrompt;
+  const hasPrompt = effectiveSystemPrompt || userPrompt.trim();
   const hasExtraBody = extraBody && Object.keys(extraBody).length > 0;
   const hasBodyParams = bodyParams && Object.keys(bodyParams).length > 0;
   // Enable preview if there's a prompt OR if there are body/extra params (for image generation, etc.)
   const canPreview = hasPrompt || hasBodyParams || hasExtraBody;
-  
-  // For image generation, use image type prompt if imageType is specified
-  let effectiveSystemPrompt = systemPrompt || '';
-  if (requiredOutputFormat === 'image' && bodyParams?.imageType) {
-    const imageType = bodyParams.imageType;
-    if (imageType && imageType !== 'none' && imageType !== 'standard') {
-      const imageTypePrompt = IMAGE_TYPE_PROMPTS[imageType] || IMAGE_TYPE_PROMPTS[imageType.toLowerCase()] || '';
-      if (imageTypePrompt) {
-        effectiveSystemPrompt = imageTypePrompt;
-      }
-    } else if (imageType === 'standard' || !imageType || imageType === 'none') {
-      // Use general image prompt for standard/none
-      effectiveSystemPrompt = IMAGE_TYPE_PROMPTS.standard || '';
-    }
-  }
-  
-  // Append general markdown rules for string format agents in preview
-  const previewSystemPrompt = requiredOutputFormat === 'string' 
-    ? effectiveSystemPrompt + GENERAL_MARKDOWN_OUTPUT_RULES
-    : effectiveSystemPrompt;
 
   return (
     <>
@@ -141,10 +168,10 @@ export function PromptPreviewSheet({
                         Loading preloaded context...
                       </div>
                     </div>
-                  ) : previewSystemPrompt ? (
+                  ) : effectiveSystemPrompt ? (
                     <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                       <MarkdownViewer 
-                        content={previewSystemPrompt}
+                        content={typeof effectiveSystemPrompt === 'string' ? effectiveSystemPrompt : String(effectiveSystemPrompt || '')}
                         showToggle={false}
                       />
                     </div>
@@ -169,7 +196,7 @@ export function PromptPreviewSheet({
                           </h4>
                           <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                             <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words font-mono">
-                              {JSON.stringify(bodyParams, null, 2)}
+                              {formatJsonForMarkdown(bodyParams)}
                             </pre>
                           </div>
                         </div>
@@ -181,7 +208,7 @@ export function PromptPreviewSheet({
                           </h4>
                           <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                             <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words font-mono">
-                              {JSON.stringify(extraBody, null, 2)}
+                              {formatJsonForMarkdown(extraBody)}
                             </pre>
                           </div>
                         </div>

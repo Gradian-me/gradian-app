@@ -4,24 +4,21 @@
  */
 
 import { AgentRequestData, AgentResponse } from './ai-agent-utils';
-import { getApiUrlForAgentType } from './ai-agent-url';
 import { extractParametersBySectionId, parseUserPromptToFormValues } from './ai-shared-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType, LOG_CONFIG } from '@/gradian-ui/shared/configs/log-config';
-import { getGeneralSystemPrompt } from './ai-general-utils';
 import { truncateText } from '@/domains/chat/utils/text-utils';
 import {
   sanitizePrompt,
-  getApiKey,
   sanitizeErrorMessage,
   safeJsonParse,
 } from './ai-security-utils';
 import {
-  createAbortController,
-  parseErrorResponse,
-  buildTimingInfo,
   validateAgentConfig,
 } from './ai-common-utils';
+import { buildSystemPrompt } from './prompt-concatenation-utils';
+import { callChatApi } from './ai-api-caller';
+import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
 
 /**
  * Comprehensive Graph Generation Prompt
@@ -111,16 +108,20 @@ export const GRAPH_GENERATION_PROMPT = `You are an Advanced Graph Structure Inte
    - Use parentId to show decision hierarchy
    - Use edges: "leads-to", "results-in", "triggers", "depends-on"
 
-4. **Edge Generation**:
-   - Identify ALL relationships between nodes
+4. **Edge Generation - CRITICAL REQUIREMENTS**:
+   - **MANDATORY**: Identify ALL relationships between nodes
+   - **MANDATORY**: Create at least ONE edge for EVERY node you generate
+   - **VALIDATION STEP**: After creating all nodes, go through each node ID and verify it appears in at least one edge (as source OR target)
    - Each edge MUST have: id, source, target, sourceSchema, sourceId, targetSchema, targetId, relationTypeId
    - Use meaningful relation types:
+     * For connectivity: "connects-to", "links-to", "communicates-with", "attached-to"
      * For causality: "causes", "affects", "triggers", "exacerbates", "contributes-to"
      * For flow: "flows-to", "leads-to", "precedes", "follows"
-     * For structure: "contains", "depends-on", "manages", "reports-to"
+     * For structure: "contains", "depends-on", "manages", "reports-to", "relates-to"
      * For decisions: "leads-to", "results-in", "triggers"
    - Ensure all source/target IDs reference valid node IDs
    - Create edges that show logical flow, causality, and dependencies
+   - **IF YOU CREATE A NODE, YOU MUST CREATE AT LEAST ONE EDGE FOR IT - NO EXCEPTIONS**
 
 5. **Industry Best Practices Integration**:
    - Apply industry-specific frameworks and standards
@@ -132,7 +133,13 @@ export const GRAPH_GENERATION_PROMPT = `You are an Advanced Graph Structure Inte
    - Every node and edge must be traceable back to the user prompt
    - Maintain logical flow and causality
    - Create hierarchical structures when appropriate (parent-child relationships using parentId)
-   - **CRITICAL: No Orphaned Nodes**: ALL nodes MUST have at least one edge connecting them to other nodes. No node should exist without any relations. Every node must be part of the connected graph structure. If a node seems isolated, create appropriate edges to connect it to the graph (e.g., "relates-to", "affects", "depends-on", "influences").
+   - **CRITICAL: No Orphaned Nodes - ABSOLUTE REQUIREMENT**: 
+     * **EVERY SINGLE NODE MUST HAVE AT LEAST ONE EDGE** connecting it to at least one other node
+     * **NO EXCEPTIONS** - If you create a node, you MUST create at least one edge for it
+     * Before finalizing your output, verify that every node ID appears in at least one edge (either as source OR target)
+     * If a node seems isolated, you MUST create appropriate edges to connect it (e.g., "connects-to", "relates-to", "affects", "depends-on", "influences", "links-to", "communicates-with")
+     * **DO NOT create any node without creating at least one edge for it**
+     * **VALIDATION CHECK**: Count your nodes, then count unique node IDs in your edges (sources + targets). Every node ID must appear in the edge list at least once.
    - Maintain consistency in naming conventions and ID patterns
 
 7. **Metadata Generation**:
@@ -145,9 +152,14 @@ export const GRAPH_GENERATION_PROMPT = `You are an Advanced Graph Structure Inte
    - Each schema should have: id, label, color, icon
    - Use appropriate colors and icons that match the domain and context
 
-8. **Graph Structure Quality**:
+8. **Graph Structure Quality - VALIDATION REQUIREMENTS**:
    - Minimum 3 nodes required (unless user explicitly requests fewer)
-   - **CRITICAL: All nodes must have edges**: Every node MUST have at least one edge connecting it to at least one other node. There should be NO isolated nodes in the graph.
+   - **ABSOLUTE REQUIREMENT: Every node MUST have at least one edge**:
+     * **BEFORE OUTPUT**: Count your nodes (N nodes)
+     * **BEFORE OUTPUT**: Extract all unique node IDs from your edges (from both source and target fields)
+     * **BEFORE OUTPUT**: Verify that every node ID appears in the edge list at least once
+     * **IF ANY NODE IS MISSING FROM EDGES**: Create an edge for it immediately - use "connects-to", "relates-to", "links-to", or another appropriate relation type
+     * **NO ORPHANED NODES ALLOWED** - Every node must be connected to the graph
    - All node IDs must be unique
    - All edge source/target must reference existing node IDs
    - All schemaIds in nodes should have corresponding entries in schemas array
@@ -214,9 +226,12 @@ You MUST output ONLY valid JSON in this exact structure (no markdown, no explana
   ]
 }
 
-VALIDATION RULES:
+VALIDATION RULES (MUST VERIFY BEFORE OUTPUT):
 - Minimum 3 nodes required (unless explicitly fewer requested)
-- **CRITICAL: All nodes must have at least one edge** - No orphaned nodes allowed
+- **ABSOLUTE REQUIREMENT: All nodes must have at least one edge** - No orphaned nodes allowed
+  * **VERIFICATION STEP**: For each node in your nodes array, check that its ID appears in at least one edge (either as source OR target)
+  * **IF YOU FIND AN ORPHANED NODE**: Create an edge connecting it to the nearest related node immediately
+  * **DO NOT OUTPUT** a graph with orphaned nodes - the system will reject it
 - All node IDs must be unique strings
 - All edge source/target must reference existing node IDs
 - All schemaIds in nodes should exist in schemas array
@@ -225,6 +240,7 @@ VALIDATION RULES:
 - Nodes with the same schemaId must have different nodeTypeId values to differentiate them
 - Payload should contain relevant domain-specific data
 - Node titles should be descriptive and meaningful
+- **FINAL CHECK**: Before outputting, verify: number of unique node IDs in edges >= number of nodes
 - **CRITICAL: For deviation/root cause analysis graphs**:
   * Deviation nodes MUST have "parentId: null" (they are NOT parents)
   * Root cause nodes (schemaId: "cause") MUST have "parentId: null" (they are NOT children of deviation)
@@ -309,16 +325,30 @@ function validateGraphStructure(graphData: any): { valid: boolean; error?: strin
   }
 
   // Validate that every node has at least one edge (no orphaned nodes)
-  const nodeEdgeCount = new Map<string, number>();
-  for (const edge of graphData.edges) {
-    nodeEdgeCount.set(edge.source, (nodeEdgeCount.get(edge.source) || 0) + 1);
-    nodeEdgeCount.set(edge.target, (nodeEdgeCount.get(edge.target) || 0) + 1);
-  }
+  // Only enforce this if there are multiple nodes and edges exist
+  if (graphData.nodes.length > 1 && graphData.edges.length > 0) {
+    const nodeEdgeCount = new Map<string, number>();
+    for (const edge of graphData.edges) {
+      if (edge.source && edge.target) {
+        nodeEdgeCount.set(edge.source, (nodeEdgeCount.get(edge.source) || 0) + 1);
+        nodeEdgeCount.set(edge.target, (nodeEdgeCount.get(edge.target) || 0) + 1);
+      }
+    }
 
-  for (const node of graphData.nodes) {
-    const edgeCount = nodeEdgeCount.get(node.id) || 0;
-    if (edgeCount === 0) {
-      return { valid: false, error: `Node "${node.id}" has no edges. All nodes must be connected to the graph with at least one edge.` };
+    const orphanedNodes: string[] = [];
+    for (const node of graphData.nodes) {
+      const edgeCount = nodeEdgeCount.get(node.id) || 0;
+      if (edgeCount === 0) {
+        orphanedNodes.push(node.id);
+      }
+    }
+    
+    // Only fail if there are orphaned nodes AND we have edges (meaning some nodes are connected but others aren't)
+    if (orphanedNodes.length > 0 && graphData.edges.length > 0) {
+      return { 
+        valid: false, 
+        error: `The following nodes have no edges and are not connected to the graph: ${orphanedNodes.join(', ')}. All nodes must be connected with at least one edge.` 
+      };
     }
   }
 
@@ -341,9 +371,19 @@ function validateGraphStructure(graphData: any): { valid: boolean; error?: strin
       return { valid: false, error: `Node ${node.id} must have incomplete field` };
     }
     
-    // Validate nodeTypeId in payload
-    if (!node.payload || typeof node.payload !== 'object' || !node.payload.nodeTypeId) {
-      return { valid: false, error: `Node ${node.id} ("${node.title || 'unnamed'}") is missing 'nodeTypeId' in its payload.` };
+    // Validate nodeTypeId in payload (make it optional but preferred)
+    if (!node.payload || typeof node.payload !== 'object') {
+      return { valid: false, error: `Node ${node.id} ("${node.title || 'unnamed'}") must have a payload object.` };
+    }
+    
+    // nodeTypeId is preferred but not required - we can derive it from schemaId and type if missing
+    if (!node.payload.nodeTypeId) {
+      // Try to derive nodeTypeId from payload.type or schemaId
+      const derivedNodeTypeId = node.payload.type 
+        ? `${node.schemaId}-${node.payload.type}` 
+        : node.schemaId;
+      // Auto-fix: add nodeTypeId if missing
+      node.payload.nodeTypeId = derivedNodeTypeId;
     }
     
     // Validate deviation/root cause analysis structure
@@ -416,6 +456,8 @@ export async function processGraphRequest(
   baseUrl?: string
 ): Promise<AgentResponse> {
   const isDevelopment = process.env.NODE_ENV === 'development';
+  // Get model from agent config (defined outside try block for use in catch block)
+  const model = agent.model || 'gpt-4o';
 
   try {
     // Security: Validate agent configuration
@@ -427,22 +469,12 @@ export async function processGraphRequest(
       };
     }
 
-    // Security: Get API key with validation
-    const apiKeyResult = getApiKey();
-    if (!apiKeyResult.key) {
-      return {
-        success: false,
-        error: apiKeyResult.error || 'LLM_API_KEY is not configured',
-      };
-    }
-    const apiKey = apiKeyResult.key;
-
     // Extract prompt from requestData
     let cleanPrompt = '';
     
     // Use body and extra_body from requestData if provided, otherwise calculate from formValues
-    let bodyParams: Record<string, any> = {};
-    let extraParams: Record<string, any> = {};
+    let bodyParams: Record<string, any> = requestData.body || {};
+    let extraParams: Record<string, any> = requestData.extra_body || {};
     let promptParams: Record<string, any> = {};
 
     if (requestData.body || requestData.extra_body) {
@@ -516,191 +548,225 @@ export async function processGraphRequest(
       };
     }
 
-    // Get model from agent config
-    const model = agent.model || 'gpt-4o';
+    // Model is already defined at function scope
 
-    // Get API URL based on agent type (graph generation uses chat API)
-    const apiUrl = getApiUrlForAgentType('chat');
+    // Build system prompt using centralized utility (handles preload routes internally)
+    const { systemPrompt } = await buildSystemPrompt({
+      agent,
+      formValues: requestData.formValues,
+      bodyParams,
+      baseUrl,
+    });
 
-    // Track timing
-    const startTime = Date.now();
+    // Call chat API using centralized utility (graph uses chat API with JSON format)
+    const apiResult = await callChatApi({
+      agent,
+      systemPrompt,
+      userPrompt: cleanPrompt,
+      model,
+      responseFormat: { type: 'json_object' }, // Force JSON output
+    });
 
-    // Performance: Use shared AbortController utility
-    const { controller, timeoutId } = createAbortController(120000); // 120 seconds
-
-    try {
-      // Build system prompt with general system prompt (date/time context) and graph generation instructions
-      const systemPrompt = getGeneralSystemPrompt() + (agent.systemPrompt || '') + '\n\n' + GRAPH_GENERATION_PROMPT;
-
-      // Build request body
-      const requestBody = {
-        model,
-        messages: [
-          {
-            role: 'system' as const,
-            content: systemPrompt,
-          },
-          {
-            role: 'user' as const,
-            content: cleanPrompt,
-          },
-        ],
-        response_format: { type: 'json_object' }, // Force JSON output
-      };
-
-      // Log request body (mask sensitive data in production)
-      if (isDevelopment) {
-        loggingCustom(
-          LogType.AI_BODY_LOG,
-          'info',
-          `Graph Generation Request to ${apiUrl}: ${JSON.stringify(requestBody, null, 2)}`
-        );
-      }
-
-      // Call LLM API
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        // Security: Use shared error parsing utility
-        const errorMessage = await parseErrorResponse(response);
-        
-        if (isDevelopment) {
-          loggingCustom(LogType.CLIENT_LOG, 'error', `Graph generation API error: ${errorMessage}`);
-        }
-
-        return {
-          success: false,
-          error: sanitizeErrorMessage(errorMessage, isDevelopment),
-        };
-      }
-
-      // Security: Use safe JSON parsing
-      const responseText = await response.text();
-      const parseResult = safeJsonParse(responseText);
+    if (!apiResult.success) {
+      const errorMessage = apiResult.error || 'API call failed';
       
-      if (!parseResult.success || !parseResult.data) {
-        return {
-          success: false,
-          error: parseResult.error || 'Invalid response format from graph generation service',
-        };
-      }
-
-      const data = parseResult.data;
-
-      // Extract content from response (OpenAI format)
-      let graphJsonString = '';
-      if (data.choices && Array.isArray(data.choices) && data.choices.length > 0) {
-        const choice = data.choices[0];
-        if (choice.message && choice.message.content) {
-          graphJsonString = choice.message.content;
-        }
-      }
-
-      // Log AI response if enabled
+      // Log to AI_RESPONSE_LOG for visibility
       if (LOG_CONFIG[LogType.AI_RESPONSE_LOG]) {
-        const responsePreview = truncateText(graphJsonString, 1000);
+        const errorDetails = {
+          error: errorMessage,
+          model,
+          agentId: agent.id,
+        };
         loggingCustom(
           LogType.AI_RESPONSE_LOG,
-          'info',
-          `Graph Generation Response from ${model}:\n${responsePreview}`
+          'error',
+          `Graph Generation API Error from ${model}:\n${JSON.stringify(errorDetails, null, 2)}`
         );
       }
-
-      if (!graphJsonString) {
-        return {
-          success: false,
-          error: 'No graph data in response',
-        };
-      }
-
-      // Parse the graph JSON
-      const graphParseResult = safeJsonParse(graphJsonString);
-      if (!graphParseResult.success || !graphParseResult.data) {
-        return {
-          success: false,
-          error: graphParseResult.error || 'Invalid graph JSON format',
-        };
-      }
-
-      const graphData = graphParseResult.data;
-
-      // Validate graph structure
-      const validation = validateGraphStructure(graphData);
-      if (!validation.valid) {
-        return {
-          success: false,
-          error: validation.error || 'Invalid graph structure',
-        };
-      }
-
-      // Performance: Use shared timing utility
-      const timing = buildTimingInfo(startTime);
-
-      // Format response data for AiBuilderResponseData structure
-      const responseData = {
-        graph: graphData,
-        format: 'graph' as const,
-        model,
-        timing,
-      };
-
-      // Extract token usage if available
-      const tokenUsage = data.usage ? {
-        prompt_tokens: data.usage.prompt_tokens || 0,
-        completion_tokens: data.usage.completion_tokens || 0,
-        total_tokens: data.usage.total_tokens || 0,
-        pricing: null, // Will be calculated by chat utils if needed
-      } : null;
-
+      
       return {
-        success: true,
-        data: {
-          response: JSON.stringify(responseData, null, 2), // Stringify for consistency with other agent types
-          format: 'graph' as const,
-          tokenUsage,
-          timing,
-          agent: {
-            id: agent.id,
-            label: agent.label,
-            description: agent.description,
-            requiredOutputFormat: 'graph' as const,
-            nextAction: agent.nextAction,
-          },
-        },
+        success: false,
+        error: errorMessage,
       };
-    } catch (fetchError) {
-      clearTimeout(timeoutId);
-
-      // Handle timeout errors
-      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        if (isDevelopment) {
-          loggingCustom(LogType.CLIENT_LOG, 'error', `Request timeout in graph generation API: ${fetchError.message}`);
-        }
-        return {
-          success: false,
-          error: sanitizeErrorMessage('Request timeout', isDevelopment),
-        };
-      }
-
-      throw fetchError;
     }
+
+    // The callChatApi already extracts JSON, but the AI might wrap it in markdown code blocks
+    // Convert to string first, then extract JSON from markdown if needed
+    let graphJsonString = typeof apiResult.data === 'string' ? apiResult.data : JSON.stringify(apiResult.data);
+    
+    // Strip markdown code blocks if present (AI sometimes wraps JSON in ```json ... ```)
+    const extractedJson = extractJson(graphJsonString);
+    if (extractedJson) {
+      graphJsonString = extractedJson;
+    }
+
+    // Log AI response if enabled
+    if (LOG_CONFIG[LogType.AI_RESPONSE_LOG]) {
+      const responsePreview = truncateText(graphJsonString, 1000);
+      loggingCustom(
+        LogType.AI_RESPONSE_LOG,
+        'info',
+        `Graph Generation Response from ${model}:\n${responsePreview}`
+      );
+    }
+
+    if (!graphJsonString) {
+      const errorMessage = 'No graph data in response';
+      
+      // Log to AI_RESPONSE_LOG for visibility
+      if (LOG_CONFIG[LogType.AI_RESPONSE_LOG]) {
+        const errorDetails = {
+          error: errorMessage,
+          model,
+          agentId: agent.id,
+        };
+        loggingCustom(
+          LogType.AI_RESPONSE_LOG,
+          'error',
+          `Graph Generation Error from ${model}:\n${JSON.stringify(errorDetails, null, 2)}`
+        );
+      }
+      
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
+
+    // Parse the graph JSON (now that markdown is stripped)
+    const graphParseResult = safeJsonParse(graphJsonString);
+    if (!graphParseResult.success || !graphParseResult.data) {
+      const errorMessage = graphParseResult.error || 'Invalid graph JSON format';
+      const errorDetails = {
+        error: errorMessage,
+        rawResponse: truncateText(graphJsonString, 1000),
+        model,
+      };
+      
+      // Log to CLIENT_LOG for debugging
+      loggingCustom(
+        LogType.CLIENT_LOG,
+        'error',
+        `Graph JSON parse failed: ${errorMessage}\nRaw response: ${truncateText(graphJsonString, 500)}`
+      );
+      
+      // Log to AI_RESPONSE_LOG for visibility
+      if (LOG_CONFIG[LogType.AI_RESPONSE_LOG]) {
+        loggingCustom(
+          LogType.AI_RESPONSE_LOG,
+          'error',
+          `Graph Generation Error from ${model}:\n${JSON.stringify(errorDetails, null, 2)}`
+        );
+      }
+      
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
+
+    const graphData = graphParseResult.data;
+
+    // Log graph structure for debugging
+    if (isDevelopment) {
+      loggingCustom(
+        LogType.CLIENT_LOG,
+        'info',
+        `Graph structure: ${graphData.nodes?.length || 0} nodes, ${graphData.edges?.length || 0} edges`
+      );
+    }
+
+    // Validate graph structure - collect warnings instead of failing
+    const validation = validateGraphStructure(graphData);
+    const warnings: string[] = [];
+    
+    if (!validation.valid && validation.error) {
+      // Log the validation issue as a warning (non-blocking)
+      const warningMessage = validation.error;
+      const warningDetails = {
+        warning: warningMessage,
+        nodeCount: graphData.nodes?.length || 0,
+        edgeCount: graphData.edges?.length || 0,
+        nodeIds: graphData.nodes?.map((n: any) => n.id) || [],
+        edgeSources: graphData.edges?.map((e: any) => e.source) || [],
+        edgeTargets: graphData.edges?.map((e: any) => e.target) || [],
+        model,
+      };
+      
+      // Add warning to array
+      warnings.push(warningMessage);
+      
+      // Log to CLIENT_LOG for debugging
+      loggingCustom(
+        LogType.CLIENT_LOG,
+        'warn',
+        `Graph validation warning: ${JSON.stringify(warningDetails, null, 2)}\nGraph data preview: ${truncateText(JSON.stringify(graphData, null, 2), 1000)}`
+      );
+      
+      // Log to AI_RESPONSE_LOG for visibility
+      if (LOG_CONFIG[LogType.AI_RESPONSE_LOG]) {
+        loggingCustom(
+          LogType.AI_RESPONSE_LOG,
+          'warn',
+          `Graph Generation Validation Warning from ${model}:\n${JSON.stringify(warningDetails, null, 2)}`
+        );
+      }
+    }
+
+    // Format response data for AiBuilderResponseData structure
+    const responseData = {
+      graph: graphData,
+      format: 'graph' as const,
+      model,
+      timing: apiResult.timing,
+    };
+
+    // Extract token usage from API result
+    const tokenUsage = apiResult.tokenUsage || null;
+
+    return {
+      success: true,
+      data: {
+        response: JSON.stringify(responseData, null, 2), // Stringify for consistency with other agent types
+        format: 'graph' as const,
+        tokenUsage,
+        timing: apiResult.timing,
+        warnings: warnings.length > 0 ? warnings : undefined, // Include warnings if any
+        agent: {
+          id: agent.id,
+          label: agent.label,
+          description: agent.description,
+          requiredOutputFormat: 'graph' as const,
+          nextAction: agent.nextAction,
+        },
+      },
+    };
   } catch (error) {
+    const errorMessage = sanitizeErrorMessage(error, isDevelopment);
+    const errorDetails = {
+      error: errorMessage,
+      originalError: error instanceof Error ? error.message : String(error),
+      model,
+      agentId: agent.id,
+    };
+    
+    // Log to CLIENT_LOG for debugging
     if (isDevelopment) {
       loggingCustom(LogType.CLIENT_LOG, 'error', `Error in graph generation request: ${error instanceof Error ? error.message : String(error)}`);
     }
+    
+    // Log to AI_RESPONSE_LOG for visibility
+    if (LOG_CONFIG[LogType.AI_RESPONSE_LOG]) {
+      loggingCustom(
+        LogType.AI_RESPONSE_LOG,
+        'error',
+        `Graph Generation Exception from ${model}:\n${JSON.stringify(errorDetails, null, 2)}`
+      );
+    }
+    
     return {
       success: false,
-      error: sanitizeErrorMessage(error, isDevelopment),
+      error: errorMessage,
     };
   }
 }
