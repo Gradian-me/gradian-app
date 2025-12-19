@@ -259,6 +259,19 @@ export function buildStandardizedPrompt(
       if (typeof fieldValue[0] === 'object' && 'id' in fieldValue[0]) {
         const normalizedOption = fieldValue[0] as NormalizedOption;
         formattedValue = normalizedOption.label || normalizedOption.id || String(normalizedOption.value || '');
+        
+        // Append option description if available
+        if (normalizedOption.description) {
+          formattedValue += `\n\n${normalizedOption.description}`;
+        } else if (field.options) {
+          // Try to find description from field options
+          const option = field.options.find(
+            (opt: any) => opt.id === normalizedOption.id || opt.value === normalizedOption.value
+          );
+          if (option?.description) {
+            formattedValue += `\n\n${option.description}`;
+          }
+        }
       } else {
         // Plain array - join with commas
         formattedValue = fieldValue.map((item: any) => {
@@ -273,9 +286,27 @@ export function buildStandardizedPrompt(
         (opt: any) => opt.id === fieldValue || opt.value === fieldValue
       );
       formattedValue = option?.label || String(fieldValue);
+      
+      // Append option description if available
+      if (option?.description) {
+        formattedValue += `\n\n${option.description}`;
+      }
     } else if (typeof fieldValue === 'object' && fieldValue !== null) {
       // Handle single object (shouldn't happen but just in case)
       formattedValue = (fieldValue as any).label || (fieldValue as any).id || String((fieldValue as any).value || '');
+      
+      // Append option description if available
+      if ((fieldValue as any).description) {
+        formattedValue += `\n\n${(fieldValue as any).description}`;
+      } else if (field.options) {
+        // Try to find description from field options
+        const option = field.options.find(
+          (opt: any) => opt.id === (fieldValue as any).id || opt.value === (fieldValue as any).value
+        );
+        if (option?.description) {
+          formattedValue += `\n\n${option.description}`;
+        }
+      }
     } else {
       formattedValue = String(fieldValue);
     }

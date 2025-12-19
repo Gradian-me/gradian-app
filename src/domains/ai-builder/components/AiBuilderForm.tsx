@@ -360,10 +360,28 @@ export function AiBuilderForm({
         // Handle NormalizedOption array (from single Select component) - only first option
         const normalizedOption = fieldValue[0];
         formattedValue = normalizedOption.label || normalizedOption.id || String(normalizedOption.value || '');
+        
+        // Append option description if available
+        if (normalizedOption.description) {
+          formattedValue += `\n\n${normalizedOption.description}`;
+        } else if (field.options) {
+          // Try to find description from field options
+          const option = field.options.find(
+            (opt: any) => opt.id === normalizedOption.id || opt.value === normalizedOption.value
+          );
+          if (option?.description) {
+            formattedValue += `\n\n${option.description}`;
+          }
+        }
       } else if (field.component === 'select') {
         // For select with string/number value, find the option label
         const option = field.options?.find((opt: any) => opt.id === fieldValue || opt.value === fieldValue);
         formattedValue = option?.label || String(fieldValue);
+        
+        // Append option description if available
+        if (option?.description) {
+          formattedValue += `\n\n${option.description}`;
+        }
       } else if (Array.isArray(fieldValue)) {
         // For arrays (like checkbox-list, tag-input), join with commas
         formattedValue = fieldValue.map((item: any) => {
@@ -374,6 +392,19 @@ export function AiBuilderForm({
       } else if (typeof fieldValue === 'object' && fieldValue !== null) {
         // Handle single object (shouldn't happen but just in case)
         formattedValue = (fieldValue as any).label || (fieldValue as any).id || String((fieldValue as any).value || '');
+        
+        // Append option description if available
+        if ((fieldValue as any).description) {
+          formattedValue += `\n\n${(fieldValue as any).description}`;
+        } else if (field.options) {
+          // Try to find description from field options
+          const option = field.options.find(
+            (opt: any) => opt.id === (fieldValue as any).id || opt.value === (fieldValue as any).value
+          );
+          if (option?.description) {
+            formattedValue += `\n\n${option.description}`;
+          }
+        }
       } else {
         formattedValue = String(fieldValue);
       }
