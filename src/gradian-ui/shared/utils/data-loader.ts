@@ -597,13 +597,21 @@ export async function loadDataById<T = any>(
       const fetchUrl = getApiUrl(`${apiBasePath}/${id}`);
       const startTime = Date.now();
 
-      // Get cookies from Next.js request context to forward to internal API calls
+      // Get cookies and Authorization header from Next.js request context to forward to internal API calls
+      // The access token is stored in memory on the server and should be sent as Authorization header
       const cookieHeader = await getCookieHeader();
+      const authHeader = await getAuthorizationHeader();
       const fetchHeaders: Record<string, string> = {
         'Content-Type': 'application/json',
       };
       if (cookieHeader) {
         fetchHeaders['cookie'] = cookieHeader;
+      }
+      if (authHeader) {
+        fetchHeaders['authorization'] = authHeader;
+        loggingCustom(logType, 'debug', `[${instanceId}] Adding Authorization header for internal fetch to ${fetchUrl}`);
+      } else {
+        loggingCustom(logType, 'warn', `[${instanceId}] No Authorization header available for internal fetch to ${fetchUrl}`);
       }
 
       // Set x-tenant-domain header for internal Next.js API requests
@@ -724,13 +732,21 @@ export async function loadDataById<T = any>(
     const fetchUrl = getApiUrl(`${apiBasePath}/${id}`);
     const startTime = Date.now();
 
-    // Get cookies from Next.js request context to forward to internal API calls
+    // Get cookies and Authorization header from Next.js request context to forward to internal API calls
+    // The access token is stored in memory on the server and should be sent as Authorization header
     const cookieHeader = await getCookieHeader();
+    const authHeader = await getAuthorizationHeader();
     const fetchHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
     };
     if (cookieHeader) {
       fetchHeaders['cookie'] = cookieHeader;
+    }
+    if (authHeader) {
+      fetchHeaders['authorization'] = authHeader;
+      loggingCustom(logType, 'debug', `[${instanceId}] Adding Authorization header for internal fetch to ${fetchUrl}`);
+    } else {
+      loggingCustom(logType, 'warn', `[${instanceId}] No Authorization header available for internal fetch to ${fetchUrl}`);
     }
 
     // Include tenant domain header for server-side internal fetches
