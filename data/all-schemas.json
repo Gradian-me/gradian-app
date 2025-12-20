@@ -4373,74 +4373,6 @@
     "applyToAllTenants": true
   },
   {
-    "id": "sync-strategies",
-    "description": "Manage sync strategies for data synchronization",
-    "singular_name": "Sync Strategy",
-    "plural_name": "Sync Strategies",
-    "fields": [
-      {
-        "id": "sync-strategy-tenants",
-        "name": "tenants",
-        "label": "Tenants",
-        "sectionId": "basic-information",
-        "component": "picker",
-        "placeholder": "Click to select tenants",
-        "description": "Select tenants from popup picker",
-        "targetSchema": "tenants",
-        "allowMultiselect": true,
-        "validation": {
-          "required": false
-        },
-        "colSpan": 1,
-        "order": 1
-      },
-      {
-        "id": "sync-strategy-switch-sync-with-data",
-        "name": "switchSyncWithData",
-        "label": "Switch Sync with Data",
-        "sectionId": "basic-information",
-        "component": "switch",
-        "description": "Enable sync with data",
-        "defaultValue": false,
-        "validation": {
-          "required": false
-        },
-        "colSpan": 1,
-        "order": 2
-      },
-      {
-        "id": "sync-strategy-description",
-        "name": "description",
-        "label": "Description",
-        "sectionId": "basic-information",
-        "component": "textarea",
-        "placeholder": "Enter sync strategy description",
-        "validation": {
-          "required": false
-        },
-        "colSpan": 2,
-        "order": 3,
-        "role": "description"
-      }
-    ],
-    "sections": [
-      {
-        "id": "basic-information",
-        "title": "Sync Strategy Information",
-        "description": "Basic sync strategy details and configuration",
-        "initialState": "expanded",
-        "columns": 2
-      }
-    ],
-    "showInNavigation": false,
-    "icon": "RefreshCw",
-    "isNotCompanyBased": true,
-    "canSelectMultiCompanies": false,
-    "allowDataInactive": true,
-    "schemaType": "system",
-    "applyToAllTenants": true
-  },
-  {
     "id": "reset-password-form",
     "description": "Lightweight action form for resetting a user password via custom route",
     "singular_name": "Reset Password Form",
@@ -4864,7 +4796,8 @@
       }
     ],
     "syncStrategy": "schema-and-data",
-    "applyToAllTenants": false
+    "applyToAllTenants": false,
+    "isNotCompanyBased": true
   },
   {
     "id": "guidelines",
@@ -4988,7 +4921,8 @@
         "id": "01KBFBD109G6CYRT7RA04TMMXC",
         "label": "AryoGen"
       }
-    ]
+    ],
+    "isNotCompanyBased": true
   },
   {
     "id": "vendors",

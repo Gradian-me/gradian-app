@@ -1107,5 +1107,15 @@
     "id": "01KCXDXSCE32BZH55MVV4Y2CV3",
     "createdAt": "2025-12-20T08:27:24.941Z",
     "updatedAt": "2025-12-20T08:27:24.941Z"
+  },
+  {
+    "sourceSchema": "vendors",
+    "sourceId": "01KCX516BZD0THVCNDXVKSQHT3",
+    "targetSchema": "users",
+    "targetId": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+    "relationTypeId": "HAS_MEMBER",
+    "id": "01KCXMTTJQN1EWS89K12XD19GD",
+    "createdAt": "2025-12-20T10:28:07.894Z",
+    "updatedAt": "2025-12-20T10:28:07.894Z"
   }
 ]

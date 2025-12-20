@@ -26,6 +26,9 @@ import { normalizeOptionArray, normalizeOptionEntry, NormalizedOption } from '..
 import { BadgeOption, getBadgeMetadata } from '../utils/badge-utils';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { formatFieldValue, getFieldValue } from '@/gradian-ui/data-display/table/utils/field-formatters';
+import { getBadgeConfig } from '@/gradian-ui/data-display/utils';
+import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
+import { Badge } from '@/components/ui/badge';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { AddButtonFull } from './AddButtonFull';
@@ -1437,9 +1440,11 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     // Find status field options
     const statusFieldDef = effectiveSchema?.fields?.find(f => f.role === 'status' || f.name === 'status');
     const ratingFieldDef = effectiveSchema?.fields?.find(f => f.role === 'rating');
+    const entityTypeFieldDef = effectiveSchema?.fields?.find(f => f.role === 'entityType' || f.name === 'entityType');
     const hasCodeField = effectiveSchema?.fields?.some(f => f.role === 'code') || false;
     const codeField = getSingleValueByRole(effectiveSchema, item, 'code');
-    const statusFieldValue = statusFieldDef ? getFieldValue(statusFieldDef, item) : null;
+    // Use getSingleValueByRole like AccordionFormSection does for status
+    const statusFieldValue = getSingleValueByRole(effectiveSchema, item, 'status') || item.status || null;
     const ratingFieldValue = ratingFieldDef ? getFieldValue(ratingFieldDef, item) : null;
     
     // Ensure status field has options from statusGroup if available (same approach as TableWrapper)
@@ -1452,6 +1457,59 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       : hasStatusGroup
         ? { id: 'status', name: 'status', role: 'status', options: effectiveSchema.statusGroup }
         : null;
+    
+    // Get status options for badge config
+    const statusOptions = statusFieldWithOptions?.options;
+    const hasStatusField = Boolean(statusFieldDef || hasStatusGroup);
+    
+    // Normalize status value to extract color/icon from enriched data (like DynamicCardRenderer)
+    const normalizedStatusOption = statusFieldValue ? normalizeOptionArray(statusFieldValue)[0] : null;
+    const statusBadgeConfig = hasStatusField && statusFieldValue && statusOptions 
+      ? (() => {
+          const config = getBadgeConfig(statusFieldValue, statusOptions);
+          return {
+            ...config,
+            // Use normalized option's color/icon first (from enriched API data), fallback to config
+            color: normalizedStatusOption?.color || config.color,
+            icon: normalizedStatusOption?.icon || config.icon,
+          };
+        })()
+      : null;
+    
+    // Entity Type handling (similar to status)
+    const hasEntityTypeGroup = Array.isArray(effectiveSchema?.entityTypeGroup) && effectiveSchema.entityTypeGroup.length > 0;
+    const entityTypeFieldWithOptions = entityTypeFieldDef
+      ? {
+          ...entityTypeFieldDef,
+          options: entityTypeFieldDef.options || (hasEntityTypeGroup ? effectiveSchema.entityTypeGroup : undefined)
+        }
+      : hasEntityTypeGroup
+        ? { id: 'entityType', name: 'entityType', role: 'entityType', options: effectiveSchema.entityTypeGroup }
+        : null;
+    
+    // Get entityType value
+    // Use getSingleValueByRole first, then fallback to getFieldValue and item.entityType
+    const entityTypeFieldValue = getSingleValueByRole(effectiveSchema, item, 'entityType') || 
+      (entityTypeFieldDef ? getFieldValue(entityTypeFieldDef, item) : null) || 
+      item.entityType || 
+      null;
+    const entityTypeOptions = entityTypeFieldWithOptions?.options;
+    const entityTypeValueForBadge = entityTypeFieldValue;
+    const hasEntityTypeField = Boolean(entityTypeFieldDef || hasEntityTypeGroup);
+    
+    // Extract entityType badge config - normalize to extract color/icon from enriched data
+    const normalizedEntityTypeOption = entityTypeFieldValue ? normalizeOptionArray(entityTypeFieldValue)[0] : null;
+    const entityTypeBadgeConfig = hasEntityTypeField && entityTypeFieldValue && entityTypeOptions 
+      ? (() => {
+          const config = getBadgeConfig(entityTypeFieldValue, entityTypeOptions);
+          return {
+            ...config,
+            // Use normalized option's color/icon first (from enriched API data), fallback to config
+            color: normalizedEntityTypeOption?.color || config.color,
+            icon: normalizedEntityTypeOption?.icon || config.icon,
+          };
+        })()
+      : null;
     
     const statusFieldNode = statusFieldWithOptions ? formatFieldValue(statusFieldWithOptions, statusFieldValue, item) : null;
     const ratingFieldNode = ratingFieldDef ? formatFieldValue(ratingFieldDef, ratingFieldValue, item) : null;
@@ -1512,11 +1570,22 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
                 </div>
 
-                {/* Rating and Status - Only render if at least one exists */}
-                {(ratingFieldNode || statusFieldNode) && (
+                {/* Rating, Status, and EntityType - Only render if at least one exists */}
+                {(ratingFieldNode || statusBadgeConfig || entityTypeBadgeConfig) && (
                   <div className="flex flex-col items-end gap-1.5 shrink-0">
                     {ratingFieldNode && <div className="flex items-center gap-1">{ratingFieldNode}</div>}
-                    {statusFieldNode && <div className="flex items-center gap-1">{statusFieldNode}</div>}
+                    {statusBadgeConfig && (
+                      <Badge variant={getValidBadgeVariant(statusBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                        {statusBadgeConfig.icon && <IconRenderer iconName={statusBadgeConfig.icon} className="h-3 w-3" />}
+                        <span>{statusBadgeConfig.label}</span>
+                      </Badge>
+                    )}
+                    {entityTypeBadgeConfig && (
+                      <Badge variant={getValidBadgeVariant(entityTypeBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                        {entityTypeBadgeConfig.icon && <IconRenderer iconName={entityTypeBadgeConfig.icon} className="h-3 w-3" />}
+                        <span>{entityTypeBadgeConfig.label}</span>
+                      </Badge>
+                    )}
                   </div>
                 )}
               </div>
@@ -1755,6 +1824,71 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
     const hasCodeField = effectiveSchema?.fields?.some((f) => f.role === 'code') || false;
     const codeField = getSingleValueByRole(effectiveSchema, item, 'code');
+    
+    // Extract status and entityType for badges
+    const statusFieldDef = effectiveSchema?.fields?.find(f => f.role === 'status' || f.name === 'status');
+    const entityTypeFieldDef = effectiveSchema?.fields?.find(f => f.role === 'entityType' || f.name === 'entityType');
+    // Use getSingleValueByRole like AccordionFormSection does for status
+    const statusFieldValue = getSingleValueByRole(effectiveSchema, item, 'status') || item.status || null;
+    
+    // Status badge config
+    const hasStatusGroup = Array.isArray(effectiveSchema?.statusGroup) && effectiveSchema.statusGroup.length > 0;
+    const statusFieldWithOptions = statusFieldDef 
+      ? { 
+          ...statusFieldDef, 
+          options: statusFieldDef.options || (hasStatusGroup ? effectiveSchema.statusGroup : undefined)
+        }
+      : hasStatusGroup
+        ? { id: 'status', name: 'status', role: 'status', options: effectiveSchema.statusGroup }
+        : null;
+    const statusOptions = statusFieldWithOptions?.options;
+    const hasStatusField = Boolean(statusFieldDef || hasStatusGroup);
+    
+    // Normalize status value to extract color/icon from enriched data (like DynamicCardRenderer)
+    const normalizedStatusOption = statusFieldValue ? normalizeOptionArray(statusFieldValue)[0] : null;
+    const statusBadgeConfig = hasStatusField && statusFieldValue && statusOptions 
+      ? (() => {
+          const config = getBadgeConfig(statusFieldValue, statusOptions);
+          return {
+            ...config,
+            // Use normalized option's color/icon first (from enriched API data), fallback to config
+            color: normalizedStatusOption?.color || config.color,
+            icon: normalizedStatusOption?.icon || config.icon,
+          };
+        })()
+      : null;
+    
+    // Entity Type badge config
+    const hasEntityTypeGroup = Array.isArray(effectiveSchema?.entityTypeGroup) && effectiveSchema.entityTypeGroup.length > 0;
+    const entityTypeFieldWithOptions = entityTypeFieldDef
+      ? {
+          ...entityTypeFieldDef,
+          options: entityTypeFieldDef.options || (hasEntityTypeGroup ? effectiveSchema.entityTypeGroup : undefined)
+        }
+      : hasEntityTypeGroup
+        ? { id: 'entityType', name: 'entityType', role: 'entityType', options: effectiveSchema.entityTypeGroup }
+        : null;
+    // Use getSingleValueByRole first, then fallback to getFieldValue and item.entityType
+    const entityTypeFieldValue = getSingleValueByRole(effectiveSchema, item, 'entityType') || 
+      (entityTypeFieldDef ? getFieldValue(entityTypeFieldDef, item) : null) || 
+      item.entityType || 
+      null;
+    const entityTypeOptions = entityTypeFieldWithOptions?.options;
+    const hasEntityTypeField = Boolean(entityTypeFieldDef || hasEntityTypeGroup);
+    
+    // Normalize entityType value to extract color/icon from enriched data
+    const normalizedEntityTypeOption = entityTypeFieldValue ? normalizeOptionArray(entityTypeFieldValue)[0] : null;
+    const entityTypeBadgeConfig = hasEntityTypeField && entityTypeFieldValue && entityTypeOptions 
+      ? (() => {
+          const config = getBadgeConfig(entityTypeFieldValue, entityTypeOptions);
+          return {
+            ...config,
+            // Use normalized option's color/icon first (from enriched API data), fallback to config
+            color: normalizedEntityTypeOption?.color || config.color,
+            icon: normalizedEntityTypeOption?.icon || config.icon,
+          };
+        })()
+      : null;
 
     return (
       <div key={item.id || index} className="space-y-1" style={{ marginLeft: depth * 16 }}>
@@ -1824,6 +1958,24 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                       </p>
                     )}
                   </div>
+                  
+                  {/* Status and EntityType badges */}
+                  {(statusBadgeConfig || entityTypeBadgeConfig) && (
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      {statusBadgeConfig && (
+                        <Badge variant={getValidBadgeVariant(statusBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                          {statusBadgeConfig.icon && <IconRenderer iconName={statusBadgeConfig.icon} className="h-3 w-3" />}
+                          <span>{statusBadgeConfig.label}</span>
+                        </Badge>
+                      )}
+                      {entityTypeBadgeConfig && (
+                        <Badge variant={getValidBadgeVariant(entityTypeBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                          {entityTypeBadgeConfig.icon && <IconRenderer iconName={entityTypeBadgeConfig.icon} className="h-3 w-3" />}
+                          <span>{entityTypeBadgeConfig.label}</span>
+                        </Badge>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
