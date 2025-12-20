@@ -137,9 +137,20 @@ export async function POST(request: NextRequest) {
       const refreshUrl = buildAuthServiceUrl('/refresh');
       const headers = buildProxyHeaders(request);
 
+      // Log request details
+      const headersForLog = headers as Record<string, string>;
       loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Calling external auth service ${JSON.stringify({
         url: refreshUrl,
         hasRefreshToken: !!tokenToUse,
+        tokenPreview: tokenToUse ? `${tokenToUse.substring(0, 20)}...` : null,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          hasCookies: !!headersForLog.cookie,
+          hasFingerprint: !!headersForLog['x-fingerprint'],
+          hasTenantDomain: !!headersForLog['x-tenant-domain'],
+        },
       })}`);
 
       const response = await fetch(refreshUrl, {
@@ -156,13 +167,31 @@ export async function POST(request: NextRequest) {
         status: response.status,
         ok: response.ok,
         duration: `${fetchDuration}ms`,
+        contentType: response.headers.get('content-type'),
       })}`);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Token refresh failed' }));
+        // Try to parse error response
+        let errorData: any = { error: 'Token refresh failed' };
+        try {
+          const responseText = await response.text();
+          if (responseText) {
+            try {
+              errorData = JSON.parse(responseText);
+            } catch (parseError) {
+              // Not JSON, use text as error message
+              errorData = { error: responseText || 'Token refresh failed' };
+            }
+          }
+        } catch (readError) {
+          loggingCustom(LogType.LOGIN_LOG, 'warn', `[REFRESH_API] Failed to read error response: ${readError instanceof Error ? readError.message : String(readError)}`);
+        }
+        
         loggingCustom(LogType.LOGIN_LOG, 'error', `[REFRESH_API] External refresh failed ${JSON.stringify({
           status: response.status,
+          statusText: response.statusText,
           error: errorData.error || errorData.message,
+          errorData,
         })}`);
         return NextResponse.json(
           {
@@ -173,7 +202,40 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const data = await response.json();
+      // Parse successful response with error handling
+      let data: any;
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            loggingCustom(LogType.LOGIN_LOG, 'error', `[REFRESH_API] Failed to parse response as JSON ${JSON.stringify({
+              error: parseError instanceof Error ? parseError.message : String(parseError),
+              responsePreview: responseText.substring(0, 200),
+            })}`);
+            return NextResponse.json(
+              {
+                success: false,
+                error: 'Invalid response format from external auth service',
+              },
+              { status: 500 }
+            );
+          }
+        } else {
+          loggingCustom(LogType.LOGIN_LOG, 'warn', `[REFRESH_API] Empty response body from external auth service`);
+          data = {};
+        }
+      } catch (readError) {
+        loggingCustom(LogType.LOGIN_LOG, 'error', `[REFRESH_API] Failed to read response: ${readError instanceof Error ? readError.message : String(readError)}`);
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Failed to read response from external auth service',
+          },
+          { status: 500 }
+        );
+      }
       
       // Handle both nested (tokens.accessToken) and flat (accessToken) response formats
       const accessToken = data?.tokens?.accessToken || data?.accessToken;
