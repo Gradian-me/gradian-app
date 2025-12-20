@@ -5,11 +5,20 @@ stages:
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
+  CINNAGEN_REGISTRY: "reg.cinnagen.com:8083"
 
 before_script:
   - echo "🔐 Ensuring clean Docker auth..."
   - docker logout "$CI_REGISTRY" || true
-  - echo "🔐 Authenticating with Docker Registry..."
+  - docker logout "$CINNAGEN_REGISTRY" || true
+  - echo "🔐 Authenticating with Cinnagen Docker Registry..."
+  - |
+    if [ -n "$CINNAGEN_REGISTRY_USER" ] && [ -n "$CINNAGEN_REGISTRY_PASSWORD" ]; then
+      echo "$CINNAGEN_REGISTRY_PASSWORD" | docker login -u "$CINNAGEN_REGISTRY_USER" --password-stdin "$CINNAGEN_REGISTRY"
+    else
+      echo "⚠️ CINNAGEN_REGISTRY_USER or CINNAGEN_REGISTRY_PASSWORD not set, attempting unauthenticated pull..."
+    fi
+  - echo "🔐 Authenticating with GitLab Docker Registry..."
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   - echo "⚙️ Setting up environment files..."
   - |
@@ -56,26 +65,14 @@ build:
   script:
     - echo "🔍 Checking Docker configuration..."
     - docker info | grep -i "registry\|mirror" || echo "No registry mirror configured"
-    - echo "📥 Attempting to pull base image from Docker Hub..."
+    - echo "📥 Pulling base image from Cinnagen registry ($CINNAGEN_REGISTRY)..."
     - |
-      if ! timeout 30 docker pull node:25.2.1-slim; then
-        echo "⚠️ Cannot reach Docker Hub. Trying GitLab registry..."
-        # Try to pull from GitLab registry if base image was pre-pushed
-        if docker pull "$CI_REGISTRY/library/node:25.2.1-slim" 2>/dev/null; then
-          echo "✅ Found base image in GitLab registry, tagging for build..."
-          docker tag "$CI_REGISTRY/library/node:25.2.1-slim" node:25.2.1-slim
-        else
-          echo "❌ Base image not available in GitLab registry either."
-          echo ""
-          echo "💡 SOLUTIONS:"
-          echo "   1. Configure a Docker registry mirror on the GitLab runner"
-          echo "   2. Pre-push base image: docker pull node:25.2.1-slim && docker tag node:25.2.1-slim $CI_REGISTRY/library/node:25.2.1-slim && docker push $CI_REGISTRY/library/node:25.2.1-slim"
-          echo "   3. Fix network/DNS access to Docker Hub (registry-1.docker.io)"
-          echo "   4. Contact infrastructure team to allow Docker Hub access"
-          exit 1
-        fi
+      if docker pull "$CINNAGEN_REGISTRY/node:25.2.1-slim"; then
+        echo "✅ Successfully pulled base image from Cinnagen registry"
       else
-        echo "✅ Successfully pulled base image from Docker Hub"
+        echo "❌ Failed to pull base image from Cinnagen registry ($CINNAGEN_REGISTRY)"
+        echo "   Please ensure the image exists at $CINNAGEN_REGISTRY/node:25.2.1-slim"
+        exit 1
       fi
     - echo "🚀 Building Docker image..."
     - SHORT_SHA=${CI_COMMIT_SHA:0:8}
