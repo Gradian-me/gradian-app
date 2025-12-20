@@ -29,8 +29,12 @@ WORKDIR /app
 # Copy package files first for better layer caching
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --legacy-peer-deps --include=optional --prefer-offline --no-audit
+# Configure npm for better network reliability and install dependencies
+RUN npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set fetch-timeout 300000 && \
+    npm ci --legacy-peer-deps --include=optional --prefer-offline --no-audit
 
 # Copy source code
 COPY . .
