@@ -596,6 +596,7 @@ trivy_image_approval:
   needs:
     - job: trivy_image_scan
       artifacts: false
+      optional: true
   script:
     - |
       echo "========================================="
