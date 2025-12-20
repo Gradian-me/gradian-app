@@ -52,7 +52,7 @@ build:
       when: manual
     - when: never
   tags:
-    - CG-GR-APP-DEV-shell
+    - CG-GR-APP-DEV
   script:
     - echo "🔍 Checking Docker configuration..."
     - docker info | grep -i "registry\|mirror" || echo "No registry mirror configured"
