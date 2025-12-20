@@ -524,33 +524,14 @@ trivy_image_scan:
       echo "🐳 Image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
       echo ""
     - |
-      # Create temporary directory for report
-      export TEMP_REPORT_DIR=$(mktemp -d)
-      echo "📁 Temporary report directory: $TEMP_REPORT_DIR"
+      # Ensure cache directory exists
+      TRIVY_CACHE_DIR="/mnt/data/container/trivy-cache"
+      mkdir -p "$TRIVY_CACHE_DIR"
+      echo "📦 Trivy cache directory: $TRIVY_CACHE_DIR"
       
-      # Get absolute path for volume mounting
-      PROJECT_DIR=$(pwd)
-      
-      echo "🐳 Pulling Trivy Docker image..."
+      # Pull latest Trivy image
+      echo "🐳 Pulling latest Trivy Docker image..."
       docker pull reg.cinnagen.com:8083/aquasec/trivy:latest
-      
-      echo "🔍 Running Trivy security scan on Docker image..."
-      # Ensure report directory is writable
-      chmod 777 "$TEMP_REPORT_DIR" 2>/dev/null || true
-      
-      # Run Trivy scan
-      # Using container name to copy files after execution
-      CONTAINER_NAME="trivy-scan-$(date +%s)"
-      
-      # Run Trivy scan
-      # image: The Docker image to scan
-      # --format json: Output in JSON format
-      # --output: Output file path
-      # --exit-code 0: Don't fail on vulnerabilities (we'll check separately)
-      # --severity HIGH,CRITICAL: Only report HIGH and CRITICAL vulnerabilities
-      # --no-progress: Disable progress bar
-      # --skip-db-update: Skip database update (faster, but may miss latest vulnerabilities)
-      IMAGE_TO_SCAN="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
       
       # Mount Docker config for registry authentication
       DOCKER_CONFIG_DIR="${HOME}/.docker"
@@ -560,107 +541,38 @@ trivy_image_scan:
         echo "🔑 Using Docker config for registry authentication"
       fi
       
-      docker run \
-        --name "$CONTAINER_NAME" \
-        --rm \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        $DOCKER_CONFIG_MOUNT \
-        -v "$TEMP_REPORT_DIR:/report:rw" \
-        reg.cinnagen.com:8083/aquasec/trivy:latest \
-        image \
-        --format json \
-        --output /report/trivy-report.json \
-        --exit-code 0 \
-        --severity HIGH,CRITICAL \
-        --no-progress \
-        "$IMAGE_TO_SCAN" || TRIVY_EXIT_CODE=$?
+      IMAGE_TO_SCAN="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
       
-      # Also run with exit-code 1 to check for vulnerabilities (for exit code check)
+      echo "🔍 Running Trivy security scan..."
+      echo "ℹ️  Trivy will automatically check and update database if needed"
+      echo ""
+      
+      # Run Trivy scan once with table format for readable output
+      # --exit-code 1: Fail if HIGH/CRITICAL vulnerabilities found
+      # --severity HIGH,CRITICAL: Only report HIGH and CRITICAL vulnerabilities
+      # --no-progress: Disable progress bar
+      # --db-repository: Use custom database repository
+      # Cache directory is mounted to persist database between runs
+      # Trivy automatically checks if database is up-to-date and downloads if needed
       docker run \
         --rm \
         -v /var/run/docker.sock:/var/run/docker.sock \
         $DOCKER_CONFIG_MOUNT \
+        -v "$TRIVY_CACHE_DIR:/root/.cache/trivy:rw" \
         reg.cinnagen.com:8083/aquasec/trivy:latest \
         image \
         --format table \
         --exit-code 1 \
         --severity HIGH,CRITICAL \
         --no-progress \
-        "$IMAGE_TO_SCAN" 2>&1 || TRIVY_HAS_VULNS=$?
+        --db-repository ghcr.io/aquasecurity/trivy-db \
+        "$IMAGE_TO_SCAN" || TRIVY_EXIT_CODE=$?
       
       echo ""
       echo "========================================="
-      echo "📊 Trivy Image Security Scan Results"
-      echo "========================================="
       
-      # Display report in log
-      REPORT_FILE="$TEMP_REPORT_DIR/trivy-report.json"
-      
-      if [ -f "$REPORT_FILE" ]; then
-        echo ""
-        echo "📋 Vulnerability Summary:"
-        echo "----------------------------------------"
-        
-        # Extract and display summary using jq if available
-        if command -v jq >/dev/null 2>&1; then
-          # Count total vulnerabilities
-          TOTAL_VULNS=$(jq '[.Results[]?.Vulnerabilities[]?] | length' "$REPORT_FILE" 2>/dev/null || echo "0")
-          echo "🔍 Total vulnerabilities: $TOTAL_VULNS"
-          
-          # Count by severity
-          if [ "$TOTAL_VULNS" -gt 0 ]; then
-            CRITICAL_COUNT=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL")] | length' "$REPORT_FILE" 2>/dev/null || echo "0")
-            HIGH_COUNT=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH")] | length' "$REPORT_FILE" 2>/dev/null || echo "0")
-            MEDIUM_COUNT=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "MEDIUM")] | length' "$REPORT_FILE" 2>/dev/null || echo "0")
-            LOW_COUNT=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "LOW")] | length' "$REPORT_FILE" 2>/dev/null || echo "0")
-            
-            echo "🚨 CRITICAL: $CRITICAL_COUNT"
-            echo "⚠️  HIGH: $HIGH_COUNT"
-            echo "ℹ️  MEDIUM: $MEDIUM_COUNT"
-            echo "ℹ️  LOW: $LOW_COUNT"
-            
-            # Display critical and high vulnerabilities
-            if [ "$CRITICAL_COUNT" -gt 0 ] || [ "$HIGH_COUNT" -gt 0 ]; then
-              echo ""
-              echo "⚠️  Critical/High Vulnerabilities:"
-              echo "----------------------------------------"
-              jq -r '.Results[]?.Vulnerabilities[]? | 
-                select(.Severity == "CRITICAL" or .Severity == "HIGH") |
-                "Package: \(.PkgName)\n" +
-                "Vulnerability: \(.VulnerabilityID)\n" +
-                "Severity: \(.Severity)\n" +
-                "Title: \(.Title // "N/A")\n" +
-                "Description: \(.Description // "N/A")[0:150]\n" +
-                "---"' "$REPORT_FILE" 2>/dev/null || echo "Could not parse vulnerability details"
-            fi
-          fi
-          
-          # Display full JSON report
-          echo ""
-          echo "📄 Full JSON Report:"
-          echo "----------------------------------------"
-          cat "$REPORT_FILE"
-        else
-          # If jq is not available, just display the raw JSON
-          echo "📄 Full JSON Report:"
-          echo "----------------------------------------"
-          cat "$REPORT_FILE"
-        fi
-        echo ""
-        echo "----------------------------------------"
-      else
-        echo "⚠️  Report file not found at $REPORT_FILE"
-        echo "ℹ️  Trivy scan completed, but report file was not generated."
-      fi
-      
-      # Clean up temporary directory
-      echo "🧹 Cleaning up temporary files..."
-      rm -rf "$TEMP_REPORT_DIR"
-      echo "✅ Temporary files removed"
-      
-      echo ""
       # Check exit code and fail if high/critical vulnerabilities found
-      if [ -n "$TRIVY_HAS_VULNS" ] && [ "$TRIVY_HAS_VULNS" -ne 0 ]; then
+      if [ -n "$TRIVY_EXIT_CODE" ] && [ "$TRIVY_EXIT_CODE" -ne 0 ]; then
         echo "❌ Trivy Image Scan FAILED!"
         echo "🚨 High/Critical vulnerabilities detected in Docker image!"
         echo "⚠️  Please review and fix the vulnerabilities before deploying."
@@ -673,8 +585,6 @@ trivy_image_scan:
     - CG-GR-APP-DEV
   only:
     - main
-    - master
-  allow_failure: true
   retry:
     max: 2
     when:
