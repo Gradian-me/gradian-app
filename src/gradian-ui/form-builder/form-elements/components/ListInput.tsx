@@ -6,6 +6,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Plus, X, Edit2, Check, X as XIcon } from 'lucide-react';
 import { ButtonMinimal } from './ButtonMinimal';
 import { Button } from '@/components/ui/button';
+import { ConfirmationMessage } from './ConfirmationMessage';
 import {
   DndContext,
   closestCenter,
@@ -23,6 +24,7 @@ import {
 } from '@dnd-kit/sortable';
 import { cn } from '@/lib/utils';
 import { getLabelClasses } from '../utils/field-styles';
+import { validateField } from '@/gradian-ui/shared/utils';
 
 export interface AnnotationItem {
   id: string;
@@ -40,6 +42,7 @@ export interface ListInputProps {
   label?: string; // Label to display above the list
   required?: boolean; // Whether the field is required
   error?: string; // Error message to display
+  config?: any; // Config object containing validation rules
 }
 
 const SortableListItem: React.FC<{
@@ -52,6 +55,7 @@ const SortableListItem: React.FC<{
   onEditStateChange?: (id: string, isEditing: boolean) => void; // Callback when edit state changes
   inputRef?: React.RefObject<HTMLInputElement | null>; // Ref for focusing input
   onPasteSplit?: (id: string, items: string[]) => void; // Callback when comma-separated values are pasted
+  validationPattern?: RegExp | string; // Validation pattern for item labels
 }> = ({ 
   item, 
   onEdit, 
@@ -62,12 +66,28 @@ const SortableListItem: React.FC<{
   onEditStateChange,
   inputRef,
   onPasteSplit,
+  validationPattern,
 }) => {
   const [internalIsEditing, setInternalIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(item.label);
+  const [itemError, setItemError] = useState<string | null>(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const internalInputRef = React.useRef<HTMLInputElement>(null);
   const inputElementRef = inputRef || internalInputRef;
   const isDeletingRef = React.useRef(false);
+  
+  // Validate edit value against pattern
+  const validateItem = React.useCallback((value: string): boolean => {
+    if (!validationPattern) return true;
+    const validation = { pattern: validationPattern };
+    const result = validateField(value, validation);
+    if (!result.isValid) {
+      setItemError(result.error || 'Invalid format.');
+    } else {
+      setItemError(null);
+    }
+    return result.isValid;
+  }, [validationPattern]);
   
   // Use controlled editing state if provided, otherwise use internal state
   const isEditing = isEditingControlled !== undefined ? isEditingControlled : internalIsEditing;
@@ -114,12 +134,17 @@ const SortableListItem: React.FC<{
   };
 
   const handleSaveEdit = () => {
-    if (editValue.trim()) {
-      onEdit(item.id, editValue.trim());
-      if (onEditStateChange) {
-        onEditStateChange(item.id, false);
-      } else {
-        setInternalIsEditing(false);
+    const trimmedValue = editValue.trim();
+    if (trimmedValue) {
+      // Validate before saving
+      if (validateItem(trimmedValue)) {
+        onEdit(item.id, trimmedValue);
+        setItemError(null);
+        if (onEditStateChange) {
+          onEditStateChange(item.id, false);
+        } else {
+          setInternalIsEditing(false);
+        }
       }
     }
   };
@@ -150,14 +175,34 @@ const SortableListItem: React.FC<{
         // If multiple items, use the split handler
         onPasteSplit(item.id, items);
       } else if (items.length === 1) {
-        // If only one item after splitting, just update the current value
-        setEditValue(items[0]);
+        // If only one item after splitting, validate and update the current value
+        if (validateItem(items[0])) {
+          setEditValue(items[0]);
+        } else {
+          setEditValue(items[0]); // Still set the value but show error
+        }
       } else {
         // If no valid items, just paste normally
         setEditValue(pastedText);
       }
+    } else {
+      // If no comma, validate the pasted text
+      const trimmedPasted = pastedText.trim();
+      if (trimmedPasted && validationPattern) {
+        validateItem(trimmedPasted);
+      }
     }
-    // If no comma, let the default paste behavior happen
+  };
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setEditValue(newValue);
+    // Validate on change if pattern exists
+    if (validationPattern && newValue.trim()) {
+      validateItem(newValue.trim());
+    } else {
+      setItemError(null);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -165,14 +210,19 @@ const SortableListItem: React.FC<{
       e.preventDefault();
       e.stopPropagation();
       // Just save and submit the current item (don't add new item)
-      if (editValue.trim()) {
-        onEdit(item.id, editValue.trim());
-      }
-      // Always switch to view mode for current item
-      if (onEditStateChange) {
-        onEditStateChange(item.id, false);
-      } else {
-        setInternalIsEditing(false);
+      const trimmedValue = editValue.trim();
+      if (trimmedValue) {
+        // Validate before saving
+        if (validateItem(trimmedValue)) {
+          onEdit(item.id, trimmedValue);
+          setItemError(null);
+          // Always switch to view mode for current item
+          if (onEditStateChange) {
+            onEditStateChange(item.id, false);
+          } else {
+            setInternalIsEditing(false);
+          }
+        }
       }
       // Don't call onEnterPress - just check/submit the current item
     } else if (e.key === 'Escape') {
@@ -200,29 +250,55 @@ const SortableListItem: React.FC<{
       return;
     }
     
-    // If item has value, ask for confirmation
-    const confirmed = window.confirm('Are you sure you want to delete this item?');
-    if (confirmed) {
-      // Delete the item directly, regardless of edit state
-      onDelete(item.id);
-    } else {
-      // Reset the flag if user cancelled
-      isDeletingRef.current = false;
-    }
+    // If item has value, show confirmation dialog
+    setShowDeleteConfirmation(true);
+  };
+  
+  const handleConfirmDelete = () => {
+    setShowDeleteConfirmation(false);
+    onDelete(item.id);
+    isDeletingRef.current = false;
+  };
+  
+  const handleCancelDelete = () => {
+    setShowDeleteConfirmation(false);
+    isDeletingRef.current = false;
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="relative">
-      <div
-        className={cn(
-          'w-full rounded border transition-all duration-200',
-          isDragging
-            ? 'border-violet-400 shadow-md ring-2 ring-violet-200 bg-white'
-            : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600'
-        )}
-      >
-        <div className="p-2">
-          <div className="flex items-center gap-2">
+    <>
+      <ConfirmationMessage
+        isOpen={showDeleteConfirmation}
+        onOpenChange={setShowDeleteConfirmation}
+        title="Delete Item"
+        message={`Are you sure you want to delete "${item.label}"? This action cannot be undone.`}
+        variant="destructive"
+        size="sm"
+        buttons={[
+          {
+            label: 'Cancel',
+            variant: 'outline',
+            action: handleCancelDelete,
+          },
+          {
+            label: 'Delete',
+            variant: 'destructive',
+            action: handleConfirmDelete,
+            icon: 'Trash2',
+          },
+        ]}
+      />
+      <div ref={setNodeRef} style={style} className="relative">
+        <div
+          className={cn(
+            'w-full rounded border transition-all duration-200',
+            isDragging
+              ? 'border-violet-400 shadow-md ring-2 ring-violet-200 bg-white'
+              : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600'
+          )}
+        >
+          <div className="p-2">
+            <div className="flex items-center gap-2">
             {isSortable && (
               <button
                 {...attributes}
@@ -234,27 +310,37 @@ const SortableListItem: React.FC<{
             )}
             <div className="flex-1 min-w-0">
               {isEditing ? (
-                <input
-                  ref={inputElementRef}
-                  type="text"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onPaste={handlePaste}
-                  onBlur={(e) => {
-                    // Don't save on blur if we're deleting or clicking a button
-                    if (isDeletingRef.current) {
-                      isDeletingRef.current = false; // Reset the flag
-                      return;
-                    }
-                    const relatedTarget = e.relatedTarget as HTMLElement;
-                    if (!relatedTarget || !relatedTarget.closest('button')) {
-                      handleSaveEdit();
-                    }
-                  }}
-                  onKeyDown={handleKeyDown}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-                  dir="auto"
-                />
+                <>
+                  <input
+                    ref={inputElementRef}
+                    type="text"
+                    value={editValue}
+                    onChange={handleInputChange}
+                    onPaste={handlePaste}
+                    onBlur={(e) => {
+                      // Don't save on blur if we're deleting or clicking a button
+                      if (isDeletingRef.current) {
+                        isDeletingRef.current = false; // Reset the flag
+                        return;
+                      }
+                      const relatedTarget = e.relatedTarget as HTMLElement;
+                      if (!relatedTarget || !relatedTarget.closest('button')) {
+                        handleSaveEdit();
+                      }
+                    }}
+                    onKeyDown={handleKeyDown}
+                    className={cn(
+                      "w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 dark:bg-gray-700 dark:text-gray-100",
+                      itemError 
+                        ? "border-red-500 focus:ring-red-500 dark:border-red-500" 
+                        : "border-gray-300 focus:ring-violet-500 dark:border-gray-600"
+                    )}
+                    dir="auto"
+                  />
+                  {itemError && (
+                    <p className="mt-1 text-xs text-red-600 dark:text-red-400">{itemError}</p>
+                  )}
+                </>
               ) : (
                 <span
                   className="text-sm font-medium text-gray-800 dark:text-gray-200 cursor-text"
@@ -272,6 +358,7 @@ const SortableListItem: React.FC<{
                     title="Save"
                     color="green"
                     size="sm"
+                    type="button"
                     onClick={handleSaveEdit}
                   />
                   <ButtonMinimal
@@ -279,6 +366,7 @@ const SortableListItem: React.FC<{
                     title="Cancel"
                     color="red"
                     size="sm"
+                    type="button"
                     onClick={handleCancelEdit}
                   />
                 </>
@@ -289,6 +377,7 @@ const SortableListItem: React.FC<{
                     title="Edit"
                     color="blue"
                     size="sm"
+                    type="button"
                     onClick={handleStartEdit}
                   />
                   <ButtonMinimal
@@ -296,6 +385,7 @@ const SortableListItem: React.FC<{
                     title="Delete"
                     color="red"
                     size="sm"
+                    type="button"
                     onMouseDown={(e) => {
                       // Set flag before blur fires
                       isDeletingRef.current = true;
@@ -305,10 +395,11 @@ const SortableListItem: React.FC<{
                 </>
               )}
             </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
@@ -328,7 +419,10 @@ export const ListInput: React.FC<ListInputProps> = ({
   label,
   required = false,
   error,
+  config,
 }) => {
+  // Extract validation pattern from config
+  const validationPattern = config?.validation?.pattern;
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const inputRefs = React.useRef<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map());
   const [itemRefsMap, setItemRefsMap] = useState<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map());
@@ -449,13 +543,27 @@ export const ListInput: React.FC<ListInputProps> = ({
       const currentIndex = value.findIndex((item) => item.id === id);
       if (currentIndex === -1) return;
 
-      // Update the current item with the first value
+      // Filter and validate items based on pattern if provided
+      const validation = config?.validation;
+      const validItems = items.filter((item) => {
+        const trimmed = item.trim();
+        if (!trimmed) return false;
+        if (validation?.pattern) {
+          const result = validateField(trimmed, { pattern: validation.pattern });
+          return result.isValid;
+        }
+        return true;
+      });
+
+      if (validItems.length === 0) return;
+
+      // Update the current item with the first valid value
       const updatedItems = value.map((item) =>
-        item.id === id ? { ...item, label: items[0] } : item
+        item.id === id ? { ...item, label: validItems[0] } : item
       );
 
-      // Add new items for the remaining values
-      const newItems = items.slice(1).map((label) => ({
+      // Add new items for the remaining valid values
+      const newItems = validItems.slice(1).map((label) => ({
         id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         label: label.trim(),
       }));
@@ -485,7 +593,7 @@ export const ListInput: React.FC<ListInputProps> = ({
         setEditingItemId(null);
       }
     },
-    [value, onChange]
+    [value, onChange, config]
   );
 
   const itemIds = useMemo(() => value.map((item) => item.id), [value]);
@@ -506,6 +614,7 @@ export const ListInput: React.FC<ListInputProps> = ({
           onEditStateChange={handleEditStateChange}
           inputRef={itemRefsMap.get(item.id)}
           onPasteSplit={handlePasteSplit}
+          validationPattern={validationPattern}
         />
       ))}
     </div>

@@ -561,11 +561,16 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         if (trimmedSearch) {
           queryParams.search = trimmedSearch;
         }
-        if (includeIds && includeIds.length > 0) {
-          queryParams.includeIds = includeIds.join(',');
-        }
-        if (excludeIds && excludeIds.length > 0) {
-          queryParams.excludeIds = excludeIds.join(',');
+        // When using sourceUrl (reference-based filtering), don't add includeIds/excludeIds
+        // because the sourceUrl already returns the correct filtered items.
+        // includeIds/excludeIds should only be used when fetching directly from schemaId.
+        if (!effectiveSourceUrl) {
+          if (includeIds && includeIds.length > 0) {
+            queryParams.includeIds = includeIds.join(',');
+          }
+          if (excludeIds && excludeIds.length > 0) {
+            queryParams.excludeIds = excludeIds.join(',');
+          }
         }
         if (companyQueryParam) {
           queryParams.companyIds = companyQueryParam;
@@ -659,6 +664,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         if (trimmedSearch) {
           queryParams.search = trimmedSearch;
         }
+        // When using schemaId, we can use includeIds/excludeIds to filter results
+        // (When using sourceUrl, these are skipped because sourceUrl already filters)
         if (includeIds && includeIds.length > 0) {
           queryParams.includeIds = includeIds.join(',');
         }

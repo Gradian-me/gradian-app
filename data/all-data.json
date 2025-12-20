@@ -1653,10 +1653,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-11-17T12:19:40.582Z",
+      "updatedAt": "2025-12-20T13:36:52.484Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-12-17T07:42:15.847Z",
+      "lastSynced": "2025-12-20T13:36:52.484Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1669,7 +1669,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 46 schemas: 46 succeeded, 0 failed (46 created, 0 updated)"
+      "lastSyncMessage": "Processed 44 schemas: 44 succeeded, 0 failed (44 created, 0 updated)"
     },
     {
       "color": "blue",
@@ -1696,8 +1696,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-11-18T13:59:23.884Z",
-      "lastSynced": "2025-12-17T07:42:31.947Z",
+      "updatedAt": "2025-12-20T13:36:58.397Z",
+      "lastSynced": "2025-12-20T13:36:58.397Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1710,7 +1710,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Generated relations for 46 out of 46 schemas",
+      "lastSyncMessage": "Generated relations for 44 out of 44 schemas",
       "sourceRoute": []
     },
     {
@@ -1757,9 +1757,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-11-22T14:38:40.167Z",
+      "updatedAt": "2025-12-20T13:37:22.504Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-17T08:15:10.364Z",
+      "lastSynced": "2025-12-20T13:37:22.504Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1770,7 +1770,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 1142, edges created: 113, nodes failed: 0, edges failed: 0.",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1198, nodes updated: 5, edges created: 125, nodes failed: 0, edges failed: 0.",
       "isTenantBased": false
     },
     {
@@ -1934,8 +1934,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-11-30T16:48:01.239Z",
-      "lastSynced": "2025-12-20T10:43:55.005Z",
+      "updatedAt": "2025-12-20T14:55:13.496Z",
+      "lastSynced": "2025-12-20T14:55:13.496Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1947,7 +1947,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 28 schemas: 21 succeeded, 7 failed (0 created, 21 updated)"
+      "lastSyncMessage": "Processed 33 schemas: 30 succeeded, 3 failed (0 created, 30 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -1974,7 +1974,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-06T09:54:51.218Z",
+      "updatedAt": "2025-12-20T14:55:50.063Z",
       "isTenantBased": true,
       "category": [
         {
@@ -1984,8 +1984,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-20T10:44:04.084Z",
-      "lastSyncMessage": "Generated relations for 42 out of 42 schemas"
+      "lastSynced": "2025-12-20T14:55:50.063Z",
+      "lastSyncMessage": "Generated relations for 33 out of 33 schemas"
     },
     {
       "title": "Graph Data Sync Production",
@@ -2031,7 +2031,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-06T09:56:02.933Z",
+      "updatedAt": "2025-12-20T14:56:11.608Z",
       "category": [
         {
           "id": "production-integration",
@@ -2040,8 +2040,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-20T10:44:21.354Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 97, nodes updated: 60, edges created: 59, nodes failed: 0, edges failed: 0."
+      "lastSynced": "2025-12-20T14:56:11.608Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 191, edges created: 88, nodes failed: 0, edges failed: 0."
     }
   ],
   "databases": [
@@ -14030,6 +14030,141 @@
       "id": "01KCXW9JEMHK1SKANMYVASJN96",
       "createdAt": "2025-12-20T12:38:31.135Z",
       "updatedAt": "2025-12-20T12:38:31.135Z"
+    },
+    {
+      "label": "PCS",
+      "icon": "FileBox",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXQN1D1QNP0QRB5GTWSJJA",
+      "createdAt": "2025-12-20T13:03:41.123Z",
+      "updatedAt": "2025-12-20T13:03:41.123Z"
+    },
+    {
+      "label": "ml",
+      "icon": "Droplet",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXML0000000000000000001",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "Liters",
+      "icon": "Beaker",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXLITERS000000000000002",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "Kilograms",
+      "icon": "Weight",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXKG0000000000000000003",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "Grams",
+      "icon": "Scale",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXG00000000000000000004",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "mg",
+      "icon": "Scale",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXMG0000000000000000005",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "Bottle",
+      "icon": "FlaskConical",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXBOTTLE000000000000006",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "Device",
+      "icon": "Cpu",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXDEVICE000000000000007",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "Kit",
+      "icon": "Package",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXKIT000000000000000008",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "mcg",
+      "icon": "Scale",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXMCG000000000000000009",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "Pack",
+      "icon": "Package",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXPACK0000000000000010",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "Pair",
+      "icon": "GitBranch",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXPAIR0000000000000011",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "Rolls",
+      "icon": "Package",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXROLLS000000000000012",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "Vial",
+      "icon": "FlaskConical",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXVIAL0000000000000013",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
+    },
+    {
+      "label": "Set",
+      "icon": "Folder",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXSET000000000000000014",
+      "createdAt": "2025-12-20T16:38:21.000Z",
+      "updatedAt": "2025-12-20T16:38:21.000Z"
     }
   ],
   "parameter-groups": [
@@ -14068,6 +14203,27 @@
           "label": "AryoGen"
         }
       ]
+    },
+    {
+      "title": "Measurement Units",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXXNWCDK18BACMC5CEPXJ7B",
+      "createdAt": "2025-12-20T13:02:43.134Z",
+      "updatedAt": "2025-12-20T13:03:52.471Z",
+      "parameter-items-section": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "relatedTenants": [
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        },
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
     }
-  ]
+  ],
+  "inquiry-items": []
 }

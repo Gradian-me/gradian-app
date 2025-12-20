@@ -9,7 +9,6 @@ import { Textarea } from '../form-elements/components/Textarea';
 import { cn } from '../../shared/utils';
 import { PickerInput } from '../form-elements/components/PickerInput';
 import { DateInput } from '../form-elements/components/DateInput';
-import { extractFromDynamicContext } from '../utils/dynamic-context-extractor';
 
 export interface FormSystemSectionProps {
   schema: FormSchema;
@@ -52,50 +51,25 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
   const hasMultiCompaniesField = schema.canSelectMultiCompanies === true;
   const hasMultiTenantsField = schema.allowDataRelatedTenants === true;
 
-  // Memoize the status sourceUrl to prevent it from changing on every render
-  // This ensures PickerInput doesn't reset when form values change
-  // Get statusGroup ID directly from schema prop (more stable than dynamic context)
-  // NOTE: Must be called before any early returns to comply with Rules of Hooks
-  const statusSourceUrl = useMemo(() => {
-    if (!hasStatusGroup || !schema.statusGroup || !Array.isArray(schema.statusGroup) || schema.statusGroup.length === 0) {
-      return '';
-    }
-    const statusGroupId = schema.statusGroup[0]?.id;
-    if (!statusGroupId) {
-      // Fallback to dynamic context if schema doesn't have the ID
-      const contextId = extractFromDynamicContext('formSchema', 'statusGroup.[0].id');
-      if (!contextId) return '';
-      return `/api/data/all-relations?schema=status-groups&direction=both&otherSchema=status-items&relationTypeId=HAS_STATUS_ITEM&id=${contextId}`;
-    }
-    return `/api/data/all-relations?schema=status-groups&direction=both&otherSchema=status-items&relationTypeId=HAS_STATUS_ITEM&id=${encodeURIComponent(String(statusGroupId))}`;
-  }, [hasStatusGroup, schema.statusGroup]);
-
-  // Memoize the entity type sourceUrl to prevent it from changing on every render
-  // This ensures PickerInput doesn't reset when form values change
-  // Get entityTypeGroup ID directly from schema prop (more stable than dynamic context)
-  // NOTE: Must be called before any early returns to comply with Rules of Hooks
-  const entityTypeSourceUrl = useMemo(() => {
-    if (!hasEntityTypeGroup || !schema.entityTypeGroup || !Array.isArray(schema.entityTypeGroup) || schema.entityTypeGroup.length === 0) {
-      return '';
-    }
-    const entityTypeGroupId = schema.entityTypeGroup[0]?.id;
-    if (!entityTypeGroupId) {
-      // Fallback to dynamic context if schema doesn't have the ID
-      const contextId = extractFromDynamicContext('formSchema', 'entityTypeGroup.[0].id');
-      if (!contextId) return '';
-      return `/api/data/all-relations?schema=entity-type-groups&direction=both&otherSchema=entity-type-items&relationTypeId=HAS_ENTITY_TYPE_ITEM&id=${contextId}`;
-    }
-    return `/api/data/all-relations?schema=entity-type-groups&direction=both&otherSchema=entity-type-items&relationTypeId=HAS_ENTITY_TYPE_ITEM&id=${encodeURIComponent(String(entityTypeGroupId))}`;
-  }, [hasEntityTypeGroup, schema.entityTypeGroup]);
+  // Get statusGroup ID for stable key generation
+  const statusGroupId = hasStatusGroup && schema.statusGroup && Array.isArray(schema.statusGroup) && schema.statusGroup.length > 0
+    ? schema.statusGroup[0]?.id
+    : null;
 
   // Memoize the status picker config to prevent PickerInput from resetting when config object reference changes
+  // Uses reference-based filtering for consistency with the general pattern
   // NOTE: Must be called before any early returns to comply with Rules of Hooks
-  const statusPickerConfig = useMemo(() => ({
+  const statusPickerConfig = useMemo(() => {
+    return {
     name: 'status',
     label: "Status",
     placeholder: 'Select status',
     description: 'Status for this record from the configured status group.',
-    sourceUrl: statusSourceUrl,
+      targetSchema: 'status-items',
+      // Use reference-based filtering
+      referenceSchema: 'status-groups',
+      referenceRelationTypeId: 'HAS_STATUS_ITEM',
+      referenceEntityId: statusGroupId || '{{formSchema.statusGroup.[0].id}}', // Fallback to dynamic context if no ID
     columnMap: {
       response: { data: 'data.0.data' }, // Extract items from data[0].data array
       item: {
@@ -108,16 +82,28 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
     metadata: {
       allowMultiselect: false, // Status is always single-select
     },
-  }), [statusSourceUrl]);
+    };
+  }, [statusGroupId]);
+
+  // Get entityTypeGroup ID for stable key generation
+  const entityTypeGroupId = hasEntityTypeGroup && schema.entityTypeGroup && Array.isArray(schema.entityTypeGroup) && schema.entityTypeGroup.length > 0
+    ? schema.entityTypeGroup[0]?.id
+    : null;
 
   // Memoize the entity type picker config to prevent PickerInput from resetting when config object reference changes
+  // Uses reference-based filtering for consistency with the general pattern
   // NOTE: Must be called before any early returns to comply with Rules of Hooks
-  const entityTypePickerConfig = useMemo(() => ({
+  const entityTypePickerConfig = useMemo(() => {
+    return {
     name: 'entityType',
     label: "Entity Type",
     placeholder: 'Select entity type',
     description: 'Entity type for this record from the configured entity type group.',
-    sourceUrl: entityTypeSourceUrl,
+      targetSchema: 'entity-type-items',
+      // Use reference-based filtering
+      referenceSchema: 'entity-type-groups',
+      referenceRelationTypeId: 'HAS_ENTITY_TYPE_ITEM',
+      referenceEntityId: entityTypeGroupId || '{{formSchema.entityTypeGroup.[0].id}}', // Fallback to dynamic context if no ID
     columnMap: {
       response: { data: 'data.0.data' }, // Extract items from data[0].data array
       item: {
@@ -130,7 +116,8 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
     metadata: {
       allowMultiselect: false, // Entity type is always single-select
     },
-  }), [entityTypeSourceUrl]);
+    };
+  }, [entityTypeGroupId]);
 
   // Count available fields
   const availableFieldsCount = [
@@ -275,7 +262,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
                 {hasStatusField && (
                   <div className="space-y-2">
                     <PickerInput
-                      key={`status-picker-${statusSourceUrl}`} // Stable key based on sourceUrl to prevent remounting
+                      key={`status-picker-${statusGroupId || 'dynamic'}`} // Stable key based on statusGroupId to prevent remounting
                       config={statusPickerConfig}
                       value={Array.isArray(values.status) ? values.status : (values.status ? [values.status] : [])}
                       error={errors?.status}
@@ -304,7 +291,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
                 {hasEntityTypeField && (
                   <div className="space-y-2">
                     <PickerInput
-                      key={`entity-type-picker-${entityTypeSourceUrl}`} // Stable key based on sourceUrl to prevent remounting
+                      key={`entity-type-picker-${entityTypeGroupId || 'dynamic'}`} // Stable key based on entityTypeGroupId to prevent remounting
                       config={entityTypePickerConfig}
                       value={Array.isArray(values.entityType) ? values.entityType : (values.entityType ? [values.entityType] : [])}
                       error={errors?.entityType}

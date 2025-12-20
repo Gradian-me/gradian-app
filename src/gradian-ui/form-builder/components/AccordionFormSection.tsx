@@ -1027,13 +1027,13 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     const codeField = getSingleValueByRole(targetSchemaData, entity, 'code');
 
     return (
-      <div className="flex items-start justify-between gap-3 w-full">
+      <div className="flex items-start justify-between gap-2 w-full">
         {/* Left side: Avatar, Title, Subtitle */}
-        <div className="flex items-start gap-3 flex-1 min-w-0">
+        <div className="flex items-start gap-2 flex-1 min-w-0">
           {shouldShowAvatar ? (
           <Avatar
               className={cn(
-                'h-10 w-10 rounded-full border shadow-sm flex items-center justify-center font-semibold shrink-0',
+                'h-8 w-8 rounded-full border shadow-sm flex items-center justify-center font-semibold shrink-0',
                 avatarColor.bg,
                 avatarColor.text,
                 avatarColor.border,
@@ -1041,7 +1041,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             >
               <AvatarFallback
                 className={cn(
-                  'h-10 w-10 rounded-full flex items-center justify-center',
+                  'h-8 w-8 rounded-full flex items-center justify-center text-xs',
                   avatarColor.bg,
                   avatarColor.text,
                 )}
@@ -1052,7 +1052,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           ) : shouldShowIconAvatar ? (
             <div
               className={cn(
-                'h-10 w-10 rounded-full flex items-center justify-center shadow-sm border shrink-0',
+                'h-8 w-8 rounded-full flex items-center justify-center shadow-sm border shrink-0',
                 avatarColor.bg,
                 avatarColor.border,
               )}
@@ -1060,7 +1060,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               <IconRenderer
                 iconName={normalizedIconValue}
                 className={cn(
-                  'h-5 w-5',
+                  'h-4 w-4',
                   avatarColor.text,
                 )}
               />
@@ -1068,7 +1068,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           ) : (
             <Avatar
               className={cn(
-                'h-10 w-10 rounded-full border shadow-sm flex items-center justify-center font-semibold shrink-0',
+                'h-8 w-8 rounded-full border shadow-sm flex items-center justify-center font-semibold shrink-0',
                 avatarColor.bg,
                 avatarColor.text,
                 avatarColor.border,
@@ -1076,7 +1076,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             >
               <AvatarFallback
                 className={cn(
-                  'h-10 w-10 rounded-full flex items-center justify-center',
+                  'h-8 w-8 rounded-full flex items-center justify-center text-xs',
                   avatarColor.bg,
                   avatarColor.text,
                 )}
@@ -1102,14 +1102,14 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               </p>
             )}
             {description && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1.5 line-clamp-2">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
                 {description}
               </p>
             )}
             
             {/* Badges */}
             {combinedBadgeField && badgeValues.length > 0 && (
-              <div className="mt-2">
+              <div className="mt-1.5">
                 <BadgeViewer
                   field={combinedBadgeField}
                   value={badgeValues}
@@ -1123,7 +1123,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         </div>
         
         {/* Right side: Buttons, Rating and Status */}
-        <div className="flex items-start gap-2 shrink-0">
+        <div className="flex items-start gap-1.5 shrink-0">
           {actionButtons && (
             <div className="flex gap-1">
               {actionButtons}
@@ -1131,7 +1131,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           )}
           
           {/* Rating and Status */}
-          <div className="flex flex-col items-end gap-1.5">
+          <div className="flex flex-col items-end gap-1">
             {hasRatingField && (
               <Rating
                 value={Number(ratingField) || 0}
@@ -1299,26 +1299,26 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                               key={i}
                               className="rounded-xl bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700 overflow-hidden"
                             >
-                              <div className="px-4 sm:px-6 py-4">
-                                <div className="flex items-start justify-between gap-3 w-full">
+                              <div className="px-3 sm:px-4 py-3">
+                                <div className="flex items-start justify-between gap-2 w-full">
                                   {/* Left side: Avatar, Title, Subtitle */}
-                                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                                  <div className="flex items-start gap-2 flex-1 min-w-0">
                                     {/* Avatar Skeleton */}
-                                    <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+                                    <Skeleton className="h-8 w-8 rounded-full shrink-0" />
                                     
                                     {/* Content */}
-                                    <div className="flex-1 min-w-0 space-y-2">
+                                    <div className="flex-1 min-w-0 space-y-1.5">
                                       <Skeleton className="h-4 w-2/3" />
                                       <Skeleton className="h-3 w-1/2" />
                                     </div>
                                   </div>
                                   
                                   {/* Right side: Buttons, Rating */}
-                                  <div className="flex items-start gap-2 shrink-0">
+                                  <div className="flex items-start gap-1.5 shrink-0">
                                     {/* Button Skeletons */}
                                     <div className="flex gap-1">
-                                      <Skeleton className="h-8 w-8 rounded" />
-                                      <Skeleton className="h-8 w-8 rounded" />
+                                      <Skeleton className="h-7 w-7 rounded" />
+                                      <Skeleton className="h-7 w-7 rounded" />
                                     </div>
                                     
                                     {/* Rating Skeleton */}
@@ -1367,7 +1367,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                     className="border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200"
                                   />
                                 ) : (
-                                  <div className="px-4 sm:px-6 py-4">
+                                  <div className="px-3 sm:px-4 py-3">
                                     <div className="flex items-center justify-between gap-2">
                                       <div className="text-sm text-gray-900 dark:text-gray-100">
                                         {entity.name || entity.title || entity.id || `Item ${index + 1}`}
@@ -1382,11 +1382,11 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                             e.stopPropagation();
                                             if (relation) handleEditEntity((entity as any).id, relation.id);
                                           }}
-                                          className="h-8 w-8"
+                                          className="h-7 w-7"
                                           title="Edit"
                                           disabled={disabled}
                                         >
-                                          <Edit className="h-4 w-4" />
+                                          <Edit className="h-3.5 w-3.5" />
                                         </Button>
                                         {relation && (
                                           <Button
@@ -1394,11 +1394,11 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                             variant="ghost"
                                             size="icon"
                                             onClick={(e) => handleDeleteClick(relation.id, e)}
-                                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                            className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
                                             title="Delete"
                                             disabled={disabled}
                                           >
-                                            <Trash2 className="h-4 w-4" />
+                                            <Trash2 className="h-3.5 w-3.5" />
                                           </Button>
                                         )}
                                       </div>
@@ -1453,11 +1453,11 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                         key={i}
                         className="rounded-xl bg-white border border-gray-100 overflow-hidden"
                       >
-                        <div className="px-4 sm:px-6 py-4">
-                          <div className="flex items-start justify-between gap-3 w-full">
-                            <div className="flex items-start gap-3 flex-1 min-w-0">
-                              <Skeleton className="h-10 w-10 rounded-full" />
-                              <div className="flex-1 space-y-2">
+                        <div className="px-3 sm:px-4 py-3">
+                          <div className="flex items-start justify-between gap-2 w-full">
+                            <div className="flex items-start gap-2 flex-1 min-w-0">
+                              <Skeleton className="h-8 w-8 rounded-full" />
+                              <div className="flex-1 space-y-1.5">
                                 <Skeleton className="h-4 w-32" />
                                 <Skeleton className="h-3 w-24" />
                               </div>
@@ -1504,7 +1504,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                               className="border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200"
                             />
                           ) : (
-                            <div className="px-4 sm:px-6 py-4">
+                            <div className="px-3 sm:px-4 py-3">
                               <div className="flex items-center justify-between gap-2">
                                 <div className="text-sm text-gray-900 dark:text-gray-100">
                                   {entity.name || entity.title || entity.id || `Item ${index + 1}`}
@@ -1519,11 +1519,11 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                       e.stopPropagation();
                                       if (relation) handleEditEntity((entity as any).id, relation.id);
                                     }}
-                                    className="h-8 w-8"
+                                    className="h-7 w-7"
                                     title="Edit"
                                     disabled={disabled}
                                   >
-                                    <Edit className="h-4 w-4" />
+                                    <Edit className="h-3.5 w-3.5" />
                                   </Button>
                                   {relation && (
                                     <Button
@@ -1531,11 +1531,11 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                       variant="ghost"
                                       size="icon"
                                       onClick={(e) => handleDeleteClick(relation.id, e)}
-                                      className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                      className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
                                       title="Delete"
                                       disabled={disabled}
                                     >
-                                      <Trash2 className="h-4 w-4" />
+                                      <Trash2 className="h-3.5 w-3.5" />
                                     </Button>
                                   )}
                                 </div>

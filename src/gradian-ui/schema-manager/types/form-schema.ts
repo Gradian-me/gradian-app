@@ -42,8 +42,12 @@ export interface FormField {
   sourceUrl?: string; // Source URL for picker component (alternative to targetSchema, fetches data from API endpoint)
   sourceColumnRoles?: Array<{ column: string; role?: string }>; // Column to role mapping for sourceUrl items (e.g., [{ column: "singular_name", role: "title" }, { column: "description", role: "description" }])
   columnMap?: ColumnMapConfig; // Optional mapping for request/response and item fields when using sourceUrl
-  pageSize?: number; // Page size for paginated data sources (default: 48)
+  pageSize?: number; // Page size for paginated data sources (default: 50)
   sortType?: 'ASC' | 'DESC' | null; // Sort order for items (null = no sorting, default)
+  // Reference-based filtering: filter items based on relation to a reference entity
+  referenceSchema?: string; // Schema of the reference entity (e.g., "status-groups", "parameter-groups")
+  referenceRelationTypeId?: string; // Relation type ID to filter by (e.g., "HAS_STATUS_ITEM", "HAS_PARAMETER_ITEM")
+  referenceEntityId?: string; // ID of the reference entity, supports dynamic context (e.g., "{{formSchema.statusGroup.[0].id}}" or "{{formData.category.id}}")
   metadata?: {
     allowMultiselect?: boolean;
     [key: string]: any;

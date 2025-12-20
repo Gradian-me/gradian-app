@@ -296,6 +296,21 @@ function normalizeEndpointWithParams(endpoint: string, params?: Record<string, a
   return mergedQuery ? `${basePath}?${mergedQuery}` : basePath;
 }
 
+// Request deduplication: Track in-flight requests to prevent duplicate concurrent calls
+const inFlightRequests = new Map<string, Promise<any>>();
+
+function createRequestKey(
+  normalizedEndpoint: string,
+  method: string,
+  params?: Record<string, any>
+): string {
+  // Use the already-normalized endpoint (params are already in the URL)
+  // For additional deduplication, we can include a hash of params if they exist separately
+  // But since normalizeEndpointWithParams already merges params into the URL,
+  // the normalizedEndpoint itself is sufficient as a key
+  return `${method}:${normalizedEndpoint}`;
+}
+
 function getCacheStrategyContext(
   endpoint: string,
   originalEndpoint: string,
@@ -848,74 +863,115 @@ export async function apiRequest<T>(
     }
   }
 
-  try {
-    let response: ApiResponse<T>;
+  // Create request key for deduplication (only for GET requests to avoid issues with mutations)
+  const requestKey = method === 'GET' ? createRequestKey(normalizedEndpoint, method, enrichedParams) : null;
+  
+  // Check if the same request is already in flight (only for GET requests)
+  if (requestKey && inFlightRequests.has(requestKey)) {
+    const existingRequest = inFlightRequests.get(requestKey);
+    if (existingRequest) {
+      loggingCustom(
+        LogType.CLIENT_LOG,
+        'info',
+        `[apiRequest] Deduplicating request: ${method} ${normalizedEndpoint} (reusing in-flight request)`
+      );
+      return existingRequest as Promise<ApiResponse<T>>;
+    }
+  }
 
-    switch (method) {
-      case 'GET': {
-        const endpointForRequest = cacheStrategyPreResult?.overrideEndpoint ?? normalizedEndpoint;
-        // If endpoint already has query params (from normalizeEndpointWithParams), don't pass params to apiClient.get()
-        // apiClient.get() will add them again, causing duplicates
-        const hasQueryParams = endpointForRequest.includes('?');
-        const paramsForRequest =
-          cacheStrategyPreResult?.overrideEndpoint !== undefined
-            ? cacheStrategyPreResult.overrideParams
-            : hasQueryParams
-            ? undefined // Don't pass params if endpoint already has query string
-            : enrichedParams; // Only pass params if endpoint doesn't have query string yet
-        response = await apiClient.get<T>(endpointForRequest, paramsForRequest, requestHeaders);
-        break;
+  // Create the request promise
+  const requestPromise = (async (): Promise<ApiResponse<T>> => {
+    try {
+      let response: ApiResponse<T>;
+
+      switch (method) {
+        case 'GET': {
+          const endpointForRequest = cacheStrategyPreResult?.overrideEndpoint ?? normalizedEndpoint;
+          // If endpoint already has query params (from normalizeEndpointWithParams), don't pass params to apiClient.get()
+          // apiClient.get() will add them again, causing duplicates
+          const hasQueryParams = endpointForRequest.includes('?');
+          const paramsForRequest =
+            cacheStrategyPreResult?.overrideEndpoint !== undefined
+              ? cacheStrategyPreResult.overrideParams
+              : hasQueryParams
+              ? undefined // Don't pass params if endpoint already has query string
+              : enrichedParams; // Only pass params if endpoint doesn't have query string yet
+          response = await apiClient.get<T>(endpointForRequest, paramsForRequest, requestHeaders);
+          break;
+        }
+        case 'POST':
+          // normalizedEndpoint already has query params properly merged
+          response = await apiClient.post<T>(normalizedEndpoint, enrichedBody, requestHeaders);
+          break;
+        case 'PUT':
+          // normalizedEndpoint already has query params properly merged
+          response = await apiClient.put<T>(normalizedEndpoint, enrichedBody, requestHeaders);
+          break;
+        case 'PATCH':
+          // normalizedEndpoint already has query params properly merged
+          response = await apiClient.patch<T>(normalizedEndpoint, enrichedBody, requestHeaders);
+          break;
+        case 'DELETE':
+          // normalizedEndpoint already has query params properly merged
+          response = await apiClient.delete<T>(normalizedEndpoint, requestHeaders);
+          break;
+        default:
+          throw new Error(`Unsupported HTTP method: ${method}`);
       }
-      case 'POST':
-        // normalizedEndpoint already has query params properly merged
-        response = await apiClient.post<T>(normalizedEndpoint, enrichedBody, requestHeaders);
-        break;
-      case 'PUT':
-        // normalizedEndpoint already has query params properly merged
-        response = await apiClient.put<T>(normalizedEndpoint, enrichedBody, requestHeaders);
-        break;
-      case 'PATCH':
-        // normalizedEndpoint already has query params properly merged
-        response = await apiClient.patch<T>(normalizedEndpoint, enrichedBody, requestHeaders);
-        break;
-      case 'DELETE':
-        // normalizedEndpoint already has query params properly merged
-        response = await apiClient.delete<T>(normalizedEndpoint, requestHeaders);
-        break;
-      default:
-        throw new Error(`Unsupported HTTP method: ${method}`);
-    }
 
-    if (method === 'GET' && cacheStrategy && cacheStrategyContext) {
-      return await cacheStrategy.postRequest(cacheStrategyContext, response, cacheStrategyPreResult);
-    }
+      if (method === 'GET' && cacheStrategy && cacheStrategyContext) {
+        const cachedResponse = await cacheStrategy.postRequest(cacheStrategyContext, response, cacheStrategyPreResult);
+        // Remove from in-flight requests when done (only for GET requests)
+        if (requestKey) {
+          inFlightRequests.delete(requestKey);
+        }
+        return cachedResponse;
+      }
 
-    // Check for connection errors in the response
-    // Suppress generic toast for integration sync - it will show a specific toast with domain
-    const suppressToast = endpoint.includes('/api/integrations/sync');
-    if (!response.success) {
-      const errorMessage = response.error || '';
-      if (isConnectionError(null, response.statusCode) || isConnectionError({ message: errorMessage })) {
+      // Check for connection errors in the response
+      // Suppress generic toast for integration sync - it will show a specific toast with domain
+      const suppressToast = endpoint.includes('/api/integrations/sync');
+      if (!response.success) {
+        const errorMessage = response.error || '';
+        if (isConnectionError(null, response.statusCode) || isConnectionError({ message: errorMessage })) {
+          showConnectionErrorToast(undefined, suppressToast);
+        }
+      }
+
+      // Remove from in-flight requests when done (only for GET requests)
+      if (requestKey) {
+        inFlightRequests.delete(requestKey);
+      }
+
+      return response;
+    } catch (error) {
+      // Remove from in-flight requests on error (only for GET requests)
+      if (requestKey) {
+        inFlightRequests.delete(requestKey);
+      }
+      
+      // Check if it's a connection/timeout error
+      // Suppress generic toast for integration sync - it will show a specific toast with domain
+      const suppressToast = endpoint.includes('/api/integrations/sync');
+      if (isConnectionError(error)) {
         showConnectionErrorToast(undefined, suppressToast);
       }
+      
+      return {
+        success: false,
+        error: formatApiError(error),
+        data: null as any,
+        statusCode: undefined,
+      };
     }
+  })();
 
-    return response;
-  } catch (error) {
-    // Check if it's a connection/timeout error
-    // Suppress generic toast for integration sync - it will show a specific toast with domain
-    const suppressToast = endpoint.includes('/api/integrations/sync');
-    if (isConnectionError(error)) {
-      showConnectionErrorToast(undefined, suppressToast);
-    }
-    
-    return {
-      success: false,
-      error: formatApiError(error),
-      data: null as any,
-      statusCode: undefined,
-    };
+  // Store the promise in the in-flight requests map (only for GET requests)
+  if (requestKey) {
+    inFlightRequests.set(requestKey, requestPromise);
   }
+
+  return requestPromise;
 }
 
 export const buildQueryString = (params: PaginationParams): string => {

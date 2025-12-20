@@ -8,6 +8,9 @@ import { cn, validateField } from '../../../shared/utils';
 import { extractFirstId, normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
+import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
+import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
+import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 
 export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
   (
@@ -33,20 +36,85 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
   ) => {
     const groupRef = useRef<HTMLDivElement>(null);
 
+    // Get dynamic context for reference-based filtering
+    const dynamicContext = useDynamicFormContextStore();
+
+    // Check for reference-based filtering fields in config
+    const referenceSchema = config?.referenceSchema;
+    const referenceRelationTypeId = config?.referenceRelationTypeId;
+    const referenceEntityId = config?.referenceEntityId;
+    const targetSchemaFromConfig = config?.targetSchema;
+
+    // Build sourceUrl from reference fields if they're present and no explicit sourceUrl is provided
+    const referenceBasedSourceUrl = React.useMemo(() => {
+      if (!referenceSchema || !referenceRelationTypeId || !referenceEntityId || sourceUrl) {
+        return null;
+      }
+      
+      // Build the sourceUrl using reference fields
+      return buildReferenceFilterUrl({
+        referenceSchema,
+        referenceRelationTypeId,
+        referenceEntityId,
+        targetSchema: targetSchemaFromConfig,
+        schema: dynamicContext.formSchema,
+        values: dynamicContext.formData,
+      });
+    }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaFromConfig, sourceUrl, dynamicContext.formSchema, dynamicContext.formData]);
+
+    // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl
+    const effectiveSourceUrl = sourceUrl || referenceBasedSourceUrl || undefined;
+
+    // Default columnMap for API responses that nest data under data[0].data
+    const defaultColumnMap: ColumnMapConfig = React.useMemo(() => ({
+      response: { data: 'data.0.data' },
+      item: {
+        id: 'id',
+        label: 'label',
+        icon: 'icon',
+        color: 'color',
+      },
+    }), []);
+
+    // Get columnMap from config if provided
+    const configColumnMap = (config as any)?.columnMap as ColumnMapConfig | undefined;
+
+    // Use provided columnMap or fallback to default when using reference-based filtering
+    const effectiveColumnMap = React.useMemo(() => {
+      if (configColumnMap) {
+        // Merge with default to ensure data extraction is handled if not explicitly overridden
+        return {
+          ...defaultColumnMap,
+          ...configColumnMap,
+          response: {
+            ...defaultColumnMap.response,
+            ...configColumnMap.response,
+          },
+          item: {
+            ...defaultColumnMap.item,
+            ...configColumnMap.item,
+          }
+        };
+      }
+      // Use default columnMap when using reference-based filtering (effectiveSourceUrl from reference)
+      return referenceBasedSourceUrl ? defaultColumnMap : undefined;
+    }, [configColumnMap, referenceBasedSourceUrl, defaultColumnMap]);
+
     // Fetch options from URL if sourceUrl is provided
     const {
       options: urlOptions,
       isLoading: isLoadingOptions,
       error: optionsError,
     } = useOptionsFromUrl({
-      sourceUrl,
-      enabled: Boolean(sourceUrl),
+      sourceUrl: effectiveSourceUrl,
+      enabled: Boolean(effectiveSourceUrl),
       transform,
       queryParams,
+      columnMap: effectiveColumnMap,
     });
 
     // Use URL options if sourceUrl is provided, otherwise use provided options
-    const resolvedOptions = sourceUrl ? urlOptions : options;
+    const resolvedOptions = effectiveSourceUrl ? urlOptions : options;
 
     useImperativeHandle(ref, () => ({
       focus: () => {

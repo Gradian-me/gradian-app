@@ -10,6 +10,9 @@ import { Label } from '@/components/ui/label';
 import { extractIds, normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
+import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
+import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
+import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 
 export interface CheckboxListProps extends FormElementProps {
   options?: Array<{ id?: string; label: string; value?: string; disabled?: boolean; icon?: string; color?: string }>;
@@ -61,16 +64,81 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
     // Get showSelectAll from prop or config, default to false
     const shouldShowSelectAll = showSelectAll ?? config.showSelectAll ?? false;
 
+    // Get dynamic context for reference-based filtering
+    const dynamicContext = useDynamicFormContextStore();
+
+    // Check for reference-based filtering fields in config
+    const referenceSchema = config?.referenceSchema;
+    const referenceRelationTypeId = config?.referenceRelationTypeId;
+    const referenceEntityId = config?.referenceEntityId;
+    const targetSchemaFromConfig = config?.targetSchema;
+
+    // Build sourceUrl from reference fields if they're present and no explicit sourceUrl is provided
+    const referenceBasedSourceUrl = React.useMemo(() => {
+      if (!referenceSchema || !referenceRelationTypeId || !referenceEntityId || sourceUrl) {
+        return null;
+      }
+      
+      // Build the sourceUrl using reference fields
+      return buildReferenceFilterUrl({
+        referenceSchema,
+        referenceRelationTypeId,
+        referenceEntityId,
+        targetSchema: targetSchemaFromConfig,
+        schema: dynamicContext.formSchema,
+        values: dynamicContext.formData,
+      });
+    }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaFromConfig, sourceUrl, dynamicContext.formSchema, dynamicContext.formData]);
+
+    // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl
+    const effectiveSourceUrl = sourceUrl || referenceBasedSourceUrl || undefined;
+
+    // Default columnMap for API responses that nest data under data[0].data
+    const defaultColumnMap: ColumnMapConfig = React.useMemo(() => ({
+      response: { data: 'data.0.data' },
+      item: {
+        id: 'id',
+        label: 'label',
+        icon: 'icon',
+        color: 'color',
+      },
+    }), []);
+
+    // Get columnMap from config if provided
+    const configColumnMap = (config as any)?.columnMap as ColumnMapConfig | undefined;
+
+    // Use provided columnMap or fallback to default when using reference-based filtering
+    const effectiveColumnMap = React.useMemo(() => {
+      if (configColumnMap) {
+        // Merge with default to ensure data extraction is handled if not explicitly overridden
+        return {
+          ...defaultColumnMap,
+          ...configColumnMap,
+          response: {
+            ...defaultColumnMap.response,
+            ...configColumnMap.response,
+          },
+          item: {
+            ...defaultColumnMap.item,
+            ...configColumnMap.item,
+          }
+        };
+      }
+      // Use default columnMap when using reference-based filtering (effectiveSourceUrl from reference)
+      return referenceBasedSourceUrl ? defaultColumnMap : undefined;
+    }, [configColumnMap, referenceBasedSourceUrl, defaultColumnMap]);
+
     // Fetch options from URL if sourceUrl is provided
     const {
       options: urlOptions,
       isLoading: isLoadingOptions,
       error: optionsError,
     } = useOptionsFromUrl({
-      sourceUrl,
-      enabled: Boolean(sourceUrl),
+      sourceUrl: effectiveSourceUrl,
+      enabled: Boolean(effectiveSourceUrl),
       transform,
       queryParams,
+      columnMap: effectiveColumnMap,
     });
 
     // Ensure value is an array
@@ -78,7 +146,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
     const selectAllCheckboxRef = useRef<HTMLButtonElement>(null);
 
     // Get options from config if not provided directly, or use URL options
-    const checkboxOptions: CheckboxListProps['options'] = sourceUrl
+    const checkboxOptions: CheckboxListProps['options'] = effectiveSourceUrl
       ? urlOptions.map(opt => ({
           id: opt.id,
           label: opt.label ?? opt.id,
@@ -168,12 +236,12 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
     const fieldLabel = config.label;
 
     return (
-      <div className={cn('w-full space-y-2', className)}>
+      <div className={cn('w-full space-y-2 border border-gray-300 dark:border-gray-700 rounded-lg p-2', className)}>
         {fieldLabel && (
           <label
             className={cn(
               'block text-xs font-medium',
-              error ? 'text-red-700' : 'text-gray-700',
+              error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-400',
               required && 'after:content-["*"] after:ms-1 after:text-red-500'
             )}
           >
