@@ -2,6 +2,7 @@ stages:
   - security
   - security_approval
   - build
+  - image_scan
   - image_approval
   - deploy
 
@@ -508,7 +509,7 @@ build:
       - stuck_or_timeout_failure
 
 trivy_image_scan:
-  stage: build
+  stage: image_scan
   needs:
     - job: build
       artifacts: false
@@ -585,6 +586,7 @@ trivy_image_scan:
     - CG-GR-APP-DEV
   only:
     - main
+    - master
   retry:
     max: 2
     when:
