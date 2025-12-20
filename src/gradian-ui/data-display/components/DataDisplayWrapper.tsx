@@ -10,6 +10,7 @@ import { DataDisplayEmptyState } from './DataDisplayEmptyState';
 import { DataDisplayLoadingState } from './DataDisplayLoadingState';
 import { DataDisplayErrorState } from './DataDisplayErrorState';
 import { cn, debounce } from '../../shared/utils';
+import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 
 export const DataDisplayWrapper: React.FC<DataDisplayWrapperProps> = ({
   config,
@@ -45,8 +46,8 @@ export const DataDisplayWrapper: React.FC<DataDisplayWrapperProps> = ({
     filters: {},
     pagination: {
       currentPage: 1,
-      pageSize: pagination.pageSize || 25,
-      totalPages: Math.ceil(data.length / (pagination.pageSize || 25)),
+      pageSize: pagination.pageSize || DEFAULT_LIMIT,
+      totalPages: Math.ceil(data.length / (pagination.pageSize || DEFAULT_LIMIT)),
       totalItems: data.length,
     },
     selection: [],

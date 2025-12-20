@@ -23,7 +23,7 @@ export {
   findStatusFieldOptions,
 } from '../../form-builder/form-elements/utils/badge-utils';
 export type { BadgeOption, BadgeMetadata, BadgeColor, BadgeConfig } from '../../form-builder/form-elements/utils/badge-utils';
-export { mapBadgeColorToVariant } from './badge-variant-mapper';
+export { mapBadgeColorToVariant, getValidBadgeVariant } from './badge-variant-mapper';
 
 // Avatar utilities
 export {

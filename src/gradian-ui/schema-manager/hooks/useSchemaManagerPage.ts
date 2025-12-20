@@ -14,6 +14,7 @@ import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { clearSchemaCache } from '@/gradian-ui/indexdb-manager/schema-cache';
 import { SCHEMA_SUMMARY_CACHE_KEY } from '@/gradian-ui/indexdb-manager/types';
 import { useTenantStore } from '@/stores/tenant.store';
+import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 
 /**
  * Transform API response messages to MessageBox format
@@ -70,7 +71,7 @@ export const useSchemaManagerPage = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [messages, setMessages] = useState<MessagesResponse | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState<number | 'all'>(25);
+  const [pageSize, setPageSize] = useState<number | 'all'>(DEFAULT_LIMIT);
   
   // Track initial mount to skip first tenant change effect
   const isInitialMountRef = useRef(true);

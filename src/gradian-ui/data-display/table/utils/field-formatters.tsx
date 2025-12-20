@@ -3,9 +3,9 @@ import { Link as LinkIcon, Check, X } from 'lucide-react';
 import { formatCurrency, formatDate, formatNumber } from '@/gradian-ui/shared/utils';
 import { BadgeViewer } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
 import type { BadgeItem } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
-import { Badge } from '@/gradian-ui/form-builder/form-elements/components/Badge';
+import { Badge } from '@/components/ui/badge';
 import { IconRenderer, isValidLucideIcon } from '@/gradian-ui/shared/utils/icon-renderer';
-import { getBadgeConfig, mapBadgeColorToVariant } from '../../utils';
+import { getBadgeConfig, getValidBadgeVariant } from '../../utils';
 import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
 import {
   getDisplayStrings,
@@ -489,29 +489,82 @@ export const formatFieldValue = (
     );
   }
 
-  if (field?.role === 'status') {
+  // Handle status field - check by role OR by name (status field in system section might not have role set)
+  if (field?.role === 'status' || field?.name === 'status') {
     const statusOptions = field.options || [];
     const primaryOption = normalizedOptions[0];
+    
+    // Extract raw value item for direct property access (color, icon, etc.)
+    // Handle both array format [{}] and single object format {}
+    // IMPORTANT: Extract BEFORE normalization to preserve all properties
+    let rawValueItem: any = null;
+    if (Array.isArray(value) && value.length > 0) {
+      // Get the first item from the array - this should contain the full status object with color
+      rawValueItem = typeof value[0] === 'object' && value[0] !== null ? value[0] : null;
+    } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      rawValueItem = value;
+    }
+    
     const statusValue = primaryOption?.id ?? String(
-      Array.isArray(value) ? value[0] : value
+      Array.isArray(value) ? (value[0]?.id || value[0]) : value
     );
     const badgeConfig = getBadgeConfig(statusValue, statusOptions);
-    // Get color from normalized option (which may have color from status items)
-    const badgeColor = primaryOption?.color || primaryOption?.normalized?.color || field.roleColor || badgeConfig.color;
-    const badgeIcon = primaryOption?.icon || primaryOption?.normalized?.icon || badgeConfig.icon;
-    const badgeLabel = primaryOption?.label || primaryOption?.normalized?.label || badgeConfig.label;
     
-    // Check if badgeColor is a Tailwind color name (not a badge variant)
-    const isTailwindColor = badgeColor && !['default', 'primary', 'secondary', 'success', 'warning', 'danger', 'outline'].includes(badgeColor);
+    // Find matching option from statusOptions by ID to get color/icon
+    let matchedOption: any = null;
+    if (statusValue && statusOptions.length > 0) {
+      matchedOption = statusOptions.find((opt: any) => 
+        String(opt?.id || opt?.value) === String(statusValue)
+      );
+    }
     
+    // Get color from multiple sources with priority: raw value item > normalized option > matched option > field config > badge config
+    // CRITICAL: rawValueItem should have the color if the value is an object/array with color property
+    // primaryOption should also have color since normalizeOptionArray preserves all properties via spread
+    const badgeColor = (rawValueItem?.color && typeof rawValueItem.color === 'string' ? rawValueItem.color.trim() : null) ||
+                       (primaryOption?.color && typeof primaryOption.color === 'string' ? primaryOption.color.trim() : null) ||
+                       (matchedOption?.color && typeof matchedOption.color === 'string' ? matchedOption.color.trim() : null) ||
+                       (field.roleColor && typeof field.roleColor === 'string' ? field.roleColor.trim() : null) ||
+                       (badgeConfig?.color && typeof badgeConfig.color === 'string' ? badgeConfig.color.trim() : null) ||
+                       null;
+    
+    // Get icon from multiple sources with priority: raw value item > normalized option > matched option > badge config
+    const badgeIcon = rawValueItem?.icon || 
+                   primaryOption?.icon || 
+                   matchedOption?.icon ||
+                   badgeConfig?.icon;
+    
+    // Get label from multiple sources
+    const badgeLabel = primaryOption?.label || 
+                       rawValueItem?.label || 
+                       badgeConfig?.label ||
+                       'Unknown';
+    
+    // Use getValidBadgeVariant to convert color to valid Badge variant (same approach as DynamicCardRenderer)
+    // This ensures consistency with card view which uses RadixBadge from @/components/ui/badge
+    const badgeVariant = getValidBadgeVariant(badgeColor || undefined);
+    
+    // Debug logging (remove in production)
+    if (process.env.NODE_ENV === 'development' && (field?.role === 'status' || field?.name === 'status')) {
+      console.log('[formatFieldValue Status]', {
+        value,
+        valueType: typeof value,
+        isArray: Array.isArray(value),
+        arrayLength: Array.isArray(value) ? value.length : 0,
+        rawValueItem: rawValueItem ? { id: rawValueItem.id, color: rawValueItem.color, hasColor: !!rawValueItem.color } : null,
+        primaryOption: primaryOption ? { id: primaryOption.id, color: primaryOption.color, hasColor: !!primaryOption.color } : null,
+        matchedOption: matchedOption ? { id: matchedOption.id, color: matchedOption.color } : null,
+        badgeConfig: badgeConfig ? { color: badgeConfig.color } : null,
+        badgeColor,
+        badgeVariant,
+        finalVariant: badgeVariant,
+      });
+    }
+    
+    // Use the same Badge component and approach as DynamicCardRenderer for consistency
     return wrapWithForceIcon(
       <div className="inline-flex items-center whitespace-nowrap">
-        <Badge
-          variant={isTailwindColor ? undefined : (mapBadgeColorToVariant(badgeColor) as any)}
-          color={isTailwindColor ? badgeColor : undefined}
-          size="sm"
-          className="inline-flex items-center gap-1.5"
-        >
+        <Badge variant={badgeVariant}>
           {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
           <span>{badgeLabel}</span>
         </Badge>
@@ -525,26 +578,56 @@ export const formatFieldValue = (
   if (field?.role === 'entityType') {
     const entityTypeOptions = field.options || [];
     const primaryOption = normalizedOptions[0];
+    
+    // Extract raw value item for direct property access (color, icon, etc.)
+    // Handle both array format [{}] and single object format {}
+    let rawValueItem: any = null;
+    if (Array.isArray(value) && value.length > 0) {
+      rawValueItem = typeof value[0] === 'object' && value[0] !== null ? value[0] : null;
+    } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      rawValueItem = value;
+    }
+    
     const entityTypeValue = primaryOption?.id ?? String(
-      Array.isArray(value) ? value[0] : value
+      Array.isArray(value) ? (value[0]?.id || value[0]) : value
     );
     const badgeConfig = getBadgeConfig(entityTypeValue, entityTypeOptions);
-    // Get color from normalized option (which may have color from entity type items)
-    const badgeColor = primaryOption?.color || primaryOption?.normalized?.color || field.roleColor || badgeConfig.color;
-    const badgeIcon = primaryOption?.icon || primaryOption?.normalized?.icon || badgeConfig.icon;
-    const badgeLabel = primaryOption?.label || primaryOption?.normalized?.label || badgeConfig.label;
     
-    // Check if badgeColor is a Tailwind color name (not a badge variant)
-    const isTailwindColor = badgeColor && !['default', 'primary', 'secondary', 'success', 'warning', 'danger', 'outline'].includes(badgeColor);
+    // Find matching option from entityTypeOptions by ID to get color/icon
+    let matchedOption: any = null;
+    if (entityTypeValue && entityTypeOptions.length > 0) {
+      matchedOption = entityTypeOptions.find((opt: any) => 
+        String(opt?.id || opt?.value) === String(entityTypeValue)
+      );
+    }
+    
+    // Get color from multiple sources with priority: raw value item > normalized option > matched option > field config > badge config
+    // Ensure we get the actual color string value
+    const badgeColor = (rawValueItem?.color && typeof rawValueItem.color === 'string' ? rawValueItem.color.trim() : null) ||
+                       (primaryOption?.color && typeof primaryOption.color === 'string' ? primaryOption.color.trim() : null) ||
+                       (matchedOption?.color && typeof matchedOption.color === 'string' ? matchedOption.color.trim() : null) ||
+                       (field.roleColor && typeof field.roleColor === 'string' ? field.roleColor.trim() : null) ||
+                       (badgeConfig?.color && typeof badgeConfig.color === 'string' ? badgeConfig.color.trim() : null) ||
+                       null;
+    
+    // Get icon from multiple sources with priority: raw value item > normalized option > matched option > badge config
+    const badgeIcon = rawValueItem?.icon || 
+                   primaryOption?.icon || 
+                   matchedOption?.icon ||
+                   badgeConfig?.icon;
+    
+    // Get label from multiple sources
+    const badgeLabel = primaryOption?.label || 
+                       rawValueItem?.label || 
+                       badgeConfig?.label ||
+                       'Unknown';
+    
+    // Use getValidBadgeVariant to convert color to valid Badge variant (same approach as DynamicCardRenderer)
+    const badgeVariant = getValidBadgeVariant(badgeColor || undefined);
     
     return wrapWithForceIcon(
       <div className="inline-flex items-center whitespace-nowrap">
-        <Badge
-          variant={isTailwindColor ? undefined : (mapBadgeColorToVariant(badgeColor) as any)}
-          color={isTailwindColor ? badgeColor : undefined}
-          size="sm"
-          className="inline-flex items-center gap-1.5"
-        >
+        <Badge variant={badgeVariant}>
           {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
           <span>{badgeLabel}</span>
         </Badge>

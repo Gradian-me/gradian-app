@@ -26,6 +26,7 @@ import { formatRelativeTime, formatTime } from '@/gradian-ui/shared/utils/date-u
 import { processTextWithStyledHashtagsAndMentions } from '../utils/text-utils';
 import { MessageMetadataDialog } from './MessageMetadataDialog';
 import type { ChatMessage as ChatMessageType } from '../types';
+import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 import type { QuickAction, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 
 export interface ChatMessageProps {
@@ -809,7 +810,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                       data: tableData,
                       pagination: {
                         enabled: tableData.length > 10,
-                        pageSize: 25,
+                        pageSize: DEFAULT_LIMIT,
                         showPageSizeSelector: true,
                         pageSizeOptions: [10, 25, 50, 100],
                       },

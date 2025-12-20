@@ -27,6 +27,7 @@ import { TextSwitcher } from '@/components/ui/text-switcher';
 import { cleanMarkdownResponse } from '@/domains/ai-builder/utils/ai-security-utils';
 import { Badge } from '@/components/ui/badge';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
+import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 
 export interface DynamicAiAgentResponseContainerProps {
   action: QuickAction;
@@ -282,7 +283,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
       data: tableData,
       pagination: {
         enabled: tableData.length > 10,
-        pageSize: 25,
+        pageSize: DEFAULT_LIMIT,
         showPageSizeSelector: true,
         pageSizeOptions: [10, 25, 50, 100],
       },

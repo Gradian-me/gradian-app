@@ -17,7 +17,7 @@ import { DynamicRepeatingTableViewer } from './DynamicRepeatingTableViewer';
 import { resolveFieldById } from '../../form-builder/form-elements/utils/field-resolver';
 import { getValueByRole, getSingleValueByRole, extractLabels, getArrayValuesByRole } from '../utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { getBadgeConfig } from '../utils';
+import { getBadgeConfig, getValidBadgeVariant } from '../utils';
 import { cn } from '../../shared/utils';
 import { getDefaultSections } from '../../schema-manager/utils/badge-utils';
 import { DynamicQuickActions } from './DynamicQuickActions';
@@ -658,22 +658,6 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
           color: headerInfo.statusMetadata.color ?? 'outline',
         }
       : getBadgeConfig(headerInfo.status, headerInfo.statusOptions);
-  
-  // Helper function to safely convert color string to valid Badge variant
-  const getValidBadgeVariant = (
-    color: string | undefined
-  ): 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' | 'info' | 'gradient' | 'muted' | 'slate' | 'gray' | 'zinc' | 'neutral' | 'stone' | 'red' | 'orange' | 'amber' | 'yellow' | 'lime' | 'green' | 'emerald' | 'teal' | 'cyan' | 'sky' | 'blue' | 'indigo' | 'violet' | 'purple' | 'fuchsia' | 'pink' | 'rose' => {
-    const validVariants = [
-      'default', 'secondary', 'destructive', 'outline', 'success', 'warning', 'info', 'gradient', 'muted',
-      'slate', 'gray', 'zinc', 'neutral', 'stone', 'red', 'orange', 'amber', 'yellow', 'lime', 'green',
-      'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'
-    ] as const;
-    
-    if (color && validVariants.includes(color as any)) {
-      return color as typeof validVariants[number];
-    }
-    return 'purple';
-  };
   
   // Entity type badge config
   const entityTypeBadgeConfig = headerInfo.entityTypeMetadata

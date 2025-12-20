@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { PencilRuler, LayoutList, Trash2, Database, Users2, Circle, Hash, FileText, Clock } from 'lucide-react';
 import { FormSchema } from '../types';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 
 interface SchemaTableViewProps {
   schemas: FormSchema[];
@@ -558,7 +559,7 @@ export function SchemaTableView({
       data: schemas,
       pagination: {
         enabled: schemas.length > 10,
-        pageSize: 25,
+        pageSize: DEFAULT_LIMIT,
         showPageSizeSelector: true,
         pageSizeOptions: [5, 10, 25, 50],
         alwaysShow: false,

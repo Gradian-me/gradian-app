@@ -28,6 +28,7 @@ import { cleanMarkdownResponse } from '../utils/ai-security-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 import { truncateText } from '@/domains/chat/utils/text-utils';
+import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 
 interface AiBuilderResponseProps {
   response: string;
@@ -567,7 +568,7 @@ export function AiBuilderResponse({
       data: tableData,
       pagination: {
         enabled: tableData.length > 10,
-        pageSize: 25,
+        pageSize: DEFAULT_LIMIT,
         showPageSizeSelector: true,
         pageSizeOptions: [10, 25, 50, 100],
       },

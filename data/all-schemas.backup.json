@@ -182,6 +182,1352 @@
     "applyToAllTenants": true
   },
   {
+    "id": "inquiries",
+    "description": "Create and manage inquiries for procurement and supply chain needs",
+    "singular_name": "Inquiry",
+    "plural_name": "Inquiries",
+    "cardMetadata": [
+      {
+        "id": "inquiry-info",
+        "title": "Inquiry Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "inquiry-number",
+          "inquiry-date",
+          "inquiry-status"
+        ]
+      },
+      {
+        "id": "timeline",
+        "title": "Timeline",
+        "colSpan": 1,
+        "fieldIds": [
+          "inquiry-deadline-date"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "inquiry-number",
+        "name": "number",
+        "label": "Inquiry Number",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter inquiry number",
+        "canCopy": true,
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "inquiry-date",
+        "name": "inquiryDate",
+        "label": "Inquiry Date",
+        "sectionId": "basic-information",
+        "component": "datetime-local",
+        "placeholder": "Select inquiry date and time",
+        "role": "subtitle",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "inquiry-deadline-date",
+        "name": "inquiryDeadlineDate",
+        "label": "Deadline Date",
+        "sectionId": "basic-information",
+        "component": "datetime-local",
+        "placeholder": "Select deadline date and time",
+        "role": "duedate",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "inquiry-status",
+        "name": "state",
+        "label": "Status",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select status",
+        "role": "status",
+        "options": [
+          {
+            "id": "0",
+            "label": "Draft",
+            "icon": "FileText",
+            "color": "default"
+          },
+          {
+            "id": "1",
+            "label": "Submitted",
+            "icon": "Send",
+            "color": "info"
+          },
+          {
+            "id": "2",
+            "label": "In Review",
+            "icon": "Clock",
+            "color": "warning"
+          },
+          {
+            "id": "3",
+            "label": "Approved",
+            "icon": "CheckCircle",
+            "color": "success"
+          },
+          {
+            "id": "4",
+            "label": "Rejected",
+            "icon": "XCircle",
+            "color": "destructive"
+          },
+          {
+            "id": "5",
+            "label": "Closed",
+            "icon": "Archive",
+            "color": "muted"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "inquiry-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter inquiry description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 5
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Inquiry Information",
+        "description": "Basic inquiry details and timeline",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "inquiry-items",
+        "title": "Inquiry Items",
+        "description": "Add items to this inquiry",
+        "isRepeatingSection": true,
+        "initialState": "expanded",
+        "columns": 2,
+        "repeatingConfig": {
+          "minItems": 1,
+          "maxItems": 100,
+          "targetSchema": "inquiry-items",
+          "relationTypeId": "HAS_INQUIRY_ITEM",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
+        }
+      },
+      {
+        "id": "inquiry-vendors",
+        "title": "Inquiry Vendors",
+        "description": "Select vendors for this inquiry",
+        "isRepeatingSection": true,
+        "initialState": "expanded",
+        "columns": 2,
+        "repeatingConfig": {
+          "minItems": 0,
+          "maxItems": 100,
+          "targetSchema": "inquiry-vendors",
+          "relationTypeId": "HAS_INQUIRY_VENDOR",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
+        }
+      },
+      {
+        "id": "contacts",
+        "title": "Contacts",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 0,
+          "targetSchema": "contacts",
+          "relationTypeId": "HAS_CONTACT",
+          "fieldRelationType": "connectToSchema"
+        }
+      }
+    ],
+    "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "create-quotation",
+          "label": "Create Quotation",
+          "icon": "FilePlus",
+          "variant": "default",
+          "action": "openFormDialog",
+          "targetSchema": "quotations"
+        },
+        {
+          "id": "view-vendors",
+          "label": "View Vendors",
+          "icon": "Users",
+          "variant": "outline",
+          "action": "goToUrl",
+          "targetUrl": "/page/vendors"
+        },
+        {
+          "id": "export-inquiry",
+          "label": "Export Inquiry",
+          "icon": "Download",
+          "variant": "secondary",
+          "action": "openUrl",
+          "targetUrl": "/api/export/inquiries",
+          "passItemAsReference": true
+        }
+      ],
+      "tableRenderers": [
+        {
+          "id": "inquiry-items-table",
+          "targetSchema": "inquiry-items",
+          "relationTypeId": "HAS_INQUIRY_ITEM",
+          "sectionId": "item-information",
+          "title": "Inquiry Items",
+          "description": "List of all items in this inquiry",
+          "columns": [
+            "item-part-code",
+            "item-part-name",
+            "item-quantity",
+            "item-unit",
+            "item-demand-date",
+            "item-minimum-expiration-date",
+            "item-description"
+          ],
+          "tableProperties": {
+            "sortingEnabled": true,
+            "paginationEnabled": true,
+            "paginationPageSize": 20,
+            "aggregations": [
+              {
+                "column": "item-row-number",
+                "aggregationTypes": [
+                  "count",
+                  "max"
+                ]
+              },
+              {
+                "column": "item-quantity",
+                "aggregationTypes": [
+                  "sum"
+                ],
+                "precision": 2
+              },
+              {
+                "column": "item-part-code",
+                "aggregationTypes": [
+                  "count"
+                ]
+              }
+            ]
+          },
+          "colSpan": 2,
+          "columnArea": "main"
+        },
+        {
+          "id": "inquiry-vendors-table",
+          "targetSchema": "inquiry-vendors",
+          "relationTypeId": "HAS_INQUIRY_VENDOR",
+          "sectionId": "vendor-information",
+          "title": "Inquiry Vendors",
+          "description": "List of all vendors associated with this inquiry",
+          "columns": [
+            "vendor-field",
+            "vendor-status"
+          ],
+          "tableProperties": {
+            "sortingEnabled": true,
+            "paginationEnabled": true,
+            "paginationPageSize": 25,
+            "cardColumns": 2
+          },
+          "colSpan": 2,
+          "columnArea": "main"
+        }
+      ],
+      "componentRenderers": [],
+      "sections": [
+        {
+          "id": "inquiry-overview",
+          "title": "Inquiry Overview",
+          "description": "Summary information",
+          "colSpan": 2,
+          "fieldIds": [
+            "inquiry-number",
+            "inquiry-date",
+            "inquiry-deadline-date",
+            "inquiry-status",
+            "inquiry-description"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": false,
+    "icon": "FileSearch",
+    "isNotCompanyBased": false,
+    "allowDataDueDate": true,
+    "allowDataAssignedTo": true,
+    "allowDataForce": true,
+    "statusGroup": [
+      {
+        "id": "01KBHD90EMZKAT502KNVVDQZC7",
+        "label": "Progress Status"
+      }
+    ],
+    "schemaType": "business"
+  },
+  {
+    "id": "inquiry-items",
+    "description": "Items in an inquiry",
+    "singular_name": "Inquiry Item",
+    "plural_name": "Inquiry Items",
+    "fields": [
+      {
+        "id": "item-part-code",
+        "name": "partCode",
+        "label": "Part Code",
+        "sectionId": "item-information",
+        "component": "text",
+        "placeholder": "Enter part code",
+        "role": "code",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "item-part-name",
+        "name": "partName",
+        "label": "Part Name",
+        "sectionId": "item-information",
+        "component": "text",
+        "placeholder": "Enter part name",
+        "role": "title",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "item-quantity",
+        "name": "quantity",
+        "label": "Quantity",
+        "sectionId": "item-information",
+        "component": "number",
+        "placeholder": "Enter quantity",
+        "role": "description",
+        "validation": {
+          "required": true,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "item-unit",
+        "name": "unit",
+        "label": "Unit",
+        "sectionId": "item-information",
+        "component": "select",
+        "placeholder": "Select unit",
+        "options": [
+          {
+            "id": "1",
+            "label": "Piece"
+          },
+          {
+            "id": "2",
+            "label": "Box"
+          },
+          {
+            "id": "3",
+            "label": "Pallet"
+          },
+          {
+            "id": "4",
+            "label": "Kilogram"
+          },
+          {
+            "id": "5",
+            "label": "Liter"
+          },
+          {
+            "id": "6",
+            "label": "Meter"
+          },
+          {
+            "id": "7",
+            "label": "Square Meter"
+          },
+          {
+            "id": "8",
+            "label": "Cubic Meter"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "item-demand-date",
+        "name": "demandDate",
+        "label": "Demand Date",
+        "sectionId": "item-information",
+        "component": "date",
+        "placeholder": "Select demand date",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "item-minimum-expiration-date",
+        "name": "minimumExpirationDate",
+        "label": "Minimum Expiration Date",
+        "sectionId": "item-information",
+        "component": "date",
+        "placeholder": "Select minimum expiration date",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "item-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "item-information",
+        "component": "textarea",
+        "placeholder": "Enter item description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 7
+      }
+    ],
+    "sections": [
+      {
+        "id": "item-information",
+        "title": "Item Information",
+        "description": "Details about the inquiry item",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Package",
+    "schemaType": "business"
+  },
+  {
+    "id": "inquiry-vendors",
+    "description": "Vendors associated with an inquiry",
+    "singular_name": "Inquiry Vendor",
+    "plural_name": "Inquiry Vendors",
+    "fields": [
+      {
+        "id": "vendor-field",
+        "name": "vendorId",
+        "label": "Vendor",
+        "sectionId": "vendor-information",
+        "component": "picker",
+        "placeholder": "Click to select vendor",
+        "description": "Select vendor from popup picker",
+        "role": "title",
+        "targetSchema": "vendors",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "vendor-status",
+        "name": "status",
+        "label": "Status",
+        "sectionId": "vendor-information",
+        "component": "select",
+        "placeholder": "Select status",
+        "role": "status",
+        "options": [
+          {
+            "id": "pending",
+            "label": "Pending",
+            "icon": "Clock",
+            "color": "default"
+          },
+          {
+            "id": "reviewed",
+            "label": "Reviewed",
+            "icon": "Eye",
+            "color": "info"
+          },
+          {
+            "id": "quotation_added",
+            "label": "Quotation Added",
+            "icon": "FileText",
+            "color": "warning"
+          },
+          {
+            "id": "awarded",
+            "label": "Awarded",
+            "icon": "CheckCircle",
+            "color": "success"
+          },
+          {
+            "id": "rejected",
+            "label": "Rejected",
+            "icon": "XCircle",
+            "color": "destructive"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      }
+    ],
+    "sections": [
+      {
+        "id": "vendor-information",
+        "title": "Vendor Information",
+        "description": "Vendor and status information",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Users",
+    "schemaType": "business"
+  },
+  {
+    "id": "vendors",
+    "description": "Add a new vendor to your supply chain management system",
+    "singular_name": "Vendor",
+    "plural_name": "Vendors",
+    "cardMetadata": [
+      {
+        "id": "contact-info",
+        "title": "Contact Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "email-address",
+          "phone-number",
+          "tax-id"
+        ]
+      },
+      {
+        "id": "location",
+        "title": "Location",
+        "colSpan": 1,
+        "fieldIds": [
+          "country",
+          "state",
+          "city"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "company-name",
+        "name": "name",
+        "label": "Company Name",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter company name",
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "email-address",
+        "name": "email",
+        "label": "Email Address",
+        "sectionId": "basic-information",
+        "component": "email",
+        "placeholder": "Enter email address",
+        "icon": "Home",
+        "role": "subtitle",
+        "validation": {
+          "required": true,
+          "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "phone-number",
+        "name": "phone",
+        "label": "Phone Number",
+        "sectionId": "basic-information",
+        "component": "phone",
+        "placeholder": "Enter phone number",
+        "icon": "Phone",
+        "role": "phone",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "registration-number",
+        "name": "registrationNumber",
+        "label": "Registration Number",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter registration number",
+        "required": false,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "tax-id",
+        "name": "taxId",
+        "label": "Tax ID",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter tax ID",
+        "required": false,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "country",
+        "name": "country",
+        "label": "Country",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select country",
+        "required": false,
+        "role": "location",
+        "options": [
+          {
+            "id": "USA",
+            "label": "United States"
+          },
+          {
+            "id": "CAN",
+            "label": "Canada"
+          },
+          {
+            "id": "UK",
+            "label": "United Kingdom"
+          },
+          {
+            "id": "DE",
+            "label": "Germany"
+          },
+          {
+            "id": "FR",
+            "label": "France"
+          },
+          {
+            "id": "JP",
+            "label": "Japan"
+          },
+          {
+            "id": "CN",
+            "label": "China"
+          },
+          {
+            "id": "IN",
+            "label": "India"
+          },
+          {
+            "id": "TR",
+            "label": "Turkey"
+          },
+          {
+            "id": "OTHER",
+            "label": "Other"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "vendor-certifications",
+        "name": "certifications",
+        "label": "Certifications",
+        "sectionId": "basic-information",
+        "component": "checkbox-list",
+        "placeholder": "Select certifications",
+        "required": false,
+        "role": "badge",
+        "options": [
+          {
+            "id": "iso9001",
+            "label": "ISO 9001"
+          },
+          {
+            "id": "iso14001",
+            "label": "ISO 14001"
+          },
+          {
+            "id": "fda",
+            "label": "FDA Approved"
+          },
+          {
+            "id": "ce",
+            "label": "CE Marking"
+          },
+          {
+            "id": "rohs",
+            "label": "RoHS Compliant"
+          },
+          {
+            "id": "reach",
+            "label": "REACH Compliant"
+          }
+        ],
+        "colSpan": 2,
+        "order": 7
+      },
+      {
+        "id": "address",
+        "name": "address",
+        "label": "Address",
+        "sectionId": "address-information",
+        "component": "textarea",
+        "placeholder": "Enter full address",
+        "required": false,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 3,
+        "order": 1
+      },
+      {
+        "id": "city",
+        "name": "city",
+        "label": "City",
+        "sectionId": "address-information",
+        "component": "text",
+        "placeholder": "Enter city",
+        "required": false,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "state",
+        "name": "state",
+        "label": "State",
+        "sectionId": "address-information",
+        "component": "text",
+        "placeholder": "Enter state",
+        "required": false,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "zip-code",
+        "name": "zipCode",
+        "label": "ZIP Code",
+        "sectionId": "address-information",
+        "component": "text",
+        "placeholder": "Enter ZIP code",
+        "required": false,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "categories",
+        "name": "categories",
+        "label": "Business Categories",
+        "sectionId": "business-details",
+        "component": "checkbox-list",
+        "placeholder": "Select categories",
+        "required": false,
+        "role": "badge",
+        "options": [
+          {
+            "id": "technology",
+            "label": "Technology"
+          },
+          {
+            "id": "manufacturing",
+            "label": "Manufacturing"
+          },
+          {
+            "id": "services",
+            "label": "Services"
+          },
+          {
+            "id": "logistics",
+            "label": "Logistics"
+          },
+          {
+            "id": "healthcare",
+            "label": "Healthcare"
+          },
+          {
+            "id": "finance",
+            "label": "Finance"
+          },
+          {
+            "id": "education",
+            "label": "Education"
+          },
+          {
+            "id": "retail",
+            "label": "Retail"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 3,
+        "order": 1
+      },
+      {
+        "id": "website",
+        "name": "website",
+        "label": "Website",
+        "sectionId": "business-details",
+        "component": "text",
+        "placeholder": "Enter website URL",
+        "required": false,
+        "validation": {
+          "pattern": "^https?:\\/\\/.+"
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "established-year",
+        "name": "establishedYear",
+        "label": "Established Year",
+        "sectionId": "business-details",
+        "component": "number",
+        "placeholder": "Enter year",
+        "required": false,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "employee-count",
+        "name": "employeeCount",
+        "label": "Number of Employees",
+        "sectionId": "business-details",
+        "component": "number",
+        "placeholder": "Enter employee count",
+        "required": false,
+        "validation": {
+          "required": false,
+          "min": 1
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "description",
+        "name": "description",
+        "label": "Company Description",
+        "sectionId": "business-details",
+        "component": "textarea",
+        "placeholder": "Enter company description",
+        "required": false,
+        "role": "description",
+        "colSpan": 3,
+        "order": 5
+      },
+      {
+        "id": "status",
+        "name": "status",
+        "label": "Status",
+        "sectionId": "business-details",
+        "component": "select",
+        "placeholder": "Select status",
+        "required": false,
+        "role": "status",
+        "options": [
+          {
+            "id": "ACTIVE",
+            "label": "Active",
+            "icon": "CheckCircle",
+            "color": "success"
+          },
+          {
+            "id": "PENDING",
+            "label": "Pending",
+            "icon": "Clock",
+            "color": "warning"
+          },
+          {
+            "id": "INACTIVE",
+            "label": "Inactive",
+            "icon": "XCircle",
+            "color": "muted"
+          },
+          {
+            "id": "FORBIDDEN",
+            "label": "Forbidden",
+            "icon": "XCircle",
+            "color": "destructive"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "rating",
+        "name": "rating",
+        "label": "Rating",
+        "sectionId": "business-details",
+        "component": "number",
+        "placeholder": "Enter rating (1-5)",
+        "required": false,
+        "role": "rating",
+        "validation": {
+          "min": 1,
+          "max": 5
+        },
+        "colSpan": 1,
+        "order": 7
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Vendor Information",
+        "description": "Basic vendor details and contact information",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "address-information",
+        "title": "Address Information",
+        "description": "Complete address details for the vendor",
+        "columns": 3
+      },
+      {
+        "id": "contacts",
+        "title": "Contact Persons",
+        "description": "Add contact persons for this vendor",
+        "isRepeatingSection": true,
+        "initialState": "expanded",
+        "columns": 2,
+        "repeatingConfig": {
+          "minItems": 1,
+          "maxItems": 5,
+          "targetSchema": "contacts",
+          "relationTypeId": "HAS_CONTACT",
+          "deleteType": "relationOnly",
+          "addType": "canSelectFromData",
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
+        }
+      },
+      {
+        "id": "business-details",
+        "title": "Business Details",
+        "description": "Additional business information and categories",
+        "initialState": "expanded",
+        "columns": 3
+      },
+      {
+        "id": "section-1762088953746",
+        "title": "Working Days",
+        "columns": 2,
+        "icon": "Calendar",
+        "isRepeatingSection": true
+      },
+      {
+        "id": "users",
+        "title": "Users",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 0,
+          "targetSchema": "users",
+          "relationTypeId": "HAS_CONTACT",
+          "addType": "canSelectFromData",
+          "fieldRelationType": "connectToSchema"
+        }
+      }
+    ],
+    "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "analyze-with-ai",
+          "label": "Analyze with AI",
+          "icon": "Brain",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "general-assistant",
+          "selectedFields": [
+            "company-name",
+            "email-address",
+            "phone-number",
+            "country",
+            "status",
+            "rating",
+            "description",
+            "performanceMetrics"
+          ],
+          "selectedSections": [
+            "basic-information",
+            "business-details"
+          ],
+          "additionalSystemPrompt": "Focus your analysis on this vendor's profile, business details, and provide insights about vendor management, risk assessment, and recommendations for working with this vendor.",
+          "displayType": "hideForm",
+          "runType": "automatic",
+          "preloadRoutes": [
+            {
+              "route": "/api/data/all-relations",
+              "title": "Vendor Relations",
+              "description": "All relations for this vendor including inquiries and other related data",
+              "method": "GET",
+              "jsonPath": "data",
+              "outputFormat": "json",
+              "queryParameters": {
+                "schema": "vendors",
+                "otherSchema": "inquiry-vendors",
+                "id": "{{formData.id}}"
+              }
+            }
+          ]
+        },
+        {
+          "id": "create-inquiry",
+          "label": "Create Inquiry",
+          "icon": "ShoppingCart",
+          "variant": "default",
+          "action": "openFormDialog",
+          "targetSchema": "inquiries"
+        },
+        {
+          "id": "view-inquiries",
+          "label": "View Inquiries",
+          "icon": "FileSearch",
+          "variant": "outline",
+          "action": "goToUrl",
+          "targetUrl": "/page/inquiries"
+        },
+        {
+          "id": "view-location",
+          "label": "View on Map",
+          "icon": "MapPin",
+          "variant": "secondary",
+          "action": "openUrl",
+          "targetUrl": "https://www.google.com/maps/search/",
+          "passItemAsReference": false
+        },
+        {
+          "id": "view-vendor-details",
+          "label": "View Full Details",
+          "icon": "ExternalLink",
+          "variant": "ghost",
+          "action": "goToUrl",
+          "targetUrl": "/page/vendors",
+          "passItemAsReference": true
+        },
+        {
+          "id": "create-comic-book",
+          "label": "Create Comic Book",
+          "icon": "Image",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "comic-book"
+          },
+          "selectedFields": [
+            "company-name",
+            "description"
+          ],
+          "additionalSystemPrompt": "Create a comic book style illustration based on the vendor information provided.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "create-sketch",
+          "label": "Create Sketch",
+          "icon": "Pencil",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "sketch"
+          },
+          "selectedFields": [
+            "company-name",
+            "description",
+            "certifications",
+            "performanceMetrics"
+          ],
+          "additionalSystemPrompt": "Create a sketch-style illustration based on the vendor information provided.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "analyze-with-ai",
+          "label": "Analyze with AI",
+          "icon": "BarChart",
+          "variant": "default",
+          "action": "runAiAgent",
+          "agentId": "data-analysis-expert",
+          "selectedFields": [
+            "company-name",
+            "description",
+            "certifications",
+            "performanceMetrics"
+          ],
+          "additionalSystemPrompt": "Perform comprehensive analysis of the vendor data including strengths, weaknesses, risks, and improvement opportunities.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        }
+      ],
+      "componentRenderers": [
+        {
+          "id": "on-time-delivery-kpi",
+          "componentType": "kpi",
+          "dataPath": "performanceMetrics",
+          "config": {
+            "id": "on-time-delivery-kpi",
+            "name": "On-Time Delivery KPI",
+            "title": "On-Time Delivery",
+            "format": "percentage",
+            "precision": 1,
+            "color": "emerald",
+            "trend": {
+              "enabled": true,
+              "period": "month",
+              "showPercentage": true,
+              "showArrow": true
+            }
+          },
+          "colSpan": 1
+        },
+        {
+          "id": "quality-score-kpi",
+          "componentType": "kpi",
+          "dataPath": "performanceMetrics",
+          "config": {
+            "id": "quality-score-kpi",
+            "name": "Quality Score KPI",
+            "title": "Quality Score",
+            "format": "percentage",
+            "precision": 1,
+            "color": "blue",
+            "trend": {
+              "enabled": true,
+              "period": "month",
+              "showPercentage": true,
+              "showArrow": true
+            }
+          },
+          "colSpan": 1
+        },
+        {
+          "id": "total-orders-kpi",
+          "componentType": "kpi",
+          "dataPath": "performanceMetrics",
+          "config": {
+            "id": "total-orders-kpi",
+            "name": "Total Orders KPI",
+            "title": "Total Orders",
+            "format": "number",
+            "precision": 0,
+            "color": "amber",
+            "trend": {
+              "enabled": true,
+              "period": "month",
+              "showPercentage": true,
+              "showArrow": true
+            }
+          },
+          "colSpan": 1
+        },
+        {
+          "id": "total-value-kpi",
+          "componentType": "kpi",
+          "dataPath": "performanceMetrics",
+          "config": {
+            "id": "total-value-kpi",
+            "name": "Total Value KPI",
+            "title": "Total Value",
+            "format": "currency",
+            "precision": 0,
+            "color": "violet",
+            "trend": {
+              "enabled": true,
+              "period": "month",
+              "showPercentage": true,
+              "showArrow": true
+            }
+          },
+          "colSpan": 1
+        }
+      ],
+      "sections": [
+        {
+          "id": "contact-information",
+          "title": "Contact Information",
+          "description": "Primary contact details",
+          "colSpan": 2,
+          "fieldIds": [
+            "email-address",
+            "phone-number",
+            "registration-number",
+            "tax-id",
+            "country"
+          ]
+        },
+        {
+          "id": "address-details",
+          "title": "Address Details",
+          "description": "Physical location information",
+          "colSpan": 1,
+          "columnArea": "sidebar",
+          "fieldIds": [
+            "address",
+            "city",
+            "zip-code",
+            "state"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "User",
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+        "label": "Supply Chain Management"
+      }
+    ]
+  },
+  {
+    "id": "contacts",
+    "description": "Schema for Contact",
+    "singular_name": "Contact",
+    "plural_name": "Contacts",
+    "fields": [
+      {
+        "id": "field-1762151430232",
+        "name": "name",
+        "label": "Name",
+        "sectionId": "section-1762151413279",
+        "component": "text",
+        "order": 1,
+        "placeholder": "Enter contact name",
+        "role": "title",
+        "validation": {
+          "required": true
+        }
+      },
+      {
+        "id": "field-1762151456340",
+        "name": "last_name",
+        "label": "Last Name",
+        "sectionId": "section-1762151413279",
+        "component": "text",
+        "order": 2,
+        "role": "title",
+        "validation": {
+          "required": true
+        }
+      },
+      {
+        "id": "field-1762151478649",
+        "name": "email",
+        "label": "Email",
+        "sectionId": "section-1762151413279",
+        "component": "email",
+        "order": 3,
+        "placeholder": "Enter contact email",
+        "required": false,
+        "role": "subtitle"
+      },
+      {
+        "id": "field-1762151519711",
+        "name": "phone_number",
+        "label": "Phone Number",
+        "sectionId": "section-1762151413279",
+        "component": "tel",
+        "order": 4,
+        "role": "tel",
+        "validation": {
+          "required": true
+        }
+      }
+    ],
+    "sections": [
+      {
+        "id": "section-1762151413279",
+        "title": "Contact Information",
+        "columns": 2
+      }
+    ],
+    "icon": "Contact",
+    "showInNavigation": false,
+    "isNotCompanyBased": true,
+    "canSelectMultiCompanies": true,
+    "schemaType": "system",
+    "applyToAllTenants": true
+  },
+  {
     "id": "companies",
     "description": "Manage company information including registration, address, and contact details",
     "singular_name": "Company",
@@ -495,6 +1841,553 @@
     "schemaType": "system",
     "applyToAllTenants": true,
     "syncStrategy": "schema-and-data"
+  },
+  {
+    "id": "quotations",
+    "description": "Create and manage quotations for procurement needs",
+    "singular_name": "Quotation",
+    "plural_name": "Quotations",
+    "cardMetadata": [
+      {
+        "id": "quotation-info",
+        "title": "Quotation Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "quotation-date",
+          "expiration-date",
+          "quotation-state",
+          "vendor"
+        ]
+      },
+      {
+        "id": "financial-info",
+        "title": "Financial Information",
+        "colSpan": 1,
+        "fieldIds": [
+          "net-price",
+          "transport-type",
+          "currency",
+          "vendor"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "quotation-number",
+        "name": "number",
+        "label": "Quotation Number",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter quotation number",
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1,
+        "canCopy": true
+      },
+      {
+        "id": "quotation-date",
+        "name": "quotationDate",
+        "label": "Quotation Date",
+        "sectionId": "basic-information",
+        "component": "date",
+        "placeholder": "Select quotation date",
+        "role": "subtitle",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "expiration-date",
+        "name": "expirationDate",
+        "label": "Expiration Date",
+        "sectionId": "basic-information",
+        "component": "date",
+        "placeholder": "Select expiration date",
+        "role": "duedate",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "vendor",
+        "name": "vendorId",
+        "label": "Vendor",
+        "sectionId": "basic-information",
+        "component": "picker",
+        "placeholder": "Click to select vendor",
+        "allowMultiselect": true,
+        "description": "Select vendor from popup picker",
+        "targetSchema": "vendors",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "quotation-state",
+        "name": "state",
+        "label": "State",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select state",
+        "role": "status",
+        "options": [
+          {
+            "id": "DRAFT",
+            "label": "Draft",
+            "icon": "FileText",
+            "color": "default"
+          },
+          {
+            "id": "SUBMITTED",
+            "label": "Submitted",
+            "icon": "Send",
+            "color": "info"
+          },
+          {
+            "id": "UNDER_REVIEW",
+            "label": "Under Review",
+            "icon": "Clock",
+            "color": "warning"
+          },
+          {
+            "id": "ACCEPTED",
+            "label": "Accepted",
+            "icon": "CheckCircle",
+            "color": "success"
+          },
+          {
+            "id": "REJECTED",
+            "label": "Rejected",
+            "icon": "XCircle",
+            "color": "destructive"
+          },
+          {
+            "id": "EXPIRED",
+            "label": "Expired",
+            "icon": "CalendarX",
+            "color": "muted"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "currency",
+        "name": "currency",
+        "label": "Currency",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select currency",
+        "options": [
+          {
+            "id": "USD",
+            "label": "USD - US Dollar"
+          },
+          {
+            "id": "EUR",
+            "label": "EUR - Euro"
+          },
+          {
+            "id": "GBP",
+            "label": "GBP - British Pound"
+          },
+          {
+            "id": "JPY",
+            "label": "JPY - Japanese Yen"
+          },
+          {
+            "id": "IRR",
+            "label": "IRR - Iranian Rial"
+          },
+          {
+            "id": "AED",
+            "label": "AED - UAE Dirham"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "transport-type",
+        "name": "transportType",
+        "label": "Transport Type",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select transport type",
+        "required": false,
+        "options": [
+          {
+            "id": "ROAD",
+            "label": "Road"
+          },
+          {
+            "id": "AIR",
+            "label": "Air"
+          },
+          {
+            "id": "SEA",
+            "label": "Sea"
+          },
+          {
+            "id": "RAIL",
+            "label": "Rail"
+          },
+          {
+            "id": "EXPRESS",
+            "label": "Express"
+          }
+        ],
+        "colSpan": 1,
+        "order": 7
+      },
+      {
+        "id": "purchase-method",
+        "name": "purchaseMethod",
+        "label": "Purchase Method",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select purchase method",
+        "required": false,
+        "options": [
+          {
+            "id": "DIRECT",
+            "label": "Direct Purchase"
+          },
+          {
+            "id": "TENDER",
+            "label": "Tender"
+          },
+          {
+            "id": "AUCTION",
+            "label": "Auction"
+          },
+          {
+            "id": "FRAMEWORK",
+            "label": "Framework Agreement"
+          },
+          {
+            "id": "NEGOTIATION",
+            "label": "Negotiation"
+          }
+        ],
+        "colSpan": 1,
+        "order": 8
+      },
+      {
+        "id": "payment-method",
+        "name": "paymentMethod",
+        "label": "Payment Method",
+        "sectionId": "basic-information",
+        "component": "multi-select",
+        "placeholder": "Choose payment method",
+        "required": false,
+        "orientation": "horizontal",
+        "options": [
+          {
+            "id": "CASH",
+            "label": "Cash",
+            "icon": "DollarSign"
+          },
+          {
+            "id": "BANK_TRANSFER",
+            "label": "Bank Transfer",
+            "icon": "Banknote",
+            "color": "info"
+          },
+          {
+            "id": "LETTER_OF_CREDIT",
+            "label": "Letter of Credit",
+            "icon": "FileSignature",
+            "color": "warning"
+          },
+          {
+            "id": "DOCUMENTARY_COLLECTION",
+            "label": "Documentary Collection",
+            "icon": "FolderOpen",
+            "color": "secondary"
+          },
+          {
+            "id": "OPEN_ACCOUNT",
+            "label": "Open Account",
+            "icon": "Notebook",
+            "color": "muted"
+          },
+          {
+            "id": "CREDIT_CARD",
+            "label": "Credit Card",
+            "icon": "CreditCard",
+            "color": "success"
+          }
+        ],
+        "colSpan": 1,
+        "order": 9
+      },
+      {
+        "id": "description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter quotation description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 10
+      },
+      {
+        "id": "advanced-payment-amount",
+        "name": "advancedPaymentAmount",
+        "label": "Advanced Payment Amount",
+        "sectionId": "financial-information",
+        "component": "number",
+        "placeholder": "Enter advanced payment amount",
+        "required": false,
+        "displayType": "currency",
+        "validation": {
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 11
+      },
+      {
+        "id": "additions",
+        "name": "additions",
+        "label": "Additions",
+        "sectionId": "financial-information",
+        "component": "number",
+        "placeholder": "Enter additions amount",
+        "required": false,
+        "displayType": "currency",
+        "validation": {
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 12
+      },
+      {
+        "id": "deductions",
+        "name": "deductions",
+        "label": "Deductions",
+        "sectionId": "financial-information",
+        "component": "number",
+        "placeholder": "Enter deductions amount",
+        "required": false,
+        "displayType": "currency",
+        "validation": {
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 13
+      },
+      {
+        "id": "net-price",
+        "name": "netPrice",
+        "label": "Net Price",
+        "sectionId": "financial-information",
+        "component": "number",
+        "placeholder": "Enter net price",
+        "displayType": "currency",
+        "validation": {
+          "required": true,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 14,
+        "canCopy": true
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Quotation details and vendor information",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "financial-information",
+        "title": "Financial Information",
+        "description": "Pricing and payment details",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "quotation-items",
+        "title": "Quotation Items",
+        "description": "Add items to this quotation",
+        "isRepeatingSection": true,
+        "initialState": "expanded",
+        "columns": 2,
+        "repeatingConfig": {
+          "minItems": 1,
+          "maxItems": 100,
+          "targetSchema": "quotation-items",
+          "relationTypeId": "HAS_QUOTATION_ITEM",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": false,
+          "fieldRelationType": "connectToSchema"
+        },
+        "inactive": false
+      }
+    ],
+    "detailPageMetadata": {
+      "tableRenderers": [
+        {
+          "id": "quotation-items-table",
+          "targetSchema": "quotation-items",
+          "relationTypeId": "HAS_QUOTATION_ITEM",
+          "sectionId": "item-information",
+          "title": "Quotation Items",
+          "description": "List of all items in this quotation",
+          "columns": [
+            "inquiry-item",
+            "unit-price",
+            "total-price",
+            "estimated-delivery-date",
+            "description"
+          ],
+          "tableProperties": {
+            "sortingEnabled": true,
+            "paginationEnabled": true,
+            "paginationPageSize": 20,
+            "aggregations": [
+              {
+                "column": "unit-price",
+                "aggregationTypes": [
+                  "avg"
+                ],
+                "unit": "EUR",
+                "precision": 2
+              },
+              {
+                "column": "total-price",
+                "aggregationTypes": [
+                  "sum"
+                ],
+                "unit": "EUR",
+                "precision": 2
+              }
+            ]
+          },
+          "colSpan": 2,
+          "columnArea": "main"
+        }
+      ]
+    },
+    "showInNavigation": false,
+    "icon": "FileText",
+    "allowDataInactive": true,
+    "allowDataForce": true,
+    "schemaType": "business"
+  },
+  {
+    "id": "quotation-items",
+    "description": "Items in a quotation",
+    "singular_name": "Quotation Item",
+    "plural_name": "Quotation Items",
+    "fields": [
+      {
+        "id": "inquiry-item",
+        "name": "inquiryItemId",
+        "label": "Inquiry Item",
+        "sectionId": "item-information",
+        "component": "picker",
+        "placeholder": "Click to select inquiry item",
+        "description": "Select inquiry item from popup picker",
+        "targetSchema": "inquiry-items",
+        "role": "title",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "unit-price",
+        "name": "unitPrice",
+        "label": "Unit Price",
+        "sectionId": "item-information",
+        "component": "number",
+        "placeholder": "Enter unit price",
+        "displayType": "currency",
+        "validation": {
+          "required": true,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "total-price",
+        "name": "totalPrice",
+        "label": "Total Price",
+        "sectionId": "item-information",
+        "component": "number",
+        "placeholder": "Enter total price",
+        "displayType": "currency",
+        "validation": {
+          "required": true,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "estimated-delivery-date",
+        "name": "estimatedDeliveryDate",
+        "label": "Estimated Delivery Date",
+        "sectionId": "item-information",
+        "component": "date",
+        "placeholder": "Select estimated delivery date",
+        "role": "duedate",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "item-information",
+        "component": "textarea",
+        "placeholder": "Enter item description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 5
+      }
+    ],
+    "sections": [
+      {
+        "id": "item-information",
+        "title": "Item Information",
+        "description": "Details about the quotation item",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Package",
+    "schemaType": "business"
   },
   {
     "id": "applications",
@@ -4996,69 +6889,6 @@
       {
         "id": "01KBFBD109G6CYRT7RA04TMMXC",
         "label": "AryoGen"
-      }
-    ]
-  },
-  {
-    "id": "vendors",
-    "description": "Manage vendor information and details",
-    "singular_name": "Vendor",
-    "plural_name": "Vendors",
-    "fields": [
-      {
-        "id": "vendor-name",
-        "name": "name",
-        "label": "Vendor Name",
-        "sectionId": "basic-information",
-        "component": "text",
-        "placeholder": "Enter vendor name",
-        "role": "title",
-        "validation": {
-          "required": true,
-          "minLength": 2
-        },
-        "colSpan": 2,
-        "order": 1
-      },
-      {
-        "id": "vendor-description",
-        "name": "description",
-        "label": "Description",
-        "sectionId": "basic-information",
-        "component": "textarea",
-        "placeholder": "Enter vendor description",
-        "required": false,
-        "role": "description",
-        "colSpan": 2,
-        "order": 2
-      }
-    ],
-    "sections": [
-      {
-        "id": "basic-information",
-        "title": "Basic Information",
-        "description": "Vendor name and description",
-        "initialState": "expanded",
-        "columns": 2
-      }
-    ],
-    "showInNavigation": true,
-    "icon": "ShoppingBasket",
-    "isNotCompanyBased": true,
-    "schemaType": "business",
-    "applyToAllTenants": false,
-    "isSystemSchema": false,
-    "syncStrategy": "schema-and-data",
-    "relatedTenants": [
-      {
-        "id": "01KBFBAZR3K04CS80DMHGPHMHF",
-        "label": "Supply Chain Management"
-      }
-    ],
-    "statusGroup": [
-      {
-        "id": "01KBCXZ2KX7N336B5GDGKEKNRC",
-        "label": "Active / Inactive"
       }
     ]
   }

@@ -96,15 +96,22 @@ export function CompanySelector({
             name: company.label,
           }));
 
-          setCompanies(mappedCompanies);
+          // Always add "All Companies" option at the beginning
+          const allCompaniesOption: Company = {
+            id: -1,
+            name: 'All Companies',
+          };
+          setCompanies([allCompaniesOption, ...mappedCompanies]);
           setLoading(false);
           return;
         }
 
-        // Fallback: Fetch companies directly from API if tenant doesn't have relatedCompanies
-        loggingCustom(LogType.CLIENT_LOG, 'info', 'Tenant does not have relatedCompanies, fetching companies from API');
+        // When no tenant is selected, fetch ALL companies from API without tenant filtering
+        // The callerName 'CompanySelector' will bypass auto-injection of tenant/company filters
+        loggingCustom(LogType.CLIENT_LOG, 'info', 'No tenant selected or tenant has no relatedCompanies, fetching all companies from API');
         
         const { apiRequest } = await import('@/gradian-ui/shared/utils/api');
+        // Using callerName 'CompanySelector' bypasses auto-injection of tenantIds/companyIds
         const response = await apiRequest<Company[] | { data?: Company[]; items?: Company[] }>(
           '/api/data/companies',
           { method: 'GET', callerName: 'CompanySelector' }
@@ -114,13 +121,32 @@ export function CompanySelector({
           const data = Array.isArray(response.data)
             ? response.data
             : ((response.data as any)?.data || (response.data as any)?.items || []);
-          setCompanies(data);
+          
+          // Always add "All Companies" option at the beginning
+          const allCompaniesOption: Company = {
+            id: -1,
+            name: 'All Companies',
+          };
+          
+          // Filter out any existing "All Companies" option to avoid duplicates
+          const filteredData = data.filter((c: Company) => c.id !== -1);
+          setCompanies([allCompaniesOption, ...filteredData]);
         } else {
-          setCompanies([]);
+          // Even if API fails, still show "All Companies" option
+          const allCompaniesOption: Company = {
+            id: -1,
+            name: 'All Companies',
+          };
+          setCompanies([allCompaniesOption]);
         }
       } catch (error) {
         loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading companies: ${error instanceof Error ? error.message : String(error)}`);
-        setCompanies([]);
+        // Even on error, show "All Companies" option
+        const allCompaniesOption: Company = {
+          id: -1,
+          name: 'All Companies',
+        };
+        setCompanies([allCompaniesOption]);
       } finally {
         setLoading(false);
       }

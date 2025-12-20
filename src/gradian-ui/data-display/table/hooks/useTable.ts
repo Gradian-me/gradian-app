@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { TableConfig, TableState } from '../types';
 import { processTableData } from '../utils';
+import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 
 export interface UseTableOptions<T = any> {
   config: TableConfig<T>;
@@ -13,7 +14,7 @@ export function useTable<T = any>({ config, onStateChange }: UseTableOptions<T>)
   const [state, setState] = useState<TableState>(() => {
     const initialState: TableState = {
       page: 1,
-      pageSize: config.pagination?.pageSize || 25,
+      pageSize: config.pagination?.pageSize || DEFAULT_LIMIT,
       sortBy: config.sorting?.defaultSort?.columnId || null,
       sortDirection: config.sorting?.defaultSort?.direction || 'asc',
       selectedRows: new Set(),

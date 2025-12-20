@@ -48,6 +48,7 @@ import { HierarchyView } from '@/gradian-ui/data-display/hierarchy/HierarchyView
 import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/PopupPicker';
 import { syncParentRelation } from '@/gradian-ui/shared/utils/parent-relation.util';
 import { getParentIdFromEntity } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
+import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 import { RepeatingSectionDialog } from './RepeatingSectionDialog';
 import { RepeatingSectionButton } from './RepeatingSectionButton';
 import { Table2 } from 'lucide-react';
@@ -172,7 +173,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState<number | 'all'>(25);
+  const [pageSize, setPageSize] = useState<number | 'all'>(DEFAULT_LIMIT);
 
   // Use the dynamic entity hook for entity management
   const {
@@ -934,7 +935,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       data: filteredEntities,
       pagination: {
         enabled: false, // Disabled - pagination is shown in page header
-        pageSize: 25,
+        pageSize: DEFAULT_LIMIT,
         showPageSizeSelector: true,
         pageSizeOptions: [10, 25, 50, 100, 'all'],
         alwaysShow: false,

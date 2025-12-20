@@ -1,5 +1,155 @@
 [
   {
+    "sourceSchema": "inquiries",
+    "sourceId": "01K945BGN1YV7RG3XKG169CGS1",
+    "targetSchema": "inquiry-items",
+    "targetId": "01K96E06Z9H5G8FKH5QY0538JB",
+    "relationTypeId": "HAS_INQUIRY_ITEM",
+    "id": "01K96E0785PBXPWY7CVMR8HV95",
+    "createdAt": "2025-11-04T03:19:07.267Z",
+    "updatedAt": "2025-11-04T03:19:07.267Z"
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01K945BGN1YV7RG3XKG169CGS1",
+    "targetSchema": "inquiry-items",
+    "targetId": "01K96WRHRE30636NDY6QVJT5AR",
+    "relationTypeId": "HAS_INQUIRY_ITEM",
+    "id": "01K96WRHVPC2WRGPSF39JKES26",
+    "createdAt": "2025-11-04T07:37:04.630Z",
+    "updatedAt": "2025-11-04T07:37:04.630Z"
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01K971SXSZZ6SBNF152M93FY64",
+    "targetSchema": "inquiry-items",
+    "targetId": "01K971TX4B7S8YBED0NEDH79TN",
+    "relationTypeId": "HAS_INQUIRY_ITEM",
+    "id": "01K971TX6E9JQRE30KHAAN8KV8",
+    "createdAt": "2025-11-04T09:05:44.654Z",
+    "updatedAt": "2025-11-04T09:05:44.654Z"
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01K971SXSZZ6SBNF152M93FY64",
+    "targetSchema": "inquiry-items",
+    "targetId": "01K971VS40NX1XM4PYVPBD59GR",
+    "relationTypeId": "HAS_INQUIRY_ITEM",
+    "id": "01K971VS62RXKBHFS9YVD8B4TK",
+    "createdAt": "2025-11-04T09:06:13.314Z",
+    "updatedAt": "2025-11-04T09:06:13.314Z"
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01K971SXSZZ6SBNF152M93FY64",
+    "targetSchema": "inquiry-vendors",
+    "targetId": "01K971W83WWA4QCVFNAZSF5N11",
+    "relationTypeId": "HAS_INQUIRY_VENDOR",
+    "id": "01K971W85WRBBE4MVK4BG7F0Y0",
+    "createdAt": "2025-11-04T09:06:28.668Z",
+    "updatedAt": "2025-11-04T09:06:28.668Z"
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01K971SXSZZ6SBNF152M93FY64",
+    "targetSchema": "inquiry-vendors",
+    "targetId": "01K971WG76Y655JPYJDAJTTVV3",
+    "relationTypeId": "HAS_INQUIRY_VENDOR",
+    "id": "01K971WG9HTZMPECGMQ2TCD8RE",
+    "createdAt": "2025-11-04T09:06:36.977Z",
+    "updatedAt": "2025-11-04T09:06:36.977Z"
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01K971SXSZZ6SBNF152M93FY64",
+    "targetSchema": "inquiry-vendors",
+    "targetId": "01K971WTDXH1GAJ33MG2FYSVYG",
+    "relationTypeId": "HAS_INQUIRY_VENDOR",
+    "id": "01K971WTFMVF5GSASSFDHXMTQM",
+    "createdAt": "2025-11-04T09:06:47.411Z",
+    "updatedAt": "2025-11-04T09:06:47.411Z"
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01K945BGN1YV7RG3XKG169CGS1",
+    "targetSchema": "inquiry-vendors",
+    "targetId": "01K97208RABW053BGN3A6W05FD",
+    "relationTypeId": "HAS_INQUIRY_VENDOR",
+    "id": "01K97208TF4Q0P3HG2H9S4ZA3V",
+    "createdAt": "2025-11-04T09:08:40.399Z",
+    "updatedAt": "2025-11-04T09:08:40.399Z"
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01K945BGN1YV7RG3XKG169CGS1",
+    "targetSchema": "inquiry-vendors",
+    "targetId": "01K9720G4M9G75V3YWB9PGKBTM",
+    "relationTypeId": "HAS_INQUIRY_VENDOR",
+    "id": "01K9720G7H85CD30WXC0DBMY46",
+    "createdAt": "2025-11-04T09:08:47.985Z",
+    "updatedAt": "2025-11-04T09:08:47.985Z"
+  },
+  {
+    "sourceSchema": "quotations",
+    "sourceId": "01K9724JFPP7A6RX7H6NTFHE1D",
+    "targetSchema": "quotation-items",
+    "targetId": "01K9725HNMEAFXGB98SCER6JVK",
+    "relationTypeId": "HAS_QUOTATION_ITEM",
+    "id": "01K9725HREBEEA5FFR36B9DBVD",
+    "createdAt": "2025-11-04T09:11:33.390Z",
+    "updatedAt": "2025-11-04T09:11:33.390Z"
+  },
+  {
+    "sourceSchema": "quotations",
+    "sourceId": "01K9724JFPP7A6RX7H6NTFHE1D",
+    "targetSchema": "quotation-items",
+    "targetId": "01K9726N9T00JAG6QC7ZWMX650",
+    "relationTypeId": "HAS_QUOTATION_ITEM",
+    "id": "01K9726NBN8FM45AT1HJ38PQC6",
+    "createdAt": "2025-11-04T09:12:09.845Z",
+    "updatedAt": "2025-11-04T09:12:09.845Z"
+  },
+  {
+    "sourceSchema": "vendors",
+    "sourceId": "01K9OP000000000000000000001",
+    "targetSchema": "contacts",
+    "targetId": "01K94Q59VYS8JA1VRMG7Q343GM",
+    "relationTypeId": "HAS_CONTACT",
+    "id": "01K972XTWAD0GWJJT96Y5P3TD1",
+    "createdAt": "2025-11-04T09:24:49.162Z",
+    "updatedAt": "2025-11-04T09:24:49.162Z"
+  },
+  {
+    "sourceSchema": "vendors",
+    "sourceId": "01K8QVCWS0ZSTMSVD5C6K7A806",
+    "targetSchema": "contacts",
+    "targetId": "01K94KB42QKQNNH7VED2K06Y40",
+    "relationTypeId": "HAS_CONTACT",
+    "id": "01K975NWDCMZJ3HEK3A5DVHRNE",
+    "createdAt": "2025-11-04T10:12:54.315Z",
+    "updatedAt": "2025-11-04T10:12:54.315Z"
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01K945BGN1YV7RG3XKG169CGS1",
+    "targetSchema": "inquiry-vendors",
+    "targetId": "01K97F0QV3S1JH1R8NJ1XWEPEG",
+    "relationTypeId": "HAS_INQUIRY_VENDOR",
+    "id": "01K97F0QWVSR2A6F1R4KMRKKRC",
+    "createdAt": "2025-11-04T12:56:07.323Z",
+    "updatedAt": "2025-11-04T12:56:07.323Z"
+  },
+  {
+    "sourceSchema": "vendors",
+    "sourceId": "01K9MP000000000000000000001",
+    "targetSchema": "contacts",
+    "targetId": "01K94K5N3QPZ03XEHXHY21GF2P",
+    "relationTypeId": "HAS_CONTACT",
+    "id": "01K9GZ3GGXSXTWDJ8QQWF4SDT0",
+    "createdAt": "2025-11-08T05:30:25.177Z",
+    "updatedAt": "2025-11-08T05:30:25.177Z"
+  },
+  {
     "sourceSchema": "servers",
     "sourceId": "01KA8QZJ9SAJ6Y2GR05K42BQYF",
     "targetSchema": "url-repositories",
@@ -208,6 +358,94 @@
     "id": "01KBHH7C1QGMS54XPVZBEWYTGB",
     "createdAt": "2025-12-03T07:18:29.687Z",
     "updatedAt": "2025-12-03T07:18:29.687Z"
+  },
+  {
+    "id": "01KBMHCVGE0EMMSF57WWWY8GWK",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K971W83WWA4QCVFNAZSF5N11",
+    "targetSchema": "vendors",
+    "targetId": "01K9MP000000000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-04T11:19:12.653Z",
+    "updatedAt": "2025-12-04T11:19:12.653Z"
+  },
+  {
+    "id": "01KBMHCVH0J12NC9TCTF2B6PF2",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K971WG76Y655JPYJDAJTTVV3",
+    "targetSchema": "vendors",
+    "targetId": "01K9PG000000000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-04T11:19:12.672Z",
+    "updatedAt": "2025-12-04T11:19:12.672Z"
+  },
+  {
+    "id": "01KBMHCVHFHN8R6PVV0P0RK71B",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K971WTDXH1GAJ33MG2FYSVYG",
+    "targetSchema": "vendors",
+    "targetId": "01K9OP000000000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-04T11:19:12.687Z",
+    "updatedAt": "2025-12-04T11:19:12.687Z"
+  },
+  {
+    "id": "01KBMHCVHWPN9WYF6ZC0C6KTSN",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K97208RABW053BGN3A6W05FD",
+    "targetSchema": "vendors",
+    "targetId": "01K8QVCWS0ZSTMSVD5C6K7A806",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-04T11:19:12.700Z",
+    "updatedAt": "2025-12-05T21:12:10.877Z"
+  },
+  {
+    "id": "01KBMHCVJV9MK8590YC0DSWPFJ",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K97F0QV3S1JH1R8NJ1XWEPEG",
+    "targetSchema": "vendors",
+    "targetId": "01K9OP000000000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-04T11:19:12.731Z",
+    "updatedAt": "2025-12-04T11:19:12.731Z"
+  },
+  {
+    "id": "01KBMHCVKQ85RE3HGQ4FDS93G6",
+    "sourceSchema": "quotations",
+    "sourceId": "01K9724JFPP7A6RX7H6NTFHE1D",
+    "targetSchema": "vendors",
+    "targetId": "01K8QVCWS0ZSTMSVD5C6K7A806",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor",
+    "createdAt": "2025-12-04T11:19:12.759Z",
+    "updatedAt": "2025-12-04T11:19:12.759Z"
+  },
+  {
+    "id": "01KBMHCVMBA9F79XAHN1GGFDX8",
+    "sourceSchema": "quotation-items",
+    "sourceId": "01K9725HNMEAFXGB98SCER6JVK",
+    "targetSchema": "inquiry-items",
+    "targetId": "01K96WRHRE30636NDY6QVJT5AR",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "inquiry-item",
+    "createdAt": "2025-12-04T11:19:12.779Z",
+    "updatedAt": "2025-12-04T11:19:12.779Z"
+  },
+  {
+    "id": "01KBMHCVMRQ8XJKTPT3ARAQP2M",
+    "sourceSchema": "quotation-items",
+    "sourceId": "01K9726N9T00JAG6QC7ZWMX650",
+    "targetSchema": "inquiry-items",
+    "targetId": "01K96E06Z9H5G8FKH5QY0538JB",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "inquiry-item",
+    "createdAt": "2025-12-04T11:19:12.792Z",
+    "updatedAt": "2025-12-04T11:19:12.792Z"
   },
   {
     "id": "01KBMHCVR5JTMYJTVEPS4MXP1W",
@@ -1047,5 +1285,16 @@
     "id": "01KCHF23WBNVP0ZNP1TXHP3SP9",
     "createdAt": "2025-12-15T16:56:22.155Z",
     "updatedAt": "2025-12-15T16:56:22.155Z"
+  },
+  {
+    "id": "01KCNNAX92YPFYQ9PEGY0YH1CV",
+    "sourceSchema": "inquiry-vendors",
+    "sourceId": "01K9720G4M9G75V3YWB9PGKBTM",
+    "targetSchema": "vendors",
+    "targetId": "01K9OP000000000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "vendor-field",
+    "createdAt": "2025-12-17T08:02:59.489Z",
+    "updatedAt": "2025-12-17T08:02:59.489Z"
   }
 ]

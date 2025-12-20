@@ -10,7 +10,7 @@ import { CardSection, FormSchema } from '@/gradian-ui/schema-manager/types/form-
 import { cn } from '@/gradian-ui/shared/utils';
 import { CardContent } from '@/gradian-ui/data-display/card/components/CardContent';
 import { CardWrapper } from '@/gradian-ui/data-display/card/components/CardWrapper';
-import { getArrayValuesByRole, getBadgeConfig, getSingleValueByRole, getValueByRole, renderCardSection, RoleBasedAvatar } from '../utils';
+import { getArrayValuesByRole, getBadgeConfig, getSingleValueByRole, getValueByRole, renderCardSection, RoleBasedAvatar, getValidBadgeVariant } from '../utils';
 import { AvatarUser } from './AvatarUser';
 import { BadgeViewer, BadgeRenderer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { getFieldsByRole } from '../../form-builder/form-elements/utils/field-resolver';
@@ -658,25 +658,19 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       </motion.div>
                     )}
                     {/* Status */}
-                    {hasStatusField && (statusFieldDef || hasStatusGroup) && (
+                    {hasStatusField && (statusFieldDef || hasStatusGroup) && normalizedStatusMetadata.label && (
                       <motion.div
                         initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
                         animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
                         transition={disableAnimation ? {} : { duration: 0.2 }}
                         whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05, transition: { duration: 0.1, delay: 0 } }}
                       >
-                        {formatFieldValue(
-                          statusFieldDef || {
-                            id: 'status',
-                            name: 'status',
-                            role: 'status',
-                            component: 'picker',
-                          },
-                          rawStatusValueFromField || data?.status,
-                          data,
-                          true,
-                          normalizedHighlightQuery
-                        )}
+                        <Badge variant={getValidBadgeVariant(normalizedStatusMetadata.color)}>
+                          {normalizedStatusMetadata.icon && (
+                            <IconRenderer iconName={normalizedStatusMetadata.icon} className="h-3 w-3 me-1" />
+                          )}
+                          {normalizedStatusMetadata.label}
+                        </Badge>
                       </motion.div>
                     )}
                     {/* Entity Type */}
@@ -687,18 +681,12 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         transition={disableAnimation ? {} : { duration: 0.2 }}
                         whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05, transition: { duration: 0.1, delay: 0 } }}
                       >
-                        {formatFieldValue(
-                          entityTypeFieldDef || {
-                            id: 'entityType',
-                            name: 'entityType',
-                            role: 'entityType',
-                            component: 'picker',
-                          },
-                          rawEntityTypeValueFromField || data?.entityType,
-                          data,
-                          true,
-                          normalizedHighlightQuery
-                        )}
+                        <Badge variant={getValidBadgeVariant(normalizedEntityTypeMetadata.color)}>
+                          {normalizedEntityTypeMetadata.icon && (
+                            <IconRenderer iconName={normalizedEntityTypeMetadata.icon} className="h-3 w-3 me-1" />
+                          )}
+                          {normalizedEntityTypeMetadata.label}
+                        </Badge>
                       </motion.div>
                     )}
                   </div>
@@ -1102,7 +1090,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         />
                       </motion.div>
                     )}
-                    {hasStatusField && (statusFieldDef || hasStatusGroup) && (
+                    {hasStatusField && (statusFieldDef || hasStatusGroup) && normalizedStatusMetadata.label && (
                       <motion.div
                         initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
                         animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
@@ -1112,18 +1100,12 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                           transition: { type: "spring", stiffness: 300, damping: 30 }
                         }}
                       >
-                        {formatFieldValue(
-                          statusFieldDef || {
-                            id: 'status',
-                            name: 'status',
-                            role: 'status',
-                            component: 'picker',
-                          },
-                          rawStatusValueFromField || data?.status,
-                          data,
-                          true,
-                          normalizedHighlightQuery
-                        )}
+                        <Badge variant={getValidBadgeVariant(normalizedStatusMetadata.color)}>
+                          {normalizedStatusMetadata.icon && (
+                            <IconRenderer iconName={normalizedStatusMetadata.icon} className="h-3 w-3 me-1" />
+                          )}
+                          {normalizedStatusMetadata.label}
+                        </Badge>
                       </motion.div>
                     )}
                     {hasEntityTypeField && (entityTypeFieldDef || hasEntityTypeGroup) && normalizedEntityTypeMetadata.label && (
@@ -1136,18 +1118,12 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                           transition: { type: "spring", stiffness: 300, damping: 30 }
                         }}
                       >
-                        {formatFieldValue(
-                          entityTypeFieldDef || {
-                            id: 'entityType',
-                            name: 'entityType',
-                            role: 'entityType',
-                            component: 'picker',
-                          },
-                          rawEntityTypeValueFromField || data?.entityType,
-                          data,
-                          true,
-                          normalizedHighlightQuery
-                        )}
+                        <Badge variant={getValidBadgeVariant(normalizedEntityTypeMetadata.color)}>
+                          {normalizedEntityTypeMetadata.icon && (
+                            <IconRenderer iconName={normalizedEntityTypeMetadata.icon} className="h-3 w-3 me-1" />
+                          )}
+                          {normalizedEntityTypeMetadata.label}
+                        </Badge>
                       </motion.div>
                     )}
                   </div>

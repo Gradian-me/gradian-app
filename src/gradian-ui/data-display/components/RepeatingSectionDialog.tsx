@@ -27,6 +27,7 @@ import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/
 import { NormalizedOption } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { toast } from 'sonner';
+import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 
 interface RepeatingSectionDialogProps {
   isOpen: boolean;
@@ -198,7 +199,7 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
       data: sectionData,
       pagination: {
         enabled: sectionData.length > 10,
-        pageSize: 25,
+        pageSize: DEFAULT_LIMIT,
         showPageSizeSelector: true,
         pageSizeOptions: [5, 10, 25, 50],
         alwaysShow: false,

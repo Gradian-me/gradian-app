@@ -120,6 +120,17 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
   const hasStatusField = Boolean(statusFieldDef);
   const statusValue = statusFieldDef ? entity?.[statusFieldDef.name] : entity?.status;
   
+  // Ensure status field has options from statusGroup if available
+  const hasStatusGroup = Array.isArray(schema?.statusGroup) && schema.statusGroup.length > 0;
+  const statusFieldWithOptions = statusFieldDef 
+    ? { 
+        ...statusFieldDef, 
+        options: statusFieldDef.options || (hasStatusGroup ? schema.statusGroup : undefined)
+      }
+    : hasStatusGroup
+      ? { id: 'status', name: 'status', role: 'status', options: schema.statusGroup }
+      : null;
+  
   // Get code field
   const hasCodeField = schema?.fields?.some(field => field.role === 'code') || false;
   const codeFieldValue = getSingleValueByRole(schema, entity, 'code');
@@ -237,10 +248,10 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                       {renderHighlightedText(String(title), highlightQuery)}
                     </div>
                   </div>
-                  {hasStatusField && statusFieldDef && statusValue && (
+                  {hasStatusField && statusFieldWithOptions && statusValue && (
                     <div className="shrink-0">
                       {formatFieldValue(
-                        statusFieldDef,
+                        statusFieldWithOptions,
                         statusValue,
                         entity,
                         true,

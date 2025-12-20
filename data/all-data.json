@@ -1,627 +1,4 @@
 {
-  "vendors": [
-    {
-      "name": "Transfarma",
-      "email": "info@transfarma.com",
-      "phone": "+90 216 504 10 41",
-      "address": "Barbaros, Al Zambak Sk. Varyap Meridian Sitesi, A Blok, Grand Tower, D:126, 34746 Ataşehir/İstanbul, Türkiye",
-      "city": "İstanbul",
-      "state": "İstanbul",
-      "zipCode": "1468943381",
-      "registrationNumber": "TF-2019-001",
-      "taxId": "TR-TAX-0012",
-      "country": [
-        {
-          "id": "TR",
-          "label": "Turkey"
-        }
-      ],
-      "categories": [
-        "technology",
-        "logistics",
-        "manufacturing",
-        "finance",
-        "healthcare",
-        "education"
-      ],
-      "status": [
-        {
-          "id": "ACTIVE",
-          "label": "Active",
-          "icon": "CheckCircle",
-          "color": "emerald"
-        }
-      ],
-      "rating": 4,
-      "id": "01K8QVCWS0ZSTMSVD5C6K7A806",
-      "createdAt": "2025-10-29T11:24:37.540Z",
-      "updatedAt": "2025-11-30T13:07:04.380Z",
-      "performanceMetrics": [
-        {
-          "id": "onTimeDelivery",
-          "label": "On Time Delivery",
-          "value": 98,
-          "unit": "%",
-          "trend": "up",
-          "icon": "Clock"
-        },
-        {
-          "id": "qualityScore",
-          "label": "Quality Score",
-          "value": 95,
-          "unit": "",
-          "trend": "same",
-          "icon": "CheckCircle"
-        },
-        {
-          "id": "totalOrders",
-          "label": "Total Orders",
-          "value": 150,
-          "unit": "",
-          "trend": "down",
-          "icon": "Package"
-        },
-        {
-          "id": "totalValue",
-          "label": "Total Value",
-          "value": 2500000,
-          "unit": "USD",
-          "trend": "up",
-          "icon": "DollarSign"
-        },
-        {
-          "id": "averageOrderValue",
-          "label": "Average Order Value",
-          "value": 16666.67,
-          "unit": "USD",
-          "trend": "same",
-          "icon": "BarChart"
-        },
-        {
-          "id": "priceCompetitiveness",
-          "label": "Price Competitiveness",
-          "value": 92,
-          "unit": "%",
-          "trend": "up",
-          "icon": "TrendingUp"
-        },
-        {
-          "id": "responsiveness",
-          "label": "Responsiveness",
-          "value": 88,
-          "unit": "%",
-          "trend": "down",
-          "icon": "MessageSquare"
-        },
-        {
-          "id": "complianceScore",
-          "label": "Compliance Score",
-          "value": 96,
-          "unit": "",
-          "trend": "same",
-          "icon": "FileCheck"
-        }
-      ],
-      "certifications": [
-        "iso9001",
-        "fda",
-        "ce"
-      ],
-      "section-1762088953746": [],
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "contacts": [],
-      "incomplete": false,
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "name": "Mana Pharma",
-      "email": "info@manapharma.com",
-      "phone": "+1 555 123 4567",
-      "categories": [],
-      "status": "PENDING",
-      "rating": 1,
-      "id": "01K9MP000000000000000000001",
-      "createdAt": "2025-11-04T12:00:00.000Z",
-      "updatedAt": "2025-11-23T10:14:35.840Z",
-      "performanceMetrics": [
-        {
-          "id": "onTimeDelivery",
-          "label": "On Time Delivery",
-          "value": 94,
-          "unit": "%",
-          "trend": "up",
-          "icon": "Clock"
-        },
-        {
-          "id": "qualityScore",
-          "label": "Quality Score",
-          "value": 92,
-          "unit": "",
-          "trend": "same",
-          "icon": "CheckCircle"
-        },
-        {
-          "id": "totalOrders",
-          "label": "Total Orders",
-          "value": 85,
-          "unit": "",
-          "trend": "up",
-          "icon": "Package"
-        },
-        {
-          "id": "totalValue",
-          "label": "Total Value",
-          "value": 1800000,
-          "unit": "USD",
-          "trend": "up",
-          "icon": "DollarSign"
-        },
-        {
-          "id": "averageOrderValue",
-          "label": "Average Order Value",
-          "value": 21176.47,
-          "unit": "USD",
-          "trend": "up",
-          "icon": "BarChart"
-        },
-        {
-          "id": "priceCompetitiveness",
-          "label": "Price Competitiveness",
-          "value": 89,
-          "unit": "%",
-          "trend": "same",
-          "icon": "TrendingUp"
-        },
-        {
-          "id": "responsiveness",
-          "label": "Responsiveness",
-          "value": 91,
-          "unit": "%",
-          "trend": "up",
-          "icon": "MessageSquare"
-        },
-        {
-          "id": "complianceScore",
-          "label": "Compliance Score",
-          "value": 93,
-          "unit": "",
-          "trend": "same",
-          "icon": "FileCheck"
-        }
-      ],
-      "certifications": [],
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "contacts": [],
-      "country": [
-        {
-          "id": "CAN",
-          "label": "Canada"
-        }
-      ],
-      "incomplete": false,
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "name": "Ottana Pharmed",
-      "email": "info@ottanapharmed.com",
-      "phone": "+1 555 123 4568",
-      "address": "No 1",
-      "city": "Istanbul",
-      "state": "Istanbul",
-      "zipCode": "124142",
-      "registrationNumber": "TF-2019-001",
-      "taxId": "US-TAX-002",
-      "country": "TR",
-      "categories": [
-        "healthcare",
-        "logistics"
-      ],
-      "status": "PENDING",
-      "rating": 5,
-      "id": "01K9OP000000000000000000001",
-      "createdAt": "2025-11-04T12:00:00.000Z",
-      "updatedAt": "2025-11-23T10:14:42.252Z",
-      "performanceMetrics": [
-        {
-          "id": "onTimeDelivery",
-          "label": "On Time Delivery",
-          "value": 96,
-          "unit": "%",
-          "trend": "up",
-          "icon": "Clock"
-        },
-        {
-          "id": "qualityScore",
-          "label": "Quality Score",
-          "value": 94,
-          "unit": "",
-          "trend": "up",
-          "icon": "CheckCircle"
-        },
-        {
-          "id": "totalOrders",
-          "label": "Total Orders",
-          "value": 120,
-          "unit": "",
-          "trend": "up",
-          "icon": "Package"
-        },
-        {
-          "id": "totalValue",
-          "label": "Total Value",
-          "value": 2200000,
-          "unit": "USD",
-          "trend": "up",
-          "icon": "DollarSign"
-        },
-        {
-          "id": "averageOrderValue",
-          "label": "Average Order Value",
-          "value": 18333.33,
-          "unit": "USD",
-          "trend": "same",
-          "icon": "BarChart"
-        },
-        {
-          "id": "priceCompetitiveness",
-          "label": "Price Competitiveness",
-          "value": 90,
-          "unit": "%",
-          "trend": "up",
-          "icon": "TrendingUp"
-        },
-        {
-          "id": "responsiveness",
-          "label": "Responsiveness",
-          "value": 89,
-          "unit": "%",
-          "trend": "same",
-          "icon": "MessageSquare"
-        },
-        {
-          "id": "complianceScore",
-          "label": "Compliance Score",
-          "value": 95,
-          "unit": "",
-          "trend": "up",
-          "icon": "FileCheck"
-        }
-      ],
-      "certifications": [
-        "fda",
-        "iso14001"
-      ],
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "contacts": [],
-      "incomplete": false,
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "name": "Pharmagona",
-      "email": "info@pharmagona.com",
-      "phone": "+1 555 123 4570",
-      "categories": [],
-      "status": "PENDING",
-      "rating": 1,
-      "id": "01K9PG000000000000000000001",
-      "createdAt": "2025-11-04T12:00:00.000Z",
-      "updatedAt": "2025-11-23T10:16:47.113Z",
-      "performanceMetrics": [
-        {
-          "id": "onTimeDelivery",
-          "label": "On Time Delivery",
-          "value": 97,
-          "unit": "%",
-          "trend": "up",
-          "icon": "Clock"
-        },
-        {
-          "id": "qualityScore",
-          "label": "Quality Score",
-          "value": 96,
-          "unit": "",
-          "trend": "up",
-          "icon": "CheckCircle"
-        },
-        {
-          "id": "totalOrders",
-          "label": "Total Orders",
-          "value": 175,
-          "unit": "",
-          "trend": "up",
-          "icon": "Package"
-        },
-        {
-          "id": "totalValue",
-          "label": "Total Value",
-          "value": 2800000,
-          "unit": "USD",
-          "trend": "up",
-          "icon": "DollarSign"
-        },
-        {
-          "id": "averageOrderValue",
-          "label": "Average Order Value",
-          "value": 16000,
-          "unit": "USD",
-          "trend": "same",
-          "icon": "BarChart"
-        },
-        {
-          "id": "priceCompetitiveness",
-          "label": "Price Competitiveness",
-          "value": 94,
-          "unit": "%",
-          "trend": "up",
-          "icon": "TrendingUp"
-        },
-        {
-          "id": "responsiveness",
-          "label": "Responsiveness",
-          "value": 92,
-          "unit": "%",
-          "trend": "up",
-          "icon": "MessageSquare"
-        },
-        {
-          "id": "complianceScore",
-          "label": "Compliance Score",
-          "value": 97,
-          "unit": "",
-          "trend": "up",
-          "icon": "FileCheck"
-        }
-      ],
-      "certifications": [],
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "country": [
-        {
-          "id": "CAN",
-          "label": "Canada"
-        }
-      ],
-      "incomplete": false,
-      "contacts": [],
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    }
-  ],
-  "inquiries": [
-    {
-      "number": "CGN-2025-09",
-      "inquiryDate": "2025-11-03T09:38",
-      "inquiryDeadlineDate": "2025-11-28T11:30",
-      "state": [
-        {
-          "id": "3",
-          "label": "Approved",
-          "icon": "CheckCircle",
-          "color": "emerald"
-        }
-      ],
-      "description": "Test Description",
-      "inquiry-items": [],
-      "id": "01K945BGN1YV7RG3XKG169CGS1",
-      "createdAt": "2025-11-03T06:09:31.312Z",
-      "updatedAt": "2025-12-03T12:10:54.287Z",
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "inquiry-vendors": [],
-      "incomplete": false,
-      "contacts": [],
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "status": [
-        {
-          "id": "01KBHH3HNFG1P7E4GTJGE3B19W",
-          "label": "Pending",
-          "icon": "GitBranch",
-          "color": "orange"
-        }
-      ],
-      "assignedTo": [
-        {
-          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-          "label": "Mahyar Abidi"
-        }
-      ],
-      "dueDate": "2025-12-11"
-    },
-    {
-      "number": "AGN-2025-12",
-      "inquiryDate": "2025-11-04T12:34",
-      "inquiryDeadlineDate": "2025-11-27T12:34",
-      "state": [
-        {
-          "id": "1",
-          "label": "Submitted",
-          "icon": "Send",
-          "color": "sky"
-        }
-      ],
-      "description": "Buffers and Raw materials",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01K971SXSZZ6SBNF152M93FY64",
-      "createdAt": "2025-11-04T09:05:12.518Z",
-      "updatedAt": "2025-11-12T16:19:07.522Z",
-      "inquiry-vendors": [
-        {
-          "id": "01K971W83WWA4QCVFNAZSF5N11",
-          "label": "Mana Pharma"
-        },
-        {
-          "id": "01K971WG76Y655JPYJDAJTTVV3",
-          "label": "Pharmagona"
-        },
-        {
-          "id": "01K971WTDXH1GAJ33MG2FYSVYG",
-          "label": "Ottana Pharmed"
-        }
-      ],
-      "inquiry-items": [
-        {
-          "id": "01K971TX4B7S8YBED0NEDH79TN",
-          "label": "Buffer Solution"
-        },
-        {
-          "id": "01K971VS40NX1XM4PYVPBD59GR",
-          "label": "Sodium Bi Carbonate"
-        }
-      ],
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    }
-  ],
-  "contacts": [
-    {
-      "name": "Hossein",
-      "last_name": "Rezaei Fard",
-      "email": "h@c.com",
-      "phone_number": "123456",
-      "id": "01K94K5N3QPZ03XEHXHY21GF2P",
-      "createdAt": "2025-11-03T10:10:59.327Z",
-      "updatedAt": "2025-12-01T16:05:44.027Z",
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "categories": [
-        "general"
-      ],
-      "contacts": [
-        {
-          "name": "Hossein",
-          "email": "h@c.com",
-          "position": "Primary Contact",
-          "isPrimary": true
-        }
-      ],
-      "status": "ACTIVE",
-      "rating": 5,
-      "incomplete": false,
-      "relatedCompanies": [
-        {
-          "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": "CinnaGen"
-        },
-        {
-          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": "AryoGen"
-        }
-      ],
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "name": "Arash",
-      "last_name": "Zarandi",
-      "email": "a@z.com",
-      "phone_number": "123455",
-      "id": "01K94KB42QKQNNH7VED2K06Y40",
-      "createdAt": "2025-11-03T10:13:58.497Z",
-      "updatedAt": "2025-12-01T16:48:03.258Z",
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "categories": [
-        "general"
-      ],
-      "contacts": [
-        {
-          "name": "Arash",
-          "email": "a@z.com",
-          "position": "Primary Contact",
-          "isPrimary": true
-        }
-      ],
-      "status": "ACTIVE",
-      "rating": 5,
-      "relatedCompanies": [
-        {
-          "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": "CinnaGen"
-        }
-      ],
-      "incomplete": false,
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "name": "Masoud",
-      "last_name": "Mirghasemi",
-      "email": "M@c.com",
-      "phone_number": "1231245124",
-      "id": "01K94KYJ0TQCGVHJRJ3Q0D0E7G",
-      "createdAt": "2025-11-03T10:24:35.367Z",
-      "updatedAt": "2025-11-04T06:55:59.232Z",
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "categories": [
-        "general"
-      ],
-      "contacts": [
-        {
-          "name": "Masoud",
-          "email": "M@c.com",
-          "position": "Primary Contact",
-          "isPrimary": true,
-          "department": "",
-          "notes": ""
-        }
-      ],
-      "status": "ACTIVE",
-      "rating": 5,
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "name": "Mahyar",
-      "last_name": "Abidi",
-      "phone_number": "09126184056",
-      "email": "abidi.mahyar@gmail.com",
-      "status": "ACTIVE",
-      "rating": 5,
-      "id": "01K94Q1ZE6M64MSHAXJARG7F8G",
-      "createdAt": "2025-11-03T11:18:53.135Z",
-      "updatedAt": "2025-11-04T06:56:08.325Z",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "name": "Ghader",
-      "last_name": "Ghaderi",
-      "email": "gh@c.com",
-      "phone_number": "1235151",
-      "id": "01K94Q59VYS8JA1VRMG7Q343GM",
-      "createdAt": "2025-11-03T11:20:42.123Z",
-      "updatedAt": "2025-11-04T06:55:38.991Z",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "categories": [
-        "general"
-      ],
-      "contacts": [
-        {
-          "name": "Ghader",
-          "email": "gh@c.com",
-          "position": "Primary Contact",
-          "isPrimary": true
-        }
-      ],
-      "status": "ACTIVE",
-      "rating": 5,
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "name": "Bahareh",
-      "last_name": "Cheshmehkhavar",
-      "phone_number": "124125121",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KAR3EADG1YK5TNS947582TJQ",
-      "createdAt": "2025-11-23T10:16:36.544Z",
-      "updatedAt": "2025-11-23T10:16:36.544Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    }
-  ],
   "companies": [
     {
       "name": "CinnaGen",
@@ -705,33 +82,6 @@
   ],
   "relation-types": [
     {
-      "id": "HAS_INQUIRY_ITEM",
-      "label": "Has Inquiry Item",
-      "description": "An inquiry contains one or more inquiry items.",
-      "color": "blue",
-      "icon": "ShoppingBasket",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "id": "HAS_CONTACT",
-      "label": "Has Contact",
-      "description": "",
-      "color": "green",
-      "icon": "Contact",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "id": "HAS_ADDRESS",
-      "label": "Has Address",
-      "description": "Defines the addresses of entities",
-      "color": "orange",
-      "icon": "MapPinHouse",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
       "color": "blue",
       "label": "Has Database",
       "icon": "Database",
@@ -804,248 +154,6 @@
       "description": "An entity has one or more attachments",
       "color": "blue",
       "icon": "Paperclip",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    }
-  ],
-  "inquiry-vendors": [
-    {
-      "vendorId": [
-        {
-          "id": "01K9MP000000000000000000001"
-        }
-      ],
-      "status": "quotation_added",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01K971W83WWA4QCVFNAZSF5N11",
-      "createdAt": "2025-11-04T09:06:28.611Z",
-      "updatedAt": "2025-11-04T09:06:28.611Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "vendorId": [
-        {
-          "id": "01K9PG000000000000000000001"
-        }
-      ],
-      "status": "reviewed",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01K971WG76Y655JPYJDAJTTVV3",
-      "createdAt": "2025-11-04T09:06:36.914Z",
-      "updatedAt": "2025-11-04T09:06:36.914Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "vendorId": [
-        {
-          "id": "01K9OP000000000000000000001"
-        }
-      ],
-      "status": "rejected",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01K971WTDXH1GAJ33MG2FYSVYG",
-      "createdAt": "2025-11-04T09:06:47.363Z",
-      "updatedAt": "2025-11-04T09:06:47.363Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "vendorId": [
-        {
-          "id": "01K8QVCWS0ZSTMSVD5C6K7A806"
-        }
-      ],
-      "status": "awarded",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01K97208RABW053BGN3A6W05FD",
-      "createdAt": "2025-11-04T09:08:40.337Z",
-      "updatedAt": "2025-12-05T21:12:10.901Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "incomplete": false
-    },
-    {
-      "vendorId": [
-        {
-          "id": "01K9OP000000000000000000001"
-        }
-      ],
-      "status": "awarded",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01K9720G4M9G75V3YWB9PGKBTM",
-      "createdAt": "2025-11-04T09:08:47.900Z",
-      "updatedAt": "2025-12-17T08:02:59.547Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "incomplete": false
-    },
-    {
-      "vendorId": [
-        {
-          "id": "01K9OP000000000000000000001"
-        }
-      ],
-      "status": "reviewed",
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01K97F0QV3S1JH1R8NJ1XWEPEG",
-      "createdAt": "2025-11-04T12:56:07.272Z",
-      "updatedAt": "2025-11-07T22:11:31.588Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    }
-  ],
-  "inquiry-items": [
-    {
-      "partCode": "5052",
-      "partName": "Himedia Feed Alpha",
-      "quantity": 170,
-      "unit": "2",
-      "demandDate": "2025-11-12",
-      "minimumExpirationDate": "2025-11-19",
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01K96E06Z9H5G8FKH5QY0538JB",
-      "createdAt": "2025-11-04T03:19:07.006Z",
-      "updatedAt": "2025-11-19T08:55:28.123Z",
-      "description": "Test Description of Himedia Feed Alpha",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "partCode": "5073",
-      "partName": "HPLC Equipment Agilent 2190 ",
-      "quantity": 2,
-      "unit": "1",
-      "demandDate": "2025-11-26",
-      "minimumExpirationDate": "2025-11-25",
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01K96WRHRE30636NDY6QVJT5AR",
-      "createdAt": "2025-11-04T07:37:04.546Z",
-      "updatedAt": "2025-11-04T07:37:04.546Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "partCode": "6098",
-      "partName": "Buffer Solution",
-      "quantity": 12,
-      "unit": "5",
-      "demandDate": "2025-11-06",
-      "minimumExpirationDate": "2026-01-16",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01K971TX4B7S8YBED0NEDH79TN",
-      "createdAt": "2025-11-04T09:05:44.595Z",
-      "updatedAt": "2025-11-04T09:05:44.595Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "partCode": "6091",
-      "partName": "Sodium Bi Carbonate",
-      "quantity": 120,
-      "unit": "4",
-      "demandDate": "2025-12-04",
-      "minimumExpirationDate": "2026-01-15",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01K971VS40NX1XM4PYVPBD59GR",
-      "createdAt": "2025-11-04T09:06:13.257Z",
-      "updatedAt": "2025-11-04T09:06:13.257Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    }
-  ],
-  "quotations": [
-    {
-      "number": "QTN-120513",
-      "quotationDate": "2025-11-04",
-      "expirationDate": "2025-11-19",
-      "transportType": "AIR",
-      "purchaseMethod": [
-        {
-          "id": "AUCTION",
-          "label": "Auction"
-        }
-      ],
-      "paymentMethod": [
-        {
-          "id": "CASH",
-          "label": "Cash",
-          "icon": "DollarSign"
-        },
-        {
-          "id": "CREDIT_CARD",
-          "label": "Credit Card",
-          "icon": "CreditCard",
-          "color": "emerald"
-        }
-      ],
-      "advancedPaymentAmount": 20000,
-      "additions": 2500,
-      "deductions": 1500,
-      "netPrice": 21000,
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01K9724JFPP7A6RX7H6NTFHE1D",
-      "createdAt": "2025-11-04T09:11:01.375Z",
-      "updatedAt": "2025-11-23T06:40:54.912Z",
-      "vendorId": [
-        {
-          "id": "01K8QVCWS0ZSTMSVD5C6K7A806"
-        }
-      ],
-      "currency": [
-        {
-          "id": "EUR",
-          "label": "EUR - Euro"
-        }
-      ],
-      "state": [
-        {
-          "id": "ACCEPTED",
-          "label": "Accepted",
-          "icon": "CheckCircle",
-          "color": "emerald"
-        }
-      ],
-      "quotation-items": [],
-      "incomplete": false,
-      "inactive": true,
-      "isForce": true,
-      "forceReason": "test",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    }
-  ],
-  "quotation-items": [
-    {
-      "inquiryItemId": [
-        {
-          "id": "01K96WRHRE30636NDY6QVJT5AR"
-        }
-      ],
-      "unitPrice": 7500,
-      "totalPrice": 15500,
-      "estimatedDeliveryDate": "2025-12-18",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01K9725HNMEAFXGB98SCER6JVK",
-      "createdAt": "2025-11-04T09:11:33.307Z",
-      "updatedAt": "2025-11-04T11:26:57.093Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "inquiryItemId": [
-        {
-          "id": "01K96E06Z9H5G8FKH5QY0538JB"
-        }
-      ],
-      "unitPrice": 260,
-      "totalPrice": 6000,
-      "estimatedDeliveryDate": "2026-01-21",
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01K9726N9T00JAG6QC7ZWMX650",
-      "createdAt": "2025-11-04T09:12:09.794Z",
-      "updatedAt": "2025-11-04T11:27:12.239Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
@@ -13665,5 +12773,808 @@
   "external-nodes": [],
   "related-documents": [],
   "sync-strategies": [],
-  "reset-password-form": []
+  "reset-password-form": [],
+  "vendors": [
+    {
+      "name": "Accessybio",
+      "description": "",
+      "id": "01KCX516BKF7M6P91JKBCTM81S",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T07:11:15.562Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "841",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+    },
+    {
+      "name": "Ace Prosper Corporation (APC)",
+      "description": "",
+      "id": "01KCX516BRTDCD254DYWXM5F6B",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Amtec",
+      "description": "",
+      "id": "01KCX516BR5HDC6FF48HRD2KKW",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "ASA KİMYASAL",
+      "description": "",
+      "id": "01KCX516BRDBR6CQ43TXXA5WM5",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "ASCO Engineering",
+      "description": "",
+      "id": "01KCX516BSBXT0JCECT908EMEX",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Azerbiotech",
+      "description": "",
+      "id": "01KCX516BS3BE1M0MBR2CA2FS2",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "BD (BECTON DICKINSON)",
+      "description": "",
+      "id": "01KCX516BSFPNG1TN6N37K4819",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Bimpex GmbH",
+      "description": "",
+      "id": "01KCX516BTJTZQNXWWM77HT6SJ",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Bio pharmatech",
+      "description": "",
+      "id": "01KCX516BT5X6NSPE16CEZJQH3",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Biomadis",
+      "description": "",
+      "id": "01KCX516BVT5NPYZRK3Q40FGZH",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "biotechindigo",
+      "description": "",
+      "id": "01KCX516BVBXB9X1P8A2B4TECA",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Caspian",
+      "description": "",
+      "id": "01KCX516BVPSVX8EH6J3SJW4MG",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Cevahir Kimya Sanayi Ve Dis Ticaret Limited Sirketi",
+      "description": "",
+      "id": "01KCX516BW0QM825QK8T13HCR3",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Converging",
+      "description": "",
+      "id": "01KCX516BWFGJKCT1VSSZ7980Z",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "DBAS",
+      "description": "",
+      "id": "01KCX516BWSE82HRRMEQ9F8KGR",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "DBT / zenengring company",
+      "description": "",
+      "id": "01KCX516BWKNZ1T4B9F3BKPG9R",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Exapilog (with subsidiaries)",
+      "description": "",
+      "id": "01KCX516BW22PVSR1QSMHKYH3A",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Gabari (sinarad)",
+      "description": "",
+      "id": "01KCX516BW19VPQ6VNMRHGQCRS",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Holad park / FisherDx",
+      "description": "",
+      "id": "01KCX516BXC3W1QXRTA9B4457C",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "IMA Darou Afzar Co.",
+      "description": "",
+      "id": "01KCX516BXX8Q0BKDBYF176XYR",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Innovix",
+      "description": "",
+      "id": "01KCX516BX8Q3MP1HYBV0RKREX",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "JKN",
+      "description": "",
+      "id": "01KCX516BXJSW0QRB9GWY7MF6V",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Levent / Cambridgepharma",
+      "description": "",
+      "id": "01KCX516BX1YRCJA372KGNXWAM",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "LSI",
+      "description": "",
+      "id": "01KCX516BYGQK18WK1D3XZ7H0E",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Makro (Part Sanat)",
+      "description": "",
+      "id": "01KCX516BY33F78FV11NNRZQXM",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Manapharma",
+      "description": "",
+      "id": "01KCX516BYV5NV9PW2ZMY7XJ29",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Medist FZE",
+      "description": "",
+      "id": "01KCX516BZ7VYFBG5N5YRC95SV",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Medvac",
+      "description": "",
+      "id": "01KCX516BZYMBQ4M3EY05HR4RW",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "NiKi GMBH",
+      "description": "",
+      "id": "01KCX516BZ30YZF525TCXVC28C",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Novelty",
+      "description": "",
+      "id": "01KCX516BZ9KBDFP45RFVVR69A",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Ostotrade / DAP",
+      "description": "",
+      "id": "01KCX516BZMFRA6GDNTB7TBBG2",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Ottanapharmed (with subsidiaries)",
+      "description": "",
+      "id": "01KCX516BZD0THVCNDXVKSQHT3",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "PentaGroup Synergy",
+      "description": "",
+      "id": "01KCX516BZV80T25ZDD72TMPW8",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Pharmagona",
+      "description": "",
+      "id": "01KCX516BZRARD25WNPPKPQS66",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Pharmalab FZE",
+      "description": "",
+      "id": "01KCX516BZBZWWTGPA197VARSF",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Piramal",
+      "description": "",
+      "id": "01KCX516BZ3E5RK8VF2Z1CFT19",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Poli panel",
+      "description": "",
+      "id": "01KCX516BZ7W4SRAEG9XHRKVR8",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Rieckermann",
+      "description": "",
+      "id": "01KCX516BZXEKJX8J1AQ6B8V5G",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Sabahi (Impex and Yino)",
+      "description": "",
+      "id": "01KCX516BZNXQ4YXENXZMY5VEJ",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Sagisa",
+      "description": "",
+      "id": "01KCX516BZEPBDCB360HMQ9HQT",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Sarli",
+      "description": "",
+      "id": "01KCX516BZST4VXVV47EBCMG4X",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "SELINCO Medikal",
+      "description": "",
+      "id": "01KCX516BZ6TGQ445J1SDZSG9Z",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Shevlin Pharma",
+      "description": "",
+      "id": "01KCX516C0G3XENNDSQQCREA9P",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Transfarma",
+      "description": "",
+      "id": "01KCX516C0VNXHNZAX220ABC4M",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "Vanda Teb",
+      "description": "",
+      "id": "01KCX516C05HEPBD0TKQ23AYW5",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "WINNING TRADING (HK) CO LTD",
+      "description": "",
+      "id": "01KCX516C0KNCGHJHXFBSAWM1F",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    },
+    {
+      "name": "YANCHENG HUIDA",
+      "description": "",
+      "id": "01KCX516C0GMK4N7SAQQQDM6EK",
+      "createdAt": "2025-12-20T12:00:00.000Z",
+      "updatedAt": "2025-12-20T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ]
+    }
+  ]
 }

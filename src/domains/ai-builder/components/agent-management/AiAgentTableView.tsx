@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { PencilRuler, Trash2, Sparkles, Code } from 'lucide-react';
 import { AiAgent } from '../../types';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 
 interface AiAgentTableViewProps {
   agents: AiAgent[];
@@ -185,7 +186,7 @@ export function AiAgentTableView({ agents, onEdit, onView, onDelete, isLoading =
       data: agents,
       pagination: {
         enabled: agents.length > 10,
-        pageSize: 25,
+        pageSize: DEFAULT_LIMIT,
         showPageSizeSelector: true,
         pageSizeOptions: [5, 10, 25, 50],
         alwaysShow: false,

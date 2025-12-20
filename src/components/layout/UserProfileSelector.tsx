@@ -155,23 +155,6 @@ export function UserProfileSelector({
     }
   };
 
-  // Check if user is logged in by checking the user store
-  // Tokens are stored in httpOnly cookies, so we can't check them from JavaScript
-  // The user store is set after successful login, so if user exists, they're authenticated
-  if (!user) {
-    return (
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="h-10 rounded-xl px-5 text-sm font-semibold"
-        onClick={() => router.push('/authentication/login')}
-      >
-        Login
-      </Button>
-    );
-  }
-
   const profilePayload: UserProfile = {
     id: user.id,
     name: displayName,
@@ -208,33 +191,51 @@ export function UserProfileSelector({
     },
   ];
 
-  // Don't render user profile until mounted to avoid hydration mismatch
-  // On server and initial client render, always render a placeholder
-  // This ensures server and client render the same initial content
+  // Always render the same structure to avoid hydration mismatch
+  // When not mounted, render a disabled placeholder with the same structure as the mounted version
+  // This ensures server and client render identical HTML structure
   if (!isMounted) {
     return (
-      <div suppressHydrationWarning>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex h-10 items-center space-x-2 rounded-xl border border-violet-200 bg-white text-violet-700 transition-colors outline-none ring-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-violet-50 hover:border-violet-300"
-          type="button"
-          aria-label="User profile"
-          disabled
-          suppressHydrationWarning
-        >
-          <Avatar className="h-8 w-8 border border-gray-100 rounded-full bg-violet-100 text-violet-800 shrink-0">
-            <AvatarFallback className="bg-violet-100 text-violet-800 text-xs">
-              --
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col text-left leading-tight max-w-[140px] overflow-hidden">
-            <span className="text-sm font-semibold truncate" suppressHydrationWarning>
-              Loading...
-            </span>
-          </div>
-        </Button>
-      </div>
+      <DropdownMenuPrimitive.Root open={false} onOpenChange={() => {}}>
+        <DropdownMenuPrimitive.Trigger asChild className={fullWidth ? 'w-full' : undefined} disabled>
+          <Button
+            variant="outline"
+            size="sm"
+            className={triggerClasses}
+            aria-label="User profile"
+            type="button"
+            disabled
+            suppressHydrationWarning
+          >
+            <Avatar
+              className={cn(
+                'h-8 w-8 border rounded-full bg-violet-100 text-violet-800 shrink-0',
+                isDarkVariant ? 'border-gray-700' : 'border-gray-100'
+              )}
+            >
+              <AvatarFallback className="bg-violet-100 text-violet-800 text-xs">
+                --
+              </AvatarFallback>
+            </Avatar>
+            <div
+              className={cn(
+                'flex flex-col text-left leading-tight',
+                fullWidth ? 'flex-1 overflow-hidden' : 'max-w-[140px] overflow-hidden'
+              )}
+            >
+              <span className="text-sm font-semibold truncate" suppressHydrationWarning>
+                Loading...
+              </span>
+            </div>
+            <ChevronDown
+              className={cn(
+                'h-4 w-4 shrink-0 transition-transform duration-200',
+                isDarkVariant ? 'text-gray-300' : 'text-gray-500'
+              )}
+            />
+          </Button>
+        </DropdownMenuPrimitive.Trigger>
+      </DropdownMenuPrimitive.Root>
     );
   }
 
@@ -242,25 +243,22 @@ export function UserProfileSelector({
   // If no user, show login button with static classes to avoid hydration mismatch
   if (!user) {
     return (
-      <div suppressHydrationWarning>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex h-10 items-center space-x-2 rounded-xl border border-violet-200 bg-white text-violet-700 transition-colors outline-none ring-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-violet-50 hover:border-violet-300"
-          type="button"
-          onClick={() => router.push('/authentication/login')}
-          aria-label="Login"
-          suppressHydrationWarning
-        >
-          Login
-        </Button>
-      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        className="flex h-10 items-center space-x-2 rounded-xl border border-violet-200 bg-white text-violet-700 transition-colors outline-none ring-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-violet-50 hover:border-violet-300"
+        type="button"
+        onClick={() => router.push('/authentication/login')}
+        aria-label="Login"
+        suppressHydrationWarning
+      >
+        Login
+      </Button>
     );
   }
 
   return (
-    <div suppressHydrationWarning>
-      <DropdownMenuPrimitive.Root
+    <DropdownMenuPrimitive.Root
         open={isMenuOpen}
         onOpenChange={(open) => {
           setIsMenuOpen(open);
@@ -395,7 +393,6 @@ export function UserProfileSelector({
         </AnimatePresence>
       </DropdownMenuPrimitive.Portal>
     </DropdownMenuPrimitive.Root>
-    </div>
   );
 }
 

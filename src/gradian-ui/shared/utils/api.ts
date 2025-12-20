@@ -693,6 +693,16 @@ async function enrichDataEndpoint(
     return { endpoint, params: existingParams };
   }
 
+  // Allow CompanySelector to see all companies when no tenant is selected
+  // by NOT auto-injecting tenantIds/companyIds for the companies collection endpoint.
+  // This ensures the company selector can always see all available companies.
+  if (
+    callerName === 'CompanySelector' &&
+    (endpoint === '/api/data/companies' || endpoint.startsWith('/api/data/companies?'))
+  ) {
+    return { endpoint, params: existingParams };
+  }
+
   const contextParams = await getContextParams();
   if (!contextParams.tenantIds && !contextParams.companyIds) {
     return { endpoint, params: existingParams };
