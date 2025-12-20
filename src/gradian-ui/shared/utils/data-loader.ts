@@ -41,6 +41,36 @@ async function getCookieHeader(): Promise<string | undefined> {
 }
 
 /**
+ * Get Authorization header from Next.js request context for server-side fetch calls
+ * This allows server-side fetch calls to forward the Authorization header from the original browser request
+ * The access token is stored in memory on the client and should be sent as Authorization header
+ */
+async function getAuthorizationHeader(): Promise<string | undefined> {
+  try {
+    const hMaybe = nextHeaders();
+    
+    // Check if headers() returned a Promise (async context) - await it
+    let h: any;
+    if (hMaybe && typeof (hMaybe as any).then === 'function') {
+      h = await (hMaybe as Promise<any>);
+    } else {
+      h = hMaybe as any;
+    }
+    
+    if (!h || typeof h.get !== 'function') {
+      return undefined;
+    }
+    
+    // Get Authorization header (case-insensitive)
+    const authHeader = h.get('authorization') || h.get('Authorization');
+    return authHeader || undefined;
+  } catch (error) {
+    // headers() may not be available in all contexts (e.g., during build)
+    return undefined;
+  }
+}
+
+/**
  * Get tenant domain for server-side requests
  * Extracts tenant domain from DNS/hostname in request headers only
  * This ensures multi-tenant deployments work correctly based on the actual DNS domain
@@ -344,13 +374,21 @@ export async function loadData<T = any>(
         const fetchUrl = getApiUrl(apiPath);
         loggingCustom(logType, 'info', `🌐 [${instanceId}] Fetching data from ${fetchUrl}`);
 
-        // Get cookies from Next.js request context to forward to internal API calls
+        // Get cookies and Authorization header from Next.js request context to forward to internal API calls
+        // The access token is stored in memory on the client and should be sent as Authorization header
         const cookieHeader = await getCookieHeader();
+        const authHeader = await getAuthorizationHeader();
         const fetchHeaders: Record<string, string> = {
           'Content-Type': 'application/json',
         };
         if (cookieHeader) {
           fetchHeaders['cookie'] = cookieHeader;
+        }
+        if (authHeader) {
+          fetchHeaders['authorization'] = authHeader;
+          loggingCustom(logType, 'debug', `[${instanceId}] Adding Authorization header for internal fetch to ${fetchUrl}`);
+        } else {
+          loggingCustom(logType, 'warn', `[${instanceId}] No Authorization header available for internal fetch to ${fetchUrl}`);
         }
 
         // Set x-tenant-domain header for internal Next.js API requests

@@ -5,6 +5,7 @@ import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
 import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
+import { getAccessToken } from '@/app/api/auth/helpers/server-token-cache';
 
 const TRUTHY_VALUES = new Set(['true', '1', 'yes', 'on']);
 const SCHEMA_ROUTE_PREFIX = '/api/schemas';
@@ -546,92 +547,95 @@ export const proxySchemaRequest = async (
     // Note: If localhost, tenant domain is undefined - this is correct as localhost has no tenant context
   }
 
-  const headers = new Headers(request.headers);
+  // Get access token from SERVER MEMORY using refresh token from cookies
+  // Access token is stored in server memory, keyed by refresh token
+  // This is more secure than storing tokens in client-side memory
+  let authHeader: string | null = null;
+  let authToken: string | null = null;
+
+  // Get refresh token from cookies
+  const cookies = request.headers.get('cookie');
+  const refreshToken = extractTokenFromCookies(cookies, AUTH_CONFIG.REFRESH_TOKEN_COOKIE);
+
+  if (refreshToken) {
+    // Look up access token from server memory using refresh token as key
+    authToken = getAccessToken(refreshToken);
+    
+    if (authToken) {
+      authHeader = `Bearer ${authToken}`;
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'info',
+        `[proxySchemaRequest] Retrieved access token from server memory (refresh token: ${refreshToken.substring(0, 30)}...)`
+      );
+    } else {
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'warn',
+        `[proxySchemaRequest] Access token not found in server memory for refresh token: ${refreshToken.substring(0, 30)}... (may need refresh)`
+      );
+    }
+  } else {
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'warn',
+      `[proxySchemaRequest] No refresh token found in cookies`
+    );
+  }
+
+  // Fallback: Try to get token from incoming Authorization header (for backward compatibility)
+  // This allows direct API calls with Authorization header to still work
+  if (!authToken) {
+    const incomingAuthHeader = request.headers.get('authorization') || request.headers.get('Authorization');
+    if (incomingAuthHeader) {
+      authToken = extractTokenFromHeader(incomingAuthHeader);
+      if (authToken) {
+        authHeader = incomingAuthHeader.toLowerCase().startsWith('bearer ') 
+          ? incomingAuthHeader 
+          : `Bearer ${authToken}`;
+        loggingCustom(
+          LogType.CALL_BACKEND,
+          'info',
+          `[proxySchemaRequest] Using access token from incoming Authorization header (fallback)`
+        );
+      }
+    }
+  }
+
+  // Create new headers object - we only forward necessary headers to backend
+  // Do NOT forward all headers from frontend request, only what's needed
+  const headers = new Headers();
   
-  // Log incoming Authorization header for debugging
-  const incomingAuthHeader = request.headers.get('authorization') || request.headers.get('Authorization');
-  loggingCustom(
-    LogType.CALL_BACKEND,
-    'debug',
-    `[proxySchemaRequest] Incoming Authorization header: ${incomingAuthHeader ? 'present' : 'missing'} ${incomingAuthHeader ? `(length: ${incomingAuthHeader.length})` : ''}`
-  );
-  
-  // Remove hop-by-hop headers that shouldn't be forwarded
-  // These headers are connection-specific and cause issues in Docker/proxy environments
-  headers.delete('host');
-  headers.delete('connection');
-  headers.delete('upgrade');
-  headers.delete('keep-alive');
-  headers.delete('transfer-encoding');
-  headers.delete('te');
-  headers.delete('trailer');
+  // Set Authorization header if we have a token (REQUIRED for backend authentication)
+  // Use 'Authorization' (capital A) as some backends are case-sensitive
+  if (authHeader) {
+    headers.set('Authorization', authHeader);
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'info',
+      `[proxySchemaRequest] Authorization header set for backend request (length: ${authHeader.length}, format: ${authHeader.substring(0, 10)}...)`
+    );
+  } else {
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'warn',
+      `[proxySchemaRequest] WARNING: No Authorization header available for backend schema request to ${targetUrl}`
+    );
+  }
 
   // Set x-tenant-domain header if we extracted it (either from header or DNS)
   if (tenantDomain) {
     headers.set('x-tenant-domain', tenantDomain);
   }
 
-  // At this point, headers object has x-tenant-domain set (either from incoming header or DNS)
-  // This will be forwarded to the external backend in the fetch call below
-
   // Log final tenant domain result
   loggingCustom(
     LogType.CALL_BACKEND,
     tenantDomain ? 'info' : 'warn',
     tenantDomain
-      ? `[Tenant Domain Extraction] Final result: x-tenant-domain="${tenantDomain}" will be forwarded to backend`
-      : '[Tenant Domain Extraction] Final result: No tenant domain extracted; x-tenant-domain header will NOT be set. Backend may reject request or use fallback.'
+      ? `[proxySchemaRequest] [Tenant Domain Extraction] Final result: x-tenant-domain="${tenantDomain}" will be forwarded to backend`
+      : '[proxySchemaRequest] [Tenant Domain Extraction] Final result: No tenant domain extracted; x-tenant-domain header will NOT be set. Backend may reject request or use fallback.'
   );
-
-  // Extract authorization token and ensure it's in Bearer format
-  // Backend APIs require Authorization: Bearer <token> header
-  // Check both lowercase and capitalized versions
-  let authHeader = headers.get('authorization') || headers.get('Authorization');
-  let authToken: string | null = null;
-
-  // Try to extract token from Authorization header if present
-  if (authHeader) {
-    authToken = extractTokenFromHeader(authHeader);
-  }
-
-  // If no token from header, try to extract from cookies
-  if (!authToken) {
-    const cookies = request.headers.get('cookie');
-    authToken = extractTokenFromCookies(cookies, AUTH_CONFIG.ACCESS_TOKEN_COOKIE);
-    if (authToken) {
-      // Format as Bearer token
-      authHeader = `Bearer ${authToken}`;
-      loggingCustom(LogType.CALL_BACKEND, 'info', 'Authorization token added from cookie');
-    } else {
-      loggingCustom(
-        LogType.CALL_BACKEND,
-        'warn',
-        `No authorization token found in header or cookies for schema request`
-      );
-    }
-  } else {
-    // Ensure header is in Bearer format if it's just a token
-    if (authHeader && !authHeader.toLowerCase().startsWith('bearer ')) {
-      authHeader = `Bearer ${authToken}`;
-      loggingCustom(LogType.CALL_BACKEND, 'info', 'Authorization header normalized to Bearer token');
-    }
-  }
-
-  // Set Authorization header if we have a token
-  if (authHeader) {
-    headers.set('authorization', authHeader);
-    loggingCustom(
-      LogType.CALL_BACKEND,
-      'info',
-      `[proxySchemaRequest] Authorization header set for backend request (length: ${authHeader.length})`
-    );
-  } else {
-    loggingCustom(
-      LogType.CALL_BACKEND,
-      'error',
-      `[proxySchemaRequest] WARNING: No Authorization header available for backend schema request to ${targetUrl}`
-    );
-  }
 
   let body: BodyInit | undefined;
   if (options.body !== undefined) {
@@ -672,10 +676,17 @@ export const proxySchemaRequest = async (
     );
   }
 
+  // Convert Headers object to plain object for fetch() to ensure proper serialization
+  // Some fetch implementations may not properly serialize Headers objects
+  const headersObject: Record<string, string> = {};
+  headers.forEach((value, key) => {
+    headersObject[key] = value;
+  });
+
   try {
     const response = await fetch(targetUrl, {
       method,
-      headers,
+      headers: headersObject,
       body,
     });
 
