@@ -10,34 +10,12 @@ variables:
   DOCKER_TLS_CERTDIR: ""
 
 before_script:
-  - |
-    echo "📦 Switching to latest Node.js 25 with nvm..."
-    # Load nvm - try multiple methods
-    export NVM_DIR="$HOME/.nvm"
-    if [ -s "$HOME/.bashrc" ]; then
-      source "$HOME/.bashrc"
-    fi
-    if [ -s "$HOME/.profile" ]; then
-      source "$HOME/.profile"
-    fi
-    if [ -s "$NVM_DIR/nvm.sh" ]; then
-      source "$NVM_DIR/nvm.sh"
-    fi
-    # Use nvm to switch to Node.js 25
-    if command -v nvm >/dev/null 2>&1; then
-      nvm use 25
-      echo "✅ Node.js version: $(node --version)"
-      echo "✅ npm version: $(npm --version)"
-    else
-      echo "⚠️  nvm command not found, using system Node.js"
-      node --version || echo "❌ Node.js not found!"
-    fi
   - echo "Authenticating with Docker Registry..."
   - |
-    if [ -n "$CINNAGEN_REGISTRY_USER" ] && [ -n "$CINNAGEN_REGISTRY_PASSWORD" ]; then
-      echo "$CINNAGEN_REGISTRY_PASSWORD" | docker login -u "$CINNAGEN_REGISTRY_USER" --password-stdin reg.cinnagen.com:8083
+    if [ -n "$nexus_user" ] && [ -n "$nexus_password" ]; then
+      echo "$nexus_password" | docker login -u "$nexus_user" --password-stdin "reg.cinnagen.com:8083"
     else
-      echo "⚠️ CINNAGEN_REGISTRY_USER or CINNAGEN_REGISTRY_PASSWORD not set, attempting unauthenticated pull..."
+      echo "⚠️ nexus_user or nexus_password not set, attempting unauthenticated pull..."
     fi
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
 
@@ -143,7 +121,7 @@ owasp_dependency_check:
         echo "ℹ️  node_modules not found - scanning package.json and package-lock.json only"
       fi
       echo "🐳 Pulling OWASP Dependency-Check Docker image..."
-      docker pull reg.cinnagen.com:8083/owasp/dependency-check:latest
+      docker pull "reg.cinnagen.com:8083/owasp/dependency-check:latest"
       echo "🔍 Running OWASP Dependency-Check against NVD database..."
       # Get absolute paths for volume mounting
       PROJECT_DIR=$(pwd)
@@ -161,7 +139,7 @@ owasp_dependency_check:
         -v "$PROJECT_DIR:/src:ro"
         -v "$TEMP_REPORT_DIR:/report:rw"
         -w /src
-        reg.cinnagen.com:8083/owasp/dependency-check:latest
+        "reg.cinnagen.com:8083/owasp/dependency-check:latest"
         --project "gradian-app"
         --scan /src
         --format "JSON"
@@ -319,7 +297,7 @@ semgrep_sast:
       PROJECT_DIR=$(pwd)
       
       echo "🐳 Pulling Semgrep Docker image..."
-      docker pull reg.cinnagen.com:8083/returntocorp/semgrep:latest
+      docker pull "reg.cinnagen.com:8083/returntocorp/semgrep:latest"
       
       echo "🔍 Running Semgrep SAST scan..."
       # Ensure report directory is writable
@@ -339,7 +317,7 @@ semgrep_sast:
         -v "$PROJECT_DIR:/src:ro" \
         -v "$TEMP_REPORT_DIR:/report:rw" \
         -w /src \
-        reg.cinnagen.com:8083/returntocorp/semgrep:latest \
+        "reg.cinnagen.com:8083/returntocorp/semgrep:latest" \
         semgrep \
         --config=auto \
         --json \
@@ -559,7 +537,7 @@ trivy_image_scan:
       PROJECT_DIR=$(pwd)
       
       echo "🐳 Pulling Trivy Docker image..."
-      docker pull reg.cinnagen.com:8083/aquasec/trivy:latest
+      docker pull "reg.cinnagen.com:8083/aquasec/trivy:latest"
       
       echo "🔍 Running Trivy security scan on Docker image..."
       # Ensure report directory is writable
@@ -593,7 +571,7 @@ trivy_image_scan:
         -v /var/run/docker.sock:/var/run/docker.sock \
         $DOCKER_CONFIG_MOUNT \
         -v "$TEMP_REPORT_DIR:/report:rw" \
-        reg.cinnagen.com:8083/aquasec/trivy:latest \
+        "reg.cinnagen.com:8083/aquasec/trivy:latest" \
         image \
         --format json \
         --output /report/trivy-report.json \
@@ -607,7 +585,7 @@ trivy_image_scan:
         --rm \
         -v /var/run/docker.sock:/var/run/docker.sock \
         $DOCKER_CONFIG_MOUNT \
-        reg.cinnagen.com:8083/aquasec/trivy:latest \
+        "reg.cinnagen.com:8083/aquasec/trivy:latest" \
         image \
         --format table \
         --exit-code 1 \
