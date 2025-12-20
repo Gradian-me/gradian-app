@@ -8,6 +8,9 @@ import { cookies, headers as nextHeaders } from 'next/headers';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
+import { extractTokenFromCookies } from '@/domains/auth';
+import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
+import { getAccessToken } from '@/app/api/auth/helpers/server-token-cache';
 
 // Cache storage structure
 interface CacheEntry<T> {
@@ -41,31 +44,69 @@ async function getCookieHeader(): Promise<string | undefined> {
 }
 
 /**
- * Get Authorization header from Next.js request context for server-side fetch calls
- * This allows server-side fetch calls to forward the Authorization header from the original browser request
- * The access token is stored in memory on the client and should be sent as Authorization header
+ * Get Authorization header for server-side fetch calls
+ * Gets access token from SERVER MEMORY using refresh token from cookies
+ * This follows the same pattern as proxyDataRequest and proxySchemaRequest
+ * The access token is stored in server memory, keyed by refresh token (which is in HttpOnly cookies)
  */
 async function getAuthorizationHeader(): Promise<string | undefined> {
   try {
-    const hMaybe = nextHeaders();
+    // Get cookies to extract refresh token
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
     
-    // Check if headers() returned a Promise (async context) - await it
-    let h: any;
-    if (hMaybe && typeof (hMaybe as any).then === 'function') {
-      h = await (hMaybe as Promise<any>);
-    } else {
-      h = hMaybe as any;
-    }
-    
-    if (!h || typeof h.get !== 'function') {
+    if (!cookieHeader) {
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'debug',
+        '[getAuthorizationHeader] No cookies found'
+      );
       return undefined;
     }
     
-    // Get Authorization header (case-insensitive)
-    const authHeader = h.get('authorization') || h.get('Authorization');
-    return authHeader || undefined;
+    // Extract refresh token from cookies
+    const refreshToken = extractTokenFromCookies(cookieHeader, AUTH_CONFIG.REFRESH_TOKEN_COOKIE);
+    
+    if (!refreshToken) {
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'debug',
+        '[getAuthorizationHeader] No refresh token found in cookies'
+      );
+      return undefined;
+    }
+    
+    // Look up access token from server memory using refresh token as key
+    const accessToken = getAccessToken(refreshToken);
+    
+    if (!accessToken) {
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'warn',
+        `[getAuthorizationHeader] Access token not found in server memory for refresh token: ${refreshToken.substring(0, 30)}... (may need refresh)`
+      );
+      return undefined;
+    }
+    
+    // Return Bearer token format
+    const authHeader = `Bearer ${accessToken}`;
+    loggingCustom(
+      LogType.SCHEMA_LOADER,
+      'debug',
+      `[getAuthorizationHeader] Retrieved access token from server memory ${JSON.stringify({
+        refreshTokenPreview: `${refreshToken.substring(0, 30)}...`,
+        accessTokenLength: accessToken.length,
+        authHeaderPreview: `${authHeader.substring(0, 20)}...`,
+      })}`
+    );
+    return authHeader;
   } catch (error) {
-    // headers() may not be available in all contexts (e.g., during build)
+    // cookies() or token lookup may not be available in all contexts (e.g., during build)
+    loggingCustom(
+      LogType.SCHEMA_LOADER,
+      'warn',
+      `[getAuthorizationHeader] Error getting authorization header: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
     return undefined;
   }
 }
@@ -405,10 +446,20 @@ export async function loadData<T = any>(
           loggingCustom(logType, 'warn', `[${instanceId}] No tenant domain extracted from DNS for internal fetch to ${fetchUrl}`);
         }
 
+        // Log the full request details including complete Authorization header (for debugging)
+        loggingCustom(logType, 'info', `[DATA_LOADER] [${instanceId}] → GET ${fetchUrl}`);
+        loggingCustom(logType, 'info', `[DATA_LOADER] [${instanceId}] Headers being sent to internal API: ${JSON.stringify({
+          ...fetchHeaders,
+          authorization: fetchHeaders['authorization'] || null, // Full Bearer token for debugging
+        })}`);
+
         const response = await fetch(fetchUrl, {
           cache: 'no-store',
           headers: fetchHeaders,
         });
+
+        // Log response details
+        loggingCustom(logType, 'info', `[DATA_LOADER] [${instanceId}] ← ${response.status} ${response.statusText} from ${fetchUrl}`);
 
         if (!response.ok) {
           throw new Error(`Failed to fetch data from ${apiPath}: ${response.status} ${response.statusText}`);

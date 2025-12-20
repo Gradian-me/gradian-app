@@ -658,19 +658,14 @@ export const proxyDataRequest = async (
 
   loggingCustom(LogType.CALL_BACKEND, 'info', `→ ${method} ${targetUrl}`);
 
-  // Log all headers being sent to backend for debugging
+  // Log all headers being sent to backend for debugging (including complete Authorization header)
   const headersToSend: Record<string, string> = {};
   headers.forEach((value, key) => {
-    if (key.toLowerCase() === 'authorization') {
-      // Mask authorization header for security (show first 20 chars only)
-      headersToSend[key] = value.length > 20 ? `${value.substring(0, 20)}...` : '***MASKED***';
-    } else {
-      headersToSend[key] = value;
-    }
+    headersToSend[key] = value; // Show complete headers including full Authorization Bearer token
   });
   loggingCustom(
     LogType.CALL_BACKEND,
-    'debug',
+    'info',
     `[proxyDataRequest] Headers being sent to backend: ${JSON.stringify(headersToSend)}`
   );
 
