@@ -13,6 +13,7 @@ import {
   buildAuthServiceUrl,
   buildProxyHeaders,
 } from '@/app/api/auth/helpers/external-auth.util';
+import { storeAccessToken, updateTokenOnRefresh } from '@/app/api/auth/helpers/server-token-cache';
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
@@ -102,17 +103,25 @@ export async function POST(request: NextRequest) {
       }
 
       const duration = Date.now() - startTime;
+      
+      // Store access token in server memory, keyed by refresh token
+      if (result.accessToken && tokenToUse) {
+        const expiresIn = AUTH_CONFIG.ACCESS_TOKEN_EXPIRY;
+        storeAccessToken(tokenToUse, result.accessToken, expiresIn);
+        loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Stored access token in server memory`);
+      }
+      
       loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Local refresh SUCCESS ${JSON.stringify({
         hasAccessToken: !!result.accessToken,
         tokenLength: result.accessToken?.length || 0,
         expiresIn: AUTH_CONFIG.ACCESS_TOKEN_EXPIRY,
         duration: `${duration}ms`,
         responseFormat: 'accessToken in body (NOT in cookie)',
-        clientStorage: 'MEMORY_ONLY',
+        storage: 'SERVER MEMORY (keyed by refresh_token)',
       })}`);
 
-      // Return access token in response body only (not in cookie)
-      // Client stores access token in memory only for security
+      // Return access token in response body (for backward compatibility, though client doesn't need to store it)
+      // Access token is now stored in server memory
       return NextResponse.json(
         {
           success: true,
@@ -187,6 +196,21 @@ export async function POST(request: NextRequest) {
       }
 
       const totalDuration = Date.now() - startTime;
+      
+      // Store access token in server memory
+      // If refresh token was rotated, update the cache entry
+      if (accessToken) {
+        if (refreshToken && refreshToken !== tokenToUse) {
+          // Refresh token was rotated - update cache with new refresh token
+          updateTokenOnRefresh(tokenToUse, refreshToken, accessToken, expiresIn);
+          loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Updated access token in server memory (refresh token rotated)`);
+        } else if (tokenToUse) {
+          // Same refresh token - just update access token
+          storeAccessToken(tokenToUse, accessToken, expiresIn);
+          loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] Stored access token in server memory`);
+        }
+      }
+      
       loggingCustom(LogType.LOGIN_LOG, 'log', `[REFRESH_API] External refresh SUCCESS ${JSON.stringify({
         hasAccessToken: !!accessToken,
         hasRefreshToken: !!refreshToken,
@@ -196,11 +220,11 @@ export async function POST(request: NextRequest) {
         refreshTokenExpiresIn,
         duration: `${totalDuration}ms`,
         responseFormat: 'accessToken in body (NOT in cookie)',
-        clientStorage: 'MEMORY_ONLY',
+        storage: 'SERVER MEMORY (keyed by refresh_token)',
       })}`);
 
-      // Return access token in response body only (not in cookie)
-      // Client stores access token in memory only for security
+      // Return access token in response body (for backward compatibility, though client doesn't need to store it)
+      // Access token is now stored in server memory
       const nextResponse = NextResponse.json(
         {
           success: true,
