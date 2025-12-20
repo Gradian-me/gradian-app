@@ -326,9 +326,10 @@ export async function buildSystemPrompt(params: {
     const promptParts: string[] = [GENERAL_IMAGE_PROMPT];
     
     // Get the appropriate image type prompt
-    if (imageType && imageType !== 'none' && imageType !== 'standard') {
-      const specificPrompt = IMAGE_TYPE_PROMPTS[imageType] || 
-                           IMAGE_TYPE_PROMPTS[imageType.toLowerCase()] || 
+    if (imageType && imageType !== 'none' && imageType !== 'standard' && typeof imageType === 'string') {
+      const imageTypeStr = String(imageType);
+      const specificPrompt = IMAGE_TYPE_PROMPTS[imageTypeStr] || 
+                           IMAGE_TYPE_PROMPTS[imageTypeStr.toLowerCase()] || 
                            '';
       
       if (specificPrompt) {
