@@ -8,6 +8,9 @@ import { cookies, headers as nextHeaders } from 'next/headers';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
+import { extractTokenFromCookies } from '@/domains/auth';
+import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
+import { getAccessToken } from '@/app/api/auth/helpers/server-token-cache';
 
 // Cache storage structure
 interface CacheEntry<T> {
@@ -36,6 +39,74 @@ async function getCookieHeader(): Promise<string | undefined> {
     return cookieHeader || undefined;
   } catch (error) {
     // cookies() may not be available in all contexts (e.g., during build)
+    return undefined;
+  }
+}
+
+/**
+ * Get Authorization header for server-side fetch calls
+ * Gets access token from SERVER MEMORY using refresh token from cookies
+ * This follows the same pattern as proxyDataRequest and proxySchemaRequest
+ * The access token is stored in server memory, keyed by refresh token (which is in HttpOnly cookies)
+ */
+async function getAuthorizationHeader(): Promise<string | undefined> {
+  try {
+    // Get cookies to extract refresh token
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.toString();
+    
+    if (!cookieHeader) {
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'debug',
+        '[getAuthorizationHeader] No cookies found'
+      );
+      return undefined;
+    }
+    
+    // Extract refresh token from cookies
+    const refreshToken = extractTokenFromCookies(cookieHeader, AUTH_CONFIG.REFRESH_TOKEN_COOKIE);
+    
+    if (!refreshToken) {
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'debug',
+        '[getAuthorizationHeader] No refresh token found in cookies'
+      );
+      return undefined;
+    }
+    
+    // Look up access token from server memory using refresh token as key
+    const accessToken = getAccessToken(refreshToken);
+    
+    if (!accessToken) {
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'warn',
+        `[getAuthorizationHeader] Access token not found in server memory for refresh token: ${refreshToken.substring(0, 30)}... (may need refresh)`
+      );
+      return undefined;
+    }
+    
+    // Return Bearer token format
+    const authHeader = `Bearer ${accessToken}`;
+    loggingCustom(
+      LogType.SCHEMA_LOADER,
+      'debug',
+      `[getAuthorizationHeader] Retrieved access token from server memory ${JSON.stringify({
+        refreshTokenPreview: `${refreshToken.substring(0, 30)}...`,
+        accessTokenLength: accessToken.length,
+        authHeaderPreview: `${authHeader.substring(0, 20)}...`,
+      })}`
+    );
+    return authHeader;
+  } catch (error) {
+    // cookies() or token lookup may not be available in all contexts (e.g., during build)
+    loggingCustom(
+      LogType.SCHEMA_LOADER,
+      'warn',
+      `[getAuthorizationHeader] Error getting authorization header: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
     return undefined;
   }
 }
@@ -344,13 +415,21 @@ export async function loadData<T = any>(
         const fetchUrl = getApiUrl(apiPath);
         loggingCustom(logType, 'info', `🌐 [${instanceId}] Fetching data from ${fetchUrl}`);
 
-        // Get cookies from Next.js request context to forward to internal API calls
+        // Get cookies and Authorization header from Next.js request context to forward to internal API calls
+        // The access token is stored in memory on the client and should be sent as Authorization header
         const cookieHeader = await getCookieHeader();
+        const authHeader = await getAuthorizationHeader();
         const fetchHeaders: Record<string, string> = {
           'Content-Type': 'application/json',
         };
         if (cookieHeader) {
           fetchHeaders['cookie'] = cookieHeader;
+        }
+        if (authHeader) {
+          fetchHeaders['authorization'] = authHeader;
+          loggingCustom(logType, 'debug', `[${instanceId}] Adding Authorization header for internal fetch to ${fetchUrl}`);
+        } else {
+          loggingCustom(logType, 'warn', `[${instanceId}] No Authorization header available for internal fetch to ${fetchUrl}`);
         }
 
         // Set x-tenant-domain header for internal Next.js API requests
@@ -367,10 +446,20 @@ export async function loadData<T = any>(
           loggingCustom(logType, 'warn', `[${instanceId}] No tenant domain extracted from DNS for internal fetch to ${fetchUrl}`);
         }
 
+        // Log the full request details including complete Authorization header (for debugging)
+        loggingCustom(logType, 'info', `[DATA_LOADER] [${instanceId}] → GET ${fetchUrl}`);
+        loggingCustom(logType, 'info', `[DATA_LOADER] [${instanceId}] Headers being sent to internal API: ${JSON.stringify({
+          ...fetchHeaders,
+          authorization: fetchHeaders['authorization'] || null, // Full Bearer token for debugging
+        })}`);
+
         const response = await fetch(fetchUrl, {
           cache: 'no-store',
           headers: fetchHeaders,
         });
+
+        // Log response details
+        loggingCustom(logType, 'info', `[DATA_LOADER] [${instanceId}] ← ${response.status} ${response.statusText} from ${fetchUrl}`);
 
         if (!response.ok) {
           throw new Error(`Failed to fetch data from ${apiPath}: ${response.status} ${response.statusText}`);
@@ -508,13 +597,21 @@ export async function loadDataById<T = any>(
       const fetchUrl = getApiUrl(`${apiBasePath}/${id}`);
       const startTime = Date.now();
 
-      // Get cookies from Next.js request context to forward to internal API calls
+      // Get cookies and Authorization header from Next.js request context to forward to internal API calls
+      // The access token is stored in memory on the server and should be sent as Authorization header
       const cookieHeader = await getCookieHeader();
+      const authHeader = await getAuthorizationHeader();
       const fetchHeaders: Record<string, string> = {
         'Content-Type': 'application/json',
       };
       if (cookieHeader) {
         fetchHeaders['cookie'] = cookieHeader;
+      }
+      if (authHeader) {
+        fetchHeaders['authorization'] = authHeader;
+        loggingCustom(logType, 'debug', `[${instanceId}] Adding Authorization header for internal fetch to ${fetchUrl}`);
+      } else {
+        loggingCustom(logType, 'warn', `[${instanceId}] No Authorization header available for internal fetch to ${fetchUrl}`);
       }
 
       // Set x-tenant-domain header for internal Next.js API requests
@@ -635,13 +732,21 @@ export async function loadDataById<T = any>(
     const fetchUrl = getApiUrl(`${apiBasePath}/${id}`);
     const startTime = Date.now();
 
-    // Get cookies from Next.js request context to forward to internal API calls
+    // Get cookies and Authorization header from Next.js request context to forward to internal API calls
+    // The access token is stored in memory on the server and should be sent as Authorization header
     const cookieHeader = await getCookieHeader();
+    const authHeader = await getAuthorizationHeader();
     const fetchHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
     };
     if (cookieHeader) {
       fetchHeaders['cookie'] = cookieHeader;
+    }
+    if (authHeader) {
+      fetchHeaders['authorization'] = authHeader;
+      loggingCustom(logType, 'debug', `[${instanceId}] Adding Authorization header for internal fetch to ${fetchUrl}`);
+    } else {
+      loggingCustom(logType, 'warn', `[${instanceId}] No Authorization header available for internal fetch to ${fetchUrl}`);
     }
 
     // Include tenant domain header for server-side internal fetches

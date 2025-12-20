@@ -13,6 +13,7 @@ import {
   getAuthServiceAppId,
   isServerDemoMode,
 } from '@/app/api/auth/helpers/external-auth.util';
+import { storeAccessToken } from '@/app/api/auth/helpers/server-token-cache';
 
 const getCookieBaseOptions = (maxAge?: number) => ({
   httpOnly: true,
@@ -142,10 +143,17 @@ export async function POST(request: NextRequest) {
       applyTokenCookies(response, result.tokens);
       loggingCustom(LogType.LOGIN_LOG, 'debug', 'Token cookies applied');
       
+      // Store access token in server memory, keyed by refresh token
+      if (result.tokens?.accessToken && result.tokens?.refreshToken) {
+        const expiresIn = AUTH_CONFIG.ACCESS_TOKEN_EXPIRY;
+        storeAccessToken(result.tokens.refreshToken, result.tokens.accessToken, expiresIn);
+        loggingCustom(LogType.LOGIN_LOG, 'log', `[LOGIN_API] Stored access token in server memory`);
+      }
+      
       loggingCustom(LogType.LOGIN_LOG, 'log', `[LOGIN_API] Login successful (Demo Mode) ${JSON.stringify({
         hasAccessToken: !!result.tokens?.accessToken,
         hasRefreshToken: !!result.tokens?.refreshToken,
-        accessTokenStorage: 'RETURNED IN RESPONSE BODY (client stores in MEMORY)',
+        accessTokenStorage: 'STORED IN SERVER MEMORY (keyed by refresh_token)',
         refreshTokenStorage: 'SET IN HTTPONLY COOKIE (not accessible to JavaScript)',
         accessTokenLength: result.tokens?.accessToken?.length || 0,
         refreshTokenInCookie: true,
@@ -299,10 +307,28 @@ export async function POST(request: NextRequest) {
     forwardSetCookieHeaders(upstreamResponse, response);
     
     const accessToken = upstreamJson?.tokens?.accessToken;
+    const refreshToken = upstreamJson?.tokens?.refreshToken;
+    
+    // Store access token in server memory, keyed by refresh token
+    // IMPORTANT: Use the refresh token from response body, which matches what we set in cookie via applyTokenCookies
+    if (accessToken && refreshToken) {
+      const expiresIn = upstreamJson?.tokens?.expiresIn || AUTH_CONFIG.ACCESS_TOKEN_EXPIRY;
+      storeAccessToken(refreshToken, accessToken, expiresIn);
+      loggingCustom(LogType.LOGIN_LOG, 'log', `[LOGIN_API] Stored access token in server memory ${JSON.stringify({
+        refreshTokenPreview: `${refreshToken.substring(0, 30)}...`,
+        refreshTokenLength: refreshToken.length,
+        accessTokenLength: accessToken.length,
+        expiresIn: `${expiresIn}s`,
+        cookieName: AUTH_CONFIG.REFRESH_TOKEN_COOKIE,
+      })}`);
+    } else {
+      loggingCustom(LogType.LOGIN_LOG, 'warn', `[LOGIN_API] Cannot store access token: missing accessToken or refreshToken`);
+    }
+    
     loggingCustom(LogType.LOGIN_LOG, 'log', `[LOGIN_API] Login successful (External Auth) ${JSON.stringify({
       hasAccessToken: !!accessToken,
-      hasRefreshToken: !!upstreamJson?.tokens?.refreshToken,
-      accessTokenStorage: 'RETURNED IN RESPONSE BODY (client stores in MEMORY)',
+      hasRefreshToken: !!refreshToken,
+      accessTokenStorage: 'STORED IN SERVER MEMORY (keyed by refresh_token)',
       refreshTokenStorage: 'SET IN HTTPONLY COOKIE via Set-Cookie headers (not accessible to JavaScript)',
       accessTokenLength: accessToken?.length || 0,
       refreshTokenInCookie: true,

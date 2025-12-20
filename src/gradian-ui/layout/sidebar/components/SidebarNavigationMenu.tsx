@@ -221,7 +221,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [companyId, selectedCompany, menuItemsStore, tenantId]);
+  }, [companyId, tenantId]); // Only depend on primitive values, not objects or store instances
 
   if (isLoading) {
     return (
