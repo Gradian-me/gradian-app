@@ -383,7 +383,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
                 value={values['relatedCompanies']}
                 error={errors?.['relatedCompanies']}
                 touched={typeof touched?.['relatedCompanies'] === 'boolean' ? touched['relatedCompanies'] : undefined}
-                required={true}
+                required={schema.isNotCompanyBased !== true}
                 onChange={(selections) => {
                   // Store full normalized selections so we keep label/icon metadata in data
                   onChange('relatedCompanies', selections);

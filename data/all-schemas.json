@@ -2465,6 +2465,148 @@
     "syncStrategy": "schema-and-data"
   },
   {
+    "id": "parameter-items",
+    "description": "Define reusable parameter items with label, icon, color, and inactive handling",
+    "singular_name": "Parameter Item",
+    "plural_name": "Parameter Items",
+    "cardMetadata": [],
+    "fields": [
+      {
+        "id": "parameter-item-label",
+        "name": "label",
+        "label": "Label",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter parameter label",
+        "description": "Human readable label shown in UI",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "title"
+      },
+      {
+        "id": "parameter-item-icon",
+        "name": "icon",
+        "label": "Icon",
+        "sectionId": "basic-information",
+        "component": "icon",
+        "placeholder": "Enter Lucide Icon name (e.g., CheckCircle)",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "icon"
+      },
+      {
+        "id": "parameter-item-color",
+        "name": "color",
+        "label": "Color",
+        "sectionId": "basic-information",
+        "component": "color-picker",
+        "placeholder": "Select color",
+        "description": "Choose a color from the Tailwind palette for this parameter.",
+        "role": "color",
+        "colSpan": 1,
+        "order": 3
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Parameter item label, icon and color",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "parameter-item-overview",
+          "title": "Parameter Item Overview",
+          "description": "Basic parameter item information",
+          "colSpan": 2,
+          "fieldIds": [
+            "parameter-item-label",
+            "parameter-item-icon",
+            "parameter-item-color"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": false,
+    "icon": "CircleDot",
+    "allowDataInactive": true,
+    "isNotCompanyBased": true,
+    "schemaType": "system",
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
+  },
+  {
+    "id": "parameter-groups",
+    "description": "Group parameter items into reusable parameter groups, optionally scoped to companies",
+    "singular_name": "Parameter Group",
+    "plural_name": "Parameter Groups",
+    "fields": [
+      {
+        "id": "parameter-group-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter parameter group title",
+        "validation": {
+          "required": true,
+          "minLength": 2
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "title"
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Parameter group title, description and company scope",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "parameter-items-section",
+        "title": "Parameter Items",
+        "description": "Parameter items that belong to this group",
+        "initialState": "expanded",
+        "columns": 1,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "connectToSchema",
+          "minItems": 1,
+          "maxItems": 0,
+          "itemTitle": null,
+          "targetSchema": "parameter-items",
+          "relationTypeId": "HAS_PARAMETER_ITEM",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": true
+        }
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Layers",
+    "isNotCompanyBased": true,
+    "canSelectMultiCompanies": false,
+    "schemaType": "system",
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data",
+    "allowDataInactive": true,
+    "allowDataRelatedTenants": true
+  },
+  {
     "id": "logical-operators",
     "description": "Manage logical operators with their symbols, SQL and Cypher equivalents",
     "singular_name": "Logical Operator",
@@ -5000,6 +5142,115 @@
       {
         "id": "01KBCXZ2KX7N336B5GDGKEKNRC",
         "label": "Active / Inactive"
+      }
+    ]
+  },
+  {
+    "id": "inquiries",
+    "description": "Manage inquiries with inquiry number, date, and description",
+    "singular_name": "Inquiry",
+    "plural_name": "Inquiries",
+    "fields": [
+      {
+        "id": "inquiry-number",
+        "name": "inquiryNumber",
+        "label": "Inquiry Number",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter inquiry number",
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1,
+        "canCopy": true
+      },
+      {
+        "id": "inquiry-date",
+        "name": "inquiryDate",
+        "label": "Inquiry Date",
+        "sectionId": "basic-information",
+        "component": "date",
+        "placeholder": "Select inquiry date",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "inquiry-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter inquiry description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 3
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Inquiry details and information",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": true,
+    "icon": "FileText",
+    "schemaType": "business",
+    "applyToAllTenants": false
+  },
+  {
+    "id": "tenders",
+    "description": "Manage tenders with vendors and description",
+    "singular_name": "Tender",
+    "plural_name": "Tenders",
+    "fields": [
+      {
+        "id": "tender-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter tender description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 2
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Tender details and vendor information",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": true,
+    "icon": "FileCheck",
+    "schemaType": "business",
+    "applyToAllTenants": false,
+    "relatedTenants": [
+      {
+        "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+        "label": "Supply Chain Management"
+      }
+    ],
+    "allowDataForce": true,
+    "allowDataDueDate": true,
+    "statusGroup": [
+      {
+        "id": "01KCXSBQMD17BR96WWSKBJMEZ4",
+        "label": "Inquiry Tender Status"
       }
     ]
   }

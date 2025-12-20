@@ -140,6 +140,15 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
+      "color": "blue",
+      "label": "Has Parameter Item",
+      "description": "A parameter group contains one or more parameter items.",
+      "icon": "ListTree",
+      "id": "HAS_PARAMETER_ITEM",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
       "label": "Has Field Value",
       "color": "zinc",
       "icon": "FormInput",
@@ -2985,6 +2994,21 @@
       "createdAt": "2025-12-06T12:59:40.005Z",
       "updatedAt": "2025-12-06T12:59:40.005Z",
       "status-items-section": []
+    },
+    {
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "title": "Inquiry Tender Status",
+      "incomplete": true,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXSBQMD17BR96WWSKBJMEZ4",
+      "createdAt": "2025-12-20T11:47:16.247Z",
+      "updatedAt": "2025-12-20T11:47:16.249Z"
     }
   ],
   "status-items": [
@@ -3263,6 +3287,63 @@
       "id": "01KC3VY8JQAY9FWT04V1RJB4TT",
       "createdAt": "2025-12-10T10:12:05.346Z",
       "updatedAt": "2025-12-10T10:12:05.346Z"
+    },
+    {
+      "label": "Draft",
+      "color": "blue",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXSC6PE82FJ8BDJTNK8SJSS",
+      "createdAt": "2025-12-20T11:47:31.680Z",
+      "updatedAt": "2025-12-20T11:56:08.214Z",
+      "icon": "LucideNotebookPen",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "Published For Vendors",
+      "icon": "FileUser",
+      "color": "yellow",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXSVBPFH4B4BNCHC0TY98ZN",
+      "createdAt": "2025-12-20T11:55:48.334Z",
+      "updatedAt": "2025-12-20T11:58:01.417Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "Under Internal Evaluation",
+      "icon": "LucideMailSearch",
+      "color": "orange",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXSZ6VTQX3P3Z3J5Q4JJ1P5",
+      "createdAt": "2025-12-20T11:57:54.431Z",
+      "updatedAt": "2025-12-20T11:57:54.431Z"
+    },
+    {
+      "label": "Awarded",
+      "icon": "Verified",
+      "color": "emerald",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXT066WCM231G176JGVGSWJ",
+      "createdAt": "2025-12-20T11:58:26.530Z",
+      "updatedAt": "2025-12-20T11:58:26.531Z"
+    },
+    {
+      "label": "Cancelled",
+      "icon": "ShieldBan",
+      "color": "rose",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXT1B3PC7FQKF0QFH0318NA",
+      "createdAt": "2025-12-20T11:59:04.330Z",
+      "updatedAt": "2025-12-20T11:59:04.330Z"
     }
   ],
   "tenants": [
@@ -13853,6 +13934,138 @@
           "label": "Active",
           "icon": "CheckCheck",
           "color": "emerald"
+        }
+      ]
+    }
+  ],
+  "inquiries": [],
+  "inquiry-tenders": [],
+  "parameter-items": [
+    {
+      "label": "Certificate of Analysis (CoA)",
+      "icon": "NotepadText",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXV8VPYF3PTEZC539WDEM28",
+      "createdAt": "2025-12-20T12:20:39.276Z",
+      "updatedAt": "2025-12-20T12:20:39.276Z"
+    },
+    {
+      "label": "Certificate of Quality (CoQ)",
+      "icon": "NotepadText",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXVH1Q682VQ085PZJA8K8FY",
+      "createdAt": "2025-12-20T12:20:39.566Z",
+      "updatedAt": "2025-12-20T12:20:39.566Z"
+    },
+    {
+      "label": "TSE-BSE",
+      "icon": "NotepadText",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXVM1P39PPQN6X6870BT1QK",
+      "createdAt": "2025-12-20T12:26:45.838Z",
+      "updatedAt": "2025-12-20T12:32:17.573Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "RT",
+      "icon": "ThermometerSun",
+      "color": "lime",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW3E9NA1WH19ZJCBCCS11N",
+      "createdAt": "2025-12-20T12:35:10.271Z",
+      "updatedAt": "2025-12-20T12:36:34.541Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "2~8",
+      "icon": "Refrigerator",
+      "color": "teal",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW5JYYQ811SSE26DA2C9K8",
+      "createdAt": "2025-12-20T12:36:20.581Z",
+      "updatedAt": "2025-12-20T12:36:42.641Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "-20",
+      "icon": "ThermometerSnowflake",
+      "color": "purple",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW8CYMG126FZHMJ9PBQMVW",
+      "createdAt": "2025-12-20T12:37:52.731Z",
+      "updatedAt": "2025-12-20T12:37:52.731Z"
+    },
+    {
+      "label": "-70",
+      "icon": "ThermometerSnowflake",
+      "color": "indigo",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW8VB5E9DZERYYH1WC5P99",
+      "createdAt": "2025-12-20T12:38:07.473Z",
+      "updatedAt": "2025-12-20T12:38:07.473Z"
+    },
+    {
+      "label": "-80",
+      "icon": "ThermometerSnowflake",
+      "color": "blue",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW972PQ1ZNRYH1GAASVN6E",
+      "createdAt": "2025-12-20T12:38:19.486Z",
+      "updatedAt": "2025-12-20T12:38:19.486Z"
+    },
+    {
+      "label": "-196",
+      "icon": "ThermometerSnowflake",
+      "color": "cyan",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW9JEMHK1SKANMYVASJN96",
+      "createdAt": "2025-12-20T12:38:31.135Z",
+      "updatedAt": "2025-12-20T12:38:31.135Z"
+    }
+  ],
+  "parameter-groups": [
+    {
+      "title": "Inquiry Required Documents",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXV771ABGHR0ST7MZ03S6B1",
+      "createdAt": "2025-12-20T12:19:45.334Z",
+      "updatedAt": "2025-12-20T12:32:20.387Z",
+      "parameter-items-section": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
+    },
+    {
+      "title": "Storage Conditions",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW1C9NT5D4TFDK511BKTSQ",
+      "createdAt": "2025-12-20T12:34:02.687Z",
+      "updatedAt": "2025-12-20T12:38:33.179Z",
+      "parameter-items-section": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        },
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
         }
       ]
     }

@@ -43,6 +43,7 @@ import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
 import { Plus } from 'lucide-react';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { fetchOptionsFromSchemaOrUrl } from '../utils/fetch-options-utils';
+import { CompanySelector } from '@/components/layout/CompanySelector';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 8, scale: 0.99 },
@@ -787,6 +788,18 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     },
     [effectiveSourceUrl, fetchSourceItems, fetchSchemaItems, supportsPagination, schemaId, staticItems, includeIds, excludeIds, shouldFilterByCompany, companyQueryParam, sortType]
   );
+
+  // Handle company change to refresh data
+  const handleCompanyChange = useCallback(() => {
+    // Clear error and refresh items when company is selected
+    setError(null);
+    if (isOpen) {
+      // Reset pagination and reload items
+      setPageMeta((prev) => ({ ...prev, page: 1, hasMore: true, totalItems: 0 }));
+      hasInitialLoadRef.current = false;
+      void loadItems(1, false);
+    }
+  }, [isOpen, loadItems]);
 
   // Keep items in sync when static dataset changes or when modal opens
   useEffect(() => {
@@ -2105,7 +2118,17 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               <span className="ms-2 text-sm text-gray-500">Loading items...</span>
             </div>
           ) : error ? (
-            <div className="text-center py-12 text-red-500 text-sm">{error}</div>
+            <div className="flex flex-col items-center justify-center py-12 gap-4 px-4">
+              <div className="text-center text-red-500 text-sm">{error}</div>
+              {error === COMPANY_REQUIRED_MESSAGE && (
+                <div className="flex flex-col items-center gap-2 w-full max-w-md">
+                  <p className="text-xs font-medium opacity-80 text-center">Select a company:</p>
+                  <div className="w-full">
+                    <CompanySelector onCompanyChange={handleCompanyChange} />
+                  </div>
+                </div>
+              )}
+            </div>
           ) : filteredItems.length === 0 && !isLoading ? (
             <div className="text-center py-12 text-gray-500 text-sm">
               {searchQuery ? `No items found matching "${searchQuery}"` : 'No items available'}
