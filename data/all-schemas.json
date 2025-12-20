@@ -5040,6 +5040,22 @@
         "description": "Vendor name and description",
         "initialState": "expanded",
         "columns": 2
+      },
+      {
+        "id": "vendor-users",
+        "title": "Vendor Users",
+        "description": "Users associated with this vendor",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 0,
+          "targetSchema": "users",
+          "relationTypeId": "HAS_MEMBER",
+          "deleteType": "relationOnly",
+          "addType": "canSelectFromData",
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
+        }
       }
     ],
     "showInNavigation": true,

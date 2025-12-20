@@ -1047,5 +1047,65 @@
     "id": "01KCHF23WBNVP0ZNP1TXHP3SP9",
     "createdAt": "2025-12-15T16:56:22.155Z",
     "updatedAt": "2025-12-15T16:56:22.155Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCXDJ8JBXRP84PW59Y5ADR5A",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCXDKF6JJ392P4HMGC8T19TC",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCXDKF97NKQRE7ZE5VYQSZZ5",
+    "createdAt": "2025-12-20T08:21:46.919Z",
+    "updatedAt": "2025-12-20T08:21:46.919Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCXDJ8JBXRP84PW59Y5ADR5A",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCXDM9ASSWTYDWA4HDT7W05B",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCXDM9D50FEDFRHXKFXQAQY4",
+    "createdAt": "2025-12-20T08:22:13.669Z",
+    "updatedAt": "2025-12-20T08:22:13.669Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCXDJ8JBXRP84PW59Y5ADR5A",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCXDMZE231SQFZZ57W3H8497",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCXDMZGG1KWCDMAEBRKEKRHD",
+    "createdAt": "2025-12-20T08:22:36.304Z",
+    "updatedAt": "2025-12-20T08:22:36.304Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCXDJ8JBXRP84PW59Y5ADR5A",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCXDNRE02CDBAXJPBDHQ3PTQ",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCXDNRGG9E0NFV3ZZKBQF867",
+    "createdAt": "2025-12-20T08:23:01.904Z",
+    "updatedAt": "2025-12-20T08:23:01.904Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCXDJ8JBXRP84PW59Y5ADR5A",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCXDP4BHXVDSRKA78J8S626A",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCXDP4DZPG3CJXQN85B8CJKW",
+    "createdAt": "2025-12-20T08:23:14.111Z",
+    "updatedAt": "2025-12-20T08:23:14.111Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCXDJ8JBXRP84PW59Y5ADR5A",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCXDXS9EYARAPWA9DC4E01TM",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCXDXSCE32BZH55MVV4Y2CV3",
+    "createdAt": "2025-12-20T08:27:24.941Z",
+    "updatedAt": "2025-12-20T08:27:24.941Z"
   }
 ]

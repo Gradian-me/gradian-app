@@ -213,7 +213,7 @@ export const DataSort: React.FC<DataSortProps> = ({
       name: field.name || field.id,
       isSystemField: false,
     }));
-  }, [schema?.fields, excludeMetadataFields, excludedFieldIds]);
+  }, [schema, excludeMetadataFields, excludedFieldIds]);
 
   // Use ref to track the latest value to avoid stale closure issues
   const valueRef = useRef(value);

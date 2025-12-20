@@ -3733,6 +3733,24 @@
       "id": "01KCPROCESSTYPES00000000001",
       "createdAt": "2025-12-15T00:00:00.000Z",
       "updatedAt": "2025-12-15T16:53:11.207Z"
+    },
+    {
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "title": "User Type",
+      "incomplete": true,
+      "createdBy": "841",
+      "id": "01KCXDJ8JBXRP84PW59Y5ADR5A",
+      "createdAt": "2025-12-20T08:21:07.292Z",
+      "updatedAt": "2025-12-20T08:21:07.292Z"
     }
   ],
   "entity-type-items": [
@@ -3941,6 +3959,66 @@
       "id": "01KCHF23V3D6MKMCJBW3WJXZX7",
       "createdAt": "2025-12-15T16:56:22.116Z",
       "updatedAt": "2025-12-15T16:56:22.116Z"
+    },
+    {
+      "label": "System Administrator",
+      "icon": "Shield",
+      "color": "rose",
+      "incomplete": false,
+      "createdBy": "841",
+      "id": "01KCXDKF6JJ392P4HMGC8T19TC",
+      "createdAt": "2025-12-20T08:21:46.840Z",
+      "updatedAt": "2025-12-20T08:21:46.840Z"
+    },
+    {
+      "label": "Business Administrator",
+      "icon": "Briefcase",
+      "color": "pink",
+      "incomplete": false,
+      "createdBy": "841",
+      "id": "01KCXDM9ASSWTYDWA4HDT7W05B",
+      "createdAt": "2025-12-20T08:22:13.599Z",
+      "updatedAt": "2025-12-20T08:22:13.599Z"
+    },
+    {
+      "label": "General User",
+      "icon": "User",
+      "color": "violet",
+      "incomplete": false,
+      "createdBy": "841",
+      "id": "01KCXDMZE231SQFZZ57W3H8497",
+      "createdAt": "2025-12-20T08:22:36.232Z",
+      "updatedAt": "2025-12-20T08:22:36.232Z"
+    },
+    {
+      "label": "Subsidiary Company",
+      "icon": "Building",
+      "color": "sky",
+      "incomplete": false,
+      "createdBy": "841",
+      "id": "01KCXDNRE02CDBAXJPBDHQ3PTQ",
+      "createdAt": "2025-12-20T08:23:01.831Z",
+      "updatedAt": "2025-12-20T08:23:01.831Z"
+    },
+    {
+      "label": "Vendor",
+      "icon": "ShoppingBasket",
+      "color": "teal",
+      "incomplete": false,
+      "createdBy": "841",
+      "id": "01KCXDP4BHXVDSRKA78J8S626A",
+      "createdAt": "2025-12-20T08:23:14.038Z",
+      "updatedAt": "2025-12-20T08:23:14.038Z"
+    },
+    {
+      "label": "Customer",
+      "icon": "BookUser",
+      "color": "yellow",
+      "incomplete": false,
+      "createdBy": "841",
+      "id": "01KCXDXS9EYARAPWA9DC4E01TM",
+      "createdAt": "2025-12-20T08:27:24.852Z",
+      "updatedAt": "2025-12-20T08:27:24.852Z"
     }
   ],
   "process-mappings": [
@@ -12948,7 +13026,7 @@
       ]
     },
     {
-      "name": "biotechindigo",
+      "name": "Biotechindigo",
       "description": "",
       "id": "01KCX516BVBXB9X1P8A2B4TECA",
       "createdAt": "2025-12-20T12:00:00.000Z",

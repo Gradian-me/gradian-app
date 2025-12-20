@@ -155,42 +155,6 @@ export function UserProfileSelector({
     }
   };
 
-  const profilePayload: UserProfile = {
-    id: user.id,
-    name: displayName,
-    email: user.email,
-    avatar: user.avatar,
-    role: user.role || 'user',
-    permissions: [],
-  };
-
-  const dropdownActions = [
-    {
-      id: 'profile',
-      label: 'Profile',
-      description: 'View your profile',
-      icon: UserIcon,
-      action: () => {
-        onProfileSelect?.(profilePayload);
-        handleNavigate(`/profiles/${user.id}`);
-      },
-    },
-    {
-      id: 'settings',
-      label: 'Account Settings',
-      description: 'Manage your preferences',
-      icon: Settings,
-      action: () => handleNavigate('/settings'),
-    },
-    {
-      id: 'password',
-      label: 'Change Password',
-      description: 'Update your credentials',
-      icon: KeyRound,
-      action: () => handleNavigate('/authentication/change-password'),
-    },
-  ];
-
   // Always render the same structure to avoid hydration mismatch
   // When not mounted, render a disabled placeholder with the same structure as the mounted version
   // This ensures server and client render identical HTML structure
@@ -256,6 +220,43 @@ export function UserProfileSelector({
       </Button>
     );
   }
+
+  // At this point, TypeScript knows user is not null
+  const profilePayload: UserProfile = {
+    id: user.id,
+    name: displayName,
+    email: user.email,
+    avatar: user.avatar,
+    role: user.role || 'user',
+    permissions: [],
+  };
+
+  const dropdownActions = [
+    {
+      id: 'profile',
+      label: 'Profile',
+      description: 'View your profile',
+      icon: UserIcon,
+      action: () => {
+        onProfileSelect?.(profilePayload);
+        handleNavigate(`/profiles/${user.id}`);
+      },
+    },
+    {
+      id: 'settings',
+      label: 'Account Settings',
+      description: 'Manage your preferences',
+      icon: Settings,
+      action: () => handleNavigate('/settings'),
+    },
+    {
+      id: 'password',
+      label: 'Change Password',
+      description: 'Update your credentials',
+      icon: KeyRound,
+      action: () => handleNavigate('/authentication/change-password'),
+    },
+  ];
 
   return (
     <DropdownMenuPrimitive.Root

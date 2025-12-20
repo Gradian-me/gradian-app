@@ -846,6 +846,16 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   }, [isOpen, supportsPagination, searchQuery, includeKey, excludeKey, loadItems, companyKey]);
 
   useEffect(() => {
+    // Skip client-side filtering when using sourceUrl with pagination (API already filters)
+    if (effectiveSourceUrl && supportsPagination) {
+      // Only apply sorting if needed, but don't filter (API handles filtering)
+      const baseSorted = sortOptions(items, sortType);
+      if (filteredItems.length !== baseSorted.length || !filteredItems.every((v, i) => v === baseSorted[i])) {
+        setFilteredItems(baseSorted);
+      }
+      return;
+    }
+
     const trimmed = searchQuery.trim();
     const baseSorted = sortOptions(items, sortType);
 
@@ -867,6 +877,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
             item.name ||
             item.title ||
             item.singular_name ||
+            item.label ||
             '';
           const subtitle =
             getValueByRoleFromSourceColumns(item, 'subtitle', effectiveSourceColumnRoles) ||
@@ -877,15 +888,18 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
             getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles) ||
             item.description ||
             '';
+          const icon = item.icon || '';
           return (
             title.toLowerCase().includes(query) ||
             subtitle.toLowerCase().includes(query) ||
-            description.toLowerCase().includes(query)
+            description.toLowerCase().includes(query) ||
+            icon.toLowerCase().includes(query)
           );
         }
-        const title = item.name || item.title || item.singular_name || '';
+        const title = item.name || item.title || item.singular_name || item.label || '';
         const subtitle = item.email || item.subtitle || '';
-        return title.toLowerCase().includes(query) || subtitle.toLowerCase().includes(query);
+        const icon = item.icon || '';
+        return title.toLowerCase().includes(query) || subtitle.toLowerCase().includes(query) || icon.toLowerCase().includes(query);
       }
 
       const title = getValueByRole(effectiveSchema, item, 'title') || item.name || '';
@@ -899,7 +913,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       return;
     }
     setFilteredItems(sortedFiltered);
-  }, [searchQuery, items, filteredItems, effectiveSchema, sortType, effectiveSourceColumnRoles]);
+  }, [searchQuery, items, filteredItems, effectiveSchema, sortType, effectiveSourceColumnRoles, effectiveSourceUrl, supportsPagination]);
 
   useEffect(() => {
     if (!supportsPagination || !isOpen) {
