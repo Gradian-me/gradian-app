@@ -1265,13 +1265,25 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     }
 
     // Find status field options
-    const statusFieldDef = effectiveSchema?.fields?.find(f => f.role === 'status');
+    const statusFieldDef = effectiveSchema?.fields?.find(f => f.role === 'status' || f.name === 'status');
     const ratingFieldDef = effectiveSchema?.fields?.find(f => f.role === 'rating');
     const hasCodeField = effectiveSchema?.fields?.some(f => f.role === 'code') || false;
     const codeField = getSingleValueByRole(effectiveSchema, item, 'code');
     const statusFieldValue = statusFieldDef ? getFieldValue(statusFieldDef, item) : null;
     const ratingFieldValue = ratingFieldDef ? getFieldValue(ratingFieldDef, item) : null;
-    const statusFieldNode = statusFieldDef ? formatFieldValue(statusFieldDef, statusFieldValue, item) : null;
+    
+    // Ensure status field has options from statusGroup if available (same approach as TableWrapper)
+    const hasStatusGroup = Array.isArray(effectiveSchema?.statusGroup) && effectiveSchema.statusGroup.length > 0;
+    const statusFieldWithOptions = statusFieldDef 
+      ? { 
+          ...statusFieldDef, 
+          options: statusFieldDef.options || (hasStatusGroup ? effectiveSchema.statusGroup : undefined)
+        }
+      : hasStatusGroup
+        ? { id: 'status', name: 'status', role: 'status', options: effectiveSchema.statusGroup }
+        : null;
+    
+    const statusFieldNode = statusFieldWithOptions ? formatFieldValue(statusFieldWithOptions, statusFieldValue, item) : null;
     const ratingFieldNode = ratingFieldDef ? formatFieldValue(ratingFieldDef, ratingFieldValue, item) : null;
 
     return (

@@ -6,14 +6,17 @@ import { IService } from '../interfaces/service.interface';
 import { BaseEntity, FilterParams } from '../types/base.types';
 import { handleDomainError } from '../errors/domain.errors';
 import { parsePaginationParams, paginateArray, buildPaginationMeta } from '@/gradian-ui/shared/utils/pagination-utils';
-import { parseSortArray, multiSort } from '@/gradian-ui/shared/utils/sort-utils';
+import { parseSortArray, multiSort, SortConfig } from '@/gradian-ui/shared/utils/sort-utils';
 import { isDemoModeEnabled } from '@/app/api/data/utils';
+import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { resolveFieldById } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 
 export class BaseController<T extends BaseEntity> {
   constructor(
     protected service: IService<T>,
     protected entityName: string = 'Entity',
-    protected isNotCompanyBased: boolean = false
+    protected isNotCompanyBased: boolean = false,
+    protected schema?: FormSchema
   ) {}
 
   /**
@@ -125,7 +128,25 @@ export class BaseController<T extends BaseEntity> {
 
       // Parse sortArray parameter
       const sortArrayParam = searchParams.get('sortArray');
-      const sortArray = parseSortArray(sortArrayParam);
+      let sortArray = parseSortArray(sortArrayParam);
+
+      // Resolve field IDs to field names for sorting
+      if (sortArray && this.schema) {
+        sortArray = sortArray.map(sort => {
+          // Check if it's a system field (status, updatedAt, etc.)
+          const systemFields = ['status', 'entityType', 'updatedBy', 'updatedAt', 'createdBy', 'createdAt', 'companyId'];
+          if (systemFields.includes(sort.column)) {
+            return sort; // System fields use their IDs directly
+          }
+          
+          // Resolve field ID to field name
+          const field = resolveFieldById(this.schema!, sort.column);
+          return {
+            ...sort,
+            column: field.name || sort.column // Use field.name if available, otherwise keep original
+          };
+        });
+      }
 
       const result = await this.service.getAll(filters);
 
@@ -147,8 +168,8 @@ export class BaseController<T extends BaseEntity> {
             column: sortBy,
             isAscending: sortOrder === 'asc'
           }]);
-        } else if (isDemoModeEnabled()) {
-          // Default sorting by updatedAt descending in demo mode when no sort is specified
+        } else {
+          // Default sorting by updatedAt descending when no sort is specified (applies to all modes)
           processedData = multiSort(processedData, [{
             column: 'updatedAt',
             isAscending: false

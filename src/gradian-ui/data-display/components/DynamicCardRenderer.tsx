@@ -735,7 +735,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     maxBadges={maxBadges}
                     className="w-full"
                     badgeVariant="default"
-                    enforceVariant
+                    enforceVariant={false}
                     animate={!disableAnimation}
                     onBadgeClick={
                       badgeValueTargetSchema.size > 0 ? handleBadgeClick : undefined
@@ -991,7 +991,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         value={cardConfig.badgeValues}
                         maxBadges={maxBadges}
                         badgeVariant="default"
-                        enforceVariant
+                        enforceVariant={false}
                         animate={!disableAnimation}
                         onBadgeClick={
                           badgeValueTargetSchema.size > 0 ? handleBadgeClick : undefined

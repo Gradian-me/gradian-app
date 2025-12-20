@@ -230,7 +230,7 @@ export const formatFieldValue = (
           field={field}
           value={value}
           badgeVariant={field.roleColor || "default"}
-          enforceVariant
+          enforceVariant={false}
           animate={true}
           onBadgeClick={field?.targetSchema ? handleBadgeClick : undefined}
           isItemClickable={
@@ -802,7 +802,7 @@ export const formatFieldValue = (
         field={field}
         value={value}
         badgeVariant={field.roleColor || "default"}
-        enforceVariant
+        enforceVariant={false}
         animate={true}
         onBadgeClick={field?.targetSchema ? handleBadgeClick : undefined}
         isItemClickable={

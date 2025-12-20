@@ -13,6 +13,7 @@ import { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 import { findBadgeOption, getBadgeMetadata, BadgeOption } from './badge-utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { normalizeOptionArray, NormalizedOption } from './option-normalizer';
+import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
 
 export type BadgeItem = {
   id: string;
@@ -200,10 +201,9 @@ const getBadgePresentation = (color?: string) => {
     const itemIcon = isItemObject ? (item as BadgeItem).icon : null;
     const itemColor = !enforceVariant && isItemObject ? (item as BadgeItem).color : null;
     
-    // Use custom renderer if provided
-    const badgePresentation = enforceVariant
-      ? { variant: undefined, className: '', style: undefined }
-      : getBadgePresentation(itemColor ?? undefined);
+    // Use getValidBadgeVariant to convert color to valid Badge variant (supports all Tailwind colors)
+    const badgeVariantFromColor = itemColor ? getValidBadgeVariant(itemColor) : undefined;
+    
     const badgeObject: BadgeItem = isItemObject
       ? (item as BadgeItem)
       : {
@@ -270,11 +270,6 @@ const getBadgePresentation = (color?: string) => {
       </span>
     );
     
-    const badgeClasses = cn(
-      "inline-flex items-center gap-1.5 px-2 py-0.5 text-[0.625rem] transition-transform duration-100 whitespace-nowrap",
-      badgePresentation.className
-    );
-    
     const clickable =
       Boolean(onBadgeClick) &&
       (typeof isItemClickable === 'function' ? isItemClickable(badgeObject) : true);
@@ -284,6 +279,11 @@ const getBadgePresentation = (color?: string) => {
       event.stopPropagation();
       onBadgeClick?.(badgeObject, event);
     };
+
+    // Use badgeVariantFromColor if available and not enforcing variant, otherwise use badgeVariant prop
+    const finalVariant = enforceVariant 
+      ? badgeVariant 
+      : (badgeVariantFromColor || badgeVariant);
 
       return (
         <motion.div
@@ -307,9 +307,8 @@ const getBadgePresentation = (color?: string) => {
           onClick={clickable ? handleItemClick : undefined}
         >
           <RadixBadge 
-            variant={enforceVariant ? badgeVariant : (badgePresentation.variant as any) ?? (itemColor ? undefined : badgeVariant)} 
-            className={badgeClasses}
-            style={enforceVariant ? undefined : badgePresentation.style}
+            variant={finalVariant as any}
+            className="inline-flex items-center gap-1.5"
           >
             {badgeContent}
           </RadixBadge>

@@ -60,6 +60,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '../utils';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { SortConfig } from '@/gradian-ui/shared/utils/sort-utils';
 
 interface DynamicPageRendererProps {
   schema: FormSchema;
@@ -165,6 +166,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     entityId: undefined,
   });
   const [showMetadataColumns, setShowMetadataColumns] = useState(false);
+  const [sortConfig, setSortConfig] = useState<SortConfig[]>([]);
   
   // State for companies data and grouping
   const [companies, setCompanies] = useState<any[]>([]);
@@ -206,6 +208,21 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     }
     prevFiltersRef.current = filtersKey;
   }, [currentFilters]);
+
+  // Reset to page 1 when sort changes
+  const prevSortRef = useRef<string>('');
+  useEffect(() => {
+    const sortKey = JSON.stringify(sortConfig);
+    if (prevSortRef.current !== sortKey && prevSortRef.current !== '') {
+      setCurrentPage(1);
+    }
+    prevSortRef.current = sortKey;
+  }, [sortConfig]);
+
+  // Handle sort change
+  const handleSortChange = useCallback((newSortConfig: SortConfig[]) => {
+    setSortConfig(newSortConfig);
+  }, []);
 
   // Pagination handlers
   const handlePageChange = useCallback((page: number) => {
@@ -404,10 +421,10 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       // Refresh entities to show updated hierarchy with current filters and cache disabled
       const filters = buildFilters();
       if (filters) {
-        await fetchEntities(filters, { disableCache: true, page: currentPage, limit: pageSize });
+        await fetchEntities(filters, { disableCache: true, page: currentPage, limit: pageSize, sortArray: sortConfig });
       } else {
         // Fallback: refresh without filters if buildFilters returns null
-        await fetchEntities(undefined, { disableCache: true, page: currentPage, limit: pageSize });
+        await fetchEntities(undefined, { disableCache: true, page: currentPage, limit: pageSize, sortArray: sortConfig });
       }
 
       toast.success('Parent updated successfully');
@@ -419,7 +436,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     } finally {
       setIsSubmitting(false);
     }
-  }, [entityForParentChange, schema?.id, fetchEntities, buildFilters]);
+  }, [entityForParentChange, schema?.id, fetchEntities, buildFilters, sortConfig, currentPage, pageSize]);
 
   const handleManualRefresh = useCallback(async () => {
     const filters = buildFilters();
@@ -433,7 +450,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     const toastId = toast.loading(`Refreshing ${pluralName.toLowerCase()}...`);
     setIsManualRefresh(true);
     try {
-      const result = await fetchEntities(filters, { disableCache: true, page: currentPage, limit: pageSize });
+      const result = await fetchEntities(filters, { disableCache: true, page: currentPage, limit: pageSize, sortArray: sortConfig });
       if (result && result.success === false) {
         throw new Error(result.error || 'Failed to refresh data');
       }
@@ -444,7 +461,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     } finally {
       setIsManualRefresh(false);
     }
-  }, [buildFilters, fetchEntities, pluralName, currentPage, pageSize]);
+  }, [buildFilters, fetchEntities, pluralName, currentPage, pageSize, sortConfig]);
 
   // Confirm and execute delete
   const confirmDelete = useCallback(async () => {
@@ -491,31 +508,34 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       // Refresh entities after deletion with current filters
       const filters = buildFilters();
       if (filters) {
-        fetchEntities(filters, { disableCache: true, page: currentPage, limit: pageSize });
+        fetchEntities(filters, { disableCache: true, page: currentPage, limit: pageSize, sortArray: sortConfig });
       }
     } catch (error) {
       loggingCustom(LogType.CLIENT_LOG, 'error', `Error deleting entity: ${error instanceof Error ? error.message : String(error)}`);
       setDeleteConfirmDialog({ open: false, entity: null });
     }
-  }, [deleteConfirmDialog.entity, handleDeleteEntity, fetchEntities, buildFilters, viewMode, entities, currentPage, pageSize]);
+  }, [deleteConfirmDialog.entity, handleDeleteEntity, fetchEntities, buildFilters, viewMode, entities, currentPage, pageSize, sortConfig]);
 
   const lastFiltersRef = useRef<string>('');
   const lastPageRef = useRef<number>(1);
   const lastPageSizeRef = useRef<number | 'all'>(25);
+  const lastSortRef = useRef<string>('');
 
-  // Fetch whenever derived filters or pagination change (includes initial mount and company/filter updates)
+  // Fetch whenever derived filters, pagination, or sort change (includes initial mount and company/filter updates)
   useEffect(() => {
     const filters = buildFilters();
     if (!filters) {
       return;
     }
     const filtersKey = JSON.stringify(filters);
+    const sortKey = JSON.stringify(sortConfig);
     const pageChanged = lastPageRef.current !== currentPage;
     const pageSizeChanged = lastPageSizeRef.current !== pageSize;
     const filtersChanged = lastFiltersRef.current !== filtersKey;
+    const sortChanged = lastSortRef.current !== sortKey;
 
     // Only skip if nothing changed
-    if (!pageChanged && !pageSizeChanged && !filtersChanged) {
+    if (!pageChanged && !pageSizeChanged && !filtersChanged && !sortChanged) {
       return;
     }
 
@@ -523,10 +543,11 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     lastFiltersRef.current = filtersKey;
     lastPageRef.current = currentPage;
     lastPageSizeRef.current = pageSize;
+    lastSortRef.current = sortKey;
 
     setFilters(filters);
-    fetchEntities(filters, { page: currentPage, limit: pageSize });
-  }, [buildFilters, fetchEntities, setFilters, currentPage, pageSize]);
+    fetchEntities(filters, { page: currentPage, limit: pageSize, sortArray: sortConfig });
+  }, [buildFilters, fetchEntities, setFilters, currentPage, pageSize, sortConfig]);
 
   // Handle edit entity - set entity ID to trigger FormModal
   const handleEditEntity = useCallback(async (entity: any) => {
@@ -849,29 +870,22 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         id: 'updatedAt',
         label: 'Updated',
         accessor: (row: any) => {
-          // Normalize dates - if createdAt and updatedAt are the same, return null for updatedAt
-          const normalized = normalizeCreateUpdateDates({
-            createdAt: row.createdAt,
-            updatedAt: row.updatedAt,
-          });
-          return normalized.updatedAt;
+          // Always return updatedAt, or fall back to createdAt if updatedAt is missing
+          return row.updatedAt || row.createdAt;
         },
         sortable: true,
         align: 'left',
         width: 200,
         render: (value: any, row: any) => {
-          // Normalize dates - if createdAt and updatedAt are the same, don't show updatedAt
-          const normalized = normalizeCreateUpdateDates({
-            createdAt: row.createdAt,
-            updatedAt: row.updatedAt,
-          });
+          // Always show updatedAt, or fall back to createdAt if updatedAt is missing
+          const updatedAt = row.updatedAt || row.createdAt;
+          const updatedBy = row.updatedBy || row.createdBy;
           
-          // If updatedAt is null (because it's the same as createdAt), show dash
-          if (!normalized.updatedAt) return <span className="text-gray-400 dark:text-gray-600 text-xs">—</span>;
+          // If no date available, show dash
+          if (!updatedAt) return <span className="text-gray-400 dark:text-gray-600 text-xs">—</span>;
           
-          const updatedLabel = formatRelativeTime(normalized.updatedAt, { addSuffix: true });
-          const updatedFullDate = formatFullDate(normalized.updatedAt);
-          const updatedBy = row.updatedBy;
+          const updatedLabel = formatRelativeTime(updatedAt, { addSuffix: true });
+          const updatedFullDate = formatFullDate(updatedAt);
           const updatedByName = getUserName(updatedBy);
           const updatedByAvatarUrl = getUserAvatarUrl(updatedBy);
           const updatedByInitials = getUserInitials(updatedBy);
@@ -1159,6 +1173,10 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           onExpandAllHierarchy={() => setHierarchyExpandToken((prev) => prev + 1)}
           onCollapseAllHierarchy={() => setHierarchyCollapseToken((prev) => prev + 1)}
           showHierarchy={schema?.allowHierarchicalParent === true}
+          sortConfig={sortConfig}
+          onSortChange={handleSortChange}
+          schema={schema}
+          excludedFieldIds={repeatingSectionFieldIds}
           customActions={
             <div className="flex items-center gap-2 px-2">
               <Label htmlFor="metadata-toggle" className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer whitespace-nowrap">
@@ -1632,7 +1650,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             setCurrentPage(1);
             const filters = buildFilters();
             if (filters) {
-              await fetchEntities(filters, { disableCache: true, page: 1, limit: pageSize });
+              await fetchEntities(filters, { disableCache: true, page: 1, limit: pageSize, sortArray: sortConfig });
             }
             setFixedParentForCreate(null);
             setCreateModalOpen(false);
@@ -1643,7 +1661,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             setCurrentPage(1);
             const filters = buildFilters();
             if (filters) {
-              await fetchEntities(filters, { disableCache: true, page: 1, limit: pageSize });
+              await fetchEntities(filters, { disableCache: true, page: 1, limit: pageSize, sortArray: sortConfig });
             }
           }}
           onClose={() => {
@@ -1762,7 +1780,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             // Refresh entities list after successful update with current filters
             const filters = buildFilters();
             if (filters) {
-              await fetchEntities(filters, { disableCache: true });
+              await fetchEntities(filters, { disableCache: true, sortArray: sortConfig });
             }
             setEditEntityId(null);
           }}
@@ -1770,7 +1788,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             // Refresh entities list when form is saved as incomplete (without closing modal)
             const filters = buildFilters();
             if (filters) {
-              await fetchEntities(filters, { disableCache: true });
+              await fetchEntities(filters, { disableCache: true, sortArray: sortConfig });
             }
           }}
           onClose={() => {

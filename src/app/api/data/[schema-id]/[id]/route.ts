@@ -23,7 +23,8 @@ async function createController(schemaId: string) {
   const controller = new BaseController<BaseEntity>(
     service, 
     schema.singular_name || 'Entity',
-    schema.isNotCompanyBased || false
+    schema.isNotCompanyBased || false,
+    schema // Pass schema to controller for field ID resolution
   );
   
   return controller;

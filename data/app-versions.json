@@ -4080,5 +4080,74 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCSORTHANDLING001",
+    "timestamp": "2025-12-20T11:44:20+0330",
+    "version": "1.34.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "SORT HANDLING IN DATA - Multi-column sorting with field ID resolution and sort configuration UI",
+        "priority": "High",
+        "affectedDomains": [
+          "data-display",
+          "api",
+          "sorting",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated all-data.json to correct timestamps and user IDs for improved data integrity",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "data-integrity"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Modified route.ts and base.controller.ts to pass schema for field ID resolution, enhancing sorting capabilities by resolving field IDs to field names",
+        "priority": "High",
+        "affectedDomains": [
+          "api",
+          "controllers",
+          "sorting",
+          "schema-manager"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced sort configuration handling in DynamicFilterPane, DataSort component, and related components with drag-and-drop reordering, ascending/descending toggles, and system fields support",
+        "priority": "High",
+        "affectedDomains": [
+          "data-display",
+          "ui",
+          "sorting",
+          "form-builder"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented default sorting by updatedAt descending when no sort is specified",
+        "priority": "Medium",
+        "affectedDomains": [
+          "api",
+          "data-display",
+          "sorting"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Added tooltip on sort button showing current sort configuration with column labels and direction indicators",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "data-display",
+          "user-experience"
+        ]
+      }
+    ]
   }
 ]

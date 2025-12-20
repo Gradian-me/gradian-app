@@ -7,6 +7,7 @@ import { apiRequest } from '../utils/api';
 import { useCompanyStore } from '@/stores/company.store';
 import { PaginationMeta } from '../utils/pagination-utils';
 import { ApiResponse } from '../types/common';
+import { SortConfig } from '../utils/sort-utils';
 
 interface EntityFilters {
   search?: string;
@@ -57,6 +58,7 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
       disableCache?: boolean;
       page?: number;
       limit?: number | 'all';
+      sortArray?: SortConfig[];
     }
   ) => {
     setIsLoading(true);
@@ -75,6 +77,11 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
       } else if (filters?.companyId) {
         // Backward compatibility: Handle single companyId
         queryParams.append('companyId', filters.companyId);
+      }
+      
+      // Add sortArray parameter if provided
+      if (options?.sortArray && options.sortArray.length > 0) {
+        queryParams.append('sortArray', JSON.stringify(options.sortArray));
       }
       
       // Add pagination parameters (skip if limit is 'all')

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
-import { TableColumn } from '../types';
+import { TableColumn } from '../types'; 
 import { cn } from '../../../shared/utils';
 
 export interface TableHeaderProps<T = any> {
@@ -111,12 +111,12 @@ export function TableHeader<T = any>({
                 <span className="shrink-0">
                   {sortBy === column.id ? (
                     sortDirection === 'asc' ? (
-                      <ChevronUp className="h-4 w-4 text-gray-600" />
+                      <ChevronUp className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                     ) : (
-                      <ChevronDown className="h-4 w-4 text-gray-600" />
+                      <ChevronDown className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                     )
                   ) : (
-                    <ChevronsUpDown className="h-4 w-4 text-gray-400" />
+                    <ChevronsUpDown className="h-4 w-4 text-gray-400 dark:text-gray-400" />
                   )}
                 </span>
               )}
