@@ -193,7 +193,7 @@ function sanitize(rawValue: string): string {
     .toLowerCase()
     .trim()
     .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9_-]/g, '')
+    .replace(/[^a-z0-9@._-]/g, '') // Allow @ and .
     .replace(/-+/g, '-')
     .replace(/^-+/, '')
     .replace(/-+$/, '');

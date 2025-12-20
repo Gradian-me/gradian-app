@@ -340,7 +340,7 @@ export function CompanySelector({
   }
 
   return (
-    <div className={cn("flex items-center space-x-2", fullWidth && "w-full")}>
+    <div className={cn("flex items-center justify-center space-x-2", fullWidth && "w-full")}>
       {selectedCompany?.logo && showLogo === 'full' && (
         <div className="relative h-10 w-30 overflow-hidden">
           <Image 

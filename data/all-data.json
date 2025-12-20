@@ -11,7 +11,7 @@
       "nationalId": "",
       "id": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdAt": "2025-11-03T12:30:16.678Z",
-      "updatedAt": "2025-12-15T12:42:56.632Z",
+      "updatedAt": "2025-11-03T12:30:16.678Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "relatedCompanies": [
@@ -34,7 +34,7 @@
       "nationalId": "",
       "id": "01K94V8K0RJS7D9K43F2VBTSVG",
       "createdAt": "2025-11-03T12:32:24.097Z",
-      "updatedAt": "2025-12-15T12:43:02.995Z",
+      "updatedAt": "2025-11-03T12:32:24.097Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "relatedCompanies": [
@@ -53,7 +53,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB85MPFBMS4GQ6KGA0EGJNGA",
       "createdAt": "2025-11-29T16:02:53.548Z",
-      "updatedAt": "2025-12-15T12:43:09.424Z",
+      "updatedAt": "2025-11-29T16:02:53.548Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "relatedCompanies": [
@@ -69,7 +69,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9VFNMVC92XF1JRND69S4Z9",
       "createdAt": "2025-11-30T07:43:51.973Z",
-      "updatedAt": "2025-12-15T12:43:15.013Z",
+      "updatedAt": "2025-11-30T07:43:51.973Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "relatedCompanies": [
@@ -108,7 +108,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "HAS_MEMBER",
       "createdAt": "2025-11-21T06:27:24.490Z",
-      "updatedAt": "2025-11-21T07:01:29.013Z",
+      "updatedAt": "2025-11-21T06:27:24.490Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -140,13 +140,22 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
+      "color": "blue",
+      "label": "Has Parameter Item",
+      "description": "A parameter group contains one or more parameter items.",
+      "icon": "ListTree",
+      "id": "HAS_PARAMETER_ITEM",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
       "label": "Has Field Value",
       "color": "zinc",
       "icon": "FormInput",
       "incomplete": false,
       "id": "HAS_FIELD_VALUE",
       "createdAt": "2025-12-04T10:05:47.411Z",
-      "updatedAt": "2025-12-04T10:05:47.412Z"
+      "updatedAt": "2025-12-04T10:05:47.411Z"
     },
     {
       "id": "HAS_ATTACHMENT",
@@ -212,7 +221,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9Y24BEVCHQXMRSZXPDGARY",
       "createdAt": "2025-11-30T08:28:54.008Z",
-      "updatedAt": "2025-11-30T08:33:46.313Z",
+      "updatedAt": "2025-11-30T08:28:54.008Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -252,7 +261,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9Y5NKY5ZZS6BFYPC8684E9",
       "createdAt": "2025-11-30T08:30:49.982Z",
-      "updatedAt": "2025-11-30T08:30:49.983Z",
+      "updatedAt": "2025-11-30T08:30:49.982Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -329,7 +338,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9YDFQ30N3GMGZZTEDX2XN2",
       "createdAt": "2025-11-30T08:35:06.084Z",
-      "updatedAt": "2025-12-03T07:54:31.706Z",
+      "updatedAt": "2025-11-30T08:35:06.084Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -348,7 +357,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSTF0BYDZ82KH018CM2EPWV",
       "createdAt": "2025-12-06T12:33:52.511Z",
-      "updatedAt": "2025-12-06T12:33:52.512Z"
+      "updatedAt": "2025-12-06T12:33:52.511Z"
     },
     {
       "parent": "01KBSTF0BYDZ82KH018CM2EPWV",
@@ -402,7 +411,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSTMAHS9QN2S28FZ70BD7Z3",
       "createdAt": "2025-12-06T12:36:46.779Z",
-      "updatedAt": "2025-12-06T12:36:54.549Z"
+      "updatedAt": "2025-12-06T12:36:46.779Z"
     },
     {
       "parent": "01KBSTG96EC9TWABAV3QX42X1A",
@@ -438,7 +447,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSTNKY2QYRYQ6EWK0ZJ6NX6",
       "createdAt": "2025-12-06T12:37:29.155Z",
-      "updatedAt": "2025-12-06T12:39:50.020Z",
+      "updatedAt": "2025-12-06T12:37:29.155Z",
       "members": []
     },
     {
@@ -457,7 +466,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSTPYV9RMR9FNZS7HWPBPY2",
       "createdAt": "2025-12-06T12:38:13.098Z",
-      "updatedAt": "2025-12-06T12:40:52.964Z",
+      "updatedAt": "2025-12-06T12:38:13.098Z",
       "members": []
     },
     {
@@ -512,7 +521,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSTRKNM2YSJ63BEBXBXSPY2",
       "createdAt": "2025-12-06T12:39:07.189Z",
-      "updatedAt": "2025-12-06T12:39:33.539Z",
+      "updatedAt": "2025-12-06T12:39:07.189Z",
       "members": []
     },
     {
@@ -562,9 +571,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBF8N88CG4YPK6VDNQAE420Z",
       "createdAt": "2025-01-01T10:10:10.000Z",
-      "updatedAt": "2025-12-18T11:51:34.275Z",
+      "updatedAt": "2025-01-01T10:10:10.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "841",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "relatedTenants": [
         {
           "id": "01KBFBGV9151FQN481NB2CT4MX",
@@ -578,6 +587,24 @@
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
           "label": "Supply Chain Management"
         }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDKF6JJ392P4HMGC8T19TC",
+          "label": "System Administrator",
+          "icon": "Shield",
+          "color": "rose"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
       ]
     },
     {
@@ -589,7 +616,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "createdAt": "2025-11-05T15:49:06.366Z",
-      "updatedAt": "2025-12-18T11:51:40.058Z",
+      "updatedAt": "2025-11-05T15:49:06.366Z",
       "avatarUrl": "https://media.licdn.com/dms/image/v2/D4D03AQFqEf1NfTjObg/profile-displayphoto-crop_800_800/B4DZlbvgWeJMAM-/0/1758180806291?e=1764201600&v=beta&t=9qdjZhqjahZqjMh_oT9QKsjgz6bbTb5Bw0BvmXu9Rag",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$lJUuCAnQyRK7q2GbUEpgQg$yoNrrPCRDTJNwVj9aDDDZ0c4reiBNGcfSHEZ6Hennqg",
       "hashType": "argon2",
@@ -615,7 +642,7 @@
       ],
       "incomplete": false,
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "841",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "relatedTenants": [
         {
           "id": "01KBFBGV9151FQN481NB2CT4MX",
@@ -628,6 +655,24 @@
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
           "label": "Supply Chain Management"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDKF6JJ392P4HMGC8T19TC",
+          "label": "System Administrator",
+          "icon": "Shield",
+          "color": "rose"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        },
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
         }
       ]
     },
@@ -658,7 +703,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSMDRHJTDY7SFEY6VWK2HEK",
       "createdAt": "2025-12-06T10:48:20.285Z",
-      "updatedAt": "2025-12-18T11:51:51.090Z",
+      "updatedAt": "2025-12-06T10:48:20.285Z",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$6FMxlYRqKjO7dE6Pd6LUFA$QrrLBt+KmmX7Oc7SjDxSRAF9IZJ81XQexsv3ZUBFmqA",
       "hashType": "argon2",
       "relatedTenants": [
@@ -667,7 +712,22 @@
           "label": "AryoGen"
         }
       ],
-      "updatedBy": "841"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "company": "AryoGen",
@@ -695,7 +755,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSTVK8P6Y3P4MW060HNNKB1",
       "createdAt": "2025-12-06T12:40:45.079Z",
-      "updatedAt": "2025-12-18T11:51:45.789Z",
+      "updatedAt": "2025-12-06T12:40:45.079Z",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$bAwGvyQyORW6Acrt3OcPuQ$h8/UhXDl2FBP55sdXjeAP846VlsKIxQa+SepjJ+43IM",
       "hashType": "argon2",
       "relatedTenants": [
@@ -704,7 +764,23 @@
           "label": "AryoGen"
         }
       ],
-      "updatedBy": "841"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "postTitle": "Change Management Supervisor",
+      "relatedCompanies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "username": "vaziril",
@@ -725,7 +801,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBZ64EBC9SWWTCCYKEMGK21E",
       "createdAt": "2025-12-08T14:34:01.460Z",
-      "updatedAt": "2025-12-18T11:52:30.449Z",
+      "updatedAt": "2025-12-08T14:34:01.460Z",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$gGbYpp66WV8vRbM6uoX56g$Vw83f/KKDMndrgUwFY+wl6PAQuSwFqFohNkyua4Tbqo",
       "hashType": "argon2",
       "status": [
@@ -742,7 +818,22 @@
           "label": "AryoGen"
         }
       ],
-      "updatedBy": "841"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "company": "CinnaGen",
@@ -771,7 +862,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KC3F76QSDY5P2XVP3T2E0DAD",
       "createdAt": "2025-12-10T06:29:46.883Z",
-      "updatedAt": "2025-12-18T11:51:56.015Z",
+      "updatedAt": "2025-12-10T06:29:46.883Z",
       "relatedTenants": [
         {
           "id": "01KBFBGV9151FQN481NB2CT4MX",
@@ -786,7 +877,26 @@
           "label": "Supply Chain Management"
         }
       ],
-      "updatedBy": "841"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "entityType": [
+        {
+          "id": "01KCXDKF6JJ392P4HMGC8T19TC",
+          "label": "System Administrator",
+          "icon": "Shield",
+          "color": "rose"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "company": "CinnaGen",
@@ -815,7 +925,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KC3FBM8YXB7V70SQMEBN0151",
       "createdAt": "2025-12-10T06:32:11.814Z",
-      "updatedAt": "2025-12-18T11:52:20.920Z",
+      "updatedAt": "2025-12-10T06:32:11.814Z",
       "relatedTenants": [
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
@@ -830,7 +940,26 @@
           "label": "Development Environment"
         }
       ],
-      "updatedBy": "841"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "entityType": [
+        {
+          "id": "01KCXDKF6JJ392P4HMGC8T19TC",
+          "label": "System Administrator",
+          "icon": "Shield",
+          "color": "rose"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        },
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "company": "CinnaGen",
@@ -859,14 +988,83 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KCPC8YBMRYB3X846103R11MH",
       "createdAt": "2025-12-17T14:43:52.319Z",
-      "updatedAt": "2025-12-18T11:49:22.902Z",
+      "updatedAt": "2025-12-17T14:43:52.319Z",
       "relatedTenants": [
         {
           "id": "01KBFBGV9151FQN481NB2CT4MX",
           "label": "Development Environment"
         }
       ],
-      "updatedBy": "841"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "company": "Accessybio",
+      "authenticationType": [
+        {
+          "id": "form-based",
+          "label": "Form-Based",
+          "icon": "User",
+          "color": "cyan"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDP4BHXVDSRKA78J8S626A",
+          "label": "Vendor",
+          "icon": "ShoppingBasket",
+          "color": "amber"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        },
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "username": "kalantarik@ottanapharmed.com",
+      "firstName": "Kamyar",
+      "lastName": "Kalantari",
+      "email": "kalantarik@ottanapharmed.com",
+      "postTitle": "CEO",
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "id": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "createdAt": "2025-12-20T09:32:57.456Z",
+      "updatedAt": "2025-12-20T11:17:26.162Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
   "purchaseOrders": [],
@@ -892,7 +1090,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBFCM00000000000000000001",
       "createdAt": "2025-12-06T12:00:00.000Z",
-      "updatedAt": "2025-12-10T10:19:59.536Z",
+      "updatedAt": "2025-12-06T12:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -936,7 +1134,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBFCM00000000000000000005",
       "createdAt": "2025-12-06T12:00:00.000Z",
-      "updatedAt": "2025-12-06T11:48:41.216Z",
+      "updatedAt": "2025-12-06T12:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -975,7 +1173,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBF113MGJ87A0J3254XSMHAT",
       "createdAt": "2025-12-02T11:26:38.000Z",
-      "updatedAt": "2025-12-02T09:07:48.679Z",
+      "updatedAt": "2025-12-02T11:26:38.000Z",
       "applications": [],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -1001,7 +1199,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBFQM00000000000000000001",
       "createdAt": "2025-12-06T12:00:00.000Z",
-      "updatedAt": "2025-12-10T08:36:28.613Z",
+      "updatedAt": "2025-12-06T12:00:00.000Z",
       "applications": [],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -1013,7 +1211,7 @@
       "address": "{\"ciphertext\":\"Sk9ZEorIWF+TaPDusnYjiAJMecBh5H69O9Gtv7USOcaE82qCCFk3p34NcsWO8AsQ9NorolE=\",\"iv\":\"J6cx9WGObuRvzKPb\"}",
       "id": "01KA8QZJ9SAJ6Y2GR05K42BQYF",
       "createdAt": "2025-11-17T11:07:42.270Z",
-      "updatedAt": "2025-12-10T06:32:15.295Z",
+      "updatedAt": "2025-11-17T11:07:42.270Z",
       "url-repositories": [],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -1038,7 +1236,7 @@
       "name": "CG-GR-API-DEV-1",
       "id": "01KA8TM7H68FPKTRNNNSPWWBKD",
       "createdAt": "2025-11-17T11:53:56.527Z",
-      "updatedAt": "2025-12-10T06:29:50.223Z",
+      "updatedAt": "2025-11-17T11:53:56.527Z",
       "url-repositories": [],
       "color": "blue",
       "environment": [
@@ -1065,7 +1263,7 @@
       "address": "{\"ciphertext\":\"OhiNzpM5frmsQYRgXe8fQrGq7D+o99xY84oL/qFwbY+BHQtU5g==\",\"iv\":\"Ic/DDNAtu7CwGprv\"}",
       "id": "01KA8VVZENR2AS7YWTAY4T6HM7",
       "createdAt": "2025-11-17T12:15:38.970Z",
-      "updatedAt": "2025-12-10T06:32:34.944Z",
+      "updatedAt": "2025-11-17T12:15:38.970Z",
       "url-repositories": [],
       "color": "blue",
       "environment": [
@@ -1101,7 +1299,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBASP59XTTA4CNBNXMNNV7SC",
       "createdAt": "2025-11-30T16:31:41.891Z",
-      "updatedAt": "2025-12-10T06:32:43.533Z",
+      "updatedAt": "2025-11-30T16:31:41.891Z",
       "url-repositories": [],
       "owners": [
         {
@@ -1132,7 +1330,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBAT7P2B5NZYX26HVWYV28N1",
       "createdAt": "2025-11-30T16:41:16.115Z",
-      "updatedAt": "2025-12-10T06:31:14.571Z",
+      "updatedAt": "2025-11-30T16:41:16.115Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "audienceId": "01KANTJN9VP30XGJY4FQTCTK7D",
@@ -1158,7 +1356,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBATBKE9E23X1JT9KDHK95H6",
       "createdAt": "2025-11-30T16:43:24.494Z",
-      "updatedAt": "2025-12-10T06:32:54.881Z",
+      "updatedAt": "2025-11-30T16:43:24.494Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -1201,7 +1399,7 @@
       ],
       "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
       "createdAt": "2025-11-17T11:45:23.067Z",
-      "updatedAt": "2025-11-25T15:20:44.099Z",
+      "updatedAt": "2025-11-17T11:45:23.067Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1220,7 +1418,7 @@
       "title": "Schema Bulk Sync",
       "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
       "createdAt": "2025-11-17T11:54:59.460Z",
-      "updatedAt": "2025-12-06T06:25:02.466Z",
+      "updatedAt": "2025-11-17T11:54:59.460Z",
       "incomplete": false,
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1240,7 +1438,7 @@
       ],
       "id": "01KA8VXHQFZR5TH0470163433K",
       "createdAt": "2025-11-17T12:16:30.459Z",
-      "updatedAt": "2025-11-17T12:16:30.460Z",
+      "updatedAt": "2025-11-17T12:16:30.459Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -1291,7 +1489,7 @@
       ],
       "id": "01KABM5QX5HRPWMPA1M7YK21WJ",
       "createdAt": "2025-11-18T13:58:53.618Z",
-      "updatedAt": "2025-12-06T06:25:29.596Z",
+      "updatedAt": "2025-11-18T13:58:53.618Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "enableSystemToken": true,
@@ -1311,7 +1509,7 @@
       ],
       "id": "01KANYZDJKCA9FNEFE7ZEY0KSD",
       "createdAt": "2025-11-22T14:19:24.000Z",
-      "updatedAt": "2025-11-22T15:56:39.570Z",
+      "updatedAt": "2025-11-22T14:19:24.000Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1358,7 +1556,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KANZNMEFM5H7211V450ZX2P8",
       "createdAt": "2025-11-22T14:32:13.019Z",
-      "updatedAt": "2025-12-06T06:25:40.006Z",
+      "updatedAt": "2025-11-22T14:32:13.019Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "enableSystemToken": true
@@ -1387,7 +1585,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBATJ4GH09B0YETWF7W1SKM7",
       "createdAt": "2025-11-30T16:46:58.586Z",
-      "updatedAt": "2025-12-06T10:04:12.142Z",
+      "updatedAt": "2025-11-30T16:46:58.586Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "enableSystemToken": true
@@ -1400,7 +1598,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSH199BZ64HYDFMS2JP6F22",
       "createdAt": "2025-12-06T09:49:05.727Z",
-      "updatedAt": "2025-12-08T13:44:40.871Z"
+      "updatedAt": "2025-12-06T09:49:05.727Z"
     },
     {
       "title": "Backend Graph API",
@@ -1410,7 +1608,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSH31P7JNZD64ED1A09DYK6",
       "createdAt": "2025-12-06T09:50:03.477Z",
-      "updatedAt": "2025-12-08T13:45:00.608Z"
+      "updatedAt": "2025-12-06T09:50:03.477Z"
     }
   ],
   "integrations": [
@@ -1455,7 +1653,7 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-17T07:42:15.847Z",
+      "updatedAt": "2025-11-17T12:19:40.582Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
       "lastSynced": "2025-12-17T07:42:15.847Z",
@@ -1498,7 +1696,7 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-17T07:42:31.947Z",
+      "updatedAt": "2025-11-18T13:59:23.884Z",
       "lastSynced": "2025-12-17T07:42:31.947Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1559,7 +1757,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-17T08:15:10.364Z",
+      "updatedAt": "2025-11-22T14:38:40.167Z",
       "targetDataPath": "data",
       "lastSynced": "2025-12-17T08:15:10.364Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1596,7 +1794,7 @@
       ],
       "id": "email_template_sync",
       "createdAt": "2025-11-17T12:05:23.829Z",
-      "updatedAt": "2025-12-02T15:02:02.921Z",
+      "updatedAt": "2025-11-17T12:05:23.829Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1644,7 +1842,7 @@
       ],
       "id": "lucide_icons_sync",
       "createdAt": "2025-11-17T18:00:00.000Z",
-      "updatedAt": "2025-12-02T15:02:32.325Z",
+      "updatedAt": "2025-11-17T18:00:00.000Z",
       "lastSynced": "2025-12-02T14:41:55.872Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1683,7 +1881,7 @@
       ],
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-12-18T21:34:53.920Z",
+      "updatedAt": "2025-11-23T15:00:59.000Z",
       "lastSynced": "2025-12-18T21:34:53.920Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1736,8 +1934,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-18T21:58:59.624Z",
-      "lastSynced": "2025-12-18T21:58:59.624Z",
+      "updatedAt": "2025-11-30T16:48:01.239Z",
+      "lastSynced": "2025-12-20T10:43:55.005Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1749,7 +1947,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 39 schemas: 38 succeeded, 1 failed (0 created, 38 updated)"
+      "lastSyncMessage": "Processed 28 schemas: 21 succeeded, 7 failed (0 created, 21 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -1776,7 +1974,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-18T21:59:06.169Z",
+      "updatedAt": "2025-12-06T09:54:51.218Z",
       "isTenantBased": true,
       "category": [
         {
@@ -1786,8 +1984,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-18T21:59:06.169Z",
-      "lastSyncMessage": "Generated relations for 39 out of 39 schemas"
+      "lastSynced": "2025-12-20T10:44:04.084Z",
+      "lastSyncMessage": "Generated relations for 42 out of 42 schemas"
     },
     {
       "title": "Graph Data Sync Production",
@@ -1833,7 +2031,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-18T21:59:36.899Z",
+      "updatedAt": "2025-12-06T09:56:02.933Z",
       "category": [
         {
           "id": "production-integration",
@@ -1842,8 +2040,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-18T21:59:36.899Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 994, edges created: 44, nodes failed: 0, edges failed: 0."
+      "lastSynced": "2025-12-20T10:44:21.354Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 97, nodes updated: 60, edges created: 59, nodes failed: 0, edges failed: 0."
     }
   ],
   "databases": [
@@ -1892,7 +2090,8 @@
       "cypherEquivalent": "=",
       "updatedAt": "2025-11-19T07:36:52.939Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:36:52.939Z"
     },
     {
       "id": "logical-operator-neq",
@@ -1904,7 +2103,8 @@
       "cypherEquivalent": "<>",
       "updatedAt": "2025-11-19T07:44:18.316Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:44:18.316Z"
     },
     {
       "id": "logical-operator-gt",
@@ -1916,7 +2116,8 @@
       "cypherEquivalent": ">",
       "updatedAt": "2025-11-19T07:38:40.164Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:38:40.164Z"
     },
     {
       "id": "logical-operator-gte",
@@ -1928,7 +2129,8 @@
       "cypherEquivalent": ">=",
       "updatedAt": "2025-11-19T07:38:19.329Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:38:19.329Z"
     },
     {
       "id": "logical-operator-lt",
@@ -1940,7 +2142,8 @@
       "cypherEquivalent": "<",
       "updatedAt": "2025-11-19T07:39:21.171Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:39:21.171Z"
     },
     {
       "id": "logical-operator-lte",
@@ -1952,7 +2155,8 @@
       "cypherEquivalent": "<=",
       "updatedAt": "2025-11-19T07:38:58.693Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:38:58.693Z"
     },
     {
       "id": "logical-operator-in",
@@ -1964,7 +2168,8 @@
       "cypherEquivalent": "IN",
       "updatedAt": "2025-11-19T07:47:20.955Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:47:20.955Z"
     },
     {
       "id": "logical-operator-not-in",
@@ -1976,7 +2181,8 @@
       "cypherEquivalent": "NOT IN",
       "updatedAt": "2025-11-19T07:46:53.849Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:46:53.849Z"
     },
     {
       "id": "logical-operator-contains",
@@ -1988,7 +2194,8 @@
       "cypherEquivalent": "CONTAINS",
       "updatedAt": "2025-11-19T07:49:27.068Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:49:27.068Z"
     },
     {
       "id": "logical-operator-starts-with",
@@ -2000,7 +2207,8 @@
       "cypherEquivalent": "STARTS WITH",
       "updatedAt": "2025-11-19T07:49:14.259Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:49:14.259Z"
     },
     {
       "id": "logical-operator-ends-with",
@@ -2012,7 +2220,8 @@
       "cypherEquivalent": "ENDS WITH",
       "updatedAt": "2025-11-19T07:49:19.840Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:49:19.840Z"
     },
     {
       "id": "logical-operator-is-blank",
@@ -2024,7 +2233,8 @@
       "cypherEquivalent": "IS NULL OR = ''",
       "updatedAt": "2025-11-19T07:45:11.901Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:45:11.901Z"
     },
     {
       "id": "logical-operator-is-not-blank",
@@ -2036,7 +2246,8 @@
       "cypherEquivalent": "IS NOT NULL AND <> ''",
       "updatedAt": "2025-11-19T07:45:52.249Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T07:45:52.249Z"
     }
   ],
   "aggregation-types": [
@@ -2051,7 +2262,8 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "updatedAt": "2025-11-19T08:21:27.547Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T08:21:27.547Z"
     },
     {
       "id": "aggregation-type-avg",
@@ -2064,7 +2276,8 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "updatedAt": "2025-11-19T08:23:06.292Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T08:23:06.292Z"
     },
     {
       "id": "aggregation-type-min",
@@ -2077,7 +2290,8 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "updatedAt": "2025-11-19T08:25:52.030Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T08:25:52.030Z"
     },
     {
       "id": "aggregation-type-max",
@@ -2090,7 +2304,8 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "updatedAt": "2025-11-19T08:25:33.667Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T08:25:33.667Z"
     },
     {
       "id": "aggregation-type-first",
@@ -2103,7 +2318,8 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "updatedAt": "2025-11-19T08:25:10.472Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T08:25:10.472Z"
     },
     {
       "id": "aggregation-type-last",
@@ -2116,7 +2332,8 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "updatedAt": "2025-11-19T08:24:51.112Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T08:24:51.112Z"
     },
     {
       "id": "aggregation-type-count",
@@ -2129,7 +2346,8 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "updatedAt": "2025-11-19T08:27:24.757Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T08:27:24.757Z"
     },
     {
       "id": "aggregation-type-countdistinct",
@@ -2142,7 +2360,8 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "updatedAt": "2025-11-19T08:27:48.390Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T08:27:48.390Z"
     },
     {
       "id": "aggregation-type-stdev",
@@ -2155,7 +2374,8 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "updatedAt": "2025-11-19T08:28:45.851Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2025-11-19T08:28:45.851Z"
     }
   ],
   "tags": [
@@ -2187,7 +2407,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB5X4QCVD4RE23PHN68X4D2J",
       "createdAt": "2025-11-28T18:55:52.754Z",
-      "updatedAt": "2025-11-28T18:55:52.756Z",
+      "updatedAt": "2025-11-28T18:55:52.754Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2199,7 +2419,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB5XRZF85N7Q3RR04P6A22AG",
       "createdAt": "2025-11-28T19:06:56.373Z",
-      "updatedAt": "2025-11-28T19:07:08.270Z",
+      "updatedAt": "2025-11-28T19:06:56.373Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2211,7 +2431,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB5YSTGPEVPW4KXPFXCMPRPJ",
       "createdAt": "2025-11-28T19:24:52.655Z",
-      "updatedAt": "2025-11-28T19:24:52.658Z",
+      "updatedAt": "2025-11-28T19:24:52.655Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2223,7 +2443,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB5Z6223WG8NGKJJ7MNSF8PN",
       "createdAt": "2025-11-28T19:31:33.580Z",
-      "updatedAt": "2025-11-28T19:31:33.581Z",
+      "updatedAt": "2025-11-28T19:31:33.580Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2247,7 +2467,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB60HCRFAV96EC248HS2X1XS",
       "createdAt": "2025-11-28T19:55:13.569Z",
-      "updatedAt": "2025-11-28T19:55:13.571Z",
+      "updatedAt": "2025-11-28T19:55:13.569Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2259,7 +2479,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB60T6SJK43M31SB2S0QCE1D",
       "createdAt": "2025-11-28T20:00:02.373Z",
-      "updatedAt": "2025-11-28T20:01:14.928Z",
+      "updatedAt": "2025-11-28T20:00:02.373Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2283,7 +2503,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB61FF21M6P6NQFRESYPX0P2",
       "createdAt": "2025-11-28T20:11:38.964Z",
-      "updatedAt": "2025-11-28T20:11:38.966Z",
+      "updatedAt": "2025-11-28T20:11:38.964Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2295,7 +2515,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB61QM4S3MY78XHX8GCPPCNP",
       "createdAt": "2025-11-28T20:16:06.307Z",
-      "updatedAt": "2025-11-28T20:16:06.309Z",
+      "updatedAt": "2025-11-28T20:16:06.307Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2331,7 +2551,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB86F53Z71P99PMGRV1CGSVP",
       "createdAt": "2025-11-29T16:17:20.512Z",
-      "updatedAt": "2025-11-29T17:07:56.758Z",
+      "updatedAt": "2025-11-29T16:17:20.512Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2343,7 +2563,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB88W95EBE3EQY3XGWNSWYR1",
       "createdAt": "2025-11-29T16:59:27.800Z",
-      "updatedAt": "2025-11-29T16:59:27.802Z",
+      "updatedAt": "2025-11-29T16:59:27.800Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2355,7 +2575,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9SSW4XR85Z4ARW4KKS4E2X",
       "createdAt": "2025-11-30T07:14:29.176Z",
-      "updatedAt": "2025-11-30T07:14:29.179Z",
+      "updatedAt": "2025-11-30T07:14:29.176Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2367,7 +2587,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBADRR9YM0HBJCKVZD0SQMXH",
       "createdAt": "2025-11-30T13:03:23.972Z",
-      "updatedAt": "2025-11-30T13:03:23.973Z",
+      "updatedAt": "2025-11-30T13:03:23.972Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2401,7 +2621,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBJFXT81MDSR3W8VRJSVWAVS",
       "createdAt": "2025-12-03T16:15:02.428Z",
-      "updatedAt": "2025-12-03T16:15:02.429Z"
+      "updatedAt": "2025-12-03T16:15:02.428Z"
     },
     {
       "label": "tasdasda",
@@ -2411,7 +2631,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBJGHV4YJ2EHDR8KE5988BFN",
       "createdAt": "2025-12-03T16:25:58.698Z",
-      "updatedAt": "2025-12-03T16:25:58.704Z"
+      "updatedAt": "2025-12-03T16:25:58.698Z"
     },
     {
       "label": "fasfasf",
@@ -2441,7 +2661,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBA5MV6M0A74BHVCJFQMHK6S",
       "createdAt": "2025-11-30T10:41:27.261Z",
-      "updatedAt": "2025-11-30T10:43:02.996Z",
+      "updatedAt": "2025-11-30T10:41:27.261Z",
       "permissions": [],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -2459,8 +2679,8 @@
       "id": "home-menu-item",
       "createdAt": "2025-12-11T00:00:00.000Z",
       "updatedAt": "2025-12-11T00:00:00.000Z",
-      "createdBy": "system",
-      "updatedBy": "system",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": []
     },
     {
@@ -2473,7 +2693,7 @@
       "openInNewTab": false,
       "id": "01KBSIAIBUILDER0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-17T05:52:37.634Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": [],
@@ -2496,7 +2716,7 @@
       "openInNewTab": false,
       "id": "01KBSICHATBOT0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-17T05:53:03.379Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": [],
@@ -2519,7 +2739,7 @@
       "openInNewTab": false,
       "id": "01KBSIBUILDER000000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-17T05:53:10.038Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": [],
@@ -2542,7 +2762,7 @@
       "openInNewTab": false,
       "id": "01KBSISCHEMABUILDER000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-17T05:53:19.727Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": [],
@@ -2565,7 +2785,7 @@
       "openInNewTab": false,
       "id": "01KBSIINTEGRATIONS0000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-17T05:52:15.007Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
       "companies": [],
       "incomplete": false,
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2588,7 +2808,7 @@
       "openInNewTab": false,
       "id": "01KBSIDASHBOARD0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-17T05:53:34.012Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": [],
@@ -2611,7 +2831,7 @@
       "openInNewTab": false,
       "id": "01KBSIGRAPHDESIGNER000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-17T05:53:39.278Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": [],
@@ -2634,7 +2854,7 @@
       "openInNewTab": false,
       "id": "01KBSITENDERCALENDAR00000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-17T05:52:27.729Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2657,7 +2877,7 @@
       "openInNewTab": false,
       "id": "01KBSIANALYTICS0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-17T05:53:45.192Z",
+      "updatedAt": "2025-12-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": [],
@@ -2680,7 +2900,7 @@
       "openInNewTab": false,
       "id": "01KCEQMSANALYTICS0000000001",
       "createdAt": "2025-12-15T12:00:00.000Z",
-      "updatedAt": "2025-12-17T05:51:58.259Z",
+      "updatedAt": "2025-12-15T12:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companies": [],
@@ -2711,7 +2931,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBCXZ2KX7N336B5GDGKEKNRC",
       "createdAt": "2025-12-01T12:24:57.230Z",
-      "updatedAt": "2025-12-03T06:01:03.814Z",
+      "updatedAt": "2025-12-01T12:24:57.230Z",
       "status-items-section": [],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -2728,7 +2948,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBHD90EMZKAT502KNVVDQZC7",
       "createdAt": "2025-12-03T06:09:29.057Z",
-      "updatedAt": "2025-12-10T10:11:43.771Z",
+      "updatedAt": "2025-12-03T06:09:29.057Z",
       "status-items-section": []
     },
     {
@@ -2743,7 +2963,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBHDSGKBHTTEH1YPGB5TECZZ",
       "createdAt": "2025-12-03T06:18:29.876Z",
-      "updatedAt": "2025-12-03T06:22:05.572Z",
+      "updatedAt": "2025-12-03T06:18:29.876Z",
       "status-items-section": []
     },
     {
@@ -2772,8 +2992,23 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSVY7K52MC3H25R3JQQAKCA",
       "createdAt": "2025-12-06T12:59:40.005Z",
-      "updatedAt": "2025-12-06T13:00:50.354Z",
+      "updatedAt": "2025-12-06T12:59:40.005Z",
       "status-items-section": []
+    },
+    {
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "title": "Inquiry Tender Status",
+      "incomplete": true,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXSBQMD17BR96WWSKBJMEZ4",
+      "createdAt": "2025-12-20T11:47:16.247Z",
+      "updatedAt": "2025-12-20T11:47:16.249Z"
     }
   ],
   "status-items": [
@@ -2853,7 +3088,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBHGRPA3CWWXY3YXJPB6667Q",
       "createdAt": "2025-12-03T07:10:28.682Z",
-      "updatedAt": "2025-12-03T07:21:00.531Z"
+      "updatedAt": "2025-12-03T07:10:28.682Z"
     },
     {
       "label": "In Progress",
@@ -2882,7 +3117,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBHH1R4BYJABP7B03NPJNY2K",
       "createdAt": "2025-12-03T07:15:25.464Z",
-      "updatedAt": "2025-12-03T07:17:00.886Z",
+      "updatedAt": "2025-12-03T07:15:25.464Z",
       "color": "slate"
     },
     {
@@ -2993,7 +3228,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSSR4NWQN5DN50STWSACGEN",
       "createdAt": "2025-12-06T12:21:23.261Z",
-      "updatedAt": "2025-12-06T12:22:09.340Z"
+      "updatedAt": "2025-12-06T12:21:23.261Z"
     },
     {
       "label": "Not Started",
@@ -3052,6 +3287,63 @@
       "id": "01KC3VY8JQAY9FWT04V1RJB4TT",
       "createdAt": "2025-12-10T10:12:05.346Z",
       "updatedAt": "2025-12-10T10:12:05.346Z"
+    },
+    {
+      "label": "Draft",
+      "color": "blue",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXSC6PE82FJ8BDJTNK8SJSS",
+      "createdAt": "2025-12-20T11:47:31.680Z",
+      "updatedAt": "2025-12-20T11:56:08.214Z",
+      "icon": "LucideNotebookPen",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "Published For Vendors",
+      "icon": "FileUser",
+      "color": "yellow",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXSVBPFH4B4BNCHC0TY98ZN",
+      "createdAt": "2025-12-20T11:55:48.334Z",
+      "updatedAt": "2025-12-20T11:58:01.417Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "Under Internal Evaluation",
+      "icon": "LucideMailSearch",
+      "color": "orange",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXSZ6VTQX3P3Z3J5Q4JJ1P5",
+      "createdAt": "2025-12-20T11:57:54.431Z",
+      "updatedAt": "2025-12-20T11:57:54.431Z"
+    },
+    {
+      "label": "Awarded",
+      "icon": "Verified",
+      "color": "emerald",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXT066WCM231G176JGVGSWJ",
+      "createdAt": "2025-12-20T11:58:26.530Z",
+      "updatedAt": "2025-12-20T11:58:26.531Z"
+    },
+    {
+      "label": "Cancelled",
+      "icon": "ShieldBan",
+      "color": "rose",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXT1B3PC7FQKF0QFH0318NA",
+      "createdAt": "2025-12-20T11:59:04.330Z",
+      "updatedAt": "2025-12-20T11:59:04.330Z"
     }
   ],
   "tenants": [
@@ -3074,7 +3366,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBFBAZR3K04CS80DMHGPHMHF",
       "createdAt": "2025-12-02T10:57:07.958Z",
-      "updatedAt": "2025-12-17T07:12:20.289Z",
+      "updatedAt": "2025-12-02T10:57:07.958Z",
       "defaultDomain": "cinnagen.com",
       "relatedTenants": [
         {
@@ -3098,7 +3390,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBFBD109G6CYRT7RA04TMMXC",
       "createdAt": "2025-12-02T10:58:14.677Z",
-      "updatedAt": "2025-12-17T07:12:30.775Z",
+      "updatedAt": "2025-12-02T10:58:14.677Z",
       "defaultDomain": "aryogen.ir",
       "relatedTenants": [
         {
@@ -3122,7 +3414,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBFBGV9151FQN481NB2CT4MX",
       "createdAt": "2025-12-02T11:00:19.878Z",
-      "updatedAt": "2025-12-17T07:23:43.828Z",
+      "updatedAt": "2025-12-02T11:00:19.878Z",
       "defaultDomain": "cinnagen.com",
       "relatedTenants": [
         {
@@ -3188,7 +3480,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KCH4F85M3Q8BNTXH67GJTKS5",
       "createdAt": "2025-12-15T13:51:18.204Z",
-      "updatedAt": "2025-12-15T13:51:18.205Z"
+      "updatedAt": "2025-12-15T13:51:18.204Z"
     }
   ],
   "change-subject-types": [
@@ -3208,7 +3500,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSVAZFKZGE307FSXWR5JGP3",
       "createdAt": "2025-12-06T12:49:09.108Z",
-      "updatedAt": "2025-12-06T12:52:03.183Z"
+      "updatedAt": "2025-12-06T12:49:09.108Z"
     },
     {
       "parent": "01KBSVAZFKZGE307FSXWR5JGP3",
@@ -3260,7 +3552,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBSMF1X8N2BEJ7ENHJDT17MX",
       "createdAt": "2025-12-06T10:49:02.641Z",
-      "updatedAt": "2025-12-06T10:49:02.703Z"
+      "updatedAt": "2025-12-06T10:49:02.641Z"
     },
     {
       "date": "2025-12-06",
@@ -3295,7 +3587,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSV30SMKKF9VHR0WP459XME",
       "createdAt": "2025-12-06T12:44:48.309Z",
-      "updatedAt": "2025-12-06T12:45:07.469Z",
+      "updatedAt": "2025-12-06T12:44:48.309Z",
       "analysisReport": "Test"
     },
     {
@@ -3327,7 +3619,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSV4N6KC3PD26QW4BT26GT0",
       "createdAt": "2025-12-06T12:45:41.971Z",
-      "updatedAt": "2025-12-06T12:45:42.005Z"
+      "updatedAt": "2025-12-06T12:45:41.971Z"
     }
   ],
   "qa-guideline-analysis": [
@@ -3438,7 +3730,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSW269QC0V5HH9RA6GJR7S2",
       "createdAt": "2025-12-06T13:01:49.752Z",
-      "updatedAt": "2025-12-06T16:14:57.718Z"
+      "updatedAt": "2025-12-06T13:01:49.752Z"
     },
     {
       "assignedTo": [
@@ -3461,7 +3753,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSW35VJHAB75VRTGXMRHK7Y",
       "createdAt": "2025-12-06T13:02:22.067Z",
-      "updatedAt": "2025-12-06T16:15:19.796Z"
+      "updatedAt": "2025-12-06T13:02:22.067Z"
     },
     {
       "assignedTo": [
@@ -3484,7 +3776,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSWPJ9SEZN67XGNGZ3YD16S",
       "createdAt": "2025-12-06T13:12:57.404Z",
-      "updatedAt": "2025-12-06T16:22:37.830Z",
+      "updatedAt": "2025-12-06T13:12:57.404Z",
       "taskDescription": "test description"
     },
     {
@@ -3507,7 +3799,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBSYN40BXYQ9JNGREYPQRH2P",
       "createdAt": "2025-12-06T13:47:07.147Z",
-      "updatedAt": "2025-12-14T10:24:07.225Z",
+      "updatedAt": "2025-12-06T13:47:07.147Z",
       "entityType": [
         {
           "id": "01KCDZTASK001WORK000000000001",
@@ -3545,7 +3837,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KCE9MJJRHMT2TN793NH33SYW",
       "createdAt": "2025-12-14T11:23:52.289Z",
-      "updatedAt": "2025-12-14T11:23:52.375Z"
+      "updatedAt": "2025-12-14T11:23:52.289Z"
     }
   ],
   "change-procedure": [
@@ -3655,7 +3947,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KCDSTMH0XRHSME4ZEFYZ34PW",
       "createdAt": "2025-12-14T06:47:33.670Z",
-      "updatedAt": "2025-12-14T06:53:36.805Z",
+      "updatedAt": "2025-12-14T06:47:33.670Z",
       "status": [
         {
           "id": "01KBHGVA9789N2GWB9XKT6RQ06",
@@ -3694,7 +3986,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KCDYYM7B28QEPXD97A1B8V5S",
       "createdAt": "2025-12-14T08:17:07.312Z",
-      "updatedAt": "2025-12-15T16:53:35.922Z",
+      "updatedAt": "2025-12-14T08:17:07.312Z",
       "entity-type-items-section": []
     },
     {
@@ -3713,7 +4005,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KCDZTASKGROUP0000000000001",
       "createdAt": "2025-12-14T08:30:00.000Z",
-      "updatedAt": "2025-12-15T16:53:26.906Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
       "entity-type-items-section": []
     },
     {
@@ -3732,7 +4024,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KCPROCESSTYPES00000000001",
       "createdAt": "2025-12-15T00:00:00.000Z",
-      "updatedAt": "2025-12-15T16:53:11.207Z"
+      "updatedAt": "2025-12-15T00:00:00.000Z"
     },
     {
       "relatedCompanies": [
@@ -3747,10 +4039,11 @@
       ],
       "title": "User Type",
       "incomplete": true,
-      "createdBy": "841",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "id": "01KCXDJ8JBXRP84PW59Y5ADR5A",
       "createdAt": "2025-12-20T08:21:07.292Z",
-      "updatedAt": "2025-12-20T08:21:07.292Z"
+      "updatedAt": "2025-12-20T08:21:07.292Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "entity-type-items": [
@@ -3965,60 +4258,66 @@
       "icon": "Shield",
       "color": "rose",
       "incomplete": false,
-      "createdBy": "841",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "id": "01KCXDKF6JJ392P4HMGC8T19TC",
       "createdAt": "2025-12-20T08:21:46.840Z",
-      "updatedAt": "2025-12-20T08:21:46.840Z"
+      "updatedAt": "2025-12-20T08:21:46.840Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "label": "Business Administrator",
       "icon": "Briefcase",
       "color": "pink",
       "incomplete": false,
-      "createdBy": "841",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "id": "01KCXDM9ASSWTYDWA4HDT7W05B",
       "createdAt": "2025-12-20T08:22:13.599Z",
-      "updatedAt": "2025-12-20T08:22:13.599Z"
+      "updatedAt": "2025-12-20T08:22:13.599Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "label": "General User",
       "icon": "User",
       "color": "violet",
       "incomplete": false,
-      "createdBy": "841",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "id": "01KCXDMZE231SQFZZ57W3H8497",
       "createdAt": "2025-12-20T08:22:36.232Z",
-      "updatedAt": "2025-12-20T08:22:36.232Z"
+      "updatedAt": "2025-12-20T08:22:36.232Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "label": "Subsidiary Company",
       "icon": "Building",
       "color": "sky",
       "incomplete": false,
-      "createdBy": "841",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "id": "01KCXDNRE02CDBAXJPBDHQ3PTQ",
       "createdAt": "2025-12-20T08:23:01.831Z",
-      "updatedAt": "2025-12-20T08:23:01.831Z"
+      "updatedAt": "2025-12-20T08:23:01.831Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "label": "Vendor",
       "icon": "ShoppingBasket",
-      "color": "teal",
+      "color": "amber",
       "incomplete": false,
-      "createdBy": "841",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "id": "01KCXDP4BHXVDSRKA78J8S626A",
       "createdAt": "2025-12-20T08:23:14.038Z",
-      "updatedAt": "2025-12-20T08:23:14.038Z"
+      "updatedAt": "2025-12-20T08:23:14.038Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "label": "Customer",
       "icon": "BookUser",
-      "color": "yellow",
+      "color": "orange",
       "incomplete": false,
-      "createdBy": "841",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "id": "01KCXDXS9EYARAPWA9DC4E01TM",
       "createdAt": "2025-12-20T08:27:24.852Z",
-      "updatedAt": "2025-12-20T08:27:24.852Z"
+      "updatedAt": "2025-12-20T08:27:24.852Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "process-mappings": [
@@ -11213,7 +11512,8 @@
       ],
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "updatedAt": "2025-12-16T05:21:55.889Z"
+      "updatedAt": "2025-12-16T05:21:55.889Z",
+      "createdAt": "2025-12-16T05:21:55.889Z"
     },
     {
       "id": "01KCHCHX8900000000000002PZ",
@@ -12854,25 +13154,6 @@
   "reset-password-form": [],
   "vendors": [
     {
-      "name": "Accessybio",
-      "description": "",
-      "id": "01KCX516BKF7M6P91JKBCTM81S",
-      "createdAt": "2025-12-20T12:00:00.000Z",
-      "updatedAt": "2025-12-20T12:00:00.000Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "status": [
-        {
-          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
-          "label": "Active",
-          "icon": "CheckCheck",
-          "color": "emerald"
-        }
-      ],
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
-    },
-    {
       "name": "Ace Prosper Corporation (APC)",
       "description": "",
       "id": "01KCX516BRTDCD254DYWXM5F6B",
@@ -13397,7 +13678,9 @@
           "icon": "CheckCheck",
           "color": "emerald"
         }
-      ]
+      ],
+      "vendor-users": [],
+      "incomplete": false
     },
     {
       "name": "PentaGroup Synergy",
@@ -13651,6 +13934,138 @@
           "label": "Active",
           "icon": "CheckCheck",
           "color": "emerald"
+        }
+      ]
+    }
+  ],
+  "inquiries": [],
+  "inquiry-tenders": [],
+  "parameter-items": [
+    {
+      "label": "Certificate of Analysis (CoA)",
+      "icon": "NotepadText",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXV8VPYF3PTEZC539WDEM28",
+      "createdAt": "2025-12-20T12:20:39.276Z",
+      "updatedAt": "2025-12-20T12:20:39.276Z"
+    },
+    {
+      "label": "Certificate of Quality (CoQ)",
+      "icon": "NotepadText",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXVH1Q682VQ085PZJA8K8FY",
+      "createdAt": "2025-12-20T12:20:39.566Z",
+      "updatedAt": "2025-12-20T12:20:39.566Z"
+    },
+    {
+      "label": "TSE-BSE",
+      "icon": "NotepadText",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXVM1P39PPQN6X6870BT1QK",
+      "createdAt": "2025-12-20T12:26:45.838Z",
+      "updatedAt": "2025-12-20T12:32:17.573Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "RT",
+      "icon": "ThermometerSun",
+      "color": "lime",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW3E9NA1WH19ZJCBCCS11N",
+      "createdAt": "2025-12-20T12:35:10.271Z",
+      "updatedAt": "2025-12-20T12:36:34.541Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "2~8",
+      "icon": "Refrigerator",
+      "color": "teal",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW5JYYQ811SSE26DA2C9K8",
+      "createdAt": "2025-12-20T12:36:20.581Z",
+      "updatedAt": "2025-12-20T12:36:42.641Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "-20",
+      "icon": "ThermometerSnowflake",
+      "color": "purple",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW8CYMG126FZHMJ9PBQMVW",
+      "createdAt": "2025-12-20T12:37:52.731Z",
+      "updatedAt": "2025-12-20T12:37:52.731Z"
+    },
+    {
+      "label": "-70",
+      "icon": "ThermometerSnowflake",
+      "color": "indigo",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW8VB5E9DZERYYH1WC5P99",
+      "createdAt": "2025-12-20T12:38:07.473Z",
+      "updatedAt": "2025-12-20T12:38:07.473Z"
+    },
+    {
+      "label": "-80",
+      "icon": "ThermometerSnowflake",
+      "color": "blue",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW972PQ1ZNRYH1GAASVN6E",
+      "createdAt": "2025-12-20T12:38:19.486Z",
+      "updatedAt": "2025-12-20T12:38:19.486Z"
+    },
+    {
+      "label": "-196",
+      "icon": "ThermometerSnowflake",
+      "color": "cyan",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW9JEMHK1SKANMYVASJN96",
+      "createdAt": "2025-12-20T12:38:31.135Z",
+      "updatedAt": "2025-12-20T12:38:31.135Z"
+    }
+  ],
+  "parameter-groups": [
+    {
+      "title": "Inquiry Required Documents",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXV771ABGHR0ST7MZ03S6B1",
+      "createdAt": "2025-12-20T12:19:45.334Z",
+      "updatedAt": "2025-12-20T12:32:20.387Z",
+      "parameter-items-section": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
+    },
+    {
+      "title": "Storage Conditions",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KCXW1C9NT5D4TFDK511BKTSQ",
+      "createdAt": "2025-12-20T12:34:02.687Z",
+      "updatedAt": "2025-12-20T12:38:33.179Z",
+      "parameter-items-section": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        },
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
         }
       ]
     }

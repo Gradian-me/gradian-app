@@ -26,6 +26,9 @@ import { normalizeOptionArray, normalizeOptionEntry, NormalizedOption } from '..
 import { BadgeOption, getBadgeMetadata } from '../utils/badge-utils';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { formatFieldValue, getFieldValue } from '@/gradian-ui/data-display/table/utils/field-formatters';
+import { getBadgeConfig } from '@/gradian-ui/data-display/utils';
+import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
+import { Badge } from '@/components/ui/badge';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { AddButtonFull } from './AddButtonFull';
@@ -40,6 +43,7 @@ import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
 import { Plus } from 'lucide-react';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { fetchOptionsFromSchemaOrUrl } from '../utils/fetch-options-utils';
+import { CompanySelector } from '@/components/layout/CompanySelector';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 8, scale: 0.99 },
@@ -79,6 +83,125 @@ const buildIdsKey = (ids?: Array<string | number>): string => {
     return '';
   }
   return normalized.slice().sort().join('|');
+};
+
+// Helper function to get avatar color classes (matching AccordionFormSection)
+const getAvatarColorClasses = (color?: string) => {
+  const colorMap: Record<string, { bg: string; text: string; border: string }> = {
+    violet: {
+      bg: 'bg-violet-50 dark:bg-violet-500/15',
+      text: 'text-violet-700 dark:text-violet-100',
+      border: 'border-violet-100 dark:border-violet-500/40',
+    },
+    emerald: {
+      bg: 'bg-emerald-50 dark:bg-emerald-500/15',
+      text: 'text-emerald-700 dark:text-emerald-100',
+      border: 'border-emerald-100 dark:border-emerald-500/40',
+    },
+    indigo: {
+      bg: 'bg-indigo-50 dark:bg-indigo-500/15',
+      text: 'text-indigo-700 dark:text-indigo-100',
+      border: 'border-indigo-100 dark:border-indigo-500/40',
+    },
+    blue: {
+      bg: 'bg-blue-50 dark:bg-blue-500/15',
+      text: 'text-blue-700 dark:text-blue-100',
+      border: 'border-blue-100 dark:border-blue-500/40',
+    },
+    green: {
+      bg: 'bg-green-50 dark:bg-green-500/15',
+      text: 'text-green-700 dark:text-green-100',
+      border: 'border-green-100 dark:border-green-500/40',
+    },
+    red: {
+      bg: 'bg-red-50 dark:bg-red-500/15',
+      text: 'text-red-700 dark:text-red-100',
+      border: 'border-red-100 dark:border-red-500/40',
+    },
+    orange: {
+      bg: 'bg-orange-50 dark:bg-orange-500/15',
+      text: 'text-orange-700 dark:text-orange-100',
+      border: 'border-orange-100 dark:border-orange-500/40',
+    },
+    amber: {
+      bg: 'bg-amber-50 dark:bg-amber-500/15',
+      text: 'text-amber-700 dark:text-amber-100',
+      border: 'border-amber-100 dark:border-amber-500/40',
+    },
+    yellow: {
+      bg: 'bg-yellow-50 dark:bg-yellow-500/15',
+      text: 'text-yellow-700 dark:text-yellow-100',
+      border: 'border-yellow-100 dark:border-yellow-500/40',
+    },
+    pink: {
+      bg: 'bg-pink-50 dark:bg-pink-500/15',
+      text: 'text-pink-700 dark:text-pink-100',
+      border: 'border-pink-100 dark:border-pink-500/40',
+    },
+    purple: {
+      bg: 'bg-purple-50 dark:bg-purple-500/15',
+      text: 'text-purple-700 dark:text-purple-100',
+      border: 'border-purple-100 dark:border-purple-500/40',
+    },
+    teal: {
+      bg: 'bg-teal-50 dark:bg-teal-500/15',
+      text: 'text-teal-700 dark:text-teal-100',
+      border: 'border-teal-100 dark:border-teal-500/40',
+    },
+    cyan: {
+      bg: 'bg-cyan-50 dark:bg-cyan-500/15',
+      text: 'text-cyan-700 dark:text-cyan-100',
+      border: 'border-cyan-100 dark:border-cyan-500/40',
+    },
+    stone: {
+      bg: 'bg-stone-50 dark:bg-stone-500/15',
+      text: 'text-stone-700 dark:text-stone-100',
+      border: 'border-stone-100 dark:border-stone-500/40',
+    },
+    neutral: {
+      bg: 'bg-neutral-50 dark:bg-neutral-500/15',
+      text: 'text-neutral-700 dark:text-neutral-100',
+      border: 'border-neutral-100 dark:border-neutral-500/40',
+    },
+    gray: {
+      bg: 'bg-gray-50 dark:bg-gray-500/15',
+      text: 'text-gray-700 dark:text-gray-100',
+      border: 'border-gray-100 dark:border-gray-500/40',
+    },
+    slate: {
+      bg: 'bg-slate-50 dark:bg-slate-500/15',
+      text: 'text-slate-700 dark:text-slate-100',
+      border: 'border-slate-100 dark:border-slate-500/40',
+    },
+    rose: {
+      bg: 'bg-rose-50 dark:bg-rose-500/15',
+      text: 'text-rose-700 dark:text-rose-100',
+      border: 'border-rose-100 dark:border-rose-500/40',
+    },
+    fuchsia: {
+      bg: 'bg-fuchsia-50 dark:bg-fuchsia-500/15',
+      text: 'text-fuchsia-700 dark:text-fuchsia-100',
+      border: 'border-fuchsia-100 dark:border-fuchsia-500/40',
+    },
+    lime: {
+      bg: 'bg-lime-50 dark:bg-lime-500/15',
+      text: 'text-lime-700 dark:text-lime-100',
+      border: 'border-lime-100 dark:border-lime-500/40',
+    },
+    sky: {
+      bg: 'bg-sky-50 dark:bg-sky-500/15',
+      text: 'text-sky-700 dark:text-sky-100',
+      border: 'border-sky-100 dark:border-sky-500/40',
+    },
+    zinc: {
+      bg: 'bg-zinc-50 dark:bg-zinc-500/15',
+      text: 'text-zinc-700 dark:text-zinc-100',
+      border: 'border-zinc-100 dark:border-zinc-500/40',
+    },
+  };
+  
+  const key = color && colorMap[color.toLowerCase()] ? color.toLowerCase() : 'violet';
+  return colorMap[key];
 };
 
 // Helper function to get value by role from sourceColumnRoles
@@ -666,6 +789,18 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     [effectiveSourceUrl, fetchSourceItems, fetchSchemaItems, supportsPagination, schemaId, staticItems, includeIds, excludeIds, shouldFilterByCompany, companyQueryParam, sortType]
   );
 
+  // Handle company change to refresh data
+  const handleCompanyChange = useCallback(() => {
+    // Clear error and refresh items when company is selected
+    setError(null);
+    if (isOpen) {
+      // Reset pagination and reload items
+      setPageMeta((prev) => ({ ...prev, page: 1, hasMore: true, totalItems: 0 }));
+      hasInitialLoadRef.current = false;
+      void loadItems(1, false);
+    }
+  }, [isOpen, loadItems]);
+
   // Keep items in sync when static dataset changes or when modal opens
   useEffect(() => {
     if (!staticItems) {
@@ -846,20 +981,20 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   }, [isOpen, supportsPagination, searchQuery, includeKey, excludeKey, loadItems, companyKey]);
 
   useEffect(() => {
-    // Skip client-side filtering when using sourceUrl with pagination (API already filters)
-    if (effectiveSourceUrl && supportsPagination) {
-      // Only apply sorting if needed, but don't filter (API handles filtering)
-      const baseSorted = sortOptions(items, sortType);
-      if (filteredItems.length !== baseSorted.length || !filteredItems.every((v, i) => v === baseSorted[i])) {
-        setFilteredItems(baseSorted);
-      }
-      return;
-    }
-
     const trimmed = searchQuery.trim();
     const baseSorted = sortOptions(items, sortType);
 
+    // If no search query, just sort and return all items
     if (!trimmed) {
+      // Skip client-side filtering when using sourceUrl with pagination and no search (API handles it)
+      if (effectiveSourceUrl && supportsPagination) {
+        // Only apply sorting if needed, but don't filter (API handles filtering)
+        if (filteredItems.length !== baseSorted.length || !filteredItems.every((v, i) => v === baseSorted[i])) {
+          setFilteredItems(baseSorted);
+        }
+        return;
+      }
+      // For non-paginated or schema-based, always do client-side filtering
       // Avoid redundant state updates if already equal
       if (filteredItems.length === baseSorted.length && filteredItems.every((v, i) => v === baseSorted[i])) {
         return;
@@ -867,6 +1002,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       setFilteredItems(baseSorted);
       return;
     }
+
+    // When there's a search query, always do client-side filtering for immediate feedback
+    // This ensures filtering works even if API filtering has issues or delays
 
     const query = trimmed.toLowerCase();
     const filtered = items.filter((item) => {
@@ -1210,6 +1348,13 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         ? getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles)
         : undefined;
       
+      // Extract color for icon styling
+      const itemColor = effectiveSourceColumnRoles
+        ? getValueByRoleFromSourceColumns(item, 'color', effectiveSourceColumnRoles) || item.color
+        : item.color;
+      const resolvedColorId = typeof itemColor === 'string' ? itemColor.toLowerCase() : undefined;
+      const iconColorClasses = getAvatarColorClasses(resolvedColorId);
+      
       return (
         <motion.div key={item.id || index} {...motionProps}>
           <div
@@ -1225,7 +1370,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           >
             <div className="flex items-center gap-3">
               {iconName && (
-                <div className="h-10 w-10 rounded-lg bg-violet-50 dark:bg-gray-700 text-violet-600 dark:text-violet-300 flex items-center justify-center">
+                <div className={cn(
+                  "h-10 w-10 rounded-lg flex items-center justify-center border",
+                  iconColorClasses.bg,
+                  iconColorClasses.text,
+                  iconColorClasses.border
+                )}>
                   <IconRenderer iconName={iconName} className="h-5 w-5" />
                 </div>
               )}
@@ -1254,6 +1404,28 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const title = getValueByRole(effectiveSchema, item, 'title') || item.name || `Item ${index + 1}`;
     const subtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
     const avatarField = getSingleValueByRole(effectiveSchema, item, 'avatar', item.name) || item.name || '?';
+    
+    // Extract color for avatar/icon styling
+    let itemColor: string | undefined;
+    const statusValue = getSingleValueByRole(effectiveSchema, item, 'status') ?? item.status;
+    if (statusValue) {
+      const statusField = effectiveSchema?.fields?.find(field => field.role === 'status');
+      const statusOptions = statusField?.options;
+      if (statusOptions) {
+        const statusMeta = getBadgeMetadata(statusValue, statusOptions as BadgeOption[]);
+        itemColor = statusMeta.color;
+      }
+    }
+    // Also check if color comes from role="color" field
+    if (!itemColor) {
+      const colorValue = getSingleValueByRole(effectiveSchema, item, 'color') || item.color;
+      if (colorValue) {
+        itemColor = colorValue;
+      }
+    }
+    const resolvedColorId = typeof itemColor === 'string' ? itemColor.toLowerCase() : undefined;
+    const avatarColorClasses = getAvatarColorClasses(resolvedColorId);
+    
     // Get badge fields
     const badgeFields = getFieldsByRole(effectiveSchema, 'badge');
     const allOptions = new Map<string, NormalizedOption>();
@@ -1281,9 +1453,11 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     // Find status field options
     const statusFieldDef = effectiveSchema?.fields?.find(f => f.role === 'status' || f.name === 'status');
     const ratingFieldDef = effectiveSchema?.fields?.find(f => f.role === 'rating');
+    const entityTypeFieldDef = effectiveSchema?.fields?.find(f => f.role === 'entityType' || f.name === 'entityType');
     const hasCodeField = effectiveSchema?.fields?.some(f => f.role === 'code') || false;
     const codeField = getSingleValueByRole(effectiveSchema, item, 'code');
-    const statusFieldValue = statusFieldDef ? getFieldValue(statusFieldDef, item) : null;
+    // Use getSingleValueByRole like AccordionFormSection does for status
+    const statusFieldValue = getSingleValueByRole(effectiveSchema, item, 'status') || item.status || null;
     const ratingFieldValue = ratingFieldDef ? getFieldValue(ratingFieldDef, item) : null;
     
     // Ensure status field has options from statusGroup if available (same approach as TableWrapper)
@@ -1296,6 +1470,59 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       : hasStatusGroup
         ? { id: 'status', name: 'status', role: 'status', options: effectiveSchema.statusGroup }
         : null;
+    
+    // Get status options for badge config
+    const statusOptions = statusFieldWithOptions?.options;
+    const hasStatusField = Boolean(statusFieldDef || hasStatusGroup);
+    
+    // Normalize status value to extract color/icon from enriched data (like DynamicCardRenderer)
+    const normalizedStatusOption = statusFieldValue ? normalizeOptionArray(statusFieldValue)[0] : null;
+    const statusBadgeConfig = hasStatusField && statusFieldValue && statusOptions 
+      ? (() => {
+          const config = getBadgeConfig(statusFieldValue, statusOptions);
+          return {
+            ...config,
+            // Use normalized option's color/icon first (from enriched API data), fallback to config
+            color: normalizedStatusOption?.color || config.color,
+            icon: normalizedStatusOption?.icon || config.icon,
+          };
+        })()
+      : null;
+    
+    // Entity Type handling (similar to status)
+    const hasEntityTypeGroup = Array.isArray(effectiveSchema?.entityTypeGroup) && effectiveSchema.entityTypeGroup.length > 0;
+    const entityTypeFieldWithOptions = entityTypeFieldDef
+      ? {
+          ...entityTypeFieldDef,
+          options: entityTypeFieldDef.options || (hasEntityTypeGroup ? effectiveSchema.entityTypeGroup : undefined)
+        }
+      : hasEntityTypeGroup
+        ? { id: 'entityType', name: 'entityType', role: 'entityType', options: effectiveSchema.entityTypeGroup }
+        : null;
+    
+    // Get entityType value
+    // Use getSingleValueByRole first, then fallback to getFieldValue and item.entityType
+    const entityTypeFieldValue = getSingleValueByRole(effectiveSchema, item, 'entityType') || 
+      (entityTypeFieldDef ? getFieldValue(entityTypeFieldDef, item) : null) || 
+      item.entityType || 
+      null;
+    const entityTypeOptions = entityTypeFieldWithOptions?.options;
+    const entityTypeValueForBadge = entityTypeFieldValue;
+    const hasEntityTypeField = Boolean(entityTypeFieldDef || hasEntityTypeGroup);
+    
+    // Extract entityType badge config - normalize to extract color/icon from enriched data
+    const normalizedEntityTypeOption = entityTypeFieldValue ? normalizeOptionArray(entityTypeFieldValue)[0] : null;
+    const entityTypeBadgeConfig = hasEntityTypeField && entityTypeFieldValue && entityTypeOptions 
+      ? (() => {
+          const config = getBadgeConfig(entityTypeFieldValue, entityTypeOptions);
+          return {
+            ...config,
+            // Use normalized option's color/icon first (from enriched API data), fallback to config
+            color: normalizedEntityTypeOption?.color || config.color,
+            icon: normalizedEntityTypeOption?.icon || config.icon,
+          };
+        })()
+      : null;
     
     const statusFieldNode = statusFieldWithOptions ? formatFieldValue(statusFieldWithOptions, statusFieldValue, item) : null;
     const ratingFieldNode = ratingFieldDef ? formatFieldValue(ratingFieldDef, ratingFieldValue, item) : null;
@@ -1317,9 +1544,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               variant="primary"
               className={cn(
                 "border shrink-0 transition-colors",
+                avatarColorClasses.bg,
+                avatarColorClasses.text,
+                avatarColorClasses.border,
                 isSelected
-                  ? "border-violet-400"
-                  : "border-gray-200"
+                  ? "ring-1 ring-violet-400"
+                  : ""
               )}
             >
               {getInitials(avatarField)}
@@ -1353,11 +1583,22 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
                 </div>
 
-                {/* Rating and Status - Only render if at least one exists */}
-                {(ratingFieldNode || statusFieldNode) && (
+                {/* Rating, Status, and EntityType - Only render if at least one exists */}
+                {(ratingFieldNode || statusBadgeConfig || entityTypeBadgeConfig) && (
                   <div className="flex flex-col items-end gap-1.5 shrink-0">
                     {ratingFieldNode && <div className="flex items-center gap-1">{ratingFieldNode}</div>}
-                    {statusFieldNode && <div className="flex items-center gap-1">{statusFieldNode}</div>}
+                    {statusBadgeConfig && (
+                      <Badge variant={getValidBadgeVariant(statusBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                        {statusBadgeConfig.icon && <IconRenderer iconName={statusBadgeConfig.icon} className="h-3 w-3" />}
+                        <span>{statusBadgeConfig.label}</span>
+                      </Badge>
+                    )}
+                    {entityTypeBadgeConfig && (
+                      <Badge variant={getValidBadgeVariant(entityTypeBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                        {entityTypeBadgeConfig.icon && <IconRenderer iconName={entityTypeBadgeConfig.icon} className="h-3 w-3" />}
+                        <span>{entityTypeBadgeConfig.label}</span>
+                      </Badge>
+                    )}
                   </div>
                 )}
               </div>
@@ -1496,6 +1737,13 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         ? getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles)
         : undefined;
       
+      // Extract color for icon styling
+      const itemColor = effectiveSourceColumnRoles
+        ? getValueByRoleFromSourceColumns(item, 'color', effectiveSourceColumnRoles) || item.color
+        : item.color;
+      const resolvedColorId = typeof itemColor === 'string' ? itemColor.toLowerCase() : undefined;
+      const iconColorClasses = getAvatarColorClasses(resolvedColorId);
+      
       return (
         <motion.div key={item.id || index} {...motionProps} style={{ marginLeft: depth * 16 }}>
           <div
@@ -1531,7 +1779,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 )}
               </button>
               {iconName && (
-                <div className="h-10 w-10 rounded-lg bg-violet-50 dark:bg-gray-700 text-violet-600 dark:text-violet-300 flex items-center justify-center">
+                <div className={cn(
+                  "h-10 w-10 rounded-lg flex items-center justify-center border",
+                  iconColorClasses.bg,
+                  iconColorClasses.text,
+                  iconColorClasses.border
+                )}>
                   <IconRenderer iconName={iconName} className="h-5 w-5" />
                 </div>
               )}
@@ -1561,8 +1814,94 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const subtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
     const avatarField = getSingleValueByRole(effectiveSchema, item, 'avatar', item.name) || item.name || '?';
 
+    // Extract color for avatar styling
+    let itemColor: string | undefined;
+    const statusValue = getSingleValueByRole(effectiveSchema, item, 'status') ?? item.status;
+    if (statusValue) {
+      const statusField = effectiveSchema?.fields?.find(field => field.role === 'status');
+      const statusOptions = statusField?.options;
+      if (statusOptions) {
+        const statusMeta = getBadgeMetadata(statusValue, statusOptions as BadgeOption[]);
+        itemColor = statusMeta.color;
+      }
+    }
+    // Also check if color comes from role="color" field
+    if (!itemColor) {
+      const colorValue = getSingleValueByRole(effectiveSchema, item, 'color') || item.color;
+      if (colorValue) {
+        itemColor = colorValue;
+      }
+    }
+    const resolvedColorId = typeof itemColor === 'string' ? itemColor.toLowerCase() : undefined;
+    const avatarColorClasses = getAvatarColorClasses(resolvedColorId);
+
     const hasCodeField = effectiveSchema?.fields?.some((f) => f.role === 'code') || false;
     const codeField = getSingleValueByRole(effectiveSchema, item, 'code');
+    
+    // Extract status and entityType for badges
+    const statusFieldDef = effectiveSchema?.fields?.find(f => f.role === 'status' || f.name === 'status');
+    const entityTypeFieldDef = effectiveSchema?.fields?.find(f => f.role === 'entityType' || f.name === 'entityType');
+    // Use getSingleValueByRole like AccordionFormSection does for status
+    const statusFieldValue = getSingleValueByRole(effectiveSchema, item, 'status') || item.status || null;
+    
+    // Status badge config
+    const hasStatusGroup = Array.isArray(effectiveSchema?.statusGroup) && effectiveSchema.statusGroup.length > 0;
+    const statusFieldWithOptions = statusFieldDef 
+      ? { 
+          ...statusFieldDef, 
+          options: statusFieldDef.options || (hasStatusGroup ? effectiveSchema.statusGroup : undefined)
+        }
+      : hasStatusGroup
+        ? { id: 'status', name: 'status', role: 'status', options: effectiveSchema.statusGroup }
+        : null;
+    const statusOptions = statusFieldWithOptions?.options;
+    const hasStatusField = Boolean(statusFieldDef || hasStatusGroup);
+    
+    // Normalize status value to extract color/icon from enriched data (like DynamicCardRenderer)
+    const normalizedStatusOption = statusFieldValue ? normalizeOptionArray(statusFieldValue)[0] : null;
+    const statusBadgeConfig = hasStatusField && statusFieldValue && statusOptions 
+      ? (() => {
+          const config = getBadgeConfig(statusFieldValue, statusOptions);
+          return {
+            ...config,
+            // Use normalized option's color/icon first (from enriched API data), fallback to config
+            color: normalizedStatusOption?.color || config.color,
+            icon: normalizedStatusOption?.icon || config.icon,
+          };
+        })()
+      : null;
+    
+    // Entity Type badge config
+    const hasEntityTypeGroup = Array.isArray(effectiveSchema?.entityTypeGroup) && effectiveSchema.entityTypeGroup.length > 0;
+    const entityTypeFieldWithOptions = entityTypeFieldDef
+      ? {
+          ...entityTypeFieldDef,
+          options: entityTypeFieldDef.options || (hasEntityTypeGroup ? effectiveSchema.entityTypeGroup : undefined)
+        }
+      : hasEntityTypeGroup
+        ? { id: 'entityType', name: 'entityType', role: 'entityType', options: effectiveSchema.entityTypeGroup }
+        : null;
+    // Use getSingleValueByRole first, then fallback to getFieldValue and item.entityType
+    const entityTypeFieldValue = getSingleValueByRole(effectiveSchema, item, 'entityType') || 
+      (entityTypeFieldDef ? getFieldValue(entityTypeFieldDef, item) : null) || 
+      item.entityType || 
+      null;
+    const entityTypeOptions = entityTypeFieldWithOptions?.options;
+    const hasEntityTypeField = Boolean(entityTypeFieldDef || hasEntityTypeGroup);
+    
+    // Normalize entityType value to extract color/icon from enriched data
+    const normalizedEntityTypeOption = entityTypeFieldValue ? normalizeOptionArray(entityTypeFieldValue)[0] : null;
+    const entityTypeBadgeConfig = hasEntityTypeField && entityTypeFieldValue && entityTypeOptions 
+      ? (() => {
+          const config = getBadgeConfig(entityTypeFieldValue, entityTypeOptions);
+          return {
+            ...config,
+            // Use normalized option's color/icon first (from enriched API data), fallback to config
+            color: normalizedEntityTypeOption?.color || config.color,
+            icon: normalizedEntityTypeOption?.icon || config.icon,
+          };
+        })()
+      : null;
 
     return (
       <div key={item.id || index} className="space-y-1" style={{ marginLeft: depth * 16 }}>
@@ -1601,7 +1940,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 variant="primary"
                 className={cn(
                   'border shrink-0 transition-colors',
-                  isSelected ? 'border-violet-400' : 'border-gray-200'
+                  avatarColorClasses.bg,
+                  avatarColorClasses.text,
+                  avatarColorClasses.border,
+                  isSelected ? 'ring-1 ring-violet-400' : ''
                 )}
               >
                 {getInitials(avatarField)}
@@ -1629,6 +1971,24 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                       </p>
                     )}
                   </div>
+                  
+                  {/* Status and EntityType badges */}
+                  {(statusBadgeConfig || entityTypeBadgeConfig) && (
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      {statusBadgeConfig && (
+                        <Badge variant={getValidBadgeVariant(statusBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                          {statusBadgeConfig.icon && <IconRenderer iconName={statusBadgeConfig.icon} className="h-3 w-3" />}
+                          <span>{statusBadgeConfig.label}</span>
+                        </Badge>
+                      )}
+                      {entityTypeBadgeConfig && (
+                        <Badge variant={getValidBadgeVariant(entityTypeBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                          {entityTypeBadgeConfig.icon && <IconRenderer iconName={entityTypeBadgeConfig.icon} className="h-3 w-3" />}
+                          <span>{entityTypeBadgeConfig.label}</span>
+                        </Badge>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1758,7 +2118,17 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               <span className="ms-2 text-sm text-gray-500">Loading items...</span>
             </div>
           ) : error ? (
-            <div className="text-center py-12 text-red-500 text-sm">{error}</div>
+            <div className="flex flex-col items-center justify-center py-12 gap-4 px-4">
+              <div className="text-center text-red-500 text-sm">{error}</div>
+              {error === COMPANY_REQUIRED_MESSAGE && (
+                <div className="flex flex-col items-center gap-2 w-full max-w-md">
+                  <p className="text-xs font-medium opacity-80 text-center">Select a company:</p>
+                  <div className="w-full">
+                    <CompanySelector onCompanyChange={handleCompanyChange} />
+                  </div>
+                </div>
+              )}
+            </div>
           ) : filteredItems.length === 0 && !isLoading ? (
             <div className="text-center py-12 text-gray-500 text-sm">
               {searchQuery ? `No items found matching "${searchQuery}"` : 'No items available'}

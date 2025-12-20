@@ -4184,5 +4184,80 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCZBADGECOLOR001",
+    "timestamp": "2025-12-20T10:17:28.000Z",
+    "version": "1.34.002",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated all-data.json to include new entity types and related companies, improving data structure for user management",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "user-management",
+          "entity-types",
+          "companies"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Modified DynamicCardRenderer and DynamicDetailPageRenderer components to enhance badge display and related entities handling",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "components",
+          "ui",
+          "badges"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new helper functions for badge color management in PopupPicker and PickerInput components, improving UI consistency",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui",
+          "components",
+          "color-management"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCZRELATION001",
+    "timestamp": "2025-12-20T11:15:22.000Z",
+    "version": "1.34.003",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Added new relation between vendors and users in all-data-relations.json to improve data connectivity",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "relations"
+        ]
+      },
+      {
+        "changeType": "fix",
+        "description": "Corrected timestamps and user IDs in all-data.json for better data integrity",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "data-integrity"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated PopupPicker component to include badge configurations for status and entity types, enhancing UI consistency and user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui",
+          "components"
+        ]
+      }
+    ]
   }
 ]

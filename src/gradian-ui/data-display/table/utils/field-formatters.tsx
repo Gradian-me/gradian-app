@@ -566,7 +566,7 @@ export const formatFieldValue = (
       <div className="inline-flex items-center whitespace-nowrap">
         <Badge variant={badgeVariant}>
           {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
-          <span>{badgeLabel}</span>
+          <span className="text-xs">{badgeLabel}</span>
         </Badge>
       </div>,
       isForce,
@@ -629,7 +629,7 @@ export const formatFieldValue = (
       <div className="inline-flex items-center whitespace-nowrap">
         <Badge variant={badgeVariant}>
           {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
-          <span>{badgeLabel}</span>
+          <span className="text-xs">{badgeLabel}</span>
         </Badge>
       </div>,
       isForce,
