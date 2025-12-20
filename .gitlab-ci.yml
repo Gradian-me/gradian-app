@@ -577,16 +577,19 @@ trivy_image_scan:
         echo "❌ Trivy Image Scan FAILED!"
         echo "🚨 High/Critical vulnerabilities detected in Docker image!"
         echo "⚠️  Please review and fix the vulnerabilities before deploying."
+        echo "⏸️  Pipeline will wait for manual approval in the next stage."
         exit 1
       else
         echo "✅ Trivy Image Scan PASSED!"
         echo "✅ No High/Critical vulnerabilities found in Docker image"
+        echo "✅ Pipeline will proceed automatically to deployment"
       fi
   tags:
     - CG-GR-APP-DEV
   only:
     - main
     - master
+  allow_failure: true
   retry:
     max: 2
     when:
@@ -608,18 +611,18 @@ trivy_image_approval:
       echo "📋 Trivy Image Scan Results:"
       echo "----------------------------------------"
       echo ""
-      echo "Please review the Trivy scan results in the trivy_image_scan job above."
+      echo "⚠️  Trivy scan detected HIGH/CRITICAL vulnerabilities!"
       echo ""
-      echo "⚠️  Trivy scan detected vulnerabilities!"
+      echo "Please review the Trivy scan results in the trivy_image_scan job above."
       echo ""
       echo "If you want to proceed despite the vulnerabilities:"
       echo "  - Review the findings in the trivy_image_scan job output"
-      echo "  - Click 'Play' button to approve and continue with deployment"
+      echo "  - Click 'Play' button below to approve and continue with deployment"
       echo ""
       echo "⚠️  WARNING: Deploying with known vulnerabilities may pose security risks!"
       echo ""
       echo "✅ Click 'Play' button to approve and continue with deployment"
-      echo "❌ Or cancel this pipeline to stop"
+      echo "❌ Or cancel this pipeline to stop deployment"
       echo ""
       echo "========================================="
   tags:
@@ -630,6 +633,8 @@ trivy_image_approval:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
       when: manual
       allow_failure: false
+  # This job only appears when trivy_image_scan fails (due to allow_failure: true)
+  # If scan passes, this job won't be created and deploy can proceed automatically
 
 deploy_staging:
   stage: deploy

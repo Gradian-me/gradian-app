@@ -9,16 +9,17 @@ ARG NEXT_PUBLIC_SKIP_KEY
 ENV NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY
 ENV NEXT_PUBLIC_SKIP_KEY=$NEXT_PUBLIC_SKIP_KEY
 
-# Install only build dependencies for native modules (argon2, etc.)
-# Using python3-minimal for smaller size
+# Update system packages and install build dependencies for native modules (argon2, etc.)
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update -qq && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-        python3-minimal \
+        python3 \
         make \
         g++ \
         gcc \
-        libc6-dev && \
+        libc6-dev \
+        ca-certificates && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -35,11 +36,7 @@ RUN npm ci --legacy-peer-deps --include=optional --prefer-offline --no-audit
 COPY . .
 
 # Build the application
-RUN npm run build && \
-    # Remove devDependencies and unnecessary files to reduce size
-    npm prune --production && \
-    # Clean npm cache
-    npm cache clean --force
+RUN npm run build
 
 # =============================================================================
 # Production stage
@@ -55,27 +52,31 @@ ENV NODE_ENV=production \
     HOSTNAME="0.0.0.0" \
     NEXT_TELEMETRY_DISABLED=1
 
-# Create non-root user and install only essential runtime dependencies
-# Removed curl (not needed - health check uses node)
+# Update system packages, create non-root user, and install runtime dependencies
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update -qq && \
+    apt-get upgrade -y && \
     groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs nextjs && \
     apt-get install -y --no-install-recommends \
         tini \
+        curl \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
-# Copy only production files from builder (node_modules already pruned)
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/package*.json ./
-COPY --from=builder --chown=nextjs:nodejs /app/next.config.* ./
-COPY --from=builder --chown=nextjs:nodejs /app/data ./data
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# Copy Next.js build output and application files from builder
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/next.config.* ./
+COPY --from=builder /app/data ./data
+COPY --from=builder /app/public ./public
 
-# Switch to non-root user for security (ownership already set via COPY --chown)
+# Fix ownership for all files (must run as root)
+RUN chown -R nextjs:nodejs /app
+
+# Switch to non-root user for security
 USER nextjs
 
 # Expose application port
