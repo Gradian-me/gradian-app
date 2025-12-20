@@ -604,7 +604,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         >
                           <Badge variant="warning" className="flex items-center gap-1 px-1.5 py-0.5 shadow-sm">
                             <IconRenderer iconName="AlertTriangle" className="h-3 w-3" />
-                            <span className="text-[0.625rem]">Incomplete</span>
+                            <span className="text-xs">Incomplete</span>
                           </Badge>
                         </motion.div>
                       )}
@@ -669,7 +669,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                           {normalizedStatusMetadata.icon && (
                             <IconRenderer iconName={normalizedStatusMetadata.icon} className="h-3 w-3 me-1" />
                           )}
-                          {normalizedStatusMetadata.label}
+                          <span className="text-xs">{normalizedStatusMetadata.label}</span>
                         </Badge>
                       </motion.div>
                     )}
@@ -685,7 +685,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                           {normalizedEntityTypeMetadata.icon && (
                             <IconRenderer iconName={normalizedEntityTypeMetadata.icon} className="h-3 w-3 me-1" />
                           )}
-                          {normalizedEntityTypeMetadata.label}
+                          <span className="text-xs">{normalizedEntityTypeMetadata.label}</span>
                         </Badge>
                       </motion.div>
                     )}
@@ -1104,7 +1104,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                           {normalizedStatusMetadata.icon && (
                             <IconRenderer iconName={normalizedStatusMetadata.icon} className="h-3 w-3 me-1" />
                           )}
-                          {normalizedStatusMetadata.label}
+                          <span className="text-xs">{normalizedStatusMetadata.label}</span>
                         </Badge>
                       </motion.div>
                     )}
@@ -1122,7 +1122,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                           {normalizedEntityTypeMetadata.icon && (
                             <IconRenderer iconName={normalizedEntityTypeMetadata.icon} className="h-3 w-3 me-1" />
                           )}
-                          {normalizedEntityTypeMetadata.label}
+                          <span className="text-xs">{normalizedEntityTypeMetadata.label}</span>
                         </Badge>
                       </motion.div>
                     )}

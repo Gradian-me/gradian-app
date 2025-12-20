@@ -36,6 +36,8 @@ import { RepeatingTableRendererConfig } from '@/gradian-ui/schema-manager/types/
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';
 import { toast } from 'sonner';
 import { EntityMetadata } from './CreateUpdateDetail';
+import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer';
+import { CardWrapper, CardHeader, CardContent, CardTitle } from '../card/components/CardWrapper';
 
 export interface DynamicDetailPageRendererProps {
   schema: FormSchema;
@@ -683,6 +685,12 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     Boolean(headerInfo.entityTypeMetadata?.label) ||
     Boolean(entityTypeBadgeConfig?.label);
 
+  // Check for related companies and tenants
+  const hasRelatedCompanies = schema?.canSelectMultiCompanies && data?.relatedCompanies && Array.isArray(data.relatedCompanies) && data.relatedCompanies.length > 0;
+  const hasRelatedTenants = schema?.allowDataRelatedTenants && data?.relatedTenants && Array.isArray(data.relatedTenants) && data.relatedTenants.length > 0;
+  const relatedCompaniesValue = hasRelatedCompanies ? normalizeOptionArray(data.relatedCompanies) : [];
+  const relatedTenantsValue = hasRelatedTenants ? normalizeOptionArray(data.relatedTenants) : [];
+
   useEffect(() => {
     if (typeof document === 'undefined') {
       return;
@@ -1240,7 +1248,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                         {badgeConfig.icon && (
                           <IconRenderer iconName={badgeConfig.icon} className="h-3 w-3 me-1" />
                         )}
-                        {badgeConfig.label}
+                        <span className="text-xs">{badgeConfig.label}</span>
                       </Badge>
                     </motion.div>
                   ) : null}
@@ -1259,7 +1267,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                         {entityTypeBadgeConfig.icon && (
                           <IconRenderer iconName={entityTypeBadgeConfig.icon} className="h-3 w-3 me-1" />
                         )}
-                        {entityTypeBadgeConfig.label}
+                        <span className="text-xs">{entityTypeBadgeConfig.label}</span>
                       </Badge>
                     </motion.div>
                   ) : null}
@@ -1272,8 +1280,8 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
 
         </motion.div>
 
-        {/* Quick Actions and Tags - Always on Top in Responsive View */}
-        {(quickActions.length > 0 || (hasStatusBadge && badgeConfig?.label) || (hasEntityTypeBadge && entityTypeBadgeConfig?.label)) && (
+        {/* Quick Actions and Tags - Mobile only */}
+        {(quickActions.length > 0 || hasRelatedCompanies || hasRelatedTenants || hasRating || headerInfo.duedate) && (
           <motion.div
             initial={disableAnimation ? false : { opacity: 0, y: 20 }}
             animate={disableAnimation ? false : { opacity: 1, y: 0 }}
@@ -1294,46 +1302,58 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
             )}
 
             {/* Tags/Badges - Mobile */}
-            {((hasStatusBadge && badgeConfig?.label) || (hasEntityTypeBadge && entityTypeBadgeConfig?.label)) && (
-              <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm p-4">
+            {(hasRelatedCompanies || hasRelatedTenants || hasRating || headerInfo.duedate) && (
+              <CardWrapper
+                config={{
+                  id: 'tags',
+                  name: 'Tags',
+                  styling: {
+                    variant: 'default',
+                    size: 'md'
+                  }
+                }}
+                className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm"
+              >
+                <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
+                  <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">Tags</CardTitle>
+                </CardHeader>
+                <CardContent>
                 <div className="flex items-center gap-2 flex-wrap">
-                  {hasStatusBadge && badgeConfig?.label && (
-                  <motion.div
-                    initial={disableAnimation ? false : { opacity: 0, scale: 0.8, y: 5 }}
-                    animate={disableAnimation ? false : { opacity: 1, scale: 1, y: 0 }}
-                    transition={disableAnimation ? {} : {
-                      duration: 0.3,
-                      delay: 0.2,
-                      ease: [0.25, 0.46, 0.45, 0.94]
-                    }}
-                    whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05 }}
-                  >
-                    <Badge variant={badgeConfig.color ?? 'outline'}>
-                      {badgeConfig.icon && (
-                        <IconRenderer iconName={badgeConfig.icon} className="h-3 w-3 me-1" />
-                      )}
-                      {badgeConfig.label}
-                    </Badge>
-                  </motion.div>
+                  {/* Related Companies */}
+                  {hasRelatedCompanies && (
+                    <div>
+                      <BadgeViewer
+                        field={{
+                          id: 'relatedCompanies',
+                          name: 'relatedCompanies',
+                          component: 'picker',
+                          targetSchema: 'companies',
+                        } as any}
+                        value={relatedCompaniesValue}
+                        badgeVariant="outline"
+                        enforceVariant={false}
+                        animate={!disableAnimation}
+                        maxBadges={3}
+                      />
+                    </div>
                   )}
-                  {hasEntityTypeBadge && entityTypeBadgeConfig?.label && (
-                    <motion.div
-                      initial={disableAnimation ? false : { opacity: 0, scale: 0.8, y: 5 }}
-                      animate={disableAnimation ? false : { opacity: 1, scale: 1, y: 0 }}
-                      transition={disableAnimation ? {} : {
-                        duration: 0.3,
-                        delay: 0.25,
-                        ease: [0.25, 0.46, 0.45, 0.94]
-                      }}
-                      whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05 }}
-                    >
-                      <Badge variant={getValidBadgeVariant(entityTypeBadgeConfig.color)}>
-                        {entityTypeBadgeConfig.icon && (
-                          <IconRenderer iconName={entityTypeBadgeConfig.icon} className="h-3 w-3 me-1" />
-                        )}
-                        {entityTypeBadgeConfig.label}
-                      </Badge>
-                    </motion.div>
+                  {/* Related Tenants */}
+                  {hasRelatedTenants && (
+                    <div>
+                      <BadgeViewer
+                        field={{
+                          id: 'relatedTenants',
+                          name: 'relatedTenants',
+                          component: 'picker',
+                          targetSchema: 'tenants',
+                        } as any}
+                        value={relatedTenantsValue}
+                        badgeVariant="outline"
+                        enforceVariant={false}
+                        animate={!disableAnimation}
+                        maxBadges={3}
+                      />
+                    </div>
                   )}
                   {hasRating && (
                     <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.15 }}>
@@ -1355,7 +1375,8 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                     />
                   )}
                 </div>
-              </div>
+                </CardContent>
+              </CardWrapper>
             )}
           </motion.div>
         )}
@@ -1466,6 +1487,86 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       disableAnimation={disableAnimation}
                       schemaCache={targetSchemaCache}
                     />
+                  </div>
+                )}
+
+                {/* Tags/Badges - Desktop Sidebar */}
+                {(hasRelatedCompanies || hasRelatedTenants || hasRating || headerInfo.duedate) && (
+                  <div className="hidden lg:block">
+                    <CardWrapper
+                      config={{
+                        id: 'tags',
+                        name: 'Tags',
+                        styling: {
+                          variant: 'default',
+                          size: 'md'
+                        }
+                      }}
+                      className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm"
+                    >
+                      <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
+                        <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">Tags</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center gap-2 flex-wrap">
+                        {/* Related Companies */}
+                        {hasRelatedCompanies && (
+                          <div>
+                            <BadgeViewer
+                              field={{
+                                id: 'relatedCompanies',
+                                name: 'relatedCompanies',
+                                component: 'picker',
+                                targetSchema: 'companies',
+                              } as any}
+                              value={relatedCompaniesValue}
+                              badgeVariant="outline"
+                              enforceVariant={false}
+                              animate={!disableAnimation}
+                              maxBadges={3}
+                            />
+                          </div>
+                        )}
+                        {/* Related Tenants */}
+                        {hasRelatedTenants && (
+                          <div>
+                            <BadgeViewer
+                              field={{
+                                id: 'relatedTenants',
+                                name: 'relatedTenants',
+                                component: 'picker',
+                                targetSchema: 'tenants',
+                              } as any}
+                              value={relatedTenantsValue}
+                              badgeVariant="outline"
+                              enforceVariant={false}
+                              animate={!disableAnimation}
+                              maxBadges={3}
+                            />
+                          </div>
+                        )}
+                        {hasRating && (
+                          <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.15 }}>
+                            <Rating
+                              value={headerInfo.rating}
+                              maxValue={5}
+                              size="md"
+                              showValue={true}
+                            />
+                          </motion.div>
+                        )}
+                        {headerInfo.duedate && (
+                          <Countdown
+                            expireDate={headerInfo.duedate}
+                            includeTime={true}
+                            size="sm"
+                            showIcon={true}
+                            fieldLabel={duedateFieldLabel}
+                          />
+                        )}
+                        </div>
+                      </CardContent>
+                    </CardWrapper>
                   </div>
                 )}
 

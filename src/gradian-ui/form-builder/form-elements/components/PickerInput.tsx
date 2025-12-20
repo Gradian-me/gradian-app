@@ -17,6 +17,7 @@ import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
 
 export interface PickerInputProps {
   config: any;
@@ -497,12 +498,50 @@ export const PickerInput: React.FC<PickerInputProps> = ({
               const optionId = String(option.id || '');
               const optionLabel = option.label || optionId;
               const optionIcon = option.icon;
+              const optionColor = option.color;
+              
+              const isHexColor = (color: string): boolean => {
+                return color.startsWith('#');
+              };
+              
+              const isTailwindClasses = (color: string): boolean => {
+                return color.includes('bg-') || 
+                       color.includes('text-') || 
+                       color.includes('border-') ||
+                       color.includes('rounded-') ||
+                       /^[a-z]+-[a-z0-9-]+/.test(color);
+              };
+              
+              // Determine badge variant or style based on color
+              let badgeVariant: any = 'outline';
+              let badgeClassName = 'flex items-center gap-1.5 px-2 py-1 text-xs';
+              let badgeStyle: React.CSSProperties | undefined = undefined;
+              
+              if (optionColor) {
+                if (isHexColor(optionColor)) {
+                  // Hex color - use inline style
+                  badgeStyle = { backgroundColor: optionColor, color: '#fff', border: 'none' };
+                  badgeClassName += ' rounded-full font-medium';
+                } else if (isTailwindClasses(optionColor)) {
+                  // Tailwind classes - use as-is
+                  const hasTextColor = optionColor.includes('text-');
+                  const defaultTextColor = hasTextColor ? '' : 'text-white';
+                  badgeClassName += ` rounded-full font-medium border ${defaultTextColor} ${optionColor}`;
+                } else {
+                  // Color name (purple, violet, etc.) - convert to valid badge variant
+                  badgeVariant = getValidBadgeVariant(optionColor);
+                }
+              } else {
+                // Default violet styling if no color
+                badgeClassName += ' bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800';
+              }
               
               return (
                 <Badge
                   key={optionId}
-                  variant="outline"
-                  className="flex items-center gap-1.5 px-2 py-1 text-xs bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800"
+                  variant={badgeVariant}
+                  className={badgeClassName}
+                  style={badgeStyle}
                 >
                   {optionIcon && (
                     <IconRenderer iconName={optionIcon} className="h-3 w-3" />
@@ -566,13 +605,6 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                   const optionIcon = option.icon;
                   const optionColor = option.color;
                   
-                  // Check if color is a valid badge variant
-                  const isValidBadgeVariant = (color?: string): boolean => {
-                    if (!color) return false;
-                    const validVariants = ['default', 'secondary', 'destructive', 'success', 'warning', 'info', 'outline', 'gradient', 'muted'];
-                    return validVariants.includes(color);
-                  };
-                  
                   const isHexColor = (color: string): boolean => {
                     return color.startsWith('#');
                   };
@@ -591,32 +623,39 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                   
                   let badgeContent: React.ReactNode;
                   
-                  if (optionColor && isValidBadgeVariant(optionColor)) {
-                    badgeContent = (
-                      <Badge variant={optionColor as any} className="flex items-center gap-1.5 px-2 py-1">
-                        {iconEl}
-                        <span className="max-w-[200px] truncate">{optionLabel}</span>
-                      </Badge>
-                    );
-                  } else if (optionColor && isHexColor(optionColor)) {
-                    badgeContent = (
-                      <div 
-                        className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium"
-                        style={{ backgroundColor: optionColor, color: '#fff', border: 'none' }}
-                      >
-                        {iconEl}
-                        <span className="max-w-[200px] truncate">{optionLabel}</span>
-                      </div>
-                    );
-                  } else if (optionColor && isTailwindClasses(optionColor)) {
-                    const hasTextColor = optionColor.includes('text-');
-                    const defaultTextColor = hasTextColor ? '' : 'text-white';
-                    badgeContent = (
-                      <div className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium border ${defaultTextColor} ${optionColor}`}>
-                        {iconEl}
-                        <span className="max-w-[200px] truncate">{optionLabel}</span>
-                      </div>
-                    );
+                  // Use getValidBadgeVariant to convert color to valid badge variant
+                  if (optionColor) {
+                    if (isHexColor(optionColor)) {
+                      // Hex color - use inline style
+                      badgeContent = (
+                        <div 
+                          className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium"
+                          style={{ backgroundColor: optionColor, color: '#fff', border: 'none' }}
+                        >
+                          {iconEl}
+                          <span className="max-w-[200px] truncate">{optionLabel}</span>
+                        </div>
+                      );
+                    } else if (isTailwindClasses(optionColor)) {
+                      // Tailwind classes - use as-is
+                      const hasTextColor = optionColor.includes('text-');
+                      const defaultTextColor = hasTextColor ? '' : 'text-white';
+                      badgeContent = (
+                        <div className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium border ${defaultTextColor} ${optionColor}`}>
+                          {iconEl}
+                          <span className="max-w-[200px] truncate">{optionLabel}</span>
+                        </div>
+                      );
+                    } else {
+                      // Color name (purple, violet, etc.) - convert to valid badge variant
+                      const badgeVariant = getValidBadgeVariant(optionColor);
+                      badgeContent = (
+                        <Badge variant={badgeVariant} className="flex items-center gap-1.5 px-2 py-1">
+                          {iconEl}
+                          <span className="max-w-[200px] truncate">{optionLabel}</span>
+                        </Badge>
+                      );
+                    }
                   } else {
                     // Default badge with icon if no color
                     badgeContent = (

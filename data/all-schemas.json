@@ -1053,7 +1053,14 @@
     "schemaType": "system",
     "applyToAllTenants": true,
     "syncStrategy": "schema-and-data",
-    "allowDataRelatedTenants": true
+    "allowDataRelatedTenants": true,
+    "entityTypeGroup": [
+      {
+        "id": "01KCXDJ8JBXRP84PW59Y5ADR5A",
+        "label": "User Type"
+      }
+    ],
+    "canSelectMultiCompanies": true
   },
   {
     "id": "servers",
@@ -3087,22 +3094,6 @@
         "required": false,
         "colSpan": 1,
         "order": 6
-      },
-      {
-        "id": "menu-companies",
-        "name": "companies",
-        "label": "Companies",
-        "sectionId": "basic-information",
-        "component": "picker",
-        "placeholder": "Select companies for this menu item (leave empty to show for all companies)",
-        "description": "If empty, the menu item is visible for all companies. Otherwise, it is only shown for the selected companies.",
-        "targetSchema": "companies",
-        "metadata": {
-          "allowMultiselect": true
-        },
-        "required": false,
-        "colSpan": 2,
-        "order": 7
       }
     ],
     "sections": [

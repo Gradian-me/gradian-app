@@ -113,6 +113,30 @@ export function multiSort<T extends Record<string, any>>(
 
   const sorted = [...data];
 
+  // Helper function to extract sortable value from entityType/status fields
+  const extractSortValue = (value: any): string => {
+    if (value === null || value === undefined) return '';
+    
+    // Handle array of objects (e.g., entityType: [{id, label, ...}])
+    if (Array.isArray(value) && value.length > 0) {
+      const firstItem = value[0];
+      if (typeof firstItem === 'object' && firstItem !== null) {
+        // Prefer label, then id, then try to stringify
+        return String(firstItem.label || firstItem.id || firstItem.name || '').toLowerCase();
+      }
+      // If array contains primitives, use first item
+      return String(value[0] || '').toLowerCase();
+    }
+    
+    // Handle single object (e.g., status: {id, label, ...})
+    if (typeof value === 'object' && value !== null && !(value instanceof Date)) {
+      return String(value.label || value.id || value.name || '').toLowerCase();
+    }
+    
+    // Handle primitives
+    return String(value).toLowerCase();
+  };
+
   sorted.sort((a, b) => {
     for (const sort of sortArray) {
       const { column, isAscending } = sort;
@@ -129,7 +153,15 @@ export function multiSort<T extends Record<string, any>>(
       // Compare values
       let comparison = 0;
       
-      if (typeof aValue === 'number' && typeof bValue === 'number') {
+      // Special handling for entityType and status fields (arrays/objects with labels)
+      if (column === 'entityType' || column === 'status') {
+        const aStr = extractSortValue(aValue);
+        const bStr = extractSortValue(bValue);
+        comparison = aStr.localeCompare(bStr, undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        });
+      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
         comparison = aValue - bValue;
       } else if (aValue instanceof Date && bValue instanceof Date) {
         comparison = aValue.getTime() - bValue.getTime();

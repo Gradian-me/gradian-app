@@ -81,6 +81,125 @@ const buildIdsKey = (ids?: Array<string | number>): string => {
   return normalized.slice().sort().join('|');
 };
 
+// Helper function to get avatar color classes (matching AccordionFormSection)
+const getAvatarColorClasses = (color?: string) => {
+  const colorMap: Record<string, { bg: string; text: string; border: string }> = {
+    violet: {
+      bg: 'bg-violet-50 dark:bg-violet-500/15',
+      text: 'text-violet-700 dark:text-violet-100',
+      border: 'border-violet-100 dark:border-violet-500/40',
+    },
+    emerald: {
+      bg: 'bg-emerald-50 dark:bg-emerald-500/15',
+      text: 'text-emerald-700 dark:text-emerald-100',
+      border: 'border-emerald-100 dark:border-emerald-500/40',
+    },
+    indigo: {
+      bg: 'bg-indigo-50 dark:bg-indigo-500/15',
+      text: 'text-indigo-700 dark:text-indigo-100',
+      border: 'border-indigo-100 dark:border-indigo-500/40',
+    },
+    blue: {
+      bg: 'bg-blue-50 dark:bg-blue-500/15',
+      text: 'text-blue-700 dark:text-blue-100',
+      border: 'border-blue-100 dark:border-blue-500/40',
+    },
+    green: {
+      bg: 'bg-green-50 dark:bg-green-500/15',
+      text: 'text-green-700 dark:text-green-100',
+      border: 'border-green-100 dark:border-green-500/40',
+    },
+    red: {
+      bg: 'bg-red-50 dark:bg-red-500/15',
+      text: 'text-red-700 dark:text-red-100',
+      border: 'border-red-100 dark:border-red-500/40',
+    },
+    orange: {
+      bg: 'bg-orange-50 dark:bg-orange-500/15',
+      text: 'text-orange-700 dark:text-orange-100',
+      border: 'border-orange-100 dark:border-orange-500/40',
+    },
+    amber: {
+      bg: 'bg-amber-50 dark:bg-amber-500/15',
+      text: 'text-amber-700 dark:text-amber-100',
+      border: 'border-amber-100 dark:border-amber-500/40',
+    },
+    yellow: {
+      bg: 'bg-yellow-50 dark:bg-yellow-500/15',
+      text: 'text-yellow-700 dark:text-yellow-100',
+      border: 'border-yellow-100 dark:border-yellow-500/40',
+    },
+    pink: {
+      bg: 'bg-pink-50 dark:bg-pink-500/15',
+      text: 'text-pink-700 dark:text-pink-100',
+      border: 'border-pink-100 dark:border-pink-500/40',
+    },
+    purple: {
+      bg: 'bg-purple-50 dark:bg-purple-500/15',
+      text: 'text-purple-700 dark:text-purple-100',
+      border: 'border-purple-100 dark:border-purple-500/40',
+    },
+    teal: {
+      bg: 'bg-teal-50 dark:bg-teal-500/15',
+      text: 'text-teal-700 dark:text-teal-100',
+      border: 'border-teal-100 dark:border-teal-500/40',
+    },
+    cyan: {
+      bg: 'bg-cyan-50 dark:bg-cyan-500/15',
+      text: 'text-cyan-700 dark:text-cyan-100',
+      border: 'border-cyan-100 dark:border-cyan-500/40',
+    },
+    stone: {
+      bg: 'bg-stone-50 dark:bg-stone-500/15',
+      text: 'text-stone-700 dark:text-stone-100',
+      border: 'border-stone-100 dark:border-stone-500/40',
+    },
+    neutral: {
+      bg: 'bg-neutral-50 dark:bg-neutral-500/15',
+      text: 'text-neutral-700 dark:text-neutral-100',
+      border: 'border-neutral-100 dark:border-neutral-500/40',
+    },
+    gray: {
+      bg: 'bg-gray-50 dark:bg-gray-500/15',
+      text: 'text-gray-700 dark:text-gray-100',
+      border: 'border-gray-100 dark:border-gray-500/40',
+    },
+    slate: {
+      bg: 'bg-slate-50 dark:bg-slate-500/15',
+      text: 'text-slate-700 dark:text-slate-100',
+      border: 'border-slate-100 dark:border-slate-500/40',
+    },
+    rose: {
+      bg: 'bg-rose-50 dark:bg-rose-500/15',
+      text: 'text-rose-700 dark:text-rose-100',
+      border: 'border-rose-100 dark:border-rose-500/40',
+    },
+    fuchsia: {
+      bg: 'bg-fuchsia-50 dark:bg-fuchsia-500/15',
+      text: 'text-fuchsia-700 dark:text-fuchsia-100',
+      border: 'border-fuchsia-100 dark:border-fuchsia-500/40',
+    },
+    lime: {
+      bg: 'bg-lime-50 dark:bg-lime-500/15',
+      text: 'text-lime-700 dark:text-lime-100',
+      border: 'border-lime-100 dark:border-lime-500/40',
+    },
+    sky: {
+      bg: 'bg-sky-50 dark:bg-sky-500/15',
+      text: 'text-sky-700 dark:text-sky-100',
+      border: 'border-sky-100 dark:border-sky-500/40',
+    },
+    zinc: {
+      bg: 'bg-zinc-50 dark:bg-zinc-500/15',
+      text: 'text-zinc-700 dark:text-zinc-100',
+      border: 'border-zinc-100 dark:border-zinc-500/40',
+    },
+  };
+  
+  const key = color && colorMap[color.toLowerCase()] ? color.toLowerCase() : 'violet';
+  return colorMap[key];
+};
+
 // Helper function to get value by role from sourceColumnRoles
 const getValueByRoleFromSourceColumns = (
   item: any,
@@ -846,20 +965,20 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   }, [isOpen, supportsPagination, searchQuery, includeKey, excludeKey, loadItems, companyKey]);
 
   useEffect(() => {
-    // Skip client-side filtering when using sourceUrl with pagination (API already filters)
-    if (effectiveSourceUrl && supportsPagination) {
-      // Only apply sorting if needed, but don't filter (API handles filtering)
-      const baseSorted = sortOptions(items, sortType);
-      if (filteredItems.length !== baseSorted.length || !filteredItems.every((v, i) => v === baseSorted[i])) {
-        setFilteredItems(baseSorted);
-      }
-      return;
-    }
-
     const trimmed = searchQuery.trim();
     const baseSorted = sortOptions(items, sortType);
 
+    // If no search query, just sort and return all items
     if (!trimmed) {
+      // Skip client-side filtering when using sourceUrl with pagination and no search (API handles it)
+      if (effectiveSourceUrl && supportsPagination) {
+        // Only apply sorting if needed, but don't filter (API handles filtering)
+        if (filteredItems.length !== baseSorted.length || !filteredItems.every((v, i) => v === baseSorted[i])) {
+          setFilteredItems(baseSorted);
+        }
+        return;
+      }
+      // For non-paginated or schema-based, always do client-side filtering
       // Avoid redundant state updates if already equal
       if (filteredItems.length === baseSorted.length && filteredItems.every((v, i) => v === baseSorted[i])) {
         return;
@@ -867,6 +986,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       setFilteredItems(baseSorted);
       return;
     }
+
+    // When there's a search query, always do client-side filtering for immediate feedback
+    // This ensures filtering works even if API filtering has issues or delays
 
     const query = trimmed.toLowerCase();
     const filtered = items.filter((item) => {
@@ -1210,6 +1332,13 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         ? getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles)
         : undefined;
       
+      // Extract color for icon styling
+      const itemColor = effectiveSourceColumnRoles
+        ? getValueByRoleFromSourceColumns(item, 'color', effectiveSourceColumnRoles) || item.color
+        : item.color;
+      const resolvedColorId = typeof itemColor === 'string' ? itemColor.toLowerCase() : undefined;
+      const iconColorClasses = getAvatarColorClasses(resolvedColorId);
+      
       return (
         <motion.div key={item.id || index} {...motionProps}>
           <div
@@ -1225,7 +1354,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           >
             <div className="flex items-center gap-3">
               {iconName && (
-                <div className="h-10 w-10 rounded-lg bg-violet-50 dark:bg-gray-700 text-violet-600 dark:text-violet-300 flex items-center justify-center">
+                <div className={cn(
+                  "h-10 w-10 rounded-lg flex items-center justify-center border",
+                  iconColorClasses.bg,
+                  iconColorClasses.text,
+                  iconColorClasses.border
+                )}>
                   <IconRenderer iconName={iconName} className="h-5 w-5" />
                 </div>
               )}
@@ -1254,6 +1388,28 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const title = getValueByRole(effectiveSchema, item, 'title') || item.name || `Item ${index + 1}`;
     const subtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
     const avatarField = getSingleValueByRole(effectiveSchema, item, 'avatar', item.name) || item.name || '?';
+    
+    // Extract color for avatar/icon styling
+    let itemColor: string | undefined;
+    const statusValue = getSingleValueByRole(effectiveSchema, item, 'status') ?? item.status;
+    if (statusValue) {
+      const statusField = effectiveSchema?.fields?.find(field => field.role === 'status');
+      const statusOptions = statusField?.options;
+      if (statusOptions) {
+        const statusMeta = getBadgeMetadata(statusValue, statusOptions as BadgeOption[]);
+        itemColor = statusMeta.color;
+      }
+    }
+    // Also check if color comes from role="color" field
+    if (!itemColor) {
+      const colorValue = getSingleValueByRole(effectiveSchema, item, 'color') || item.color;
+      if (colorValue) {
+        itemColor = colorValue;
+      }
+    }
+    const resolvedColorId = typeof itemColor === 'string' ? itemColor.toLowerCase() : undefined;
+    const avatarColorClasses = getAvatarColorClasses(resolvedColorId);
+    
     // Get badge fields
     const badgeFields = getFieldsByRole(effectiveSchema, 'badge');
     const allOptions = new Map<string, NormalizedOption>();
@@ -1317,9 +1473,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               variant="primary"
               className={cn(
                 "border shrink-0 transition-colors",
+                avatarColorClasses.bg,
+                avatarColorClasses.text,
+                avatarColorClasses.border,
                 isSelected
-                  ? "border-violet-400"
-                  : "border-gray-200"
+                  ? "ring-1 ring-violet-400"
+                  : ""
               )}
             >
               {getInitials(avatarField)}
@@ -1496,6 +1655,13 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         ? getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles)
         : undefined;
       
+      // Extract color for icon styling
+      const itemColor = effectiveSourceColumnRoles
+        ? getValueByRoleFromSourceColumns(item, 'color', effectiveSourceColumnRoles) || item.color
+        : item.color;
+      const resolvedColorId = typeof itemColor === 'string' ? itemColor.toLowerCase() : undefined;
+      const iconColorClasses = getAvatarColorClasses(resolvedColorId);
+      
       return (
         <motion.div key={item.id || index} {...motionProps} style={{ marginLeft: depth * 16 }}>
           <div
@@ -1531,7 +1697,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 )}
               </button>
               {iconName && (
-                <div className="h-10 w-10 rounded-lg bg-violet-50 dark:bg-gray-700 text-violet-600 dark:text-violet-300 flex items-center justify-center">
+                <div className={cn(
+                  "h-10 w-10 rounded-lg flex items-center justify-center border",
+                  iconColorClasses.bg,
+                  iconColorClasses.text,
+                  iconColorClasses.border
+                )}>
                   <IconRenderer iconName={iconName} className="h-5 w-5" />
                 </div>
               )}
@@ -1560,6 +1731,27 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const title = getValueByRole(effectiveSchema, item, 'title') || item.name || `Item ${index + 1}`;
     const subtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
     const avatarField = getSingleValueByRole(effectiveSchema, item, 'avatar', item.name) || item.name || '?';
+
+    // Extract color for avatar styling
+    let itemColor: string | undefined;
+    const statusValue = getSingleValueByRole(effectiveSchema, item, 'status') ?? item.status;
+    if (statusValue) {
+      const statusField = effectiveSchema?.fields?.find(field => field.role === 'status');
+      const statusOptions = statusField?.options;
+      if (statusOptions) {
+        const statusMeta = getBadgeMetadata(statusValue, statusOptions as BadgeOption[]);
+        itemColor = statusMeta.color;
+      }
+    }
+    // Also check if color comes from role="color" field
+    if (!itemColor) {
+      const colorValue = getSingleValueByRole(effectiveSchema, item, 'color') || item.color;
+      if (colorValue) {
+        itemColor = colorValue;
+      }
+    }
+    const resolvedColorId = typeof itemColor === 'string' ? itemColor.toLowerCase() : undefined;
+    const avatarColorClasses = getAvatarColorClasses(resolvedColorId);
 
     const hasCodeField = effectiveSchema?.fields?.some((f) => f.role === 'code') || false;
     const codeField = getSingleValueByRole(effectiveSchema, item, 'code');
@@ -1601,7 +1793,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 variant="primary"
                 className={cn(
                   'border shrink-0 transition-colors',
-                  isSelected ? 'border-violet-400' : 'border-gray-200'
+                  avatarColorClasses.bg,
+                  avatarColorClasses.text,
+                  avatarColorClasses.border,
+                  isSelected ? 'ring-1 ring-violet-400' : ''
                 )}
               >
                 {getInitials(avatarField)}
