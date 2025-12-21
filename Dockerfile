@@ -10,7 +10,10 @@ ENV NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY
 ENV NEXT_PUBLIC_SKIP_KEY=$NEXT_PUBLIC_SKIP_KEY
 
 # Update system packages and install build dependencies for native modules (argon2, etc.)
-RUN export DEBIAN_FRONTEND=noninteractive && \
+# Use BuildKit cache mount for apt cache to speed up package installation
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    export DEBIAN_FRONTEND=noninteractive && \
     apt-get update -qq && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
@@ -30,7 +33,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # Configure npm for better network reliability and install dependencies
-RUN npm config set fetch-retries 5 && \
+# Use BuildKit cache mount for npm cache to speed up package installation
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    npm config set fetch-retries 5 && \
     npm config set fetch-retry-mintimeout 20000 && \
     npm config set fetch-retry-maxtimeout 120000 && \
     npm config set fetch-timeout 300000 && \
@@ -40,7 +45,9 @@ RUN npm config set fetch-retries 5 && \
 COPY . .
 
 # Build the application
-RUN npm run build
+# Use BuildKit cache mount for Next.js build cache to speed up builds
+RUN --mount=type=cache,target=/app/.next/cache,sharing=locked \
+    npm run build
 
 # =============================================================================
 # Production stage
@@ -57,7 +64,10 @@ ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1
 
 # Update system packages, create non-root user, and install runtime dependencies
-RUN export DEBIAN_FRONTEND=noninteractive && \
+# Use BuildKit cache mount for apt cache to speed up package installation
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    export DEBIAN_FRONTEND=noninteractive && \
     apt-get update -qq && \
     apt-get upgrade -y && \
     groupadd --system --gid 1001 nodejs && \
