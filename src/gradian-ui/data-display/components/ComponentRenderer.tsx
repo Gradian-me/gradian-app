@@ -25,7 +25,20 @@ export interface ComponentRendererProps {
 const getValueByPath = (obj: any, path: string): any => {
   const keys = path.split('.');
   let value = obj;
+  // SECURITY: Prevent prototype pollution by validating keys
+  const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
+  
   for (const key of keys) {
+    // SECURITY: Skip prototype pollution keys
+    if (PROTOTYPE_POLLUTION_KEYS.includes(key)) {
+      return null;
+    }
+    // SECURITY: Use hasOwnProperty check for objects
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      if (!Object.prototype.hasOwnProperty.call(value, key)) {
+        return null;
+      }
+    }
     value = value?.[key];
     if (value === undefined) return null;
   }

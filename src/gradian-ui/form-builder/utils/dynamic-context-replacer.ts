@@ -42,6 +42,12 @@ export function extractValueFromContext(
     }
     
     // Handle array access like [0]
+    // SECURITY: Prevent prototype pollution by validating keys
+    const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
+    if (PROTOTYPE_POLLUTION_KEYS.includes(part)) {
+      return '';
+    }
+    
     const arrayMatch = part.match(/^\[(\d+)\]$/);
     if (arrayMatch) {
       const index = parseInt(arrayMatch[1], 10);
@@ -51,6 +57,12 @@ export function extractValueFromContext(
         return '';
       }
     } else {
+      // SECURITY: Use hasOwnProperty check for objects
+      if (current && typeof current === 'object' && !Array.isArray(current)) {
+        if (!Object.prototype.hasOwnProperty.call(current, part)) {
+          return '';
+        }
+      }
       // Regular property access
       current = current[part];
     }

@@ -22,10 +22,27 @@ function getPropertyValue(property: Property | null, formValues: Record<string, 
   // Try path (dot notation like "user.profile.email")
   if (property.path) {
     const pathParts = property.path.split('.');
-    let value = formValues;
+    let value: any = formValues;
+    // SECURITY: Prevent prototype pollution by validating keys
+    const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
+    
     for (const part of pathParts) {
       if (value === null || value === undefined) return undefined;
-      value = value[part];
+      // SECURITY: Skip prototype pollution keys
+      if (PROTOTYPE_POLLUTION_KEYS.includes(part)) {
+        return undefined;
+      }
+      // SECURITY: Use hasOwnProperty check for objects
+      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        if (!Object.prototype.hasOwnProperty.call(value, part)) {
+          return undefined;
+        }
+        // TypeScript: value is confirmed to be a Record<string, any> here
+        value = (value as Record<string, any>)[part];
+      } else {
+        // For arrays or other types, we can't safely index with string
+        return undefined;
+      }
     }
     return value;
   }

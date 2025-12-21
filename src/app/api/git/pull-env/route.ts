@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import axios from 'axios';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -100,10 +100,23 @@ export async function POST(request: NextRequest) {
     // Format as .env file content
     const envFileContent = formatEnvFile(filteredVars);
 
-    // Write to file
-    const envFilePath = join(process.cwd(), outputFile);
-    loggingCustom(LogType.INFRA_LOG, 'info', `Writing ${filteredVars.length} variable(s) to file: ${outputFile}`);
-    await writeFile(envFilePath, envFileContent, 'utf-8');
+    // SECURITY: Validate path to prevent path traversal
+    // Normalize and resolve the path, then verify it's within the project directory
+    const normalizedOutputFile = outputFile.replace(/\\/g, '/').replace(/\.\./g, '');
+    const envFilePath = join(process.cwd(), normalizedOutputFile);
+    const resolvedPath = resolve(envFilePath);
+    const projectRoot = resolve(process.cwd());
+    
+    // Ensure the resolved path is within the project root
+    if (!resolvedPath.startsWith(projectRoot)) {
+      return NextResponse.json(
+        { error: 'Invalid file path' },
+        { status: 400 }
+      );
+    }
+    
+    loggingCustom(LogType.INFRA_LOG, 'info', `Writing ${filteredVars.length} variable(s) to file: ${normalizedOutputFile}`);
+    await writeFile(resolvedPath, envFileContent, 'utf-8');
     loggingCustom(LogType.INFRA_LOG, 'info', `Successfully wrote environment file: ${envFilePath}`);
 
     return NextResponse.json(

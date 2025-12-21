@@ -188,15 +188,18 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     // Use requestAnimationFrame to ensure we don't interfere with undo/redo
     styleUpdateTimerRef.current = setTimeout(() => {
       requestAnimationFrame(() => {
+        // SECURITY: processTextWithMarkdownHashtagsAndMentions escapes HTML to prevent XSS
+        // The function escapes &, <, > before processing markdown, making innerHTML safe
         const styledContent = processTextWithMarkdownHashtagsAndMentions(plainText);
         if (element.innerHTML !== styledContent) {
           // Save current selection
           const currentSelection = window.getSelection();
           const currentRange = currentSelection?.rangeCount ? currentSelection.getRangeAt(0) : null;
           
-          // Use document.execCommand to preserve undo history when possible
-          // But since we're updating HTML, we'll need to update innerHTML
-          // The browser's undo stack should still work for text changes
+          // SECURITY: innerHTML is safe here because:
+          // 1. Content is sanitized by processTextWithMarkdownHashtagsAndMentions (escapes HTML)
+          // 2. Only creates safe HTML tags: span, code, pre, strong, em, del, br
+          // 3. User input is escaped before processing
           element.innerHTML = styledContent;
           
           // Restore cursor position
@@ -316,9 +319,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     setMentionQuery('');
     setMentionPosition(null);
     
+    // SECURITY: processTextWithMarkdownHashtagsAndMentions escapes HTML to prevent XSS
     // Update styled content
     const styledContent = processTextWithMarkdownHashtagsAndMentions(newValue);
     if (contentEditableRef.current) {
+      // SECURITY: innerHTML is safe - content is sanitized (HTML escaped) before processing
       contentEditableRef.current.innerHTML = styledContent;
       adjustHeight();
 
@@ -457,10 +462,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       const newText = element.innerText || element.textContent || '';
       setValue(newText);
       
+      // SECURITY: processTextWithMarkdownHashtagsAndMentions escapes HTML to prevent XSS
       // Update styled content with the new text
       const styledContent = processTextWithMarkdownHashtagsAndMentions(newText);
       // Save cursor position before updating HTML
       const cursorOffset = getCursorOffset(element);
+      // SECURITY: innerHTML is safe - content is sanitized (HTML escaped) before processing
       element.innerHTML = styledContent;
       
       // Restore cursor position

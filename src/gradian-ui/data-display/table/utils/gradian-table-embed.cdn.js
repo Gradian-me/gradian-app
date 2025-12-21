@@ -87,7 +87,7 @@
     // Header
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
-    headerRow.className = 'bg-gray-50/50 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-700';
+    headerRow.className = 'bg-gray-100 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-700';
     
     for (let i = 0; i <= columnCount; i++) {
       const th = document.createElement('th');
@@ -264,7 +264,7 @@
     // Header
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
-    headerRow.className = 'bg-gray-50/50 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-700';
+    headerRow.className = 'bg-gray-100 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-700';
 
     // Add actions column first if tableActions is provided
     if (tableActions.length > 0) {
@@ -376,13 +376,15 @@
           try {
             const rendered = col.render(rawValue, item, index);
             if (typeof rendered === 'string') {
+              // SECURITY: Use textContent instead of innerHTML to prevent XSS
               td.textContent = rendered;
             } else if (rendered && rendered.nodeType) {
               // DOM node
               td.appendChild(rendered);
             } else {
-              // Try to convert to string
-              td.innerHTML = String(rendered);
+              // SECURITY: Use textContent instead of innerHTML to prevent XSS
+              // Convert to string and use textContent to safely display the value
+              td.textContent = String(rendered);
             }
           } catch (e) {
             console.error('Error in render function for column', col.id, ':', e);

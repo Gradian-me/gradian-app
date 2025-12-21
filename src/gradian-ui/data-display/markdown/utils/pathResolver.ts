@@ -10,10 +10,18 @@ function findMarkdownFile(dir: string, targetRoute: string): string | null {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   
   for (const entry of entries) {
+    // SECURITY: Validate path to prevent path traversal
     const fullPath = path.join(dir, entry.name);
+    const resolvedPath = path.resolve(fullPath);
+    const baseDir = path.resolve(dir);
+    
+    // Ensure the resolved path is within the base directory
+    if (!resolvedPath.startsWith(baseDir)) {
+      continue; // Skip this entry if it's outside the base directory
+    }
     
     if (entry.isDirectory()) {
-      const found = findMarkdownFile(fullPath, targetRoute);
+      const found = findMarkdownFile(resolvedPath, targetRoute);
       if (found) return found;
     } else if (entry.isFile() && entry.name.endsWith('.md')) {
       // Match by filename (case-insensitive, with hyphens/underscores normalized)
@@ -22,7 +30,7 @@ function findMarkdownFile(dir: string, targetRoute: string): string | null {
       const normalizedFileName = fileName.replace(/[_-]/g, '-');
       
       if (normalizedFileName === normalizedRoute || fileName === targetRoute.toLowerCase()) {
-        return fullPath;
+        return resolvedPath;
       }
     }
   }
@@ -57,8 +65,10 @@ export function getMarkdownPath(
       ? filePath 
       : `${filePath}.md`;
     
-    // Ensure path is relative to project root and doesn't escape it
-    const absolutePath = path.join(process.cwd(), fullPath);
+    // SECURITY: Validate path to prevent path traversal
+    // Normalize the path by removing any .. sequences
+    const normalizedPath = fullPath.replace(/\.\./g, '').replace(/\\/g, '/');
+    const absolutePath = path.join(process.cwd(), normalizedPath);
     const resolvedPath = path.resolve(absolutePath);
     const projectRoot = path.resolve(process.cwd());
     
@@ -72,10 +82,23 @@ export function getMarkdownPath(
 
   // Single segment: backward compatibility - try to find file automatically in docs directory
   const routeName = route[0];
+  // SECURITY: Validate base path to prevent path traversal
   const basePath = path.join(process.cwd(), docsBasePath);
+  const resolvedBasePath = path.resolve(basePath);
+  const projectRoot = path.resolve(process.cwd());
   
-  const foundPath = findMarkdownFile(basePath, routeName);
+  // Ensure base path is within project root
+  if (!resolvedBasePath.startsWith(projectRoot)) {
+    return null;
+  }
+  
+  const foundPath = findMarkdownFile(resolvedBasePath, routeName);
   if (foundPath) {
+    // SECURITY: Validate found path is within project root
+    const resolvedFoundPath = path.resolve(foundPath);
+    if (!resolvedFoundPath.startsWith(projectRoot)) {
+      return null;
+    }
     // Return relative path from project root
     return path.relative(process.cwd(), foundPath);
   }

@@ -272,12 +272,14 @@ export default function EqmsAnalyticsPage() {
                 </CardContent>
               </Card>
             </div>
-            <EqmsInsightCard
-              agentId="data-analysis-expert"
-              title="Change Insights"
-              payload={{ funnel: data.funnels.change, cycle: data.changeCycle }}
-              prompt="Act as a GxP quality analyst. Summarize change control drop-offs, cycle time trend, and give 3 actions to improve verification throughput without compromising compliance."
-            />
+            <div className="h-full min-h-0">
+              <EqmsInsightCard
+                agentId="data-analysis-expert"
+                title="Change Insights"
+                payload={{ funnel: data.funnels.change, cycle: data.changeCycle }}
+                prompt="Act as a GxP quality analyst. Summarize change control drop-offs, cycle time trend, and give 3 actions to improve verification throughput without compromising compliance."
+              />
+            </div>
           </div>
         )}
 
@@ -311,12 +313,14 @@ export default function EqmsAnalyticsPage() {
                 </CardContent>
               </Card>
             </div>
-            <EqmsInsightCard
-              agentId="data-analysis-expert"
-              title="Deviation Insights"
-              payload={{ pareto: data.paretoRootCauses, graph: rootCauseGraph }}
-              prompt="Analyze the top deviation root causes over the last 6 months and their linked actions. Identify systemic drivers and propose the top 3 mitigation actions with highest impact."
-            />
+            <div className="h-full min-h-0">
+              <EqmsInsightCard
+                agentId="data-analysis-expert"
+                title="Deviation Insights"
+                payload={{ pareto: data.paretoRootCauses, graph: rootCauseGraph }}
+                prompt="Analyze the top deviation root causes over the last 6 months and their linked actions. Identify systemic drivers and propose the top 3 mitigation actions with highest impact."
+              />
+            </div>
           </div>
         )}
 
@@ -332,12 +336,14 @@ export default function EqmsAnalyticsPage() {
                 </CardContent>
               </Card>
             </div>
-            <EqmsInsightCard
-              agentId="data-analysis-expert"
-              title="Complaint Insights"
-              payload={{ complaints: 'biologics customer complaints severity vs resolution' }}
-              prompt="Provide a concise view of complaint severity vs resolution time. Flag any SLA risk, recurrence patterns, and propose 2 actions to reduce high-severity resolution time."
-            />
+            <div className="h-full min-h-0">
+              <EqmsInsightCard
+                agentId="data-analysis-expert"
+                title="Complaint Insights"
+                payload={{ complaints: 'biologics customer complaints severity vs resolution' }}
+                prompt="Provide a concise view of complaint severity vs resolution time. Flag any SLA risk, recurrence patterns, and propose 2 actions to reduce high-severity resolution time."
+              />
+            </div>
           </div>
         )}
 
@@ -353,12 +359,14 @@ export default function EqmsAnalyticsPage() {
                 </CardContent>
               </Card>
             </div>
-            <EqmsInsightCard
-              agentId="data-analysis-expert"
-              title="Audit Insights"
-              payload={{ auditRadar: data.radars.audit }}
-              prompt="Summarize audit readiness gaps across Data Integrity, GMP, CSV, Training, Supplier Quality, and Documentation. Suggest next-step remediations before FDA/EMA inspections."
-            />
+            <div className="h-full min-h-0">
+              <EqmsInsightCard
+                agentId="data-analysis-expert"
+                title="Audit Insights"
+                payload={{ auditRadar: data.radars.audit }}
+                prompt="Summarize audit readiness gaps across Data Integrity, GMP, CSV, Training, Supplier Quality, and Documentation. Suggest next-step remediations before FDA/EMA inspections."
+              />
+            </div>
           </div>
         )}
 
@@ -420,12 +428,14 @@ export default function EqmsAnalyticsPage() {
                 </CardContent>
               </Card>
             </div>
-            <EqmsInsightCard
-              agentId="data-analysis-expert"
-              title="CAPA Insights"
-              payload={{ capaBurndown: '8-week burndown', effectiveness: '89%' }}
-              prompt="Review CAPA burndown and effectiveness. Highlight backlog risk, repeat event drivers, and 2 high-yield actions to sustain on-time closure in a biotech quality system."
-            />
+            <div className="h-full min-h-0">
+              <EqmsInsightCard
+                agentId="data-analysis-expert"
+                title="CAPA Insights"
+                payload={{ capaBurndown: '8-week burndown', effectiveness: '89%' }}
+                prompt="Review CAPA burndown and effectiveness. Highlight backlog risk, repeat event drivers, and 2 high-yield actions to sustain on-time closure in a biotech quality system."
+              />
+            </div>
           </div>
         )}
       </div>

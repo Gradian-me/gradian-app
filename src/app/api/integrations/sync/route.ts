@@ -53,9 +53,22 @@ function extractDataByPath(data: any, path: string): any {
   const parts = path.split('.');
   let result = data;
   
+  // SECURITY: Prevent prototype pollution by validating keys
+  const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
+  
   for (const part of parts) {
     if (result === null || result === undefined) {
       return null;
+    }
+    // SECURITY: Skip prototype pollution keys
+    if (PROTOTYPE_POLLUTION_KEYS.includes(part)) {
+      return null;
+    }
+    // SECURITY: Use hasOwnProperty check for objects
+    if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
+      if (!Object.prototype.hasOwnProperty.call(result, part)) {
+        return undefined;
+      }
     }
     result = result[part];
   }

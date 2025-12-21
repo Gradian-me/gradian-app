@@ -34,7 +34,20 @@ const getFieldValue = (field: any, data: any): any => {
   if (field.source) {
     const path = field.source.split('.');
     let value = data;
+    // SECURITY: Prevent prototype pollution by validating keys
+    const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
+    
     for (const key of path) {
+      // SECURITY: Skip prototype pollution keys
+      if (PROTOTYPE_POLLUTION_KEYS.includes(key)) {
+        return null;
+      }
+      // SECURITY: Use hasOwnProperty check for objects
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        if (!Object.prototype.hasOwnProperty.call(value, key)) {
+          return null;
+        }
+      }
       value = value?.[key];
       if (value === undefined) return null;
     }

@@ -53,8 +53,16 @@ function getValueByPath(obj: any, path: string): any {
   const parts = normalizedPath.split('.');
   let current = obj;
   
+  // SECURITY: Prevent prototype pollution by validating keys
+  const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
+  
   for (const part of parts) {
     if (current === null || current === undefined) {
+      return undefined;
+    }
+    
+    // SECURITY: Skip prototype pollution keys
+    if (PROTOTYPE_POLLUTION_KEYS.includes(part)) {
       return undefined;
     }
     
@@ -62,7 +70,17 @@ function getValueByPath(obj: any, path: string): any {
     const arrayPartMatch = part.match(/^(\w+)\[(\d+)\]$/);
     if (arrayPartMatch) {
       const key = arrayPartMatch[1];
+      // SECURITY: Skip prototype pollution keys
+      if (PROTOTYPE_POLLUTION_KEYS.includes(key)) {
+        return undefined;
+      }
       const index = parseInt(arrayPartMatch[2], 10);
+      // SECURITY: Use hasOwnProperty check for objects
+      if (typeof current === 'object' && current !== null && !Array.isArray(current)) {
+        if (!Object.prototype.hasOwnProperty.call(current, key)) {
+          return undefined;
+        }
+      }
       current = current[key];
       if (Array.isArray(current) && current[index] !== undefined) {
         current = current[index];
@@ -70,6 +88,12 @@ function getValueByPath(obj: any, path: string): any {
         return undefined;
       }
     } else {
+      // SECURITY: Use hasOwnProperty check for objects
+      if (typeof current === 'object' && current !== null && !Array.isArray(current)) {
+        if (!Object.prototype.hasOwnProperty.call(current, part)) {
+          return undefined;
+        }
+      }
       current = current[part];
     }
   }

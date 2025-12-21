@@ -35,14 +35,22 @@ export default async function MarkdownRenderPage({ params, searchParams }: PageP
     notFound();
   }
 
+  // SECURITY: Validate path to prevent path traversal
   const filePath = path.join(process.cwd(), markdownPath);
-
-  // Check if file exists
-  if (!fs.existsSync(filePath)) {
+  const resolvedPath = path.resolve(filePath);
+  const projectRoot = path.resolve(process.cwd());
+  
+  // Ensure the resolved path is within the project root
+  if (!resolvedPath.startsWith(projectRoot)) {
     notFound();
   }
 
-  const fileContents = fs.readFileSync(filePath, 'utf8');
+  // Check if file exists
+  if (!fs.existsSync(resolvedPath)) {
+    notFound();
+  }
+
+  const fileContents = fs.readFileSync(resolvedPath, 'utf8');
 
   // Extract filename and format title for header
   const fileName = extractFilename(markdownPath);

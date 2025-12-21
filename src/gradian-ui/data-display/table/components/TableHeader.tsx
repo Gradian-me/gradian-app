@@ -33,7 +33,7 @@ export function TableHeader<T = any>({
   bordered,
 }: TableHeaderProps<T>) {
   const headerClasses = cn(
-    'bg-gray-50/50 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-700',
+    'bg-gray-100 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-700',
     striped && 'bg-gray-50/50',
     bordered && 'border-b border-gray-100'
   );
@@ -44,8 +44,8 @@ export function TableHeader<T = any>({
       column.align === 'center' && 'text-center',
       column.align === 'right' && 'text-right',
       column.sortable && onSort && 'cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-gray-700',
-      column.sticky === 'left' && 'sticky left-0 z-10 bg-gray-50/50 dark:bg-gray-700',
-      column.sticky === 'right' && 'sticky right-0 z-10 bg-gray-50/50 dark:bg-gray-700',
+      column.sticky === 'left' && 'sticky left-0 z-10 bg-gray-100 dark:bg-gray-700',
+      column.sticky === 'right' && 'sticky right-0 z-10 bg-gray-100 dark:bg-gray-700',
       stickyHeader && 'sticky top-0 z-20',
       bordered && 'border-r border-gray-200 dark:border-gray-700 last:border-r-0',
       // Match padding with td cells - use same padding as TableBody
