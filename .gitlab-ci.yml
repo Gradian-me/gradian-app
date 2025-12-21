@@ -541,7 +541,7 @@ trivy_image_scan:
       echo ""
     - |
       # Ensure cache directory exists
-      TRIVY_CACHE_DIR="$CI_PROJECT_DIR/.trivy-cache"
+      TRIVY_CACHE_DIR=/tmp/trivy-cache"
       mkdir -p "$TRIVY_CACHE_DIR"
       echo "📦 Trivy cache directory: $TRIVY_CACHE_DIR"
       
