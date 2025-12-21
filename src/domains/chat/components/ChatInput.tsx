@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { useAiAgents } from '@/domains/ai-builder';
 import { MentionCommand } from './MentionCommand';
 import { processTextWithStyledHashtagsAndMentions, processTextWithMarkdownHashtagsAndMentions } from '../utils/text-utils';
+import { sanitizeForContentEditable } from '@/gradian-ui/shared/utils/html-sanitizer';
 import type { AiAgent } from '@/domains/ai-builder/types';
 
 export interface ChatInputProps {
@@ -191,16 +192,21 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         // SECURITY: processTextWithMarkdownHashtagsAndMentions escapes HTML to prevent XSS
         // The function escapes &, <, > before processing markdown, making innerHTML safe
         const styledContent = processTextWithMarkdownHashtagsAndMentions(plainText);
-        if (element.innerHTML !== styledContent) {
+        // SECURITY: Additional sanitization with DOMPurify for defense in depth
+        const sanitizedContent = sanitizeForContentEditable(styledContent);
+        if (element.innerHTML !== sanitizedContent) {
           // Save current selection
           const currentSelection = window.getSelection();
           const currentRange = currentSelection?.rangeCount ? currentSelection.getRangeAt(0) : null;
           
           // SECURITY: innerHTML is safe here because:
           // 1. Content is sanitized by processTextWithMarkdownHashtagsAndMentions (escapes HTML)
-          // 2. Only creates safe HTML tags: span, code, pre, strong, em, del, br
-          // 3. User input is escaped before processing
-          element.innerHTML = styledContent;
+          // 2. Additional sanitization with DOMPurify (defense in depth)
+          // 3. Only creates safe HTML tags: span, code, pre, strong, em, del, br
+          // 4. User input is escaped before processing
+          // nosemgrep: javascript.browser.security.insecure-document-method
+          // Rationale: Content is sanitized with DOMPurify before assignment
+          element.innerHTML = sanitizedContent;
           
           // Restore cursor position
           if (currentSelection && currentRange) {
@@ -322,9 +328,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     // SECURITY: processTextWithMarkdownHashtagsAndMentions escapes HTML to prevent XSS
     // Update styled content
     const styledContent = processTextWithMarkdownHashtagsAndMentions(newValue);
+    // SECURITY: Additional sanitization with DOMPurify for defense in depth
+    const sanitizedContent = sanitizeForContentEditable(styledContent);
     if (contentEditableRef.current) {
-      // SECURITY: innerHTML is safe - content is sanitized (HTML escaped) before processing
-      contentEditableRef.current.innerHTML = styledContent;
+      // SECURITY: innerHTML is safe - content is sanitized (HTML escaped + DOMPurify) before processing
+      // nosemgrep: javascript.browser.security.insecure-document-method
+      // Rationale: Content is sanitized with DOMPurify before assignment
+      contentEditableRef.current.innerHTML = sanitizedContent;
       adjustHeight();
 
       // Focus and set cursor position
@@ -465,10 +475,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       // SECURITY: processTextWithMarkdownHashtagsAndMentions escapes HTML to prevent XSS
       // Update styled content with the new text
       const styledContent = processTextWithMarkdownHashtagsAndMentions(newText);
+      // SECURITY: Additional sanitization with DOMPurify for defense in depth
+      const sanitizedContent = sanitizeForContentEditable(styledContent);
       // Save cursor position before updating HTML
       const cursorOffset = getCursorOffset(element);
-      // SECURITY: innerHTML is safe - content is sanitized (HTML escaped) before processing
-      element.innerHTML = styledContent;
+      // SECURITY: innerHTML is safe - content is sanitized (HTML escaped + DOMPurify) before processing
+      // nosemgrep: javascript.browser.security.insecure-document-method
+      // Rationale: Content is sanitized with DOMPurify before assignment
+      element.innerHTML = sanitizedContent;
       
       // Restore cursor position
       setTimeout(() => {

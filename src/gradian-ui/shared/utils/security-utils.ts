@@ -72,6 +72,9 @@ export function safeGetByPath(obj: any, path: string): any {
       }
     }
 
+    // SECURITY: Safe property access - part is validated above to not be a prototype pollution key
+    // and hasOwnProperty check ensures it exists on the object (not from prototype chain)
+    // nosemgrep: javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop
     current = current[part];
   }
 
