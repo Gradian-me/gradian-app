@@ -246,13 +246,13 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
                     <TooltipTrigger asChild>
                       <div className="flex items-center gap-2">
                         {relationDirections.has('source') && (
-                          <Badge variant="primary" size="sm">
+                          <Badge color="orange" size="sm">
                             <IconRenderer iconName="ArrowDown" className="h-3 w-3 me-1" />
                             Source
                           </Badge>
                         )}
                         {relationDirections.has('target') && (
-                          <Badge variant="secondary" size="sm">
+                          <Badge color="emerald" size="sm">
                             <IconRenderer iconName="ArrowUp" className="h-3 w-3 me-1" />
                             Target
                           </Badge>

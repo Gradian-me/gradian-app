@@ -38,6 +38,7 @@ import { toast } from 'sonner';
 import { EntityMetadata } from './CreateUpdateDetail';
 import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { CardWrapper, CardHeader, CardContent, CardTitle } from '../card/components/CardWrapper';
+import { EndLine } from '../../layout/end-line/components/EndLine';
 
 export interface DynamicDetailPageRendererProps {
   schema: FormSchema;
@@ -525,8 +526,19 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
 
         const groupedRelations = relationsResponse.data;
 
+        // Sort relations to show targets first, then sources
+        const sortedRelations = [...groupedRelations].sort((a, b) => {
+          // Targets (direction === 'target') come first
+          const aIsTarget = a.direction === 'target';
+          const bIsTarget = b.direction === 'target';
+          if (aIsTarget && !bIsTarget) return -1;
+          if (!aIsTarget && bIsTarget) return 1;
+          // If both are same direction, maintain original order
+          return 0;
+        });
+
         const relatedSchemasSet = new Set<string>();
-        groupedRelations.forEach((group) => {
+        sortedRelations.forEach((group) => {
           let schemaToUse: string | undefined;
 
           if (group.direction === 'source') {
@@ -1724,7 +1736,9 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
 
         {/* Auto Table Renderers - Show relations to uncovered target schemas */}
         {relatedSchemas.length > 0 && (
-          <div className="space-y-6 mt-6 w-full min-w-0">
+          <>
+            <EndLine label="Relations" />
+            <div className="space-y-6 mt-6 w-full min-w-0">
             {relatedSchemas.map((targetSchema, index) => (
               <DynamicRepeatingTableViewer
                 key={`auto-table-${targetSchema}`}
@@ -1746,6 +1760,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
               />
             ))}
           </div>
+          </>
         )}
       </div>
 
