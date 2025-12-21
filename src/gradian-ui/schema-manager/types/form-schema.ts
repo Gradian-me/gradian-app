@@ -44,6 +44,7 @@ export interface FormField {
   columnMap?: ColumnMapConfig; // Optional mapping for request/response and item fields when using sourceUrl
   pageSize?: number; // Page size for paginated data sources (default: 50)
   sortType?: 'ASC' | 'DESC' | null; // Sort order for items (null = no sorting, default)
+  mustSelectLeaves?: boolean; // If true, only allow selecting leaf nodes (nodes without children) in hierarchical schemas
   // Reference-based filtering: filter items based on relation to a reference entity
   referenceSchema?: string; // Schema of the reference entity (e.g., "status-groups", "parameter-groups")
   referenceRelationTypeId?: string; // Relation type ID to filter by (e.g., "HAS_STATUS_ITEM", "HAS_PARAMETER_ITEM")
@@ -600,6 +601,11 @@ export interface DataRelation {
    * When true, relation is kept for history but should be treated as inactive.
    */
   inactive?: boolean;
+  /**
+   * Incomplete flag for relations.
+   * When true, indicates that the target entity is incomplete.
+   */
+  incomplete?: boolean;
   createdAt?: string;
   updatedAt?: string;
   // Direction indicator for API responses - indicates whether this relation is from the perspective of source or target

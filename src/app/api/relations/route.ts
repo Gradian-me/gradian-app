@@ -268,7 +268,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const { sourceSchema, sourceId, targetSchema, targetId, relationTypeId } = body;
+    const { sourceSchema, sourceId, targetSchema, targetId, relationTypeId, incomplete } = body;
 
     // Validate required fields
     if (!sourceSchema || !sourceId || !targetSchema || !targetId || !relationTypeId) {
@@ -325,6 +325,7 @@ export async function POST(request: NextRequest) {
       targetSchema,
       targetId,
       relationTypeId,
+      incomplete: incomplete === true ? true : undefined, // Only set if explicitly true
     });
 
     return NextResponse.json(

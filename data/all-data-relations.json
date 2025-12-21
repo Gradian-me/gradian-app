@@ -1395,5 +1395,60 @@
     "id": "01KCXXSETREL000000000000000014",
     "createdAt": "2025-12-20T16:38:21.000Z",
     "updatedAt": "2025-12-20T16:38:21.000Z"
+  },
+  {
+    "sourceSchema": "tenders",
+    "sourceId": "01KD0RAP41ADG8EC0W5E2MAXHZ",
+    "targetSchema": "inquiry-items",
+    "targetId": "01KD0RDKTPWBAP0HQFAJT8PEDE",
+    "relationTypeId": "HAS_ITEM",
+    "id": "01KD0RDKZ7KP5R9GPCYGV4BZTX",
+    "createdAt": "2025-12-21T15:28:32.742Z",
+    "updatedAt": "2025-12-21T15:28:37.210Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01KCZVDJHHKT672CHJC27ZGF5C",
+    "targetSchema": "tenders",
+    "targetId": "01KD0RAP41ADG8EC0W5E2MAXHZ",
+    "relationTypeId": "HAS_TENDER",
+    "id": "01KD0RDRCFS9E0XDKDNEW9RE31",
+    "createdAt": "2025-12-21T15:28:37.263Z",
+    "updatedAt": "2025-12-21T15:28:37.263Z"
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01KCZVDJHHKT672CHJC27ZGF5C",
+    "targetSchema": "tenders",
+    "targetId": "01KD0RK5KHD47AS11GFE4TMQ1C",
+    "relationTypeId": "HAS_TENDER",
+    "incomplete": true,
+    "id": "01KD0RK5X74RBYSX2M8YJ8TYVZ",
+    "createdAt": "2025-12-21T15:31:34.951Z",
+    "updatedAt": "2025-12-21T15:31:34.951Z"
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01KD0TBZ4TNEQEVAWE11B1R1SK",
+    "targetSchema": "tenders",
+    "targetId": "01KD0TE4WYXF8QFA3ENH5PCVCP",
+    "relationTypeId": "HAS_TENDER",
+    "incomplete": true,
+    "id": "01KD0TE51G0XV9VW83CM6JNKZ7",
+    "createdAt": "2025-12-21T16:03:47.376Z",
+    "updatedAt": "2025-12-21T16:05:01.319Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "tenders",
+    "sourceId": "01KD0TE4WYXF8QFA3ENH5PCVCP",
+    "targetSchema": "inquiry-items",
+    "targetId": "01KD0TG13H2V7GMWDAYH0Q1EDZ",
+    "relationTypeId": "HAS_ITEM",
+    "id": "01KD0TG16SPCMZ93H00KDX6ZKW",
+    "createdAt": "2025-12-21T16:04:48.985Z",
+    "updatedAt": "2025-12-21T16:04:59.186Z",
+    "inactive": true
   }
 ]

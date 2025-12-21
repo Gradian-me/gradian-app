@@ -685,6 +685,9 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     Boolean(headerInfo.entityTypeMetadata?.label) ||
     Boolean(entityTypeBadgeConfig?.label);
 
+  // Check if entity is incomplete
+  const isIncomplete = data?.incomplete === true;
+
   // Check for related companies and tenants
   const hasRelatedCompanies = schema?.canSelectMultiCompanies && data?.relatedCompanies && Array.isArray(data.relatedCompanies) && data.relatedCompanies.length > 0;
   const hasRelatedTenants = schema?.allowDataRelatedTenants && data?.relatedTenants && Array.isArray(data.relatedTenants) && data.relatedTenants.length > 0;
@@ -1221,7 +1224,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                     />
                   </div>
                 )}
-              {(hasRating || hasStatusBadge || hasEntityTypeBadge) && (
+              {(hasRating || hasStatusBadge || hasEntityTypeBadge || isIncomplete) && (
                 <div className="flex items-end flex-col justify-end gap-2">
                   {hasRating && (
                     <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.15 }}>
@@ -1231,6 +1234,23 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                         size="md"
                         showValue={true}
                       />
+                    </motion.div>
+                  )}
+                  {isIncomplete && (
+                    <motion.div
+                      initial={disableAnimation ? false : { opacity: 0, scale: 0.8, y: 5 }}
+                      animate={disableAnimation ? false : { opacity: 1, scale: 1, y: 0 }}
+                      transition={disableAnimation ? {} : {
+                        duration: 0.3,
+                        delay: 0.15,
+                        ease: [0.25, 0.46, 0.45, 0.94]
+                      }}
+                      whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05 }}
+                    >
+                      <Badge variant="warning" className="flex items-center gap-1">
+                        <IconRenderer iconName="AlertTriangle" className="h-3 w-3" />
+                        <span className="text-xs">Incomplete</span>
+                      </Badge>
                     </motion.div>
                   )}
                   {hasStatusBadge ? (

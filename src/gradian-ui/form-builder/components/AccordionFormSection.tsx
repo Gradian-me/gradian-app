@@ -162,8 +162,9 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       const queryParams = new URLSearchParams();
       queryParams.append('sourceSchema', sourceSchemaId);
       queryParams.append('sourceId', currentEntityId);
-      queryParams.append('relationTypeId', relationTypeId);
       queryParams.append('targetSchema', targetSchema);
+      queryParams.append('relationTypeId', relationTypeId);
+      queryParams.append('includeInactive', 'true');
       // If id needs to be added, append it here as the last parameter
       
       // Fetch relations
@@ -1337,6 +1338,38 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                         <div className="space-y-3">
                           {itemsToDisplay.map((entity, index) => {
                             const relation = relations.find(r => r.targetId === (entity as any).id);
+                            
+                            // Ensure entity has a title - if no title role value exists, use singular name + index
+                            let entityWithTitle = entity;
+                            if (targetSchemaData) {
+                              const singularName = targetSchemaData.singular_name || targetSchemaData.name || 'Item';
+                              const fallbackTitle = `${singularName} ${index + 1}`;
+                              
+                              const titleField = targetSchemaData.fields?.find(f => f.role === 'title');
+                              const hasTitleRole = !!titleField;
+                              
+                              if (hasTitleRole) {
+                                // Check if title field has a value
+                                const titleValue = getValueByRole(targetSchemaData, entity, 'title');
+                                
+                                // If no title value or empty/Unknown, set fallback title
+                                if (!titleValue || titleValue === '' || titleValue === 'Unknown') {
+                                  entityWithTitle = {
+                                    ...entity,
+                                    [titleField.name]: fallbackTitle,
+                                  };
+                                }
+                              } else {
+                                // No title field - ensure name has fallback if name is also missing/empty
+                                if (!entity.name || entity.name === '' || entity.name === 'Unknown') {
+                                  entityWithTitle = {
+                                    ...entity,
+                                    name: fallbackTitle,
+                                  };
+                                }
+                              }
+                            }
+                            
                             return (
                               <div
                                 key={(entity as any).id || `entity-${index}`}
@@ -1345,7 +1378,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                 {targetSchemaData ? (
                                   <DynamicCardRenderer
                                     schema={targetSchemaData}
-                                    data={entity}
+                                    data={entityWithTitle}
                                     index={index}
                                     viewMode="list"
                                     onView={(data) => {
@@ -1370,7 +1403,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                   <div className="px-3 sm:px-4 py-3">
                                     <div className="flex items-center justify-between gap-2">
                                       <div className="text-sm text-gray-900 dark:text-gray-100">
-                                        {entity.name || entity.title || entity.id || `Item ${index + 1}`}
+                                        {entity.name || entity.title || entity.id || (targetSchema ? `${targetSchema} ${index + 1}` : `Item ${index + 1}`)}
                                       </div>
                                       <div className="flex gap-1">
                                         <Button
@@ -1475,6 +1508,38 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   <div className="space-y-3">
                     {itemsToDisplay.map((entity, index) => {
                       const relation = relations.find(r => r.targetId === (entity as any).id);
+                      
+                      // Ensure entity has a title - if no title role value exists, use singular name + index
+                      let entityWithTitle = entity;
+                      if (targetSchemaData) {
+                        const singularName = targetSchemaData.singular_name || targetSchemaData.name || 'Item';
+                        const fallbackTitle = `${singularName} ${index + 1}`;
+                        
+                        const titleField = targetSchemaData.fields?.find(f => f.role === 'title');
+                        const hasTitleRole = !!titleField;
+                        
+                        if (hasTitleRole) {
+                          // Check if title field has a value
+                          const titleValue = getValueByRole(targetSchemaData, entity, 'title');
+                          
+                          // If no title value or empty/Unknown, set fallback title
+                          if (!titleValue || titleValue === '' || titleValue === 'Unknown') {
+                            entityWithTitle = {
+                              ...entity,
+                              [titleField.name]: fallbackTitle,
+                            };
+                          }
+                        } else {
+                          // No title field - ensure name has fallback if name is also missing/empty
+                          if (!entity.name || entity.name === '' || entity.name === 'Unknown') {
+                            entityWithTitle = {
+                              ...entity,
+                              name: fallbackTitle,
+                            };
+                          }
+                        }
+                      }
+                      
                       return (
                         <div
                           key={(entity as any).id || `entity-${index}`}
@@ -1483,7 +1548,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                           {targetSchemaData ? (
                             <DynamicCardRenderer
                               schema={targetSchemaData}
-                              data={entity}
+                              data={entityWithTitle}
                               index={index}
                               viewMode="list"
                               onView={(data) => {
@@ -1507,7 +1572,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                             <div className="px-3 sm:px-4 py-3">
                               <div className="flex items-center justify-between gap-2">
                                 <div className="text-sm text-gray-900 dark:text-gray-100">
-                                  {entity.name || entity.title || entity.id || `Item ${index + 1}`}
+                                  {entity.name || entity.title || entity.id || (targetSchema ? `${targetSchema} ${index + 1}` : `Item ${index + 1}`)}
                                 </div>
                                 <div className="flex gap-1">
                                   <Button

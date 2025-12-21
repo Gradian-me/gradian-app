@@ -511,8 +511,13 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
             : viewMode === 'list'
               ? "rounded-xl" // Match container roundness in list mode
               : "rounded-2xl",
-          !className?.includes('border-none') && !className?.includes('border ') && "border border-gray-200 dark:border-gray-700",
+          !className?.includes('border-none') && !className?.includes('border ') && "border",
+          // Amber border and background for incomplete items
+          isIncomplete 
+            ? "border-amber-400 dark:border-amber-500 bg-amber-50/30 dark:bg-amber-950/20" 
+            : "border-gray-200 dark:border-gray-700",
           !disableAnimation && !isInDialog && "transition-colors hover:bg-gray-200 dark:hover:bg-gray-600",
+          isIncomplete && !disableAnimation && !isInDialog && "hover:bg-amber-100/40 dark:hover:bg-amber-950/30",
           className?.includes('border-none') 
             ? "focus-within:ring-0 border-none" 
             : !isInDialog && "focus-within:ring-2 focus-within:ring-violet-400 focus-within:ring-offset-0 focus-within:rounded-xl"

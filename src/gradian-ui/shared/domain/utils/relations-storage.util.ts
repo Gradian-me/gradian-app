@@ -75,6 +75,8 @@ export function createRelation(relation: Omit<DataRelation, 'id' | 'createdAt' |
       id: ulid(),
       createdAt: now,
       updatedAt: now,
+      // Preserve incomplete flag if provided
+      incomplete: relation.incomplete === true ? true : undefined,
     };
     relations.push(newRelation);
     writeAllRelations(relations);

@@ -10,6 +10,7 @@ import { isValidSchemaId, getSchemaById } from '@/gradian-ui/schema-manager/util
 import { loadAllCompanies, clearCompaniesCache } from '@/gradian-ui/shared/utils/companies-loader';
 import { isDemoModeEnabled, proxyDataRequest, enrichWithUsers, enrichEntitiesWithUsers } from '../utils';
 import { syncHasFieldValueRelationsForEntity, minimizePickerFieldValues, enrichEntitiesPickerFieldsFromRelations, enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
+import { extractRepeatingSectionValues, syncRepeatingSectionRelationsForEntity } from '@/gradian-ui/shared/domain/utils/repeating-section-relations.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
@@ -432,9 +433,10 @@ export async function POST(
     
     // If single item, use controller (maintains existing behavior)
     if (!isArray) {
-      // In demo mode, extract picker values and remove them from request body before saving
+      // In demo mode, extract picker values and repeating section values before saving
       // This implements relations-only storage
       let pickerValues: Record<string, any> = {};
+      let repeatingSectionValues: Record<string, any[]> = {};
       let cleanedRequestBody = requestBody;
       
       if (isDemoModeEnabled()) {
@@ -445,6 +447,9 @@ export async function POST(
             const { extractPickerFieldValues, minimizePickerFieldValues: minimizeValues } = await import('@/gradian-ui/shared/domain/utils/field-value-relations.util');
             pickerValues = extractPickerFieldValues({ schema, data: requestBody });
             
+            // Extract repeating section values before minimizing them
+            repeatingSectionValues = extractRepeatingSectionValues({ schema, data: requestBody });
+            
             // Minimize picker values to [{id}, {id}] format (keep IDs for tracing)
             cleanedRequestBody = minimizeValues({ schema, data: requestBody });
           }
@@ -452,7 +457,7 @@ export async function POST(
           loggingCustom(
             LogType.INFRA_LOG,
             'warn',
-            `[POST /api/data] Failed to extract picker values: ${error instanceof Error ? error.message : String(error)}`,
+            `[POST /api/data] Failed to extract picker values and repeating section values: ${error instanceof Error ? error.message : String(error)}`,
           );
         }
       }
@@ -479,37 +484,68 @@ export async function POST(
         clearCompaniesCache();
       }
 
-      // In demo mode, synchronize HAS_FIELD_VALUE relations after entity creation
-      // Use the extracted picker values to create relations
-      if (isDemoModeEnabled() && responseData?.success && responseData.data && typeof responseData.data === 'object' && Object.keys(pickerValues).length > 0) {
+      // In demo mode, synchronize HAS_FIELD_VALUE relations and repeating section relations after entity creation
+      // Use the extracted picker values and repeating section values to create relations
+      if (isDemoModeEnabled() && responseData?.success && responseData.data && typeof responseData.data === 'object') {
         try {
-          // Create relations from the extracted picker values
-          const entityWithPickerValues = { ...responseData.data, ...pickerValues };
-          await syncHasFieldValueRelationsForEntity({
-            schemaId,
-            entity: entityWithPickerValues,
-          });
-          
-          // Update entity with minimized picker values (keep IDs for tracing)
           const schema = await getSchemaById(schemaId);
-          if (schema) {
-            const minimizedEntity = minimizePickerFieldValues({
-              schema,
-              data: responseData.data,
+          
+          // Sync picker field relations if we have picker values
+          if (Object.keys(pickerValues).length > 0) {
+            try {
+              // Create relations from the extracted picker values
+              const entityWithPickerValues = { ...responseData.data, ...pickerValues };
+              await syncHasFieldValueRelationsForEntity({
+                schemaId,
+                entity: entityWithPickerValues,
+              });
+              
+              // Update entity with minimized picker values (keep IDs for tracing)
+              if (schema) {
+                const minimizedEntity = minimizePickerFieldValues({
+                  schema,
+                  data: responseData.data,
+                });
+                
+                // Update entity in storage with minimized values
+                const repository = new BaseRepository(schemaId);
+                await repository.update(String(responseData.data.id), minimizedEntity);
+                
+                // Update response data to reflect minimized entity
+                responseData.data = minimizedEntity;
+              }
+            } catch (error) {
+              loggingCustom(
+                LogType.INFRA_LOG,
+                'warn',
+                `[POST /api/data] Failed to sync HAS_FIELD_VALUE relations: ${error instanceof Error ? error.message : String(error)}`,
+              );
+            }
+          }
+          
+          // Sync repeating section relations
+          // Always call sync, even if repeatingSectionValues is empty, to ensure existing relations
+          // created through modals are preserved when form is saved as incomplete
+          try {
+            // Include repeating section values in the entity for relation creation
+            // If repeatingSectionValues is empty, the sync function will still preserve existing relations
+            const entityWithRepeatingSections = { ...responseData.data, ...repeatingSectionValues };
+            await syncRepeatingSectionRelationsForEntity({
+              schemaId,
+              entity: entityWithRepeatingSections,
             });
-            
-            // Update entity in storage with minimized values
-            const repository = new BaseRepository(schemaId);
-            await repository.update(String(responseData.data.id), minimizedEntity);
-            
-            // Update response data to reflect minimized entity
-            responseData.data = minimizedEntity;
+          } catch (error) {
+            loggingCustom(
+              LogType.INFRA_LOG,
+              'warn',
+              `[POST /api/data] Failed to sync repeating section relations: ${error instanceof Error ? error.message : String(error)}`,
+            );
           }
         } catch (error) {
           loggingCustom(
             LogType.INFRA_LOG,
             'warn',
-            `[POST /api/data] Failed to sync HAS_FIELD_VALUE relations: ${error instanceof Error ? error.message : String(error)}`,
+            `[POST /api/data] Failed to sync relations: ${error instanceof Error ? error.message : String(error)}`,
           );
         }
       }

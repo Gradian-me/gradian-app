@@ -3415,7 +3415,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 1
+        "order": 2
       },
       {
         "id": "change-management-type-label-en",
@@ -3429,7 +3429,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 2,
+        "order": 1,
         "role": "title"
       }
     ],
@@ -3451,63 +3451,8 @@
         "label": "AryoGen"
       }
     ],
-    "syncStrategy": "schema-only"
-  },
-  {
-    "id": "change-subject-types",
-    "description": "Manage change subject types with multilingual labels and hierarchical support",
-    "singular_name": "Change Subject Type",
-    "plural_name": "Change Subject Types",
-    "allowHierarchicalParent": true,
-    "fields": [
-      {
-        "id": "change-subject-type-label-fa",
-        "name": "label_fa",
-        "label": "Label (Farsi)",
-        "sectionId": "basic-information",
-        "component": "text",
-        "placeholder": "Enter Farsi label",
-        "validation": {
-          "required": true,
-          "minLength": 1
-        },
-        "colSpan": 1,
-        "order": 1
-      },
-      {
-        "id": "change-subject-type-label-en",
-        "name": "label_en",
-        "label": "Label (English)",
-        "sectionId": "basic-information",
-        "component": "text",
-        "placeholder": "Enter English label",
-        "validation": {
-          "required": true,
-          "minLength": 1
-        },
-        "colSpan": 1,
-        "order": 2,
-        "role": "title"
-      }
-    ],
-    "sections": [
-      {
-        "id": "basic-information",
-        "title": "Change Subject Type Information",
-        "description": "Basic change subject type details",
-        "initialState": "expanded",
-        "columns": 2
-      }
-    ],
-    "showInNavigation": true,
-    "icon": "FolderTree",
-    "schemaType": "business",
-    "relatedTenants": [
-      {
-        "id": "01KBFBD109G6CYRT7RA04TMMXC",
-        "label": "AryoGen"
-      }
-    ]
+    "syncStrategy": "schema-and-data",
+    "isNotCompanyBased": true
   },
   {
     "id": "change-management",
@@ -3589,17 +3534,18 @@
         "order": 5
       },
       {
-        "id": "change-subject-types",
-        "name": "changeSubjectTypes",
-        "label": "Change Subject Types",
+        "id": "affected-processes",
+        "name": "affectedProcesses",
+        "label": "Affected Processes",
         "sectionId": "change-information",
         "component": "picker",
-        "placeholder": "Click to select change subject type",
-        "description": "Select change subject type from popup picker",
-        "targetSchema": "change-subject-types",
+        "placeholder": "Click to select affected processes",
+        "description": "Select affected processes from popup picker",
+        "targetSchema": "process-mappings",
         "validation": {
           "required": false
         },
+        "allowMultiselect": true,
         "colSpan": 1,
         "order": 7
       },
@@ -4088,7 +4034,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 1
+        "order": 2
       },
       {
         "id": "change-category-label-en",
@@ -4102,7 +4048,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 2,
+        "order": 1,
         "role": "title"
       }
     ],
@@ -4124,7 +4070,8 @@
         "label": "AryoGen"
       }
     ],
-    "syncStrategy": "schema-only"
+    "syncStrategy": "schema-and-data",
+    "isNotCompanyBased": true
   },
   {
     "id": "related-documents",
@@ -4237,7 +4184,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 1
+        "order": 2
       },
       {
         "id": "change-procedure-label-en",
@@ -4251,7 +4198,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 2,
+        "order": 1,
         "role": "title"
       }
     ],
@@ -4272,7 +4219,9 @@
         "id": "01KBFBD109G6CYRT7RA04TMMXC",
         "label": "AryoGen"
       }
-    ]
+    ],
+    "isNotCompanyBased": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "tasks",
@@ -4877,23 +4826,6 @@
         "order": 3
       },
       {
-        "id": "parent-process",
-        "name": "parent",
-        "label": "Parent Process",
-        "sectionId": "hierarchy",
-        "component": "picker",
-        "placeholder": "Select parent process (optional)",
-        "description": "Use this to build hierarchical process maps (e.g. Level 1 → Level 2 → Level 3).",
-        "targetSchema": "process-mappings",
-        "allowMultiselect": false,
-        "validation": {
-          "required": false
-        },
-        "colSpan": 1,
-        "order": 0,
-        "inactive": true
-      },
-      {
         "id": "field-1765814967501",
         "name": "code",
         "label": "Code",
@@ -5118,7 +5050,7 @@
           "targetSchema": "users",
           "relationTypeId": "HAS_MEMBER",
           "deleteType": "relationOnly",
-          "addType": "canSelectFromData",
+          "addType": "mustSelectFromData",
           "isUnique": true,
           "fieldRelationType": "connectToSchema"
         }
@@ -5208,7 +5140,7 @@
         "initialState": "expanded",
         "columns": 2,
         "repeatingConfig": {
-          "minItems": 0,
+          "minItems": 1,
           "maxItems": 100,
           "targetSchema": "tenders",
           "relationTypeId": "HAS_TENDER",
@@ -5266,13 +5198,14 @@
         "isRepeatingSection": true,
         "repeatingConfig": {
           "fieldRelationType": "connectToSchema",
-          "minItems": 0,
+          "minItems": 1,
           "targetSchema": "inquiry-items",
-          "addType": "addOnly"
+          "addType": "addOnly",
+          "relationTypeId": "HAS_ITEM"
         }
       }
     ],
-    "showInNavigation": true,
+    "showInNavigation": false,
     "icon": "FileCheck",
     "schemaType": "business",
     "applyToAllTenants": false,
