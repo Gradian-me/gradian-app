@@ -1,5 +1,9 @@
 stages:
+  - security
+  - security_approval
   - build
+  - image_scan
+  - image_approval
   - deploy
 
 variables:
@@ -7,120 +11,667 @@ variables:
   DOCKER_TLS_CERTDIR: ""
 
 before_script:
-  - echo "🔐 Ensuring clean Docker auth..."
-  - docker logout "$CI_REGISTRY" || true
-  - echo "🔐 Authenticating with Docker Registry..."
+  - echo "Authenticating with Docker Registry..."
+  - echo "$nexus_password" | docker login -u "$nexus_user" --password-stdin reg.cinnagen.com:8083
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-  - echo "⚙️ Setting up environment files..."
-  - |
-    cat > .env << EOF
-    AVALAI_API_KEY=$AVALAI_API_KEY
-    APP_ID=$APP_ID
-    URL_AUTHENTICATION=$URL_AUTHENTICATION
-    APP_SECRET_KEY=$APP_SECRET_KEY
-    CLIENT_ID=$CLIENT_ID
-    DATABASE_URL=$DATABASE_URL
-    JWT_SECRET=$JWT_SECRET
-    NEXTAUTH_SECRET=$NEXTAUTH_SECRET
-    NEXTAUTH_URL=$NEXTAUTH_URL
-    NEXT_PUBLIC_CLIENT_ID=$NEXT_PUBLIC_CLIENT_ID
-    NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY
-    NEXT_PUBLIC_SCHEMA_API_BASE=$NEXT_PUBLIC_SCHEMA_API_BASE
-    NEXT_PUBLIC_SECRET_KEY=$NEXT_PUBLIC_SECRET_KEY
-    NEXT_PUBLIC_URL_DATA_CRUD=$NEXT_PUBLIC_URL_DATA_CRUD
-    NEXT_PUBLIC_URL_SCHEMA_CRUD=$NEXT_PUBLIC_URL_SCHEMA_CRUD
-    NEXT_PUBLIC_URL_SYNC_MAIL_TEMPLATE=$NEXT_PUBLIC_URL_SYNC_MAIL_TEMPLATE
-    PEPPER=$PEPPER
-    SECRET_KEY=$SECRET_KEY
-    URL_DATA_CRUD=$URL_DATA_CRUD
-    URL_SCHEMA_CRUD=$URL_SCHEMA_CRUD
-    URL_SEND_EMAIL=$URL_SEND_EMAIL
-    URL_SYNC_MAIL_TEMPLATE=$URL_SYNC_MAIL_TEMPLATE
-    DEMO_MODE=$DEMO_MODE
-    NEXT_PUBLIC_SKIP_KEY=$NEXT_PUBLIC_SKIP_KEY
-    REQUIRE_LOGIN=$REQUIRE_LOGIN
-    INTERNAL_API_BASE_URL=$INTERNAL_API_BASE_URL
-    ENABLE_LOGGING=${ENABLE_LOGGING:-false}
-    NEXT_PUBLIC_ENABLE_LOGGING=${NEXT_PUBLIC_ENABLE_LOGGING:-false}
-    EOF
+
+security_audit:
+  stage: security
+  script:
+    - echo "🔒 Starting security audit..."
+    - |
+      if [ ! -f "package.json" ]; then
+        echo "❌ package.json not found!"
+        exit 1
+      fi
+    - echo "📦 Installing dependencies..."
+    - npm ci --prefer-offline --no-audit
+    - echo ""
+    - |
+      echo "========================================="
+      echo "🔒 Security Audit Report"
+      echo "========================================="
+      echo "📅 Date: $(date)"
+      echo "🔖 Commit: $CI_COMMIT_SHORT_SHA"
+      echo "🌿 Branch: $CI_COMMIT_REF_NAME"
+      echo ""
+    - |
+      echo "========================================="
+      echo "🚨 Vulnerability Report"
+      echo "========================================="
+      echo ""
+      HAS_VULNERABILITIES=false
+      # Capture npm audit output and exit code
+      AUDIT_OUTPUT=$(npm audit --audit-level=moderate 2>&1) || AUDIT_EXIT_CODE=$?
+      # Display the audit output
+      echo "$AUDIT_OUTPUT"
+      echo ""
+      # Check if vulnerabilities were found
+      if [ -n "$AUDIT_EXIT_CODE" ] && [ "$AUDIT_EXIT_CODE" -ne 0 ]; then
+        echo "❌ Security audit failed: Vulnerabilities found!"
+        HAS_VULNERABILITIES=true
+      else
+        echo "✅ No vulnerabilities found"
+      fi
+      echo ""
+      echo "========================================="
+      echo "⚠️  Deprecated Packages Report"
+      echo "========================================="
+      echo ""
+      HAS_DEPRECATED=false
+      DEPRECATED_OUTPUT=$(npm ls --depth=0 2>&1 | grep -i "deprecated" || true)
+      if [ -n "$DEPRECATED_OUTPUT" ]; then
+        echo "$DEPRECATED_OUTPUT"
+        echo ""
+        echo "❌ Security audit failed: Deprecated packages found!"
+        HAS_DEPRECATED=true
+      else
+        echo "✅ No deprecated packages found"
+      fi
+      echo ""
+      echo "========================================="
+      if [ "$HAS_VULNERABILITIES" = "true" ] || [ "$HAS_DEPRECATED" = "true" ]; then
+        echo "❌ Security audit failed!"
+        exit 1
+      fi
+      echo "✅ Security audit passed! No vulnerabilities or deprecated packages found."
+  tags:
+    - CG-GR-APP-DEV
+  only:
+    - main
+    - master
+  allow_failure: true
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+owasp_dependency_check:
+  stage: security
+  script:
+    - echo "🛡️ Starting OWASP Dependency-Check scan..."
+    - |
+      echo "========================================="
+      echo "🛡️ OWASP Dependency-Check Report"
+      echo "========================================="
+      echo "📅 Date: $(date)"
+      echo "🔖 Commit: $CI_COMMIT_SHORT_SHA"
+      echo "🌿 Branch: $CI_COMMIT_REF_NAME"
+      echo ""
+    - |
+      if [ ! -f "package.json" ]; then
+        echo "❌ package.json not found!"
+        exit 1
+      fi
+    - |
+      # Create temporary report directory (will be deleted after displaying)
+      export TEMP_REPORT_DIR=$(mktemp -d)
+      echo "📦 Preparing project for OWASP scan..."
+      echo "📁 Temporary report directory: $TEMP_REPORT_DIR"
+      # OWASP Dependency-Check can scan package.json and package-lock.json directly
+      # It will also check node_modules if available, but it's not required
+      if [ -d "node_modules" ]; then
+        echo "✅ node_modules found - will be included in scan"
+      else
+        echo "ℹ️  node_modules not found - scanning package.json and package-lock.json only"
+      fi
+      echo "🐳 Pulling OWASP Dependency-Check Docker image..."
+      docker pull reg.cinnagen.com:8083/owasp/dependency-check:latest
+      echo "🔍 Running OWASP Dependency-Check against NVD database..."
+      # Get absolute paths for volume mounting
+      PROJECT_DIR=$(pwd)
+      
+      # Ensure report directory is writable
+      chmod 777 "$TEMP_REPORT_DIR" 2>/dev/null || true
+      
+      # Build base docker command
+      # Note: Some Node.js-specific options are not available in CLI version
+      # Using container name to copy files after execution
+      CONTAINER_NAME="owasp-dc-$(date +%s)"
+      
+      DOCKER_ARGS=(
+        --name "$CONTAINER_NAME"
+        -v "$PROJECT_DIR:/src:ro"
+        -v "$TEMP_REPORT_DIR:/report:rw"
+        -w /src
+        reg.cinnagen.com:8083/owasp/dependency-check:latest
+        --project "gradian-app"
+        --scan /src
+        --format "JSON"
+        --out /report
+        --enableExperimental
+        --failOnCVSS 7
+      )
+      
+      # Add NVD API key if provided
+      if [ -n "$NVD_API_KEY" ]; then
+        DOCKER_ARGS+=(--nvdApiKey "$NVD_API_KEY")
+        echo "🔑 Using NVD API Key"
+      else
+        echo "ℹ️  No NVD API Key provided (using public NVD API)"
+      fi
+      
+      # Run OWASP Dependency-Check
+      echo "🚀 Executing OWASP Dependency-Check..."
+      docker run "${DOCKER_ARGS[@]}" || OWASP_EXIT_CODE=$?
+      
+      # Try to copy report from container if volume mount didn't work
+      if [ ! -f "$TEMP_REPORT_DIR/dependency-check-report.json" ]; then
+        echo "⚠️  Report not found in volume mount, trying to copy from container..."
+        docker cp "$CONTAINER_NAME:/report/dependency-check-report.json" "$TEMP_REPORT_DIR/" 2>/dev/null || true
+      fi
+      
+      # Clean up container
+      docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+      
+      echo ""
+      echo "========================================="
+      echo "📊 OWASP Dependency-Check Results"
+      echo "========================================="
+      
+      # Display report in log
+      REPORT_FILE="$TEMP_REPORT_DIR/dependency-check-report.json"
+      
+      # Check if report file exists
+      if [ -f "$REPORT_FILE" ]; then
+        echo ""
+        echo "📋 Vulnerability Summary:"
+        echo "----------------------------------------"
+        # Extract and display summary using jq if available
+        if command -v jq >/dev/null 2>&1; then
+          # Count total dependencies
+          TOTAL_DEPS=$(jq '.dependencies | length' "$REPORT_FILE" 2>/dev/null || echo "0")
+          echo "📦 Total dependencies scanned: $TOTAL_DEPS"
+          
+          # Count vulnerable dependencies
+          VULN_DEPS=$(jq '[.dependencies[] | select(.vulnerabilities != null and (.vulnerabilities | length) > 0)] | length' "$REPORT_FILE" 2>/dev/null || echo "0")
+          echo "🚨 Vulnerable dependencies: $VULN_DEPS"
+          
+          # Display vulnerable packages with details
+          if [ "$VULN_DEPS" -gt 0 ]; then
+            echo ""
+            echo "⚠️  Vulnerable Packages:"
+            echo "----------------------------------------"
+            jq -r '.dependencies[] | select(.vulnerabilities != null and (.vulnerabilities | length) > 0) | 
+              "Package: \(.packages[0].id // .fileName)\n" +
+              "Vulnerabilities: \(.vulnerabilities | length)\n" +
+              (.vulnerabilities[] | "  - \(.name): CVSS \(.cvssv3.baseScore // .cvssv2.score // "N/A") - \(.description // "No description")[0:100]\n") +
+              "---"' "$REPORT_FILE" 2>/dev/null || echo "Could not parse vulnerability details"
+          fi
+          
+          # Display full JSON report
+          echo ""
+          echo "📄 Full JSON Report:"
+          echo "----------------------------------------"
+          cat "$REPORT_FILE"
+        else
+          # If jq is not available, just display the raw JSON
+          echo "📄 Full JSON Report:"
+          echo "----------------------------------------"
+          cat "$REPORT_FILE"
+        fi
+        echo ""
+        echo "----------------------------------------"
+      else
+        echo "⚠️  Report file not found at $REPORT_FILE"
+        echo ""
+        echo "ℹ️  Checking for alternative report locations..."
+        # Try to find any JSON files in temp directory
+        if ls "$TEMP_REPORT_DIR"/*.json 1> /dev/null 2>&1; then
+          echo "📄 Found alternative report files:"
+          ls -lh "$TEMP_REPORT_DIR"/*.json
+          echo ""
+          echo "📄 Displaying first JSON file found:"
+          FIRST_JSON=$(ls "$TEMP_REPORT_DIR"/*.json | head -1)
+          cat "$FIRST_JSON"
+        else
+          echo "❌ No report files found. Analysis may have completed but report generation failed."
+          echo "ℹ️  Check the OWASP Dependency-Check output above for analysis results."
+        fi
+      fi
+      
+      # Check if report exists before cleanup
+      REPORT_EXISTS=false
+      if [ -f "$TEMP_REPORT_DIR/dependency-check-report.json" ] || ls "$TEMP_REPORT_DIR"/*.json 1> /dev/null 2>&1; then
+        REPORT_EXISTS=true
+      fi
+      
+      # Clean up temporary directory
+      echo "🧹 Cleaning up temporary files..."
+      rm -rf "$TEMP_REPORT_DIR"
+      echo "✅ Temporary files removed"
+      
+      echo ""
+      # Check exit code and fail if vulnerabilities found
+      
+      if [ -n "$OWASP_EXIT_CODE" ] && [ "$OWASP_EXIT_CODE" -ne 0 ]; then
+        echo "❌ OWASP Dependency-Check FAILED!"
+        echo "🚨 High/Critical vulnerabilities (CVSS >= 7) detected!"
+        if [ "$REPORT_EXISTS" = "false" ]; then
+          echo "⚠️  Note: Report file was not generated, but scan detected vulnerabilities."
+        fi
+        exit 1
+      else
+        if [ "$REPORT_EXISTS" = "false" ]; then
+          echo "⚠️  OWASP Dependency-Check completed, but report file was not generated."
+          echo "✅ Scan completed without detecting high/critical vulnerabilities (CVSS >= 7)"
+        else
+          echo "✅ OWASP Dependency-Check PASSED!"
+          echo "✅ No high/critical vulnerabilities (CVSS >= 7) found in dependencies"
+        fi
+      fi
+  tags:
+    - CG-GR-APP-DEV
+  only:
+    - main
+    - master
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+semgrep_sast:
+  stage: security
+  script:
+    - echo "🔍 Starting Semgrep SAST scan..."
+    - |
+      echo "========================================="
+      echo "🔍 Semgrep SAST Report"
+      echo "========================================="
+      echo "📅 Date: $(date)"
+      echo "🔖 Commit: $CI_COMMIT_SHORT_SHA"
+      echo "🌿 Branch: $CI_COMMIT_REF_NAME"
+      echo ""
+    - |
+      # Create temporary directory for report
+      export TEMP_REPORT_DIR=$(mktemp -d)
+      echo "📁 Temporary report directory: $TEMP_REPORT_DIR"
+      
+      # Get absolute path for volume mounting
+      PROJECT_DIR=$(pwd)
+      
+      echo "🐳 Pulling Semgrep Docker image..."
+      docker pull reg.cinnagen.com:8083/returntocorp/semgrep:latest
+      
+      echo "🔍 Running Semgrep SAST scan..."
+      # Ensure report directory is writable
+      chmod 777 "$TEMP_REPORT_DIR" 2>/dev/null || true
+      
+      # Run Semgrep with JSON output
+      # Using container name to copy files after execution
+      CONTAINER_NAME="semgrep-sast-$(date +%s)"
+      
+      # Run Semgrep scan
+      # --config=auto: Use Semgrep's auto-config for the project
+      # --json: Output in JSON format
+      # --output: Output file path (inside container, will be mounted)
+      # --error: Exit with non-zero code if findings are found
+      docker run \
+        --name "$CONTAINER_NAME" \
+        -v "$PROJECT_DIR:/src:ro" \
+        -v "$TEMP_REPORT_DIR:/report:rw" \
+        -w /src \
+        reg.cinnagen.com:8083/returntocorp/semgrep:latest \
+        semgrep \
+        --config=auto \
+        --json \
+        --output=/report/semgrep-report.json \
+        --error \
+        /src || SEMGREP_EXIT_CODE=$?
+      
+      # Try to copy report from container if volume mount didn't work
+      if [ ! -f "$TEMP_REPORT_DIR/semgrep-report.json" ]; then
+        echo "⚠️  Report not found in volume mount, trying to copy from container..."
+        docker cp "$CONTAINER_NAME:/report/semgrep-report.json" "$TEMP_REPORT_DIR/" 2>/dev/null || true
+      fi
+      
+      # Clean up container
+      docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+      
+      echo ""
+      echo "========================================="
+      echo "📊 Semgrep SAST Results"
+      echo "========================================="
+      
+      # Display report in log
+      REPORT_FILE="$TEMP_REPORT_DIR/semgrep-report.json"
+      
+      if [ -f "$REPORT_FILE" ]; then
+        echo ""
+        echo "📋 Security Findings Summary:"
+        echo "----------------------------------------"
+        
+        # Extract and display summary using jq if available
+        if command -v jq >/dev/null 2>&1; then
+          # Count total findings
+          TOTAL_FINDINGS=$(jq '.results | length' "$REPORT_FILE" 2>/dev/null || echo "0")
+          echo "🔍 Total findings: $TOTAL_FINDINGS"
+          
+          # Count findings by severity
+          if [ "$TOTAL_FINDINGS" -gt 0 ]; then
+            ERROR_COUNT=$(jq '[.results[] | select(.extra.severity == "ERROR")] | length' "$REPORT_FILE" 2>/dev/null || echo "0")
+            WARNING_COUNT=$(jq '[.results[] | select(.extra.severity == "WARNING")] | length' "$REPORT_FILE" 2>/dev/null || echo "0")
+            INFO_COUNT=$(jq '[.results[] | select(.extra.severity == "INFO")] | length' "$REPORT_FILE" 2>/dev/null || echo "0")
+            
+            echo "🚨 ERROR severity: $ERROR_COUNT"
+            echo "⚠️  WARNING severity: $WARNING_COUNT"
+            echo "ℹ️  INFO severity: $INFO_COUNT"
+            
+            # Display findings details
+            echo ""
+            echo "⚠️  Security Findings:"
+            echo "----------------------------------------"
+            jq -r '.results[] | 
+              "File: \(.path)\n" +
+              "Rule: \(.check_id)\n" +
+              "Severity: \(.extra.severity)\n" +
+              "Message: \(.message)\n" +
+              "Line: \(.start.line)-\(.end.line)\n" +
+              "---"' "$REPORT_FILE" 2>/dev/null || echo "Could not parse findings details"
+          fi
+          
+          # Display full JSON report
+          echo ""
+          echo "📄 Full JSON Report:"
+          echo "----------------------------------------"
+          cat "$REPORT_FILE"
+        else
+          # If jq is not available, just display the raw JSON
+          echo "📄 Full JSON Report:"
+          echo "----------------------------------------"
+          cat "$REPORT_FILE"
+        fi
+        echo ""
+        echo "----------------------------------------"
+      else
+        echo "⚠️  Report file not found at $REPORT_FILE"
+        echo "ℹ️  Semgrep scan completed, but report file was not generated."
+      fi
+      
+      # Clean up temporary directory
+      echo "🧹 Cleaning up temporary files..."
+      rm -rf "$TEMP_REPORT_DIR"
+      echo "✅ Temporary files removed"
+      
+      echo ""
+      # Check exit code and fail if findings found
+      # Semgrep returns exit code 2 when findings are found (with --error flag)
+      # Exit code 1 is for other errors
+      if [ -n "$SEMGREP_EXIT_CODE" ] && [ "$SEMGREP_EXIT_CODE" -ne 0 ]; then
+        if [ "$SEMGREP_EXIT_CODE" -eq 2 ]; then
+          echo "❌ Semgrep SAST FAILED!"
+          echo "🚨 Security findings detected in code!"
+        else
+          echo "❌ Semgrep SAST FAILED!"
+          echo "⚠️  Semgrep scan encountered an error (exit code: $SEMGREP_EXIT_CODE)"
+        fi
+        exit 1
+      else
+        echo "✅ Semgrep SAST PASSED!"
+        echo "✅ No security findings detected in code"
+      fi
+  tags:
+    - CG-GR-APP-DEV
+  only:
+    - main
+    - master
+  allow_failure: true
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+security_approval:
+  stage: security_approval
+  script:
+    - |
+      echo "========================================="
+      echo "🔐 Security Scan Approval Required"
+      echo "========================================="
+      echo ""
+      echo "📋 Security Scan Results Summary:"
+      echo "----------------------------------------"
+      echo ""
+      echo "Please review the security scan results above."
+      echo "If any security scans failed, please review the findings"
+      echo "and approve to continue with build and deployment."
+      echo ""
+      echo "✅ Click 'Play' button to approve and continue"
+      echo "❌ Or cancel this pipeline to stop"
+      echo ""
+      echo "========================================="
+  tags:
+    - CG-GR-APP-DEV
+  only:
+    - main
+    - master
+  when: manual
+  allow_failure: false
 
 build:
   stage: build
-  retry: 2
+  needs:
+    - job: security_approval
+      artifacts: false
+  script:
+    - echo "⚙️ Setting up environment files..."
+    - |
+      cat > .env << EOF
+      AVALAI_API_KEY=$AVALAI_API_KEY
+      APP_ID=$APP_ID
+      URL_AUTHENTICATION=$URL_AUTHENTICATION
+      APP_SECRET_KEY=$APP_SECRET_KEY
+      CLIENT_ID=$CLIENT_ID
+      DATABASE_URL=$DATABASE_URL
+      JWT_SECRET=$JWT_SECRET
+      NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+      NEXTAUTH_URL=$NEXTAUTH_URL
+      NEXT_PUBLIC_CLIENT_ID=$NEXT_PUBLIC_CLIENT_ID
+      NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY
+      NEXT_PUBLIC_SCHEMA_API_BASE=$NEXT_PUBLIC_SCHEMA_API_BASE
+      NEXT_PUBLIC_SECRET_KEY=$NEXT_PUBLIC_SECRET_KEY
+      NEXT_PUBLIC_URL_DATA_CRUD=$NEXT_PUBLIC_URL_DATA_CRUD
+      NEXT_PUBLIC_URL_SCHEMA_CRUD=$NEXT_PUBLIC_URL_SCHEMA_CRUD
+      NEXT_PUBLIC_URL_SYNC_MAIL_TEMPLATE=$NEXT_PUBLIC_URL_SYNC_MAIL_TEMPLATE
+      PEPPER=$PEPPER
+      SECRET_KEY=$SECRET_KEY
+      URL_DATA_CRUD=$URL_DATA_CRUD
+      URL_SCHEMA_CRUD=$URL_SCHEMA_CRUD
+      URL_SEND_EMAIL=$URL_SEND_EMAIL
+      URL_SYNC_MAIL_TEMPLATE=$URL_SYNC_MAIL_TEMPLATE
+      DEMO_MODE=$DEMO_MODE
+      NEXT_PUBLIC_SKIP_KEY=$NEXT_PUBLIC_SKIP_KEY
+      REQUIRE_LOGIN=$REQUIRE_LOGIN
+      INTERNAL_API_BASE_URL=$INTERNAL_API_BASE_URL
+      ENABLE_LOGGING=${ENABLE_LOGGING:-false}
+      NEXT_PUBLIC_ENABLE_LOGGING=${NEXT_PUBLIC_ENABLE_LOGGING:-false}
+      EOF
+    - echo "🚀 Starting Docker image build..."
+    - echo "📦 Building image with tags latest, $CI_COMMIT_SHORT_SHA"
+    - export DOCKER_BUILDKIT=1
+    - docker build --tag="$CI_REGISTRY_IMAGE:latest" --tag="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" --build-arg NODE_ENV=$NODE_ENV --build-arg NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY --build-arg NEXT_PUBLIC_SKIP_KEY=$NEXT_PUBLIC_SKIP_KEY .
+    - echo "📤 Pushing images to registry..."
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+    - echo "✅ Build completed!"
+  tags:
+    - CG-GR-APP-DEV
+  only:
+    - main
+    - master
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+trivy_image_scan:
+  stage: image_scan
+  needs:
+    - job: build
+      artifacts: false
+  script:
+    - echo "🔒 Starting Trivy Docker Image Security Scan..."
+    - |
+      echo "========================================="
+      echo "🔒 Trivy Image Security Scan Report"
+      echo "========================================="
+      echo "📅 Date: $(date)"
+      echo "🔖 Commit: $CI_COMMIT_SHORT_SHA"
+      echo "🌿 Branch: $CI_COMMIT_REF_NAME"
+      echo "🐳 Image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+      echo ""
+    - |
+      # Ensure cache directory exists
+      TRIVY_CACHE_DIR="/mnt/data/container/trivy-cache"
+      mkdir -p "$TRIVY_CACHE_DIR"
+      echo "📦 Trivy cache directory: $TRIVY_CACHE_DIR"
+      
+      # Pull latest Trivy image
+      echo "🐳 Pulling latest Trivy Docker image..."
+      docker pull reg.cinnagen.com:8083/aquasec/trivy:latest
+      
+      # Mount Docker config for registry authentication
+      DOCKER_CONFIG_DIR="${HOME}/.docker"
+      DOCKER_CONFIG_MOUNT=""
+      if [ -d "$DOCKER_CONFIG_DIR" ]; then
+        DOCKER_CONFIG_MOUNT="-v $DOCKER_CONFIG_DIR:/root/.docker:ro"
+        echo "🔑 Using Docker config for registry authentication"
+      fi
+      
+      IMAGE_TO_SCAN="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+      
+      echo "🔍 Running Trivy security scan..."
+      echo "ℹ️  Trivy will automatically check and update database if needed"
+      echo ""
+      
+      # Run Trivy scan once with table format for readable output
+      # --exit-code 1: Fail if HIGH/CRITICAL vulnerabilities found
+      # --severity HIGH,CRITICAL: Only report HIGH and CRITICAL vulnerabilities
+      # --no-progress: Disable progress bar
+      # --db-repository: Use custom database repository
+      # Cache directory is mounted to persist database between runs
+      # Trivy automatically checks if database is up-to-date and downloads if needed
+      docker run \
+        --rm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        $DOCKER_CONFIG_MOUNT \
+        -v "$TRIVY_CACHE_DIR:/root/.cache/trivy:rw" \
+        reg.cinnagen.com:8083/aquasec/trivy:latest \
+        image \
+        --format table \
+        --exit-code 1 \
+        --severity HIGH,CRITICAL \
+        --no-progress \
+        --db-repository ghcr.io/aquasecurity/trivy-db \
+        "$IMAGE_TO_SCAN" || TRIVY_EXIT_CODE=$?
+      
+      echo ""
+      echo "========================================="
+      
+      # Check exit code and fail if high/critical vulnerabilities found
+      if [ -n "$TRIVY_EXIT_CODE" ] && [ "$TRIVY_EXIT_CODE" -ne 0 ]; then
+        echo "❌ Trivy Image Scan FAILED!"
+        echo "🚨 High/Critical vulnerabilities detected in Docker image!"
+        echo "⚠️  Please review and fix the vulnerabilities before deploying."
+        echo "⏸️  Pipeline will wait for manual approval in the next stage."
+        exit 1
+      else
+        echo "✅ Trivy Image Scan PASSED!"
+        echo "✅ No High/Critical vulnerabilities found in Docker image"
+        echo "✅ Pipeline will proceed automatically to deployment"
+      fi
+  tags:
+    - CG-GR-APP-DEV
+  only:
+    - main
+    - master
+  allow_failure: true
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+trivy_image_approval:
+  stage: image_approval
+  needs:
+    - job: trivy_image_scan
+      artifacts: false
+      optional: true
+  script:
+    - |
+      echo "========================================="
+      echo "🔐 Trivy Image Scan Approval"
+      echo "========================================="
+      echo ""
+      echo "📋 Trivy Image Scan Results:"
+      echo "----------------------------------------"
+      echo ""
+      echo "⚠️  Trivy scan detected HIGH/CRITICAL vulnerabilities!"
+      echo ""
+      echo "Please review the Trivy scan results in the trivy_image_scan job above."
+      echo ""
+      echo "If you want to proceed despite the vulnerabilities:"
+      echo "  - Review the findings in the trivy_image_scan job output"
+      echo "  - Click 'Play' button below to approve and continue with deployment"
+      echo ""
+      echo "⚠️  WARNING: Deploying with known vulnerabilities may pose security risks!"
+      echo ""
+      echo "✅ Click 'Play' button to approve and continue with deployment"
+      echo "❌ Or cancel this pipeline to stop deployment"
+      echo ""
+      echo "========================================="
+  tags:
+    - CG-GR-APP-DEV
   rules:
+    # Only show manual approval if trivy_image_scan failed
+    # If trivy passed, this job will not run (deploy can proceed automatically)
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
       when: manual
-    - when: never
-  tags:
-    - CG-GR-APP-DEV-shell
-  script:
-    - echo "🔍 Checking Docker configuration..."
-    - docker info | grep -i "registry\|mirror" || echo "No registry mirror configured"
-    - echo "📥 Attempting to pull base image from Docker Hub..."
-    - |
-      if ! timeout 30 docker pull node:25.2.1-slim; then
-        echo "⚠️ Cannot reach Docker Hub. Trying GitLab registry..."
-        # Try to pull from GitLab registry if base image was pre-pushed
-        if docker pull "$CI_REGISTRY/library/node:25.2.1-slim" 2>/dev/null; then
-          echo "✅ Found base image in GitLab registry, tagging for build..."
-          docker tag "$CI_REGISTRY/library/node:25.2.1-slim" node:25.2.1-slim
-        else
-          echo "❌ Base image not available in GitLab registry either."
-          echo ""
-          echo "💡 SOLUTIONS:"
-          echo "   1. Configure a Docker registry mirror on the GitLab runner"
-          echo "   2. Pre-push base image: docker pull node:25.2.1-slim && docker tag node:25.2.1-slim $CI_REGISTRY/library/node:25.2.1-slim && docker push $CI_REGISTRY/library/node:25.2.1-slim"
-          echo "   3. Fix network/DNS access to Docker Hub (registry-1.docker.io)"
-          echo "   4. Contact infrastructure team to allow Docker Hub access"
-          exit 1
-        fi
-      else
-        echo "✅ Successfully pulled base image from Docker Hub"
-      fi
-    - echo "🚀 Building Docker image..."
-    - SHORT_SHA=${CI_COMMIT_SHA:0:8}
-    - export DOCKER_BUILDKIT=1
-    - docker build --tag="$CI_REGISTRY_IMAGE:latest" --tag="$CI_REGISTRY_IMAGE:$SHORT_SHA" --build-arg NODE_ENV=$NODE_ENV --build-arg NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY --build-arg NEXT_PUBLIC_SKIP_KEY=$NEXT_PUBLIC_SKIP_KEY .
-    - docker push "$CI_REGISTRY_IMAGE:latest"
-    - docker push "$CI_REGISTRY_IMAGE:$SHORT_SHA"
-    - echo "🧹 Cleaning Docker after build..."
-    - docker system prune -af
-    - docker volume prune -f
+      allow_failure: false
+  # This job only appears when trivy_image_scan fails (due to allow_failure: true)
+  # If scan passes, this job won't be created and deploy can proceed automatically
 
 deploy_staging:
   stage: deploy
-  retry: 2
   needs:
     - job: build
+      artifacts: true   # Use .env from build
+    - job: trivy_image_scan
+      artifacts: false
       optional: true
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
-    - when: never
-  tags:
-    - CG-GR-APP-PRD-1
+    - job: trivy_image_approval
+      artifacts: false
+      optional: true
   script:
-    - echo "🚀 Deploying to staging..."
-    # Backup current container image (previous stable)
-    - PREV_IMAGE=$(docker compose images -q app | head -n1) || true
-    - docker ps -q > current_containers.txt || true
+    - echo "🚀 Starting deployment..."
     - docker compose pull
     - docker compose down --remove-orphans || true
-    # Attempt to start new containers
-    - |
-      if ! docker compose up -d; then
-        echo "❌ Deployment failed. Rolling back to previous image..."
-        if [ -n "$PREV_IMAGE" ]; then
-          docker run -d --name app "$PREV_IMAGE"
-        fi
-        exit 1
-      fi
+    - docker compose up -d
+    - echo "🏥 Performing health check..."
     - sleep 10
     - docker compose ps
-    - echo "🧹 Cleaning Docker after deploy..."
-    - docker system prune -af
-    - docker volume prune -f
-  after_script:
-    - rm -f current_containers.txt || true
+    - echo "🧹 Cleaning up old images..."
+    - |
+      docker images --format "table {{.Repository}}:{{.Tag}}\t{{.ID}}" | grep "$CI_REGISTRY_IMAGE" | grep -v "latest" | awk '{print $2}' | xargs -r docker rmi || echo "No old images to remove"
+      docker image prune -f
+      echo "📋 Remaining images:"
+      docker images | grep "$CI_REGISTRY_IMAGE" || echo "No images found"
+    - echo "✅ Deployment completed!"
   environment:
     name: staging
     url: https://scm.cinnagen.com/
+  tags:
+    - CG-GR-APP-PRD-1
+  only:
+    - main
+    - master
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
