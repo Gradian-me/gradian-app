@@ -10,13 +10,16 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
   DOCKER_BUILDKIT: "1"
+  TRIVY_CACHE_DIR: /tmp/trivy-cache
 
 
 before_script:
   - echo "Authenticating with Docker Registry..."
   - echo "$nexus_password" | docker login -u "$nexus_user" --password-stdin reg.cinnagen.com:8083
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-
+  - export TRIVY_CACHE_DIR=/tmp/trivy-cache
+  - mkdir -p $TRIVY_CACHE_DIR
+  
 security_audit:
   stage: security
   script:
@@ -540,8 +543,7 @@ trivy_image_scan:
       echo "🐳 Image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
       echo ""
     - |
-      # Ensure cache directory exists
-      TRIVY_CACHE_DIR="$CI_PROJECT_DIR/.trivy-cache"
+      # Ensure cache directory exists"
       mkdir -p "$TRIVY_CACHE_DIR"
       echo "📦 Trivy cache directory: $TRIVY_CACHE_DIR"
       
