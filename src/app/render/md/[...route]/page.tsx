@@ -35,15 +35,13 @@ export default async function MarkdownRenderPage({ params, searchParams }: PageP
     notFound();
   }
 
-  // SECURITY: Validate path to prevent path traversal
-  const filePath = path.join(process.cwd(), markdownPath);
-  const resolvedPath = path.resolve(filePath);
-  const projectRoot = path.resolve(process.cwd());
-  
-  // Ensure the resolved path is within the project root
-  if (!resolvedPath.startsWith(projectRoot)) {
+  // SECURITY: Validate path to prevent path traversal using security utility
+  const { validateFilePath } = await import('@/gradian-ui/shared/utils/security-utils');
+  const validatedPath = validateFilePath(markdownPath, process.cwd());
+  if (!validatedPath) {
     notFound();
   }
+  const resolvedPath = validatedPath;
 
   // Check if file exists
   if (!fs.existsSync(resolvedPath)) {

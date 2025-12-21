@@ -100,24 +100,20 @@ export async function POST(request: NextRequest) {
     // Format as .env file content
     const envFileContent = formatEnvFile(filteredVars);
 
-    // SECURITY: Validate path to prevent path traversal
-    // Normalize and resolve the path, then verify it's within the project directory
-    const normalizedOutputFile = outputFile.replace(/\\/g, '/').replace(/\.\./g, '');
-    const envFilePath = join(process.cwd(), normalizedOutputFile);
-    const resolvedPath = resolve(envFilePath);
-    const projectRoot = resolve(process.cwd());
-    
-    // Ensure the resolved path is within the project root
-    if (!resolvedPath.startsWith(projectRoot)) {
+    // SECURITY: Validate path to prevent path traversal using security utility
+    const { validateFilePath } = require('@/gradian-ui/shared/utils/security-utils');
+    const validatedPath = validateFilePath(outputFile, process.cwd());
+    if (!validatedPath) {
       return NextResponse.json(
         { error: 'Invalid file path' },
         { status: 400 }
       );
     }
+    const resolvedPath = validatedPath;
     
-    loggingCustom(LogType.INFRA_LOG, 'info', `Writing ${filteredVars.length} variable(s) to file: ${normalizedOutputFile}`);
+    loggingCustom(LogType.INFRA_LOG, 'info', `Writing ${filteredVars.length} variable(s) to file: ${resolvedPath}`);
     await writeFile(resolvedPath, envFileContent, 'utf-8');
-    loggingCustom(LogType.INFRA_LOG, 'info', `Successfully wrote environment file: ${envFilePath}`);
+    loggingCustom(LogType.INFRA_LOG, 'info', `Successfully wrote environment file: ${resolvedPath}`);
 
     return NextResponse.json(
       {
@@ -125,7 +121,7 @@ export async function POST(request: NextRequest) {
         message: `Successfully pulled ${filteredVars.length} environment variable(s) from GitLab`,
         pulled: filteredVars.length,
         file: outputFile,
-        filePath: envFilePath,
+        filePath: resolvedPath,
         variables: filteredVars.map((v: any) => v.key),
       },
       { status: 200 }

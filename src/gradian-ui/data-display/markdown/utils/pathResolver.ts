@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { validateFilePath } from '@/gradian-ui/shared/utils/security-utils';
 
 /**
  * Search recursively for markdown files in a directory
@@ -65,42 +66,32 @@ export function getMarkdownPath(
       ? filePath 
       : `${filePath}.md`;
     
-    // SECURITY: Validate path to prevent path traversal
-    // Normalize the path by removing any .. sequences
-    const normalizedPath = fullPath.replace(/\.\./g, '').replace(/\\/g, '/');
-    const absolutePath = path.join(process.cwd(), normalizedPath);
-    const resolvedPath = path.resolve(absolutePath);
-    const projectRoot = path.resolve(process.cwd());
-    
-    // Security check: ensure the resolved path is within project root
-    if (!resolvedPath.startsWith(projectRoot)) {
+    // SECURITY: Validate path to prevent path traversal using security utility
+    const validatedPath = validateFilePath(fullPath, process.cwd());
+    if (!validatedPath) {
       return null;
     }
     
-    return fullPath;
+    return path.relative(process.cwd(), validatedPath);
   }
 
   // Single segment: backward compatibility - try to find file automatically in docs directory
   const routeName = route[0];
-  // SECURITY: Validate base path to prevent path traversal
-  const basePath = path.join(process.cwd(), docsBasePath);
-  const resolvedBasePath = path.resolve(basePath);
-  const projectRoot = path.resolve(process.cwd());
-  
-  // Ensure base path is within project root
-  if (!resolvedBasePath.startsWith(projectRoot)) {
+  // SECURITY: Validate base path to prevent path traversal using security utility
+  const validatedBasePath = validateFilePath(docsBasePath, process.cwd());
+  if (!validatedBasePath) {
     return null;
   }
   
-  const foundPath = findMarkdownFile(resolvedBasePath, routeName);
+  const foundPath = findMarkdownFile(validatedBasePath, routeName);
   if (foundPath) {
-    // SECURITY: Validate found path is within project root
-    const resolvedFoundPath = path.resolve(foundPath);
-    if (!resolvedFoundPath.startsWith(projectRoot)) {
+    // SECURITY: Validate found path is within project root using security utility
+    const validatedFoundPath = validateFilePath(foundPath, process.cwd());
+    if (!validatedFoundPath) {
       return null;
     }
     // Return relative path from project root
-    return path.relative(process.cwd(), foundPath);
+    return path.relative(process.cwd(), validatedFoundPath);
   }
 
   return null;

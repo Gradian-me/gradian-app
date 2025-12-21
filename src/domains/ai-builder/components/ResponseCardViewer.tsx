@@ -11,6 +11,7 @@ import { cn } from '@/gradian-ui/shared/utils';
 import type { ResponseCardConfig } from '../types';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { safeGetProperty, isPrototypePollutionKey } from '@/gradian-ui/shared/utils/security-utils';
 
 interface ResponseCardViewerProps {
   response: string;
@@ -53,16 +54,13 @@ function getValueByPath(obj: any, path: string): any {
   const parts = normalizedPath.split('.');
   let current = obj;
   
-  // SECURITY: Prevent prototype pollution by validating keys
-  const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
-  
   for (const part of parts) {
     if (current === null || current === undefined) {
       return undefined;
     }
     
-    // SECURITY: Skip prototype pollution keys
-    if (PROTOTYPE_POLLUTION_KEYS.includes(part)) {
+    // SECURITY: Prevent prototype pollution using security utility
+    if (isPrototypePollutionKey(part)) {
       return undefined;
     }
     
@@ -70,31 +68,27 @@ function getValueByPath(obj: any, path: string): any {
     const arrayPartMatch = part.match(/^(\w+)\[(\d+)\]$/);
     if (arrayPartMatch) {
       const key = arrayPartMatch[1];
-      // SECURITY: Skip prototype pollution keys
-      if (PROTOTYPE_POLLUTION_KEYS.includes(key)) {
+      // SECURITY: Prevent prototype pollution using security utility
+      if (isPrototypePollutionKey(key)) {
         return undefined;
       }
       const index = parseInt(arrayPartMatch[2], 10);
-      // SECURITY: Use hasOwnProperty check for objects
-      if (typeof current === 'object' && current !== null && !Array.isArray(current)) {
-        if (!Object.prototype.hasOwnProperty.call(current, key)) {
-          return undefined;
-        }
+      // SECURITY: Use safe property access to prevent prototype pollution
+      current = safeGetProperty(current, key);
+      if (current === undefined) {
+        return undefined;
       }
-      current = current[key];
       if (Array.isArray(current) && current[index] !== undefined) {
         current = current[index];
       } else {
         return undefined;
       }
     } else {
-      // SECURITY: Use hasOwnProperty check for objects
-      if (typeof current === 'object' && current !== null && !Array.isArray(current)) {
-        if (!Object.prototype.hasOwnProperty.call(current, part)) {
-          return undefined;
-        }
+      // SECURITY: Use safe property access to prevent prototype pollution
+      current = safeGetProperty(current, part);
+      if (current === undefined) {
+        return undefined;
       }
-      current = current[part];
     }
   }
   

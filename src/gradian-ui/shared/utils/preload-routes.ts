@@ -55,25 +55,9 @@ export function extractDataByPath(data: any, jsonPath?: string): any {
     return data;
   }
 
-  const pathParts = jsonPath.split('.');
-  let result = data;
-  // SECURITY: Prevent prototype pollution by validating keys
-  const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
-
-  for (const part of pathParts) {
-    // SECURITY: Skip prototype pollution keys
-    if (PROTOTYPE_POLLUTION_KEYS.includes(part)) {
-      return null;
-    }
-    // SECURITY: Use hasOwnProperty instead of 'in' operator to prevent prototype pollution
-    if (result && typeof result === 'object' && Object.prototype.hasOwnProperty.call(result, part)) {
-      result = result[part];
-    } else {
-      return null;
-    }
-  }
-
-  return result;
+  // SECURITY: Use safe path access from security utility to prevent prototype pollution
+  const { safeGetByPath } = require('@/gradian-ui/shared/utils/security-utils');
+  return safeGetByPath(data, jsonPath) ?? null;
 }
 
 /**

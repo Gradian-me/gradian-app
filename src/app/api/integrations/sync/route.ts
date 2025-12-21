@@ -50,30 +50,9 @@ function getApiUrl(apiPath: string): string {
 function extractDataByPath(data: any, path: string): any {
   if (!path) return data;
   
-  const parts = path.split('.');
-  let result = data;
-  
-  // SECURITY: Prevent prototype pollution by validating keys
-  const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
-  
-  for (const part of parts) {
-    if (result === null || result === undefined) {
-      return null;
-    }
-    // SECURITY: Skip prototype pollution keys
-    if (PROTOTYPE_POLLUTION_KEYS.includes(part)) {
-      return null;
-    }
-    // SECURITY: Use hasOwnProperty check for objects
-    if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
-      if (!Object.prototype.hasOwnProperty.call(result, part)) {
-        return undefined;
-      }
-    }
-    result = result[part];
-  }
-  
-  return result;
+  // SECURITY: Use safe path access from security utility
+  const { safeGetByPath } = require('@/gradian-ui/shared/utils/security-utils');
+  return safeGetByPath(data, path);
 }
 
 type IntegrationEntity = Record<string, any>;

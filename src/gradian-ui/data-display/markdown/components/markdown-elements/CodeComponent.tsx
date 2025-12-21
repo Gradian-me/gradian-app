@@ -70,6 +70,10 @@ export function CodeComponent({
       return null;
     }
     
+    // SECURITY: dangerouslySetInnerHTML is safe here because:
+    // 1. KaTeX library sanitizes all output HTML to prevent XSS
+    // 2. Input is validated math content from markdown code blocks (not user input)
+    // 3. KaTeX only generates safe SVG/HTML markup for mathematical notation
     if (inline) {
       // Inline math
       return (

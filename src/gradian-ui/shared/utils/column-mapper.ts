@@ -39,25 +39,9 @@ const isObject = (value: unknown): value is Record<string, any> =>
 
 export const getByPath = (obj: any, path?: string): any => {
   if (!obj || !path) return undefined;
-  const parts = path.split('.').filter(Boolean);
-  let current: any = obj;
-  // SECURITY: Prevent prototype pollution by validating keys
-  const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
-  
-  for (const part of parts) {
-    // SECURITY: Skip prototype pollution keys
-    if (PROTOTYPE_POLLUTION_KEYS.includes(part)) {
-      return undefined;
-    }
-    if (!isObject(current) && !Array.isArray(current)) return undefined;
-    // SECURITY: Use hasOwnProperty check for objects
-    if (isObject(current) && !Object.prototype.hasOwnProperty.call(current, part)) {
-      return undefined;
-    }
-    current = (current as Record<string, any>)?.[part];
-    if (current === undefined || current === null) break;
-  }
-  return current;
+  // SECURITY: Use safe path access from security utility to prevent prototype pollution
+  const { safeGetByPath } = require('@/gradian-ui/shared/utils/security-utils');
+  return safeGetByPath(obj, path);
 };
 
 export const setIfMissing = (target: Record<string, any>, key: string, value: any) => {

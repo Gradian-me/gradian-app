@@ -1,4 +1,5 @@
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
+import { safeGetProperty, isPrototypePollutionKey } from '@/gradian-ui/shared/utils/security-utils';
 
 /**
  * Extract a value from the dynamic form context using dot-notation path
@@ -34,10 +35,8 @@ export function extractFromDynamicContext(
       return '';
     }
     
-    // Handle array access like [0]
-    // SECURITY: Prevent prototype pollution by validating keys
-    const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
-    if (PROTOTYPE_POLLUTION_KEYS.includes(part)) {
+    // SECURITY: Prevent prototype pollution using security utility
+    if (isPrototypePollutionKey(part)) {
       return '';
     }
     
@@ -50,14 +49,11 @@ export function extractFromDynamicContext(
         return '';
       }
     } else {
-      // SECURITY: Use hasOwnProperty check for objects
-      if (current && typeof current === 'object' && !Array.isArray(current)) {
-        if (!Object.prototype.hasOwnProperty.call(current, part)) {
-          return '';
-        }
+      // SECURITY: Use safe property access from security utility
+      current = safeGetProperty(current, part);
+      if (current === undefined) {
+        return '';
       }
-      // Regular property access
-      current = current[part];
     }
   }
   

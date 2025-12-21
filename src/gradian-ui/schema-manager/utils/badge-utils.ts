@@ -1,5 +1,6 @@
 import { FormSchema, FormField, DetailPageSection } from '../types/form-schema';
 import { resolveFieldById } from '../../form-builder/form-elements/utils/field-resolver';
+import { safeGetProperty, isPrototypePollutionKey } from '@/gradian-ui/shared/utils/security-utils';
 
 /**
  * Get field value from data, handling nested paths and compute functions
@@ -11,21 +12,14 @@ const getFieldValue = (field: FormField, data: any): any => {
   if (field.source) {
     const path = field.source.split('.');
     let value = data;
-    // SECURITY: Prevent prototype pollution by validating keys
-    const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
     
     for (const key of path) {
-      // SECURITY: Skip prototype pollution keys
-      if (PROTOTYPE_POLLUTION_KEYS.includes(key)) {
+      // SECURITY: Prevent prototype pollution using security utility
+      if (isPrototypePollutionKey(key)) {
         return null;
       }
-      // SECURITY: Use hasOwnProperty check for objects
-      if (value && typeof value === 'object' && !Array.isArray(value)) {
-        if (!Object.prototype.hasOwnProperty.call(value, key)) {
-          return null;
-        }
-      }
-      value = value?.[key];
+      // SECURITY: Use safe property access from security utility
+      value = safeGetProperty(value, key);
       if (value === undefined) return null;
     }
     return value;

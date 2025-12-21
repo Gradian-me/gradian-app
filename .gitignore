@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+# security scan reports
+/reports
+
 # next.js
 /.next/
 # Note: .next/cache/ is intentionally ignored for build caching

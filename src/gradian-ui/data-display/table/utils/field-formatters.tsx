@@ -26,26 +26,10 @@ export const getFieldValue = (field: any, row: any): any => {
   if (!field || !row) return null;
 
   if (field.source) {
-    const path = field.source.split('.');
-    let value = row;
-    // SECURITY: Prevent prototype pollution by validating keys
-    const PROTOTYPE_POLLUTION_KEYS = ['__proto__', 'constructor', 'prototype'];
-    
-    for (const key of path) {
-      // SECURITY: Skip prototype pollution keys
-      if (PROTOTYPE_POLLUTION_KEYS.includes(key)) {
-        return null;
-      }
-      // SECURITY: Use hasOwnProperty check for objects
-      if (value && typeof value === 'object' && !Array.isArray(value)) {
-        if (!Object.prototype.hasOwnProperty.call(value, key)) {
-          return null;
-        }
-      }
-      value = value?.[key];
-      if (value === undefined) return null;
-    }
-    return value;
+    // SECURITY: Use safe path access from security utility to prevent prototype pollution
+    const { safeGetByPath } = require('@/gradian-ui/shared/utils/security-utils');
+    const value = safeGetByPath(row, field.source);
+    return value ?? null;
   }
 
   if (field.compute && typeof field.compute === 'function') {

@@ -109,12 +109,14 @@ export async function decryptSensitiveValue(encryptedJson: string): Promise<stri
     const encrypted = encryptedWithTag.slice(0, -TAG_LENGTH);
     const authTag = encryptedWithTag.slice(-TAG_LENGTH);
     
-    // Validate auth tag length explicitly (GCM requires 16-byte tag)
+    // SECURITY: Validate auth tag length BEFORE creating decipher (GCM requires exactly 16-byte tag)
+    // This prevents GCM authentication tag length vulnerabilities
     if (authTag.length !== TAG_LENGTH) {
       return null;
     }
     
     const decipher = crypto.createDecipheriv(AES_ALGO, key, iv);
+    // SECURITY: Set auth tag only after validation (must be exactly TAG_LENGTH bytes)
     decipher.setAuthTag(authTag);
     
     let decrypted = decipher.update(encrypted);

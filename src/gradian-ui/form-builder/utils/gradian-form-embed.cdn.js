@@ -208,15 +208,29 @@
       }
 
       // Send close message to iframe if it exists
+      // SECURITY: Using '*' origin for postMessage is required for CDN embedding scenarios
+      // where the parent page origin is unknown. The iframe validates message types and
+      // only processes expected message formats, providing defense-in-depth.
       const iframe = body.querySelector('iframe');
       if (iframe && iframe.contentWindow) {
         try {
+          // Try to get origin from iframe src if available, otherwise use wildcard
+          const iframeSrc = iframe.src;
+          const targetOrigin = iframeSrc ? (new URL(iframeSrc).origin) : '*';
           iframe.contentWindow.postMessage({
             type: 'close-form',
             timestamp: Date.now(),
-          }, '*');
+          }, targetOrigin);
         } catch (e) {
-          // Ignore cross-origin errors
+          // Fallback to wildcard if origin extraction fails (required for CDN embedding)
+          try {
+            iframe.contentWindow.postMessage({
+              type: 'close-form',
+              timestamp: Date.now(),
+            }, '*');
+          } catch (e2) {
+            // Ignore cross-origin errors
+          }
         }
       }
 
