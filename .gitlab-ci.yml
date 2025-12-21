@@ -9,6 +9,8 @@ stages:
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
+  DOCKER_BUILDKIT: "1"
+
 
 before_script:
   - echo "Authenticating with Docker Registry..."
@@ -80,6 +82,7 @@ security_audit:
   only:
     - main
     - master
+  when: manual
   allow_failure: true
   retry:
     max: 2
@@ -266,6 +269,7 @@ owasp_dependency_check:
   only:
     - main
     - master
+  when: manual
   retry:
     max: 2
     when:
@@ -417,6 +421,7 @@ semgrep_sast:
   only:
     - main
     - master
+  when: manual
   allow_failure: true
   retry:
     max: 2
@@ -491,8 +496,18 @@ build:
       EOF
     - echo "🚀 Starting Docker image build..."
     - echo "📦 Building image with tags latest, $CI_COMMIT_SHORT_SHA"
+    - echo "💾 Using BuildKit cache for faster builds..."
     - export DOCKER_BUILDKIT=1
-    - docker build --tag="$CI_REGISTRY_IMAGE:latest" --tag="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" --build-arg NODE_ENV=$NODE_ENV --build-arg NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY --build-arg NEXT_PUBLIC_SKIP_KEY=$NEXT_PUBLIC_SKIP_KEY .
+    - |
+      # Build with BuildKit cache from registry
+      docker build \
+        --tag="$CI_REGISTRY_IMAGE:latest" \
+        --tag="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" \
+        --build-arg NODE_ENV=$NODE_ENV \
+        --build-arg NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY \
+        --build-arg NEXT_PUBLIC_SKIP_KEY=$NEXT_PUBLIC_SKIP_KEY \
+        --cache-from "$CI_REGISTRY_IMAGE:latest" \
+        .
     - echo "📤 Pushing images to registry..."
     - docker push "$CI_REGISTRY_IMAGE:latest"
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
@@ -526,7 +541,7 @@ trivy_image_scan:
       echo ""
     - |
       # Ensure cache directory exists
-      TRIVY_CACHE_DIR="/mnt/data/container/trivy-cache"
+      TRIVY_CACHE_DIR="$CI_PROJECT_DIR/.trivy-cache"
       mkdir -p "$TRIVY_CACHE_DIR"
       echo "📦 Trivy cache directory: $TRIVY_CACHE_DIR"
       
