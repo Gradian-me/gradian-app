@@ -499,20 +499,14 @@ build:
     - echo "💾 Using BuildKit cache for faster builds..."
     - export DOCKER_BUILDKIT=1
     - |
-      # Create cache directory for BuildKit cache
-      BUILDKIT_CACHE_DIR="/mnt/data/container/buildkit-cache"
-      mkdir -p "$BUILDKIT_CACHE_DIR"
-      echo "📁 BuildKit cache directory: $BUILDKIT_CACHE_DIR"
-      
-      # Build with BuildKit cache import/export for better caching between builds
+      # Build with BuildKit cache from registry
       docker build \
         --tag="$CI_REGISTRY_IMAGE:latest" \
         --tag="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" \
         --build-arg NODE_ENV=$NODE_ENV \
         --build-arg NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY \
         --build-arg NEXT_PUBLIC_SKIP_KEY=$NEXT_PUBLIC_SKIP_KEY \
-        --cache-from type=local,src="$BUILDKIT_CACHE_DIR" \
-        --cache-to type=local,dest="$BUILDKIT_CACHE_DIR",mode=max \
+        --cache-from "$CI_REGISTRY_IMAGE:latest" \
         .
     - echo "📤 Pushing images to registry..."
     - docker push "$CI_REGISTRY_IMAGE:latest"
@@ -547,7 +541,7 @@ trivy_image_scan:
       echo ""
     - |
       # Ensure cache directory exists
-      TRIVY_CACHE_DIR="/mnt/data/container/trivy-cache"
+      TRIVY_CACHE_DIR="$CI_PROJECT_DIR/.trivy-cache"
       mkdir -p "$TRIVY_CACHE_DIR"
       echo "📦 Trivy cache directory: $TRIVY_CACHE_DIR"
       
