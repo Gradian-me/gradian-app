@@ -3147,5 +3147,246 @@
     "selectedAgentId": null,
     "lastMessage": "create image fashion \"This year, a familiar name from our homeland shines in the list of top health ",
     "lastMessageAt": "2025-12-20T15:44:14.539Z"
+  },
+  {
+    "id": "01KCZW8XAFNT41DJ5J6KP295BZ",
+    "title": "New Chat",
+    "createdAt": "2025-12-21T07:16:38.360Z",
+    "updatedAt": "2025-12-21T07:16:38.360Z",
+    "userId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "messages": [],
+    "selectedAgentId": null
+  },
+  {
+    "id": "01KCZWXBMFWF6HMC1TW9CJGW6V",
+    "title": "New Chat",
+    "createdAt": "2025-12-21T07:27:48.377Z",
+    "updatedAt": "2025-12-21T07:27:48.379Z",
+    "userId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "messages": [],
+    "selectedAgentId": null
+  },
+  {
+    "id": "01KCZX6J9NHCPF32RKK717SKM1",
+    "title": "asdas das",
+    "createdAt": "2025-12-21T07:32:50.109Z",
+    "updatedAt": "2025-12-21T08:07:08.884Z",
+    "userId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "messages": [
+      {
+        "id": "01KCZX6TP8DTG36RNEC515C1YW",
+        "role": "user",
+        "content": "asdas das",
+        "createdAt": "2025-12-21T07:32:58.704Z"
+      },
+      {
+        "id": "01KCZXDVGDDWKAP6NW3BVT2M9W",
+        "role": "user",
+        "content": "asdas \nasd asd asdas \nas dasd asd\nas d\nas d\nasd \nasd",
+        "createdAt": "2025-12-21T07:36:48.918Z"
+      },
+      {
+        "id": "01KCZXDYSVHXVGC4GKGYY0PY7W",
+        "role": "assistant",
+        "content": "It seems like your message might have been sent accidentally or is incomplete. If you have a specific question or need assistance with something, please feel free to clarify, and I’d be happy to help!\n\nIf you're looking for information about the capabilities of the system or have questions about any specific agents, just let me know!\n\n#help #guidance #faq #capabilities",
+        "agentId": "orchestrator",
+        "metadata": {
+          "complexity": 0,
+          "executionType": "guidance"
+        },
+        "createdAt": "2025-12-21T07:36:52.289Z"
+      },
+      {
+        "id": "01KCZXNAWQ6NC9JMM3NVT7V2RQ",
+        "role": "user",
+        "content": "asd asd\nas dasd asd\na sda\ns d as",
+        "createdAt": "2025-12-21T07:40:54.048Z"
+      },
+      {
+        "id": "01KCZXND2NAC2AJ7NGKS7ZSMF2",
+        "role": "assistant",
+        "content": "It seems like your message might have been a placeholder or an error. If you have a specific question or need assistance with something, please let me know, and I'll be happy to help!\n\nIf you are curious about the capabilities of different agents or how to use them, feel free to ask about any specific tasks you have in mind.\n\n#help #guidance #capabilities #faq",
+        "agentId": "orchestrator",
+        "metadata": {
+          "complexity": 0,
+          "executionType": "guidance"
+        },
+        "createdAt": "2025-12-21T07:40:56.287Z"
+      },
+      {
+        "id": "01KCZXQKRRNWPJ4ZFGEQEW0PR3",
+        "role": "user",
+        "content": "what are your capabilities",
+        "createdAt": "2025-12-21T07:42:08.694Z"
+      },
+      {
+        "id": "01KCZXQS0XFGBF56D5KFNH416D",
+        "role": "assistant",
+        "content": "I can assist you with a wide range of capabilities through various specialized agents designed for specific tasks. Here are some key areas where I can help:\n\n1. **Content Generation**:\n   - **Image Generator**: Create images from text prompts.\n   - **Video Generator**: Generate videos based on descriptions.\n   - **Professional Writing**: Enhance and improve text, including grammar corrections and translations.\n   - **Presentation Slide Creator**: Generate structured presentation slides.\n\n2. **Data Analysis**:\n   - **General Assistant**: Analyze preloaded system data for insights and recommendations.\n   - **Data Analysis Expert**: Analyze raw user-provided data for patterns and strengths.\n\n3. **Process and Quality Management**:\n   - **Process Analyst**: Create and analyze business process documentation.\n   - **Quality Assurance Analyst**: Perform deviation analysis using root cause analysis models.\n   - **Routing Plan Analyzer**: Optimize routing for Points of Interest based on various constraints.\n\n4. **Management and Development**:\n   - **Performance Manager**: Generate employee performance improvement plans.\n   - **Change Management Analyst**: Specialize in change management within the pharmaceutical and biotech sectors.\n\n5. **Technical Support**:\n   - **Code Review Agent**: Analyze programming code for security and quality.\n   - **App Builder**: Create and modify JSON database schemas for applications.\n\n6. **AI Agent Development**:\n   - **AI Agent Builder**: Build and configure custom AI agents with specific capabilities.\n\nEach of these agents is tailored to provide focused and effective support in their respective areas. If you have a specific task in mind, feel free to ask, and I can direct you to the appropriate agent!\n\n#capabilities #agents #help #dataanalysis",
+        "agentId": "orchestrator",
+        "metadata": {
+          "complexity": 0,
+          "executionType": "guidance"
+        },
+        "createdAt": "2025-12-21T07:42:14.050Z"
+      },
+      {
+        "id": "01KCZXS7AV6NNN766GDV05P8BG",
+        "role": "user",
+        "content": "how can i ask you best questions",
+        "createdAt": "2025-12-21T07:43:01.476Z"
+      },
+      {
+        "id": "01KCZXSA1VGV695ZJR1QFESGKM",
+        "role": "assistant",
+        "content": "To ask me the best questions, consider the following tips:\n\n1. **Be Specific**: Clearly define what you need help with. Instead of asking vague questions, try to specify the topic or area of interest.\n\n2. **Provide Context**: If your question relates to a particular project, task, or area of expertise, include relevant details. This helps me tailor my response to your needs.\n\n3. **Use Keywords**: If you know about the available agents, mention them in your question. For example, asking about data analysis can be directed to the General Assistant or Data Analysis Expert.\n\n4. **Ask Follow-up Questions**: If my initial response raises more questions, feel free to ask follow-ups for deeper insights.\n\nBy following these tips, you can maximize the effectiveness of our interaction and get more precise and useful answers!\n\n#guidance #faq #help #capabilities",
+        "agentId": "orchestrator",
+        "metadata": {
+          "complexity": 0,
+          "executionType": "guidance"
+        },
+        "createdAt": "2025-12-21T07:43:04.253Z"
+      },
+      {
+        "id": "01KCZYNPPR9FMZ0R4484WE22ZM",
+        "role": "user",
+        "content": "asdasdasdsa",
+        "createdAt": "2025-12-21T07:58:34.750Z"
+      },
+      {
+        "id": "01KCZYNSB7W9RXVHV07T4EBCPG",
+        "role": "assistant",
+        "content": "It seems like your message may have been a typo or an error. If you have a specific question or need assistance with something, please let me know! I'm here to help with information about our capabilities, available agents, or any other inquiries you might have.\n\n#help #faq #guidance #agents",
+        "agentId": "orchestrator",
+        "metadata": {
+          "complexity": 0,
+          "executionType": "guidance"
+        },
+        "createdAt": "2025-12-21T07:58:37.428Z"
+      },
+      {
+        "id": "01KCZYT71BTXZFJKWD0H61X3ZE",
+        "role": "user",
+        "content": "It seems like your message may have been a typo or an error. If you have a specific question or need assistance with something, please let me know! I'm here to help with information about our capabilities, available agents, or any other inquiries you might have.\n\n#help #faq #guidance #agents",
+        "hashtags": [
+          "help",
+          "faq",
+          "guidance",
+          "agents"
+        ],
+        "createdAt": "2025-12-21T08:01:02.526Z"
+      },
+      {
+        "id": "01KCZYTA20ZAQQEG10R1C0CSA9",
+        "role": "assistant",
+        "content": "It seems there might have been a misunderstanding in your previous message. If you have specific questions or need assistance regarding our capabilities or available agents, feel free to ask! I'm here to provide you with information about what I can help you with, whether it's generating content, analyzing data, or managing projects.\n\nFor example, if you need assistance with writing, the **Professional Writing** agent can help enhance your text. If you're looking to analyze data, the **General Assistant** or **Data Analysis Expert** can assist with that as well. Just let me know what you need!\n\n#help #faq #guidance #capabilities",
+        "agentId": "orchestrator",
+        "metadata": {
+          "complexity": 0,
+          "executionType": "guidance"
+        },
+        "createdAt": "2025-12-21T08:01:05.605Z"
+      },
+      {
+        "id": "01KCZYTKXXCF8ERYTHPGYJYHYM",
+        "role": "user",
+        "content": "It seems there might have been a misunderstanding in your previous message. If you have specific questions or need assistance regarding our capabilities or available agents, feel free to ask! I'm here to provide you with information about what I can help you with, whether it's generating content, analyzing data, or managing projects.\n\nFor example, if you need assistance with writing, the **Professional Writing** agent can help enhance your text. If you're looking to analyze data, the **General Assistant** or **Data Analysis Expert** can assist with that as well. Just let me know what you need!\n\n#help #faq #guidance #capabilities",
+        "hashtags": [
+          "help",
+          "faq",
+          "guidance",
+          "capabilities"
+        ],
+        "createdAt": "2025-12-21T08:01:15.714Z"
+      },
+      {
+        "id": "01KCZYTQAZPBS3TK48PYCKWMNT",
+        "role": "assistant",
+        "content": "It looks like you're looking for clarification on how I can assist you! If you have specific questions about our capabilities or the agents available, I'm here to help. \n\nFor content-related tasks, the **Professional Writing** agent can enhance your text, whether that involves grammar correction, style adaptation, or summarization. If you're looking to analyze data, the **General Assistant** can provide insights into existing schemas and data, while the **Data Analysis Expert** specializes in raw data analysis and generating detailed reports.\n\nFeel free to ask about any specific needs you have or the type of assistance you're looking for!\n\n#help #capabilities #agents #faq",
+        "agentId": "orchestrator",
+        "metadata": {
+          "complexity": 0,
+          "executionType": "guidance"
+        },
+        "createdAt": "2025-12-21T08:01:19.205Z"
+      },
+      {
+        "id": "01KCZYV195WKX3DA5CEM7KYNKK",
+        "role": "user",
+        "content": "It looks like you're looking for clarification on how I can assist you! If you have specific questions about our capabilities or the agents available, I'm here to help. \n\nFor content-related tasks, the **Professional Writing** agent can enhance your text, whether that involves grammar correction, style adaptation, or summarization. If you're looking to analyze data, the **General Assistant** can provide insights into existing schemas and data, while the **Data Analysis Expert** specializes in raw data analysis and generating detailed reports.\n\nFeel free to ask about any specific needs you have or the type of assistance you're looking for!\n\n#help #capabilities #agents #faq",
+        "hashtags": [
+          "help",
+          "capabilities",
+          "agents",
+          "faq"
+        ],
+        "createdAt": "2025-12-21T08:01:29.389Z"
+      },
+      {
+        "id": "01KCZYV42TPRXGRS21A6NZG7GT",
+        "role": "assistant",
+        "content": "It seems you're seeking clarification on how I can assist you! I'm equipped to help with a variety of tasks through specialized agents:\n\n- For content-related needs, the **Professional Writing** agent can enhance your text by correcting grammar, adapting style, summarizing information, and more.\n- If you require data insights, the **General Assistant** can analyze existing schemas and provide business intelligence. For raw data analysis, the **Data Analysis Expert** can generate detailed reports based on the data you provide.\n\nPlease let me know if you have specific tasks in mind or any particular questions about how I can assist you!\n\n#help #capabilities #agents #faq",
+        "agentId": "orchestrator",
+        "metadata": {
+          "complexity": 0,
+          "executionType": "guidance"
+        },
+        "createdAt": "2025-12-21T08:01:32.256Z"
+      },
+      {
+        "id": "01KCZYW7NKKPSNPPTYBJS6NPS1",
+        "role": "user",
+        "content": "I understand you may need clarification on how I can assist you effectively. If you have specific questions or tasks in mind, I'm here to help. \n\nFor writing tasks, I can enhance your text through professional editing, grammar correction, style adaptations, and summarization. If you're looking for data analysis, I can provide insights into your existing schemas or conduct raw data analysis and generate detailed reports.\n\nPlease let me know your specific needs or the type of assistance you're seeking, and I'll be glad to support you!",
+        "createdAt": "2025-12-21T08:02:08.699Z"
+      },
+      {
+        "id": "01KCZYWB2WJ4M9M557KFTE9AW1",
+        "role": "assistant",
+        "content": "I'm here to assist you with a wide range of tasks! If you need help with writing, I can enhance your text through professional editing, grammar correction, style adaptations, and summarization using the **Professional Writing** agent. For data-related inquiries, I can analyze existing schemas or conduct raw data analysis to generate detailed reports with the **General Assistant** and **Data Analysis Expert** agents.\n\nJust let me know what specific assistance you require, and I'll be glad to help you with it!\n\n#help #capabilities #agents #guidance",
+        "agentId": "orchestrator",
+        "metadata": {
+          "complexity": 0,
+          "executionType": "guidance"
+        },
+        "createdAt": "2025-12-21T08:02:12.196Z"
+      },
+      {
+        "id": "01KCZYWVSHQ03HV1SB5R6KTEFT",
+        "role": "user",
+        "content": "class=\"inline-flex items-center justify-center whitespace-nowrap font-semibold focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 active:scale-95 dark:hover:bg-gray-800 rounded-lg text-xs h-7 w-7 p-0 hover:bg-violet-100 duration-200 relative focus:ring-0 focus-visible:ring-0 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors\"",
+        "createdAt": "2025-12-21T08:02:29.306Z"
+      },
+      {
+        "id": "01KCZYWYB9HC1Y4VJE48Z8A5F9",
+        "role": "assistant",
+        "content": "I understand your request, but I don't have any agents that are specifically designed to handle this task.\n\nCould you please:\n1. Rephrase your request to align with available agent capabilities, or\n2. Be more specific about what you'd like to accomplish?\n\nI'm here to help once I understand how to best assist you with the available tools.\n\n#guidance #help #agents",
+        "agentId": "orchestrator",
+        "metadata": {
+          "complexity": 0.5,
+          "executionType": "guidance"
+        },
+        "createdAt": "2025-12-21T08:02:31.920Z"
+      },
+      {
+        "id": "01KCZZ59P7ZCTVNRFQ1YJ83BT5",
+        "role": "user",
+        "content": "بگو دوچرخه",
+        "createdAt": "2025-12-21T08:07:05.681Z"
+      },
+      {
+        "id": "01KCZZ5CTGEDPE21KGGE4BCMYQ",
+        "role": "assistant",
+        "content": "I understand your request, but I don't have any agents that are specifically designed to handle this task.\n\nCould you please:\n1. Rephrase your request to align with available agent capabilities, or\n2. Be more specific about what you'd like to accomplish?\n\nI'm here to help once I understand how to best assist you with the available tools.\n\n#guidance #help #agents",
+        "agentId": "orchestrator",
+        "metadata": {
+          "complexity": 0.5,
+          "executionType": "guidance"
+        },
+        "createdAt": "2025-12-21T08:07:08.884Z"
+      }
+    ],
+    "selectedAgentId": null,
+    "lastMessage": "I understand your request, but I don't have any agents that are specifically designed to handle this",
+    "lastMessageAt": "2025-12-21T08:07:08.884Z"
   }
 ]

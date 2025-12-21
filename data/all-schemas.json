@@ -3260,8 +3260,7 @@
             "menu-url",
             "hide-in-ad",
             "open-in-new-tab",
-            "menu-description",
-            "menu-companies"
+            "menu-description"
           ]
         }
       ]
@@ -5200,6 +5199,24 @@
         "description": "Inquiry details and information",
         "initialState": "expanded",
         "columns": 2
+      },
+      {
+        "id": "tenders",
+        "title": "Tenders",
+        "description": "Add tenders to this inquiry",
+        "isRepeatingSection": true,
+        "initialState": "expanded",
+        "columns": 2,
+        "repeatingConfig": {
+          "minItems": 0,
+          "maxItems": 100,
+          "targetSchema": "tenders",
+          "relationTypeId": "HAS_TENDER",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
+        }
       }
     ],
     "showInNavigation": true,

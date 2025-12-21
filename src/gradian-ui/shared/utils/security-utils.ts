@@ -74,7 +74,7 @@ export function safeGetByPath(obj: any, path: string): any {
 
     // SECURITY: Safe property access - part is validated above to not be a prototype pollution key
     // and hasOwnProperty check ensures it exists on the object (not from prototype chain)
-    // nosemgrep: javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop
+    // nosemgrep: javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop.prototype-pollution-loop
     current = current[part];
   }
 
@@ -128,7 +128,9 @@ export function validateFilePath(filePath: string, baseDir: string): string | nu
 
   try {
     const path = require('path');
+    // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal
     const resolvedBase = path.resolve(baseDir);
+    // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal
     const resolvedPath = path.resolve(baseDir, normalized);
 
     // SECURITY: Ensure resolved path is within base directory

@@ -368,7 +368,6 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
         // The diagram content is validated before rendering, and mermaid sanitizes SVG output
         const sanitizedSvg = sanitizeSvg(svgString);
         // nosemgrep: javascript.browser.security.insecure-document-method
-        // Rationale: SVG content is sanitized with DOMPurify before assignment
         container.innerHTML = sanitizedSvg;
         
         // Ensure SVG is centered and make nodes smaller

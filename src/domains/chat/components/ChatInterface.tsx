@@ -83,25 +83,24 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, [chatIdFromUrl, currentChat?.id, selectChat]);
 
-  // Auto-scroll to bottom when switching chats or loading new messages for current chat
+  // Auto-scroll to bottom when switching chats, sending messages, or receiving messages
   useEffect(() => {
     const isChatChanged = currentChat?.id && currentChat.id !== prevChatIdRef.current;
     if (isChatChanged) {
       prevChatIdRef.current = currentChat?.id ?? null;
-      requestAnimationFrame(() => {
-        messagesContainerRef.current?.scrollTo({ top: messagesContainerRef.current.scrollHeight, behavior: 'smooth' });
-      });
+      // Small delay to ensure messages are rendered
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
       return;
     }
-    // If new messages arrive and the user is near the bottom, keep at bottom
-    const container = messagesContainerRef.current;
-    if (container) {
-      const nearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 120;
-      if (nearBottom) {
-        requestAnimationFrame(() => {
-          container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-        });
-      }
+    
+    // Always scroll to bottom when messages change (new message sent or received)
+    if (messages && messages.length > 0) {
+      // Small delay to ensure new message is rendered
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     }
   }, [messages, currentChat]);
 

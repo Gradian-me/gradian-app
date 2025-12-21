@@ -122,8 +122,6 @@ function runSemgrepLocal() {
     // SECURITY: Use spawnSync without shell to prevent command injection
     // On Windows, we need shell for .cmd files, but we validate the command first
     // The semgrepCmd is validated to be either 'semgrep' or 'semgrep.cmd' (no user input)
-    // nosemgrep: javascript.lang.security.audit.spawn-shell-true
-    // Rationale: shell is only enabled for Windows .cmd files, command is validated (no user input)
     const semgrepProcess = spawnSync(
       semgrepCmd,
       semgrepArgs,
@@ -132,6 +130,7 @@ function runSemgrepLocal() {
         encoding: 'utf-8',
         env: env,
         // SECURITY: Only use shell on Windows for .cmd files, but command is validated
+        // nosemgrep: javascript.lang.security.audit.spawn-shell-true
         shell: process.platform === 'win32' && semgrepCmd.endsWith('.cmd')
       }
     );

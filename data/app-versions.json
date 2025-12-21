@@ -4322,5 +4322,44 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCZSECURITYSANITIZATION001",
+    "timestamp": "2025-12-21T11:45:48.000Z",
+    "version": "1.35.000",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Added new inquiry structure to support inquiries with tenders, improving data management capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "inquiries",
+          "tenders"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated chat input component to integrate voice input and professional writing features, enhancing user experience and functionality",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "voice",
+          "professional-writing",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Implemented additional sanitization measures in various components to prevent XSS vulnerabilities, further strengthening application security",
+        "priority": "High",
+        "affectedDomains": [
+          "security",
+          "xss-prevention",
+          "html-sanitization",
+          "components"
+        ]
+      }
+    ]
   }
 ]

@@ -4,6 +4,7 @@
  */
 
 import DOMPurify from 'dompurify';
+import type { Config } from 'dompurify';
 
 /**
  * Sanitize HTML content using DOMPurify
@@ -23,7 +24,7 @@ export function sanitizeHtml(
   }
 
   // Default configuration for markdown content (safe tags only)
-  const defaultConfig: DOMPurify.Config = {
+  const defaultConfig: Config = {
     ALLOWED_TAGS: [
       'span', 'code', 'pre', 'strong', 'em', 'del', 'br',
       'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
@@ -35,7 +36,7 @@ export function sanitizeHtml(
   };
 
   // Custom configuration if allowList provided
-  const config: DOMPurify.Config = allowList
+  const config: Config = allowList
     ? {
         ...defaultConfig,
         ALLOWED_TAGS: allowList.tags || defaultConfig.ALLOWED_TAGS,
@@ -43,8 +44,9 @@ export function sanitizeHtml(
       }
     : defaultConfig;
 
-  // Sanitize HTML
-  return DOMPurify.sanitize(html, config);
+  // Sanitize HTML (convert TrustedHTML to string if needed)
+  const sanitized = DOMPurify.sanitize(html, config);
+  return typeof sanitized === 'string' ? sanitized : String(sanitized);
 }
 
 /**
@@ -58,7 +60,7 @@ export function sanitizeSvg(svg: string): string {
   }
 
   // More permissive config for SVG (needed for Mermaid diagrams)
-  const config: DOMPurify.Config = {
+  const config: Config = {
     ALLOWED_TAGS: [
       'svg', 'g', 'path', 'circle', 'ellipse', 'line', 'polyline', 'polygon',
       'rect', 'text', 'tspan', 'foreignObject', 'defs', 'marker', 'use',
@@ -77,7 +79,9 @@ export function sanitizeSvg(svg: string): string {
     NAMESPACE: 'http://www.w3.org/2000/svg',
   };
 
-  return DOMPurify.sanitize(svg, config);
+  // Sanitize SVG (convert TrustedHTML to string if needed)
+  const sanitized = DOMPurify.sanitize(svg, config);
+  return typeof sanitized === 'string' ? sanitized : String(sanitized);
 }
 
 /**
@@ -91,13 +95,15 @@ export function sanitizeForContentEditable(html: string): string {
   }
 
   // Very restrictive config for contentEditable (only formatting tags)
-  const config: DOMPurify.Config = {
+  const config: Config = {
     ALLOWED_TAGS: ['span', 'code', 'pre', 'strong', 'em', 'del', 'br'],
     ALLOWED_ATTR: ['class'],
     ALLOW_DATA_ATTR: false,
     KEEP_CONTENT: true,
   };
 
-  return DOMPurify.sanitize(html, config);
+  // Sanitize HTML (convert TrustedHTML to string if needed)
+  const sanitized = DOMPurify.sanitize(html, config);
+  return typeof sanitized === 'string' ? sanitized : String(sanitized);
 }
 

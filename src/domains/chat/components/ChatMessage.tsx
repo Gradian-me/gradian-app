@@ -65,7 +65,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       .toUpperCase();
   }, [displayName, user]);
 
-  // Get content for display (keep newlines for markdown)
+  // Get content for display (preserve newlines - they'll be handled by CSS for user messages)
   const cleanContent = useMemo(() => {
     if (!message.content) return '';
     return message.content.trim();
@@ -135,7 +135,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     }
   }, [shouldRenderAgentContainer, isAssistant, message.content]);
 
-  const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isStringExpanded, setIsStringExpanded] = useState(false);
   const markdownContentRef = useRef<HTMLDivElement>(null);
@@ -491,60 +490,12 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           'flex-1 max-w-[80%] relative',
           isUser && 'flex flex-col items-end'
         )}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Action Buttons - Copy and Info (appear on hover, outside bubble) */}
-        <AnimatePresence>
-          {isHovered && (
-            <div className={cn(
-              'absolute top-2 z-10 flex flex-col items-center gap-1',
-              isUser ? 'right-full mr-1' : 'left-full ml-1'
-            )}>
-              {rawContent && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  <CopyContent 
-                    content={rawContent}
-                    className="hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-                  />
-                </motion.div>
-              )}
-              {/* Info icon for assistant messages with metadata */}
-              {isAssistant && (message.metadata?.tokenUsage || message.metadata?.duration !== undefined || message.metadata?.cost !== undefined || message.metadata?.executionType) && (
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.15 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsMetadataDialogOpen(true);
-                  }}
-                  className={cn(
-                    'p-1.5 rounded-md transition-colors',
-                    'hover:bg-gray-200 dark:hover:bg-gray-700',
-                    'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500'
-                  )}
-                  title="View message metadata"
-                  aria-label="View message metadata"
-                >
-                  <Info className="w-4 h-4" />
-                </motion.button>
-              )}
-            </div>
-          )}
-        </AnimatePresence>
 
         <div 
           dir="auto"
           className={cn(
-            'rounded-2xl overflow-x-hidden relative',
+            'rounded-2xl overflow-x-hidden relative min-w-[120px]',
             hasImageOrVideo ? 'p-0' : 'px-4 py-3',
             // Add extra padding-top for assistant messages with agent badge
             isAssistant && message.agentId && !hasImageOrVideo && 'pt-12',
@@ -908,12 +859,20 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   : { maxHeight: contentHeight ? `${contentHeight + 10}px` : '10000px' }
                 }
               >
-                <MarkdownViewer 
-                  content={displayContent}
-                  showToggle={false}
-                  isEditable={false}
-                  showEndLine={false}
-                />
+                {isUser ? (
+                  // For user messages, render as plain text with preserved newlines
+                  <div className="whitespace-pre-line break-words">
+                    {displayContent}
+                  </div>
+                ) : (
+                  // For assistant messages, use MarkdownViewer for markdown support
+                  <MarkdownViewer 
+                    content={displayContent}
+                    showToggle={false}
+                    isEditable={false}
+                    showEndLine={false}
+                  />
+                )}
               </div>
               {isLongContent && (contentHeight === null || contentHeight > maxCollapsedHeight) && (
                 <div className="mt-2 flex justify-end">
@@ -942,7 +901,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         </div>
 
         {/* Metadata */}
-        {(message.createdAt || showComplexity) && (
+        {(message.createdAt || showComplexity || rawContent || (isAssistant && (message.metadata?.tokenUsage || message.metadata?.duration !== undefined || message.metadata?.cost !== undefined || message.metadata?.executionType))) && (
           <div className={cn(
             'mt-1.5 text-xs flex items-center gap-2 flex-wrap',
             isUser ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400 dark:text-gray-500'
@@ -971,6 +930,35 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
+            )}
+            {/* Copy button */}
+            {rawContent && (
+              <CopyContent 
+                content={rawContent}
+                className={cn(
+                  'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
+                  'transition-colors'
+                )}
+              />
+            )}
+            {/* Info icon for assistant messages with metadata */}
+            {isAssistant && (message.metadata?.tokenUsage || message.metadata?.duration !== undefined || message.metadata?.cost !== undefined || message.metadata?.executionType) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMetadataDialogOpen(true);
+                }}
+                className={cn(
+                  'p-1 rounded transition-colors',
+                  'hover:bg-gray-200 dark:hover:bg-gray-700',
+                  'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500'
+                )}
+                title="View message metadata"
+                aria-label="View message metadata"
+              >
+                <Info className="w-3 h-3" />
+              </button>
             )}
           </div>
         )}
