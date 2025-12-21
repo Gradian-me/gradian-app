@@ -574,7 +574,7 @@ trivy_image_scan:
         --rm \
         -v /var/run/docker.sock:/var/run/docker.sock \
         $DOCKER_CONFIG_MOUNT \
-        -v "$TRIVY_CACHE_DIR:/root/.cache/trivy:rw" \
+        -v "$TRIVY_CACHE_DIR:/tmp/trivy-cache:rw" \
         reg.cinnagen.com:8083/aquasec/trivy:latest \
         image \
         --format table \
