@@ -627,7 +627,7 @@ export const proxyDataRequest = async (
   }
 
   // Extract and forward x-fingerprint header
-  // Priority: x-fingerprint header → x-fingerprint cookie
+  // Priority: x-fingerprint header → x-fingerprint cookie → JWT token payload
   let fingerprint: string | null = null;
   const fingerprintHeader = request.headers.get('x-fingerprint') || request.headers.get('X-Fingerprint');
   
@@ -648,11 +648,44 @@ export const proxyDataRequest = async (
         'info',
         `[proxyDataRequest] Extracted x-fingerprint from cookie: ${fingerprint.substring(0, 8)}...`
       );
-    } else {
+    } else if (authToken) {
+      // Final fallback: Extract fingerprint from JWT token payload
+      // This ensures consistency with the fingerprint used during login
+      try {
+        const parts = authToken.split('.');
+        if (parts.length === 3) {
+          // Decode the payload (second part)
+          const payload = parts[1];
+          // Add padding if needed
+          let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+          while (base64.length % 4) {
+            base64 += '=';
+          }
+          const decoded = Buffer.from(base64, 'base64').toString('utf-8');
+          const parsed = JSON.parse(decoded) as { fingerprint?: string };
+          if (parsed.fingerprint && typeof parsed.fingerprint === 'string') {
+            fingerprint = parsed.fingerprint;
+            loggingCustom(
+              LogType.CALL_BACKEND,
+              'info',
+              `[proxyDataRequest] Extracted x-fingerprint from JWT token payload: ${fingerprint.substring(0, 8)}...`
+            );
+          }
+        }
+      } catch (error) {
+        loggingCustom(
+          LogType.CALL_BACKEND,
+          'debug',
+          `[proxyDataRequest] Could not extract fingerprint from JWT token: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+    }
+    
+    if (!fingerprint) {
       loggingCustom(
         LogType.CALL_BACKEND,
         'warn',
-        `[proxyDataRequest] No x-fingerprint found in headers or cookies`
+        `[proxyDataRequest] No x-fingerprint found in headers, cookies, or JWT token`
       );
     }
   }
