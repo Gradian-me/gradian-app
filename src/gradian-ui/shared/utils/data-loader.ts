@@ -244,7 +244,7 @@ async function getTenantDomainForServerFetch(): Promise<string | undefined> {
  * Get the API URL for internal server-side calls
  * Server-side fetch requires absolute URLs, so we construct them here
  */
-function getApiUrl(apiPath: string): string {
+async function getApiUrl(apiPath: string): Promise<string> {
   // If it's already a full URL, use it as-is
   if (apiPath.startsWith('http')) {
     return apiPath;
@@ -260,18 +260,22 @@ function getApiUrl(apiPath: string): string {
   // IMPORTANT: do NOT use NEXTAUTH_URL here because it may point to an external
   // auth host (e.g., https://octa.../auth) which causes 401s when we call our
   // own API routes. Always prefer this app's origin.
-  // Priority: Extract from request DNS → INTERNAL_API_BASE_URL env → localhost
+  // Priority: Extract from request DNS → INTERNAL_API_BASE_URL env → localhost with PORT
   let baseUrl: string | undefined;
 
   // PRIORITY 1: Extract from incoming request headers (DNS-based for multi-tenant)
   // This ensures the internal API URL matches the actual domain being accessed
   try {
     const hMaybe = nextHeaders();
-    // Next.js may return a Promise in some contexts; skip if so to avoid sync dynamic API error
-    const h =
-      hMaybe && typeof (hMaybe as any).then !== 'function'
-        ? (hMaybe as any)
-        : null;
+    // Next.js may return a Promise in async contexts - await it properly
+    let h: any;
+    if (hMaybe && typeof (hMaybe as any).then === 'function') {
+      // In async context, await the Promise
+      h = await (hMaybe as Promise<any>);
+    } else {
+      h = hMaybe as any;
+    }
+    
     if (h && typeof h.get === 'function') {
       const forwardedHost = h.get('x-forwarded-host');
       const hostHeader = h.get('host');
@@ -284,11 +288,21 @@ function getApiUrl(apiPath: string): string {
         // Only use real domains, not localhost (which would be handled by fallback)
         if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
           baseUrl = `${proto}://${hostname}`;
+          loggingCustom(
+            LogType.SCHEMA_LOADER,
+            'debug',
+            `[getApiUrl] Extracted baseUrl from headers: ${baseUrl}`
+          );
         }
       }
     }
-  } catch {
+  } catch (error) {
     // headers() may not be available in all contexts; fallback below
+    loggingCustom(
+      LogType.SCHEMA_LOADER,
+      'debug',
+      `[getApiUrl] Error extracting from headers: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 
   // PRIORITY 2: Fallback to environment variable (if DNS extraction failed)
@@ -296,17 +310,36 @@ function getApiUrl(apiPath: string): string {
     baseUrl =
       process.env.INTERNAL_API_BASE_URL ||
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
+    
+    if (baseUrl) {
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'debug',
+        `[getApiUrl] Using baseUrl from environment variable: ${baseUrl}`
+      );
+    }
   }
 
   if (!baseUrl) {
     if (!isBuildTime) {
       // Default to localhost for local development (but not during build)
+      // Use PORT environment variable if set, otherwise default to 3000
       const port = process.env.PORT || '3000';
       baseUrl = `http://localhost:${port}`;
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'debug',
+        `[getApiUrl] Using localhost fallback with port ${port}: ${baseUrl}`
+      );
     } else {
       // During build, return a placeholder that will fail gracefully
       // This should not be reached if build-time code paths are correct
       baseUrl = 'http://localhost:3000';
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'warn',
+        `[getApiUrl] Using build-time placeholder: ${baseUrl}`
+      );
     }
   }
 
@@ -316,7 +349,14 @@ function getApiUrl(apiPath: string): string {
   // Remove trailing slash from baseUrl if present
   const normalizedBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
 
-  return `${normalizedBase}${cleanPath}`;
+  const finalUrl = `${normalizedBase}${cleanPath}`;
+  loggingCustom(
+    LogType.SCHEMA_LOADER,
+    'debug',
+    `[getApiUrl] Final URL: ${finalUrl}`
+  );
+  
+  return finalUrl;
 }
 
 /**
@@ -412,7 +452,7 @@ export async function loadData<T = any>(
         loggingCustom(logType, 'info', `🌐 [${instanceId}] Using custom fetcher for route "${routeKey}"`);
         rawData = await fetcher();
       } else {
-        const fetchUrl = getApiUrl(apiPath);
+        const fetchUrl = await getApiUrl(apiPath);
         loggingCustom(logType, 'info', `🌐 [${instanceId}] Fetching data from ${fetchUrl}`);
 
         // Get cookies and Authorization header from Next.js request context to forward to internal API calls
@@ -594,7 +634,7 @@ export async function loadDataById<T = any>(
   const fetchItem = async (shouldCache: boolean): Promise<T | null> => {
     const cacheBeforeFetch = entry.cache;
     try {
-      const fetchUrl = getApiUrl(`${apiBasePath}/${id}`);
+      const fetchUrl = await getApiUrl(`${apiBasePath}/${id}`);
       const startTime = Date.now();
 
       // Get cookies and Authorization header from Next.js request context to forward to internal API calls
@@ -729,7 +769,7 @@ export async function loadDataById<T = any>(
   loggingCustom(logType, 'info', `🔄 [${instanceId}] CACHE MISS for "${routeKey}" ID "${id}" - Loading from API...`);
 
   try {
-    const fetchUrl = getApiUrl(`${apiBasePath}/${id}`);
+    const fetchUrl = await getApiUrl(`${apiBasePath}/${id}`);
     const startTime = Date.now();
 
     // Get cookies and Authorization header from Next.js request context to forward to internal API calls

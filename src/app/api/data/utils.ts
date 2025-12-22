@@ -626,6 +626,53 @@ export const proxyDataRequest = async (
     );
   }
 
+  // Extract and forward x-fingerprint header
+  // Priority: x-fingerprint header → x-fingerprint cookie
+  let fingerprint: string | null = null;
+  const fingerprintHeader = request.headers.get('x-fingerprint') || request.headers.get('X-Fingerprint');
+  
+  if (fingerprintHeader) {
+    fingerprint = fingerprintHeader.trim();
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'info',
+      `[proxyDataRequest] Extracted x-fingerprint from header: ${fingerprint.substring(0, 8)}...`
+    );
+  } else {
+    // Fallback: Try to extract from cookies
+    const fingerprintFromCookie = extractTokenFromCookies(cookies, 'x-fingerprint');
+    if (fingerprintFromCookie) {
+      fingerprint = fingerprintFromCookie;
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'info',
+        `[proxyDataRequest] Extracted x-fingerprint from cookie: ${fingerprint.substring(0, 8)}...`
+      );
+    } else {
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'warn',
+        `[proxyDataRequest] No x-fingerprint found in headers or cookies`
+      );
+    }
+  }
+
+  // Set x-fingerprint header if we extracted it
+  if (fingerprint) {
+    headers.set('x-fingerprint', fingerprint);
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'info',
+      `[proxyDataRequest] x-fingerprint header set for backend request`
+    );
+  } else {
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'warn',
+      `[proxyDataRequest] WARNING: No x-fingerprint available for backend data request to ${targetUrl}`
+    );
+  }
+
   if (options.headers) {
     const overrideEntries = new Headers(options.headers);
     overrideEntries.forEach((value, key) => {
@@ -657,6 +704,17 @@ export const proxyDataRequest = async (
     : 'GET';
 
   loggingCustom(LogType.CALL_BACKEND, 'info', `→ ${method} ${targetUrl}`);
+
+  // Final verification: Check that required headers are present
+  const hasAuthorization = headers.has('Authorization') || headers.has('authorization');
+  const hasTenantDomain = headers.has('x-tenant-domain') || headers.has('X-Tenant-Domain');
+  const hasFingerprint = headers.has('x-fingerprint') || headers.has('X-Fingerprint');
+  
+  loggingCustom(
+    LogType.CALL_BACKEND,
+    hasAuthorization && hasTenantDomain && hasFingerprint ? 'info' : 'warn',
+    `[proxyDataRequest] Header verification: Authorization=${hasAuthorization ? '✓' : '✗'}, x-tenant-domain=${hasTenantDomain ? '✓' : '✗'}, x-fingerprint=${hasFingerprint ? '✓' : '✗'}`
+  );
 
   // Log all headers being sent to backend for debugging (including complete Authorization header)
   const headersToSend: Record<string, string> = {};
