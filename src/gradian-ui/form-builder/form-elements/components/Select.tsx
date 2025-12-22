@@ -259,7 +259,13 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     [normalizedOptions]
   );
 
-
+  // Calculate fallback select value for default behavior (must be before any conditional returns)
+  const fallbackSelectValue = React.useMemo(() => {
+    const extracted = extractFirstId(value);
+    return extracted === '' || extracted === undefined || extracted === null
+      ? undefined
+      : String(extracted);
+  }, [value]);
 
   // Check if color is a valid badge variant, custom color, or Tailwind classes
   const isValidBadgeVariant = (color?: string): boolean => {
@@ -376,7 +382,12 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   if (hasNormalizedOptions) {
     const selectedOption = normalizedOptions.find((opt) => opt.id === normalizedCurrentValue);
     // Convert empty string to undefined so placeholder shows
-    const selectValue = selectedOption?.id ?? (normalizedCurrentValue === '' ? undefined : normalizedCurrentValue);
+    // Ensure selectValue is always a scalar string or undefined (never an array or object)
+    const selectValue = selectedOption?.id 
+      ? String(selectedOption.id) 
+      : (normalizedCurrentValue === '' || normalizedCurrentValue === undefined || normalizedCurrentValue === null
+          ? undefined 
+          : String(normalizedCurrentValue));
     const displayOption = selectedOption ??
       (normalizedValueEntry
         ? {
@@ -445,7 +456,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   return (
     <div className="w-full">
       {renderFieldLabel()}
-      <RadixSelect value={value} onValueChange={onValueChange} {...props}>
+      <RadixSelect value={fallbackSelectValue} onValueChange={onValueChange} {...props}>
         <SelectTrigger className={selectClasses} id={fieldName}>
           <SelectValue placeholder={fieldPlaceholder} />
         </SelectTrigger>

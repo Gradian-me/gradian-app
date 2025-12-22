@@ -1161,6 +1161,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       const itemsToDisplay = relatedEntities;
       const itemsCount = itemsToDisplay.length;
       const headerSectionMessage = displaySectionError;
+      const maxItems = section.repeatingConfig?.maxItems;
+      const canAddMore = maxItems === undefined || maxItems === 0 || itemsCount < maxItems;
       
       return (
         <>
@@ -1230,7 +1232,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                     </div>
                   )}
                   {/* Select button for canSelectFromData or mustSelectFromData */}
-                  {(addType === 'canSelectFromData' || addType === 'mustSelectFromData') && targetSchema && (
+                  {(addType === 'canSelectFromData' || addType === 'mustSelectFromData') && targetSchema && canAddMore && (
                     <Button
                       type="button"
                       variant="outline"
@@ -1445,7 +1447,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                       )}
 
                       {/* Add button - only show if addType is 'addOnly' or 'canSelectFromData' */}
-                      {onAddRepeatingItem && addType !== 'mustSelectFromData' && (
+                      {onAddRepeatingItem && addType !== 'mustSelectFromData' && canAddMore && (
                         <div className="space-y-2">
                           <div className="flex justify-center mb-4">
                             <AddButtonFull
@@ -1614,7 +1616,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 )}
 
                 {/* Add button - only show if addType is 'addOnly' or 'canSelectFromData' */}
-                {onAddRepeatingItem && addType !== 'mustSelectFromData' && (
+                {onAddRepeatingItem && addType !== 'mustSelectFromData' && canAddMore && (
                   <div className="space-y-2">
                     <div className="flex justify-center mb-4">
                       <AddButtonFull
@@ -1740,6 +1742,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     }
     
     // For traditional inline fields repeating sections
+    const maxItems = section.repeatingConfig?.maxItems;
+    const currentItemsCount = (repeatingItems || []).length;
+    const canAddMore = maxItems === undefined || maxItems === 0 || currentItemsCount < maxItems;
+    
     return (
       <>
       <Card className={cn(
@@ -1869,7 +1875,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                     </div>
                   )}
 
-                  {onAddRepeatingItem && (
+                  {onAddRepeatingItem && canAddMore && (
                     <div className="space-y-2">
                       <div className="flex justify-center mb-4">
                         <AddButtonFull
@@ -1937,7 +1943,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               </div>
             )}
 
-            {onAddRepeatingItem && (
+            {onAddRepeatingItem && canAddMore && (
               <div className="space-y-2">
                 <div className="flex justify-center mb-4">
                   <AddButtonFull

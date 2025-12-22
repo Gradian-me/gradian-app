@@ -1472,5 +1472,306 @@
     "fieldId": "item-warehouse",
     "createdAt": "2025-12-22T08:20:41.677Z",
     "updatedAt": "2025-12-22T08:20:41.677Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD33VYXBTM8CR7NRAK76MS8M",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYSQP6SRYAQNX1YDMQ11",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B49YJV00PGV7FZXP8XG",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD33VYXBTM8CR7NRAK76MS8M",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYV5JTYPG3ZEB7FP4RT9",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4BTEBWZPGHAEN32JYK",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD33VYXBTM8CR7NRAK76MS8M",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYV8BYET3NJ5KR6V9Z92",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4CKJNZH634NFTQ5862",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD33VYXBTM8CR7NRAK76MS8M",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYVCC9NS3609PC5DF49R",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4CSFHT9VNQKB90KV0G",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD33VYXBTM8CR7NRAK76MS8M",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYVE7G913JEB6GVWFSX2",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4E8EWQXK43T20H6AH9",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD33VYXBTM8CR7NRAK76MS8M",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYVF7RG7PNQKQS2AS2JG",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4EBG1MM6A8ECWTGDPS",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD33VYXJ438ENQ6Y08GDW4HG",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYVJ0ETJDQGXPP2414FZ",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4FFCWTBGK6EYZ9QBT1",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD33VYXJ438ENQ6Y08GDW4HG",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYVQYR8M44B6WFRK0YTQ",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4J9BVGHHYBKYY34B7A",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD33VYXJ438ENQ6Y08GDW4HG",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYVSH2915FEAY5RBFEWZ",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4KMPVJ77EG8MDZHNXT",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD33VYXJ438ENQ6Y08GDW4HG",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYVZNCBDTS6ZHJPA8040",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4KW34V03N5BQ10AWED",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD33VYXJ438ENQ6Y08GDW4HG",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYW1P4MYP7214ZDD6SBP",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4MQRV5054JHJ6RYSFV",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B3E99M7AEVV8DKYKZ9S",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYW223S24BFZ8524H9P5",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4NJQJ0EHKXN0QH3457",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B3E99M7AEVV8DKYKZ9S",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYW67MNGXHEJ4N6NF8RZ",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4NA00B0M1HHPAKZYDA",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B3E99M7AEVV8DKYKZ9S",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYW82Q0E1DKH48Z65VK7",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4PC995CYJK49PSYYAP",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B3E99M7AEVV8DKYKZ9S",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYW975NTFHAQ10BTEQYP",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4PT00NQ10E2D7A9D2G",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B3E99M7AEVV8DKYKZ9S",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYWA3A1GFEZ6ZF91VC9D",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4QSC8SWZZ5KT4RHP26",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B3E99M7AEVV8DKYKZ9S",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYWBM27Z1TBYGZBXWA6B",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4RZZ3N0R1AN177F9A1",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B47E7QZSRE7PTZG63H4",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYWC0A2G4QYAX5ZJ4XMF",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4RX834PV42JMNYKEMA",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B47E7QZSRE7PTZG63H4",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYWGAAJR84SB7BDWRF72",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4SKNRGG2MGHYK0PYZD",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B47E7QZSRE7PTZG63H4",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYWJD8XCNCH7DYTH1P3T",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4SR32AYS5VBSBT0MZ7",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B47E7QZSRE7PTZG63H4",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYWK0B01ZZXPSC088YHB",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4TMRRKF9MNJ4EXAY6S",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B47E7QZSRE7PTZG63H4",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYWQBHE3NNVMKA8VC8P1",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4V3G5N0ZRVYKX0M3TQ",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B47E7QZSRE7PTZG63H4",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYWTNSRFZTRHJJTCKBYS",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4VK2DQ73JN1F85D3D9",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B47E7QZSRE7PTZG63H4",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYWV63HN7QZJWSSN1CAG",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B4WENAJKVZ67KSN3VHV",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B47E7QZSRE7PTZG63H4",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYWZB3WJ2QQ7W0432BMB",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B54QMWJ8DPCCBDSD4VD",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B47E7QZSRE7PTZG63H4",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYX2JPBEV8SX4TK1157D",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B558SSY4NTG08RD79QB",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B47E7QZSRE7PTZG63H4",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYX9T16510MYBSV588JX",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B55YPN3CWN3N3EBKBA3",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KD341B47E7QZSRE7PTZG63H4",
+    "targetSchema": "parameter-items",
+    "targetId": "01KD33VYXABMQ5D7DPZM31N4H7",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KD341B554K59YV2EXQXZ99E8",
+    "createdAt": "2025-12-22T12:00:00.000Z",
+    "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "id": "01KD389B20516DVBVT84JTP6AV",
+    "sourceSchema": "tender-invitations",
+    "sourceId": "01KD389AY647AG5RAMJTQG4HES",
+    "targetSchema": "vendors",
+    "targetId": "01KCX516BZD0THVCNDXVKSQHT3",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "tender-invitation-vendor",
+    "createdAt": "2025-12-22T14:44:18.622Z",
+    "updatedAt": "2025-12-22T14:44:42.393Z"
+  },
+  {
+    "sourceSchema": "tender-invitations",
+    "sourceId": "01KD389AY647AG5RAMJTQG4HES",
+    "targetSchema": "quotations",
+    "targetId": "01KD38B85D6DPYYYD0JMQ93Q12",
+    "relationTypeId": "HAS_QUOTATION",
+    "id": "01KD38B8B7XEXM552WEX46JBV0",
+    "createdAt": "2025-12-22T14:45:21.382Z",
+    "updatedAt": "2025-12-22T14:45:21.382Z"
   }
 ]

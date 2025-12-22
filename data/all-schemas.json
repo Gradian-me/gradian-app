@@ -5211,6 +5211,23 @@
           "addType": "addOnly",
           "relationTypeId": "HAS_ITEM"
         }
+      },
+      {
+        "id": "tender-invitations-section",
+        "title": "Tender Invitations",
+        "description": "Vendors invited to participate in this tender",
+        "initialState": "expanded",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "connectToSchema",
+          "minItems": 0,
+          "targetSchema": "tender-invitations",
+          "addType": "addOnly",
+          "relationTypeId": "HAS_INVITATION",
+          "deleteType": "itemAndRelation",
+          "isUnique": true
+        }
       }
     ],
     "showInNavigation": false,
@@ -5451,6 +5468,443 @@
         "id": "related-purchase-requests",
         "title": "Related Purchase Requests",
         "description": "Purchase request codes related to this inquiry item",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Package",
+    "schemaType": "business",
+    "applyToAllTenants": false,
+    "relatedTenants": [
+      {
+        "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+        "label": "Supply Chain Management"
+      }
+    ]
+  },
+  {
+    "id": "tender-invitations",
+    "description": "Manage tender invitations with vendor selection",
+    "singular_name": "Tender Invitation",
+    "plural_name": "Tender Invitations",
+    "fields": [
+      {
+        "id": "tender-invitation-vendor",
+        "name": "vendor",
+        "label": "Vendor",
+        "sectionId": "basic-information",
+        "component": "picker",
+        "placeholder": "Select vendor",
+        "description": "Select a vendor for this tender invitation",
+        "targetSchema": "vendors",
+        "validation": {
+          "required": true
+        },
+        "metadata": {
+          "allowMultiselect": false
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "title"
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Vendor selection for tender invitation",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "quotations-section",
+        "title": "Quotations",
+        "description": "Quotations submitted for this tender invitation",
+        "initialState": "expanded",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "connectToSchema",
+          "minItems": 0,
+          "maxItems": 1,
+          "targetSchema": "quotations",
+          "addType": "addOnly",
+          "relationTypeId": "HAS_QUOTATION",
+          "deleteType": "itemAndRelation",
+          "isUnique": true
+        }
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Mail",
+    "schemaType": "business",
+    "applyToAllTenants": false,
+    "relatedTenants": [
+      {
+        "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+        "label": "Supply Chain Management"
+      }
+    ],
+    "statusGroup": [
+      {
+        "id": "01KCXSBQMD17BR96WWSKBJMEZ4",
+        "label": "Inquiry Tender Status"
+      }
+    ]
+  },
+  {
+    "id": "quotations",
+    "description": "Manage quotations with financial details and items",
+    "singular_name": "Quotation",
+    "plural_name": "Quotations",
+    "fields": [
+      {
+        "id": "quotation-number",
+        "name": "quotationNumber",
+        "label": "Quotation Number",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter quotation number",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1,
+        "role": "code",
+        "canCopy": true
+      },
+      {
+        "id": "quotation-date",
+        "name": "quotationDate",
+        "label": "Quotation Date",
+        "sectionId": "basic-information",
+        "component": "date",
+        "placeholder": "Select quotation date",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "subtitle"
+      },
+      {
+        "id": "quotation-currency",
+        "name": "currency",
+        "label": "Currency",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select currency",
+        "description": "Select currency from parameter items",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KD33VYXBTM8CR7NRAK76MS8M",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "quotation-transport-mode",
+        "name": "transportMode",
+        "label": "Transport Mode",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select transport mode",
+        "description": "Select transport mode from parameter items",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KD33VYXJ438ENQ6Y08GDW4HG",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "quotation-incoterm",
+        "name": "incoterm",
+        "label": "INCOTERM",
+        "sectionId": "basic-information",
+        "component": "select",
+        "placeholder": "Select INCOTERM",
+        "description": "Select INCOTERM from parameter items",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KD341B47E7QZSRE7PTZG63H4",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "quotation-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter quotation description",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 6,
+        "role": "description"
+      },
+      {
+        "id": "quotation-advanced-payment-amount",
+        "name": "advancedPaymentAmount",
+        "label": "Advanced Payment Amount",
+        "sectionId": "financial-details",
+        "component": "number",
+        "placeholder": "Enter advanced payment amount",
+        "validation": {
+          "required": false,
+          "min": 0
+        },
+        "displayType": "currency",
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "quotation-freight-charges",
+        "name": "freightCharges",
+        "label": "Freight Charges",
+        "sectionId": "financial-details",
+        "component": "number",
+        "placeholder": "Enter freight charges",
+        "validation": {
+          "required": false,
+          "min": 0
+        },
+        "displayType": "currency",
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "quotation-other-charges",
+        "name": "otherCharges",
+        "label": "Other Charges",
+        "sectionId": "financial-details",
+        "component": "number",
+        "placeholder": "Enter other charges",
+        "validation": {
+          "required": false,
+          "min": 0
+        },
+        "displayType": "currency",
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "quotation-discounts",
+        "name": "discounts",
+        "label": "Discounts",
+        "sectionId": "financial-details",
+        "component": "number",
+        "placeholder": "Enter discounts",
+        "validation": {
+          "required": false,
+          "min": 0
+        },
+        "displayType": "currency",
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "quotation-net-price",
+        "name": "netPrice",
+        "label": "Net Price",
+        "sectionId": "financial-details",
+        "component": "number",
+        "placeholder": "Enter net price",
+        "validation": {
+          "required": true,
+          "min": 0
+        },
+        "displayType": "currency",
+        "colSpan": 1,
+        "order": 5,
+        "role": "title"
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Quotation details and information",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "financial-details",
+        "title": "Financial Details",
+        "description": "Financial information including charges and pricing",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "quotation-items-section",
+        "title": "Quotation Items",
+        "description": "Items included in this quotation",
+        "initialState": "expanded",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "connectToSchema",
+          "minItems": 1,
+          "targetSchema": "quotation-items",
+          "addType": "addOnly",
+          "relationTypeId": "HAS_QUOTATION_ITEM",
+          "deleteType": "itemAndRelation",
+          "isUnique": true
+        }
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "FileText",
+    "schemaType": "business",
+    "applyToAllTenants": false,
+    "relatedTenants": [
+      {
+        "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+        "label": "Supply Chain Management"
+      }
+    ]
+  },
+  {
+    "id": "quotation-items",
+    "description": "Manage Quotation Items linked to tender items with financial details",
+    "singular_name": "Quotation Item",
+    "plural_name": "Quotation Items",
+    "fields": [
+      {
+        "id": "quotation-item-tender-item",
+        "name": "tenderItem",
+        "label": "Tender Item Details",
+        "sectionId": "tender-item-details",
+        "component": "picker",
+        "placeholder": "Select tender item",
+        "description": "Select a tender item for this quotation",
+        "targetSchema": "tender-items",
+        "validation": {
+          "required": true
+        },
+        "metadata": {
+          "allowMultiselect": false
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "title"
+      },
+      {
+        "id": "quotation-item-fee",
+        "name": "fee",
+        "label": "Fee",
+        "sectionId": "financial-details",
+        "component": "number",
+        "placeholder": "Enter fee",
+        "validation": {
+          "required": false,
+          "min": 0
+        },
+        "displayType": "currency",
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "quotation-item-total-price",
+        "name": "totalPrice",
+        "label": "Total Price",
+        "sectionId": "financial-details",
+        "component": "number",
+        "placeholder": "Enter total price",
+        "validation": {
+          "required": true,
+          "min": 0
+        },
+        "displayType": "currency",
+        "colSpan": 1,
+        "order": 2,
+        "role": "title"
+      },
+      {
+        "id": "quotation-item-storage-condition",
+        "name": "storageCondition",
+        "label": "Storage Condition",
+        "sectionId": "financial-details",
+        "component": "select",
+        "placeholder": "Select storage condition",
+        "description": "Select storage condition from parameter items",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KCXW1C9NT5D4TFDK511BKTSQ",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "quotation-item-expiration-date",
+        "name": "expirationDate",
+        "label": "Expiration Date",
+        "sectionId": "financial-details",
+        "component": "date",
+        "placeholder": "Select expiration date",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "quotation-item-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "financial-details",
+        "component": "textarea",
+        "placeholder": "Enter description",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 5,
+        "role": "description"
+      },
+      {
+        "id": "quotation-item-pack-size",
+        "name": "packSize",
+        "label": "Pack Size",
+        "sectionId": "financial-details",
+        "component": "textarea",
+        "placeholder": "Enter pack size",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4
+      }
+    ],
+    "sections": [
+      {
+        "id": "tender-item-details",
+        "title": "Tender Item Details",
+        "description": "Select the tender item for this quotation",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "financial-details",
+        "title": "Financial Details",
+        "description": "Financial information and item details",
         "initialState": "expanded",
         "columns": 2
       }

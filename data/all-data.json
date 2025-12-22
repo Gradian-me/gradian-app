@@ -17157,6 +17157,314 @@
       "createdAt": "2025-12-20T16:38:21.000Z",
       "updatedAt": "2025-12-20T16:38:21.000Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "USD - US Dollar",
+      "icon": "DollarSign",
+      "color": "green",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYSQP6SRYAQNX1YDMQ11",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "EUR - Euro",
+      "icon": "Euro",
+      "color": "blue",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYV5JTYPG3ZEB7FP4RT9",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "GBP - British Pound",
+      "icon": "PoundSterling",
+      "color": "purple",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYV8BYET3NJ5KR6V9Z92",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "JPY - Japanese Yen",
+      "icon": "Yen",
+      "color": "red",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYVCC9NS3609PC5DF49R",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "IRR - Iranian Rial",
+      "icon": "Coins",
+      "color": "orange",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYVE7G913JEB6GVWFSX2",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "AED - UAE Dirham",
+      "icon": "Coins",
+      "color": "teal",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYVF7RG7PNQKQS2AS2JG",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Road",
+      "icon": "Truck",
+      "color": "blue",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYVJ0ETJDQGXPP2414FZ",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Air",
+      "icon": "Plane",
+      "color": "sky",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYVQYR8M44B6WFRK0YTQ",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Sea",
+      "icon": "Ship",
+      "color": "cyan",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYVSH2915FEAY5RBFEWZ",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Rail",
+      "icon": "Train",
+      "color": "slate",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYVZNCBDTS6ZHJPA8040",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Express",
+      "icon": "Zap",
+      "color": "yellow",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYW1P4MYP7214ZDD6SBP",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Cash",
+      "icon": "DollarSign",
+      "color": "green",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYW223S24BFZ8524H9P5",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Bank Transfer",
+      "icon": "Banknote",
+      "color": "blue",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYW67MNGXHEJ4N6NF8RZ",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Letter of Credit",
+      "icon": "FileSignature",
+      "color": "orange",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYW82Q0E1DKH48Z65VK7",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Documentary Collection",
+      "icon": "FolderOpen",
+      "color": "slate",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYW975NTFHAQ10BTEQYP",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Open Account",
+      "icon": "Notebook",
+      "color": "gray",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYWA3A1GFEZ6ZF91VC9D",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Credit Card",
+      "icon": "CreditCard",
+      "color": "purple",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYWBM27Z1TBYGZBXWA6B",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "EXW - Ex Works",
+      "icon": "Warehouse",
+      "color": "slate",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYWC0A2G4QYAX5ZJ4XMF",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "FCA - Free Carrier",
+      "icon": "Truck",
+      "color": "blue",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYWGAAJR84SB7BDWRF72",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "CPT - Carriage Paid To",
+      "icon": "Package",
+      "color": "teal",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYWJD8XCNCH7DYTH1P3T",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "CIP - Carriage and Insurance Paid",
+      "icon": "Shield",
+      "color": "green",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYWK0B01ZZXPSC088YHB",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "DAP - Delivered At Place",
+      "icon": "MapPin",
+      "color": "orange",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYWQBHE3NNVMKA8VC8P1",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "DPU - Delivered at Place Unloaded",
+      "icon": "PackageCheck",
+      "color": "purple",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYWTNSRFZTRHJJTCKBYS",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "DDP - Delivered Duty Paid",
+      "icon": "CheckCircle",
+      "color": "green",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYWV63HN7QZJWSSN1CAG",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "FAS - Free Alongside Ship",
+      "icon": "Ship",
+      "color": "cyan",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYWZB3WJ2QQ7W0432BMB",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "FOB - Free On Board",
+      "icon": "Ship",
+      "color": "blue",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYX2JPBEV8SX4TK1157D",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "CFR - Cost and Freight",
+      "icon": "Ship",
+      "color": "teal",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYX9T16510MYBSV588JX",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "CIF - Cost, Insurance and Freight",
+      "icon": "Ship",
+      "color": "indigo",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYXABMQ5D7DPZM31N4H7",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "parameter-groups": [
@@ -17210,6 +17518,70 @@
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
           "label": "AryoGen"
         },
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
+    },
+    {
+      "title": "Currency",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYXBTM8CR7NRAK76MS8M",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "parameter-items-section": [],
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
+    },
+    {
+      "title": "Transport Mode",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD33VYXJ438ENQ6Y08GDW4HG",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "parameter-items-section": [],
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
+    },
+    {
+      "title": "Payment Method",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD341B3E99M7AEVV8DKYKZ9S",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "parameter-items-section": [],
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
+    },
+    {
+      "title": "Incoterms",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD341B47E7QZSRE7PTZG63H4",
+      "createdAt": "2025-12-22T12:00:00.000Z",
+      "updatedAt": "2025-12-22T12:00:00.000Z",
+      "parameter-items-section": [],
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "relatedTenants": [
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
           "label": "Supply Chain Management"
@@ -17305,5 +17677,76 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     }
-  ]
+  ],
+  "tender-invitations": [
+    {
+      "status": [
+        {
+          "id": "01KCXSVBPFH4B4BNCHC0TY98ZN",
+          "label": "Published For Vendors",
+          "icon": "FileUser",
+          "color": "yellow"
+        }
+      ],
+      "vendor": [
+        {
+          "id": "01KCX516BZD0THVCNDXVKSQHT3"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD389AY647AG5RAMJTQG4HES",
+      "createdAt": "2025-12-22T14:44:18.519Z",
+      "updatedAt": "2025-12-22T14:44:42.445Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    }
+  ],
+  "page-metadata-editor-form": [],
+  "quotations": [
+    {
+      "quotationNumber": "test",
+      "quotationDate": "2025-12-23",
+      "currency": [
+        {
+          "id": "01KD33VYV5JTYPG3ZEB7FP4RT9",
+          "label": "EUR - Euro",
+          "icon": "Euro",
+          "color": "blue",
+          "value": "01KD33VYV5JTYPG3ZEB7FP4RT9"
+        }
+      ],
+      "transportMode": [
+        {
+          "id": "01KD33VYVQYR8M44B6WFRK0YTQ",
+          "label": "Air",
+          "icon": "Plane",
+          "color": "sky",
+          "value": "01KD33VYVQYR8M44B6WFRK0YTQ"
+        }
+      ],
+      "incoterm": [
+        {
+          "id": "01KD33VYWJD8XCNCH7DYTH1P3T",
+          "label": "CPT - Carriage Paid To",
+          "icon": "Package",
+          "color": "teal",
+          "value": "01KD33VYWJD8XCNCH7DYTH1P3T"
+        }
+      ],
+      "description": "test",
+      "advancedPaymentAmount": 120,
+      "freightCharges": 90,
+      "otherCharges": 51,
+      "discounts": 51,
+      "netPrice": 12,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KD38B85D6DPYYYD0JMQ93Q12",
+      "createdAt": "2025-12-22T14:45:21.205Z",
+      "updatedAt": "2025-12-22T14:45:21.205Z"
+    }
+  ],
+  "quotation-items": []
 }

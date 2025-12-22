@@ -107,6 +107,9 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
   const addType = repeatingConfig?.addType || 'addOnly';
   const isConnectToSchema =
     repeatingConfig?.fieldRelationType === 'connectToSchema';
+  const maxItems = repeatingConfig?.maxItems;
+  const currentItemsCount = sectionData?.length || 0;
+  const canAddMore = maxItems === undefined || maxItems === 0 || currentItemsCount < maxItems;
 
   const currentEntityId = entityId || entityData?.id;
   const targetSchemaId = isRelationBased && repeatingConfig?.targetSchema
@@ -410,7 +413,8 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
                 {isRelationBased &&
                   repeatingConfig?.fieldRelationType === 'connectToSchema' &&
                   (addType === 'canSelectFromData' || addType === 'mustSelectFromData') &&
-                  targetSchemaId && (
+                  targetSchemaId &&
+                  canAddMore && (
                     <Button
                       type="button"
                       variant="outline"
@@ -435,7 +439,8 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
                 {isRelationBased &&
                   repeatingConfig?.fieldRelationType === 'connectToSchema' &&
                   addType !== 'mustSelectFromData' &&
-                  targetSchemaId && (
+                  targetSchemaId &&
+                  canAddMore && (
                     <Button
                       type="button"
                       variant="outline"
