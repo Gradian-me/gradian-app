@@ -241,8 +241,9 @@ export function useChat(): UseChatResult {
           setError('Failed to create chat: missing ID');
           return null;
         }
-        // Optimistically add to chat list without showing skeleton
-        setChats((prev) => [newChat, ...prev]);
+        // Refresh chat list to ensure all chats are loaded (including the new one)
+        // This ensures consistency and that all chats are displayed
+        await refreshChats();
         setCurrentChat(newChat);
         setMessages([]);
         setTodos([]);
@@ -255,7 +256,7 @@ export function useChat(): UseChatResult {
       setError(err instanceof Error ? err.message : 'Failed to create chat');
       return null;
     }
-  }, [userId]);
+  }, [userId, refreshChats]);
 
   // Stop ongoing requests
   const stop = useCallback(() => {
@@ -989,12 +990,12 @@ export function useChat(): UseChatResult {
     setTodos(todos);
   }, []);
 
-  // Initial load - only on mount, not on every route change
-  const hasLoadedChatsRef = useRef(false);
+  // Initial load - refresh chats when userId is available
   useEffect(() => {
-    if (userId && !hasLoadedChatsRef.current) {
-      hasLoadedChatsRef.current = true;
+    if (userId) {
       refreshChats();
+    } else {
+      setChats([]);
     }
   }, [userId, refreshChats]);
 

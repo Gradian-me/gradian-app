@@ -26,13 +26,10 @@ export const getFieldValue = (field: any, row: any): any => {
   if (!field || !row) return null;
 
   if (field.source) {
-    const path = field.source.split('.');
-    let value = row;
-    for (const key of path) {
-      value = value?.[key];
-      if (value === undefined) return null;
-    }
-    return value;
+    // SECURITY: Use safe path access from security utility to prevent prototype pollution
+    const { safeGetByPath } = require('@/gradian-ui/shared/utils/security-utils');
+    const value = safeGetByPath(row, field.source);
+    return value ?? null;
   }
 
   if (field.compute && typeof field.compute === 'function') {

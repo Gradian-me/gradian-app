@@ -4259,5 +4259,107 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KCZREFERENCE001",
+    "timestamp": "2025-12-20T13:45:39.000Z",
+    "version": "1.34.004",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Introduced reference-based filtering in form elements, enhancing data retrieval for dynamic forms",
+        "priority": "High",
+        "affectedDomains": [
+          "form-builder",
+          "data-management",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Added new inquiry items schema and related configurations in all-schemas.json to improve inquiry management capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "data-management"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated CheckboxList, PickerInput, RadioGroup, Select, ToggleGroup components to support reference-based filtering, improving data handling and user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui",
+          "components"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCZPEC651J277DA3PKTJB5A1",
+    "timestamp": "2025-12-21T05:34:25.000Z",
+    "version": "1.34.005",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "Updated path handling in pull-env and sync routes to enhance security against path traversal vulnerabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "security",
+          "api",
+          "infrastructure"
+        ]
+      },
+      {
+        "changeType": "fix",
+        "description": "Improved data extraction methods in various components to prevent prototype pollution and ensure data integrity",
+        "priority": "Medium",
+        "affectedDomains": [
+          "security",
+          "data-management",
+          "components"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KCZSECURITYSANITIZATION001",
+    "timestamp": "2025-12-21T11:45:48.000Z",
+    "version": "1.35.000",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Added new inquiry structure to support inquiries with tenders, improving data management capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "inquiries",
+          "tenders"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated chat input component to integrate voice input and professional writing features, enhancing user experience and functionality",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "voice",
+          "professional-writing",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Implemented additional sanitization measures in various components to prevent XSS vulnerabilities, further strengthening application security",
+        "priority": "High",
+        "affectedDomains": [
+          "security",
+          "xss-prevention",
+          "html-sanitization",
+          "components"
+        ]
+      }
+    ]
   }
 ]

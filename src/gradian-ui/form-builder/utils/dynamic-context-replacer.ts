@@ -1,4 +1,5 @@
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
+import { safeGetProperty, isPrototypePollutionKey } from '@/gradian-ui/shared/utils/security-utils';
 
 /**
  * Extract a value from the dynamic form context using dot-notation path
@@ -41,7 +42,11 @@ export function extractValueFromContext(
       return '';
     }
     
-    // Handle array access like [0]
+    // SECURITY: Prevent prototype pollution using security utility
+    if (isPrototypePollutionKey(part)) {
+      return '';
+    }
+    
     const arrayMatch = part.match(/^\[(\d+)\]$/);
     if (arrayMatch) {
       const index = parseInt(arrayMatch[1], 10);
@@ -51,8 +56,11 @@ export function extractValueFromContext(
         return '';
       }
     } else {
-      // Regular property access
-      current = current[part];
+      // SECURITY: Use safe property access from security utility
+      current = safeGetProperty(current, part);
+      if (current === undefined) {
+        return '';
+      }
     }
   }
   

@@ -35,14 +35,20 @@ export default async function MarkdownRenderPage({ params, searchParams }: PageP
     notFound();
   }
 
-  const filePath = path.join(process.cwd(), markdownPath);
+  // SECURITY: Validate path to prevent path traversal using security utility
+  const { validateFilePath } = await import('@/gradian-ui/shared/utils/security-utils');
+  const validatedPath = validateFilePath(markdownPath, process.cwd());
+  if (!validatedPath) {
+    notFound();
+  }
+  const resolvedPath = validatedPath;
 
   // Check if file exists
-  if (!fs.existsSync(filePath)) {
+  if (!fs.existsSync(resolvedPath)) {
     notFound();
   }
 
-  const fileContents = fs.readFileSync(filePath, 'utf8');
+  const fileContents = fs.readFileSync(resolvedPath, 'utf8');
 
   // Extract filename and format title for header
   const fileName = extractFilename(markdownPath);

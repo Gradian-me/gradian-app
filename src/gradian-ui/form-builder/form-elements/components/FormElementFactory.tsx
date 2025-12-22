@@ -568,6 +568,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           required={restProps.required}
           error={restProps.error}
           disabled={restProps.disabled}
+          config={config}
         />
       );
     

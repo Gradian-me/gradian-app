@@ -21,6 +21,9 @@ import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { useOptionsFromSchemaOrUrl } from '../hooks/useOptionsFromSchemaOrUrl';
 import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
+import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
+import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
+import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 
 export interface SelectOption {
   id?: string;
@@ -87,6 +90,70 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   sortType = null,
   ...props
 }) => {
+  // Get dynamic context for reference-based filtering
+  const dynamicContext = useDynamicFormContextStore();
+
+  // Check for reference-based filtering fields in config
+  const referenceSchema = config?.referenceSchema;
+  const referenceRelationTypeId = config?.referenceRelationTypeId;
+  const referenceEntityId = config?.referenceEntityId;
+  const targetSchemaFromConfig = config?.targetSchema;
+
+  // Build sourceUrl from reference fields if they're present and no explicit sourceUrl is provided
+  const referenceBasedSourceUrl = React.useMemo(() => {
+    if (!referenceSchema || !referenceRelationTypeId || !referenceEntityId || sourceUrl) {
+      return null;
+    }
+    
+    // Build the sourceUrl using reference fields
+    return buildReferenceFilterUrl({
+      referenceSchema,
+      referenceRelationTypeId,
+      referenceEntityId,
+      targetSchema: targetSchemaFromConfig || schemaId,
+      schema: dynamicContext.formSchema,
+      values: dynamicContext.formData,
+    });
+  }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaFromConfig, schemaId, sourceUrl, dynamicContext.formSchema, dynamicContext.formData]);
+
+  // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl
+  const effectiveSourceUrl = sourceUrl || referenceBasedSourceUrl || undefined;
+
+  // Default columnMap for API responses that nest data under data[0].data
+  const defaultColumnMap: ColumnMapConfig = React.useMemo(() => ({
+    response: { data: 'data.0.data' },
+    item: {
+      id: 'id',
+      label: 'label',
+      icon: 'icon',
+      color: 'color',
+    },
+  }), []);
+
+  // Get columnMap from config if provided
+  const configColumnMap = (config as any)?.columnMap as ColumnMapConfig | undefined;
+
+  // Use provided columnMap or fallback to default when using reference-based filtering
+  const effectiveColumnMap = React.useMemo(() => {
+    if (configColumnMap) {
+      // Merge with default to ensure data extraction is handled if not explicitly overridden
+      return {
+        ...defaultColumnMap,
+        ...configColumnMap,
+        response: {
+          ...defaultColumnMap.response,
+          ...configColumnMap.response,
+        },
+        item: {
+          ...defaultColumnMap.item,
+          ...configColumnMap.item,
+        }
+      };
+    }
+    // Use default columnMap when using reference-based filtering (effectiveSourceUrl from reference)
+    return referenceBasedSourceUrl ? defaultColumnMap : undefined;
+  }, [configColumnMap, referenceBasedSourceUrl, defaultColumnMap]);
+
   // Fetch options from schemaId or sourceUrl if provided
   const {
     options: fetchedOptions,
@@ -94,15 +161,16 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     error: optionsError,
   } = useOptionsFromSchemaOrUrl({
     schemaId,
-    sourceUrl,
-    enabled: Boolean(schemaId || sourceUrl),
+    sourceUrl: effectiveSourceUrl,
+    enabled: Boolean(schemaId || effectiveSourceUrl),
     transform,
     queryParams,
     sortType,
+    columnMap: effectiveColumnMap,
   });
 
   // Use fetched options if schemaId or sourceUrl is provided, otherwise use provided options
-  const resolvedOptions = (schemaId || sourceUrl) ? fetchedOptions : options;
+  const resolvedOptions = (schemaId || effectiveSourceUrl) ? fetchedOptions : options;
   const sizeClasses = {
     sm: 'h-8',
     md: 'h-10',
@@ -144,7 +212,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   );
 
   const normalizedOptions = useMemo(() => {
-    const isFetching = Boolean(schemaId || sourceUrl);
+    const isFetching = Boolean(schemaId || effectiveSourceUrl);
     
     // If fetching and still loading, return empty array
     if (isFetching && isLoadingOptions) {
@@ -169,7 +237,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     }));
     // Sort options if sortType is specified
     return sortNormalizedOptions(normalized, sortType);
-  }, [resolvedOptions, schemaId, sourceUrl, fetchedOptions, isLoadingOptions, optionsError, sortType]);
+  }, [resolvedOptions, schemaId, effectiveSourceUrl, fetchedOptions, isLoadingOptions, optionsError, sortType]);
 
   const normalizedOptionsLookup = useMemo(() => {
     const map = new Map<string, NormalizedOption>();
@@ -275,7 +343,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   };
 
   // Show loading state if fetching from schemaId or sourceUrl
-  if ((schemaId || sourceUrl) && isLoadingOptions) {
+  if ((schemaId || effectiveSourceUrl) && isLoadingOptions) {
     return (
       <div className="w-full">
         {renderFieldLabel()}
@@ -289,7 +357,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   }
 
   // Show error state if fetching from schemaId or sourceUrl failed
-  if ((schemaId || sourceUrl) && optionsError) {
+  if ((schemaId || effectiveSourceUrl) && optionsError) {
     return (
       <div className="w-full">
         {renderFieldLabel()}

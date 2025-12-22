@@ -415,6 +415,7 @@ export function SchemaTableView({
             const diffMs = now.getTime() - date.getTime();
             
             // Handle future dates - show as "in X time" format
+            // Also handle cases where date is very close to now (within 5 minutes) due to clock skew
             if (diffMs < 0) {
               const absDiffMs = Math.abs(diffMs);
               const absDiffSeconds = Math.floor(absDiffMs / 1000);
@@ -422,7 +423,21 @@ export function SchemaTableView({
               const absDiffHours = Math.floor(absDiffMinutes / 60);
               const absDiffDays = Math.floor(absDiffHours / 24);
               
-              if (absDiffDays < 7) {
+              // If date is very close to now (within 5 minutes), treat as "just now" to handle clock skew
+              if (absDiffMinutes < 5) {
+                return 'Just now';
+              }
+              
+              // For very recent future dates (same day), show hours/minutes instead of "in 0 days"
+              if (absDiffDays === 0) {
+                if (absDiffHours > 0) {
+                  return `in ${absDiffHours} ${absDiffHours === 1 ? 'hour' : 'hours'}`;
+                } else if (absDiffMinutes > 0) {
+                  return `in ${absDiffMinutes} ${absDiffMinutes === 1 ? 'minute' : 'minutes'}`;
+                } else {
+                  return 'Just now';
+                }
+              } else if (absDiffDays < 7) {
                 return `in ${absDiffDays} ${absDiffDays === 1 ? 'day' : 'days'}`;
               } else {
                 // For future dates more than a week away, show absolute date

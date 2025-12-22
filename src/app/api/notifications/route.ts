@@ -159,7 +159,9 @@ export async function POST(request: NextRequest) {
     const notifications = loadNotifications();
     
     // Generate ID if not provided
-    const id = body.id || String(Date.now()) + '-' + Math.random().toString(36).substr(2, 9);
+    // SECURITY: Use cryptographically secure ID generation for security-critical operations
+    const { generateSecureId } = require('@/gradian-ui/shared/utils/security-utils');
+    const id = body.id || `${Date.now()}-${generateSecureId(9)}`;
     
     // Create new notification
     const newNotification = {

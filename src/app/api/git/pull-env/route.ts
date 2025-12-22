@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import axios from 'axios';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -100,11 +100,20 @@ export async function POST(request: NextRequest) {
     // Format as .env file content
     const envFileContent = formatEnvFile(filteredVars);
 
-    // Write to file
-    const envFilePath = join(process.cwd(), outputFile);
-    loggingCustom(LogType.INFRA_LOG, 'info', `Writing ${filteredVars.length} variable(s) to file: ${outputFile}`);
-    await writeFile(envFilePath, envFileContent, 'utf-8');
-    loggingCustom(LogType.INFRA_LOG, 'info', `Successfully wrote environment file: ${envFilePath}`);
+    // SECURITY: Validate path to prevent path traversal using security utility
+    const { validateFilePath } = require('@/gradian-ui/shared/utils/security-utils');
+    const validatedPath = validateFilePath(outputFile, process.cwd());
+    if (!validatedPath) {
+      return NextResponse.json(
+        { error: 'Invalid file path' },
+        { status: 400 }
+      );
+    }
+    const resolvedPath = validatedPath;
+    
+    loggingCustom(LogType.INFRA_LOG, 'info', `Writing ${filteredVars.length} variable(s) to file: ${resolvedPath}`);
+    await writeFile(resolvedPath, envFileContent, 'utf-8');
+    loggingCustom(LogType.INFRA_LOG, 'info', `Successfully wrote environment file: ${resolvedPath}`);
 
     return NextResponse.json(
       {
@@ -112,7 +121,7 @@ export async function POST(request: NextRequest) {
         message: `Successfully pulled ${filteredVars.length} environment variable(s) from GitLab`,
         pulled: filteredVars.length,
         file: outputFile,
-        filePath: envFilePath,
+        filePath: resolvedPath,
         variables: filteredVars.map((v: any) => v.key),
       },
       { status: 200 }

@@ -16,10 +16,10 @@ interface HeadingComponentProps extends HeadingProps {
 
 function Heading({ level, isSticky, children, id, ...props }: HeadingComponentProps) {
   const baseClasses = {
-    1: "text-3xl font-bold mt-12 mb-6 text-gray-900 dark:text-gray-100 border-b-2 border-gray-300 dark:border-gray-600 pb-3",
-    2: "text-2xl font-bold mt-10 mb-5 text-gray-900 dark:text-gray-100 scroll-mt-20",
-    3: "text-xl font-semibold mt-8 mb-4 text-gray-900 dark:text-gray-100 scroll-mt-20",
-    4: "text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 scroll-mt-20",
+    1: "text-3xl font-bold mt-10 mb-6 text-gray-900 dark:text-gray-100 border-b-2 border-gray-300 dark:border-gray-600 pb-3",
+    2: "text-2xl font-bold mt-8 mb-5 text-gray-900 dark:text-gray-100 scroll-mt-20",
+    3: "text-xl font-semibold mt-6 mb-4 text-gray-900 dark:text-gray-100 scroll-mt-20",
+    4: "text-lg font-semibold mt-4 mb-3 text-gray-900 dark:text-gray-100 scroll-mt-20",
   };
 
   const stickyClasses = {

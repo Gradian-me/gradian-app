@@ -2458,7 +2458,7 @@
     ],
     "showInNavigation": false,
     "icon": "Layers",
-    "isNotCompanyBased": false,
+    "isNotCompanyBased": true,
     "canSelectMultiCompanies": true,
     "schemaType": "system",
     "applyToAllTenants": true,
@@ -3260,8 +3260,7 @@
             "menu-url",
             "hide-in-ad",
             "open-in-new-tab",
-            "menu-description",
-            "menu-companies"
+            "menu-description"
           ]
         }
       ]
@@ -3416,7 +3415,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 1
+        "order": 2
       },
       {
         "id": "change-management-type-label-en",
@@ -3430,7 +3429,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 2,
+        "order": 1,
         "role": "title"
       }
     ],
@@ -3452,63 +3451,8 @@
         "label": "AryoGen"
       }
     ],
-    "syncStrategy": "schema-only"
-  },
-  {
-    "id": "change-subject-types",
-    "description": "Manage change subject types with multilingual labels and hierarchical support",
-    "singular_name": "Change Subject Type",
-    "plural_name": "Change Subject Types",
-    "allowHierarchicalParent": true,
-    "fields": [
-      {
-        "id": "change-subject-type-label-fa",
-        "name": "label_fa",
-        "label": "Label (Farsi)",
-        "sectionId": "basic-information",
-        "component": "text",
-        "placeholder": "Enter Farsi label",
-        "validation": {
-          "required": true,
-          "minLength": 1
-        },
-        "colSpan": 1,
-        "order": 1
-      },
-      {
-        "id": "change-subject-type-label-en",
-        "name": "label_en",
-        "label": "Label (English)",
-        "sectionId": "basic-information",
-        "component": "text",
-        "placeholder": "Enter English label",
-        "validation": {
-          "required": true,
-          "minLength": 1
-        },
-        "colSpan": 1,
-        "order": 2,
-        "role": "title"
-      }
-    ],
-    "sections": [
-      {
-        "id": "basic-information",
-        "title": "Change Subject Type Information",
-        "description": "Basic change subject type details",
-        "initialState": "expanded",
-        "columns": 2
-      }
-    ],
-    "showInNavigation": true,
-    "icon": "FolderTree",
-    "schemaType": "business",
-    "relatedTenants": [
-      {
-        "id": "01KBFBD109G6CYRT7RA04TMMXC",
-        "label": "AryoGen"
-      }
-    ]
+    "syncStrategy": "schema-and-data",
+    "isNotCompanyBased": true
   },
   {
     "id": "change-management",
@@ -3590,17 +3534,18 @@
         "order": 5
       },
       {
-        "id": "change-subject-types",
-        "name": "changeSubjectTypes",
-        "label": "Change Subject Types",
+        "id": "affected-processes",
+        "name": "affectedProcesses",
+        "label": "Affected Processes",
         "sectionId": "change-information",
         "component": "picker",
-        "placeholder": "Click to select change subject type",
-        "description": "Select change subject type from popup picker",
-        "targetSchema": "change-subject-types",
+        "placeholder": "Click to select affected processes",
+        "description": "Select affected processes from popup picker",
+        "targetSchema": "process-mappings",
         "validation": {
           "required": false
         },
+        "allowMultiselect": true,
         "colSpan": 1,
         "order": 7
       },
@@ -4089,7 +4034,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 1
+        "order": 2
       },
       {
         "id": "change-category-label-en",
@@ -4103,7 +4048,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 2,
+        "order": 1,
         "role": "title"
       }
     ],
@@ -4125,7 +4070,8 @@
         "label": "AryoGen"
       }
     ],
-    "syncStrategy": "schema-only"
+    "syncStrategy": "schema-and-data",
+    "isNotCompanyBased": true
   },
   {
     "id": "related-documents",
@@ -4238,7 +4184,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 1
+        "order": 2
       },
       {
         "id": "change-procedure-label-en",
@@ -4252,7 +4198,7 @@
           "minLength": 1
         },
         "colSpan": 1,
-        "order": 2,
+        "order": 1,
         "role": "title"
       }
     ],
@@ -4273,7 +4219,9 @@
         "id": "01KBFBD109G6CYRT7RA04TMMXC",
         "label": "AryoGen"
       }
-    ]
+    ],
+    "isNotCompanyBased": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "tasks",
@@ -4878,23 +4826,6 @@
         "order": 3
       },
       {
-        "id": "parent-process",
-        "name": "parent",
-        "label": "Parent Process",
-        "sectionId": "hierarchy",
-        "component": "picker",
-        "placeholder": "Select parent process (optional)",
-        "description": "Use this to build hierarchical process maps (e.g. Level 1 → Level 2 → Level 3).",
-        "targetSchema": "process-mappings",
-        "allowMultiselect": false,
-        "validation": {
-          "required": false
-        },
-        "colSpan": 1,
-        "order": 0,
-        "inactive": true
-      },
-      {
         "id": "field-1765814967501",
         "name": "code",
         "label": "Code",
@@ -5119,7 +5050,7 @@
           "targetSchema": "users",
           "relationTypeId": "HAS_MEMBER",
           "deleteType": "relationOnly",
-          "addType": "canSelectFromData",
+          "addType": "mustSelectFromData",
           "isUnique": true,
           "fieldRelationType": "connectToSchema"
         }
@@ -5200,12 +5131,36 @@
         "description": "Inquiry details and information",
         "initialState": "expanded",
         "columns": 2
+      },
+      {
+        "id": "tenders",
+        "title": "Tenders",
+        "description": "Add tenders to this inquiry",
+        "isRepeatingSection": true,
+        "initialState": "expanded",
+        "columns": 2,
+        "repeatingConfig": {
+          "minItems": 1,
+          "maxItems": 100,
+          "targetSchema": "tenders",
+          "relationTypeId": "HAS_TENDER",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
+        }
       }
     ],
     "showInNavigation": true,
     "icon": "FileText",
     "schemaType": "business",
-    "applyToAllTenants": false
+    "applyToAllTenants": false,
+    "relatedTenants": [
+      {
+        "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+        "label": "Supply Chain Management"
+      }
+    ]
   },
   {
     "id": "tenders",
@@ -5233,9 +5188,24 @@
         "description": "Tender details and vendor information",
         "initialState": "expanded",
         "columns": 2
+      },
+      {
+        "id": "inquiry-items-section",
+        "title": "Inquiry Items",
+        "description": "Items included in this inquiry tender",
+        "initialState": "expanded",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "connectToSchema",
+          "minItems": 1,
+          "targetSchema": "inquiry-items",
+          "addType": "addOnly",
+          "relationTypeId": "HAS_ITEM"
+        }
       }
     ],
-    "showInNavigation": true,
+    "showInNavigation": false,
     "icon": "FileCheck",
     "schemaType": "business",
     "applyToAllTenants": false,
@@ -5251,6 +5221,240 @@
       {
         "id": "01KCXSBQMD17BR96WWSKBJMEZ4",
         "label": "Inquiry Tender Status"
+      }
+    ]
+  },
+  {
+    "id": "inquiry-items",
+    "description": "Manage inquiry items with part details, quantities, and requirements",
+    "singular_name": "Inquiry Item",
+    "plural_name": "Inquiry Items",
+    "fields": [
+      {
+        "id": "inquiry-item-part-code",
+        "name": "partCode",
+        "label": "Part Code",
+        "sectionId": "part-information",
+        "component": "text",
+        "placeholder": "Enter part code",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 1,
+        "role": "code"
+      },
+      {
+        "id": "inquiry-item-part-name",
+        "name": "partName",
+        "label": "Part Name",
+        "sectionId": "part-information",
+        "component": "text",
+        "placeholder": "Enter part name",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "title"
+      },
+      {
+        "id": "inquiry-item-brand",
+        "name": "brand",
+        "label": "Brand",
+        "sectionId": "part-information",
+        "component": "text",
+        "placeholder": "Enter brand",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 3,
+        "role": "subtitle"
+      },
+      {
+        "id": "inquiry-item-cat-no",
+        "name": "catNo",
+        "label": "Cat. No",
+        "sectionId": "part-information",
+        "component": "text",
+        "placeholder": "Enter catalog number",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 4,
+        "role": "subtitle"
+      },
+      {
+        "id": "inquiry-item-quantity",
+        "name": "quantity",
+        "label": "Quantity",
+        "sectionId": "quantity-packaging",
+        "component": "number",
+        "placeholder": "Enter quantity",
+        "validation": {
+          "required": true,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 1,
+        "role": "description"
+      },
+      {
+        "id": "inquiry-item-unit",
+        "name": "unit",
+        "label": "Unit",
+        "sectionId": "quantity-packaging",
+        "component": "select",
+        "placeholder": "Select unit",
+        "description": "Select unit from parameter items",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KCXXNWCDK18BACMC5CEPXJ7B",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "description"
+      },
+      {
+        "id": "inquiry-item-pack-size",
+        "name": "packSize",
+        "label": "Pack Size",
+        "sectionId": "quantity-packaging",
+        "component": "textarea",
+        "placeholder": "Enter pack size",
+        "required": true,
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "inquiry-item-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "description",
+        "component": "textarea",
+        "placeholder": "Enter description",
+        "validation": {
+          "required": false
+        },
+        "role": "description",
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "inquiry-item-required-documents",
+        "name": "requiredDocuments",
+        "label": "Required Documents",
+        "sectionId": "requirements-storage",
+        "component": "checkbox-list",
+        "placeholder": "Select required documents",
+        "description": "Select one or more required documents",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KCXV771ABGHR0ST7MZ03S6B1",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "inquiry-item-storage-condition",
+        "name": "storageCondition",
+        "label": "Storage Condition",
+        "sectionId": "requirements-storage",
+        "component": "select",
+        "placeholder": "Select storage condition",
+        "description": "Select storage condition from parameter items",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KCXW1C9NT5D4TFDK511BKTSQ",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "inquiry-item-minimum-expiration-date",
+        "name": "minimumExpirationDate",
+        "label": "Minimum Expiration Date",
+        "sectionId": "requirements-storage",
+        "component": "date",
+        "placeholder": "Select minimum expiration date",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "inquiry-item-related-purchase-requests",
+        "name": "relatedPurchaseRequests",
+        "label": "Related Purchase Requests",
+        "sectionId": "related-purchase-requests",
+        "component": "list-input",
+        "placeholder": "Enter purchase request code (e.g., OR-X515141)",
+        "addButtonText": "Add Purchase Request",
+        "validation": {
+          "required": false,
+          "pattern": "^[A-Z0-9-]+$"
+        },
+        "colSpan": 2,
+        "order": 1
+      }
+    ],
+    "sections": [
+      {
+        "id": "part-information",
+        "title": "Part Information",
+        "description": "Part code, name, brand, and catalog number",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "quantity-packaging",
+        "title": "Quantity & Packaging",
+        "description": "Quantity, unit, and pack size information",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "description",
+        "title": "Description",
+        "description": "Item description and details",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "requirements-storage",
+        "title": "Requirements & Storage",
+        "description": "Required documents, storage conditions, and expiration date",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "related-purchase-requests",
+        "title": "Related Purchase Requests",
+        "description": "Purchase request codes related to this inquiry item",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Package",
+    "schemaType": "business",
+    "applyToAllTenants": false,
+    "relatedTenants": [
+      {
+        "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+        "label": "Supply Chain Management"
       }
     ]
   }

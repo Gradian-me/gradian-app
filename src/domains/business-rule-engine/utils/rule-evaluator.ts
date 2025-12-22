@@ -21,12 +21,10 @@ function getPropertyValue(property: Property | null, formValues: Record<string, 
 
   // Try path (dot notation like "user.profile.email")
   if (property.path) {
-    const pathParts = property.path.split('.');
-    let value = formValues;
-    for (const part of pathParts) {
-      if (value === null || value === undefined) return undefined;
-      value = value[part];
-    }
+    // SECURITY: Use safe path access from security utility to prevent prototype pollution
+    const { safeGetByPath } = require('@/gradian-ui/shared/utils/security-utils');
+    const value = safeGetByPath(formValues, property.path);
+    if (value === undefined) return undefined;
     return value;
   }
 

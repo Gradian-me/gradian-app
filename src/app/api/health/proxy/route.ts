@@ -23,30 +23,21 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Validate URL format
-  let healthApiUrl: URL;
-  try {
-    healthApiUrl = new URL(targetUrl);
-  } catch (error) {
+  // SECURITY: Validate URL to prevent SSRF attacks
+  const { validateUrl } = require('@/gradian-ui/shared/utils/security-utils');
+  const urlValidation = validateUrl(targetUrl);
+  if (!urlValidation.valid) {
     return NextResponse.json(
       {
         success: false,
-        error: 'Invalid URL format',
+        error: urlValidation.error || 'Invalid URL',
       },
       { status: 400 }
     );
   }
-
-  // Security: Only allow http/https protocols
-  if (!['http:', 'https:'].includes(healthApiUrl.protocol)) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Only HTTP and HTTPS protocols are allowed',
-      },
-      { status: 400 }
-    );
-  }
+  
+  // Use validated URL
+  const healthApiUrl = new URL(urlValidation.sanitized!);
 
   try {
     // Create AbortController for timeout (10 seconds)

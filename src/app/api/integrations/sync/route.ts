@@ -50,17 +50,9 @@ function getApiUrl(apiPath: string): string {
 function extractDataByPath(data: any, path: string): any {
   if (!path) return data;
   
-  const parts = path.split('.');
-  let result = data;
-  
-  for (const part of parts) {
-    if (result === null || result === undefined) {
-      return null;
-    }
-    result = result[part];
-  }
-  
-  return result;
+  // SECURITY: Use safe path access from security utility
+  const { safeGetByPath } = require('@/gradian-ui/shared/utils/security-utils');
+  return safeGetByPath(data, path);
 }
 
 type IntegrationEntity = Record<string, any>;

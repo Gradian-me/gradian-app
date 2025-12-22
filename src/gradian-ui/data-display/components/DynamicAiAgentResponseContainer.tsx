@@ -574,7 +574,10 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
           duration: 0.3,
           delay: index * 0.1
         }}
-        className={cn(className)}
+        className={cn(
+          className,
+          action.maxHeight && action.maxHeight > 0 ? "" : "h-full min-h-0 flex flex-col"
+        )}
       >
         <CardWrapper
           config={{
@@ -585,9 +588,12 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               size: 'md'
             }
           }}
-          className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm"
+          className={cn(
+            "bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm",
+            action.maxHeight && action.maxHeight > 0 ? "h-auto" : "h-full min-h-0 flex flex-col"
+          )}
         >
-          <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4">
+          <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4 shrink-0">
             <div className="relative flex flex-col gap-1">
               <CardTitle className="text-sm font-semibold text-white">{action.label}</CardTitle>
               <div className="flex items-center gap-2 text-xs text-white/80">
@@ -604,7 +610,14 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent 
+            className="p-6"
+            style={
+              action.maxHeight && action.maxHeight > 0
+                ? undefined
+                : { flex: 1, minHeight: 0, overflowY: 'auto' }
+            }
+          >
             <div className="flex items-center justify-center min-h-[200px]">
               <Button
                 disabled
@@ -632,7 +645,10 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
           duration: 0.3,
           delay: index * 0.1
         }}
-        className={cn(className)}
+        className={cn(
+          className,
+          action.maxHeight && action.maxHeight > 0 ? "" : "h-full min-h-0 flex flex-col"
+        )}
       >
         <CardWrapper
           config={{
@@ -643,9 +659,12 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               size: 'md'
             }
           }}
-          className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm"
+          className={cn(
+            "bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm",
+            action.maxHeight && action.maxHeight > 0 ? "h-auto" : "h-full min-h-0 flex flex-col"
+          )}
         >
-          <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4">
+          <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4 shrink-0">
             {/* Dotted background pattern */}
             <div className="absolute inset-0 opacity-10 dark:opacity-15 rounded-t-xl">
               <div
@@ -664,7 +683,14 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent 
+            className="p-6"
+            style={
+              action.maxHeight && action.maxHeight > 0
+                ? undefined
+                : { flex: 1, minHeight: 0, overflowY: 'auto' }
+            }
+          >
             <div className="w-full h-96 relative rounded-xl overflow-hidden">
               <VoicePoweredOrb
                 enableVoiceControl={false}
@@ -704,7 +730,10 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
         duration: 0.3,
         delay: index * 0.1
       }}
-      className={cn(className)}
+      className={cn(
+        className,
+        action.maxHeight && action.maxHeight > 0 ? "" : "h-full max-h-full min-h-0 flex flex-col overflow-hidden"
+      )}
     >
       <CardWrapper
         config={{
@@ -715,9 +744,12 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
             size: 'md'
           }
         }}
-        className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm"
+        className={cn(
+          "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm",
+          action.maxHeight && action.maxHeight > 0 ? "h-auto" : "h-full min-h-0 flex flex-col"
+        )}
       >
-        <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4">
+        <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4 shrink-0">
           {/* Dotted background pattern */}
           <div className="absolute inset-0 opacity-10 dark:opacity-15 rounded-t-xl">
             <div
@@ -758,7 +790,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
           style={
             action.maxHeight && action.maxHeight > 0
               ? { height: `${action.maxHeight}px`, overflowY: 'auto' }
-              : undefined
+              : { flex: 1, minHeight: 0, overflowY: 'auto' }
           }
         >
           {showSkeleton ? (

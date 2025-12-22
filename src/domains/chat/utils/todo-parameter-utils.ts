@@ -104,16 +104,55 @@ export function formatParameterValue(value: any): string {
     return '';
   }
   
+  // Handle if value is already the string "[object Object]" (shouldn't happen, but defensive)
+  if (typeof value === 'string' && value === '[object Object]') {
+    return 'Invalid value';
+  }
+  
   if (typeof value === 'boolean') {
     return value ? 'Yes' : 'No';
   }
   
   if (Array.isArray(value)) {
+    // Handle arrays of objects
+    if (value.length > 0 && typeof value[0] === 'object' && value[0] !== null) {
+      return value.map(item => {
+        if (typeof item === 'object' && item !== null) {
+          // Try to extract a meaningful value from the object
+          if ('label' in item) return String(item.label);
+          if ('name' in item) return String(item.name);
+          if ('value' in item) return String(item.value);
+          if ('id' in item) return String(item.id);
+          return JSON.stringify(item);
+        }
+        return String(item);
+      }).join(', ');
+    }
     return value.join(', ');
   }
   
-  if (typeof value === 'object') {
-    return JSON.stringify(value);
+  // Handle objects - check before typeof to avoid null issues
+  if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+    // Try to extract a meaningful value from common object structures
+    if ('label' in value) return String(value.label);
+    if ('name' in value) return String(value.name);
+    if ('value' in value) return String(value.value);
+    if ('id' in value) return String(value.id);
+    if ('title' in value) return String(value.title);
+    if ('text' in value) return String(value.text);
+    
+    // If it's an object with a single key-value pair, show that
+    const keys = Object.keys(value);
+    if (keys.length === 1) {
+      const singleValue = value[keys[0]];
+      if (typeof singleValue === 'string' || typeof singleValue === 'number') {
+        return String(singleValue);
+      }
+    }
+    
+    // Fallback to JSON stringify with max length
+    const jsonStr = JSON.stringify(value);
+    return jsonStr.length > 50 ? jsonStr.substring(0, 50) + '...' : jsonStr;
   }
   
   return String(value);

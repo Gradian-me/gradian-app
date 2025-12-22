@@ -94,7 +94,9 @@ function MainLayoutContent({
   const router = useRouter();
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
-  const profileTheme = resolvedTheme === 'dark' ? 'dark' : 'light';
+  // SECURITY: Default to 'light' to ensure consistent server/client rendering
+  // The UserProfileSelector will handle theme switching after mount
+  const profileTheme: 'light' | 'dark' = 'light';
   // Initialize sidebar state from localStorage if available, otherwise default to collapsed
   // This prevents the flash of collapsed sidebar when navigating
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
@@ -459,12 +461,10 @@ function MainLayoutContent({
           )}
           <Tooltip key="user-profile-tooltip" open={isUserMenuOpen ? false : undefined}>
             <TooltipTrigger asChild>
-              <div suppressHydrationWarning data-component="user-profile-selector">
-                <UserProfileSelector
-                  theme={profileTheme}
-                  onMenuOpenChange={setIsUserMenuOpen}
-                />
-              </div>
+              <UserProfileSelector
+                theme={profileTheme}
+                onMenuOpenChange={setIsUserMenuOpen}
+              />
             </TooltipTrigger>
             <TooltipContent>
               <p>User Profile</p>

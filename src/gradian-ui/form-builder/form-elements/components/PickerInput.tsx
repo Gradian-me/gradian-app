@@ -18,6 +18,8 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
+import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
+import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 
 export interface PickerInputProps {
   config: any;
@@ -51,16 +53,72 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   const [lastValidSelection, setLastValidSelection] = useState<NormalizedOption[] | null>(null);
   const queryClient = useQueryClient();
 
+  // Get dynamic context for reference-based filtering
+  const dynamicContext = useDynamicFormContextStore();
+
   // Get targetSchema or sourceUrl from config
   // Memoize these to prevent unnecessary re-renders when config object reference changes
   const targetSchemaId = useMemo(() => (config as any).targetSchema, [(config as any).targetSchema]);
-  const sourceUrl = useMemo(() => (config as any).sourceUrl, [(config as any).sourceUrl]);
+  
+  // Check for reference-based filtering fields
+  const referenceSchema = (config as any).referenceSchema;
+  const referenceRelationTypeId = (config as any).referenceRelationTypeId;
+  const referenceEntityId = (config as any).referenceEntityId;
+  
+  // Build sourceUrl from reference fields if they're present and no explicit sourceUrl is provided
+  const referenceBasedSourceUrl = useMemo(() => {
+    if (!referenceSchema || !referenceRelationTypeId || !referenceEntityId) {
+      return null;
+    }
+    
+    // Build the sourceUrl using reference fields
+    // Use dynamic context store for resolving dynamic context values
+    return buildReferenceFilterUrl({
+      referenceSchema,
+      referenceRelationTypeId,
+      referenceEntityId,
+      targetSchema: targetSchemaId,
+      schema: dynamicContext.formSchema,
+      values: dynamicContext.formData,
+    });
+  }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaId, dynamicContext.formSchema, dynamicContext.formData]);
+  
+  // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl
+  const sourceUrl = useMemo(() => {
+    const explicitSourceUrl = (config as any).sourceUrl;
+    if (explicitSourceUrl) {
+      return explicitSourceUrl;
+    }
+    return referenceBasedSourceUrl || undefined;
+  }, [(config as any).sourceUrl, referenceBasedSourceUrl]);
   const fieldOptions = (config as any).options; // Static options from field config
   const allowMultiselect = Boolean(
     (config as any)?.metadata?.allowMultiselect ??
     (config as any)?.allowMultiselect
   );
-  const columnMap = (config as any).columnMap;
+  
+  // Use explicit columnMap if provided, otherwise provide default for reference-based filtering
+  // Reference-based filtering returns data in format: { data: [{ data: [...] }] }
+  // So we need to extract from data[0].data
+  const columnMap = useMemo(() => {
+    const explicitColumnMap = (config as any).columnMap;
+    if (explicitColumnMap) {
+      return explicitColumnMap;
+    }
+    // If using reference-based filtering, provide default columnMap to extract from nested structure
+    if (referenceBasedSourceUrl && !explicitColumnMap) {
+      return {
+        response: { data: 'data.0.data' }, // Extract items from data[0].data array
+        item: {
+          id: 'id',
+          label: 'label',
+          icon: 'icon',
+          color: 'color',
+        },
+      };
+    }
+    return explicitColumnMap;
+  }, [(config as any).columnMap, referenceBasedSourceUrl]);
   const pageSize = (config as any).pageSize;
   const sortType = (config as any).sortType;
   const sourceColumnRoles = (config as any).sourceColumnRoles;

@@ -15,7 +15,7 @@ The refresh endpoint is called **server-side** (from `proxySchemaRequest` and `p
 
 ### 1. **Browser Request**
 ```
-Browser → GET /api/schemas/change-subject-types
+Browser → GET /api/schemas/change-categories
 ```
 
 ### 2. **Server-Side API Route Handler** (`proxySchemaRequest`)

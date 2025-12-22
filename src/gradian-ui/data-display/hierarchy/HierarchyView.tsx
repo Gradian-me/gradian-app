@@ -140,6 +140,9 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
   const hasIconField = schema?.fields?.some(field => field.role === 'icon') || false;
   const hasColorField = schema?.fields?.some(field => field.role === 'color') || false;
   
+  // Check if entity is incomplete
+  const isIncomplete = entity?.incomplete === true;
+  
   // Get person field (assignedTo)
   const hasPersonField = schema?.fields?.some(field => field.role === 'person') || false;
   const personFieldDef = schema?.fields?.find(field => field.role === 'person');
@@ -193,9 +196,16 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
       >
         <Card
           className={cn(
-            'border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/70 shadow-sm hover:shadow-md transition-all duration-200',
+            'border shadow-sm hover:shadow-md transition-all duration-200',
             'flex items-center justify-between gap-2 flex-wrap',
-            onView && 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800'
+            // Amber border and background for incomplete items
+            isIncomplete 
+              ? 'border-amber-400 dark:border-amber-500 bg-amber-50/30 dark:bg-amber-950/20' 
+              : 'border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/70',
+            onView && 'cursor-pointer',
+            isIncomplete && onView 
+              ? 'hover:bg-amber-100/40 dark:hover:bg-amber-950/30' 
+              : onView && 'hover:bg-gray-50 dark:hover:bg-gray-800'
           )}
           onClick={onView ? () => onView(entity) : undefined}
         >

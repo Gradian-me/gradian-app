@@ -23,13 +23,9 @@ export interface ComponentRendererProps {
  * Get nested value from object by path string (e.g., 'performanceMetrics.onTimeDelivery')
  */
 const getValueByPath = (obj: any, path: string): any => {
-  const keys = path.split('.');
-  let value = obj;
-  for (const key of keys) {
-    value = value?.[key];
-    if (value === undefined) return null;
-  }
-  return value;
+  // SECURITY: Use safe path access from security utility to prevent prototype pollution
+  const { safeGetByPath } = require('@/gradian-ui/shared/utils/security-utils');
+  return safeGetByPath(obj, path);
 };
 
 /**

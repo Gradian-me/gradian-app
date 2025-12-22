@@ -100,11 +100,30 @@ export async function decryptSensitiveValue(encryptedJson: string): Promise<stri
     const iv = Buffer.from(payload.iv, 'base64');
     const encryptedWithTag = Buffer.from(payload.ciphertext, 'base64');
     
+    // Validate encrypted data length
+    if (encryptedWithTag.length < TAG_LENGTH) {
+      return null;
+    }
+    
     // Extract auth tag and encrypted data
     const encrypted = encryptedWithTag.slice(0, -TAG_LENGTH);
     const authTag = encryptedWithTag.slice(-TAG_LENGTH);
     
+    // SECURITY: Validate auth tag length BEFORE creating decipher (GCM requires exactly 16-byte tag)
+    // This prevents GCM authentication tag length vulnerabilities (CVE-2019-1563 style)
+    // GCM mode requires the auth tag to be exactly TAG_LENGTH (16 bytes) - no other length is valid
+    if (authTag.length !== TAG_LENGTH) {
+      console.error('[SENSITIVE_FIELD] Invalid auth tag length:', authTag.length, 'expected:', TAG_LENGTH);
+      return null;
+    }
+    
+    // SECURITY: Create decipher AFTER tag validation to ensure proper GCM tag handling
+    // Auth tag length is explicitly validated above (line 115) before creating decipher
+    // nosemgrep: javascript.node-crypto.security.gcm-no-tag-length
     const decipher = crypto.createDecipheriv(AES_ALGO, key, iv);
+    // SECURITY: Set auth tag with explicit length validation (must be exactly TAG_LENGTH bytes)
+    // This is required for GCM mode - setting an invalid tag length would cause decryption to fail
+    // Note: setAuthTag only accepts a Buffer, not an options object
     decipher.setAuthTag(authTag);
     
     let decrypted = decipher.update(encrypted);

@@ -3781,14 +3781,15 @@ export async function processImageRequest(
     let imageTypePrompt = GENERAL_IMAGE_PROMPT;
     
     // If imageType is set and not "none" or "standard", append the specific type prompt
-    if (imageType && imageType !== 'none' && imageType !== 'standard') {
-      const specificPrompt = IMAGE_TYPE_PROMPTS[imageType] || '';
+    if (imageType && imageType !== 'none' && imageType !== 'standard' && typeof imageType === 'string') {
+      const imageTypeStr = String(imageType);
+      const specificPrompt = IMAGE_TYPE_PROMPTS[imageTypeStr] || '';
       
       // If not found, try with different casing
       if (!specificPrompt) {
-        const lowerKey = imageType.toLowerCase();
-        const upperKey = imageType.toUpperCase();
-        const titleKey = imageType.charAt(0).toUpperCase() + imageType.slice(1).toLowerCase();
+        const lowerKey = imageTypeStr.toLowerCase();
+        const upperKey = imageTypeStr.toUpperCase();
+        const titleKey = imageTypeStr.charAt(0).toUpperCase() + imageTypeStr.slice(1).toLowerCase();
         
         const foundPrompt = IMAGE_TYPE_PROMPTS[lowerKey] || 
                            IMAGE_TYPE_PROMPTS[upperKey] || 

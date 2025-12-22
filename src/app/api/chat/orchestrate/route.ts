@@ -12,7 +12,37 @@ import type { AgentRequestData } from '@/domains/ai-builder/utils/ai-agent-utils
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    // Check if request has a body
+    const contentType = request.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      return NextResponse.json(
+        { success: false, error: 'Content-Type must be application/json' },
+        { status: 400 }
+      );
+    }
+
+    // Parse request body with error handling
+    let body: any;
+    try {
+      const text = await request.text();
+      if (!text || text.trim() === '') {
+        return NextResponse.json(
+          { success: false, error: 'Request body is required' },
+          { status: 400 }
+        );
+      }
+      body = JSON.parse(text);
+    } catch (parseError) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Invalid JSON in request body',
+          details: parseError instanceof Error ? parseError.message : 'Unknown parsing error'
+        },
+        { status: 400 }
+      );
+    }
+
     const { userPrompt, chatId, agentId, ...rest } = body;
 
     if (!userPrompt) {

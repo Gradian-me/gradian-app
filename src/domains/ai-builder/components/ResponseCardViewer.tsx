@@ -11,6 +11,7 @@ import { cn } from '@/gradian-ui/shared/utils';
 import type { ResponseCardConfig } from '../types';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { safeGetProperty, isPrototypePollutionKey } from '@/gradian-ui/shared/utils/security-utils';
 
 interface ResponseCardViewerProps {
   response: string;
@@ -58,19 +59,36 @@ function getValueByPath(obj: any, path: string): any {
       return undefined;
     }
     
+    // SECURITY: Prevent prototype pollution using security utility
+    if (isPrototypePollutionKey(part)) {
+      return undefined;
+    }
+    
     // Handle array notation in the middle
     const arrayPartMatch = part.match(/^(\w+)\[(\d+)\]$/);
     if (arrayPartMatch) {
       const key = arrayPartMatch[1];
+      // SECURITY: Prevent prototype pollution using security utility
+      if (isPrototypePollutionKey(key)) {
+        return undefined;
+      }
       const index = parseInt(arrayPartMatch[2], 10);
-      current = current[key];
+      // SECURITY: Use safe property access to prevent prototype pollution
+      current = safeGetProperty(current, key);
+      if (current === undefined) {
+        return undefined;
+      }
       if (Array.isArray(current) && current[index] !== undefined) {
         current = current[index];
       } else {
         return undefined;
       }
     } else {
-      current = current[part];
+      // SECURITY: Use safe property access to prevent prototype pollution
+      current = safeGetProperty(current, part);
+      if (current === undefined) {
+        return undefined;
+      }
     }
   }
   

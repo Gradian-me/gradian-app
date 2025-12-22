@@ -55,18 +55,9 @@ export function extractDataByPath(data: any, jsonPath?: string): any {
     return data;
   }
 
-  const pathParts = jsonPath.split('.');
-  let result = data;
-
-  for (const part of pathParts) {
-    if (result && typeof result === 'object' && part in result) {
-      result = result[part];
-    } else {
-      return null;
-    }
-  }
-
-  return result;
+  // SECURITY: Use safe path access from security utility to prevent prototype pollution
+  const { safeGetByPath } = require('@/gradian-ui/shared/utils/security-utils');
+  return safeGetByPath(data, jsonPath) ?? null;
 }
 
 /**

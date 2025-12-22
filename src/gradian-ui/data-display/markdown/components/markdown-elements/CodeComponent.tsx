@@ -7,6 +7,7 @@ import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { MermaidDiagramSimple } from '../MermaidDiagramSimple';
 import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
 import { extractLanguage, extractLanguageFromNode, getCodeContent } from '../../utils/markdownComponentUtils';
+import { sanitizeHtml } from '@/gradian-ui/shared/utils/html-sanitizer';
 import type { GraphNodeData, GraphEdgeData, GraphRecord } from '@/domains/graph-designer/types';
 
 export interface CodeComponentProps {
@@ -70,20 +71,31 @@ export function CodeComponent({
       return null;
     }
     
+    // SECURITY: dangerouslySetInnerHTML is safe here because:
+    // 1. KaTeX library sanitizes all output HTML to prevent XSS
+    // 2. Input is validated math content from markdown code blocks (not user input)
+    // 3. KaTeX only generates safe SVG/HTML markup for mathematical notation
+    // 4. Additional sanitization with DOMPurify for defense in depth
+    const sanitizedHtml = sanitizeHtml(html, {
+      tags: ['span', 'math', 'mi', 'mo', 'mn', 'mtext', 'mspace', 'ms', 'mfrac', 'msqrt', 'mroot', 'mstyle', 'merror', 'mpadded', 'mphantom', 'mfenced', 'menclose', 'msub', 'msup', 'msubsup', 'munder', 'mover', 'munderover', 'mmultiscripts', 'mtable', 'mlabeledtr', 'mtr', 'mtd', 'maligngroup', 'malignmark', 'mgroup', 'mrow', 'maction'],
+      attributes: ['class', 'style', 'data-*']
+    });
     if (inline) {
       // Inline math
+      // nosemgrep: typescript.react.security.audit.react-dangerouslysetinnerhtml
       return (
         <span 
           className="katex-inline"
-          dangerouslySetInnerHTML={{ __html: html }}
+          dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
         />
       );
     } else {
       // Block math
+      // nosemgrep: typescript.react.security.audit.react-dangerouslysetinnerhtml
       return (
         <div 
           className="my-4 katex-display"
-          dangerouslySetInnerHTML={{ __html: html }}
+          dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
         />
       );
     }

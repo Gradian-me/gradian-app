@@ -3,6 +3,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';
+import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
+import { extractItemsFromPayload } from '@/gradian-ui/shared/utils/column-mapper';
 
 export interface UseOptionsFromUrlOptions {
   /**
@@ -26,6 +28,11 @@ export interface UseOptionsFromUrlOptions {
    * Query parameters to append to the URL
    */
   queryParams?: Record<string, string | number | boolean | string[]>;
+  
+  /**
+   * Column mapping configuration for API requests
+   */
+  columnMap?: ColumnMapConfig;
 }
 
 export interface UseOptionsFromUrlResult {
@@ -71,6 +78,7 @@ export function useOptionsFromUrl({
   enabled = true,
   transform,
   queryParams,
+  columnMap,
 }: UseOptionsFromUrlOptions): UseOptionsFromUrlResult {
   const [options, setOptions] = useState<NormalizedOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -123,10 +131,15 @@ export function useOptionsFromUrl({
         url = `${sourceUrl}${separator}${params.toString()}`;
       }
 
-      const response = await apiRequest<any[]>(url);
+      const response = await apiRequest<any>(url);
 
-      if (response.success && response.data) {
-        let data = response.data;
+      if (response.success && (response.data || columnMap)) {
+        // Extract items using column mapping if provided
+        // When columnMap is used, pass the full response object so paths like 'data.0.data' can navigate correctly
+        // When columnMap is not used, extractItemsFromPayload will fall back to response.data
+        let data = columnMap 
+          ? extractItemsFromPayload(response, columnMap)
+          : (response.data || []);
 
         // Transform data if transform function is provided
         if (transform) {
@@ -171,7 +184,7 @@ export function useOptionsFromUrl({
       setError(null);
       setIsLoading(false);
     }
-  }, [sourceUrl, enabled, JSON.stringify(queryParams)]);
+  }, [sourceUrl, enabled, JSON.stringify(queryParams), columnMap]);
 
   const normalizedOptions = useMemo(() => {
     return options.map(opt => ({

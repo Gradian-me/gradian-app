@@ -41,6 +41,7 @@ export function useRepeatingTableData(
 
   const isFetchingRelationsRef = useRef(false);
   const lastFetchParamsRef = useRef('');
+  const inFlightRequestRef = useRef<string | null>(null);
 
   // Use React Query to fetch target schema
   const shouldFetchTargetSchema = isRelationBased && !!targetSchemaId && !initialTargetSchema;
@@ -64,7 +65,16 @@ export function useRepeatingTableData(
       return;
     }
 
+    // Create a unique request key to prevent duplicate concurrent requests
+    const requestKey = `${effectiveSourceSchemaId}-${effectiveSourceId}-${targetSchemaId}-${relationTypeId || 'all'}-${targetSchemaData.id}`;
+    
+    // If the same request is already in flight, skip
+    if (inFlightRequestRef.current === requestKey) {
+      return;
+    }
+
     isFetchingRelationsRef.current = true;
+    inFlightRequestRef.current = requestKey;
     setIsLoadingRelations(true);
 
     try {
@@ -91,9 +101,9 @@ export function useRepeatingTableData(
         });
       }
 
-      // Add cache-busting timestamp to ensure fresh data on refresh
-      const timestamp = Date.now();
-      const allRelationsUrl = `/api/data/all-relations?schema=${effectiveSourceSchemaId}&id=${effectiveSourceId}&direction=both&otherSchema=${targetSchemaId}${relationTypeId ? `&relationTypeId=${relationTypeId}` : ''}&_t=${timestamp}`;
+      // Remove cache-busting timestamp to allow browser/API caching
+      // Only add timestamp when explicitly refreshing (handled by refresh callback)
+      const allRelationsUrl = `/api/data/all-relations?schema=${effectiveSourceSchemaId}&id=${effectiveSourceId}&direction=both&otherSchema=${targetSchemaId}${relationTypeId ? `&relationTypeId=${relationTypeId}` : ''}`;
 
       const allRelationsResponse = await apiRequest<Array<{
         schema: string;
@@ -429,13 +439,14 @@ export function useRepeatingTableData(
     } finally {
       setIsLoadingRelations(false);
       isFetchingRelationsRef.current = false;
+      inFlightRequestRef.current = null;
     }
   }, [
     effectiveSourceId,
     effectiveSourceSchemaId,
     isRelationBased,
     relationTypeId,
-    targetSchemaData,
+    targetSchemaData?.id, // Use targetSchemaData.id instead of whole object to prevent unnecessary re-fetches
     targetSchemaId,
   ]);
 
@@ -444,7 +455,8 @@ export function useRepeatingTableData(
       return;
     }
 
-    const fetchKey = `${effectiveSourceSchemaId}-${effectiveSourceId}-${targetSchemaId}-${relationTypeId || 'all'}`;
+    // Include targetSchemaData.id in the key to ensure we refetch if schema changes
+    const fetchKey = `${effectiveSourceSchemaId}-${effectiveSourceId}-${targetSchemaId}-${relationTypeId || 'all'}-${targetSchemaData.id}`;
     if (lastFetchParamsRef.current === fetchKey) {
       return;
     }
@@ -458,6 +470,7 @@ export function useRepeatingTableData(
     isRelationBased,
     relationTypeId,
     targetSchemaId,
+    targetSchemaData?.id, // Use targetSchemaData.id instead of whole object
   ]);
 
   const section = useMemo(
@@ -534,8 +547,9 @@ export function useRepeatingTableData(
     if (isRelationBased) {
       // Reset the fetch params ref to force a fresh fetch
       lastFetchParamsRef.current = '';
-      // Reset the fetching flag to allow immediate fetch
+      // Reset the fetching flags to allow immediate fetch
       isFetchingRelationsRef.current = false;
+      inFlightRequestRef.current = null;
       await fetchRelations();
     }
   }, [fetchRelations, isRelationBased]);

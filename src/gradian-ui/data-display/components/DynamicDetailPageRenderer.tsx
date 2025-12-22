@@ -38,6 +38,7 @@ import { toast } from 'sonner';
 import { EntityMetadata } from './CreateUpdateDetail';
 import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { CardWrapper, CardHeader, CardContent, CardTitle } from '../card/components/CardWrapper';
+import { EndLine } from '../../layout/end-line/components/EndLine';
 
 export interface DynamicDetailPageRendererProps {
   schema: FormSchema;
@@ -525,8 +526,19 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
 
         const groupedRelations = relationsResponse.data;
 
+        // Sort relations to show targets first, then sources
+        const sortedRelations = [...groupedRelations].sort((a, b) => {
+          // Targets (direction === 'target') come first
+          const aIsTarget = a.direction === 'target';
+          const bIsTarget = b.direction === 'target';
+          if (aIsTarget && !bIsTarget) return -1;
+          if (!aIsTarget && bIsTarget) return 1;
+          // If both are same direction, maintain original order
+          return 0;
+        });
+
         const relatedSchemasSet = new Set<string>();
-        groupedRelations.forEach((group) => {
+        sortedRelations.forEach((group) => {
           let schemaToUse: string | undefined;
 
           if (group.direction === 'source') {
@@ -684,6 +696,9 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     Boolean(headerInfo.entityType && headerInfo.entityType.trim() !== '') ||
     Boolean(headerInfo.entityTypeMetadata?.label) ||
     Boolean(entityTypeBadgeConfig?.label);
+
+  // Check if entity is incomplete
+  const isIncomplete = data?.incomplete === true;
 
   // Check for related companies and tenants
   const hasRelatedCompanies = schema?.canSelectMultiCompanies && data?.relatedCompanies && Array.isArray(data.relatedCompanies) && data.relatedCompanies.length > 0;
@@ -1221,7 +1236,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                     />
                   </div>
                 )}
-              {(hasRating || hasStatusBadge || hasEntityTypeBadge) && (
+              {(hasRating || hasStatusBadge || hasEntityTypeBadge || isIncomplete) && (
                 <div className="flex items-end flex-col justify-end gap-2">
                   {hasRating && (
                     <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.15 }}>
@@ -1231,6 +1246,23 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                         size="md"
                         showValue={true}
                       />
+                    </motion.div>
+                  )}
+                  {isIncomplete && (
+                    <motion.div
+                      initial={disableAnimation ? false : { opacity: 0, scale: 0.8, y: 5 }}
+                      animate={disableAnimation ? false : { opacity: 1, scale: 1, y: 0 }}
+                      transition={disableAnimation ? {} : {
+                        duration: 0.3,
+                        delay: 0.15,
+                        ease: [0.25, 0.46, 0.45, 0.94]
+                      }}
+                      whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05 }}
+                    >
+                      <Badge variant="warning" className="flex items-center gap-1">
+                        <IconRenderer iconName="AlertTriangle" className="h-3 w-3" />
+                        <span className="text-xs">Incomplete</span>
+                      </Badge>
                     </motion.div>
                   )}
                   {hasStatusBadge ? (
@@ -1704,7 +1736,9 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
 
         {/* Auto Table Renderers - Show relations to uncovered target schemas */}
         {relatedSchemas.length > 0 && (
-          <div className="space-y-6 mt-6 w-full min-w-0">
+          <>
+            <EndLine label="Relations" />
+            <div className="space-y-6 mt-6 w-full min-w-0">
             {relatedSchemas.map((targetSchema, index) => (
               <DynamicRepeatingTableViewer
                 key={`auto-table-${targetSchema}`}
@@ -1726,6 +1760,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
               />
             ))}
           </div>
+          </>
         )}
       </div>
 

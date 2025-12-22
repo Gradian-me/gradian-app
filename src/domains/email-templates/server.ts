@@ -13,8 +13,11 @@ export type StoredEmailTemplate = {
 
 const normalizePath = (value: string) => value.replace(/\\/g, '/');
 
-export const templateDirRelativePath = (fileName: string) =>
-  normalizePath(join('src', 'app', 'builder', 'email-templates', 'templates', fileName));
+export const templateDirRelativePath = (fileName: string) => {
+  // SECURITY: Sanitize fileName to prevent path traversal
+  const sanitizedFileName = fileName.replace(/\.\./g, '').replace(/[\/\\]/g, '');
+  return normalizePath(join('src', 'app', 'builder', 'email-templates', 'templates', sanitizedFileName));
+};
 
 const DATA_FILE = join(process.cwd(), 'data', 'all-templates.json');
 const TEMPLATE_DIR = join(process.cwd(), 'src', 'app', 'builder', 'email-templates', 'templates');
@@ -22,9 +25,16 @@ const DEFAULT_TEMPLATE_ID = 'password-reset';
 const DEFAULT_TEMPLATE_PATH = templateDirRelativePath('reset-password.html');
 
 const getAbsolutePath = (filePath: string) => {
-  const absolute = resolve(process.cwd(), filePath);
-  if (!normalizePath(absolute).startsWith(normalizePath(TEMPLATE_DIR))) {
-    throw new Error('Invalid template path');
+  // SECURITY: Validate and sanitize path to prevent path traversal
+  // Normalize the path and remove any .. sequences
+  const sanitizedPath = filePath.replace(/\.\./g, '').replace(/\\/g, '/');
+  const absolute = resolve(process.cwd(), sanitizedPath);
+  const normalizedAbsolute = normalizePath(absolute);
+  const normalizedTemplateDir = normalizePath(TEMPLATE_DIR);
+  
+  // Ensure the resolved path is within the template directory
+  if (!normalizedAbsolute.startsWith(normalizedTemplateDir)) {
+    throw new Error('Invalid template path: path traversal detected');
   }
   return absolute;
 };

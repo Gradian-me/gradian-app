@@ -92,34 +92,42 @@ export function TableBody<T = any>({
 
     return node;
   };
-  const trClasses = (index: number, isSelected: boolean) =>
-    cn(
+  const trClasses = (index: number, isSelected: boolean, row: T) => {
+    const isIncomplete = (row as any)?.incomplete === true;
+    return cn(
       'transition-colors',
-      striped && index % 2 === 1 && 'bg-gray-50 dark:bg-gray-800',
-      striped && index % 2 === 0 && 'bg-white dark:bg-gray-900',
+      // Amber background for incomplete rows (takes priority over striped)
+      isIncomplete && 'bg-amber-50/50 dark:bg-amber-950/20 border-l-4 border-l-amber-400 dark:border-l-amber-500',
+      // Striped rows (only if not incomplete)
+      !isIncomplete && striped && index % 2 === 1 && 'bg-gray-50 dark:bg-gray-800',
+      !isIncomplete && striped && index % 2 === 0 && 'bg-white dark:bg-gray-900',
       hoverable && 'hover:bg-gray-200 dark:hover:bg-gray-600',
+      isIncomplete && hoverable && 'hover:bg-amber-100/60 dark:hover:bg-amber-950/30',
       hoverable && onRowClick && 'cursor-pointer',
       isSelected && 'bg-blue-50',
       bordered && 'border-b border-gray-200 dark:border-gray-700'
     );
+  };
 
-  const tdClasses = (column: TableColumn<T>, rowIndex: number, isSelected: boolean) =>
-    cn(
+  const tdClasses = (column: TableColumn<T>, rowIndex: number, isSelected: boolean, row: T) => {
+    const isIncomplete = (row as any)?.incomplete === true;
+    return cn(
       'p-3 text-xs text-gray-900 dark:text-gray-200',
       // Use better word breaking for columns with maxWidth - break on words, not characters
       column.maxWidth && 'wrap-break-word',
       column.align === 'center' && 'text-center',
       column.align === 'right' && 'text-right',
-      // For sticky columns, match the row background for zebra striping and selection
+      // For sticky columns, match the row background for zebra striping, selection, and incomplete
       column.sticky === 'left' && 'sticky left-0 z-10',
       column.sticky === 'right' && 'sticky right-0 z-10',
-      // Set background for sticky columns based on row state (selected > striped > default)
-      column.sticky === 'left' && (isSelected ? 'bg-blue-50' : (striped && rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800')),
-      column.sticky === 'right' && (isSelected ? 'bg-blue-50' : (striped && rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800')),
+      // Set background for sticky columns based on row state (selected > incomplete > striped > default)
+      column.sticky === 'left' && (isSelected ? 'bg-blue-50' : (isIncomplete ? 'bg-amber-50/50 dark:bg-amber-950/20' : (striped && rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800'))),
+      column.sticky === 'right' && (isSelected ? 'bg-blue-50' : (isIncomplete ? 'bg-amber-50/50 dark:bg-amber-950/20' : (striped && rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800'))),
       // For non-sticky columns, use transparent to show row background
       !column.sticky && striped && 'bg-transparent',
       bordered && 'border-r border-gray-200 dark:border-gray-700 last:border-r-0'
     );
+  };
 
   const handleRowClick = (row: T, index: number) => {
     if (onRowClick) {
@@ -159,7 +167,7 @@ export function TableBody<T = any>({
               delay: Math.min(rowIndex * 0.02, 0.3),
               ease: 'easeOut',
             }}
-            className={trClasses(rowIndex, isSelected)}
+            className={trClasses(rowIndex, isSelected, row)}
             onClick={() => handleRowClick(row, rowIndex)}
           >
             {selectionEnabled && (
@@ -192,7 +200,7 @@ export function TableBody<T = any>({
               return (
                 <td
                   key={column.id}
-                  className={cn(tdClasses(column, rowIndex, isSelected), cellClassName)}
+                  className={cn(tdClasses(column, rowIndex, isSelected, row), cellClassName)}
                   dir="auto"
                   style={{
                     // Only set width if explicitly provided, otherwise let content determine width

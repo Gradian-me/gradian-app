@@ -10,6 +10,7 @@ import { isValidSchemaId, getSchemaById } from '@/gradian-ui/schema-manager/util
 import { clearCompaniesCache } from '@/gradian-ui/shared/utils/companies-loader';
 import { isDemoModeEnabled, proxyDataRequest, enrichWithUsers } from '../../utils';
 import { syncHasFieldValueRelationsForEntity, minimizePickerFieldValues, enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
+import { extractRepeatingSectionValues, syncRepeatingSectionRelationsForEntity } from '@/gradian-ui/shared/domain/utils/repeating-section-relations.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
@@ -343,9 +344,10 @@ export async function PUT(
       );
     }
 
-    // In demo mode, extract picker values and minimize them in request body before saving
+    // In demo mode, extract picker values and repeating section values before saving
     // This keeps minimal [{id}, {id}] format for tracing while using relations for operations
     let pickerValues: Record<string, any> = {};
+    let repeatingSectionValues: Record<string, any[]> = {};
     if (isDemoModeEnabled()) {
       try {
         // Schema already loaded above, reuse it
@@ -354,6 +356,9 @@ export async function PUT(
           const { extractPickerFieldValues, minimizePickerFieldValues: minimizeValues } = await import('@/gradian-ui/shared/domain/utils/field-value-relations.util');
           pickerValues = extractPickerFieldValues({ schema, data: requestBody });
           
+          // Extract repeating section values before minimizing them
+          repeatingSectionValues = extractRepeatingSectionValues({ schema, data: requestBody });
+          
           // Minimize picker values to [{id}, {id}] format (keep IDs for tracing)
           requestBody = minimizeValues({ schema, data: requestBody });
         }
@@ -361,7 +366,7 @@ export async function PUT(
         loggingCustom(
           LogType.INFRA_LOG,
           'warn',
-          `[PUT /api/data/:id] Failed to extract picker values: ${error instanceof Error ? error.message : String(error)}`,
+          `[PUT /api/data/:id] Failed to extract picker values and repeating section values: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }
@@ -394,37 +399,67 @@ export async function PUT(
       clearCompaniesCache();
     }
 
-    // In demo mode, synchronize HAS_FIELD_VALUE relations after entity update
-    // Use the extracted picker values to create relations
-    if (isDemoModeEnabled() && responseData?.success && responseData.data && typeof responseData.data === 'object' && Object.keys(pickerValues).length > 0) {
+    // In demo mode, synchronize HAS_FIELD_VALUE relations and repeating section relations after entity update
+    // Use the extracted picker values and repeating section values to create relations
+    if (isDemoModeEnabled() && responseData?.success && responseData.data && typeof responseData.data === 'object') {
       try {
-        // Create relations from the extracted picker values
-        const entityWithPickerValues = { ...responseData.data, ...pickerValues };
-        await syncHasFieldValueRelationsForEntity({
-          schemaId,
-          entity: entityWithPickerValues,
-        });
-        
-        // Update entity with minimized picker values (keep IDs for tracing)
         // Schema already loaded above, reuse it
         if (schema) {
-          const minimizedEntity = minimizePickerFieldValues({
-            schema,
-            data: responseData.data,
-          });
+          // Sync picker field relations if we have picker values
+          if (Object.keys(pickerValues).length > 0) {
+            try {
+              // Create relations from the extracted picker values
+              const entityWithPickerValues = { ...responseData.data, ...pickerValues };
+              await syncHasFieldValueRelationsForEntity({
+                schemaId,
+                entity: entityWithPickerValues,
+              });
+              
+              // Update entity with minimized picker values (keep IDs for tracing)
+              const minimizedEntity = minimizePickerFieldValues({
+                schema,
+                data: responseData.data,
+              });
+              
+              // Update entity in storage with minimized values
+              const repository = new BaseRepository(schemaId);
+              await repository.update(id, minimizedEntity);
+              
+              // Update response data to reflect minimized entity
+              responseData.data = minimizedEntity;
+            } catch (error) {
+              loggingCustom(
+                LogType.INFRA_LOG,
+                'warn',
+                `[PUT /api/data/:id] Failed to sync HAS_FIELD_VALUE relations: ${error instanceof Error ? error.message : String(error)}`,
+              );
+            }
+          }
           
-          // Update entity in storage with minimized values
-          const repository = new BaseRepository(schemaId);
-          await repository.update(id, minimizedEntity);
-          
-          // Update response data to reflect minimized entity
-          responseData.data = minimizedEntity;
+          // Sync repeating section relations
+          // Always call sync, even if repeatingSectionValues is empty, to ensure existing relations
+          // created through modals are preserved when form is saved as incomplete
+          try {
+            // Include repeating section values in the entity for relation creation
+            // If repeatingSectionValues is empty, the sync function will still preserve existing relations
+            const entityWithRepeatingSections = { ...responseData.data, ...repeatingSectionValues };
+            await syncRepeatingSectionRelationsForEntity({
+              schemaId,
+              entity: entityWithRepeatingSections,
+            });
+          } catch (error) {
+            loggingCustom(
+              LogType.INFRA_LOG,
+              'warn',
+              `[PUT /api/data/:id] Failed to sync repeating section relations: ${error instanceof Error ? error.message : String(error)}`,
+            );
+          }
         }
       } catch (error) {
         loggingCustom(
           LogType.INFRA_LOG,
           'warn',
-          `[PUT /api/data/:id] Failed to sync HAS_FIELD_VALUE relations: ${error instanceof Error ? error.message : String(error)}`,
+          `[PUT /api/data/:id] Failed to sync relations: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }

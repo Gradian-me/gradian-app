@@ -65,7 +65,7 @@ export function Table({ node, children }: TableProps) {
 
 export function TableHead({ children }: { children?: React.ReactNode }) {
   return (
-    <thead className="bg-gray-50/50 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-700">
+    <thead className="bg-gray-100 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-700">
       {children ?? null}
     </thead>
   );

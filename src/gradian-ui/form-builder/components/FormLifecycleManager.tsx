@@ -1552,6 +1552,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             
             if (currentEntityId && relationModalState.relationTypeId && targetEntityId && relationModalState.targetSchema) {
               try {
+                // Check if the created entity is incomplete
+                const isTargetIncomplete = createdEntity?.incomplete === true || (createdEntity as any)?.data?.incomplete === true;
+                
                 const relationResponse = await apiRequest('/api/relations', {
                   method: 'POST',
                   body: {
@@ -1560,6 +1563,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                     targetSchema: relationModalState.targetSchema,
                     targetId: targetEntityId,
                     relationTypeId: relationModalState.relationTypeId,
+                    incomplete: isTargetIncomplete || undefined, // Only include if true
                   },
                   callerName: 'FormLifecycleManager.createRelationFromModal',
                 });
@@ -1579,6 +1583,40 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             
             // Close modal and clear state
             setRelationModalState({ isOpen: false, sectionId: '' });
+          }}
+          onIncompleteSave={async (createdEntity) => {
+            // When form is saved as incomplete, still create the relation
+            const currentEntityId = state.values?.id;
+            const targetEntityId = createdEntity?.id || (createdEntity as any)?.data?.id;
+            
+            if (currentEntityId && relationModalState.relationTypeId && targetEntityId && relationModalState.targetSchema) {
+              try {
+                // Target entity is incomplete, so relation should also be marked as incomplete
+                const relationResponse = await apiRequest('/api/relations', {
+                  method: 'POST',
+                  body: {
+                    sourceSchema: schema.id,
+                    sourceId: currentEntityId,
+                    targetSchema: relationModalState.targetSchema,
+                    targetId: targetEntityId,
+                    relationTypeId: relationModalState.relationTypeId,
+                    incomplete: true, // Mark relation as incomplete since target is incomplete
+                  },
+                  callerName: 'FormLifecycleManager.createRelationFromModal.incomplete',
+                });
+                
+                if (!relationResponse.success) {
+                  loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to create relation for incomplete entity: ${relationResponse.error}`);
+                } else {
+                  loggingCustom(LogType.FORM_DATA, 'info', 'Relation created successfully for incomplete entity');
+                  // Trigger refresh of relation-based sections
+                  setRefreshRelationsTrigger(prev => prev + 1);
+                }
+              } catch (error) {
+                loggingCustom(LogType.CLIENT_LOG, 'error', `Error creating relation for incomplete entity: ${error instanceof Error ? error.message : String(error)}`);
+              }
+            }
+            // Don't close modal - keep it open for incomplete saves
           }}
           onClose={() => {
             setRelationModalState({ isOpen: false, sectionId: '' });

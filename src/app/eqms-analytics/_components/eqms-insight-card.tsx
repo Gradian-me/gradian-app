@@ -28,11 +28,11 @@ export default function EqmsInsightCard({ agentId, title, payload, prompt, runTy
         label: title,
         action: 'runAiAgent',
         componentType: 'ai-agent-response',
+        maxHeight: 800,
         agentId,
         runType,
         icon: 'Sparkles',
         variant: 'default',
-        maxHeight: 400,
         additionalSystemPrompt: prompt,
       } as QuickAction}
       schema={schema}
