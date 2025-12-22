@@ -180,7 +180,10 @@ export const FormModal: React.FC<FormModalProps> = ({
     }
     const qa = schema.detailPageMetadata?.quickActions?.find((q: any) => q.action === 'callApi');
     if (!qa?.submitRoute) {
-      throw new Error('No callApi quick action configured for this action form');
+      // If action form doesn't have a callApi action, just close the modal
+      // This allows action forms that only have other action types (like openMetadataEditor)
+      // to be used as containers without requiring form submission
+      return; // Return successfully to close the modal
     }
     // If a payloadTemplate is provided, apply dynamic context replacement; otherwise use raw formData
     let payload = qa.payloadTemplate

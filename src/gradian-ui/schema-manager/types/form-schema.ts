@@ -265,6 +265,10 @@ export interface RepeatingTableRendererConfig {
   description?: string;
   targetSchema?: string; // Target schema ID for relation-based tables
   relationTypeId?: string; // Relation type ID for relation-based tables
+  // Reference-based filtering: filter items based on relation to a reference entity
+  referenceSchema?: string; // Schema of the reference entity (e.g., "parameter-groups", "status-groups")
+  referenceRelationTypeId?: string; // Relation type ID to filter by (e.g., "HAS_PARAMETER_ITEM", "HAS_STATUS_ITEM")
+  referenceEntityId?: string; // ID of the reference entity, supports dynamic context (e.g., "{{formData.id}}")
   tableProperties?: {
     sortingEnabled?: boolean;
     paginationEnabled?: boolean;
@@ -295,7 +299,7 @@ export interface QuickAction {
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'gradient';
   icon?: string; // Icon name to display before the label
   componentType?: 'button' | 'ai-agent-response'; // How the quick action is rendered (default: 'button')
-  action: 'goToUrl' | 'openUrl' | 'openFormDialog' | 'openActionForm' | 'runAiAgent' | 'callApi';
+  action: 'goToUrl' | 'openUrl' | 'openFormDialog' | 'openActionForm' | 'runAiAgent' | 'callApi' | 'openMetadataEditor';
   targetSchema?: string; // Required for openFormDialog action
   targetUrl?: string; // Required for goToUrl and openUrl actions
   passItemAsReference?: boolean; // Default: false - if true, pass current schema item as reference to target URL

@@ -4,7 +4,7 @@ A domain module within Gradian UI for managing relation types in the application
 
 ## Overview
 
-The Relation Manager provides functionality to create, read, update, and delete relation types. Relation types define relationships between entities in the application, such as "HAS_INQUIRY_ITEM" which links inquiries to inquiry items.
+The Relation Manager provides functionality to create, read, update, and delete relation types. Relation types define relationships between entities in the application, such as "HAS_INQUIRY_ITEM" which links inquiries to Tender Items.
 
 ## Features
 
@@ -121,7 +121,7 @@ Relation types are stored in `data/all-relation-types.json` as JSON. The API rou
 {
   "id": "HAS_INQUIRY_ITEM",
   "label": "Has Inquiry Item",
-  "description": "An inquiry contains one or more inquiry items.",
+  "description": "An inquiry contains one or more Tender Items.",
   "color": "#4E79A7",
   "icon": "Basket"
 }

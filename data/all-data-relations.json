@@ -1399,7 +1399,7 @@
   {
     "sourceSchema": "tenders",
     "sourceId": "01KD0RAP41ADG8EC0W5E2MAXHZ",
-    "targetSchema": "inquiry-items",
+    "targetSchema": "tender-items",
     "targetId": "01KD0RDKTPWBAP0HQFAJT8PEDE",
     "relationTypeId": "HAS_ITEM",
     "id": "01KD0RDKZ7KP5R9GPCYGV4BZTX",
@@ -1443,12 +1443,34 @@
   {
     "sourceSchema": "tenders",
     "sourceId": "01KD0TE4WYXF8QFA3ENH5PCVCP",
-    "targetSchema": "inquiry-items",
+    "targetSchema": "tender-items",
     "targetId": "01KD0TG13H2V7GMWDAYH0Q1EDZ",
     "relationTypeId": "HAS_ITEM",
     "id": "01KD0TG16SPCMZ93H00KDX6ZKW",
     "createdAt": "2025-12-21T16:04:48.985Z",
     "updatedAt": "2025-12-21T16:04:59.186Z",
     "inactive": true
+  },
+  {
+    "id": "01KD2J9SWGMCQRQDJAJ3ESF531",
+    "sourceSchema": "warehouses",
+    "sourceId": "01KD2J9STKWYKWHCGG6H0Q5D9Y",
+    "targetSchema": "users",
+    "targetId": "01KCPC8YBMRYB3X846103R11MH",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "warehouse-manager",
+    "createdAt": "2025-12-22T08:20:05.135Z",
+    "updatedAt": "2025-12-22T08:20:05.135Z"
+  },
+  {
+    "id": "01KD2JAXJD5WZS1H07RK8MRYJJ",
+    "sourceSchema": "inventory-items",
+    "sourceId": "01KD2JAXH250JXT5F16FXVZZYS",
+    "targetSchema": "warehouses",
+    "targetId": "01KD2J9STKWYKWHCGG6H0Q5D9Y",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "item-warehouse",
+    "createdAt": "2025-12-22T08:20:41.677Z",
+    "updatedAt": "2025-12-22T08:20:41.677Z"
   }
 ]

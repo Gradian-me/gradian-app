@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avat
 import { AvatarUser } from './AvatarUser';
 import { Badge } from '../../../components/ui/badge';
 import { GridBuilder } from '../../layout/grid-builder';
-import { FormSchema, DetailPageSection } from '@/gradian-ui/schema-manager/types/form-schema';
+import { FormSchema, DetailPageSection, QuickAction } from '@/gradian-ui/schema-manager/types/form-schema';
 import { DynamicInfoCard } from './DynamicInfoCard';
 import { DynamicAiAgentResponseContainer } from './DynamicAiAgentResponseContainer';
 import { ComponentRenderer } from './ComponentRenderer';
@@ -56,6 +56,8 @@ export interface DynamicDetailPageRendererProps {
   customComponents?: Record<string, React.ComponentType<any>>;
   onRefreshData?: () => Promise<void> | void;
   preloadedSchemas?: FormSchema[];
+  // Custom quick action handler - if returns true, action is handled and default handler is skipped
+  customQuickActionHandler?: (action: QuickAction) => boolean | void;
 }
 
 /**
@@ -411,6 +413,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   customComponents = {},
   onRefreshData,
   preloadedSchemas = [],
+  customQuickActionHandler,
 }) => {
   const [editEntityId, setEditEntityId] = useState<string | null>(null);
   const [relatedSchemas, setRelatedSchemas] = useState<string[]>([]);
@@ -426,6 +429,11 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   });
   const detailMetadata = schema.detailPageMetadata;
   const quickActions = detailMetadata?.quickActions || [];
+  
+  // Debug: Log customQuickActionHandler
+  React.useEffect(() => {
+    console.log('[DynamicDetailPageRenderer] customQuickActionHandler:', !!customQuickActionHandler, typeof customQuickActionHandler);
+  }, [customQuickActionHandler]);
   // Extract ai-agent-response actions (these are rendered as separate card sections)
   const aiAgentResponseActions = quickActions.filter(
     (action) => action.componentType === 'ai-agent-response' && action.action === 'runAiAgent'
@@ -632,7 +640,15 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   const showBackButton = true;
   const showActions = true;
 
-  const headerInfo = data ? getHeaderInfo(schema, data) : {
+  // Check if this is a standalone page (no data required)
+  // Standalone pages are identified by having detailPageMetadata but no required data
+  const isStandalonePage = !schema.fields || schema.fields.length === 0 || 
+    (detailMetadata && (!data || Object.keys(data).length === 0) && !error);
+
+  // For standalone pages without data, use empty object
+  const pageData = isStandalonePage && !data ? {} : data;
+
+  const headerInfo = pageData ? getHeaderInfo(schema, pageData) : {
     title: '',
     subtitle: '',
     avatar: undefined,
@@ -648,13 +664,13 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     hasEntityTypeGroup: false,
     entityTypeField: undefined,
   };
-  const headerStatusRoleValues = getArrayValuesByRole(schema, data, 'status');
+  const headerStatusRoleValues = getArrayValuesByRole(schema, pageData, 'status');
   const headerStatusArray = headerStatusRoleValues.length > 0
     ? headerStatusRoleValues
-    : Array.isArray(data?.status)
-      ? data.status
-      : data?.status
-        ? [data.status]
+    : Array.isArray(pageData?.status)
+      ? pageData.status
+      : pageData?.status
+        ? [pageData.status]
         : [];
   const headerStatusObject = headerStatusArray[0] || null;
   const badgeConfig = headerStatusObject
@@ -698,13 +714,13 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     Boolean(entityTypeBadgeConfig?.label);
 
   // Check if entity is incomplete
-  const isIncomplete = data?.incomplete === true;
+  const isIncomplete = pageData?.incomplete === true;
 
   // Check for related companies and tenants
-  const hasRelatedCompanies = schema?.canSelectMultiCompanies && data?.relatedCompanies && Array.isArray(data.relatedCompanies) && data.relatedCompanies.length > 0;
-  const hasRelatedTenants = schema?.allowDataRelatedTenants && data?.relatedTenants && Array.isArray(data.relatedTenants) && data.relatedTenants.length > 0;
-  const relatedCompaniesValue = hasRelatedCompanies ? normalizeOptionArray(data.relatedCompanies) : [];
-  const relatedTenantsValue = hasRelatedTenants ? normalizeOptionArray(data.relatedTenants) : [];
+  const hasRelatedCompanies = schema?.canSelectMultiCompanies && pageData?.relatedCompanies && Array.isArray(pageData.relatedCompanies) && pageData.relatedCompanies.length > 0;
+  const hasRelatedTenants = schema?.allowDataRelatedTenants && pageData?.relatedTenants && Array.isArray(pageData.relatedTenants) && pageData.relatedTenants.length > 0;
+  const relatedCompaniesValue = hasRelatedCompanies ? normalizeOptionArray(pageData.relatedCompanies) : [];
+  const relatedTenantsValue = hasRelatedTenants ? normalizeOptionArray(pageData.relatedTenants) : [];
 
   useEffect(() => {
     if (typeof document === 'undefined') {
@@ -713,7 +729,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
 
     const previousTitle = document.title;
     const schemaTitle = schema?.plural_name || schema?.title || schema?.name || 'Schema';
-    const dynamicTitle = headerInfo.title || headerInfo.subtitle || headerInfo.code || data?.name || '';
+    const dynamicTitle = headerInfo.title || headerInfo.subtitle || headerInfo.code || pageData?.name || '';
     const fullTitle = dynamicTitle
       ? `${schemaTitle} - ${dynamicTitle} | Gradian`
       : `${schemaTitle} | Gradian`;
@@ -723,7 +739,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     return () => {
       document.title = previousTitle;
     };
-  }, [schema?.plural_name, schema?.title, schema?.name, headerInfo.title, headerInfo.subtitle, headerInfo.code, data?.name]);
+  }, [schema?.plural_name, schema?.title, schema?.name, headerInfo.title, headerInfo.subtitle, headerInfo.code, pageData?.name]);
 
   // Show skeleton when loading or refreshing
   if (isLoading || isRefreshing) {
@@ -958,8 +974,9 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     );
   }
 
-  // Only show error if not refreshing (during refresh, show skeleton instead)
-  if ((error || !data) && !isRefreshing) {
+  // Only show error if not refreshing and not a standalone page
+  // Standalone pages can render without data
+  if (error && !isRefreshing && !isStandalonePage) {
     return (
       <div className="container mx-auto px-4 py-6">
         <div className="text-center py-12">
@@ -1203,10 +1220,10 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                     transition={disableAnimation ? {} : { duration: 0.3, delay: 0.1 }}
                   >
                     <EntityMetadata
-                      createdAt={data?.createdAt}
-                      createdBy={data?.createdBy}
-                      updatedAt={data?.updatedAt}
-                      updatedBy={data?.updatedBy}
+                      createdAt={pageData?.createdAt}
+                      createdBy={pageData?.createdBy}
+                      updatedAt={pageData?.updatedAt}
+                      updatedBy={pageData?.updatedBy}
                       variant="compact"
                       avatarType="user"
                     />
@@ -1326,9 +1343,10 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                 <DynamicQuickActions
                   actions={quickActions}
                   schema={schema}
-                  data={data}
+                  data={pageData}
                   disableAnimation={disableAnimation}
                   schemaCache={targetSchemaCache}
+                  onActionClick={customQuickActionHandler}
                 />
               </div>
             )}
@@ -1449,7 +1467,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                         key={compConfig.id}
                         config={compConfig}
                         schema={schema}
-                        data={data}
+                        data={pageData}
                         index={index}
                         disableAnimation={disableAnimation}
                         customComponents={customComponents}
@@ -1467,7 +1485,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       <DynamicAiAgentResponseContainer
                         action={action}
                         schema={schema}
-                        data={data}
+                        data={pageData}
                         index={index + mainComponents.length + sectionsForMain.length}
                         disableAnimation={disableAnimation}
                       />
@@ -1490,7 +1508,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                         <DynamicInfoCard
                           section={section}
                           schema={schema}
-                          data={data}
+                          data={pageData}
                           index={index + mainComponents.length + aiAgentResponseActions.length}
                           disableAnimation={disableAnimation}
                         />
@@ -1515,9 +1533,10 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                     <DynamicQuickActions
                       actions={quickActions}
                       schema={schema}
-                      data={data}
+                      data={pageData}
                       disableAnimation={disableAnimation}
                       schemaCache={targetSchemaCache}
+                      onActionClick={customQuickActionHandler}
                     />
                   </div>
                 )}
@@ -1608,7 +1627,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                     key={compConfig.id}
                     config={compConfig}
                     schema={schema}
-                    data={data}
+                    data={pageData}
                     index={index + sections.length}
                     disableAnimation={disableAnimation}
                     customComponents={customComponents}
@@ -1623,7 +1642,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                         key={section.id}
                         section={section}
                         schema={schema}
-                        data={data}
+                        data={pageData}
                         index={index + mainComponents.length + sectionsForMain.length}
                         disableAnimation={disableAnimation}
                       />
@@ -1656,7 +1675,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       key={compConfig.id}
                       config={compConfig}
                       schema={schema}
-                      data={data}
+                      data={pageData}
                       index={index}
                       disableAnimation={disableAnimation}
                       customComponents={customComponents}
@@ -1674,7 +1693,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                     <DynamicAiAgentResponseContainer
                       action={action}
                       schema={schema}
-                      data={data}
+                      data={pageData}
                       index={index + mainComponents.length + sectionsForMain.length}
                       disableAnimation={disableAnimation}
                     />
@@ -1698,7 +1717,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       <DynamicInfoCard
                         section={section}
                         schema={schema}
-                        data={data}
+                        data={pageData}
                         index={index + mainComponents.length + aiAgentResponseActions.length}
                         disableAnimation={disableAnimation}
                       />
@@ -1722,7 +1741,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                 index={index + mainComponents.length + sectionsForMain.length}
                 disableAnimation={disableAnimation}
                 sourceSchemaId={schema.id}
-                sourceId={data?.id}
+                sourceId={pageData?.id}
                 showRefreshButton
                 initialTargetSchema={
                   tableConfig.targetSchema
@@ -1754,7 +1773,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                 index={tableRenderers.length + index + mainComponents.length + sectionsForMain.length}
                 disableAnimation={disableAnimation}
                 sourceSchemaId={schema.id}
-                sourceId={data?.id}
+                sourceId={pageData?.id}
                 showRefreshButton
                 initialTargetSchema={targetSchemaCache[targetSchema]}
               />
@@ -1776,7 +1795,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
           mode="edit"
           getInitialSchema={(requestedId) => (requestedId === schema.id ? schema : null)}
         getInitialEntityData={(requestedSchemaId, requestedEntityId) =>
-          requestedSchemaId === schema.id && requestedEntityId === data?.id ? data : null
+          requestedSchemaId === schema.id && requestedEntityId === pageData?.id ? pageData : null
         }
         onSuccess={async () => {
             // Reset edit state and refresh the page to get updated data
