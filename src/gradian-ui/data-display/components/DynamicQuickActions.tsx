@@ -15,6 +15,8 @@ import { AiAgentDialog } from '@/domains/ai-builder/components/AiAgentDialog';
 import { getEncryptedSkipKey } from '@/gradian-ui/shared/utils/skip-key-storage';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { DetailPageMetadataDialog } from '@/gradian-ui/schema-manager/components/DetailPageMetadataDialog';
+import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 
 export interface DynamicQuickActionsProps {
   actions: QuickAction[];
@@ -23,6 +25,8 @@ export interface DynamicQuickActionsProps {
   className?: string;
   disableAnimation?: boolean;
   schemaCache?: Record<string, FormSchema>;
+  // Custom action handler - if returns true, action is handled and default handler is skipped
+  onActionClick?: (action: QuickAction) => boolean | void;
 }
 
 export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
@@ -32,8 +36,14 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
   className,
   disableAnimation = false,
   schemaCache,
+  onActionClick,
 }) => {
   const router = useRouter();
+  
+  // Debug: Log when component receives onActionClick
+  React.useEffect(() => {
+    console.log('[DynamicQuickActions] Component mounted/updated, onActionClick:', !!onActionClick, typeof onActionClick);
+  }, [onActionClick]);
   
   // Track loading state per action (not globally)
   const [loadingActionId, setLoadingActionId] = useState<string | null>(null);
@@ -43,6 +53,10 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
   const [agentForDialog, setAgentForDialog] = useState<any | null>(null);
   const [loadingAgent, setLoadingAgent] = useState(false);
   const [formAction, setFormAction] = useState<QuickAction | null>(null);
+  const [metadataEditorAction, setMetadataEditorAction] = useState<QuickAction | null>(null);
+  
+  // Get reference data from store (for action forms)
+  const referenceData = useDynamicFormContextStore((s) => s.referenceData);
 
   useEffect(() => {
     if (!schemaCache) {
@@ -65,17 +79,49 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
    * Handle action click - simplified
    */
   const handleAction = useCallback(async (action: QuickAction) => {
+    // Check if custom handler wants to handle this action FIRST, before any loading states
+    console.log('[DynamicQuickActions] handleAction called, onActionClick:', !!onActionClick, 'action:', action.id);
+    if (onActionClick) {
+      console.log('[DynamicQuickActions] Checking custom handler for action:', action.id, action);
+      try {
+        const handled = onActionClick(action);
+        console.log('[DynamicQuickActions] Handler returned:', handled);
+        if (handled === true) {
+          console.log('[DynamicQuickActions] Custom handler processed action, skipping default:', action.id);
+          return; // Custom handler processed it, skip default handling
+        }
+      } catch (error) {
+        console.error('[DynamicQuickActions] Error in custom handler:', error);
+      }
+    } else {
+      console.log('[DynamicQuickActions] No custom handler provided, using default');
+    }
+
     if (action.action === 'goToUrl' && action.targetUrl) {
-      let url = action.targetUrl;
+      // Replace dynamic context variables in the URL
+      let url = replaceDynamicContext(action.targetUrl, {
+        formSchema: schema,
+        formData: data,
+        referenceData: data, // Use data as referenceData for consistency
+      });
+      
+      // If passItemAsReference is set, append the ID (for backward compatibility)
       if (action.passItemAsReference && data?.id) {
-        url = `${action.targetUrl}${action.targetUrl.endsWith('/') ? '' : '/'}${data.id}`;
+        url = `${url}${url.endsWith('/') ? '' : '/'}${data.id}`;
       }
       router.push(url);
       
     } else if (action.action === 'openUrl' && action.targetUrl) {
-      let url = action.targetUrl;
+      // Replace dynamic context variables in the URL
+      let url = replaceDynamicContext(action.targetUrl, {
+        formSchema: schema,
+        formData: data,
+        referenceData: data, // Use data as referenceData for consistency
+      });
+      
+      // If passItemAsReference is set, append the ID (for backward compatibility)
       if (action.passItemAsReference && data?.id) {
-        url = `${action.targetUrl}${action.targetUrl.endsWith('/') ? '' : '/'}${data.id}`;
+        url = `${url}${url.endsWith('/') ? '' : '/'}${data.id}`;
       }
       window.open(url, '_blank', 'noopener,noreferrer');
       
@@ -105,6 +151,13 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
           setLoadingActionId(null);
         }, 100);
       }
+    } else if (action.action === 'openMetadataEditor') {
+      // Open the metadata editor dialog
+      setLoadingActionId(action.id);
+      setMetadataEditorAction(action);
+      setTimeout(() => {
+        setLoadingActionId(null);
+      }, 100);
     } else if (action.action === 'runAiAgent' && action.agentId) {
       // Fetch the specific agent and open dialog
       setLoadingActionId(action.id);
@@ -128,6 +181,25 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
           setLoadingActionId(null);
         });
     } else if (action.action === 'callApi' && action.submitRoute) {
+      // Check if this is a special action that should be intercepted
+      // This is a fallback check in case the custom handler didn't catch it
+      if (action.submitRoute.includes('configure-layout') || action.id === 'configure-page-layout') {
+        console.log('[DynamicQuickActions] Detected configure-layout action, checking custom handler again');
+        if (onActionClick) {
+          const handled = onActionClick(action);
+          if (handled === true) {
+            console.log('[DynamicQuickActions] Custom handler intercepted configure-layout action');
+            return;
+          }
+        } else {
+          // If no custom handler but this is a configure-layout action, dispatch an event
+          // This is a fallback for when the handler isn't passed correctly
+          console.warn('[DynamicQuickActions] configure-layout action detected but no custom handler provided. Dispatching event as fallback.');
+          window.dispatchEvent(new CustomEvent('configure-page-layout'));
+          return;
+        }
+      }
+      
       setLoadingActionId(action.id);
       try {
         // Fetch latest reference data if possible
@@ -310,6 +382,59 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
           schema={schema}
           data={data}
           agent={agentForDialog}
+        />
+      )}
+
+      {/* Metadata Editor Dialog */}
+      {metadataEditorAction && (
+        <DetailPageMetadataDialog
+          isOpen={!!metadataEditorAction}
+          onClose={() => {
+            setMetadataEditorAction(null);
+          }}
+          schema={schema}
+          metadata={
+            // If this is the action form, use the reference data's metadata
+            // Otherwise use the schema's metadata
+            schema.id === 'page-metadata-editor-form' && referenceData?.detailPageMetadata
+              ? (typeof referenceData.detailPageMetadata === 'string'
+                  ? JSON.parse(referenceData.detailPageMetadata)
+                  : referenceData.detailPageMetadata)
+              : schema.detailPageMetadata
+          }
+          onUpdate={async (updatedMetadata) => {
+            // Determine which page entity to update
+            // If opened from action form, use referenceData; otherwise use data
+            const pageEntity = (schema.id === 'page-metadata-editor-form' && referenceData) 
+              ? referenceData 
+              : (schema.id === 'pages' ? data : null);
+            
+            if (pageEntity?.id) {
+              try {
+                const response = await apiRequest(`/api/data/pages/${pageEntity.id}`, {
+                  method: 'PUT',
+                  body: JSON.stringify({
+                    ...pageEntity,
+                    detailPageMetadata: JSON.stringify(updatedMetadata),
+                  }),
+                });
+
+                if (response.success) {
+                  // Close the dialog
+                  setMetadataEditorAction(null);
+                  // Optionally refresh the page or trigger a reload
+                  window.location.reload();
+                } else {
+                  loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to save page metadata: ${response.error}`);
+                }
+              } catch (err) {
+                loggingCustom(LogType.CLIENT_LOG, 'error', `Error saving page metadata: ${err instanceof Error ? err.message : String(err)}`);
+              }
+            } else {
+              // Just close if we can't save
+              setMetadataEditorAction(null);
+            }
+          }}
         />
       )}
     </>

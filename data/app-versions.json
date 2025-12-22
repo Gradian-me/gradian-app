@@ -4277,7 +4277,7 @@
       },
       {
         "changeType": "enhance",
-        "description": "Added new inquiry items schema and related configurations in all-schemas.json to improve inquiry management capabilities",
+        "description": "Added new Tender Items schema and related configurations in all-schemas.json to improve inquiry management capabilities",
         "priority": "Medium",
         "affectedDomains": [
           "schema-manager",

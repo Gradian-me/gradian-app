@@ -3768,12 +3768,20 @@
             "change-additional-description",
             "change-conclusion",
             "change-is-approved-by-qa",
-            "change-effectiveness"
+            "change-effectiveness",
+            "change-procedure",
+            "change-classification",
+            "affected-processes",
+            "change-request-date",
+            "change-number"
           ],
           "selectedSections": [
             "change-information",
             "qa-analysis",
-            "change-conclusion"
+            "change-conclusion",
+            "quality-assurance-analyses",
+            "qa-guideline-analyses",
+            "follow-up"
           ],
           "additionalSystemPrompt": "Analyze this change management record from a change management analyst perspective. Provide comprehensive analysis including risk assessment, compliance evaluation, and recommendations based on GMP, WHO guidelines, ISO 9001, and pharmaceutical quality standards.",
           "displayType": "hideForm",
@@ -5190,8 +5198,8 @@
         "columns": 2
       },
       {
-        "id": "inquiry-items-section",
-        "title": "Inquiry Items",
+        "id": "tender-items-section",
+        "title": "Tender Items",
         "description": "Items included in this inquiry tender",
         "initialState": "expanded",
         "columns": 2,
@@ -5199,7 +5207,7 @@
         "repeatingConfig": {
           "fieldRelationType": "connectToSchema",
           "minItems": 1,
-          "targetSchema": "inquiry-items",
+          "targetSchema": "tender-items",
           "addType": "addOnly",
           "relationTypeId": "HAS_ITEM"
         }
@@ -5225,10 +5233,10 @@
     ]
   },
   {
-    "id": "inquiry-items",
-    "description": "Manage inquiry items with part details, quantities, and requirements",
+    "id": "tender-items",
+    "description": "Manage Tender Items with part details, quantities, and requirements",
     "singular_name": "Inquiry Item",
-    "plural_name": "Inquiry Items",
+    "plural_name": "Tender Items",
     "fields": [
       {
         "id": "inquiry-item-part-code",
@@ -5457,5 +5465,203 @@
         "label": "Supply Chain Management"
       }
     ]
+  },
+  {
+    "id": "pages",
+    "description": "Manage custom pages with configurable layouts, sections, quick actions, and components",
+    "singular_name": "Page",
+    "plural_name": "Pages",
+    "fields": [
+      {
+        "id": "page-id",
+        "name": "pageId",
+        "label": "Page ID",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter page ID (used in URL: /custom-pages/[page-id])",
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 1,
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "colSpan": 1,
+        "order": 1,
+        "canCopy": true
+      },
+      {
+        "id": "page-title",
+        "name": "pageTitle",
+        "label": "Page Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter page title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "page-description",
+        "name": "pageDescription",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter page description",
+        "required": false,
+        "role": "description",
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "page-icon",
+        "name": "icon",
+        "label": "Icon",
+        "sectionId": "basic-information",
+        "component": "icon",
+        "placeholder": "Enter Lucide Icon name (e.g., FileText)",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4,
+        "role": "icon"
+      },
+      {
+        "id": "page-target-schema",
+        "name": "targetSchema",
+        "label": "Target Schema (Optional)",
+        "sectionId": "basic-information",
+        "component": "picker",
+        "targetSchema": "schemas",
+        "placeholder": "Select schema for data source (optional)",
+        "required": false,
+        "description": "If specified, page will load data from this schema. Leave empty for standalone pages.",
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "page-is-active",
+        "name": "isActive",
+        "label": "Active",
+        "sectionId": "basic-information",
+        "component": "checkbox",
+        "defaultValue": true,
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "page-detail-metadata",
+        "name": "detailPageMetadata",
+        "label": "Page Layout Metadata",
+        "sectionId": "page-layout",
+        "component": "textarea",
+        "placeholder": "Page layout configuration (JSON format)",
+        "required": false,
+        "description": "Stores sections, quick actions, table renderers, and component renderers configuration. Use 'Configure Page Layout' button to edit.",
+        "colSpan": 2,
+        "order": 1,
+        "readonly": true
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Page identification and basic settings",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "page-layout",
+        "title": "Page Layout",
+        "description": "Configure page layout, sections, and components",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "configure-page-layout",
+          "label": "Configure Page Layout",
+          "icon": "Settings",
+          "variant": "default",
+          "action": "openActionForm",
+          "targetSchema": "page-metadata-editor-form"
+        },
+        {
+          "id": "view-custom-page",
+          "label": "View Custom Page",
+          "icon": "ExternalLink",
+          "variant": "outline",
+          "action": "goToUrl",
+          "targetUrl": "/custom-pages/{{formData.pageId}}"
+        }
+      ]
+    },
+    "showInNavigation": false,
+    "icon": "FileText",
+    "isNotCompanyBased": true,
+    "schemaType": "system",
+    "applyToAllTenants": true
+  },
+  {
+    "id": "page-metadata-editor-form",
+    "description": "Action form for editing page layout metadata",
+    "singular_name": "Page Metadata Editor",
+    "plural_name": "Page Metadata Editors",
+    "icon": "LayoutList",
+    "schemaType": "action-form",
+    "showInNavigation": false,
+    "isNotCompanyBased": true,
+    "fields": [
+      {
+        "id": "page-info-title",
+        "name": "pageTitle",
+        "label": "Page Title",
+        "sectionId": "page-info",
+        "component": "text",
+        "placeholder": "Page Title",
+        "disabled": true,
+        "defaultValue": "{{referenceData.pageTitle}}",
+        "readonly": true,
+        "order": 0
+      },
+      {
+        "id": "page-info-id",
+        "name": "pageId",
+        "label": "Page ID",
+        "sectionId": "page-info",
+        "component": "text",
+        "placeholder": "Page ID",
+        "disabled": true,
+        "defaultValue": "{{referenceData.pageId}}",
+        "readonly": true,
+        "order": 1
+      }
+    ],
+    "sections": [
+      {
+        "id": "page-info",
+        "title": "Page Information",
+        "description": "Information about the page being edited",
+        "initialState": "expanded",
+        "columns": 1
+      }
+    ],
+    "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "open-metadata-editor",
+          "label": "Open Metadata Editor",
+          "icon": "LayoutList",
+          "variant": "default",
+          "action": "openMetadataEditor"
+        }
+      ]
+    },
+    "applyToAllTenants": true
   }
 ]

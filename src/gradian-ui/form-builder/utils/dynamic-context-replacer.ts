@@ -2,12 +2,49 @@ import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store'
 import { safeGetProperty, isPrototypePollutionKey } from '@/gradian-ui/shared/utils/security-utils';
 
 /**
+ * Get page data (URL, query parameters, etc.) from browser
+ * Only works in browser environment
+ */
+function getPageData(): {
+  host?: string;
+  hostname?: string;
+  origin?: string;
+  pathname?: string;
+  query?: Record<string, string>;
+} {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  try {
+    const url = new URL(window.location.href);
+    const query: Record<string, string> = {};
+    
+    // Extract all query parameters
+    url.searchParams.forEach((value, key) => {
+      query[key] = value;
+    });
+
+    return {
+      host: url.host,
+      hostname: url.hostname,
+      origin: url.origin,
+      pathname: url.pathname,
+      query,
+    };
+  } catch (error) {
+    console.warn('Failed to get page data:', error);
+    return {};
+  }
+}
+
+/**
  * Extract a value from the dynamic form context using dot-notation path
  * Supports array access like [0] in the path
  * Returns the raw value (not URI-encoded)
  * 
- * @param contextKey - The context key: 'formSchema', 'formData', or 'userData'
- * @param path - Dot-notation path with optional array access, e.g., 'statusGroup.[0].id'
+ * @param contextKey - The context key: 'formSchema', 'formData', 'userData', 'referenceData', or 'pageData'
+ * @param path - Dot-notation path with optional array access, e.g., 'statusGroup.[0].id', 'query.inquiry_id'
  * @param data - Optional data object to use instead of context store
  * @returns The extracted value as a string, or empty string if not found
  * 
@@ -15,19 +52,27 @@ import { safeGetProperty, isPrototypePollutionKey } from '@/gradian-ui/shared/ut
  * extractValueFromContext('formSchema', 'statusGroup.[0].id')
  * extractValueFromContext('formData', 'status.id')
  * extractValueFromContext('userData', 'email')
+ * extractValueFromContext('pageData', 'query.inquiry_id')
+ * extractValueFromContext('pageData', 'host')
  */
 export function extractValueFromContext(
-  contextKey: 'formSchema' | 'formData' | 'userData' | 'referenceData',
+  contextKey: 'formSchema' | 'formData' | 'userData' | 'referenceData' | 'pageData',
   path: string,
   data?: {
     formSchema?: any;
     formData?: any;
     userData?: any;
     referenceData?: any;
+    pageData?: any;
   }
 ): string {
-  // Use provided data or fall back to context store
-  const source = data?.[contextKey] ?? useDynamicFormContextStore.getState()[contextKey];
+  // Special handling for pageData - get from browser if not provided
+  let source: any;
+  if (contextKey === 'pageData') {
+    source = data?.pageData ?? getPageData();
+  } else {
+    source = data?.[contextKey] ?? useDynamicFormContextStore.getState()[contextKey];
+  }
   
   if (!source) {
     return '';
@@ -80,6 +125,8 @@ export function extractValueFromContext(
  * replaceDynamicContext('/api/data/vendors?id={{formData.id}}')
  * replaceDynamicContext('/api/data/{{formSchema.id}}/{{formData.id}}')
  * replaceDynamicContext('User: {{userData.email}}')
+ * replaceDynamicContext('/api/data/inquiries?id={{pageData.query.inquiry_id}}')
+ * replaceDynamicContext('Host: {{pageData.host}}')
  */
 export function replaceDynamicContext(
   template: string,
@@ -88,6 +135,7 @@ export function replaceDynamicContext(
     formData?: any;
     userData?: any;
     referenceData?: any;
+    pageData?: any;
   }
 ): string {
   if (!template || typeof template !== 'string') {
@@ -95,11 +143,13 @@ export function replaceDynamicContext(
   }
 
   // Get context from store or use provided data
+  // For pageData, always get fresh from browser unless explicitly provided
   const context = data || {
     formSchema: useDynamicFormContextStore.getState().formSchema,
     formData: useDynamicFormContextStore.getState().formData,
     userData: useDynamicFormContextStore.getState().userData,
     referenceData: useDynamicFormContextStore.getState().referenceData,
+    // pageData is always fetched fresh from browser, so don't store it
   };
 
   // Match variables in format {{contextKey.path}}
@@ -107,16 +157,16 @@ export function replaceDynamicContext(
   
   return template.replace(variablePattern, (match, contextKey, path) => {
     // Validate context key
-    if (!['formSchema', 'formData', 'userData', 'referenceData'].includes(contextKey)) {
+    if (!['formSchema', 'formData', 'userData', 'referenceData', 'pageData'].includes(contextKey)) {
       console.warn(`Invalid context key in template: ${contextKey}`);
       return match; // Return original if invalid
     }
 
     // Extract value from context (pass data parameter if provided)
     const value = extractValueFromContext(
-      contextKey as 'formSchema' | 'formData' | 'userData' | 'referenceData',
+      contextKey as 'formSchema' | 'formData' | 'userData' | 'referenceData' | 'pageData',
       path.trim(),
-      data
+      data || context
     );
 
     return value || match; // Return value or original if not found
@@ -146,6 +196,8 @@ export function replaceDynamicContextInObject<T>(
     formSchema?: any;
     formData?: any;
     userData?: any;
+    referenceData?: any;
+    pageData?: any;
   }
 ): T {
   if (obj === null || obj === undefined) {

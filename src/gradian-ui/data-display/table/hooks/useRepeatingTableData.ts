@@ -13,6 +13,8 @@ import { formatRelationType } from '../utils';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { replaceDynamicContext } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
+import { useCompanyStore } from '@/stores/company.store';
 
 async function fetchSchemaClient(schemaId: string): Promise<FormSchema | null> {
   const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);
@@ -31,9 +33,39 @@ export function useRepeatingTableData(
   const isRelationBased = Boolean(config.targetSchema);
   const targetSchemaId = config.targetSchema || null;
   const relationTypeId = config.relationTypeId;
+  
+  // Get company ID from store to include in API requests
+  const getCompanyId = useCompanyStore((state) => state.getCompanyId);
+  
+  // Reference-based filtering properties
+  const referenceSchema = config.referenceSchema;
+  const referenceRelationTypeId = config.referenceRelationTypeId;
+  const referenceEntityIdRaw = config.referenceEntityId;
+  
+  // Resolve referenceEntityId with dynamic context if needed
+  const referenceEntityId = useMemo(() => {
+    if (!referenceEntityIdRaw) return null;
+    // Check if it contains dynamic context syntax
+    if (referenceEntityIdRaw.includes('{{')) {
+      return replaceDynamicContext(referenceEntityIdRaw, {
+        formSchema: schema,
+        formData: data,
+      });
+    }
+    return referenceEntityIdRaw;
+  }, [referenceEntityIdRaw, schema, data]);
 
   const effectiveSourceSchemaId = sourceSchemaId || schema.id;
   const effectiveSourceId = sourceId ?? data?.id;
+  
+  // Helper function to get companyIds param for API requests
+  const getCompanyIdsParam = useCallback(() => {
+    const companyId = getCompanyId();
+    if (companyId) {
+      return { companyIds: String(companyId) };
+    }
+    return {};
+  }, [getCompanyId]);
 
   const [relatedEntities, setRelatedEntities] = useState<any[]>([]);
   const [isLoadingRelations, setIsLoadingRelations] = useState(false);
@@ -66,7 +98,7 @@ export function useRepeatingTableData(
     }
 
     // Create a unique request key to prevent duplicate concurrent requests
-    const requestKey = `${effectiveSourceSchemaId}-${effectiveSourceId}-${targetSchemaId}-${relationTypeId || 'all'}-${targetSchemaData.id}`;
+    const requestKey = `${effectiveSourceSchemaId}-${effectiveSourceId}-${targetSchemaId}-${relationTypeId || 'all'}-${targetSchemaData.id}-${referenceSchema || ''}-${referenceRelationTypeId || ''}-${referenceEntityId || ''}`;
     
     // If the same request is already in flight, skip
     if (inFlightRequestRef.current === requestKey) {
@@ -78,6 +110,41 @@ export function useRepeatingTableData(
     setIsLoadingRelations(true);
 
     try {
+      // Get companyIds param once for all API requests in this function
+      const companyIdsParam = getCompanyIdsParam();
+      
+      // If reference-based filtering is enabled, first fetch entities related to the reference entity
+      let referenceFilteredTargetIds: Set<string> | null = null;
+      if (referenceSchema && referenceRelationTypeId && referenceEntityId && targetSchemaId) {
+        try {
+          // Fetch all entities in targetSchema that are related to the reference entity
+          const referenceRelationsResponse = await apiRequest<Array<{
+            id: string;
+            sourceSchema: string;
+            sourceId: string;
+            targetSchema: string;
+            targetId: string;
+            relationTypeId: string;
+          }>>(
+            `/api/relations?sourceSchema=${referenceSchema}&sourceId=${referenceEntityId}&targetSchema=${targetSchemaId}&relationTypeId=${referenceRelationTypeId}&includeInactive=true`,
+            {
+              params: companyIdsParam,
+            }
+          );
+
+          if (referenceRelationsResponse.success && Array.isArray(referenceRelationsResponse.data)) {
+            referenceFilteredTargetIds = new Set(
+              referenceRelationsResponse.data
+                .map((rel) => rel.targetId)
+                .filter(Boolean)
+                .map(String)
+            );
+          }
+        } catch (error) {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `Error fetching reference relations: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+
       // Fetch relation metadata (ids) for delete/edit actions
       const relationsMetaResponse = await apiRequest<Array<{
         id: string;
@@ -89,14 +156,21 @@ export function useRepeatingTableData(
       }>>(
         `/api/relations?sourceSchema=${effectiveSourceSchemaId}&sourceId=${effectiveSourceId}&targetSchema=${targetSchemaId}${
           relationTypeId ? `&relationTypeId=${relationTypeId}` : ''
-        }&includeInactive=true`
+        }&includeInactive=true`,
+        {
+          params: companyIdsParam,
+        }
       );
 
       const relationIdByTargetId = new Map<string, string>();
       if (relationsMetaResponse.success && Array.isArray(relationsMetaResponse.data)) {
         relationsMetaResponse.data.forEach((rel) => {
           if (rel.targetId) {
-            relationIdByTargetId.set(String(rel.targetId), rel.id);
+            const targetIdStr = String(rel.targetId);
+            // Apply reference filtering if enabled
+            if (referenceFilteredTargetIds === null || referenceFilteredTargetIds.has(targetIdStr)) {
+              relationIdByTargetId.set(targetIdStr, rel.id);
+            }
           }
         });
       }
@@ -110,7 +184,9 @@ export function useRepeatingTableData(
         direction: RelationDirection;
         relation_type: string;
         data: any[];
-      }>>(allRelationsUrl);
+      }>>(allRelationsUrl, {
+        params: companyIdsParam,
+      });
 
       if (allRelationsResponse.success && Array.isArray(allRelationsResponse.data)) {
         const groupedData = allRelationsResponse.data;
@@ -121,8 +197,18 @@ export function useRepeatingTableData(
           if (group.schema !== targetSchemaId) continue;
           if (relationTypeId && group.relation_type !== relationTypeId) continue;
 
+          // Apply reference filtering if enabled
+          let filteredData = group.data;
+          if (referenceFilteredTargetIds !== null) {
+            filteredData = group.data.filter((item) => 
+              item?.id && referenceFilteredTargetIds!.has(String(item.id))
+            );
+          }
+
+          if (filteredData.length === 0) continue;
+
           directionsSet.add(group.direction);
-          const annotatedData = group.data.map((item) => ({
+          const annotatedData = filteredData.map((item) => ({
             ...item,
             __relationType: group.relation_type,
             __relationId: relationIdByTargetId.get(String(item?.id)) || null,
@@ -448,6 +534,9 @@ export function useRepeatingTableData(
     relationTypeId,
     targetSchemaData?.id, // Use targetSchemaData.id instead of whole object to prevent unnecessary re-fetches
     targetSchemaId,
+    referenceSchema,
+    referenceRelationTypeId,
+    referenceEntityId,
   ]);
 
   useEffect(() => {
@@ -456,7 +545,7 @@ export function useRepeatingTableData(
     }
 
     // Include targetSchemaData.id in the key to ensure we refetch if schema changes
-    const fetchKey = `${effectiveSourceSchemaId}-${effectiveSourceId}-${targetSchemaId}-${relationTypeId || 'all'}-${targetSchemaData.id}`;
+    const fetchKey = `${effectiveSourceSchemaId}-${effectiveSourceId}-${targetSchemaId}-${relationTypeId || 'all'}-${targetSchemaData.id}-${referenceSchema || ''}-${referenceRelationTypeId || ''}-${referenceEntityId || ''}`;
     if (lastFetchParamsRef.current === fetchKey) {
       return;
     }
@@ -471,6 +560,9 @@ export function useRepeatingTableData(
     relationTypeId,
     targetSchemaId,
     targetSchemaData?.id, // Use targetSchemaData.id instead of whole object
+    referenceSchema,
+    referenceRelationTypeId,
+    referenceEntityId,
   ]);
 
   const section = useMemo(
