@@ -5536,7 +5536,7 @@
         }
       }
     ],
-    "showInNavigation": false,
+    "showInNavigation": true,
     "icon": "Mail",
     "schemaType": "business",
     "applyToAllTenants": false,
