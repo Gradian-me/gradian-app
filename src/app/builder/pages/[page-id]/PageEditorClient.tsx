@@ -92,6 +92,34 @@ export function PageEditorClient({ pageId }: PageEditorClientProps) {
     }
   };
 
+  // Parse detailPageMetadata if it's a string
+  const parsedPageEntity = useMemo(() => {
+    if (pageEntity?.detailPageMetadata && typeof pageEntity.detailPageMetadata === 'string') {
+      try {
+        return {
+          ...pageEntity,
+          detailPageMetadata: JSON.parse(pageEntity.detailPageMetadata),
+        };
+      } catch {
+        return pageEntity;
+      }
+    }
+    return pageEntity;
+  }, [pageEntity]);
+
+  // Create schema with metadata for renderer
+  const schemaWithMetadata = useMemo(() => {
+    if (!pagesSchema) {
+      return pagesSchema;
+    }
+    return {
+      ...pagesSchema,
+      detailPageMetadata: parsedPageEntity?.detailPageMetadata || {},
+    };
+  }, [pagesSchema, parsedPageEntity]);
+
+  const serializedNavigationSchemas = navigationSchemas.map(serializeSchema);
+
   if (isLoading) {
     return (
       <MainLayout title="Loading..." subtitle="Loading page editor" icon="FileText">
@@ -118,32 +146,6 @@ export function PageEditorClient({ pageId }: PageEditorClientProps) {
     );
   }
 
-  const serializedPagesSchema = serializeSchema(pagesSchema);
-  const serializedNavigationSchemas = navigationSchemas.map(serializeSchema);
-
-  // Parse detailPageMetadata if it's a string
-  const parsedPageEntity = useMemo(() => {
-    if (pageEntity?.detailPageMetadata && typeof pageEntity.detailPageMetadata === 'string') {
-      try {
-        return {
-          ...pageEntity,
-          detailPageMetadata: JSON.parse(pageEntity.detailPageMetadata),
-        };
-      } catch {
-        return pageEntity;
-      }
-    }
-    return pageEntity;
-  }, [pageEntity]);
-
-  // Create schema with metadata for renderer
-  const schemaWithMetadata = useMemo(() => {
-    return {
-      ...pagesSchema,
-      detailPageMetadata: parsedPageEntity?.detailPageMetadata || {},
-    };
-  }, [pagesSchema, parsedPageEntity]);
-
   return (
     <MainLayout
       title={parsedPageEntity?.pageTitle || pageId}
@@ -152,7 +154,7 @@ export function PageEditorClient({ pageId }: PageEditorClientProps) {
       navigationSchemas={serializedNavigationSchemas}
     >
       <PageEditorWrapper
-        schema={schemaWithMetadata}
+        schema={schemaWithMetadata!}
         data={parsedPageEntity}
         onRefreshData={handleRefreshData}
       />

@@ -100,6 +100,12 @@ export async function GET(request: NextRequest) {
       relations = readAllRelations();
     }
 
+    // Exclude HAS_FIELD_VALUE relations from generic fetches unless explicitly requested
+    // The relations section in detail pages should not show field-value relations
+    if (!relationTypeId) {
+      relations = relations.filter((r) => r.relationTypeId !== 'HAS_FIELD_VALUE');
+    }
+
     // Optional filter by fieldId (mainly for HAS_FIELD_VALUE)
     if (fieldId) {
       relations = relations.filter((r) => r.fieldId === fieldId);

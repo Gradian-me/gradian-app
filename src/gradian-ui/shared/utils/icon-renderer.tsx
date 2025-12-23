@@ -5,6 +5,7 @@ import { Text } from 'lucide-react';
 export interface IconRendererProps {
   iconName?: string;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const getIconComponent = (iconName?: string): React.ComponentType<any> => {
@@ -18,9 +19,9 @@ export const isValidLucideIcon = (iconName?: string): boolean => {
   return !!(LucideIcons as any)[iconName];
 };
 
-export const IconRenderer: React.FC<IconRendererProps> = ({ iconName, className = "h-4 w-4" }) => {
+export const IconRenderer: React.FC<IconRendererProps> = ({ iconName, className = "h-4 w-4", style }) => {
   const IconComponent = getIconComponent(iconName);
-  return <IconComponent className={className} />;
+  return <IconComponent className={className} style={style} />;
 };
 
 // Export all Lucide icons for direct access if needed

@@ -289,6 +289,7 @@ export function AiBuilderResponse({
       'polaroid': 'Polaroid',
       'lego-style': 'Lego Style',
       'disney': 'Disney',
+      'xray': 'X-Ray',
       'mindmap': 'Mindmap',
       'timeline': 'Timeline',
       'dashboard': 'Dashboard',

@@ -472,7 +472,7 @@ KEYWORD DETECTION RULES (PRIORITY ORDER - CHECK IN THIS ORDER):
 1. IMAGE GENERATION (HIGHEST PRIORITY):
    - If user mentions "sketch", "sketch image", "drawing", "pencil drawing", "create sketch", "generate sketch", "sketch of", "visual sketch" → MUST use "image-generator" agent with "imageType": "sketch"
    - If user mentions "image", "generate image", "create image", "picture" → use "image-generator" agent
-   - For image-generator: detect image types like "infographic", "3d-model", "creative", "iconic", "editorial", "comic-book", "blueprint", "portrait", "landscape", "fashion", "cinematic", "isometric", "vector-illustration", "architectural", "product-photography", "tilt-shift", "polaroid", "lego-style", "disney", "mindmap", "timeline", "dashboard", "negative-space", "abstract", "retro", "poster", "photocopy", "newspaper", "collage", "paper-craft", "mockup", "persian", "hollywood-movie", "new-york", "cyberpunk", "retro-miami" and set "imageType" accordingly
+   - For image-generator: detect image types like "infographic", "3d-model", "creative", "iconic", "editorial", "comic-book", "blueprint", "portrait", "landscape", "fashion", "cinematic", "isometric", "vector-illustration", "architectural", "product-photography", "tilt-shift", "polaroid", "lego-style", "disney", "red-dead", "gta-style", "xray", "mindmap", "timeline", "dashboard", "negative-space", "abstract", "retro", "poster", "photocopy", "newspaper", "collage", "paper-craft", "mockup", "persian", "hollywood-movie", "new-york", "cyberpunk", "retro-miami" and set "imageType" accordingly
    - CRITICAL: "sketch" keyword ALWAYS means image generation, NOT process analysis. Use "image-generator" agent, NOT "process-analyst"
 
 1.5. GRAPH GENERATION (HIGH PRIORITY - AFTER IMAGE):

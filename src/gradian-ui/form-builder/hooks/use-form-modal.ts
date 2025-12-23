@@ -114,11 +114,13 @@ async function applyHasFieldValueRelationsToEntity(params: {
 
     const updatedEntity = { ...entity };
 
-    // Process all picker fields to populate from relations (for form display)
+    // Process all relation-supporting fields to populate from relations (for form display)
     // Relations are the source of truth for full data (label, icon, color)
     // But we preserve minimal IDs in entity for tracing
+    // Supports: picker, select, checkbox-list, radio, toggle-group
+    const supportedComponents = ['picker', 'select', 'checkbox-list', 'checkboxlist', 'checkbox_list', 'radio', 'toggle-group', 'togglegroup'];
     for (const field of formBuilderSchema.fields ?? []) {
-      if (field.component !== 'picker' || !field.name) {
+      if (!supportedComponents.includes(field.component) || !field.name) {
         continue;
       }
 
@@ -146,7 +148,7 @@ async function applyHasFieldValueRelationsToEntity(params: {
       // Map relations to normalized options with id, label, icon, color, metadata
       // This format matches what PickerInput expects: [{id, label, icon, color, metadata}, ...]
       // Relations are the source of truth for form display
-      const newValue = fieldRelations.map((rel) => {
+      const mappedRelations = fieldRelations.map((rel) => {
         if (rel.targetData) {
           // Use enriched target data if available
           return {
@@ -164,7 +166,12 @@ async function applyHasFieldValueRelationsToEntity(params: {
         };
       });
 
-      updatedEntity[field.name] = newValue;
+      // Determine if this is a single-select or multi-select component
+      const isFieldMultiSelect = field.component === 'picker' || 
+                                 field.component === 'checkbox-list';
+
+      // For single-select components, use first relation only; for multi-select, use all
+      updatedEntity[field.name] = isFieldMultiSelect ? mappedRelations : (mappedRelations[0] || null);
     }
 
     return updatedEntity;

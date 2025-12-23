@@ -278,9 +278,10 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
   };
 
   // Always render the same structure to avoid hydration mismatch
-  // Use the same wrapper div and DropdownMenuPrimitive structure for both placeholder and actual
+  // Use the same DropdownMenuPrimitive structure for both placeholder and actual
+  // Wrap in a single element for TooltipTrigger asChild compatibility
   return (
-    <div suppressHydrationWarning data-notifications-dropdown={isMounted ? "active" : "placeholder"}>
+    <div suppressHydrationWarning>
       <DropdownMenuPrimitive.Root open={isMounted ? isOpen : false} onOpenChange={isMounted ? setIsOpen : undefined}>
         <DropdownMenuPrimitive.Trigger asChild disabled={!isMounted}>
           <Button 

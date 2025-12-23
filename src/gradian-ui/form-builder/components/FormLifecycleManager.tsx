@@ -266,6 +266,12 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
       };
     
     case 'RESET':
+      // Dispatch custom event to trigger formula refresh in dialogs
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('form-reset', { 
+          detail: { schemaId: action.schema?.id } 
+        }));
+      }
       return {
         values: ensureRepeatingItemIds(action.initialValues, action.schema, action.referenceEntityData),
         errors: {},

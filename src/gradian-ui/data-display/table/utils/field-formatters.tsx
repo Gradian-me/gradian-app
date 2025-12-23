@@ -21,6 +21,7 @@ import { AvatarUser } from '../../components/AvatarUser';
 import { toast } from 'sonner';
 import { cn } from '@/gradian-ui/shared/utils';
 import { CodeBadge } from '@/gradian-ui/form-builder/form-elements/components/CodeBadge';
+import { FormulaDisplay } from '@/gradian-ui/form-builder/form-elements/components/FormulaDisplay';
 
 export const getFieldValue = (field: any, row: any): any => {
   if (!field || !row) return null;
@@ -111,6 +112,16 @@ export const formatFieldValue = (
   const isInactive = isRecordInactive(row);
   const isTitle = field?.role === 'title';
   
+  // Handle formula fields - show calculated result with view button
+  if (field?.component === 'formula' && field?.formula) {
+    return wrapWithForceIcon(
+      <FormulaDisplay field={field} data={row} />,
+      isForce,
+      field,
+      row
+    );
+  }
+  
   if (value === null || value === undefined || value === '') {
     // Still show ForceIcon even if value is empty (only for title role)
     if (isForce && isTitle) {
@@ -127,11 +138,194 @@ export const formatFieldValue = (
     return isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
   }
 
-  const normalizedOptions = normalizeOptionArray(value);
-  const displayStrings = getDisplayStrings(value);
+  // If value is an array of IDs (strings) and field has options, resolve labels from options first
+  // This applies to checkbox-list, picker fields, select fields, and any field that stores IDs but needs to display labels
+  let resolvedValue = value;
+  const isCheckboxList = field?.component === 'checkbox-list' || field?.component === 'checkboxlist' || field?.component === 'checkbox_list';
+  const isSelect = field?.component === 'select';
+  const isRadio = field?.component === 'radio' || field?.component === 'radio-group' || field?.component === 'radiogroup';
+  const isToggleGroup = field?.component === 'toggle-group' || field?.component === 'togglegroup';
+  
+  // Handle arrays that might contain IDs or objects with just {id}
+  if (Array.isArray(value) && value.length > 0) {
+    // Check if items are objects with just {id} (like [{id: "..."}])
+    const valueIsIdObjects = value.every((item: any) => 
+      typeof item === 'object' && item !== null && item.id && Object.keys(item).length === 1
+    );
+    
+    // Check if all items are likely IDs (strings without spaces, length > 10 for ULID format)
+    const valueIsStringIds = value.every((item: any) => 
+      typeof item === 'string' && !item.includes(' ') && item.length > 10
+    );
+    
+    // Extract IDs if items are {id} objects
+    if (valueIsIdObjects) {
+      const extractedIds = value.map((item: any) => item.id);
+      // Try to resolve from field options if available
+      if (field?.options && Array.isArray(field.options) && field.options.length > 0) {
+        resolvedValue = extractedIds.map((id: string) => {
+          const option = field.options.find((opt: any) => 
+            String(opt.id || opt.value) === String(id)
+          );
+          if (option) {
+            return { ...option };
+          }
+          return { id, label: id };
+        });
+      } else {
+        // No options to resolve from, keep as IDs
+        resolvedValue = extractedIds;
+      }
+    } else if (valueIsStringIds && field?.options && Array.isArray(field.options) && field.options.length > 0) {
+      // Items are string IDs, try to resolve from field options
+      const shouldResolve = valueIsStringIds || isCheckboxList || isSelect || isRadio || isToggleGroup;
+      
+      if (shouldResolve) {
+        // Map IDs to option objects with labels, icons, colors
+        resolvedValue = value.map((id: string) => {
+          const option = field.options.find((opt: any) => 
+            String(opt.id || opt.value) === String(id)
+          );
+          // Return the full option object if found (has label, icon, color), otherwise create fallback
+          if (option) {
+            // Return a copy of the option object to ensure all properties are preserved
+            return { ...option };
+          }
+          return { id, label: id }; // Fallback to ID if option not found
+        });
+      }
+    }
+  }
+  
+  const normalizedOptions = normalizeOptionArray(resolvedValue);
+  const displayStrings = getDisplayStrings(resolvedValue);
   const hasStructuredOptions =
     displayStrings.length > 0 &&
-    (Array.isArray(value) || (typeof value === 'object' && value !== null));
+    (Array.isArray(resolvedValue) || (typeof resolvedValue === 'object' && resolvedValue !== null));
+
+  // Handle checkbox-list component - render as badges with labels, icons, colors
+  // Checkbox-list always stores values as arrays of IDs, so we need to ensure they're resolved
+  if (field?.component === 'checkbox-list' || field?.component === 'checkboxlist' || field?.component === 'checkbox_list') {
+    if (!resolvedValue || (Array.isArray(resolvedValue) && resolvedValue.length === 0)) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    // Ensure resolvedValue is an array
+    const checkboxItems = Array.isArray(resolvedValue) ? resolvedValue : [resolvedValue];
+    
+    // Check if resolvedValue contains option objects with labels (from ID resolution)
+    // If not, the ID resolution didn't work, so BadgeViewer will handle it
+    // BadgeViewer's convertValueToBadgeItems will:
+    // 1. Use normalizeOptionArray to extract labels from resolved option objects
+    // 2. Use findBadgeOption to look up options if values are still IDs
+    // So we pass resolvedValue (which may be resolved option objects or original IDs)
+    const valueToPass = resolvedValue;
+    
+    // Use BadgeViewer to display checkbox list items with proper formatting
+    const handleBadgeClick = (item: BadgeItem) => {
+      const candidateId = item.normalized?.id ?? item.id;
+      if (!candidateId) return;
+      const targetSchema = field?.targetSchema;
+      if (!targetSchema) return;
+
+      const url = `/page/${targetSchema}/${encodeURIComponent(candidateId)}?showBack=true`;
+      if (typeof window !== 'undefined') {
+        window.open(url, '_self');
+      }
+    };
+
+    return wrapWithForceIcon(
+      <BadgeViewer
+        field={field}
+        value={valueToPass}
+        badgeVariant={field.roleColor || "default"}
+        enforceVariant={false}
+        animate={true}
+        onBadgeClick={field?.targetSchema ? handleBadgeClick : undefined}
+        isItemClickable={
+          field?.targetSchema
+            ? (item) => Boolean(item.normalized?.id ?? item.id)
+            : () => false
+        }
+      />,
+      isForce,
+      field,
+      row
+    );
+  }
+
+  // Handle select component - render similar to picker fields with badges
+  // Select fields can have targetSchema (like picker) or static options
+  if (field?.component === 'select') {
+    if (!resolvedValue || (Array.isArray(resolvedValue) && resolvedValue.length === 0)) {
+      return <span className="text-gray-400">—</span>;
+    }
+    
+    // For select fields, value might be a single item or array
+    // If it's an array with one item, use that item; if it's a single object, use it directly
+    const selectValue = Array.isArray(resolvedValue) 
+      ? (resolvedValue.length === 1 ? resolvedValue[0] : resolvedValue)
+      : resolvedValue;
+    
+    // Check if value looks like a picker/select value (object with id/label or array of such objects)
+    const looksLikeSelectValue = (val: any): boolean => {
+      if (Array.isArray(val) && val.length > 0) {
+        return val.some(item => 
+          (typeof item === 'object' && item !== null && (item.id || item.label || item.name || item.title))
+        );
+      }
+      if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
+        return !!(val.id || val.label || val.name || val.title || val.value);
+      }
+      return false;
+    };
+    
+    // If it looks like a select value (has targetSchema or looks like picker value), use BadgeViewer
+    if (field?.targetSchema || looksLikeSelectValue(selectValue)) {
+      const handleBadgeClick = (item: BadgeItem) => {
+        const candidateId = item.normalized?.id ?? item.id;
+        if (!candidateId) return;
+        const targetSchema = field?.targetSchema;
+        if (!targetSchema) return;
+
+        const url = `/page/${targetSchema}/${encodeURIComponent(candidateId)}?showBack=true`;
+        if (typeof window !== 'undefined') {
+          window.open(url, '_self');
+        }
+      };
+
+      // Normalize to array for BadgeViewer (it handles both single and array values)
+      const valueToPass = Array.isArray(selectValue) ? selectValue : [selectValue];
+
+      return wrapWithForceIcon(
+        <BadgeViewer
+          field={field}
+          value={valueToPass}
+          badgeVariant={field.roleColor || "default"}
+          enforceVariant={false}
+          animate={true}
+          onBadgeClick={field?.targetSchema ? handleBadgeClick : undefined}
+          isItemClickable={
+            field?.targetSchema
+              ? (item) => Boolean(item.normalized?.id ?? item.id)
+              : () => false
+          }
+        />,
+        isForce,
+        field,
+        row
+      );
+    }
+    
+    // Fallback: try to get display value
+    const displayValue = typeof selectValue === 'object' && selectValue !== null
+      ? (selectValue.label || selectValue.name || selectValue.title || selectValue.value || selectValue.id)
+      : String(selectValue);
+    
+    if (displayValue) {
+      return wrapWithForceIcon(<span>{String(displayValue)}</span>, isForce, field, row);
+    }
+  }
 
   // Handle list-input component FIRST - render as bullet list (before picker field check)
   if (field?.component === 'list-input' || field?.component === 'listinput') {
@@ -193,23 +387,58 @@ export const formatFieldValue = (
   };
   
   const isPickerField = isPickerComponent || 
-                        (field?.targetSchema && (typeof value === 'object' || Array.isArray(value))) ||
-                        (looksLikePickerValue(value) && (typeof value === 'object' || Array.isArray(value)));
+                        (field?.targetSchema && (typeof resolvedValue === 'object' || Array.isArray(resolvedValue))) ||
+                        (looksLikePickerValue(resolvedValue) && (typeof resolvedValue === 'object' || Array.isArray(resolvedValue)));
   
   if (isPickerField) {
     // Check if value is an array (even single-item arrays should use BadgeViewer for consistency)
-    const isArrayValue = Array.isArray(value) && value.length > 0;
+    const isArrayValue = Array.isArray(resolvedValue) && resolvedValue.length > 0;
+    
     const isNormalizedArray = isArrayValue && normalizedOptions.length > 0;
     
     // For array values (multi-select or single-item arrays with normalized format),
     // use BadgeViewer to show all items with proper formatting
     // Check if array items look like picker objects (have id, label, name, title, icon, or color)
-    const arrayItemsLookLikePicker = isArrayValue && value.some((item: any) => 
+    const arrayItemsLookLikePicker = isArrayValue && resolvedValue.some((item: any) => 
       typeof item === 'object' && item !== null && 
       (item.id || item.label || item.name || item.title || item.icon || item.color)
     );
     
     if (isNormalizedArray || arrayItemsLookLikePicker) {
+      const handleBadgeClick = (item: BadgeItem) => {
+        const candidateId = item.normalized?.id ?? item.id;
+        if (!candidateId) return;
+        const targetSchema = field?.targetSchema;
+        if (!targetSchema) return;
+
+        const url = `/page/${targetSchema}/${encodeURIComponent(candidateId)}?showBack=true`;
+        if (typeof window !== 'undefined') {
+          window.open(url, '_self');
+        }
+      };
+
+      return wrapWithForceIcon(
+        <BadgeViewer
+          field={field}
+          value={resolvedValue}
+          badgeVariant={field.roleColor || "default"}
+          enforceVariant={false}
+          animate={true}
+          onBadgeClick={field?.targetSchema ? handleBadgeClick : undefined}
+          isItemClickable={
+            field?.targetSchema
+              ? (item) => Boolean(item.normalized?.id ?? item.id)
+              : () => false
+          }
+        />,
+        isForce,
+        field,
+        row
+      );
+    }
+    
+    // For single non-array values (including objects), try to get display value
+    if (typeof resolvedValue === 'object' && resolvedValue !== null && !Array.isArray(resolvedValue)) {
       const handleBadgeClick = (item: BadgeItem) => {
         const candidateId = item.normalized?.id ?? item.id;
         if (!candidateId) return;

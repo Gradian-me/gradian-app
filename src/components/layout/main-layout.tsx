@@ -450,7 +450,7 @@ function MainLayoutContent({
           {ENABLE_NOTIFICATION && (
             <Tooltip key="notifications-tooltip">
               <TooltipTrigger asChild>
-                <div suppressHydrationWarning data-component="notifications-dropdown">
+                <div suppressHydrationWarning>
                   <NotificationsDropdown initialCount={5} />
                 </div>
               </TooltipTrigger>

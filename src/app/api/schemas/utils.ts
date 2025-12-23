@@ -637,6 +637,86 @@ export const proxySchemaRequest = async (
       : '[proxySchemaRequest] [Tenant Domain Extraction] Final result: No tenant domain extracted; x-tenant-domain header will NOT be set. Backend may reject request or use fallback.'
   );
 
+  // Extract and forward x-fingerprint header
+  // Priority: x-fingerprint header → x-fingerprint cookie → JWT token payload
+  let fingerprint: string | null = null;
+  const fingerprintHeader = request.headers.get('x-fingerprint') || request.headers.get('X-Fingerprint');
+  
+  if (fingerprintHeader) {
+    fingerprint = fingerprintHeader.trim();
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'info',
+      `[proxySchemaRequest] Extracted x-fingerprint from header: ${fingerprint.substring(0, 8)}...`
+    );
+  } else {
+    // Fallback: Try to extract from cookies
+    const fingerprintFromCookie = extractTokenFromCookies(cookies, 'x-fingerprint');
+    if (fingerprintFromCookie) {
+      fingerprint = fingerprintFromCookie;
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'info',
+        `[proxySchemaRequest] Extracted x-fingerprint from cookie: ${fingerprint.substring(0, 8)}...`
+      );
+    } else if (authToken) {
+      // Final fallback: Extract fingerprint from JWT token payload
+      // This ensures consistency with the fingerprint used during login
+      try {
+        const parts = authToken.split('.');
+        if (parts.length === 3) {
+          // Decode the payload (second part)
+          const payload = parts[1];
+          // Add padding if needed
+          let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+          while (base64.length % 4) {
+            base64 += '=';
+          }
+          const decoded = Buffer.from(base64, 'base64').toString('utf-8');
+          const parsed = JSON.parse(decoded) as { fingerprint?: string };
+          if (parsed.fingerprint && typeof parsed.fingerprint === 'string') {
+            fingerprint = parsed.fingerprint;
+            loggingCustom(
+              LogType.CALL_BACKEND,
+              'info',
+              `[proxySchemaRequest] Extracted x-fingerprint from JWT token payload: ${fingerprint.substring(0, 8)}...`
+            );
+          }
+        }
+      } catch (error) {
+        loggingCustom(
+          LogType.CALL_BACKEND,
+          'debug',
+          `[proxySchemaRequest] Could not extract fingerprint from JWT token: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+    }
+    
+    if (!fingerprint) {
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'warn',
+        `[proxySchemaRequest] No x-fingerprint found in headers, cookies, or JWT token`
+      );
+    }
+  }
+
+  // Set x-fingerprint header if we extracted it
+  if (fingerprint) {
+    headers.set('x-fingerprint', fingerprint);
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'info',
+      `[proxySchemaRequest] x-fingerprint header set for backend request`
+    );
+  } else {
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'warn',
+      `[proxySchemaRequest] WARNING: No x-fingerprint available for backend schema request to ${targetUrl}`
+    );
+  }
+
   let body: BodyInit | undefined;
   if (options.body !== undefined) {
     body = JSON.stringify(options.body);

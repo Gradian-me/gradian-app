@@ -394,11 +394,16 @@ const convertValueToBadgeItems = (
     const option = findBadgeOption(optionValue, field.options as BadgeOption[]);
     const metadata = getBadgeMetadata(optionValue, field.options as BadgeOption[]);
 
-    if (option || normalizedValue) {
-      const id = option?.id ?? option?.value ?? normalizedValue?.id ?? normalizedValue?.value ?? `${idx}`;
-      const label = option?.label ?? normalizedValue?.label ?? String(optionValue);
-      const iconName = normalizedValue?.icon ?? metadata.icon;
-      const color = normalizedValue?.color ?? metadata.color;
+    // Check if optionValue is already a resolved option object with label
+    // This handles cases where IDs were resolved to option objects in field formatters
+    const hasDirectLabel = typeof optionValue === 'object' && optionValue !== null && optionValue.label && optionValue.label !== optionValue.id;
+
+    if (option || normalizedValue || hasDirectLabel) {
+      const id = option?.id ?? option?.value ?? normalizedValue?.id ?? normalizedValue?.value ?? (typeof optionValue === 'object' && optionValue?.id ? optionValue.id : `${idx}`);
+      // Prioritize: option label > normalizedValue label > direct optionValue label > fallback
+      const label = option?.label ?? normalizedValue?.label ?? (typeof optionValue === 'object' && optionValue?.label ? optionValue.label : String(optionValue));
+      const iconName = normalizedValue?.icon ?? metadata.icon ?? (typeof optionValue === 'object' && optionValue?.icon ? optionValue.icon : undefined);
+      const color = normalizedValue?.color ?? metadata.color ?? (typeof optionValue === 'object' && optionValue?.color ? optionValue.color : undefined);
       return {
         id,
         label,

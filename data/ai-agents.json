@@ -871,6 +871,24 @@
             "color": "default"
           },
           {
+            "id": "red-dead",
+            "label": "Red Dead Redemption",
+            "icon": "ChessKnight",
+            "color": "default"
+          },
+          {
+            "id": "gta-style",
+            "label": "GTA Style",
+            "icon": "House",
+            "color": "default"
+          },
+          {
+            "id": "xray",
+            "label": "X-Ray",
+            "icon": "XRay",
+            "color": "default"
+          },
+          {
             "id": "mindmap",
             "label": "Mindmap",
             "icon": "Network",

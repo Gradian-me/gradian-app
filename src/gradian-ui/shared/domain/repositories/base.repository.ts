@@ -390,6 +390,35 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
     }
 
     writeSchemaData(this.schemaId, filteredEntities);
+    
+    // Delete HAS_FIELD_VALUE relations for this entity
+    // Relations are stored with sourceSchema and sourceId matching the deleted entity
+    try {
+      const { readAllRelations, writeAllRelations } = await import('../utils/relations-storage.util');
+      const relations = readAllRelations();
+      
+      // Filter out HAS_FIELD_VALUE relations where sourceSchema and sourceId match the deleted entity
+      const filteredRelations = relations.filter(
+        (r) => !(
+          r.relationTypeId === 'HAS_FIELD_VALUE' &&
+          r.sourceSchema === this.schemaId &&
+          r.sourceId === id
+        )
+      );
+      
+      // Only write if relations were actually removed
+      if (filteredRelations.length < relations.length) {
+        writeAllRelations(filteredRelations);
+      }
+    } catch (error) {
+      // Log error but don't fail the delete operation
+      // Relations cleanup is important but shouldn't block entity deletion
+      console.error(
+        `[BaseRepository.delete] Failed to delete HAS_FIELD_VALUE relations for ${this.schemaId}/${id}:`,
+        error instanceof Error ? error.message : String(error)
+      );
+    }
+    
     return true;
   }
 

@@ -55,7 +55,6 @@ export default async function CustomPage({ params }: PageProps) {
 
   // Load target schema if specified
   let targetSchema: FormSchema | null = null;
-  let targetData: any = null;
   if (pageEntity.targetSchema) {
     try {
       targetSchema = await findSchemaById(pageEntity.targetSchema);

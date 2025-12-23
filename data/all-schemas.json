@@ -5252,11 +5252,11 @@
   {
     "id": "tender-items",
     "description": "Manage Tender Items with part details, quantities, and requirements",
-    "singular_name": "Inquiry Item",
+    "singular_name": "Tender Item",
     "plural_name": "Tender Items",
     "fields": [
       {
-        "id": "inquiry-item-part-code",
+        "id": "part-code",
         "name": "partCode",
         "label": "Part Code",
         "sectionId": "part-information",
@@ -5270,7 +5270,7 @@
         "role": "code"
       },
       {
-        "id": "inquiry-item-part-name",
+        "id": "part-name",
         "name": "partName",
         "label": "Part Name",
         "sectionId": "part-information",
@@ -5284,7 +5284,7 @@
         "role": "title"
       },
       {
-        "id": "inquiry-item-brand",
+        "id": "brand",
         "name": "brand",
         "label": "Brand",
         "sectionId": "part-information",
@@ -5295,10 +5295,10 @@
         },
         "colSpan": 1,
         "order": 3,
-        "role": "subtitle"
+        "role": "title"
       },
       {
-        "id": "inquiry-item-cat-no",
+        "id": "cat-no",
         "name": "catNo",
         "label": "Cat. No",
         "sectionId": "part-information",
@@ -5309,10 +5309,10 @@
         },
         "colSpan": 1,
         "order": 4,
-        "role": "subtitle"
+        "role": "title"
       },
       {
-        "id": "inquiry-item-quantity",
+        "id": "quantity",
         "name": "quantity",
         "label": "Quantity",
         "sectionId": "quantity-packaging",
@@ -5324,10 +5324,10 @@
         },
         "colSpan": 1,
         "order": 1,
-        "role": "description"
+        "role": "subtitle"
       },
       {
-        "id": "inquiry-item-unit",
+        "id": "unit",
         "name": "unit",
         "label": "Unit",
         "sectionId": "quantity-packaging",
@@ -5343,10 +5343,10 @@
         },
         "colSpan": 1,
         "order": 2,
-        "role": "description"
+        "role": "subtitle"
       },
       {
-        "id": "inquiry-item-pack-size",
+        "id": "pack-size",
         "name": "packSize",
         "label": "Pack Size",
         "sectionId": "quantity-packaging",
@@ -5357,7 +5357,7 @@
         "order": 3
       },
       {
-        "id": "inquiry-item-description",
+        "id": "description",
         "name": "description",
         "label": "Description",
         "sectionId": "description",
@@ -5371,7 +5371,7 @@
         "order": 1
       },
       {
-        "id": "inquiry-item-required-documents",
+        "id": "required-documents",
         "name": "requiredDocuments",
         "label": "Required Documents",
         "sectionId": "requirements-storage",
@@ -5389,7 +5389,7 @@
         "order": 1
       },
       {
-        "id": "inquiry-item-storage-condition",
+        "id": "storage-condition",
         "name": "storageCondition",
         "label": "Storage Condition",
         "sectionId": "requirements-storage",
@@ -5407,7 +5407,7 @@
         "order": 2
       },
       {
-        "id": "inquiry-item-minimum-expiration-date",
+        "id": "minimum-expiration-date",
         "name": "minimumExpirationDate",
         "label": "Minimum Expiration Date",
         "sectionId": "requirements-storage",
@@ -5420,7 +5420,7 @@
         "order": 3
       },
       {
-        "id": "inquiry-item-related-purchase-requests",
+        "id": "related-purchase-requests",
         "name": "relatedPurchaseRequests",
         "label": "Related Purchase Requests",
         "sectionId": "related-purchase-requests",
@@ -5467,7 +5467,7 @@
       {
         "id": "related-purchase-requests",
         "title": "Related Purchase Requests",
-        "description": "Purchase request codes related to this inquiry item",
+        "description": "Purchase request codes related to this tender item",
         "initialState": "expanded",
         "columns": 2
       }
@@ -5572,7 +5572,7 @@
         },
         "colSpan": 1,
         "order": 1,
-        "role": "code",
+        "role": "title",
         "canCopy": true
       },
       {
@@ -5623,7 +5623,8 @@
           "required": false
         },
         "colSpan": 1,
-        "order": 4
+        "order": 4,
+        "role": "subtitle"
       },
       {
         "id": "quotation-incoterm",
@@ -5641,7 +5642,8 @@
           "required": false
         },
         "colSpan": 1,
-        "order": 5
+        "order": 5,
+        "role": "subtitle"
       },
       {
         "id": "quotation-description",
@@ -5722,8 +5724,14 @@
         "name": "netPrice",
         "label": "Net Price",
         "sectionId": "financial-details",
-        "component": "number",
-        "placeholder": "Enter net price",
+        "component": "formula",
+        "formula": "{{reference.quotation-items.totalPrice.sum}} + {{formData.advancedPaymentAmount}} + {{formData.freightCharges}} + {{formData.otherCharges}} - {{formData.discounts}}",
+        "formulaConfig": {
+          "precision": 2,
+          "format": "currency",
+          "showEditor": false,
+          "unit": "{{formData.currency}}"
+        },
         "validation": {
           "required": true,
           "min": 0
@@ -5785,88 +5793,49 @@
     "plural_name": "Quotation Items",
     "fields": [
       {
-        "id": "quotation-item-tender-item",
+        "id": "tender-item",
         "name": "tenderItem",
-        "label": "Tender Item Details",
+        "label": "Tender Item",
         "sectionId": "tender-item-details",
         "component": "picker",
         "placeholder": "Select tender item",
-        "description": "Select a tender item for this quotation",
+        "description": "Link this quotation item to a tender item",
         "targetSchema": "tender-items",
+        "role": "reference",
         "validation": {
           "required": true
         },
-        "metadata": {
-          "allowMultiselect": false
-        },
         "colSpan": 2,
-        "order": 1,
-        "role": "title"
-      },
-      {
-        "id": "quotation-item-fee",
-        "name": "fee",
-        "label": "Fee",
-        "sectionId": "financial-details",
-        "component": "number",
-        "placeholder": "Enter fee",
-        "validation": {
-          "required": false,
-          "min": 0
-        },
-        "displayType": "currency",
-        "colSpan": 1,
         "order": 1
       },
       {
-        "id": "quotation-item-total-price",
+        "id": "unit-price",
+        "name": "unitPrice",
+        "label": "Unit Price",
+        "sectionId": "financial-details",
+        "component": "number",
+        "placeholder": "Enter unit price",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "total-price",
         "name": "totalPrice",
         "label": "Total Price",
         "sectionId": "financial-details",
         "component": "number",
         "placeholder": "Enter total price",
         "validation": {
-          "required": true,
-          "min": 0
-        },
-        "displayType": "currency",
-        "colSpan": 1,
-        "order": 2,
-        "role": "title"
-      },
-      {
-        "id": "quotation-item-storage-condition",
-        "name": "storageCondition",
-        "label": "Storage Condition",
-        "sectionId": "financial-details",
-        "component": "select",
-        "placeholder": "Select storage condition",
-        "description": "Select storage condition from parameter items",
-        "targetSchema": "parameter-items",
-        "referenceSchema": "parameter-groups",
-        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
-        "referenceEntityId": "01KCXW1C9NT5D4TFDK511BKTSQ",
-        "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 3
       },
       {
-        "id": "quotation-item-expiration-date",
-        "name": "expirationDate",
-        "label": "Expiration Date",
-        "sectionId": "financial-details",
-        "component": "date",
-        "placeholder": "Select expiration date",
-        "validation": {
-          "required": false
-        },
-        "colSpan": 1,
-        "order": 4
-      },
-      {
-        "id": "quotation-item-description",
+        "id": "description",
         "name": "description",
         "label": "Description",
         "sectionId": "financial-details",
@@ -5876,21 +5845,64 @@
           "required": false
         },
         "colSpan": 2,
-        "order": 5,
-        "role": "description"
+        "order": 4
       },
       {
-        "id": "quotation-item-pack-size",
-        "name": "packSize",
+        "id": "storage-condition",
+        "name": "storageCondition",
+        "label": "Storage Condition",
+        "sectionId": "delivery-details",
+        "component": "select",
+        "placeholder": "Select storage condition",
+        "description": "Select storage condition from parameter items",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KCXW1C9NT5D4TFDK511BKTSQ",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "estimated-delivery-date",
+        "name": "estimatedDeliveryDate",
+        "label": "Estimated Delivery Date",
+        "sectionId": "delivery-details",
+        "component": "date",
+        "placeholder": "Select estimated delivery date",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 7
+      },
+      {
+        "id": "expiration-date",
+        "name": "expirationDate",
+        "label": "Expiration Date",
+        "sectionId": "delivery-details",
+        "component": "date",
+        "placeholder": "Select expiration date",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 8
+      },
+      {
+        "id": "package-size",
+        "name": "packageSize",
         "label": "Pack Size",
-        "sectionId": "financial-details",
+        "sectionId": "delivery-details",
         "component": "textarea",
-        "placeholder": "Enter pack size",
+        "placeholder": "Enter packages",
         "validation": {
           "required": false
         },
         "colSpan": 2,
-        "order": 4
+        "order": 9
       }
     ],
     "sections": [
@@ -5905,6 +5917,13 @@
         "id": "financial-details",
         "title": "Financial Details",
         "description": "Financial information and item details",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "delivery-details",
+        "title": "Delivery Details",
+        "description": "Packaging and delivery schedule",
         "initialState": "expanded",
         "columns": 2
       }
@@ -6060,6 +6079,220 @@
     "isNotCompanyBased": true,
     "schemaType": "system",
     "applyToAllTenants": true
+  },
+  {
+    "id": "dynamic-queries",
+    "description": "Manage dynamic queries with configurable parameters",
+    "singular_name": "Dynamic Query",
+    "plural_name": "Dynamic Queries",
+    "fields": [
+      {
+        "id": "dynamic-query-name",
+        "name": "name",
+        "label": "Name",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter query name",
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "dynamic-query-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter query description",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 2
+      },
+      {
+        "id": "dynamic-query-metadata",
+        "name": "metadata",
+        "label": "Metadata",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "placeholder": "Enter metadata",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "dynamic-query-include-user-id",
+        "name": "includeUserId",
+        "label": "Include User ID",
+        "sectionId": "basic-information",
+        "component": "switch",
+        "defaultValue": false,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "dynamic-query-include-company-id",
+        "name": "includeCompanyId",
+        "label": "Include Company ID",
+        "sectionId": "basic-information",
+        "component": "switch",
+        "defaultValue": false,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "dynamic-query-param-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "dynamic-query-parameters",
+        "component": "text",
+        "placeholder": "Enter parameter title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "dynamic-query-param-name",
+        "name": "name",
+        "label": "Name",
+        "sectionId": "dynamic-query-parameters",
+        "component": "text",
+        "placeholder": "Enter parameter name",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "dynamic-query-param-datatype",
+        "name": "datatype",
+        "label": "Data Type",
+        "sectionId": "dynamic-query-parameters",
+        "component": "select",
+        "placeholder": "Select data type",
+        "validation": {
+          "required": true
+        },
+        "options": [
+          {
+            "id": "string",
+            "label": "String"
+          },
+          {
+            "id": "number",
+            "label": "Number"
+          },
+          {
+            "id": "boolean",
+            "label": "Boolean"
+          },
+          {
+            "id": "object",
+            "label": "Object"
+          },
+          {
+            "id": "array",
+            "label": "Array"
+          },
+          {
+            "id": "date",
+            "label": "Date"
+          },
+          {
+            "id": "datetime",
+            "label": "DateTime"
+          },
+          {
+            "id": "timestamp",
+            "label": "Timestamp"
+          }
+        ],
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "dynamic-query-param-is-required",
+        "name": "isRequired",
+        "label": "Is Required",
+        "sectionId": "dynamic-query-parameters",
+        "component": "switch",
+        "defaultValue": false,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "description": "Dynamic query identification and metadata",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "dynamic-query-parameters",
+        "title": "Dynamic Query Parameters",
+        "description": "Define parameters for the dynamic query",
+        "initialState": "expanded",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 0,
+          "maxItems": 100,
+          "fieldRelationType": "addFields"
+        }
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "dynamic-query-overview",
+          "title": "Dynamic Query Overview",
+          "description": "Dynamic query information",
+          "colSpan": 2,
+          "fieldIds": [
+            "dynamic-query-name",
+            "dynamic-query-description",
+            "dynamic-query-metadata"
+          ]
+        },
+        {
+          "id": "dynamic-query-parameters-section",
+          "title": "Dynamic Query Parameters",
+          "description": "Parameters for this dynamic query",
+          "colSpan": 2
+        }
+      ]
+    },
+    "showInNavigation": false,
+    "icon": "Database",
+    "isNotCompanyBased": true,
+    "schemaType": "system",
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data",
+    "allowDataRelatedTenants": true
   },
   {
     "id": "page-metadata-editor-form",

@@ -8,7 +8,7 @@ export interface FormField {
   name: string;
   label: string;
   sectionId: string; // Reference to the section this field belongs to
-  component: 'text' | 'email' | 'tel' | 'number' | 'password' | 'url' | 'textarea' | 'select' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'datetime-local' | 'datetime' | 'file' | 'picker' | 'icon' | 'image-text' | 'image-viewer' | 'name' | 'avatar' | 'color-picker' | 'rating' | 'badge' | 'countdown' | 'code-viewer' | 'list-input' | 'tag-input' | 'toggle' | 'toggle-group' | 'switch';
+  component: 'text' | 'email' | 'tel' | 'number' | 'password' | 'url' | 'textarea' | 'select' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'datetime-local' | 'datetime' | 'file' | 'picker' | 'icon' | 'image-text' | 'image-viewer' | 'name' | 'avatar' | 'color-picker' | 'rating' | 'badge' | 'countdown' | 'code-viewer' | 'list-input' | 'tag-input' | 'toggle' | 'toggle-group' | 'switch' | 'formula';
   placeholder?: string;
   icon?: string;
   displayType?: 'text' | 'number' | 'currency' | 'percentage' | 'array' | 'computed';
@@ -69,6 +69,14 @@ export interface FormField {
   conditional?: {
     dependsOn: string;
     condition: (value: any) => boolean;
+  };
+  // Formula configuration for formula fields
+  formula?: string; // Formula expression (e.g., "{{formData.price}} * {{formData.quantity}}")
+  formulaConfig?: {
+    showEditor?: boolean; // Allow editing formula (default: false for display-only)
+    precision?: number; // Decimal precision for numeric results (default: 2)
+    format?: 'number' | 'currency' | 'percentage' | 'text'; // Format for display
+    unit?: string; // Unit to display after the value (e.g., "kg", "{{formData.currency.icon}}", "m²")
   };
   // @deprecated - Use compute property instead. Kept for backward compatibility.
   display?: {

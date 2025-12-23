@@ -13,6 +13,7 @@ import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer
 import { CopyContent } from '../../form-builder/form-elements/components/CopyContent';
 import { ForceIcon } from '../../form-builder/form-elements/components/ForceIcon';
 import { formatFieldValue } from '../table/utils/field-formatters';
+import { FormulaDisplay } from '@/gradian-ui/form-builder/form-elements/components/FormulaDisplay';
 
 export interface DynamicInfoCardProps {
   section: DetailPageSection;
@@ -257,9 +258,13 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                   </label>
                   <div className="flex items-center gap-2">
                     <div className="text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word flex-1">
-                    {formatFieldValue(field, field.value, data, false)}
+                      {field.component === 'formula' && field.formula ? (
+                        <FormulaDisplay field={field} data={data} schema={schema} />
+                      ) : (
+                        formatFieldValue(field, field.value, data, false)
+                      )}
                     </div>
-                    {field.canCopy && field.value && field.value !== '' && (
+                    {field.canCopy && field.value && field.value !== '' && field.component !== 'formula' && (
                       <div
                         onClick={(e) => e.stopPropagation()}
                         onMouseDown={(e) => e.stopPropagation()}

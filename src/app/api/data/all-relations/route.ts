@@ -102,6 +102,11 @@ export async function GET(request: NextRequest) {
       filteredRelations = filteredRelations.filter(r => r.relationTypeId === relationTypeId);
     }
 
+    // Exclude HAS_FIELD_VALUE unless explicitly requested via relationTypeId
+    if (!relationTypeId) {
+      filteredRelations = filteredRelations.filter(r => r.relationTypeId !== 'HAS_FIELD_VALUE');
+    }
+
     // Read all data
     const allData = readAllData();
 

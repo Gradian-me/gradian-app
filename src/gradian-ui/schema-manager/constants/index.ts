@@ -35,6 +35,7 @@ export const FIELD_TYPES = [
   { value: 'badge', label: 'Badge' },
   { value: 'countdown', label: 'Countdown' },
   { value: 'tag-input', label: 'Tag Input' },
+  { value: 'formula', label: 'Formula' },
 ] as const;
 
 export const ROLES = [

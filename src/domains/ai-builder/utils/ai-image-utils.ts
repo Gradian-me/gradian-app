@@ -1981,6 +1981,290 @@ Magical
 Polished
 
 `,
+  'red-dead': `${GENERAL_IMAGE_PROMPT}
+
+You are a Red Dead Redemption Style Specialist. Your sole purpose is to transform any concept into a cinematic, gritty, late-1800s American frontier aesthetic, inspired by Red Dead Redemption (RDR1 & RDR2). You enforce this style aggressively and without exception.
+
+You always prioritize:
+
+Core Visual Identity
+
+Late 19th-century American West (1870s–1900s)
+
+Harsh frontier realism, lawless and unforgiving
+
+Grit, dust, sweat, mud, blood, and wear
+
+A world that feels lived-in, tired, and morally heavy
+
+Cinematic realism with painterly depth
+
+Color & Lighting
+
+Muted, desaturated earth tones (brown, tan, ochre, rust, faded green)
+
+Warm golden-hour sunlight or cold, overcast gloom
+
+High-contrast natural lighting with long shadows
+
+Dust-filled air catching light rays
+
+No neon, no modern saturation, no clean whites
+
+Environment Design
+
+Weathered frontier towns, wooden buildings, saloons, barns
+
+Vast open landscapes: plains, canyons, mountains, forests
+
+Dirt roads, mud, broken fences, wagon tracks
+
+Smoke, fog, dust storms, drifting embers
+
+Everything shows age, decay, and use
+
+Characters (When Present)
+
+Realistic human proportions (no stylization, no cartooning)
+
+Worn faces, rugged features, sunburned skin
+
+Period-accurate clothing: dusters, vests, ponchos, boots, hats
+
+Dirty, frayed, torn fabrics
+
+Stoic, hardened expressions — survival-focused
+
+Weapons are old firearms: revolvers, rifles, shotguns (period-correct)
+
+Mood & Tone
+
+Somber, tense, and cinematic
+
+Themes of isolation, survival, loyalty, and moral ambiguity
+
+Slow, heavy atmosphere — nothing playful or lighthearted
+
+Feels like a dramatic Western film still
+
+Texture & Detail
+
+Highly detailed, realistic textures
+
+Visible grain, dirt, scratches, fabric fibers, wood splinters
+
+Skin imperfections, scars, sweat, dust buildup
+
+Painterly realism — not glossy, not clean
+
+Composition & Camera
+
+Cinematic framing (wide shots, low angles, dramatic close-ups)
+
+Depth of field with strong foreground/background separation
+
+Feels like a frame from a prestige Western game or film
+
+Epic scale when outdoors, intimate tension when indoors
+
+Absolute Rules (No Exceptions)
+
+❌ No modern elements (cars, phones, electricity, modern weapons)
+
+❌ No futuristic or sci-fi design
+
+❌ No cartoon, anime, LEGO, or stylized aesthetics
+
+❌ No clean, minimal, or glossy surfaces
+
+❌ No bright neon colors or modern lighting
+
+❌ No fantasy creatures unless grounded in gritty realism
+
+Your Outputs Must Always Be
+
+Gritty
+
+Cinematic
+
+Realistic
+
+Weathered
+
+Period-accurate
+
+Emotionally heavy
+
+Dusty, dirty, imperfect
+
+Authentically Red Dead Redemption Style
+`,
+  'gta-style': `${GENERAL_IMAGE_PROMPT}
+
+Create a high-resolution illustrated cover image using the exact collage layout, panel geometry, and typography of the official Grand Theft Auto V cover art, enhanced with a retro Miami / Vice City aesthetic.
+
+Overall Theme:
+ 1980s–1990s Miami / Vice City atmosphere
+ Neon nightlife, palm trees, beachfront streets, art-deco buildings
+ Heat, crime, excess, law enforcement pressure
+
+Layout & Composition (UNCHANGED STRUCTURE):
+ Multi-panel comic-book collage
+ Sharp black diagonal borders separating each panel
+ Panels of mixed sizes and angles filling the entire canvas
+ Central title dominance with surrounding action scenes
+ Composition must match GTA V cover art proportions exactly
+
+Art Style (CRITICAL):
+ Official GTA illustrated style (Rockstar promo art)
+ Semi-realistic, stylized realism
+ Faces must look distinctly like GTA characters:
+ Slightly exaggerated jawlines
+ Sharp cheekbones
+ Expressive brows and eyes
+ Hardened, cinematic expressions
+ No generic AI faces, no smooth fashion-model look
+
+Characters & Scenes:
+ Include multiple human characters based on the user prompt
+ Add uniformed police officers with pistols, rifles, or tactical gear
+ Include police helicopters in the sky (spotlights on)
+ Include police cars with flashing red-and-blue lights
+ Show chaos escalation: chases, confrontations, standoffs
+
+GTA Wanted-Level Elements:
+ Include floating GTA-style wanted stars (1–5 stars) integrated naturally into the collage
+ Stars should glow gold and feel part of the GTA UI language
+
+Environment Details:
+ Miami beach roads, neon motel signs, palm-lined highways
+ Art-deco facades, sunset skies, ocean blues and pinks
+ Subtle inclusion of a GTA-style city map fragment (radar/map texture) as a background element in one panel
+
+Vehicles & Action:
+ Sports cars, motorcycles, speedboats, helicopters
+ High-speed motion, drifting, gunfire, pursuit angles
+ Perspective exaggeration consistent with GTA artwork
+
+Color & Lighting:
+ Retro neon palette:
+ Hot pinks, cyan blues, teal skies, orange sunsets
+ Strong rim lighting and dramatic shadows
+ Night + sunset blend common to Vice City aesthetics
+
+Typography & Logo (NON-NEGOTIABLE):
+ Centered official Grand Theft Auto block typography
+ White bold letters with black outline and subtle bevel
+ Stacked exactly as:
+ GRAND
+ THEFT
+ AUTO
+ Green Roman numeral V banner emblem beneath the title
+ Font weight, spacing, and proportions must match GTA V logo precisely
+
+Rules:
+ Use only authentic GTA visual language
+ No parody, no redesign, no modern minimalism
+ No alternate fonts or logo variations
+ The image must instantly read as a GTA cover at first glance
+
+Content Injection:
+ Replace characters, locations, and actions based strictly on the user’s prompt
+ Every panel should represent a different aspect of crime, lifestyle, or tension
+ Maintain high visual density without clutter
+
+Technical Requirements:
+ Ultra-high resolution
+ Print-ready clarity
+ Clean edges, no noise, no blur, no grain
+ Aspect ratio identical to GTA V cover art
+
+NEGATIVE PROMPT (DO NOT SKIP)
+
+No photorealism, no anime, no cartoon style, no flat illustration, no pastel-only palette, no soft fashion faces, no generic AI portraits, no logo redesigns, no thin outlines, no futuristic cyberpunk elements.
+
+`
+  ,
+  'xray': `${GENERAL_IMAGE_PROMPT}
+
+You are a Medical Radiology Imaging Specialist.
+
+Your purpose is to generate images that look EXACTLY like real diagnostic radiology scans
+(MRI / CT / X-ray cross-sectional imaging), not illustrations, not sci-fi visuals, not artistic interpretations.
+
+You always prioritize:
+
+True medical radiology appearance.
+
+Complete volumetric scanning of all objects in the scene.
+
+Density-based grayscale imaging only.
+
+Clinical, diagnostic visual language.
+
+No visible exterior surface rendering.
+
+For every prompt:
+
+Render everything as a medical radiology scan:
+- Every object, shape, and element must appear fully scanned
+- No normal surface view, no exterior textures
+- Objects appear as internal cross-sections or volumetric density maps
+- Nothing exists outside the scan
+- Scene looks like it was captured by a medical imaging machine
+
+Use authentic MRI / CT / X-ray imaging characteristics:
+- Grayscale only (black, white, gray)
+- Bright white for dense materials
+- Dark gray to black for low-density or empty space
+- Soft gradients representing tissue or material density
+- No colors, no stylization, no glow
+
+Apply clinical radiology lighting:
+- Flat, non-directional imaging
+- No shadows, highlights, or artistic lighting
+- Image appears machine-captured, not photographed
+- Uniform exposure across the entire frame
+
+Show internal structure ONLY:
+- Internal layers, cross-sections, and volumetric forms
+- Overlapping densities where objects intersect
+- Anatomical or structural realism appropriate to the objects
+- Clean internal boundaries based on density differences
+- No outlines, no edge stylization
+
+Ensure full-scene scan integrity:
+- Entire frame appears inside a scanner
+- Black or neutral background typical of radiology scans
+- Slight image noise or grain consistent with medical imaging
+- Subtle blur consistent with real scan resolution
+
+Strictly avoid:
+- Color of any kind
+- Transparency or glow effects
+- Exterior surfaces or skin
+- Artistic shading or illustration
+- Sci-fi, holographic, or futuristic visuals
+- Cartoon or stylized rendering
+
+Your outputs must always be:
+
+Pure radiology scan
+
+Grayscale only
+
+Density-based
+
+Fully scanned (nothing unscanned)
+
+Clinically accurate
+
+Machine-captured
+
+MRI / CT / X-ray authentic
+
+Diagnostic, not artistic
+`,
   mindmap: `${GENERAL_IMAGE_PROMPT}
 
 You are a Professional Mind Map Visualization Specialist.
@@ -3679,7 +3963,7 @@ export async function processImageRequest(
       // Use provided body and extra_body
       bodyParams = requestData.body || {};
       extraParams = requestData.extra_body || {};
-      
+
       // If formValues are provided, extract prompt params from fields that are not body/extra
       if (requestData.formValues) {
         const allParams = extractParametersBySectionId(agent, requestData.formValues);
@@ -3714,7 +3998,7 @@ export async function processImageRequest(
           return promptParams[fieldName] !== undefined;
         })
         .sort((a: any, b: any) => (a.order || 999) - (b.order || 999));
-      
+
       promptComponents.forEach((comp: any) => {
         const fieldName = comp.name || comp.id;
         const value = promptParams[fieldName];
@@ -3758,7 +4042,7 @@ export async function processImageRequest(
     // Get image type and prepend the corresponding prompt if available
     // Check multiple sources for imageType (in order of priority)
     let imageType: string = 'infographic'; // Default fallback
-    
+
     // Priority 1: bodyParams (from requestData.body)
     if (bodyParams?.imageType && bodyParams.imageType !== 'none') {
       imageType = bodyParams.imageType;
@@ -3775,27 +4059,27 @@ export async function processImageRequest(
     else if (requestData.formValues?.imageType && requestData.formValues.imageType !== 'none') {
       imageType = requestData.formValues.imageType;
     }
-    
+
     // Get the image type prompt - ensure we're using the correct key
     // Always start with GENERAL_IMAGE_PROMPT for all image types
     let imageTypePrompt = GENERAL_IMAGE_PROMPT;
-    
+
     // If imageType is set and not "none" or "standard", append the specific type prompt
     if (imageType && imageType !== 'none' && imageType !== 'standard' && typeof imageType === 'string') {
       const imageTypeStr = String(imageType);
       const specificPrompt = IMAGE_TYPE_PROMPTS[imageTypeStr] || '';
-      
+
       // If not found, try with different casing
       if (!specificPrompt) {
         const lowerKey = imageTypeStr.toLowerCase();
         const upperKey = imageTypeStr.toUpperCase();
         const titleKey = imageTypeStr.charAt(0).toUpperCase() + imageTypeStr.slice(1).toLowerCase();
-        
-        const foundPrompt = IMAGE_TYPE_PROMPTS[lowerKey] || 
-                           IMAGE_TYPE_PROMPTS[upperKey] || 
-                           IMAGE_TYPE_PROMPTS[titleKey] || 
-                           '';
-        
+
+        const foundPrompt = IMAGE_TYPE_PROMPTS[lowerKey] ||
+          IMAGE_TYPE_PROMPTS[upperKey] ||
+          IMAGE_TYPE_PROMPTS[titleKey] ||
+          '';
+
         if (foundPrompt) {
           // If specific prompt is found, it already includes GENERAL_IMAGE_PROMPT, so use it directly
           imageTypePrompt = foundPrompt;
@@ -3807,7 +4091,7 @@ export async function processImageRequest(
       }
     }
     // For "none" or "standard", imageTypePrompt is already set to GENERAL_IMAGE_PROMPT above
-    
+
     // Log for debugging
     if (isDevelopment) {
       loggingCustom(LogType.CLIENT_LOG, 'log', '[ai-image-utils] ===== IMAGE TYPE DETECTION =====');
@@ -3824,7 +4108,7 @@ export async function processImageRequest(
         loggingCustom(LogType.CLIENT_LOG, 'log', `[ai-image-utils] First 100 chars of imageTypePrompt: ${IMAGE_TYPE_PROMPTS[imageType].substring(0, 100)}`);
       }
     }
-    
+
     // Concatenate image type prompt before user prompt if prompt exists
     // IMPORTANT: This must happen BEFORE sanitization to preserve the full prompt
     if (imageTypePrompt && imageTypePrompt.trim()) {
@@ -3912,7 +4196,7 @@ export async function processImageRequest(
     if (Array.isArray(b64Data) && b64Data.length === 0) {
       b64Data = null;
     }
-    
+
     // If we have base64 data but no URL, save it and get URL
     let savedUrl: string | null = null;
     if (b64Data && !imageData.url && baseUrl) {
@@ -3923,7 +4207,7 @@ export async function processImageRequest(
           const mimeType = imageData.mimeType || 'image/png';
           base64String = `data:${mimeType};base64,${base64String}`;
         }
-        
+
         // Save image via API
         const saveResponse = await fetch(`${baseUrl}/api/images/save`, {
           method: 'POST',
@@ -3935,7 +4219,7 @@ export async function processImageRequest(
             mimeType: imageData.mimeType || 'image/png',
           }),
         });
-        
+
         if (saveResponse.ok) {
           const saveResult = await saveResponse.json();
           if (saveResult.success && saveResult.url) {
@@ -3949,17 +4233,17 @@ export async function processImageRequest(
         // Continue with base64 if save fails
       }
     }
-    
+
     const result = {
       url: imageData.url || savedUrl || null,
       b64_json: savedUrl ? null : b64Data, // Remove base64 if we have URL
       revised_prompt: imageData.revised_prompt || null,
       mimeType: imageData.mimeType || null,
     };
-    
+
     // Final validation - must have either url or b64_json
     if (!result.url && !result.b64_json) {
-      const errorDetails = isDevelopment 
+      const errorDetails = isDevelopment
         ? ` imageData keys: ${JSON.stringify(Object.keys(imageData || {}))}`
         : '';
       return {

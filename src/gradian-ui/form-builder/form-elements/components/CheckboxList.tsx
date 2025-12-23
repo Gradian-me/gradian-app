@@ -141,8 +141,10 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
       columnMap: effectiveColumnMap,
     });
 
-    // Ensure value is an array
-    const currentValue = extractIds(value);
+    // Handle value - support both array of IDs and array of option objects
+    // For backward compatibility, extract IDs if value contains objects
+    const currentValueIds = extractIds(value);
+    
     const selectAllCheckboxRef = useRef<HTMLButtonElement>(null);
 
     // Get options from config if not provided directly, or use URL options
@@ -164,24 +166,75 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
       sortType
     );
 
+    // Resolve current value to option objects (for backward compatibility with IDs)
+    // This converts array of IDs to array of option objects with labels, icons, colors
+    // Resolve current value to option objects (for backward compatibility with IDs)
+    // This converts array of IDs to array of option objects with labels, icons, colors
+    const resolvedValueObjects = React.useMemo(() => {
+      if (!value || !Array.isArray(value)) return [];
+      // Treat value as immutable for memoization; callers should not mutate in-place.
+      return value
+        .map((v: any) => {
+          if (typeof v === 'object' && v !== null && (v.id || v.label)) {
+            return v; // Already an option object
+          }
+          // If it's an ID, find the option object from normalizedOptions
+          const id = typeof v === 'string' ? v : String(v);
+          const option = normalizedOptions.find((opt) => opt.id === id);
+          if (option) {
+            return {
+              id: option.id,
+              label: option.label ?? option.id,
+              icon: option.icon,
+              color: option.color,
+              disabled: option.disabled,
+              value: option.value,
+            };
+          }
+          return { id, label: id };
+        })
+        .filter(Boolean);
+      // eslint-disable-next-line react-hooks/preserve-manual-memoization
+    }, [value, normalizedOptions]);
+
     // Get selectable options (not disabled)
     const selectableOptions = normalizedOptions.filter(opt => !opt.disabled);
     const selectableOptionIds = selectableOptions.map(opt => opt.id);
     
-    // Calculate select all state
-    const selectedSelectableCount = selectableOptionIds.filter(id => currentValue.includes(id)).length;
+    // Helper to convert IDs to option objects for saving
+    const convertIdsToOptionObjects = React.useCallback((ids: string[]): NormalizedOption[] => {
+      return ids.map((id: string) => {
+        const option = normalizedOptions.find((opt) => opt.id === id);
+        if (option) {
+          return {
+            id: option.id,
+            label: option.label ?? option.id,
+            icon: option.icon,
+            color: option.color,
+            disabled: option.disabled,
+            value: option.value,
+          };
+        }
+        return { id, label: id };
+      });
+    }, [normalizedOptions]);
+    
+    // Calculate select all state using IDs
+    const selectedSelectableCount = selectableOptionIds.filter(id => currentValueIds.includes(id)).length;
     const isAllSelected = selectableOptions.length > 0 && selectedSelectableCount === selectableOptions.length;
     const isIndeterminate = selectedSelectableCount > 0 && selectedSelectableCount < selectableOptions.length;
 
-    // Handle select all/deselect all
+    // Handle select all/deselect all - save as option objects
     const handleSelectAll = (checked: boolean) => {
       if (checked) {
-        // Select all selectable options
-        const newValue = Array.from(new Set([...currentValue, ...selectableOptionIds]));
+        // Select all selectable options - save as option objects
+        const newIds = Array.from(new Set([...currentValueIds, ...selectableOptionIds]));
+        const newValue = convertIdsToOptionObjects(newIds);
         onChange?.(newValue);
       } else {
-        // Deselect all selectable options
-        const newValue = currentValue.filter((v: string) => !selectableOptionIds.includes(v));
+        // Deselect all selectable options - save as option objects
+        const remainingIds = currentValueIds.filter((v: string) => !selectableOptionIds.includes(v));
+        const newValue = convertIdsToOptionObjects(remainingIds);
         onChange?.(newValue);
       }
     };
@@ -226,10 +279,30 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
       option: NormalizedOption,
       checked: boolean
     ) => {
-      const newValue = checked
-        ? Array.from(new Set([...currentValue, option.id]))
-        : currentValue.filter((v: string) => v !== option.id);
-      onChange?.(newValue);
+      if (checked) {
+        // Add option - save as option object
+        const newOptionObject = {
+          id: option.id,
+          label: option.label ?? option.id,
+          icon: option.icon,
+          color: option.color,
+          disabled: option.disabled,
+          value: option.value,
+        };
+        // Check if already exists (by ID) to avoid duplicates
+        const existingIds = currentValueIds;
+        if (!existingIds.includes(option.id)) {
+          const newValue = [...resolvedValueObjects, newOptionObject];
+          onChange?.(newValue);
+        }
+      } else {
+        // Remove option - keep other option objects
+        const newValue = resolvedValueObjects.filter((v: any) => {
+          const vId = typeof v === 'string' ? v : (v?.id || v?.value || String(v));
+          return vId !== option.id;
+        });
+        onChange?.(newValue);
+      }
     };
 
     const fieldName = config.name || 'checkbox-list';
@@ -282,7 +355,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
             "grid-cols-1 md:grid-cols-2"
           )}>
             {normalizedOptions.map((option) => {
-            const isChecked = currentValue.includes(option.id);
+            const isChecked = currentValueIds.includes(option.id);
             const optionId = `${fieldName}-${option.id}`;
 
             return (

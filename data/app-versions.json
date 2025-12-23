@@ -4399,5 +4399,81 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KD1FORMULAENGINE001",
+    "timestamp": "2025-12-21T12:30:00.000Z",
+    "version": "1.36.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "FORMULA ENGINE | Introduced formula field type in form schema, allowing for dynamic calculations within forms with support for formData, formSchema, pageData, userData, and reference aggregations",
+        "priority": "High",
+        "affectedDomains": [
+          "form-builder",
+          "formula-engine",
+          "schema-manager"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Updated all-schemas.json to include new formula fields for net price and total price calculations in quotation items and quotations schemas",
+        "priority": "High",
+        "affectedDomains": [
+          "schema-manager",
+          "data-management",
+          "quotations"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Enhanced FormElementFactory to support rendering of formula fields with KaTeX mathematical notation visualization and calculation breakdowns",
+        "priority": "High",
+        "affectedDomains": [
+          "form-builder",
+          "formula-engine",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Modified form schema types to accommodate formula configurations including precision, format, and showEditor options, enhancing flexibility in form design",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "form-builder",
+          "types"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Implemented secure formula parser without eval() usage, supporting mathematical operations, variable resolution, and reference aggregations with dependency tracking",
+        "priority": "High",
+        "affectedDomains": [
+          "formula-engine",
+          "security"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Added formula visualization with KaTeX rendering, showing field names and values in mathematical notation format for better calculation transparency",
+        "priority": "Medium",
+        "affectedDomains": [
+          "formula-engine",
+          "ui",
+          "visualization"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Implemented automatic refresh of formula calculations when referenced repeating section items are added or updated",
+        "priority": "Medium",
+        "affectedDomains": [
+          "formula-engine",
+          "form-builder",
+          "data-display"
+        ]
+      }
+    ]
   }
 ]

@@ -178,7 +178,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   };
 
   // Base classes from SelectTrigger - we'll merge with size and error
-  const baseSelectClasses = 'rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 text-sm text-gray-900 dark:text-gray-100 shadow-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 ring-offset-background dark:ring-offset-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:ring-offset-1 focus:border-violet-400 dark:focus:border-violet-500 data-[state=open]:outline-none data-[state=open]:ring-1 data-[state=open]:ring-violet-300 dark:data-[state=open]:ring-violet-500 data-[state=open]:ring-offset-1 data-[state=open]:border-violet-400 dark:data-[state=open]:border-violet-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-gray-800/30 disabled:text-gray-500 dark:disabled:text-gray-400 transition-colors';
+  const baseSelectClasses = 'rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 text-sm text-gray-900 dark:text-gray-100 shadow-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 ring-offset-background dark:ring-offset-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:ring-offset-1 focus:border-violet-400 dark:focus:border-violet-500 data-[state=open]:outline-none data-[state=open]:ring-1 data-[state=open]:ring-violet-300 dark:data-[state=open]:ring-violet-500 data-[state=open]:ring-offset-1 data-[state=open]:border-violet-400 dark:data-[state=open]:border-violet-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-gray-800/30 disabled:text-gray-500 dark:disabled:text-gray-300 transition-colors';
   
   const selectClasses = cn(
     baseSelectClasses,
@@ -292,14 +292,14 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     if (!option.color) {
       return (
         <div className="flex items-center gap-2">
-          {option.icon && <IconRenderer iconName={option.icon} className="h-4 w-4" />}
+          {option.icon && <IconRenderer iconName={option.icon} className="h-5 w-5" />}
           {option.label}
         </div>
       );
     }
 
     const iconEl = option.icon ? (
-      <IconRenderer iconName={option.icon} className="h-3 w-3" />
+      <IconRenderer iconName={option.icon} className="h-4 w-4" />
     ) : null;
 
     // Check badge variant

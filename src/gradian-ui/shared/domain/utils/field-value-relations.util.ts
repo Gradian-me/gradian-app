@@ -20,8 +20,9 @@ function toArray<T>(value: T | T[] | null | undefined): T[] {
 }
 
 /**
- * Extract picker field values from form data or entity.
- * Returns a map of fieldName -> value for picker fields.
+ * Extract relation-supporting field values from form data or entity.
+ * Returns a map of fieldName -> value for fields that support HAS_FIELD_VALUE relations.
+ * Supports: picker, select, checkbox-list, radio, toggle-group
  */
 export function extractPickerFieldValues(params: {
   schema: FormSchema;
@@ -30,11 +31,11 @@ export function extractPickerFieldValues(params: {
   const { schema, data } = params;
   const pickerValues: Record<string, any> = {};
 
-  const pickerFields = (schema.fields || []).filter(
-    (field) => field.component === 'picker' && (field as any).name,
+  const relationFields = (schema.fields || []).filter(
+    (field) => shouldCreateFieldValueRelations(field),
   );
 
-  for (const field of pickerFields) {
+  for (const field of relationFields) {
     const fieldName = (field as any).name as string;
     const value = data[fieldName];
     if (value !== null && value !== undefined && value !== '') {
@@ -46,10 +47,11 @@ export function extractPickerFieldValues(params: {
 }
 
 /**
- * Convert picker field values to minimal [{id, metadata}, {id, metadata}] format for tracing.
+ * Convert relation-supporting field values to minimal [{id, metadata}, {id, metadata}] format for tracing.
  * This keeps IDs and metadata in the entity for backward compatibility and tracing,
  * but all operations should use relations for full data (label, icon, color).
  * Metadata is preserved from fields with addToReferenceMetadata: true.
+ * Supports: picker, select, checkbox-list, radio, toggle-group
  */
 export function minimizePickerFieldValues(params: {
   schema: FormSchema;
@@ -58,11 +60,11 @@ export function minimizePickerFieldValues(params: {
   const { schema, data } = params;
   const minimized = { ...data };
 
-  const pickerFields = (schema.fields || []).filter(
-    (field) => field.component === 'picker' && (field as any).name,
+  const relationFields = (schema.fields || []).filter(
+    (field) => shouldCreateFieldValueRelations(field),
   );
 
-  for (const field of pickerFields) {
+  for (const field of relationFields) {
     const fieldName = (field as any).name as string;
     const value = minimized[fieldName];
 
@@ -129,11 +131,37 @@ export function removePickerFieldValues(params: {
 }
 
 /**
- * Synchronize HAS_FIELD_VALUE relations for all picker fields on a given entity.
+ * Check if a field component type should create HAS_FIELD_VALUE relations.
+ * Supports: picker, select, checkbox-list, radio, toggle-group
+ */
+function shouldCreateFieldValueRelations(field: any): boolean {
+  const component = field.component;
+  const supportedComponents = [
+    'picker',
+    'popup-picker',
+    'popuppicker',
+    'popup-picker-input',
+    'pickerinput',
+    'select',
+    'checkbox-list',
+    'checkboxlist',
+    'checkbox_list',
+    'radio',
+    'radio-group',
+    'radiogroup',
+    'toggle-group',
+    'togglegroup',
+  ];
+  return supportedComponents.includes(component) && (field as any).name;
+}
+
+/**
+ * Synchronize HAS_FIELD_VALUE relations for all relation-supporting fields on a given entity.
+ * Supports: picker, select, checkbox-list, radio, toggle-group
  * This should be called after the main entity is created or updated.
  * 
- * Note: This function reads picker values from the entity/data object.
- * For relations-only storage, picker values should be removed from the entity
+ * Note: This function reads field values from the entity/data object.
+ * For relations-only storage, field values should be removed from the entity
  * after relations are created.
  */
 export async function syncHasFieldValueRelationsForEntity(params: {
@@ -149,21 +177,36 @@ export async function syncHasFieldValueRelationsForEntity(params: {
   const schema: FormSchema = await getSchemaById(schemaId);
   const relations: DataRelation[] = [];
 
-  const pickerFields = (schema.fields || []).filter(
-    (field) => field.component === 'picker' && (field as any).name,
+  // Find all fields that support HAS_FIELD_VALUE relations
+  const relationFields = (schema.fields || []).filter(
+    (field) => shouldCreateFieldValueRelations(field),
   );
 
-  for (const field of pickerFields) {
+  for (const field of relationFields) {
     const fieldName = (field as any).name as string;
     const fieldId = field.id || fieldName;
     const targetSchemaId = (field as any).targetSchema as string | undefined;
     const sourceUrl = (field as any).sourceUrl as string | undefined;
+    const fieldOptions = (field as any).options as Array<{ id?: string; label?: string; value?: string; icon?: string; color?: string }> | undefined;
 
     const rawValue = entity[fieldName];
-    const options = toArray<NormalizedOptionLike | string | number>(rawValue);
-
-    if (!targetSchemaId && !sourceUrl) {
-      continue;
+    // For single-select components (select, radio, toggle-group), convert to array
+    // For multi-select components (picker, checkbox-list), already array or convert
+    const isMultiSelect = field.component === 'picker' || 
+                         field.component === 'checkbox-list';
+    
+    // Handle both single values and arrays for all components
+    // If rawValue is already an array, use it directly (for both single and multi-select)
+    // If rawValue is a single value, convert to array
+    let options: Array<NormalizedOptionLike | string | number> = [];
+    if (rawValue === null || rawValue === undefined || rawValue === '') {
+      options = [];
+    } else if (Array.isArray(rawValue)) {
+      // Already an array - use it directly (handles both [{id: ...}] and [id1, id2, ...])
+      options = rawValue;
+    } else {
+      // Single value - wrap in array
+      options = [rawValue];
     }
 
     // Build target list for relations
@@ -173,7 +216,7 @@ export async function syncHasFieldValueRelationsForEntity(params: {
       if (option === null || option === undefined) continue;
 
       if (targetSchemaId) {
-        // Internal schema-based picker
+        // Internal schema-based picker/select
         if (typeof option === 'string' || typeof option === 'number') {
           targets.push({
             targetSchema: targetSchemaId,
@@ -189,7 +232,7 @@ export async function syncHasFieldValueRelationsForEntity(params: {
           }
         }
       } else if (sourceUrl) {
-        // External URL-based picker -> map into external_nodes
+        // External URL-based picker/select -> map into external_nodes
         if (typeof option === 'object') {
           const externalNode = upsertExternalNodeFromOption({
             sourceUrl,
@@ -213,6 +256,54 @@ export async function syncHasFieldValueRelationsForEntity(params: {
             option: {
               id: option as any,
               label: String(option),
+            },
+          });
+
+          targets.push({
+            targetSchema: 'external-nodes',
+            targetId: externalNode.id,
+          });
+        }
+      } else if (fieldOptions && Array.isArray(fieldOptions) && fieldOptions.length > 0) {
+        // Field has options defined directly (select, checkbox-list, radio, toggle-group with static options)
+        // Create relations to external-nodes for these options
+        let optionId: string | undefined;
+        let optionLabel: string | undefined;
+        let optionIcon: string | undefined;
+        let optionColor: string | undefined;
+
+        if (typeof option === 'string' || typeof option === 'number') {
+          // Find the option in fieldOptions by id or value
+          const foundOption = fieldOptions.find(
+            (opt) => opt.id === String(option) || opt.value === String(option)
+          );
+          if (foundOption) {
+            optionId = foundOption.id || foundOption.value || String(option);
+            optionLabel = foundOption.label || optionId;
+            optionIcon = foundOption.icon;
+            optionColor = foundOption.color;
+          } else {
+            // Use the value as-is if not found in options
+            optionId = String(option);
+            optionLabel = String(option);
+          }
+        } else if (typeof option === 'object' && option !== null) {
+          // Option is already an object with id, label, etc.
+          optionId = option.id ?? (option as any).value ?? String(option);
+          optionLabel = option.label ?? optionId;
+          optionIcon = (option as any).icon;
+          optionColor = (option as any).color;
+        }
+
+        if (optionId) {
+          // Create external node for this option
+          const externalNode = upsertExternalNodeFromOption({
+            sourceUrl: `field-options:${schemaId}:${fieldId}`, // Use a unique sourceUrl for field options
+            option: {
+              id: optionId,
+              label: optionLabel || optionId,
+              icon: optionIcon,
+              color: optionColor,
             },
           });
 
@@ -261,12 +352,12 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
       return entity;
     }
 
-    // Find all picker fields in the schema
-    const pickerFields = (schema.fields || []).filter(
-      (field) => field.component === 'picker' && (field as any).name,
+    // Find all fields that support HAS_FIELD_VALUE relations
+    const relationFields = (schema.fields || []).filter(
+      (field) => shouldCreateFieldValueRelations(field),
     );
 
-    if (pickerFields.length === 0) {
+    if (relationFields.length === 0) {
       return entity;
     }
 
@@ -307,7 +398,7 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
         // 1. Match by fieldId directly matching field.id or field.name
         // 2. Match by fieldId containing the field name
         // 3. Match by field name containing the fieldId
-        for (const field of pickerFields) {
+        for (const field of relationFields) {
           const fieldName = (field as any).name;
           const fieldIdFromField = field.id || fieldName;
           
@@ -387,8 +478,8 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
         }),
     );
 
-    // Process each picker field
-    for (const field of pickerFields) {
+    // Process each relation-supporting field
+    for (const field of relationFields) {
       const fieldName = (field as any).name as string;
       if (!fieldName) continue;
       
@@ -433,6 +524,13 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
         continue;
       }
 
+      // Determine if this is a single-select or multi-select component
+      const isFieldMultiSelect = field.component === 'picker' || 
+                                 field.component === 'checkbox-list';
+      
+      // For single-select components, only use the first relation
+      const relationsToUse = isFieldMultiSelect ? fieldRelations : (fieldRelations.slice(0, 1));
+      
       // Map relations to enriched format
       // First, check if there are existing stored values with metadata
       const existingValue = enrichedEntity[fieldName];
@@ -445,7 +543,7 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
         });
       }
 
-      const enrichedValues = fieldRelations.map((rel) => {
+      const enrichedValues = relationsToUse.map((rel) => {
         // Check if we have stored metadata for this ID
         const storedItem = existingValueMap.get(String(rel.targetId));
         const storedMetadata = storedItem?.metadata;
@@ -506,7 +604,10 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
         }
       });
 
-      enrichedEntity[fieldName] = enrichedValues;
+      // Set enriched value on entity
+      // For single-select components, use the first option (or null if empty)
+      // For multi-select components, use the array of options
+      enrichedEntity[fieldName] = isFieldMultiSelect ? enrichedValues : (enrichedValues[0] || null);
     }
 
     return enrichedEntity;

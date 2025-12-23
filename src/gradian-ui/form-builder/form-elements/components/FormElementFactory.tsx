@@ -41,6 +41,7 @@ import { NameInput } from './NameInput';
 import { ListInput } from './ListInput';
 import { TagInput } from './TagInput';
 import { LanguageSelector } from './LanguageSelector';
+import { FormulaField } from './FormulaField';
 import { ImageViewer } from './ImageViewer';
 import { VideoViewer } from './VideoViewer';
 
@@ -596,6 +597,21 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           className={restProps.className}
           placeholder={(config as any)?.placeholder}
           defaultLanguage={(config as any)?.defaultLanguage}
+        />
+      );
+    
+    case 'formula':
+      return (
+        <FormulaField
+          config={config}
+          value={restProps.value}
+          onChange={restProps.onChange}
+          onBlur={restProps.onBlur}
+          onFocus={restProps.onFocus}
+          error={restProps.error}
+          disabled={restProps.disabled}
+          required={restProps.required}
+          className={restProps.className}
         />
       );
     
