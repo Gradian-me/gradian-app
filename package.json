@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "start:dev": "next dev --turbopack",
-    "build": "next build --webpack",
-    "build:release": "OBFUSCATE=true next build --webpack",
+    "clean:relations": "node scripts/clean-relations.js",
+    "build": "npm run clean:relations && next build --webpack",
+    "build:release": "npm run clean:relations && OBFUSCATE=true next build --webpack",
     "verify": "tsc --noEmit && eslint .",
     "start": "next start",
     "start:standalone": "node .next/standalone/server.js",

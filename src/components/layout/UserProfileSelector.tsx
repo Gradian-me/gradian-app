@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn, resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { Badge as FormBadge } from '@/gradian-ui/form-builder/form-elements/components/Badge';
 import { useUserStore } from '@/stores/user.store';
+import { clearMenuItemsCache } from '@/stores/menu-items.store';
 import { useLanguageStore } from '@/stores/language.store';
 import { useTheme } from 'next-themes';
 import { ProfileSelectorConfig } from '@/gradian-ui/layout/profile-selector/types';
@@ -143,6 +144,12 @@ export function UserProfileSelector({
       authTokenManager.clearAccessToken();
       
       useUserStore.getState().clearUser();
+      // Clear menu items cache on logout to force fresh fetch on next session
+      try {
+        clearMenuItemsCache();
+      } catch (error) {
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGOUT] Failed to clear menu items cache: ${error instanceof Error ? error.message : String(error)}`);
+      }
       // Clean up any localStorage tokens if they exist (for migration purposes)
       if (typeof window !== 'undefined') {
         try {

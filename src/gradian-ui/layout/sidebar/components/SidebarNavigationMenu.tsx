@@ -138,24 +138,26 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
 
     let isMounted = true;
 
-    async function loadMenuItems() {
-      // Check cache first
-      const cachedItems = menuItemsStore.getMenuItems(companyId);
-      if (cachedItems && cachedItems.length > 0) {
-        // Use cached items
-        const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId);
-        if (isMounted) {
-          setItems(mapped);
-          currentItemsRef.current = mapped;
-          setIsLoading(false);
-          lastLoadedCompanyIdRef.current = companyId;
-          lastLoadedTenantIdRef.current = tenantId;
-          hasLoadedRef.current = true;
+    async function loadMenuItems(forceFetch: boolean = false) {
+      // Check cache first unless explicitly forced
+      if (!forceFetch) {
+        const cachedItems = menuItemsStore.getMenuItems(companyId);
+        if (cachedItems && cachedItems.length > 0) {
+          // Use cached items
+          const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId);
+          if (isMounted) {
+            setItems(mapped);
+            currentItemsRef.current = mapped;
+            setIsLoading(false);
+            lastLoadedCompanyIdRef.current = companyId;
+            lastLoadedTenantIdRef.current = tenantId;
+            hasLoadedRef.current = true;
+          }
+          return;
         }
-        return;
       }
 
-      // Cache miss or stale - fetch from API
+      // Cache miss or forced fetch - fetch from API
       // Always set loading when fetching (items will be preserved if they exist)
       setIsLoading(true);
       try {
@@ -218,8 +220,23 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
 
     loadMenuItems();
 
+    const handleMenuItemsCleared = () => {
+      // Force refetch on clear events
+      currentItemsRef.current = [];
+      setItems([]);
+      setIsLoading(true);
+      void loadMenuItems(true);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('menu-items-cleared', handleMenuItemsCleared);
+    }
+
     return () => {
       isMounted = false;
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('menu-items-cleared', handleMenuItemsCleared);
+      }
     };
   }, [companyId, tenantId]); // Only depend on primitive values, not objects or store instances
 

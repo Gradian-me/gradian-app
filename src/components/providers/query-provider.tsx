@@ -7,6 +7,7 @@ import { clearSchemaCache } from '@/gradian-ui/indexdb-manager/schema-cache';
 import { clearCompaniesCache } from '@/gradian-ui/indexdb-manager/companies-cache';
 import { toast } from 'sonner';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
+import { clearMenuItemsCache } from '@/stores/menu-items.store';
 
 // Get default cache configuration from config file
 const defaultCacheConfig = getCacheConfig('schemas');
@@ -201,8 +202,7 @@ function ReactQueryCacheClearHandler() {
       }
       // Clear menu items cache
       try {
-        const { useMenuItemsStore } = await import('@/stores/menu-items.store');
-        useMenuItemsStore.getState().clearMenuItems();
+        clearMenuItemsCache();
       } catch (error) {
         console.warn('[menu-items-cache] Failed to clear menu items cache:', error);
       }
@@ -250,8 +250,7 @@ function ReactQueryCacheClearHandler() {
         }
         // Clear menu items cache
         try {
-          const { useMenuItemsStore } = await import('@/stores/menu-items.store');
-          useMenuItemsStore.getState().clearMenuItems();
+          clearMenuItemsCache();
         } catch (error) {
           console.warn('[menu-items-cache] Failed to clear menu items cache from storage event:', error);
         }

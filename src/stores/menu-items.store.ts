@@ -23,6 +23,7 @@ interface MenuItemsState {
 }
 
 const DEFAULT_CACHE_MAX_AGE = 5 * 60 * 1000; // 5 minutes in milliseconds
+export const MENU_ITEMS_STORAGE_KEY = 'menu-items-store';
 
 export const useMenuItemsStore = create<MenuItemsState>()(
   devtools(
@@ -83,10 +84,31 @@ export const useMenuItemsStore = create<MenuItemsState>()(
         },
       }),
       {
-        name: 'menu-items-store',
+        name: MENU_ITEMS_STORAGE_KEY,
       }
     ),
     getZustandDevToolsConfig<MenuItemsState>('menu-items-store')
   )
 );
+
+/**
+ * Clear menu items from store and remove persisted cache for full reset.
+ * Safe to call during logout/login/cache clear events.
+ */
+export function clearMenuItemsCache(): void {
+  try {
+    useMenuItemsStore.getState().clearMenuItems();
+  } catch (error) {
+    console.warn('[menu-items-store] Failed to clear in-memory cache:', error);
+  }
+
+  if (typeof window !== 'undefined') {
+    try {
+      // Notify listeners (e.g., sidebar) to refetch menu items
+      window.dispatchEvent(new CustomEvent('menu-items-cleared'));
+    } catch (error) {
+      console.warn('[menu-items-store] Failed to dispatch menu-items-cleared event:', error);
+    }
+  }
+}
 

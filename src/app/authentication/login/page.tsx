@@ -7,7 +7,7 @@ import { ensureFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie
 import { normalizeUsernameToEmail } from '@/domains/auth/utils/username-email.util';
 import { useUserStore } from '@/stores/user.store';
 import { useTenantStore } from '@/stores/tenant.store';
-import { useMenuItemsStore } from '@/stores/menu-items.store';
+import { clearMenuItemsCache } from '@/stores/menu-items.store';
 import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -313,7 +313,7 @@ function LoginPageContent() {
         
         // Clear menu items cache on login to ensure fresh data
         try {
-          useMenuItemsStore.getState().clearMenuItems();
+          clearMenuItemsCache();
           loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Menu items cache cleared');
         } catch (error) {
           loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN] Failed to clear menu items cache: ${error instanceof Error ? error.message : String(error)}`);
