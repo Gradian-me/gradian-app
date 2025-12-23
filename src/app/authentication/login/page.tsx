@@ -296,6 +296,8 @@ function LoginPageContent() {
           name: data.user.name,
           role: data.user.role,
           hasAvatar: !!data.user.avatar,
+          relatedCompanies: data.user.relatedCompanies?.length,
+          entityType: data.user.entityType?.length,
         })}`);
         setUser({
           id: data.user.id,
@@ -306,6 +308,11 @@ function LoginPageContent() {
           role: data.user.role as 'admin' | 'procurement' | 'vendor',
           department: data.user.department,
           avatar: data.user.avatar,
+          relatedCompanies: data.user.relatedCompanies,
+          entityType: data.user.entityType,
+          status: data.user.status,
+          profile_id: data.user.profile_id,
+          isAdmin: data.user.isAdmin,
           createdAt: new Date(),
           updatedAt: new Date(),
         });

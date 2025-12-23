@@ -10,15 +10,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn, resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { Badge as FormBadge } from '@/gradian-ui/form-builder/form-elements/components/Badge';
 import { useUserStore } from '@/stores/user.store';
-import { clearMenuItemsCache } from '@/stores/menu-items.store';
 import { useLanguageStore } from '@/stores/language.store';
 import { useTheme } from 'next-themes';
 import { ProfileSelectorConfig } from '@/gradian-ui/layout/profile-selector/types';
 import { UserProfile } from '@/gradian-ui/shared/types';
-import { ensureFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
-import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
-import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { AuthEventType, dispatchAuthEvent } from '@/gradian-ui/shared/utils/auth-events';
 
 interface UserProfileSelectorProps {
   config?: Partial<ProfileSelectorConfig>;
@@ -102,7 +98,9 @@ export function UserProfileSelector({
     'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
     'data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2',
-    isDarkVariant ? 'bg-gray-900 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-900'
+    isDarkVariant
+      ? 'bg-gray-900 border-gray-700 text-gray-100'
+      : 'bg-white border-gray-200 text-gray-900'
   );
   const separatorClasses = cn(
     '-mx-1 my-1 h-px',
@@ -111,8 +109,8 @@ export function UserProfileSelector({
   const itemClasses = cn(
     'relative flex cursor-pointer select-none items-center rounded-lg px-3 py-2 text-sm outline-none transition-colors',
     isDarkVariant
-      ? 'hover:bg-violet-500/10 focus:bg-violet-500/10 text-gray-200'
-      : 'hover:bg-violet-50 focus:bg-violet-50 text-gray-800'
+      ? 'hover:bg-violet-500/10 focus:bg-violet-500/10 text-gray-100 data-[highlighted]:bg-violet-500/15'
+      : 'hover:bg-violet-50 focus:bg-violet-50 text-gray-800 data-[highlighted]:bg-violet-100'
   );
 
   const handleNavigate = (path: string) => {
@@ -122,45 +120,7 @@ export function UserProfileSelector({
 
   const handleLogout = async () => {
     setIsMenuOpen(false);
-    try {
-      // Tokens are stored in httpOnly cookies, so they're automatically sent with the request
-      const fingerprint = await ensureFingerprintCookie();
-
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(fingerprint ? { 'x-fingerprint': fingerprint } : {}),
-        },
-        body: JSON.stringify({
-          deviceFingerprint: fingerprint ?? undefined,
-        }),
-        credentials: 'include', // Ensure cookies are sent
-      });
-    } catch (error) {
-      loggingCustom(LogType.CLIENT_LOG, 'error', `Logout error: ${error instanceof Error ? error.message : String(error)}`);
-    } finally {
-      // Clear access token from memory
-      authTokenManager.clearAccessToken();
-      
-      useUserStore.getState().clearUser();
-      // Clear menu items cache on logout to force fresh fetch on next session
-      try {
-        clearMenuItemsCache();
-      } catch (error) {
-        loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGOUT] Failed to clear menu items cache: ${error instanceof Error ? error.message : String(error)}`);
-      }
-      // Clean up any localStorage tokens if they exist (for migration purposes)
-      if (typeof window !== 'undefined') {
-        try {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-        } catch (error) {
-          // Ignore errors
-        }
-      }
-      router.push('/authentication/login');
-    }
+    dispatchAuthEvent(AuthEventType.FORCE_LOGOUT, 'User requested logout');
   };
 
   // Always render the same structure to avoid hydration mismatch
@@ -213,23 +173,9 @@ export function UserProfileSelector({
   }
 
   // After mount, check for user and render accordingly
-  // If no user, show login button with static classes to avoid hydration mismatch
+  // If no user, render nothing (global auth logic will handle redirects if needed)
   if (!user) {
-    return (
-      <div suppressHydrationWarning>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex h-10 items-center space-x-2 rounded-xl border border-violet-200 bg-white text-violet-700 transition-colors outline-none ring-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-violet-50 hover:border-violet-300"
-          type="button"
-          onClick={() => router.push('/authentication/login')}
-          aria-label="Login"
-          suppressHydrationWarning
-        >
-          Login
-        </Button>
-      </div>
-    );
+    return null;
   }
 
   // At this point, TypeScript knows user is not null
@@ -358,9 +304,28 @@ export function UserProfileSelector({
                       </FormBadge>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate" title={user.email}>
+                  <p
+                    className="text-xs text-gray-500 dark:text-gray-400 truncate"
+                    title={user.email}
+                  >
                     {user.email}
                   </p>
+                  {Array.isArray(user?.entityType) && user.entityType.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {user.entityType.map((entity) => (
+                        <FormBadge
+                          key={entity.id}
+                          variant="outline"
+                          size="sm"
+                          color={entity.color || 'gray'}
+                          className="flex items-center gap-1"
+                          tooltip={entity.label}
+                        >
+                          {entity.label}
+                        </FormBadge>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <DropdownMenuPrimitive.Separator className={separatorClasses} />
@@ -377,7 +342,9 @@ export function UserProfileSelector({
                     <Icon className="me-3 h-4 w-4" />
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{label}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">{description}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {description}
+                      </span>
                     </div>
                   </DropdownMenuPrimitive.Item>
                 ))}
@@ -397,7 +364,9 @@ export function UserProfileSelector({
                   <LogOut className="me-3 h-4 w-4" />
                   <div className="flex flex-col">
                     <span className="text-sm font-medium">Logout</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Sign out of your account</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      Sign out of your account
+                    </span>
                   </div>
                 </DropdownMenuPrimitive.Item>
               </motion.div>

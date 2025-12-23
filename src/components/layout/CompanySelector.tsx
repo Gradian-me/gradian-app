@@ -10,6 +10,7 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useCompanyStore } from '@/stores/company.store';
 import { useTenantStore } from '@/stores/tenant.store';
+import { useUserStore } from '@/stores/user.store';
 import { useTheme } from 'next-themes';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -20,6 +21,13 @@ interface Company {
   logo?: string;
   [key: string]: any;
 }
+
+type RelatedCompanyLike = {
+  id: string | number;
+  label?: string;
+  name?: string;
+  logo?: string;
+};
 
 interface CompanySelectorProps {
   onCompanyChange?: (company: string) => void;
@@ -40,6 +48,7 @@ export function CompanySelector({
 }: CompanySelectorProps) {
   const { selectedCompany, setSelectedCompany } = useCompanyStore();
   const { selectedTenant } = useTenantStore();
+  const user = useUserStore((state) => state.user);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
@@ -70,30 +79,34 @@ export function CompanySelector({
 
     const loadCompanies = async () => {
       try {
-        // Try to get from Zustand store first
+        // Prefer user.relatedCompanies to avoid network call
+        const relatedFromUser: RelatedCompanyLike[] = (user?.relatedCompanies || []) as RelatedCompanyLike[];
+
         const tenant = selectedTenant;
         
         // If not in store, read directly from localStorage
-        let relatedCompanies: Array<{ id: string; label: string }> = [];
+        let relatedCompanies: RelatedCompanyLike[] = [];
         
-        if (tenant && tenant['relatedCompanies']) {
-          relatedCompanies = tenant['relatedCompanies'];
+        if (relatedFromUser && relatedFromUser.length > 0) {
+          relatedCompanies = relatedFromUser;
+        } else if (tenant && tenant['relatedCompanies']) {
+          relatedCompanies = tenant['relatedCompanies'] as RelatedCompanyLike[];
         } else if (typeof window !== 'undefined') {
           const tenantStoreData = localStorage.getItem('tenant-store');
           if (tenantStoreData) {
             const parsed = JSON.parse(tenantStoreData);
             if (parsed?.state?.selectedTenant?.['relatedCompanies']) {
-              relatedCompanies = parsed.state.selectedTenant['relatedCompanies'];
+              relatedCompanies = parsed.state.selectedTenant['relatedCompanies'] as RelatedCompanyLike[];
             }
           }
         }
 
-        // If we have relatedCompanies from tenant, use them
+        // If we have relatedCompanies from user/tenant, use them
         if (relatedCompanies && relatedCompanies.length > 0) {
-          // Map relatedCompanies to Company format (label -> name)
-          const mappedCompanies: Company[] = relatedCompanies.map((company) => ({
+          const mappedCompanies: Company[] = relatedCompanies.map((company: RelatedCompanyLike) => ({
             id: company.id,
-            name: company.label,
+            name: company.label || company.name || 'Company',
+            logo: company.logo,
           }));
 
           // Always add "All Companies" option at the beginning
@@ -158,14 +171,15 @@ export function CompanySelector({
   // Set default company when companies are loaded
   useEffect(() => {
     if (isMounted && companies.length > 0) {
-      // If there's only one company, automatically set it as default
-      if (companies.length === 1) {
-        const singleCompany = companies[0];
-        if (!selectedCompany || selectedCompany.id !== singleCompany.id) {
-          setSelectedCompany(singleCompany);
-          // Set cookie for the single company
+      const realCompanies = companies.filter((c) => c.id !== -1);
+
+      // If there's exactly one real company, select it by default
+      if (realCompanies.length === 1) {
+        const singleRealCompany = realCompanies[0];
+        if (!selectedCompany || selectedCompany.id !== singleRealCompany.id) {
+          setSelectedCompany(singleRealCompany);
           if (typeof document !== 'undefined') {
-            const companyId = singleCompany.id !== -1 ? String(singleCompany.id) : '';
+            const companyId = String(singleRealCompany.id);
             document.cookie = `selectedCompanyId=${companyId}; path=/; max-age=${60 * 60 * 24 * 365}`;
           }
         }
@@ -360,42 +374,51 @@ export function CompanySelector({
         }}
       >
           <DropdownMenuPrimitive.Trigger asChild className={fullWidth ? "w-full" : "min-w-44"}>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className={triggerBaseClasses}
-              aria-label="Select company"
-              ref={triggerRef}
-            >
-            <Avatar 
-              fallback={companyInitials}
-              size={showLogo === 'sidebar-avatar' ? 'xs' : 'sm'}
-              variant="primary"
-              className={cn(
-                "border",
-                avatarBorderClass,
-                showLogo === 'sidebar-avatar' ? "h-8 w-8" : ""
-              )}
-              src={showLogo === 'sidebar-avatar' ? selectedCompany?.logo : undefined}
-            />
-            <span
-              className={cn(
-                "text-sm font-medium line-clamp-1 whitespace-nowrap overflow-hidden text-ellipsis text-start",
-                isDarkVariant ? "text-gray-300" : "text-gray-700 dark:text-gray-300",
-                fullWidth ? "flex-1" : ""
-              )}
-            >
-              {getCompanyName(selectedCompany) || 'Select company'}
-            </span>
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 shrink-0 transition-transform duration-200",
-                chevronColorClass,
-                isMenuOpen && "rotate-180"
-              )}
-            />
-          </Button>
-        </DropdownMenuPrimitive.Trigger>
+            <div className="relative w-full">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className={triggerBaseClasses}
+                aria-label="Select company"
+                ref={triggerRef}
+              >
+              <Avatar 
+                fallback={companyInitials}
+                size={showLogo === 'sidebar-avatar' ? 'xs' : 'sm'}
+                variant="primary"
+                className={cn(
+                  "border",
+                  avatarBorderClass,
+                  showLogo === 'sidebar-avatar' ? "h-8 w-8" : ""
+                )}
+                src={showLogo === 'sidebar-avatar' ? selectedCompany?.logo : undefined}
+              />
+              <span
+                className={cn(
+                  "text-sm font-medium line-clamp-1 whitespace-nowrap overflow-hidden text-ellipsis text-start",
+                  isDarkVariant ? "text-gray-300" : "text-gray-700 dark:text-gray-300",
+                  fullWidth ? "flex-1" : ""
+                )}
+              >
+                {getCompanyName(selectedCompany) || 'Select company'}
+              </span>
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 shrink-0 transition-transform duration-200",
+                  chevronColorClass,
+                  isMenuOpen && "rotate-180"
+                )}
+              />
+            </Button>
+            {selectedCompany && selectedCompany.id !== -1 && (
+              <div
+                className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-emerald-500 border border-white shadow-sm"
+                title={getCompanyName(selectedCompany)}
+                aria-label={getCompanyName(selectedCompany)}
+              />
+            )}
+            </div>
+          </DropdownMenuPrimitive.Trigger>
       
       <DropdownMenuPrimitive.Portal>
         <DropdownMenuPrimitive.Content

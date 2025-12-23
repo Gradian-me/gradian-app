@@ -10,6 +10,11 @@ export interface User {
   role: 'admin' | 'procurement' | 'vendor';
   department?: string;
   avatar?: string;
+  status?: Array<{ id: string; icon?: string; color?: string; label?: string }>;
+  entityType?: Array<{ id: string; icon?: string; color?: string; label?: string }>;
+  relatedCompanies?: Array<{ id: string; label: string; logo?: string }>;
+  profile_id?: string;
+  isAdmin?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

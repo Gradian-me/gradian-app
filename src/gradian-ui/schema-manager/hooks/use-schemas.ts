@@ -60,7 +60,7 @@ export function useSchemas(options?: UseSchemasOptions) {
       // Use /api/schemas directly (apiRequest will handle it correctly via resolveApiUrl)
       const response = await apiRequest<FormSchema[]>(apiPath, {
         params: Object.keys(queryParams).length > 0 ? queryParams : undefined,
-        disableCache: false, // Use cache for better performance
+        disableCache: true, // Force network to make call visible and fresh
       });
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to fetch schemas');
@@ -81,9 +81,9 @@ export function useSchemas(options?: UseSchemasOptions) {
     },
     enabled: enabled !== false,
     initialData,
-    staleTime: cacheConfig.staleTime ?? 10 * 60 * 1000,
+    staleTime: 0, // always stale so a network fetch occurs (visible in DevTools)
     gcTime: cacheConfig.gcTime ?? 30 * 60 * 1000,
-    refetchOnMount: false, // Don't refetch on mount - only fetch once on initial load
+    refetchOnMount: true, // ensure network call on mount
     refetchOnWindowFocus: false, // Don't refetch on window focus
     refetchOnReconnect: false, // Don't refetch on reconnect
     retry: 1, // Only retry once on failure

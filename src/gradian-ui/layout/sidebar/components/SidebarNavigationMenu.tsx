@@ -162,7 +162,9 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
       setIsLoading(true);
       try {
         // Use apiRequest which automatically includes tenantIds and companyIds
-        const response = await apiRequest<any[]>('/api/data/menu-items');
+        const response = await apiRequest<any[]>('/api/data/menu-items', {
+          disableCache: true,
+        });
         
         if (!response.success || !response.data) {
           if (isMounted) {

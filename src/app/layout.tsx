@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { DialogProvider } from "@/gradian-ui/shared/contexts/DialogContext";
 import { SecurityProvider } from "@/components/security/SecurityProvider";
+import { IdleTimeoutProvider } from "@/gradian-ui/shared/providers/IdleTimeoutProvider";
+import { AuthEventListener } from "@/gradian-ui/shared/components/AuthEventListener";
 
 export const metadata: Metadata = {
   title: "Gradian",
@@ -38,8 +40,11 @@ export default function RootLayout({
                 enableSystem
                 disableTransitionOnChange
               >
-                <Toaster />
-                {children}
+                <IdleTimeoutProvider idleTimeoutMs={15 * 60 * 1000}>
+                  <AuthEventListener />
+                  <Toaster />
+                  {children}
+                </IdleTimeoutProvider>
               </ThemeProvider>
             </DialogProvider>
           </QueryProvider>

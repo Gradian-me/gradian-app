@@ -18,6 +18,7 @@
 import { loggingCustom } from './logging-custom';
 import { LogType } from '../configs/log-config';
 import { REQUIRE_LOGIN } from '../configs/env-config';
+import { AuthEventType, dispatchAuthEvent } from './auth-events';
 
 type QueuedRequest = {
   resolve: (token: string | null) => void;
@@ -34,6 +35,24 @@ export class RateLimitError extends Error {
     this.name = 'RateLimitError';
     Object.setPrototypeOf(this, RateLimitError.prototype);
   }
+}
+
+const IDLE_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes default, configurable via caller if needed
+const LAST_INTERACTION_KEY = 'last_interaction';
+
+function getLastInteraction(): number | null {
+  if (typeof window === 'undefined') return null;
+  const raw = window.localStorage.getItem(LAST_INTERACTION_KEY);
+  if (!raw) return null;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function isIdleExceeded(thresholdMs: number = IDLE_TIMEOUT_MS): boolean {
+  if (typeof window === 'undefined') return false;
+  const last = getLastInteraction();
+  if (!last) return false;
+  return Date.now() - last > thresholdMs;
 }
 
 class AuthTokenManager {
@@ -286,17 +305,27 @@ class AuthTokenManager {
    */
   private async performRefresh(): Promise<string | null> {
     const startTime = Date.now();
-    loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] performRefresh() - calling /api/auth/token/refresh ${JSON.stringify({
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] performRefresh() - calling /login with Bearer token ${JSON.stringify({
       timestamp: new Date().toISOString(),
       refreshTokenSource: 'HttpOnly cookie (sent automatically with credentials: include)',
     })}`);
 
+    // Do not attempt refresh if idle threshold exceeded
+    if (isIdleExceeded()) {
+      loggingCustom(LogType.CLIENT_LOG, 'warn', '[AUTH_TOKEN] performRefresh() - skipped due to idle timeout');
+      dispatchAuthEvent(AuthEventType.FORCE_LOGOUT, 'Idle timeout exceeded before refresh');
+      return null;
+    }
+
     try {
-      // Call refresh endpoint - refresh token is sent via HttpOnly cookie (withCredentials)
-      const response = await fetch('/api/auth/token/refresh', {
+      const bearer = this.accessToken ? `Bearer ${this.accessToken}` : undefined;
+
+      // Call backend login endpoint - refresh token is sent via HttpOnly cookie (withCredentials)
+      const response = await fetch('/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(bearer ? { Authorization: bearer } : {}),
         },
         credentials: 'include', // Required to send HttpOnly cookies
       });
@@ -312,7 +341,17 @@ class AuthTokenManager {
       if (!response.ok) {
         // Refresh failed - clear auth state
         this.clearAccessToken();
-        
+
+        if (response.status === 401 || response.status === 400 || response.status === 403) {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[AUTH_TOKEN] performRefresh() - refresh failed (auth) ${JSON.stringify({
+            status: response.status,
+            reason: 'Invalid or missing refresh token',
+            action: 'Dispatching FORCE_LOGOUT',
+          })}`);
+          dispatchAuthEvent(AuthEventType.FORCE_LOGOUT, 'Refresh token invalid');
+          return null;
+        }
+
         // Handle 429 Too Many Requests with exponential backoff
         if (response.status === 429) {
           const now = Date.now();
@@ -328,8 +367,6 @@ class AuthTokenManager {
               action: 'Will wait before retrying',
             })}`);
             
-            // Don't throw - return null to prevent further retries
-            // The calling code should handle this gracefully
             return null;
           }
           
@@ -337,7 +374,6 @@ class AuthTokenManager {
           this.lastRateLimitError = now;
           this.rateLimitRetryCount += 1;
           
-          // Exponential backoff: increase cooldown with each retry (max 5 minutes)
           this.rateLimitCooldownMs = Math.min(
             300000, // 5 minutes max
             Math.pow(2, Math.min(this.rateLimitRetryCount, 6)) * 1000 // 2^retryCount seconds, capped at 2^6 = 64 seconds base
@@ -350,19 +386,6 @@ class AuthTokenManager {
             action: 'Will wait before retrying',
           })}`);
           
-          // Don't throw - return null to prevent cascading failures
-          // The error will be logged but won't cause infinite retry loops
-          return null;
-        }
-        
-        if (response.status === 401 || response.status === 400) {
-          loggingCustom(LogType.CLIENT_LOG, 'warn', `[AUTH_TOKEN] performRefresh() - refresh failed (401/400) ${JSON.stringify({
-            status: response.status,
-            reason: 'Invalid or missing refresh token',
-            action: 'Will redirect to login (if not already on login page)',
-          })}`);
-          // Invalid or missing refresh token - redirect to login
-          this.redirectToLogin();
           return null;
         }
         
@@ -371,6 +394,7 @@ class AuthTokenManager {
           status: response.status,
           error: errorMsg,
         })}`);
+        dispatchAuthEvent(AuthEventType.FORCE_LOGOUT, 'Token refresh failed');
         throw new Error(errorMsg);
       }
 
@@ -382,19 +406,21 @@ class AuthTokenManager {
         message: data.message,
       })}`);
       
-      if (!data.success || !data.accessToken) {
+      const newToken: string | null = data?.tokens?.accessToken || data?.accessToken || null;
+
+      if (!data.success || !newToken) {
         loggingCustom(LogType.CLIENT_LOG, 'error', `[AUTH_TOKEN] performRefresh() - invalid response ${JSON.stringify({
           success: data.success,
-          hasAccessToken: !!data.accessToken,
+          hasAccessToken: !!newToken,
           error: data.error,
         })}`);
         this.clearAccessToken();
-        this.redirectToLogin();
+        dispatchAuthEvent(AuthEventType.FORCE_LOGOUT, 'Refresh response invalid');
         return null;
       }
 
       // Store new access token in memory
-      this.setAccessToken(data.accessToken);
+      this.setAccessToken(newToken);
       
       // Reset rate limit tracking on successful refresh
       this.lastRateLimitError = null;
@@ -404,10 +430,10 @@ class AuthTokenManager {
       loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] performRefresh() - SUCCESS ${JSON.stringify({
         tokenStored: true,
         storageLocation: 'MEMORY (not in cookies)',
-        tokenLength: data.accessToken.length,
+        tokenLength: newToken.length,
         expiresIn: data.expiresIn,
       })}`);
-      return data.accessToken;
+      return newToken;
     } catch (error) {
       const duration = Date.now() - startTime;
       this.clearAccessToken();
@@ -427,6 +453,7 @@ class AuthTokenManager {
         error: error instanceof Error ? error.message : String(error),
         duration: `${duration}ms`,
       })}`);
+      dispatchAuthEvent(AuthEventType.FORCE_LOGOUT, 'Refresh error');
       throw error;
     }
   }
@@ -458,6 +485,13 @@ class AuthTokenManager {
     // Don't try to get token if we're on login page
     if (isOnLogin) {
       loggingCustom(LogType.CLIENT_LOG, 'log', '[AUTH_TOKEN] getValidAccessToken() - skipped (on login page)');
+      return null;
+    }
+
+    // Enforce idle timeout before attempting refresh
+    if (isIdleExceeded()) {
+      loggingCustom(LogType.CLIENT_LOG, 'warn', '[AUTH_TOKEN] getValidAccessToken() - idle threshold exceeded, dispatching logout');
+      dispatchAuthEvent(AuthEventType.FORCE_LOGOUT, 'Idle timeout exceeded');
       return null;
     }
 

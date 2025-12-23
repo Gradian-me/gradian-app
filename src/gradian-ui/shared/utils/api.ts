@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { getFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
 import { useTenantStore } from '@/stores/tenant.store';
 import { authTokenManager, RateLimitError } from './auth-token-manager';
+import { AuthEventType, dispatchAuthEvent } from './auth-events';
 
 // Helper function to resolve API endpoint URL
 // IMPORTANT: Always use relative URLs so requests go through Next.js API routes
@@ -463,6 +464,7 @@ export class ApiClient {
             loggingCustom(LogType.CLIENT_LOG, 'warn', `[API_CLIENT] request() - token refresh failed, user will be redirected to login ${JSON.stringify({
               endpoint,
             })}`);
+            dispatchAuthEvent(AuthEventType.FORCE_LOGOUT, 'Token refresh failed in ApiClient');
             // Refresh failed - user will be redirected to login by authTokenManager
             return {
               success: false,
