@@ -23,6 +23,13 @@ RUN echo "deb [trusted=yes] https://reg.cinnagen.com/repository/apt-debian-main-
 # Update system packages and install build dependencies
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update -qq && \
+    apt-get --only-upgrade install -y --no-install-recommends \
+        libldap-2.5-0 \
+        libpam-modules \
+        libpam-modules-bin \
+        libpam-runtime \
+        libpam0g \
+        zlib1g || true && \
     apt-get install -y --no-install-recommends \
         python3 \
         make \
@@ -69,6 +76,13 @@ RUN echo "deb [trusted=yes] https://reg.cinnagen.com/repository/apt-debian-arvan
 # Update system packages, create non-root user, and install runtime dependencies
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update -qq && \
+    apt-get --only-upgrade install -y --no-install-recommends \
+        libldap-2.5-0 \
+        libpam-modules \
+        libpam-modules-bin \
+        libpam-runtime \
+        libpam0g \
+        zlib1g || true && \
     groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs nextjs && \
     apt-get install -y --no-install-recommends \

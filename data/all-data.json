@@ -1155,8 +1155,7 @@
     }
   ],
   "purchaseOrders": [],
-  "tenders": [
-  ],
+  "tenders": [],
   "shipments": [],
   "invoices": [],
   "applications": [
@@ -2026,8 +2025,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-21T10:36:50.773Z",
-      "lastSynced": "2025-12-21T10:36:50.773Z",
+      "updatedAt": "2025-12-23T12:13:11.902Z",
+      "lastSynced": "2025-12-23T12:13:11.902Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2066,7 +2065,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-21T10:37:03.061Z",
+      "updatedAt": "2025-12-23T12:13:30.100Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2076,7 +2075,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-21T10:37:03.061Z",
+      "lastSynced": "2025-12-23T12:13:30.100Z",
       "lastSyncMessage": "Generated relations for 39 out of 39 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -2125,7 +2124,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-21T10:46:07.717Z",
+      "updatedAt": "2025-12-23T12:13:48.821Z",
       "category": [
         {
           "id": "production-integration",
@@ -2134,8 +2133,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-21T10:46:07.717Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 1122, edges created: 71, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2025-12-23T12:13:48.821Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 220, nodes updated: 6, edges created: 116, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
@@ -17583,8 +17582,7 @@
       ]
     }
   ],
-  "tender-items": [
-  ],
+  "tender-items": [],
   "pages": [
     {
       "pageId": "inquiry-tender-overview",
@@ -17602,13 +17600,10 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     }
   ],
-  "tender-invitations": [
-  ],
+  "tender-invitations": [],
   "page-metadata-editor-form": [],
-  "quotations": [
-  ],
-  "quotation-items": [
-  ],
+  "quotations": [],
+  "quotation-items": [],
   "dynamic-queries": [
     {
       "name": "Tender Invitations By Vendor",
