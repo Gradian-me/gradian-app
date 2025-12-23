@@ -3,10 +3,10 @@
   "version": "1.36.000",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "npm run clean:relations && next dev --turbopack",
     "start:dev": "next dev --turbopack",
     "clean:relations": "node scripts/clean-relations.js",
-    "build": "npm run clean:relations && next build --webpack",
+    "build": "next build --webpack",
     "build:release": "npm run clean:relations && OBFUSCATE=true next build --webpack",
     "verify": "tsc --noEmit && eslint .",
     "start": "next start",
