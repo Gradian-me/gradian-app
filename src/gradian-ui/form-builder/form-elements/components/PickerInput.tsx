@@ -58,7 +58,19 @@ export const PickerInput: React.FC<PickerInputProps> = ({
 
   // Get targetSchema or sourceUrl from config
   // Memoize these to prevent unnecessary re-renders when config object reference changes
-  const targetSchemaId = useMemo(() => (config as any).targetSchema, [(config as any).targetSchema]);
+  // Ensure we handle empty strings and other falsy values correctly
+  // Also check for alternative property names that might be used in production
+  const targetSchemaId = useMemo(() => {
+    // Try multiple possible property names
+    const ts = (config as any).targetSchema || (config as any).target_schema || (config as any)['target-schema'];
+    // Return null for falsy values (null, undefined, empty string) to ensure consistent behavior
+    const result = ts && String(ts).trim() !== '' ? String(ts).trim() : null;
+    // Log in production to help debug issues
+    if (process.env.NODE_ENV === 'production' && !result && (config as any).component === 'picker') {
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `[PickerInput] targetSchemaId is null/empty for field: ${(config as any).name || (config as any).id}, targetSchema value: ${JSON.stringify(ts)}, config keys: ${Object.keys(config || {}).join(', ')}`);
+    }
+    return result;
+  }, [(config as any).targetSchema, (config as any).target_schema, (config as any)['target-schema'], (config as any).name, (config as any).id]);
   
   // Check for reference-based filtering fields
   const referenceSchema = (config as any).referenceSchema;
@@ -77,7 +89,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       referenceSchema,
       referenceRelationTypeId,
       referenceEntityId,
-      targetSchema: targetSchemaId,
+      targetSchema: targetSchemaId || undefined,
       schema: dynamicContext.formSchema,
       values: dynamicContext.formData,
     });
@@ -753,7 +765,15 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => !disabled && setIsPickerOpen(true)}
+                onClick={() => {
+                  if (disabled) return;
+                  // Ensure we have a valid picker configuration before opening
+                  if (!targetSchemaId && !sourceUrl && !staticItems) {
+                    loggingCustom(LogType.CLIENT_LOG, 'warn', `[PickerInput] Cannot open picker - no targetSchemaId, sourceUrl, or staticItems. Field: ${fieldName}, targetSchema: ${(config as any).targetSchema}`);
+                    return;
+                  }
+                  setIsPickerOpen(true);
+                }}
                 disabled={disabled}
                 className="h-7 w-7 p-0 shrink-0"
                 aria-label="Change selection"
@@ -771,7 +791,15 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                 value={getDisplayValue() || ''}
                 placeholder={fieldPlaceholder}
                 readOnly
-                onClick={() => !disabled && setIsPickerOpen(true)}
+                onClick={() => {
+                  if (disabled) return;
+                  // Ensure we have a valid picker configuration before opening
+                  if (!targetSchemaId && !sourceUrl && !staticItems) {
+                    loggingCustom(LogType.CLIENT_LOG, 'warn', `[PickerInput] Cannot open picker - no targetSchemaId, sourceUrl, or staticItems. Field: ${fieldName}, targetSchema: ${(config as any).targetSchema}`);
+                    return;
+                  }
+                  setIsPickerOpen(true);
+                }}
                 onFocus={onFocus}
                 onBlur={onBlur}
                 disabled={disabled}
@@ -786,7 +814,15 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => !disabled && setIsPickerOpen(true)}
+                onClick={() => {
+                  if (disabled) return;
+                  // Ensure we have a valid picker configuration before opening
+                  if (!targetSchemaId && !sourceUrl && !staticItems) {
+                    loggingCustom(LogType.CLIENT_LOG, 'warn', `[PickerInput] Cannot open picker - no targetSchemaId, sourceUrl, or staticItems. Field: ${fieldName}, targetSchema: ${(config as any).targetSchema}`);
+                    return;
+                  }
+                  setIsPickerOpen(true);
+                }}
                 disabled={disabled}
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
               >
@@ -813,15 +849,17 @@ export const PickerInput: React.FC<PickerInputProps> = ({
         </p>
       )}
       
+      {/* Always render PopupPicker if we have targetSchemaId, sourceUrl, or staticItems */}
+      {/* This ensures the picker is available even if schema fetch fails or is still loading */}
       {(targetSchemaId || sourceUrl || staticItems) && (
         <PopupPicker
           isOpen={isPickerOpen}
           onClose={() => setIsPickerOpen(false)}
-          schemaId={targetSchemaId}
+          schemaId={targetSchemaId || undefined}
           sourceUrl={sourceUrl}
           schema={targetSchema || undefined}
           onSelect={handleSelect}
-          title={sourceUrl ? (config as any).label || 'Select item' : staticItems ? (config as any).label || 'Select option' : `Select ${targetSchema?.plural_name || targetSchema?.singular_name || targetSchemaId}`}
+          title={sourceUrl ? (config as any).label || 'Select item' : staticItems ? (config as any).label || 'Select option' : `Select ${targetSchema?.plural_name || targetSchema?.singular_name || targetSchemaId || 'item'}`}
           description={(config as any).description || (sourceUrl ? 'Choose an item' : staticItems ? 'Choose an option' : `Choose a ${targetSchema?.singular_name || 'item'}`)}
           canViewList={Boolean(targetSchemaId)}
           viewListUrl={targetSchemaId ? `/page/${targetSchemaId}` : undefined}

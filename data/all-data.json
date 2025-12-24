@@ -2026,8 +2026,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-23T13:26:59.600Z",
-      "lastSynced": "2025-12-23T13:26:59.600Z",
+      "updatedAt": "2025-12-24T07:09:39.516Z",
+      "lastSynced": "2025-12-24T07:09:39.516Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2039,7 +2039,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 39 schemas: 39 succeeded, 0 failed (0 created, 39 updated)"
+      "lastSyncMessage": "Processed 41 schemas: 41 succeeded, 0 failed (0 created, 41 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -2066,7 +2066,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-23T12:13:30.100Z",
+      "updatedAt": "2025-12-24T07:07:56.506Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2076,8 +2076,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-23T12:13:30.100Z",
-      "lastSyncMessage": "Generated relations for 39 out of 39 schemas",
+      "lastSynced": "2025-12-24T07:07:56.506Z",
+      "lastSyncMessage": "Generated relations for 42 out of 42 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2125,7 +2125,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-24T06:19:18.775Z",
+      "updatedAt": "2025-12-24T07:09:02.932Z",
       "category": [
         {
           "id": "production-integration",
@@ -2134,8 +2134,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-24T06:19:18.775Z",
-      "lastSyncMessage": "Cannot GET /50x.html",
+      "lastSynced": "2025-12-24T07:09:02.932Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 1145, edges created: 71, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }

@@ -24,6 +24,8 @@ import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-
 import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export interface SelectOption {
   id?: string;
@@ -97,7 +99,25 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const referenceSchema = config?.referenceSchema;
   const referenceRelationTypeId = config?.referenceRelationTypeId;
   const referenceEntityId = config?.referenceEntityId;
-  const targetSchemaFromConfig = config?.targetSchema;
+  
+  // Extract config values for dependency array (must be simple expressions)
+  const configTargetSchema = (config as any)?.targetSchema;
+  const configTargetSchemaUnderscore = (config as any)?.target_schema;
+  const configTargetSchemaDash = (config as any)?.['target-schema'];
+  const configName = (config as any)?.name;
+  const configId = (config as any)?.id;
+  
+  // Extract targetSchema with defensive checks for production
+  // Try multiple possible property names and handle empty strings
+  const targetSchemaFromConfig = React.useMemo(() => {
+    const ts = configTargetSchema || configTargetSchemaUnderscore || configTargetSchemaDash;
+    const result = ts && String(ts).trim() !== '' ? String(ts).trim() : null;
+    // Log in production to help debug issues
+    if (process.env.NODE_ENV === 'production' && !result && (config as any)?.component === 'select' && (configTargetSchema || configTargetSchemaUnderscore || configTargetSchemaDash)) {
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `[Select] targetSchema is null/empty for field: ${configName || configId}, targetSchema value: ${JSON.stringify(ts)}, config keys: ${Object.keys(config || {}).join(', ')}`);
+    }
+    return result;
+  }, [configTargetSchema, configTargetSchemaUnderscore, configTargetSchemaDash, configName, configId]);
 
   // Build sourceUrl from reference fields if they're present and no explicit sourceUrl is provided
   const referenceBasedSourceUrl = React.useMemo(() => {
@@ -110,7 +130,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       referenceSchema,
       referenceRelationTypeId,
       referenceEntityId,
-      targetSchema: targetSchemaFromConfig || schemaId,
+      targetSchema: (targetSchemaFromConfig || schemaId) || undefined,
       schema: dynamicContext.formSchema,
       values: dynamicContext.formData,
     });
@@ -122,9 +142,17 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl
   // If reference-based URL is empty, fall back to using schemaId or targetSchema
   const effectiveSourceUrl = sourceUrl || referenceBasedSourceUrl || undefined;
-  // If we have reference fields but the URL is empty (dynamic context not ready), 
-  // fall back to using targetSchema if available, otherwise use schemaId
-  const effectiveSchemaId = schemaId || (referenceSchema && !referenceBasedSourceUrl && !sourceUrl && targetSchemaFromConfig ? targetSchemaFromConfig : undefined);
+  // Determine effective schemaId: use schemaId prop if provided, otherwise use targetSchemaFromConfig
+  // This ensures targetSchema works even when schemaId prop is not explicitly passed
+  const effectiveSchemaId = React.useMemo(() => {
+    if (schemaId) return schemaId;
+    if (targetSchemaFromConfig) return targetSchemaFromConfig;
+    // Fallback: if we have reference fields but URL is empty, try using targetSchema
+    if (referenceSchema && !referenceBasedSourceUrl && !sourceUrl && targetSchemaFromConfig) {
+      return targetSchemaFromConfig;
+    }
+    return undefined;
+  }, [schemaId, targetSchemaFromConfig, referenceSchema, referenceBasedSourceUrl, sourceUrl]);
 
   // Default columnMap for API responses that nest data under data[0].data
   const defaultColumnMap: ColumnMapConfig = React.useMemo(() => ({

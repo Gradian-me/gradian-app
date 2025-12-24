@@ -11,6 +11,8 @@ import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-
 import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
   (
@@ -43,7 +45,25 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
     const referenceSchema = config?.referenceSchema;
     const referenceRelationTypeId = config?.referenceRelationTypeId;
     const referenceEntityId = config?.referenceEntityId;
-    const targetSchemaFromConfig = config?.targetSchema;
+    
+    // Extract config values for dependency array (must be simple expressions)
+    const configTargetSchema = (config as any)?.targetSchema;
+    const configTargetSchemaUnderscore = (config as any)?.target_schema;
+    const configTargetSchemaDash = (config as any)?.['target-schema'];
+    const configName = (config as any)?.name;
+    const configId = (config as any)?.id;
+    
+    // Extract targetSchema with defensive checks for production
+    // Try multiple possible property names and handle empty strings
+    const targetSchemaFromConfig = React.useMemo(() => {
+      const ts = configTargetSchema || configTargetSchemaUnderscore || configTargetSchemaDash;
+      const result = ts && String(ts).trim() !== '' ? String(ts).trim() : null;
+      // Log in production to help debug issues
+      if (process.env.NODE_ENV === 'production' && !result && (config as any)?.component === 'radio' && (configTargetSchema || configTargetSchemaUnderscore || configTargetSchemaDash)) {
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `[RadioGroup] targetSchema is null/empty for field: ${configName || configId}, targetSchema value: ${JSON.stringify(ts)}, config keys: ${Object.keys(config || {}).join(', ')}`);
+      }
+      return result;
+    }, [configTargetSchema, configTargetSchemaUnderscore, configTargetSchemaDash, configName, configId]);
 
     // Build sourceUrl from reference fields if they're present and no explicit sourceUrl is provided
     const referenceBasedSourceUrl = React.useMemo(() => {
@@ -56,7 +76,7 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
         referenceSchema,
         referenceRelationTypeId,
         referenceEntityId,
-        targetSchema: targetSchemaFromConfig,
+        targetSchema: targetSchemaFromConfig ?? undefined,
         schema: dynamicContext.formSchema,
         values: dynamicContext.formData,
       });

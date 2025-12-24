@@ -7,6 +7,7 @@ import type { SidebarProps } from '../types';
 import { useCompanyStore } from '@/stores/company.store';
 import { useMenuItemsStore } from '@/stores/menu-items.store';
 import { useTenantStore } from '@/stores/tenant.store';
+import { useUserStore } from '@/stores/user.store';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '../../../shared/utils';
@@ -69,6 +70,9 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
   const companyId = selectedCompany && selectedCompany.id !== -1 ? selectedCompany.id : null;
   // Get tenantId to ensure it's available before making API calls
   const tenantId = useTenantStore((state) => state.getTenantId());
+  // Get user to detect login state changes
+  const user = useUserStore((state) => state.user);
+  const userId = user?.id ?? null;
   
   // Get menu items store
   const menuItemsStore = useMenuItemsStore();
@@ -76,6 +80,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
   // Track the last companyId and tenantId that were used to load items
   const lastLoadedCompanyIdRef = React.useRef<number | string | null>(null);
   const lastLoadedTenantIdRef = React.useRef<string | number | null | undefined>(undefined);
+  const lastLoadedUserIdRef = React.useRef<string | number | null>(null);
   // Track if items have been loaded at least once
   const hasLoadedRef = React.useRef<boolean>(false);
   // Track current items to avoid stale closures
@@ -100,6 +105,17 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
     if (lastLoadedTenantIdRef.current !== undefined && lastLoadedTenantIdRef.current !== tenantId) {
       hasLoadedRef.current = false;
       lastLoadedCompanyIdRef.current = null;
+    }
+
+    // Reset loaded state if userId changed (user logged in/out)
+    if (lastLoadedUserIdRef.current !== userId) {
+      // If user just logged in (was null, now is not null), force reload
+      if (userId !== null && lastLoadedUserIdRef.current === null) {
+        hasLoadedRef.current = false;
+        lastLoadedCompanyIdRef.current = null;
+        lastLoadedTenantIdRef.current = undefined;
+      }
+      lastLoadedUserIdRef.current = userId;
     }
 
     // Only reload if companyId or tenantId changed, or if we haven't loaded yet
@@ -151,6 +167,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
             setIsLoading(false);
             lastLoadedCompanyIdRef.current = companyId;
             lastLoadedTenantIdRef.current = tenantId;
+            lastLoadedUserIdRef.current = userId;
             hasLoadedRef.current = true;
           }
           return;
@@ -168,16 +185,17 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
         
         if (!response.success || !response.data) {
           if (isMounted) {
-            // Preserve existing items if available, otherwise show empty
+            // Preserve existing items if available, otherwise show fallback home item
             const cachedItems = menuItemsStore.getMenuItems(companyId);
             if (cachedItems && cachedItems.length > 0) {
               const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId);
               setItems(mapped);
               currentItemsRef.current = mapped;
             } else if (currentItemsRef.current.length === 0) {
-              // Only set empty if we don't have items already
-              setItems([]);
-              currentItemsRef.current = [];
+              // No cached items and no current items - show fallback home item
+              const fallbackItems = mapMenuItemsToNavigationItems([], companyId);
+              setItems(fallbackItems);
+              currentItemsRef.current = fallbackItems;
             }
             setIsLoading(false);
           }
@@ -200,10 +218,11 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
           setIsLoading(false);
           lastLoadedCompanyIdRef.current = companyId;
           lastLoadedTenantIdRef.current = tenantId;
+          lastLoadedUserIdRef.current = userId;
           hasLoadedRef.current = true;
         }
       } catch (error) {
-        // On error, preserve existing items if available
+        // On error, preserve existing items if available, otherwise show fallback home item
         if (isMounted) {
           const cachedItems = menuItemsStore.getMenuItems(companyId);
           if (cachedItems && cachedItems.length > 0) {
@@ -211,9 +230,10 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
             setItems(mapped);
             currentItemsRef.current = mapped;
           } else if (currentItemsRef.current.length === 0) {
-            // Only set empty if we don't have items already
-            setItems([]);
-            currentItemsRef.current = [];
+            // No cached items and no current items - show fallback home item
+            const fallbackItems = mapMenuItemsToNavigationItems([], companyId);
+            setItems(fallbackItems);
+            currentItemsRef.current = fallbackItems;
           }
           setIsLoading(false);
         }
@@ -240,7 +260,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
         window.removeEventListener('menu-items-cleared', handleMenuItemsCleared);
       }
     };
-  }, [companyId, tenantId]); // Only depend on primitive values, not objects or store instances
+  }, [companyId, tenantId, userId]); // Include userId to detect login state changes
 
   if (isLoading) {
     return (

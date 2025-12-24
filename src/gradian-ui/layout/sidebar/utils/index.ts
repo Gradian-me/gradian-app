@@ -2,6 +2,7 @@
 
 import {
   LayoutDashboard,
+  Home,
   type LucideIcon,
 } from 'lucide-react';
 import { NavigationItem } from '../types';
@@ -9,16 +10,30 @@ import { AD_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { getIconComponent, isValidLucideIcon } from '@/gradian-ui/shared/utils/icon-renderer';
 
 /**
+ * Fallback home menu item to show when no menu items are available
+ */
+const FALLBACK_HOME_MENU_ITEM: NavigationItem = {
+  id: 'home-menu-item',
+  name: 'Home',
+  href: '/',
+  icon: Home,
+};
+
+/**
  * Transform menu-items API data into sidebar NavigationItem[]
  * - Applies AD_MODE filter: if AD_MODE is true, hide items where hideInAD is true.
  * - Applies company filter: if companyId is set, only show items that either have no companies
  *   or include the selected company in their companies field.
+ * - Adds fallback home menu item if no items are available after filtering.
  */
 export function mapMenuItemsToNavigationItems(
   menuItems: any[],
   companyId?: string | number | null
 ): NavigationItem[] {
-  if (!Array.isArray(menuItems)) return [];
+  if (!Array.isArray(menuItems)) {
+    // Return fallback home item if menuItems is not an array
+    return [FALLBACK_HOME_MENU_ITEM];
+  }
 
   const filtered = menuItems
     // Preserve a stable index-based ordering independent of updatedAt
@@ -70,6 +85,11 @@ export function mapMenuItemsToNavigationItems(
         icon: Icon as LucideIcon,
       };
     });
+
+  // If no items after filtering, return fallback home item
+  if (filtered.length === 0) {
+    return [FALLBACK_HOME_MENU_ITEM];
+  }
 
   return filtered;
 }

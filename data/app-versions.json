@@ -4503,5 +4503,36 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KD3FORMELEMENTSLOGGING001",
+    "timestamp": "2025-12-21T14:00:00.000Z",
+    "version": "1.36.002",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Improved logging in form elements (CheckboxList, PickerInput, RadioGroup, Select, ToggleGroup) to handle empty targetSchema values and provide better debugging information in production. This change enhances data management and user experience by ensuring accurate schema handling and improved error tracking.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "logging",
+          "data-management",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "fix",
+        "description": "Fixed production issue where form elements with targetSchema or reference properties were not opening. Added defensive checks for targetSchema extraction with support for multiple property name variations and improved error handling.",
+        "priority": "High",
+        "affectedDomains": [
+          "form-builder",
+          "picker",
+          "select",
+          "checkbox-list",
+          "radio",
+          "toggle-group"
+        ]
+      }
+    ]
   }
 ]
