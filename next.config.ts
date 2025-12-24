@@ -3,6 +3,9 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  // Enable standalone output for optimized Docker builds
+  output: 'standalone',
+  
   // Argon2 is a native module that should only run on the server
   // serverExternalPackages tells Next.js/Turbopack not to bundle this package
   serverExternalPackages: [

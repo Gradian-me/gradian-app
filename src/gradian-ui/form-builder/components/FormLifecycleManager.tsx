@@ -934,9 +934,14 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
   useEffect(() => {
     // Initialize dynamic form context when schema changes
+    // Set immediately to ensure context is available before fields render
     setFormSchemaInContext(schema);
     setUserDataInContext(currentUser ?? null);
     setReferenceDataInContext(referenceEntityData ?? null);
+    // Also set initial form data immediately if available
+    if (state.values && Object.keys(state.values).length > 0) {
+      setFormDataInContext(state.values);
+    }
     return () => {
       resetDynamicContext();
     };

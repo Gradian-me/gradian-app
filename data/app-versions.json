@@ -4534,5 +4534,43 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KD4FORMCONTEXTREFACTOR001",
+    "timestamp": "2025-12-21T15:00:00.000Z",
+    "version": "1.36.003",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Improved dynamic context handling in form elements (CheckboxList, PickerInput, Select) to ensure reactivity when formSchema or formData changes",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "form-elements",
+          "state-management"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Enhanced FormLifecycleManager to set initial form data immediately if available, improving user experience during form rendering",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "form-lifecycle",
+          "user-experience"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated SidebarNavigationMenu to ensure home button is always displayed and merged with menu items, enhancing navigation clarity",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout",
+          "navigation",
+          "sidebar",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

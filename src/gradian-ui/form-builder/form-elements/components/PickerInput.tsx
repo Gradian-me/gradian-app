@@ -54,7 +54,10 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   const queryClient = useQueryClient();
 
   // Get dynamic context for reference-based filtering
-  const dynamicContext = useDynamicFormContextStore();
+  // Use selector to ensure reactivity when formSchema or formData changes
+  const formSchema = useDynamicFormContextStore((state) => state.formSchema);
+  const formData = useDynamicFormContextStore((state) => state.formData);
+  const dynamicContext = { formSchema, formData };
 
   // Get targetSchema or sourceUrl from config
   // Memoize these to prevent unnecessary re-renders when config object reference changes

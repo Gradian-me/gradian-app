@@ -12,7 +12,7 @@ import { getIconComponent, isValidLucideIcon } from '@/gradian-ui/shared/utils/i
 /**
  * Fallback home menu item to show when no menu items are available
  */
-const FALLBACK_HOME_MENU_ITEM: NavigationItem = {
+export const FALLBACK_HOME_MENU_ITEM: NavigationItem = {
   id: 'home-menu-item',
   name: 'Home',
   href: '/',

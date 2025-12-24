@@ -93,7 +93,10 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   ...props
 }) => {
   // Get dynamic context for reference-based filtering
-  const dynamicContext = useDynamicFormContextStore();
+  // Use selector to ensure reactivity when formSchema or formData changes
+  const formSchema = useDynamicFormContextStore((state) => state.formSchema);
+  const formData = useDynamicFormContextStore((state) => state.formData);
+  const dynamicContext = { formSchema, formData };
 
   // Check for reference-based filtering fields in config
   const referenceSchema = config?.referenceSchema;
