@@ -111,6 +111,7 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/data ./data
+COPY --from=builder /app/healthcheck.js ./healthcheck.js
 
 # Create uploads folder and set restrictive permissions
 RUN mkdir -p /app/public/uploads /home/nonroot && \
@@ -146,8 +147,9 @@ USER 65532:65532
 
 EXPOSE 8502
 
-# Health check using node directly (distroless doesn't have curl or shell)
+# Health check using dedicated script
+# Checks /api/health endpoint and verifies JSON response has status: "healthy"
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD ["node", "-e", "require('http').get('http://localhost:8502/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)}).on('error', () => process.exit(1))"]
+    CMD ["node", "healthcheck.js"]
 
 CMD ["server.js"]
