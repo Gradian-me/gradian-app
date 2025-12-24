@@ -173,7 +173,7 @@ export async function fetchOptionsFromSchemaOrUrl(
       apiParams.companyIds = companyId;
     }
 
-    const response = await apiRequest<any[]>(`/api/data/${schemaId}`, { params: apiParams });
+    const response = await apiRequest<any[]>(`/api/data/${schemaId}`, { params: apiParams, disableCache: true });
 
     if (!response.success || !Array.isArray(response.data)) {
       throw new Error(response.error || 'Failed to fetch items');

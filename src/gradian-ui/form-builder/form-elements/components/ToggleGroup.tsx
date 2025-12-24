@@ -92,7 +92,7 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
       }
       
       // Build the sourceUrl using reference fields
-      return buildReferenceFilterUrl({
+      const url = buildReferenceFilterUrl({
         referenceSchema,
         referenceRelationTypeId,
         referenceEntityId,
@@ -100,6 +100,9 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
         schema: dynamicContext.formSchema,
         values: dynamicContext.formData,
       });
+      
+      // If URL is empty (e.g., dynamic context not ready), return null
+      return url && url.trim() !== '' ? url : null;
     }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaFromConfig, sourceUrl, dynamicContext.formSchema, dynamicContext.formData]);
 
     // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl

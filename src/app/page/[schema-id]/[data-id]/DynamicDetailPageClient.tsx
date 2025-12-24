@@ -116,6 +116,37 @@ export function DynamicDetailPageClient({
           const updated = reconstructRegExp(response.data) as FormSchema;
           setSchemaState(ensureSchemaActions(updated));
           queryClient.setQueryData(['schemas', schemaId], updated);
+          
+          // Preload schemas for quick actions that open form modals
+          const quickActions = updated.detailPageMetadata?.quickActions || [];
+          const targetSchemas = quickActions
+            .filter((action) => 
+              (action.action === 'openFormDialog' || action.action === 'openActionForm') && 
+              action.targetSchema
+            )
+            .map((action) => action.targetSchema!)
+            .filter((schemaId, index, self) => self.indexOf(schemaId) === index); // Remove duplicates
+          
+          if (targetSchemas.length > 0) {
+            // Preload all target schemas in parallel
+            Promise.all(
+              targetSchemas.map(async (targetSchemaId) => {
+                try {
+                  const schemaResponse = await apiRequest<FormSchema>(`/api/schemas/${targetSchemaId}`, {
+                    disableCache: true,
+                    callerName: 'DynamicDetailPageClient.preloadQuickActionSchema',
+                  });
+                  if (schemaResponse.success && schemaResponse.data) {
+                    const reconstructed = reconstructRegExp(schemaResponse.data) as FormSchema;
+                    await cacheSchemaClientSide(reconstructed, { queryClient, persist: false });
+                    queryClient.setQueryData(['schemas', targetSchemaId], reconstructed);
+                  }
+                } catch (err) {
+                  console.warn(`[DetailPage] Failed to preload schema ${targetSchemaId} for quick action:`, err);
+                }
+              })
+            );
+          }
         }
       } catch (err) {
         console.warn('[DetailPage] Error fetching schema from API, keeping server-provided schema:', err);

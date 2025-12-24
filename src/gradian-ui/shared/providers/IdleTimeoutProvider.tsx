@@ -97,10 +97,22 @@ export function IdleTimeoutProvider({ idleTimeoutMs = DEFAULT_IDLE_TIMEOUT, chil
     };
   }, [idleTimeoutMs, lastInteraction, touch]);
 
+  // Use state to track current time instead of calling Date.now() during render
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+  
+  useEffect(() => {
+    // Update current time periodically to check idle status
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000); // Update every second
+    
+    return () => clearInterval(interval);
+  }, []);
+
   const isIdle = useMemo(() => {
     if (!lastInteraction) return false;
-    return Date.now() - lastInteraction > idleTimeoutMs;
-  }, [lastInteraction, idleTimeoutMs]);
+    return currentTime - lastInteraction > idleTimeoutMs;
+  }, [lastInteraction, idleTimeoutMs, currentTime]);
 
   const value = useMemo<IdleContextValue>(
     () => ({

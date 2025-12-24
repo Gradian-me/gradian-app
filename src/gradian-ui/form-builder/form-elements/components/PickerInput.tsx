@@ -73,7 +73,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     
     // Build the sourceUrl using reference fields
     // Use dynamic context store for resolving dynamic context values
-    return buildReferenceFilterUrl({
+    const url = buildReferenceFilterUrl({
       referenceSchema,
       referenceRelationTypeId,
       referenceEntityId,
@@ -81,6 +81,9 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       schema: dynamicContext.formSchema,
       values: dynamicContext.formData,
     });
+    
+    // If URL is empty (e.g., dynamic context not ready), return null to allow fallback to targetSchema
+    return url && url.trim() !== '' ? url : null;
   }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaId, dynamicContext.formSchema, dynamicContext.formData]);
   
   // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl

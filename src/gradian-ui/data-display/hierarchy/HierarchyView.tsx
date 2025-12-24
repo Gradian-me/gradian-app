@@ -7,9 +7,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { DynamicActionButtons } from '../components/DynamicActionButtons';
 import { RoleBasedAvatar } from '@/gradian-ui/data-display/utils';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
-import { getSingleValueByRole, getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
+import { getSingleValueByRole, getValueByRole, getArrayValuesByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { cn } from '@/gradian-ui/shared/utils';
+import { getPrimaryDisplayString } from '../utils/value-display';
+import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
+import { Badge } from '@/components/ui/badge';
 import { HierarchyNode, buildHierarchyTree, getAncestorIds, getParentIdFromEntity, filterHierarchyTree } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
 import { HierarchyActionsMenu } from './HierarchyActionsMenu';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -130,6 +133,45 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
     : hasStatusGroup
       ? { id: 'status', name: 'status', role: 'status', options: schema.statusGroup }
       : null;
+  
+  // Get entity type field definition and value
+  const entityTypeFieldDef = schema?.fields?.find(field => field.role === 'entityType');
+  const hasEntityTypeGroup = Array.isArray(schema?.entityTypeGroup) && schema.entityTypeGroup.length > 0;
+  const hasEntityTypeField = Boolean(entityTypeFieldDef) || hasEntityTypeGroup;
+  const entityTypeRoleValues = getArrayValuesByRole(schema, entity, 'entityType');
+  const entityTypeFieldArray = entityTypeRoleValues.length > 0 ? entityTypeRoleValues : [];
+  const rawEntityTypeValueFromField = entityTypeFieldDef ? entity?.[entityTypeFieldDef.name] : undefined;
+  
+  const normalizedEntityTypeOption =
+    normalizeOptionArray(rawEntityTypeValueFromField)[0] ??
+    normalizeOptionArray(entityTypeFieldArray)[0] ??
+    normalizeOptionArray(entity?.entityType)[0];
+  const entityTypeValueFromRole = getSingleValueByRole(schema, entity, 'entityType', '');
+
+  const entityTypeIdentifier =
+    normalizedEntityTypeOption?.id ??
+    (typeof rawEntityTypeValueFromField === 'string' || typeof rawEntityTypeValueFromField === 'number'
+      ? String(rawEntityTypeValueFromField)
+      : undefined) ??
+    (typeof entity?.entityType === 'string' || typeof entity?.entityType === 'number'
+      ? String(entity.entityType)
+      : undefined);
+
+  const entityTypeLabel =
+    normalizedEntityTypeOption?.label ??
+    (entityTypeValueFromRole && entityTypeValueFromRole.trim() !== '' ? entityTypeValueFromRole : undefined) ??
+    getPrimaryDisplayString(rawEntityTypeValueFromField) ??
+    getPrimaryDisplayString(entityTypeFieldArray) ??
+    getPrimaryDisplayString(entity?.entityType) ??
+    entityTypeIdentifier ??
+    '';
+
+  const normalizedEntityTypeMetadata = {
+    color: normalizedEntityTypeOption?.color ?? 'purple',
+    icon: normalizedEntityTypeOption?.icon ?? 'Tag',
+    label: entityTypeLabel,
+    value: entityTypeIdentifier ?? entityTypeLabel ?? '',
+  };
   
   // Get code field
   const hasCodeField = schema?.fields?.some(field => field.role === 'code') || false;
@@ -267,6 +309,16 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                         true,
                         highlightQuery
                       )}
+                    </div>
+                  )}
+                  {hasEntityTypeField && (entityTypeFieldDef || hasEntityTypeGroup) && normalizedEntityTypeMetadata.label && (
+                    <div className="shrink-0">
+                      <Badge variant={getValidBadgeVariant(normalizedEntityTypeMetadata.color)}>
+                        {normalizedEntityTypeMetadata.icon && (
+                          <IconRenderer iconName={normalizedEntityTypeMetadata.icon} className="h-3 w-3 me-1" />
+                        )}
+                        <span className="text-xs">{normalizedEntityTypeMetadata.label}</span>
+                      </Badge>
                     </div>
                   )}
                 </div>

@@ -80,7 +80,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
       }
       
       // Build the sourceUrl using reference fields
-      return buildReferenceFilterUrl({
+      const url = buildReferenceFilterUrl({
         referenceSchema,
         referenceRelationTypeId,
         referenceEntityId,
@@ -88,6 +88,9 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
         schema: dynamicContext.formSchema,
         values: dynamicContext.formData,
       });
+      
+      // If URL is empty (e.g., dynamic context not ready), return null
+      return url && url.trim() !== '' ? url : null;
     }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaFromConfig, sourceUrl, dynamicContext.formSchema, dynamicContext.formData]);
 
     // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl

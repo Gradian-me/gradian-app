@@ -34,6 +34,7 @@ export function UserProfileSelector({
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [triggerWidth, setTriggerWidth] = useState<number | undefined>(undefined);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const language = useLanguageStore((state) => state.language || 'en');
   const { resolvedTheme } = useTheme();
@@ -45,6 +46,13 @@ export function UserProfileSelector({
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Update trigger width when menu opens or trigger element changes
+  useEffect(() => {
+    if (isMenuOpen && triggerRef.current) {
+      setTriggerWidth(triggerRef.current.offsetWidth);
+    }
+  }, [isMenuOpen]);
 
   // Use theme prop if provided, otherwise default to light to avoid hydration mismatch
   // Only use resolvedTheme after mount to ensure server/client consistency
@@ -283,8 +291,8 @@ export function UserProfileSelector({
                 transition={{ duration: 0.2, ease: 'easeOut' }}
                 className={menuContentClasses}
                 style={{
-                  minWidth: triggerRef.current?.offsetWidth || undefined,
-                  width: triggerRef.current?.offsetWidth || undefined,
+                  minWidth: triggerWidth || undefined,
+                  width: triggerWidth || undefined,
                 }}
               >
                 <div className="px-3 py-2">

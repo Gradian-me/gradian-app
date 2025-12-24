@@ -4475,5 +4475,33 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KD2AUTHLOGOUT001",
+    "timestamp": "2025-12-21T13:00:00.000Z",
+    "version": "1.36.001",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Implemented centralized cookie and localStorage clearing functions for improved forced logout handling",
+        "priority": "High",
+        "affectedDomains": [
+          "auth",
+          "security",
+          "session-management"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated handleForceLogout to clear all auth-related cookies and localStorage keys, ensuring a more thorough logout process. This change enhances security and user experience during session management",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "security",
+          "session-management",
+          "user-experience"
+        ]
+      }
+    ]
   }
 ]

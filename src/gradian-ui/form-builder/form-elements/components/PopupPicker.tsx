@@ -383,7 +383,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   allowMultiselect = false,
   columnMap,
   staticItems,
-  pageSize = 48,
+  pageSize = 200,
   sortType = null,
   sourceColumnRoles,
   showAddButton = true,
@@ -787,7 +787,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         
         // Always use apiRequest which goes through Next.js API routes
         // The API routes will check isDemoModeEnabled() and proxy to backend if needed
-        const response = await apiRequest<any[]>(relativeUrl);
+        const response = await apiRequest<any[]>(relativeUrl, { disableCache: true });
 
         if (response.success && response.data) {
           const itemsArray = Array.isArray(response.data) ? response.data : [];

@@ -131,7 +131,7 @@ export function useOptionsFromUrl({
         url = `${sourceUrl}${separator}${params.toString()}`;
       }
 
-      const response = await apiRequest<any>(url);
+      const response = await apiRequest<any>(url, { disableCache: true });
 
       if (response.success && (response.data || columnMap)) {
         // Extract items using column mapping if provided

@@ -17,6 +17,7 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { DetailPageMetadataDialog } from '@/gradian-ui/schema-manager/components/DetailPageMetadataDialog';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
+import { useQueryClient } from '@tanstack/react-query';
 
 export interface DynamicQuickActionsProps {
   actions: QuickAction[];
@@ -39,6 +40,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
   onActionClick,
 }) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   
   // Debug: Log when component receives onActionClick
   React.useEffect(() => {
@@ -129,13 +131,29 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
       setLoadingActionId(action.id);
       
       try {
-        if (!schemaCacheState?.[action.targetSchema]) {
-          const response = await apiRequest<FormSchema[]>(`/api/schemas?schemaIds=${action.targetSchema}`);
+        // Check React Query cache first, then schemaCacheState, then fetch
+        let targetSchema: FormSchema | null = null;
+        
+        // Check React Query cache
+        const cachedSchema = queryClient.getQueryData<FormSchema>(['schemas', action.targetSchema]);
+        if (cachedSchema) {
+          targetSchema = cachedSchema;
+        } else if (schemaCacheState?.[action.targetSchema]) {
+          targetSchema = schemaCacheState[action.targetSchema];
+        } else {
+          // Fetch from API
+          const response = await apiRequest<FormSchema[]>(`/api/schemas?schemaIds=${action.targetSchema}`, {
+            disableCache: true,
+          });
           const schemaResponse = response.data?.[0];
           if (!response.success || !Array.isArray(response.data) || !schemaResponse) {
             throw new Error(response.error || `Schema ${action.targetSchema} not found`);
           }
 
+          targetSchema = schemaResponse;
+          
+          // Update both caches
+          queryClient.setQueryData(['schemas', schemaResponse.id], schemaResponse);
           setSchemaCacheState((prev) => ({
             ...prev,
             [schemaResponse.id]: schemaResponse,
@@ -292,7 +310,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
         setLoadingActionId(null);
       }
     }
-  }, [router, data, schemaCacheState]);
+  }, [router, data, schemaCacheState, queryClient]);
 
   if (!actions || actions.length === 0) {
     return null;

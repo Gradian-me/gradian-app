@@ -106,7 +106,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     }
     
     // Build the sourceUrl using reference fields
-    return buildReferenceFilterUrl({
+    const url = buildReferenceFilterUrl({
       referenceSchema,
       referenceRelationTypeId,
       referenceEntityId,
@@ -114,10 +114,17 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       schema: dynamicContext.formSchema,
       values: dynamicContext.formData,
     });
+    
+    // If URL is empty (e.g., dynamic context not ready), return null to allow fallback to schemaId
+    return url && url.trim() !== '' ? url : null;
   }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaFromConfig, schemaId, sourceUrl, dynamicContext.formSchema, dynamicContext.formData]);
 
   // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl
+  // If reference-based URL is empty, fall back to using schemaId or targetSchema
   const effectiveSourceUrl = sourceUrl || referenceBasedSourceUrl || undefined;
+  // If we have reference fields but the URL is empty (dynamic context not ready), 
+  // fall back to using targetSchema if available, otherwise use schemaId
+  const effectiveSchemaId = schemaId || (referenceSchema && !referenceBasedSourceUrl && !sourceUrl && targetSchemaFromConfig ? targetSchemaFromConfig : undefined);
 
   // Default columnMap for API responses that nest data under data[0].data
   const defaultColumnMap: ColumnMapConfig = React.useMemo(() => ({
@@ -160,9 +167,9 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     isLoading: isLoadingOptions,
     error: optionsError,
   } = useOptionsFromSchemaOrUrl({
-    schemaId,
+    schemaId: effectiveSchemaId || schemaId,
     sourceUrl: effectiveSourceUrl,
-    enabled: Boolean(schemaId || effectiveSourceUrl),
+    enabled: Boolean(effectiveSchemaId || schemaId || effectiveSourceUrl),
     transform,
     queryParams,
     sortType,
@@ -170,7 +177,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   });
 
   // Use fetched options if schemaId or sourceUrl is provided, otherwise use provided options
-  const resolvedOptions = (schemaId || effectiveSourceUrl) ? fetchedOptions : options;
+  const resolvedOptions = (effectiveSchemaId || schemaId || effectiveSourceUrl) ? fetchedOptions : options;
   const sizeClasses = {
     sm: 'h-8',
     md: 'h-10',

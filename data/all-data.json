@@ -1146,6 +1146,7 @@
       "firstName": "Mohammad",
       "lastName": "Saffarioun",
       "postTitle": "CEO",
+      "password": "$argon2id$v=19$m=32768,t=3,p=4$gGbYpp66WV8vRbM6uoX56g$Vw83f/KKDMndrgUwFY+wl6PAQuSwFqFohNkyua4Tbqo",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KD06TGJVES5TDYR29FQ1S5JT",
@@ -2124,7 +2125,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-23T12:13:48.821Z",
+      "updatedAt": "2025-12-24T06:19:18.775Z",
       "category": [
         {
           "id": "production-integration",
@@ -2133,8 +2134,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-23T12:13:48.821Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 220, nodes updated: 6, edges created: 116, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2025-12-24T06:19:18.775Z",
+      "lastSyncMessage": "Cannot GET /50x.html",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
