@@ -1,13 +1,15 @@
 // Select Component
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useLayoutEffect } from 'react';
 import {
   Select as RadixSelect,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
+  SelectLabel,
 } from '../../../../components/ui/select';
 import { SelectProps } from '../types';
 import { cn } from '../../../shared/utils';
@@ -34,6 +36,7 @@ export interface SelectOption {
   disabled?: boolean;
   icon?: string;
   color?: string; // Can be a badge variant (success, warning, etc.), custom hex color, or Tailwind classes
+  category?: string; // Category for grouping options
 }
 
 export interface SelectWithBadgesProps extends Omit<SelectProps, 'children'> {
@@ -76,6 +79,10 @@ export interface SelectWithBadgesProps extends Omit<SelectProps, 'children'> {
    * Sort options alphabetically A to Z (default: true). If false, shows options in original order.
    */
   sortAtoZ?: boolean;
+  /**
+   * Enable grouping by category (default: true). If true and options have categories, they will be grouped. If false, shows all options directly.
+   */
+  enableGrouping?: boolean;
 }
 
 export const Select: React.FC<SelectWithBadgesProps> = ({
@@ -100,10 +107,26 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   sortType = null,
   enableSearch = true,
   sortAtoZ = true,
+  enableGrouping = true,
   ...props
 }) => {
   // State for search functionality
   const [searchValue, setSearchValue] = React.useState('');
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+  const [isSelectOpen, setIsSelectOpen] = React.useState(false);
+  
+  // Maintain focus on search input when select is open
+  useLayoutEffect(() => {
+    if (isSelectOpen && enableSearch && searchInputRef.current) {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        if (searchInputRef.current && document.activeElement !== searchInputRef.current) {
+          searchInputRef.current.focus();
+        }
+      });
+    }
+  }, [isSelectOpen, enableSearch, searchValue]);
+  
   // Get dynamic context for reference-based filtering
   // Use selector to ensure reactivity when formSchema or formData changes
   const formSchema = useDynamicFormContextStore((state) => state.formSchema);
@@ -349,6 +372,46 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     [filteredOptions]
   );
 
+  // Group options by category (only if enableGrouping is true)
+  const groupedOptions = useMemo(() => {
+    if (!enableGrouping) {
+      return { groups: {}, ungrouped: validOptions };
+    }
+
+    const groups: Record<string, NormalizedOption[]> = {};
+    const ungrouped: NormalizedOption[] = [];
+
+    validOptions.forEach((option) => {
+      const category = (option as any).category || option.category;
+      if (category && String(category).trim()) {
+        const categoryKey = String(category).trim();
+        if (!groups[categoryKey]) {
+          groups[categoryKey] = [];
+        }
+        groups[categoryKey].push(option);
+      } else {
+        ungrouped.push(option);
+      }
+    });
+
+    // Sort groups by title (category name)
+    const sortedGroupEntries = Object.entries(groups).sort(([a], [b]) => 
+      a.localeCompare(b)
+    );
+
+    // Sort items within each group by label
+    const sortedGroups: Record<string, NormalizedOption[]> = {};
+    sortedGroupEntries.forEach(([category, options]) => {
+      sortedGroups[category] = [...options].sort((a, b) => {
+        const labelA = (a.label || a.id || '').toLowerCase();
+        const labelB = (b.label || b.id || '').toLowerCase();
+        return labelA.localeCompare(labelB);
+      });
+    });
+
+    return { groups: sortedGroups, ungrouped };
+  }, [validOptions, enableGrouping]);
+
   // Calculate fallback select value for default behavior (must be before any conditional returns)
   const fallbackSelectValue = React.useMemo(() => {
     const extracted = extractFirstId(value);
@@ -504,10 +567,18 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       }
     };
     
-    // Clear search when select closes
+    // Clear search when select closes, focus search input when opens
     const handleOpenChange = (open: boolean) => {
+      setIsSelectOpen(open);
       if (!open && enableSearch) {
         setSearchValue('');
+      }
+      // Focus search input when select opens
+      if (open && enableSearch && searchInputRef.current) {
+        // Use setTimeout to ensure the DOM is ready
+        setTimeout(() => {
+          searchInputRef.current?.focus();
+        }, 0);
       }
       onOpenChange?.(open);
     };
@@ -530,21 +601,70 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
           <SelectContent
             searchSlot={
               enableSearch ? (
-                <div className="px-2 py-2">
+                <div 
+                  className="px-2 py-2"
+                  onKeyDown={(e) => {
+                    // Prevent Radix Select from handling keyboard events in search area
+                    if (e.target === searchInputRef.current || (e.target as HTMLElement).tagName === 'INPUT') {
+                      e.stopPropagation();
+                    }
+                  }}
+                  onKeyUp={(e) => {
+                    // Prevent Radix Select from handling keyboard events in search area
+                    if (e.target === searchInputRef.current || (e.target as HTMLElement).tagName === 'INPUT') {
+                      e.stopPropagation();
+                    }
+                  }}
+                >
                   <div className="relative">
                     <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4 pointer-events-none" />
                     <input
+                      ref={searchInputRef}
                       type="text"
                       value={searchValue}
-                      onChange={(e) => setSearchValue(e.target.value)}
+                      onChange={(e) => {
+                        setSearchValue(e.target.value);
+                      }}
+                      onInput={(e) => {
+                        // Keep focus on input during typing
+                        const target = e.currentTarget;
+                        requestAnimationFrame(() => {
+                          if (target && document.activeElement !== target) {
+                            target.focus();
+                          }
+                        });
+                      }}
                       onKeyDown={(e) => {
                         // Prevent select from closing when typing
+                        e.stopPropagation();
+                        // Prevent arrow keys from navigating select items when typing
+                        if (['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) {
+                          e.stopPropagation();
+                        }
+                        // Prevent Escape from closing if there's text (allow clearing instead)
+                        if (e.key === 'Escape' && searchValue) {
+                          e.stopPropagation();
+                          setSearchValue('');
+                        }
+                      }}
+                      onKeyUp={(e) => {
+                        // Prevent select from handling keyboard events
                         e.stopPropagation();
                       }}
                       onClick={(e) => {
                         // Prevent select from closing when clicking search input
                         e.stopPropagation();
+                        e.currentTarget.focus();
                       }}
+                      onMouseDown={(e) => {
+                        // Prevent focus loss when clicking
+                        e.stopPropagation();
+                      }}
+                      onFocus={(e) => {
+                        // Ensure input stays focused
+                        e.stopPropagation();
+                      }}
+                      autoFocus
                       placeholder="Search options..."
                       className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:border-violet-400 dark:focus:border-violet-500"
                     />
@@ -582,7 +702,60 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
               <div className="px-2 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
                 No options found
               </div>
+            ) : enableGrouping && Object.keys(groupedOptions.groups).length > 0 ? (
+              <>
+                {/* Render ungrouped options first */}
+                {groupedOptions.ungrouped.length > 0 && (
+                  <>
+                    {groupedOptions.ungrouped.map((option, index) => (
+              <motion.div
+                key={option.id ?? index}
+                initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{
+                  duration: 0.2,
+                  delay: Math.min(
+                    index * UI_PARAMS.CARD_INDEX_DELAY.STEP,
+                    UI_PARAMS.CARD_INDEX_DELAY.SKELETON_MAX
+                  ),
+                  ease: 'easeOut',
+                }}
+              >
+                <SelectItem value={option.id as string} disabled={option.disabled}>
+                  {renderBadgeContent(option)}
+                </SelectItem>
+              </motion.div>
+            ))}
+                  </>
+                )}
+                {/* Render grouped options - sorted by category title */}
+                {Object.entries(groupedOptions.groups).map(([category, options], groupIndex) => (
+                  <SelectGroup key={category}>
+                    <SelectLabel icon={<IconRenderer iconName="Folder" className="h-5 w-5" />}>{category}</SelectLabel>
+                    {options.map((option, index) => (
+                      <motion.div
+                        key={option.id ?? `${category}-${index}`}
+                        initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{
+                          duration: 0.2,
+                          delay: Math.min(
+                            (groupedOptions.ungrouped.length + groupIndex * 10 + index) * UI_PARAMS.CARD_INDEX_DELAY.STEP,
+                            UI_PARAMS.CARD_INDEX_DELAY.SKELETON_MAX
+                          ),
+                          ease: 'easeOut',
+                        }}
+                      >
+                        <SelectItem value={option.id as string} disabled={option.disabled}>
+                          {renderBadgeContent(option)}
+                        </SelectItem>
+                      </motion.div>
+                    ))}
+                  </SelectGroup>
+                ))}
+              </>
             ) : (
+              /* Render all options directly when grouping is disabled or no categories */
               validOptions.map((option, index) => (
                 <motion.div
                   key={option.id ?? index}
@@ -601,7 +774,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                     {renderBadgeContent(option)}
                   </SelectItem>
                 </motion.div>
-              )))}
+              ))
+            )}
           </SelectContent>
         </RadixSelect>
         {error && renderErrorMessage(error)}

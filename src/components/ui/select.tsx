@@ -1,6 +1,6 @@
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
-import { Check, ChevronDown, ChevronUp } from "lucide-react"
+import { Check, ChevronDown, ChevronUp, Folder } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -112,13 +112,18 @@ SelectContent.displayName = SelectPrimitive.Content.displayName
 
 const SelectLabel = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Label>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label> & {
+    icon?: React.ReactNode;
+  }
+>(({ className, icon, children, ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
-    className={cn("py-1.5 ps-8 pe-2 text-sm font-semibold", className)}
+    className={cn("py-1.5 ps-3 pe-2 text-sm font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md mx-1 my-0.5 flex items-center gap-2", className)}
     {...props}
-  />
+  >
+    {icon || <Folder className="h-4 w-4" />}
+    {children}
+  </SelectPrimitive.Label>
 ))
 SelectLabel.displayName = SelectPrimitive.Label.displayName
 

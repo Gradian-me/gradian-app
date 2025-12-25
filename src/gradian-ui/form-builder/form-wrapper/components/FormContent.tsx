@@ -65,7 +65,7 @@ const FieldItem: React.FC<FieldItemProps> = ({
         error={errors[field.name]}
         disabled={isDisabled}
         required={isRequired}
-        tabIndex={fieldTabIndexMap?.[field.name] !== undefined ? fieldTabIndexMap[field.name] : undefined}
+        tabIndex={fieldTabIndexMap?.[field.name]}
       />
     </div>
   );

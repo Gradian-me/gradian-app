@@ -1003,6 +1003,7 @@ export function AiBuilderForm({
                             id: agent.id,
                             label: agent.label,
                             icon: agent.icon,
+                            category: agent.category,
                           })),
                         }}
                         value={selectedAgentId}

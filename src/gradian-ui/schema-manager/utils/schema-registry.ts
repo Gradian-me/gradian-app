@@ -153,9 +153,9 @@ async function loadSchemasFromServer(): Promise<FormSchema[]> {
   }
 }
 
-// ============================================================================
+// ===========================================
 // CLIENT-SIDE COMPATIBLE ASYNC FUNCTIONS
-// ============================================================================
+// ===========================================
 
 /**
  * Fetch a schema by ID (Works on both client and server)
@@ -232,11 +232,11 @@ export async function schemaExistsAsync(schemaId: string): Promise<boolean> {
   return schema !== null;
 }
 
-// ============================================================================
+// ===========================================
 // NOTE: For server-side synchronous functions, import from:
 // './schema-registry.server' which includes:
 // - getSchemaById, findSchemaById, getAvailableSchemaIds
 // - schemaExists, getAllSchemasArray, getSchemaMetadata
 // - isValidSchemaId, clearSchemaCache
-// ============================================================================
+// ===========================================
 

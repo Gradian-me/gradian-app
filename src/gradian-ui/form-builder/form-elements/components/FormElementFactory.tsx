@@ -206,6 +206,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         disabled: opt.disabled,
         icon: opt.icon,
         color: opt.color,
+        category: opt.category,
       }));
 
       const handleSelectNormalizedChange = (selection: NormalizedOption[]) => {
@@ -530,6 +531,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           required={restProps.required}
           error={restProps.error}
           className={restProps.className}
+          tabIndex={tabIndex}
         />
       );
     

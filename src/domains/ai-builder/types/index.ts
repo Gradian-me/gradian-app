@@ -9,6 +9,7 @@ export interface AiAgent {
   label: string;
   icon: string;
   description: string;
+  category?: string; // Category for grouping agents
   agentType?: 'chat' | 'image-generation' | 'voice-transcription' | 'video-generation' | 'graph-generation' | 'orchestrator' | 'search'; // Type of AI agent
   requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph' | 'search-results' | 'search-card';
   model?: string;

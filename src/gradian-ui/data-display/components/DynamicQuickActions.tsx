@@ -18,6 +18,15 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { DetailPageMetadataDialog } from '@/gradian-ui/schema-manager/components/DetailPageMetadataDialog';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { useQueryClient } from '@tanstack/react-query';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export interface DynamicQuickActionsProps {
   actions: QuickAction[];
@@ -56,6 +65,8 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
   const [loadingAgent, setLoadingAgent] = useState(false);
   const [formAction, setFormAction] = useState<QuickAction | null>(null);
   const [metadataEditorAction, setMetadataEditorAction] = useState<QuickAction | null>(null);
+  const [showAgentErrorDialog, setShowAgentErrorDialog] = useState(false);
+  const [agentError, setAgentError] = useState<string | null>(null);
   
   // Get reference data from store (for action forms)
   const referenceData = useDynamicFormContextStore((s) => s.referenceData);
@@ -175,17 +186,27 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
       setLoadingAgent(true);
       
       fetch(`/api/ai-agents/${action.agentId}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success && data.data) {
+        .then(async (res) => {
+          const data = await res.json();
+          
+          // Check if response is successful and agent data exists
+          if (res.ok && data.success && data.data) {
             setAgentForDialog(data.data);
             setAiAgentAction(action);
           } else {
-            loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to load agent: ${data.error}`);
+            // Agent not found or not available
+            const errorMessage = data.error || 'AI agent is not available';
+            setAgentError(errorMessage);
+            setShowAgentErrorDialog(true);
+            loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to load agent: ${errorMessage}`);
           }
         })
         .catch(err => {
-          loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading agent: ${err instanceof Error ? err.message : String(err)}`);
+          // Network error or other fetch errors
+          const errorMessage = err instanceof Error ? err.message : 'Failed to load AI agent';
+          setAgentError('The AI agent is not available or you do not have access to it.');
+          setShowAgentErrorDialog(true);
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading agent: ${errorMessage}`);
         })
         .finally(() => {
           setLoadingAgent(false);
@@ -448,6 +469,29 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
           }}
         />
       )}
+
+      {/* AI Agent Error Dialog */}
+      <AlertDialog open={showAgentErrorDialog} onOpenChange={setShowAgentErrorDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <IconRenderer iconName="AlertCircle" className="h-5 w-5 text-amber-500" />
+              AI Agent Not Available
+            </AlertDialogTitle>
+            <AlertDialogDescription className="pt-2">
+              {agentError || 'The AI agent is not available or you do not have access to it.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => {
+              setShowAgentErrorDialog(false);
+              setAgentError(null);
+            }}>
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

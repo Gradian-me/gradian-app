@@ -20,9 +20,9 @@ function getEnvVar(name: string, publicName?: string): string | undefined {
   return process.env[publicName || `NEXT_PUBLIC_${name}`] || process.env[name];
 }
 
-// ============================================================================
+// ===========================================
 // Environment Detection
-// ============================================================================
+// ===========================================
 
 /**
  * Check if running in development mode
@@ -38,9 +38,9 @@ export const IS_PRODUCTION = typeof process !== 'undefined'
   ? process.env.NODE_ENV === 'production'
   : true;
 
-// ============================================================================
+// ===========================================
 // Demo Mode Configuration
-// ============================================================================
+// ===========================================
 
 /**
  * Demo mode flag
@@ -54,9 +54,9 @@ export const DEMO_MODE: boolean = (() => {
   return toBoolean(value, false);
 })();
 
-// ============================================================================
+// ===========================================
 // Authentication Configuration
-// ============================================================================
+// ===========================================
 
 /**
  * Login locally flag (use local demo users instead of external auth)
@@ -111,9 +111,9 @@ export const ENABLE_BUILDER: boolean = (() => {
   return result;
 })();
 
-// ============================================================================
+// ===========================================
 // Convenience Exports
-// ============================================================================
+// ===========================================
 
 export const DEMO_MODE_PARAMS = { DEMO_MODE } as const;
 export const LOGIN_LOCALLY_PARAMS = { LOGIN_LOCALLY } as const;

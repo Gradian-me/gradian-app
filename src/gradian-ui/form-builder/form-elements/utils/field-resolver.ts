@@ -33,15 +33,26 @@ export const getFieldsForSection = (schema: FormSchema | BuilderFormSchema, sect
 };
 
 /**
- * Get all fields in render order (sections sorted by order, fields within sections sorted by order)
- * Returns a map of field names to tab indices (0-based, excluding hidden fields)
+ * Get tab index information for a schema
+ * Returns an object with:
+ * - baseTabIndexMap: Map of field names to base tab indices (for non-repeating sections)
+ * - sectionStartIndices: Map of section IDs to their starting tab index
+ * - repeatingSectionFieldCounts: Map of repeating section IDs to the number of fields in that section
  */
-export const getFieldTabIndexMap = (schema: FormSchema | BuilderFormSchema): Record<string, number> => {
-  const tabIndexMap: Record<string, number> = {};
+export interface TabIndexInfo {
+  baseTabIndexMap: Record<string, number>;
+  sectionStartIndices: Record<string, number>;
+  repeatingSectionFieldCounts: Record<string, number>;
+}
+
+export const getFieldTabIndexInfo = (schema: FormSchema | BuilderFormSchema): TabIndexInfo => {
+  const baseTabIndexMap: Record<string, number> = {};
+  const sectionStartIndices: Record<string, number> = {};
+  const repeatingSectionFieldCounts: Record<string, number> = {};
   let currentTabIndex = 0;
 
   if (!schema?.sections || !schema?.fields) {
-    return tabIndexMap;
+    return { baseTabIndexMap, sectionStartIndices, repeatingSectionFieldCounts };
   }
 
   // Sort sections by order
@@ -63,13 +74,37 @@ export const getFieldTabIndexMap = (schema: FormSchema | BuilderFormSchema): Rec
         return orderA - orderB;
       });
 
-    // Assign tab indices to fields in this section
-    sectionFields.forEach((field) => {
-      tabIndexMap[field.name] = currentTabIndex++;
-    });
+    // Record the starting tab index for this section
+    sectionStartIndices[section.id] = currentTabIndex;
+
+    if (section.isRepeatingSection) {
+      // For repeating sections, store the field count but don't assign indices yet
+      // Indices will be calculated dynamically based on item count
+      repeatingSectionFieldCounts[section.id] = sectionFields.length;
+      
+      // Don't increment currentTabIndex for repeating sections here
+      // It will be handled dynamically when rendering
+    } else {
+      // For non-repeating sections, assign tab indices directly
+      sectionFields.forEach((field) => {
+        baseTabIndexMap[field.name] = currentTabIndex++;
+      });
+    }
   });
 
-  return tabIndexMap;
+  return { baseTabIndexMap, sectionStartIndices, repeatingSectionFieldCounts };
+};
+
+/**
+ * Get all fields in render order (sections sorted by order, fields within sections sorted by order)
+ * Returns a map of field names to tab indices (0-based, excluding hidden fields)
+ * 
+ * @deprecated Use getFieldTabIndexInfo instead for better repeating section support
+ * This function is kept for backward compatibility but doesn't handle repeating sections correctly
+ */
+export const getFieldTabIndexMap = (schema: FormSchema | BuilderFormSchema): Record<string, number> => {
+  const { baseTabIndexMap } = getFieldTabIndexInfo(schema);
+  return baseTabIndexMap;
 };
 
 /**

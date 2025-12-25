@@ -60,6 +60,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   onChange,
   onBlur,
   fieldTabIndexMap,
+  tabIndexInfo,
   onFocus,
   disabled = false,
   repeatingItems,
@@ -360,16 +361,65 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     return 1;
   };
 
+  // Calculate the actual starting tab index for this section
+  // This accounts for previous sections and their items (for repeating sections)
+  const getActualSectionStartTabIndex = (): number => {
+    if (!tabIndexInfo) {
+      // Fallback to old logic
+      return 0;
+    }
+
+    const sectionStartIndex = tabIndexInfo.sectionStartIndices[section.id] ?? 0;
+    
+    if (!isRepeatingSection) {
+      // For non-repeating sections, the start index is already correct
+      return sectionStartIndex;
+    }
+
+    // For repeating sections, we need to account for items in previous repeating sections
+    // Calculate the offset from previous repeating sections' items
+    let offset = 0;
+    
+    // Sort sections by order to process them in the correct sequence
+    const sortedSections = [...schema.sections].sort((a, b) => {
+      const orderA = a.order ?? 999;
+      const orderB = b.order ?? 999;
+      return orderA - orderB;
+    });
+
+    const currentSectionIndex = sortedSections.findIndex(s => s.id === section.id);
+    
+    // Sum up fields from previous repeating sections
+    for (let i = 0; i < currentSectionIndex; i++) {
+      const prevSection = sortedSections[i];
+      if (prevSection.isRepeatingSection) {
+        const fieldCount = tabIndexInfo.repeatingSectionFieldCounts[prevSection.id] ?? 0;
+        const itemCount = Array.isArray((values as any)?.[prevSection.id]) 
+          ? (values as any)[prevSection.id].length 
+          : 0;
+        offset += fieldCount * itemCount;
+      }
+    }
+
+    return sectionStartIndex + offset;
+  };
+
   const renderFields = (fieldsToRender: typeof fields, itemIndex?: number) => {
+    // Filter and sort fields (excluding hidden/inactive) to get the correct field order for tab index calculation
+    const visibleFields = fieldsToRender
+      .filter(field => field && !field.hidden && !(field as any).layout?.hidden && !field.inactive)
+      .sort((a, b) => {
+        const orderA = a.order ?? 999;
+        const orderB = b.order ?? 999;
+        return orderA - orderB;
+      });
+
+    const actualSectionStartIndex = getActualSectionStartTabIndex();
+    const fieldsPerItem = tabIndexInfo?.repeatingSectionFieldCounts[section.id] ?? visibleFields.length;
+
     return (
       <AnimatePresence>
-        {fieldsToRender.map((field, index) => {
-          if (!field) return null;
-
-          // Skip hidden and inactive fields
-          if (field.hidden || (field as any).layout?.hidden || field.inactive) {
-            return null;
-          }
+        {visibleFields.map((field, index) => {
 
           // Build name/value/error/touched for normal vs repeating sections
           const isItem = itemIndex !== undefined && isRepeatingSection;
@@ -403,6 +453,22 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 || nestedTouched?.[`${section.id}[${itemIndex}].${field.name}`]
               )
             : Boolean(nestedTouched?.[field.name]);
+
+          // Calculate tab index
+          let calculatedTabIndex: number | undefined;
+          if (isRepeatingSection && itemIndex !== undefined && tabIndexInfo) {
+            // For repeating section items, calculate dynamically
+            const fieldIndexInItem = visibleFields.findIndex(f => f.name === field.name);
+            if (fieldIndexInItem >= 0) {
+              calculatedTabIndex = actualSectionStartIndex + (itemIndex * fieldsPerItem) + fieldIndexInItem;
+            }
+          } else if (!isRepeatingSection && tabIndexInfo) {
+            // For non-repeating sections, use the base tab index map
+            calculatedTabIndex = tabIndexInfo.baseTabIndexMap[field.name];
+          } else if (fieldTabIndexMap) {
+            // Fallback to old logic
+            calculatedTabIndex = fieldTabIndexMap[field.name];
+          }
 
           // Calculate column span for this field
           const colSpan = getColSpan(field);
@@ -462,7 +528,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 onBlur={() => onBlur(fieldName)}
                 onFocus={() => onFocus(fieldName)}
                 disabled={disabled || field.disabled || isNotApplicable}
-                tabIndex={fieldTabIndexMap?.[field.name] !== undefined ? fieldTabIndexMap[field.name] : undefined}
+                tabIndex={calculatedTabIndex !== undefined ? calculatedTabIndex : undefined}
               />
             </motion.div>
           );

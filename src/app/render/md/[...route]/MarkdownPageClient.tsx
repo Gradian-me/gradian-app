@@ -43,7 +43,7 @@ export function MarkdownPageClient({
       loggingCustom(LogType.CLIENT_LOG, 'log', `Headings: ${JSON.stringify(navigationData.headings)}`);
       loggingCustom(LogType.CLIENT_LOG, 'log', `Active heading ID: ${navigationData.activeHeadingId}`);
       loggingCustom(LogType.CLIENT_LOG, 'log', `Will show navigation? ${navigationData.headings && navigationData.headings.length > 0}`);
-      loggingCustom(LogType.CLIENT_LOG, 'log', '======================');
+      loggingCustom(LogType.CLIENT_LOG, 'log', '===========');
       hasLoggedRef.current = true;
     }
   }, [navigationData.headings.length, navigationHeadingLevels]);

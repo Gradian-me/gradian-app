@@ -42,11 +42,16 @@ export const FormSection: React.FC<FormSectionProps> = ({
   );
 
   const renderFields = (fieldsToRender: typeof fields, itemIndex?: number) => {
-    return fieldsToRender.map((field) => {
-      // Skip hidden and inactive fields
-      if (field.hidden || (field as any).layout?.hidden || field.inactive) {
-        return null;
-      }
+    // Filter and sort fields by order to ensure correct tab order
+    const visibleFields = fieldsToRender
+      .filter(field => field && !field.hidden && !(field as any).layout?.hidden && !field.inactive)
+      .sort((a, b) => {
+        const orderA = a.order ?? 999;
+        const orderB = b.order ?? 999;
+        return orderA - orderB;
+      });
+
+    return visibleFields.map((field) => {
 
       const fieldName = itemIndex !== undefined ? `${field.name}[${itemIndex}]` : field.name;
       let fieldValue = itemIndex !== undefined 
@@ -96,7 +101,7 @@ export const FormSection: React.FC<FormSectionProps> = ({
             onBlur={() => onBlur(fieldName)}
             onFocus={() => onFocus(fieldName)}
             disabled={disabled || field.disabled}
-            tabIndex={fieldTabIndexMap?.[field.name] !== undefined ? fieldTabIndexMap[field.name] : undefined}
+            tabIndex={fieldTabIndexMap?.[field.name]}
           />
         </div>
       );
