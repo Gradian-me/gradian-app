@@ -20,7 +20,6 @@ import { ulid } from 'ulid';
 import { GoToTopForm } from '../form-elements/go-to-top-form';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { useUserStore } from '@/stores/user.store';
-import { getFieldTabIndexMap, getFieldTabIndexInfo } from '../form-elements/utils/field-resolver';
 import { getActionConfig, getSingularName, isEditMode } from '../utils/action-config';
 import { AccordionFormSection } from './AccordionFormSection';
 import { FormModal } from './FormModal';
@@ -1308,11 +1307,6 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   const isInsideForm = typeof window !== 'undefined' && 
     document.getElementById('form-dialog-form')?.closest('form');
 
-  // Compute tab index information based on field render order
-  const tabIndexInfo = useMemo(() => getFieldTabIndexInfo(schema), [schema]);
-  // Keep backward compatibility with fieldTabIndexMap for now
-  const fieldTabIndexMap = useMemo(() => tabIndexInfo.baseTabIndexMap, [tabIndexInfo]);
-
   const renderSections = () => {
     return schema.sections.map((section) => {
       return (
@@ -1335,8 +1329,6 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           addItemError={section.isRepeatingSection ? addItemErrors[section.id] : undefined}
           refreshRelationsTrigger={section.isRepeatingSection && section.repeatingConfig?.targetSchema ? refreshRelationsTrigger : undefined}
           isAddingItem={section.isRepeatingSection && relationModalState.isOpen && relationModalState.sectionId === section.id}
-          fieldTabIndexMap={fieldTabIndexMap}
-          tabIndexInfo={tabIndexInfo}
         />
       );
     });

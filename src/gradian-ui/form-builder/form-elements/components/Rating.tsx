@@ -13,7 +13,6 @@ export interface RatingProps {
   label?: string;
   required?: boolean;
   error?: string;
-  tabIndex?: number;
 }
 
 const normalizeRatingValue = (rawValue: any): number => {
@@ -61,8 +60,7 @@ export const Rating: React.FC<RatingProps> = ({
   disabled = false,
   label,
   required = false,
-  error,
-  tabIndex
+  error
 }) => {
   const safeValue = normalizeRatingValue(value);
   const [hoverValue, setHoverValue] = useState<number | null>(null);
@@ -135,7 +133,6 @@ export const Rating: React.FC<RatingProps> = ({
               onClick={() => handleStarClick(i)}
               onMouseEnter={() => handleStarHover(i)}
               disabled={!isEditable}
-              tabIndex={i === 0 ? tabIndex : -1}
               className={cn(
                 "transition-all duration-150",
                 isEditable && "hover:scale-110 focus:outline-none rounded",

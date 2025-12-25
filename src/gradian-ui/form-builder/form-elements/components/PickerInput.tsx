@@ -32,7 +32,6 @@ export interface PickerInputProps {
   disabled?: boolean;
   required?: boolean;
   className?: string;
-  tabIndex?: number;
 }
 
 export const PickerInput: React.FC<PickerInputProps> = ({
@@ -46,7 +45,6 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   disabled = false,
   required = false,
   className,
-  tabIndex,
 }) => {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [targetSchema, setTargetSchema] = useState<FormSchema | null>(null);
@@ -818,7 +816,6 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                 onFocus={onFocus}
                 onBlur={onBlur}
                 disabled={disabled}
-                tabIndex={tabIndex}
                 className={cn(
                   'cursor-pointer',
                   error

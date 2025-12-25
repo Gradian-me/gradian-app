@@ -20,7 +20,6 @@ export const FormSection: React.FC<FormSectionProps> = ({
   repeatingItems,
   onAddRepeatingItem,
   onRemoveRepeatingItem,
-  fieldTabIndexMap,
 }) => {
   // Get fields for this section from the schema
   const fields = getFieldsForSection(schema, section.id);
@@ -101,7 +100,6 @@ export const FormSection: React.FC<FormSectionProps> = ({
             onBlur={() => onBlur(fieldName)}
             onFocus={() => onFocus(fieldName)}
             disabled={disabled || field.disabled}
-            tabIndex={fieldTabIndexMap?.[field.name]}
           />
         </div>
       );

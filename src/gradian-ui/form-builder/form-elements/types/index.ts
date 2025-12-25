@@ -16,7 +16,6 @@ export interface FormElementProps {
   disabled?: boolean;
   required?: boolean;
   className?: string;
-  tabIndex?: number;
 }
 
 export interface TextInputProps extends FormElementProps {

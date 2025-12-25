@@ -16,7 +16,6 @@ interface FieldItemProps {
   onFocus: (fieldName: string) => void;
   disabled: boolean;
   layout?: FormContentProps['layout'];
-  fieldTabIndexMap?: Record<string, number>;
 }
 
 const FieldItem: React.FC<FieldItemProps> = ({
@@ -28,7 +27,6 @@ const FieldItem: React.FC<FieldItemProps> = ({
   onFocus,
   disabled,
   layout,
-  fieldTabIndexMap,
 }) => {
   // Skip hidden and inactive fields
   if ((field as any).hidden || (field as any).inactive) {
@@ -65,7 +63,6 @@ const FieldItem: React.FC<FieldItemProps> = ({
         error={errors[field.name]}
         disabled={isDisabled}
         required={isRequired}
-        tabIndex={fieldTabIndexMap?.[field.name]}
       />
     </div>
   );
@@ -82,7 +79,6 @@ export const FormContent: React.FC<FormContentProps> = ({
   layout,
   className,
   children,
-  fieldTabIndexMap,
   ...props
 }) => {
   const contentClasses = cn(
@@ -109,7 +105,6 @@ export const FormContent: React.FC<FormContentProps> = ({
           onFocus={onFocus}
           disabled={disabled}
           layout={layout}
-          fieldTabIndexMap={fieldTabIndexMap}
         />
       ))}
     </div>

@@ -50,7 +50,6 @@ export interface FormElementFactoryProps extends Omit<FormElementProps, 'config'
   config?: any;
   field?: FormField;
   touched?: boolean | boolean[];
-  tabIndex?: number;
 }
 
 export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => {
@@ -122,16 +121,12 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   // Extract loadingTextSwitches from restProps if it exists
   const loadingTextSwitches = (restProps as any)?.loadingTextSwitches;
   
-  // Extract tabIndex from props or restProps
-  const tabIndex = props.tabIndex ?? (restProps as any)?.tabIndex;
-  
-  // Remove canCopy, enableVoiceInput, loadingTextSwitches, and tabIndex from restProps to avoid conflicts when we explicitly pass them
-  const { canCopy: _, enableVoiceInput: __, loadingTextSwitches: ___, tabIndex: ____, ...restPropsWithoutCanCopy } = restProps;
+  // Remove canCopy, enableVoiceInput, and loadingTextSwitches from restProps to avoid conflicts when we explicitly pass them
+  const { canCopy: _, enableVoiceInput: __, loadingTextSwitches: ___, ...restPropsWithoutExtras } = restProps;
 
   // Common props to pass to all form elements
   const commonProps = {
-    ...restPropsWithoutCanCopy,
-    tabIndex,
+    ...restPropsWithoutExtras,
   };
 
   switch (elementType) {
@@ -177,7 +172,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           error={restProps.error}
           required={restProps.required}
           className={restProps.className}
-          tabIndex={tabIndex}
           resendDuration={config.resendDuration}
           resendButtonLabel={config.resendButtonLabel}
           autoStartTimer={config.autoStartTimer}
@@ -390,7 +384,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           orientation={config.orientation}
           selectionBehavior={config.selectionBehavior}
           onNormalizedChange={handleToggleGroupChange}
-          tabIndex={tabIndex}
         />
       );
     }
@@ -484,7 +477,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           disabled={restProps.disabled}
           placeholder={(config as any).placeholder}
           className={restProps.className}
-          tabIndex={tabIndex}
           {...(restProps.onBlur ? { onBlur: restProps.onBlur } as any : {})}
           {...(restProps.onFocus ? { onFocus: restProps.onFocus } as any : {})}
         />
@@ -531,7 +523,6 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           required={restProps.required}
           error={restProps.error}
           className={restProps.className}
-          tabIndex={tabIndex}
         />
       );
     
