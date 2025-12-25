@@ -18,6 +18,7 @@ import {
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { truncateText } from '@/domains/chat/utils/text-utils';
+import { formatSearchResultsToToon, type SearchResult } from '../utils/ai-search-utils';
 
 interface UseAiBuilderReturn {
   userPrompt: string;
@@ -35,6 +36,10 @@ interface UseAiBuilderReturn {
   imageResponse: string | null;
   imageError: string | null;
   graphWarnings: string[]; // Warnings for graph validation issues
+  searchResults: any[] | null; // Search results for display
+  searchError: string | null; // Search error
+  searchDuration: number | null; // Search duration in milliseconds
+  searchUsage: { cost: number; tool: string } | null; // Search usage (cost and tool)
   generateResponse: (request: GeneratePromptRequest) => Promise<void>;
   stopGeneration: () => void;
   approveResponse: (response: string, agent: AiAgent) => Promise<void>;
@@ -50,6 +55,7 @@ interface UseAiBuilderReturn {
  */
 export function useAiBuilder(): UseAiBuilderReturn {
   const tenantId = useTenantStore((state) => state.getTenantId());
+  const isDevelopment = process.env.NODE_ENV === 'development';
   const [userPrompt, setUserPrompt] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
@@ -65,6 +71,10 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const [imageError, setImageError] = useState<string | null>(null);
   const [graphWarnings, setGraphWarnings] = useState<string[]>([]);
   const [lastPromptId, setLastPromptId] = useState<string | null>(null);
+  const [searchResults, setSearchResults] = useState<any[] | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [searchDuration, setSearchDuration] = useState<number | null>(null);
+  const [searchUsage, setSearchUsage] = useState<{ cost: number; tool: string } | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   
   const user = useUserStore((state) => state.user);
@@ -201,11 +211,156 @@ export function useAiBuilder(): UseAiBuilderReturn {
     setAiResponse('');
     setImageResponse(null);
     setImageError(null);
+    setSearchResults(null);
+    setSearchError(null);
+    setSearchDuration(null);
+    setSearchUsage(null);
 
     try {
       const agentId = request.agentId;
       if (!agentId) {
         throw new Error('agentId is required');
+      }
+
+      // Check if search is enabled
+      // Search is enabled when searchType is set and is not 'no-search'
+      const searchType = request.body?.searchType || 'no-search';
+      const isSearchEnabled = searchType && searchType !== 'no-search';
+      let enhancedPrompt = request.userPrompt.trim();
+      let searchResultsData: SearchResult[] | null = null;
+
+      // Debug logging
+      if (isDevelopment) {
+        loggingCustom(LogType.AI_BODY_LOG, 'info', `Search check - searchType: ${searchType}, enabled: ${isSearchEnabled}, body keys: ${Object.keys(request.body || {}).join(', ')}`);
+      }
+
+      // If search is enabled, call search API first
+      if (isSearchEnabled) {
+        if (isDevelopment) {
+          loggingCustom(LogType.AI_BODY_LOG, 'info', `Starting search API call with query: ${enhancedPrompt.substring(0, 100)}...`);
+        }
+        try {
+          // Map searchType to search_tool_name
+          const searchToolNameMap: Record<string, string> = {
+            'basic': 'parallel_ai-search',
+            'advanced': 'perplexity-search',
+            'deep': 'parallel_ai-search-pro',
+          };
+          const searchToolName = searchToolNameMap[searchType] || 'parallel_ai-search';
+          const maxResults = request.body?.max_results || 5;
+
+          // Search tool pricing (per query)
+          const searchToolPricing: Record<string, number> = {
+            'parallel_ai-search': 0.004,
+            'perplexity-search': 0.005,
+            'google_pse-search': 0.005,
+            'tavily-search': 0.008,
+            'firecrawl-search': 0.008,
+            'parallel_ai-search-pro': 0.009,
+            'tavily-search-advanced': 0.016,
+            'exa_ai-search': 0.025,
+          };
+
+          // Clean the query - remove common prefixes that might be added by form building
+          const cleanQuery = enhancedPrompt
+            .replace(/^(?:User Prompt|Prompt|User Prompt:)\s*:?\s*/i, '')
+            .trim();
+
+          // Track search start time
+          const searchStartTime = Date.now();
+
+          // Call search API through server route (like other agent calls)
+          try {
+            const searchResponse = await fetch('/api/ai-builder/search', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userPrompt: cleanQuery,
+                body: {
+                  search_tool_name: searchToolName,
+                  max_results: maxResults,
+                },
+              }),
+              signal: abortController.signal,
+            });
+
+            // Calculate search duration
+            const searchEndTime = Date.now();
+            const searchDurationMs = searchEndTime - searchStartTime;
+            setSearchDuration(searchDurationMs);
+
+            if (!searchResponse.ok) {
+              const errorText = await searchResponse.text();
+              let errorData: any = null;
+              try {
+                errorData = JSON.parse(errorText);
+              } catch {
+                // If not JSON, use the text as error message
+              }
+              const errorMessage = errorData?.error || errorText || `HTTP ${searchResponse.status}: ${searchResponse.statusText}`;
+              setSearchError(errorMessage);
+              loggingCustom(LogType.CLIENT_LOG, 'error', `Search API error: ${errorMessage}`);
+            } else {
+              const searchResponseData = await searchResponse.json();
+              
+              if (searchResponseData.success && searchResponseData.data) {
+                const builderResponse: AiBuilderResponseData = searchResponseData.data;
+                
+                // Extract search results from response
+                if (builderResponse.searchResults && Array.isArray(builderResponse.searchResults)) {
+                  searchResultsData = builderResponse.searchResults;
+                } else {
+                  // Try to parse from response string
+                  try {
+                    const parsedResponse = JSON.parse(builderResponse.response);
+                    if (parsedResponse.results && Array.isArray(parsedResponse.results)) {
+                      searchResultsData = parsedResponse.results;
+                    } else if (Array.isArray(parsedResponse)) {
+                      searchResultsData = parsedResponse;
+                    }
+                  } catch {
+                    // If parsing fails, leave searchResultsData as null
+                  }
+                }
+
+                if (searchResultsData && searchResultsData.length > 0) {
+                  setSearchResults(searchResultsData);
+
+                  // Calculate estimated cost
+                  const searchCost = searchToolPricing[searchToolName] || 0.004;
+                  setSearchUsage({
+                    cost: searchCost,
+                    tool: searchToolName,
+                  });
+
+                  // Format search results in TOON format
+                  const toonFormatted = formatSearchResultsToToon(searchResultsData);
+
+                  // Append formatted results to prompt with divider
+                  enhancedPrompt = `${enhancedPrompt}\n\n---\n\n${toonFormatted}`;
+                } else {
+                  setSearchError('No search results found');
+                }
+              } else {
+                setSearchError(searchResponseData.error || 'Search failed');
+              }
+            }
+          } catch (searchFetchError) {
+            if (!(searchFetchError instanceof Error && searchFetchError.name === 'AbortError')) {
+              const errorMessage = searchFetchError instanceof Error ? searchFetchError.message : 'Search fetch error';
+              setSearchError(errorMessage);
+              loggingCustom(LogType.CLIENT_LOG, 'error', `Search fetch error: ${errorMessage}`);
+            }
+          }
+        } catch (searchErr) {
+          if (!(searchErr instanceof Error && searchErr.name === 'AbortError')) {
+            const errorMessage = searchErr instanceof Error ? searchErr.message : 'Search error';
+            setSearchError(errorMessage);
+            loggingCustom(LogType.CLIENT_LOG, 'error', `Search error: ${errorMessage}`);
+          }
+        }
       }
 
       // If imageType is set and not "none", run both requests in parallel with Promise.allSettled
@@ -225,7 +380,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                userPrompt: request.userPrompt.trim(),
+                userPrompt: enhancedPrompt,
                 previousAiResponse: request.previousAiResponse,
                 previousUserPrompt: request.previousUserPrompt,
                 annotations: request.annotations,
@@ -241,10 +396,10 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                userPrompt: request.userPrompt.trim(),
+                userPrompt: enhancedPrompt,
                 body: {
                   imageType: imageType,
-                  prompt: request.userPrompt.trim(),
+                  prompt: enhancedPrompt,
                   ...(request.body || {}), // Include other body params if any
                 },
                 extra_body: {
@@ -349,6 +504,30 @@ export function useAiBuilder(): UseAiBuilderReturn {
                   setDuration(builderResponse.timing?.duration || null);
                   setError(null);
 
+                  // Extract search results if format is 'search-results' or 'search-card'
+                  if (builderResponse.format === 'search-results' || builderResponse.format === 'search-card') {
+                    // First check if searchResults is directly in the response data (from ai-search-utils)
+                    if (builderResponse.searchResults && Array.isArray(builderResponse.searchResults)) {
+                      setSearchResults(builderResponse.searchResults);
+                    } else {
+                      // Try to parse search results from the response string
+                      try {
+                        const parsedResponse = JSON.parse(builderResponse.response);
+                        // Check for different possible structures
+                        if (parsedResponse.results && Array.isArray(parsedResponse.results)) {
+                          setSearchResults(parsedResponse.results);
+                        } else if (parsedResponse.search?.results && Array.isArray(parsedResponse.search.results)) {
+                          setSearchResults(parsedResponse.search.results);
+                        } else if (Array.isArray(parsedResponse)) {
+                          setSearchResults(parsedResponse);
+                        }
+                      } catch (parseError) {
+                        // If parsing fails, search results might be in a different format
+                        // Leave searchResults as null, will be handled by response component
+                      }
+                    }
+                  }
+
                   // Save prompt to history
                   if (builderResponse.response && builderResponse.tokenUsage) {
                     const username = user?.name || user?.email || 'anonymous';
@@ -357,7 +536,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
                     const savedPrompt = await createPrompt({
                       username: user?.username || '',
                       aiAgent: request.agentId,
-                      userPrompt: request.userPrompt.trim(),
+                      userPrompt: enhancedPrompt,
                       agentResponse: typeof builderResponse.response === 'string' 
                         ? builderResponse.response 
                         : JSON.stringify(builderResponse.response, null, 2),
@@ -483,7 +662,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              userPrompt: request.userPrompt.trim(),
+              userPrompt: enhancedPrompt,
               previousAiResponse: request.previousAiResponse,
               previousUserPrompt: request.previousUserPrompt,
               annotations: request.annotations,
@@ -581,6 +760,30 @@ export function useAiBuilder(): UseAiBuilderReturn {
       setDuration(builderResponse.timing?.duration || null);
       setGraphWarnings(builderResponse.warnings || []);
 
+      // Extract search results if format is 'search-results' or 'search-card'
+      if (builderResponse.format === 'search-results' || builderResponse.format === 'search-card') {
+        // First check if searchResults is directly in the response data (from ai-search-utils)
+        if (builderResponse.searchResults && Array.isArray(builderResponse.searchResults)) {
+          setSearchResults(builderResponse.searchResults);
+        } else {
+          // Try to parse search results from the response string
+          try {
+            const parsedResponse = JSON.parse(builderResponse.response);
+            // Check for different possible structures
+            if (parsedResponse.results && Array.isArray(parsedResponse.results)) {
+              setSearchResults(parsedResponse.results);
+            } else if (parsedResponse.search?.results && Array.isArray(parsedResponse.search.results)) {
+              setSearchResults(parsedResponse.search.results);
+            } else if (Array.isArray(parsedResponse)) {
+              setSearchResults(parsedResponse);
+            }
+          } catch (parseError) {
+            // If parsing fails, search results might be in a different format
+            // Leave searchResults as null, will be handled by response component
+          }
+        }
+      }
+
       // Save prompt to history
       if (builderResponse.response && builderResponse.tokenUsage) {
         const username = user?.name || user?.email || 'anonymous';
@@ -589,7 +792,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
         const savedPrompt = await createPrompt({
           username: user?.username || '',
           aiAgent: request.agentId,
-          userPrompt: request.userPrompt.trim(),
+          userPrompt: enhancedPrompt,
           agentResponse: typeof builderResponse.response === 'string' 
             ? builderResponse.response 
             : JSON.stringify(builderResponse.response, null, 2),
@@ -683,7 +886,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
 
       // Determine if we should parse as JSON
       const trimmedResponse = response.trim();
-      const shouldParseAsJson = agent.requiredOutputFormat === 'json' || agent.requiredOutputFormat === 'table' || 
+      const shouldParseAsJson = agent.requiredOutputFormat === 'json' || agent.requiredOutputFormat === 'table' || agent.requiredOutputFormat === 'search-results' || agent.requiredOutputFormat === 'search-card' || 
         (agent.requiredOutputFormat !== 'string' && (trimmedResponse.startsWith('{') || trimmedResponse.startsWith('[')));
 
       // If required output format is JSON, parse it
@@ -904,6 +1107,10 @@ export function useAiBuilder(): UseAiBuilderReturn {
     setImageResponse(null);
     setImageError(null);
     setGraphWarnings([]);
+    setSearchResults(null);
+    setSearchError(null);
+    setSearchDuration(null);
+    setSearchUsage(null);
   }, []);
 
   const clearError = useCallback(() => {
@@ -930,6 +1137,10 @@ export function useAiBuilder(): UseAiBuilderReturn {
     imageResponse,
     imageError,
     graphWarnings,
+    searchResults,
+    searchError,
+    searchDuration,
+    searchUsage,
     generateResponse,
     stopGeneration,
     approveResponse,

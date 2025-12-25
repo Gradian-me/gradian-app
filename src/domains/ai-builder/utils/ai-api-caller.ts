@@ -253,7 +253,7 @@ export async function callChatApi(params: {
 
   // Process response based on required output format
   let processedResponse = aiResponseContent;
-  if (agent.requiredOutputFormat === 'json' || agent.requiredOutputFormat === 'table') {
+  if (agent.requiredOutputFormat === 'json' || agent.requiredOutputFormat === 'table' || agent.requiredOutputFormat === 'search-results' || agent.requiredOutputFormat === 'search-card') {
     const extractedJson = extractJson(aiResponseContent);
     if (extractedJson) {
       processedResponse = extractedJson;
@@ -584,6 +584,126 @@ export async function callVoiceApi(params: {
       return {
         success: false,
         error: parseResult.error || 'Invalid response format from voice transcription service',
+      };
+    }
+
+    return {
+      success: true,
+      data: parseResult.data,
+    };
+  } catch (fetchError) {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+      if (isDevelopment) {
+        loggingCustom(LogType.INFRA_LOG, 'error', `Request timeout: ${fetchError.message}`);
+      }
+      return {
+        success: false,
+        error: sanitizeErrorMessage('Request timeout', isDevelopment),
+      };
+    }
+
+    throw fetchError;
+  }
+}
+
+/**
+ * Call search API
+ */
+export async function callSearchApi(params: {
+  query: string;
+  search_tool_name?: string;
+  max_results?: number;
+  timeout?: number;
+  signal?: AbortSignal;
+}): Promise<{
+  success: boolean;
+  data?: any;
+  error?: string;
+}> {
+  const {
+    query,
+    search_tool_name = 'parallel_ai-search',
+    max_results = 5,
+    timeout = 60000,
+    signal,
+  } = params;
+
+  // Get API key
+  const apiKeyResult = getApiKey();
+  if (!apiKeyResult.key) {
+    return {
+      success: false,
+      error: apiKeyResult.error || 'LLM_API_KEY is not configured',
+    };
+  }
+
+  // Get base search API URL and construct URL with search_tool_name in path
+  const baseSearchUrl = getApiUrlForAgentType('search');
+  const searchApiUrl = `${baseSearchUrl}/${search_tool_name}`;
+
+  // Clean the query - remove common prefixes that might be added by form building
+  const cleanQuery = query
+    .replace(/^(?:User Prompt|Prompt|User Prompt:)\s*:?\s*/i, '')
+    .trim();
+
+  // Build request body (without search_tool_name, as it's in the URL)
+  const requestBody = {
+    query: cleanQuery,
+    max_results,
+  };
+
+  // Log request body
+  loggingCustom(
+    LogType.AI_BODY_LOG,
+    'info',
+    `Search Request to ${searchApiUrl}: ${JSON.stringify(requestBody, null, 2)}`
+  );
+
+  // Create abort controller if not provided
+  const { controller, timeoutId } = signal
+    ? { controller: { signal }, timeoutId: null }
+    : createAbortController(timeout);
+
+  const finalSignal = signal || controller.signal;
+
+  try {
+    const response = await fetch(searchApiUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKeyResult.key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+      signal: finalSignal,
+    });
+
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    if (!response.ok) {
+      const errorMessage = await parseErrorResponse(response);
+      if (isDevelopment) {
+        loggingCustom(LogType.INFRA_LOG, 'error', `Search API error: ${errorMessage}`);
+      }
+      return {
+        success: false,
+        error: sanitizeErrorMessage(errorMessage, isDevelopment),
+      };
+    }
+
+    // Parse JSON response
+    const responseText = await response.text();
+    const parseResult = safeJsonParse(responseText);
+
+    if (!parseResult.success || !parseResult.data) {
+      return {
+        success: false,
+        error: parseResult.error || 'Invalid response format from search service',
       };
     }
 

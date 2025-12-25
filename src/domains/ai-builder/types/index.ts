@@ -9,8 +9,8 @@ export interface AiAgent {
   label: string;
   icon: string;
   description: string;
-  agentType?: 'chat' | 'image-generation' | 'voice-transcription' | 'video-generation' | 'graph-generation' | 'orchestrator'; // Type of AI agent
-  requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph';
+  agentType?: 'chat' | 'image-generation' | 'voice-transcription' | 'video-generation' | 'graph-generation' | 'orchestrator' | 'search'; // Type of AI agent
+  requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph' | 'search-results' | 'search-card';
   model?: string;
   systemPrompt?: string;
   loadingTextSwitches?: string | string[];
@@ -75,7 +75,7 @@ export interface VideoUsage {
 
 export interface AiBuilderResponseData {
   response: string;
-  format: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph';
+  format: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph' | 'search-results' | 'search-card';
   tokenUsage: TokenUsage | null;
   videoUsage?: VideoUsage | null; // Video usage (duration and cost) for video generation agents
   timing?: {
@@ -83,11 +83,17 @@ export interface AiBuilderResponseData {
     duration: number; // Total duration in milliseconds
   };
   warnings?: string[]; // Warnings for graph validation issues (non-blocking)
+  searchResults?: Array<{
+    title: string;
+    url: string;
+    snippet: string;
+    date?: string;
+  }>; // Search results for search-results format
   agent: {
     id: string;
     label: string;
     description: string;
-    requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph';
+    requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph' | 'search-results' | 'search-card';
     nextAction: {
       label: string;
       icon?: string;

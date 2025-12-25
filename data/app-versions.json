@@ -4601,5 +4601,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KDAPCJZY1T7AS1QE3DC6ACF6",
+    "timestamp": "2025-12-25T12:05:07.000Z",
+    "version": "1.37.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Introduced a new Search Agent to perform web searches and return structured results, enhancing the capabilities of the AI agents",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "search"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated the AiBuilderForm to include search configuration defaults and improved handling of search parameters",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Adjusted API response handling to support new search result formats and ensured consistent data management across components. This change improves user experience by providing more robust search functionalities and better integration of search results in the application",
+        "priority": "Medium",
+        "affectedDomains": [
+          "api",
+          "data-management",
+          "components"
+        ]
+      }
+    ]
   }
 ]

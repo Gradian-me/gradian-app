@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // If multiple agent IDs requested, return only those agents
+    // If multiple agent IDs requested, return only those agents in the order they appear in the original array
     if (agentIdsParam) {
       const agentIds = agentIdsParam
         .split(',')
@@ -138,13 +138,14 @@ export async function GET(request: NextRequest) {
         .filter(id => id.length > 0);
       const uniqueAgentIds = Array.from(new Set(agentIds));
 
-      let matchedAgents = uniqueAgentIds
-        .map((id) => agents.find((a: any) => a.id === id))
-        .filter((agent): agent is any => Boolean(agent));
+      // Preserve the order from the original agents array, not the requested IDs order
+      // Filter agents array to only include requested IDs, maintaining original array order
+      let matchedAgents = agents.filter((agent: any) => uniqueAgentIds.includes(agent.id));
 
       // If summary mode, return only essential fields
       if (summary) {
         const allSummaryAgents = getSummaryAgents(agents);
+        // Filter summary agents in the same order as original array
         matchedAgents = allSummaryAgents.filter((agent: any) => 
           uniqueAgentIds.includes(agent.id)
         );
@@ -152,7 +153,7 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        data: matchedAgents,
+        data: matchedAgents, // Now in original array order, not requested IDs order
         meta: {
           requestedIds: uniqueAgentIds,
           returnedCount: matchedAgents.length,
@@ -210,13 +211,14 @@ export async function GET(request: NextRequest) {
       });
     }
 
-      // If summary mode, return only essential fields for all agents
+      // If summary mode, return only essential fields for all agents (preserve order)
     if (summary) {
       const summaryAgents = getSummaryAgents(agents);
+      // getSummaryAgents uses map() which preserves array order
 
       return NextResponse.json({
         success: true,
-        data: summaryAgents,
+        data: summaryAgents, // Preserves original array order
         meta: {
           totalCount: summaryAgents.length,
           summary: true,
@@ -228,10 +230,11 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Return all agents
+    // Return all agents in the exact order they appear in the JSON file (preserve array index order)
+    // Agents are already in the correct order from the file, but we explicitly ensure no reordering
     return NextResponse.json({
       success: true,
-      data: agents,
+      data: agents, // Already in correct order from JSON array
       meta: {
         totalCount: agents.length,
       },

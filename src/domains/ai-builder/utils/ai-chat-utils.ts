@@ -451,7 +451,7 @@ export async function processChatRequest(
       systemPrompt,
       userPrompt: finalUserPrompt,
       model,
-      responseFormat: (agent.requiredOutputFormat === 'json' || agent.requiredOutputFormat === 'table')
+      responseFormat: (agent.requiredOutputFormat === 'json' || agent.requiredOutputFormat === 'table' || agent.requiredOutputFormat === 'search-results' || agent.requiredOutputFormat === 'search-card')
         ? { type: 'json_object' }
         : undefined,
     });
@@ -490,7 +490,7 @@ export async function processChatRequest(
       success: true,
       data: {
         response: apiResult.data,
-        format: agent.requiredOutputFormat === 'table' ? 'json' : agent.requiredOutputFormat || 'string',
+        format: (agent.requiredOutputFormat === 'table' || agent.requiredOutputFormat === 'search-results' || agent.requiredOutputFormat === 'search-card') ? 'json' : agent.requiredOutputFormat || 'string',
         tokenUsage,
         timing: apiResult.timing,
         agent: {

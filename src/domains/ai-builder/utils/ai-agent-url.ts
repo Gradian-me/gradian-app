@@ -4,13 +4,14 @@
  * These URLs can be overridden via environment variables
  */
 
-export type AgentType = 'chat' | 'voice-transcription' | 'image-generation' | 'video-generation' | 'graph-generation' | 'orchestrator';
+export type AgentType = 'chat' | 'voice-transcription' | 'image-generation' | 'video-generation' | 'graph-generation' | 'orchestrator' | 'search';
 
 export interface AiAgentUrlConfig {
   LLM_API_URL: string;
   LLM_VOICE_TRANSCRIBE_URL: string;
   LLM_IMAGE_GENERATION_URL: string;
   LLM_VIDEO_GENERATION_URL: string;
+  LLM_SEARCH_URL: string;
 }
 
 /**
@@ -21,6 +22,7 @@ const DEFAULT_AI_AGENT_URLS: AiAgentUrlConfig = {
   LLM_VOICE_TRANSCRIBE_URL: 'https://api.avalai.ir/v1/audio/transcriptions',
   LLM_IMAGE_GENERATION_URL: 'https://api.avalai.ir/v1/images/generations',
   LLM_VIDEO_GENERATION_URL: 'https://api.avalai.ir/v1/videos',
+  LLM_SEARCH_URL: 'https://api.avalai.ir/v1/search',
 };
 
 /**
@@ -33,6 +35,7 @@ export function getAiAgentUrls(): AiAgentUrlConfig {
     LLM_VOICE_TRANSCRIBE_URL: process.env.LLM_VOICE_TRANSCRIBE_URL || DEFAULT_AI_AGENT_URLS.LLM_VOICE_TRANSCRIBE_URL,
     LLM_IMAGE_GENERATION_URL: process.env.LLM_IMAGE_GENERATION_URL || DEFAULT_AI_AGENT_URLS.LLM_IMAGE_GENERATION_URL,
     LLM_VIDEO_GENERATION_URL: process.env.LLM_VIDEO_GENERATION_URL || DEFAULT_AI_AGENT_URLS.LLM_VIDEO_GENERATION_URL,
+    LLM_SEARCH_URL: process.env.LLM_SEARCH_URL || DEFAULT_AI_AGENT_URLS.LLM_SEARCH_URL,
   };
 }
 
@@ -49,6 +52,7 @@ export function getApiUrlForAgentType(agentType: AgentType): string {
     'video-generation': urls.LLM_VIDEO_GENERATION_URL,
     'graph-generation': urls.LLM_API_URL, // Graph generation uses chat API
     'orchestrator': urls.LLM_API_URL, // Orchestrator uses chat API
+    'search': urls.LLM_SEARCH_URL, // Search API
   };
 
   return URL_MAP[agentType] || URL_MAP['chat'];

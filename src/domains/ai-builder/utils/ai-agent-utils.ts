@@ -9,6 +9,7 @@ import { processImageRequest } from './ai-image-utils';
 import { processVideoRequest } from './ai-video-utils';
 import { processGraphRequest } from './ai-graph-utils';
 import { processOrchestratorRequest } from './ai-orchestrator-utils';
+import { processSearchRequest } from './ai-search-utils';
 import { getApiUrlForAgentType, AgentType } from './ai-agent-url';
 
 export type { AgentType };
@@ -74,6 +75,9 @@ export async function processAiAgent(
     
     case 'orchestrator':
       return await processOrchestratorRequest(agent.id, requestData, baseUrl);
+    
+    case 'search':
+      return await processSearchRequest(agent, requestData);
     
     default:
       return {

@@ -28,7 +28,7 @@ interface SystemPromptPreviewSheetProps {
   onOpenChange: (open: boolean) => void;
   systemPrompt: string;
   requiredOutputFormat?: string;
-  agentType?: 'chat' | 'image-generation' | 'voice-transcription' | 'video-generation' | 'graph-generation' | 'orchestrator';
+  agentType?: 'chat' | 'image-generation' | 'voice-transcription' | 'video-generation' | 'graph-generation' | 'orchestrator' | 'search';
 }
 
 export function SystemPromptPreviewSheet({

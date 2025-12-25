@@ -16,7 +16,7 @@ import { Badge } from '../../../../components/ui/badge';
 import { motion } from 'framer-motion';
 import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { extractFirstId, normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Search } from 'lucide-react';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { useOptionsFromSchemaOrUrl } from '../hooks/useOptionsFromSchemaOrUrl';
 import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
@@ -68,6 +68,14 @@ export interface SelectWithBadgesProps extends Omit<SelectProps, 'children'> {
    * Sort order for options: 'ASC' (ascending), 'DESC' (descending), or null (no sorting, default)
    */
   sortType?: SortType;
+  /**
+   * Enable client-side search functionality (default: true)
+   */
+  enableSearch?: boolean;
+  /**
+   * Sort options alphabetically A to Z (default: true). If false, shows options in original order.
+   */
+  sortAtoZ?: boolean;
 }
 
 export const Select: React.FC<SelectWithBadgesProps> = ({
@@ -90,8 +98,12 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   queryParams,
   transform,
   sortType = null,
+  enableSearch = true,
+  sortAtoZ = true,
   ...props
 }) => {
+  // State for search functionality
+  const [searchValue, setSearchValue] = React.useState('');
   // Get dynamic context for reference-based filtering
   // Use selector to ensure reactivity when formSchema or formData changes
   const formSchema = useDynamicFormContextStore((state) => state.formSchema);
@@ -284,9 +296,24 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       ...opt,
       label: opt.label ?? opt.id,
     }));
-    // Sort options if sortType is specified
-    return sortNormalizedOptions(normalized, sortType);
-  }, [resolvedOptions, schemaId, effectiveSourceUrl, fetchedOptions, isLoadingOptions, optionsError, sortType]);
+    
+    // Sort options based on sortType or sortAtoZ
+    let sorted = normalized;
+    if (sortType) {
+      // Use sortType if specified (takes precedence)
+      sorted = sortNormalizedOptions(normalized, sortType);
+    } else if (sortAtoZ) {
+      // Sort alphabetically A to Z
+      sorted = [...normalized].sort((a, b) => {
+        const labelA = (a.label || a.id || '').toLowerCase();
+        const labelB = (b.label || b.id || '').toLowerCase();
+        return labelA.localeCompare(labelB);
+      });
+    }
+    // If sortAtoZ is false and sortType is null, keep original order (no sorting)
+    
+    return sorted;
+  }, [resolvedOptions, schemaId, effectiveSourceUrl, fetchedOptions, isLoadingOptions, optionsError, sortType, sortAtoZ]);
 
   const normalizedOptionsLookup = useMemo(() => {
     const map = new Map<string, NormalizedOption>();
@@ -303,9 +330,23 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     return map;
   }, [normalizedOptions, normalizedValueArray]);
   const hasNormalizedOptions = normalizedOptions.length > 0;
+  
+  // Filter options based on search value
+  const filteredOptions = useMemo(() => {
+    if (!enableSearch || !searchValue.trim()) {
+      return normalizedOptions;
+    }
+    const searchLower = searchValue.toLowerCase().trim();
+    return normalizedOptions.filter((opt) => {
+      const label = (opt.label || opt.id || '').toLowerCase();
+      const id = (opt.id || '').toLowerCase();
+      return label.includes(searchLower) || id.includes(searchLower);
+    });
+  }, [normalizedOptions, searchValue, enableSearch]);
+  
   const validOptions = useMemo(
-    () => normalizedOptions.filter((opt) => opt.id && opt.id !== ''),
-    [normalizedOptions]
+    () => filteredOptions.filter((opt) => opt.id && opt.id !== ''),
+    [filteredOptions]
   );
 
   // Calculate fallback select value for default behavior (must be before any conditional returns)
@@ -446,6 +487,10 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
         : undefined);
 
     const handleRadixChange = (selectedId: string) => {
+      // Clear search when an option is selected
+      if (enableSearch) {
+        setSearchValue('');
+      }
       if (onValueChange) {
         onValueChange(selectedId);
       }
@@ -458,6 +503,14 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
         onNormalizedChange(matched ? [matched] : []);
       }
     };
+    
+    // Clear search when select closes
+    const handleOpenChange = (open: boolean) => {
+      if (!open && enableSearch) {
+        setSearchValue('');
+      }
+      onOpenChange?.(open);
+    };
 
     return (
       <div className="w-full">
@@ -466,7 +519,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
           value={selectValue}
           onValueChange={handleRadixChange}
           disabled={disabled}
-          onOpenChange={onOpenChange}
+          onOpenChange={handleOpenChange}
           {...props}
         >
           <SelectTrigger className={cn(selectClasses)} id={fieldName}>
@@ -474,26 +527,81 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
               {displayOption && renderBadgeContent(displayOption)}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent>
-            {validOptions.map((option, index) => (
-              <motion.div
-                key={option.id ?? index}
-                initial={{ opacity: 0, y: 6, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{
-                  duration: 0.2,
-                  delay: Math.min(
-                    index * UI_PARAMS.CARD_INDEX_DELAY.STEP,
-                    UI_PARAMS.CARD_INDEX_DELAY.SKELETON_MAX
-                  ),
-                  ease: 'easeOut',
-                }}
-              >
-                <SelectItem value={option.id as string} disabled={option.disabled}>
-                  {renderBadgeContent(option)}
-                </SelectItem>
-              </motion.div>
-            ))}
+          <SelectContent
+            searchSlot={
+              enableSearch ? (
+                <div className="px-2 py-2">
+                  <div className="relative">
+                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={searchValue}
+                      onChange={(e) => setSearchValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        // Prevent select from closing when typing
+                        e.stopPropagation();
+                      }}
+                      onClick={(e) => {
+                        // Prevent select from closing when clicking search input
+                        e.stopPropagation();
+                      }}
+                      placeholder="Search options..."
+                      className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:border-violet-400 dark:focus:border-violet-500"
+                    />
+                    {searchValue && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSearchValue('');
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none"
+                        aria-label="Clear search"
+                      >
+                        <svg
+                          className="h-3.5 w-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : undefined
+            }
+          >
+            {validOptions.length === 0 && searchValue ? (
+              <div className="px-2 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                No options found
+              </div>
+            ) : (
+              validOptions.map((option, index) => (
+                <motion.div
+                  key={option.id ?? index}
+                  initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{
+                    duration: 0.2,
+                    delay: Math.min(
+                      index * UI_PARAMS.CARD_INDEX_DELAY.STEP,
+                      UI_PARAMS.CARD_INDEX_DELAY.SKELETON_MAX
+                    ),
+                    ease: 'easeOut',
+                  }}
+                >
+                  <SelectItem value={option.id as string} disabled={option.disabled}>
+                    {renderBadgeContent(option)}
+                  </SelectItem>
+                </motion.div>
+              )))}
           </SelectContent>
         </RadixSelect>
         {error && renderErrorMessage(error)}

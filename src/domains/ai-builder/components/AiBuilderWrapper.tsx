@@ -125,6 +125,10 @@ export function AiBuilderWrapper({
     imageResponse,
     imageError,
     graphWarnings,
+    searchResults,
+    searchError,
+    searchDuration,
+    searchUsage,
     lastPromptId: hookLastPromptId,
     generateResponse,
     stopGeneration,
@@ -270,43 +274,47 @@ export function AiBuilderWrapper({
     if (!selectedAgentId) return;
     
     // Start with preset body/extra_body values (highest priority)
-    let body: Record<string, any> | undefined = initialBody ? { ...initialBody } : undefined;
-    let extra_body: Record<string, any> | undefined = initialExtraBody ? { ...initialExtraBody } : undefined;
+    // Initialize as empty objects to ensure we can always add properties
+    let body: Record<string, any> = initialBody ? { ...initialBody } : {};
+    let extra_body: Record<string, any> = initialExtraBody ? { ...initialExtraBody } : {};
     
     // Calculate body and extra_body from formValues and merge with preset values
     // Preset values take precedence, but formValues can add additional parameters
     if (selectedAgent && Object.keys(formValues).length > 0) {
       const params = extractParametersBySectionId(selectedAgent, formValues);
-      const formBody = Object.keys(params.body).length > 0 ? params.body : undefined;
-      const formExtraBody = Object.keys(params.extra).length > 0 ? params.extra : undefined;
+      const formBody = Object.keys(params.body).length > 0 ? params.body : {};
+      const formExtraBody = Object.keys(params.extra).length > 0 ? params.extra : {};
       
       // Merge form values with preset values (preset takes precedence)
-      if (formBody) {
-        body = {
-          ...formBody,
-          ...body, // Preset values override form values
-        };
-      }
-      if (formExtraBody) {
-        extra_body = {
-          ...formExtraBody,
-          ...extra_body, // Preset values override form values
-        };
-      }
+      body = {
+        ...formBody,
+        ...body, // Preset values override form values
+      };
+      extra_body = {
+        ...formExtraBody,
+        ...extra_body, // Preset values override form values
+      };
     }
     
     // Ensure imageType is always included in body if it exists in formValues or preset body and is not "none"
     // This handles cases where imageType might not be in the agent's renderComponents
     const imageType = formValues.imageType || (initialBody?.imageType as string | undefined);
     if (imageType && imageType !== 'none') {
-      body = {
-        ...body,
-        imageType: imageType,
-      };
+      body.imageType = imageType;
       // Store the imageType for display in the response
       setCurrentImageType(imageType);
     } else {
       setCurrentImageType(undefined);
+    }
+    
+    // Ensure search configuration is always included in body if it exists in formValues
+    // These fields don't have sectionId, so they need to be manually added
+    if (formValues.searchType !== undefined) {
+      body.searchType = formValues.searchType;
+      // Always include max_results with default value when search is enabled
+      if (formValues.searchType && formValues.searchType !== 'no-search') {
+        body.max_results = formValues.max_results ?? 5;
+      }
     }
     
     generateResponse({
@@ -608,6 +616,10 @@ export function AiBuilderWrapper({
               imageType={currentImageType}
               imageModel={imageModel}
               graphWarnings={graphWarnings}
+              searchResults={searchResults}
+              searchError={searchError}
+              searchDuration={searchDuration}
+              searchUsage={searchUsage}
             />
           </motion.div>
         ) : null}

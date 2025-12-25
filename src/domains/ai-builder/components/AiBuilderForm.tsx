@@ -291,6 +291,9 @@ export function AiBuilderForm({
     userPrompt: userPrompt,
     // Include selectedLanguage in formValues for all agents
     ...(selectedLanguage && selectedLanguage !== 'text' ? { 'output-language': selectedLanguage } : {}),
+    // Search configuration defaults
+    searchType: 'no-search',
+    max_results: 5,
   });
 
   // State for form errors
@@ -510,6 +513,10 @@ export function AiBuilderForm({
     if (selectedLanguage && selectedLanguage !== 'text') {
       initialValues['output-language'] = selectedLanguage;
     }
+    
+    // Initialize search configuration defaults
+    initialValues.searchType = initialValues.searchType ?? 'no-search';
+    initialValues.max_results = initialValues.max_results ?? 5;
     
     setFormValues(initialValues);
     
@@ -863,7 +870,7 @@ export function AiBuilderForm({
     type: 'select',
     defaultValue: 'none',
     options: [
-      { id: 'none', label: 'None', icon: 'X', color: 'default' },
+      { id: 'none', label: 'No Image', icon: 'X', color: 'default' },
       { id: 'standard', label: 'Standard', icon: 'Image', color: 'default' },
       { id: 'infographic', label: 'Infographic', icon: 'FileText', color: 'default' },
       { id: '3d-model', label: '3D Model', icon: 'Box', color: 'default' },
@@ -1086,7 +1093,7 @@ export function AiBuilderForm({
             
             {/* Footer Section with Model Badge and Buttons */}
             {showFooter && (
-              <div className="flex flex-col md:flex-row justify-end items-stretch md:items-center gap-3 md:gap-2 pt-2 border-t border-violet-200/50 dark:border-violet-800/50">
+              <div className="flex flex-col md:flex-row justify-end items-stretch md:items-center gap-3 md:gap-2 pt-2 border-t border-violet-200/50 dark:border-violet-800/50 min-w-0">
                 {/* Model Badge */}
                 {showModelBadge && selectedAgent?.model && (
                   <Badge 
@@ -1102,11 +1109,11 @@ export function AiBuilderForm({
                 )}
                 
                 {/* Buttons */}
-                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto md:flex-wrap min-w-0">
                   {onSheetOpenChange && (
                     <>
                       {onLanguageChange && (
-                        <div className="w-full md:w-36">
+                        <div className="w-full md:w-36 min-w-0 shrink-0">
                           <LanguageSelector
                             config={{
                               name: 'output-language',
@@ -1139,7 +1146,7 @@ export function AiBuilderForm({
                           />
                         </div>
                       )}
-                      <div className="w-full md:w-40">
+                      <div className="w-full md:w-40 min-w-0 shrink-0">
                         <FormElementFactory
                           config={{
                             ...effectiveImageTypeField,
@@ -1173,6 +1180,66 @@ export function AiBuilderForm({
                           className="w-full"
                           />
                         </div>
+                      {/* Search Configuration */}
+                      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto min-w-0">
+                        <div className="w-full md:w-48 min-w-0 shrink-0">
+                          <FormElementFactory
+                            config={{
+                              id: 'search-type',
+                              name: 'searchType',
+                              label: '',
+                              component: 'select',
+                              type: 'select',
+                              options: [
+                                { 
+                                  id: 'no-search', 
+                                  label: 'No Search',
+                                  icon: 'X',
+                                  color: 'default'
+                                },
+                                { 
+                                  id: 'basic', 
+                                  label: 'Basic Search',
+                                  icon: 'Search',
+                                  color: 'default'
+                                },
+                                { 
+                                  id: 'advanced', 
+                                  label: 'Advanced Search',
+                                  icon: 'Search',
+                                  color: 'default'
+                                },
+                                { 
+                                  id: 'deep', 
+                                  label: 'Deep Search',
+                                  icon: 'Search',
+                                  color: 'default'
+                                },
+                              ],
+                              defaultValue: 'no-search',
+                            }}
+                            value={formValues.searchType || 'no-search'}
+                            onChange={(value) => {
+                              let actualValue = value;
+                              if (Array.isArray(value) && value.length > 0) {
+                                actualValue = value[0].id || value[0].value || value;
+                              } else if (typeof value === 'string') {
+                                actualValue = value;
+                              }
+                              const newFormValues = {
+                                ...formValues,
+                                searchType: actualValue,
+                              };
+                              setFormValues(newFormValues);
+                              if (onFormValuesChange) {
+                                onFormValuesChange(newFormValues);
+                              }
+                            }}
+                            disabled={isLoading || disabled}
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
                       {(() => {
                         const params = selectedAgent && formValues 
                           ? extractParametersBySectionId(selectedAgent, formValues)

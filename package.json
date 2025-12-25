@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.36.004",
+  "version": "1.37.000",
   "private": true,
   "scripts": {
     "dev": "npm run clean:relations && next dev --turbopack",

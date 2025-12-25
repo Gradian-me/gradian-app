@@ -27,7 +27,7 @@ const INITIAL_FORM_STATE = {
   label: '',
   icon: 'Sparkles',
   description: '',
-  requiredOutputFormat: 'json' as 'json' | 'string' | 'table',
+  requiredOutputFormat: 'json' as 'json' | 'string' | 'table' | 'search-results' | 'search-card',
   model: 'gpt-4o-mini',
   systemPrompt: '',
   loadingTextSwitches: [] as string[],
@@ -169,9 +169,11 @@ export function CreateAiAgentDialog({ open, onOpenChange, onSubmit }: CreateAiAg
                     { value: 'json', label: 'JSON' },
                     { value: 'string', label: 'String' },
                     { value: 'table', label: 'Table' },
+                    { value: 'search-results', label: 'Search Results' },
+                    { value: 'search-card', label: 'Search Card' },
                   ]}
                   value={formState.requiredOutputFormat}
-                  onValueChange={(value) => setFormState(prev => ({ ...prev, requiredOutputFormat: value as 'json' | 'string' | 'table' }))}
+                  onValueChange={(value) => setFormState(prev => ({ ...prev, requiredOutputFormat: value as 'json' | 'string' | 'table' | 'search-results' | 'search-card' }))}
                 />
               </div>
               <div>

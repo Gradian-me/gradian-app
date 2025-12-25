@@ -20,6 +20,7 @@ import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/Ma
 import { ImageViewer } from '@/gradian-ui/form-builder/form-elements/components/ImageViewer';
 import { VideoViewer } from '@/gradian-ui/form-builder/form-elements/components/VideoViewer';
 import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
+import { AISearchResults } from './AISearchResults';
 import { cn } from '@/gradian-ui/shared/utils';
 import { useAiResponseStore } from '@/stores/ai-response.store';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
@@ -50,6 +51,10 @@ interface AiBuilderResponseProps {
   imageType?: string; // The type of image that was generated (e.g., "infographic", "sketch", "creative")
   imageModel?: string; // The model used for image generation (e.g., "gemini-2.5-flash-image")
   graphWarnings?: string[]; // Warnings for graph validation issues
+  searchResults?: any[] | null; // Search results for display
+  searchError?: string | null; // Search error
+  searchDuration?: number | null; // Search duration in milliseconds
+  searchUsage?: { cost: number; tool: string } | null; // Search usage (cost and tool)
 }
 
 // Utility function to generate table columns from JSON data
@@ -142,6 +147,10 @@ export function AiBuilderResponse({
   imageType,
   imageModel,
   graphWarnings = [],
+  searchResults,
+  searchError,
+  searchDuration,
+  searchUsage,
 }: AiBuilderResponseProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const prevIsLoadingRef = useRef<boolean>(isLoading);
@@ -151,12 +160,15 @@ export function AiBuilderResponse({
   // Get agent format
   const agentFormat = useMemo(() => {
     if (!agent?.requiredOutputFormat) return 'string';
-    return agent.requiredOutputFormat as 'string' | 'json' | 'table' | 'image' | 'video' | 'graph';
+    return agent.requiredOutputFormat as 'string' | 'json' | 'table' | 'image' | 'video' | 'graph' | 'search-results' | 'search-card';
   }, [agent?.requiredOutputFormat]);
   
-  // Use 'json' format for storage if agent format is 'image' or 'graph' (store may not support these yet)
+  // Use 'json' format for storage if agent format is 'image', 'graph', 'video', 'search-results', or 'search-card' (store may not support these yet)
   const storageFormat = useMemo(() => {
-    return (agentFormat === 'image' || agentFormat === 'graph' || agentFormat === 'video') ? 'json' : agentFormat;
+    if (agentFormat === 'image' || agentFormat === 'graph' || agentFormat === 'video' || agentFormat === 'search-results' || agentFormat === 'search-card') {
+      return 'json' as const;
+    }
+    return agentFormat as 'string' | 'json' | 'table';
   }, [agentFormat]);
   
   // Reactively get latest response from store using selector
@@ -546,8 +558,9 @@ export function AiBuilderResponse({
     return isGraphAgent || !!graphData || hasGraphError;
   }, [agent?.requiredOutputFormat, agent?.id, graphData, displayContent]);
 
-  // Check if we should render as table
+  // Check if we should render as table (search-results and search-card should render as cards, not table)
   const shouldRenderTable = agent?.requiredOutputFormat === 'table';
+  const isSearchResultsFormat = agent?.requiredOutputFormat === 'search-results' || agent?.requiredOutputFormat === 'search-card';
   const { data: tableData, isValid: isValidTable } = useMemo(() => {
     if (!displayContent || !shouldRenderTable) {
       return { data: [], isValid: false };
@@ -886,8 +899,22 @@ export function AiBuilderResponse({
         )}
       </div>
 
+      {/* Search Results - shown before everything else (only for "respond after search" flow, not for direct search agent) */}
+      {searchResults && searchResults.length > 0 && !isSearchResultsFormat && (
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+          <AISearchResults results={searchResults} />
+        </div>
+      )}
+      {searchError && (
+        <div className="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30 p-4">
+          <p className="text-sm text-orange-800 dark:text-orange-200">
+            Search Error: {searchError}
+          </p>
+        </div>
+      )}
+
       {/* Token Usage & Pricing - MetricCard */}
-      {(tokenUsage || videoUsage || duration !== null) && (
+      {(tokenUsage || videoUsage || duration !== null || searchDuration !== null || searchUsage) && (
         <MetricCard
           gradient="indigo"
           metrics={[
@@ -912,11 +939,23 @@ export function AiBuilderResponse({
                 precision: 4,
               },
             ] : []),
+            ...(searchUsage ? [
+              {
+                id: 'search-cost',
+                label: 'Search Cost',
+                value: searchUsage.cost,
+                prefix: '$',
+                icon: 'Search',
+                iconColor: 'violet' as const,
+                format: 'currency' as const,
+                precision: 4,
+              },
+            ] : []),
             ...(videoUsage ? [
               {
                 id: 'video-duration',
                 label: 'Video Duration',
-                value: videoUsage.duration_seconds,
+                value: videoUsage.duration_seconds ?? 0,
                 unit: 's',
                 icon: 'Video',
                 iconColor: 'violet' as const,
@@ -937,7 +976,7 @@ export function AiBuilderResponse({
                 {
                   id: 'video-cost-irt',
                   label: 'Cost (IRT)',
-                  value: videoUsage.estimated_cost.irt,
+                  value: videoUsage.estimated_cost.irt ?? 0,
                   unit: 'IRT',
                   icon: 'Banknote',
                   iconColor: 'amber' as const,
@@ -955,6 +994,16 @@ export function AiBuilderResponse({
               iconColor: 'emerald' as const,
               format: 'number' as const,
               precision: duration < 1000 ? 0 : 2,
+            }] : []),
+            ...(searchDuration !== null && searchDuration !== undefined ? [{
+              id: 'search-duration',
+              label: 'Search Duration',
+              value: searchDuration < 1000 ? searchDuration : searchDuration / 1000,
+              unit: searchDuration < 1000 ? 'ms' : 's',
+              icon: 'Timer',
+              iconColor: 'violet' as const,
+              format: 'number' as const,
+              precision: searchDuration < 1000 ? 0 : 2,
             }] : []),
           ]}
           footer={{
@@ -1385,6 +1434,19 @@ export function AiBuilderResponse({
               title="Raw Response Data"
               initialLineNumbers={10}
             />
+          </div>
+        )
+      ) : isSearchResultsFormat ? (
+        // Show search results if available, otherwise show empty state
+        searchResults && searchResults.length > 0 ? (
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+            <AISearchResults results={searchResults} />
+          </div>
+        ) : (
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              No search results available.
+            </p>
           </div>
         )
       ) : shouldRenderTable && isValidTable && tableData.length > 0 ? (

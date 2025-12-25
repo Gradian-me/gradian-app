@@ -60,9 +60,11 @@ export function GeneralInfoTab({ agent, onUpdate, readonly = false }: GeneralInf
                 { value: 'json', label: 'JSON' },
                 { value: 'string', label: 'String' },
                 { value: 'table', label: 'Table' },
+                { value: 'search-results', label: 'Search Results' },
+                { value: 'search-card', label: 'Search Card' },
               ]}
               value={agent.requiredOutputFormat || 'json'}
-              onValueChange={(value) => onUpdate({ requiredOutputFormat: value as 'json' | 'string' | 'table' })}
+              onValueChange={(value) => onUpdate({ requiredOutputFormat: value as 'json' | 'string' | 'table' | 'search-results' | 'search-card' })}
               disabled={readonly}
             />
           </div>
