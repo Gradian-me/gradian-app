@@ -96,11 +96,22 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
       return result;
     }, [configTargetSchema, configTargetSchemaUnderscore, configTargetSchemaDash, configName, configId]);
 
+    // Check if referenceEntityId is static (no dynamic context syntax)
+    const isStaticReferenceId = React.useMemo(() => {
+      return referenceEntityId && !referenceEntityId.includes('{{') && !referenceEntityId.includes('}}');
+    }, [referenceEntityId]);
+
     // Build sourceUrl from reference fields if they're present and no explicit sourceUrl is provided
     const referenceBasedSourceUrl = React.useMemo(() => {
       if (!referenceSchema || !referenceRelationTypeId || !referenceEntityId || sourceUrl) {
         return null;
       }
+      
+      // For static IDs, we can build the URL immediately without waiting for dynamic context
+      // For dynamic IDs, we need the context to be ready
+      const shouldUseContext = !isStaticReferenceId;
+      const contextSchema = shouldUseContext ? dynamicContext.formSchema : undefined;
+      const contextValues = shouldUseContext ? dynamicContext.formData : undefined;
       
       // Build the sourceUrl using reference fields
       const url = buildReferenceFilterUrl({
@@ -108,13 +119,13 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
         referenceRelationTypeId,
         referenceEntityId,
         targetSchema: targetSchemaFromConfig ?? undefined,
-        schema: dynamicContext.formSchema,
-        values: dynamicContext.formData,
+        schema: contextSchema,
+        values: contextValues,
       });
       
-      // If URL is empty (e.g., dynamic context not ready), return null
+      // If URL is empty (e.g., dynamic context not ready for dynamic IDs), return null
       return url && url.trim() !== '' ? url : null;
-    }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaFromConfig, sourceUrl, dynamicContext.formSchema, dynamicContext.formData]);
+    }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaFromConfig, sourceUrl, isStaticReferenceId, dynamicContext.formSchema, dynamicContext.formData]);
 
     // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl
     const effectiveSourceUrl = sourceUrl || referenceBasedSourceUrl || undefined;

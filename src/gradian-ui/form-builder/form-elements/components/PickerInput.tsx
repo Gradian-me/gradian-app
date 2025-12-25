@@ -80,26 +80,36 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   const referenceRelationTypeId = (config as any).referenceRelationTypeId;
   const referenceEntityId = (config as any).referenceEntityId;
   
+  // Check if referenceEntityId is static (no dynamic context syntax)
+  const isStaticReferenceId = useMemo(() => {
+    return referenceEntityId && !referenceEntityId.includes('{{') && !referenceEntityId.includes('}}');
+  }, [referenceEntityId]);
+  
   // Build sourceUrl from reference fields if they're present and no explicit sourceUrl is provided
   const referenceBasedSourceUrl = useMemo(() => {
     if (!referenceSchema || !referenceRelationTypeId || !referenceEntityId) {
       return null;
     }
     
+    // For static IDs, we can build the URL immediately without waiting for dynamic context
+    // For dynamic IDs, we need the context to be ready
+    const shouldUseContext = !isStaticReferenceId;
+    const contextSchema = shouldUseContext ? dynamicContext.formSchema : undefined;
+    const contextValues = shouldUseContext ? dynamicContext.formData : undefined;
+    
     // Build the sourceUrl using reference fields
-    // Use dynamic context store for resolving dynamic context values
     const url = buildReferenceFilterUrl({
       referenceSchema,
       referenceRelationTypeId,
       referenceEntityId,
       targetSchema: targetSchemaId || undefined,
-      schema: dynamicContext.formSchema,
-      values: dynamicContext.formData,
+      schema: contextSchema,
+      values: contextValues,
     });
     
-    // If URL is empty (e.g., dynamic context not ready), return null to allow fallback to targetSchema
+    // If URL is empty (e.g., dynamic context not ready for dynamic IDs), return null to allow fallback to targetSchema
     return url && url.trim() !== '' ? url : null;
-  }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaId, dynamicContext.formSchema, dynamicContext.formData]);
+  }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaId, isStaticReferenceId, dynamicContext.formSchema, dynamicContext.formData]);
   
   // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl
   const sourceUrl = useMemo(() => {

@@ -83,10 +83,19 @@ export function buildReferenceFilterUrl(params: {
           resolvedEntityId = decodeURIComponent(extractFromDynamicContext('formData', path));
         }
       }
+      
+      // If dynamic resolution failed and we got an empty string, return empty to indicate failure
+      // This allows the caller to handle the case where dynamic context isn't ready yet
+      if (!resolvedEntityId || resolvedEntityId === '') {
+        return '';
+      }
+    } else {
+      // Invalid dynamic context syntax - return empty
+      return '';
     }
   } else {
-    // Static value - use as-is
-    resolvedEntityId = referenceEntityId;
+    // Static value - use as-is (trim whitespace to handle any accidental spaces)
+    resolvedEntityId = referenceEntityId.trim();
   }
 
   // If resolved entity ID is empty, return empty string

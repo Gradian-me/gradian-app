@@ -4572,5 +4572,34 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KD5REFERENCEENTITYID001",
+    "timestamp": "2025-12-25T07:27:59.000Z",
+    "version": "1.36.004",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Improved handling of static and dynamic referenceEntityId in form elements (CheckboxList, PickerInput, RadioGroup, Select, ToggleGroup) to ensure accurate URL generation based on context readiness. This change enhances data management and user experience by providing more reliable source URLs in dynamic contexts",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "form-elements",
+          "data-management",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated reference filter builder to handle empty resolvedEntityId cases more gracefully, improving error handling and debugging capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "utils",
+          "error-handling",
+          "debugging"
+        ]
+      }
+    ]
   }
 ]
