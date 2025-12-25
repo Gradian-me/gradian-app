@@ -56,7 +56,7 @@ security_audit:
         echo "❌ Security audit failed: Vulnerabilities found!"
         HAS_VULNERABILITIES=true
       else
-        echo "✅ No vulnerabilities found"
+        echo "✅ No vulnerabilities found."
       fi
       echo ""
       echo "========================================="
