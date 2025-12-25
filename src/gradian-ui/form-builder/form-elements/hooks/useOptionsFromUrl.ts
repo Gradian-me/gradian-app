@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
@@ -84,7 +84,7 @@ export function useOptionsFromUrl({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchOptions = async () => {
+  const fetchOptions = useCallback(async () => {
     if (!sourceUrl || !enabled) {
       return;
     }
@@ -174,17 +174,22 @@ export function useOptionsFromUrl({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [sourceUrl, enabled, queryParams, columnMap]);
 
   useEffect(() => {
+    // Only fetch if we have a valid sourceUrl and fetching is enabled
+    // Important: This effect will trigger when sourceUrl changes from undefined/null to a valid URL
+    // This is crucial for reference-based filtering where the URL is built dynamically
     if (sourceUrl && enabled) {
       void fetchOptions();
-    } else {
+    } else if (!sourceUrl) {
+      // Clear options only if we don't have a sourceUrl (not just when disabled)
+      // This prevents clearing options when sourceUrl is temporarily undefined during context initialization
       setOptions([]);
       setError(null);
       setIsLoading(false);
     }
-  }, [sourceUrl, enabled, JSON.stringify(queryParams), columnMap]);
+  }, [sourceUrl, enabled, fetchOptions]);
 
   const normalizedOptions = useMemo(() => {
     return options.map(opt => ({

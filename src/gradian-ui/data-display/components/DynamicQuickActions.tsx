@@ -131,34 +131,27 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
       setLoadingActionId(action.id);
       
       try {
-        // Check React Query cache first, then schemaCacheState, then fetch
+        // Always fetch fresh schema from API to ensure we have the latest schema definition
+        // This is especially important for nested modals where schemas might have been updated
         let targetSchema: FormSchema | null = null;
         
-        // Check React Query cache
-        const cachedSchema = queryClient.getQueryData<FormSchema>(['schemas', action.targetSchema]);
-        if (cachedSchema) {
-          targetSchema = cachedSchema;
-        } else if (schemaCacheState?.[action.targetSchema]) {
-          targetSchema = schemaCacheState[action.targetSchema];
-        } else {
-          // Fetch from API
-          const response = await apiRequest<FormSchema[]>(`/api/schemas?schemaIds=${action.targetSchema}`, {
-            disableCache: true,
-          });
-          const schemaResponse = response.data?.[0];
-          if (!response.success || !Array.isArray(response.data) || !schemaResponse) {
-            throw new Error(response.error || `Schema ${action.targetSchema} not found`);
-          }
-
-          targetSchema = schemaResponse;
-          
-          // Update both caches
-          queryClient.setQueryData(['schemas', schemaResponse.id], schemaResponse);
-          setSchemaCacheState((prev) => ({
-            ...prev,
-            [schemaResponse.id]: schemaResponse,
-          }));
+        // Fetch from API with cache disabled to get the latest schema
+        const response = await apiRequest<FormSchema[]>(`/api/schemas?schemaIds=${action.targetSchema}`, {
+          disableCache: true, // Always fetch fresh schema
+        });
+        const schemaResponse = response.data?.[0];
+        if (!response.success || !Array.isArray(response.data) || !schemaResponse) {
+          throw new Error(response.error || `Schema ${action.targetSchema} not found`);
         }
+
+        targetSchema = schemaResponse;
+        
+        // Update both caches with fresh schema
+        queryClient.setQueryData(['schemas', schemaResponse.id], schemaResponse);
+        setSchemaCacheState((prev) => ({
+          ...prev,
+          [schemaResponse.id]: schemaResponse,
+        }));
 
         setTargetSchemaId(action.targetSchema);
         setFormAction(action);

@@ -392,25 +392,36 @@ export function useFormModal(
     setIsLoading(true);
     
     try {
+      // Always fetch fresh schema from API to ensure we have the latest schema definition
+      // This is especially important for nested modals where schemas might have been updated
       let schemaSource: FormSchema | null = null;
-      if (getInitialSchema) {
-        try {
-          schemaSource = getInitialSchema(schemaId) ?? null;
-        } catch (error) {
-          loggingCustom(LogType.CLIENT_LOG, 'warn', `getInitialSchema threw an error, falling back to API fetch: ${error instanceof Error ? error.message : String(error)}`);
-          schemaSource = null;
-        }
-      }
-
-      if (!schemaSource) {
-        const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);
-        
-        if (!response.success || !response.data) {
-          throw new Error(response.error || `Schema not found: ${schemaId}`);
-        }
-
+      
+      // Fetch from API with cache disabled to get the latest schema
+      const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`, {
+        disableCache: true, // Always fetch fresh schema
+      });
+      
+      if (response.success && response.data) {
         schemaSource = response.data;
         await cacheSchemaClientSide(schemaSource, { queryClient, persist: false });
+      } else {
+        // Fallback to getInitialSchema if API fetch fails
+        if (getInitialSchema) {
+          try {
+            schemaSource = getInitialSchema(schemaId) ?? null;
+            if (schemaSource) {
+              loggingCustom(LogType.CLIENT_LOG, 'warn', `API fetch failed for schema ${schemaId}, using cached schema from getInitialSchema`);
+            }
+          } catch (error) {
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `getInitialSchema threw an error: ${error instanceof Error ? error.message : String(error)}`);
+            schemaSource = null;
+          }
+        }
+        
+        // If still no schema, throw error
+        if (!schemaSource) {
+          throw new Error(response.error || `Schema not found: ${schemaId}`);
+        }
       }
 
       const schemaCopy = JSON.parse(JSON.stringify(schemaSource));

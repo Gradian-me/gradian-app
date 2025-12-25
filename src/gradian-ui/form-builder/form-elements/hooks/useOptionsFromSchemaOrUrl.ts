@@ -170,9 +170,14 @@ export function useOptionsFromSchemaOrUrl({
   }, [sourceUrl, schemaId, enabled, queryParams, transform, sortType, filterByCompany, activeCompanyId, columnMap]);
 
   useEffect(() => {
+    // Only fetch if we have a valid sourceUrl or schemaId and fetching is enabled
+    // Important: This effect will trigger when sourceUrl changes from undefined/null to a valid URL
+    // This is crucial for reference-based filtering where the URL is built dynamically
     if ((sourceUrl || schemaId) && enabled) {
       void fetchOptions();
-    } else {
+    } else if (!sourceUrl && !schemaId) {
+      // Clear options only if we don't have any source (not just when disabled)
+      // This prevents clearing options when sourceUrl is temporarily undefined during context initialization
       setOptions([]);
       setError(null);
       setIsLoading(false);

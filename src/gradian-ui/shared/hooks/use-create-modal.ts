@@ -158,8 +158,11 @@ export function useCreateModal(
     setIsLoadingSchema(true);
     
     try {
-      // Fetch schema using React Query (will use cache if available)
-      const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);
+      // Always fetch fresh schema from API to ensure we have the latest schema definition
+      // This is especially important for nested modals where schemas might have been updated
+      const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`, {
+        disableCache: true, // Always fetch fresh schema
+      });
       
       if (!response.success || !response.data) {
         throw new Error(response.error || `Schema not found: ${schemaId}`);

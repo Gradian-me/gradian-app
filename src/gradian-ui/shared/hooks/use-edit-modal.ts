@@ -171,8 +171,11 @@ export function useEditModal(
     setIsLoading(true);
     
     try {
-      // Fetch schema using React Query (will use cache if available)
-      const schemaResponse = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);
+      // Always fetch fresh schema from API to ensure we have the latest schema definition
+      // This is especially important for nested modals where schemas might have been updated
+      const schemaResponse = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`, {
+        disableCache: true, // Always fetch fresh schema
+      });
       
       if (!schemaResponse.success || !schemaResponse.data) {
         throw new Error(schemaResponse.error || `Schema not found: ${schemaId}`);
