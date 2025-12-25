@@ -75,6 +75,48 @@ export function formatSearchResultsToToon(results: SearchResult[]): string {
 }
 
 /**
+ * Check if an error is a retryable timeout/connection error
+ */
+function isRetryableError(error: any): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  // Check for AbortController timeout
+  if (error.name === 'AbortError') {
+    return true;
+  }
+
+  // Check for connection timeout errors (UND_ERR_CONNECT_TIMEOUT)
+  const errorCode = (error as any).code;
+  const errorCause = (error as any).cause;
+  const causeCode = errorCause?.code;
+  const causeName = errorCause?.name;
+  const errorMessage = error.message?.toLowerCase() || '';
+  
+  const isConnectionTimeout = 
+    errorCode === 'UND_ERR_CONNECT_TIMEOUT' ||
+    errorCode === 'ETIMEDOUT' ||
+    causeCode === 'UND_ERR_CONNECT_TIMEOUT' ||
+    causeName === 'ConnectTimeoutError' ||
+    errorMessage.includes('connect timeout') ||
+    errorMessage.includes('connection timeout') ||
+    (errorMessage.includes('fetch failed') && (
+      causeCode === 'UND_ERR_CONNECT_TIMEOUT' ||
+      causeName === 'ConnectTimeoutError'
+    ));
+
+  return isConnectionTimeout;
+}
+
+/**
+ * Sleep utility for retry delays
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * Process search request
  */
 export async function processSearchRequest(
@@ -139,140 +181,209 @@ export async function processSearchRequest(
     // Track timing
     const startTime = Date.now();
 
-    // Performance: Use shared AbortController utility
-    const { controller, timeoutId } = createAbortController(60000); // 60 seconds timeout
-
-    try {
-      // Build request body (without search_tool_name, as it's in the URL)
-      const requestBody = {
-        query: sanitizedQuery,
-        max_results: maxResultsNum,
-      };
-
-      // Log request body
-      loggingCustom(
-        LogType.AI_BODY_LOG,
-        'info',
-        `Search Request to ${searchApiUrl}: ${JSON.stringify(requestBody, null, 2)}`
-      );
-
-      // Get API key
-      const apiKeyResult = getApiKey();
-      if (!apiKeyResult.key) {
-        return {
-          success: false,
-          error: apiKeyResult.error || 'LLM_API_KEY is not configured',
-        };
-      }
-
-      // Call Search API
-      const headers: HeadersInit = {
-        Authorization: `Bearer ${apiKeyResult.key}`,
-        'Content-Type': 'application/json',
-      };
-
-      const response = await fetch(searchApiUrl, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(requestBody),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        // Security: Use shared error parsing utility
-        const errorMessage = await parseErrorResponse(response);
-        
-        if (isDevelopment) {
-          console.error('Search API error:', errorMessage);
-        }
-
-        return {
-          success: false,
-          error: sanitizeErrorMessage(errorMessage, isDevelopment),
-        };
-      }
-
-      // Security: Use safe JSON parsing
-      const responseText = await response.text();
-      const parseResult = safeJsonParse(responseText);
-      
-      if (!parseResult.success || !parseResult.data) {
-        return {
-          success: false,
-          error: parseResult.error || 'Invalid response format from search service',
-        };
-      }
-
-      const data = parseResult.data as SearchApiResponse;
-
-      // Log the response structure in development for debugging
-      if (isDevelopment) {
-        console.log('Search API response structure:', JSON.stringify(data, null, 2).substring(0, 1000));
-      }
-
-      // Extract search results
-      const searchResults = data.results || [];
-
-      if (!Array.isArray(searchResults) || searchResults.length === 0) {
-        return {
-          success: false,
-          error: 'No search results returned',
-        };
-      }
-
-      // Format search results in TOON format
-      const toonFormatted = formatSearchResultsToToon(searchResults);
-
-      // Performance: Use shared timing utility
-      const timing = buildTimingInfo(startTime);
-
-      // Format response data for AiBuilderResponseData structure
-      const responseData = {
-        search: {
-          results: searchResults,
-          query: sanitizedQuery,
-          search_tool_name: searchToolName,
-          max_results: maxResultsNum,
-        },
-        toonFormatted, // Formatted results for appending to prompts
-        timing,
-      };
-
+    // Get API key
+    const apiKeyResult = getApiKey();
+    if (!apiKeyResult.key) {
       return {
-        success: true,
-        data: {
-          response: JSON.stringify(searchResults, null, 2), // Return search results as JSON string
-          format: 'search-card' as const, // Use search-card format for card-based search results
-          tokenUsage: null, // Search doesn't use tokens
-          timing,
-          agent: {
-            id: agent.id,
-            label: agent.label,
-            description: agent.description,
-            requiredOutputFormat: 'search-card' as const, // Search card format
-            nextAction: agent.nextAction,
-          },
-          searchResults: searchResults, // Pass raw results for component rendering
-        },
+        success: false,
+        error: apiKeyResult.error || 'LLM_API_KEY is not configured',
       };
-    } catch (fetchError) {
-      clearTimeout(timeoutId);
-
-      // Handle timeout errors
-      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        if (isDevelopment) {
-          console.error('Request timeout in search API:', fetchError);
-        }
-        return {
-          success: false,
-          error: sanitizeErrorMessage('Request timeout', isDevelopment),
-        };
-      }
-
-      throw fetchError;
     }
+
+    // Build request body (without search_tool_name, as it's in the URL)
+    const requestBody = {
+      query: sanitizedQuery,
+      max_results: maxResultsNum,
+    };
+
+    // Log request body
+    loggingCustom(
+      LogType.AI_BODY_LOG,
+      'info',
+      `Search Request to ${searchApiUrl}: ${JSON.stringify(requestBody, null, 2)}`
+    );
+
+    // Call Search API with retry logic
+    const headers: HeadersInit = {
+      Authorization: `Bearer ${apiKeyResult.key}`,
+      'Content-Type': 'application/json',
+    };
+
+    const maxRetries = 3;
+    let lastError: any = null;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      // Performance: Use shared AbortController utility for each attempt
+      const { controller, timeoutId } = createAbortController(60000); // 60 seconds timeout
+
+      try {
+        if (attempt > 0) {
+          // Exponential backoff: 1s, 2s, 4s
+          const delayMs = Math.pow(2, attempt - 1) * 1000;
+          if (isDevelopment) {
+            loggingCustom(
+              LogType.AI_BODY_LOG,
+              'info',
+              `Search API retry attempt ${attempt}/${maxRetries} after ${delayMs}ms delay`
+            );
+          }
+          await sleep(delayMs);
+        }
+
+        const response = await fetch(searchApiUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(requestBody),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          // Security: Use shared error parsing utility
+          const errorMessage = await parseErrorResponse(response);
+          
+          if (isDevelopment) {
+            console.error('Search API error:', errorMessage);
+          }
+
+          // Don't retry on non-timeout HTTP errors
+          return {
+            success: false,
+            error: sanitizeErrorMessage(errorMessage, isDevelopment),
+          };
+        }
+
+        // Security: Use safe JSON parsing
+        const responseText = await response.text();
+        const parseResult = safeJsonParse(responseText);
+        
+        if (!parseResult.success || !parseResult.data) {
+          // Don't retry on parsing errors
+          return {
+            success: false,
+            error: parseResult.error || 'Invalid response format from search service',
+          };
+        }
+
+        const data = parseResult.data as SearchApiResponse;
+
+        // Log the response structure in development for debugging
+        if (isDevelopment) {
+          console.log('Search API response structure:', JSON.stringify(data, null, 2).substring(0, 1000));
+        }
+
+        // Extract search results
+        const searchResults = data.results || [];
+
+        if (!Array.isArray(searchResults) || searchResults.length === 0) {
+          // Don't retry on empty results
+          return {
+            success: false,
+            error: 'No search results returned',
+          };
+        }
+
+        // Format search results in TOON format
+        const toonFormatted = formatSearchResultsToToon(searchResults);
+
+        // Performance: Use shared timing utility
+        const timing = buildTimingInfo(startTime);
+
+        // Format response data for AiBuilderResponseData structure
+        const responseData = {
+          search: {
+            results: searchResults,
+            query: sanitizedQuery,
+            search_tool_name: searchToolName,
+            max_results: maxResultsNum,
+          },
+          toonFormatted, // Formatted results for appending to prompts
+          timing,
+        };
+
+        return {
+          success: true,
+          data: {
+            response: JSON.stringify(searchResults, null, 2), // Return search results as JSON string
+            format: 'search-card' as const, // Use search-card format for card-based search results
+            tokenUsage: null, // Search doesn't use tokens
+            timing,
+            agent: {
+              id: agent.id,
+              label: agent.label,
+              description: agent.description,
+              requiredOutputFormat: 'search-card' as const, // Search card format
+              nextAction: agent.nextAction,
+            },
+            searchResults: searchResults, // Pass raw results for component rendering
+          },
+        };
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        lastError = fetchError;
+
+        // Check if this is a retryable error
+        if (isRetryableError(fetchError)) {
+          if (attempt < maxRetries) {
+            // Will retry in next iteration
+            if (isDevelopment) {
+              loggingCustom(
+                LogType.AI_BODY_LOG,
+                'warn',
+                `Search API timeout/connection error (attempt ${attempt + 1}/${maxRetries + 1}), will retry: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`
+              );
+            }
+            continue; // Retry
+          } else {
+            // Max retries reached
+            if (isDevelopment) {
+              console.error('Search API timeout after all retries:', fetchError);
+            }
+            return {
+              success: false,
+              error: sanitizeErrorMessage('Connection timeout - unable to reach search service after multiple attempts. Please try again later.', isDevelopment),
+            };
+          }
+        } else {
+          // Non-retryable error, return immediately
+          if (fetchError instanceof Error) {
+            // Check for other connection errors (but not timeout-related)
+            const errorMessage = fetchError.message?.toLowerCase() || '';
+            if (errorMessage.includes('fetch failed')) {
+              if (isDevelopment) {
+                console.error('Network error in search API:', fetchError);
+              }
+              return {
+                success: false,
+                error: sanitizeErrorMessage('Network error - unable to connect to search service. Please check your connection and try again.', isDevelopment),
+              };
+            }
+          }
+
+          // For other errors, return them instead of throwing
+          if (isDevelopment) {
+            console.error('Error in search request:', fetchError);
+          }
+          return {
+            success: false,
+            error: sanitizeErrorMessage(fetchError, isDevelopment),
+          };
+        }
+      }
+    }
+
+    // This should never be reached as all paths in the loop return
+    // But TypeScript requires a return here
+    return {
+      success: false,
+      error: sanitizeErrorMessage(
+        lastError ? 
+          (lastError instanceof Error ? lastError.message : String(lastError)) : 
+          'Unexpected error in search request',
+        isDevelopment
+      ),
+    };
   } catch (error) {
     if (isDevelopment) {
       console.error('Error in search request:', error);
