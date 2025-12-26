@@ -30,6 +30,8 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 import { truncateText } from '@/domains/chat/utils/text-utils';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
+import { detectMessageRenderType } from '@/domains/chat/utils/message-render-utils';
+import type { ChatMessage } from '@/domains/chat/types';
 
 interface AiBuilderResponseProps {
   response: string;
@@ -181,9 +183,9 @@ export function AiBuilderResponse({
     return state.responses[storageKey] || null;
   });
   
-    // Use stored content if available, otherwise use response
-    // For image-generator, graph-generator, and video-generator agents, always use the current response (don't use stored content)
-    const displayContent = useMemo(() => {
+  // Use stored content if available, otherwise use response
+  // For image-generator, graph-generator, and video-generator agents, always use the current response (don't use stored content)
+  const displayContent = useMemo(() => {
       // Skip using stored content for image/graph/video generators to avoid showing stale cached responses
       if (agent?.id === 'image-generator' || agent?.id === 'graph-generator' || agent?.id === 'video-generator' || 
           agentFormat === 'image' || agentFormat === 'graph' || agentFormat === 'video') {
@@ -195,6 +197,25 @@ export function AiBuilderResponse({
     }
     return (response && response.trim()) || '';
   }, [latestResponse, response, agent?.id, agentFormat]);
+
+  // Create a mock ChatMessage-like object for unified detection
+  const mockMessage: ChatMessage = useMemo(() => ({
+    id: 'ai-builder-response',
+    role: 'assistant',
+    content: displayContent || '',
+    agentId: agent?.id,
+    agentType: agent?.agentType || 'chat',
+    metadata: {
+      responseFormat: agentFormat === 'search-results' || agentFormat === 'search-card' 
+        ? 'search-card' 
+        : agentFormat,
+      searchResults: searchResults || undefined,
+    },
+    createdAt: new Date().toISOString(),
+  }), [displayContent, agent?.id, agent?.agentType, agentFormat, searchResults]);
+
+  // Use unified detection function
+  const renderData = useMemo(() => detectMessageRenderType(mockMessage), [mockMessage]);
   
   // Get store actions
   const saveResponse = useAiResponseStore((state) => state.saveResponse);
@@ -1213,12 +1234,18 @@ export function AiBuilderResponse({
                           ? `Gradian_Image_${imageTypeSuffix}_${timestamp}.png`
                           : `Gradian_Image_${timestamp}.png`;
                         
-                        if (imageData.b64_json) {
+                        const currentImageData = renderData.imageData || imageData || parallelImageData;
+                        
+                        if (!currentImageData) {
+                          return;
+                        }
+                        
+                        if (currentImageData.b64_json) {
                           // Handle base64 image
                           // Extract base64 string (remove data URL prefix if present)
-                          const base64String = imageData.b64_json.startsWith('data:image/')
-                            ? imageData.b64_json.split(',')[1] || imageData.b64_json
-                            : imageData.b64_json;
+                          const base64String = currentImageData.b64_json.startsWith('data:image/')
+                            ? currentImageData.b64_json.split(',')[1] || currentImageData.b64_json
+                            : currentImageData.b64_json;
                           
                           // Convert base64 to blob
                           const byteCharacters = atob(base64String);
@@ -1228,9 +1255,9 @@ export function AiBuilderResponse({
                           }
                           const byteArray = new Uint8Array(byteNumbers);
                           blob = new Blob([byteArray], { type: 'image/png' });
-                        } else if (imageData.url) {
+                        } else if (currentImageData?.url) {
                           // Handle URL image - fetch and convert to blob
-                          const response = await fetch(imageData.url);
+                          const response = await fetch(currentImageData.url);
                           blob = await response.blob();
                         } else {
                           return;
@@ -1262,17 +1289,18 @@ export function AiBuilderResponse({
                     onClick={() => {
                       try {
                         let imageUrl: string;
+                        const currentImageData = renderData.imageData || imageData || parallelImageData;
                         
-                        if (imageData.url) {
-                          imageUrl = imageData.url;
-                        } else if (imageData.b64_json) {
+                        if (currentImageData?.url) {
+                          imageUrl = currentImageData.url;
+                        } else if (currentImageData?.b64_json) {
                           // Convert base64 to data URL format: data:image/jpeg;base64,...
-                          if (imageData.b64_json.startsWith('data:image/')) {
+                          if (currentImageData.b64_json.startsWith('data:image/')) {
                             // Already has data URL prefix
-                            imageUrl = imageData.b64_json;
+                            imageUrl = currentImageData.b64_json;
                           } else {
                             // Add data URL prefix - use jpeg format as it works reliably
-                            imageUrl = `data:image/jpeg;base64,${imageData.b64_json}`;
+                            imageUrl = `data:image/jpeg;base64,${currentImageData.b64_json}`;
                           }
                         } else {
                           return;
@@ -1290,27 +1318,27 @@ export function AiBuilderResponse({
                     Open
                   </Button>
                   
-                  {imageData.url && <CopyContent content={imageData.url} />}
+                  {(renderData.imageData || imageData || parallelImageData)?.url && <CopyContent content={(renderData.imageData || imageData || parallelImageData)?.url || ''} />}
                 </div>
               </div>
               <div className="flex justify-center items-center w-full">
                 <div className="w-full max-w-4xl">
                   <ImageViewer
-                    sourceUrl={imageData.url || undefined}
-                    content={imageData.b64_json || undefined}
+                    sourceUrl={(renderData.imageData || imageData || parallelImageData)?.url || undefined}
+                    content={(renderData.imageData || imageData || parallelImageData)?.b64_json || undefined}
                     alt="AI Generated Image"
                     objectFit="contain"
                     className="w-full h-auto rounded-lg"
                   />
                 </div>
               </div>
-              {imageData.revised_prompt && (
+              {(renderData.imageData || imageData || parallelImageData)?.revised_prompt && (
                 <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
                   <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                     Revised Prompt:
                   </p>
                   <p className="text-sm text-gray-900 dark:text-gray-100">
-                    {imageData.revised_prompt}
+                    {(renderData.imageData || imageData || parallelImageData)?.revised_prompt}
                   </p>
                 </div>
               )}
@@ -1366,8 +1394,8 @@ export function AiBuilderResponse({
             />
           </div>
         )
-      ) : shouldRenderVideo ? (
-        videoData ? (
+      ) : renderData.type === 'video' || shouldRenderVideo ? (
+        (renderData.videoData || videoData) ? (
           <div className="space-y-4">
             <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -1381,7 +1409,7 @@ export function AiBuilderResponse({
                       variant="outline"
                       className="text-xs font-medium bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800"
                     >
-                      {videoData.model || agent?.model}
+                      {(renderData.videoData || videoData)?.model || agent?.model}
                     </Badge>
                   )}
                 </div>
@@ -1389,10 +1417,10 @@ export function AiBuilderResponse({
               <div className="flex justify-center items-center w-full">
                 <div className="w-full max-w-4xl">
                   <VideoViewer
-                    videoId={videoData.video_id || undefined}
-                    sourceUrl={videoData.url || undefined}
-                    content={videoData.file_path || undefined}
-                    value={videoData}
+                    videoId={(renderData.videoData || videoData)?.video_id || undefined}
+                    sourceUrl={(renderData.videoData || videoData)?.url || undefined}
+                    content={(renderData.videoData || videoData)?.file_path || undefined}
+                    value={renderData.videoData || videoData}
                     alt="AI Generated Video"
                     className="w-full h-auto rounded-lg"
                     controls={true}
@@ -1436,11 +1464,11 @@ export function AiBuilderResponse({
             />
           </div>
         )
-      ) : isSearchResultsFormat ? (
+      ) : renderData.type === 'search' || isSearchResultsFormat ? (
         // Show search results if available, otherwise show empty state
-        searchResults && searchResults.length > 0 ? (
+        (renderData.searchResults || searchResults) && (renderData.searchResults || searchResults)!.length > 0 ? (
           <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
-            <AISearchResults results={searchResults} />
+            <AISearchResults results={renderData.searchResults || searchResults || []} />
           </div>
         ) : (
           <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
@@ -1449,13 +1477,13 @@ export function AiBuilderResponse({
             </p>
           </div>
         )
-      ) : shouldRenderTable && isValidTable && tableData.length > 0 ? (
+      ) : renderData.type === 'table' || (shouldRenderTable && isValidTable && tableData.length > 0) ? (
         <div className="space-y-4">
           <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
             <TableWrapper
               tableConfig={tableConfig}
               columns={tableColumns}
-              data={tableData}
+              data={renderData.tableData && Array.isArray(renderData.tableData) ? renderData.tableData : tableData}
               showCards={false}
               disableAnimation={false}
             />
@@ -1474,8 +1502,8 @@ export function AiBuilderResponse({
             </div>
           </details>
         </div>
-      ) : shouldRenderGraph ? (
-        actualGraphData ? (
+      ) : renderData.type === 'graph' || shouldRenderGraph ? (
+        (renderData.graphData || actualGraphData) ? (
           <div className="space-y-4">
             <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -1497,11 +1525,11 @@ export function AiBuilderResponse({
               <div className="w-full h-[600px] min-h-[400px] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
                 <GraphViewer
                   data={{
-                    nodes: actualGraphData.nodes || [],
-                    edges: actualGraphData.edges || [],
-                    nodeTypes: actualGraphData.nodeTypes,
-                    relationTypes: actualGraphData.relationTypes,
-                    schemas: actualGraphData.schemas,
+                    nodes: (renderData.graphData || actualGraphData)?.nodes || [],
+                    edges: (renderData.graphData || actualGraphData)?.edges || [],
+                    nodeTypes: (renderData.graphData || actualGraphData)?.nodeTypes,
+                    relationTypes: (renderData.graphData || actualGraphData)?.relationTypes,
+                    schemas: (renderData.graphData || actualGraphData)?.schemas,
                   }}
                   height="100%"
                 />

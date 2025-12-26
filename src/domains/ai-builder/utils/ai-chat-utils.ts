@@ -414,6 +414,37 @@ export async function processChatRequest(
     // Extract bodyParams from requestData if available (for direct API calls)
     const bodyParams = requestData.body || {};
     
+    // Append option descriptions to userPrompt when bodyParams contain option values
+    // This ensures option descriptions are in the userPrompt (like AiBuilderForm does)
+    // not just in the system prompt
+    if (bodyParams && Object.keys(bodyParams).length > 0 && agent.renderComponents) {
+      const optionDescriptionsParts: string[] = [];
+      
+      agent.renderComponents.forEach((field: any) => {
+        const fieldName = field.name || field.id;
+        const fieldValue = bodyParams[fieldName];
+        
+        if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
+          // For select fields, find the option and append its description
+          if (field.component === 'select' && field.options) {
+            const option = field.options.find(
+              (opt: any) => opt.id === fieldValue || opt.value === fieldValue
+            );
+            
+            if (option?.description) {
+              const fieldLabel = field.label || fieldName;
+              optionDescriptionsParts.push(`${fieldLabel} (${option.label || fieldValue}):\n${option.description}`);
+            }
+          }
+        }
+      });
+      
+      // Append option descriptions to userPrompt if any were found
+      if (optionDescriptionsParts.length > 0) {
+        userPrompt = `${userPrompt}\n\n${optionDescriptionsParts.join('\n\n')}`;
+      }
+    }
+    
     // Build system prompt using centralized utility (handles preload routes internally)
     const { systemPrompt } = await buildSystemPrompt({
       agent,

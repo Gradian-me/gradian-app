@@ -29,6 +29,9 @@ export interface SearchResult {
   url: string;
   snippet: string;
   date?: string;
+  source_host?: string; // Extracted from URL
+  source_title?: string; // Same as title, for consistency
+  source_link?: string; // Same as url, for consistency
 }
 
 /**
@@ -40,6 +43,21 @@ export interface SearchApiResponse {
 }
 
 /**
+ * Extract host from URL
+ */
+function extractHostFromUrl(url: string): string {
+  if (!url) return '';
+  try {
+    const urlObj = new URL(url);
+    return urlObj.hostname.replace('www.', '');
+  } catch {
+    // If URL parsing fails, try to extract hostname manually
+    const match = url.match(/https?:\/\/(?:www\.)?([^\/]+)/);
+    return match ? match[1] : '';
+  }
+}
+
+/**
  * Format search results in TOON format for appending to prompts
  */
 export function formatSearchResultsToToon(results: SearchResult[]): string {
@@ -47,21 +65,36 @@ export function formatSearchResultsToToon(results: SearchResult[]): string {
     return '';
   }
 
-  // Format each result as: [title] + snippet
-  const formattedResults = results.map((result) => ({
-    title: result.title || '',
-    snippet: result.snippet || '',
-    url: result.url || '',
-    date: result.date || '',
-  }));
+  // Format each result with source_host, source_title, source_link, and snippet
+  const formattedResults = results.map((result) => {
+    const sourceHost = result.source_host || extractHostFromUrl(result.url || '');
+    const sourceTitle = result.source_title || result.title || '';
+    const sourceLink = result.source_link || result.url || '';
+    
+    return {
+      source_host: sourceHost,
+      source_title: sourceTitle,
+      source_link: sourceLink,
+      snippet: result.snippet || '',
+      title: result.title || '', // Keep for backward compatibility
+      url: result.url || '', // Keep for backward compatibility
+      date: result.date || '',
+    };
+  });
 
-  // Use TOON format with title and snippet fields
-  const toonResult = formatToToon('search-results', formattedResults, ['title', 'snippet']);
+  // Use TOON format with source_host, source_title, source_link, and snippet fields
+  const toonResult = formatToToon('search-results', formattedResults, ['source_host', 'source_title', 'source_link', 'snippet']);
 
   if (!toonResult) {
     // Fallback: manual formatting
     const parts = formattedResults.map((result) => {
-      let formatted = `[${result.title}]`;
+      let formatted = `**${result.source_title}**\n`;
+      if (result.source_host) {
+        formatted += `Source: ${result.source_host}\n`;
+      }
+      if (result.source_link) {
+        formatted += `Link: ${result.source_link}\n`;
+      }
       if (result.snippet) {
         formatted += `\n${result.snippet}`;
       }
@@ -70,8 +103,11 @@ export function formatSearchResultsToToon(results: SearchResult[]): string {
     return parts.join('\n\n---\n\n');
   }
 
-  // Add divider between results
-  return toonResult.replace(/\n\n/g, '\n\n---\n\n');
+  // Add title and divider before search results
+  const title = '## Search Results\n\n';
+  const divider = '\n\n---\n\n';
+  
+  return title + toonResult.replace(/\n\n/g, divider);
 }
 
 /**
@@ -274,15 +310,23 @@ export async function processSearchRequest(
         }
 
         // Extract search results
-        const searchResults = data.results || [];
+        const rawSearchResults = data.results || [];
 
-        if (!Array.isArray(searchResults) || searchResults.length === 0) {
+        if (!Array.isArray(rawSearchResults) || rawSearchResults.length === 0) {
           // Don't retry on empty results
           return {
             success: false,
             error: 'No search results returned',
           };
         }
+
+        // Enrich search results with source metadata
+        const searchResults: SearchResult[] = rawSearchResults.map((result) => ({
+          ...result,
+          source_host: result.source_host || extractHostFromUrl(result.url || ''),
+          source_title: result.source_title || result.title || '',
+          source_link: result.source_link || result.url || '',
+        }));
 
         // Format search results in TOON format
         const toonFormatted = formatSearchResultsToToon(searchResults);

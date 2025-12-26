@@ -21,7 +21,7 @@ export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
   agentId?: string; // Which agent processed this
-  agentType?: 'chat' | 'orchestrator' | 'image-generation' | 'voice-transcription' | 'video-generation';
+  agentType?: 'chat' | 'orchestrator' | 'image-generation' | 'voice-transcription' | 'video-generation' | 'graph-generation' | 'search';
   hashtags?: string[]; // Array of hashtags extracted from content
   mentions?: string[]; // Array of mentioned agent IDs
   metadata?: ChatMessageMetadata;
@@ -31,7 +31,7 @@ export interface ChatMessage {
 export interface ChatMessageMetadata {
   todos?: Todo[];
   tokenUsage?: TokenUsage;
-  responseFormat?: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph';
+  responseFormat?: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph' | 'search-card' | 'search-results';
   isThinking?: boolean;
   complexity?: number; // Complexity score (0.0-1.0) from orchestrator analysis
   todoId?: string; // ID of the todo that generated this response
@@ -39,6 +39,15 @@ export interface ChatMessageMetadata {
   duration?: number; // Duration in milliseconds
   cost?: number; // Cost in currency (e.g., USD)
   executionType?: 'direct' | 'todo_required' | 'chain_executed'; // Execution type from orchestrator
+  searchResults?: Array<{
+    title: string;
+    url: string;
+    snippet: string;
+    date?: string;
+    source_host?: string;
+    source_title?: string;
+    source_link?: string;
+  }>; // Search results for search agents
 }
 
 export interface Todo {

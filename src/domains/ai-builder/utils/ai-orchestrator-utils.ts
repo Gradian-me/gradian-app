@@ -19,6 +19,46 @@ let agentsCacheTime: number = 0;
 const AGENTS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /**
+ * Retry utility function with exponential backoff
+ * @param fn Function to retry
+ * @param maxRetries Maximum number of retries (default: 3)
+ * @param initialDelay Initial delay in ms (default: 1000)
+ * @returns Result of the function
+ */
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  initialDelay: number = 1000
+): Promise<T> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      
+      // If it's the last attempt, throw the error
+      if (attempt === maxRetries) {
+        throw lastError;
+      }
+      
+      // Calculate exponential backoff delay: initialDelay * 2^attempt
+      const delay = initialDelay * Math.pow(2, attempt);
+      
+      // Log retry attempt
+      console.warn(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms. Error: ${lastError.message}`);
+      
+      // Wait before retrying
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  // This should never be reached, but TypeScript needs it
+  throw lastError || new Error('Retry failed');
+}
+
+/**
  * Load AI agents from JSON file with caching
  */
 function loadAiAgents(): any[] {
@@ -498,18 +538,67 @@ KEYWORD DETECTION RULES (PRIORITY ORDER - CHECK IN THIS ORDER):
 PARAMETER EXTRACTION:
 - Analyze the user request carefully to identify which parameters should be set
 - For each agent's formFields, determine if the user's request implies specific values
-- Extract values from the user prompt that match field names or options
+- Extract values from the user prompt that match field names, labels, placeholders, or descriptions
 - Set parameters in the "input" field structure:
   * Fields with sectionId "body" → go in "input.body"
   * Fields with sectionId "extra" → go in "input.extra_body"
   * Use the field "name" (not "id") as the key in the input object
   * For select fields, use the option "id" value (not the label)
+  * For text/textarea fields, extract relevant text from the user prompt that matches the field's purpose
+  * Match field labels, placeholders, and descriptions to user intent (e.g., if field label is "Process Description" and user says "analyze this process", extract the process description)
+
+FIELD DETECTION RULES:
+- **Text/Textarea Fields**: Look for fields that match the main content of the user's request:
+  * Common field names: "prompt", "userPrompt", "description", "content", "text", "input", "query", "question"
+  * Process-related: "processDescription", "processSteps", "processChallenges", "workflowDescription"
+  * Analysis-related: "incidentDescription", "codeInput", "dataInput", "analysisRequest"
+  * Creative: "imageDescription", "graphDescription", "presentationTopic", "documentContent"
+  * Improvement: "pointsToImprove", "areasToEnhance", "feedback"
+  * Match field labels, placeholders, and descriptions to extract appropriate values from user prompt
+- **Select Fields**: Match user intent to available options:
+  * Look for keywords in user prompt that match option labels
+  * Use the option "id" value (not label) in the input
+  * If user intent is unclear, choose the most appropriate default option
+- **Checkbox/Radio Fields**: Set boolean or option values based on user intent
+- **If field purpose is unclear**: Extract text from user prompt that seems most relevant to the field's label/description
 
 DEPENDENCY-DRIVEN PARAMETERS (AUTO-FILL FROM PREVIOUS TODO OUTPUT):
-- For text/textarea fields whose name suggests the main prompt (e.g., "prompt", "userPrompt", "processDescription", "processSteps", "processChallenges", "pointsToImprove", "presentationTopic", "incidentDescription", "codeInput", "description", "imageDescription", "graphDescription", or other user-facing text fields):
-  * If the todo depends on a previous step and should consume the previous output, set the value to the object {"__fromDependency": true, "source": "previous-output"} instead of hardcoding user text.
-  * Use this especially for downstream steps in a chain so the UI switch is ON by default and the value is hydrated at execution time with the prior todo's output.
-  * If the step must use fresh user-provided text (e.g., first todo, or explicitly different input), set the explicit text value instead.
+**CRITICAL: You MUST determine when a todo should use previous output vs fresh user input.**
+
+**When to Use Previous Output ({"__fromDependency": true, "source": "previous-output"}):**
+- **ALWAYS use for todos that have dependencies** (except the first todo in the chain)
+- **Use when the todo is clearly a continuation or processing of previous output**, such as:
+  * Second todo that processes/transforms output from first todo
+  * Analysis of previous step's output
+  * Translation/summarization of previous content
+  * Enhancement/improvement of previous output
+  * Format conversion (e.g., text → image, text → graph)
+  * Any step that builds upon or uses previous step's result
+- **Field names that typically use previous output** (when todo has dependencies):
+  * "prompt", "userPrompt", "description", "content", "text", "input", "query"
+  * "processDescription", "processSteps", "codeInput", "incidentDescription"
+  * "imageDescription", "graphDescription", "documentContent"
+  * Any text/textarea field that represents the main input for the agent
+- **Detection logic**:
+  1. If todo has dependencies (not the first todo) AND the field is a main input field (text/textarea)
+  2. AND the user request suggests processing/transforming previous output
+  3. THEN use {"__fromDependency": true, "source": "previous-output"}
+  4. Example: "translate the summary" → second todo uses previous output for "userPrompt" field
+
+**When to Use Fresh User Input (explicit text value):**
+- **ALWAYS use for the FIRST todo** in the chain (no dependencies)
+- **Use when user explicitly provides new/different input** for that step
+- **Use when the step requires specific user-provided information** that's different from previous output
+- **Use when user mentions specific details** that should override previous output
+- Example: First todo always uses user's original prompt; subsequent todos use previous output unless user specifies otherwise
+
+**Decision Process:**
+1. Check if todo has dependencies (if not, use fresh input)
+2. Identify the main input field(s) for the agent (usually text/textarea fields)
+3. Analyze user request: Does it suggest processing previous output or using new input?
+4. If processing previous output → use {"__fromDependency": true, "source": "previous-output"}
+5. If using new input → extract and use explicit text from user prompt
+6. For non-main fields (selects, checkboxes, etc.), always extract from user prompt or use defaults
 
 Create a JSON array of todos:
 [
@@ -673,7 +762,89 @@ Each todo (except the first) MUST have dependencies set to the previous todo's I
 - "review this code" → code-review-agent
 - "create employee KPIs" → performance-manager
 - "analyze this data table" → data-analysis-expert
-- "create a schema for products" → app-builder`),
+- "create a schema for products" → app-builder
+
+### 6. PARAMETER EXTRACTION AND FIELD DETECTION
+
+**CRITICAL: You MUST extract appropriate parameter values from the user request and populate agent formFields correctly.**
+
+#### A. FIELD DETECTION PROCESS
+
+1. **Examine Agent formFields**: Each agent has formFields (body and extra_body sections) that define configurable parameters
+2. **Match User Intent to Fields**: 
+   - Read field labels, placeholders, and descriptions
+   - Match user's request content to appropriate fields
+   - Extract relevant text/values from user prompt
+3. **Field Types**:
+   - **Text/Textarea**: Extract text from user prompt that matches field purpose
+   - **Select**: Match user keywords to option labels, use option "id" value
+   - **Checkbox/Radio**: Set boolean or option values based on user intent
+
+#### B. COMMON FIELD NAMES TO DETECT
+
+**Main Input Fields** (usually text/textarea):
+- "prompt", "userPrompt", "description", "content", "text", "input", "query", "question"
+- "processDescription", "processSteps", "processChallenges", "workflowDescription"
+- "incidentDescription", "codeInput", "dataInput", "analysisRequest"
+- "imageDescription", "graphDescription", "presentationTopic", "documentContent"
+- "pointsToImprove", "areasToEnhance", "feedback"
+
+**Configuration Fields** (usually select):
+- "imageType", "writingStyle", "language", "format", "type", "style"
+- Match user keywords to available options
+
+#### C. DEPENDENCY-DRIVEN PARAMETERS (CRITICAL)
+
+**When to Use Previous Output** ({"__fromDependency": true, "source": "previous-output"}):
+- **ALWAYS for todos with dependencies** (except first todo)
+- **When todo processes/transforms previous output**:
+  * Translation, summarization, enhancement of previous content
+  * Format conversion (text → image, text → graph)
+  * Analysis of previous step's output
+  * Any continuation or building upon previous result
+- **For main input fields** (text/textarea) in dependent todos
+- **Example**: Todo 1 generates text → Todo 2 translates it → Todo 2's "userPrompt" field uses previous output
+
+**When to Use Fresh User Input** (explicit text value):
+- **ALWAYS for FIRST todo** (no dependencies)
+- **When user provides specific new input** for that step
+- **When step requires different information** than previous output
+- **Example**: First todo always uses user's original prompt text
+
+**Decision Algorithm**:
+1. Is this the first todo? → Use fresh user input
+2. Does todo have dependencies? → Check step 3
+3. Is the field a main input field (text/textarea)? → Check step 4
+4. Does user request suggest processing previous output? → Use {"__fromDependency": true, "source": "previous-output"}
+5. Otherwise → Extract explicit text from user prompt
+
+#### D. PARAMETER EXTRACTION EXAMPLES
+
+**Example 1**: User says "summarize this document about quality control"
+- Agent: professional-writing
+- Field: "userPrompt" → Extract: "this document about quality control"
+- Field: "writingStyle" → Set: "summarizer" (from keyword "summarize")
+
+**Example 2**: User says "create a sketch of a pharmaceutical lab"
+- Agent: image-generator
+- Field: "imageDescription" → Extract: "a pharmaceutical lab"
+- Field: "imageType" → Set: "sketch" (from keyword "sketch")
+
+**Example 3**: Two-step chain - "analyze this process, then create a graph"
+- Todo 1: process-analyst, "processDescription": "this process" (fresh input)
+- Todo 2: graph-generator, "graphDescription": {"__fromDependency": true, "source": "previous-output"} (uses Todo 1 output)
+
+**Example 4**: Two-step chain - "translate this text to Spanish, then summarize it"
+- Todo 1: professional-writing, "userPrompt": "this text", "writingStyle": "translate", "targetLanguage": "Spanish"
+- Todo 2: professional-writing, "userPrompt": {"__fromDependency": true, "source": "previous-output"}, "writingStyle": "summarizer"
+
+### 7. CRITICAL REMINDERS
+
+- **ALWAYS populate "input" field** when agent has formFields
+- **ALWAYS use field "name"** (not "id") as the key in input.body or input.extra_body
+- **ALWAYS check field labels/descriptions** to understand what to extract
+- **ALWAYS use {"__fromDependency": true}** for dependent todos' main input fields (unless user specifies otherwise)
+- **ALWAYS extract from user prompt** for first todo and when user provides specific input`),
     },
     {
       role: 'user' as const,
@@ -682,7 +853,8 @@ Each todo (except the first) MUST have dependencies set to the previous todo's I
   ];
 
   const apiUrl = getApiUrlForAgentType('chat');
-  const { controller, timeoutId } = createAbortController(30000);
+  // Increased timeout to 45 seconds to reduce timeout errors
+  const { controller, timeoutId } = createAbortController(45000);
 
   try {
     const response = await fetch(apiUrl, {
@@ -870,7 +1042,7 @@ Each todo (except the first) MUST have dependencies set to the previous todo's I
     return processedTodos;
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Todo generation timeout');
+      throw new Error('Todo generation timeout after 45 seconds');
     }
     throw error;
   }
@@ -886,7 +1058,10 @@ async function executeAgentChain(
   baseUrl?: string
 ): Promise<{ todos: Todo[]; finalOutput: any }> {
   let currentInput = initialInput;
-  const completedTodos = new Set<string>();
+  // Initialize completedTodos with todos that are already completed
+  const completedTodos = new Set<string>(
+    todos.filter(t => t.status === 'completed').map(t => t.id)
+  );
 
   // Validate all dependencies exist before execution
   const validateDependencies = () => {
@@ -917,18 +1092,18 @@ async function executeAgentChain(
       const unmetDeps: string[] = [];
       
       for (const dep of todo.dependencies) {
-        // Check if dependency is completed by ID
-        if (completedTodos.has(dep)) {
+        // Find the dependency todo by ID (most common) or by title
+        const depTodo = todos.find(t => t.id === dep) || todos.find(t => t.title === dep);
+        
+        if (depTodo) {
+          // Check if dependency is completed (either in current execution or from previous execution)
+          const isCompleted = completedTodos.has(depTodo.id) || depTodo.status === 'completed';
+          if (isCompleted) {
           continue; // Dependency is met
+          }
         }
         
-        // Check if any todo with matching ID or title is completed
-        const depTodo = todos.find(t => (t.id === dep || t.title === dep));
-        if (depTodo && completedTodos.has(depTodo.id)) {
-          continue; // Dependency is met
-        }
-        
-        // Dependency is unmet
+        // Dependency is unmet (either not found or not completed)
         unmetDeps.push(dep);
       }
       
@@ -1174,11 +1349,16 @@ I'm here to help once I understand how to best assist you with the available too
     // Generate todos if needed
     let todos: Todo[] = [];
     if (analysis.needsTodos || analysis.complexity >= complexityThreshold) {
-      todos = await generateTodoList(
+      // Retry todo generation up to 3 times with exponential backoff
+      todos = await retryWithBackoff(
+        () => generateTodoList(
         userPrompt,
         analysis.suggestedAgents,
         availableAgents,
         orchestratorAgent.systemPrompt
+        ),
+        3, // max retries
+        2000 // initial delay: 2 seconds (will be 2s, 4s, 8s for retries)
       );
     }
 

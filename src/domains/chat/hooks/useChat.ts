@@ -3,10 +3,14 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, startTransition, useMemo } from 'react';
 import { useUserStore } from '@/stores/user.store';
 import { extractHashtags, extractMentions } from '../utils/text-utils';
+import { REQUIRE_LOGIN, DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import type { Chat, ChatMessage, AddMessageRequest, Todo } from '../types';
+
+// Hardcoded demo userId for when REQUIRE_LOGIN is false and DEMO_MODE is true
+const DEMO_USER_ID = '01K9ABA6MQ9K64MY7M4AEBCAP2';
 
 // Ensure unique messages by id while preserving order (earlier entries first)
 const dedupeMessagesById = (items: ChatMessage[]): ChatMessage[] => {
@@ -67,7 +71,15 @@ export function useChat(): UseChatResult {
   const abortControllerRef = useRef<AbortController | null>(null);
   const thinkingMessageIdRef = useRef<string | null>(null);
   
-  const userId = useUserStore((state) => state.getUserId());
+  const userStoreUserId = useUserStore((state) => state.getUserId());
+  
+  // Use hardcoded demo userId when REQUIRE_LOGIN is false and DEMO_MODE is true
+  const userId = useMemo(() => {
+    if (!REQUIRE_LOGIN && DEMO_MODE) {
+      return DEMO_USER_ID;
+    }
+    return userStoreUserId;
+  }, [userStoreUserId]);
 
   // Load chats for current user (summary mode for better performance)
   const refreshChats = useCallback(async (useSummary: boolean = true) => {
@@ -212,8 +224,13 @@ export function useChat(): UseChatResult {
 
   // Create new chat
   const createNewChat = useCallback(async (): Promise<Chat | null> => {
+    // userId is already computed to use DEMO_USER_ID when REQUIRE_LOGIN is false and DEMO_MODE is true
+    // Only show error if userId is still null (shouldn't happen in demo mode)
     if (!userId) {
-      setError('User not logged in');
+      // Only show error if REQUIRE_LOGIN is true or DEMO_MODE is false
+      if (REQUIRE_LOGIN || !DEMO_MODE) {
+        setError('User not logged in');
+      }
       return null;
     }
 
@@ -268,8 +285,10 @@ export function useChat(): UseChatResult {
 
     // Remove thinking message if present
     if (thinkingMessageIdRef.current) {
-      setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageIdRef.current));
-      thinkingMessageIdRef.current = null;
+      startTransition(() => {
+        setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageIdRef.current));
+        thinkingMessageIdRef.current = null;
+      });
     }
 
     // Reset states
@@ -311,33 +330,21 @@ export function useChat(): UseChatResult {
       const mentions = extractMentions(content);
       
       // Add user message first - optimistically add to UI immediately
-      const userMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          role: 'user',
-          content: content.trim(),
-          hashtags: hashtags.length > 0 ? hashtags : undefined,
-          mentions: mentions.length > 0 ? mentions : undefined,
-        }),
-        signal: abortController.signal,
-      });
+      // Create optimistic user message for immediate UI update
+      // Use a predictable ID format that can be updated in place
+      const optimisticId = `user-${Date.now()}`;
+      const optimisticUserMessage: ChatMessage = {
+        id: optimisticId,
+        role: 'user',
+        content: content.trim(),
+        createdAt: new Date().toISOString(),
+        hashtags: hashtags,
+        mentions: mentions,
+      };
 
-      // Check if aborted
-      if (abortController.signal.aborted) {
-        return;
-      }
-
-      const userMessageResult = await userMessageResponse.json();
-
-      if (!userMessageResult.success) {
-        setError(userMessageResult.error || 'Failed to send message');
-        return;
-      }
-
-      // Optimistically add user message to UI immediately
-      if (userMessageResult.success && userMessageResult.data) {
-        setMessages((prev) => [...prev, userMessageResult.data]);
+      // Add optimistic message to UI immediately - use startTransition to batch updates
+      startTransition(() => {
+        setMessages((prev) => [...prev, optimisticUserMessage]);
         // Update chat list item without full refresh
         setChats((prev) => {
           const filtered = prev.filter((chat) => chat.id !== currentChat.id);
@@ -351,6 +358,128 @@ export function useChat(): UseChatResult {
             },
             ...filtered,
           ];
+        });
+      });
+
+      // Now send to API
+      let userMessageResponse: Response;
+      try {
+        userMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          role: 'user',
+          content: content.trim(),
+          hashtags: hashtags.length > 0 ? hashtags : undefined,
+          mentions: mentions.length > 0 ? mentions : undefined,
+        }),
+        signal: abortController.signal,
+      });
+      } catch (fetchError) {
+        // Network error or abort
+        if (abortController.signal.aborted) {
+          // Remove optimistic message if aborted - use startTransition to batch updates
+          startTransition(() => {
+            setMessages((prev) => {
+              const index = prev.findIndex((msg) => msg.id === optimisticUserMessage.id);
+              if (index !== -1) {
+                const updated = [...prev];
+                updated.splice(index, 1);
+                return updated;
+              }
+              return prev;
+            });
+          });
+          return;
+        }
+        setError(fetchError instanceof Error ? fetchError.message : 'Network error - failed to send message');
+        return;
+      }
+
+      // Check if aborted
+      if (abortController.signal.aborted) {
+        // Remove optimistic message if aborted - use startTransition to batch updates
+        startTransition(() => {
+          setMessages((prev) => {
+            const index = prev.findIndex((msg) => msg.id === optimisticUserMessage.id);
+            if (index !== -1) {
+              const updated = [...prev];
+              updated.splice(index, 1);
+              return updated;
+            }
+            return prev;
+          });
+        });
+        return;
+      }
+
+      // Check response status and content type
+      if (!userMessageResponse.ok) {
+        const contentType = userMessageResponse.headers.get('content-type');
+        let errorMessage = 'Failed to send message';
+        
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const errorData = await userMessageResponse.json();
+            errorMessage = errorData.error || errorData.message || `Server error: ${userMessageResponse.status}`;
+          } catch {
+            errorMessage = `Server error: ${userMessageResponse.status} ${userMessageResponse.statusText}`;
+          }
+        } else {
+          // Response is HTML (error page), not JSON
+          const errorText = await userMessageResponse.text();
+          errorMessage = `Server error: ${userMessageResponse.status} ${userMessageResponse.statusText}`;
+          console.error('Non-JSON response from API:', errorText.substring(0, 200));
+        }
+        
+        setError(errorMessage);
+        // Keep optimistic message but mark it as failed
+        return;
+      }
+
+      // Parse JSON response
+      const contentType = userMessageResponse.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const errorText = await userMessageResponse.text();
+        console.error('Non-JSON response from API:', errorText.substring(0, 200));
+        setError('Server returned invalid response format');
+        return;
+      }
+
+      let userMessageResult: any;
+      try {
+        userMessageResult = await userMessageResponse.json();
+      } catch (parseError) {
+        console.error('Failed to parse JSON response:', parseError);
+        setError('Failed to parse server response');
+        return;
+      }
+
+      if (!userMessageResult.success) {
+        setError(userMessageResult.error || 'Failed to send message');
+        return;
+      }
+
+      // Update optimistic message with server data, keeping the same ID to avoid DOM reconciliation issues
+      if (userMessageResult.success && userMessageResult.data) {
+        startTransition(() => {
+          setMessages((prev) => {
+            // Find the optimistic message and merge server data into it
+            const optimisticIndex = prev.findIndex((msg) => msg.id === optimisticUserMessage.id);
+            if (optimisticIndex !== -1) {
+              // Merge server data into optimistic message, keeping the same ID and position
+              // This prevents React from treating it as a new component
+              const updated = [...prev];
+              updated[optimisticIndex] = {
+                ...userMessageResult.data,
+                id: optimisticUserMessage.id, // Keep the same ID to maintain DOM stability
+              };
+              return updated;
+            } else {
+              // Fallback: if optimistic message not found, just add the real one
+              return [...prev, userMessageResult.data];
+            }
+          });
         });
       }
 
@@ -367,11 +496,13 @@ export function useChat(): UseChatResult {
           isThinking: true,
         },
       };
-      setMessages((prev) => [...prev, thinkingMessage]);
-      setMessagesPagination((prev) => ({
-        ...prev,
-        totalMessages: prev.totalMessages + 1,
-      }));
+      startTransition(() => {
+        setMessages((prev) => [...prev, thinkingMessage]);
+        setMessagesPagination((prev) => ({
+          ...prev,
+          totalMessages: prev.totalMessages + 1,
+        }));
+      });
 
       // Determine which API to call
       // Use orchestrator if no agent is selected, or if explicitly orchestrator
@@ -412,12 +543,14 @@ export function useChat(): UseChatResult {
       if (!aiResult.success) {
         setError(aiResult.error || 'Failed to get AI response');
         // Remove thinking message on error
-        setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageId));
-        setMessagesPagination((prev) => ({
-          ...prev,
-          totalMessages: Math.max(0, prev.totalMessages - 1),
-        }));
-        thinkingMessageIdRef.current = null;
+        startTransition(() => {
+          setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageId));
+          setMessagesPagination((prev) => ({
+            ...prev,
+            totalMessages: Math.max(0, prev.totalMessages - 1),
+          }));
+          thinkingMessageIdRef.current = null;
+        });
         setIsLoading(false);
         setIsActive(false);
         abortControllerRef.current = null;
@@ -440,9 +573,24 @@ export function useChat(): UseChatResult {
               // Get the actual agent used (not orchestrator)
               const actualAgentId = responseData.agentUsed || agentId || 'orchestrator';
               
+              // Determine agentType from responseData or agentId
+              // Check if it's a search agent by agentId or response format
+              const isSearchAgent = actualAgentId === 'search' || 
+                                   responseData.format === 'search-card' || 
+                                   responseData.format === 'search-results' ||
+                                   responseData.searchResults !== undefined;
+              const determinedAgentType = isSearchAgent ? 'search' : (agentType || 'chat');
+              
               // Extract timing and cost from response
               const duration = responseData.timing?.duration || responseData.timing?.responseTime || null;
               const cost = responseData.tokenUsage?.pricing?.total_cost || null;
+
+              // Extract search results if available (check multiple possible locations)
+              const searchResults = responseData.searchResults || 
+                                   responseData.data?.searchResults ||
+                                   responseData.data?.search?.results ||
+                                   (Array.isArray(responseData.data) && (responseData.format === 'search-card' || responseData.format === 'search-results') ? responseData.data : null) ||
+                                   (Array.isArray(responseData.search?.results) ? responseData.search.results : null);
 
               // Add direct response message
               const messageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
@@ -452,7 +600,7 @@ export function useChat(): UseChatResult {
                   role: 'assistant',
                   content: responseContent,
                   agentId: actualAgentId,
-                  agentType: 'chat', // Will be determined from agent config if needed
+                  agentType: determinedAgentType,
                   hashtags: hashtags.length > 0 ? hashtags : undefined,
                   mentions: mentions.length > 0 ? mentions : undefined,
                   metadata: {
@@ -462,6 +610,9 @@ export function useChat(): UseChatResult {
                     duration: duration,
                     cost: cost,
                     responseFormat: responseData.format || 'string',
+                    ...(searchResults && Array.isArray(searchResults) && searchResults.length > 0 
+                      ? { searchResults: searchResults } 
+                      : {}),
                   },
                 }),
                 signal: abortController.signal,
@@ -476,21 +627,23 @@ export function useChat(): UseChatResult {
                 const messageResult = await messageResponse.json();
                 if (messageResult.success) {
                   // Remove thinking message and add actual response
-                  setMessages((prev) => {
-                    const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
-                    return [...withoutThinking, messageResult.data];
+                  startTransition(() => {
+                    setMessages((prev) => {
+                      const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
+                      return [...withoutThinking, messageResult.data];
+                    });
+                    setMessagesPagination((prev) => ({
+                      ...prev,
+                      totalMessages: prev.totalMessages + (thinkingMessageId ? 0 : 1),
+                    }));
+                    // Update current chat
+                    setCurrentChat((prev) => prev ? {
+                      ...prev,
+                      lastMessage: messageResult.data.content.substring(0, 100),
+                      lastMessageAt: messageResult.data.createdAt,
+                      updatedAt: messageResult.data.createdAt,
+                    } : null);
                   });
-                  setMessagesPagination((prev) => ({
-                    ...prev,
-                    totalMessages: prev.totalMessages + (thinkingMessageId ? 0 : 1),
-                  }));
-                  // Update current chat
-                  setCurrentChat((prev) => prev ? {
-                    ...prev,
-                    lastMessage: messageResult.data.content.substring(0, 100),
-                    lastMessageAt: messageResult.data.createdAt,
-                    updatedAt: messageResult.data.createdAt,
-                  } : null);
                 }
               }
               
@@ -543,17 +696,19 @@ export function useChat(): UseChatResult {
                 const messageResult = await messageResponse.json();
                 if (messageResult.success) {
                   // Remove thinking message and add actual response
-                  setMessages((prev) => {
-                    const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
-                    return [...withoutThinking, messageResult.data];
+                  startTransition(() => {
+                    setMessages((prev) => {
+                      const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
+                      return [...withoutThinking, messageResult.data];
+                    });
+                    // Update current chat
+                    setCurrentChat((prev) => prev ? {
+                      ...prev,
+                      lastMessage: messageResult.data.content.substring(0, 100),
+                      lastMessageAt: messageResult.data.createdAt,
+                      updatedAt: messageResult.data.createdAt,
+                    } : null);
                   });
-                  // Update current chat
-                  setCurrentChat((prev) => prev ? {
-                    ...prev,
-                    lastMessage: messageResult.data.content.substring(0, 100),
-                    lastMessageAt: messageResult.data.createdAt,
-                    updatedAt: messageResult.data.createdAt,
-                  } : null);
                 }
               }
               
@@ -727,6 +882,7 @@ export function useChat(): UseChatResult {
             } else if (responseData.response && responseData.executionType !== 'chain_executed') {
               // Direct execution (not chain) - use response
               const responseContent = responseData.response;
+              const responseFormat = responseData.format || (typeof responseContent === 'string' ? 'string' : 'json');
 
               // Extract hashtags and mentions from response content if it's a string
               const contentString = typeof responseContent === 'string' 
@@ -738,6 +894,20 @@ export function useChat(): UseChatResult {
               const mentions = typeof responseContent === 'string' 
                 ? extractMentions(contentString) 
                 : [];
+              
+              // Determine agentType from agentId or response format
+              const isSearchAgent = agentId === 'search' || 
+                                   responseFormat === 'search-card' || 
+                                   responseFormat === 'search-results' ||
+                                   responseData.searchResults !== undefined;
+              const determinedAgentType = isSearchAgent ? 'search' : (agentType || 'orchestrator');
+              
+              // Extract search results if available (check multiple possible locations)
+              const searchResults = responseData.searchResults || 
+                                   responseData.data?.searchResults ||
+                                   responseData.data?.search?.results ||
+                                   (Array.isArray(responseData.data) && (responseFormat === 'search-card' || responseFormat === 'search-results') ? responseData.data : null) ||
+                                   (Array.isArray(responseData.search?.results) ? responseData.search.results : null);
 
               const assistantMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
                 method: 'POST',
@@ -746,12 +916,16 @@ export function useChat(): UseChatResult {
                   role: 'assistant',
                   content: contentString,
                   agentId: agentId || 'orchestrator',
+                  agentType: determinedAgentType,
                   hashtags: hashtags.length > 0 ? hashtags : undefined,
                   mentions: mentions.length > 0 ? mentions : undefined,
                   metadata: {
                     complexity: responseData.complexity,
                     executionType: responseData.executionType,
-                    responseFormat: typeof responseContent === 'string' ? 'string' : 'json',
+                    responseFormat: responseFormat,
+                    ...(searchResults && Array.isArray(searchResults) && searchResults.length > 0 
+                      ? { searchResults: searchResults } 
+                      : {}),
                   },
                 }),
                 signal: abortController.signal,
@@ -800,6 +974,20 @@ export function useChat(): UseChatResult {
               // Regular agent response
               const responseContent = responseData.response;
               const responseFormat = responseData.format || 'string';
+              
+              // Determine agentType from agentId or response format
+              const isSearchAgent = agentId === 'search' || 
+                                   responseFormat === 'search-card' || 
+                                   responseFormat === 'search-results' ||
+                                   responseData.searchResults !== undefined;
+              const determinedAgentType = isSearchAgent ? 'search' : (agentType || 'chat');
+              
+              // Extract search results if available (check multiple possible locations)
+              const searchResults = responseData.searchResults || 
+                                   responseData.data?.searchResults ||
+                                   responseData.data?.search?.results ||
+                                   (Array.isArray(responseData.data) && (responseFormat === 'search-card' || responseFormat === 'search-results') ? responseData.data : null) ||
+                                   (Array.isArray(responseData.search?.results) ? responseData.search.results : null);
 
               const assistantMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
                 method: 'POST',
@@ -810,10 +998,14 @@ export function useChat(): UseChatResult {
                     ? responseContent 
                     : JSON.stringify(responseContent, null, 2),
                   agentId: agentId,
+                  agentType: determinedAgentType,
                   metadata: {
                     responseFormat,
                     tokenUsage: responseData.tokenUsage,
                     timing: responseData.timing,
+                    ...(searchResults && Array.isArray(searchResults) && searchResults.length > 0 
+                      ? { searchResults: searchResults } 
+                      : {}),
                   },
                 }),
                 signal: abortController.signal,
@@ -828,14 +1020,16 @@ export function useChat(): UseChatResult {
 
               // Remove thinking message and add actual response
               if (assistantMessageResult.success && assistantMessageResult.data) {
-                setMessages((prev) => {
-                  const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
-                  return [...withoutThinking, assistantMessageResult.data];
+                startTransition(() => {
+                  setMessages((prev) => {
+                    const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
+                    return [...withoutThinking, assistantMessageResult.data];
+                  });
+                  setMessagesPagination((prev) => ({
+                    ...prev,
+                    totalMessages: prev.totalMessages + (thinkingMessageId ? 0 : 1),
+                  }));
                 });
-              setMessagesPagination((prev) => ({
-                ...prev,
-                totalMessages: prev.totalMessages + (thinkingMessageId ? 0 : 1),
-              }));
               }
 
               // Update chat list item without full refresh
@@ -888,14 +1082,16 @@ export function useChat(): UseChatResult {
 
             // Remove thinking message and add actual response
             if (assistantMessageResult.success && assistantMessageResult.data) {
-              setMessages((prev) => {
-                const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
-                return [...withoutThinking, assistantMessageResult.data];
+              startTransition(() => {
+                setMessages((prev) => {
+                  const withoutThinking = prev.filter((msg) => msg.id !== thinkingMessageId);
+                  return [...withoutThinking, assistantMessageResult.data];
+                });
+                setMessagesPagination((prev) => ({
+                  ...prev,
+                  totalMessages: prev.totalMessages + (thinkingMessageId ? 0 : 1),
+                }));
               });
-              setMessagesPagination((prev) => ({
-                ...prev,
-                totalMessages: prev.totalMessages + (thinkingMessageId ? 0 : 1),
-              }));
             }
 
             // Update chat list item without full refresh
@@ -926,8 +1122,10 @@ export function useChat(): UseChatResult {
       setError(err instanceof Error ? err.message : 'Failed to send message');
       // Remove thinking message on error
       if (thinkingMessageIdRef.current) {
-        setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageIdRef.current));
-        thinkingMessageIdRef.current = null;
+        startTransition(() => {
+          setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageIdRef.current));
+          thinkingMessageIdRef.current = null;
+        });
       }
     } finally {
       setIsLoading(false);
@@ -943,51 +1141,56 @@ export function useChat(): UseChatResult {
 
   // Add message directly without reloading (for todo execution messages)
   const addMessage = useCallback((message: ChatMessage) => {
-    setMessages((prev) => {
-      // Check if message already exists to avoid duplicates
-      if (prev.some(msg => msg.id === message.id)) {
-        return prev;
-      }
-      return [...prev, message];
-    });
-    
-    // Update chat list item without full refresh
-    if (currentChat) {
-      setChats((prev) => {
-        const filtered = prev.filter((chat) => chat.id !== currentChat.id);
-        const updatedChat = prev.find((chat) => chat.id === currentChat.id);
-        return [
-          {
-            ...(updatedChat || currentChat),
-            lastMessage: message.content.substring(0, 100) || 'Response received',
-            lastMessageAt: message.createdAt,
-            updatedAt: message.createdAt,
-          },
-          ...filtered,
-        ];
+    // Use startTransition to prevent blocking the UI
+    startTransition(() => {
+      setMessages((prev) => {
+        // Check if message already exists to avoid duplicates
+        if (prev.some(msg => msg.id === message.id)) {
+          return prev;
+        }
+        return [...prev, message];
       });
-    }
+      
+      // Update chat list item without full refresh
+      if (currentChat) {
+        setChats((prev) => {
+          const filtered = prev.filter((chat) => chat.id !== currentChat.id);
+          const updatedChat = prev.find((chat) => chat.id === currentChat.id);
+          return [
+            {
+              ...(updatedChat || currentChat),
+              lastMessage: message.content.substring(0, 100) || 'Response received',
+              lastMessageAt: message.createdAt,
+              updatedAt: message.createdAt,
+            },
+            ...filtered,
+          ];
+        });
+      }
+    });
   }, [currentChat]);
 
   // Update todos in a specific message
   const updateMessageTodos = useCallback((messageId: string, todos: Todo[]) => {
-    setMessages((prev) => {
-      return prev.map(msg => {
-        if (msg.id === messageId && msg.metadata) {
-          return {
-            ...msg,
-            metadata: {
-              ...msg.metadata,
-              todos: todos,
-            },
-          };
-        }
-        return msg;
+    startTransition(() => {
+      setMessages((prev) => {
+        return prev.map(msg => {
+          if (msg.id === messageId && msg.metadata) {
+            return {
+              ...msg,
+              metadata: {
+                ...msg.metadata,
+                todos: todos,
+              },
+            };
+          }
+          return msg;
+        });
       });
+      
+      // Also update todos state if this is the latest message with todos
+      setTodos(todos);
     });
-    
-    // Also update todos state if this is the latest message with todos
-    setTodos(todos);
   }, []);
 
   // Initial load - refresh chats when userId is available

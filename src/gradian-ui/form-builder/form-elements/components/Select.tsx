@@ -115,17 +115,40 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   const [isSelectOpen, setIsSelectOpen] = React.useState(false);
   
+  // Detect touch device
+  const isTouchDevice = React.useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  }, []);
+  
   // Maintain focus on search input when select is open
+  // On touch devices, delay focus to prevent keyboard from closing the select
   useLayoutEffect(() => {
     if (isSelectOpen && enableSearch && searchInputRef.current) {
-      // Use requestAnimationFrame to ensure DOM is ready
-      requestAnimationFrame(() => {
-        if (searchInputRef.current && document.activeElement !== searchInputRef.current) {
-          searchInputRef.current.focus();
-        }
-      });
+      if (isTouchDevice) {
+        // On touch devices, delay focus significantly to allow select to fully open
+        // and prevent keyboard from triggering click-outside detection
+        const timeoutId = setTimeout(() => {
+          if (searchInputRef.current && document.activeElement !== searchInputRef.current && isSelectOpen) {
+            // Use a small delay to ensure select is fully rendered
+            requestAnimationFrame(() => {
+              if (searchInputRef.current && isSelectOpen) {
+                searchInputRef.current.focus();
+              }
+            });
+          }
+        }, 300); // Longer delay for touch devices
+        return () => clearTimeout(timeoutId);
+      } else {
+        // On non-touch devices, focus immediately
+        requestAnimationFrame(() => {
+          if (searchInputRef.current && document.activeElement !== searchInputRef.current) {
+            searchInputRef.current.focus();
+          }
+        });
+      }
     }
-  }, [isSelectOpen, enableSearch, searchValue]);
+  }, [isSelectOpen, enableSearch, isTouchDevice]);
   
   // Get dynamic context for reference-based filtering
   // Use selector to ensure reactivity when formSchema or formData changes
@@ -573,8 +596,9 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       if (!open && enableSearch) {
         setSearchValue('');
       }
-      // Focus search input when select opens
-      if (open && enableSearch && searchInputRef.current) {
+      // Focus search input when select opens (only on non-touch devices)
+      // On touch devices, let useLayoutEffect handle it with proper delay
+      if (open && enableSearch && searchInputRef.current && !isTouchDevice) {
         // Use setTimeout to ensure the DOM is ready
         setTimeout(() => {
           searchInputRef.current?.focus();
@@ -615,6 +639,14 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                       e.stopPropagation();
                     }
                   }}
+                  onTouchStart={(e) => {
+                    // Prevent select from closing when touching search area on mobile
+                    e.stopPropagation();
+                  }}
+                  onTouchEnd={(e) => {
+                    // Prevent select from closing when touch ends in search area
+                    e.stopPropagation();
+                  }}
                 >
                   <div className="relative">
                     <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4 pointer-events-none" />
@@ -654,17 +686,67 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                       onClick={(e) => {
                         // Prevent select from closing when clicking search input
                         e.stopPropagation();
-                        e.currentTarget.focus();
+                        // Ensure focus on click (works for both mouse and touch)
+                        const input = e.currentTarget;
+                        if (input && isSelectOpen) {
+                          // Focus immediately
+                          input.focus();
+                          // On touch devices, ensure keyboard opens by focusing again after a tiny delay
+                          if (isTouchDevice) {
+                            setTimeout(() => {
+                              if (input && isSelectOpen && document.activeElement !== input) {
+                                input.focus();
+                              }
+                            }, 50);
+                          }
+                        }
                       }}
                       onMouseDown={(e) => {
-                        // Prevent focus loss when clicking
+                        // Prevent select from closing, but allow default focus behavior
                         e.stopPropagation();
+                        // Don't prevent default to allow normal focus
+                      }}
+                      onTouchStart={(e) => {
+                        // Prevent select from closing when touching search input on mobile
+                        e.stopPropagation();
+                        // Don't prevent default to allow native focus behavior
+                        // Focus immediately on touch start for better responsiveness
+                        if (e.currentTarget && isSelectOpen) {
+                          // Use a small delay to ensure touch event completes first
+                          setTimeout(() => {
+                            if (e.currentTarget && isSelectOpen) {
+                              e.currentTarget.focus();
+                            }
+                          }, 10);
+                        }
+                      }}
+                      onTouchEnd={(e) => {
+                        // Prevent select from closing when touch ends
+                        e.stopPropagation();
+                        // Don't prevent default to allow native focus behavior
+                        // Ensure focus on touch end (user interaction)
+                        if (e.currentTarget && isSelectOpen) {
+                          e.currentTarget.focus();
+                        }
                       }}
                       onFocus={(e) => {
                         // Ensure input stays focused
                         e.stopPropagation();
                       }}
-                      autoFocus
+                      onBlur={(e) => {
+                        // On touch devices, prevent blur from closing select immediately
+                        // But only if it wasn't a user-initiated blur (like clicking outside)
+                        if (isTouchDevice && isSelectOpen) {
+                          // Small delay to check if select is still open and refocus if needed
+                          setTimeout(() => {
+                            if (isSelectOpen && searchInputRef.current && document.activeElement !== searchInputRef.current) {
+                              // Only refocus if the select is still open and input lost focus unintentionally
+                              searchInputRef.current.focus();
+                            }
+                          }, 150);
+                        }
+                      }}
+                      autoFocus={!isTouchDevice}
                       placeholder="Search options..."
                       className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:border-violet-400 dark:focus:border-violet-500"
                     />
@@ -730,28 +812,42 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                 )}
                 {/* Render grouped options - sorted by category title */}
                 {Object.entries(groupedOptions.groups).map(([category, options], groupIndex) => (
-                  <SelectGroup key={category}>
-                    <SelectLabel icon={<IconRenderer iconName="Folder" className="h-5 w-5" />}>{category}</SelectLabel>
-                    {options.map((option, index) => (
-                      <motion.div
-                        key={option.id ?? `${category}-${index}`}
-                        initial={{ opacity: 0, y: 6, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{
-                          duration: 0.2,
-                          delay: Math.min(
-                            (groupedOptions.ungrouped.length + groupIndex * 10 + index) * UI_PARAMS.CARD_INDEX_DELAY.STEP,
-                            UI_PARAMS.CARD_INDEX_DELAY.SKELETON_MAX
-                          ),
-                          ease: 'easeOut',
-                        }}
-                      >
-                        <SelectItem value={option.id as string} disabled={option.disabled}>
-                          {renderBadgeContent(option)}
-                        </SelectItem>
-                      </motion.div>
-                    ))}
-                  </SelectGroup>
+                  <motion.div
+                    key={category}
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{
+                      duration: 0.25,
+                      delay: Math.min(
+                        (groupedOptions.ungrouped.length + groupIndex * 10) * UI_PARAMS.CARD_INDEX_DELAY.STEP,
+                        UI_PARAMS.CARD_INDEX_DELAY.SKELETON_MAX
+                      ),
+                      ease: 'easeOut',
+                    }}
+                  >
+                    <SelectGroup>
+                      <SelectLabel icon={<IconRenderer iconName="Folder" className="h-5 w-5" />}>{category}</SelectLabel>
+                      {options.map((option, index) => (
+                        <motion.div
+                          key={option.id ?? `${category}-${index}`}
+                          initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{
+                            duration: 0.2,
+                            delay: Math.min(
+                              (groupedOptions.ungrouped.length + groupIndex * 10 + index) * UI_PARAMS.CARD_INDEX_DELAY.STEP,
+                              UI_PARAMS.CARD_INDEX_DELAY.SKELETON_MAX
+                            ),
+                            ease: 'easeOut',
+                          }}
+                        >
+                          <SelectItem value={option.id as string} disabled={option.disabled}>
+                            {renderBadgeContent(option)}
+                          </SelectItem>
+                        </motion.div>
+                      ))}
+                    </SelectGroup>
+                  </motion.div>
                 ))}
               </>
             ) : (

@@ -68,10 +68,16 @@ function truncateText(text: string, maxChars: number = 200): string {
 export function AISearchResults({ results, className }: AISearchResultsProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState<{ title: string; snippet: string; url: string } | null>(null);
+  const [allResultsDialogOpen, setAllResultsDialogOpen] = useState(false);
 
   if (!results || results.length === 0) {
     return null;
   }
+
+  // Show only first 2 results initially
+  const initialResultsCount = 1;
+  const displayedResults = results.slice(0, initialResultsCount);
+  const hasMoreResults = results.length > initialResultsCount;
 
   const handleShowMore = (result: SearchResult, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -101,16 +107,19 @@ export function AISearchResults({ results, className }: AISearchResultsProps) {
         </motion.div>
 
         <div className="space-y-2">
-          {results.map((result, index) => {
+          {displayedResults.map((result, index) => {
             const host = extractHost(result.url);
             const initials = getInitials(host);
             const formattedDate = formatDate(result.date);
             const truncatedSnippet = truncateText(result.snippet, 150);
             const shouldShowMore = result.snippet.length > 150;
 
+            // Use a stable key based on URL or title+index to prevent re-renders
+            const stableKey = result.url || `${result.title}-${index}`;
+            
             return (
               <motion.div
-                key={index}
+                key={stableKey}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
@@ -200,7 +209,146 @@ export function AISearchResults({ results, className }: AISearchResultsProps) {
             );
           })}
         </div>
+
+        {/* Button to show all results in dialog */}
+        {hasMoreResults && (
+          <div className="flex justify-center pt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setAllResultsDialogOpen(true)}
+              className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 border-violet-200 dark:border-violet-800 hover:bg-violet-50 dark:hover:bg-violet-950/30"
+            >
+              View all {results.length} results
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* Dialog for showing all search results */}
+      <Dialog open={allResultsDialogOpen} onOpenChange={setAllResultsDialogOpen}>
+        <DialogContent className={cn(
+          "w-full h-full rounded-none flex flex-col p-0",
+          "sm:max-w-4xl sm:max-h-[90vh] sm:rounded-2xl sm:h-auto sm:p-6"
+        )}>
+          <DialogHeader className="shrink-0 px-6 pt-6 pb-4 border-b border-gray-200 dark:border-gray-700 sm:px-0 sm:pt-0 sm:pb-4 sm:border-b">
+            <div className="flex items-center justify-between">
+              <DialogTitle>All Search Results ({results.length})</DialogTitle>
+            </div>
+          </DialogHeader>
+          <div className={cn(
+            "flex-1 overflow-y-auto px-6 pb-6 sm:px-0 sm:pb-0 sm:mt-4",
+            "space-y-2",
+            "scrollbar-thin scrollbar-thumb-violet-300 dark:scrollbar-thumb-violet-700 scrollbar-track-transparent",
+            "[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-violet-300 [&::-webkit-scrollbar-thumb]:dark:bg-violet-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+          )}
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(139, 92, 246, 0.3) transparent'
+          }}
+          >
+            {results.map((result, index) => {
+              const host = extractHost(result.url);
+              const initials = getInitials(host);
+              const formattedDate = formatDate(result.date);
+              const truncatedSnippet = truncateText(result.snippet, 150);
+              const shouldShowMore = result.snippet.length > 150;
+              const stableKey = result.url || `${result.title}-${index}`;
+              
+              return (
+                <motion.div
+                  key={stableKey}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.2,
+                    delay: index * 0.05,
+                  }}
+                  whileHover={{ y: -1 }}
+                  className={cn(
+                    'group relative rounded-md border border-gray-200 dark:border-gray-700',
+                    'bg-white dark:bg-gray-800',
+                    'p-3 shadow-sm hover:shadow',
+                    'transition-all duration-200',
+                    'overflow-hidden'
+                  )}
+                >
+                  <div className="flex items-start gap-2.5">
+                    <Avatar className="h-8 w-8 border border-gray-200 dark:border-gray-700 shrink-0">
+                      <AvatarFallback className="bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300 text-xs font-semibold">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            {host}
+                          </span>
+                          {formattedDate && (
+                            <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+                              <Calendar className="h-3 w-3" />
+                              <span>{formattedDate}</span>
+                            </div>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs px-2 shrink-0"
+                          onClick={() => {
+                            if (result.url) {
+                              window.open(result.url, '_blank', 'noopener,noreferrer');
+                            }
+                          }}
+                        >
+                          <ExternalLink className="h-3 w-3 me-1.5" />
+                          Open
+                        </Button>
+                      </div>
+
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                        {result.title}
+                      </h4>
+
+                      <div className="space-y-0.5">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                          <MarkdownViewer
+                            content={truncatedSnippet}
+                            showToggle={false}
+                            isEditable={false}
+                            showEndLine={false}
+                          />
+                        </div>
+                        {shouldShowMore && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDialogContent({
+                                title: result.title,
+                                snippet: result.snippet,
+                                url: result.url,
+                              });
+                              setDialogOpen(true);
+                            }}
+                            className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium"
+                          >
+                            Show more
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="absolute inset-0 bg-gradient-to-r from-violet-50/0 via-violet-50/0 to-violet-50/0 dark:from-violet-950/0 dark:via-violet-950/0 dark:to-violet-950/0 group-hover:from-violet-50/50 group-hover:via-violet-50/30 group-hover:to-violet-50/50 dark:group-hover:from-violet-950/20 dark:group-hover:via-violet-950/10 dark:group-hover:to-violet-950/20 transition-all duration-300 pointer-events-none rounded-md" />
+                </motion.div>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog for showing full snippet content */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

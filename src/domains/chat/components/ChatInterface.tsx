@@ -211,12 +211,79 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     try {
       // Prepare content based on output format
       const output = todo.output || result.output;
-      const responseFormat = todo.responseFormat || result.responseFormat || 'string';
-      const requiredOutputFormat = result.requiredOutputFormat || responseFormat;
+      const responseFormat = todo.responseFormat || result.responseFormat || result.data?.format || 'string';
+      const requiredOutputFormat = result.requiredOutputFormat || result.data?.format || responseFormat;
       const agentId = todo.agentId || result.agentId;
-      const agentType = todo.agentType || result.agentType;
+      let agentType = todo.agentType || result.agentType;
 
-      // Format content for message
+      // Check if this is a search agent
+      const isSearchAgent = agentId === 'search' || 
+                           agentType === 'search' ||
+                           requiredOutputFormat === 'search-card' ||
+                           requiredOutputFormat === 'search-results' ||
+                           result.data?.format === 'search-card' ||
+                           result.data?.format === 'search-results';
+
+      // Extract search results if available (for search agents)
+      // Check multiple possible locations in the result object
+      let searchResults = null;
+      if (isSearchAgent || result.searchResults || result.data?.searchResults || result.data?.search?.results) {
+        searchResults = result.searchResults || 
+                       result.data?.searchResults ||
+                       result.data?.search?.results ||
+                       (Array.isArray(result.data) && (requiredOutputFormat === 'search-card' || requiredOutputFormat === 'search-results') ? result.data : null) ||
+                       (typeof output === 'object' && output !== null && Array.isArray((output as any).searchResults) ? (output as any).searchResults : null) ||
+                       (typeof output === 'object' && output !== null && Array.isArray((output as any).results) ? (output as any).results : null) ||
+                       (typeof output === 'object' && output !== null && output.search && Array.isArray(output.search.results) ? output.search.results : null);
+      }
+
+      // If search results are found, set appropriate format and agent type
+      if (searchResults && Array.isArray(searchResults) && searchResults.length > 0) {
+        agentType = 'search';
+        // Use 'search-card' format for search results
+        const finalResponseFormat = requiredOutputFormat === 'search-results' || requiredOutputFormat === 'search-card' 
+          ? 'search-card' 
+          : 'search-card';
+        
+        // Format content for message - use empty string or minimal content for search results
+        // The AISearchResults component will handle the display
+        const content = '';
+        
+        // Add message to chat with search results
+        const messageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            role: 'assistant',
+            content,
+            agentId,
+            agentType: 'search',
+            metadata: {
+              responseFormat: finalResponseFormat,
+              tokenUsage: todo.tokenUsage || result.tokenUsage || result.data?.tokenUsage,
+              duration: todo.duration || result.duration || result.data?.timing?.duration,
+              cost: todo.cost || result.cost || result.data?.tokenUsage?.pricing?.total_cost,
+              todoId: todo.id,
+              todoTitle: todo.title,
+              searchResults: searchResults,
+            },
+          }),
+        });
+
+        const messageResult = await messageResponse.json();
+
+        if (messageResult.success && messageResult.data) {
+          const newMessage = messageResult.data;
+          addMessage(newMessage);
+          
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }
+        return; // Early return for search results
+      }
+
+      // Format content for message (non-search agents)
       let content: string;
       if (typeof output === 'string') {
         content = output;
@@ -253,6 +320,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             cost: todo.cost || result.cost,
             todoId: todo.id,
             todoTitle: todo.title,
+            ...(searchResults && Array.isArray(searchResults) && searchResults.length > 0 
+              ? { searchResults: searchResults } 
+              : {}),
           },
         }),
       });

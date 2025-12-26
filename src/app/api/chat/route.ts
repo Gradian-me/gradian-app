@@ -3,6 +3,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { loadChats, createChat, getChatsByUserId } from '@/domains/chat/utils/chat-storage.util';
+import { requireAuth } from '@/domains/chat/utils/auth-utils';
+import { validateChatTitle, validateRequestBodySize } from '@/domains/chat/utils/validation-utils';
 import type { CreateChatRequest } from '@/domains/chat/types';
 
 /**
@@ -13,17 +15,17 @@ import type { CreateChatRequest } from '@/domains/chat/types';
  */
 export async function GET(request: NextRequest) {
   try {
+    // Require authentication
+    const authResult = requireAuth(request);
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+    const { userId } = authResult;
+
     const searchParams = request.nextUrl.searchParams;
-    const userId = searchParams.get('userId');
     const summary = searchParams.get('summary') === 'true';
 
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, error: 'userId query parameter is required' },
-        { status: 400 }
-      );
-    }
-
+    // Use authenticated user ID instead of query parameter
     // Delegate to the same logic as POST
     return await handleGetChats(userId, summary);
   } catch (error) {
@@ -104,27 +106,63 @@ async function handleGetChats(userId: string, summary: boolean) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body: any = await request.json();
+    // Require authentication
+    const authResult = requireAuth(request);
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+    const { userId } = authResult;
 
-    if (!body.userId) {
+    // Validate request body size
+    const contentLength = request.headers.get('content-length');
+    if (contentLength) {
+      const sizeValidation = validateRequestBodySize(parseInt(contentLength, 10));
+      if (!sizeValidation.valid) {
+        return NextResponse.json(
+          { success: false, error: sizeValidation.error },
+          { status: 413, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // Parse request body with error handling
+    let body: any;
+    try {
+      const contentType = request.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        return NextResponse.json(
+          { success: false, error: 'Content-Type must be application/json' },
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      body = await request.json();
+    } catch (parseError) {
       return NextResponse.json(
-        { success: false, error: 'userId is required' },
-        { status: 400 }
+        { success: false, error: 'Invalid JSON in request body' },
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    // Check if this is a "get chats" request (only userId and optional summary)
-    // vs a "create chat" request (has title or selectedAgentId)
+    // Check if this is a "get chats" request (only summary) vs a "create chat" request
     const isGetRequest = !body.title && body.selectedAgentId === undefined;
     
     if (isGetRequest) {
-      // Get chats request
+      // Get chats request - use authenticated user ID
       const summary = body.summary === true;
-      return await handleGetChats(body.userId, summary);
+      return await handleGetChats(userId, summary);
     } else {
-      // Create chat request
+      // Create chat request - validate title
+      const titleValidation = validateChatTitle(body.title);
+      if (!titleValidation.valid) {
+        return NextResponse.json(
+          { success: false, error: titleValidation.error },
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Use authenticated user ID, not from body
       const createRequest: CreateChatRequest = {
-        userId: body.userId,
+        userId: userId, // Use authenticated user ID
         title: body.title,
         selectedAgentId: body.selectedAgentId,
       };
@@ -134,7 +172,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         data: newChat,
-      }, { status: 201 });
+      }, { status: 201, headers: { 'Content-Type': 'application/json' } });
     }
   } catch (error) {
     console.error('Error in POST /api/chat:', error);

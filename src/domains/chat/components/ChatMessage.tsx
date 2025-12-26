@@ -8,12 +8,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn, resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { Bot, Hash, AtSign, Clock, Info, Download, ChevronUp, ChevronDown } from 'lucide-react';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';
+import { AISearchResults } from '@/domains/ai-builder/components/AISearchResults';
+import type { SearchResult } from '@/domains/ai-builder/utils/ai-search-utils';
 import { DynamicAiAgentResponseContainer } from '@/gradian-ui/data-display/components/DynamicAiAgentResponseContainer';
 import { ImageViewer } from '@/gradian-ui/form-builder/form-elements/components/ImageViewer';
 import { VideoViewer } from '@/gradian-ui/form-builder/form-elements/components/VideoViewer';
 import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
 import { TableWrapper } from '@/gradian-ui/data-display/table/components/TableWrapper';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
+import { detectMessageRenderType } from '../utils/message-render-utils';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { TextShimmerWave } from '@/components/ui/text-shimmer-wave';
@@ -34,6 +37,95 @@ export interface ChatMessageProps {
   index?: number;
   className?: string;
 }
+
+// Error boundary component for MarkdownViewer
+class MarkdownViewerErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback?: React.ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: { children: React.ReactNode; fallback?: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('MarkdownViewer error:', error, errorInfo);
+  }
+
+  componentDidUpdate(prevProps: { children: React.ReactNode }) {
+    // Reset error state when content changes
+    if (this.state.hasError && prevProps.children !== this.props.children) {
+      this.setState({ hasError: false });
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || (
+        <div className="text-sm text-gray-600 dark:text-gray-400 p-2">
+          Error rendering markdown content.
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Safe wrapper for MarkdownViewer to prevent DOM reconciliation errors
+// Uses error boundary and debounced rendering to prevent DOM conflicts
+const SafeMarkdownViewer = React.memo(({ content, componentKey }: { content: string; componentKey: string }) => {
+  const [displayContent, setDisplayContent] = useState(content);
+  const [isReady, setIsReady] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Debounce content updates to prevent rapid re-renders during reconciliation
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    setIsReady(false);
+    timeoutRef.current = setTimeout(() => {
+      setDisplayContent(content);
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        setIsReady(true);
+      });
+    }, 50); // Small delay to batch rapid updates
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [content]);
+
+  if (!isReady) {
+    return <div className="min-h-[20px]" />;
+  }
+
+  return (
+    <MarkdownViewerErrorBoundary>
+      <MarkdownViewer 
+        key={componentKey}
+        content={displayContent}
+        showToggle={false}
+        isEditable={false}
+        showEndLine={false}
+      />
+    </MarkdownViewerErrorBoundary>
+  );
+}, (prevProps, nextProps) => {
+  // Re-render only if content or key changed
+  return prevProps.content === nextProps.content && prevProps.componentKey === nextProps.componentKey;
+});
+
+SafeMarkdownViewer.displayName = 'SafeMarkdownViewer';
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
@@ -71,11 +163,46 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     return message.content.trim();
   }, [message.content]);
 
-  // Check if message should render as DynamicAiAgentResponseContainer
-  // Render for todo execution responses when responseFormat is specified
-  // Also render for image/video responses even without todoId
-  const isTodoResponse = !!message.metadata?.todoId;
+  // Create a stable key for MarkdownViewer that doesn't change on updates
+  // Use message.id only to prevent re-mounting on updates
+  const markdownKey = useMemo(() => `markdown-${message.id}`, [message.id]);
+
+  // Track if component is mounted to prevent rendering during unmount
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  // Use unified detection function to determine render type and extract data
+  const renderData = useMemo(() => detectMessageRenderType(message), [
+    message.role,
+    message.content,
+    message.metadata?.responseFormat,
+    message.metadata?.searchResults,
+    message.agentType,
+    message.agentId,
+  ]);
+
   const responseFormat = message.metadata?.responseFormat;
+  const isTodoResponse = !!message.metadata?.todoId;
+  
+  // Helper function to parse JSON
+  const tryParseJson = useCallback((content: string): any => {
+    if (!content || typeof content !== 'string') return null;
+    const trimmed = content.trim();
+    if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) return null;
+    try {
+      return JSON.parse(trimmed);
+    } catch {
+      return null;
+    }
+  }, []);
+  
+  // Determine if we should use DynamicAiAgentResponseContainer
+  // Use it for structured formats that need special rendering
   const shouldRenderAgentContainer = isAssistant && 
     responseFormat && 
     ['json', 'table', 'image', 'video', 'graph', 'string'].includes(responseFormat) &&
@@ -103,37 +230,45 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   };
 
   // Parse message content for DynamicAiAgentResponseContainer
-  // If content is JSON string, parse it; otherwise use as-is
-  // Also check if content looks like an image/video response even if responseFormat isn't set
+  // Use the data from renderData when available, otherwise parse content
   const parsedContent = useMemo(() => {
-    // Parse if shouldRenderAgentContainer is true, OR if content looks like image/video JSON
-    const shouldParse = shouldRenderAgentContainer || 
-      (isAssistant && message.content && 
-       (message.content.trim().startsWith('{') || message.content.trim().startsWith('[')));
-    
-    if (!shouldParse) return null;
-    
-    try {
-      // Try to parse as JSON if it looks like JSON
-      const trimmed = message.content.trim();
-      
-      // Handle escaped newlines in JSON strings (from chat.json storage)
-      // Replace literal \n with actual newlines for proper JSON parsing
-      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
-        // If the string contains escaped newlines, they're already escaped in the JSON
-        // JSON.parse should handle them correctly, but we need to ensure proper parsing
-        const parsed = JSON.parse(trimmed);
-        return parsed;
-      }
-      return message.content;
-    } catch (error) {
-      // Log parsing errors for debugging
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Failed to parse message content as JSON:', error, 'Content:', message.content?.substring(0, 200));
-      }
-      return message.content;
+    // If renderData already has parsed data, use it
+    if (renderData.type === 'image' && renderData.imageData) {
+      return renderData.imageData;
     }
-  }, [shouldRenderAgentContainer, isAssistant, message.content]);
+    if (renderData.type === 'video' && renderData.videoData) {
+      return renderData.videoData;
+    }
+    if (renderData.type === 'graph' && renderData.graphData) {
+      return renderData.graphData;
+    }
+    if (renderData.type === 'table' && renderData.tableData) {
+      return renderData.tableData;
+    }
+    if (renderData.type === 'json' && renderData.jsonData) {
+      return renderData.jsonData;
+    }
+    
+    // Otherwise, try to parse content if needed
+    if (shouldRenderAgentContainer || 
+      (isAssistant && message.content && 
+       (message.content.trim().startsWith('{') || message.content.trim().startsWith('[')))) {
+      try {
+        const trimmed = message.content.trim();
+        if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+          return JSON.parse(trimmed);
+        }
+        return message.content;
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Failed to parse message content as JSON:', error, 'Content:', message.content?.substring(0, 200));
+        }
+        return message.content;
+      }
+    }
+    
+    return null;
+  }, [shouldRenderAgentContainer, isAssistant, message.content, renderData]);
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isStringExpanded, setIsStringExpanded] = useState(false);
@@ -155,7 +290,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   
   // Measure content height after render
   useEffect(() => {
-    if (markdownContentRef.current && !shouldRenderAgentContainer) {
+    // Skip height measurement for special render types or agent container
+    if (markdownContentRef.current && !shouldRenderAgentContainer && renderData.type === 'markdown') {
       // Use a small delay to ensure markdown is fully rendered
       const timer = setTimeout(() => {
         if (markdownContentRef.current) {
@@ -165,7 +301,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [cleanContent, shouldRenderAgentContainer, isExpanded]);
+  }, [cleanContent, shouldRenderAgentContainer, renderData.type, isExpanded]);
   
   // Measure string content height for assistant messages with responseFormat === 'string'
   const isStringMessage = isAssistant && responseFormat === 'string' && shouldRenderAgentContainer;
@@ -193,7 +329,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   
   // Post-process markdown to add hashtag/mention styling
   useEffect(() => {
-    if (!markdownContentRef.current || shouldRenderAgentContainer) return;
+    if (!markdownContentRef.current || shouldRenderAgentContainer || renderData.type !== 'markdown') return;
     
     const processHashtagsAndMentions = (container: HTMLElement) => {
       // Find all text nodes that contain # or @
@@ -322,8 +458,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   }, [displayContent]);
 
   // Check if message contains image or video
-  const hasImageOrVideo = shouldRenderAgentContainer && 
-    (responseFormat === 'image' || responseFormat === 'video' || responseFormat === 'graph');
+  const hasImageOrVideo = ['image', 'video', 'graph'].includes(renderData.type);
 
   // Get complexity for orchestrator messages
   const complexity = message.metadata?.complexity;
@@ -534,30 +669,43 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 Thinking...
               </TextShimmerWave>
             </div>
-          ) : (shouldRenderAgentContainer || (responseFormat === 'image' || responseFormat === 'video' || responseFormat === 'graph')) && parsedContent !== null ? (
+          ) : (shouldRenderAgentContainer || (['image', 'video', 'graph', 'table', 'json', 'string'].includes(renderData.type) && renderData.type !== 'search')) && parsedContent !== null ? (
             <div className="w-full text-sm leading-relaxed">
               {(() => {
-                // Render based on response format, similar to DynamicAiAgentResponseContainer
-                // Also check if parsedContent has image/video/graph structure even if responseFormat isn't set
-                const detectedFormat = responseFormat || 
-                  (parsedContent && typeof parsedContent === 'object' && parsedContent.image ? 'image' : null) ||
-                  (parsedContent && typeof parsedContent === 'object' && parsedContent.video ? 'video' : null) ||
-                  (parsedContent && typeof parsedContent === 'object' && parsedContent.graph ? 'graph' : null);
-                
-                if (detectedFormat === 'image' || responseFormat === 'image') {
+                // Render based on unified renderData type
+                if (renderData.type === 'image') {
+                  // Use imageData from renderData or parse from content
                   let imageData: any = null;
                   
-                  // Try to extract image data from parsed content
-                  if (typeof parsedContent === 'object' && parsedContent?.image) {
-                    imageData = parsedContent.image;
-                  } else if (typeof parsedContent === 'string' && (parsedContent.startsWith('{') || parsedContent.startsWith('['))) {
-                    try {
-                      const parsed = JSON.parse(parsedContent);
-                      imageData = parsed?.image || null;
-                    } catch (parseError) {
-                      if (process.env.NODE_ENV === 'development') {
-                        console.warn('Failed to parse image content:', parseError);
+                  if (renderData.imageData) {
+                    imageData = renderData.imageData;
+                  } else if (parsedContent) {
+                    // Try to extract image data from parsed content
+                    if (typeof parsedContent === 'object' && parsedContent?.image) {
+                      imageData = parsedContent.image;
+                    } else if (typeof parsedContent === 'object' && (parsedContent.url || parsedContent.b64_json)) {
+                      imageData = parsedContent;
+                    } else if (typeof parsedContent === 'string') {
+                      try {
+                        const parsed = JSON.parse(parsedContent);
+                        imageData = parsed?.image || parsed;
+                      } catch {
+                        // If not JSON, treat as URL string
+                        imageData = { url: parsedContent };
                       }
+                    }
+                  } else if (message.content) {
+                    // Try to parse from message content
+                    try {
+                      const parsed = tryParseJson(message.content);
+                      if (parsed) {
+                        imageData = parsed?.image || parsed;
+                      } else {
+                        // If not JSON, treat as URL string
+                        imageData = { url: message.content };
+                      }
+                    } catch {
+                      imageData = { url: message.content };
                     }
                   }
                   
@@ -611,12 +759,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   }
                 }
                 
-                if (detectedFormat === 'video' || responseFormat === 'video') {
-                  const videoData = typeof parsedContent === 'object' && parsedContent?.video
-                    ? parsedContent.video
-                    : typeof parsedContent === 'string' && (parsedContent.startsWith('{') || parsedContent.startsWith('['))
-                    ? JSON.parse(parsedContent)?.video
-                    : null;
+                if (renderData.type === 'video') {
+                  // Use videoData from renderData
+                  const videoData = renderData.videoData || parsedContent;
                   
                   if (videoData && (videoData.video_id || videoData.url || videoData.file_path)) {
                     return (
@@ -656,22 +801,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   }
                 }
                 
-                if (detectedFormat === 'graph' || responseFormat === 'graph') {
-                  let graphData: any = null;
-                  
-                  // Try to extract graph data from parsed content
-                  if (typeof parsedContent === 'object') {
-                    graphData = parsedContent.graph || parsedContent;
-                  } else if (typeof parsedContent === 'string' && (parsedContent.startsWith('{') || parsedContent.startsWith('['))) {
-                    try {
-                      const parsed = JSON.parse(parsedContent);
-                      graphData = parsed?.graph || parsed;
-                    } catch (parseError) {
-                      if (process.env.NODE_ENV === 'development') {
-                        console.warn('Failed to parse graph content:', parseError);
-                      }
-                    }
-                  }
+                if (renderData.type === 'graph') {
+                  // Use graphData from renderData
+                  const graphData = renderData.graphData || parsedContent;
                   
                   if (graphData && Array.isArray(graphData.nodes) && Array.isArray(graphData.edges)) {
                     return (
@@ -696,29 +828,36 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   }
                 }
                 
-                if (responseFormat === 'table') {
-                  // Parse table data
+                if (renderData.type === 'table') {
+                  // Use tableData from renderData or parse from content
                   let tableData: any[] = [];
-                  try {
-                    const data = typeof parsedContent === 'string' ? JSON.parse(parsedContent) : parsedContent;
-                    if (Array.isArray(data)) {
-                      tableData = data;
-                    } else if (data && typeof data === 'object') {
-                      const keys = Object.keys(data);
-                      if (keys.length === 1 && Array.isArray(data[keys[0]])) {
-                        tableData = data[keys[0]];
-                      } else {
-                        tableData = [data];
+                  
+                  if (renderData.tableData) {
+                    tableData = Array.isArray(renderData.tableData) 
+                      ? renderData.tableData 
+                      : [renderData.tableData];
+                  } else if (parsedContent) {
+                    try {
+                      const data = typeof parsedContent === 'string' ? JSON.parse(parsedContent) : parsedContent;
+                      if (Array.isArray(data)) {
+                        tableData = data;
+                      } else if (data && typeof data === 'object') {
+                        const keys = Object.keys(data);
+                        if (keys.length === 1 && Array.isArray(data[keys[0]])) {
+                          tableData = data[keys[0]];
+                        } else {
+                          tableData = [data];
+                        }
                       }
-                    }
-                  } catch {
-                    // If parsing fails, try to extract array from string
-                    const match = message.content.match(/\[[\s\S]*\]/);
-                    if (match) {
-                      try {
-                        tableData = JSON.parse(match[0]);
-                      } catch {
-                        tableData = [];
+                    } catch {
+                      // If parsing fails, try to extract array from string
+                      const match = message.content.match(/\[[\s\S]*\]/);
+                      if (match) {
+                        try {
+                          tableData = JSON.parse(match[0]);
+                        } catch {
+                          tableData = [];
+                        }
                       }
                     }
                   }
@@ -787,7 +926,22 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   }
                 }
                 
-                if (responseFormat === 'string') {
+                if (renderData.type === 'json') {
+                  // Use jsonData from renderData
+                  const jsonData = renderData.jsonData || parsedContent;
+                  return (
+                    <CodeViewer
+                      code={typeof jsonData === 'string' ? jsonData : JSON.stringify(jsonData, null, 2)}
+                      programmingLanguage="json"
+                      title={message.metadata?.todoTitle || 'AI Generated Content'}
+                      initialLineNumbers={10}
+                    />
+                  );
+                }
+                
+                if (renderData.type === 'string') {
+                  // Use stringData from renderData
+                  const stringData = renderData.stringData || message.content || '';
                   return (
                     <div className="relative">
                       <div 
@@ -802,7 +956,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                         }
                       >
                         <MarkdownViewer 
-                          content={stringContent}
+                          content={stringData}
                           showToggle={false}
                           isEditable={false}
                           showEndLine={false}
@@ -832,11 +986,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   );
                 }
                 
-                // Default: render as code viewer for JSON or other formats
+                // Fallback: render as code viewer
                 return (
                   <CodeViewer
                     code={typeof parsedContent === 'string' ? parsedContent : JSON.stringify(parsedContent, null, 2)}
-                    programmingLanguage={responseFormat === 'json' ? 'json' : 'text'}
+                    programmingLanguage="text"
                     title={message.metadata?.todoTitle || 'AI Generated Content'}
                     initialLineNumbers={10}
                   />
@@ -864,17 +1018,22 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   <div className="whitespace-pre-line break-words">
                     {displayContent}
                   </div>
+                ) : renderData.type === 'search' && renderData.searchResults && renderData.searchResults.length > 0 ? (
+                  // For search agent responses, render search results component
+                  <AISearchResults results={renderData.searchResults} />
                 ) : (
-                  // For assistant messages, use MarkdownViewer for markdown support
-                  <MarkdownViewer 
-                    content={displayContent}
-                    showToggle={false}
-                    isEditable={false}
-                    showEndLine={false}
-                  />
+                  // For assistant messages, use SafeMarkdownViewer for markdown support
+                  // Use stable key and mounted check to prevent DOM reconciliation issues
+                  isMountedRef.current && (
+                    <SafeMarkdownViewer 
+                      key={markdownKey}
+                      componentKey={markdownKey}
+                      content={displayContent}
+                    />
+                  )
                 )}
               </div>
-              {isLongContent && (contentHeight === null || contentHeight > maxCollapsedHeight) && (
+              {renderData.type === 'markdown' && isLongContent && (contentHeight === null || contentHeight > maxCollapsedHeight) && (
                 <div className="mt-2 flex justify-end">
                   <button
                     onClick={() => setIsExpanded(!isExpanded)}
