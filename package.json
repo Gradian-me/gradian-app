@@ -17,8 +17,7 @@
     "build:cdn:webpack": "webpack --config scripts/webpack-cdn/webpack.cdn.config.js",
     "build:cdn:modal": "webpack --config scripts/webpack-cdn/webpack.cdn.modal.config.js",
     "build:cdn:table": "webpack --config scripts/webpack-cdn/webpack.cdn.table.config.js",
-    "build:cdn:all": "npm run build:cdn && npm run build:cdn:modal && npm run build:cdn:table",
-    "security:semgrep": "node scripts/security/run-semgrep.js"
+    "build:cdn:all": "npm run build:cdn && npm run build:cdn:modal && npm run build:cdn:table"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

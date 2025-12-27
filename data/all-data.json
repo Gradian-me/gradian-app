@@ -1245,6 +1245,59 @@
       "id": "01KDFEH9R5NH6C1QXN7PE3HK43",
       "createdAt": "2025-12-27T08:24:24.071Z",
       "updatedAt": "2025-12-27T08:24:24.367Z"
+    },
+    {
+      "company": "CinnaGen",
+      "authenticationType": [
+        {
+          "id": "active-directory"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDM9ASSWTYDWA4HDT7W05B",
+          "label": "Business Administrator",
+          "icon": "Briefcase",
+          "color": "pink"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        },
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        },
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "username": "heydarzadehn@cinnagen.com",
+      "firstName": "Nima",
+      "lastName": "Heydarzadeh",
+      "email": "heydarzadehn@cinnagen.com",
+      "postTitle": "AI / DevOps / Digital Twin Engineer",
+      "incomplete": false,
+      "id": "01KDG66XCHTD0GGQX3A2E69T85",
+      "createdAt": "2025-12-27T15:18:09.558Z",
+      "updatedAt": "2025-12-27T15:18:09.725Z"
     }
   ],
   "purchaseOrders": [],

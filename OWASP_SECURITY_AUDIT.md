@@ -140,7 +140,7 @@ The following security utilities have been created in `src/gradian-ui/shared/uti
 ## 🔍 Testing Recommendations
 
 1. **Penetration Testing**: Conduct regular security testing
-2. **Automated Scanning**: Integrate Semgrep/SAST tools in CI/CD pipeline
+2. **Automated Scanning**: Integrate SAST tools in CI/CD pipeline
 3. **Dependency Scanning**: Regular `npm audit` checks
 4. **Security Headers Testing**: Verify headers with securityheaders.com
 
