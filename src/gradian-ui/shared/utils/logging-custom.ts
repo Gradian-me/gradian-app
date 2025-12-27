@@ -52,13 +52,17 @@ const isLoggingEnabled = (): boolean => {
 /**
  * Custom logging function that checks if logging is enabled for the given log type
  * Requires ENABLE_LOGGING=true (server) or NEXT_PUBLIC_ENABLE_LOGGING=true (client)
+ * Note: Errors and warnings are always logged regardless of ENABLE_LOGGING setting
  * @param logType - The type of logging from LogType enum
  * @param level - The log level (log, info, warn, error, debug)
  * @param message - The message to log
  */
 export const loggingCustom = (logType: LogType, level: LogLevel, message: string) => {
-  // Check if logging is enabled via environment variable
-  if (!isLoggingEnabled()) {
+  // Errors and warnings are always logged, bypassing ENABLE_LOGGING check
+  const isCriticalLevel = level === 'error' || level === 'warn';
+  
+  // For non-critical levels, check if logging is enabled via environment variable
+  if (!isCriticalLevel && !isLoggingEnabled()) {
     return;
   }
 

@@ -984,7 +984,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KCXSC71SRWXQQBBWSSP61TCV",
     "createdAt": "2025-12-20T11:47:32.021Z",
-    "updatedAt": "2025-12-20T11:47:32.021Z"
+    "updatedAt": "2025-12-27T12:41:06.731Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -994,7 +995,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KCXSVBZ8JNHRRZZ8PK28M0R3",
     "createdAt": "2025-12-20T11:55:48.584Z",
-    "updatedAt": "2025-12-20T11:55:48.584Z"
+    "updatedAt": "2025-12-27T12:41:06.751Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -1004,7 +1006,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KCXSZ71CR4A0NPEDW66S841Y",
     "createdAt": "2025-12-20T11:57:54.604Z",
-    "updatedAt": "2025-12-20T11:57:54.604Z"
+    "updatedAt": "2025-12-27T12:41:06.768Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -1014,7 +1017,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KCXT06AHF5HHK8CBN4FFNDNA",
     "createdAt": "2025-12-20T11:58:26.641Z",
-    "updatedAt": "2025-12-20T11:58:26.641Z"
+    "updatedAt": "2025-12-27T12:41:06.788Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -1024,7 +1028,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KCXT1B6RFHPEWC583FA7EK4V",
     "createdAt": "2025-12-20T11:59:04.408Z",
-    "updatedAt": "2025-12-20T11:59:04.408Z"
+    "updatedAt": "2025-12-27T12:41:06.803Z",
+    "inactive": true
   },
   {
     "sourceSchema": "parameter-groups",
@@ -1545,5 +1550,94 @@
     "id": "01KD341B554K59YV2EXQXZ99E8",
     "createdAt": "2025-12-22T12:00:00.000Z",
     "updatedAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "id": "01KDFEG66DW0M0MAERJBGN065N",
+    "sourceSchema": "users",
+    "sourceId": "01KDFEG5Z10VPAMAG3E76KJMCG",
+    "targetSchema": "external-nodes",
+    "targetId": "active-directory",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2025-12-27T08:23:47.659Z",
+    "updatedAt": "2025-12-27T08:23:47.659Z"
+  },
+  {
+    "id": "01KDFEH9XSBM8C25D0JRYAEP5G",
+    "sourceSchema": "users",
+    "sourceId": "01KDFEH9R5NH6C1QXN7PE3HK43",
+    "targetSchema": "external-nodes",
+    "targetId": "active-directory",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2025-12-27T08:24:24.249Z",
+    "updatedAt": "2025-12-27T08:24:24.249Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KCXSBQMD17BR96WWSKBJMEZ4",
+    "targetSchema": "status-items",
+    "targetId": "01KDFX74SR0S1165EVS0SCT2RB",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KDFX752124N0GPCDC4C5XN4A",
+    "createdAt": "2025-12-27T12:41:00.225Z",
+    "updatedAt": "2025-12-27T12:41:06.821Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "inquiries",
+    "sourceId": "01KD5D2AZ6AVRV8P5ZNJEX5DQK",
+    "targetSchema": "tenders",
+    "targetId": "01KDG1MGJXNHB3EMD64GBZ9YDP",
+    "relationTypeId": "HAS_TENDER",
+    "incomplete": true,
+    "id": "01KDG1MGP51Y6H9Q63SJXZP5XN",
+    "createdAt": "2025-12-27T13:58:12.421Z",
+    "updatedAt": "2025-12-27T13:58:46.608Z",
+    "inactive": true
+  },
+  {
+    "id": "01KDG1ND96CZ25QBJSFAVBJPR1",
+    "sourceSchema": "tender-items",
+    "sourceId": "01KDG1ND73G7BD67MSFC5BT9K6",
+    "targetSchema": "parameter-items",
+    "targetId": "01KCXXG00000000000000000004",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "unit",
+    "createdAt": "2025-12-27T13:58:41.701Z",
+    "updatedAt": "2025-12-27T13:58:41.701Z"
+  },
+  {
+    "id": "01KDG1ND9GR069DCAA521K4W15",
+    "sourceSchema": "tender-items",
+    "sourceId": "01KDG1ND73G7BD67MSFC5BT9K6",
+    "targetSchema": "parameter-items",
+    "targetId": "01KCXVM1P39PPQN6X6870BT1QK",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "required-documents",
+    "createdAt": "2025-12-27T13:58:41.712Z",
+    "updatedAt": "2025-12-27T13:58:41.712Z"
+  },
+  {
+    "id": "01KDG1ND9W4HNHV72A0JF5Z7R6",
+    "sourceSchema": "tender-items",
+    "sourceId": "01KDG1ND73G7BD67MSFC5BT9K6",
+    "targetSchema": "parameter-items",
+    "targetId": "01KCXW8CYMG126FZHMJ9PBQMVW",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "storage-condition",
+    "createdAt": "2025-12-27T13:58:41.724Z",
+    "updatedAt": "2025-12-27T13:58:41.724Z"
+  },
+  {
+    "sourceSchema": "tenders",
+    "sourceId": "01KDG1MGJXNHB3EMD64GBZ9YDP",
+    "targetSchema": "tender-items",
+    "targetId": "01KDG1ND73G7BD67MSFC5BT9K6",
+    "relationTypeId": "HAS_ITEM",
+    "id": "01KDG1NDED6794M3648QYJQPRS",
+    "createdAt": "2025-12-27T13:58:41.868Z",
+    "updatedAt": "2025-12-27T13:58:44.179Z",
+    "inactive": true
   }
 ]

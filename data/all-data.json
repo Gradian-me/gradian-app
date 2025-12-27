@@ -1153,10 +1153,121 @@
       "createdAt": "2025-12-21T10:21:00.902Z",
       "updatedAt": "2025-12-21T10:21:00.902Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "company": "CinnaGen",
+      "authenticationType": [
+        {
+          "id": "active-directory"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "username": "sabzim@cinnagen.com",
+      "firstName": "Mahboubeh",
+      "lastName": "Sabzi",
+      "email": "sabzim@cinnagen.com",
+      "postTitle": "Foreign Commercial Supervisor",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KDFEG5Z10VPAMAG3E76KJMCG",
+      "createdAt": "2025-12-27T08:23:47.429Z",
+      "updatedAt": "2025-12-27T08:23:47.793Z"
+    },
+    {
+      "company": "CinnaGen",
+      "authenticationType": [
+        {
+          "id": "active-directory"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "username": "cheshmehkhavarb@cinnagen.com",
+      "firstName": "Bahareh",
+      "lastName": "Chesmehkhavar",
+      "email": "cheshmehkhavarb@cinnagen.com",
+      "postTitle": "Commercial Deputy",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KDFEH9R5NH6C1QXN7PE3HK43",
+      "createdAt": "2025-12-27T08:24:24.071Z",
+      "updatedAt": "2025-12-27T08:24:24.367Z"
     }
   ],
   "purchaseOrders": [],
-  "tenders": [],
+  "tenders": [
+    {
+      "dueDate": "2025-12-25",
+      "status": [
+        {
+          "id": "01KCXSVBPFH4B4BNCHC0TY98ZN",
+          "label": "Published For Vendors",
+          "icon": "FileUser",
+          "color": "yellow"
+        }
+      ],
+      "description": "test",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KDG1MGJXNHB3EMD64GBZ9YDP",
+      "createdAt": "2025-12-27T13:58:12.319Z",
+      "updatedAt": "2025-12-27T13:58:44.129Z",
+      "tender-items-section": []
+    }
+  ],
   "shipments": [],
   "invoices": [],
   "applications": [
@@ -2125,7 +2236,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-24T07:09:02.932Z",
+      "updatedAt": "2025-12-27T08:33:39.221Z",
       "category": [
         {
           "id": "production-integration",
@@ -2134,8 +2245,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-24T07:09:02.932Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 1145, edges created: 71, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2025-12-27T08:33:39.221Z",
+      "lastSyncMessage": "Cannot GET /50x.html",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
@@ -3115,13 +3226,14 @@
         }
       ],
       "title": "Inquiry Tender Status",
-      "incomplete": true,
+      "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KCXSBQMD17BR96WWSKBJMEZ4",
       "createdAt": "2025-12-20T11:47:16.247Z",
-      "updatedAt": "2025-12-20T11:47:16.249Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedAt": "2025-12-27T12:41:06.611Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "status-items-section": []
     }
   ],
   "status-items": [
@@ -3506,6 +3618,15 @@
       "createdAt": "2025-12-20T11:59:04.330Z",
       "updatedAt": "2025-12-20T11:59:04.330Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Rejected",
+      "icon": "Ban",
+      "color": "pink",
+      "incomplete": false,
+      "id": "01KDFX74SR0S1165EVS0SCT2RB",
+      "createdAt": "2025-12-27T12:40:59.974Z",
+      "updatedAt": "2025-12-27T12:40:59.975Z"
     }
   ],
   "tenants": [
@@ -16899,7 +17020,7 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KD5D2AZ6AVRV8P5ZNJEX5DQK",
       "createdAt": "2025-12-23T10:46:20.911Z",
-      "updatedAt": "2025-12-23T10:51:12.765Z",
+      "updatedAt": "2025-12-27T13:58:46.551Z",
       "tenders": [],
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
@@ -17583,7 +17704,44 @@
       ]
     }
   ],
-  "tender-items": [],
+  "tender-items": [
+    {
+      "partCode": "123",
+      "partName": "123",
+      "brand": "123",
+      "catNo": "123",
+      "quantity": 123,
+      "unit": [
+        {
+          "id": "01KCXXG00000000000000000004"
+        }
+      ],
+      "packSize": "4124",
+      "description": "4124",
+      "requiredDocuments": [
+        {
+          "id": "01KCXVM1P39PPQN6X6870BT1QK"
+        }
+      ],
+      "storageCondition": [
+        {
+          "id": "01KCXW8CYMG126FZHMJ9PBQMVW"
+        }
+      ],
+      "minimumExpirationDate": "2025-12-25",
+      "relatedPurchaseRequests": [
+        {
+          "id": "item-1766843915954-iymi23c6c",
+          "label": "OR-J515121"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KDG1ND73G7BD67MSFC5BT9K6",
+      "createdAt": "2025-12-27T13:58:41.637Z",
+      "updatedAt": "2025-12-27T13:58:41.780Z"
+    }
+  ],
   "pages": [
     {
       "pageId": "inquiry-tender-overview",
@@ -17638,6 +17796,15 @@
           "label": "Supply Chain Management"
         }
       ]
+    }
+  ],
+  "external_nodes": [
+    {
+      "id": "active-directory",
+      "label": "Active Directory",
+      "icon": "Server",
+      "color": "success",
+      "sourceUrl": "field-options:users:authentication-type"
     }
   ]
 }
