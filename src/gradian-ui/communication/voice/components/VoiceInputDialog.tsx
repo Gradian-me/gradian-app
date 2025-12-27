@@ -61,7 +61,6 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcriptionError, setTranscriptionError] = useState<string | null>(null);
   const [outputLanguage, setOutputLanguage] = useState<string>('fa');
-  const [isBlobLoaded, setIsBlobLoaded] = useState(false);
   const [tokenUsage, setTokenUsage] = useState<{ usage?: any; estimated_cost?: any } | null>(null);
   const [shouldAutoTranscribe, setShouldAutoTranscribe] = useState(false);
   const [isRequestingPermission, setIsRequestingPermission] = useState(false);
@@ -92,36 +91,24 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   useEffect(() => {
     // Only load if we have a new blob (different reference)
     if (recordedBlob && recordedBlob !== loadedBlobRef.current) {
-      setIsBlobLoaded(false);
       try {
-        // Convert blob to File if needed, or use blob directly
-        // The visualizer might need a File object with a name
-        const audioFile = recordedBlob instanceof File 
-          ? recordedBlob 
-          : new File([recordedBlob], 'recording.webm', { type: recordedBlob.type || 'audio/webm' });
-        
-        // Set the blob/file in the visualizer
-        setPreloadedAudioBlob(audioFile);
+        setPreloadedAudioBlob(recordedBlob);
         loadedBlobRef.current = recordedBlob;
-        
-        // Give the visualizer a moment to process the audio
-        setTimeout(() => {
-          setIsBlobLoaded(true);
-        }, 100);
-        
         loggingCustom(LogType.CLIENT_LOG, 'log', `Audio blob loaded into visualizer: ${recordedBlob.size} bytes, type: ${recordedBlob.type}`);
       } catch (error) {
         loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to set preloaded audio blob: ${error instanceof Error ? error.message : String(error)}`);
-        setIsBlobLoaded(false);
       }
     } else if (!recordedBlob) {
       // Clear the ref when blob is cleared
       loadedBlobRef.current = null;
-      setIsBlobLoaded(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recordedBlob]); // Only depend on recordedBlob, setPreloadedAudioBlob is stable
 
   const handleStartRecording = useCallback(async () => {
+    // Clear any previous errors when attempting to start recording
+    setTranscriptionError(null);
+    // The error from useAudioRecorder will be set if permission is denied
     await startRecording();
   }, [startRecording]);
 
@@ -143,7 +130,8 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   const handleRequestPermission = useCallback(async () => {
     setIsRequestingPermission(true);
     setTranscriptionError(null);
-    // Note: error from useAudioRecorder will be cleared when startRecording is called
+    // Clear any existing recording state to ensure fresh start
+    clearRecording();
     
     try {
       // Check if mediaDevices is available
@@ -225,7 +213,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
     } finally {
       setIsRequestingPermission(false);
     }
-  }, [handleStartRecording, getBrowserInstructions]);
+  }, [handleStartRecording, getBrowserInstructions, clearRecording]);
 
   // Note: Auto-start functionality removed to prevent permission issues
   // Users must manually click the record button to start recording
@@ -273,17 +261,6 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
     };
   }, []); // Only run on unmount
 
-  // Auto-transcribe when blob is ready after stop-and-transcribe
-  useEffect(() => {
-    if (shouldAutoTranscribe && recordedBlob && !isRecording) {
-      setShouldAutoTranscribe(false);
-      // Small delay to ensure blob is fully processed
-      setTimeout(() => {
-        handleTranscribe();
-      }, 200);
-    }
-  }, [shouldAutoTranscribe, recordedBlob, isRecording]);
-
   const handleStopRecording = () => {
     // Stop the recording but keep the blob so user can record again
     stopRecording();
@@ -307,17 +284,6 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
     // Stop recording
     stopRecording();
   };
-
-  // Auto-transcribe when blob is ready after stop-and-transcribe
-  useEffect(() => {
-    if (shouldAutoTranscribe && recordedBlob && !isRecording) {
-      setShouldAutoTranscribe(false);
-      // Small delay to ensure blob is fully processed
-      setTimeout(() => {
-        handleTranscribe();
-      }, 200);
-    }
-  }, [shouldAutoTranscribe, recordedBlob, isRecording]);
 
   const handleClear = () => {
     setTranscription(null);
@@ -390,6 +356,18 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
     }
   };
 
+  // Auto-transcribe when blob is ready after stop-and-transcribe
+  useEffect(() => {
+    if (shouldAutoTranscribe && recordedBlob && !isRecording) {
+      setShouldAutoTranscribe(false);
+      // Small delay to ensure blob is fully processed
+      setTimeout(() => {
+        handleTranscribe();
+      }, 200);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldAutoTranscribe, recordedBlob, isRecording]);
+
   const handleApply = () => {
     if (transcription) {
       // Call onApply if provided (for applying to text field)
@@ -432,7 +410,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
         )}
         hideCloseButton={false}
       >
-        <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
+        <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
           <DialogTitle className="flex items-center gap-2"><AudioLines className="h-5 w-5 text-violet-500" /> Voice Input</DialogTitle>
           <DialogDescription>
             Speak to see the orb respond to your voice. Click the button to start recording.
@@ -464,8 +442,8 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
           )}
 
           {/* Voice Visualizer - Show when recording exists */}
-          {recordedBlob && !isRecording && loadedBlobRef.current && isBlobLoaded && (
-            <div className="w-full" key={loadedBlobRef.current.size}>
+          {recordedBlob && !isRecording && (
+            <div className="w-full">
               <VoiceVisualizer
                 controls={recorderControls}
                 height={180}
@@ -497,12 +475,11 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
             <div className="w-full p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
               <div className="flex flex-col gap-3">
                 <div className="text-sm text-red-600 dark:text-red-400 whitespace-pre-line">
-                {error && typeof error === 'object' && 'message' in error 
-                  ? (error as Error).message 
-                  : String(error || '') || 
-                  (visualizerError && typeof visualizerError === 'object' && 'message' in visualizerError
-                    ? (visualizerError as Error).message
-                    : String(visualizerError || ''))}
+                  {error 
+                    ? (typeof error === 'string' ? error : (typeof error === 'object' && 'message' in error ? (error as Error).message : String(error)))
+                    : (visualizerError && typeof visualizerError === 'object' && 'message' in visualizerError
+                        ? (visualizerError as Error).message
+                        : String(visualizerError || ''))}
                 </div>
                 {/* Show permission request button if it's a permission error */}
                 {(() => {
@@ -511,7 +488,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                     ? error 
                     : (typeof error === 'object' && 'message' in error 
                         ? String((error as Error).message) 
-                        : '');
+                        : String(error || ''));
                   return errorMessage.toLowerCase().includes('permission') || 
                          errorMessage.toLowerCase().includes('denied');
                 })() && (
@@ -773,7 +750,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
 
         {/* Footer with Apply button */}
         {onApply && (
-          <DialogFooter className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 px-6 py-4 mt-auto">
+          <DialogFooter className="shrink-0 border-t border-gray-200 dark:border-gray-700 px-6 py-4 mt-auto">
             <Button
               variant="outline"
               onClick={handleClose}

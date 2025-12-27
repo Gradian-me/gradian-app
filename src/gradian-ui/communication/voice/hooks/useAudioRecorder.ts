@@ -61,24 +61,18 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       mediaRecorderRef.current = mediaRecorder;
 
       mediaRecorder.ondataavailable = (event) => {
-        if (event.data && event.data.size > 0) {
+        if (event.data.size > 0) {
           chunksRef.current.push(event.data);
         }
       };
 
       mediaRecorder.onstop = () => {
-        // Only create blob if we have chunks
-        if (chunksRef.current.length > 0) {
-          const blob = new Blob(chunksRef.current, { type: mediaRecorder.mimeType });
-          setRecordedBlob(blob);
-          
-          // Create object URL for playback
-          const url = URL.createObjectURL(blob);
-          setAudioUrl(url);
-        }
+        const blob = new Blob(chunksRef.current, { type: mediaRecorder.mimeType });
+        setRecordedBlob(blob);
         
-        // Ensure isRecording is false after stopping
-        setIsRecording(false);
+        // Create object URL for playback
+        const url = URL.createObjectURL(blob);
+        setAudioUrl(url);
 
         // Tracks are already stopped in stopRecording, but ensure cleanup here too
         if (streamRef.current) {
@@ -96,9 +90,8 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
         setError('Recording error occurred');
       };
 
-      // Start recording with timeslice to ensure data is collected periodically
-      // Using 1000ms (1 second) timeslice for reliable data collection
-      mediaRecorder.start(1000);
+      // Start recording without timeslice for continuous recording
+      mediaRecorder.start();
       setIsRecording(true);
     } catch (err) {
       loggingCustom(LogType.CLIENT_LOG, 'error', `Error starting recording: ${err instanceof Error ? err.message : String(err)}`);
@@ -164,16 +157,11 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive' && isRecording) {
       try {
-        // Request any remaining data before stopping
+        // Stop the MediaRecorder first
         if (mediaRecorderRef.current.state === 'recording') {
-          // Request final data chunk
-          mediaRecorderRef.current.requestData();
-          // Stop the MediaRecorder - onstop callback will set isRecording to false and create blob
           mediaRecorderRef.current.stop();
-        } else {
-          // If already stopped or pausing, just set isRecording to false
-          setIsRecording(false);
         }
+        setIsRecording(false);
         // Don't stop tracks immediately - let MediaRecorder finish properly
         // Tracks will be stopped in the onstop callback
       } catch (error) {
@@ -182,24 +170,15 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
         // If stopping fails, stop tracks anyway
         stopAllTracks();
       }
-    } else if (!isRecording) {
-      // If not recording, ensure state is correct
-      setIsRecording(false);
     }
   }, [isRecording, stopAllTracks]);
 
   const clearRecording = useCallback(() => {
-    // Stop any active recording and tracks immediately
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      try {
-        mediaRecorderRef.current.stop();
-      } catch (error) {
-        loggingCustom(LogType.CLIENT_LOG, 'warn', `Error stopping MediaRecorder: ${error instanceof Error ? error.message : String(error)}`);
-      }
+    // Stop any active recording and tracks
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
     }
-    setIsRecording(false);
-    
-    // Stop all tracks immediately to release microphone
     stopAllTracks();
     
     // Revoke object URL to free memory
@@ -211,8 +190,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     setAudioUrl(null);
     setError(null);
     chunksRef.current = [];
-    mediaRecorderRef.current = null;
-  }, [audioUrl, stopAllTracks]);
+  }, [audioUrl, isRecording, stopAllTracks]);
 
   return {
     isRecording,
