@@ -7,7 +7,7 @@ services:
       - '8502:8502' # Host port 9501 maps to container port 8502
     volumes:
       # Optional: Mount logs directory if you want to persist logs
-      - ./logs:/app/logs
+      - /mnt/data/container/gradian-app/logs:/app/logs
     networks:
       - gradian-network
     healthcheck:
