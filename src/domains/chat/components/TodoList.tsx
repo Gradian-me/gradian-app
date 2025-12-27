@@ -1104,6 +1104,39 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
             </div>
           );
         })()}
+        {/* Input Display - Expandable */}
+        {todo.input && (todo.input.body || todo.input.extra_body) && (
+          <Accordion type="single" collapsible className="mt-1 w-full">
+            <AccordionItem value={`input-${todo.id}`} className="border-0">
+              <AccordionTrigger className="text-[10px] py-1 px-0 h-auto hover:no-underline text-gray-600 dark:text-gray-400">
+                <span className="flex items-center gap-1">
+                  <Network className="w-3 h-3" />
+                  View Input
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="pt-1 pb-0 px-0">
+                <div className="text-[10px] space-y-1 bg-gray-50 dark:bg-gray-900/50 rounded p-2 border border-gray-200 dark:border-gray-700">
+                  {todo.input.body && typeof todo.input.body === 'object' && Object.keys(todo.input.body).length > 0 && (
+                    <div>
+                      <div className="font-medium text-gray-700 dark:text-gray-300 mb-0.5">Body:</div>
+                      <pre className="text-[9px] text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words font-mono">
+                        {JSON.stringify(todo.input.body, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                  {todo.input.extra_body && typeof todo.input.extra_body === 'object' && Object.keys(todo.input.extra_body).length > 0 && (
+                    <div>
+                      <div className="font-medium text-gray-700 dark:text-gray-300 mb-0.5">Extra Body:</div>
+                      <pre className="text-[9px] text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words font-mono">
+                        {JSON.stringify(todo.input.extra_body, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        )}
         {todo.dependencies && todo.dependencies.length > 0 && (
           <div className="mt-0.5 text-[10px] text-gray-500 dark:text-gray-500">
             Depends on: {todo.dependencies.length} step{todo.dependencies.length !== 1 ? 's' : ''}

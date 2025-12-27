@@ -1464,8 +1464,8 @@ export function AiBuilderResponse({
             />
           </div>
         )
-      ) : renderData.type === 'search' || isSearchResultsFormat ? (
-        // Show search results if available, otherwise show empty state
+      ) : isSearchResultsFormat ? (
+        // For search-only agents, show only search results
         (renderData.searchResults || searchResults) && (renderData.searchResults || searchResults)!.length > 0 ? (
           <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
             <AISearchResults results={renderData.searchResults || searchResults || []} />
@@ -1679,6 +1679,37 @@ export function AiBuilderResponse({
               <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-1" />
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                 AI Generated Content
+              </h3>
+              {showModelBadge && agent?.model && (
+                <Badge
+                  variant="outline"
+                  className="ml-1 text-xs font-medium bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800"
+                >
+                  {agent.model}
+                </Badge>
+              )}
+            </div>
+            <CopyContent content={displayContent} />
+          </div>
+          <div className="w-full">
+            <div className="p-4">
+              <MarkdownViewer 
+                content={cleanMarkdownResponse(displayContent)}
+                showToggle={true}
+                isEditable={true}
+                onChange={handleContentChange}
+              />
+            </div>
+          </div>
+        </div>
+      ) : renderData.type === 'markdown' || (displayContent && displayContent.trim() && agentFormat !== 'json' && agentFormat !== 'string' && !shouldRenderTable && !shouldRenderGraph) ? (
+        // Show markdown content (for agents that use search as a tool, this shows after search results)
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-1" />
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                {agent?.label || 'AI Response'}
               </h3>
               {showModelBadge && agent?.model && (
                 <Badge

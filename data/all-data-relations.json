@@ -1552,28 +1552,6 @@
     "updatedAt": "2025-12-22T12:00:00.000Z"
   },
   {
-    "id": "01KDFEG66DW0M0MAERJBGN065N",
-    "sourceSchema": "users",
-    "sourceId": "01KDFEG5Z10VPAMAG3E76KJMCG",
-    "targetSchema": "external-nodes",
-    "targetId": "active-directory",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "authentication-type",
-    "createdAt": "2025-12-27T08:23:47.659Z",
-    "updatedAt": "2025-12-27T08:23:47.659Z"
-  },
-  {
-    "id": "01KDFEH9XSBM8C25D0JRYAEP5G",
-    "sourceSchema": "users",
-    "sourceId": "01KDFEH9R5NH6C1QXN7PE3HK43",
-    "targetSchema": "external-nodes",
-    "targetId": "active-directory",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "authentication-type",
-    "createdAt": "2025-12-27T08:24:24.249Z",
-    "updatedAt": "2025-12-27T08:24:24.249Z"
-  },
-  {
     "sourceSchema": "status-groups",
     "sourceId": "01KCXSBQMD17BR96WWSKBJMEZ4",
     "targetSchema": "status-items",
@@ -1639,16 +1617,5 @@
     "createdAt": "2025-12-27T13:58:41.868Z",
     "updatedAt": "2025-12-27T13:58:44.179Z",
     "inactive": true
-  },
-  {
-    "id": "01KDG66XG0SB5DS2ZEY4MDC25X",
-    "sourceSchema": "users",
-    "sourceId": "01KDG66XCHTD0GGQX3A2E69T85",
-    "targetSchema": "external-nodes",
-    "targetId": "active-directory",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "authentication-type",
-    "createdAt": "2025-12-27T15:18:09.664Z",
-    "updatedAt": "2025-12-27T15:18:09.664Z"
   }
 ]

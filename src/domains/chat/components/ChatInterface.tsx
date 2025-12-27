@@ -64,6 +64,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const prevChatIdRef = useRef<string | null>(null);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const addedMessageIdsRef = useRef<Set<string>>(new Set());
+  const messagesRef = useRef(messages);
+  
+  // Keep messages ref in sync
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   // Select chat from URL on mount or when URL changes
   // Only update if URL chat ID is different from current chat
@@ -333,15 +340,55 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         // Add message directly to state without reloading
         // This prevents showing skeleton loader
         const newMessage = messageResult.data;
-        addMessage(newMessage);
         
-        // Scroll to end after a short delay to ensure message is rendered
-        setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+        // Ensure message has required fields
+        if (newMessage && newMessage.id) {
+          // Track that we're adding this message
+          addedMessageIdsRef.current.add(newMessage.id);
+          
+          addMessage(newMessage);
+          
+          // Scroll to end after a short delay to ensure message is rendered
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+          
+          // Double-check message was added after a delay and reload if needed
+          // This ensures the message appears even if startTransition delays it
+          const messageIdToCheck = newMessage.id;
+          const chatIdToReload = currentChat?.id;
+          setTimeout(() => {
+            // Check if message exists in current messages (use ref to avoid closure issues)
+            const messageExists = messagesRef.current.some(msg => msg.id === messageIdToCheck);
+            if (!messageExists && chatIdToReload && addedMessageIdsRef.current.has(messageIdToCheck)) {
+              // Message wasn't added despite our attempt, reload chat to ensure it appears
+              addedMessageIdsRef.current.delete(messageIdToCheck);
+              selectChat(chatIdToReload);
+            } else if (messageExists) {
+              // Message was successfully added, remove from tracking
+              addedMessageIdsRef.current.delete(messageIdToCheck);
+            }
+          }, 2000);
+        } else {
+          console.error('Message data missing required fields:', newMessage);
+          // Reload chat as fallback
+          if (currentChat) {
+            selectChat(currentChat.id);
+          }
+        }
+      } else {
+        console.error('Failed to add message:', messageResult.error);
+        // Reload chat as fallback to ensure message appears
+        if (currentChat) {
+          selectChat(currentChat.id);
+        }
       }
     } catch (error) {
       console.error('Error adding todo execution message:', error);
+      // Reload chat as fallback to ensure message appears
+      if (currentChat) {
+        selectChat(currentChat.id);
+      }
     }
   };
 
