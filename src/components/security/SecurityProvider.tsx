@@ -32,24 +32,37 @@ export function SecurityProvider({ children }: { children: React.ReactNode }) {
       const errorMessage = error?.message || '';
       const errorName = error?.name || '';
       
-      // Check if error is from a browser extension
+      // Check if error is from a browser extension (most reliable check)
       const hasExtensionUrl = (
         errorString.includes('chrome-extension://') ||
         errorStack.includes('chrome-extension://') ||
         errorMessage.includes('chrome-extension://') ||
         errorString.includes('moz-extension://') ||
         errorStack.includes('moz-extension://') ||
-        errorMessage.includes('moz-extension://')
+        errorMessage.includes('moz-extension://') ||
+        errorString.includes('safari-extension://') ||
+        errorStack.includes('safari-extension://') ||
+        errorMessage.includes('safari-extension://')
       );
       
       // Check for common extension error patterns
+      // These patterns typically indicate extension code trying to use undefined APIs
       const hasExtensionErrorPattern = (
-        (errorMessage.includes('addListener') && (errorString.includes('undefined') || errorStack.includes('undefined'))) ||
-        (errorMessage.includes('emit') && (errorString.includes('undefined') || errorStack.includes('undefined'))) ||
+        // Generic "cannot read properties of undefined" with emit/addListener
         (errorString.includes('Cannot read properties of undefined') && 
-         (errorString.includes('addListener') || errorString.includes('emit'))) ||
-        (errorName === 'TypeError' && errorMessage.includes('addListener') && errorStack.includes('chrome-extension://')) ||
-        (errorName === 'TypeError' && errorMessage.includes('emit') && errorStack.includes('chrome-extension://'))
+         (errorString.includes('addListener') || errorString.includes('emit') || errorString.includes('reading \'emit\'') || errorString.includes('reading \'addListener\''))) ||
+        (errorMessage.includes('Cannot read properties of undefined') && 
+         (errorMessage.includes('addListener') || errorMessage.includes('emit') || errorMessage.includes('reading \'emit\'') || errorMessage.includes('reading \'addListener\''))) ||
+        (errorStack.includes('Cannot read properties of undefined') && 
+         (errorStack.includes('addListener') || errorStack.includes('emit') || errorStack.includes('reading \'emit\'') || errorStack.includes('reading \'addListener\''))) ||
+        // TypeError with emit/addListener and undefined
+        (errorName === 'TypeError' && 
+         (errorMessage.includes('addListener') || errorMessage.includes('emit')) && 
+         (errorString.includes('undefined') || errorStack.includes('undefined'))) ||
+        // Direct patterns: "reading 'emit'" or "reading 'addListener'"
+        (errorString.includes('reading \'emit\'') || errorString.includes('reading \'addListener\'')) ||
+        (errorMessage.includes('reading \'emit\'') || errorMessage.includes('reading \'addListener\'')) ||
+        (errorStack.includes('reading \'emit\'') || errorStack.includes('reading \'addListener\''))
       );
       
       return hasExtensionUrl || hasExtensionErrorPattern;

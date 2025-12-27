@@ -8,6 +8,7 @@ import { ProfessionalWritingModal } from '@/gradian-ui/communication/professiona
 import { IconRenderer } from '../../../shared/utils/icon-renderer';
 import { VoiceInputDialog } from '@/gradian-ui/communication/voice/components/VoiceInputDialog';
 import { Mic } from 'lucide-react';
+import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
 
 export const Textarea = forwardRef<FormElementRef, TextareaProps>(
   (
@@ -60,7 +61,9 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       onBlur?.();
     };
 
-    const handleFocus = () => {
+    const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+      // Scroll textarea into view when focused (especially important on mobile when keyboard opens)
+      scrollInputIntoView(e.currentTarget, { delay: 100 });
       onFocus?.();
     };
 

@@ -3,10 +3,10 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Plus, X, Edit2, Check, X as XIcon } from 'lucide-react';
+import { GripVertical, X, Edit2, Check, X as XIcon } from 'lucide-react';
 import { ButtonMinimal } from './ButtonMinimal';
-import { Button } from '@/components/ui/button';
 import { ConfirmationMessage } from './ConfirmationMessage';
+import { AddButtonFull } from './AddButtonFull';
 import {
   DndContext,
   closestCenter,
@@ -25,6 +25,7 @@ import {
 import { cn } from '@/lib/utils';
 import { getLabelClasses } from '../utils/field-styles';
 import { validateField } from '@/gradian-ui/shared/utils';
+import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
 
 export interface AnnotationItem {
   id: string;
@@ -104,7 +105,11 @@ const SortableListItem: React.FC<{
     if (isEditing && inputElementRef.current) {
       // Small delay to ensure the input is rendered
       setTimeout(() => {
-        inputElementRef.current?.focus();
+        if (inputElementRef.current) {
+          inputElementRef.current.focus();
+          // Scroll input into view when focused (especially important on mobile when keyboard opens)
+          scrollInputIntoView(inputElementRef.current, { delay: 150 });
+        }
       }, 0);
     }
   }, [isEditing, inputElementRef]);
@@ -317,6 +322,10 @@ const SortableListItem: React.FC<{
                     value={editValue}
                     onChange={handleInputChange}
                     onPaste={handlePaste}
+                    onFocus={(e) => {
+                      // Scroll input into view when focused (especially important on mobile when keyboard opens)
+                      scrollInputIntoView(e.currentTarget, { delay: 100 });
+                    }}
                     onBlur={(e) => {
                       // Don't save on blur if we're deleting or clicking a button
                       if (isDeletingRef.current) {
@@ -498,6 +507,8 @@ export const ListInput: React.FC<ListInputProps> = ({
       const newItemRef = inputRefs.current.get(newId);
       if (newItemRef?.current) {
         newItemRef.current.focus();
+        // Scroll input into view when focused (especially important on mobile when keyboard opens)
+        scrollInputIntoView(newItemRef.current, { delay: 150 });
       }
     }, 0);
   }, [value, onChange]);
@@ -586,6 +597,8 @@ export const ListInput: React.FC<ListInputProps> = ({
           const newItemRef = inputRefs.current.get(lastNewItemId);
           if (newItemRef?.current) {
             newItemRef.current.focus();
+            // Scroll input into view when focused (especially important on mobile when keyboard opens)
+            scrollInputIntoView(newItemRef.current, { delay: 150 });
           }
         }, 0);
       } else {
@@ -655,16 +668,11 @@ export const ListInput: React.FC<ListInputProps> = ({
         </div>
       )}
 
-      <Button
-        type="button"
-        variant="outline"
+      <AddButtonFull
+        label={addButtonText}
         onClick={handleAddItem}
         disabled={hasEmptyItem || disabled}
-        className="w-full gap-2"
-      >
-        <Plus className="h-4 w-4" />
-        {addButtonText}
-      </Button>
+      />
     </div>
   );
 };

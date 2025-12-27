@@ -7,6 +7,7 @@ import { baseInputClasses, getLabelClasses, errorTextClasses } from '../utils/fi
 import { CopyContent } from './CopyContent';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
 
 export const TextInput = forwardRef<FormElementRef, TextInputProps>(
   (
@@ -54,7 +55,9 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
       onBlur?.();
     };
 
-    const handleFocus = () => {
+    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+      // Scroll input into view when focused (especially important on mobile when keyboard opens)
+      scrollInputIntoView(e.currentTarget, { delay: 100 });
       onFocus?.();
     };
 

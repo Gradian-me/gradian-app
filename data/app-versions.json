@@ -4687,5 +4687,52 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KDFB6PG64ZN93HVF4SFVR1PX",
+    "timestamp": "2025-12-27T07:26:10.974Z",
+    "version": "1.37.002",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "Updated tsconfig.json to exclude the .next directory for improved build clarity",
+        "priority": "Medium",
+        "affectedDomains": [
+          "infrastructure",
+          "build"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Modified permissions utility functions to handle custom permission types more effectively, ensuring better compatibility across browsers",
+        "priority": "Medium",
+        "affectedDomains": [
+          "permissions",
+          "utils",
+          "browser-compatibility"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Enhanced SecurityProvider component to improve error handling for browser extension issues, providing clearer feedback on extension-related errors",
+        "priority": "Medium",
+        "affectedDomains": [
+          "security",
+          "error-handling",
+          "browser-extensions"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved input focus handling in various components (ListInput, Select, TextInput, Textarea) to ensure inputs are scrolled into view when focused, enhancing user experience on mobile devices",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui",
+          "mobile",
+          "accessibility"
+        ]
+      }
+    ]
   }
 ]

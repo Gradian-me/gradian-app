@@ -102,7 +102,6 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
       // Clear the ref when blob is cleared
       loadedBlobRef.current = null;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recordedBlob]); // Only depend on recordedBlob, setPreloadedAudioBlob is stable
 
   const handleStartRecording = useCallback(async () => {
@@ -365,7 +364,6 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
         handleTranscribe();
       }, 200);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldAutoTranscribe, recordedBlob, isRecording]);
 
   const handleApply = () => {

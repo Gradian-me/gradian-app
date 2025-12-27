@@ -42,7 +42,12 @@ export function validateField(
   // Required validation
   const isRequired = field.validation?.required ?? false;
   if (isRequired) {
-    if (value === undefined || value === null || value === '') {
+    // Check for empty values (including empty arrays for list-input)
+    const isEmpty = value === undefined || 
+                    value === null || 
+                    value === '' || 
+                    (Array.isArray(value) && value.length === 0);
+    if (isEmpty) {
       errors.push({
         field: field.name,
         message: `${field.label} is required`,
@@ -53,7 +58,12 @@ export function validateField(
   }
 
   // Skip further validation if value is empty and not required
-  if (value === undefined || value === null || value === '') {
+  // For list-input, empty array is considered empty
+  const isEmpty = value === undefined || 
+                  value === null || 
+                  value === '' || 
+                  (Array.isArray(value) && value.length === 0);
+  if (isEmpty) {
     return errors;
   }
 
@@ -142,12 +152,39 @@ export function validateField(
     if (field.validation.pattern) {
       const pattern = toRegExp(field.validation.pattern);
       
-      if (pattern && typeof pattern.test === 'function' && !pattern.test(value)) {
-        errors.push({
-          field: field.name,
-          message: `${field.label} format is invalid`,
-          code: 'INVALID_FORMAT',
-        });
+      if (pattern && typeof pattern.test === 'function') {
+        // Special handling for list-input: validate each item's label
+        if (field.component === 'list-input' && Array.isArray(value)) {
+          // Validate each item in the list
+          for (const item of value) {
+            // Extract label from item (could be object with label property or just a string)
+            const itemLabel = typeof item === 'string' ? item : (item?.label || item?.value || String(item));
+            
+            // Trim the label before validation to handle whitespace
+            const trimmedLabel = itemLabel ? String(itemLabel).trim() : '';
+            
+            if (trimmedLabel && !pattern.test(trimmedLabel)) {
+              errors.push({
+                field: field.name,
+                message: `${field.label} contains invalid format: "${trimmedLabel}"`,
+                code: 'INVALID_FORMAT',
+              });
+              // Only report first invalid item to avoid spam
+              break;
+            }
+          }
+        } else {
+          // Standard validation for non-list-input fields
+          // Trim string values before validation
+          const testValue = typeof value === 'string' ? value.trim() : value;
+          if (!pattern.test(testValue)) {
+            errors.push({
+              field: field.name,
+              message: `${field.label} format is invalid`,
+              code: 'INVALID_FORMAT',
+            });
+          }
+        }
       }
     }
   }

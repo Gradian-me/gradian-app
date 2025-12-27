@@ -1,4 +1,4 @@
-import type { PermissionName, PermissionStatus, MediaDeviceType } from './types';
+import type { PermissionName, PermissionStatus, PermissionState, MediaDeviceType } from './types';
 
 /**
  * Check if Permissions API is supported
@@ -41,7 +41,8 @@ export const queryPermission = async (name: PermissionName): Promise<PermissionS
   }
 
   try {
-    const result = await navigator.permissions.query({ name: name as PermissionName });
+    // Type assertion needed because browser's PermissionName type doesn't include all custom permissions
+    const result = await navigator.permissions.query({ name: name as any });
     return {
       status: result.state as PermissionStatus,
       error: null,

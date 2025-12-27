@@ -28,6 +28,7 @@ import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store'
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
 
 export interface SelectOption {
   id?: string;
@@ -114,6 +115,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const [searchValue, setSearchValue] = React.useState('');
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   const [isSelectOpen, setIsSelectOpen] = React.useState(false);
+  // Controlled open state to prevent closing when keyboard opens (must be declared unconditionally)
+  const [controlledOpen, setControlledOpen] = React.useState<boolean | undefined>(undefined);
   
   // Detect touch device
   const isTouchDevice = React.useMemo(() => {
@@ -121,32 +124,67 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }, []);
   
+  // Track viewport height to detect keyboard appearance
+  const viewportHeightRef = React.useRef<number>(typeof window !== 'undefined' ? window.innerHeight : 0);
+  const isKeyboardOpeningRef = React.useRef(false);
+  const isKeyboardClosingRef = React.useRef(false);
+  
   // Maintain focus on search input when select is open
-  // On touch devices, delay focus to prevent keyboard from closing the select
+  // On touch devices, don't auto-focus to prevent keyboard from closing the select
+  // Instead, let user tap the input to open keyboard
   useLayoutEffect(() => {
-    if (isSelectOpen && enableSearch && searchInputRef.current) {
-      if (isTouchDevice) {
-        // On touch devices, delay focus significantly to allow select to fully open
-        // and prevent keyboard from triggering click-outside detection
-        const timeoutId = setTimeout(() => {
-          if (searchInputRef.current && document.activeElement !== searchInputRef.current && isSelectOpen) {
-            // Use a small delay to ensure select is fully rendered
-            requestAnimationFrame(() => {
-              if (searchInputRef.current && isSelectOpen) {
-                searchInputRef.current.focus();
-              }
-            });
-          }
-        }, 300); // Longer delay for touch devices
-        return () => clearTimeout(timeoutId);
-      } else {
-        // On non-touch devices, focus immediately
-        requestAnimationFrame(() => {
-          if (searchInputRef.current && document.activeElement !== searchInputRef.current) {
-            searchInputRef.current.focus();
-          }
-        });
+    if (isSelectOpen && enableSearch && searchInputRef.current && !isTouchDevice) {
+      // On non-touch devices, focus immediately
+      requestAnimationFrame(() => {
+        if (searchInputRef.current && document.activeElement !== searchInputRef.current) {
+          searchInputRef.current.focus();
+        }
+      });
+    }
+    
+    // Track viewport height changes (keyboard open/close)
+    if (isTouchDevice && isSelectOpen) {
+      const updateViewportHeight = () => {
+        const currentHeight = window.innerHeight;
+        const heightDiff = viewportHeightRef.current - currentHeight;
+        
+        // If viewport shrunk significantly (keyboard opened), mark it
+        if (heightDiff > 100) {
+          isKeyboardOpeningRef.current = true;
+          isKeyboardClosingRef.current = false;
+          // Reset after a short delay
+          setTimeout(() => {
+            isKeyboardOpeningRef.current = false;
+          }, 500);
+        }
+        // If viewport expanded significantly (keyboard closed), mark it
+        else if (heightDiff < -100) {
+          isKeyboardClosingRef.current = true;
+          isKeyboardOpeningRef.current = false;
+          // Reset after a short delay
+          setTimeout(() => {
+            isKeyboardClosingRef.current = false;
+          }, 500);
+        }
+        viewportHeightRef.current = currentHeight;
+      };
+      
+      // Update initial viewport height
+      viewportHeightRef.current = window.innerHeight;
+      
+      // Listen for resize events (keyboard open/close)
+      window.addEventListener('resize', updateViewportHeight);
+      // Also listen for visual viewport changes (more accurate for mobile keyboards)
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', updateViewportHeight);
       }
+      
+      return () => {
+        window.removeEventListener('resize', updateViewportHeight);
+        if (window.visualViewport) {
+          window.visualViewport.removeEventListener('resize', updateViewportHeight);
+        }
+      };
     }
   }, [isSelectOpen, enableSearch, isTouchDevice]);
   
@@ -592,12 +630,41 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     
     // Clear search when select closes, focus search input when opens
     const handleOpenChange = (open: boolean) => {
-      setIsSelectOpen(open);
-      if (!open && enableSearch) {
-        setSearchValue('');
+      // On touch devices, prevent closing if keyboard is opening
+      if (!open && isTouchDevice && isKeyboardOpeningRef.current) {
+        // Reset the flag after a short delay
+        setTimeout(() => {
+          isKeyboardOpeningRef.current = false;
+        }, 300);
+        // Force select to stay open by setting controlled state
+        setControlledOpen(true);
+        setIsSelectOpen(true);
+        return;
       }
-      // Focus search input when select opens (only on non-touch devices)
-      // On touch devices, let useLayoutEffect handle it with proper delay
+      
+      // On touch devices, prevent closing if keyboard is closing (don't clear search)
+      if (!open && isTouchDevice && isKeyboardClosingRef.current) {
+        // Reset the flag after a short delay
+        setTimeout(() => {
+          isKeyboardClosingRef.current = false;
+        }, 300);
+        // Force select to stay open by setting controlled state
+        // Don't clear search - keyboard closing shouldn't clear it
+        setControlledOpen(true);
+        setIsSelectOpen(true);
+        return;
+      }
+      
+      setIsSelectOpen(open);
+      setControlledOpen(open ? true : undefined); // Use controlled when open, undefined when closed
+      // Only clear search when select is actually closed (not due to keyboard closing)
+      if (!open && enableSearch && !isKeyboardClosingRef.current) {
+        setSearchValue('');
+        isKeyboardOpeningRef.current = false;
+        isKeyboardClosingRef.current = false;
+      }
+      // Only focus on non-touch devices
+      // On touch devices, let user manually tap the search input to open keyboard
       if (open && enableSearch && searchInputRef.current && !isTouchDevice) {
         // Use setTimeout to ensure the DOM is ready
         setTimeout(() => {
@@ -614,6 +681,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
           value={selectValue}
           onValueChange={handleRadixChange}
           disabled={disabled}
+          open={controlledOpen}
           onOpenChange={handleOpenChange}
           {...props}
         >
@@ -626,6 +694,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
             searchSlot={
               enableSearch ? (
                 <div 
+                  data-search-container
                   className="px-2 py-2"
                   onKeyDown={(e) => {
                     // Prevent Radix Select from handling keyboard events in search area
@@ -686,20 +755,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                       onClick={(e) => {
                         // Prevent select from closing when clicking search input
                         e.stopPropagation();
-                        // Ensure focus on click (works for both mouse and touch)
-                        const input = e.currentTarget;
-                        if (input && isSelectOpen) {
-                          // Focus immediately
-                          input.focus();
-                          // On touch devices, ensure keyboard opens by focusing again after a tiny delay
-                          if (isTouchDevice) {
-                            setTimeout(() => {
-                              if (input && isSelectOpen && document.activeElement !== input) {
-                                input.focus();
-                              }
-                            }, 50);
-                          }
-                        }
+                        // Let native focus behavior handle it - don't force focus
+                        // This prevents issues with keyboard opening on touch devices
                       }}
                       onMouseDown={(e) => {
                         // Prevent select from closing, but allow default focus behavior
@@ -709,44 +766,29 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                       onTouchStart={(e) => {
                         // Prevent select from closing when touching search input on mobile
                         e.stopPropagation();
-                        // Don't prevent default to allow native focus behavior
-                        // Focus immediately on touch start for better responsiveness
-                        if (e.currentTarget && isSelectOpen) {
-                          // Use a small delay to ensure touch event completes first
-                          setTimeout(() => {
-                            if (e.currentTarget && isSelectOpen) {
-                              e.currentTarget.focus();
-                            }
-                          }, 10);
-                        }
+                        // Mark that we're interacting with the input (keyboard might open)
+                        isKeyboardOpeningRef.current = true;
+                        // Don't prevent default - let native focus happen naturally
+                        // Focus will happen via native touch behavior
                       }}
                       onTouchEnd={(e) => {
                         // Prevent select from closing when touch ends
                         e.stopPropagation();
                         // Don't prevent default to allow native focus behavior
-                        // Ensure focus on touch end (user interaction)
-                        if (e.currentTarget && isSelectOpen) {
-                          e.currentTarget.focus();
-                        }
+                        // The input will focus naturally via the touch event
                       }}
                       onFocus={(e) => {
                         // Ensure input stays focused
                         e.stopPropagation();
+                        // Scroll input into view when focused (especially important on mobile when keyboard opens)
+                        scrollInputIntoView(e.currentTarget, { delay: 150 });
                       }}
                       onBlur={(e) => {
-                        // On touch devices, prevent blur from closing select immediately
-                        // But only if it wasn't a user-initiated blur (like clicking outside)
-                        if (isTouchDevice && isSelectOpen) {
-                          // Small delay to check if select is still open and refocus if needed
-                          setTimeout(() => {
-                            if (isSelectOpen && searchInputRef.current && document.activeElement !== searchInputRef.current) {
-                              // Only refocus if the select is still open and input lost focus unintentionally
-                              searchInputRef.current.focus();
-                            }
-                          }, 150);
-                        }
+                        // Don't aggressively refocus on blur - let the select stay open
+                        // The user can tap the input again if needed
+                        // Only prevent event propagation to avoid closing select
+                        e.stopPropagation();
                       }}
-                      autoFocus={!isTouchDevice}
                       placeholder="Search options..."
                       className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:border-violet-400 dark:focus:border-violet-500"
                     />

@@ -23,8 +23,16 @@ export const validateField = (
   value: any,
   rules: ValidationRule
 ): { isValid: boolean; error?: string } => {
-  if (rules.required && (!value || value.toString().trim() === '')) {
-    return { isValid: false, error: 'This field is required' };
+  if (rules.required) {
+    // Check for empty values (including empty arrays)
+    const isEmpty = value === undefined || 
+                    value === null || 
+                    value === '' || 
+                    (Array.isArray(value) && value.length === 0) ||
+                    (!Array.isArray(value) && value.toString().trim() === '');
+    if (isEmpty) {
+      return { isValid: false, error: 'This field is required' };
+    }
   }
 
   if (value && rules.minLength && value.toString().length < rules.minLength) {
@@ -52,8 +60,27 @@ export const validateField = (
   if (value && rules.pattern) {
     const pattern = toRegExp(rules.pattern);
 
-    if (pattern && typeof pattern.test === 'function' && !pattern.test(value.toString())) {
-      return { isValid: false, error: 'Invalid format' };
+    if (pattern && typeof pattern.test === 'function') {
+      // Handle arrays (list-input fields): validate each item's label
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          // Extract label from item (could be object with label property or just a string)
+          const itemLabel = typeof item === 'string' ? item : (item?.label || item?.value || String(item));
+          
+          // Trim the label before validation to handle whitespace
+          const trimmedLabel = itemLabel ? String(itemLabel).trim() : '';
+          
+          if (trimmedLabel && !pattern.test(trimmedLabel)) {
+            return { isValid: false, error: 'Invalid format' };
+          }
+        }
+      } else {
+        // Standard validation for non-array fields - trim string values
+        const testValue = typeof value === 'string' ? value.trim() : value.toString();
+        if (!pattern.test(testValue)) {
+          return { isValid: false, error: 'Invalid format' };
+        }
+      }
     }
   }
 

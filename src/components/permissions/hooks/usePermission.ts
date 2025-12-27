@@ -44,7 +44,8 @@ export const usePermission = (name: PermissionName): UsePermissionReturn => {
       
       const setupListener = async () => {
         try {
-          const result = await navigator.permissions.query({ name: name as PermissionName });
+          // Type assertion needed because browser's PermissionName type doesn't include all custom permissions
+          const result = await navigator.permissions.query({ name: name as any });
           permissionStatus = result.state as PermissionStatus;
           
           // Listen for changes
