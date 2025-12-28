@@ -270,6 +270,30 @@
       "cached_input": 1.5,
       "output": 12.0
     }
+  },
+  {
+    "id": "gpt-5-mini",
+    "label": "GPT-5 Mini",
+    "provider": "openai",
+    "category": "chat",
+    "description": "OpenAI's cost-effective GPT-5 Mini model for general-purpose tasks",
+    "pricing": {
+      "input": 0.25,
+      "cached_input": 0.025,
+      "output": 2.0
+    }
+  },
+  {
+    "id": "claude-haiku-4-5",
+    "label": "Claude Haiku 4.5",
+    "provider": "anthropic",
+    "category": "chat",
+    "description": "Anthropic's Claude Haiku 4.5 model for fast and efficient responses",
+    "pricing": {
+      "input": 1.0,
+      "cached_input": 0.5,
+      "output": 5.0
+    }
   }
 ]
 

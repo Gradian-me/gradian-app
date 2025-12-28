@@ -1,15 +1,59 @@
 import { TableColumn, TableConfig } from '../../table/types/index';
 
 /**
+ * Format number with thousand separators
+ */
+function formatNumberWithSeparators(text: string): string {
+  // Match numbers (integers or decimals) that are standalone or part of text
+  // This regex matches:
+  // - Whole numbers: 1234567
+  // - Decimal numbers: 1234.56
+  // - Numbers with signs: +1234, -1234
+  // - Numbers with currency symbols: $1234, 1234 IRR
+  // - Numbers in parentheses: (1234)
+  // But avoids matching:
+  // - Dates: 2024-01-01
+  // - Percentages: 50% (we'll handle these separately)
+  // - Phone numbers, IDs, etc.
+  
+  // First, try to match standalone numbers (most common case)
+  const numberPattern = /(\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d{4,}(?:\.\d+)?)/g;
+  
+  return text.replace(numberPattern, (match) => {
+    // Skip if already has commas (already formatted)
+    if (match.includes(',')) return match;
+    
+    // Check if it's a decimal number
+    const hasDecimal = match.includes('.');
+    const parts = hasDecimal ? match.split('.') : [match];
+    const integerPart = parts[0];
+    const decimalPart = parts[1] || '';
+    
+    // Only format if integer part has 4+ digits
+    if (integerPart.length < 4) return match;
+    
+    // Add thousand separators to integer part
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    
+    return hasDecimal ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+  });
+}
+
+/**
  * Helper function to extract text from AST node recursively
  */
 export function extractText(node: any): string {
-  if (typeof node === 'string') return node;
-  if (node?.value) return node.value;
-  if (node?.children && Array.isArray(node.children)) {
-    return node.children.map(extractText).join('');
+  let text = '';
+  if (typeof node === 'string') {
+    text = node;
+  } else if (node?.value) {
+    text = node.value;
+  } else if (node?.children && Array.isArray(node.children)) {
+    text = node.children.map(extractText).join('');
   }
-  return '';
+  
+  // Format numbers only once at the end
+  return formatNumberWithSeparators(text);
 }
 
 /**

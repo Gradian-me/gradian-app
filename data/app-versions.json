@@ -4920,5 +4920,80 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KDAENHANCEMENTS007",
+    "timestamp": "2025-12-28T12:19:10.000Z",
+    "version": "1.37.007",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated .gitignore to exclude SalesData.csv for better file management",
+        "priority": "Medium",
+        "affectedDomains": [
+          "infrastructure",
+          "file-management"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Modified ai-agents.json to change the category of the Performance Manager agent to Human Resources, improving clarity",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "data-management"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated ai-models.json to add new models GPT-5 Mini and Claude Haiku 4.5, expanding available AI options",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-models",
+          "configuration"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Enhanced all-data.json with a new Sales Analytics entry for improved data organization",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "analytics"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Refactored UserProfileSelector component to simplify button rendering and prevent hydration issues",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "components",
+          "user-management"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved DynamicAiAgentResponseContainer with new refresh confirmation and maximize dialog features for better user interaction",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ui",
+          "data-display"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Added number formatting functionality in TableComponents and tableParser for improved data presentation",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "table",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

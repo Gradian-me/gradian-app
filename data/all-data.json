@@ -3180,6 +3180,29 @@
       ],
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
+    },
+    {
+      "menuTitle": "Sales Analytics",
+      "menuIcon": "TrendingUp",
+      "sortIndex": 11,
+      "hideInAD": false,
+      "description": "Board-level sales performance analysis and insights",
+      "menuUrl": "/sales-analytics",
+      "openInNewTab": false,
+      "id": "01KCSALESANALYTICS00000001",
+      "createdAt": "2025-12-15T12:00:00.000Z",
+      "updatedAt": "2025-12-15T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": [],
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     }
   ],
   "status-groups": [

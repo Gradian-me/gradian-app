@@ -12,7 +12,7 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { RotateCcw, Sparkles } from 'lucide-react';
+import { RefreshCw, Sparkles, Maximize2 } from 'lucide-react';
 import type { AiAgent } from '@/domains/ai-builder/types';
 import { useAiBuilder } from '@/domains/ai-builder/hooks/useAiBuilder';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';
@@ -28,6 +28,13 @@ import { cleanMarkdownResponse } from '@/domains/ai-builder/utils/ai-security-ut
 import { Badge } from '@/components/ui/badge';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
+import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export interface DynamicAiAgentResponseContainerProps {
   action: QuickAction;
@@ -63,7 +70,10 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   const [processedBody, setProcessedBody] = useState<Record<string, any> | undefined>(undefined);
   const [processedExtraBody, setProcessedExtraBody] = useState<Record<string, any> | undefined>(undefined);
   const [hasExecuted, setHasExecuted] = useState(false);
+  const [showRefreshConfirmation, setShowRefreshConfirmation] = useState(false);
+  const [showMaximizeDialog, setShowMaximizeDialog] = useState(false);
   const autoExecuteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isCurrentlyLoadingRef = useRef(false);
 
   const {
     aiResponse,
@@ -517,6 +527,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   const executeAgent = useCallback(() => {
     if (!agent || !action.agentId || !userPrompt.trim()) return;
 
+    isCurrentlyLoadingRef.current = true;
     generateResponse({
       userPrompt,
       agentId: action.agentId,
@@ -525,6 +536,15 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     });
     setHasExecuted(true);
   }, [agent, action.agentId, userPrompt, processedBody, processedExtraBody, generateResponse]);
+
+  // Track loading state
+  useEffect(() => {
+    if (isLoading) {
+      isCurrentlyLoadingRef.current = true;
+    } else if (aiResponse || error) {
+      isCurrentlyLoadingRef.current = false;
+    }
+  }, [isLoading, aiResponse, error]);
 
   // Auto-execute when runType is 'automatic' after delay
   useEffect(() => {
@@ -535,11 +555,14 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     // If there's already a response, mark as executed and don't re-execute
     if (aiResponse && aiResponse.trim().length > 0) {
       setHasExecuted(true);
+      isCurrentlyLoadingRef.current = false;
       return;
     }
     
-    // Don't execute if already executed or if manual mode
-    if (hasExecuted || runType !== 'automatic' || !userPrompt.trim()) return;
+    // Don't execute if already executed, if manual mode, if currently loading, or if there's no prompt
+    if (hasExecuted || runType !== 'automatic' || isCurrentlyLoadingRef.current || !userPrompt.trim()) {
+      return;
+    }
     
     // Clear any existing timeout
     if (autoExecuteTimeoutRef.current) {
@@ -548,7 +571,10 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     
     // Set timeout for ~500ms delay
     autoExecuteTimeoutRef.current = setTimeout(() => {
-      executeAgent();
+      // Double-check we're not loading before executing
+      if (!isCurrentlyLoadingRef.current) {
+        executeAgent();
+      }
     }, 500);
 
     return () => {
@@ -556,13 +582,211 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
         clearTimeout(autoExecuteTimeoutRef.current);
       }
     };
-  }, [agent, isLoadingAgent, hasExecuted, action.runType, aiResponse, executeAgent]);
+  }, [agent, isLoadingAgent, hasExecuted, action.runType, aiResponse, executeAgent, userPrompt]);
 
-  // Handle refresh
-  const handleRefresh = useCallback(() => {
+  // Handle refresh with confirmation
+  const handleRefreshClick = useCallback(() => {
+    // If currently loading, don't allow refresh
+    if (isLoading) {
+      return;
+    }
+    setShowRefreshConfirmation(true);
+  }, [isLoading]);
+
+  const handleRefreshConfirm = useCallback(() => {
+    setShowRefreshConfirmation(false);
     setHasExecuted(false);
+    isCurrentlyLoadingRef.current = false;
     executeAgent();
   }, [executeAgent]);
+
+  // Define variables needed for renderContent (before early returns to maintain hook order)
+  // These are safe to compute even if agent is null
+  const runType = action.runType || 'manual';
+  const hasResponse = aiResponse && aiResponse.trim().length > 0;
+  const showManualButton = runType === 'manual' && !hasResponse && !isLoading;
+  const showSkeleton = isLoading || (runType === 'automatic' && !hasExecuted && !hasResponse);
+
+  // Reusable content renderer function - MUST be defined before any early returns
+  // This hook must always be called, even if agent is null
+  const renderContent = useCallback(() => {
+    // Early return inside the callback is fine - the hook itself is always called
+    if (!agent) return null;
+    if (showSkeleton) {
+      return (
+        <AnimatePresence>
+          <motion.div
+            key="loading-orb"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="w-full h-96 relative rounded-xl overflow-hidden"
+          >
+            <VoicePoweredOrb
+              enableVoiceControl={false}
+              className="rounded-xl overflow-hidden"
+            />
+            {agent?.loadingTextSwitches && agent.loadingTextSwitches.length > 0 && (
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4">
+                <div className="max-w-[85%] text-center">
+                  <TextSwitcher
+                    texts={agent.loadingTextSwitches}
+                    className="text-violet-900 dark:text-white font-medium text-sm md:text-base px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
+                    switchInterval={3000}
+                    transitionDuration={0.5}
+                  />
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      );
+    }
+    
+    if (showManualButton) {
+      return (
+        <div className="flex items-center justify-center min-h-[200px]">
+          <Button
+            onClick={executeAgent}
+            size="default"
+            variant="default"
+            className="bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
+          >
+            <Sparkles className="h-4 w-4 me-2" />
+            Do the Magic
+          </Button>
+        </div>
+      );
+    }
+    
+    if (hasResponse) {
+      return (
+        <div className="w-full">
+          {shouldRenderImage ? (
+            imageData ? (
+              <div className="flex justify-center items-center w-full">
+                <div className="w-full max-w-4xl">
+                  <ImageViewer
+                    sourceUrl={imageData.url || undefined}
+                    content={imageData.b64_json || undefined}
+                    alt="AI Generated Image"
+                    objectFit="contain"
+                    className="w-full h-auto rounded-lg"
+                  />
+                </div>
+              </div>
+            ) : (
+              <CodeViewer
+                code={aiResponse}
+                programmingLanguage="json"
+                title="AI Generated Content"
+                initialLineNumbers={10}
+              />
+            )
+          ) : shouldRenderVideo ? (
+            videoData ? (
+              <div className="flex justify-center items-center w-full">
+                <div className="w-full max-w-4xl">
+                  <VideoViewer
+                    videoId={videoData.video_id || undefined}
+                    sourceUrl={videoData.url || undefined}
+                    content={videoData.file_path || undefined}
+                    value={videoData}
+                    alt="AI Generated Video"
+                    className="w-full h-auto rounded-lg"
+                    controls={true}
+                    autoplay={false}
+                  />
+                </div>
+              </div>
+            ) : (
+              <CodeViewer
+                code={aiResponse}
+                programmingLanguage="json"
+                title="AI Generated Content"
+                initialLineNumbers={10}
+              />
+            )
+          ) : shouldRenderGraph ? (
+            graphData ? (
+              <div className="w-full h-[600px] min-h-[400px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <GraphViewer
+                  data={{
+                    nodes: graphData.nodes || [],
+                    edges: graphData.edges || [],
+                    nodeTypes: graphData.nodeTypes,
+                    relationTypes: graphData.relationTypes,
+                    schemas: graphData.schemas,
+                  }}
+                  height="100%"
+                />
+              </div>
+            ) : (
+              <CodeViewer
+                code={aiResponse}
+                programmingLanguage="json"
+                title="AI Generated Content"
+                initialLineNumbers={10}
+              />
+            )
+          ) : shouldRenderTable && isValidTable && tableData.length > 0 ? (
+            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
+              <TableWrapper
+                tableConfig={tableConfig}
+                columns={tableColumns}
+                data={tableData}
+                showCards={false}
+                disableAnimation={false}
+              />
+            </div>
+          ) : agent?.requiredOutputFormat === 'string' ? (
+            <MarkdownViewer 
+              content={cleanMarkdownResponse(aiResponse || '')}
+              showToggle={false}
+              isEditable={false}
+            />
+          ) : (
+            <CodeViewer
+              code={aiResponse}
+              programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}
+              title="AI Generated Content"
+              initialLineNumbers={10}
+            />
+          )}
+        </div>
+      );
+    }
+    
+    if (error) {
+      return (
+        <div className="text-sm text-red-600 dark:text-red-400">
+          Error: {error}
+        </div>
+      );
+    }
+    
+    return null;
+  }, [
+    showSkeleton,
+    showManualButton,
+    hasResponse,
+    shouldRenderImage,
+    imageData,
+    shouldRenderVideo,
+    videoData,
+    shouldRenderGraph,
+    graphData,
+    shouldRenderTable,
+    isValidTable,
+    tableData,
+    tableConfig,
+    tableColumns,
+    agent,
+    aiResponse,
+    error,
+    executeAgent,
+  ]);
 
   // For manual run type, avoid showing the orb while the agent metadata loads; show a disabled action instead
   if (isLoadingAgent && (action.runType || 'manual') === 'manual') {
@@ -625,7 +849,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
                 variant="secondary"
                 className="gap-2"
               >
-                <RotateCcw className="h-4 w-4 animate-spin" />
+                <RefreshCw className="h-4 w-4 animate-spin" />
                 Loading agent...
               </Button>
             </div>
@@ -717,11 +941,6 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     return null;
   }
 
-  const runType = action.runType || 'manual';
-  const hasResponse = aiResponse && aiResponse.trim().length > 0;
-  const showManualButton = runType === 'manual' && !hasResponse && !isLoading;
-  const showSkeleton = isLoading || (runType === 'automatic' && !hasExecuted && !hasResponse);
-
   return (
     <motion.div
       initial={disableAnimation ? false : { opacity: 0, y: 20 }}
@@ -773,16 +992,27 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
                 <span>Powered by Gradian AI</span>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleRefresh}
-              disabled={isLoading}
-              className="h-7 w-7 p-0 text-white hover:bg-white/20 hover:text-white"
-              title="Refresh"
-            >
-              <RotateCcw className={cn("h-3.5 w-3.5", isLoading && "animate-spin")} />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowMaximizeDialog(true)}
+                className="h-7 w-7 p-0 text-white hover:bg-white/20 hover:text-white"
+                title="Maximize"
+              >
+                <Maximize2 className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRefreshClick}
+                disabled={isLoading}
+                className="h-7 w-7 p-0 text-white hover:bg-white/20 hover:text-white"
+                title="Refresh"
+              >
+                <RefreshCw className={cn("h-3.5 w-3.5", isLoading && "animate-spin")} />
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent 
@@ -793,147 +1023,60 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               : { flex: 1, minHeight: 0, overflowY: 'auto' }
           }
         >
-          {showSkeleton ? (
-            <AnimatePresence>
-              <motion.div
-                key="loading-orb"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="w-full h-96 relative rounded-xl overflow-hidden"
-              >
-                <VoicePoweredOrb
-                  enableVoiceControl={false}
-                  className="rounded-xl overflow-hidden"
-                />
-                {agent?.loadingTextSwitches && agent.loadingTextSwitches.length > 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4">
-                    <div className="max-w-[85%] text-center">
-                      <TextSwitcher
-                        texts={agent.loadingTextSwitches}
-                        className="text-violet-900 dark:text-white font-medium text-sm md:text-base px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
-                        switchInterval={3000}
-                        transitionDuration={0.5}
-                      />
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          ) : showManualButton ? (
-            <div className="flex items-center justify-center min-h-[200px]">
-              <Button
-                onClick={executeAgent}
-                size="default"
-                variant="default"
-                className="bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
-              >
-                <Sparkles className="h-4 w-4 me-2" />
-                Do the Magic
-              </Button>
-            </div>
-          ) : hasResponse ? (
-            <div className="w-full">
-              {shouldRenderImage ? (
-                imageData ? (
-                  <div className="flex justify-center items-center w-full">
-                    <div className="w-full max-w-4xl">
-                      <ImageViewer
-                        sourceUrl={imageData.url || undefined}
-                        content={imageData.b64_json || undefined}
-                        alt="AI Generated Image"
-                        objectFit="contain"
-                        className="w-full h-auto rounded-lg"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <CodeViewer
-                    code={aiResponse}
-                    programmingLanguage="json"
-                    title="AI Generated Content"
-                    initialLineNumbers={10}
-                  />
-                )
-              ) : shouldRenderVideo ? (
-                videoData ? (
-                  <div className="flex justify-center items-center w-full">
-                    <div className="w-full max-w-4xl">
-                      <VideoViewer
-                        videoId={videoData.video_id || undefined}
-                        sourceUrl={videoData.url || undefined}
-                        content={videoData.file_path || undefined}
-                        value={videoData}
-                        alt="AI Generated Video"
-                        className="w-full h-auto rounded-lg"
-                        controls={true}
-                        autoplay={false}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <CodeViewer
-                    code={aiResponse}
-                    programmingLanguage="json"
-                    title="AI Generated Content"
-                    initialLineNumbers={10}
-                  />
-                )
-              ) : shouldRenderGraph ? (
-                graphData ? (
-                  <div className="w-full h-[600px] min-h-[400px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <GraphViewer
-                      data={{
-                        nodes: graphData.nodes || [],
-                        edges: graphData.edges || [],
-                        nodeTypes: graphData.nodeTypes,
-                        relationTypes: graphData.relationTypes,
-                        schemas: graphData.schemas,
-                      }}
-                      height="100%"
-                    />
-                  </div>
-                ) : (
-                  <CodeViewer
-                    code={aiResponse}
-                    programmingLanguage="json"
-                    title="AI Generated Content"
-                    initialLineNumbers={10}
-                  />
-                )
-              ) : shouldRenderTable && isValidTable && tableData.length > 0 ? (
-                <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
-                  <TableWrapper
-                    tableConfig={tableConfig}
-                    columns={tableColumns}
-                    data={tableData}
-                    showCards={false}
-                    disableAnimation={false}
-                  />
-                </div>
-              ) : agent?.requiredOutputFormat === 'string' ? (
-                <MarkdownViewer 
-                  content={cleanMarkdownResponse(aiResponse || '')}
-                  showToggle={false}
-                  isEditable={false}
-                />
-              ) : (
-                <CodeViewer
-                  code={aiResponse}
-                  programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}
-                  title="AI Generated Content"
-                  initialLineNumbers={10}
-                />
-              )}
-            </div>
-          ) : error ? (
-            <div className="text-sm text-red-600 dark:text-red-400">
-              Error: {error}
-            </div>
-          ) : null}
+          {renderContent()}
         </CardContent>
       </CardWrapper>
+      
+      <ConfirmationMessage
+        isOpen={showRefreshConfirmation}
+        onOpenChange={setShowRefreshConfirmation}
+        title="Refresh AI Analysis"
+        message="Are you sure you want to refresh this analysis? This will regenerate the AI response and may take some time."
+        buttons={[
+          {
+            label: 'Cancel',
+            variant: 'outline',
+            action: () => setShowRefreshConfirmation(false),
+          },
+          {
+            label: 'Refresh',
+            variant: 'default',
+            action: handleRefreshConfirm,
+            icon: 'RefreshCw',
+          },
+        ]}
+        size="md"
+      />
+
+      <Dialog open={showMaximizeDialog} onOpenChange={setShowMaximizeDialog}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-full flex flex-col p-0">
+          <DialogHeader className="px-6 pt-6 pb-4 shrink-0 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {action.icon && (
+                  <IconRenderer iconName={action.icon} className="h-5 w-5" />
+                )}
+                <DialogTitle className="text-lg font-semibold">{action.label}</DialogTitle>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                <Sparkles className="h-3 w-3" />
+                <span>Powered by Gradian AI</span>
+                {showModelBadge && agent?.model && (
+                  <Badge
+                    variant="outline"
+                    className="ml-1 text-[0.65rem] font-medium"
+                  >
+                    {agent.model}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto p-6">
+            {renderContent()}
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };

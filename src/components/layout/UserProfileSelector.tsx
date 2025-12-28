@@ -144,40 +144,35 @@ export function UserProfileSelector({
       fullWidth ? 'w-full justify-between' : ''
     );
     
+    // Render a plain button without Radix UI to avoid hydration mismatch
     return (
       <div suppressHydrationWarning>
-        <DropdownMenuPrimitive.Root open={false} onOpenChange={() => {}}>
-          <DropdownMenuPrimitive.Trigger asChild className={fullWidth ? 'w-full' : undefined} disabled>
-            <Button
-              variant="outline"
-              size="sm"
-              className={placeholderClasses}
-              aria-label="User profile"
-              type="button"
-              disabled
-              suppressHydrationWarning
-            >
-            <Avatar
-              className="h-8 w-8 border border-gray-100 rounded-full bg-violet-100 text-violet-800 shrink-0"
-            >
-              <AvatarFallback className="bg-violet-100 text-violet-800 text-xs">
-                --
-              </AvatarFallback>
-            </Avatar>
-            <div
-              className={cn(
-                'flex flex-col text-left leading-tight',
-                fullWidth ? 'flex-1 overflow-hidden' : 'max-w-[140px] overflow-hidden'
-              )}
-            >
-              <span className="text-sm font-semibold truncate" suppressHydrationWarning>
-                Loading...
-              </span>
-            </div>
-            <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 text-gray-500" />
-          </Button>
-        </DropdownMenuPrimitive.Trigger>
-      </DropdownMenuPrimitive.Root>
+        <button
+          className={cn(placeholderClasses, 'cursor-not-allowed opacity-50')}
+          aria-label="User profile"
+          type="button"
+          disabled
+          suppressHydrationWarning
+        >
+          <Avatar
+            className="h-8 w-8 border border-gray-100 rounded-full bg-violet-100 text-violet-800 shrink-0"
+          >
+            <AvatarFallback className="bg-violet-100 text-violet-800 text-xs">
+              --
+            </AvatarFallback>
+          </Avatar>
+          <div
+            className={cn(
+              'flex flex-col text-left leading-tight',
+              fullWidth ? 'flex-1 overflow-hidden' : 'max-w-[140px] overflow-hidden'
+            )}
+          >
+            <span className="text-sm font-semibold truncate" suppressHydrationWarning>
+              Loading...
+            </span>
+          </div>
+          <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 text-gray-500" />
+        </button>
       </div>
     );
   }
@@ -234,7 +229,11 @@ export function UserProfileSelector({
           onMenuOpenChange?.(open);
         }}
       >
-        <DropdownMenuPrimitive.Trigger asChild className={fullWidth ? 'w-full' : undefined}>
+        <DropdownMenuPrimitive.Trigger 
+          asChild 
+          className={fullWidth ? 'w-full' : undefined}
+          suppressHydrationWarning
+        >
           <Button
             variant="outline"
             size="sm"
@@ -243,6 +242,7 @@ export function UserProfileSelector({
             aria-label="Open user menu"
             type="button"
             suppressHydrationWarning
+            id="user-profile-trigger"
           >
           <Avatar
             className={cn(

@@ -116,13 +116,65 @@ export function TableHeader({ children, className }: TableCellProps) {
   );
 }
 
+/**
+ * Format number with thousand separators
+ */
+function formatNumberWithSeparators(text: string): string {
+  // Match numbers (integers or decimals) that are standalone
+  // Only format if integer part has 4+ digits
+  const numberPattern = /(\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d{4,}(?:\.\d+)?)/g;
+  
+  return text.replace(numberPattern, (match) => {
+    // Skip if already has commas (already formatted)
+    if (match.includes(',')) return match;
+    
+    // Check if it's a decimal number
+    const hasDecimal = match.includes('.');
+    const parts = hasDecimal ? match.split('.') : [match];
+    const integerPart = parts[0];
+    const decimalPart = parts[1] || '';
+    
+    // Only format if integer part has 4+ digits
+    if (integerPart.length < 4) return match;
+    
+    // Add thousand separators to integer part
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    
+    return hasDecimal ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+  });
+}
+
+/**
+ * Recursively format numbers in React children
+ */
+function formatNumbersInChildren(children: React.ReactNode): React.ReactNode {
+  return React.Children.map(children, (child) => {
+    if (typeof child === 'string') {
+      return formatNumberWithSeparators(child);
+    }
+    if (React.isValidElement(child)) {
+      const props = child.props as { children?: React.ReactNode };
+      if (props.children) {
+        return React.cloneElement(child, {
+          ...props,
+          children: formatNumbersInChildren(props.children),
+        } as any);
+      }
+      return child;
+    }
+    return child;
+  });
+}
+
 export function TableCell({ children, className }: TableCellProps) {
+  const formattedChildren = children ? formatNumbersInChildren(children) : null;
+  
   return (
     <td className={cn(
       "p-3 text-xs text-gray-900 dark:text-gray-200 border-r border-gray-200 dark:border-gray-700 last:border-r-0",
       className
     )}>
-      {children ?? null}
+      {formattedChildren ?? null}
     </td>
   );
 }
