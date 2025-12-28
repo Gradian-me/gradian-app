@@ -16,7 +16,7 @@ import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card';
 import { TodoResponseDialog } from './TodoResponseDialog';
 import { TodoEditDialog } from './TodoEditDialog';
 import { TodoGraphViewerDialog } from './TodoGraphViewerDialog';
-import { extractTodoParameters, formatParameterValue, getParameterLabel } from '../utils/todo-parameter-utils';
+import { extractTodoParameters, formatParameterValue, getParameterLabel, isDependencyOutputValue } from '../utils/todo-parameter-utils';
 import { useAiAgents } from '@/domains/ai-builder';
 import { truncateText } from '../utils/text-utils';
 import { ButtonMinimal } from '@/gradian-ui/form-builder/form-elements';
@@ -756,6 +756,8 @@ export const TodoList: React.FC<TodoListProps> = ({
                         isOver={overId === todo.id && activeId !== todo.id}
                         aiAgents={aiAgents}
                         executingTodoId={executingTodoId}
+                        todos={localTodos}
+                        initialInput={initialInput}
                       />
                     </React.Fragment>
                   );
@@ -921,7 +923,56 @@ interface SortableTodoItemProps {
   isOver?: boolean; // Whether this item is being dragged over
   aiAgents?: any[]; // AI agents for parameter label resolution
   executingTodoId?: string | null; // ID of currently executing todo
+  todos?: Todo[]; // All todos for dependency resolution
+  initialInput?: string; // Initial input for dependency resolution
 }
+
+// Helper function to resolve dependency markers in input
+const resolveInputFromDependencies = (input: any, todo: Todo, todos: Todo[], initialInput: string): any => {
+  if (!input || typeof input !== 'object') return input;
+  
+  const cloned = Array.isArray(input) ? [...input] : { ...input };
+  
+  const resolveValue = (value: any): any => {
+    if (isDependencyOutputValue(value)) {
+      // Find the dependency todo's output
+      if (todo.dependencies && todo.dependencies.length > 0) {
+        // Get the first dependency (usually there's only one)
+        const depId = todo.dependencies[0];
+        const depTodo = todos.find(t => t.id === depId);
+        
+        if (depTodo?.output !== undefined) {
+          return typeof depTodo.output === 'string' 
+            ? depTodo.output 
+            : JSON.stringify(depTodo.output, null, 2);
+        }
+      }
+      
+      // Fallback to initialInput
+      return initialInput;
+    }
+    
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      const resolved: any = {};
+      Object.entries(value).forEach(([k, v]) => {
+        resolved[k] = resolveValue(v);
+      });
+      return resolved;
+    }
+    
+    if (Array.isArray(value)) {
+      return value.map(resolveValue);
+    }
+    
+    return value;
+  };
+  
+  Object.entries(cloned).forEach(([k, v]) => {
+    cloned[k] = resolveValue(v);
+  });
+  
+  return cloned;
+};
 
 const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
   todo,
@@ -936,6 +987,8 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
   isOver = false,
   aiAgents = [],
   executingTodoId = null,
+  todos = [], // Add todos prop to access all todos for dependency resolution
+  initialInput = '', // Add initialInput prop
 }) => {
   const {
     attributes,
@@ -1116,22 +1169,84 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
               </AccordionTrigger>
               <AccordionContent className="pt-1 pb-0 px-0">
                 <div className="text-[10px] space-y-1 bg-gray-50 dark:bg-gray-900/50 rounded p-2 border border-gray-200 dark:border-gray-700">
-                  {todo.input.body && typeof todo.input.body === 'object' && Object.keys(todo.input.body).length > 0 && (
-                    <div>
-                      <div className="font-medium text-gray-700 dark:text-gray-300 mb-0.5">Body:</div>
-                      <pre className="text-[9px] text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words font-mono">
-                        {JSON.stringify(todo.input.body, null, 2)}
-                      </pre>
-                    </div>
-                  )}
-                  {todo.input.extra_body && typeof todo.input.extra_body === 'object' && Object.keys(todo.input.extra_body).length > 0 && (
-                    <div>
-                      <div className="font-medium text-gray-700 dark:text-gray-300 mb-0.5">Extra Body:</div>
-                      <pre className="text-[9px] text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words font-mono">
-                        {JSON.stringify(todo.input.extra_body, null, 2)}
-                      </pre>
-                    </div>
-                  )}
+                  {(() => {
+                    // Use resolved input from chainMetadata if available, otherwise resolve from dependencies
+                    let resolvedBody = todo.input.body;
+                    let resolvedExtraBody = todo.input.extra_body;
+                    let resolvedUserPrompt: string | undefined;
+                    
+                    // Check if we have chainMetadata with resolved input
+                    // chainMetadata.input contains the actual requestData that was passed to the agent
+                    if (todo.chainMetadata?.input) {
+                      const resolvedInput = todo.chainMetadata.input;
+                      // chainMetadata.input has structure: { userPrompt: string, body?: {...}, extra_body?: {...} }
+                      if (resolvedInput.userPrompt) {
+                        resolvedUserPrompt = typeof resolvedInput.userPrompt === 'string' 
+                          ? resolvedInput.userPrompt 
+                          : JSON.stringify(resolvedInput.userPrompt, null, 2);
+                      }
+                      if (resolvedInput.body) {
+                        resolvedBody = resolvedInput.body;
+                      }
+                      if (resolvedInput.extra_body) {
+                        resolvedExtraBody = resolvedInput.extra_body;
+                      }
+                    } else {
+                      // Resolve dependency markers
+                      if (resolvedBody) {
+                        resolvedBody = resolveInputFromDependencies(resolvedBody, todo, todos || [], initialInput || '');
+                      }
+                      if (resolvedExtraBody) {
+                        resolvedExtraBody = resolveInputFromDependencies(resolvedExtraBody, todo, todos || [], initialInput || '');
+                      }
+                    }
+                    
+                    // Format as markdown dialog (similar to Show Response)
+                    const formatInputForDisplay = (input: any): string => {
+                      if (typeof input === 'string') {
+                        return input;
+                      }
+                      if (input && typeof input === 'object') {
+                        // If it's a single key-value pair with a string value, show just the value
+                        const keys = Object.keys(input);
+                        if (keys.length === 1 && typeof input[keys[0]] === 'string') {
+                          return input[keys[0]];
+                        }
+                        // Otherwise format as JSON
+                        return JSON.stringify(input, null, 2);
+                      }
+                      return String(input || '');
+                    };
+                    
+                    return (
+                      <>
+                        {resolvedUserPrompt && (
+                          <div>
+                            <div className="font-medium text-gray-700 dark:text-gray-300 mb-0.5">User Prompt:</div>
+                            <div className="text-[9px] text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words font-mono bg-white dark:bg-gray-800 rounded p-1.5 border border-gray-200 dark:border-gray-700">
+                              {resolvedUserPrompt}
+                            </div>
+                          </div>
+                        )}
+                        {resolvedBody && typeof resolvedBody === 'object' && Object.keys(resolvedBody).length > 0 && (
+                          <div>
+                            <div className="font-medium text-gray-700 dark:text-gray-300 mb-0.5">Body:</div>
+                            <div className="text-[9px] text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words font-mono bg-white dark:bg-gray-800 rounded p-1.5 border border-gray-200 dark:border-gray-700">
+                              {formatInputForDisplay(resolvedBody)}
+                            </div>
+                          </div>
+                        )}
+                        {resolvedExtraBody && typeof resolvedExtraBody === 'object' && Object.keys(resolvedExtraBody).length > 0 && (
+                          <div>
+                            <div className="font-medium text-gray-700 dark:text-gray-300 mb-0.5">Extra Body:</div>
+                            <div className="text-[9px] text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words font-mono bg-white dark:bg-gray-800 rounded p-1.5 border border-gray-200 dark:border-gray-700">
+                              {formatInputForDisplay(resolvedExtraBody)}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </AccordionContent>
             </AccordionItem>

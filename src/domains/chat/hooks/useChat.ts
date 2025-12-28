@@ -50,6 +50,7 @@ export interface UseChatResult {
   addMessage: (message: ChatMessage) => void; // Add message directly without reloading
   updateMessageTodos: (messageId: string, todos: Todo[]) => void; // Update todos in a specific message
   loadMoreMessages: () => Promise<void>; // Load older messages (pagination)
+  deleteChat: (chatId: string) => Promise<boolean>; // Delete a chat
 }
 
 export function useChat(): UseChatResult {
@@ -1193,6 +1194,49 @@ export function useChat(): UseChatResult {
     });
   }, []);
 
+  // Delete chat
+  const deleteChat = useCallback(async (chatId: string): Promise<boolean> => {
+    if (!chatId) {
+      return false;
+    }
+
+    try {
+      const response = await fetch(`/api/chat/${chatId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Remove chat from local state
+        setChats((prev) => prev.filter((chat) => chat.id !== chatId));
+        
+        // If deleted chat was current, clear current chat and navigate to chat list
+        if (currentChat?.id === chatId) {
+          setCurrentChat(null);
+          setMessages([]);
+          setTodos([]);
+          setMessagesPagination({
+            page: 1,
+            limit: 20,
+            totalMessages: 0,
+            hasMore: false,
+          });
+        }
+
+        return true;
+      } else {
+        setError(result.error || 'Failed to delete chat');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+      setError(error instanceof Error ? error.message : 'Failed to delete chat');
+      return false;
+    }
+  }, [currentChat]);
+
   // Initial load - refresh chats when userId is available
   useEffect(() => {
     if (userId) {
@@ -1222,6 +1266,7 @@ export function useChat(): UseChatResult {
         addMessage,
         updateMessageTodos,
     loadMoreMessages,
+    deleteChat,
       };
 }
 

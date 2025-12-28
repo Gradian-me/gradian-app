@@ -149,6 +149,7 @@ export async function POST(
     const output = result.data?.response || result.data;
 
     // Update todo with execution metadata
+    // Store the full requestData (with resolved dependencies) in chainMetadata.input
     const updatedTodo: Todo = {
       ...todo,
       status: 'completed' as const,
@@ -159,7 +160,7 @@ export async function POST(
       cost,
       responseFormat,
       chainMetadata: {
-        input: initialInput,
+        input: requestData, // Store full requestData with resolved dependencies
         executedAt,
         output,
       },

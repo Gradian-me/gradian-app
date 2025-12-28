@@ -20,6 +20,7 @@ import { EmptyState } from '@/gradian-ui/data-display/components/EmptyState';
 import { extractHashtags, extractMentions } from '../utils/text-utils';
 import { BotMessageSquare, Plus } from 'lucide-react';
 import type { Chat, Todo } from '../types';
+import { formatSearchResultsToToon } from '@/domains/ai-builder/utils/ai-search-utils';
 
 export interface ChatInterfaceProps {
   className?: string;
@@ -55,6 +56,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     refreshChats,
     addMessage,
     updateMessageTodos,
+    deleteChat,
   } = useChat();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -252,17 +254,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           ? 'search-card' 
           : 'search-card';
         
-        // Format content for message - use empty string or minimal content for search results
-        // The AISearchResults component will handle the display
-        const content = '';
+        // Format search results as markdown text content for the message
+        // This provides a rigid AI response that can be displayed in chat
+        const searchContent = formatSearchResultsToToon(searchResults);
         
-        // Add message to chat with search results
+        // Add message to chat with search results and formatted content
         const messageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             role: 'assistant',
-            content,
+            content: searchContent, // Use formatted search results as content
             agentId,
             agentType: 'search',
             metadata: {
@@ -475,6 +477,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 onSelectChat={selectChat}
                 onCreateNewChat={handleCreateNewChat}
                 onRefresh={refreshChats}
+                onDeleteChat={deleteChat}
                 isLoading={isRefreshingChats}
               />
             </div>

@@ -8,12 +8,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/stores/user.store';
 import { cn } from '@/lib/utils';
-import { Plus, BotMessageSquare, Clock, RefreshCw } from 'lucide-react';
+import { Plus, BotMessageSquare, Clock, RefreshCw, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
 import type { Chat } from '../types';
 import { CardWrapper, CardContent } from '@/gradian-ui/data-display/card/components/CardWrapper';
 import { Button } from '@/gradian-ui/form-builder/form-elements';
+import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
 
 export interface ChatListProps {
   chats: Chat[];
@@ -21,6 +22,7 @@ export interface ChatListProps {
   onSelectChat: (chatId: string) => void;
   onCreateNewChat: () => void;
   onRefresh?: () => void;
+  onDeleteChat?: (chatId: string) => Promise<boolean>;
   isLoading?: boolean;
   className?: string;
 }
@@ -31,10 +33,14 @@ const ChatListComponent: React.FC<ChatListProps> = ({
   onSelectChat,
   onCreateNewChat,
   onRefresh,
+  onDeleteChat,
   isLoading = false,
   className,
 }) => {
   const router = useRouter();
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [chatToDelete, setChatToDelete] = useState<Chat | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleSelectChat = (chatId: string) => {
     // Use replace to avoid building up history when switching chats
@@ -43,6 +49,37 @@ const ChatListComponent: React.FC<ChatListProps> = ({
     router.replace(`/chat/${chatId}`);
     // Call onSelectChat after navigation to ensure state is in sync
     onSelectChat(chatId);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, chat: Chat) => {
+    e.stopPropagation(); // Prevent chat selection when clicking delete
+    setChatToDelete(chat);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!chatToDelete || !onDeleteChat) {
+      setDeleteConfirmOpen(false);
+      setChatToDelete(null);
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const success = await onDeleteChat(chatToDelete.id);
+      if (success) {
+        setDeleteConfirmOpen(false);
+        setChatToDelete(null);
+        // If deleted chat was selected, navigate to chat list
+        if (chatToDelete.id === selectedChatId) {
+          router.replace('/chat');
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -114,67 +151,119 @@ const ChatListComponent: React.FC<ChatListProps> = ({
               {chats.map((chat) => {
                 const isSelected = chat.id === selectedChatId;
                 return (
-                  <motion.button
+                  <motion.div
                     key={chat.id}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
-                    onClick={() => handleSelectChat(chat.id)}
                     className={cn(
-                      'w-full text-start p-1 my-1 bg-gray-50 dark:bg-gray-800 rounded-lg transition-all',
-                      'hover:bg-gray-100 dark:hover:bg-gray-800',
+                      'group relative w-full my-1 rounded-lg transition-all',
                       isSelected 
                         ? 'bg-violet-50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-800/50' 
-                        : 'border border-transparent'
+                        : 'bg-gray-50 dark:bg-gray-800 border border-transparent hover:bg-gray-100 dark:hover:bg-gray-800'
                     )}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className={cn(
-                        'shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-colors',
-                        isSelected
-                          ? 'bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300'
-                          : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
-                      )}>
-                        <BotMessageSquare className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className={cn(
-                            'text-sm font-medium truncate',
-                            isSelected
-                              ? 'text-violet-900 dark:text-violet-100'
-                              : 'text-gray-900 dark:text-gray-100'
-                          )}>
-                            {chat.title}
-                          </h3>
+                    <button
+                      onClick={() => handleSelectChat(chat.id)}
+                      className={cn(
+                        'w-full text-start p-1 rounded-lg transition-all'
+                      )}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={cn(
+                          'shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-colors',
+                          isSelected
+                            ? 'bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                        )}>
+                          <BotMessageSquare className="w-5 h-5" />
                         </div>
-                        {chat.lastMessage && (
-                          <p className={cn(
-                            'text-xs truncate mb-1',
-                            isSelected
-                              ? 'text-violet-700 dark:text-violet-300'
-                              : 'text-gray-600 dark:text-gray-400'
-                          )}>
-                            {chat.lastMessage}
-                          </p>
-                        )}
-                        {chat.lastMessageAt && (
-                          <div className="mt-1 pt-1 border-t border-gray-200 dark:border-gray-700">
-                            <span className="text-xs flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                              <Clock className="w-3 h-3" />
-                              {formatRelativeTime(chat.lastMessageAt)}
-                            </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <h3 className={cn(
+                              'text-sm font-medium truncate',
+                              isSelected
+                                ? 'text-violet-900 dark:text-violet-100'
+                                : 'text-gray-900 dark:text-gray-100'
+                            )}>
+                              {chat.title}
+                            </h3>
                           </div>
-                        )}
+                          {chat.lastMessage && (
+                            <p className={cn(
+                              'text-xs truncate mb-1',
+                              isSelected
+                                ? 'text-violet-700 dark:text-violet-300'
+                                : 'text-gray-600 dark:text-gray-400'
+                            )}>
+                              {chat.lastMessage}
+                            </p>
+                          )}
+                          {chat.lastMessageAt && (
+                            <div className="mt-1 pt-1 border-t border-gray-200 dark:border-gray-700">
+                              <span className="text-xs flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                                <Clock className="w-3 h-3" />
+                                {formatRelativeTime(chat.lastMessageAt)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </motion.button>
+                    </button>
+                    {/* Delete button - shows on hover */}
+                    {onDeleteChat && (
+                      <button
+                        onClick={(e) => handleDeleteClick(e, chat)}
+                        className={cn(
+                          'absolute top-2 right-2 p-1.5 rounded-md transition-all opacity-0 group-hover:opacity-100',
+                          'hover:bg-red-100 dark:hover:bg-red-900/30',
+                          'text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400',
+                          'focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                        )}
+                        title="Delete chat"
+                        aria-label="Delete chat"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </motion.div>
                 );
               })}
             </AnimatePresence>
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationMessage
+        isOpen={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Delete Chat"
+        message={
+          chatToDelete
+            ? `Are you sure you want to delete "${chatToDelete.title}"? This action cannot be undone and will delete all messages in this chat.`
+            : 'Are you sure you want to delete this chat?'
+        }
+        variant="destructive"
+        size="md"
+        buttons={[
+          {
+            label: 'Cancel',
+            variant: 'outline',
+            action: () => {
+              setDeleteConfirmOpen(false);
+              setChatToDelete(null);
+            },
+          },
+          {
+            label: 'Delete',
+            variant: 'destructive',
+            icon: 'Trash2',
+            action: handleConfirmDelete,
+            disabled: isDeleting,
+          },
+        ]}
+      />
     </div>
   );
 };

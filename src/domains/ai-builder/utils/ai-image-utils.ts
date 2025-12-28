@@ -2101,87 +2101,81 @@ Authentically Red Dead Redemption Style
 `,
   'gta-style': `${GENERAL_IMAGE_PROMPT}
 
-Create a high-resolution illustrated cover image using the exact collage layout, panel geometry, and typography of the official Grand Theft Auto V cover art, enhanced with a retro Miami / Vice City aesthetic.
+You are a Grand Theft Auto Style Specialist. Transform the user's prompt into an image using the visual aesthetic and art style of Grand Theft Auto (GTA) games, while keeping the content relevant to the user's actual subject matter.
 
-Overall Theme:
- 1980s–1990s Miami / Vice City atmosphere
- Neon nightlife, palm trees, beachfront streets, art-deco buildings
- Heat, crime, excess, law enforcement pressure
+CRITICAL CONTEXTUAL RULES:
+- Analyze the user's prompt to determine if it relates to crime, action, urban settings, vehicles, or similar themes
+- ONLY include GTA-specific UI elements (wanted stars, GTA logo, police elements) if the user's prompt is about crime, action, urban life, vehicles, or similar action-oriented subjects
+- For non-action subjects (nature, peaceful scenes, abstract concepts, etc.), apply ONLY the visual style without GTA game-specific symbols
+- The visual style should always match GTA, but the content must be directly related to what the user requested
 
-Layout & Composition (UNCHANGED STRUCTURE):
- Multi-panel comic-book collage
- Sharp black diagonal borders separating each panel
- Panels of mixed sizes and angles filling the entire canvas
- Central title dominance with surrounding action scenes
- Composition must match GTA V cover art proportions exactly
-
-Art Style (CRITICAL):
+Art Style (ALWAYS APPLY):
  Official GTA illustrated style (Rockstar promo art)
  Semi-realistic, stylized realism
- Faces must look distinctly like GTA characters:
+ Character faces (when present) should have GTA-style features:
  Slightly exaggerated jawlines
  Sharp cheekbones
  Expressive brows and eyes
  Hardened, cinematic expressions
  No generic AI faces, no smooth fashion-model look
 
-Characters & Scenes:
- Include multiple human characters based on the user prompt
- Add uniformed police officers with pistols, rifles, or tactical gear
- Include police helicopters in the sky (spotlights on)
- Include police cars with flashing red-and-blue lights
- Show chaos escalation: chases, confrontations, standoffs
+Layout & Composition:
+ Multi-panel comic-book collage style (when appropriate for the subject)
+ Sharp black diagonal borders separating panels (for action/urban subjects)
+ Panels of mixed sizes and angles filling the canvas
+ Dynamic composition with strong visual hierarchy
+ For peaceful/nature subjects, use cinematic single-frame or multi-panel layouts that match the mood
 
-GTA Wanted-Level Elements:
- Include floating GTA-style wanted stars (1–5 stars) integrated naturally into the collage
- Stars should glow gold and feel part of the GTA UI language
-
-Environment Details:
- Miami beach roads, neon motel signs, palm-lined highways
- Art-deco facades, sunset skies, ocean blues and pinks
- Subtle inclusion of a GTA-style city map fragment (radar/map texture) as a background element in one panel
-
-Vehicles & Action:
- Sports cars, motorcycles, speedboats, helicopters
- High-speed motion, drifting, gunfire, pursuit angles
- Perspective exaggeration consistent with GTA artwork
-
-Color & Lighting:
- Retro neon palette:
- Hot pinks, cyan blues, teal skies, orange sunsets
+Color & Lighting (ALWAYS APPLY):
+ Retro neon palette when appropriate:
+ Hot pinks, cyan blues, teal skies, orange sunsets (for urban/night scenes)
+ For other subjects, adapt the palette while maintaining GTA's strong contrast and saturation
  Strong rim lighting and dramatic shadows
- Night + sunset blend common to Vice City aesthetics
+ High contrast lighting consistent with GTA artwork
+ Vibrant, saturated colors with cinematic depth
 
-Typography & Logo (NON-NEGOTIABLE):
- Centered official Grand Theft Auto block typography
- White bold letters with black outline and subtle bevel
- Stacked exactly as:
- GRAND
- THEFT
- AUTO
- Green Roman numeral V banner emblem beneath the title
- Font weight, spacing, and proportions must match GTA V logo precisely
+Environment Details (CONTEXTUAL):
+ For urban/action subjects: Miami/Vice City aesthetic, neon signs, art-deco buildings, palm-lined streets
+ For other subjects: Adapt the environment to match the user's prompt while maintaining GTA's visual style
+ Use GTA-style city map fragments or radar textures ONLY for urban/action subjects
+
+Characters & Scenes (CONTEXTUAL):
+ Base all characters and scenes strictly on the user's prompt
+ ONLY add police officers, helicopters, or police cars if the user's prompt involves crime, action, or law enforcement
+ For non-action subjects, focus on the actual subject matter requested
+ Show dynamic action when appropriate, but respect peaceful or abstract subjects
+
+GTA UI Elements (CONDITIONAL - ONLY FOR ACTION/CRIME SUBJECTS):
+ ONLY include floating GTA-style wanted stars if the user's prompt involves crime, action, or conflict
+ ONLY include GTA logo/typography if the subject matter is action-oriented or crime-related
+ For peaceful, nature, abstract, or non-action subjects: DO NOT include wanted stars, GTA logo, or police elements
+ Instead, use the GTA visual style (colors, lighting, art style) without game-specific UI elements
+
+Vehicles & Action (CONTEXTUAL):
+ Include vehicles, motion, and action ONLY when relevant to the user's prompt
+ For non-vehicle subjects, focus on the actual subject matter
+ Maintain GTA's perspective exaggeration and dynamic composition when appropriate
+
+Content Priority:
+ The user's prompt is the PRIMARY subject - never override it with generic GTA elements
+ Apply GTA visual style (art style, colors, lighting, composition) to enhance the user's subject
+ Only add GTA-specific symbols (wanted stars, logo, police) when the subject matter naturally calls for them
 
 Rules:
- Use only authentic GTA visual language
- No parody, no redesign, no modern minimalism
- No alternate fonts or logo variations
- The image must instantly read as a GTA cover at first glance
-
-Content Injection:
- Replace characters, locations, and actions based strictly on the user’s prompt
- Every panel should represent a different aspect of crime, lifestyle, or tension
- Maintain high visual density without clutter
+ Use authentic GTA visual language and art style
+ Adapt the style to fit the user's subject matter, not force GTA game elements onto unrelated subjects
+ Maintain high visual quality and cinematic composition
+ The image should feel like GTA artwork, but the content must be directly relevant to the user's prompt
 
 Technical Requirements:
  Ultra-high resolution
  Print-ready clarity
  Clean edges, no noise, no blur, no grain
- Aspect ratio identical to GTA V cover art
+ Dynamic aspect ratio appropriate for the subject matter
 
 NEGATIVE PROMPT (DO NOT SKIP)
 
-No photorealism, no anime, no cartoon style, no flat illustration, no pastel-only palette, no soft fashion faces, no generic AI portraits, no logo redesigns, no thin outlines, no futuristic cyberpunk elements.
+No photorealism, no anime, no cartoon style, no flat illustration, no pastel-only palette, no soft fashion faces, no generic AI portraits, no thin outlines, no futuristic cyberpunk elements. Do not add GTA-specific symbols (wanted stars, logo, police) to subjects that don't involve action, crime, or urban themes.
 
 `
   ,
