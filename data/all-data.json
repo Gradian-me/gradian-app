@@ -1298,6 +1298,98 @@
       "id": "01KDG66XCHTD0GGQX3A2E69T85",
       "createdAt": "2025-12-27T15:18:09.558Z",
       "updatedAt": "2025-12-27T15:18:09.725Z"
+    },
+    {
+      "company": "AryoGen",
+      "authenticationType": [
+        {
+          "id": "form-based"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "username": "bastamin@aryogen.com",
+      "firstName": "Nima",
+      "lastName": "Bastami",
+      "email": "bastamin@aryogen.com",
+      "postTitle": "Commercial Deputy",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KDK3NM3EEJ7DJ81BJ0JDAWDT",
+      "createdAt": "2025-12-28T18:31:29.171Z",
+      "updatedAt": "2025-12-28T18:31:29.839Z"
+    },
+    {
+      "company": "CinnaGen",
+      "authenticationType": [
+        {
+          "id": "active-directory"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "username": "montajabim@cinnagen.com",
+      "firstName": "Mehran",
+      "lastName": "Montajabi",
+      "email": "montajabim@cinnagen.com",
+      "postTitle": "CEO",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KDK3V3153CFBWENVSF15E7RR",
+      "createdAt": "2025-12-28T18:34:28.278Z",
+      "updatedAt": "2025-12-28T18:34:28.740Z"
     }
   ],
   "purchaseOrders": [],
@@ -2190,8 +2282,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-24T07:09:39.516Z",
-      "lastSynced": "2025-12-24T07:09:39.516Z",
+      "updatedAt": "2025-12-28T18:34:55.850Z",
+      "lastSynced": "2025-12-28T18:34:55.850Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2203,7 +2295,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 41 schemas: 41 succeeded, 0 failed (0 created, 41 updated)"
+      "lastSyncMessage": "Processed 39 schemas: 39 succeeded, 0 failed (0 created, 39 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -2230,7 +2322,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-24T07:07:56.506Z",
+      "updatedAt": "2025-12-28T18:35:07.495Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2240,8 +2332,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-24T07:07:56.506Z",
-      "lastSyncMessage": "Generated relations for 42 out of 42 schemas",
+      "lastSynced": "2025-12-28T18:35:07.495Z",
+      "lastSyncMessage": "Generated relations for 39 out of 39 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2289,7 +2381,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-27T08:33:39.221Z",
+      "updatedAt": "2025-12-28T18:35:35.114Z",
       "category": [
         {
           "id": "production-integration",
@@ -2298,8 +2390,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-27T08:33:39.221Z",
-      "lastSyncMessage": "Cannot GET /50x.html",
+      "lastSynced": "2025-12-28T18:35:35.114Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 4, nodes updated: 228, edges created: 117, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
@@ -17894,6 +17986,22 @@
           "label": "Supply Chain Management"
         }
       ]
+    }
+  ],
+  "external_nodes": [
+    {
+      "id": "form-based",
+      "label": "Form-Based",
+      "icon": "User",
+      "color": "cyan",
+      "sourceUrl": "field-options:users:authentication-type"
+    },
+    {
+      "id": "active-directory",
+      "label": "Active Directory",
+      "icon": "Server",
+      "color": "success",
+      "sourceUrl": "field-options:users:authentication-type"
     }
   ]
 }
