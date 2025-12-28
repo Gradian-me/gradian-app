@@ -14,6 +14,9 @@ import {
 import { AuthenticationLayout, GlassInputWrapper } from '@/components/authentication';
 import { useTenantStore } from '@/stores/tenant.store';
 import { normalizeUsernameToEmail } from '@/domains/auth/utils/username-email.util';
+import { Logo } from '@/gradian-ui/layout/logo/components/Logo';
+import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
+import { TenantSelector } from '@/components/layout/TenantSelector';
 
 const OTP_LENGTH = 6;
 
@@ -232,17 +235,34 @@ function ResetPasswordContent() {
   };
 
   return (
-    <AuthenticationLayout
-      heroImageSrc="/screenshots/gradian.me_bg_desktop.png"
-    >
-      <div className="w-full max-w-md">
-        <div className="flex flex-col gap-6">
-          <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">
-            Reset password
-          </h1>
-          <p className="animate-element animate-delay-200 text-muted-foreground hidden md:block">
-            Verify your identity and create a secure new password.
-          </p>
+    <>
+      {/* Only render TenantSelector on client to prevent hydration mismatch */}
+      {typeof window !== 'undefined' && DEMO_MODE && (
+        <div className="fixed top-4 right-4 z-50 w-64">
+          <TenantSelector placeholder="Select tenant" />
+        </div>
+      )}
+      <div className="fixed top-8 left-8 z-50">
+        <Logo variant="auto" width={140} height={46} />
+      </div>
+      <AuthenticationLayout
+        heroImageSrc="/screenshots/gradian.me_bg_desktop.png"
+        showTestimonials={false}
+        showModeToggle={false}
+      >
+        <div className="w-full max-w-md pt-10 md:pt-4">
+          <div className="flex flex-col gap-6">
+            <h1 
+              className="animate-element animate-delay-100 font-semibold leading-tight whitespace-nowrap overflow-hidden"
+              style={{
+                fontSize: "clamp(1.5rem, 3vw + 0.5rem, 3rem)"
+              }}
+            >
+              Reset password
+            </h1>
+            <p className="animate-element animate-delay-200 text-muted-foreground">
+              Verify your identity and create a secure new password.
+            </p>
 
           {error && (
             <div className="animate-element animate-delay-250 rounded-2xl border border-red-500/50 bg-red-500/10 dark:bg-red-500/5 p-4">
@@ -371,7 +391,7 @@ function ResetPasswordContent() {
             <button
               type="submit"
               disabled={isSubmitDisabled}
-              className="animate-element animate-delay-550 w-full rounded-2xl bg-violet-500 py-4 font-medium text-violet-50 hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="animate-element animate-delay-550 w-full rounded-2xl bg-violet-500 dark:bg-violet-600 py-4 font-medium text-white hover:bg-violet-600 dark:hover:bg-violet-700 transition-all cursor-pointer disabled:opacity-60 disabled:bg-violet-400 dark:disabled:bg-violet-700/50 disabled:hover:bg-violet-400 dark:disabled:hover:bg-violet-700/50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Updating password...' : 'Reset password'}
             </button>
@@ -390,6 +410,7 @@ function ResetPasswordContent() {
         </div>
       </div>
     </AuthenticationLayout>
+    </>
   );
 }
 

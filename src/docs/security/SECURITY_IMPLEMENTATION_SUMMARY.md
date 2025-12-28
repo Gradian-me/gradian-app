@@ -32,10 +32,28 @@ Comprehensive security measures have been implemented to prevent sensitive data 
 ### 4. ✅ Secure Token Storage
 - **File**: `src/gradian-ui/shared/utils/token-storage.util.ts`
 - Removed localStorage token storage from login page
-- Tokens should be stored in httpOnly cookies (set by server)
+- Access tokens stored in memory only (not in cookies or localStorage)
+- Refresh tokens stored in httpOnly cookies (set by server)
 - Added migration utility for existing localStorage tokens
 
-### 5. ✅ Security Headers
+### 5. ✅ Centralized Logout Flow
+- **File**: `src/gradian-ui/shared/utils/logout-flow.ts`
+- Centralized logout logic to prevent code duplication
+- Calls `/api/auth/logout` API to invalidate server-side session
+- Clears all cookies (access_token, refresh_token, session_token, user_session_id)
+- Clears all localStorage stores (user-store, company-store, tenant-store, menu-items-store, etc.)
+- Clears all Zustand stores (user, company, tenant, menu-items)
+- Clears in-memory access token
+- Handles errors gracefully to ensure cleanup completes
+
+### 6. ✅ AuthGuard Component
+- **File**: `src/components/auth/AuthGuard.tsx`
+- Prevents layout flash during authentication checks
+- Shows loading spinner instead of layout during auth verification
+- Redirects to login if not authenticated (without showing layout)
+- Integrated into root layout for seamless UX
+
+### 7. ✅ Security Headers
 - **File**: `next.config.ts`
 - Added comprehensive security headers:
   - Strict-Transport-Security
@@ -45,7 +63,7 @@ Comprehensive security measures have been implemented to prevent sensitive data 
   - Content-Security-Policy
   - Referrer-Policy
 
-### 6. ✅ Security Documentation
+### 8. ✅ Security Documentation
 - **File**: `docs/SECURITY.md`
 - Complete security guidelines and best practices
 - Developer checklist and testing procedures
@@ -56,8 +74,10 @@ Comprehensive security measures have been implemented to prevent sensitive data 
 1. `src/gradian-ui/shared/utils/security.util.ts` - Security utilities
 2. `src/gradian-ui/shared/utils/zustand-devtools.util.ts` - Conditional DevTools
 3. `src/gradian-ui/shared/utils/token-storage.util.ts` - Secure token storage
-4. `src/components/security/SecurityProvider.tsx` - Security initialization
-5. `docs/SECURITY.md` - Security documentation
+4. `src/gradian-ui/shared/utils/logout-flow.ts` - Centralized logout flow
+5. `src/components/security/SecurityProvider.tsx` - Security initialization
+6. `src/components/auth/AuthGuard.tsx` - Authentication guard component
+7. `docs/SECURITY.md` - Security documentation
 
 ### Updated Stores
 1. `src/stores/user.store.ts`
@@ -69,10 +89,16 @@ Comprehensive security measures have been implemented to prevent sensitive data 
 7. `src/stores/ai-response.store.ts`
 
 ### Updated Application Files
-1. `src/app/layout.tsx` - Added SecurityProvider
+1. `src/app/layout.tsx` - Added SecurityProvider and AuthGuard
 2. `src/app/authentication/login/page.tsx` - Removed localStorage token storage
 3. `src/app/authentication/change-password/page.tsx` - Updated token clearing
-4. `next.config.ts` - Added security headers
+4. `src/app/authentication/sign-up/page.tsx` - Updated to use centralized logout flow
+5. `src/app/authentication/reset-password/page.tsx` - Updated to use centralized logout flow
+6. `src/gradian-ui/shared/utils/auth-token-manager.ts` - Fixed refresh endpoint to use `/api/auth/token/refresh`
+7. `src/gradian-ui/shared/utils/auth-events.ts` - Updated to use centralized logout flow
+8. `src/components/layout/UserProfileSelector.tsx` - Updated to use centralized logout flow
+9. `src/components/layout/UserProfileDropdown.tsx` - Updated to use centralized logout flow
+10. `next.config.ts` - Added security headers
 
 ## How It Works
 
@@ -130,6 +156,27 @@ devtools(
 )
 ```
 
+### 4. Centralized Logout Flow
+```typescript
+import { performLogout } from '@/gradian-ui/shared/utils/logout-flow';
+
+// Perform complete logout (clears everything and redirects)
+await performLogout('User requested logout', false);
+
+// Or skip redirect (useful for testing)
+await performLogout('User requested logout', true);
+```
+
+### 5. AuthGuard Component
+```typescript
+import { AuthGuard } from '@/components/auth/AuthGuard';
+
+// Wrap protected routes to prevent layout flash
+<AuthGuard>
+  {children}
+</AuthGuard>
+```
+
 ## Testing
 
 ### Verify DevTools are Disabled
@@ -146,15 +193,24 @@ devtools(
 ### Verify Token Storage
 1. Login to application
 2. Check browser DevTools → Application → Storage
-3. Verify tokens are NOT in localStorage
-4. Verify tokens ARE in Cookies (httpOnly, secure)
+3. Verify access tokens are NOT in localStorage (stored in memory only)
+4. Verify refresh tokens ARE in Cookies (httpOnly, secure)
+5. Verify access tokens are NOT in cookies (stored in memory only)
+
+### Verify Logout Flow
+1. Click logout button
+2. Check browser console for `[LOGOUT_FLOW]` logs
+3. Verify all cookies are cleared (check DevTools → Application → Cookies)
+4. Verify all localStorage stores are cleared
+5. Verify redirect to login page occurs
 
 ## Important Notes
 
 ### ⚠️ Token Storage
-- **Current**: Tokens are stored in httpOnly cookies (server-side)
-- **Never store tokens in**: localStorage, sessionStorage, or React state
-- The login API already sets cookies - localStorage storage has been removed
+- **Access tokens**: Stored in memory only (not in cookies or localStorage)
+- **Refresh tokens**: Stored in httpOnly cookies (server-side)
+- **Never store tokens in**: localStorage, sessionStorage, or React state (except memory for access tokens)
+- The login API sets refresh token cookies - access tokens are stored in memory by client
 
 ### ⚠️ Environment Variables
 - Variables prefixed with `NEXT_PUBLIC_` are exposed to the browser
@@ -188,8 +244,10 @@ For questions or security concerns, refer to:
 ✅ Zustand DevTools automatically disabled in production
 ✅ Sensitive data automatically sanitized before storage
 ✅ Tokens moved from localStorage to httpOnly cookies
+✅ Centralized logout flow with complete cleanup
+✅ AuthGuard prevents layout flash during auth checks
 ✅ Security headers configured
 ✅ Comprehensive documentation provided
 
-Your application is now protected from common client-side inspection vulnerabilities!
+Your application is now protected from common client-side inspection vulnerabilities and has improved authentication UX!
 

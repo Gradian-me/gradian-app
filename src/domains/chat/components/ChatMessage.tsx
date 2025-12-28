@@ -232,7 +232,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   // Parse message content for DynamicAiAgentResponseContainer
   // Use the data from renderData when available, otherwise parse content
   const parsedContent = useMemo(() => {
-    // If renderData already has parsed data, use it
+    // If renderData already has parsed data, use it (highest priority)
     if (renderData.type === 'image' && renderData.imageData) {
       return renderData.imageData;
     }
@@ -248,8 +248,12 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     if (renderData.type === 'json' && renderData.jsonData) {
       return renderData.jsonData;
     }
+    if (renderData.type === 'string' && renderData.stringData) {
+      return renderData.stringData;
+    }
     
     // Otherwise, try to parse content if needed
+    // Note: detectMessageRenderType already handles markdown-wrapped JSON via extractJson
     if (shouldRenderAgentContainer || 
       (isAssistant && message.content && 
        (message.content.trim().startsWith('{') || message.content.trim().startsWith('[')))) {
@@ -669,7 +673,21 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 Thinking...
               </TextShimmerWave>
             </div>
-          ) : (shouldRenderAgentContainer || (['image', 'video', 'graph', 'table', 'json', 'string'].includes(renderData.type) && renderData.type !== 'search')) && parsedContent !== null ? (
+          ) : (() => {
+            // Check if we should render special components
+            const hasSpecialRenderType = ['image', 'video', 'graph', 'table', 'json', 'string'].includes(renderData.type) && renderData.type !== 'search';
+            
+            // Check if we have data available (either from renderData or parsedContent)
+            const hasData = parsedContent !== null || 
+              (renderData.type === 'graph' && renderData.graphData !== undefined) ||
+              (renderData.type === 'image' && renderData.imageData !== undefined) ||
+              (renderData.type === 'video' && renderData.videoData !== undefined) ||
+              (renderData.type === 'table' && renderData.tableData !== undefined) ||
+              (renderData.type === 'json' && renderData.jsonData !== undefined) ||
+              (renderData.type === 'string' && renderData.stringData !== undefined);
+            
+            return (shouldRenderAgentContainer || hasSpecialRenderType) && hasData;
+          })() ? (
             <div className="w-full text-sm leading-relaxed">
               {(() => {
                 // Render based on unified renderData type

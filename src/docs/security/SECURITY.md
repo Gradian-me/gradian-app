@@ -65,15 +65,17 @@ const sanitizedUser = sanitizeNestedData(userData);
 **Important:** Tokens should NEVER be stored in localStorage or React state.
 
 **Current Implementation:**
-- Tokens are stored in httpOnly cookies (set by server)
+- Access tokens are stored in **memory only** (not in cookies or localStorage)
+- Refresh tokens are stored in httpOnly cookies (set by server)
 - localStorage token storage has been removed from login flow
 - Tokens are automatically sent with requests via cookies
 
 **Best Practices:**
-1. Server sets tokens as httpOnly cookies (prevents XSS)
-2. Cookies use `secure` flag in production (HTTPS only)
-3. Cookies use `sameSite=strict` to prevent CSRF
-4. Never expose tokens in client-side code
+1. Server sets refresh tokens as httpOnly cookies (prevents XSS)
+2. Access tokens stored in memory only (cleared on page refresh)
+3. Cookies use `secure` flag in production (HTTPS only)
+4. Cookies use `sameSite=lax` to prevent CSRF while allowing navigation
+5. Never expose tokens in client-side code
 
 **Migration Utility:**
 ```typescript
@@ -83,7 +85,50 @@ import { migrateTokensToCookies } from '@/gradian-ui/shared/utils/token-storage.
 await migrateTokensToCookies();
 ```
 
-### 5. Environment Variables
+### 5. Centralized Logout Flow
+
+**Implementation:**
+- **File**: `src/gradian-ui/shared/utils/logout-flow.ts`
+- Centralized logout logic prevents code duplication
+- Ensures complete cleanup on logout
+
+**What Gets Cleared:**
+1. Calls `/api/auth/logout` API to invalidate server-side session
+2. Clears in-memory access token
+3. Clears all cookies (access_token, refresh_token, session_token, user_session_id)
+4. Clears all localStorage stores (user-store, company-store, tenant-store, menu-items-store, language-store, etc.)
+5. Clears all Zustand stores (user, company, tenant, menu-items)
+6. Redirects to login page with returnUrl
+
+**Usage:**
+```typescript
+import { performLogout } from '@/gradian-ui/shared/utils/logout-flow';
+
+// Complete logout with redirect
+await performLogout('User requested logout', false);
+
+// Logout without redirect (for testing)
+await performLogout('User requested logout', true);
+```
+
+### 6. AuthGuard Component
+
+**Implementation:**
+- **File**: `src/components/auth/AuthGuard.tsx`
+- Prevents layout flash during authentication checks
+- Shows loading spinner instead of authenticated layout
+- Redirects to login if not authenticated
+
+**Usage:**
+The AuthGuard is automatically integrated into the root layout. It:
+- Checks for refresh token before rendering children
+- Shows loading spinner during auth check
+- Redirects to login if not authenticated (without showing layout)
+- Skips check for authentication pages
+
+This ensures users don't see the authenticated layout flash before being redirected to login.
+
+### 7. Environment Variables
 
 **Never expose sensitive values in client-side code:**
 
@@ -102,7 +147,7 @@ NEXT_PUBLIC_SECRET=...   # Visible in browser bundle
 
 **Rule:** Any variable prefixed with `NEXT_PUBLIC_` is exposed to the browser and should NOT contain secrets.
 
-### 6. Console Logging
+### 8. Console Logging
 
 In production:
 - `console.log`, `console.debug`, `console.info`, `console.warn` are disabled
@@ -112,7 +157,7 @@ In production:
 - Automatically applied in production builds
 - Controlled by `SecurityProvider` component
 
-### 7. Security Headers
+### 9. Security Headers
 
 Next.js security headers are configured to prevent common attacks:
 
@@ -190,8 +235,9 @@ See `next.config.ts` for full configuration.
 
 1. Login to the application
 2. Check browser DevTools → Application → Storage
-3. Verify tokens are NOT in localStorage
-4. Verify tokens ARE in Cookies (httpOnly, secure)
+3. Verify access tokens are NOT in localStorage (stored in memory only)
+4. Verify refresh tokens ARE in Cookies (httpOnly, secure)
+5. Verify access tokens are NOT in cookies (stored in memory only)
 
 ### Verify Data Sanitization
 
@@ -204,9 +250,12 @@ See `next.config.ts` for full configuration.
 - [ ] React DevTools disabled
 - [ ] Zustand DevTools disabled
 - [ ] Console methods disabled/sanitized
-- [ ] Tokens stored in httpOnly cookies only
+- [ ] Access tokens stored in memory only (not in cookies or localStorage)
+- [ ] Refresh tokens stored in httpOnly cookies only
 - [ ] No sensitive data in localStorage
 - [ ] All sensitive data sanitized before state storage
+- [ ] Logout flow clears all cookies, localStorage, and stores
+- [ ] AuthGuard prevents layout flash on auth redirect
 - [ ] Security headers configured
 - [ ] Environment variables properly scoped (no `NEXT_PUBLIC_` on secrets)
 - [ ] CSP headers configured appropriately

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,9 @@ import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { config } from '@/lib/config';
 import { useCompanyStore } from '@/stores/company.store';
 import { AuthenticationLayout } from '@/components/authentication';
+import { Logo } from '@/gradian-ui/layout/logo/components/Logo';
+import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
+import { TenantSelector } from '@/components/layout/TenantSelector';
 
 interface FeedbackState {
   type: 'success' | 'error';
@@ -288,15 +291,32 @@ export default function SignUpPage() {
   }, [isLoading, loadError, schema, handleSubmit, isSubmitting]);
 
   return (
-    <AuthenticationLayout
-      heroImageSrc="/screenshots/gradian.me_bg_desktop.png"
-    >
-        <div className="w-full max-w-md">
+    <>
+      {/* Only render TenantSelector on client to prevent hydration mismatch */}
+      {typeof window !== 'undefined' && DEMO_MODE && (
+        <div className="fixed top-4 right-4 z-50 w-64">
+          <TenantSelector placeholder="Select tenant" />
+        </div>
+      )}
+      <div className="fixed top-8 left-8 z-50">
+        <Logo variant="auto" width={140} height={46} />
+      </div>
+      <AuthenticationLayout
+        heroImageSrc="/screenshots/gradian.me_bg_desktop.png"
+        showTestimonials={false}
+        showModeToggle={false}
+      >
+        <div className="w-full max-w-md pt-10 md:pt-4">
           <div className="flex flex-col gap-6">
-            <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">
+            <h1 
+              className="animate-element animate-delay-100 font-semibold leading-tight whitespace-nowrap overflow-hidden"
+              style={{
+                fontSize: "clamp(1.5rem, 3vw + 0.5rem, 3rem)"
+              }}
+            >
               Create account
             </h1>
-            <p className="animate-element animate-delay-200 text-muted-foreground hidden md:block">
+            <p className="animate-element animate-delay-200 text-muted-foreground">
               The password link would be sent to your email address after the account is activated by administrator.
             </p>
 
@@ -317,13 +337,8 @@ export default function SignUpPage() {
             )}
 
             {loadError && (
-              <div className="animate-element animate-delay-250">
-                <FormAlert
-                  type="error"
-                  message={loadError}
-                  dismissible
-                  onDismiss={() => setLoadError(null)}
-                />
+              <div className="animate-element animate-delay-250 rounded-2xl border border-red-500/50 bg-red-500/10 dark:bg-red-500/5 p-4">
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">{loadError}</p>
               </div>
             )}
 
@@ -336,7 +351,7 @@ export default function SignUpPage() {
                 type="button"
                 onClick={() => submitForm?.()}
                 disabled={!submitForm || isSubmitting || isLoading || !!loadError}
-                className="w-full rounded-2xl bg-violet-500 py-4 font-medium text-violet-50 hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full rounded-2xl bg-violet-500 dark:bg-violet-600 py-4 font-medium text-white hover:bg-violet-600 dark:hover:bg-violet-700 transition-all cursor-pointer disabled:opacity-60 disabled:bg-violet-400 dark:disabled:bg-violet-700/50 disabled:hover:bg-violet-400 dark:disabled:hover:bg-violet-700/50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Creating Account...' : 'Create Account'}
               </Button>
@@ -350,6 +365,7 @@ export default function SignUpPage() {
             </div>
           </div>
         </div>
-    </AuthenticationLayout>
+      </AuthenticationLayout>
+    </>
   );
 }

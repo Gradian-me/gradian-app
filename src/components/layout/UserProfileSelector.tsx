@@ -128,7 +128,9 @@ export function UserProfileSelector({
 
   const handleLogout = async () => {
     setIsMenuOpen(false);
-    dispatchAuthEvent(AuthEventType.FORCE_LOGOUT, 'User requested logout');
+    // Use centralized logout flow
+    const { performLogout } = await import('@/gradian-ui/shared/utils/logout-flow');
+    await performLogout('User requested logout', false);
   };
 
   // Always render the same structure to avoid hydration mismatch

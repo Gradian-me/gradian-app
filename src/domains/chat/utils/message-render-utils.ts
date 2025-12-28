@@ -5,6 +5,7 @@
 
 import type { ChatMessage } from '../types';
 import type { SearchResult } from '@/domains/ai-builder/utils/ai-search-utils';
+import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
 
 export type MessageRenderType = 
   | 'search' 
@@ -29,19 +30,59 @@ export interface MessageRenderData {
 }
 
 /**
- * Parse content as JSON if possible
+ * Parse content as JSON if possible, including markdown-wrapped JSON
  */
 function tryParseJson(content: string): any {
   if (!content || typeof content !== 'string') return null;
   
-  const trimmed = content.trim();
-  if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) return null;
-  
-  try {
-    return JSON.parse(trimmed);
-  } catch {
-    return null;
+  // First try extractJson to handle markdown code blocks (```json ... ``` or ```graph ... ```)
+  const extractedJson = extractJson(content);
+  if (extractedJson) {
+    try {
+      return JSON.parse(extractedJson);
+    } catch {
+      // Fall through to direct parsing
+    }
   }
+  
+  // Also try direct parsing for content that starts with { or [
+  const trimmed = content.trim();
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+    try {
+      return JSON.parse(trimmed);
+    } catch {
+      return null;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Extract graph data from markdown code blocks with graph/cytoscape language tags
+ */
+function tryExtractGraphFromMarkdown(content: string): any {
+  if (!content || typeof content !== 'string') return null;
+  
+  // Check for graph-specific code blocks: ```graph, ```cytoscape, ```cytoscape json
+  const graphBlockRegex = /```(?:graph|cytoscape(?:\s+json)?)\s*([\s\S]*?)```/i;
+  const graphBlockMatch = content.match(graphBlockRegex);
+  
+  if (graphBlockMatch && graphBlockMatch[1]) {
+    const jsonCandidate = graphBlockMatch[1].trim();
+    try {
+      const parsed = JSON.parse(jsonCandidate);
+      // Validate it has graph structure
+      if (parsed && typeof parsed === 'object' && 
+          (Array.isArray(parsed.nodes) && Array.isArray(parsed.edges))) {
+        return parsed;
+      }
+    } catch {
+      // Not valid JSON, continue
+    }
+  }
+  
+  return null;
 }
 
 /**
@@ -53,7 +94,7 @@ function extractSearchResults(message: ChatMessage): SearchResult[] | null {
     return message.metadata.searchResults as SearchResult[];
   }
 
-  // Try parsing from content
+  // Try parsing from content (handles markdown-wrapped JSON)
   if (message.content) {
     const parsed = tryParseJson(message.content);
     if (parsed) {
@@ -153,7 +194,7 @@ function isVideoMessage(message: ChatMessage, parsedContent: any): boolean {
 /**
  * Check if message should render as graph
  */
-function isGraphMessage(message: ChatMessage, parsedContent: any): boolean {
+function isGraphMessage(message: ChatMessage, parsedContent: any, rawContent?: string): boolean {
   if (message.role !== 'assistant') return false;
   
   const responseFormat = message.metadata?.responseFormat;
@@ -164,10 +205,15 @@ function isGraphMessage(message: ChatMessage, parsedContent: any): boolean {
   if (parsedContent && typeof parsedContent === 'object') {
     return (
       parsedContent.graph !== undefined ||
-      parsedContent.nodes !== undefined ||
-      parsedContent.edges !== undefined ||
+      (Array.isArray(parsedContent.nodes) && Array.isArray(parsedContent.edges)) ||
       parsedContent.type === 'graph'
     );
+  }
+  
+  // Check if raw content contains graph markdown code blocks
+  if (rawContent) {
+    const graphFromMarkdown = tryExtractGraphFromMarkdown(rawContent);
+    if (graphFromMarkdown) return true;
   }
   
   return false;
@@ -235,7 +281,7 @@ function isStringMessage(message: ChatMessage): boolean {
  * Unified function to detect message render type and extract data
  */
 export function detectMessageRenderType(message: ChatMessage): MessageRenderData {
-  // Parse content once
+  // Parse content once (handles markdown-wrapped JSON)
   const parsedContent = tryParseJson(message.content || '');
   
   // Check search first (highest priority)
@@ -285,11 +331,15 @@ export function detectMessageRenderType(message: ChatMessage): MessageRenderData
     };
   }
   
-  // Check graph
-  if (isGraphMessage(message, parsedContent)) {
+  // Check graph (also check markdown code blocks)
+  if (isGraphMessage(message, parsedContent, message.content)) {
+    // Try to extract graph data from markdown code blocks first
+    const graphFromMarkdown = tryExtractGraphFromMarkdown(message.content || '');
+    const graphData = graphFromMarkdown || parsedContent;
+    
     return {
       type: 'graph',
-      graphData: parsedContent || message.content,
+      graphData: graphData || message.content,
     };
   }
   

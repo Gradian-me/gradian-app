@@ -53,12 +53,10 @@ export function UserProfileDropdown({
     router.push('/settings');
   };
 
-  const handleLogout = () => {
-    // Implement logout logic here
-    console.log('Logging out...');
-    // Example: Call API to logout
-    // Then redirect to login page
-    // router.push('/authentication/login');
+  const handleLogout = async () => {
+    // Use centralized logout flow
+    const { performLogout } = await import('@/gradian-ui/shared/utils/logout-flow');
+    await performLogout('User requested logout', false);
   };
 
   if (!isMounted) {

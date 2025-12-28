@@ -305,7 +305,7 @@ class AuthTokenManager {
    */
   private async performRefresh(): Promise<string | null> {
     const startTime = Date.now();
-    loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] performRefresh() - calling /login with Bearer token ${JSON.stringify({
+    loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] performRefresh() - calling /api/auth/token/refresh ${JSON.stringify({
       timestamp: new Date().toISOString(),
       refreshTokenSource: 'HttpOnly cookie (sent automatically with credentials: include)',
     })}`);
@@ -320,8 +320,8 @@ class AuthTokenManager {
     try {
       const bearer = this.accessToken ? `Bearer ${this.accessToken}` : undefined;
 
-      // Call backend login endpoint - refresh token is sent via HttpOnly cookie (withCredentials)
-      const response = await fetch('/login', {
+      // Call backend refresh endpoint - refresh token is sent via HttpOnly cookie (withCredentials)
+      const response = await fetch('/api/auth/token/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

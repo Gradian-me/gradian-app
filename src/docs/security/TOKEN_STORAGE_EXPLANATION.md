@@ -31,6 +31,7 @@ Use these prefixes to filter logs:
 - `[REFRESH_API]` - Server-side refresh endpoint
 - `[LOGIN_API]` - Server-side login endpoint
 - `[LOGIN]` - Client-side login page
+- `[LOGOUT_FLOW]` - Logout flow operations
 
 ### 3. Expected Flow After Login
 
@@ -73,6 +74,20 @@ Use these prefixes to filter logs:
   - tokenStored: true
   - storageLocation: "MEMORY (not in cookies)"
 [API_CLIENT] request() - token refreshed, retrying request
+```
+
+#### Step 4: Logout
+```
+[LOGOUT_FLOW] ========== LOGOUT STARTED ==========
+[LOGOUT_FLOW] Calling logout API...
+[LOGOUT_FLOW] Logout API call successful
+[LOGOUT_FLOW] In-memory access token cleared
+[LOGOUT_FLOW] User store cleared
+[LOGOUT_FLOW] Company store cleared
+[LOGOUT_FLOW] Tenant store cleared
+[LOGOUT_FLOW] Menu items cache cleared
+[LOGOUT_FLOW] ========== LOGOUT CLEANUP COMPLETED ==========
+[LOGOUT_FLOW] Redirecting to login: /authentication/login?returnUrl=...
 ```
 
 ### 4. Check Cookies (Refresh Token Only)
@@ -118,6 +133,7 @@ Check logs for:
 | `[REFRESH_API]` | Server | Refresh endpoint processing |
 | `[LOGIN_API]` | Server | Login endpoint processing |
 | `[LOGIN]` | Client | Login page operations |
+| `[LOGOUT_FLOW]` | Client | Logout flow (API call, cleanup, redirect) |
 
 ## 🎯 Quick Verification Checklist
 
@@ -126,4 +142,6 @@ Check logs for:
 - [ ] API requests show `[API_CLIENT] request() - Authorization header added`
 - [ ] On 401, see `[AUTH_TOKEN] performRefresh()` and `[REFRESH_API] Refresh SUCCESS`
 - [ ] After refresh, see `[AUTH_TOKEN] performRefresh() - SUCCESS` with `storageLocation: "MEMORY"`
+- [ ] On logout, see `[LOGOUT_FLOW]` logs showing complete cleanup
+- [ ] After logout, verify all cookies and localStorage are cleared
 

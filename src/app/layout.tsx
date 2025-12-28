@@ -7,6 +7,7 @@ import { DialogProvider } from "@/gradian-ui/shared/contexts/DialogContext";
 import { SecurityProvider } from "@/components/security/SecurityProvider";
 import { IdleTimeoutProvider } from "@/gradian-ui/shared/providers/IdleTimeoutProvider";
 import { AuthEventListener } from "@/gradian-ui/shared/components/AuthEventListener";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
 export const metadata: Metadata = {
   title: "Gradian",
@@ -43,7 +44,9 @@ export default function RootLayout({
                 <IdleTimeoutProvider idleTimeoutMs={15 * 60 * 1000}>
                   <AuthEventListener />
                   <Toaster />
-                  {children}
+                  <AuthGuard>
+                    {children}
+                  </AuthGuard>
                 </IdleTimeoutProvider>
               </ThemeProvider>
             </DialogProvider>

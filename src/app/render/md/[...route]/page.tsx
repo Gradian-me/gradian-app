@@ -43,12 +43,65 @@ export default async function MarkdownRenderPage({ params, searchParams }: PageP
   }
   const resolvedPath = validatedPath;
 
+  // SECURITY: Explicitly verify file has .md extension to prevent reading non-markdown files
+  const normalizedPath = resolvedPath.toLowerCase();
+  if (!normalizedPath.endsWith('.md')) {
+    notFound();
+  }
+
+  // SECURITY: Restrict access to only allowed directories (docs and public markdown files)
+  // Prevent access to source code, config files, and other sensitive project files
+  const allowedBasePaths = [
+    path.resolve(process.cwd(), 'src', 'docs'),
+    path.resolve(process.cwd(), 'public'),
+  ];
+  const isInAllowedDirectory = allowedBasePaths.some(allowedPath => 
+    resolvedPath.startsWith(allowedPath)
+  );
+  if (!isInAllowedDirectory) {
+    notFound();
+  }
+
   // Check if file exists
   if (!fs.existsSync(resolvedPath)) {
     notFound();
   }
 
-  const fileContents = fs.readFileSync(resolvedPath, 'utf8');
+  // SECURITY: Verify it's actually a file (not a directory)
+  // Use lstatSync to detect symlinks and prevent symlink-based path traversal
+  const stats = fs.lstatSync(resolvedPath);
+  if (stats.isSymbolicLink()) {
+    // SECURITY: Block symlinks to prevent accessing files outside allowed directories
+    notFound();
+  }
+  if (!stats.isFile()) {
+    notFound();
+  }
+  
+  // SECURITY: Double-check resolved path after following symlink (if any)
+  // This ensures even if a symlink exists, the final resolved path is still in allowed directory
+  const realPath = fs.realpathSync(resolvedPath);
+  const isRealPathInAllowedDirectory = allowedBasePaths.some(allowedPath => 
+    realPath.startsWith(allowedPath)
+  );
+  if (!isRealPathInAllowedDirectory) {
+    notFound();
+  }
+  
+  // SECURITY: Verify real path also ends with .md extension
+  if (!realPath.toLowerCase().endsWith('.md')) {
+    notFound();
+  }
+
+  // SECURITY: Read file with explicit encoding to prevent binary file injection
+  // Use realPath to ensure we're reading the actual file (not a symlink)
+  let fileContents: string;
+  try {
+    fileContents = fs.readFileSync(realPath, 'utf8');
+  } catch (error) {
+    // SECURITY: Don't expose internal errors to prevent information leakage
+    notFound();
+  }
 
   // Extract filename and format title for header
   const fileName = extractFilename(markdownPath);

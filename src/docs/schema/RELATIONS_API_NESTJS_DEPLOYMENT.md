@@ -1,52 +1,48 @@
-# Relations API - NestJS Backend Deployment Rules
+# Complete API Routes - NestJS Backend Deployment Guide
 
-This document provides comprehensive rules and guidelines for implementing the `/api/relations` endpoint in a NestJS backend service.
+This comprehensive document provides detailed specifications, rules, and implementation guidelines for deploying all API routes in a NestJS backend service.
 
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Endpoint Structure](#endpoint-structure)
-3. [Request/Response Formats](#requestresponse-formats)
-4. [Query Parameters](#query-parameters)
-5. [Business Logic Requirements](#business-logic-requirements)
-6. [Database Schema](#database-schema)
-7. [Security & Authentication](#security--authentication)
-8. [Error Handling](#error-handling)
-9. [Performance Considerations](#performance-considerations)
-10. [Implementation Checklist](#implementation-checklist)
+2. [Common Standards](#common-standards)
+3. [Route Categories](#route-categories)
+   - [Data & Schema Management](#1-data--schema-management)
+   - [Relations API](#2-relations-api)
+   - [Authentication & Authorization](#3-authentication--authorization)
+   - [Chat & AI](#4-chat--ai)
+   - [Dashboard & Analytics](#5-dashboard--analytics)
+   - [Builder & Configuration](#6-builder--configuration)
+   - [Graph & Visualization](#7-graph--visualization)
+   - [Email Templates](#8-email-templates)
+   - [Notifications](#9-notifications)
+   - [Media & Assets](#10-media--assets)
+   - [Integrations](#11-integrations)
+   - [System & Utilities](#12-system--utilities)
+4. [Security & Authentication](#security--authentication)
+5. [Error Handling](#error-handling)
+6. [Performance Considerations](#performance-considerations)
+7. [Implementation Checklist](#implementation-checklist)
 
 ---
 
 ## Overview
 
-The Relations API handles CRUD operations for data relations between entities across different schemas. Relations represent connections between entities (e.g., a vendor is related to multiple tenders).
+This application uses a standardized API response format and follows RESTful conventions across all endpoints. The backend should implement all routes with consistent patterns for authentication, validation, error handling, and response formatting.
 
-**Base Endpoint**: `GET|POST /api/relations`
-
-**Key Features**:
-- Bidirectional relation queries (source/target/both)
-- Soft-delete support (inactive flag)
-- Relation enrichment with target metadata
-- Multiple query patterns for different use cases
-- Duplicate prevention with revival logic
-
----
-
-## Endpoint Structure
-
-### GET /api/relations
-
-Query relations based on various criteria. Supports multiple query patterns with priority order.
-
-### POST /api/relations
-
-Create a new relation. Includes duplicate detection and revival logic for inactive relations.
+**Key Principles:**
+- All responses use standardized format: `{ success: boolean, data?: any, error?: string, ... }`
+- Authentication via JWT Bearer tokens
+- Multi-tenant support via `tenantIds` query parameter or `x-tenant-domain` header
+- Comprehensive input validation
+- Consistent error handling with appropriate HTTP status codes
+- Demo mode vs Live mode support (proxy to external services or use local storage)
 
 ---
 
-## Request/Response Formats
+## Common Standards
 
-### Required Response Format
+### Standard Response Format
 
 All endpoints must return responses in this standardized format:
 
@@ -56,14 +52,308 @@ All endpoints must return responses in this standardized format:
   data?: any | any[];
   error?: string;
   message?: string;
-  count?: number; // For list responses
-  code?: string; // Error code
+  count?: number;        // For list responses
+  code?: string;         // Error code
+  meta?: {               // Optional metadata
+    [key: string]: any;
+  };
 }
 ```
 
-### Success Response Examples
+### HTTP Status Codes
 
-**GET - Single Query Result**:
+| Status | Usage |
+|--------|-------|
+| `200 OK` | Successful GET, PUT, DELETE (non-creation) |
+| `201 Created` | Successful POST (resource created) |
+| `400 Bad Request` | Invalid request, validation errors |
+| `401 Unauthorized` | Missing or invalid authentication |
+| `403 Forbidden` | User lacks permission |
+| `404 Not Found` | Resource not found |
+| `409 Conflict` | Duplicate resource, conflict |
+| `413 Payload Too Large` | Request body too large |
+| `500 Internal Server Error` | Server error |
+| `502 Bad Gateway` | Upstream service error |
+| `503 Service Unavailable` | Service temporarily unavailable |
+
+### Query Parameter Conventions
+
+- **Pagination**: `page` (1-based), `limit` (items per page)
+- **Filtering**: Schema-specific query params (e.g., `status`, `search`, `category`)
+- **Tenant Filtering**: `tenantIds` (comma-separated, required on non-localhost)
+- **Summary/List Views**: `summary=true` (returns lightweight data)
+- **Sorting**: `sortBy` (field name), `sortOrder` (`asc` | `desc`)
+
+### Authentication
+
+All protected endpoints require:
+- **Authorization Header**: `Bearer <access_token>`
+- Token extraction from `Authorization` header (case-insensitive) or cookies
+- JWT validation with user context extraction
+
+### Multi-Tenant Support
+
+- **Tenant Domain**: Extracted from `x-tenant-domain` header or request hostname
+- **Tenant IDs**: Passed via `tenantIds` query parameter (comma-separated)
+- **Tenant Filtering**: Applied at data layer (filter by `relatedTenants` field or tenant domain)
+
+---
+
+## Route Categories
+
+### 1. Data & Schema Management
+
+#### 1.1 Dynamic CRUD Routes
+
+**Base Path**: `/api/data/{schema-id}`
+
+##### GET `/api/data/{schema-id}`
+
+List all entities for a schema with filtering and pagination.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `search` | string | Search across text fields |
+| `status` | string | Filter by status |
+| `category` | string | Filter by category |
+| `tenantIds` | string (comma-separated) | Filter by tenant IDs (required on non-localhost) |
+| `page` | number | Page number (1-based) |
+| `limit` | number | Items per page |
+| `sortBy` | string | Field to sort by |
+| `sortOrder` | `asc` \| `desc` | Sort order |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [...],
+  "count": 100,
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 100
+  }
+}
+```
+
+**Business Logic:**
+- Validate schema ID exists
+- Apply tenant filtering if `tenantIds` provided
+- Filter by query parameters
+- Apply pagination
+- Sort results
+- Enrich with user objects and picker field relations (if applicable)
+
+##### POST `/api/data/{schema-id}`
+
+Create new entity or multiple entities.
+
+**Request Body:**
+- Single entity: `{ ...entityData }`
+- Multiple entities: `[{ ...entityData1 }, { ...entityData2 }]`
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": { ...createdEntity },
+  "message": "Entity created successfully"
+}
+```
+
+**Business Logic:**
+- Validate schema ID exists
+- Validate entity data against schema
+- Extract picker field values and repeating section values
+- Create entity with minimal picker format `[{id}, {id}]`
+- Sync HAS_FIELD_VALUE relations for picker fields
+- Sync repeating section relations
+- Return enriched entity data
+
+##### GET `/api/data/{schema-id}/{id}`
+
+Get single entity by ID.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": { ...entity }
+}
+```
+
+**Business Logic:**
+- Validate schema ID and entity ID
+- Check tenant visibility (if `allowDataRelatedTenants` enabled)
+- Enrich with user objects and picker field relations
+- Return entity
+
+##### PUT `/api/data/{schema-id}/{id}`
+
+Update existing entity.
+
+**Request Body:** `{ ...partialEntityData }`
+
+**Business Logic:**
+- Validate schema ID and entity ID
+- Check tenant visibility before update
+- Extract picker field values
+- Update entity
+- Sync relations (picker fields, repeating sections)
+- Return updated entity
+
+##### DELETE `/api/data/{schema-id}/{id}`
+
+Delete entity (soft delete by default, hard delete with query param).
+
+**Query Parameters:**
+- `hardDelete=true` - Permanently delete entity
+
+**Business Logic:**
+- Validate schema ID and entity ID
+- Check tenant visibility
+- Soft delete (set `inactive: true`) or hard delete
+- Clean up related relations
+- Return deleted entity
+
+#### 1.2 Schema Routes
+
+**Base Path**: `/api/schemas`
+
+##### GET `/api/schemas`
+
+Get all schemas or specific schemas with filtering.
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | No | Single schema ID |
+| `schemaIds` | string (comma-separated) | No | Multiple schema IDs |
+| `tenantIds` | string (comma-separated) | Yes* | Tenant IDs (*required on non-localhost) |
+| `summary` | boolean | No | Return summary format (excludes fields) |
+| `includeStatistics` | boolean | No | Include statistics (records count, size) |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "vendors",
+      "singular_name": "Vendor",
+      "plural_name": "Vendors",
+      "fieldsCount": 15,
+      "sectionsCount": 3,
+      "applyToAllTenants": false,
+      "relatedTenants": ["tenant1"],
+      "statistics": {
+        "hasPartition": false,
+        "isIndexed": false,
+        "records": 150,
+        "size": 2.5,
+        "maxUpdatedAt": "2024-01-15T10:30:00.000Z"
+      }
+    }
+  ],
+  "meta": {
+    "requestedIds": ["vendors"],
+    "returnedCount": 1
+  }
+}
+```
+
+**Tenant Filtering Logic:**
+- System schemas (`schemaType === 'system'`): Always visible
+- Schemas with `applyToAllTenants: true`: Always visible
+- Other schemas: Must have matching tenant in `relatedTenants` array
+
+##### POST `/api/schemas`
+
+Create new schema(s).
+
+**Request Body:**
+- Single schema: `{ id: string, ...schemaData }`
+- Multiple schemas: `[{ ...schema1 }, { ...schema2 }]`
+
+**Validation:**
+- Schema ID must be unique
+- Required fields: `id`, `singular_name`, `plural_name`
+- Normalize nested fields (e.g., `repeatingConfig` JSON strings to objects)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": { ...createdSchema },
+  "message": "Schema created successfully"
+}
+```
+
+##### GET `/api/schemas/{schema-id}`
+
+Get specific schema by ID.
+
+##### PUT `/api/schemas/{schema-id}`
+
+Update schema.
+
+##### DELETE `/api/schemas/{schema-id}`
+
+Delete schema.
+
+**Query Parameters:**
+- `hardDelete=true` - Delete schema, all its data, and relations
+
+**Business Logic:**
+- If `hardDelete=true`: Delete schema, all data, and all relations
+- Otherwise: Soft delete (set `inactive: true`)
+- Clear all caches
+
+##### POST `/api/schemas/clear-cache`
+
+Clear schema cache (no-op, kept for compatibility).
+
+#### 1.3 Relations Routes
+
+**Base Path**: `/api/relations`
+
+See [Relations API Documentation](#2-relations-api) for detailed specification.
+
+---
+
+### 2. Relations API
+
+**Base Path**: `/api/relations`
+
+#### GET `/api/relations`
+
+Query relations based on various criteria.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `schema` + `id` + `direction` | string | Unified query (direction: `'source'` \| `'target'` \| `'both'`) |
+| `otherSchema` | string | Filter by the other schema (optional with unified query) |
+| `sourceSchema` + `sourceId` | string | Legacy source query |
+| `targetSchema` + `targetId` | string | Legacy target query |
+| `relationTypeId` | string | Filter by relation type |
+| `fieldId` | string | Filter by field ID |
+| `includeInactive` | boolean | Include inactive relations |
+| `resolveTargets` | boolean | Enrich with target entity data (label, icon, color, metadata) |
+
+**Query Mode Priority:**
+1. Unified query (`schema` + `id`)
+2. Repeating section query (`sourceSchema` + `sourceId` + `relationTypeId`)
+3. Legacy source query (`sourceSchema` + `sourceId`)
+4. Legacy target query (`targetSchema` + `targetId`)
+5. Type query (`relationTypeId` only)
+6. All relations (no parameters)
+
+**Response:**
 ```json
 {
   "success": true,
@@ -79,25 +369,7 @@ All endpoints must return responses in this standardized format:
       "inactive": false,
       "createdAt": "2024-01-15T10:30:00.000Z",
       "updatedAt": "2024-01-15T10:30:00.000Z",
-      "direction": "source"
-    }
-  ],
-  "count": 1
-}
-```
-
-**GET - With Resolved Targets**:
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
-      "sourceSchema": "vendors",
-      "sourceId": "vendor-123",
-      "targetSchema": "tenders",
-      "targetId": "tender-456",
-      "relationTypeId": "vendor-tender",
+      "direction": "source",
       "targetData": {
         "id": "tender-456",
         "label": "Q1 Procurement Tender",
@@ -114,326 +386,899 @@ All endpoints must return responses in this standardized format:
 }
 ```
 
-**POST - Success**:
+**Target Resolution (`resolveTargets=true`):**
+- For external nodes: Lookup in external nodes registry
+- For internal entities: Batch fetch by schema, resolve label/icon/color from schema fields with roles
+- Extract metadata from fields with `addToReferenceMetadata: true`
+- **Performance**: Batch fetch entities by schema to avoid N+1 queries
+
+#### POST `/api/relations`
+
+Create new relation.
+
+**Request Body:**
 ```json
 {
-  "success": true,
-  "data": {
-    "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
-    "sourceSchema": "vendors",
-    "sourceId": "vendor-123",
-    "targetSchema": "tenders",
-    "targetId": "tender-456",
-    "relationTypeId": "vendor-tender",
-    "createdAt": "2024-01-15T10:30:00.000Z",
-    "updatedAt": "2024-01-15T10:30:00.000Z"
-  }
+  "sourceSchema": "vendors",
+  "sourceId": "vendor-123",
+  "targetSchema": "tenders",
+  "targetId": "tender-456",
+  "relationTypeId": "vendor-tender",
+  "fieldId": "relatedTenders"
 }
 ```
 
-**POST - Revived Relation**:
+**Business Logic:**
+- Validate required fields
+- Check for duplicate relation
+- If duplicate exists and is inactive: Revive it (set `inactive: false`, update `updatedAt`)
+- If duplicate exists and is active: Return `409 Conflict`
+- Generate ULID for new relation
+- Set `createdAt` and `updatedAt` timestamps
+
+**Response:**
 ```json
 {
   "success": true,
-  "data": {
-    "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
-    // ... relation data
-    "inactive": false,
-    "updatedAt": "2024-01-15T10:35:00.000Z"
+  "data": { ...relation },
+  "revived": true  // If relation was revived
+}
+```
+
+#### GET `/api/relations/{id}`
+
+Get relation by ID.
+
+#### PUT `/api/relations/{id}`
+
+Update relation.
+
+#### DELETE `/api/relations/{id}`
+
+Delete relation (soft delete: set `inactive: true`).
+
+---
+
+### 3. Authentication & Authorization
+
+**Base Path**: `/api/auth`
+
+#### POST `/api/auth/login`
+
+Authenticate user and return JWT tokens.
+
+**Request Body:**
+```json
+{
+  "emailOrUsername": "user@example.com",
+  "password": "password123",
+  "deviceFingerprint": "optional-device-id"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "user": {
+    "id": "user-123",
+    "email": "user@example.com",
+    "name": "John Doe",
+    ...
   },
-  "revived": true
+  "tokens": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    "expiresIn": 3600
+  },
+  "message": "Login successful"
 }
 ```
 
-### Error Response Examples
+**Cookie Handling:**
+- **Refresh Token**: Set in HttpOnly cookie (`refresh_token`)
+- **Session Token**: Set in HttpOnly cookie (`session_token`)
+- **Access Token**: Returned in response body only (client stores in memory)
+- **Server Memory**: Access token stored in server memory, keyed by refresh token
 
-**400 Bad Request - Missing Fields**:
+**Status Codes:**
+- `200 OK`: Successful login
+- `400 Bad Request`: Missing email/password
+- `401 Unauthorized`: Invalid credentials
+- `500 Internal Server Error`: Server error
+- `503 Service Unavailable`: External auth service unavailable
+
+#### POST `/api/auth/logout`
+
+Logout user (clear tokens).
+
+**Response:**
 ```json
 {
-  "success": false,
-  "error": "Missing required fields: sourceSchema, sourceId, targetSchema, targetId, relationTypeId",
-  "code": "VALIDATION_ERROR"
+  "success": true,
+  "message": "Logged out successfully"
 }
 ```
 
-**409 Conflict - Duplicate Relation**:
+#### POST `/api/auth/token/refresh`
+
+Refresh access token using refresh token.
+
+**Request:**
+- Refresh token from HttpOnly cookie or request body
+
+**Response:**
 ```json
 {
-  "success": false,
-  "error": "Duplicate relation not allowed for the same source, target, and relation type.",
-  "code": "DUPLICATE_RELATION",
-  "existing": {
-    "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
-    // ... existing relation data
+  "success": true,
+  "tokens": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    "expiresIn": 3600
   }
 }
 ```
 
-**500 Internal Server Error**:
+#### GET `/api/auth/token/validate`
+
+Validate access token.
+
+**Response:**
 ```json
 {
-  "success": false,
-  "error": "Failed to process relations request",
-  "code": "INTERNAL_ERROR"
+  "success": true,
+  "valid": true,
+  "user": { ...userData }
+}
+```
+
+#### POST `/api/auth/password/reset`
+
+Request password reset.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+#### POST `/api/auth/password/change`
+
+Change password (requires authentication).
+
+**Request Body:**
+```json
+{
+  "currentPassword": "oldPassword",
+  "newPassword": "newPassword"
+}
+```
+
+#### POST `/api/auth/2fa/generate`
+
+Generate 2FA code.
+
+#### POST `/api/auth/2fa/validate`
+
+Validate 2FA code.
+
+**Request Body:**
+```json
+{
+  "code": "123456"
+}
+```
+
+#### GET `/api/auth/middleware-config`
+
+Get middleware configuration (CORS, auth requirements, etc.).
+
+---
+
+### 4. Chat & AI
+
+**Base Path**: `/api/chat`
+
+#### GET `/api/chat` (Deprecated)
+
+Get all chats for authenticated user.
+
+**Query Parameters:**
+- `summary=true` - Return lightweight chat data without messages
+
+**Use POST `/api/chat` instead.**
+
+#### POST `/api/chat`
+
+Get chats or create new chat.
+
+**To Get Chats:**
+```json
+{
+  "userId": "user-123",  // Optional, uses authenticated user ID
+  "summary": true
+}
+```
+
+**To Create Chat:**
+```json
+{
+  "userId": "user-123",  // Optional, uses authenticated user ID
+  "title": "New Chat",
+  "selectedAgentId": "agent-123"
+}
+```
+
+**Response (Get):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "chat-123",
+      "userId": "user-123",
+      "title": "Chat Title",
+      "selectedAgentId": "agent-123",
+      "lastMessageAt": "2024-01-15T10:30:00.000Z",
+      "messages": [...]  // Only if summary=false
+    }
+  ]
+}
+```
+
+**Response (Create):**
+```json
+{
+  "success": true,
+  "data": { ...createdChat }
+}
+```
+
+**Business Logic:**
+- Require authentication
+- Use authenticated user ID (ignore userId in body)
+- Validate request body size (max 1MB)
+- Sort chats by `lastMessageAt` (most recent first)
+
+#### GET `/api/chat/{chat-id}`
+
+Get chat by ID with pagination.
+
+**Query Parameters:**
+- `page` - Page number (1-based, default: 1)
+- `limit` - Items per page (default: 20)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "chat-123",
+    "userId": "user-123",
+    "title": "Chat Title",
+    "messages": [...],  // Paginated
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "totalMessages": 100,
+      "hasMore": true
+    }
+  }
+}
+```
+
+**Business Logic:**
+- Require authentication and ownership
+- Validate chat ID format (ULID)
+- Return messages in reverse chronological order (newest first)
+- Paginate messages (from end of array)
+
+#### PUT `/api/chat/{chat-id}`
+
+Update chat (title, selectedAgentId).
+
+**Request Body:**
+```json
+{
+  "title": "Updated Title",
+  "selectedAgentId": "agent-456"  // or null
+}
+```
+
+#### DELETE `/api/chat/{chat-id}`
+
+Delete chat.
+
+**Business Logic:**
+- Require authentication and ownership
+- Validate chat ID format
+- Delete chat and all messages
+
+#### GET `/api/chat/{chat-id}/messages`
+
+Get chat messages with pagination.
+
+**Query Parameters:**
+- `limit` - Items per page (default: 50)
+- `offset` - Offset (default: 0)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "msg-123",
+      "role": "user",
+      "content": "Hello",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    }
+  ],
+  "pagination": {
+    "limit": 50,
+    "offset": 0,
+    "total": 100,
+    "hasMore": true
+  }
+}
+```
+
+#### POST `/api/chat/{chat-id}/messages`
+
+Add message to chat.
+
+**Request Body:**
+```json
+{
+  "role": "user",  // "user" | "assistant" | "system"
+  "content": "Message content",
+  "agentId": "agent-123",  // Optional
+  "agentType": "chat",  // Optional
+  "metadata": {}  // Optional
+}
+```
+
+**Validation:**
+- `role`: Must be "user", "assistant", or "system"
+- `content`: Required, max length validation
+- Request body size: Max 1MB
+
+#### GET `/api/chat/{chat-id}/todos`
+
+Get todos for chat.
+
+#### POST `/api/chat/{chat-id}/execute-todos`
+
+Execute all todos in chat.
+
+#### POST `/api/chat/{chat-id}/execute-todo/{todo-id}`
+
+Execute specific todo.
+
+#### POST `/api/chat/orchestrate`
+
+Orchestrate chat with AI agents.
+
+---
+
+### 5. Dashboard & Analytics
+
+**Base Path**: `/api/dashboard`
+
+#### GET `/api/dashboard`
+
+Get dashboard metrics.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "metrics": {
+      "totalOrders": 150,
+      "totalVendors": 25,
+      ...
+    },
+    "spendAnalysis": {
+      "totalSpend": 500000,
+      "byCategory": [...]
+    },
+    "monthlyTrends": [
+      {
+        "month": "2024-01",
+        "orders": 50,
+        "spend": 150000
+      }
+    ]
+  }
+}
+```
+
+#### GET `/api/dashboard/stats`
+
+Get dashboard statistics.
+
+#### GET `/api/dashboard/kpi-cards`
+
+Get KPI cards data.
+
+#### GET `/api/dashboard/kpi-lists`
+
+Get KPI lists data.
+
+#### GET `/api/dashboard/spend-analysis`
+
+Get spend analysis data.
+
+#### GET `/api/dashboard/performance-metrics`
+
+Get performance metrics.
+
+---
+
+### 6. Builder & Configuration
+
+**Base Path**: `/api/builders`
+
+#### GET `/api/builders`
+
+Get all builders.
+
+#### POST `/api/builders`
+
+Create builder.
+
+#### GET `/api/builders/{id}`
+
+Get builder by ID.
+
+#### PUT `/api/builders/{id}`
+
+Update builder.
+
+#### DELETE `/api/builders/{id}`
+
+Delete builder.
+
+#### GET `/api/builders/versions`
+
+Get all builder versions.
+
+#### POST `/api/builders/versions`
+
+Create builder version.
+
+**Request Body:**
+```json
+{
+  "changes": [
+    {
+      "changeType": "feature" | "refactor" | "add" | "restore" | "enhance" | "update",
+      "description": "Change description",
+      "priority": "LOW" | "Medium" | "High",
+      "affectedDomains": ["domain1", "domain2"]
+    }
+  ],
+  "priority": "High"  // Overall priority (determines version increment)
+}
+```
+
+**Version Increment Rules:**
+- LOW or Medium priority: Increments patch version (e.g., 1.00.000 → 1.00.001)
+- High priority: Increments minor version (e.g., 1.00.000 → 1.01.000)
+- Major version: Never auto-incremented
+
+---
+
+### 7. Graph & Visualization
+
+**Base Path**: `/api/graph`
+
+#### GET `/api/graph`
+
+Get graph data.
+
+**Query Parameters:**
+- `includedSchemaIds` - Comma-separated schema IDs to include
+- `excludedSchemaIds` - Comma-separated schema IDs to exclude
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "nodes": [
+      {
+        "id": "entity-123",
+        "schemaId": "vendors",
+        "label": "Vendor Name",
+        ...
+      }
+    ],
+    "edges": [
+      {
+        "source": "entity-123",
+        "target": "entity-456",
+        "relationTypeId": "vendor-tender"
+      }
+    ]
+  }
+}
+```
+
+#### POST `/api/graph`
+
+Create new graph.
+
+#### GET `/api/graph/{graphId}`
+
+Get graph by ID.
+
+#### PUT `/api/graph/{graphId}`
+
+Update graph.
+
+#### DELETE `/api/graph/{graphId}`
+
+Delete graph.
+
+---
+
+### 8. Email Templates
+
+**Base Path**: `/api/email-templates`
+
+#### GET `/api/email-templates`
+
+Get all email templates.
+
+#### POST `/api/email-templates`
+
+Create email template.
+
+#### GET `/api/email-templates/{id}`
+
+Get email template by ID.
+
+#### PUT `/api/email-templates/{id}`
+
+Update email template.
+
+#### DELETE `/api/email-templates/{id}`
+
+Delete email template.
+
+#### GET `/api/email-templates/{id}/content`
+
+Get email template content.
+
+#### PUT `/api/email-templates/{id}/content`
+
+Update email template content.
+
+#### POST `/api/email-templates/send`
+
+Send email template.
+
+**Request Body:**
+```json
+{
+  "templateId": "template-123",
+  "to": "recipient@example.com",
+  "variables": {
+    "name": "John Doe",
+    ...
+  }
 }
 ```
 
 ---
 
-## Query Parameters
+### 9. Notifications
 
-### GET /api/relations
+**Base Path**: `/api/notifications`
 
-All query parameters are optional, but specific combinations trigger different query modes (checked in priority order).
+#### GET `/api/notifications`
 
-#### Available Parameters
+Get all notifications (filtered by authenticated user).
 
-| Parameter | Type | Description | Required For |
-|-----------|------|-------------|--------------|
-| `schema` | string | Schema ID of the entity | New unified query |
-| `id` | string | Entity ID | New unified query |
-| `direction` | string | `'source'` \| `'target'` \| `'both'` | Optional (default: `'both'`) |
-| `otherSchema` | string | Filter by the other schema | Optional filter |
-| `sourceSchema` | string | Source schema ID (legacy) | Legacy queries |
-| `sourceId` | string | Source entity ID (legacy) | Legacy queries |
-| `targetSchema` | string | Target schema ID | Legacy queries / filters |
-| `targetId` | string | Target entity ID (legacy) | Legacy queries |
-| `relationTypeId` | string | Relation type identifier | Type query / section query |
-| `fieldId` | string | Field identifier filter | Optional filter |
-| `includeInactive` | boolean | Include inactive relations (`'true'`) | Optional (default: `false` when `relationTypeId` present) |
-| `resolveTargets` | boolean | Enrich with target data (`'true'`) | Optional (default: `false`) |
+**Query Parameters:**
+- `unread` - Filter unread notifications only
+- `limit` - Items per page
+- `offset` - Offset
 
-#### Query Mode Priority
+#### POST `/api/notifications`
 
-The endpoint checks query parameters in this order (first match wins):
+Create notification.
 
-1. **New Unified Query** (`schema` + `id`)
-   - Required: `schema`, `id`
-   - Optional: `direction` (default: `'both'`), `otherSchema`, `relationTypeId`
-   - Returns relations where the entity appears as source, target, or both
-
-2. **Repeating Section Query** (`sourceSchema` + `sourceId` + `relationTypeId`)
-   - Required: `sourceSchema`, `sourceId`, `relationTypeId`
-   - Optional: `targetSchema`
-   - Used for repeating section components
-   - Automatically adds `direction: 'source'` to results
-
-3. **Legacy Source Query** (`sourceSchema` + `sourceId`)
-   - Required: `sourceSchema`, `sourceId`
-   - Optional: `targetSchema` (filter)
-   - Automatically adds `direction: 'source'` to results
-
-4. **Legacy Target Query** (`targetSchema` + `targetId`)
-   - Required: `targetSchema`, `targetId`
-   - Automatically adds `direction: 'target'` to results
-
-5. **Type Query** (`relationTypeId` only)
-   - Required: `relationTypeId`
-   - Returns all relations of a specific type
-
-6. **All Relations** (no parameters)
-   - Fallback: Returns all relations in the system
-
-#### Additional Filters (Applied After Main Query)
-
-- **`fieldId`**: Filters relations by field identifier (mainly for HAS_FIELD_VALUE relations)
-- **`includeInactive`**: When `relationTypeId` is specified, inactive relations are excluded by default unless `includeInactive=true`
-- **`resolveTargets`**: When `true`, enriches relations with target entity metadata (label, icon, color, custom metadata)
-
-#### Query Examples
-
+**Request Body:**
+```json
+{
+  "userId": "user-123",
+  "title": "Notification Title",
+  "message": "Notification message",
+  "type": "info",
+  "read": false
+}
 ```
-# New unified query - both directions
-GET /api/relations?schema=vendors&id=vendor-123
 
-# New unified query - source only
-GET /api/relations?schema=vendors&id=vendor-123&direction=source
+#### GET `/api/notifications/{id}`
 
-# New unified query - with target schema filter
-GET /api/relations?schema=vendors&id=vendor-123&direction=source&otherSchema=tenders
+Get notification by ID.
 
-# Repeating section query
-GET /api/relations?sourceSchema=vendors&sourceId=vendor-123&relationTypeId=vendor-tender
+#### PUT `/api/notifications/{id}`
 
-# Legacy source query
-GET /api/relations?sourceSchema=vendors&sourceId=vendor-123
+Update notification (e.g., mark as read).
 
-# Type query
-GET /api/relations?relationTypeId=vendor-tender
-
-# With target resolution
-GET /api/relations?schema=vendors&id=vendor-123&resolveTargets=true
-
-# Include inactive relations
-GET /api/relations?relationTypeId=vendor-tender&includeInactive=true
+**Request Body:**
+```json
+{
+  "read": true
+}
 ```
+
+#### DELETE `/api/notifications/{id}`
+
+Delete notification.
 
 ---
 
-## Business Logic Requirements
+### 10. Media & Assets
 
-### POST /api/relations - Create Relation
+#### Images
 
-#### Request Body
+**Base Path**: `/api/images`
 
-```typescript
+##### GET `/api/images/{filename}`
+
+Get image by filename.
+
+**Response:** Image binary with appropriate Content-Type header.
+
+##### POST `/api/images/save`
+
+Save uploaded image.
+
+**Request:** Multipart form data with image file.
+
+**Response:**
+```json
 {
-  sourceSchema: string;      // Required
-  sourceId: string;          // Required
-  targetSchema: string;      // Required
-  targetId: string;          // Required
-  relationTypeId: string;    // Required
-  fieldId?: string;          // Optional
+  "success": true,
+  "data": {
+    "filename": "image-123.jpg",
+    "url": "/api/images/image-123.jpg",
+    "size": 102400
+  }
 }
 ```
 
-#### Validation Rules
+#### Videos
 
-1. **Required Fields**: All of `sourceSchema`, `sourceId`, `targetSchema`, `targetId`, `relationTypeId` must be present
-2. **Duplicate Detection**: Check for existing relation with exact match on:
-   - `sourceSchema`
-   - `sourceId`
-   - `targetSchema`
-   - `targetId`
-   - `relationTypeId`
+**Base Path**: `/api/videos`
 
-#### Duplicate Handling
+##### GET `/api/videos`
 
-- **If duplicate exists and is ACTIVE**: Return `409 Conflict` with existing relation data
-- **If duplicate exists and is INACTIVE**: Revive the relation by:
-  - Setting `inactive: false` (or removing the field)
-  - Updating `updatedAt` to current timestamp
-  - Return `200 OK` with `revived: true` flag
+Get all videos.
 
-#### Relation Creation
+##### POST `/api/videos`
 
-- Generate unique ID using ULID format (e.g., `01ARZ3NDEKTSV4RRFFQ69G5FAV`)
-- Set `createdAt` and `updatedAt` to current ISO timestamp
-- `inactive` defaults to `false` (or `undefined`/`null`)
+Create video.
 
-### GET /api/relations - Query Logic
+##### GET `/api/videos/{videoId}`
 
-#### Filtering Priority
+Get video by ID.
 
-1. Execute main query based on parameter combination (see Query Mode Priority above)
-2. Apply `fieldId` filter if provided
-3. Apply `includeInactive` filter if `relationTypeId` is present:
-   - Default behavior: Exclude inactive relations when `relationTypeId` is specified
-   - Override: Include inactive if `includeInactive=true`
-4. Apply `resolveTargets` enrichment if requested
+##### PUT `/api/videos/{videoId}`
 
-#### Direction Indicators
+Update video.
 
-When returning results, add `direction` field based on query context:
-- **Source queries**: Add `direction: 'source'` to all results
-- **Target queries**: Add `direction: 'target'` to all results
-- **Both/unified queries**: Add appropriate direction based on which side of the relation the queried entity appears
+##### DELETE `/api/videos/{videoId}`
 
-#### Target Resolution (`resolveTargets=true`)
+Delete video.
 
-When `resolveTargets=true`, enrich each relation's target entity with:
+##### GET `/api/videos/{videoId}/content`
 
-1. **For External Nodes** (`targetSchema === 'external-nodes'`):
-   - Lookup in external nodes registry
-   - Include: `id`, `label`, `icon`, `color`
+Get video content (stream).
 
-2. **For Internal Entities**:
-   - Batch fetch all target entities by schema (avoid N+1 queries)
-   - Resolve `label` from schema field with role `'title'` (fallback: `name`, `title`, or `targetId`)
-   - Resolve `icon` from schema field with role `'icon'` (fallback: entity `icon`)
-   - Resolve `color` from schema field with role `'color'` (fallback: entity `color`)
-   - Extract metadata from fields with `addToReferenceMetadata: true`
+#### Avatars
 
-**Performance Optimization**:
-- Group relations by `targetSchema`
-- Batch fetch all entities per schema in parallel
-- Use Map/Set for O(1) lookups
-- Handle errors gracefully (log and continue without enrichment)
+**Base Path**: `/api/avatars`
+
+##### GET `/api/avatars/{filename}`
+
+Get avatar by filename.
 
 ---
 
-## Database Schema
+### 11. Integrations
 
-### Recommended Database Table Structure
+**Base Path**: `/api/integrations`
 
-```sql
-CREATE TABLE relations (
-  id VARCHAR(26) PRIMARY KEY,              -- ULID format
-  source_schema VARCHAR(255) NOT NULL,
-  source_id VARCHAR(255) NOT NULL,
-  target_schema VARCHAR(255) NOT NULL,
-  target_id VARCHAR(255) NOT NULL,
-  relation_type_id VARCHAR(255) NOT NULL,
-  field_id VARCHAR(255) NULL,              -- Optional field identifier
-  inactive BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL,
-  
-  -- Composite unique index to prevent duplicates
-  UNIQUE KEY unique_active_relation (
-    source_schema, 
-    source_id, 
-    target_schema, 
-    target_id, 
-    relation_type_id,
-    inactive
-  ),
-  
-  -- Indexes for common queries
-  INDEX idx_source (source_schema, source_id),
-  INDEX idx_target (target_schema, target_id),
-  INDEX idx_relation_type (relation_type_id),
-  INDEX idx_field (field_id),
-  INDEX idx_inactive (inactive),
-  
-  -- Foreign key constraints (if applicable)
-  -- FOREIGN KEY (source_schema, source_id) REFERENCES entities(schema, id),
-  -- FOREIGN KEY (target_schema, target_id) REFERENCES entities(schema, id)
-);
-```
+#### GET `/api/integrations`
 
-### Alternative: NoSQL Structure (MongoDB)
+Get all integrations.
 
-```typescript
+#### POST `/api/integrations`
+
+Create integration.
+
+#### GET `/api/integrations/lucide-icons`
+
+Get Lucide icons.
+
+#### POST `/api/integrations/lucide-icons/sync`
+
+Sync Lucide icons.
+
+#### POST `/api/integrations/sync`
+
+Sync integrations.
+
+---
+
+### 12. System & Utilities
+
+#### Health Checks
+
+##### GET `/api/health`
+
+Health check endpoint.
+
+**Response:**
+```json
 {
-  _id: ObjectId,
-  id: string,                    // ULID
-  sourceSchema: string,
-  sourceId: string,
-  targetSchema: string,
-  targetId: string,
-  relationTypeId: string,
-  fieldId?: string,
-  inactive?: boolean,
-  createdAt: Date,
-  updatedAt: Date
-}
-
-// Indexes
-{
-  sourceSchema: 1,
-  sourceId: 1
-}
-
-{
-  targetSchema: 1,
-  targetId: 1
-}
-
-{
-  relationTypeId: 1
-}
-
-{
-  sourceSchema: 1,
-  sourceId: 1,
-  targetSchema: 1,
-  targetId: 1,
-  relationTypeId: 1,
-  unique: true,
-  partialFilterExpression: { inactive: { $ne: true } }
+  "success": true,
+  "status": "healthy",
+  "timestamp": "2024-01-15T10:30:00.000Z"
 }
 ```
+
+##### GET `/api/health/proxy`
+
+Proxy health check.
+
+##### GET `/api/data/health`
+
+Data layer health check.
+
+#### Settings
+
+##### GET `/api/settings`
+
+Get application settings.
+
+##### PUT `/api/settings`
+
+Update application settings.
+
+**Request Body:**
+```json
+{
+  "setting1": "value1",
+  "setting2": "value2"
+}
+```
+
+#### UI Components
+
+##### GET `/api/ui/components`
+
+Get UI components registry.
+
+#### Documentation
+
+##### GET `/api/docs/swagger`
+
+Get Swagger API documentation.
+
+#### Migration
+
+##### POST `/api/migrate/picker-fields`
+
+Migrate picker fields (one-time migration endpoint).
+
+#### Git Integration
+
+##### POST `/api/git/pull-env`
+
+Pull environment variables from Git.
+
+##### POST `/api/git/sync-env`
+
+Sync environment variables to Git.
+
+#### AI Models
+
+##### GET `/api/ai-models`
+
+Get available AI models.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "gpt-4",
+      "name": "GPT-4",
+      "provider": "openai",
+      ...
+    }
+  ]
+}
+```
+
+#### AI Agents
+
+**Base Path**: `/api/ai-agents`
+
+##### GET `/api/ai-agents`
+
+Get all AI agents.
+
+**Query Parameters:**
+- `id` - Single agent ID
+- `agentIds` - Comma-separated agent IDs
+- `summary` - Return summary format
+
+##### POST `/api/ai-agents`
+
+Create AI agent.
+
+##### GET `/api/ai-agents/{agent-id}`
+
+Get AI agent by ID.
+
+##### PUT `/api/ai-agents/{agent-id}`
+
+Update AI agent.
+
+##### DELETE `/api/ai-agents/{agent-id}`
+
+Delete AI agent.
+
+#### AI Prompts
+
+**Base Path**: `/api/ai-prompts`
+
+##### GET `/api/ai-prompts`
+
+Get AI prompts with filters.
+
+**Query Parameters:**
+- `username` - Filter by username
+- `aiAgent` - Filter by AI agent
+- `startDate` - Start date (ISO format)
+- `endDate` - End date (ISO format)
+- `search` - Search query
+
+##### POST `/api/ai-prompts`
+
+Create AI prompt record.
+
+##### GET `/api/ai-prompts/{id}`
+
+Get AI prompt by ID.
+
+##### PUT `/api/ai-prompts/{id}`
+
+Update AI prompt.
+
+##### DELETE `/api/ai-prompts/{id}`
+
+Delete AI prompt.
+
+#### AI Builder
+
+**Base Path**: `/api/ai-builder`
+
+##### GET `/api/ai-builder/{agent-id}`
+
+Get AI builder agent configuration.
+
+##### POST `/api/ai-builder/{agent-id}`
+
+Update AI builder agent.
 
 ---
 
@@ -441,12 +1286,10 @@ CREATE TABLE relations (
 
 ### Required Headers
 
-Backend must accept and process:
-
-1. **Authorization Header** (Required)
+1. **Authorization Header** (Required for protected routes)
    - Format: `Bearer <access_token>`
    - Extract from: `Authorization` or `authorization` header
-   - Validate token and extract user/tenant context
+   - Validate JWT token and extract user/tenant context
 
 2. **x-tenant-domain Header** (Optional but Recommended)
    - Format: Tenant domain hostname (e.g., `example.com`)
@@ -459,11 +1302,14 @@ Backend must accept and process:
    - Validate all query parameters (sanitize strings, validate IDs)
    - Validate request body schema (use DTOs/class-validator)
    - Reject malformed requests with `400 Bad Request`
+   - Validate ULID formats for IDs
+   - Validate email formats
+   - Validate URL formats
 
 2. **Authorization**
-   - Verify user has permission to read relations for requested schemas/entities
-   - Verify user has permission to create relations
-   - Implement tenant isolation (filter by tenant domain)
+   - Verify user has permission to access requested resources
+   - Implement tenant isolation (filter by tenant domain/IDs)
+   - Verify ownership for user-specific resources (e.g., chats)
 
 3. **SQL Injection Prevention**
    - Use parameterized queries / ORM query builders
@@ -472,12 +1318,18 @@ Backend must accept and process:
 
 4. **Rate Limiting**
    - Implement rate limiting per user/IP
-   - Especially important for `resolveTargets=true` queries (more expensive)
+   - Stricter limits for expensive operations (e.g., `resolveTargets=true`)
+   - Stricter limits for authentication endpoints
 
 5. **Data Exposure**
-   - Only return relations the user has permission to see
-   - Filter by tenant domain when applicable
-   - Don't expose sensitive metadata in `targetData` if user lacks permission
+   - Only return data the user has permission to see
+   - Filter by tenant domain/IDs when applicable
+   - Don't expose sensitive metadata if user lacks permission
+   - Mask sensitive fields in logs (passwords, tokens, PII)
+
+6. **Request Size Limits**
+   - Enforce maximum request body size (e.g., 1MB for chat messages, 10MB for file uploads)
+   - Return `413 Payload Too Large` if exceeded
 
 ---
 
@@ -487,15 +1339,17 @@ Backend must accept and process:
 
 | Status | Scenario |
 |--------|----------|
-| `200 OK` | Successful query, relation created, or relation revived |
-| `201 Created` | New relation created successfully |
-| `400 Bad Request` | Missing required fields, invalid parameters |
+| `200 OK` | Successful GET, PUT, DELETE (non-creation), successful query |
+| `201 Created` | New resource created successfully |
+| `400 Bad Request` | Missing required fields, invalid parameters, validation errors |
 | `401 Unauthorized` | Missing or invalid authentication token |
 | `403 Forbidden` | User lacks permission for requested operation |
-| `404 Not Found` | Relation not found (if querying by ID) |
-| `409 Conflict` | Duplicate active relation exists |
+| `404 Not Found` | Resource not found (entity, schema, relation, etc.) |
+| `409 Conflict` | Duplicate resource exists, conflict |
+| `413 Payload Too Large` | Request body exceeds size limit |
 | `500 Internal Server Error` | Server error during processing |
 | `502 Bad Gateway` | Upstream service error (if applicable) |
+| `503 Service Unavailable` | Service temporarily unavailable |
 
 ### Error Response Format
 
@@ -512,17 +1366,23 @@ Backend must accept and process:
 
 - `VALIDATION_ERROR`: Missing or invalid input
 - `DUPLICATE_RELATION`: Attempted to create duplicate active relation
+- `DUPLICATE_ENTITY`: Attempted to create duplicate entity
+- `DUPLICATE_SCHEMA`: Attempted to create duplicate schema
 - `AUTHORIZATION_ERROR`: User lacks permission
-- `NOT_FOUND`: Requested relation does not exist
+- `AUTHENTICATION_ERROR`: Invalid or missing authentication
+- `NOT_FOUND`: Requested resource does not exist
 - `INTERNAL_ERROR`: Unexpected server error
 - `DATABASE_ERROR`: Database operation failed
+- `UPSTREAM_ERROR`: External service error
 
 ### Exception Handling Best Practices
 
 1. **Catch and Transform**: Catch database/ORM exceptions and transform to standardized error responses
 2. **Log Errors**: Log all errors with context (user ID, tenant, query parameters) for debugging
 3. **Don't Expose Internals**: Don't return raw database errors or stack traces to clients
-4. **Graceful Degradation**: For `resolveTargets`, if enrichment fails, return relation without `targetData` rather than failing entire request
+4. **Graceful Degradation**: For optional features (e.g., `resolveTargets`), if enrichment fails, return data without enrichment rather than failing entire request
+5. **Validation Errors**: Return detailed validation errors with field names and messages
+6. **Rate Limit Errors**: Return `429 Too Many Requests` with retry-after header
 
 ---
 
@@ -531,24 +1391,37 @@ Backend must accept and process:
 ### Query Optimization
 
 1. **Indexing Strategy**
-   - Index on `(sourceSchema, sourceId)` for source queries
-   - Index on `(targetSchema, targetId)` for target queries
-   - Index on `relationTypeId` for type queries
-   - Composite unique index on `(sourceSchema, sourceId, targetSchema, targetId, relationTypeId, inactive)` for duplicate detection
+   - Index on `(schemaId, id)` for entity lookups
+   - Index on `(sourceSchema, sourceId)` for relation source queries
+   - Index on `(targetSchema, targetId)` for relation target queries
+   - Index on `relationTypeId` for relation type queries
+   - Composite indexes for common query patterns
+   - Index on `tenantIds` or tenant-related fields for multi-tenant filtering
 
 2. **Batch Operations**
    - When `resolveTargets=true`, batch fetch entities by schema
    - Use `IN` queries or `$in` operators instead of N+1 queries
    - Cache schema definitions if frequently accessed
+   - Batch create/update operations when possible
 
-3. **Pagination** (Future Enhancement)
-   - Consider adding `limit` and `offset` parameters for large result sets
-   - Default limit: 1000 relations per query
+3. **Pagination**
+   - Implement pagination for all list endpoints
+   - Default limit: 20-50 items per page
+   - Maximum limit: 1000 items per page
+   - Use cursor-based pagination for large datasets
 
 4. **Caching**
-   - Cache external nodes registry (if applicable)
-   - Cache schema definitions
-   - Consider caching frequently accessed relations (with TTL)
+   - Cache schema definitions (TTL: 5 minutes)
+   - Cache frequently accessed entities (TTL: 1-5 minutes)
+   - Cache external nodes registry (TTL: 1 hour)
+   - Invalidate cache on writes (POST/PUT/DELETE)
+   - Use Redis or in-memory cache for shared caching
+
+5. **Database Query Optimization**
+   - Use SELECT only needed fields (avoid `SELECT *`)
+   - Use JOINs instead of multiple queries when possible
+   - Implement query result caching for read-heavy endpoints
+   - Use database connection pooling
 
 ### Target Resolution Performance
 
@@ -587,135 +1460,399 @@ Backend must accept and process:
 
 ## Implementation Checklist
 
-### NestJS Controller Setup
+### NestJS Project Structure
 
-- [ ] Create `RelationsController` with `@Controller('api/relations')`
-- [ ] Implement `@Get()` handler for query operations
-- [ ] Implement `@Post()` handler for create operations
-- [ ] Add `@UseGuards()` for authentication (JWT/AuthGuard)
+```
+src/
+├── common/
+│   ├── decorators/
+│   │   ├── auth.decorator.ts        # @CurrentUser(), @TenantDomain()
+│   │   └── public.decorator.ts      # @Public() for public routes
+│   ├── filters/
+│   │   └── http-exception.filter.ts # Global exception filter
+│   ├── guards/
+│   │   ├── jwt-auth.guard.ts        # JWT authentication guard
+│   │   └── roles.guard.ts           # Role-based authorization guard
+│   ├── interceptors/
+│   │   ├── transform.interceptor.ts # Response transformation
+│   │   └── logging.interceptor.ts   # Request/response logging
+│   ├── pipes/
+│   │   └── validation.pipe.ts       # Global validation pipe
+│   └── dto/
+│       └── pagination.dto.ts        # Common DTOs
+├── modules/
+│   ├── auth/
+│   │   ├── auth.controller.ts
+│   │   ├── auth.service.ts
+│   │   ├── auth.module.ts
+│   │   └── dto/
+│   │       ├── login.dto.ts
+│   │       └── refresh-token.dto.ts
+│   ├── data/
+│   │   ├── data.controller.ts
+│   │   ├── data.service.ts
+│   │   ├── data.module.ts
+│   │   └── dto/
+│   │       └── create-entity.dto.ts
+│   ├── schemas/
+│   │   ├── schemas.controller.ts
+│   │   ├── schemas.service.ts
+│   │   └── schemas.module.ts
+│   ├── relations/
+│   │   ├── relations.controller.ts
+│   │   ├── relations.service.ts
+│   │   └── relations.module.ts
+│   ├── chat/
+│   │   ├── chat.controller.ts
+│   │   ├── chat.service.ts
+│   │   └── chat.module.ts
+│   └── ... (other modules)
+└── main.ts
+```
+
+### Core Setup Checklist
+
+- [ ] Initialize NestJS project with TypeScript
+- [ ] Configure environment variables (.env)
+- [ ] Set up database connection (TypeORM, Prisma, or Mongoose)
+- [ ] Configure JWT authentication (Passport)
+- [ ] Set up global exception filter
+- [ ] Set up global validation pipe (class-validator, class-transformer)
+- [ ] Configure CORS
+- [ ] Set up logging (Winston or Pino)
+- [ ] Configure rate limiting (Throttler)
+- [ ] Set up caching (Redis or in-memory)
+
+### Module Implementation Checklist
+
+For each module (data, schemas, relations, chat, etc.):
+
+#### Controller Setup
+- [ ] Create controller with `@Controller('api/{module}')`
+- [ ] Implement GET handler(s) for list/single resource
+- [ ] Implement POST handler for create
+- [ ] Implement PUT handler for update
+- [ ] Implement DELETE handler for delete
+- [ ] Add `@UseGuards(JwtAuthGuard)` for protected routes
 - [ ] Add DTOs for request validation (`class-validator`)
+- [ ] Add `@UseInterceptors(TransformInterceptor)` for response formatting
+- [ ] Add Swagger decorators (`@ApiTags`, `@ApiOperation`, etc.)
 
-### Service Layer
-
-- [ ] Create `RelationsService` with business logic
-- [ ] Implement query methods matching utility functions:
-  - [ ] `getRelationsBySchemaAndId()`
-  - [ ] `getRelationsForSection()`
-  - [ ] `getRelationsBySource()`
-  - [ ] `getRelationsByTarget()`
-  - [ ] `getRelationsByType()`
-- [ ] Implement `createRelation()` with duplicate detection and revival
-- [ ] Implement `resolveTargets()` enrichment logic
+#### Service Layer
+- [ ] Create service with business logic
+- [ ] Implement query methods
+- [ ] Implement create methods with validation
+- [ ] Implement update methods
+- [ ] Implement delete methods (soft/hard delete)
 - [ ] Add proper error handling and logging
+- [ ] Implement tenant filtering logic
+- [ ] Implement caching logic
 
-### Repository/Data Access Layer
-
-- [ ] Create `RelationsRepository` or use ORM entities
+#### Repository/Data Access Layer
+- [ ] Create repository or use ORM entities
 - [ ] Implement database queries with proper indexing
-- [ ] Add batch fetch methods for target resolution
-- [ ] Implement transaction support for create operations
+- [ ] Add batch fetch methods for performance
+- [ ] Implement transaction support for create/update operations
 - [ ] Add database connection error handling
+- [ ] Implement soft delete support (if applicable)
 
-### DTOs and Validation
-
-- [ ] Create `CreateRelationDto` with validation decorators
-- [ ] Create `QueryRelationsDto` for GET parameters
+#### DTOs and Validation
+- [ ] Create DTOs for all request/response types
+- [ ] Add validation decorators (`@IsString()`, `@IsOptional()`, etc.)
 - [ ] Add custom validators for:
-  - [ ] ULID format validation (for IDs)
-  - [ ] Schema ID validation
-  - [ ] Direction enum validation
+  - ULID format validation (for IDs)
+  - Schema ID validation
+  - Email format validation
+  - URL format validation
+- [ ] Create pagination DTOs
 
-### Security
-
+#### Security
 - [ ] Integrate authentication guard
-- [ ] Implement authorization checks (permission to read/write relations)
+- [ ] Implement authorization checks (permission to read/write)
 - [ ] Add tenant domain extraction and filtering
 - [ ] Implement rate limiting
 - [ ] Add input sanitization
+- [ ] Implement request size limits
 
-### Error Handling
-
+#### Error Handling
 - [ ] Create custom exception filters
 - [ ] Map database exceptions to HTTP status codes
 - [ ] Implement standardized error response format
 - [ ] Add error logging with context
+- [ ] Handle validation errors gracefully
 
-### Testing
-
+#### Testing
 - [ ] Unit tests for service methods
 - [ ] Integration tests for controller endpoints
 - [ ] Test all query parameter combinations
-- [ ] Test duplicate detection and revival
-- [ ] Test target resolution with various schemas
-- [ ] Test error scenarios (401, 403, 409, 500)
+- [ ] Test authentication and authorization
+- [ ] Test error scenarios (401, 403, 404, 409, 500)
+- [ ] Test tenant filtering
+- [ ] Load testing for performance
 
-### Documentation
-
+#### Documentation
 - [ ] Add Swagger/OpenAPI decorators
 - [ ] Document all query parameters
 - [ ] Document request/response examples
 - [ ] Document error codes
+- [ ] Add API versioning if needed
 
-### Performance
+### Specific Module Checklists
 
-- [ ] Verify database indexes are created
-- [ ] Test batch fetching for `resolveTargets`
-- [ ] Load test with large relation sets
-- [ ] Optimize slow queries
+#### Data Module
+- [ ] Implement dynamic schema-based CRUD
+- [ ] Support multi-tenant filtering
+- [ ] Implement picker field relation syncing
+- [ ] Implement repeating section relation syncing
+- [ ] Support bulk create (array of entities)
+- [ ] Support soft/hard delete
+- [ ] Implement entity enrichment (users, picker fields)
+
+#### Relations Module
+- [ ] Implement all query modes (unified, legacy, type-based)
+- [ ] Implement target resolution with batch fetching
+- [ ] Implement duplicate detection and revival
+- [ ] Support direction indicators
+- [ ] Implement relation enrichment
+
+#### Chat Module
+- [ ] Implement chat ownership verification
+- [ ] Support message pagination (reverse chronological)
+- [ ] Implement request body size validation
+- [ ] Support chat summary mode
+- [ ] Implement message validation (role, content)
+
+#### Schema Module
+- [ ] Implement tenant-based schema filtering
+- [ ] Support summary format (excludes fields)
+- [ ] Support statistics calculation
+- [ ] Implement schema normalization (repeatingConfig, etc.)
+- [ ] Support bulk create (array of schemas)
+- [ ] Implement hard delete (schema + data + relations)
 
 ---
 
-## NestJS Code Structure Example
+## NestJS Code Examples
 
-### Controller
+### Controller Example (Data Module)
 
 ```typescript
-import { Controller, Get, Post, Body, Query, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
-import { RelationsService } from './relations.service';
-import { CreateRelationDto, QueryRelationsDto } from './dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { DataService } from './data.service';
+import { CreateEntityDto, UpdateEntityDto, QueryEntitiesDto } from './dto';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { CurrentUser } from '../common/decorators/auth.decorator';
+import { TransformInterceptor } from '../common/interceptors/transform.interceptor';
+import { UseInterceptors } from '@nestjs/common';
 
-@Controller('api/relations')
+@ApiTags('Data')
+@Controller('api/data')
 @UseGuards(JwtAuthGuard)
-export class RelationsController {
-  constructor(private readonly relationsService: RelationsService) {}
+@ApiBearerAuth()
+@UseInterceptors(TransformInterceptor)
+export class DataController {
+  constructor(private readonly dataService: DataService) {}
 
-  @Get()
-  async getRelations(@Query() query: QueryRelationsDto) {
-    return this.relationsService.queryRelations(query);
+  @Get(':schemaId')
+  @ApiOperation({ summary: 'Get all entities for a schema' })
+  @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'status', required: false })
+  @ApiQuery({ name: 'tenantIds', required: false })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  async getAll(
+    @Param('schemaId') schemaId: string,
+    @Query() query: QueryEntitiesDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.dataService.findAll(schemaId, query, user);
   }
 
-  @Post()
+  @Post(':schemaId')
   @HttpCode(HttpStatus.CREATED)
-  async createRelation(@Body() dto: CreateRelationDto) {
-    return this.relationsService.createRelation(dto);
+  @ApiOperation({ summary: 'Create new entity' })
+  async create(
+    @Param('schemaId') schemaId: string,
+    @Body() createDto: CreateEntityDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.dataService.create(schemaId, createDto, user);
+  }
+
+  @Get(':schemaId/:id')
+  @ApiOperation({ summary: 'Get entity by ID' })
+  async getById(
+    @Param('schemaId') schemaId: string,
+    @Param('id') id: string,
+    @Query('tenantIds') tenantIds?: string,
+    @CurrentUser() user: any,
+  ) {
+    return this.dataService.findById(schemaId, id, tenantIds, user);
+  }
+
+  @Put(':schemaId/:id')
+  @ApiOperation({ summary: 'Update entity' })
+  async update(
+    @Param('schemaId') schemaId: string,
+    @Param('id') id: string,
+    @Body() updateDto: UpdateEntityDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.dataService.update(schemaId, id, updateDto, user);
+  }
+
+  @Delete(':schemaId/:id')
+  @ApiOperation({ summary: 'Delete entity' })
+  async delete(
+    @Param('schemaId') schemaId: string,
+    @Param('id') id: string,
+    @Query('hardDelete') hardDelete?: boolean,
+    @CurrentUser() user: any,
+  ) {
+    return this.dataService.delete(schemaId, id, hardDelete, user);
   }
 }
 ```
 
-### Service
+### Service Example (Data Module)
 
 ```typescript
-import { Injectable, ConflictException, BadRequestException } from '@nestjs/common';
-import { RelationsRepository } from './relations.repository';
-import { CreateRelationDto, QueryRelationsDto } from './dto';
-import { DataRelation } from './entities/relation.entity';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { DataRepository } from './data.repository';
+import { CreateEntityDto, UpdateEntityDto, QueryEntitiesDto } from './dto';
+import { RelationsService } from '../relations/relations.service';
 
 @Injectable()
-export class RelationsService {
-  constructor(private readonly repository: RelationsRepository) {}
+export class DataService {
+  constructor(
+    private readonly repository: DataRepository,
+    private readonly relationsService: RelationsService,
+  ) {}
 
-  async queryRelations(query: QueryRelationsDto) {
-    // Implement query logic based on parameter combinations
-    // See business logic requirements above
+  async findAll(schemaId: string, query: QueryEntitiesDto, user: any) {
+    // Validate schema exists
+    const schema = await this.repository.findSchema(schemaId);
+    if (!schema) {
+      throw new NotFoundException(`Schema "${schemaId}" not found`);
+    }
+
+    // Apply tenant filtering
+    const tenantIds = query.tenantIds?.split(',').map(id => id.trim()) || [];
+    if (tenantIds.length > 0 && !this.isLocalhost(user)) {
+      // Apply tenant filtering logic
+    }
+
+    // Build query filters
+    const filters = this.buildFilters(query);
+
+    // Query entities
+    const entities = await this.repository.findAll(schemaId, filters);
+
+    // Enrich with relations if needed
+    const enriched = await this.enrichEntities(schemaId, entities);
+
+    return {
+      success: true,
+      data: enriched,
+      count: enriched.length,
+    };
   }
 
-  async createRelation(dto: CreateRelationDto): Promise<{ success: boolean; data: DataRelation; revived?: boolean }> {
-    // Validate required fields
-    // Check for duplicates
-    // Revive if inactive, create if new
-    // Return standardized response
+  async create(schemaId: string, createDto: CreateEntityDto, user: any) {
+    // Validate schema
+    const schema = await this.repository.findSchema(schemaId);
+    if (!schema) {
+      throw new NotFoundException(`Schema "${schemaId}" not found`);
+    }
+
+    // Validate entity data against schema
+    this.validateEntityData(schema, createDto);
+
+    // Extract picker values and repeating section values
+    const { pickerValues, repeatingSectionValues, cleanedData } = 
+      this.extractRelationValues(schema, createDto);
+
+    // Create entity
+    const entity = await this.repository.create(schemaId, cleanedData);
+
+    // Sync relations
+    await this.relationsService.syncPickerFieldRelations(
+      schemaId,
+      entity.id,
+      pickerValues,
+    );
+    await this.relationsService.syncRepeatingSectionRelations(
+      schemaId,
+      entity.id,
+      repeatingSectionValues,
+    );
+
+    // Enrich and return
+    const enriched = await this.enrichEntity(schemaId, entity);
+    return {
+      success: true,
+      data: enriched,
+      message: 'Entity created successfully',
+    };
   }
+
+  // ... other methods
+}
+```
+
+### DTO Example
+
+```typescript
+import { IsString, IsOptional, IsArray, IsBoolean, IsNumber, Min, Max } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+export class QueryEntitiesDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  status?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  tenantIds?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  page?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(1000)
+  limit?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  sortBy?: string;
+
+  @ApiPropertyOptional({ enum: ['asc', 'desc'] })
+  @IsOptional()
+  @IsString()
+  sortOrder?: 'asc' | 'desc';
+}
+
+export class CreateEntityDto {
+  @ApiProperty()
+  @IsString()
+  name: string;
+
+  // ... other fields based on schema
 }
 ```
 
@@ -723,16 +1860,18 @@ export class RelationsService {
 
 ## Additional Notes
 
-- **ULID Generation**: Use a ULID library (e.g., `ulid` npm package) for generating relation IDs
+- **ULID Generation**: Use a ULID library (e.g., `ulid` npm package) for generating IDs
 - **Timestamp Format**: Use ISO 8601 format (e.g., `2024-01-15T10:30:00.000Z`)
 - **Soft Delete**: Use `inactive` boolean field rather than hard deletes for audit trail
-- **Backward Compatibility**: Support legacy query parameters (`sourceSchema`, `sourceId`, etc.) for existing clients
+- **Backward Compatibility**: Support legacy query parameters for existing clients
 - **External Nodes**: If your system uses external nodes, implement lookup logic for `targetSchema === 'external-nodes'`
 - **Schema Registry**: Implement schema lookup service to resolve field roles (`title`, `icon`, `color`, `addToReferenceMetadata`)
+- **Demo Mode**: Consider supporting demo mode for development/testing (use local file storage instead of database)
+- **Migration Strategy**: Plan migration path from file-based storage to database
+- **API Versioning**: Consider adding API versioning (`/api/v1/...`) for future changes
 
 ---
 
 ## Version History
 
-- **v1.0.0** (2024-01-15): Initial documentation based on Next.js implementation
-
+- **v1.0.0** (2024-01-15): Initial comprehensive documentation covering all API routes
