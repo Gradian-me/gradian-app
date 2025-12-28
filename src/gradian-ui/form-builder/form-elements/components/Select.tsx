@@ -128,6 +128,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const viewportHeightRef = React.useRef<number>(typeof window !== 'undefined' ? window.innerHeight : 0);
   const isKeyboardOpeningRef = React.useRef(false);
   const isKeyboardClosingRef = React.useRef(false);
+  // Track if we're manually closing to prevent double-closing
+  const isManuallyClosingRef = React.useRef(false);
   
   // Maintain focus on search input when select is open
   // On touch devices, don't auto-focus to prevent keyboard from closing the select
@@ -503,9 +505,12 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
   // Render badge or custom colored badge
   const renderBadgeContent = (option: NormalizedOption) => {
+    // Add pointer-events-none to nested elements to ensure clicks propagate to SelectItem
+    const pointerEventsNone = 'pointer-events-none';
+    
     if (!option.color) {
       return (
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${pointerEventsNone}`}>
           {option.icon && <IconRenderer iconName={option.icon} className="h-5 w-5" />}
           {option.label}
         </div>
@@ -519,7 +524,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     // Check badge variant
     if (isValidBadgeVariant(option.color)) {
       return (
-        <Badge variant={option.color as any} className="flex items-center gap-1.5 px-2 py-0.5">
+        <Badge variant={option.color as any} className={`flex items-center gap-1.5 px-2 py-0.5 ${pointerEventsNone}`}>
           {iconEl}
           {option.label}
         </Badge>
@@ -533,7 +538,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       const defaultTextColor = hasTextColor ? '' : 'text-white';
       
       return (
-        <div className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium border ${defaultTextColor} ${option.color}`}>
+        <div className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium border ${defaultTextColor} ${option.color} ${pointerEventsNone}`}>
           {iconEl}
           {option.label}
         </div>
@@ -544,7 +549,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     if (isHexColor(option.color)) {
       return (
         <div 
-          className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium"
+          className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${pointerEventsNone}`}
           style={{ backgroundColor: option.color, color: '#fff', border: 'none' }}
         >
           {iconEl}
@@ -555,7 +560,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
     // Fallback - just render with color as className
     return (
-      <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 ${option.color}`}>
+      <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 ${option.color} ${pointerEventsNone}`}>
         {iconEl}
         {option.label}
       </div>
@@ -611,10 +616,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
         : undefined);
 
     const handleRadixChange = (selectedId: string) => {
-      // Clear search when an option is selected
-      if (enableSearch) {
-        setSearchValue('');
-      }
+      // Don't clear search here - let handleOpenChange do it when closing
+      // This prevents showing all items again before the select closes
       if (onValueChange) {
         onValueChange(selectedId);
       }
@@ -626,10 +629,28 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
         const matched = normalizedOptions.find((opt) => opt.id === selectedId);
         onNormalizedChange(matched ? [matched] : []);
       }
+      // Close the select immediately after selection
+      // Mark that we're manually closing to prevent double-closing
+      isManuallyClosingRef.current = true;
+      setIsSelectOpen(false);
+      setControlledOpen(false);
+      // Clear search when closing
+      if (enableSearch) {
+        setSearchValue('');
+      }
+      onOpenChange?.(false);
+      // Reset the flag after a short delay
+      setTimeout(() => {
+        isManuallyClosingRef.current = false;
+      }, 100);
     };
     
     // Clear search when select closes, focus search input when opens
     const handleOpenChange = (open: boolean) => {
+      // If we're manually closing, skip this handler to prevent double-closing
+      if (!open && isManuallyClosingRef.current) {
+        return;
+      }
       // On touch devices, prevent closing if keyboard is opening
       if (!open && isTouchDevice && isKeyboardOpeningRef.current) {
         // Reset the flag after a short delay
@@ -656,7 +677,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       }
       
       setIsSelectOpen(open);
-      setControlledOpen(open ? true : undefined); // Use controlled when open, undefined when closed
+      setControlledOpen(open ? true : false); // Use controlled when open, false when closed
       // Only clear search when select is actually closed (not due to keyboard closing)
       if (!open && enableSearch && !isKeyboardClosingRef.current) {
         setSearchValue('');

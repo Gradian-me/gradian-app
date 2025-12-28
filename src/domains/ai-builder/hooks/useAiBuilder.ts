@@ -1045,6 +1045,39 @@ export function useAiBuilder(): UseAiBuilderReturn {
         }
       }
 
+      // Special handling for graph-viewer page route
+      const isGraphViewerRoute = agent.nextAction.route === '/ui/components/graph-viewer';
+      const isGraphFormat = agent.requiredOutputFormat === 'graph' || agent.id === 'graph-generator';
+      
+      if (isGraphViewerRoute && isGraphFormat && typeof window !== 'undefined') {
+        // Parse graph data from response
+        try {
+          const parsed = JSON.parse(response);
+          const graphData = parsed.graph || parsed;
+          
+          // Validate graph structure
+          if (graphData && typeof graphData === 'object' && 
+              Array.isArray(graphData.nodes) && Array.isArray(graphData.edges)) {
+            // Store graph data in localStorage
+            const storageKey = 'graph-viewer-data';
+            window.localStorage.setItem(storageKey, JSON.stringify(graphData));
+            
+            // Navigate to graph viewer page
+            window.location.href = agent.nextAction.route;
+            
+            setIsApproving(false);
+            return;
+          } else {
+            throw new Error('Invalid graph data structure: must have nodes and edges arrays');
+          }
+        } catch (parseError) {
+          if (parseError instanceof SyntaxError) {
+            throw new Error('Invalid JSON in graph response. Please check the AI response.');
+          }
+          throw parseError;
+        }
+      }
+
       const fetchResponse = await fetch(agent.nextAction.route, {
         method: 'POST',
         headers: {

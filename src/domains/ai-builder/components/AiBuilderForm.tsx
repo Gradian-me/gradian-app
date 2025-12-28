@@ -321,14 +321,8 @@ export function AiBuilderForm({
         return;
       }
 
-      // Skip fields with sectionId "body" or "extra" - these go in body/extra_body, not in prompt
-      // Exception: include "prompt" or "userPrompt" fields in userPrompt for display purposes, even if they have sectionId "body"
-      const isPromptField = (field.name === 'prompt' || field.id === 'prompt' || 
-                            field.name === 'userPrompt' || field.id === 'user-prompt' ||
-                            field.name === 'user-prompt');
-      if ((field.sectionId === 'body' || field.sectionId === 'extra') && !isPromptField) {
-        return;
-      }
+      // Note: sectionId is used to determine where data goes in API calls (body/extra_body vs prompt),
+      // but ALL fields should be included in the concatenated prompt for preview purposes
       
       // Format the value based on field type
       let formattedValue = '';

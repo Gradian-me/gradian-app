@@ -476,9 +476,33 @@ export const TodoList: React.FC<TodoListProps> = ({
     setExecutingTodoId(null);
   };
 
-  const handleShowResponse = (todo: Todo) => {
+  const handleShowResponse = async (todo: Todo) => {
     setSelectedTodoForDialog(todo);
     setIsDialogOpen(true);
+    
+    // Also append the message to chat if it doesn't already exist
+    // This ensures the response appears in chat messages when viewing
+    if (onTodoExecuted && todo.status === 'completed' && todo.output) {
+      // Create a mock result object similar to what execute-todo returns
+      const mockResult = {
+        output: todo.output,
+        responseFormat: todo.responseFormat,
+        agentId: todo.agentId,
+        agentType: todo.agentType,
+        tokenUsage: todo.tokenUsage,
+        duration: todo.duration,
+        cost: todo.cost,
+        requiredOutputFormat: todo.responseFormat,
+        data: {
+          format: todo.responseFormat,
+          tokenUsage: todo.tokenUsage,
+          timing: { duration: todo.duration },
+        },
+      };
+      
+      // Call onTodoExecuted to append message (it will check for duplicates)
+      await onTodoExecuted(todo, mockResult);
+    }
   };
 
   // Calculate overall execution plan status

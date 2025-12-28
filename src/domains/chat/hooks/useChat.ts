@@ -1159,7 +1159,26 @@ export function useChat(): UseChatResult {
         if (prev.some(msg => msg.id === message.id)) {
           return prev;
         }
-        return [...prev, message];
+        
+        // Insert message in chronological order based on createdAt
+        // This ensures messages appear in the correct order even if they're added asynchronously
+        const messageTime = new Date(message.createdAt).getTime();
+        const insertIndex = prev.findIndex(msg => {
+          const msgTime = new Date(msg.createdAt).getTime();
+          return msgTime > messageTime;
+        });
+        
+        // If no message is later, append to end
+        // Otherwise, insert before the first message that's later
+        if (insertIndex === -1) {
+          return [...prev, message];
+        } else {
+          return [
+            ...prev.slice(0, insertIndex),
+            message,
+            ...prev.slice(insertIndex),
+          ];
+        }
       });
       
       // Update chat list item without full refresh

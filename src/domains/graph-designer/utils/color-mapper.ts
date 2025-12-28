@@ -220,3 +220,45 @@ export function generateBadgeSvg(label: string, colorName: string): string {
   return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
 }
 
+/**
+ * Generates an info icon SVG data URI for nodes with payload data
+ * @returns Data URI string for the info icon SVG
+ */
+export function generateInfoIconSvg(): string {
+  const nodeWidth = 82;
+  const nodeHeight = 46;
+  const iconSize = 10;
+  const iconX = nodeWidth - iconSize - 2; // Position at top-right with 2px margin from edge
+  const iconY = 2 + iconSize / 2; // Position higher up, near the top edge
+  
+  // Info icon (circle with 'i')
+  const svg = `
+    <svg width="${nodeWidth}" height="${nodeHeight}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>
+          .info-icon-circle {
+            fill: #3b82f6;
+            stroke: #ffffff;
+            stroke-width: 1;
+          }
+          .info-icon-text {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 7px;
+            font-weight: 700;
+            fill: #ffffff;
+            text-anchor: middle;
+            dominant-baseline: central;
+          }
+        </style>
+      </defs>
+      <!-- Transparent background for positioning -->
+      <rect x="0" y="0" width="${nodeWidth}" height="${nodeHeight}" fill="transparent"/>
+      <!-- Info icon circle at top-right -->
+      <circle cx="${iconX}" cy="${iconY}" r="${iconSize / 2}" class="info-icon-circle"/>
+      <text x="${iconX}" y="${iconY}" class="info-icon-text">i</text>
+    </svg>
+  `.trim();
+  
+  return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+}
+

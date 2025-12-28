@@ -22,6 +22,48 @@ import { ProfessionalWritingModal } from '@/gradian-ui/communication/professiona
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
+/**
+ * Clean markdown content by removing problematic nested markdown code blocks
+ * Removes code blocks that contain markdown examples (```markdown) which cause nested markdown rendering issues
+ * IMPORTANT: Only removes ```markdown blocks, preserves all other code blocks (mermaid, json, etc.)
+ */
+function cleanMarkdownContent(content: string): string {
+  if (!content || typeof content !== 'string') {
+    return content;
+  }
+
+  let cleaned = content;
+
+  // Remove all ```markdown code blocks (these cause nested markdown rendering issues)
+  // Pattern: ```markdown followed by content and closing ```
+  // Use non-greedy matching to ensure we only match complete markdown blocks
+  cleaned = cleaned.replace(/```markdown\s*\n?([\s\S]*?)\n?```/gi, (match, innerContent) => {
+    // Extract the content inside the code block and return it as plain text
+    // This preserves the content but removes the problematic code block wrapper
+    const text = innerContent.trim();
+    // If it's empty, remove it entirely
+    if (!text) {
+      return '';
+    }
+    // Return the content as plain text (not in a code block)
+    // Add a newline before and after to maintain spacing
+    return `\n${text}\n`;
+  });
+
+  // Handle cases where ```markdown appears after mermaid diagrams or other sections
+  // This pattern handles the specific case: mermaid diagram followed by markdown code block
+  // Keep the mermaid diagram intact, only remove the markdown block
+  cleaned = cleaned.replace(/```mermaid\s*\n?([\s\S]*?)\n?```\s*\n+```markdown\s*\n?([\s\S]*?)\n?```/gi, (match, mermaidContent, markdownContent) => {
+    // Keep the mermaid diagram, remove the nested markdown block
+    return `\`\`\`mermaid\n${mermaidContent}\n\`\`\``;
+  });
+
+  // Remove any excessive newlines that might have been created (more than 3 consecutive)
+  cleaned = cleaned.replace(/\n{4,}/g, '\n\n\n');
+
+  return cleaned;
+}
+
 export function MarkdownViewer({ 
   content, 
   showToggle = true,
@@ -47,9 +89,12 @@ export function MarkdownViewer({
   }, [onChange]);
   
   // Always use content prop as source of truth (it should come from store)
+  // Clean the content to remove problematic nested markdown code blocks
   // This ensures preview/raw modes always show the latest from store
   // When editing, onChange updates the store, which updates content prop, which flows back
-  const displayContent = content;
+  const displayContent = useMemo(() => {
+    return cleanMarkdownContent(content);
+  }, [content]);
   
   // Memoize navigationHeadingLevels array to prevent unnecessary re-renders
   const navigationLevelsKey = useMemo(() => {

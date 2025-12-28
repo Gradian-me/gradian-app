@@ -50,6 +50,10 @@ export interface GraphViewerProps {
    * Allow node selection/hover (defaults to true)
    */
   allowSelection?: boolean;
+  /**
+   * Callback when a node is clicked (optional)
+   */
+  onNodeClick?: (node: GraphNodeData) => void;
 }
 
 /**
@@ -61,6 +65,7 @@ export function GraphViewer({
   layout: initialLayout,
   height = '600px',
   allowSelection = true,
+  onNodeClick,
 }: GraphViewerProps) {
   const canvasHandleRef = useRef<GraphCanvasHandle | null>(null);
 
@@ -127,10 +132,13 @@ export function GraphViewer({
   };
 
   // Handle node click for selection (read-only, no editing)
-  const handleNodeClick = allowSelection
-    ? (node: GraphNodeData) => {
+  const handleNodeClick = allowSelection || onNodeClick
+    ? (node: GraphNodeData, isMultiSelect: boolean) => {
+        // Call the onNodeClick callback if provided
+        if (onNodeClick) {
+          onNodeClick(node);
+        }
         // Selection is handled by GraphCanvas internally
-        // This is just for potential future use
       }
     : undefined;
 

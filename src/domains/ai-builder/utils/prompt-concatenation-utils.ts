@@ -5,7 +5,7 @@
  */
 
 import { getGeneralSystemPrompt } from './ai-general-utils';
-import { GENERAL_MARKDOWN_OUTPUT_RULES } from './ai-chat-utils';
+import { GENERAL_MARKDOWN_OUTPUT_RULES, REFERENCE_PROMPT, MERMAID_RULES } from './ai-chat-utils';
 import { GRAPH_GENERATION_PROMPT } from './ai-graph-utils';
 import { GENERAL_IMAGE_PROMPT, IMAGE_TYPE_PROMPTS } from './ai-image-utils';
 import { preloadRoutes } from '@/gradian-ui/shared/utils/preload-routes';
@@ -225,6 +225,8 @@ function buildCompleteSystemPrompt(params: {
   graphGenerationPrompt?: string;
   imageGenerationPrompt?: string;
   generalMarkdownRules?: string;
+  mermaidRules?: string;
+  referencePrompt?: string;
   preloadedContext: string;
 }): string {
   let systemPrompt = params.generalSystemPrompt;
@@ -259,7 +261,17 @@ function buildCompleteSystemPrompt(params: {
     systemPrompt += '\n\n***\n\n' + params.generalMarkdownRules;
   }
   
-  // 8. Preloaded context (added at the end)
+  // 8. Mermaid diagram rules (for string format agents)
+  if (params.mermaidRules) {
+    systemPrompt += '\n\n' + params.mermaidRules;
+  }
+  
+  // 9. Reference and source citation rules (for string format agents)
+  if (params.referencePrompt) {
+    systemPrompt += '\n\n' + params.referencePrompt;
+  }
+  
+  // 10. Preloaded context (added at the end)
   if (params.preloadedContext) {
     systemPrompt += '\n\n***\n\n' + params.preloadedContext;
   }
@@ -356,7 +368,17 @@ export async function buildSystemPrompt(params: {
     ? GENERAL_MARKDOWN_OUTPUT_RULES
     : undefined;
 
-  // 8. Preload routes - called internally in parallel
+  // 8. Mermaid diagram rules (for string format agents)
+  const mermaidRules = agent.requiredOutputFormat === 'string'
+    ? MERMAID_RULES
+    : undefined;
+
+  // 9. Reference and source citation rules (for string format agents)
+  const referencePrompt = agent.requiredOutputFormat === 'string'
+    ? REFERENCE_PROMPT
+    : undefined;
+
+  // 10. Preload routes - called internally in parallel
   let preloadedContext = '';
   let isLoadingPreload = false;
   
@@ -385,6 +407,8 @@ export async function buildSystemPrompt(params: {
     graphGenerationPrompt,
     imageGenerationPrompt,
     generalMarkdownRules,
+    mermaidRules,
+    referencePrompt,
     preloadedContext,
   });
 

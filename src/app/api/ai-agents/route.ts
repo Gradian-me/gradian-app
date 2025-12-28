@@ -119,9 +119,10 @@ export async function GET(request: NextRequest) {
     const agentId = searchParams.get('id');
     const agentIdsParam = searchParams.get('agentIds');
     const summary = searchParams.get('summary') === 'true';
+    const nocache = searchParams.get('nocache') === 'true' || searchParams.get('refresh') === 'true';
 
-    // Load agents (with caching)
-    const agents = await loadAiAgents(true);
+    // Load agents (bypass cache if nocache parameter is present)
+    const agents = await loadAiAgents(!nocache);
     
     if (!agents || agents.length === 0) {
       return NextResponse.json(
@@ -161,9 +162,11 @@ export async function GET(request: NextRequest) {
         },
       }, {
         headers: {
-          'Cache-Control': summary 
-            ? 'public, s-maxage=300, stale-while-revalidate=600' 
-            : 'public, s-maxage=60, stale-while-revalidate=120',
+          'Cache-Control': nocache 
+            ? 'no-cache, no-store, must-revalidate' 
+            : (summary 
+              ? 'public, s-maxage=300, stale-while-revalidate=600' 
+              : 'public, s-maxage=60, stale-while-revalidate=120'),
         },
       });
     }
@@ -196,7 +199,9 @@ export async function GET(request: NextRequest) {
           data: summaryAgent,
         }, {
           headers: {
-            'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+            'Cache-Control': nocache 
+              ? 'no-cache, no-store, must-revalidate' 
+              : 'public, s-maxage=300, stale-while-revalidate=600',
           },
         });
       }
@@ -206,7 +211,9 @@ export async function GET(request: NextRequest) {
         data: agent,
       }, {
         headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+          'Cache-Control': nocache 
+            ? 'no-cache, no-store, must-revalidate' 
+            : 'public, s-maxage=60, stale-while-revalidate=120',
         },
       });
     }
@@ -225,7 +232,9 @@ export async function GET(request: NextRequest) {
         },
       }, {
         headers: {
-          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600', // 5 min cache, 10 min stale
+          'Cache-Control': nocache 
+            ? 'no-cache, no-store, must-revalidate' 
+            : 'public, s-maxage=300, stale-while-revalidate=600', // 5 min cache, 10 min stale
         },
       });
     }
@@ -240,7 +249,9 @@ export async function GET(request: NextRequest) {
       },
     }, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+        'Cache-Control': nocache 
+          ? 'no-cache, no-store, must-revalidate' 
+          : 'public, s-maxage=60, stale-while-revalidate=120',
       },
     });
   } catch (error) {

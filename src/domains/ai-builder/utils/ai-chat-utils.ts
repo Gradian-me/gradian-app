@@ -182,31 +182,7 @@ Content about topic B (completely different subject)...
 - Feature lists
 - Organized information
 
-#### 7. Mermaid Diagrams - Complete and Comprehensive
-
-**CRITICAL**: Create complete, comprehensive Mermaid diagrams showing all decision points, branches, loops, and end states.
-
-**Format:**
-\`\`\`markdown
-\`\`\`mermaid
-flowchart TD
-    A[Start] --> B{Decision}
-    B -->|Yes| C[Action 1]
-    B -->|No| D[Action 2]
-    C --> E[End]
-    D --> E
-\`\`\`
-\`\`\`
-
-**Requirements:**
-- Each statement MUST be on its own line with proper spacing
-- Do NOT include parentheses or special characters in node labels
-- Include all decision points, branches, and alternative flows
-- Show complete workflows, not just happy paths
-- Use descriptive node labels
-- Label all edges/arrows clearly
-
-#### 8. Headings - Proper Hierarchy
+#### 7. Headings - Proper Hierarchy
 
 - Use H1 (#) for main document title
 - Use H2 (##) for major sections
@@ -236,7 +212,6 @@ Before finalizing your output, ensure:
 - [ ] Action items use task lists (- [ ])
 - [ ] Different subjects are separated with dividers (***)
 - [ ] Tables are properly formatted with headers and separators
-- [ ] Mermaid diagrams are complete and comprehensive
 - [ ] All sections have detailed descriptions (2-3 paragraphs minimum)
 - [ ] Output meets length requirements (1000-5000+ words depending on complexity)
 - [ ] Professional formatting throughout
@@ -248,14 +223,472 @@ Before finalizing your output, ensure:
 - ❌ Missing blockquotes for important notes
 - ❌ Not using dividers between different subjects
 - ❌ Incomplete or improperly formatted tables
-- ❌ Incomplete Mermaid diagrams (missing paths or decision points)
 - ❌ Surface-level descriptions instead of comprehensive analysis
 - ❌ Outputs that are too short or lack depth
+- ❌ **NEVER include \`\`\`markdown code blocks in your output** - This creates nested markdown rendering issues and breaks the display. If you need to show markdown examples, use plain text or code blocks with a different language identifier (like \`\`\`text or \`\`\`plaintext), but avoid \`\`\`markdown at all costs.
 
 ---
 
 **Remember**: These rules apply to ALL string format outputs. Follow them strictly to ensure professional, consistent, meaningful, decision builder and well-formatted markdown output.`;
 
+/**
+ * Reference and Source Citation Rules
+ * This prompt is automatically appended to all chat agents with string output format
+ * to ensure consistent, professional reference formatting when sources are used
+ */
+export const REFERENCE_PROMPT = `
+
+## 📚 REFERENCES AND SOURCE CITATION RULES (APPLIES TO ALL STRING FORMAT AGENTS)
+
+If you use any references, sources, external information, or RAG (Retrieval-Augmented Generation) data in your output, you MUST include a "References" section following these rules.
+
+### 🎯 When to Include References
+
+Include a References section if you:
+- Used any external sources, documents, or articles
+- Referenced RAG (Retrieval-Augmented Generation) data or search results
+- Cited regulatory guidelines, standards, or official documentation
+- Referenced research papers, studies, or publications
+- Used information from websites, documentation, or knowledge bases
+- Referenced any source material provided in the input or context
+
+**If NO references were used, omit the References section entirely.**
+
+### 📋 Reference Section Format
+
+**Location**: The References section MUST be the FINAL section in your output, placed after all other content.
+
+**Divider**: Add a divider (\`***\`) BEFORE the References section to separate it from the main content.
+
+**CRITICAL**: Only output ONE References section with ONE divider. Do NOT duplicate dividers or headings.
+
+**Output Format** (this is what you should output - only once):
+\`\`\`text
+Add exactly this structure at the end of your output (replace placeholders with actual data):
+
+***
+## References
+
+| Source Title | Source Host | Source URL | Description |
+| --- | --- | --- | --- |
+| [Actual Title from Source] | [Actual Host/Domain] | [Actual URL] | [Brief description] |
+\`\`\`
+
+**DO NOT** include the divider from instruction sections. Only add the divider and References section in your actual output.
+
+### ✅ Reference Table Requirements
+
+**Column Definitions:**
+- **Source Title**: The actual title of the document, article, or source (e.g., "FDA 21 CFR Part 211", "ICH Q7 Guidelines", "Pharmaceutical Manufacturing Best Practices")
+- **Source Host**: The domain or organization that hosts the source (e.g., "fda.gov", "ich.org", "example.com")
+- **Source URL**: The full URL to the source (e.g., "https://www.fda.gov/regulations/...")
+- **Description**: A brief description of how this source was used in your analysis or what information it provided
+
+### 🚨 Critical Rules for References
+
+**1. Use ONLY Actual Source Data:**
+- **NEVER** create fake, example, or placeholder source information
+- **NEVER** use values like "Example Host 1", "Example Title", "example.com", or placeholder URLs
+- **ONLY** use actual source data provided in:
+  - RAG inputs
+  - Search results
+  - User-provided context
+  - Preloaded data
+  - System context
+
+**2. If Source Information is Missing:**
+- If source information (host, title, URL) is not available in the provided data, clearly state: "Source information not available in provided data"
+- Do NOT invent or guess source information
+- It is better to omit incomplete references than to include fake data
+
+**3. Complete Reference List:**
+- **MUST** include ALL references that were used in your analysis
+- **MUST** cite references throughout your output where they are used (not just in the References section)
+- **MUST** ensure every reference from RAG sources is included in the table
+- Even if multiple references cover similar topics, include all of them for complete transparency
+
+**4. Reference Citation in Content:**
+- Cite sources inline where they are used (e.g., "According to [Source Title](Source URL)...")
+- Reference citations should include source title and URL when possible
+- Format inline citations as: \`[Source Title](Source URL) - Source Host\` or use a simple reference number that maps to the References table
+
+**5. RAG Source Handling:**
+- **MANDATORY**: Use ALL references provided in RAG sources throughout your analysis
+- **MANDATORY**: Display ALL references used in the References section with complete citations
+- **MANDATORY**: Extract source metadata (host, title, URL) from RAG inputs when available
+- Cross-check claims across multiple sources when possible
+- Grade evidence strength (Strong/Moderate/Weak) if relevant to your analysis
+
+### 📝 Example Reference Section
+
+**This is an EXAMPLE only. Output ONE References section like this (do NOT duplicate):**
+
+\`\`\`text
+Example output structure (replace with your actual references):
+
+***
+## References
+
+| Source Title | Source Host | Source URL | Description |
+| --- | --- | --- | --- |
+| FDA 21 CFR Part 211 | fda.gov | https://www.fda.gov/... | Used for regulatory compliance |
+| ICH Q7 Guidelines | ich.org | https://www.ich.org/... | Referenced for API standards |
+\`\`\`
+
+**CRITICAL REMINDER**: 
+- Only output ONE References section
+- Only ONE divider (\`***\`) before it
+- Do NOT duplicate dividers from instruction sections
+- Do NOT include multiple References sections
+
+### ✅ Checklist for References
+
+Before finalizing your output, ensure:
+
+- [ ] If references were used, a References section is included as the FINAL section
+- [ ] A divider (\`***\`) is placed BEFORE the References section
+- [ ] All references used in the analysis are included in the table
+- [ ] Source Title, Source Host, Source URL, and Description are provided for each reference
+- [ ] ONLY actual source data is used (no fake, example, or placeholder information)
+- [ ] If source information is missing, it is clearly stated rather than invented
+- [ ] References are cited inline where they are used in the content
+- [ ] All RAG sources are included if RAG data was used
+- [ ] The References section is properly formatted as a markdown table
+
+### 🚫 Common Mistakes to Avoid
+
+- ❌ Creating fake or example source information
+- ❌ Using placeholder values like "Example Host 1" or "example.com"
+- ❌ Omitting references that were actually used
+- ❌ Including a References section when no references were used
+- ❌ Placing References section in the middle of the document (must be final section)
+- ❌ Missing the divider before the References section
+- ❌ **DUPLICATING the References section, divider, or heading** - Only ONE References section with ONE divider
+- ❌ Including multiple dividers (\`---\`, \`***\`) or multiple References headings
+- ❌ Incomplete reference information (missing host, URL, or description)
+- ❌ Not citing references inline where they are used
+
+---
+
+**Remember**: References provide transparency and traceability. If you used sources, cite them properly. If you didn't use sources, don't include a References section.`;
+
+/**
+ * Mermaid Diagram Rules
+ * This prompt is automatically appended to all chat agents with string output format
+ * to ensure consistent, professional Mermaid diagram formatting
+ */
+export const MERMAID_RULES = `
+
+---
+
+## 📊 MERMAID DIAGRAM RULES (APPLIES TO ALL STRING FORMAT AGENTS)
+
+When creating Mermaid diagrams in your output, follow these rules strictly to ensure proper rendering and professional appearance.
+
+### 🎯 Choose the Right Diagram Type
+
+**Use \`flowchart\` for process flows:**
+- Step-by-step processes
+- Workflows and procedures
+- Sequential actions
+- Task dependencies
+- Process flows
+- Decision trees with labeled branches
+
+**Use \`stateDiagram-v2\` for state changes:**
+- State transitions
+- State machines
+- System states
+- Decision flows (when modeling state changes, not process steps)
+- State-based workflows
+
+**Use \`mindmap\` for hierarchical information:**
+- Concept mapping
+- Brainstorming
+- Knowledge organization
+- Topic hierarchies
+- Idea relationships
+- Subject breakdowns
+
+**Use \`timeline\` for chronological sequences:**
+- Historical events
+- Project phases
+- Milestones over time
+- Sequential events
+- Development stages
+- Time-based progressions
+
+**Use \`journey\` for user experiences:**
+- User journeys
+- Process experiences
+- Step-by-step experiences with actors
+- Workflow experiences
+- Customer journeys
+- Task sequences with participants
+
+### 📋 Flowchart Rules (for process flows)
+
+**Syntax:**
+\`\`\`mermaid
+flowchart TD
+    Start([Start]) --> Step1[Step 1: Action]
+    Step1 --> Decision{Decision Point}
+    Decision -->|Yes| Step2[Step 2: Action A]
+    Decision -->|No| Step3[Step 3: Action B]
+    Step2 --> End([End])
+    Step3 --> End
+\`\`\`
+
+**Requirements:**
+- Use \`flowchart TD\` (top-down) or \`flowchart LR\` (left-right)
+- Use \`([Start])\` and \`([End])\` for start/end nodes (rounded rectangles)
+- Use \`{Decision}\` for decision points (diamonds)
+- Use \`[Action]\` for process steps (rectangles)
+- Label edges/arrows clearly when needed: \`Node1 -->|Label| Node2\`
+- Keep labels concise and descriptive
+- Each statement MUST be on its own line with proper spacing
+- Include all decision points, branches, and alternative flows
+- Show complete workflows, not just happy paths
+- Use descriptive node labels
+
+### 📋 StateDiagram-v2 Rules (for state changes)
+
+**Syntax:**
+\`\`\`mermaid
+stateDiagram-v2
+    [*] --> Initial_State
+    Initial_State --> Processing_State
+    Processing_State --> Decision_Point
+    Decision_Point --> Final_State : Success
+    Decision_Point --> Error_State : Failure
+    Final_State --> [*]
+    Error_State --> [*]
+\`\`\`
+
+**Note**: If you need transition labels, use \`State1 --> State2 : Label\` syntax, NOT \`State1 -->|Label| State2\`
+
+**CRITICAL REQUIREMENTS:**
+
+1. **Start and End States:**
+   - **ALWAYS use \`[*]\` for start and end states**
+   - **NEVER use custom labels like "Start", "End", "Begin", or "Finish"**
+   - Example: \`[*] --> Initial_State\` (correct)
+   - Example: \`Start --> Initial_State\` (WRONG)
+
+2. **Node Names:**
+   - **NEVER use spaces in node names** - use underscores instead
+   - Example: \`Check_Stop_Code\` (correct)
+   - Example: \`Check Stop Code\` (WRONG - will cause errors)
+   - Example: \`CheckStopCode\` (acceptable but underscores preferred)
+   - All node names must be single words or use underscores to separate words
+   - Keep node names short and descriptive
+
+3. **Transitions:**
+   - **NEVER use \`|Label|\` syntax in stateDiagram-v2** (this is for flowcharts only)
+   - **If you need labels, use the colon syntax**: \`State1 --> State2 : Label\`
+   - Simple transitions without labels: \`State1 --> State2\` (correct)
+   - Labeled transitions: \`State1 --> State2 : Label\` (correct)
+   - **WRONG**: \`State1 -->|Label| State2\` (this syntax causes parse errors in stateDiagram-v2)
+   - **WRONG**: \`State1 -->|Label| State2\` (use \`State1 --> State2 : Label\` instead)
+   - If you don't need labels, use simple transitions: \`State1 --> State2\`
+
+4. **No Parentheses:**
+   - **DO NOT include parentheses inside the diagram**
+   - Do not use parentheses in node names or transitions
+   - Example: \`Check_Stop_Code\` (correct)
+   - Example: \`Check(Stop)Code\` (WRONG)
+
+5. **Structure:**
+   - Model decision points, not just steps
+   - Reflect real-world branching behavior
+   - Keep it minimal and readable
+   - Use branching decisions
+   - Include escalation and stop conditions
+
+### 📋 Mindmap Rules (for hierarchical information)
+
+**Syntax:**
+\`\`\`mermaid
+mindmap
+  Root_Subject
+    Branch1
+      Leaf1
+      Leaf2
+    Branch2
+      Leaf3
+        SubLeaf1
+\`\`\`
+
+**Requirements:**
+- Start with a root node (main subject)
+- Use indentation to show hierarchy (2 spaces per level)
+- Keep node names concise and descriptive
+- Use underscores for multi-word nodes if needed
+- Each level should be indented consistently
+- Show relationships through hierarchy structure
+- Each branch/leaf must be on its own line
+
+### 📋 Timeline Rules (for chronological sequences)
+
+**Syntax:**
+\`\`\`mermaid
+timeline
+    title Timeline Title
+    Phase 1 : Event 1
+    Phase 2 : Event 2
+             : Event 3
+    Phase 3 : Event 4
+\`\`\`
+
+**Requirements:**
+- Always include a title using \`title Timeline Title\`
+- Use phases or time periods as main sections
+- Multiple events can share the same phase (indent with spaces to align with the colon)
+- Use colons (\`:\`) to separate phase from event
+- Keep phase and event names concise
+- Show chronological progression from top to bottom
+- Each phase/event must be on its own line
+
+### 📋 Journey Rules (for user experiences)
+
+**Syntax:**
+\`\`\`mermaid
+journey
+    title Journey Title
+    section Section Name
+      Action 1: 5: Actor1
+      Action 2: 3: Actor1, Actor2
+    section Next Section
+      Action 3: 4: Actor2
+\`\`\`
+
+**Requirements:**
+- Always include a title using \`title Journey Title\`
+- Use \`section\` to group related actions
+- Format: \`Action Name: Score: Actor1, Actor2\`
+- Score is typically 1-5 (satisfaction, importance, effort, etc.)
+- Multiple actors can be listed (comma-separated)
+- Each action must be on its own line
+- Use descriptive action names
+- Show progression through sections
+- Indent actions under their section (2 spaces)
+
+### ✅ General Mermaid Requirements
+
+**Formatting:**
+- Each statement MUST be on its own line with proper spacing
+- Use proper indentation for readability
+- Include all decision points, branches, and alternative flows
+- Show complete workflows, not just happy paths
+- Use descriptive node/state labels
+
+**Completeness:**
+- Create complete, comprehensive diagrams
+- Include all decision points, branches, loops, and end states
+- Show all alternative paths, not just the happy path
+- Include error handling and edge cases when relevant
+
+**Code Block Format:**
+- Always wrap Mermaid diagrams in code blocks with \`mermaid\` language identifier
+- Format: \`\`\`mermaid followed by diagram code, then \`\`\`
+- Ensure proper closing of code blocks
+
+### 🚫 Common Mistakes to Avoid
+
+- ❌ Using spaces in stateDiagram-v2 node names (use underscores)
+- ❌ Using custom labels for start/end states instead of \`[*]\`
+- ❌ Using \`|Label|\` syntax in stateDiagram-v2 (use \`State1 --> State2 : Label\` instead, or \`State1 --> State2\` without labels)
+- ❌ Using parentheses in node names or diagrams
+- ❌ Using \`stateDiagram-v2\` for process flows (use \`flowchart\` instead)
+- ❌ Using \`flowchart\` for state machines (use \`stateDiagram-v2\` instead)
+- ❌ Using wrong diagram type for the use case (choose flowchart, stateDiagram-v2, mindmap, timeline, or journey based on content)
+- ❌ Incomplete diagrams (missing paths or decision points)
+- ❌ Only showing happy paths without alternatives
+- ❌ Not properly closing code blocks
+- ❌ Mixing flowchart and stateDiagram syntax incorrectly
+
+### 📝 Examples
+
+**Correct Flowchart (process flow):**
+\`\`\`mermaid
+flowchart TD
+    Start([Start]) --> Validate{Valid Input?}
+    Validate -->|Yes| Process[Process Data]
+    Validate -->|No| Error[Show Error]
+    Process --> End([End])
+    Error --> End
+\`\`\`
+
+**Correct StateDiagram-v2 (state changes):**
+\`\`\`mermaid
+stateDiagram-v2
+    [*] --> Initial_State
+    Initial_State --> Processing_State
+    Processing_State --> Validation_State
+    Validation_State --> Success_State : Valid
+    Validation_State --> Error_State : Invalid
+    Success_State --> [*]
+    Error_State --> [*]
+\`\`\`
+
+**Note**: Use \`State1 --> State2 : Label\` for labeled transitions, NOT \`State1 -->|Label| State2\`
+
+**Correct Mindmap (hierarchical information):**
+\`\`\`mermaid
+mindmap
+  Subject
+    Origins
+      Long_history
+      Popularisation
+        British_author
+    Research
+      Effectiveness
+      Automatic_creation
+        Uses
+          Creative_techniques
+          Strategic_planning
+\`\`\`
+
+**Correct Timeline (chronological sequences):**
+\`\`\`mermaid
+timeline
+    title History of Social Media Platform
+    Phase 1 : LinkedIn
+    Phase 2 : Facebook
+             : Google
+    Phase 3 : YouTube
+    Phase 4 : Twitter
+\`\`\`
+
+**Correct Journey (user experiences):**
+\`\`\`mermaid
+journey
+    title My working day
+    section Go to work
+      Make tea: 5: Me
+      Go upstairs: 3: Me
+      Do work: 1: Me, Cat
+    section Go home
+      Go downstairs: 5: Me
+      Sit down: 5: Me
+\`\`\`
+
+**Incorrect Examples:**
+- \`Start --> State\` (should use \`[*] --> State\`)
+- \`Check Stop Code\` (should use \`Check_Stop_Code\`)
+- \`State1 -->|Label| State2\` (WRONG - use \`State1 --> State2 : Label\` for labeled transitions, or \`State1 --> State2\` without labels)
+- \`State(With)Parentheses\` (should use \`State_With_Parentheses\`)
+
+---
+
+**Remember**: Choose the right diagram type based on your content:
+- **flowchart** for process flows and workflows
+- **stateDiagram-v2** for state changes and state machines
+- **mindmap** for hierarchical information and concept mapping
+- **timeline** for chronological sequences and historical events
+- **journey** for user experiences and step-by-step experiences with actors
+
+Follow syntax rules strictly, and create complete, comprehensive diagrams that show all paths and decision points.`;
 
 /**
  * Load AI models from API route with caching

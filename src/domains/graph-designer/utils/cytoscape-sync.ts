@@ -136,6 +136,9 @@ export function syncCytoscapeGraph(config: CytoscapeSyncConfig): void {
           // Generate badge SVG if we have a node type label (use node type color, not schema color)
           const badgeImage = nodeTypeLabel ? generateBadgeSvg(nodeTypeLabel, nodeTypeColor) : undefined;
           
+          // Check if node has payload data
+          const hasPayload = !!node.payload;
+          
           return {
             data: {
               ...nodeDataToCytoscapeData(node, nodeType),
@@ -145,6 +148,8 @@ export function syncCytoscapeGraph(config: CytoscapeSyncConfig): void {
               nodeBorderColor: borderColor,
               icon,
               badgeImage,
+              payload: node.payload, // Include payload data for info icon functionality
+              hasPayload,
             },
           };
         }),
@@ -192,6 +197,9 @@ export function syncCytoscapeGraph(config: CytoscapeSyncConfig): void {
         // Generate badge SVG if we have a node type label (use node type color, not schema color)
         const badgeImage = nodeTypeLabel ? generateBadgeSvg(nodeTypeLabel, nodeTypeColor) : undefined;
         
+        // Check if node has payload data
+        const hasPayload = !!node.payload;
+        
         existing.data({
           ...nodeDataToCytoscapeData(node, nodeType),
           incomplete: incompleteValue,
@@ -201,6 +209,8 @@ export function syncCytoscapeGraph(config: CytoscapeSyncConfig): void {
           nodeBorderColor: borderColor,
           icon,
           badgeImage,
+          payload: node.payload, // Include payload data for info icon functionality
+          hasPayload,
         });
         
         // Apply colors if available

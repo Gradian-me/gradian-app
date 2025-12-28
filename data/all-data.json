@@ -1909,10 +1909,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-21T10:37:20.140Z",
+      "updatedAt": "2025-12-28T14:13:29.456Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-12-21T10:37:20.140Z",
+      "lastSynced": "2025-12-28T14:13:29.456Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -1925,7 +1925,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 44 schemas: 44 succeeded, 0 failed (44 created, 0 updated)"
+      "lastSyncMessage": "Processed 49 schemas: 49 succeeded, 0 failed (7 created, 42 updated)"
     },
     {
       "color": "blue",
@@ -1952,8 +1952,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-21T10:37:23.745Z",
-      "lastSynced": "2025-12-21T10:37:23.745Z",
+      "updatedAt": "2025-12-28T14:13:37.937Z",
+      "lastSynced": "2025-12-28T14:13:37.937Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -1966,7 +1966,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Generated relations for 44 out of 44 schemas",
+      "lastSyncMessage": "Generated relations for 53 out of 53 schemas",
       "sourceRoute": []
     },
     {
@@ -2013,9 +2013,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-21T10:37:42.995Z",
+      "updatedAt": "2025-12-28T14:15:07.430Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-21T10:37:42.995Z",
+      "lastSynced": "2025-12-28T14:15:07.430Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2026,7 +2026,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1275, nodes updated: 6, edges created: 124, nodes failed: 0, edges failed: 0.",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 44, nodes updated: 1281, edges created: 160, nodes failed: 0, edges failed: 0.",
       "isTenantBased": false
     },
     {
@@ -17865,7 +17865,7 @@
     {
       "name": "Tender Invitations By Vendor",
       "description": "Get Tender Invitations By Vendor",
-      "metadata": "{json}",
+      "metadata": "{\n    \"applyRBAC\": false,\n    \"patterns\": [\n      {\n        \"from\": { \"schemaId\": \"tenders\", \"alias\": \"\" },\n        \"to\": { \"schemaId\": \"tender-items\", \"alias\": \"\" },\n        \"edge\": \"HAS_ITEM\"\n      }\n    ],\n    \"columns\": [\n      {\n        \"schemaId\": \"tenders\",\n        \"fieldId\": \"id\",\n        \"selectOrder\": 1,\n        \"groupOrder\": 1,\n        \"sortOrder\": 1,\n        \"isAscending\": true,\n        \"filter\": {\n          \"op\": \"eq\",\n          \"value\": \"TND-001\"\n        }\n      },\n      {\n        \"schemaId\": \"tender-items\",\n        \"fieldId\": \"quantity\",\n        \"filter\": {\n          \"op\": \"gte\",\n          \"value\": 200\n        }\n      }\n    ],\n    \"pagination\": {\n      \"strategy\": \"offset\",\n      \"limit\": 20,\n      \"offset\": 0\n    }\n  }",
       "dynamic-query-parameters": [
         {
           "title": "Vendor ID",
@@ -17884,7 +17884,7 @@
       "datatype": [],
       "id": "01KD5E6TZ97SEF9SVS32PR1DTQ",
       "createdAt": "2025-12-23T11:06:16.945Z",
-      "updatedAt": "2025-12-23T11:25:32.248Z",
+      "updatedAt": "2025-12-28T14:10:41.356Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "includeUserId": false,
       "includeCompanyId": false,
@@ -17894,15 +17894,6 @@
           "label": "Supply Chain Management"
         }
       ]
-    }
-  ],
-  "external_nodes": [
-    {
-      "id": "active-directory",
-      "label": "Active Directory",
-      "icon": "Server",
-      "color": "success",
-      "sourceUrl": "field-options:users:authentication-type"
     }
   ]
 }

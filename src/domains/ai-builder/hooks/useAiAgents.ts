@@ -31,6 +31,24 @@ interface CacheEntry {
 const cache = new Map<string, CacheEntry>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+// Clear cache on page refresh to ensure fresh data
+if (typeof window !== 'undefined') {
+  // Check if this is a page refresh (not initial navigation)
+  const navigationType = (performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming)?.type;
+  const isPageRefresh = navigationType === 'reload';
+  
+  // Clear cache on page refresh
+  if (isPageRefresh) {
+    cache.clear();
+  }
+  
+  // Also clear cache if there's a query parameter to force refresh
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('refresh') === 'true' || urlParams.get('nocache') === 'true') {
+    cache.clear();
+  }
+}
+
 function getCacheKey(agentId?: string, summary?: boolean): string {
   return `${agentId || 'all'}_${summary ? 'summary' : 'full'}`;
 }
@@ -103,12 +121,27 @@ export function useAiAgents(options?: UseAiAgentsOptions): UseAiAgentsReturn {
         if (agentId) {
           params.append('id', agentId);
         }
+        // Add nocache parameter on page refresh to bypass server cache
+        if (typeof window !== 'undefined') {
+          const navigationType = (performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming)?.type;
+          const isPageRefresh = navigationType === 'reload';
+          if (isPageRefresh) {
+            params.append('nocache', 'true');
+          }
+        }
         if (params.toString()) {
           url += `?${params.toString()}`;
         }
 
         // Fetch agents (works for both single agent and all agents)
-        const response = await fetch(url);
+        // Use cache: 'no-store' to bypass browser cache and ensure fresh data on refresh
+        const response = await fetch(url, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         data = await handleResponse(response);
         
         if (response.ok && data.success && data.data) {

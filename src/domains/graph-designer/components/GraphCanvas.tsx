@@ -101,7 +101,8 @@ export function GraphCanvas(props: GraphCanvasProps) {
       edgeModeEnabledRef,
       multiSelectEnabledRef,
       edgesRef,
-      onNodeClick: readOnly ? undefined : onNodeClick,
+      // Allow onNodeClick even in readOnly mode (useful for viewer mode to show payload dialogs)
+      onNodeClick: onNodeClick,
       onBackgroundClick: readOnly ? undefined : onBackgroundClick,
       onNodeContextAction: readOnly ? undefined : onNodeContextAction,
       onEdgeContextAction: readOnly ? undefined : onEdgeContextAction,

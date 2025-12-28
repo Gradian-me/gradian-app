@@ -78,19 +78,17 @@ export function initializeCytoscape(config: CytoscapeInitConfig): CytoscapeInitR
   const tooltipManager = new NodeTooltipManager(cy, schemas, schemasConfig, nodeTypes, relationTypes);
   tooltipManager.setupEventHandlers();
 
-  // Setup event handlers (skip in read-only mode)
-  let eventHandlersCleanup: () => void = () => {};
-  if (!readOnly) {
-    eventHandlersCleanup = setupCytoscapeEventHandlers({
-      cy,
-      edgeModeEnabledRef,
-      multiSelectEnabledRef,
-      onNodeClick,
-      onBackgroundClick,
-      onNodeContextAction,
-      onEdgeContextAction,
-    });
-  }
+  // Setup event handlers (always set up, but editing handlers only if not read-only)
+  // onNodeClick should work even in read-only mode (e.g., for viewer mode to show payload dialogs)
+  const eventHandlersCleanup = setupCytoscapeEventHandlers({
+    cy,
+    edgeModeEnabledRef,
+    multiSelectEnabledRef,
+    onNodeClick,
+    onBackgroundClick: readOnly ? undefined : onBackgroundClick,
+    onNodeContextAction: readOnly ? undefined : onNodeContextAction,
+    onEdgeContextAction: readOnly ? undefined : onEdgeContextAction,
+  });
 
   // Initialize edgehandles plugin (skip in read-only mode)
   let edgehandles: any = null;

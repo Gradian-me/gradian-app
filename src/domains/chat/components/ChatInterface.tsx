@@ -218,6 +218,26 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     if (!currentChat) return;
 
     try {
+      // Check if a message with this todoId already exists to avoid duplicates
+      const existingMessage = messages.find(msg => 
+        msg.metadata?.todoId === todo.id && msg.role === 'assistant'
+      );
+      
+      // If message already exists, skip creating a new one
+      if (existingMessage) {
+        // Scroll to existing message
+        setTimeout(() => {
+          const messageElement = document.getElementById(`message-${existingMessage.id}`) || 
+                                 document.querySelector(`[data-message-id="${existingMessage.id}"]`);
+          if (messageElement) {
+            messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+        return;
+      }
+
       // Prepare content based on output format
       const output = todo.output || result.output;
       const responseFormat = todo.responseFormat || result.responseFormat || result.data?.format || 'string';

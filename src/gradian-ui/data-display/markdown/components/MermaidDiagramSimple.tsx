@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useTheme } from 'next-themes';
-import { RefreshCw, Download } from 'lucide-react';
+import { RefreshCw, Download, Sparkles } from 'lucide-react';
 import { CopyContent } from '../../../form-builder/form-elements/components/CopyContent';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -899,8 +899,14 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
     <div className={`border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden ${className || ''}`}>
       {/* Header with actions */}
       <div className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
-        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Mermaid Diagram
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Diagram
+          </span>
+          <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+            <Sparkles className="h-3 w-3 text-violet-500" />
+            Powered by Gradian AI
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <Button

@@ -35,6 +35,7 @@ export const GRAPH_STYLES: StylesheetJson = [
   },
   {
     // Style for nodes with badge - show badge as background image at top center
+    // Also handles info icon when node has payload (combined in badge SVG)
     selector: 'node[badgeImage]',
     style: {
       'background-image': 'data(badgeImage)',

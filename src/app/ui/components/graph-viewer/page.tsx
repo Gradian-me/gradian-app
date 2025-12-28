@@ -3,8 +3,11 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
-import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import type { GraphNodeData, GraphEdgeData } from '@/domains/graph-designer/types';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Info } from 'lucide-react';
+import { CardWrapper, CardHeader, CardTitle, CardContent } from '@/gradian-ui/data-display/card/components/CardWrapper';
+import { formatKeyToLabel, formatValueForDisplay } from '@/gradian-ui/shared/utils/text-utils';
 
 export interface NodeType {
   id: string;
@@ -511,11 +514,46 @@ const getInitialData = (): GraphData => GRAPH_DATA;
 
 export default function GraphViewerPage() {
   const initialData = useMemo(() => getInitialData(), []);
-  const [graphData, setGraphData] = useState<GraphData>(initialData);
+  
+  // Compute initial graph data (from localStorage if available, otherwise use default)
+  const getInitialGraphData = useCallback((): GraphData => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = window.localStorage.getItem('graph-viewer-data');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && typeof parsed === 'object' && 
+              Array.isArray(parsed.nodes) && Array.isArray(parsed.edges)) {
+            // Clear the stored data after reading it
+            window.localStorage.removeItem('graph-viewer-data');
+            return {
+              nodes: parsed.nodes as GraphNodeData[],
+              edges: parsed.edges as GraphEdgeData[],
+              nodeTypes: parsed.nodeTypes || initialData.nodeTypes,
+              relationTypes: parsed.relationTypes || initialData.relationTypes,
+              schemas: parsed.schemas || initialData.schemas,
+            };
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to load graph data from localStorage:', error);
+        // Clear invalid data
+        if (typeof window !== 'undefined') {
+          window.localStorage.removeItem('graph-viewer-data');
+        }
+      }
+    }
+    return initialData;
+  }, [initialData]);
+  
+  const initialGraphData = useMemo(() => getInitialGraphData(), [getInitialGraphData]);
+  
+  const [graphData, setGraphData] = useState<GraphData>(initialGraphData);
   const [jsonCode, setJsonCode] = useState(() => 
-    JSON.stringify(GRAPH_DATA, null, 2)
+    JSON.stringify(initialGraphData, null, 2)
   );
   const [jsonError, setJsonError] = useState<string | null>(null);
+  const [selectedNodePayload, setSelectedNodePayload] = useState<{ node: GraphNodeData; payload: any } | null>(null);
 
   const handleJsonChange = useCallback((newCode: string) => {
     setJsonCode(newCode);
@@ -540,13 +578,12 @@ export default function GraphViewerPage() {
 
   const nodeCount = graphData.nodes.length;
   const edgeCount = graphData.edges.length;
-  const dvNode = graphData.nodes.find(n => n.id === 'dv-2025-0198');
-  const causesIntoDv = dvNode 
-    ? graphData.edges.filter(e => e.target === 'dv-2025-0198').length
-    : 0;
-  const actionsOutOfDv = dvNode 
-    ? graphData.edges.filter(e => e.source === 'dv-2025-0198').length
-    : 0;
+
+  const handleNodeClick = useCallback((node: GraphNodeData) => {
+    if (node.payload && Object.keys(node.payload).length > 0) {
+      setSelectedNodePayload({ node, payload: node.payload });
+    }
+  }, []);
     
   return (
     <MainLayout
@@ -557,14 +594,12 @@ export default function GraphViewerPage() {
       <div className="container mx-auto px-4 py-6 space-y-6 max-w-full overflow-x-hidden">
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 md:p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            Deviation Analysis: DV-2025-0198
+            Graph Viewer
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            This graph represents a 6-month investigation into a product quality deviation. 
-            Causes (Man, Machine, Method) can affect each other and all flow into the DV. 
-            Actions taken flow out of the DV as responses to the deviation.
+            Visualize and edit your graph data. You can modify the JSON below to update the graph visualization in real-time.
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div className="grid grid-cols-2 md:grid-cols-2 gap-4 text-sm">
             <div>
               <div className="font-medium text-gray-900 dark:text-gray-100">Total Nodes</div>
               <div className="text-gray-600 dark:text-gray-400">{nodeCount}</div>
@@ -572,14 +607,6 @@ export default function GraphViewerPage() {
             <div>
               <div className="font-medium text-gray-900 dark:text-gray-100">Total Edges</div>
               <div className="text-gray-600 dark:text-gray-400">{edgeCount}</div>
-            </div>
-            <div>
-              <div className="font-medium text-gray-900 dark:text-gray-100">Causes → DV</div>
-              <div className="text-gray-600 dark:text-gray-400">{causesIntoDv} edges</div>
-            </div>
-            <div>
-              <div className="font-medium text-gray-900 dark:text-gray-100">DV → Actions</div>
-              <div className="text-gray-600 dark:text-gray-400">{actionsOutOfDv} edges</div>
             </div>
           </div>
         </div>
@@ -601,14 +628,22 @@ export default function GraphViewerPage() {
               </p>
             </div>
           )}
-          <div className="w-full overflow-hidden">
-            <CodeViewer
-              code={jsonCode}
-              programmingLanguage="json"
-              title="Graph Data"
-              onChange={handleJsonChange}
-              initialLineNumbers={10}
+          <div className="w-full space-y-2">
+            <textarea
+              value={jsonCode}
+              onChange={(e) => setJsonCode(e.target.value)}
+              className="w-full h-64 p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 resize-y focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+              placeholder="Paste your graph JSON data here..."
+              spellCheck={false}
             />
+            <div className="flex justify-end">
+              <button
+                onClick={() => handleJsonChange(jsonCode)}
+                className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium transition-colors"
+              >
+                Refresh Graph
+              </button>
+            </div>
           </div>
         </div>
 
@@ -627,10 +662,76 @@ export default function GraphViewerPage() {
                 schemas: graphData.schemas,
               }}
               height="100%"
+              onNodeClick={handleNodeClick}
             />
           </div>
         </div>
       </div>
+
+      {/* Node Payload Dialog */}
+      <Dialog open={!!selectedNodePayload} onOpenChange={(open) => !open && setSelectedNodePayload(null)}>
+        <DialogContent className="w-full h-full lg:max-w-4xl lg:max-h-[90vh] lg:h-auto overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Info className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+              Node Details: {selectedNodePayload?.node.title}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedNodePayload && (
+            <div className="space-y-4 mt-4">
+              <CardWrapper
+                config={{
+                  id: 'node-payload',
+                  name: 'Payload Data',
+                  styling: {
+                    variant: 'default',
+                    size: 'md'
+                  }
+                }}
+                className="h-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm"
+              >
+                <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
+                  <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">
+                    Payload Data
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(selectedNodePayload.payload).map(([key, value]) => {
+                      const label = formatKeyToLabel(key);
+                      const formatted = formatValueForDisplay(value);
+                      // Make full width if: complex object/array, or display text is longer than 80 characters
+                      const isLongText = formatted.display.length > 80;
+                      const isComplex = formatted.isComplex;
+                      const shouldSpanFullWidth = isComplex || isLongText;
+                      
+                      return (
+                        <div
+                          key={key}
+                          className={`space-y-1 ${shouldSpanFullWidth ? 'md:col-span-2' : ''}`}
+                        >
+                          <label className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                            {label}
+                          </label>
+                          <div className="text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word">
+                            {formatted.isComplex ? (
+                              <pre className="text-xs bg-gray-50 dark:bg-gray-900 p-3 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto max-h-64 overflow-y-auto">
+                                {JSON.stringify(value, null, 2)}
+                              </pre>
+                            ) : (
+                              <span className="break-words">{formatted.display}</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </CardWrapper>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 }
