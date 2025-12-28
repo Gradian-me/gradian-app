@@ -1617,5 +1617,26 @@
     "createdAt": "2025-12-27T13:58:41.868Z",
     "updatedAt": "2025-12-27T13:58:44.179Z",
     "inactive": true
+  },
+  {
+    "id": "01KDHY0X83CCZZN7ZSZ2JRFKR6",
+    "sourceSchema": "tender-invitations",
+    "sourceId": "01KDHY0X5A0M2A91XPFCCV7M7R",
+    "targetSchema": "vendors",
+    "targetId": "01KCX516BRTDCD254DYWXM5F6B",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "tender-invitation-vendor",
+    "createdAt": "2025-12-28T07:33:33.059Z",
+    "updatedAt": "2025-12-28T07:33:33.059Z"
+  },
+  {
+    "sourceSchema": "tenders",
+    "sourceId": "01KDG1MGJXNHB3EMD64GBZ9YDP",
+    "targetSchema": "tender-invitations",
+    "targetId": "01KDHY0X5A0M2A91XPFCCV7M7R",
+    "relationTypeId": "HAS_INVITATION",
+    "id": "01KDHY0XBV610B9DKC9H1ACNAG",
+    "createdAt": "2025-12-28T07:33:33.179Z",
+    "updatedAt": "2025-12-28T07:33:33.179Z"
   }
 ]

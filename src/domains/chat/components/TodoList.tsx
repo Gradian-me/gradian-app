@@ -21,6 +21,7 @@ import { useAiAgents } from '@/domains/ai-builder';
 import { truncateText } from '../utils/text-utils';
 import { ButtonMinimal } from '@/gradian-ui/form-builder/form-elements';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { PromptPreviewSheet } from '@/domains/ai-builder/components/PromptPreviewSheet';
 import {
   DndContext,
   closestCenter,
@@ -105,6 +106,7 @@ export const TodoList: React.FC<TodoListProps> = ({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const [isGraphViewerOpen, setIsGraphViewerOpen] = useState(false);
+  const [previewSheetOpenTodoId, setPreviewSheetOpenTodoId] = useState<string | null>(null);
   const { agents: aiAgents } = useAiAgents({ summary: true });
   const cancelExecutionRef = React.useRef(false);
 
@@ -758,6 +760,7 @@ export const TodoList: React.FC<TodoListProps> = ({
                         executingTodoId={executingTodoId}
                         todos={localTodos}
                         initialInput={initialInput}
+                        onOpenPreview={(todoId) => setPreviewSheetOpenTodoId(todoId)}
                       />
                     </React.Fragment>
                   );
@@ -905,6 +908,78 @@ export const TodoList: React.FC<TodoListProps> = ({
           },
         ]}
       />
+
+      {/* Prompt Preview Sheet */}
+      {(() => {
+        const previewTodo = previewSheetOpenTodoId ? localTodos.find(t => t.id === previewSheetOpenTodoId) : null;
+        if (!previewTodo || !previewTodo.input) return null;
+
+        // Find the agent for this todo
+        const todoAgent = previewTodo.agentId ? aiAgents.find(a => a.id === previewTodo.agentId) : null;
+
+        // Extract resolved input from chainMetadata if available, otherwise resolve from dependencies
+        let resolvedBody = previewTodo.input.body;
+        let resolvedExtraBody = previewTodo.input.extra_body;
+        let resolvedUserPrompt: string | undefined;
+
+        // Check if we have chainMetadata with resolved input
+        if (previewTodo.chainMetadata?.input) {
+          const resolvedInput = previewTodo.chainMetadata.input;
+          if (resolvedInput.userPrompt) {
+            resolvedUserPrompt = typeof resolvedInput.userPrompt === 'string' 
+              ? resolvedInput.userPrompt 
+              : JSON.stringify(resolvedInput.userPrompt, null, 2);
+          }
+          if (resolvedInput.body) {
+            resolvedBody = resolvedInput.body;
+          }
+          if (resolvedInput.extra_body) {
+            resolvedExtraBody = resolvedInput.extra_body;
+          }
+        } else {
+          // Resolve dependency markers
+          if (resolvedBody) {
+            resolvedBody = resolveInputFromDependencies(resolvedBody, previewTodo, localTodos, initialInput || '');
+          }
+          if (resolvedExtraBody) {
+            resolvedExtraBody = resolveInputFromDependencies(resolvedExtraBody, previewTodo, localTodos, initialInput || '');
+          }
+          
+          // Try to extract userPrompt from body if it exists (for image generation, etc.)
+          if (resolvedBody && typeof resolvedBody === 'object' && 'prompt' in resolvedBody) {
+            resolvedUserPrompt = typeof resolvedBody.prompt === 'string' ? resolvedBody.prompt : undefined;
+          }
+        }
+
+        // Convert bodyParams to object format (remove prompt if it's in there, as it goes to userPrompt)
+        const bodyParams: Record<string, any> = resolvedBody && typeof resolvedBody === 'object' 
+          ? { ...resolvedBody }
+          : {};
+        if ('prompt' in bodyParams) {
+          delete bodyParams.prompt;
+        }
+
+        const extraBody: Record<string, any> = resolvedExtraBody && typeof resolvedExtraBody === 'object'
+          ? resolvedExtraBody
+          : {};
+
+        return (
+          <PromptPreviewSheet
+            isOpen={previewSheetOpenTodoId === previewTodo.id}
+            onOpenChange={(open) => {
+              if (!open) {
+                setPreviewSheetOpenTodoId(null);
+              }
+            }}
+            userPrompt={resolvedUserPrompt || ''}
+            bodyParams={Object.keys(bodyParams).length > 0 ? bodyParams : undefined}
+            extraBody={Object.keys(extraBody).length > 0 ? extraBody : undefined}
+            agent={todoAgent || undefined}
+            requiredOutputFormat={todoAgent?.requiredOutputFormat}
+            baseUrl={typeof window !== 'undefined' ? window.location.origin : ''}
+          />
+        );
+      })()}
     </>
   );
 };
@@ -925,6 +1000,7 @@ interface SortableTodoItemProps {
   executingTodoId?: string | null; // ID of currently executing todo
   todos?: Todo[]; // All todos for dependency resolution
   initialInput?: string; // Initial input for dependency resolution
+  onOpenPreview?: (todoId: string) => void; // Callback to open preview sheet
 }
 
 // Helper function to resolve dependency markers in input
@@ -989,6 +1065,7 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
   executingTodoId = null,
   todos = [], // Add todos prop to access all todos for dependency resolution
   initialInput = '', // Add initialInput prop
+  onOpenPreview,
 }) => {
   const {
     attributes,
@@ -1157,100 +1234,17 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
             </div>
           );
         })()}
-        {/* Input Display - Expandable */}
+        {/* Input Display - Button to open Preview Sheet */}
         {todo.input && (todo.input.body || todo.input.extra_body) && (
-          <Accordion type="single" collapsible className="mt-1 w-full">
-            <AccordionItem value={`input-${todo.id}`} className="border-0">
-              <AccordionTrigger className="text-[10px] py-1 px-0 h-auto hover:no-underline text-gray-600 dark:text-gray-400">
-                <span className="flex items-center gap-1">
-                  <Network className="w-3 h-3" />
-                  View Input
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="pt-1 pb-0 px-0">
-                <div className="text-[10px] space-y-1 bg-gray-50 dark:bg-gray-900/50 rounded p-2 border border-gray-200 dark:border-gray-700">
-                  {(() => {
-                    // Use resolved input from chainMetadata if available, otherwise resolve from dependencies
-                    let resolvedBody = todo.input.body;
-                    let resolvedExtraBody = todo.input.extra_body;
-                    let resolvedUserPrompt: string | undefined;
-                    
-                    // Check if we have chainMetadata with resolved input
-                    // chainMetadata.input contains the actual requestData that was passed to the agent
-                    if (todo.chainMetadata?.input) {
-                      const resolvedInput = todo.chainMetadata.input;
-                      // chainMetadata.input has structure: { userPrompt: string, body?: {...}, extra_body?: {...} }
-                      if (resolvedInput.userPrompt) {
-                        resolvedUserPrompt = typeof resolvedInput.userPrompt === 'string' 
-                          ? resolvedInput.userPrompt 
-                          : JSON.stringify(resolvedInput.userPrompt, null, 2);
-                      }
-                      if (resolvedInput.body) {
-                        resolvedBody = resolvedInput.body;
-                      }
-                      if (resolvedInput.extra_body) {
-                        resolvedExtraBody = resolvedInput.extra_body;
-                      }
-                    } else {
-                      // Resolve dependency markers
-                      if (resolvedBody) {
-                        resolvedBody = resolveInputFromDependencies(resolvedBody, todo, todos || [], initialInput || '');
-                      }
-                      if (resolvedExtraBody) {
-                        resolvedExtraBody = resolveInputFromDependencies(resolvedExtraBody, todo, todos || [], initialInput || '');
-                      }
-                    }
-                    
-                    // Format as markdown dialog (similar to Show Response)
-                    const formatInputForDisplay = (input: any): string => {
-                      if (typeof input === 'string') {
-                        return input;
-                      }
-                      if (input && typeof input === 'object') {
-                        // If it's a single key-value pair with a string value, show just the value
-                        const keys = Object.keys(input);
-                        if (keys.length === 1 && typeof input[keys[0]] === 'string') {
-                          return input[keys[0]];
-                        }
-                        // Otherwise format as JSON
-                        return JSON.stringify(input, null, 2);
-                      }
-                      return String(input || '');
-                    };
-                    
-                    return (
-                      <>
-                        {resolvedUserPrompt && (
-                          <div>
-                            <div className="font-medium text-gray-700 dark:text-gray-300 mb-0.5">User Prompt:</div>
-                            <div className="text-[9px] text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words font-mono bg-white dark:bg-gray-800 rounded p-1.5 border border-gray-200 dark:border-gray-700">
-                              {resolvedUserPrompt}
-                            </div>
-                          </div>
-                        )}
-                        {resolvedBody && typeof resolvedBody === 'object' && Object.keys(resolvedBody).length > 0 && (
-                          <div>
-                            <div className="font-medium text-gray-700 dark:text-gray-300 mb-0.5">Body:</div>
-                            <div className="text-[9px] text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words font-mono bg-white dark:bg-gray-800 rounded p-1.5 border border-gray-200 dark:border-gray-700">
-                              {formatInputForDisplay(resolvedBody)}
-                            </div>
-                          </div>
-                        )}
-                        {resolvedExtraBody && typeof resolvedExtraBody === 'object' && Object.keys(resolvedExtraBody).length > 0 && (
-                          <div>
-                            <div className="font-medium text-gray-700 dark:text-gray-300 mb-0.5">Extra Body:</div>
-                            <div className="text-[9px] text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words font-mono bg-white dark:bg-gray-800 rounded p-1.5 border border-gray-200 dark:border-gray-700">
-                              {formatInputForDisplay(resolvedExtraBody)}
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mt-1 h-6 text-[10px] px-2"
+            onClick={() => onOpenPreview?.(todo.id)}
+          >
+            <Network className="w-3 h-3 mr-0.5" />
+            View Input
+          </Button>
         )}
         {todo.dependencies && todo.dependencies.length > 0 && (
           <div className="mt-0.5 text-[10px] text-gray-500 dark:text-gray-500">

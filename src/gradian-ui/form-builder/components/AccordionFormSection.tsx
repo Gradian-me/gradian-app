@@ -30,25 +30,6 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DynamicCardRenderer } from '../../data-display/components/DynamicCardRenderer';
 import { toast } from 'sonner';
-const fieldVariants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: (index: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.25,
-      delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX),
-    },
-  }),
-  exit: (index: number) => ({
-    opacity: 0,
-    y: -12,
-    transition: {
-      duration: 0.2,
-      delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX / 2),
-    },
-  }),
-} as const;
 
 
 export const AccordionFormSection: React.FC<FormSectionProps> = ({
@@ -370,7 +351,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       });
 
     return (
-      <AnimatePresence>
+      <>
         {visibleFields.map((field, index) => {
 
           // Build name/value/error/touched for normal vs repeating sections
@@ -440,19 +421,13 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           }
 
           return (
-            <motion.div
+            <div
               key={field.id}
               className={cn(
                 'space-y-2',
                 colSpanClass,
                 (field as any).layout?.rowSpan && `row-span-${(field as any).layout.rowSpan}`
               )}
-              layout
-              variants={fieldVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              custom={index}
               style={{ order: field.order ?? (field as any).layout?.order }}
             >
               <FormElementFactory
@@ -465,10 +440,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 onFocus={() => onFocus(fieldName)}
                 disabled={disabled || field.disabled || isNotApplicable}
               />
-            </motion.div>
+            </div>
           );
         })}
-      </AnimatePresence>
+      </>
     );
   };
 
@@ -1296,49 +1271,92 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 >
                   <CardContent className="px-6 pb-6 overflow-visible">
                     <div className="space-y-4">
-                      {isLoadingRelations ? (
-                        <div className="space-y-3">
-                          {[1, 2, 3].map((i) => (
-                            <div
-                              key={i}
-                              className="rounded-xl bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700 overflow-hidden"
-                            >
-                              <div className="px-3 sm:px-4 py-3">
-                                <div className="flex items-start justify-between gap-2 w-full">
-                                  {/* Left side: Avatar, Title, Subtitle */}
-                                  <div className="flex items-start gap-2 flex-1 min-w-0">
-                                    {/* Avatar Skeleton */}
-                                    <Skeleton className="h-8 w-8 rounded-full shrink-0" />
-                                    
-                                    {/* Content */}
-                                    <div className="flex-1 min-w-0 space-y-1.5">
-                                      <Skeleton className="h-4 w-2/3" />
-                                      <Skeleton className="h-3 w-1/2" />
+                      <AnimatePresence mode="wait">
+                        {isLoadingRelations ? (
+                          <motion.div 
+                            key="skeletons"
+                            className="space-y-3"
+                            initial="hidden"
+                            animate="visible"
+                            exit="hidden"
+                            variants={{
+                              visible: {
+                                transition: {
+                                  staggerChildren: 0.05,
+                                },
+                              },
+                            }}
+                          >
+                            {[1, 2, 3].map((i) => (
+                              <motion.div
+                                key={i}
+                                className="rounded-xl bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700 overflow-hidden"
+                                variants={{
+                                  hidden: { opacity: 0, y: 10 },
+                                  visible: { 
+                                    opacity: 1, 
+                                    y: 0,
+                                    transition: {
+                                      duration: 0.3,
+                                      ease: 'easeOut',
+                                    },
+                                  },
+                                }}
+                              >
+                                <div className="px-3 sm:px-4 py-3">
+                                  <div className="flex items-start justify-between gap-2 w-full">
+                                    {/* Left side: Avatar, Title, Subtitle */}
+                                    <div className="flex items-start gap-2 flex-1 min-w-0">
+                                      {/* Avatar Skeleton */}
+                                      <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+                                      
+                                      {/* Content */}
+                                      <div className="flex-1 min-w-0 space-y-1.5">
+                                        <Skeleton className="h-4 w-2/3" />
+                                        <Skeleton className="h-3 w-1/2" />
+                                      </div>
                                     </div>
-                                  </div>
-                                  
-                                  {/* Right side: Buttons, Rating */}
-                                  <div className="flex items-start gap-1.5 shrink-0">
-                                    {/* Button Skeletons */}
-                                    <div className="flex gap-1">
-                                      <Skeleton className="h-7 w-7 rounded" />
-                                      <Skeleton className="h-7 w-7 rounded" />
-                                    </div>
                                     
-                                    {/* Rating Skeleton */}
-                                    <Skeleton className="h-4 w-12" />
+                                    {/* Right side: Buttons, Rating */}
+                                    <div className="flex items-start gap-1.5 shrink-0">
+                                      {/* Button Skeletons */}
+                                      <div className="flex gap-1">
+                                        <Skeleton className="h-7 w-7 rounded" />
+                                        <Skeleton className="h-7 w-7 rounded" />
+                                      </div>
+                                      
+                                      {/* Rating Skeleton */}
+                                      <Skeleton className="h-4 w-12" />
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : itemsCount === 0 ? (
-                        <div className="text-center py-8 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
-                          <p>No items added yet</p>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
+                              </motion.div>
+                            ))}
+                          </motion.div>
+                        ) : itemsCount === 0 ? (
+                          <motion.div
+                            key="empty"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.3, ease: 'easeOut' }}
+                            className="text-center py-8 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700"
+                          >
+                            <p>No items added yet</p>
+                          </motion.div>
+                        ) : (
+                        <motion.div 
+                          className="space-y-3"
+                          initial="hidden"
+                          animate="visible"
+                          variants={{
+                            visible: {
+                              transition: {
+                                staggerChildren: 0.05,
+                              },
+                            },
+                          }}
+                        >
                           {itemsToDisplay.map((entity, index) => {
                             const relation = relations.find(r => r.targetId === (entity as any).id);
                             
@@ -1374,15 +1392,26 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                             }
                             
                             return (
-                              <div
+                              <motion.div
                                 key={(entity as any).id || `entity-${index}`}
                                 className="rounded-xl overflow-hidden"
+                                variants={{
+                                  hidden: { opacity: 0, y: 10 },
+                                  visible: { 
+                                    opacity: 1, 
+                                    y: 0,
+                                    transition: {
+                                      duration: 0.3,
+                                      ease: 'easeOut',
+                                    },
+                                  },
+                                }}
                               >
                                 {targetSchemaData ? (
                                   <DynamicCardRenderer
                                     schema={targetSchemaData}
                                     data={entityWithTitle}
-                                    index={index}
+                                    index={0}
                                     viewMode="list"
                                     onView={(data) => {
                                       // Open view dialog if needed
@@ -1397,7 +1426,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                     onDelete={(data) => {
                                       if (relation) handleDeleteClick(relation.id, {} as React.MouseEvent);
                                     }}
-                                    disableAnimation={false}
+                                    disableAnimation={true}
                                     isInDialog={false}
                                     showUserDetails={false}
                                     className="border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200"
@@ -1441,11 +1470,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                     </div>
                                   </div>
                                 )}
-                              </div>
+                              </motion.div>
                             );
                           })}
-                        </div>
-                      )}
+                        </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       {/* Add button - only show if addType is 'addOnly' or 'canSelectFromData' */}
                       {onAddRepeatingItem && addType !== 'mustSelectFromData' && canAddMore && (
@@ -1482,33 +1512,76 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           ) : (
             <CardContent className="px-6 pb-6 overflow-visible">
               <div className="space-y-4">
-                {isLoadingRelations ? (
-                  <div className="space-y-3">
-                    {[1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className="rounded-xl bg-white border border-gray-100 overflow-hidden"
-                      >
-                        <div className="px-3 sm:px-4 py-3">
-                          <div className="flex items-start justify-between gap-2 w-full">
-                            <div className="flex items-start gap-2 flex-1 min-w-0">
-                              <Skeleton className="h-8 w-8 rounded-full" />
-                              <div className="flex-1 space-y-1.5">
-                                <Skeleton className="h-4 w-32" />
-                                <Skeleton className="h-3 w-24" />
+                <AnimatePresence mode="wait">
+                  {isLoadingRelations ? (
+                    <motion.div 
+                      key="skeletons"
+                      className="space-y-3"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={{
+                        visible: {
+                          transition: {
+                            staggerChildren: 0.05,
+                          },
+                        },
+                      }}
+                    >
+                      {[1, 2, 3].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="rounded-xl bg-white border border-gray-100 overflow-hidden"
+                          variants={{
+                            hidden: { opacity: 0, y: 10 },
+                            visible: { 
+                              opacity: 1, 
+                              y: 0,
+                              transition: {
+                                duration: 0.3,
+                                ease: 'easeOut',
+                              },
+                            },
+                          }}
+                        >
+                          <div className="px-3 sm:px-4 py-3">
+                            <div className="flex items-start justify-between gap-2 w-full">
+                              <div className="flex items-start gap-2 flex-1 min-w-0">
+                                <Skeleton className="h-8 w-8 rounded-full" />
+                                <div className="flex-1 space-y-1.5">
+                                  <Skeleton className="h-4 w-32" />
+                                  <Skeleton className="h-3 w-24" />
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : itemsCount === 0 ? (
-                  <div className="text-center py-8 text-gray-500 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
-                    <p>No items added yet</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  ) : itemsCount === 0 ? (
+                    <motion.div
+                      key="empty"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                      className="text-center py-8 text-gray-500 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700"
+                    >
+                      <p>No items added yet</p>
+                    </motion.div>
+                  ) : (
+                  <motion.div 
+                    className="space-y-3"
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                      visible: {
+                        transition: {
+                          staggerChildren: 0.05,
+                        },
+                      },
+                    }}
+                  >
                     {itemsToDisplay.map((entity, index) => {
                       const relation = relations.find(r => r.targetId === (entity as any).id);
                       
@@ -1544,15 +1617,26 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                       }
                       
                       return (
-                        <div
+                        <motion.div
                           key={(entity as any).id || `entity-${index}`}
                           className="rounded-xl overflow-hidden"
+                          variants={{
+                            hidden: { opacity: 0, y: 10 },
+                            visible: { 
+                              opacity: 1, 
+                              y: 0,
+                              transition: {
+                                duration: 0.3,
+                                ease: 'easeOut',
+                              },
+                            },
+                          }}
                         >
                           {targetSchemaData ? (
                             <DynamicCardRenderer
                               schema={targetSchemaData}
                               data={entityWithTitle}
-                              index={index}
+                              index={0}
                               viewMode="list"
                               onView={(data) => {
                                 if (relation) handleEditEntity((data as any).id, relation.id);
@@ -1566,7 +1650,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                               onDelete={(data) => {
                                 if (relation) handleDeleteClick(relation.id, {} as React.MouseEvent);
                               }}
-                              disableAnimation={false}
+                              disableAnimation={true}
                               isInDialog={false}
                               showUserDetails={false}
                               className="border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200"
@@ -1610,11 +1694,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                               </div>
                             </div>
                           )}
-                        </div>
+                        </motion.div>
                       );
                     })}
-                  </div>
-                )}
+                  </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Add button - only show if addType is 'addOnly' or 'canSelectFromData' */}
                 {onAddRepeatingItem && addType !== 'mustSelectFromData' && canAddMore && (

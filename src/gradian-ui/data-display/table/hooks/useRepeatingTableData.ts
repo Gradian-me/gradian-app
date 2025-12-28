@@ -581,7 +581,9 @@ export function useRepeatingTableData(
 
   const fieldsToUse = useMemo(() => {
     if (isRelationBased && targetSchemaData) {
-      return targetSchemaData.fields || [];
+      // Filter out hidden fields for relation-based tables
+      const allFields = targetSchemaData.fields || [];
+      return allFields.filter((field: any) => !field.hidden);
     }
 
     if (!isRelationBased && section) {
@@ -603,7 +605,9 @@ export function useRepeatingTableData(
     }
 
     if (isRelationBased && targetSchemaData) {
-      return targetSchemaData.fields || [];
+      // Filter out hidden fields for relation-based tables
+      const allFields = targetSchemaData.fields || [];
+      return allFields.filter((field: any) => !field.hidden);
     }
 
     return fieldsToUse;

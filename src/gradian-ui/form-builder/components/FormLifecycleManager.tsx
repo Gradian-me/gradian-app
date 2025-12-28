@@ -15,7 +15,7 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { cn, validateField as validateFieldUtil } from '@/gradian-ui/shared/utils';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import { ulid } from 'ulid';
 import { GoToTopForm } from '../form-elements/go-to-top-form';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
@@ -417,6 +417,10 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   hideGoToTopButton = false,
   ...props
 }) => {
+  // Ref for error alert to scroll to on 400 errors
+  const errorAlertRef = useRef<HTMLDivElement>(null);
+  const lastErrorStatusCodeRef = useRef<number | undefined>(undefined);
+
   const [state, dispatch] = useReducer(formReducer, {
     values: ensureRepeatingItemIds(initialValues, schema, referenceEntityData),
     errors: {},
@@ -989,6 +993,38 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     }
   }, [referenceEntityData, schema, state.values, state.dirty, dispatch]);
 
+  // Scroll to error alert when 400 error occurs
+  useEffect(() => {
+    // Only scroll if:
+    // 1. We have an error
+    // 2. Status code is 400
+    // 3. This is a new error (status code changed from previous value)
+    // 4. Error alert ref is available
+    if (
+      error &&
+      errorStatusCode === 400 &&
+      errorStatusCode !== lastErrorStatusCodeRef.current &&
+      errorAlertRef.current
+    ) {
+      // Update the ref to track this error
+      lastErrorStatusCodeRef.current = errorStatusCode;
+
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        if (errorAlertRef.current) {
+          errorAlertRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest',
+          });
+        }
+      }, 100);
+    } else if (!error) {
+      // Reset the ref when error is cleared
+      lastErrorStatusCodeRef.current = undefined;
+    }
+  }, [error, errorStatusCode]);
+
   const addRepeatingItem = useCallback((sectionId: string) => {
     const section = schema.sections.find(s => s.id === sectionId);
     if (!section?.isRepeatingSection) return;
@@ -1420,7 +1456,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           
           {/* Error Alert - shown when there's an error or validation issue */}
           {(error || firstValidationError) && (
-            <div className="mb-4">
+            <div ref={errorAlertRef} className="mb-4">
               <FormAlert 
                 type="error" 
                 message={error || firstValidationError} 

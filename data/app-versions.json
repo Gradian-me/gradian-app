@@ -4861,5 +4861,64 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KD9TENDERENHANCE006",
+    "timestamp": "2025-12-28T12:00:00.000Z",
+    "version": "1.37.006",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Added new data relations in all-data-relations.json to support tender-invitation and vendor associations, improving data integrity",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "relations",
+          "tenders",
+          "vendors"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated all-data.json to include detailed tender-invitation entries, enhancing data completeness for vendor interactions",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "tenders",
+          "vendors"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Modified AuthGuard component to improve authentication checks and prevent layout flashes during loading",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "layout",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Enhanced TodoList component with a new prompt preview feature for better user interaction",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "todo-management",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved useChat hook to dynamically determine response formats based on search results, optimizing chat functionality",
+        "priority": "Medium",
+        "affectedDomains": [
+          "chat",
+          "hooks",
+          "search",
+          "performance"
+        ]
+      }
+    ]
   }
 ]

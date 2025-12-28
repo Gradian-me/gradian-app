@@ -593,6 +593,11 @@ export function useChat(): UseChatResult {
                                    (Array.isArray(responseData.data) && (responseData.format === 'search-card' || responseData.format === 'search-results') ? responseData.data : null) ||
                                    (Array.isArray(responseData.search?.results) ? responseData.search.results : null);
 
+              // Determine response format - set to 'search-card' if search results are present
+              const finalResponseFormat = (searchResults && Array.isArray(searchResults) && searchResults.length > 0)
+                ? 'search-card'
+                : (responseData.format || 'string');
+
               // Add direct response message
               const messageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
                 method: 'POST',
@@ -610,7 +615,7 @@ export function useChat(): UseChatResult {
                     tokenUsage: responseData.tokenUsage,
                     duration: duration,
                     cost: cost,
-                    responseFormat: responseData.format || 'string',
+                    responseFormat: finalResponseFormat,
                     ...(searchResults && Array.isArray(searchResults) && searchResults.length > 0 
                       ? { searchResults: searchResults } 
                       : {}),
@@ -910,6 +915,11 @@ export function useChat(): UseChatResult {
                                    (Array.isArray(responseData.data) && (responseFormat === 'search-card' || responseFormat === 'search-results') ? responseData.data : null) ||
                                    (Array.isArray(responseData.search?.results) ? responseData.search.results : null);
 
+              // Determine response format - set to 'search-card' if search results are present
+              const finalResponseFormat = (searchResults && Array.isArray(searchResults) && searchResults.length > 0)
+                ? 'search-card'
+                : responseFormat;
+
               const assistantMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -923,7 +933,7 @@ export function useChat(): UseChatResult {
                   metadata: {
                     complexity: responseData.complexity,
                     executionType: responseData.executionType,
-                    responseFormat: responseFormat,
+                    responseFormat: finalResponseFormat,
                     ...(searchResults && Array.isArray(searchResults) && searchResults.length > 0 
                       ? { searchResults: searchResults } 
                       : {}),

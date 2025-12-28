@@ -27,6 +27,11 @@ export function useRepeatingTableColumns({
       return [];
     }
 
+    // If fields array is empty, return empty array (will only show actions/force columns)
+    if (!fields || fields.length === 0) {
+      return [];
+    }
+
     return buildTableColumns(fields, schemaForColumns, columnWidths);
   }, [columnWidths, fields, schemaForColumns]);
 

@@ -619,9 +619,16 @@ export const FormulaField: React.FC<FormulaFieldProps> = ({
   }, [formSchema?.id, formData?.id, dependencies.length, pickerFieldDependencies.length]);
 
   // Merge enriched form data with original form data
+  // IMPORTANT: Exclude the formula field's own value from formData to prevent it from interfering with calculation
+  // Formula fields should always be calculated, not use stored values
   const effectiveFormData = useMemo(() => {
-    return { ...(formData || {}), ...enrichedFormData };
-  }, [formData, enrichedFormData]);
+    const cleanedFormData = { ...(formData || {}) };
+    // Remove the formula field's value from formData to ensure calculation uses dependencies, not stored value
+    if (config.name && cleanedFormData[config.name] !== undefined) {
+      delete cleanedFormData[config.name];
+    }
+    return { ...cleanedFormData, ...enrichedFormData };
+  }, [formData, enrichedFormData, config.name]);
 
   // Evaluate formula
   const evaluation = useFormulaEvaluation({
@@ -633,8 +640,14 @@ export const FormulaField: React.FC<FormulaFieldProps> = ({
   });
 
   // Update value when evaluation changes
+  // Only update if the evaluated value is actually a calculated result (not a string that looks like a formula)
   useEffect(() => {
-    if (evaluation.value !== null && evaluation.value !== value && onChange) {
+    if (evaluation.value !== null && 
+        evaluation.value !== undefined &&
+        evaluation.value !== value &&
+        // Ensure we're not updating with a formula string (which shouldn't happen, but be safe)
+        (typeof evaluation.value !== 'string' || !evaluation.value.includes('{{')) &&
+        onChange) {
       onChange(evaluation.value);
     }
   }, [evaluation.value, value, onChange]);
@@ -717,8 +730,16 @@ export const FormulaField: React.FC<FormulaFieldProps> = ({
   }, [unitDisplayInfo?.color]);
 
   // Format display value (without unit - unit is shown separately)
+  // IMPORTANT: Never display the formula string itself - only show calculated results
   const displayValue = useMemo(() => {
     if (evaluation.value === null || evaluation.value === undefined) {
+      return '';
+    }
+
+    // Safety check: if evaluation.value is a string that looks like a formula, don't display it
+    // This should never happen, but protect against it just in case
+    if (typeof evaluation.value === 'string' && evaluation.value.includes('{{') && evaluation.value.includes('}}')) {
+      console.warn(`FormulaField ${config.name}: evaluation returned formula string instead of calculated value. Formula: ${localFormula}`);
       return '';
     }
 
@@ -748,7 +769,7 @@ export const FormulaField: React.FC<FormulaFieldProps> = ({
     }
 
     return formattedValue;
-  }, [evaluation.value, config.formulaConfig]);
+  }, [evaluation.value, config.formulaConfig, config.name, localFormula]);
 
   // Extract variable values for visualization
   const variableValues = useMemo(() => {
@@ -934,8 +955,8 @@ export const FormulaField: React.FC<FormulaFieldProps> = ({
         </div>
       )}
 
-      {/* Formula preview (dialog) */}
-      {localFormula && (
+      {/* Formula preview (dialog) - Always show when formula exists, regardless of showEditor setting */}
+      {localFormula && localFormula.trim() !== '' && (
         <Dialog>
           <DialogTrigger asChild>
             <Button

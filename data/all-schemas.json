@@ -5733,7 +5733,7 @@
           "unit": "{{formData.currency}}"
         },
         "validation": {
-          "required": true,
+          "required": false,
           "min": 0
         },
         "displayType": "currency",

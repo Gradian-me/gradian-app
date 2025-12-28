@@ -17812,7 +17812,29 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     }
   ],
-  "tender-invitations": [],
+  "tender-invitations": [
+    {
+      "status": [
+        {
+          "id": "01KCXSVBPFH4B4BNCHC0TY98ZN",
+          "label": "Published For Vendors",
+          "icon": "FileUser",
+          "color": "yellow"
+        }
+      ],
+      "vendor": [
+        {
+          "id": "01KCX516BRTDCD254DYWXM5F6B"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KDHY0X5A0M2A91XPFCCV7M7R",
+      "createdAt": "2025-12-28T07:33:32.986Z",
+      "updatedAt": "2025-12-28T07:33:33.111Z"
+    }
+  ],
   "page-metadata-editor-form": [],
   "quotations": [],
   "quotation-items": [],

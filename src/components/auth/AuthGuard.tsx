@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 import { REQUIRE_LOGIN } from '@/gradian-ui/shared/configs/env-config';
 import { encryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util';
@@ -9,13 +9,13 @@ import { encryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util'
 /**
  * AuthGuard Component
  * 
- * Prevents layout flash by checking authentication before rendering children.
+ * Prevents layout flash by checking authentication BEFORE rendering children.
  * Shows loading spinner during auth check, then either:
  * - Renders children if authenticated
  * - Redirects to login if not authenticated (without showing layout)
  * 
- * This component should wrap the main layout to prevent the flash of
- * authenticated content before redirecting to login.
+ * This component checks auth status immediately on mount to prevent any content
+ * from rendering before authentication is verified.
  */
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -40,64 +40,121 @@ function hasRefreshToken(): boolean {
   return cookies.includes(`${refreshTokenCookieName}=`);
 }
 
-export function AuthGuard({ children }: AuthGuardProps) {
-  const [isChecking, setIsChecking] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const pathname = usePathname();
-  const router = useRouter();
+/**
+ * Check authentication status via API
+ * This provides a more reliable check than cookie inspection
+ */
+async function checkAuthViaAPI(): Promise<boolean> {
+  try {
+    const response = await fetch('/api/auth/token/validate', {
+      method: 'GET',
+      credentials: 'include', // Include cookies
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      return data.valid === true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('[AuthGuard] Error checking auth via API:', error);
+    return false;
+  }
+}
 
-  useEffect(() => {
+export function AuthGuard({ children }: AuthGuardProps) {
+  const pathname = usePathname();
+  
+  // Determine if current path requires authentication
+  // Default to true (requires auth) if pathname is not yet available
+  const requiresAuth = useMemo(() => {
     // Skip auth check if REQUIRE_LOGIN is false
     if (!REQUIRE_LOGIN) {
-      setIsChecking(false);
-      setIsAuthenticated(true);
-      return;
+      return false;
+    }
+
+    // If pathname is not available yet, assume auth is required (will check once available)
+    if (!pathname) {
+      return true;
     }
 
     // Skip auth check for authentication pages
-    if (pathname?.startsWith('/authentication/')) {
+    if (pathname.startsWith('/authentication/')) {
+      return false;
+    }
+
+    return true;
+  }, [pathname]);
+
+  const [isChecking, setIsChecking] = useState(requiresAuth); // Start checking if auth is required
+  const [isAuthenticated, setIsAuthenticated] = useState(!requiresAuth); // Assume authenticated if auth not required
+
+  useEffect(() => {
+    // If auth is not required, allow rendering immediately
+    if (!requiresAuth) {
       setIsChecking(false);
       setIsAuthenticated(true);
       return;
     }
 
-    // Perform auth check
+    // Perform auth check immediately
     const checkAuth = async () => {
       try {
-        // Check if refresh token exists
-        // Note: This is a best-effort check since HttpOnly cookies
-        // are not accessible via JavaScript
-        const hasToken = hasRefreshToken();
-
-        if (!hasToken) {
-          // No token found - redirect to login without showing layout
-          const currentPath = pathname || window.location.pathname;
+        // First, do a quick cookie check (synchronous)
+        const hasTokenInCookie = hasRefreshToken();
+        
+        // If no token in cookie, redirect immediately without API call
+        if (!hasTokenInCookie) {
+          const currentPath = pathname || (typeof window !== 'undefined' ? window.location.pathname : '/');
           const encryptedReturnUrl = encryptReturnUrl(currentPath);
           const loginUrl = `/authentication/login?returnUrl=${encodeURIComponent(encryptedReturnUrl)}`;
           
-          // Use replace to avoid adding to history
-          router.replace(loginUrl);
+          // Use window.location for immediate redirect (prevents any rendering)
+          if (typeof window !== 'undefined') {
+            window.location.href = loginUrl;
+          }
           return;
         }
 
-        // Token exists - allow rendering
+        // Token exists in cookie - verify via API for more reliable check
+        const isValid = await checkAuthViaAPI();
+        
+        if (!isValid) {
+          // Token invalid - redirect to login
+          const currentPath = pathname || (typeof window !== 'undefined' ? window.location.pathname : '/');
+          const encryptedReturnUrl = encryptReturnUrl(currentPath);
+          const loginUrl = `/authentication/login?returnUrl=${encodeURIComponent(encryptedReturnUrl)}`;
+          
+          // Use window.location for immediate redirect
+          if (typeof window !== 'undefined') {
+            window.location.href = loginUrl;
+          }
+          return;
+        }
+
+        // Authentication verified - allow rendering
         setIsAuthenticated(true);
       } catch (error) {
         // On error, redirect to login to be safe
         console.error('[AuthGuard] Error during auth check:', error);
-        const currentPath = pathname || window.location.pathname;
+        const currentPath = pathname || (typeof window !== 'undefined' ? window.location.pathname : '/');
         const encryptedReturnUrl = encryptReturnUrl(currentPath);
         const loginUrl = `/authentication/login?returnUrl=${encodeURIComponent(encryptedReturnUrl)}`;
-        router.replace(loginUrl);
+        
+        if (typeof window !== 'undefined') {
+          window.location.href = loginUrl;
+        }
       } finally {
         setIsChecking(false);
       }
     };
 
+    // Run check immediately
     checkAuth();
-  }, [pathname, router]);
+  }, [pathname, requiresAuth]);
 
-  // Show loading spinner during auth check
+  // ALWAYS show loading spinner during auth check - this prevents any content flash
   if (isChecking) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
