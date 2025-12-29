@@ -1,7 +1,7 @@
 'use client';
 
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback, startTransition } from 'react';
 import { ChevronDown, KeyRound, LogOut, Settings, User as UserIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -121,17 +121,23 @@ export function UserProfileSelector({
       : 'hover:bg-violet-50 focus:bg-violet-50 text-gray-800 data-[highlighted]:bg-violet-100'
   );
 
-  const handleNavigate = (path: string) => {
+  const handleNavigate = useCallback((path: string) => {
     setIsMenuOpen(false);
-    router.push(path);
-  };
+    // Use startTransition for non-urgent navigation
+    startTransition(() => {
+      router.push(path);
+    });
+  }, [router]);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     setIsMenuOpen(false);
-    // Use centralized logout flow
-    const { performLogout } = await import('@/gradian-ui/shared/utils/logout-flow');
-    await performLogout('User requested logout', false);
-  };
+    // Defer logout to avoid blocking interaction
+    setTimeout(async () => {
+      // Use centralized logout flow
+      const { performLogout } = await import('@/gradian-ui/shared/utils/logout-flow');
+      await performLogout('User requested logout', false);
+    }, 0);
+  }, []);
 
   // Always render the same structure to avoid hydration mismatch
   // When not mounted, render a disabled placeholder with the same structure as the mounted version

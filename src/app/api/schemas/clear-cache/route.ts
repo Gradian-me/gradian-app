@@ -8,6 +8,7 @@ import { isDemoModeEnabled, proxySchemaRequest } from '../utils';
 import { getAllReactQueryKeys } from '@/gradian-ui/shared/configs/cache-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 /**
  * Clear cache from schema-loader (server-side cache)
@@ -226,6 +227,12 @@ async function callRemoteClearCache(method: string = 'POST') {
  * - Tenant store tenants list (client-side via custom event dispatch)
  */
 export async function POST(request: NextRequest) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   // Always clear local caches first (this route always runs on current server)
   try {
     await clearLocalCaches();
@@ -279,6 +286,12 @@ export async function POST(request: NextRequest) {
  * - Tenant store tenants list (client-side via custom event dispatch)
  */
 export async function GET(request: NextRequest) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   // Always clear local caches first (this route always runs on current server)
   try {
     await clearLocalCaches();

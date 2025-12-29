@@ -13,6 +13,7 @@ import { syncHasFieldValueRelationsForEntity, minimizePickerFieldValues, enrichE
 import { extractRepeatingSectionValues, syncRepeatingSectionRelationsForEntity } from '@/gradian-ui/shared/domain/utils/repeating-section-relations.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 /**
  * Create controller instance for the given schema
@@ -39,6 +40,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ 'schema-id': string; id: string }> }
 ) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
   const { 'schema-id': schemaId, id } = await params;
 
   // Special-case: if schema is "schemas", delegate to /api/schemas/:id
@@ -248,6 +254,11 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ 'schema-id': string; id: string }> }
 ) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
   const { 'schema-id': schemaId, id } = await params;
   const targetPath = `/api/data/${schemaId}/${id}`;
 
@@ -506,6 +517,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ 'schema-id': string; id: string }> }
 ) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
   const { 'schema-id': schemaId, id } = await params;
   const targetPath = `/api/data/${schemaId}/${id}`;
 

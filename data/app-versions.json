@@ -5050,5 +5050,84 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KDMERMAIDENHANCE001",
+    "timestamp": "2025-12-29T15:30:58+0330",
+    "version": "1.37.009",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated Mermaid diagram guidelines in ai-chat-utils.ts to enforce strict rules against using parentheses and pipe syntax, ensuring better clarity and consistency in diagram representations. This update enhances overall documentation quality and user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "documentation",
+          "mermaid",
+          "user-experience"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KDAUTHRESFACTOR001",
+    "timestamp": "2025-12-29T16:47:51+0330",
+    "version": "1.38.000",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "MAJOR: Refactored authentication system to implement authentication checks on routes and refresh token mechanism, significantly improving security and token management",
+        "priority": "High",
+        "affectedDomains": [
+          "auth",
+          "security",
+          "api",
+          "routing"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated token management to utilize global cache for access tokens, improving security and performance across the application",
+        "priority": "High",
+        "affectedDomains": [
+          "auth",
+          "security",
+          "performance",
+          "token-management"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Implemented authentication checks across various API routes, ensuring secure access control and preventing unauthorized access",
+        "priority": "High",
+        "affectedDomains": [
+          "auth",
+          "security",
+          "api",
+          "access-control"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Enhanced user experience by preloading logo images for faster loading times, improving perceived performance",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "performance",
+          "user-experience"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Simplified sidebar and mobile menu toggle functions using useCallback for better performance and code maintainability",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout",
+          "performance",
+          "ui",
+          "sidebar"
+        ]
+      }
+    ]
   }
 ]

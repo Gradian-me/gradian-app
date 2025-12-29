@@ -32,9 +32,11 @@ Comprehensive security measures have been implemented to prevent sensitive data 
 ### 4. ✅ Secure Token Storage
 - **File**: `src/gradian-ui/shared/utils/token-storage.util.ts`
 - Removed localStorage token storage from login page
-- Access tokens stored in memory only (not in cookies or localStorage)
+- **Client-side**: Access tokens stored in memory only (not in cookies or localStorage)
+- **Server-side**: Access tokens stored in global cache (server memory, keyed by refresh token)
 - Refresh tokens stored in httpOnly cookies (set by server)
 - Added migration utility for existing localStorage tokens
+- **Server cache**: Uses `globalThis` for persistence across serverless/edge invocations
 
 ### 5. ✅ Centralized Logout Flow
 - **File**: `src/gradian-ui/shared/utils/logout-flow.ts`
@@ -99,6 +101,10 @@ Comprehensive security measures have been implemented to prevent sensitive data 
 8. `src/components/layout/UserProfileSelector.tsx` - Updated to use centralized logout flow
 9. `src/components/layout/UserProfileDropdown.tsx` - Updated to use centralized logout flow
 10. `next.config.ts` - Added security headers
+11. `src/app/api/auth/helpers/server-token-cache.ts` - Server-side token cache with global persistence
+12. `src/gradian-ui/shared/utils/api-auth.util.ts` - Unified API authentication with server cache lookup
+13. `src/domains/auth/services/auth.service.ts` - External token validation (decode without signature verification)
+14. `src/domains/auth/utils/jwt.util.ts` - Added `decodeTokenWithoutVerification` for external tokens
 
 ## How It Works
 
@@ -193,9 +199,11 @@ import { AuthGuard } from '@/components/auth/AuthGuard';
 ### Verify Token Storage
 1. Login to application
 2. Check browser DevTools → Application → Storage
-3. Verify access tokens are NOT in localStorage (stored in memory only)
+3. Verify access tokens are NOT in localStorage (stored in memory only on client)
 4. Verify refresh tokens ARE in Cookies (httpOnly, secure)
-5. Verify access tokens are NOT in cookies (stored in memory only)
+5. Verify access tokens are NOT in cookies (stored in memory only on client)
+6. Check server logs for `[ServerTokenCache] ✅ Stored access token in server memory`
+7. Verify server cache persists across requests (check `cacheSize` in logs)
 
 ### Verify Logout Flow
 1. Click logout button
@@ -207,10 +215,12 @@ import { AuthGuard } from '@/components/auth/AuthGuard';
 ## Important Notes
 
 ### ⚠️ Token Storage
-- **Access tokens**: Stored in memory only (not in cookies or localStorage)
+- **Client-side access tokens**: Stored in memory only (not in cookies or localStorage)
+- **Server-side access tokens**: Stored in global cache (server memory, keyed by refresh token)
 - **Refresh tokens**: Stored in httpOnly cookies (server-side)
 - **Never store tokens in**: localStorage, sessionStorage, or React state (except memory for access tokens)
-- The login API sets refresh token cookies - access tokens are stored in memory by client
+- The login API sets refresh token cookies and stores access token in server cache
+- Access tokens are also returned to client for storage in memory (redundancy)
 
 ### ⚠️ Environment Variables
 - Variables prefixed with `NEXT_PUBLIC_` are exposed to the browser

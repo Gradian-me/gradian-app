@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { HeaderBrandProps } from '../types';
 import { cn } from '../../../shared/utils';
 
@@ -30,10 +31,15 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
   return (
     <Link href={href} className={brandClasses} {...props}>
       {logo && (
-        <img
+        <Image
           src={logo.src}
           alt={logo.alt}
-          className={logoClasses}
+          width={120}
+          height={40}
+          className={cn('object-contain m-0', logoClasses)}
+          priority
+          quality={90}
+          loading="eager"
         />
       )}
       {title && (

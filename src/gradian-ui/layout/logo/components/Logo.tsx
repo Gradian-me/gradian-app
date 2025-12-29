@@ -88,7 +88,8 @@ export function Logo({
       height={height}
       className={cn('object-contain m-0', className)}
       priority
-      unoptimized
+      quality={90}
+      loading="eager"
     />
   );
 }

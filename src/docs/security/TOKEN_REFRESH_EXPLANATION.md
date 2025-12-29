@@ -21,11 +21,13 @@ Browser → POST /api/auth/token/refresh
 ```
 
 ### 2. **Server-Side Refresh Endpoint** (`/api/auth/token/refresh`)
-- Reads `refresh_token` from HttpOnly cookie
+- Reads `refresh_token` from HttpOnly cookie (or request body/header)
 - Validates refresh token
 - Calls external auth service to refresh
-- Returns new `accessToken` in response body
+- **Stores new access token in server memory** (global cache, keyed by refresh token)
+- Returns new `accessToken` in response body (for client to store in memory)
 - Sets new `refresh_token` in HttpOnly cookie (if rotated)
+- Updates server cache if refresh token was rotated
 
 ### 3. **Client Receives New Token**
 ```
@@ -39,8 +41,10 @@ Browser ← Response:
 ```
 
 ### 4. **Client Stores Access Token**
-- `authTokenManager.setAccessToken(newToken)` - stores in memory only
+- `authTokenManager.setAccessToken(newToken)` - stores in memory only (client-side)
 - Token is NOT stored in cookies or localStorage
+- **Server already stored it** in global cache (keyed by refresh token)
+- Both client and server have the token for redundancy
 
 ### 5. **Retry Original Request**
 ```
@@ -50,8 +54,14 @@ Browser → GET /api/schemas/change-categories
 
 ### 6. **Server Processes Request**
 ```
-Server → External API
-         Headers: Authorization: Bearer <new_access_token>
+Server receives request:
+  - Checks Authorization header for access token
+  - If missing, looks up access token from server cache using refresh token from cookie
+  - Validates token (with fallback for external tokens)
+  - Extracts userId and processes request
+         ↓
+Server → External API (if needed)
+         Headers: Authorization: Bearer <access_token>
          ↓
 Server ← Response with data
          ↓
@@ -139,12 +149,37 @@ When logout is triggered (via `performLogout()` in `logout-flow.ts`):
 5. **Clears Zustand stores** - user, company, tenant, menu-items
 6. **Redirects to login** - Preserves returnUrl for post-login redirect
 
+## Server-Side Token Cache
+
+### How It Works
+- Access tokens are stored in **server memory (global cache)** keyed by refresh token
+- Uses `globalThis` for persistence across serverless/edge function invocations
+- When API route needs authentication:
+  1. First checks Authorization header for access token
+  2. If missing, extracts refresh token from HttpOnly cookie
+  3. Looks up access token from server cache using refresh token as key
+  4. Validates token and extracts userId
+
+### Benefits
+- **Redundancy**: Both client and server have access token
+- **Fallback**: Works even if client token is missing
+- **Security**: Access token never exposed to client-side JavaScript (server-only)
+- **Persistence**: Global cache persists across requests in serverless environments
+
+### Cache Management
+- Tokens automatically expire based on `expiresIn` value
+- Expired tokens are cleaned up periodically (every 5 minutes)
+- Cache is cleared on logout
+- Cache is updated when refresh token is rotated
+
 ## Summary
 
 1. **Refresh endpoint in Network tab?** ✅ Yes - it's client-side
 2. **Multiple refresh attempts?** ✅ Fixed - using single-flight pattern
-3. **Cookies cleared on logout?** ✅ Yes - all auth cookies cleared
-4. **Complete cleanup?** ✅ Yes - memory, cookies, localStorage, and stores cleared
+3. **Server-side token cache?** ✅ Yes - access tokens stored in global cache
+4. **Cookies cleared on logout?** ✅ Yes - all auth cookies cleared
+5. **Complete cleanup?** ✅ Yes - memory, cookies, localStorage, stores, and server cache cleared
+6. **External token validation?** ✅ Yes - decodes without signature verification for external tokens
 
 
 

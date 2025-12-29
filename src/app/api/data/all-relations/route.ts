@@ -9,6 +9,7 @@ import { DataRelation } from '@/gradian-ui/schema-manager/types/form-schema';
 import { handleDomainError } from '@/gradian-ui/shared/domain/errors/domain.errors';
 import { isDemoModeEnabled, proxyDataRequest } from '../utils';
 import { enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 // Route segment config to optimize performance
 export const dynamic = 'force-dynamic';
@@ -31,6 +32,12 @@ interface GroupedRelationData {
  * - relationTypeId: Filter by specific relation type (optional)
  */
 export async function GET(request: NextRequest) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   const targetPath = `/api/data/all-relations${request.nextUrl.search}`;
 
   if (!isDemoModeEnabled()) {

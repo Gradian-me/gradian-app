@@ -65,7 +65,20 @@ function loadAuthConfig(): AuthConfig {
 export const AUTH_CONFIG = loadAuthConfig();
 
 // Routes excluded from login requirements
-export const EXCLUDED_LOGIN_ROUTES: string[] = ['/authentication'];
+// These routes are accessible without authentication
+// Supports exact matches and wildcard patterns (e.g., /api/auth/*)
+export const EXCLUDED_LOGIN_ROUTES: string[] = [
+  // Page routes
+  '/authentication',
+  '/health',
+  
+  // API auth routes (login, logout, token refresh, etc.)
+  '/api/auth/*',
+  
+  // API health routes
+  '/api/health',
+  '/api/health/*',
+];
 
 // Routes forbidden in production environment
 export const FORBIDDEN_ROUTES_PRODUCTION: string[] = [];

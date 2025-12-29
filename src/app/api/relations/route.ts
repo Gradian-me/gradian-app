@@ -21,6 +21,7 @@ import { BaseRepository } from '@/gradian-ui/shared/domain/repositories/base.rep
 import { getValueByRole, getSingleValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 /**
  * GET - Query relations
@@ -34,6 +35,12 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
  * - targetSchema (optional with legacy queries) - Filter by target schema
  */
 export async function GET(request: NextRequest) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
 		// In non-demo mode, proxy to upstream data service
 		if (!isDemoModeEnabled()) {
@@ -262,6 +269,12 @@ export async function GET(request: NextRequest) {
  * Body: { sourceSchema, sourceId, targetSchema, targetId, relationTypeId }
  */
 export async function POST(request: NextRequest) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
 		// In non-demo mode, proxy to upstream data service
 		if (!isDemoModeEnabled()) {

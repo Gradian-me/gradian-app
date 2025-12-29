@@ -10,6 +10,7 @@ import { SCHEMA_SUMMARY_EXCLUDED_KEYS } from '@/gradian-ui/shared/configs/genera
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { calculateSchemaStatistics } from '@/gradian-ui/schema-manager/utils/schema-statistics-utils';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 const SCHEMA_SUMMARY_EXCLUDED_KEY_SET = new Set<string>(SCHEMA_SUMMARY_EXCLUDED_KEYS);
 const MAX_SCHEMA_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
@@ -179,6 +180,12 @@ function writeSchemasAtomically(schemas: any[]): void {
  * - GET /api/schemas?id=vendors - returns only vendors schema
  */
 export async function GET(request: NextRequest) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   const searchParams = request.nextUrl.searchParams;
 
   try {
@@ -400,6 +407,12 @@ export async function GET(request: NextRequest) {
  * - POST /api/schemas - creates multiple schemas (array of objects)
  */
 export async function POST(request: NextRequest) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
     const requestData = await request.json();
 

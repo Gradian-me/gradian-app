@@ -171,22 +171,64 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<L
 
 /**
  * Validate a JWT token
+ * First tries signature verification (for internal tokens)
+ * Falls back to decode-only (for external tokens from external auth services)
  */
 export function validateToken(token: string): TokenValidationResponse {
   try {
-    const payload = verifyToken(token);
-    
-    return {
-      valid: true,
-      payload: {
-        userId: payload.userId,
-        email: payload.email,
-        name: payload.name,
-        role: payload.role,
-        iat: payload.iat,
-        exp: payload.exp,
-      },
-    };
+    // First try: Verify with signature (for internal tokens)
+    try {
+      const payload = verifyToken(token);
+      
+      return {
+        valid: true,
+        payload: {
+          userId: payload.userId,
+          email: payload.email,
+          name: payload.name,
+          role: payload.role,
+          iat: payload.iat,
+          exp: payload.exp,
+        },
+      };
+    } catch (verifyError) {
+      // If signature verification fails, try decode-only (for external tokens)
+      // This handles tokens from external auth services that we don't have the secret for
+      const { decodeTokenWithoutVerification } = require('../utils/jwt.util');
+      const decoded = decodeTokenWithoutVerification(token);
+      
+      // Check expiration
+      if (decoded.exp) {
+        const now = Math.floor(Date.now() / 1000);
+        if (decoded.exp < now) {
+          return {
+            valid: false,
+            error: 'Token has expired',
+          };
+        }
+      }
+      
+      // Extract userId from various possible fields (external tokens may use different field names)
+      const userId = decoded.id || decoded.sub || decoded.userId;
+      if (!userId) {
+        return {
+          valid: false,
+          error: 'Token missing user identifier',
+        };
+      }
+      
+      return {
+        valid: true,
+        payload: {
+          userId: String(userId),
+          email: decoded.email || '',
+          name: decoded.name || '',
+          role: decoded.role || decoded.roles || '',
+          iat: decoded.iat,
+          exp: decoded.exp,
+        },
+      };
+    }
   } catch (error) {
     return {
       valid: false,

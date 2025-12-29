@@ -54,6 +54,20 @@ export function createTokenPair(payload: Omit<JWTPayload, 'iat' | 'exp'>): AuthT
 }
 
 /**
+ * Decode JWT token without signature verification (for external tokens)
+ * This is used when tokens come from external auth services
+ */
+export function decodeTokenWithoutVerification(token: string): any {
+  try {
+    // Decode without verification
+    const decoded = jwt.decode(token, { complete: false });
+    return decoded;
+  } catch (error) {
+    throw new Error('Failed to decode token');
+  }
+}
+
+/**
  * Verify and decode a JWT token
  */
 export function verifyToken(token: string): JWTPayload {

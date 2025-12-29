@@ -313,13 +313,24 @@ export async function POST(request: NextRequest) {
     // IMPORTANT: Use the refresh token from response body, which matches what we set in cookie via applyTokenCookies
     if (accessToken && refreshToken) {
       const expiresIn = upstreamJson?.tokens?.expiresIn || AUTH_CONFIG.ACCESS_TOKEN_EXPIRY;
-      storeAccessToken(refreshToken, accessToken, expiresIn);
+      
+      // Normalize refresh token (trim whitespace)
+      // IMPORTANT: Use the exact value that will be in the cookie for storage key
+      // Next.js cookies.set() doesn't encode, but we normalize to handle any edge cases
+      const normalizedRefreshToken = refreshToken.trim();
+      
+      // Store access token using normalized refresh token as key
+      // This key must match what we'll extract from cookies in future requests
+      storeAccessToken(normalizedRefreshToken, accessToken, expiresIn);
+      
       loggingCustom(LogType.LOGIN_LOG, 'log', `[LOGIN_API] Stored access token in server memory ${JSON.stringify({
-        refreshTokenPreview: `${refreshToken.substring(0, 30)}...`,
-        refreshTokenLength: refreshToken.length,
+        refreshTokenPreview: `${normalizedRefreshToken.substring(0, 30)}...`,
+        refreshTokenLength: normalizedRefreshToken.length,
         accessTokenLength: accessToken.length,
         expiresIn: `${expiresIn}s`,
         cookieName: AUTH_CONFIG.REFRESH_TOKEN_COOKIE,
+        storageKey: 'normalized_refresh_token_trimmed',
+        note: 'Token stored with key matching what will be extracted from cookies (trimmed)',
       })}`);
     } else {
       loggingCustom(LogType.LOGIN_LOG, 'warn', `[LOGIN_API] Cannot store access token: missing accessToken or refreshToken`);

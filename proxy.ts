@@ -84,18 +84,30 @@ const REQUIRE_LOGIN = process.env.REQUIRE_LOGIN === 'true' || false;
 
 /**
  * Check if a path should be excluded from authentication
+ * Supports exact matches and wildcard patterns (e.g., /api/auth/*)
+ * Matches the logic in api-auth.util.ts for consistency
  */
 function isExcludedPath(pathname: string, excludedRoutes: string[]): boolean {
-  if (excludedRoutes.includes(pathname)) {
-    return true;
-  }
-
-  for (const route of excludedRoutes) {
-    if (pathname.startsWith(route)) {
+  for (const excludedRoute of excludedRoutes) {
+    // Exact match
+    if (pathname === excludedRoute) {
+      return true;
+    }
+    
+    // Wildcard pattern support (e.g., /api/auth/*)
+    if (excludedRoute.endsWith('/*')) {
+      const prefix = excludedRoute.slice(0, -2); // Remove '/*'
+      if (pathname.startsWith(prefix)) {
+        return true;
+      }
+    }
+    
+    // Prefix match for routes (e.g., /api/auth matches /api/auth/login)
+    if (pathname.startsWith(excludedRoute + '/')) {
       return true;
     }
   }
-
+  
   return false;
 }
 

@@ -48,6 +48,16 @@ function getLastInteraction(): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function updateLastInteraction(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const now = Date.now();
+    window.localStorage.setItem(LAST_INTERACTION_KEY, String(now));
+  } catch {
+    // ignore localStorage errors
+  }
+}
+
 function isIdleExceeded(thresholdMs: number = IDLE_TIMEOUT_MS): boolean {
   if (typeof window === 'undefined') return false;
   const last = getLastInteraction();
@@ -109,6 +119,8 @@ class AuthTokenManager {
           expiresInSeconds: expiresInSeconds > 0 ? expiresInSeconds : 0,
         };
       }
+      // Update last interaction when token is set (user is actively using the app)
+      updateLastInteraction();
     }
     
     loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] setAccessToken() ${JSON.stringify({
@@ -507,7 +519,8 @@ class AuthTokenManager {
         this.clearAccessToken();
         // Fall through to refresh logic below
       } else if (expired === false) {
-        // Token is valid - return it
+        // Token is valid - return it and update last interaction (user is actively using the app)
+        updateLastInteraction();
         loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] getValidAccessToken() - returning valid token from memory ${JSON.stringify({
           tokenLength: this.accessToken.length,
           tokenPreview: `${this.accessToken.substring(0, 20)}...`,
@@ -516,6 +529,8 @@ class AuthTokenManager {
       } else {
         // Cannot determine expiration (invalid token format) - still return it
         // Server will reject if truly invalid and trigger 401 handling
+        // Update last interaction since user is actively using the app
+        updateLastInteraction();
         loggingCustom(LogType.CLIENT_LOG, 'warn', `[AUTH_TOKEN] getValidAccessToken() - cannot determine expiration, returning token anyway ${JSON.stringify({
           tokenLength: this.accessToken.length,
         })}`);
@@ -588,6 +603,11 @@ class AuthTokenManager {
         const remainingCooldown = Math.ceil((this.rateLimitCooldownMs - timeSinceLast429) / 1000);
         throw new RateLimitError(`Too many requests. Please wait ${remainingCooldown} seconds before retrying.`);
       }
+    }
+    
+    // Update last interaction if refresh succeeded (user is actively using the app)
+    if (newToken) {
+      updateLastInteraction();
     }
     
     loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] handleUnauthorized() - refresh result ${JSON.stringify({

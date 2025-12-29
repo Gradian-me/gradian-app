@@ -27,6 +27,25 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="/odometer-theme-minimal.css" />
         <link rel="stylesheet" href="/fonts/estedad/estedad.css" />
+        {/* Preload logo images for faster LCP */}
+        <link
+          rel="preload"
+          href="/logo/Gradian-Logo-lightmode-min.png"
+          as="image"
+          type="image/png"
+        />
+        <link
+          rel="preload"
+          href="/logo/Gradian-Logo-darkmode-min.png"
+          as="image"
+          type="image/png"
+        />
+        <link
+          rel="preload"
+          href="/logo/Gradian-logo-white.png"
+          as="image"
+          type="image/png"
+        />
       </head>
       <body
         className="font-sans antialiased"

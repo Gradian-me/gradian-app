@@ -10,6 +10,7 @@ import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
 import { clearCache as clearSharedSchemaCache } from '@/gradian-ui/shared/utils/data-loader';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 const MAX_SCHEMA_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
 const SCHEMA_FILE_PATH = path.join(process.cwd(), 'data', 'all-schemas.json');
@@ -127,6 +128,12 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ 'schema-id': string }> }
 ) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   const { 'schema-id': schemaId } = await params;
 
   if (!schemaId) {
@@ -367,6 +374,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ 'schema-id': string }> }
 ) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
   const { 'schema-id': schemaId } = await params;
   const searchParams = request.nextUrl.searchParams;
   const hardDelete = searchParams.get('hardDelete') === 'true';

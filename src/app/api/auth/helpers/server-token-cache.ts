@@ -25,7 +25,24 @@ type TokenEntry = {
 };
 
 // In-memory token cache: refresh_token -> access_token mapping
-const tokenCache = new Map<string, TokenEntry>();
+// Use globalThis to persist across module reloads in serverless/edge environments
+const GLOBAL_CACHE_KEY = '__GRADIAN_TOKEN_CACHE__';
+const GLOBAL_CLEANUP_KEY = '__GRADIAN_TOKEN_CLEANUP_INTERVAL__';
+
+function getTokenCache(): Map<string, TokenEntry> {
+  // @ts-expect-error - globalThis may not have our cache key in types
+  if (!globalThis[GLOBAL_CACHE_KEY]) {
+    // @ts-expect-error - globalThis accessed with dynamic key for server-side token cache
+    globalThis[GLOBAL_CACHE_KEY] = new Map<string, TokenEntry>();
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'debug',
+      `[ServerTokenCache] Initialized global token cache`
+    );
+  }
+  // @ts-expect-error - globalThis accessed with dynamic key for server-side token cache
+  return globalThis[GLOBAL_CACHE_KEY];
+}
 
 // Cleanup interval: Remove expired tokens every 5 minutes
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
@@ -35,6 +52,7 @@ const CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
  * Called periodically and on access
  */
 function cleanupExpiredTokens(): void {
+  const tokenCache = getTokenCache();
   const now = Date.now();
   const keysToDelete: string[] = [];
   
@@ -62,9 +80,18 @@ function cleanupExpiredTokens(): void {
   }
 }
 
-// Start periodic cleanup
+// Start periodic cleanup (only once, using global flag)
 if (typeof setInterval !== 'undefined') {
-  setInterval(cleanupExpiredTokens, CLEANUP_INTERVAL_MS);
+  // @ts-expect-error - globalThis accessed with dynamic key for cleanup interval tracking
+  if (!globalThis[GLOBAL_CLEANUP_KEY]) {
+    // @ts-expect-error - globalThis accessed with dynamic key to store cleanup interval
+    globalThis[GLOBAL_CLEANUP_KEY] = setInterval(cleanupExpiredTokens, CLEANUP_INTERVAL_MS);
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'debug',
+      `[ServerTokenCache] Started periodic cleanup interval`
+    );
+  }
 }
 
 /**
@@ -88,6 +115,7 @@ export function storeAccessToken(
     return;
   }
 
+  const tokenCache = getTokenCache();
   const expiresAt = Date.now() + (expiresIn * 1000);
   
   tokenCache.set(refreshToken, {
@@ -105,6 +133,7 @@ export function storeAccessToken(
       expiresIn: `${expiresIn}s`,
       expiresAt: new Date(expiresAt).toISOString(),
       cacheSize: tokenCache.size,
+      usingGlobalCache: true,
     })}`
   );
 
@@ -123,12 +152,79 @@ export function getAccessToken(refreshToken: string): string | null {
     return null;
   }
 
+  // Get cache instance once at the start of the function (no duplicates)
+  const cache = getTokenCache();
+
   // Cleanup expired tokens before lookup
   cleanupExpiredTokens();
 
-  const entry = tokenCache.get(refreshToken);
+  // Log cache state for debugging
+  loggingCustom(
+    LogType.INFRA_LOG,
+    'debug',
+    `[ServerTokenCache] Looking up access token ${JSON.stringify({
+      refreshTokenPreview: `${refreshToken.substring(0, 30)}...`,
+      refreshTokenLength: refreshToken.length,
+      cacheSize: cache.size,
+      cacheKeys: Array.from(cache.keys()).map(k => `${k.substring(0, 30)}...`),
+      usingGlobalCache: true,
+    })}`
+  );
+
+  const entry = cache.get(refreshToken);
   
   if (!entry) {
+    // Try to find a matching entry (in case of encoding/whitespace issues)
+    let foundEntry: TokenEntry | null = null;
+    let foundKey: string | null = null;
+    
+    for (const [key, value] of cache.entries()) {
+      // Check if keys match after trimming
+      if (key.trim() === refreshToken.trim()) {
+        foundEntry = value;
+        foundKey = key;
+        break;
+      }
+      // Check if they're the same after URL encoding/decoding
+      try {
+        const decodedKey = decodeURIComponent(key);
+        const decodedRefresh = decodeURIComponent(refreshToken);
+        if (decodedKey === decodedRefresh || decodedKey === refreshToken || key === decodedRefresh) {
+          foundEntry = value;
+          foundKey = key;
+          break;
+        }
+      } catch {
+        // Ignore encoding errors
+      }
+    }
+    
+    if (foundEntry && foundKey) {
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'warn',
+        `[ServerTokenCache] ⚠️ Found token with different key (encoding/whitespace mismatch). Using found entry. ${JSON.stringify({
+          requestedKeyPreview: `${refreshToken.substring(0, 30)}...`,
+          foundKeyPreview: `${foundKey.substring(0, 30)}...`,
+          keysMatch: foundKey === refreshToken,
+        })}`
+      );
+      // Update cache with correct key for future lookups
+      cache.delete(foundKey);
+      cache.set(refreshToken, foundEntry);
+      // Continue with found entry
+      const now = Date.now();
+      if (now >= foundEntry.expiresAt) {
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'log',
+          `[ServerTokenCache] ⏰ Access token expired, removed from cache for refresh token: ${refreshToken.substring(0, 30)}...`
+        );
+        return null;
+      }
+      return foundEntry.accessToken;
+    }
+    
     loggingCustom(
       LogType.INFRA_LOG,
       'debug',
@@ -140,7 +236,7 @@ export function getAccessToken(refreshToken: string): string | null {
   // Check if expired
   const now = Date.now();
   if (now >= entry.expiresAt) {
-    tokenCache.delete(refreshToken);
+    cache.delete(refreshToken);
     loggingCustom(
       LogType.INFRA_LOG,
       'log',
@@ -157,7 +253,8 @@ export function getAccessToken(refreshToken: string): string | null {
       refreshTokenPreview: `${refreshToken.substring(0, 30)}...`,
       accessTokenLength: entry.accessToken.length,
       expiresIn: `${Math.floor(timeUntilExpiry / 1000)}s`,
-      cacheSize: tokenCache.size,
+      cacheSize: cache.size,
+      usingGlobalCache: true,
     })}`
   );
 
@@ -175,6 +272,7 @@ export function removeAccessToken(refreshToken: string): void {
     return;
   }
 
+  const tokenCache = getTokenCache();
   const deleted = tokenCache.delete(refreshToken);
   
   if (deleted) {
@@ -218,6 +316,7 @@ export function getCacheStats(): {
 } {
   cleanupExpiredTokens();
   
+  const tokenCache = getTokenCache();
   const entries = Array.from(tokenCache.entries()).map(([refreshToken, entry]) => {
     const now = Date.now();
     const timeUntilExpiry = entry.expiresAt - now;

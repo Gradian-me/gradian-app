@@ -492,7 +492,13 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
             !target.closest('[data-avatar-user]')) {
           e.preventDefault();
           e.stopPropagation();
-          if (onView) onView(data);
+          // Defer onView call to avoid blocking interaction
+          if (onView) {
+            // Use requestAnimationFrame to defer to next frame
+            requestAnimationFrame(() => {
+              onView(data);
+            });
+          }
         }
       }}
       aria-label={`Vendor card for ${cardConfig.title}`}

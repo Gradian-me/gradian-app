@@ -59,8 +59,17 @@ export function IdleTimeoutProvider({ idleTimeoutMs = DEFAULT_IDLE_TIMEOUT, chil
   // Track user interactions
   useEffect(() => {
     const handler = () => touch();
-    // Only treat explicit user intent (click/tap) as interaction to extend session
-    const events = ['click', 'touchstart', 'visibilitychange'];
+    // Track various user interactions to extend session
+    // Includes clicks, touches, keyboard input, mouse movement, scrolling, and visibility changes
+    const events = [
+      'click',
+      'touchstart',
+      'keydown',
+      'keypress',
+      'mousemove',
+      'scroll',
+      'visibilitychange',
+    ];
     events.forEach((evt) => document.addEventListener(evt, handler, { passive: true }));
     return () => {
       events.forEach((evt) => document.removeEventListener(evt, handler));

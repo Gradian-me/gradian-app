@@ -65,17 +65,21 @@ const sanitizedUser = sanitizeNestedData(userData);
 **Important:** Tokens should NEVER be stored in localStorage or React state.
 
 **Current Implementation:**
-- Access tokens are stored in **memory only** (not in cookies or localStorage)
+- **Client-side**: Access tokens stored in **memory only** (not in cookies or localStorage)
+- **Server-side**: Access tokens stored in **global cache** (server memory, keyed by refresh token)
 - Refresh tokens are stored in httpOnly cookies (set by server)
 - localStorage token storage has been removed from login flow
-- Tokens are automatically sent with requests via cookies
+- Tokens are automatically sent with requests via Authorization header (client) or server cache lookup
 
 **Best Practices:**
 1. Server sets refresh tokens as httpOnly cookies (prevents XSS)
-2. Access tokens stored in memory only (cleared on page refresh)
-3. Cookies use `secure` flag in production (HTTPS only)
-4. Cookies use `sameSite=lax` to prevent CSRF while allowing navigation
-5. Never expose tokens in client-side code
+2. Client stores access tokens in memory only (cleared on page refresh)
+3. Server stores access tokens in global cache (persists across requests, keyed by refresh token)
+4. API routes can look up access tokens from server cache using refresh token from cookies
+5. Cookies use `secure` flag in production (HTTPS only)
+6. Cookies use `sameSite=lax` to prevent CSRF while allowing navigation
+7. Never expose tokens in client-side code
+8. Server cache uses `globalThis` for persistence in serverless/edge environments
 
 **Migration Utility:**
 ```typescript
@@ -235,9 +239,12 @@ See `next.config.ts` for full configuration.
 
 1. Login to the application
 2. Check browser DevTools → Application → Storage
-3. Verify access tokens are NOT in localStorage (stored in memory only)
+3. Verify access tokens are NOT in localStorage (stored in memory only on client)
 4. Verify refresh tokens ARE in Cookies (httpOnly, secure)
-5. Verify access tokens are NOT in cookies (stored in memory only)
+5. Verify access tokens are NOT in cookies (stored in memory only on client)
+6. Check server logs for `[ServerTokenCache] ✅ Stored access token in server memory`
+7. Verify API authentication works by checking `[API_AUTH] ✅ Authentication successful` logs
+8. Verify server cache lookup works when client token is missing
 
 ### Verify Data Sanitization
 
@@ -250,11 +257,15 @@ See `next.config.ts` for full configuration.
 - [ ] React DevTools disabled
 - [ ] Zustand DevTools disabled
 - [ ] Console methods disabled/sanitized
-- [ ] Access tokens stored in memory only (not in cookies or localStorage)
+- [ ] Access tokens stored in memory only on client (not in cookies or localStorage)
+- [ ] Access tokens stored in server global cache (keyed by refresh token)
 - [ ] Refresh tokens stored in httpOnly cookies only
+- [ ] Server cache persists across requests (using `globalThis`)
+- [ ] API authentication works with server cache lookup
+- [ ] External tokens validated correctly (decode without signature verification)
 - [ ] No sensitive data in localStorage
 - [ ] All sensitive data sanitized before state storage
-- [ ] Logout flow clears all cookies, localStorage, and stores
+- [ ] Logout flow clears all cookies, localStorage, stores, and server cache
 - [ ] AuthGuard prevents layout flash on auth redirect
 - [ ] Security headers configured
 - [ ] Environment variables properly scoped (no `NEXT_PUBLIC_` on secrets)

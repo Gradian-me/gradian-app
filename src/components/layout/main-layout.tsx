@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bell, PanelLeftOpen, PencilRuler, Plus } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback, startTransition } from 'react';
 import { GoToTop, Header } from '@/gradian-ui/layout';
 import { Sidebar } from '@/gradian-ui/layout/sidebar';
 import { EndLine } from '@/gradian-ui/layout/end-line/components/EndLine';
@@ -255,13 +255,17 @@ function MainLayoutContent({
     };
   }, [closeAllDialogs, hasOpenDialogs]);
 
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed((collapsed) => !collapsed);
-  };
+  const toggleSidebar = useCallback(() => {
+    startTransition(() => {
+      setIsSidebarCollapsed((collapsed) => !collapsed);
+    });
+  }, []);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  const toggleMobileMenu = useCallback(() => {
+    startTransition(() => {
+      setIsMobileMenuOpen((prev) => !prev);
+    });
+  }, []);
 
   // Register mobile menu as a dialog for back button handling
   useEffect(() => {
@@ -277,9 +281,9 @@ function MainLayoutContent({
     }
   }, [isMobileMenuOpen, registerDialog, unregisterDialog, toggleMobileMenu]);
 
-  const handleNotificationClick = () => {
-    window.location.href = '/notifications';
-  };
+  const handleNotificationClick = useCallback(() => {
+    router.push('/notifications');
+  }, [router]);
 
   const handleEditSchemaMouseDown = (e: React.MouseEvent) => {
     // Middle click (button 1) should open schema builder in new tab
@@ -450,9 +454,7 @@ function MainLayoutContent({
           {ENABLE_NOTIFICATION && (
             <Tooltip key="notifications-tooltip">
               <TooltipTrigger asChild>
-                <div suppressHydrationWarning>
-                  <NotificationsDropdown initialCount={5} />
-                </div>
+                <NotificationsDropdown initialCount={5} />
               </TooltipTrigger>
               <TooltipContent>
                 <p>Notifications</p>
@@ -479,22 +481,24 @@ function MainLayoutContent({
           </div>
         )}
         <DemoModeBadge />
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative"
-          onClick={handleNotificationClick}
-        >
-          <Bell className="h-5 w-5" />
-          {notificationCount > 0 && (
-            <Badge
-              variant="destructive"
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs p-0"
-            >
-              {notificationCount}
-            </Badge>
-          )}
-        </Button>
+        {ENABLE_NOTIFICATION && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative"
+            onClick={handleNotificationClick}
+          >
+            <Bell className="h-5 w-5" />
+            {notificationCount > 0 && (
+              <Badge
+                variant="destructive"
+                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs p-0"
+              >
+                {notificationCount}
+              </Badge>
+            )}
+          </Button>
+        )}
         {showCreateButton && (
           <Button
             onClick={onCreateClick}

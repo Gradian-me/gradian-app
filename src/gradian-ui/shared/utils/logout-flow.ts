@@ -17,6 +17,7 @@ import { AUTH_CONFIG } from '../configs/auth-config';
 import { loggingCustom } from './logging-custom';
 import { LogType } from '../configs/log-config';
 import { encryptReturnUrl } from './url-encryption.util';
+import { authTokenManager } from './auth-token-manager';
 
 /**
  * Clear all auth-related cookies by setting them to expire
@@ -86,7 +87,6 @@ function clearLocalStorageStores(): void {
  */
 function clearInMemoryAccessToken(): void {
   try {
-    const { authTokenManager } = require('./auth-token-manager');
     authTokenManager.clearAccessToken();
     loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGOUT_FLOW] In-memory access token cleared');
   } catch (error) {
@@ -204,7 +204,7 @@ function redirectToLogin(currentPath?: string): void {
 }
 
 /**
- * Centralized logout flow
+ * Unified logout flow
  * 
  * This function performs a complete logout:
  * 1. Calls logout API to invalidate server-side session
@@ -217,9 +217,9 @@ function redirectToLogin(currentPath?: string): void {
  * @param reason - Optional reason for logout (for logging)
  * @param skipRedirect - If true, skip redirect to login page (useful for testing or special cases)
  */
-export async function performLogout(reason?: string, skipRedirect: boolean = false): Promise<void> {
+export async function logoutFlow(reason?: string, skipRedirect: boolean = false): Promise<void> {
   if (typeof window === 'undefined') {
-    loggingCustom(LogType.CLIENT_LOG, 'warn', '[LOGOUT_FLOW] performLogout called on server, skipping');
+    loggingCustom(LogType.CLIENT_LOG, 'warn', '[LOGOUT_FLOW] logoutFlow called on server, skipping');
     return;
   }
 
@@ -264,4 +264,7 @@ export async function performLogout(reason?: string, skipRedirect: boolean = fal
     }
   }
 }
+
+// Export performLogout as alias for backward compatibility
+export const performLogout = logoutFlow;
 

@@ -13,6 +13,7 @@ import { syncHasFieldValueRelationsForEntity, minimizePickerFieldValues, enrichE
 import { extractRepeatingSectionValues, syncRepeatingSectionRelationsForEntity } from '@/gradian-ui/shared/domain/utils/repeating-section-relations.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { requireApiAuth, isAuthSkipped } from '@/gradian-ui/shared/utils/api-auth.util';
 
 /**
  * Create controller instance for the given schema
@@ -39,6 +40,12 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ 'schema-id': string }> }
 ) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  // If auth was skipped (excluded route or REQUIRE_LOGIN=false), continue
   const { 'schema-id': schemaId } = await params;
 
   // Special-case: if schema is "schemas", delegate to /api/schemas to avoid scattered handling
@@ -367,6 +374,12 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ 'schema-id': string }> }
 ) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  // If auth was skipped (excluded route or REQUIRE_LOGIN=false), continue
   const { 'schema-id': schemaId } = await params;
   
   if (!schemaId) {

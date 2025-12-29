@@ -7,6 +7,7 @@ import {
   deleteRelation,
 } from '@/gradian-ui/shared/domain/utils/relations-storage.util';
 import { handleDomainError } from '@/gradian-ui/shared/domain/errors/domain.errors';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 /**
  * GET - Get single relation by ID
@@ -16,6 +17,12 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
     const { id } = await params;
 
@@ -56,6 +63,12 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Check authentication (unless route is excluded)
+  const authResult = requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
     const { id } = await params;
 

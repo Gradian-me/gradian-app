@@ -279,20 +279,19 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
 
   // Always render the same structure to avoid hydration mismatch
   // Use the same DropdownMenuPrimitive structure for both placeholder and actual
-  // Wrap in a single element for TooltipTrigger asChild compatibility
   return (
-    <div suppressHydrationWarning>
+    <>
       <DropdownMenuPrimitive.Root open={isMounted ? isOpen : false} onOpenChange={isMounted ? setIsOpen : undefined}>
-        <DropdownMenuPrimitive.Trigger asChild disabled={!isMounted}>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="relative rounded-xl"
-            aria-label="Notifications"
-            disabled={!isMounted}
-            type="button"
-            suppressHydrationWarning
-          >
+      <DropdownMenuPrimitive.Trigger asChild disabled={!isMounted}>
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="relative rounded-xl"
+          aria-label="Notifications"
+          disabled={!isMounted}
+          type="button"
+          suppressHydrationWarning
+        >
             <Bell className="h-5 w-5" />
             {isMounted && notificationCount > 0 && (
               <Badge 
@@ -428,7 +427,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
     </DropdownMenuPrimitive.Root>
     
     {/* Notification Dialog */}
-    {isMounted && (
+    {isMounted && selectedNotification && (
       <NotificationDialog
         notification={selectedNotification}
         isOpen={isDialogOpen}
@@ -441,6 +440,6 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
         onMarkAsUnread={handleMarkAsUnread}
       />
     )}
-    </div>
+    </>
   );
 }

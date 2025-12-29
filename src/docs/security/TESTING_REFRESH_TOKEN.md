@@ -1,27 +1,31 @@
 # Testing Refresh Token Flow
 
-## Method 1: Manual Cookie Manipulation (Fastest)
+## Method 1: Manual Token Removal (Fastest)
 
 ### Steps:
 1. **Login to your app** - Make sure you're logged in successfully
 2. **Open Browser DevTools** (F12)
-3. **Go to Application tab → Cookies**
-4. **Delete or corrupt the `access_token` cookie**:
-   - Right-click `access_token` → Delete
-   - OR edit it to an invalid value like `invalid_token`
-5. **Trigger an API call**:
+3. **Clear client-side access token** (stored in memory):
+   ```javascript
+   // In browser console:
+   import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
+   authTokenManager.clearAccessToken();
+   ```
+4. **Trigger an API call**:
    - Navigate to a page that makes API calls
    - OR open Network tab and watch for requests
-6. **Check the Network tab**:
+5. **Check the Network tab**:
    - You should see a request to `/api/auth/token/refresh`
    - Then the original request should retry successfully
-   - Check that a new `access_token` cookie is set
+   - Check server logs for `[ServerTokenCache]` entries
 
 ### Expected Behavior:
 - ✅ Automatic refresh call to `/api/auth/token/refresh`
-- ✅ New access token cookie set
+- ✅ Server stores new access token in global cache
+- ✅ Client stores new access token in memory
 - ✅ Original request retries and succeeds
 - ✅ No redirect to login (refresh token still valid)
+- ✅ Server cache lookup works as fallback
 
 ---
 
@@ -30,17 +34,17 @@
 ### Steps:
 1. **Login to your app**
 2. **Note the current time** - Access token expires in 899 seconds (~15 minutes)
-3. **Keep the app open** and wait, OR:
-   - Use browser DevTools → Application → Cookies
-   - Check the `access_token` cookie expiration time
-   - Wait until after that time
+3. **Keep the app open** and wait for token expiration
 4. **Trigger an API call** (navigate, refresh page, etc.)
 5. **Check Network tab** for automatic refresh
+6. **Check server logs** for cache operations
 
 ### Expected Behavior:
 - ✅ After 15 minutes, next API call triggers refresh
-- ✅ New access token cookie set with new expiration
+- ✅ Server stores new access token in global cache
+- ✅ Client stores new access token in memory
 - ✅ Request succeeds without user noticing
+- ✅ Server cache persists across requests
 
 ---
 
@@ -84,6 +88,11 @@ curl -X POST http://localhost:3000/api/auth/token/refresh \
 }
 ```
 
+**Note**: The access token is:
+- Returned in response body (for client to store in memory)
+- Stored in server global cache (keyed by refresh token)
+- NOT set as a cookie (stored in memory only)
+
 ---
 
 ## Method 4: Test Refresh Token Expiration (Redirect to Login)
@@ -91,11 +100,15 @@ curl -X POST http://localhost:3000/api/auth/token/refresh \
 ### Steps:
 1. **Login to your app**
 2. **Open DevTools → Application → Cookies**
-3. **Delete BOTH cookies**:
-   - `access_token`
-   - `refresh_token`
-4. **Trigger an API call** or navigate to a protected page
-5. **Check the behavior**
+3. **Delete the refresh token cookie**:
+   - `refresh_token` (this is the only auth cookie)
+4. **Clear client-side access token** (in memory):
+   ```javascript
+   import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
+   authTokenManager.clearAccessToken();
+   ```
+5. **Trigger an API call** or navigate to a protected page
+6. **Check the behavior**
 
 ### Expected Behavior:
 - ❌ Refresh token missing
@@ -112,11 +125,16 @@ curl -X POST http://localhost:3000/api/auth/token/refresh \
    - Open DevTools → Application → Cookies
    - Edit `refresh_token` to an expired/invalid token
    - OR wait for refresh token to expire (604799 seconds = ~7 days)
-3. **Delete `access_token` cookie**
+3. **Clear client-side access token** (in memory):
+   ```javascript
+   import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
+   authTokenManager.clearAccessToken();
+   ```
 4. **Trigger an API call**
 
 ### Expected Behavior:
 - ❌ Refresh attempt fails (refresh token expired)
+- ❌ Server cache lookup fails (no valid refresh token)
 - ✅ Redirect to `/authentication/login?returnUrl=...`
 - ✅ User must login again
 
@@ -127,35 +145,47 @@ curl -X POST http://localhost:3000/api/auth/token/refresh \
 ### Steps:
 1. **Login to your app**
 2. **Open DevTools → Network tab**
-3. **Delete `access_token` cookie** (keep `refresh_token`)
+3. **Clear client-side access token** (in memory):
+   ```javascript
+   import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
+   authTokenManager.clearAccessToken();
+   ```
 4. **Make an API call** (e.g., navigate to a page)
 5. **Watch Network tab**:
-   - First request should return 401
-   - Automatic call to `/api/auth/token/refresh`
+   - First request may succeed (server cache lookup) OR return 401
+   - If 401, automatic call to `/api/auth/token/refresh`
    - Original request retries with new token
 
 ### Expected Network Flow:
 ```
-1. GET /api/data/something → 401 Unauthorized
-2. POST /api/auth/token/refresh → 200 OK (new token)
+1. GET /api/data/something → 200 OK (server cache lookup) OR 401 Unauthorized
+2. If 401: POST /api/auth/token/refresh → 200 OK (new token)
 3. GET /api/data/something → 200 OK (retry successful)
 ```
 
+**Note**: Server can look up access token from cache using refresh token, so 401 may not occur if server cache has the token.
+
 ---
 
-## Method 7: Test Middleware Refresh (Server-Side)
+## Method 7: Test Server-Side Cache Lookup
 
 ### Steps:
 1. **Login to your app**
-2. **Delete `access_token` cookie** (keep `refresh_token`)
-3. **Navigate to a protected page** (not an API route)
-4. **Check server logs** for middleware refresh activity
+2. **Clear client-side access token** (in memory):
+   ```javascript
+   import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
+   authTokenManager.clearAccessToken();
+   ```
+3. **Make an API call** (e.g., navigate to a page)
+4. **Check server logs** for cache lookup activity
 
 ### Expected Behavior:
-- ✅ Middleware detects expired/missing access token
-- ✅ Calls refresh endpoint
-- ✅ Sets new access token cookie
-- ✅ Allows request to proceed
+- ✅ Server detects missing access token in Authorization header
+- ✅ Server extracts refresh token from HttpOnly cookie
+- ✅ Server looks up access token from global cache
+- ✅ Server validates token (with external token fallback)
+- ✅ Request succeeds without client refresh needed
+- ✅ Check logs for `[ServerTokenCache] ✅ Retrieved access token from server memory`
 
 ---
 
@@ -163,20 +193,27 @@ curl -X POST http://localhost:3000/api/auth/token/refresh \
 
 ### Check Console Logs:
 Look for these log messages:
-- `[checkAuthAndRedirect] Starting auth check...`
-- `[checkAuthAndRedirect] Validate response: ...`
-- `[LOGIN_LOG] Token refresh successful...`
-- `[LOGIN_LOG] Token refresh failed...`
+- `[AUTH_TOKEN]` - Client-side token operations
+- `[API_AUTH]` - Server-side authentication checks
+- `[ServerTokenCache]` - Server cache operations
+- `[REFRESH_API]` - Token refresh endpoint
+- `[LOGIN_LOG]` - Login/authentication logs
 
 ### Check Network Tab:
 - Filter by "refresh" to see refresh calls
 - Check request/response headers
 - Verify cookies are being sent/received
+- Check Authorization headers for access tokens
 
 ### Check Cookies:
 - DevTools → Application → Cookies
-- Verify `access_token` and `refresh_token` exist
-- Check expiration times match `expiresIn` values
+- Verify `refresh_token` exists (HttpOnly cookie)
+- **Note**: `access_token` is NOT in cookies (stored in memory only)
+
+### Check Server Cache:
+- Look for `[ServerTokenCache]` logs in server console
+- Verify `cacheSize` increases after login
+- Verify tokens are retrieved from cache on API requests
 
 ### Common Issues:
 1. **Refresh not happening**: Check if `REQUIRE_LOGIN` is true
@@ -202,14 +239,19 @@ async function testRefresh() {
     return acc;
   }, {});
   
-  console.log('📋 Current cookies:', {
-    hasAccessToken: !!cookies.access_token,
-    hasRefreshToken: !!cookies.refresh_token,
+  // Check client-side access token (in memory)
+  const { authTokenManager } = await import('@/gradian-ui/shared/utils/auth-token-manager');
+  const clientToken = authTokenManager.getAccessToken();
+  
+  console.log('📋 Current state:', {
+    hasRefreshTokenCookie: !!cookies.refresh_token,
+    hasClientAccessToken: !!clientToken,
+    clientTokenPreview: clientToken ? `${clientToken.substring(0, 20)}...` : null,
   });
   
-  // 2. Delete access token
-  document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  console.log('🗑️ Deleted access_token cookie');
+  // 2. Clear client-side access token
+  authTokenManager.clearAccessToken();
+  console.log('🗑️ Cleared client-side access token (memory)');
   
   // 3. Try to refresh
   try {
@@ -226,22 +268,26 @@ async function testRefresh() {
       expiresIn: data.expiresIn,
     });
     
-    // 4. Check new cookie
-    const newCookies = document.cookie.split(';').reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split('=');
-      acc[key] = value;
-      return acc;
-    }, {});
-    
-    console.log('✅ New cookies:', {
-      hasAccessToken: !!newCookies.access_token,
-      hasRefreshToken: !!newCookies.refresh_token,
+    // 4. Check if client stored new token
+    const newClientToken = authTokenManager.getAccessToken();
+    console.log('✅ New client token:', {
+      hasToken: !!newClientToken,
+      tokenPreview: newClientToken ? `${newClientToken.substring(0, 20)}...` : null,
     });
     
-    if (newCookies.access_token) {
-      console.log('✅ SUCCESS: New access token set!');
+    // 5. Check server cache (via API call)
+    const testResponse = await fetch('/api/schemas?summary=true', {
+      credentials: 'include',
+    });
+    console.log('✅ Server cache test:', {
+      status: testResponse.status,
+      authenticated: testResponse.status === 200,
+    });
+    
+    if (newClientToken && testResponse.status === 200) {
+      console.log('✅ SUCCESS: Token refresh and server cache working!');
     } else {
-      console.log('❌ FAILED: No new access token set');
+      console.log('❌ FAILED: Check server logs for details');
     }
   } catch (error) {
     console.error('❌ Refresh error:', error);
@@ -258,13 +304,18 @@ testRefresh();
 
 - [ ] Access token refresh works when access token expires
 - [ ] Refresh token is used to get new access token
-- [ ] New access token cookie is set with correct expiration
+- [ ] Server stores new access token in global cache
+- [ ] Client stores new access token in memory
 - [ ] Original request retries successfully after refresh
+- [ ] Server cache lookup works when client token is missing
+- [ ] External tokens validated correctly (decode without signature verification)
 - [ ] Redirect to login when refresh token is missing
 - [ ] Redirect to login when refresh token is expired
 - [ ] No infinite redirect loops
 - [ ] Client-side interceptor works (401 → refresh → retry)
-- [ ] Server-side middleware works (expired token → refresh → continue)
-- [ ] Console logs show refresh activity
+- [ ] Server-side cache lookup works (refresh token → access token from cache)
+- [ ] Console logs show refresh activity (`[AUTH_TOKEN]`, `[REFRESH_API]`)
+- [ ] Server logs show cache operations (`[ServerTokenCache]`, `[API_AUTH]`)
 - [ ] Network tab shows refresh calls
+- [ ] Server cache persists across requests (check `cacheSize` in logs)
 
