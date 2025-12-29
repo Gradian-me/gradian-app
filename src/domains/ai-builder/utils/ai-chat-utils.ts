@@ -431,25 +431,27 @@ When creating Mermaid diagrams in your output, follow these rules strictly to en
 **Syntax:**
 \`\`\`mermaid
 flowchart TD
-    Start([Start]) --> Step1[Step 1: Action]
+    Start --> Step1[Step 1: Action]
     Step1 --> Decision{Decision Point}
     Decision -->|Yes| Step2[Step 2: Action A]
     Decision -->|No| Step3[Step 3: Action B]
-    Step2 --> End([End])
+    Step2 --> End
     Step3 --> End
 \`\`\`
 
 **Requirements:**
 - Use \`flowchart TD\` (top-down) or \`flowchart LR\` (left-right)
-- Use \`([Start])\` and \`([End])\` for start/end nodes (rounded rectangles)
+- Use \`([Start])\` and \`([End])\` for start/end nodes (rounded rectangles) - parentheses here are shape syntax, NOT content
 - Use \`{Decision}\` for decision points (diamonds)
 - Use \`[Action]\` for process steps (rectangles)
-- Label edges/arrows clearly when needed: \`Node1 -->|Label| Node2\`
-- Keep labels concise and descriptive
+- **NEVER use parentheses in node names or labels** - use underscores instead
+- **Label edges/arrows using pipe syntax**: \`Node1 -->|Label| Node2\` (this syntax is ONLY allowed in flowcharts, not in any other diagram type)
+- **IMPORTANT**: The \`|Label|\` syntax with pipes is EXCLUSIVE to flowcharts - do NOT use it in stateDiagram-v2, mindmap, timeline, or journey diagrams
+- Keep labels concise and descriptive (without parentheses)
 - Each statement MUST be on its own line with proper spacing
 - Include all decision points, branches, and alternative flows
 - Show complete workflows, not just happy paths
-- Use descriptive node labels
+- Use descriptive node labels (without parentheses)
 
 ### 📋 StateDiagram-v2 Rules (for state changes)
 
@@ -469,13 +471,22 @@ stateDiagram-v2
 
 **CRITICAL REQUIREMENTS:**
 
-1. **Start and End States:**
+1. **NO PARENTHESES - ABSOLUTE RULE:**
+   - **NEVER use parentheses in state names, node names, transition labels, or any content**
+   - **Parentheses are FORBIDDEN in stateDiagram-v2 diagrams**
+   - Example: \`Check_Stop_Code\` (correct)
+   - Example: \`Check(Stop)Code\` (WRONG - will cause parsing errors)
+   - Example: \`State1 --> State2 : Label_Note\` (correct)
+   - Example: \`State1 --> State2 : Label (Note)\` (WRONG - parentheses not allowed)
+   - If you need to include additional information, use underscores, hyphens, or separate states
+
+2. **Start and End States:**
    - **ALWAYS use \`[*]\` for start and end states**
    - **NEVER use custom labels like "Start", "End", "Begin", or "Finish"**
    - Example: \`[*] --> Initial_State\` (correct)
    - Example: \`Start --> Initial_State\` (WRONG)
 
-2. **Node Names:**
+3. **Node Names:**
    - **NEVER use spaces in node names** - use underscores instead
    - Example: \`Check_Stop_Code\` (correct)
    - Example: \`Check Stop Code\` (WRONG - will cause errors)
@@ -483,20 +494,15 @@ stateDiagram-v2
    - All node names must be single words or use underscores to separate words
    - Keep node names short and descriptive
 
-3. **Transitions:**
-   - **NEVER use \`|Label|\` syntax in stateDiagram-v2** (this is for flowcharts only)
-   - **If you need labels, use the colon syntax**: \`State1 --> State2 : Label\`
+4. **Transitions:**
+   - **NEVER use \`|Label|\` syntax in stateDiagram-v2** - this pipe syntax is ONLY for flowcharts
+   - **The \`|Label|\` syntax is EXCLUSIVE to flowcharts** - it will cause parse errors in stateDiagram-v2
+   - **If you need labels, use the colon syntax**: \`State1 --> State2 : Label\` (no parentheses in labels)
    - Simple transitions without labels: \`State1 --> State2\` (correct)
    - Labeled transitions: \`State1 --> State2 : Label\` (correct)
-   - **WRONG**: \`State1 -->|Label| State2\` (this syntax causes parse errors in stateDiagram-v2)
-   - **WRONG**: \`State1 -->|Label| State2\` (use \`State1 --> State2 : Label\` instead)
+   - **WRONG**: \`State1 -->|Label| State2\` (this syntax causes parse errors in stateDiagram-v2 - use colon syntax instead)
+   - **WRONG**: \`State1 --> State2 : Label (Note)\` (parentheses not allowed)
    - If you don't need labels, use simple transitions: \`State1 --> State2\`
-
-4. **No Parentheses:**
-   - **DO NOT include parentheses inside the diagram**
-   - Do not use parentheses in node names or transitions
-   - Example: \`Check_Stop_Code\` (correct)
-   - Example: \`Check(Stop)Code\` (WRONG)
 
 5. **Structure:**
    - Model decision points, not just steps
@@ -522,7 +528,9 @@ mindmap
 **Requirements:**
 - Start with a root node (main subject)
 - Use indentation to show hierarchy (2 spaces per level)
-- Keep node names concise and descriptive
+- **NEVER use parentheses in node names** - use underscores instead
+- **NEVER use \`|Label|\` syntax** - this pipe syntax is ONLY for flowcharts, not mindmaps
+- Keep node names concise and descriptive (without parentheses)
 - Use underscores for multi-word nodes if needed
 - Each level should be indented consistently
 - Show relationships through hierarchy structure
@@ -541,11 +549,13 @@ timeline
 \`\`\`
 
 **Requirements:**
-- Always include a title using \`title Timeline Title\`
+- Always include a title using \`title Timeline Title\` (no parentheses in title)
 - Use phases or time periods as main sections
+- **NEVER use parentheses in phase or event names** - use underscores or hyphens instead
+- **NEVER use \`|Label|\` syntax** - this pipe syntax is ONLY for flowcharts, not timelines
 - Multiple events can share the same phase (indent with spaces to align with the colon)
 - Use colons (\`:\`) to separate phase from event
-- Keep phase and event names concise
+- Keep phase and event names concise (without parentheses)
 - Show chronological progression from top to bottom
 - Each phase/event must be on its own line
 
@@ -563,24 +573,51 @@ journey
 \`\`\`
 
 **Requirements:**
-- Always include a title using \`title Journey Title\`
+- Always include a title using \`title Journey Title\` (no parentheses in title)
 - Use \`section\` to group related actions
 - Format: \`Action Name: Score: Actor1, Actor2\`
+- **NEVER use parentheses in action names, section names, or actor names** - use underscores instead
+- **NEVER use \`|Label|\` syntax** - this pipe syntax is ONLY for flowcharts, not journeys
 - Score is typically 1-5 (satisfaction, importance, effort, etc.)
-- Multiple actors can be listed (comma-separated)
+- Multiple actors can be listed (comma-separated, no parentheses)
 - Each action must be on its own line
-- Use descriptive action names
+- Use descriptive action names (without parentheses)
 - Show progression through sections
 - Indent actions under their section (2 spaces)
 
 ### ✅ General Mermaid Requirements
+
+**🚫 CRITICAL: NO PARENTHESES RULE**
+- **NEVER use parentheses in node names, state names, labels, or any content within Mermaid diagrams**
+- **NEVER use parentheses in transition labels, action names, phase names, or any text content**
+- Parentheses are ONLY allowed in flowchart syntax for node shapes: \`([Start])\` and \`([End])\` (these are shape delimiters, not content)
+- **ALL other uses of parentheses are FORBIDDEN and will cause parsing errors**
+- Examples of FORBIDDEN usage:
+  - ❌ \`State(With)Parentheses\` → Use \`State_With_Parentheses\`
+  - ❌ \`Node(Name)\` → Use \`Node_Name\`
+  - ❌ \`Action (Step 1)\` → Use \`Action_Step_1\` or \`Action_Step1\`
+  - ❌ \`Phase (1)\` → Use \`Phase_1\` or \`Phase1\`
+  - ❌ \`State1 --> State2 : Label (Note)\` → Use \`State1 --> State2 : Label_Note\`
+- This rule applies to ALL diagram types: flowchart, stateDiagram-v2, mindmap, timeline, and journey
+
+**🚫 CRITICAL: PIPE SYNTAX \`|Label|\` RULE**
+- **The \`|Label|\` syntax with pipes is EXCLUSIVE to flowcharts ONLY**
+- **NEVER use \`|Label|\` syntax in stateDiagram-v2, mindmap, timeline, or journey diagrams**
+- **Flowcharts**: Use \`Node1 -->|Label| Node2\` for labeled edges (correct)
+- **StateDiagram-v2**: Use \`State1 --> State2 : Label\` with colon syntax instead (NOT \`|Label|\`)
+- **Mindmap, Timeline, Journey**: These diagram types do NOT support edge labels with pipes
+- Using \`|Label|\` in non-flowchart diagrams will cause parsing errors
+- Examples:
+  - ✅ Flowchart: \`Decision -->|Yes| Step1\` (correct)
+  - ❌ StateDiagram-v2: \`State1 -->|Label| State2\` → Use \`State1 --> State2 : Label\` instead
+  - ❌ Mindmap/Timeline/Journey: Do not use \`|Label|\` syntax at all
 
 **Formatting:**
 - Each statement MUST be on its own line with proper spacing
 - Use proper indentation for readability
 - Include all decision points, branches, and alternative flows
 - Show complete workflows, not just happy paths
-- Use descriptive node/state labels
+- Use descriptive node/state labels (without parentheses)
 
 **Completeness:**
 - Create complete, comprehensive diagrams
@@ -595,10 +632,10 @@ journey
 
 ### 🚫 Common Mistakes to Avoid
 
+- ❌ **USING PARENTHESES IN ANY MERMAID CONTENT** - This is the #1 mistake. NEVER use parentheses in node names, state names, labels, transition labels, action names, phase names, section names, or any text content. Use underscores or hyphens instead. The ONLY exception is flowchart shape syntax: \`([Start])\` and \`([End])\` which are shape delimiters, not content.
+- ❌ **USING \`|Label|\` PIPE SYNTAX IN NON-FLOWCHART DIAGRAMS** - The \`|Label|\` syntax is EXCLUSIVE to flowcharts. NEVER use it in stateDiagram-v2, mindmap, timeline, or journey diagrams. In stateDiagram-v2, use colon syntax: \`State1 --> State2 : Label\` instead.
 - ❌ Using spaces in stateDiagram-v2 node names (use underscores)
 - ❌ Using custom labels for start/end states instead of \`[*]\`
-- ❌ Using \`|Label|\` syntax in stateDiagram-v2 (use \`State1 --> State2 : Label\` instead, or \`State1 --> State2\` without labels)
-- ❌ Using parentheses in node names or diagrams
 - ❌ Using \`stateDiagram-v2\` for process flows (use \`flowchart\` instead)
 - ❌ Using \`flowchart\` for state machines (use \`stateDiagram-v2\` instead)
 - ❌ Using wrong diagram type for the use case (choose flowchart, stateDiagram-v2, mindmap, timeline, or journey based on content)
@@ -612,10 +649,10 @@ journey
 **Correct Flowchart (process flow):**
 \`\`\`mermaid
 flowchart TD
-    Start([Start]) --> Validate{Valid Input?}
+    Start --> Validate{Valid Input?}
     Validate -->|Yes| Process[Process Data]
     Validate -->|No| Error[Show Error]
-    Process --> End([End])
+    Process --> End
     Error --> End
 \`\`\`
 
@@ -674,10 +711,14 @@ journey
 \`\`\`
 
 **Incorrect Examples:**
-- \`Start --> State\` (should use \`[*] --> State\`)
-- \`Check Stop Code\` (should use \`Check_Stop_Code\`)
-- \`State1 -->|Label| State2\` (WRONG - use \`State1 --> State2 : Label\` for labeled transitions, or \`State1 --> State2\` without labels)
-- \`State(With)Parentheses\` (should use \`State_With_Parentheses\`)
+- ❌ \`State(With)Parentheses\` → **WRONG** - Use \`State_With_Parentheses\` (NEVER use parentheses in node/state names)
+- ❌ \`Action (Step 1)\` → **WRONG** - Use \`Action_Step_1\` or \`Action_Step1\` (NEVER use parentheses in action names)
+- ❌ \`State1 --> State2 : Label (Note)\` → **WRONG** - Use \`State1 --> State2 : Label_Note\` (NEVER use parentheses in transition labels)
+- ❌ \`Phase (1)\` → **WRONG** - Use \`Phase_1\` or \`Phase1\` (NEVER use parentheses in phase names)
+- ❌ \`State1 -->|Label| State2\` in stateDiagram-v2 → **WRONG** - The \`|Label|\` pipe syntax is ONLY for flowcharts. In stateDiagram-v2, use \`State1 --> State2 : Label\` with colon syntax instead
+- ❌ \`State1 -->|Label| State2\` in mindmap/timeline/journey → **WRONG** - These diagram types do NOT support \`|Label|\` syntax at all
+- ❌ \`Start --> State\` → **WRONG** - Should use \`[*] --> State\`
+- ❌ \`Check Stop Code\` → **WRONG** - Should use \`Check_Stop_Code\`
 
 ---
 

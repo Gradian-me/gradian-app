@@ -1638,27 +1638,5 @@
     "id": "01KDHY0XBV610B9DKC9H1ACNAG",
     "createdAt": "2025-12-28T07:33:33.179Z",
     "updatedAt": "2025-12-28T07:33:33.179Z"
-  },
-  {
-    "id": "01KDK3NMJQSJQWPESSB048P4F0",
-    "sourceSchema": "users",
-    "sourceId": "01KDK3NM3EEJ7DJ81BJ0JDAWDT",
-    "targetSchema": "external-nodes",
-    "targetId": "form-based",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "authentication-type",
-    "createdAt": "2025-12-28T18:31:29.622Z",
-    "updatedAt": "2025-12-28T18:31:29.622Z"
-  },
-  {
-    "id": "01KDK3V394QEEN9EKSZFX0FA8M",
-    "sourceSchema": "users",
-    "sourceId": "01KDK3V3153CFBWENVSF15E7RR",
-    "targetSchema": "external-nodes",
-    "targetId": "active-directory",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "authentication-type",
-    "createdAt": "2025-12-28T18:34:28.516Z",
-    "updatedAt": "2025-12-28T18:34:28.516Z"
   }
 ]
