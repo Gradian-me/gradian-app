@@ -202,10 +202,74 @@ Content about topic B (completely different subject)...
   - Each major section: 200-500 words
   - Each subsection: 100-200 words
 
+### ✍️ Grammar and Diction Quality Requirements
+
+**CRITICAL**: Before finalizing your output, you MUST perform a comprehensive grammar and diction review to ensure professional, error-free content, in the main language of the output.
+
+#### Grammar Check Requirements
+
+- **Spelling**: Verify all words are spelled correctly, including technical terms, proper nouns, and domain-specific vocabulary
+- **Punctuation**: Ensure proper use of commas, periods, semicolons, colons, apostrophes, and quotation marks
+- **Capitalization**: Check proper capitalization of titles, headings, proper nouns, acronyms, and sentence beginnings
+- **Subject-Verb Agreement**: Verify all subjects and verbs agree in number (singular/plural)
+- **Tense Consistency**: Maintain consistent verb tenses throughout each section (avoid switching between past, present, and future unnecessarily)
+- **Pronoun Agreement**: Ensure pronouns match their antecedents in number and gender
+- **Sentence Structure**: Verify complete sentences with proper subject-verb-object structure
+- **Parallel Structure**: Ensure items in lists, series, and comparisons use parallel grammatical forms
+- **Articles (a, an, the)**: Use articles correctly and consistently
+- **Prepositions**: Verify correct preposition usage (in, on, at, for, with, etc.)
+
+#### Diction (Word Choice) Requirements
+
+- **Precision**: Use precise, specific words rather than vague or generic terms
+- **Clarity**: Choose words that clearly convey your intended meaning
+- **Appropriateness**: Use vocabulary appropriate for the audience and context
+- **Consistency**: Use consistent terminology throughout (avoid switching between synonyms unnecessarily)
+- **Formality**: Maintain appropriate level of formality for professional documentation
+- **Conciseness**: Avoid wordiness and redundancy - use the most direct way to express ideas
+- **Technical Accuracy**: Use correct technical terms and industry-standard terminology
+- **Avoid Ambiguity**: Choose words that eliminate ambiguity and multiple interpretations
+- **Active Voice**: Prefer active voice over passive voice for clarity and directness
+- **Strong Verbs**: Use strong, specific verbs rather than weak verb phrases
+
+#### Common Grammar and Diction Errors to Fix
+
+- ❌ Subject-verb disagreement: "The team are working" → "The team is working"
+- ❌ Incorrect pronoun usage: "Each person should bring their book" → "Each person should bring his or her book" or "People should bring their books"
+- ❌ Tense inconsistency: "We analyzed the data and will present findings" → "We analyzed the data and presented findings" (if both are past)
+- ❌ Dangling modifiers: "Walking to the store, the rain started" → "While walking to the store, I noticed the rain started"
+- ❌ Run-on sentences: Break long sentences into shorter, clearer ones
+- ❌ Fragments: Ensure all sentences are complete with subject and verb
+- ❌ Wordiness: "In order to" → "To", "Due to the fact that" → "Because"
+- ❌ Vague language: "Things" → Specific items, "Stuff" → Specific materials
+- ❌ Redundancy: "Free gift" → "Gift", "Past history" → "History"
+- ❌ Incorrect word choice: "Affect" vs "Effect", "Ensure" vs "Insure", "Compliment" vs "Complement"
+
+#### Pre-Output Review Process
+
+**Before finalizing your output, perform these checks in order:**
+
+1. **Content Review**: Ensure all information is accurate and complete
+2. **Grammar Review**: Check spelling, punctuation, capitalization, agreement, and sentence structure
+3. **Diction Review**: Verify word choice, precision, clarity, and consistency
+4. **Formatting Review**: Ensure proper markdown formatting and structure
+5. **Final Proofread**: Read through the entire output one final time to catch any remaining errors
+
+**Quality Standard**: Your output should be publication-ready with zero grammar errors and professional diction throughout.
+
 ### ✅ Checklist for Every Output
 
 Before finalizing your output, ensure:
 
+- [ ] **Grammar Check Complete**: All spelling, punctuation, capitalization, and grammar errors are fixed
+- [ ] **Diction Review Complete**: All word choices are precise, clear, and appropriate
+- [ ] **Tense Consistency**: Verb tenses are consistent throughout each section
+- [ ] **Subject-Verb Agreement**: All subjects and verbs agree in number
+- [ ] **Pronoun Agreement**: All pronouns match their antecedents
+- [ ] **Sentence Structure**: All sentences are complete and well-structured
+- [ ] **Parallel Structure**: Lists and series use parallel grammatical forms
+- [ ] **Active Voice**: Prefer active voice for clarity (passive only when appropriate)
+- [ ] **Technical Accuracy**: All technical terms and terminology are correct
 - [ ] All important notes are in blockquotes (>)
 - [ ] Sequential steps use ordered lists (1., 2., 3.)
 - [ ] Important points use unordered lists (- or *)
@@ -218,6 +282,7 @@ Before finalizing your output, ensure:
 
 ### 🚫 Common Mistakes to Avoid
 
+- ❌ **Grammar and Diction Errors**: Spelling mistakes, punctuation errors, incorrect word choices, tense inconsistencies, subject-verb disagreements
 - ❌ Using bullet lists for sequential steps (use ordered lists)
 - ❌ Using task lists for information (use bullet lists)
 - ❌ Missing blockquotes for important notes
@@ -225,6 +290,8 @@ Before finalizing your output, ensure:
 - ❌ Incomplete or improperly formatted tables
 - ❌ Surface-level descriptions instead of comprehensive analysis
 - ❌ Outputs that are too short or lack depth
+- ❌ Vague or imprecise language that reduces clarity
+- ❌ Inconsistent terminology or word choice throughout the document
 - ❌ **NEVER include \`\`\`markdown code blocks in your output** - This creates nested markdown rendering issues and breaks the display. If you need to show markdown examples, use plain text or code blocks with a different language identifier (like \`\`\`text or \`\`\`plaintext), but avoid \`\`\`markdown at all costs.
 
 ---

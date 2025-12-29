@@ -1,3 +1,8 @@
-// Voice-related utilities will be exported here
-// Example: export { analyzeAudioLevel } from './audioAnalysis';
+// Voice-related utilities
+export {
+  validateAudioFile,
+  fileToBlob,
+  formatFileSize,
+  getFileExtension,
+} from './audio-file-utils';
 

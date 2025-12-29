@@ -12,7 +12,7 @@ import {
 import { VoicePoweredOrb } from "@/components/ui/voice-powered-orb";
 import { TextSwitcher } from "@/components/ui/text-switcher";
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff, Sparkles, Play, Pause, RotateCcw, Circle, ArrowUp, Square, AudioLines } from "lucide-react";
+import { Mic, MicOff, Sparkles, Play, Pause, RotateCcw, Circle, ArrowUp, Square, AudioLines, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
 import dynamic from "next/dynamic";
@@ -24,6 +24,9 @@ import { ButtonMinimal } from "@/gradian-ui/form-builder/form-elements/component
 import { MetricCard } from "@/gradian-ui/analytics/indicators/metric-card";
 import { loggingCustom } from "@/gradian-ui/shared/utils/logging-custom";
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { AudioFileUpload } from "./AudioFileUpload";
+import { fileToBlob } from "../utils/audio-file-utils";
+import { TextShimmerWave } from "@/components/ui/text-shimmer-wave";
 
 const VoiceVisualizer = dynamic(
   () =>
@@ -64,6 +67,8 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   const [tokenUsage, setTokenUsage] = useState<{ usage?: any; estimated_cost?: any } | null>(null);
   const [shouldAutoTranscribe, setShouldAutoTranscribe] = useState(false);
   const [isRequestingPermission, setIsRequestingPermission] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedFileBlob, setUploadedFileBlob] = useState<Blob | null>(null);
   
   const {
     isRecording,
@@ -87,22 +92,25 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   // Track if we've loaded the current blob to prevent infinite loops
   const loadedBlobRef = useRef<Blob | null>(null);
 
-  // Load recorded blob into voice visualizer when available
+  // Determine which blob to use (uploaded file or recorded)
+  const activeBlob = uploadedFileBlob || recordedBlob;
+
+  // Load recorded or uploaded blob into voice visualizer when available
   useEffect(() => {
     // Only load if we have a new blob (different reference)
-    if (recordedBlob && recordedBlob !== loadedBlobRef.current) {
+    if (activeBlob && activeBlob !== loadedBlobRef.current) {
       try {
-        setPreloadedAudioBlob(recordedBlob);
-        loadedBlobRef.current = recordedBlob;
-        loggingCustom(LogType.CLIENT_LOG, 'log', `Audio blob loaded into visualizer: ${recordedBlob.size} bytes, type: ${recordedBlob.type}`);
+        setPreloadedAudioBlob(activeBlob);
+        loadedBlobRef.current = activeBlob;
+        loggingCustom(LogType.CLIENT_LOG, 'log', `Audio blob loaded into visualizer: ${activeBlob.size} bytes, type: ${activeBlob.type || 'unknown'}`);
       } catch (error) {
         loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to set preloaded audio blob: ${error instanceof Error ? error.message : String(error)}`);
       }
-    } else if (!recordedBlob) {
+    } else if (!activeBlob) {
       // Clear the ref when blob is cleared
       loadedBlobRef.current = null;
     }
-  }, [recordedBlob]); // Only depend on recordedBlob, setPreloadedAudioBlob is stable
+  }, [activeBlob, setPreloadedAudioBlob]); // Include setPreloadedAudioBlob in dependencies
 
   const handleStartRecording = useCallback(async () => {
     // Clear any previous errors when attempting to start recording
@@ -238,6 +246,8 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
       setTranscriptionError(null);
       setTokenUsage(null);
       setShouldAutoTranscribe(false);
+      setUploadedFile(null);
+      setUploadedFileBlob(null);
       // Reset the loaded blob ref
       loadedBlobRef.current = null;
     } else {
@@ -289,24 +299,57 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
     setTranscriptionError(null);
     setTokenUsage(null);
     clearRecording();
+    setUploadedFile(null);
+    setUploadedFileBlob(null);
     if (clearCanvas) {
       clearCanvas();
     }
+  };
+
+  const handleFileSelect = async (file: File) => {
+    try {
+      setTranscriptionError(null);
+      // Clear any existing recording
+      clearRecording();
+      setTranscription(null);
+      setTokenUsage(null);
+      
+      // Convert file to blob for processing
+      const blob = await fileToBlob(file);
+      setUploadedFile(file);
+      setUploadedFileBlob(blob);
+      
+      loggingCustom(LogType.CLIENT_LOG, 'log', `Audio file selected: ${file.name}, size: ${file.size} bytes, type: ${file.type}`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process file';
+      setTranscriptionError(errorMessage);
+      loggingCustom(LogType.CLIENT_LOG, 'error', `File processing error: ${errorMessage}`);
+    }
+  };
+
+  const handleFileError = (error: string) => {
+    setTranscriptionError(error);
   };
 
   const handlePlayPause = () => {
     togglePauseResume?.();
   };
 
-  const handleTranscribe = async () => {
-    if (!recordedBlob) return;
+  const handleTranscribe = useCallback(async () => {
+    const blobToTranscribe = uploadedFileBlob || recordedBlob;
+    if (!blobToTranscribe) return;
 
     setIsTranscribing(true);
     setTranscriptionError(null);
 
     try {
       const formData = new FormData();
-      formData.append('file', recordedBlob, 'recording.webm');
+      // Use uploaded file if available, otherwise use recorded blob
+      if (uploadedFile) {
+        formData.append('file', uploadedFile);
+      } else {
+        formData.append('file', blobToTranscribe, 'recording.webm');
+      }
       formData.append('language', outputLanguage);
 
       // Use the new unified route with voice-transcription agent
@@ -353,18 +396,19 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
     } finally {
       setIsTranscribing(false);
     }
-  };
+  }, [uploadedFileBlob, recordedBlob, uploadedFile, outputLanguage]);
 
   // Auto-transcribe when blob is ready after stop-and-transcribe
   useEffect(() => {
-    if (shouldAutoTranscribe && recordedBlob && !isRecording) {
+    const blobToTranscribe = uploadedFileBlob || recordedBlob;
+    if (shouldAutoTranscribe && blobToTranscribe && !isRecording) {
       setShouldAutoTranscribe(false);
       // Small delay to ensure blob is fully processed
       setTimeout(() => {
         handleTranscribe();
       }, 200);
     }
-  }, [shouldAutoTranscribe, recordedBlob, isRecording]);
+  }, [shouldAutoTranscribe, recordedBlob, uploadedFileBlob, isRecording, handleTranscribe]);
 
   const handleApply = () => {
     if (transcription) {
@@ -416,8 +460,20 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
         </DialogHeader>
 
         <div className="flex flex-col items-center space-y-6 px-6 pb-6 overflow-y-auto flex-1 min-h-0">
+          {/* File Upload - Show when no recording or uploaded file exists */}
+          {!activeBlob && !isRecording && (
+            <div className="w-full">
+              <AudioFileUpload
+                onFileSelect={handleFileSelect}
+                onError={handleFileError}
+                disabled={isTranscribing || isRecording}
+                className="mb-4"
+              />
+            </div>
+          )}
+
           {/* Orb Container - Show when not recording and no recording exists, or during recording */}
-          {!recordedBlob && isOpen && (
+          {!activeBlob && isOpen && (
             <div className="w-full h-96 relative rounded-xl overflow-hidden">
               <VoicePoweredOrb
                 enableVoiceControl={false}
@@ -439,8 +495,8 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
             </div>
           )}
 
-          {/* Voice Visualizer - Show when recording exists */}
-          {recordedBlob && !isRecording && (
+          {/* Voice Visualizer - Show when recording or uploaded file exists */}
+          {activeBlob && !isRecording && (
             <div className="w-full">
               <VoiceVisualizer
                 controls={recorderControls}
@@ -546,7 +602,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
 
           {/* Control Buttons */}
           <div className="flex items-center justify-center w-full gap-3">
-            {!recordedBlob ? (
+            {!activeBlob ? (
               // Recording Controls - Centered
               <div className="flex items-center gap-3">
                 {!isRecording ? (
@@ -601,7 +657,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                 )}
               </div>
             ) : (
-              // Playback Controls - Show when recording exists
+              // Playback Controls - Show when recording or uploaded file exists
               <div className="flex items-center justify-between w-full gap-3">
                 <div className="flex items-center gap-3 px-4 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                   <ButtonMinimal
@@ -633,6 +689,17 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                       }, 100);
                     }}
                   />
+                  {/* Upload File Button - Allows uploading a file */}
+                  <ButtonMinimal
+                    icon={Upload}
+                    title="Upload File"
+                    color="blue"
+                    size="md"
+                    onClick={() => {
+                      // Clear current recording/file and show upload
+                      handleClear();
+                    }}
+                  />
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-40 h-10">
@@ -652,13 +719,19 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                     variant="default"
                     size="default"
                     className="h-10 px-8 min-w-[200px]"
-                    disabled={isTranscribing || !!transcription}
+                    disabled={isTranscribing || !!transcription || !activeBlob}
                   >
                     {isTranscribing ? (
-                      <>
-                        <Sparkles className="w-5 h-5 me-3 animate-pulse" />
-                        Transcribing...
-                      </>
+                      <div className="flex items-center gap-3">
+                        <Sparkles className="w-5 h-5 animate-pulse" />
+                        <TextShimmerWave
+                          duration={1.5}
+                          spread={1.2}
+                          className="text-sm font-medium"
+                        >
+                          Transcribing...
+                        </TextShimmerWave>
+                      </div>
                     ) : (
                       <>
                         <Sparkles className="w-5 h-5 me-3" />
@@ -734,13 +807,13 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
           <p className="text-muted-foreground text-center max-w-md text-sm">
             {isRecording
               ? "Speak clearly into your microphone."
-              : recordedBlob
-              ? "You can start over or transcribe the recording."
+              : activeBlob
+              ? "You can start over, upload a different file, or transcribe the audio."
               : (
                   <>
-                    Click the button above to start recording.
+                    Upload an audio file (MP4, WAV, etc.) or click the button above to start recording.
                     <br />
-                    Make sure your microphone access is granted.
+                    Make sure your microphone access is granted if recording.
                   </>
                 )}
           </p>

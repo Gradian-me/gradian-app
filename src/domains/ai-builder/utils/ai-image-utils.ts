@@ -26,6 +26,19 @@ export const GENERAL_IMAGE_PROMPT = `CRITICAL TEXT GENERATION REQUIREMENTS:
 
 You MUST prioritize text clarity and readability above all else.
 
+ABSOLUTE LANGUAGE REQUIREMENT - NO EXCEPTIONS:
+- ALL text displayed in the image MUST be in English ONLY
+- NEVER display any non-English text, characters, or words in the image under ANY circumstances
+- This includes but is not limited to: Farsi, Arabic, Chinese, Japanese, Korean, Russian, Spanish, French, German, Hindi, or ANY other non-English language
+- If the user prompt contains text in any language other than English, you MUST:
+  1. IMMEDIATELY translate ALL non-English text to English
+  2. Display ONLY the translated English text in the image
+  3. NEVER display the original non-English text
+- Even if the user explicitly requests non-English text, you MUST translate it to English and display only the English translation
+- If the user wants to show multilingual content, translate everything to English first, then display only the English translations
+- This is a MANDATORY requirement with ZERO exceptions - no non-English text is allowed in any form
+- This ensures maximum readability, accessibility, and consistency
+
 Text Generation Rules:
 - All text in the image must be perfectly readable, clear, and legible
 - Use high contrast between text and background (dark text on light background or light text on dark background)
@@ -35,14 +48,6 @@ Text Generation Rules:
 - Avoid text distortion, blur, or overlapping characters
 - Do not use decorative fonts that sacrifice readability
 - Ensure proper spacing between letters, words, and lines
-
-Language Translation Requirements:
-- If the user prompt contains text in languages other than English (such as Farsi, Arabic, Chinese, etc.), you MUST:
-  1. First translate ALL non-English text to English
-  2. Then display the translated English text in the image
-- NEVER display non-English text directly in the image without translation
-- If the user wants to show multilingual content, translate everything to English first, then display it
-- This ensures maximum readability and accessibility
 
 Text Accuracy:
 - Generate text exactly as specified - no hallucinations or made-up content

@@ -514,11 +514,6 @@ export function AiBuilderForm({
     
     setFormValues(initialValues);
     
-    // Notify parent of formValues change
-    if (onFormValuesChange) {
-      onFormValuesChange(initialValues);
-    }
-    
     // Reset errors and touched when agent changes
     setFormErrors({});
     setTouched({});
@@ -538,11 +533,19 @@ export function AiBuilderForm({
       setFormErrors(initialErrors);
     }
     
-    // Build initial concatenated prompt and update userPrompt
-    const initialPrompt = buildConcatenatedPromptForResetRef.current(initialValues);
-    if (initialPrompt) {
-      onPromptChange(initialPrompt);
-    }
+    // Defer parent callbacks to avoid updating parent state during render
+    queueMicrotask(() => {
+      // Notify parent of formValues change
+      if (onFormValuesChange) {
+        onFormValuesChange(initialValues);
+      }
+      
+      // Build initial concatenated prompt and update userPrompt
+      const initialPrompt = buildConcatenatedPromptForResetRef.current(initialValues);
+      if (initialPrompt) {
+        onPromptChange(initialPrompt);
+      }
+    });
   }, [selectedAgentId, selectedAgent, userPrompt, onFormValuesChange, onPromptChange, selectedLanguage]); // Only reset when agent ID changes, not when buildConcatenatedPrompt changes
 
   // Track previous selectedLanguage to avoid unnecessary updates
@@ -630,7 +633,10 @@ export function AiBuilderForm({
       const initialPrompt = buildConcatenatedPrompt(formValues);
       // Always update to ensure prompt is set, even if empty (for 'en' language case)
       // This ensures the preview can show the current state
-      onPromptChange(initialPrompt);
+      // Defer to avoid updating parent state during render
+      queueMicrotask(() => {
+        onPromptChange(initialPrompt);
+      });
     }
   }, [selectedAgentId, selectedAgent, formFields.length, formValues, buildConcatenatedPrompt, onPromptChange]);
 
