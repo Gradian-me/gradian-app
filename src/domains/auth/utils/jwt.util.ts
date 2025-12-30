@@ -112,26 +112,48 @@ export function extractTokenFromCookies(cookies: string | null, cookieName: stri
 
   const cookieMap = new Map<string, string>();
   cookies.split(';').forEach((cookie) => {
-    const [name, ...valueParts] = cookie.trim().split('=');
+    const trimmedCookie = cookie.trim();
+    if (!trimmedCookie) {
+      return; // Skip empty cookie strings
+    }
+    
+    const [name, ...valueParts] = trimmedCookie.split('=');
+    if (!name) {
+      return; // Skip if no name found
+    }
+    
+    const trimmedName = name.trim();
     const value = valueParts.join('=');
-    // Store with original case for exact match, but also enable case-insensitive lookup
-    cookieMap.set(name, decodeURIComponent(value));
+    
+    // Safely decode URI component
+    let decodedValue = value;
+    try {
+      decodedValue = decodeURIComponent(value);
+    } catch (error) {
+      // If decoding fails, use original value (might not be encoded)
+      decodedValue = value;
+    }
+    
+    // Store with trimmed name for exact match, but also enable case-insensitive lookup
+    cookieMap.set(trimmedName, decodedValue);
   });
 
-  // Try exact match first
-  let token = cookieMap.get(cookieName);
+  // Try exact match first (with trimmed cookie name)
+  const trimmedCookieName = cookieName.trim();
+  let token = cookieMap.get(trimmedCookieName);
   
   // If not found, try case-insensitive match
   if (!token) {
     for (const [name, value] of cookieMap.entries()) {
-      if (name.toLowerCase() === cookieName.toLowerCase()) {
+      if (name.toLowerCase() === trimmedCookieName.toLowerCase()) {
         token = value;
         break;
       }
     }
   }
 
-  return token || null;
+  // Return null if token is empty string or falsy
+  return (token && token.trim()) || null;
 }
 
 /**

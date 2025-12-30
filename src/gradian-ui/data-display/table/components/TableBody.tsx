@@ -258,7 +258,7 @@ export function TableBody<T = any>({
                         let textValue: string;
                         let isStructured = false;
                         let isJson = false;
-                        let originalValue: any = value;
+                        const originalValue: any = value;
                         
                         if (value === null || value === undefined) {
                           textValue = '—';

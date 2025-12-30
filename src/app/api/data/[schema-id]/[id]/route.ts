@@ -41,7 +41,7 @@ export async function GET(
   { params }: { params: Promise<{ 'schema-id': string; id: string }> }
 ) {
   // Check authentication (unless route is excluded)
-  const authResult = requireApiAuth(request);
+  const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) {
     return authResult; // Return 401 if not authenticated
   }
@@ -255,7 +255,7 @@ export async function PUT(
   { params }: { params: Promise<{ 'schema-id': string; id: string }> }
 ) {
   // Check authentication (unless route is excluded)
-  const authResult = requireApiAuth(request);
+  const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) {
     return authResult; // Return 401 if not authenticated
   }
@@ -518,7 +518,7 @@ export async function DELETE(
   { params }: { params: Promise<{ 'schema-id': string; id: string }> }
 ) {
   // Check authentication (unless route is excluded)
-  const authResult = requireApiAuth(request);
+  const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) {
     return authResult; // Return 401 if not authenticated
   }

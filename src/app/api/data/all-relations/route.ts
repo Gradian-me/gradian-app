@@ -33,7 +33,7 @@ interface GroupedRelationData {
  */
 export async function GET(request: NextRequest) {
   // Check authentication (unless route is excluded)
-  const authResult = requireApiAuth(request);
+  const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) {
     return authResult; // Return 401 if not authenticated
   }

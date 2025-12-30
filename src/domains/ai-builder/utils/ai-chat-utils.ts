@@ -1,29 +1,555 @@
 /**
  * AI Chat Utilities
- * Handles chat completion requests
+ * Handles chat completion requests with optimized performance and error handling
  */
 
 import { AgentRequestData, AgentResponse } from './ai-agent-utils';
 import { validateAgentFormFields, buildStandardizedPrompt } from './prompt-builder';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType, LOG_CONFIG } from '@/gradian-ui/shared/configs/log-config';
-import { truncateText } from '@/domains/chat/utils/text-utils';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import {
   sanitizePrompt,
   sanitizeErrorMessage,
-  validateAgentId,
 } from './ai-security-utils';
 import {
   validateAgentConfig,
 } from './ai-common-utils';
 import { buildSystemPrompt } from './prompt-concatenation-utils';
 import { callChatApi } from './ai-api-caller';
-import { extractParametersBySectionId } from './ai-shared-utils';
 
-// Performance: Cache AI models to avoid repeated API calls
-let cachedModels: any[] | null = null;
+// ============================================================================
+// Constants
+// ============================================================================
+
+/** Cache TTL for AI models (5 minutes) */
+const MODELS_CACHE_TTL = 5 * 60 * 1000;
+
+/** Default model fallback */
+const DEFAULT_MODEL = 'gpt-4o-mini';
+
+/** Default API base URL for server-side */
+const DEFAULT_API_BASE_URL = 'http://localhost:3000';
+
+/** Output formats that require JSON response format */
+const JSON_RESPONSE_FORMATS = ['json', 'table', 'search-results', 'search-card'] as const;
+
+/** Output formats that should be stored as JSON */
+const JSON_STORAGE_FORMATS = ['table', 'search-results', 'search-card'] as const;
+
+// ============================================================================
+// Types
+// ============================================================================
+
+interface AiModel {
+  id: string;
+  pricing?: {
+    input?: number;
+    output?: number;
+  };
+}
+
+interface PricingResult {
+  inputPricePer1M: number;
+  outputPricePer1M: number;
+  inputPrice: number;
+  outputPrice: number;
+  totalPrice: number;
+}
+
+interface AgentConfig {
+  id: string;
+  label?: string;
+  description?: string;
+  model?: string;
+  requiredOutputFormat?: string;
+  renderComponents?: Array<{
+    name?: string;
+    id?: string;
+    label?: string;
+    component?: string;
+    options?: Array<{
+      id?: string;
+      value?: string;
+      label?: string;
+      description?: string;
+    }>;
+  }>;
+  nextAction?: {
+    label?: string;
+    icon?: string;
+    route?: string;
+  };
+}
+
+interface Annotation {
+  schemaId: string;
+  schemaName: string;
+  annotations: Array<{ id: string; label: string }>;
+}
+
+// ============================================================================
+// Cache Management
+// ============================================================================
+
+/** Cache for AI models to avoid repeated API calls */
+let cachedModels: AiModel[] | null = null;
 let modelsCacheTime: number = 0;
-const MODELS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Clear the models cache (useful for testing or forced refresh)
+ */
+export function clearModelsCache(): void {
+  cachedModels = null;
+  modelsCacheTime = 0;
+}
+
+/**
+ * Get API base URL based on environment
+ */
+function getApiBaseUrl(): string {
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  return process.env.NEXT_PUBLIC_APP_URL || DEFAULT_API_BASE_URL;
+}
+
+/**
+ * Load AI models from API route with caching
+ * Performance: Cache models to avoid repeated API calls
+ * Works on both client and server side
+ */
+async function loadAiModels(): Promise<AiModel[]> {
+  const now = Date.now();
+  
+  // Return cached models if still valid
+  if (cachedModels !== null && (now - modelsCacheTime) < MODELS_CACHE_TTL) {
+    return cachedModels;
+  }
+
+  try {
+    const baseUrl = getApiBaseUrl();
+    const apiUrl = `${baseUrl}/api/ai-models`;
+    
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'default',
+    });
+
+    if (!response.ok) {
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'warn',
+        `Failed to load AI models: ${response.status} ${response.statusText}`
+      );
+      // Cache empty array to prevent repeated failed requests
+      cachedModels = [];
+      modelsCacheTime = now;
+      return cachedModels;
+    }
+
+    const result = await response.json();
+    
+    if (!result.success || !Array.isArray(result.data)) {
+      loggingCustom(LogType.INFRA_LOG, 'warn', 'Invalid AI models API response format');
+      cachedModels = [];
+      modelsCacheTime = now;
+      return cachedModels;
+    }
+    
+    const models: AiModel[] = result.data || [];
+    cachedModels = models;
+    modelsCacheTime = now;
+    return models;
+  } catch (error) {
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'error',
+      `Error loading AI models from API: ${error instanceof Error ? error.message : String(error)}`
+    );
+    // Cache empty array on error to prevent repeated failed requests
+    cachedModels = [];
+    modelsCacheTime = now;
+    return cachedModels;
+  }
+}
+
+// ============================================================================
+// Pricing Calculation
+// ============================================================================
+
+/**
+ * Calculate pricing for token usage
+ * Returns null if model not found or pricing unavailable
+ */
+async function calculatePricing(
+  modelId: string,
+  promptTokens: number,
+  completionTokens: number
+): Promise<PricingResult | null> {
+  const models = await loadAiModels();
+  const model = models.find((m) => m.id === modelId);
+
+  if (!model?.pricing) {
+    return null;
+  }
+
+  const inputPricePerMillion = model.pricing.input ?? 0;
+  const outputPricePerMillion = model.pricing.output ?? 0;
+
+  // Calculate prices (pricing is per 1 million tokens)
+  const TOKENS_PER_MILLION = 1_000_000;
+  const inputPrice = (promptTokens / TOKENS_PER_MILLION) * inputPricePerMillion;
+  const outputPrice = (completionTokens / TOKENS_PER_MILLION) * outputPricePerMillion;
+  const totalPrice = inputPrice + outputPrice;
+
+  return {
+    inputPricePer1M: inputPricePerMillion,
+    outputPricePer1M: outputPricePerMillion,
+    inputPrice,
+    outputPrice,
+    totalPrice,
+  };
+}
+
+// ============================================================================
+// Prompt Building Helpers
+// ============================================================================
+
+/**
+ * Build user prompt from form values or provided userPrompt
+ */
+function buildUserPrompt(
+  agent: AgentConfig,
+  requestData: AgentRequestData
+): string {
+  let userPrompt = requestData.userPrompt || '';
+  
+  if (requestData.formValues && agent.renderComponents) {
+    const builtPrompt = buildStandardizedPrompt(agent, requestData.formValues);
+    if (builtPrompt) {
+      userPrompt = builtPrompt;
+    }
+  }
+
+  return userPrompt;
+}
+
+/**
+ * Append option descriptions to user prompt when bodyParams contain option values
+ * This ensures option descriptions are in the userPrompt (like AiBuilderForm does)
+ */
+function appendOptionDescriptions(
+  userPrompt: string,
+  agent: AgentConfig,
+  bodyParams: Record<string, any>
+): string {
+  if (!bodyParams || Object.keys(bodyParams).length === 0 || !agent.renderComponents) {
+    return userPrompt;
+  }
+
+  const optionDescriptionsParts: string[] = [];
+  
+  for (const field of agent.renderComponents) {
+    const fieldName = field.name || field.id;
+    if (!fieldName) continue;
+
+    const fieldValue = bodyParams[fieldName];
+    
+    if (fieldValue === undefined || fieldValue === null || fieldValue === '') {
+      continue;
+    }
+
+    // For select fields, find the option and append its description
+    if (field.component === 'select' && field.options) {
+      const option = field.options.find(
+        (opt) => opt.id === fieldValue || opt.value === fieldValue
+      );
+      
+      if (option?.description) {
+        const fieldLabel = field.label || fieldName;
+        const optionLabel = option.label || fieldValue;
+        optionDescriptionsParts.push(`${fieldLabel} (${optionLabel}):\n${option.description}`);
+      }
+    }
+  }
+  
+  // Append option descriptions to userPrompt if any were found
+  if (optionDescriptionsParts.length > 0) {
+    return `${userPrompt}\n\n${optionDescriptionsParts.join('\n\n')}`;
+  }
+
+  return userPrompt;
+}
+
+/**
+ * Format annotations in TOON-like format and add to user prompt
+ */
+function formatAnnotationsForPrompt(
+  userPrompt: string,
+  annotations: Annotation[],
+  previousAiResponse: string
+): string {
+  if (!annotations || annotations.length === 0 || !previousAiResponse) {
+    return userPrompt;
+  }
+
+  const annotationSections = annotations.map((ann) => {
+    const changes = ann.annotations.map((a) => `- ${a.label}`).join('\n');
+    return `${ann.schemaName}\n\n${changes}`;
+  }).join('\n\n');
+
+  const modificationRequest = `\n\n---\n\n## MODIFY EXISTING SCHEMA(S)\n\nPlease update the following schema(s) based on the requested modifications. Apply ONLY the specified changes while keeping everything else exactly the same.\n\nRequested Modifications:\n\n${annotationSections}\n\nPrevious Schema(s):\n\`\`\`json\n${previousAiResponse}\n\`\`\`\n\n---\n\nIMPORTANT: You are the world's best schema editor. Apply these modifications precisely while preserving all other aspects of the schema(s). Output the complete updated schema(s) in the same format (single object or array).`;
+
+  return userPrompt + modificationRequest;
+}
+
+/**
+ * Determine if response format should be JSON object
+ */
+function shouldUseJsonResponseFormat(requiredOutputFormat?: string): boolean {
+  return requiredOutputFormat !== undefined && 
+         JSON_RESPONSE_FORMATS.includes(requiredOutputFormat as typeof JSON_RESPONSE_FORMATS[number]);
+}
+
+/**
+ * Determine the storage format based on agent's required output format
+ */
+function getStorageFormat(requiredOutputFormat?: string): string {
+  if (!requiredOutputFormat) {
+    return 'string';
+  }
+  
+  if (JSON_STORAGE_FORMATS.includes(requiredOutputFormat as typeof JSON_STORAGE_FORMATS[number])) {
+    return 'json';
+  }
+  
+  return requiredOutputFormat;
+}
+
+// ============================================================================
+// Validation Helpers
+// ============================================================================
+
+/**
+ * Validate agent configuration and form fields
+ */
+function validateRequest(
+  agent: AgentConfig,
+  requestData: AgentRequestData
+): { valid: boolean; error?: string; validationErrors?: Array<{ field: string; message: string }> } {
+  // Validate agent configuration
+  const agentValidation = validateAgentConfig(agent);
+  if (!agentValidation.valid) {
+    return {
+      valid: false,
+      error: agentValidation.error || 'Invalid agent configuration',
+    };
+  }
+
+  // Validate form fields if renderComponents exist
+  if (agent.renderComponents && requestData.formValues) {
+    const validationErrors = validateAgentFormFields(agent, requestData.formValues);
+    if (validationErrors.length > 0) {
+      return {
+        valid: false,
+        error: 'Validation failed',
+        validationErrors,
+      };
+    }
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Validate and sanitize user prompt
+ */
+function validateAndSanitizePrompt(userPrompt: string): { valid: boolean; prompt?: string; error?: string } {
+  if (!userPrompt || typeof userPrompt !== 'string') {
+    return {
+      valid: false,
+      error: 'userPrompt is required and must be a string',
+    };
+  }
+
+  const sanitized = sanitizePrompt(userPrompt);
+  if (!sanitized) {
+    return {
+      valid: false,
+      error: 'Prompt cannot be empty after sanitization',
+    };
+  }
+
+  return { valid: true, prompt: sanitized };
+}
+
+// ============================================================================
+// Response Building
+// ============================================================================
+
+/**
+ * Build token usage response with pricing information
+ */
+async function buildTokenUsageResponse(
+  tokenUsage: any,
+  modelId: string
+): Promise<any> {
+  if (!tokenUsage) {
+    return null;
+  }
+
+  const pricing = await calculatePricing(
+    modelId,
+    tokenUsage.prompt_tokens || 0,
+    tokenUsage.completion_tokens || 0
+  );
+
+  return {
+    ...tokenUsage,
+    pricing: pricing
+      ? {
+          input_price_per_1m: pricing.inputPricePer1M,
+          output_price_per_1m: pricing.outputPricePer1M,
+          input_cost: pricing.inputPrice,
+          output_cost: pricing.outputPrice,
+          total_cost: pricing.totalPrice,
+          model_id: modelId,
+        }
+      : null,
+  };
+}
+
+/**
+ * Build agent metadata for response
+ */
+function buildAgentMetadata(agent: AgentConfig) {
+  return {
+    id: agent.id,
+    label: agent.label,
+    description: agent.description,
+    requiredOutputFormat: agent.requiredOutputFormat,
+    nextAction: agent.nextAction,
+  };
+}
+
+// ============================================================================
+// Main Processing Function
+// ============================================================================
+
+/**
+ * Process chat request
+ * Handles validation, prompt building, API calls, and response formatting
+ */
+export async function processChatRequest(
+  agent: AgentConfig,
+  requestData: AgentRequestData,
+  baseUrl?: string
+): Promise<AgentResponse> {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  try {
+    // Step 1: Validate request
+    const validation = validateRequest(agent, requestData);
+    if (!validation.valid) {
+      return {
+        success: false,
+        error: validation.error,
+        validationErrors: validation.validationErrors,
+      };
+    }
+
+    // Step 2: Build user prompt
+    let userPrompt = buildUserPrompt(agent, requestData);
+
+    // Step 3: Validate and sanitize prompt
+    const promptValidation = validateAndSanitizePrompt(userPrompt);
+    if (!promptValidation.valid) {
+      return {
+        success: false,
+        error: promptValidation.error,
+      };
+    }
+    userPrompt = promptValidation.prompt!;
+
+    // Step 4: Append option descriptions if needed
+    const bodyParams = requestData.body || {};
+    userPrompt = appendOptionDescriptions(userPrompt, agent, bodyParams);
+
+    // Step 5: Build system prompt
+    const { systemPrompt } = await buildSystemPrompt({
+      agent,
+      formValues: requestData.formValues,
+      bodyParams,
+      baseUrl,
+    });
+
+    // Step 6: Format annotations if present
+    if (requestData.annotations && requestData.previousAiResponse) {
+      userPrompt = formatAnnotationsForPrompt(
+        userPrompt,
+        requestData.annotations,
+        requestData.previousAiResponse
+      );
+    }
+
+    // Step 7: Get model and call API
+    const model = agent.model || DEFAULT_MODEL;
+    const responseFormat = shouldUseJsonResponseFormat(agent.requiredOutputFormat)
+      ? { type: 'json_object' as const }
+      : undefined;
+
+    const apiResult = await callChatApi({
+      agent,
+      systemPrompt,
+      userPrompt,
+      model,
+      responseFormat,
+    });
+
+    if (!apiResult.success) {
+      return {
+        success: false,
+        error: apiResult.error || 'API call failed',
+      };
+    }
+
+    // Step 8: Build response with token usage and pricing
+    const tokenUsage = await buildTokenUsageResponse(
+      apiResult.tokenUsage,
+      model
+    );
+
+    return {
+      success: true,
+      data: {
+        response: apiResult.data,
+        format: getStorageFormat(agent.requiredOutputFormat),
+        tokenUsage,
+        timing: apiResult.timing,
+        agent: buildAgentMetadata(agent),
+      },
+    };
+  } catch (error) {
+    if (isDevelopment) {
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'error',
+        `Error in AI chat request: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+    return {
+      success: false,
+      error: sanitizeErrorMessage(error, isDevelopment),
+    };
+  }
+}
+
+// ============================================================================
+// Export Prompt Constants
+// ============================================================================
 
 /**
  * General Markdown Output Rules
@@ -265,291 +791,3 @@ journey
 ---
 
 **Choose the right type, follow syntax rules, create complete diagrams with all paths.**`;
-
-/**
- * Load AI models from API route with caching
- * Performance: Cache models to avoid repeated API calls
- * Works on both client and server side
- */
-async function loadAiModels(): Promise<any[]> {
-  const now = Date.now();
-  
-  // Return cached models if still valid
-  if (cachedModels !== null && (now - modelsCacheTime) < MODELS_CACHE_TTL) {
-    return cachedModels;
-  }
-
-  try {
-    // Determine API base URL
-    const baseUrl = typeof window !== 'undefined' 
-      ? window.location.origin 
-      : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    
-    const apiUrl = `${baseUrl}/api/ai-models`;
-    
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // Add cache control for client-side requests
-      cache: 'default',
-    });
-
-    if (!response.ok) {
-      loggingCustom(LogType.INFRA_LOG, 'warn', `Failed to load AI models: ${response.status} ${response.statusText}`);
-      cachedModels = [];
-      modelsCacheTime = now;
-      return cachedModels;
-    }
-
-    const result = await response.json();
-    
-    if (!result.success || !Array.isArray(result.data)) {
-      loggingCustom(LogType.INFRA_LOG, 'warn', 'Invalid AI models API response format');
-      cachedModels = [];
-      modelsCacheTime = now;
-      return cachedModels;
-    }
-    
-    const models = result.data || [];
-    cachedModels = models;
-    modelsCacheTime = now;
-    return models;
-  } catch (error) {
-    loggingCustom(LogType.INFRA_LOG, 'error', `Error loading AI models from API: ${error instanceof Error ? error.message : String(error)}`);
-    cachedModels = [];
-    modelsCacheTime = now;
-    return cachedModels;
-  }
-}
-
-/**
- * Calculate pricing for token usage
- */
-async function calculatePricing(
-  modelId: string,
-  promptTokens: number,
-  completionTokens: number
-): Promise<{
-  inputPricePer1M: number;
-  outputPricePer1M: number;
-  inputPrice: number;
-  outputPrice: number;
-  totalPrice: number;
-} | null> {
-  const models = await loadAiModels();
-  const model = models.find((m: any) => m.id === modelId);
-
-  if (!model || !model.pricing) {
-    return null;
-  }
-
-  const inputPricePerMillion = model.pricing.input || 0;
-  const outputPricePerMillion = model.pricing.output || 0;
-
-  // Calculate prices (pricing is per 1 million tokens)
-  const inputPrice = (promptTokens / 1_000_000) * inputPricePerMillion;
-  const outputPrice = (completionTokens / 1_000_000) * outputPricePerMillion;
-  const totalPrice = inputPrice + outputPrice;
-
-  return {
-    inputPricePer1M: inputPricePerMillion,
-    outputPricePer1M: outputPricePerMillion,
-    inputPrice,
-    outputPrice,
-    totalPrice,
-  };
-}
-
-/**
- * Process chat request
- */
-export async function processChatRequest(
-  agent: any,
-  requestData: AgentRequestData,
-  baseUrl?: string
-): Promise<AgentResponse> {
-  const isDevelopment = process.env.NODE_ENV === 'development';
-
-  try {
-    // Security: Validate agent configuration
-    const agentValidation = validateAgentConfig(agent);
-    if (!agentValidation.valid) {
-      return {
-        success: false,
-        error: agentValidation.error || 'Invalid agent configuration',
-      };
-    }
-
-    // Validate form fields if renderComponents exist
-    if (agent.renderComponents && requestData.formValues) {
-      const validationErrors = validateAgentFormFields(agent, requestData.formValues);
-      if (validationErrors.length > 0) {
-        return {
-          success: false,
-          error: 'Validation failed',
-          validationErrors,
-        };
-      }
-    }
-
-    // Build user prompt from form values or use provided userPrompt
-    let userPrompt = requestData.userPrompt || '';
-    
-    if (requestData.formValues && agent.renderComponents) {
-      const builtPrompt = buildStandardizedPrompt(agent, requestData.formValues);
-      if (builtPrompt) {
-        userPrompt = builtPrompt;
-      }
-    }
-
-    // Security: Sanitize and validate prompt
-    if (!userPrompt || typeof userPrompt !== 'string') {
-      return {
-        success: false,
-        error: 'userPrompt is required and must be a string',
-      };
-    }
-
-    userPrompt = sanitizePrompt(userPrompt);
-    if (!userPrompt) {
-      return {
-        success: false,
-        error: 'Prompt cannot be empty after sanitization',
-      };
-    }
-
-    // Extract bodyParams from requestData if available (for direct API calls)
-    const bodyParams = requestData.body || {};
-    
-    // Append option descriptions to userPrompt when bodyParams contain option values
-    // This ensures option descriptions are in the userPrompt (like AiBuilderForm does)
-    // not just in the system prompt
-    if (bodyParams && Object.keys(bodyParams).length > 0 && agent.renderComponents) {
-      const optionDescriptionsParts: string[] = [];
-      
-      agent.renderComponents.forEach((field: any) => {
-        const fieldName = field.name || field.id;
-        const fieldValue = bodyParams[fieldName];
-        
-        if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
-          // For select fields, find the option and append its description
-          if (field.component === 'select' && field.options) {
-            const option = field.options.find(
-              (opt: any) => opt.id === fieldValue || opt.value === fieldValue
-            );
-            
-            if (option?.description) {
-              const fieldLabel = field.label || fieldName;
-              optionDescriptionsParts.push(`${fieldLabel} (${option.label || fieldValue}):\n${option.description}`);
-            }
-          }
-        }
-      });
-      
-      // Append option descriptions to userPrompt if any were found
-      if (optionDescriptionsParts.length > 0) {
-        userPrompt = `${userPrompt}\n\n${optionDescriptionsParts.join('\n\n')}`;
-      }
-    }
-    
-    // Build system prompt using centralized utility (handles preload routes internally)
-    const { systemPrompt } = await buildSystemPrompt({
-      agent,
-      formValues: requestData.formValues,
-      bodyParams,
-      baseUrl,
-    });
-
-    // Format annotations in TOON-like format and add to user prompt
-    let finalUserPrompt = userPrompt;
-    if (
-      requestData.annotations &&
-      Array.isArray(requestData.annotations) &&
-      requestData.annotations.length > 0 &&
-      requestData.previousAiResponse
-    ) {
-      // Format annotations in TOON-like structure
-      const annotationSections = requestData.annotations.map((ann) => {
-        const changes = ann.annotations.map((a) => `- ${a.label}`).join('\n');
-        return `${ann.schemaName}\n\n${changes}`;
-      }).join('\n\n');
-
-      // Build the modification request in user prompt
-      const modificationRequest = `\n\n---\n\n## MODIFY EXISTING SCHEMA(S)\n\nPlease update the following schema(s) based on the requested modifications. Apply ONLY the specified changes while keeping everything else exactly the same.\n\nRequested Modifications:\n\n${annotationSections}\n\nPrevious Schema(s):\n\`\`\`json\n${requestData.previousAiResponse}\n\`\`\`\n\n---\n\nIMPORTANT: You are the world's best schema editor. Apply these modifications precisely while preserving all other aspects of the schema(s). Output the complete updated schema(s) in the same format (single object or array).`;
-
-      finalUserPrompt = userPrompt + modificationRequest;
-    }
-
-    // Get model from agent config or use default
-    const model = agent.model || 'gpt-4o-mini';
-
-    // Call chat API using centralized utility
-    const apiResult = await callChatApi({
-      agent,
-      systemPrompt,
-      userPrompt: finalUserPrompt,
-      model,
-      responseFormat: (agent.requiredOutputFormat === 'json' || agent.requiredOutputFormat === 'table' || agent.requiredOutputFormat === 'search-results' || agent.requiredOutputFormat === 'search-card')
-        ? { type: 'json_object' }
-        : undefined,
-    });
-
-    if (!apiResult.success) {
-      return {
-        success: false,
-        error: apiResult.error || 'API call failed',
-      };
-    }
-
-    // Calculate pricing for token usage
-    const pricing = await calculatePricing(
-      model,
-      apiResult.tokenUsage?.prompt_tokens || 0,
-      apiResult.tokenUsage?.completion_tokens || 0
-    );
-
-    const tokenUsage = apiResult.tokenUsage
-      ? {
-          ...apiResult.tokenUsage,
-          pricing: pricing
-            ? {
-                input_price_per_1m: pricing.inputPricePer1M || 0,
-                output_price_per_1m: pricing.outputPricePer1M || 0,
-                input_cost: pricing.inputPrice,
-                output_cost: pricing.outputPrice,
-                total_cost: pricing.totalPrice,
-                model_id: model,
-              }
-            : null,
-        }
-      : null;
-
-    return {
-      success: true,
-      data: {
-        response: apiResult.data,
-        format: (agent.requiredOutputFormat === 'table' || agent.requiredOutputFormat === 'search-results' || agent.requiredOutputFormat === 'search-card') ? 'json' : agent.requiredOutputFormat || 'string',
-        tokenUsage,
-        timing: apiResult.timing,
-        agent: {
-          id: agent.id,
-          label: agent.label,
-          description: agent.description,
-          requiredOutputFormat: agent.requiredOutputFormat,
-          nextAction: agent.nextAction,
-        },
-      },
-    };
-  } catch (error) {
-    if (isDevelopment) {
-      loggingCustom(LogType.INFRA_LOG, 'error', `Error in AI chat request: ${error instanceof Error ? error.message : String(error)}`);
-    }
-    return {
-      success: false,
-      error: sanitizeErrorMessage(error, isDevelopment),
-    };
-  }
-}
-
