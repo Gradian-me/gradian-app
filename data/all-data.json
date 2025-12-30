@@ -1263,10 +1263,10 @@
       ],
       "entityType": [
         {
-          "id": "01KCXDM9ASSWTYDWA4HDT7W05B",
-          "label": "Business Administrator",
-          "icon": "Briefcase",
-          "color": "pink"
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
         }
       ],
       "relatedCompanies": [
@@ -1279,14 +1279,6 @@
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
           "label": "Supply Chain Management"
-        },
-        {
-          "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": "AryoGen"
-        },
-        {
-          "id": "01KBFBGV9151FQN481NB2CT4MX",
-          "label": "Development Environment"
         }
       ],
       "username": "heydarzadehn@cinnagen.com",
@@ -1297,7 +1289,8 @@
       "incomplete": false,
       "id": "01KDG66XCHTD0GGQX3A2E69T85",
       "createdAt": "2025-12-27T15:18:09.558Z",
-      "updatedAt": "2025-12-27T15:18:09.725Z"
+      "updatedAt": "2025-12-30T13:25:34.255Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
       "company": "AryoGen",
@@ -18018,9 +18011,7 @@
     },
     {
       "id": "active-directory",
-      "label": "Active Directory",
-      "icon": "Server",
-      "color": "success",
+      "label": "active-directory",
       "sourceUrl": "field-options:users:authentication-type"
     }
   ]

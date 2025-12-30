@@ -20,9 +20,10 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface NotificationsDropdownProps {
   initialCount?: number;
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
-export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdownProps) {
+export function NotificationsDropdown({ initialCount = 3, onOpenChange }: NotificationsDropdownProps) {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [notificationCount, setNotificationCount] = useState(initialCount);
   const [isMounted, setIsMounted] = useState(false);
@@ -32,10 +33,16 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
 
+  // Handle open state changes and notify parent
+  const handleOpenChange = React.useCallback((open: boolean) => {
+    setIsOpen(open);
+    onOpenChange?.(open);
+  }, [onOpenChange]);
+
   // Register dropdown for back button handling on mobile
   const handleClose = React.useCallback(() => {
-    setIsOpen(false);
-  }, []);
+    handleOpenChange(false);
+  }, [handleOpenChange]);
   
   useDialogBackHandler(isOpen, handleClose, 'dropdown', 'notifications-dropdown');
 
@@ -281,7 +288,7 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
   // Use the same DropdownMenuPrimitive structure for both placeholder and actual
   return (
     <>
-      <DropdownMenuPrimitive.Root open={isMounted ? isOpen : false} onOpenChange={isMounted ? setIsOpen : undefined}>
+      <DropdownMenuPrimitive.Root open={isMounted ? isOpen : false} onOpenChange={isMounted ? handleOpenChange : undefined}>
       <DropdownMenuPrimitive.Trigger asChild disabled={!isMounted}>
         <Button 
           variant="outline" 

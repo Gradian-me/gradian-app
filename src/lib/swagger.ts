@@ -62,6 +62,10 @@ export const swaggerDocument = {
       description: 'Schema registry endpoints for forms and dynamic pages.',
     },
     {
+      name: 'Data',
+      description: 'Data query and manipulation endpoints.',
+    },
+    {
       name: 'Git',
       description: 'Git and CI/CD integration endpoints.',
     },
@@ -635,6 +639,84 @@ export const swaggerDocument = {
           },
           500: {
             description: 'Failed to sync environment variables.',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+        },
+      },
+    },
+    '/api/dynamic-query/{dynamic-query-id}': {
+      parameters: [
+        {
+          name: 'dynamic-query-id',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          description: 'Unique identifier for the dynamic query.',
+          example: '01KDQDXXJH77ZZR5D8Y6PNZ65N',
+        },
+      ],
+      post: {
+        tags: ['Data'],
+        summary: 'Execute dynamic query',
+        description:
+          'Proxies a POST request to the backend dynamic query endpoint. The request is forwarded to the external backend service with authentication headers and query parameters. If companyIds is "-1", missing, or empty, all company IDs are automatically loaded and passed.',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'flatten',
+            in: 'query',
+            required: false,
+            schema: { type: 'boolean' },
+            description: 'Whether to flatten the response data.',
+            example: true,
+          },
+          {
+            name: 'companyIds',
+            in: 'query',
+            required: false,
+            schema: { type: 'string' },
+            description:
+              'Comma-separated list of company IDs. If "-1", missing, or empty, all company IDs are automatically loaded and passed.',
+            example: '01K94V4PJSFKCXS6AVX07P86N5,01K94V8K0RJS7D9K43F2VBTSVG',
+          },
+        ],
+        requestBody: {
+          required: false,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                description: 'Request body (if any) to be forwarded to the backend.',
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Dynamic query executed successfully.',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  description: 'Response from the backend dynamic query endpoint.',
+                },
+              },
+            },
+          },
+          400: {
+            description: 'Bad request - invalid parameters or missing dynamic query ID.',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          401: {
+            description: 'Unauthorized - missing or invalid authentication.',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          404: {
+            description: 'Dynamic query not found or backend endpoint not available.',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          500: {
+            description: 'Internal server error or backend service unavailable.',
             content: { 'application/json': { schema: errorResponse } },
           },
         },

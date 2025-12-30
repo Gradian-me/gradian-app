@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { TableColumn } from '../types';
 import { getCellValue } from '../utils';
 import { cn } from '../../../shared/utils';
 import { extractLabels } from '../../../form-builder/form-elements/utils/option-normalizer';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { CopyContent } from '../../../form-builder/form-elements/components/CopyContent';
+import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 
 export interface TableCardProps<T = any> {
   row: T;
@@ -22,7 +30,23 @@ export function TableCard<T = any>({
   contentColumns = 2,
   disableAnimation = false,
 }: TableCardProps<T>) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogContent, setDialogContent] = useState<{ fieldName: string; content: string; isJson?: boolean } | null>(null);
+  
   const resolvedColumns = contentColumns ?? 2;
+
+  // Helper function to truncate text to 200 characters
+  const truncateText = (text: string, maxChars: number = 200): string => {
+    if (!text) return '';
+    if (text.length <= maxChars) return text;
+    return text.substring(0, maxChars) + '...';
+  };
+
+  const handleShowMore = (fieldName: string, content: string, e: React.MouseEvent, isJson: boolean = false) => {
+    e.stopPropagation();
+    setDialogContent({ fieldName, content, isJson });
+    setDialogOpen(true);
+  };
 
   const gridClasses = cn(
     'grid gap-2',
@@ -50,23 +74,53 @@ export function TableCard<T = any>({
                 if (value === null || value === undefined) {
                   return '—';
                 }
-                const isStructured = Array.isArray(value) || (typeof value === 'object' && value !== null);
+                let isStructured = false;
+                let isJson = false;
+                let textValue: string;
+                
+                isStructured = Array.isArray(value) || (typeof value === 'object' && value !== null);
                 if (isStructured) {
                   const labels = extractLabels(value);
                   if (labels.length > 0) {
-                    return labels.join(', ');
-                  }
-                  if (Array.isArray(value)) {
-                    return value.map(entry => {
+                    textValue = labels.join(', ');
+                  } else if (Array.isArray(value)) {
+                    textValue = value.map(entry => {
                       if (entry && typeof entry === 'object') {
                         return entry.label || entry.name || entry.id || JSON.stringify(entry);
                       }
                       return String(entry);
                     }).join(', ');
+                  } else {
+                    // For objects, stringify with formatting
+                    textValue = JSON.stringify(value, null, 2);
+                    isJson = true;
                   }
-                  return JSON.stringify(value);
+                } else {
+                  textValue = String(value);
                 }
-                return String(value);
+                
+                // Check if JSON string is too long (more than 200 characters)
+                const shouldTruncateJson = isJson && textValue.length > 200;
+                const truncatedJson = shouldTruncateJson ? truncateText(textValue, 200) : null;
+                
+                if (shouldTruncateJson) {
+                  return (
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-900 dark:text-gray-100 font-mono whitespace-pre-wrap wrap-break-word">
+                        {truncatedJson}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => handleShowMore(column.label, textValue, e, true)}
+                        className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium"
+                      >
+                        Show more
+                      </button>
+                    </div>
+                  );
+                }
+                
+                return textValue;
               })();
 
           return (
@@ -90,6 +144,37 @@ export function TableCard<T = any>({
           })}
         </div>
       )}
+      
+      {/* Dialog for showing full JSON content */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className={cn(
+          "max-w-4xl max-h-[85vh] overflow-hidden flex flex-col",
+          dialogContent?.isJson && "max-w-5xl"
+        )}>
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle>{dialogContent?.fieldName || 'Content'}</DialogTitle>
+              {dialogContent && (
+                <CopyContent content={dialogContent.content} />
+              )}
+            </div>
+          </DialogHeader>
+          <div className="mt-4 flex-1 overflow-auto">
+            {dialogContent?.isJson ? (
+              <CodeViewer
+                code={dialogContent.content}
+                programmingLanguage="json"
+                title={dialogContent.fieldName}
+                initialLineNumbers={20}
+              />
+            ) : (
+              <pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300 font-sans bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                {dialogContent?.content || ''}
+              </pre>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

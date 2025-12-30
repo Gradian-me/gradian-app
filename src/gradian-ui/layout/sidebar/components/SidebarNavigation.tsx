@@ -50,11 +50,11 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
             const content = (
               <Link href={item.href} prefetch={false} onClick={() => onItemClick?.(item)}>
                 <motion.div
-                  initial={!hasMounted ? { opacity: 0, y: 6, scale: 0.98 } : false}
+                  initial={{ opacity: 0, y: 6, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{
                     duration: 0.25,
-                    delay: !hasMounted ? Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX) : 0,
+                    delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX),
                     ease: 'easeOut',
                   }}
                   whileHover={!isCollapsed || isMobile ? { scale: 1.02 } : undefined}

@@ -5414,5 +5414,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KDAPIVERSION002",
+    "timestamp": "2025-12-30T17:46:11+0330",
+    "version": "1.40.002",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "Modified all-data.json to change entity type from \"Business Administrator\" to \"General User\" and adjusted related company entries for improved data accuracy",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "user-management"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated API documentation to include new dynamic query endpoints, enhancing data manipulation capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "api-docs",
+          "api",
+          "dynamic-queries"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved error handling in Swagger UI and added loading states for better user experience",
+        "priority": "Medium",
+        "affectedDomains": [
+          "api-docs",
+          "swagger",
+          "ui",
+          "error-handling"
+        ]
+      }
+    ]
   }
 ]

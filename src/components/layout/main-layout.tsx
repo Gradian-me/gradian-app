@@ -139,6 +139,7 @@ function MainLayoutContent({
   const { isMaximized, setTitle, setIcon } = useLayoutContext();
   const pageTitle = title ? `${title} | Gradian` : 'Gradian';
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isNotificationsDropdownOpen, setIsNotificationsDropdownOpen] = useState(false);
 
   // Update layout context with title and icon
   useEffect(() => {
@@ -460,10 +461,13 @@ function MainLayoutContent({
           {/* Organization settings button that wraps tenant & company selection */}
           <OrganizationSettings />
           {ENABLE_NOTIFICATION ? (
-            <Tooltip key="notifications-tooltip">
+            <Tooltip key="notifications-tooltip" open={isNotificationsDropdownOpen ? false : undefined}>
               <TooltipTrigger asChild>
                 <div className="flex items-center">
-                  <NotificationsDropdown initialCount={5} />
+                  <NotificationsDropdown 
+                    initialCount={5} 
+                    onOpenChange={setIsNotificationsDropdownOpen}
+                  />
                 </div>
               </TooltipTrigger>
               <TooltipContent>

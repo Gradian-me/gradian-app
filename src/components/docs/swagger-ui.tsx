@@ -13,24 +13,36 @@ export default function SwaggerUIRenderer({ url }: SwaggerUIRendererProps) {
     // Suppress the UNSAFE_componentWillReceiveProps warning from swagger-ui-react
     // This is a known issue with the library and doesn't affect functionality
     const originalWarn = console.warn;
-    const suppressedWarnings = [
+    const originalError = console.error;
+    const suppressedMessages = [
       'UNSAFE_componentWillReceiveProps',
       'componentWillReceiveProps',
+      'ModelCollapse',
     ];
+
+    const shouldSuppress = (message: string): boolean => {
+      return suppressedMessages.some((suppressed) =>
+        message.includes(suppressed)
+      );
+    };
 
     console.warn = (...args: any[]) => {
       const message = args[0]?.toString() || '';
-      if (
-        !suppressedWarnings.some((warning) =>
-          message.includes(warning)
-        )
-      ) {
+      if (!shouldSuppress(message)) {
         originalWarn.apply(console, args);
+      }
+    };
+
+    console.error = (...args: any[]) => {
+      const message = args[0]?.toString() || '';
+      if (!shouldSuppress(message)) {
+        originalError.apply(console, args);
       }
     };
 
     return () => {
       console.warn = originalWarn;
+      console.error = originalError;
     };
   }, []);
 
