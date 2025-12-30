@@ -170,19 +170,20 @@ export const DataSort: React.FC<DataSortProps> = ({
   );
 
   // System fields that are always available for sorting
+  // For system fields, the id and name are the same (they're already field names)
   const systemFields = useMemo(() => {
     const fields = [
-      { id: 'status', label: 'Status' },
-      { id: 'entityType', label: 'Type' },
-      { id: 'updatedBy', label: 'Updated By' },
-      { id: 'updatedAt', label: 'Updated At' },
-      { id: 'createdBy', label: 'Created By' },
-      { id: 'createdAt', label: 'Created At' },
+      { id: 'status', name: 'status', label: 'Status' },
+      { id: 'entityType', name: 'entityType', label: 'Type' },
+      { id: 'updatedBy', name: 'updatedBy', label: 'Updated By' },
+      { id: 'updatedAt', name: 'updatedAt', label: 'Updated At' },
+      { id: 'createdBy', name: 'createdBy', label: 'Created By' },
+      { id: 'createdAt', name: 'createdAt', label: 'Created At' },
     ];
 
     // Add company field if schema is company-based
     if (schema && !schema.isNotCompanyBased) {
-      fields.push({ id: 'companyId', label: 'Company' });
+      fields.push({ id: 'companyId', name: 'companyId', label: 'Company' });
     }
 
     return fields;
@@ -223,30 +224,33 @@ export const DataSort: React.FC<DataSortProps> = ({
 
   const handleToggleColumn = useCallback((columnId: string) => {
     const currentValue = valueRef.current;
-    const isSelected = currentValue.some(item => item.column === columnId);
     const column = availableColumns.find(c => c.id === columnId) || systemFields.find(f => f.id === columnId);
     
     if (!column) return;
 
+    // Use field name (not ID) for the sort configuration
+    const fieldName = column.name;
+    const isSelected = currentValue.some(item => item.column === fieldName);
+
     if (isSelected) {
       // Remove from selected
-      onChange(currentValue.filter(item => item.column !== columnId));
+      onChange(currentValue.filter(item => item.column !== fieldName));
     } else {
-      // Add to selected (default to ascending)
-      onChange([...currentValue, { column: columnId, isAscending: true }]);
+      // Add to selected (default to ascending) - use field name
+      onChange([...currentValue, { column: fieldName, isAscending: true }]);
     }
   }, [availableColumns, systemFields, onChange]);
 
-  const handleRemoveColumn = useCallback((columnId: string) => {
+  const handleRemoveColumn = useCallback((fieldName: string) => {
     const currentValue = valueRef.current;
-    onChange(currentValue.filter(item => item.column !== columnId));
+    onChange(currentValue.filter(item => item.column !== fieldName));
   }, [onChange]);
 
-  const handleToggleDirection = useCallback((columnId: string) => {
+  const handleToggleDirection = useCallback((fieldName: string) => {
     const currentValue = valueRef.current;
     onChange(
       currentValue.map(item =>
-        item.column === columnId
+        item.column === fieldName
           ? { ...item, isAscending: !item.isAscending }
           : item
       )
@@ -272,21 +276,21 @@ export const DataSort: React.FC<DataSortProps> = ({
   }, [onChange]);
 
   const getAvailableColumns = () => {
-    const selectedColumnIds = new Set(value.map(item => item.column));
-    return availableColumns.filter(column => !selectedColumnIds.has(column.id));
+    const selectedFieldNames = new Set(value.map(item => item.column));
+    return availableColumns.filter(column => !selectedFieldNames.has(column.name));
   };
 
   const getAvailableSystemFields = () => {
-    const selectedColumnIds = new Set(value.map(item => item.column));
-    return systemFields.filter(field => !selectedColumnIds.has(field.id));
+    const selectedFieldNames = new Set(value.map(item => item.column));
+    return systemFields.filter(field => !selectedFieldNames.has(field.name));
   };
 
   const unselectedColumns = getAvailableColumns();
   const unselectedSystemFields = getAvailableSystemFields();
 
-  const getColumnLabel = (columnId: string): string => {
-    const column = availableColumns.find(c => c.id === columnId) || systemFields.find(f => f.id === columnId);
-    return column?.label || columnId;
+  const getColumnLabel = (fieldName: string): string => {
+    const column = availableColumns.find(c => c.name === fieldName) || systemFields.find(f => f.name === fieldName);
+    return column?.label || fieldName;
   };
 
   return (

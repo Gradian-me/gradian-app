@@ -14,6 +14,7 @@ import { CopyContent } from '../../form-builder/form-elements/components/CopyCon
 import { ForceIcon } from '../../form-builder/form-elements/components/ForceIcon';
 import { formatFieldValue } from '../table/utils/field-formatters';
 import { FormulaDisplay } from '@/gradian-ui/form-builder/form-elements/components/FormulaDisplay';
+import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 
 export interface DynamicInfoCardProps {
   section: DetailPageSection;
@@ -236,12 +237,55 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
           <div className={gridClasses}>
             {fields.map((field: any) => {
               const isTextarea = field.component === 'textarea';
+              const isJson = field.component === 'json';
               const fieldClasses = cn(
                 "space-y-1",
-                isTextarea && gridColumns === 1 && "col-span-1",
-                isTextarea && gridColumns === 2 && "col-span-1 md:col-span-2",
-                isTextarea && gridColumns === 3 && "col-span-1 md:col-span-2 lg:col-span-3"
+                (isTextarea || isJson) && gridColumns === 1 && "col-span-1",
+                (isTextarea || isJson) && gridColumns === 2 && "col-span-1 md:col-span-2",
+                (isTextarea || isJson) && gridColumns === 3 && "col-span-1 md:col-span-2 lg:col-span-3"
               );
+              
+              // Handle JSON fields with CodeViewer
+              if (isJson) {
+                let jsonValue = field.value;
+                // Convert value to JSON string if it's an object/array
+                if (jsonValue !== null && jsonValue !== undefined && typeof jsonValue !== 'string') {
+                  try {
+                    jsonValue = JSON.stringify(jsonValue, null, 2);
+                  } catch {
+                    jsonValue = String(jsonValue);
+                  }
+                } else if (jsonValue === null || jsonValue === undefined) {
+                  jsonValue = '';
+                }
+                
+                return (
+                  <motion.div
+                    key={field.id}
+                    className={fieldClasses}
+                    whileHover={{ x: 2 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 mb-2">
+                      {field.icon && (
+                        <IconRenderer iconName={field.icon} className="h-4 w-4" />
+                      )}
+                      {field.label}
+                    </label>
+                    {jsonValue ? (
+                      <CodeViewer
+                        code={jsonValue}
+                        programmingLanguage="json"
+                        title={field.label}
+                        initialLineNumbers={10}
+                        className="mt-2"
+                      />
+                    ) : (
+                      <div className="text-sm text-gray-400 dark:text-gray-500 italic">No data</div>
+                    )}
+                  </motion.div>
+                );
+              }
               
               return (
                 <motion.div

@@ -6118,11 +6118,10 @@
         "name": "metadata",
         "label": "Metadata",
         "sectionId": "basic-information",
-        "component": "textarea",
-        "placeholder": "Enter metadata",
+        "component": "json",
+        "placeholder": "Enter metadata (JSON object or array)...",
         "validation": {
-          "required": true,
-          "minLength": 1
+          "required": true
         },
         "colSpan": 2,
         "order": 3

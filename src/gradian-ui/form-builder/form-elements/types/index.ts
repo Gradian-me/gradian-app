@@ -164,7 +164,7 @@ export interface FileInputProps extends FormElementProps {
 }
 
 export interface FormElementConfig extends FormFieldConfig {
-  component: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'file' | 'picker' | 'toggle' | 'toggle-group' | 'language-selector';
+  component: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea' | 'json' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'file' | 'picker' | 'toggle' | 'toggle-group' | 'language-selector';
   required?: boolean;
   metadata?: {
     allowMultiselect?: boolean;

@@ -7,6 +7,7 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { TextInput } from './TextInput';
 import { Textarea } from './Textarea';
+import { JsonInput } from './JsonInput';
 import { MarkdownInput } from './MarkdownInput';
 import { Checkbox } from './Checkbox';
 import { CheckboxList } from './CheckboxList';
@@ -288,6 +289,43 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           canCopy={canCopy} 
           enableVoiceInput={enableVoiceInput} 
           loadingTextSwitches={loadingTextSwitches}
+          rows={resolvedRows}
+        />
+      );
+    }
+    
+    case 'json': {
+      // Dynamically adjust rows based on content, unless an explicit rows value is provided
+      const explicitRows =
+        (config as any)?.rows ?? (restProps as any)?.rows ?? undefined;
+
+      const value = restProps.value;
+      const hasValue =
+        typeof value === 'string'
+          ? value.trim().length > 0
+          : value !== undefined && value !== null;
+
+      // Count visible lines in the current value (for strings)
+      const lineCount =
+        typeof value === 'string'
+          ? value.split('\n').length
+          : 0;
+
+      // Default to 12 rows for JSON (more than textarea since JSON is usually longer)
+      // Only expand to 20 rows when there is content AND more than 20 lines,
+      // otherwise keep the smaller default height.
+      const resolvedRows =
+        explicitRows !== undefined
+          ? explicitRows
+          : hasValue && lineCount > 20
+            ? 20
+            : 12;
+
+      return (
+        <JsonInput 
+          config={config} 
+          {...commonProps} 
+          canCopy={canCopy}
           rows={resolvedRows}
         />
       );

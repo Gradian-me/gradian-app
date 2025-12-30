@@ -2282,8 +2282,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-30T10:13:46.681Z",
-      "lastSynced": "2025-12-30T10:13:46.681Z",
+      "updatedAt": "2025-12-30T10:24:45.878Z",
+      "lastSynced": "2025-12-30T10:24:45.878Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2322,7 +2322,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-30T10:13:51.664Z",
+      "updatedAt": "2025-12-30T10:24:50.122Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2332,8 +2332,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-30T10:13:51.664Z",
-      "lastSyncMessage": "Generated relations for 39 out of 39 schemas",
+      "lastSynced": "2025-12-30T10:24:50.122Z",
+      "lastSyncMessage": "Generated relations for 40 out of 40 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2381,7 +2381,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-30T08:59:35.838Z",
+      "updatedAt": "2025-12-30T10:24:57.093Z",
       "category": [
         {
           "id": "production-integration",
@@ -2390,7 +2390,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-30T08:59:35.838Z",
+      "lastSynced": "2025-12-30T10:24:57.093Z",
       "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 232, edges created: 117, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -17986,6 +17986,26 @@
           "label": "Supply Chain Management"
         }
       ]
+    },
+    {
+      "includeUserId": false,
+      "includeCompanyId": false,
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "metadata": "{\n  \"applyRBAC\": false,\n  \"patterns\": [\n    {\n      \"from\": {\n        \"schemaId\": \"inquiries\",\n        \"alias\": \"\"\n      }\n    },\n    {\n      \"from\": {\n        \"schemaId\": \"inquiries\",\n        \"alias\": \"\"\n      },\n      \"to\": {\n        \"schemaId\": \"tenders\",\n        \"alias\": \"\"\n      },\n      \"edge\": \"HAS_TENDER\",\n      \"optional\": true\n    },\n    {\n      \"from\": {\n        \"schemaId\": \"tenders\",\n        \"alias\": \"\"\n      },\n      \"to\": {\n        \"schemaId\": \"tender-items\",\n        \"alias\": \"\"\n      },\n      \"edge\": \"HAS_ITEM\",\n      \"optional\": true\n    }\n  ],\n  \"columns\": [\n    {\n      \"schemaId\": \"inquiries\",\n      \"fieldId\": \"id\",\n      \"selectOrder\": 1,\n      \"groupOrder\": 1\n    },\n    {\n      \"schemaId\": \"inquiries\",\n      \"fieldId\": \"inquiryNumber\",\n      \"selectOrder\": 2,\n      \"groupOrder\": 1\n    },\n    {\n      \"schemaId\": \"inquiries\",\n      \"fieldId\": \"description\",\n      \"selectOrder\": 3,\n      \"groupOrder\": 1\n    },\n    {\n      \"schemaId\": \"inquiries\",\n      \"fieldId\": \"inquiryDate\",\n      \"selectOrder\": 4,\n      \"groupOrder\": 1\n    },\n    {\n      \"schemaId\": \"tenders\",\n      \"fieldId\": \"id\",\n      \"selectOrder\": 5,\n      \"groupOrder\": 2\n    },\n    {\n      \"schemaId\": \"tenders\",\n      \"fieldId\": \"title\",\n      \"selectOrder\": 6,\n      \"groupOrder\": 2\n    },\n    {\n      \"schemaId\": \"tenders\",\n      \"fieldId\": \"status\",\n      \"selectOrder\": 7,\n      \"groupOrder\": 2\n    },\n    {\n      \"schemaId\": \"tender-items\",\n      \"fieldId\": \"id\",\n      \"selectOrder\": 8,\n      \"groupOrder\": 3\n    },\n    {\n      \"schemaId\": \"tender-items\",\n      \"fieldId\": \"quantity\",\n      \"selectOrder\": 9,\n      \"groupOrder\": 3\n    },\n    {\n      \"schemaId\": \"tender-items\",\n      \"fieldId\": \"description\",\n      \"selectOrder\": 10,\n      \"groupOrder\": 3\n    },\n    {\n      \"schemaId\": \"tender-items\",\n      \"fieldId\": \"unitPrice\",\n      \"selectOrder\": 11,\n      \"groupOrder\": 3\n    }\n  ],\n  \"pagination\": {\n    \"strategy\": \"offset\",\n    \"limit\": 100,\n    \"offset\": 0\n  }\n}",
+      "name": "Inquiries → Tenders → Items",
+      "description": "Three-level nested query showing the full hierarchy: inquiries contain tenders, which contain items.",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "datatype": [],
+      "isRequired": false,
+      "id": "01KDQDXXJH77ZZR5D8Y6PNZ65N",
+      "createdAt": "2025-12-30T10:47:44.478Z",
+      "updatedAt": "2025-12-30T10:47:44.478Z"
     }
   ],
   "external_nodes": [
