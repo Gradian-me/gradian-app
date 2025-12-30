@@ -6,7 +6,7 @@
 /**
  * Maximum message content length (10,000 characters)
  */
-export const MAX_MESSAGE_LENGTH = 10000;
+export const MAX_MESSAGE_LENGTH = 20000;
 
 /**
  * Maximum chat title length (200 characters)
@@ -16,7 +16,7 @@ export const MAX_TITLE_LENGTH = 200;
 /**
  * Maximum request body size (1MB)
  */
-export const MAX_REQUEST_BODY_SIZE = 1024 * 1024; // 1MB
+export const MAX_REQUEST_BODY_SIZE = 2 * 1024 * 1024; // 2MB
 
 /**
  * Allowed agent types
@@ -27,7 +27,7 @@ export const ALLOWED_AGENT_TYPES = [
   'image-generation',
   'voice-transcription',
   'video-generation',
-  'search',
+  'search'
 ] as const;
 
 /**

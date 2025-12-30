@@ -8,6 +8,7 @@ import { validateToken, extractTokenFromHeader, extractTokenFromCookies } from '
 import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 import { REQUIRE_LOGIN, DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { getChatById } from './chat-storage.util';
+import { getAccessToken } from '@/app/api/auth/helpers/server-token-cache';
 
 // Hardcoded demo userId for when REQUIRE_LOGIN is false and DEMO_MODE is true
 const DEMO_USER_ID = '01K9ABA6MQ9K64MY7M4AEBCAP2';
@@ -15,13 +16,32 @@ const DEMO_USER_ID = '01K9ABA6MQ9K64MY7M4AEBCAP2';
 /**
  * Extract and validate user ID from request
  * Returns userId if valid, null otherwise
+ * 
+ * Checks in this order:
+ * 1. Authorization header (Bearer token)
+ * 2. Server memory (access token stored using refresh token from cookies)
+ * 3. Cookies (access_token cookie - legacy support)
  */
 export function getUserIdFromRequest(request: NextRequest): string | null {
   // Try Authorization header first
   const authHeader = request.headers.get('authorization');
   let token = extractTokenFromHeader(authHeader);
 
-  // If not in header, try cookies
+  // If not in header, try to get access token from server memory using refresh token
+  if (!token) {
+    const cookies = request.headers.get('cookie');
+    const refreshToken = extractTokenFromCookies(cookies, AUTH_CONFIG.REFRESH_TOKEN_COOKIE);
+    
+    if (refreshToken) {
+      // Look up access token from server memory using refresh token as key
+      const serverToken = getAccessToken(refreshToken);
+      if (serverToken) {
+        token = serverToken;
+      }
+    }
+  }
+
+  // Fallback: try access_token cookie (legacy support)
   if (!token) {
     const cookies = request.headers.get('cookie');
     token = extractTokenFromCookies(cookies, AUTH_CONFIG.ACCESS_TOKEN_COOKIE);

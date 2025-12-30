@@ -2282,8 +2282,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-28T18:34:55.850Z",
-      "lastSynced": "2025-12-28T18:34:55.850Z",
+      "updatedAt": "2025-12-30T04:47:08.745Z",
+      "lastSynced": "2025-12-30T04:47:08.745Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2322,7 +2322,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-28T18:35:07.495Z",
+      "updatedAt": "2025-12-30T04:47:21.632Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2332,7 +2332,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-28T18:35:07.495Z",
+      "lastSynced": "2025-12-30T04:47:21.632Z",
       "lastSyncMessage": "Generated relations for 39 out of 39 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -2381,7 +2381,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-28T18:35:35.114Z",
+      "updatedAt": "2025-12-30T04:48:54.286Z",
       "category": [
         {
           "id": "production-integration",
@@ -2390,8 +2390,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-28T18:35:35.114Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 4, nodes updated: 228, edges created: 117, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2025-12-30T04:48:54.286Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 232, edges created: 117, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }

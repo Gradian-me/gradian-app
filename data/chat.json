@@ -746,5 +746,14 @@
     "selectedAgentId": null,
     "lastMessage": "{\n  \"image\": {\n    \"url\": \"/api/images/Gradian_Image_01KDJR3NTHAZZ0K3FX5QZSMQTW.png\",\n    \"b64_json\"",
     "lastMessageAt": "2025-12-28T15:09:27.209Z"
+  },
+  {
+    "id": "01KDPTNRTT3GDNSR53WM0VM4VZ",
+    "title": "New Chat",
+    "createdAt": "2025-12-30T05:11:14.522Z",
+    "updatedAt": "2025-12-30T05:11:14.522Z",
+    "userId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "messages": [],
+    "selectedAgentId": null
   }
 ]

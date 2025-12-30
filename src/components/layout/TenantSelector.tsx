@@ -373,9 +373,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
     "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
     "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
     "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-    isDarkVariant
-      ? "bg-gray-900 border-gray-700 text-gray-100"
-      : "bg-white border-gray-200 text-gray-900"
+    "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-100 dark:text-gray-900"
   );
   const labelClasses = cn(
     "px-2 py-1.5 text-sm font-semibold",
@@ -588,11 +586,9 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
             <DropdownMenuPrimitive.Item
               className={cn(
                 menuItemBaseClasses,
-                isDarkVariant
-                  ? "hover:bg-violet-500/10 focus:bg-violet-500/10 text-gray-200"
-                  : "hover:bg-violet-50 focus:bg-violet-50 text-gray-800",
+                "hover:bg-violet-50 focus:bg-violet-50 text-gray-800 dark:hover:bg-violet-500/10 dark:focus:bg-violet-500/10 dark:text-gray-200",
                 !selectedTenant &&
-                  (isDarkVariant ? "bg-violet-500/15" : "bg-violet-50")
+                  "bg-violet-50 dark:bg-violet-500/15"
               )}
               onSelect={() => handleTenantSelect(null)}
             >
@@ -606,9 +602,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
                   key={tenant.id}
                   className={cn(
                     menuItemBaseClasses,
-                    isDarkVariant
-                      ? "hover:bg-violet-500/10 focus:bg-violet-500/10 text-gray-200"
-                      : "hover:bg-violet-50 focus:bg-violet-50 text-gray-800",
+                    "hover:bg-violet-50 focus:bg-violet-50 text-gray-800 dark:hover:bg-violet-500/10 dark:focus:bg-violet-500/10 dark:text-gray-200",
                     selectedTenant?.id === tenant.id &&
                       (isDarkVariant ? "bg-violet-500/15" : "bg-violet-50")
                   )}

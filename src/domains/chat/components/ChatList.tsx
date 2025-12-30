@@ -210,15 +210,17 @@ const ChatListComponent: React.FC<ChatListProps> = ({
                         </div>
                       </div>
                     </button>
-                    {/* Delete button - shows on hover */}
+                    {/* Delete button - visible on hover, slightly visible by default */}
                     {onDeleteChat && (
                       <button
                         onClick={(e) => handleDeleteClick(e, chat)}
                         className={cn(
-                          'absolute top-2 right-2 p-1.5 rounded-md transition-all opacity-0 group-hover:opacity-100',
+                          'absolute top-2 right-2 p-1.5 rounded-md transition-all',
+                          'opacity-40 group-hover:opacity-100',
                           'hover:bg-red-100 dark:hover:bg-red-900/30',
                           'text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400',
-                          'focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                          'focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2',
+                          'z-10'
                         )}
                         title="Delete chat"
                         aria-label="Delete chat"

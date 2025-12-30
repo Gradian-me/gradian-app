@@ -42,14 +42,12 @@ export const HierarchyActionsMenu: React.FC<HierarchyActionsMenuProps> = ({
     'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
     'data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2',
-    isDark ? 'bg-gray-900 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-900'
+    "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-100 dark:text-gray-900"
   );
 
   const itemClasses = cn(
     'relative flex cursor-pointer select-none items-center rounded-lg px-3 py-2 text-sm outline-none transition-colors',
-    isDark
-      ? 'hover:bg-violet-500/10 focus:bg-violet-500/10 text-gray-200'
-      : 'hover:bg-violet-50 focus:bg-violet-50 text-gray-800'
+    'hover:bg-violet-50 focus:bg-violet-50 text-gray-800 dark:hover:bg-violet-500/10 dark:focus:bg-violet-500/10 dark:text-gray-200'
   );
 
   return (

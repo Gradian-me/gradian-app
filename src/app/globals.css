@@ -201,8 +201,9 @@ button {
   cursor: pointer;
 }
 
-#dmermaid-simple-bruvz2gp8 {
-  display: hidden;
+/* Hide all elements with IDs starting with dmermaid-simple- */
+[id^="dmermaid-simple-"] {
+  display: none !important;
 }
 
 body {

@@ -201,6 +201,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                   'overflow-y-auto',
                   (isLoading || isActive) && 'opacity-50 cursor-not-allowed'
                 )}
+                dir="auto"
                 rows={3}
               />
             </div>

@@ -109,6 +109,14 @@ function MainLayoutContent({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notificationCount] = useState(3);
   const [isDesktop, setIsDesktop] = useState(false);
+  
+  // Debug: Log ENABLE_NOTIFICATION value (only in development)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+      console.log('[MainLayout] ENABLE_NOTIFICATION:', ENABLE_NOTIFICATION);
+      console.log('[MainLayout] NEXT_PUBLIC_ENABLE_NOTIFICATION:', process.env.NEXT_PUBLIC_ENABLE_NOTIFICATION);
+    }
+  }, []);
   // Always start with collapsed width to match SSR (prevents hydration mismatch)
   // Use previous width if available to prevent animation on route change
   const [sidebarWidth, setSidebarWidth] = useState(() => {
@@ -451,21 +459,41 @@ function MainLayoutContent({
           </Tooltip>
           {/* Organization settings button that wraps tenant & company selection */}
           <OrganizationSettings />
-          {ENABLE_NOTIFICATION && (
+          {ENABLE_NOTIFICATION ? (
             <Tooltip key="notifications-tooltip">
               <TooltipTrigger asChild>
-                <NotificationsDropdown initialCount={5} />
+                <div className="flex items-center">
+                  <NotificationsDropdown initialCount={5} />
+                </div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Notifications</p>
               </TooltipContent>
             </Tooltip>
-          )}
+          ) : null}
           <Tooltip key="user-profile-tooltip" open={isUserMenuOpen ? false : undefined}>
             <TooltipTrigger asChild>
               <UserProfileSelector
                 theme={profileTheme}
                 onMenuOpenChange={setIsUserMenuOpen}
+                config={{
+                  layout: {
+                    variant: 'dropdown',
+                    size: 'sm',
+                    showAvatar: true,
+                    showName: true,
+                    showEmail: false,
+                    showRole: false,
+                    showStatus: false,
+                    fullWidth: false,
+                    popoverPlacement: 'auto',
+                  },
+                  styling: {
+                    variant: 'minimal',
+                    theme: profileTheme,
+                    rounded: true,
+                  },
+                }}
               />
             </TooltipTrigger>
             <TooltipContent>

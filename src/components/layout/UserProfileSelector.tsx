@@ -38,7 +38,7 @@ export function UserProfileSelector({
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const language = useLanguageStore((state) => state.language || 'en');
   const { resolvedTheme } = useTheme();
-  
+
   // Access user store normally - but ensure we always render placeholder until mounted
   // This prevents hydration mismatch because server and client both render placeholder initially
   const user = useUserStore((state) => state.user);
@@ -106,9 +106,7 @@ export function UserProfileSelector({
     'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
     'data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2',
-    isDarkVariant
-      ? 'bg-gray-900 border-gray-700 text-gray-100'
-      : 'bg-white border-gray-200 text-gray-900'
+    "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-100 dark:text-gray-900"
   );
   const separatorClasses = cn(
     '-mx-1 my-1 h-px',
@@ -116,9 +114,7 @@ export function UserProfileSelector({
   );
   const itemClasses = cn(
     'relative flex cursor-pointer select-none items-center rounded-lg px-3 py-2 text-sm outline-none transition-colors',
-    isDarkVariant
-      ? 'hover:bg-violet-500/10 focus:bg-violet-500/10 text-gray-100 data-[highlighted]:bg-violet-500/15'
-      : 'hover:bg-violet-50 focus:bg-violet-50 text-gray-800 data-[highlighted]:bg-violet-100'
+    'hover:bg-violet-50 focus:bg-violet-50 text-gray-800 data-[highlighted]:bg-violet-100 dark:hover:bg-violet-500/10 dark:focus:bg-violet-500/10 dark:text-gray-100 dark:data-[highlighted]:bg-violet-500/15'
   );
 
   const handleNavigate = useCallback((path: string) => {
@@ -149,7 +145,7 @@ export function UserProfileSelector({
       'border-violet-200 bg-white text-violet-700',
       fullWidth ? 'w-full justify-between' : ''
     );
-    
+
     // Render a plain button without Radix UI to avoid hydration mismatch
     return (
       <div suppressHydrationWarning>
@@ -173,7 +169,7 @@ export function UserProfileSelector({
               fullWidth ? 'flex-1 overflow-hidden' : 'max-w-[140px] overflow-hidden'
             )}
           >
-            <span className="text-sm font-semibold truncate" suppressHydrationWarning>
+            <span className="text-gray-900 dark:text-gray-100 text-sm font-semibold truncate" suppressHydrationWarning>
               Loading...
             </span>
           </div>
@@ -235,8 +231,8 @@ export function UserProfileSelector({
           onMenuOpenChange?.(open);
         }}
       >
-        <DropdownMenuPrimitive.Trigger 
-          asChild 
+        <DropdownMenuPrimitive.Trigger
+          asChild
           className={fullWidth ? 'w-full' : undefined}
           suppressHydrationWarning
         >
@@ -250,147 +246,147 @@ export function UserProfileSelector({
             suppressHydrationWarning
             id="user-profile-trigger"
           >
-          <Avatar
-            className={cn(
-              'h-8 w-8 border rounded-full bg-violet-100 text-violet-800 shrink-0',
-              isDarkVariant ? 'border-gray-700' : 'border-gray-100'
-            )}
-          >
-            {user?.avatar ? (
-              <AvatarImage
-                src={user.avatar}
-                alt={displayName}
-              />
-            ) : null}
-            <AvatarFallback className="bg-violet-100 text-violet-800 text-xs">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div
-            className={cn(
-              'flex flex-col text-left leading-tight',
-              fullWidth ? 'flex-1 overflow-hidden' : 'max-w-[140px] overflow-hidden'
-            )}
-          >
-            <span className="text-sm font-semibold truncate" title={displayName}>
-              {displayName}
-            </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 truncate" title={user?.email || ''}>
-              {user?.email || ''}
-            </span>
-          </div>
-          <ChevronDown
-            className={cn(
-              'h-4 w-4 shrink-0 transition-transform duration-200',
-              isDarkVariant ? 'text-gray-300' : 'text-gray-500',
-              isMenuOpen && 'rotate-180'
-            )}
-          />
-        </Button>
-      </DropdownMenuPrimitive.Trigger>
-      <DropdownMenuPrimitive.Portal>
-        <AnimatePresence>
-          {isMenuOpen && (
-            <DropdownMenuPrimitive.Content forceMount asChild>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: -8 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className={menuContentClasses}
-                style={{
-                  minWidth: triggerWidth || undefined,
-                  width: triggerWidth || undefined,
-                }}
-              >
-                <div className="px-3 py-2">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold truncate" title={displayName}>
-                      {displayName}
-                    </p>
-                    {isAdmin && (
-                      <FormBadge
-                        variant="outline"
-                        size="sm"
-                        color="violet"
-                        tooltip="Administrator access"
-                        className="shrink-0"
-                      >
-                        Admin
-                      </FormBadge>
-                    )}
-                  </div>
-                  <p
-                    className="text-xs text-gray-500 dark:text-gray-400 truncate"
-                    title={user.email}
-                  >
-                    {user.email}
-                  </p>
-                  {Array.isArray(user?.entityType) && user.entityType.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {user.entityType.map((entity) => (
+            <Avatar
+              className={cn(
+                'h-8 w-8 border rounded-full bg-violet-100 text-violet-800 shrink-0',
+                isDarkVariant ? 'border-gray-700' : 'border-gray-100'
+              )}
+            >
+              {user?.avatar ? (
+                <AvatarImage
+                  src={user.avatar}
+                  alt={displayName}
+                />
+              ) : null}
+              <AvatarFallback className="bg-violet-100 text-violet-800 text-xs">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div
+              className={cn(
+                'flex flex-col text-left leading-tight',
+                fullWidth ? 'flex-1 overflow-hidden' : 'max-w-[140px] overflow-hidden'
+              )}
+            >
+              <span className="text-gray-900 dark:text-gray-100 text-sm font-semibold truncate" title={displayName}>
+                {displayName}
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate" title={user?.email || ''}>
+                {user?.email || ''}
+              </span>
+            </div>
+            <ChevronDown
+              className={cn(
+                'h-4 w-4 shrink-0 transition-transform duration-200',
+                isDarkVariant ? 'text-gray-300' : 'text-gray-500',
+                isMenuOpen && 'rotate-180'
+              )}
+            />
+          </Button>
+        </DropdownMenuPrimitive.Trigger>
+        <DropdownMenuPrimitive.Portal>
+          <AnimatePresence>
+            {isMenuOpen && (
+              <DropdownMenuPrimitive.Content forceMount asChild>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className={menuContentClasses}
+                  style={{
+                    minWidth: triggerWidth || undefined,
+                    width: triggerWidth || undefined,
+                  }}
+                >
+                  <div className="px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <p className="text-gray-900 dark:text-gray-100 text-sm font-semibold truncate" title={displayName}>
+                        {displayName}
+                      </p>
+                      {isAdmin && (
                         <FormBadge
-                          key={entity.id}
                           variant="outline"
                           size="sm"
-                          color={entity.color || 'gray'}
-                          className="flex items-center gap-1"
-                          tooltip={entity.label}
+                          color="violet"
+                          tooltip="Administrator access"
+                          className="shrink-0"
                         >
-                          {entity.label}
+                          Admin
                         </FormBadge>
-                      ))}
+                      )}
                     </div>
-                  )}
-                </div>
+                    <p
+                      className="text-xs text-gray-500 dark:text-gray-400 truncate"
+                      title={user.email}
+                    >
+                      {user.email}
+                    </p>
+                    {Array.isArray(user?.entityType) && user.entityType.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {user.entityType.map((entity) => (
+                          <FormBadge
+                            key={entity.id}
+                            variant="outline"
+                            size="sm"
+                            color={entity.color || 'gray'}
+                            className="flex items-center gap-1"
+                            tooltip={entity.label}
+                          >
+                            {entity.label}
+                          </FormBadge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
-                <DropdownMenuPrimitive.Separator className={separatorClasses} />
+                  <DropdownMenuPrimitive.Separator className={separatorClasses} />
 
-                {dropdownActions.map(({ id, label, description, icon: Icon, action }) => (
+                  {dropdownActions.map(({ id, label, description, icon: Icon, action }) => (
+                    <DropdownMenuPrimitive.Item
+                      key={id}
+                      className={itemClasses}
+                      onSelect={(event) => {
+                        event.preventDefault();
+                        action();
+                      }}
+                    >
+                      <Icon className="me-3 h-4 w-4" />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">{label}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {description}
+                        </span>
+                      </div>
+                    </DropdownMenuPrimitive.Item>
+                  ))}
+
+                  <DropdownMenuPrimitive.Separator className={separatorClasses} />
+
                   <DropdownMenuPrimitive.Item
-                    key={id}
-                    className={itemClasses}
+                    className={cn(
+                      itemClasses,
+                      'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 focus:bg-red-50 dark:focus:bg-red-500/10'
+                    )}
                     onSelect={(event) => {
                       event.preventDefault();
-                      action();
+                      handleLogout();
                     }}
                   >
-                    <Icon className="me-3 h-4 w-4" />
+                    <LogOut className="me-3 h-4 w-4" />
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium">{label}</span>
+                      <span className="text-sm font-medium">Logout</span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {description}
+                        Sign out of your account
                       </span>
                     </div>
                   </DropdownMenuPrimitive.Item>
-                ))}
-
-                <DropdownMenuPrimitive.Separator className={separatorClasses} />
-
-                <DropdownMenuPrimitive.Item
-                  className={cn(
-                    itemClasses,
-                    'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 focus:bg-red-50 dark:focus:bg-red-500/10'
-                  )}
-                  onSelect={(event) => {
-                    event.preventDefault();
-                    handleLogout();
-                  }}
-                >
-                  <LogOut className="me-3 h-4 w-4" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">Logout</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Sign out of your account
-                    </span>
-                  </div>
-                </DropdownMenuPrimitive.Item>
-              </motion.div>
-            </DropdownMenuPrimitive.Content>
-          )}
-        </AnimatePresence>
-      </DropdownMenuPrimitive.Portal>
-    </DropdownMenuPrimitive.Root>
+                </motion.div>
+              </DropdownMenuPrimitive.Content>
+            )}
+          </AnimatePresence>
+        </DropdownMenuPrimitive.Portal>
+      </DropdownMenuPrimitive.Root>
     </div>
   );
 }
