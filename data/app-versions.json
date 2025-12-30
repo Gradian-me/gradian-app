@@ -5387,5 +5387,32 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KDAUTHCOOKIE001",
+    "timestamp": "2025-12-30T15:25:31+0330",
+    "version": "1.40.001",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "Adjusted sync timestamps and messages in all-data.json for improved data management",
+        "priority": "LOW",
+        "affectedDomains": [
+          "data-management",
+          "sync"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Enhanced login and logout routes to ensure proper cookie handling and logging for authentication processes. Improved cookie deletion to use set() with matching path/domain attributes, and updated cookie setting order to prevent overwrites",
+        "priority": "Medium",
+        "affectedDomains": [
+          "auth",
+          "security",
+          "cookie-management",
+          "logging"
+        ]
+      }
+    ]
   }
 ]

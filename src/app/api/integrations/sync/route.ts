@@ -8,6 +8,7 @@ import { addAudienceToToken } from '@/domains/auth/utils/jwt.util';
 import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 // system-token.util is server-only - import directly
 import { getSystemTokenForTargetRoute, getAudienceIdFromTargetRoute } from '@/gradian-ui/shared/utils/system-token.util';
+import { getAccessToken } from '@/app/api/auth/helpers/server-token-cache';
 import { enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
 
 /**
@@ -395,6 +396,7 @@ export async function POST(request: NextRequest) {
     );
     
     // Extract authorization header from incoming request
+    // Priority: Authorization header > Access token cookie > Server memory (via refresh token)
     let authHeader = request.headers.get('authorization');
     let authToken: string | null = null;
     
@@ -408,26 +410,57 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // If no token from header, try to extract from cookies
+    // If no token from header, try to extract from access token cookie
     if (!authToken) {
       const cookies = request.headers.get('cookie');
       authToken = extractTokenFromCookies(cookies, AUTH_CONFIG.ACCESS_TOKEN_COOKIE);
       if (authToken) {
         const tokenPrefix = authToken.substring(0, 10);
         const tokenLength = authToken.length;
-        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Authorization token extracted from cookie: ${tokenPrefix}... (length: ${tokenLength})`);
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Authorization token extracted from access token cookie: ${tokenPrefix}... (length: ${tokenLength})`);
         // Format as Bearer token
         authHeader = `Bearer ${authToken}`;
+      }
+    }
+    
+    // If still no token, try to get access token from SERVER MEMORY using refresh token from cookies
+    // This is the preferred method for server-to-server requests
+    if (!authToken) {
+      const cookies = request.headers.get('cookie');
+      const refreshToken = extractTokenFromCookies(cookies, AUTH_CONFIG.REFRESH_TOKEN_COOKIE);
+      
+      if (refreshToken) {
+        // Look up access token from server memory using refresh token as key
+        authToken = getAccessToken(refreshToken);
+        
+        if (authToken) {
+          authHeader = `Bearer ${authToken}`;
+          loggingCustom(
+            LogType.INTEGRATION_LOG,
+            'info',
+            `[INTEGRATION_SYNC] Retrieved access token from server memory using refresh token (refresh token: ${refreshToken.substring(0, 30)}...)`
+          );
+        } else {
+          loggingCustom(
+            LogType.INTEGRATION_LOG,
+            'warn',
+            `[INTEGRATION_SYNC] Access token not found in server memory for refresh token: ${refreshToken.substring(0, 30)}... (may need refresh)`
+          );
+        }
       } else {
-        loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'No authorization token found in header or cookies');
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'No refresh token found in cookies');
       }
-    } else {
-      // Ensure header is in Bearer format if it's just a token
-      if (authHeader && !authHeader.toLowerCase().startsWith('bearer ')) {
-        authHeader = `Bearer ${authToken}`;
-      } else if (!authHeader && authToken) {
-        authHeader = `Bearer ${authToken}`;
-      }
+    }
+    
+    // Ensure header is in Bearer format if we have a token
+    if (!authHeader && authToken) {
+      authHeader = `Bearer ${authToken}`;
+    } else if (authHeader && !authHeader.toLowerCase().startsWith('bearer ') && authToken) {
+      authHeader = `Bearer ${authToken}`;
+    }
+    
+    if (!authToken) {
+      loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'No authorization token found in header, cookies, or server memory');
     }
     
     loggingCustom(LogType.INTEGRATION_LOG, 'info', `Starting integration sync for id: ${id}`);
@@ -616,16 +649,30 @@ export async function POST(request: NextRequest) {
         }
         const sourceMethod = String(sourceMethodValue || 'GET').toUpperCase();
         loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Source method: ${sourceMethod}`);
+        
+        // Forward cookies from incoming request to source route fetch
+        // This is critical for server-to-server requests - cookies are not automatically forwarded
+        const cookieHeader = request.headers.get('cookie');
+        
         const sourceFetchOptions: RequestInit = {
           method: sourceMethod as any,
           headers: {
             'Content-Type': 'application/json',
+            // Forward cookies from incoming request (includes refresh_token for authentication)
+            ...(cookieHeader ? { 'cookie': cookieHeader } : {}),
             // Pass authorization header to source route if present
             ...(authHeader ? { 'Authorization': authHeader } : {}),
             // For tenant-based integrations, override tenant domain for source route as well
             ...(tenantDomainForHeader ? { 'x-tenant-domain': tenantDomainForHeader } : {}),
           },
         };
+        
+        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Source fetch options: ${JSON.stringify({
+          method: sourceMethod,
+          hasCookies: !!cookieHeader,
+          hasAuthHeader: !!authHeader,
+          hasTenantDomain: !!tenantDomainForHeader,
+        })}`);
         
         loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Source route headers: ${JSON.stringify(sourceFetchOptions.headers)}`);
         

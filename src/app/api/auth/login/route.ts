@@ -301,10 +301,29 @@ export async function POST(request: NextRequest) {
     } : { success: true };
     
     const response = NextResponse.json(responseData, { status: upstreamResponse.status });
-    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Applying token cookies from external auth (refresh token only)...');
-    applyTokenCookies(response, upstreamJson?.tokens);
+    
+    // IMPORTANT: Forward external auth cookies FIRST, then apply our own cookies
+    // This ensures our manually set cookies (with correct path/domain) take precedence
     loggingCustom(LogType.LOGIN_LOG, 'debug', 'Forwarding set-cookie headers from external auth...');
     forwardSetCookieHeaders(upstreamResponse, response);
+    
+    // Apply our token cookies AFTER forwarding external cookies
+    // This ensures refresh token cookie is set with correct path='/', sameSite='lax', etc.
+    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Applying token cookies from external auth (refresh token only)...');
+    applyTokenCookies(response, upstreamJson?.tokens);
+    
+    // Log cookie configuration for debugging
+    if (upstreamJson?.tokens?.refreshToken) {
+      loggingCustom(LogType.LOGIN_LOG, 'log', `[LOGIN_API] Refresh token cookie configured ${JSON.stringify({
+        cookieName: AUTH_CONFIG.REFRESH_TOKEN_COOKIE,
+        tokenLength: upstreamJson.tokens.refreshToken.length,
+        path: '/',
+        sameSite: 'lax',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: AUTH_CONFIG.REFRESH_TOKEN_EXPIRY,
+      })}`);
+    }
     
     const accessToken = upstreamJson?.tokens?.accessToken;
     const refreshToken = upstreamJson?.tokens?.refreshToken;

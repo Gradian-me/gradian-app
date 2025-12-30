@@ -2001,10 +2001,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-30T10:22:06.418Z",
+      "updatedAt": "2025-12-30T11:50:37.141Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-12-30T10:22:06.418Z",
+      "lastSynced": "2025-12-30T11:50:37.141Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2017,7 +2017,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 49 schemas: 49 succeeded, 0 failed (1 created, 48 updated)"
+      "lastSyncMessage": "Processed 49 schemas: 49 succeeded, 0 failed (0 created, 49 updated)"
     },
     {
       "color": "blue",
@@ -2044,8 +2044,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-30T10:22:10.971Z",
-      "lastSynced": "2025-12-30T10:22:10.971Z",
+      "updatedAt": "2025-12-30T11:50:45.391Z",
+      "lastSynced": "2025-12-30T11:50:45.391Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2105,9 +2105,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-30T10:22:38.592Z",
+      "updatedAt": "2025-12-30T11:51:16.091Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-30T10:22:38.592Z",
+      "lastSynced": "2025-12-30T11:51:16.091Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2118,7 +2118,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 4, nodes updated: 1325, edges created: 160, nodes failed: 0, edges failed: 0.",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1, nodes updated: 1329, edges created: 160, nodes failed: 0, edges failed: 0.",
       "isTenantBased": false
     },
     {
@@ -2282,8 +2282,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-30T10:24:45.878Z",
-      "lastSynced": "2025-12-30T10:24:45.878Z",
+      "updatedAt": "2025-12-30T11:51:44.352Z",
+      "lastSynced": "2025-12-30T11:51:44.352Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2322,7 +2322,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-30T10:24:50.122Z",
+      "updatedAt": "2025-12-30T11:51:56.803Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2332,7 +2332,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-30T10:24:50.122Z",
+      "lastSynced": "2025-12-30T11:51:56.803Z",
       "lastSyncMessage": "Generated relations for 40 out of 40 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -2381,7 +2381,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-30T10:24:57.093Z",
+      "updatedAt": "2025-12-30T11:52:07.169Z",
       "category": [
         {
           "id": "production-integration",
@@ -2390,8 +2390,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-30T10:24:57.093Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 232, edges created: 117, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2025-12-30T11:52:07.169Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1, nodes updated: 232, edges created: 117, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
