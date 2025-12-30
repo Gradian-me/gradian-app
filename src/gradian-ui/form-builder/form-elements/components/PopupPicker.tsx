@@ -1781,7 +1781,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 className={cn(
                   'h-6 w-6 flex items-center justify-center rounded-md border text-gray-500 dark:text-gray-400',
                   'border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/60',
-                  !hasChildren && 'opacity-40 cursor-default'
+                  !hasChildren && 'opacity-60 cursor-default'
                 )}
                 disabled={!hasChildren}
               >
@@ -1937,7 +1937,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 className={cn(
                   'h-6 w-6 mt-1 flex items-center justify-center rounded-md border text-gray-500 dark:text-gray-400',
                   'border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/60',
-                  !hasChildren && 'opacity-40 cursor-default'
+                  !hasChildren && 'opacity-60 cursor-default'
                 )}
                 disabled={!hasChildren}
               >

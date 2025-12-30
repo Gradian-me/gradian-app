@@ -31,14 +31,10 @@ export function UserProfileDropdown({
   const isDarkVariant = variant === 'dark';
   const buttonClasses = cn(
     "flex items-center space-x-2 h-10 rounded-lg border px-3 transition-colors duration-200",
-    isDarkVariant
-      ? "border-gray-700 bg-gray-900 text-gray-200 hover:bg-gray-800"
-      : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
+    "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
     "dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/30",
-    isDarkVariant
-      ? "focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
-      : "focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
+    "focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
   );
 
   useEffect(() => {

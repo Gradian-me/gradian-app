@@ -243,7 +243,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
             // Amber border and background for incomplete items
             isIncomplete 
               ? 'border-amber-400 dark:border-amber-500 bg-amber-50/30 dark:bg-amber-950/20' 
-              : 'border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/70',
+              : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800',
             onView && 'cursor-pointer',
             isIncomplete && onView 
               ? 'hover:bg-amber-100/40 dark:hover:bg-amber-950/30' 
@@ -261,8 +261,8 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                 }}
                 className={cn(
                   'h-6 w-6 flex items-center justify-center rounded-md border text-gray-500 dark:text-gray-400 shrink-0',
-                  'border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/60',
-                  !hasChildren && 'opacity-40 cursor-default'
+                  'border-gray-200 dark:border-gray-700 bg-gray-200 dark:bg-gray-900',
+                  !hasChildren && 'opacity-60 cursor-default'
                 )}
                 disabled={!hasChildren}
               >
@@ -550,7 +550,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
     
     return (
       <div className={cn("space-y-1", depth === 0 && "mb-4")}>
-        <Card className="border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/70 shadow-sm">
+        <Card className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
           <CardContent className="flex items-center gap-3 p-3">
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <Skeleton className="h-6 w-6 rounded-md" />
