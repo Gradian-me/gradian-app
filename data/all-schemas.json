@@ -75,7 +75,7 @@
     "applyToAllTenants": true
   },
   {
-    "id": "external-nodes",
+    "id": "external_nodes",
     "description": "Manage external nodes from external data sources and APIs",
     "singular_name": "External Node",
     "plural_name": "External Nodes",
@@ -115,11 +115,10 @@
         "name": "sourceUrl",
         "label": "Source URL",
         "sectionId": "basic-information",
-        "component": "url",
-        "placeholder": "Enter source URL (e.g., https://api.example.com/endpoint)",
+        "component": "text",
+        "placeholder": "Enter source URL (e.g., field-options:users:authentication-type)",
         "validation": {
-          "required": true,
-          "pattern": "^https?:\\/\\/.+"
+          "required": true
         },
         "colSpan": 1,
         "order": 3,
