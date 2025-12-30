@@ -34,6 +34,7 @@ function LoginPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
+  const [statusCode, setStatusCode] = useState<number | null>(null);
   const [fingerprint, setFingerprint] = useState<string | null>(null);
   const [returnUrl, setReturnUrl] = useState<string | null>(null);
 
@@ -79,6 +80,7 @@ function LoginPageContent() {
     loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] ========== LOGIN PROCESS STARTED ==========');
     setError(null);
     setErrorDetails(null);
+    setStatusCode(null);
     event.preventDefault();
     setIsLoading(true);
 
@@ -211,9 +213,9 @@ function LoginPageContent() {
           const text = await responseClone.text().catch(() => 'Unable to read response');
           loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Response as text: ${text}`);
           const errorMessage = `Login failed with status ${response.status}`;
-          const details = `Status: ${response.status} ${response.statusText}\n\nResponse body:\n${text}`;
           setError(errorMessage);
-          setErrorDetails(details);
+          setStatusCode(response.status);
+          setErrorDetails(null);
           toast.error(errorMessage);
           setIsLoading(false);
           return;
@@ -230,14 +232,9 @@ function LoginPageContent() {
             fullResponse: data,
           })}`);
           const errorMessage = data.error || `Login failed with status ${response.status}`;
-          const details = [
-            `Status: ${response.status} ${response.statusText}`,
-            data.error ? `Error: ${data.error}` : '',
-            data.message ? `Message: ${data.message}` : '',
-            Object.keys(data).length > 0 ? `\nFull response:\n${JSON.stringify(data, null, 2)}` : '',
-          ].filter(Boolean).join('\n');
           setError(errorMessage);
-          setErrorDetails(details);
+          setStatusCode(response.status);
+          setErrorDetails(null);
           toast.error(errorMessage);
           setIsLoading(false);
           return;
@@ -253,12 +250,9 @@ function LoginPageContent() {
           name: fetchError instanceof Error ? fetchError.name : undefined,
         })}`);
         const errorMessage = 'Network error: Failed to connect to the server';
-        const details = [
-          `Error: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`,
-          fetchError instanceof Error && fetchError.stack ? `\nStack trace:\n${fetchError.stack}` : '',
-        ].filter(Boolean).join('\n');
         setError(errorMessage);
-        setErrorDetails(details);
+        setStatusCode(null);
+        setErrorDetails(null);
         toast.error(errorMessage);
         setIsLoading(false);
         return;
@@ -393,13 +387,9 @@ function LoginPageContent() {
         cause: error instanceof Error ? error.cause : undefined,
       })}`);
       const errorMessage = error instanceof Error ? error.message : 'An error occurred during login. Please try again.';
-      const details = [
-        `Error: ${errorMessage}`,
-        error instanceof Error && error.stack ? `\nStack trace:\n${error.stack}` : '',
-        error instanceof Error && error.cause ? `\nCause: ${error.cause}` : '',
-      ].filter(Boolean).join('\n');
       setError(errorMessage);
-      setErrorDetails(details);
+      setStatusCode(null);
+      setErrorDetails(null);
       toast.error(errorMessage);
       setIsLoading(false);
       loggingCustom(LogType.CLIENT_LOG, 'error', '[LOGIN] ========== LOGIN PROCESS ENDED WITH ERROR ==========');
@@ -432,7 +422,7 @@ function LoginPageContent() {
         onResetPassword={handleResetPassword}
         onCreateAccount={handleCreateAccount}
         error={error}
-        errorDetails={errorDetails}
+        statusCode={statusCode}
         isLoading={isLoading}
       />
     </>

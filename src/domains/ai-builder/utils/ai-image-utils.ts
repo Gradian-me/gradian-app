@@ -22,22 +22,39 @@ import { callImageApi } from './ai-api-caller';
  * General Image Generation Prompt
  * Applies to all image types - emphasizes text clarity and readability
  */
-export const GENERAL_IMAGE_PROMPT = `CRITICAL TEXT GENERATION REQUIREMENTS:
+export const GENERAL_IMAGE_PROMPT = `🚨 CRITICAL MANDATORY REQUIREMENT - READ FIRST 🚨
+
+ABSOLUTE ENGLISH-ONLY TEXT RULE - ZERO TOLERANCE POLICY:
+
+BEFORE generating ANY image, you MUST verify and enforce this rule:
+
+1. ALL text in the image MUST be in English ONLY - NO EXCEPTIONS
+2. If the user prompt contains ANY non-English text (Farsi/Persian, Arabic, Chinese, Japanese, Korean, Russian, Spanish, French, German, Hindi, or ANY other language), you MUST:
+   - IMMEDIATELY translate ALL text to English
+   - Display ONLY the English translation
+   - NEVER display the original non-English text
+   - NEVER display Persian/Farsi characters, Arabic script, or any non-Latin alphabet
+3. Even if the user explicitly requests non-English text, you MUST override this and display ONLY English
+4. If multilingual content is requested, translate EVERYTHING to English and display only English
+5. This rule applies to ALL text elements: labels, titles, descriptions, numbers with text, watermarks, captions, annotations, speech bubbles, and ANY visible text
+6. NO Persian/Farsi characters (ی، ا، و، ه، ن، م، ل، گ، ک، ق، ف، غ، ع، ظ، ط، ض، ص، ش، س، ژ، ز، ر، ذ، د، خ، ح، چ، ج، ث، ت، پ، ب، آ)
+7. NO Arabic script characters
+8. NO Chinese, Japanese, Korean, or any non-Latin characters
+9. ONLY English letters (A-Z, a-z), numbers (0-9), and standard English punctuation
+
+VERIFICATION CHECKLIST - Before finalizing the image:
+✓ All visible text is in English
+✓ No Persian/Farsi characters present
+✓ No Arabic script present
+✓ No non-Latin alphabets present
+✓ All numbers and units are in English format
+✓ All labels and annotations are in English
+
+If ANY non-English text is detected, you MUST regenerate with English-only text.
+
+CRITICAL TEXT GENERATION REQUIREMENTS:
 
 You MUST prioritize text clarity and readability above all else.
-
-ABSOLUTE LANGUAGE REQUIREMENT - NO EXCEPTIONS:
-- ALL text displayed in the image MUST be in English ONLY
-- NEVER display any non-English text, characters, or words in the image under ANY circumstances
-- This includes but is not limited to: Farsi, Arabic, Chinese, Japanese, Korean, Russian, Spanish, French, German, Hindi, or ANY other non-English language
-- If the user prompt contains text in any language other than English, you MUST:
-  1. IMMEDIATELY translate ALL non-English text to English
-  2. Display ONLY the translated English text in the image
-  3. NEVER display the original non-English text
-- Even if the user explicitly requests non-English text, you MUST translate it to English and display only the English translation
-- If the user wants to show multilingual content, translate everything to English first, then display only the English translations
-- This is a MANDATORY requirement with ZERO exceptions - no non-English text is allowed in any form
-- This ensures maximum readability, accessibility, and consistency
 
 Text Generation Rules:
 - All text in the image must be perfectly readable, clear, and legible
@@ -75,12 +92,37 @@ Visual Hierarchy:
 
 Watermark Requirement:
 - ALL images MUST include a minimal text watermark in the bottom right corner
-- The watermark text must be: "Powered by Gradian AI" in one line
+- The watermark text must be: "Powered by Gradian AI" in English ONLY
 - Use small, subtle font size (not too prominent, but readable)
 - Use a semi-transparent or low-contrast color that doesn't distract from the main content
 - Position it in the bottom right corner with appropriate padding from edges
 - Ensure the watermark is always visible but unobtrusive
 - This watermark must appear on EVERY generated image without exception
+- The watermark MUST be in English - NO exceptions
+
+🚨 FINAL VERIFICATION - BEFORE GENERATING THE IMAGE 🚨
+
+MANDATORY PRE-GENERATION CHECK:
+1. Scan the entire prompt for any non-English text
+2. If found, translate ALL non-English text to English
+3. Verify that ALL text elements will be displayed in English ONLY
+4. Confirm NO Persian/Farsi, Arabic, or any non-Latin characters will appear
+5. Ensure ALL labels, titles, descriptions, and annotations will be in English
+6. Double-check that numbers and units use English format (e.g., "USD", "kg", "%", not "ریال", "کیلوگرم")
+
+STRICTLY FORBIDDEN:
+❌ Persian/Farsi text or characters
+❌ Arabic script or characters
+❌ Chinese, Japanese, Korean characters
+❌ ANY non-English text in ANY form
+❌ Mixed-language content (English + other languages)
+❌ Transliteration of non-English words using non-Latin characters
+
+ONLY ALLOWED:
+✅ English text (A-Z, a-z)
+✅ English numbers (0-9)
+✅ Standard English punctuation
+✅ English units and abbreviations (USD, kg, %, etc.)
 
 `;
 
@@ -4108,6 +4150,30 @@ export async function processImageRequest(
       }
     }
 
+    // Detect non-English text in user prompt (especially Persian/Farsi)
+    const persianFarsiPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    const arabicPattern = /[\u0600-\u06FF]/;
+    const chinesePattern = /[\u4E00-\u9FFF]/;
+    const japanesePattern = /[\u3040-\u309F\u30A0-\u30FF]/;
+    const koreanPattern = /[\uAC00-\uD7AF]/;
+    const cyrillicPattern = /[\u0400-\u04FF]/;
+    
+    const hasNonEnglishText = 
+      persianFarsiPattern.test(cleanPrompt) ||
+      arabicPattern.test(cleanPrompt) ||
+      chinesePattern.test(cleanPrompt) ||
+      japanesePattern.test(cleanPrompt) ||
+      koreanPattern.test(cleanPrompt) ||
+      cyrillicPattern.test(cleanPrompt);
+    
+    if (hasNonEnglishText) {
+      const warningMessage = `[ai-image-utils] ⚠️ WARNING: Non-English text detected in user prompt. The image generation prompt will enforce English-only translation.`;
+      loggingCustom(LogType.CLIENT_LOG, 'warn', warningMessage);
+      if (isDevelopment) {
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-image-utils] Original prompt contains non-English characters. These will be translated to English in the generated image.`);
+      }
+    }
+
     // Concatenate image type prompt before user prompt if prompt exists
     // IMPORTANT: This must happen BEFORE sanitization to preserve the full prompt
     if (imageTypePrompt && imageTypePrompt.trim()) {
@@ -4130,6 +4196,33 @@ export async function processImageRequest(
         }
       }
     }
+
+    // Add negative prompt enforcement for English-only text
+    const negativePromptSection = `
+
+🚨 CRITICAL NEGATIVE REQUIREMENTS - STRICTLY FORBIDDEN 🚨
+
+DO NOT generate images with:
+- Persian/Farsi text or characters (ی، ا، و، ه، ن، م، ل، گ، ک، ق، ف، غ، ع، ظ، ط، ض، ص، ش، س، ژ، ز، ر، ذ، د، خ، ح، چ، ج، ث، ت، پ، ب، آ)
+- Arabic script or characters
+- Chinese, Japanese, Korean characters (汉字, ひらがな, 한글)
+- Russian Cyrillic characters
+- ANY non-English text in ANY form
+- Mixed-language content
+- Non-Latin alphabets
+
+ONLY generate images with:
+- English text (A-Z, a-z) ONLY
+- English numbers (0-9)
+- Standard English punctuation
+- English units (USD, kg, %, etc.)
+
+If you detect ANY non-English text in the user prompt, you MUST translate it to English before generating the image.
+
+`;
+
+    // Append negative prompt to enforce English-only
+    cleanPrompt = `${cleanPrompt}${negativePromptSection}`;
 
     cleanPrompt = sanitizePrompt(cleanPrompt);
     if (!cleanPrompt) {

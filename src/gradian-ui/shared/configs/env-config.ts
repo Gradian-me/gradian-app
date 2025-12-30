@@ -86,11 +86,20 @@ export const REQUIRE_LOGIN: boolean = toBoolean(
  * Enable notifications (header button, notifications page, API access)
  * Server: ENABLE_NOTIFICATION=true
  * Client: NEXT_PUBLIC_ENABLE_NOTIFICATION=true
+ * 
+ * Note: In Next.js, NEXT_PUBLIC_* variables are embedded at build/start time.
+ * You must restart the dev server after changing this variable.
  */
-export const ENABLE_NOTIFICATION: boolean = toBoolean(
-  getEnvVar('ENABLE_NOTIFICATION', 'NEXT_PUBLIC_ENABLE_NOTIFICATION'),
-  false
-);
+export const ENABLE_NOTIFICATION: boolean = (() => {
+  if (typeof process === 'undefined') return false;
+  
+  // Directly access NEXT_PUBLIC_ENABLE_NOTIFICATION first (client-side)
+  // Then fall back to ENABLE_NOTIFICATION (server-side)
+  const value = process.env.NEXT_PUBLIC_ENABLE_NOTIFICATION || process.env.ENABLE_NOTIFICATION;
+  const result = toBoolean(value, false);
+    
+  return result;
+})();
 
 /**
  * Enable builder UI (/builder and all sub-routes)

@@ -271,7 +271,7 @@ export function CompanySelector({
   );
   const labelClasses = cn(
     "px-2 py-1.5 text-sm font-semibold",
-    isDarkVariant ? "text-gray-100" : "text-gray-900"
+    "text-gray-900 dark:text-gray-100"
   );
   const separatorClasses = cn(
     "-mx-1 my-1 h-px",
@@ -441,9 +441,9 @@ export function CompanySelector({
               key={company.id}
               className={cn(
                 menuItemBaseClasses,
-                "hover:bg-violet-50 focus:bg-violet-50 text-gray-800 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800 dark:text-gray-200",
+                "hover:bg-violet-50 focus:bg-violet-50 text-gray-800 dark:hover:bg-violet-500/10 dark:focus:bg-violet-500/10 dark:text-gray-200",
                 selectedCompany?.id === company.id &&
-                  (isDarkVariant ? "bg-neutral-900" : "bg-violet-50")
+                  (isDarkVariant ? "bg-violet-500/15" : "bg-violet-50")
               )}
               onSelect={() => handleCompanySelect(company)}
             >

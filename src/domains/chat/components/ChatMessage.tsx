@@ -922,7 +922,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                         enabled: tableData.length > 10,
                         pageSize: DEFAULT_LIMIT,
                         showPageSizeSelector: true,
-                        pageSizeOptions: [10, 25, 50, 100],
+                        pageSizeOptions: [10, 25, 50, 100, 500],
                       },
                       sorting: { enabled: true },
                       filtering: { enabled: true, globalSearch: true },

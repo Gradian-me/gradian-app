@@ -4,9 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { NotificationGroup as NotificationGroupType, GroupByOption } from '../types';
 import { NotificationItem } from './NotificationItem';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardTitle } from '@/components/ui/card';
+import { AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { NotificationService } from '../services/notification.service';
 import { CTAButton } from '@/gradian-ui/form-builder/form-elements/components/CTAButton';
+import { cn } from '@/gradian-ui/shared/utils';
 
 interface NotificationGroupProps {
   group: NotificationGroupType;
@@ -14,9 +16,11 @@ interface NotificationGroupProps {
   onMarkAsRead: (id: string) => void;
   onAcknowledge?: (id: string) => void;
   onMarkAsUnread?: (id: string) => void;
+  value?: string;
+  defaultOpen?: boolean;
 }
 
-export function NotificationGroup({ group, groupBy = 'category', onMarkAsRead, onAcknowledge, onMarkAsUnread }: NotificationGroupProps) {
+export function NotificationGroup({ group, groupBy = 'category', onMarkAsRead, onAcknowledge, onMarkAsUnread, value, defaultOpen = true }: NotificationGroupProps) {
   const [displayCount, setDisplayCount] = useState(10); // Start with 10 items
   const INITIAL_COUNT = 10;
   const LOAD_MORE_COUNT = 20;
@@ -52,10 +56,19 @@ export function NotificationGroup({ group, groupBy = 'category', onMarkAsRead, o
     }
   };
 
+  const groupValue = value || `group-${group.category}`;
+
   return (
-    <Card className="mb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
+    <AccordionItem 
+      value={groupValue} 
+      className={cn(
+        "mb-6 rounded-xl border border-violet-200 dark:border-violet-800/40 bg-violet-50/30 dark:bg-violet-900/20 shadow-sm overflow-hidden",
+        "data-[state=open]:border-violet-300 dark:data-[state=open]:border-violet-700/60",
+        "!border-b-0"
+      )}
+    >
+      <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]]:border-b border-violet-200 dark:border-violet-800/40">
+        <div className="flex items-center justify-between w-full pr-4">
           <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {getGroupLabel(group.category, groupBy)}
           </CardTitle>
@@ -70,9 +83,9 @@ export function NotificationGroup({ group, groupBy = 'category', onMarkAsRead, o
             )}
           </div>
         </div>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <div className="space-y-3">
+      </AccordionTrigger>
+      <AccordionContent className="px-4 pb-4">
+        <div className="space-y-3 pt-4">
           {displayedNotifications.map((notification) => (
             <NotificationItem
               key={notification.id}
@@ -93,7 +106,7 @@ export function NotificationGroup({ group, groupBy = 'category', onMarkAsRead, o
             />
           </div>
         )}
-      </CardContent>
-    </Card>
+      </AccordionContent>
+    </AccordionItem>
   );
 }

@@ -377,7 +377,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
   );
   const labelClasses = cn(
     "px-2 py-1.5 text-sm font-semibold",
-    isDarkVariant ? "text-gray-100" : "text-gray-900"
+    "text-gray-900 dark:text-gray-100"
   );
   const separatorClasses = cn(
     "-mx-1 my-1 h-px",
@@ -529,41 +529,50 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
         }}
       >
         <DropdownMenuPrimitive.Trigger asChild className={fullWidth ? "w-full" : "min-w-44"}>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className={triggerBaseClasses}
-            aria-label="Select tenant"
-            ref={triggerRef}
-          >
-            <Avatar 
-              fallback={tenantInitials}
-              size={showLogo === 'sidebar-avatar' ? 'xs' : 'sm'}
-              variant="primary"
-              className={cn(
-                "border",
-                avatarBorderClass,
-                showLogo === 'sidebar-avatar' ? "h-8 w-8" : ""
-              )}
-              src={showLogo === 'sidebar-avatar' ? selectedTenant?.logo : undefined}
-            />
-            <span
-              className={cn(
-                "text-sm font-medium line-clamp-1 whitespace-nowrap overflow-hidden text-ellipsis text-start",
-                isDarkVariant ? "text-gray-300" : "text-gray-700 dark:text-gray-300",
-                fullWidth ? "flex-1" : ""
-              )}
+          <div className="relative w-full">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className={triggerBaseClasses}
+              aria-label="Select tenant"
+              ref={triggerRef}
             >
-              {getTenantName(selectedTenant) || placeholder}
-            </span>
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 shrink-0 transition-transform duration-200",
-                chevronColorClass,
-                isMenuOpen && "rotate-180"
-              )}
-            />
-          </Button>
+              <Avatar 
+                fallback={tenantInitials}
+                size={showLogo === 'sidebar-avatar' ? 'xs' : 'sm'}
+                variant="primary"
+                className={cn(
+                  "border",
+                  avatarBorderClass,
+                  showLogo === 'sidebar-avatar' ? "h-8 w-8" : ""
+                )}
+                src={showLogo === 'sidebar-avatar' ? selectedTenant?.logo : undefined}
+              />
+              <span
+                className={cn(
+                  "text-sm font-medium line-clamp-1 whitespace-nowrap overflow-hidden text-ellipsis text-start",
+                  isDarkVariant ? "text-gray-300" : "text-gray-700 dark:text-gray-300",
+                  fullWidth ? "flex-1" : ""
+                )}
+              >
+                {getTenantName(selectedTenant) || placeholder}
+              </span>
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 shrink-0 transition-transform duration-200",
+                  chevronColorClass,
+                  isMenuOpen && "rotate-180"
+                )}
+              />
+            </Button>
+            {selectedTenant && (
+              <div
+                className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-emerald-500 border border-white shadow-sm"
+                title={getTenantName(selectedTenant)}
+                aria-label={getTenantName(selectedTenant)}
+              />
+            )}
+          </div>
         </DropdownMenuPrimitive.Trigger>
       
         <DropdownMenuPrimitive.Portal>

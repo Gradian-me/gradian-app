@@ -84,10 +84,10 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
   return (
     <>
       <Card
-        className={`hover:shadow-md transition-all duration-200 cursor-pointer border ${
+        className={`hover:shadow-md transition-all duration-200 cursor-pointer ${
           !notification.isRead
-            ? 'bg-violet-50/30 dark:bg-violet-500/10 border-violet-200 dark:border-violet-400/40'
-            : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800'
+            ? 'bg-violet-50/30 dark:bg-violet-500/10 border-2 border-violet-300 dark:border-violet-400'
+            : 'bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800'
         }`}
         onClick={() => {
           setIsDialogOpen(true);
@@ -102,76 +102,45 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
               {getTypeIcon(notification.type)}
             </div>
             
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between mb-2">
-                <div className="flex-1 gap-2 flex flex-col md:flex-row flex-wrap">
-                  <div className="flex flex-wrap items-center gap-2 sm:hidden">
-                    <span className="inline-flex items-center justify-center">
-                      {getTypeIcon(notification.type)}
-                    </span>
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8, y: 5 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      <Badge variant={getTypeBadgeVariant(notification.type)} className="text-xs">
-                        {notification.type}
-                      </Badge>
-                    </motion.div>
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8, y: 5 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      <Badge variant={getPriorityBadgeVariant(notification.priority)} className="text-xs">
-                        {notification.priority}
-                      </Badge>
-                    </motion.div>
-                  </div>
-                  <h3
-                    className={`text-md font-medium ${
-                      !notification.isRead ? 'font-semibold text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300'
-                    } sm:hidden`}
-                  >
-                    {notification.title}
-                  </h3>
-                  <div className="hidden sm:flex items-center gap-2 mb-1">
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8, y: 5 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      <Badge variant={getTypeBadgeVariant(notification.type)} className="text-xs">
-                        {notification.type}
-                      </Badge>
-                    </motion.div>
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8, y: 5 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      <Badge variant={getPriorityBadgeVariant(notification.priority)} className="text-xs">
-                        {notification.priority}
-                      </Badge>
-                    </motion.div>
-                    <h3 className={`text-sm font-medium ${
-                      !notification.isRead ? 'font-semibold text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300'
-                    }`}>
-                      {notification.title}
-                    </h3>
-                  </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
-                    {notification.message}
-                  </p>
-                </div>
+            <div className="flex-1 min-w-0 w-full">
+              {/* Badges and Title */}
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, y: 5 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Badge variant={getTypeBadgeVariant(notification.type)} className="text-xs">
+                    {notification.type}
+                  </Badge>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, y: 5 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Badge variant={getPriorityBadgeVariant(notification.priority)} className="text-xs">
+                    {notification.priority}
+                  </Badge>
+                </motion.div>
+                <h3 className={`text-sm font-medium flex-1 min-w-0 ${
+                  !notification.isRead ? 'font-semibold text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300'
+                }`}>
+                  {notification.title}
+                </h3>
               </div>
               
-              {/* Creator, Assigned To, and Date Info */}
-              <div className="mt-2 space-y-1">
+              {/* Description - Full Width */}
+              <div className="w-full mb-2">
+                <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 w-full">
+                  {notification.message}
+                </p>
+              </div>
+              
+              {/* Creator, Assigned To, and Date Info - Full Width */}
+              <div className="w-full mt-2 space-y-1">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-500 dark:text-gray-400">
                   {notification.createdBy && (
                     <div className="flex items-center gap-1.5">

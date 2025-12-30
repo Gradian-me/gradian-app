@@ -25,7 +25,7 @@ import { useCompanyStore } from '@/stores/company.store';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { UserProfileSelector } from './UserProfileSelector';
 import { DemoModeBadge } from './DemoModeBadge';
-import { DEMO_MODE, ENABLE_NOTIFICATION } from '@/gradian-ui/shared/configs/env-config';
+import { DEMO_MODE, ENABLE_NOTIFICATION, ENABLE_BUILDER } from '@/gradian-ui/shared/configs/env-config';
 import type { HeaderConfig } from '@/gradian-ui/layout/header';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useTheme } from 'next-themes';
@@ -402,7 +402,7 @@ function MainLayoutContent({
           >
             {title}
           </motion.h1>
-          {isAdmin && editSchemaPath && (
+          {isAdmin && editSchemaPath && ENABLE_BUILDER && (
             <TooltipProvider delayDuration={200}>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -510,22 +510,7 @@ function MainLayoutContent({
         )}
         <DemoModeBadge />
         {ENABLE_NOTIFICATION && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative"
-            onClick={handleNotificationClick}
-          >
-            <Bell className="h-5 w-5" />
-            {notificationCount > 0 && (
-              <Badge
-                variant="destructive"
-                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs p-0"
-              >
-                {notificationCount}
-              </Badge>
-            )}
-          </Button>
+          <NotificationsDropdown initialCount={5} />
         )}
         {showCreateButton && (
           <Button

@@ -34,269 +34,62 @@ export const GENERAL_MARKDOWN_OUTPUT_RULES = `
 
 ---
 
-## 📋 GENERAL MARKDOWN OUTPUT RULES (APPLIES TO ALL STRING FORMAT AGENTS)
+## 📋 GENERAL MARKDOWN OUTPUT RULES
 
-These rules apply to ALL agents that output markdown. Follow them strictly to ensure professional, consistent, and well-formatted output.
+### 🎯 Quality & Structure
+- **Length**: 1000-5000+ words (standard: 1000-2000, complex: 2000-5000+)
+- **Depth**: 2-3 paragraphs per major section, 100-200 words per subsection
+- **Coverage**: Comprehensive analysis with actionable insights
+- **Hierarchy**: H1 (title) → H2 (sections) → H3/H4 (subsections), aim for 8-15+ major sections
 
-### 🎯 Output Quality Requirements
+### 📝 Formatting Rules
 
-- **Comprehensive Coverage**: Provide thorough, detailed analysis (1000-5000+ words depending on complexity)
-- **Detailed Descriptions**: Every major section must have 2-3 paragraphs minimum
-- **Depth Over Breadth**: Go deep into each topic rather than providing surface-level coverage
-- **Actionable Content**: Every section should include actionable insights, recommendations, or next steps
-- **Professional Formatting**: Use proper markdown formatting throughout
-
-### 📝 Markdown Formatting Rules
-
-#### 1. Blockquotes (>) - Use Extensively for Important Notes
-
-**CRITICAL**: Use blockquotes for ALL important notes, warnings, critical information, cautions, and key reminders.
-
-**Format:**
-\`\`\`markdown
-> ⚠️ **Warning:** This action cannot be undone.
-
-> **Important:** Please review all requirements before proceeding.
-
-> **Note:** This information requires special attention.
+**Blockquotes (>)** - For warnings, important notes, critical info:
+\`\`\`text
+> ⚠️ **Warning:** Action cannot be undone.
+> **Important:** Review requirements before proceeding.
 \`\`\`
 
-**When to Use:**
-- Warnings and cautions
-- Important notes and reminders
-- Critical information
-- Key instructions
-- Notices and alerts
-- Any information that needs special attention
+**Ordered Lists (1., 2., 3.)** - For sequential steps, procedures, numbered instructions
 
-#### 2. Ordered Lists (1., 2., 3.) - For Sequential Items
+**Unordered Lists (- or *)** - For important points, features, considerations (no specific order)
 
-**CRITICAL**: Use ordered lists for sequential steps, step-by-step procedures, numbered instructions, and any items with a specific order.
+**Task Lists (- [ ])** - For action items, follow-ups, tasks requiring completion
 
-**Format:**
-\`\`\`markdown
-1. First step: Detailed description
-2. Second step: Specific action
-3. Third step: Validation and verification
-\`\`\`
+**Dividers (***)** - Separate completely different subjects/major topic changes (not minor subsections)
 
-**When to Use:**
-- Sequential steps and procedures
-- Step-by-step instructions
-- Numbered procedures
-- Ordered recommendations
-- Implementation steps
-- Any items that must be done in a specific order
+**Tables** - Always include header row, separator (\`| --- |\`), proper alignment (\`:---:\` center, \`---:\` right, \`:---\` left)
 
-**Do NOT use for**: Important points without order (use bullet lists instead)
+**Headings** - Use proper hierarchy (H1-H4), maintain consistent structure
 
-#### 3. Unordered Lists (- or *) - For Important Items
+### ✍️ Grammar & Diction
+**Before finalizing, review:**
+1. **Grammar**: Spelling, punctuation, capitalization, subject-verb agreement, tense consistency, pronoun agreement, sentence structure, parallel structure
+2. **Diction**: Precise word choice, clarity, consistency, technical accuracy, active voice preference, avoid wordiness/ambiguity
 
-**CRITICAL**: Use unordered lists (bullet points) for important points, key features, benefits, considerations, and any items that don't have a specific order.
+**Common errors to fix:**
+- Subject-verb disagreement, incorrect pronouns, tense inconsistency
+- Dangling modifiers, run-on sentences, fragments
+- Wordiness ("In order to" → "To"), vague language ("Things" → specific items)
+- Incorrect word choice (Affect/Effect, Ensure/Insure, Compliment/Complement)
 
-**Format:**
-\`\`\`markdown
-- Important point 1: Detailed explanation
-- Important point 2: Key consideration
-- Important point 3: Critical factor
-\`\`\`
+**Quality standard**: Publication-ready, zero grammar errors, professional diction
 
-**When to Use:**
-- Important points and key items
-- Key features and benefits
-- Considerations and factors
-- Highlights and key takeaways
-- Any items without a specific order
-
-**Do NOT use for**: Sequential steps (use ordered lists instead) or tasks requiring follow-up (use task lists instead)
-
-#### 4. Task Lists (- [ ]) - For Things That Need Follow-up
-
-**CRITICAL**: Use task lists (checkboxes) specifically for things that need follow-up, action items, and tasks that require completion.
-
-**Format:**
-\`\`\`markdown
-- [ ] Task 1: Detailed description of what needs to be done
-- [ ] Task 2: Specific action item with clear deliverables
-- [x] Task 3: Completed task (only mark as complete if explicitly done)
-\`\`\`
-
-**When to Use:**
-- Action items that need to be done
-- Tasks requiring completion
-- Validation and verification items
-- Review and approval checkpoints
-- Follow-up activities
-- Monitoring tasks
-- Any task someone needs to do or check
-
-**Do NOT use for**: Information or facts (use bullet lists), sequential steps (use ordered lists), or general descriptions
-
-#### 5. Dividers (***) - To Separate Different Subjects
-
-**CRITICAL**: Use \`***\` (three asterisks on its own line) to separate completely different subjects, major topic changes, or conceptually distinct sections.
-
-**Format:**
-\`\`\`markdown
-## Section 1: Topic A
-
-Content about topic A...
-
-***
-
-## Section 2: Topic B
-
-Content about topic B (completely different subject)...
-\`\`\`
-
-**When to Use:**
-- Transitioning between completely different topics
-- Separating major sections that are conceptually distinct
-- Creating visual breaks between unrelated content areas
-- Separating different phases or stages
-
-**Do NOT use for**: Minor subsections or related content - only for completely different subjects
-
-#### 6. Tables - Proper Formatting Required
-
-**CRITICAL**: Always format tables correctly with header rows, separator rows, and proper alignment.
-
-**Format:**
-\`\`\`markdown
-| Column 1 | Column 2 | Column 3 |
-| --- | --- | --- |
-| Row 1 Col 1 | Row 1 Col 2 | Row 1 Col 3 |
-| Row 2 Col 1 | Row 2 Col 2 | Row 2 Col 3 |
-\`\`\`
-
-**Formatting Rules:**
-- Always include header row with column names
-- Use \`| --- |\` separator row (use \`:---:\` for center, \`---:\` for right, \`:---\` for left alignment)
-- Ensure all rows have the same number of columns as the header
-- Use proper spacing and alignment for readability
-- Keep table content concise but informative
-
-**When to Use:**
-- Structured data and comparisons
-- Metrics and KPIs
-- Feature lists
-- Organized information
-
-#### 7. Headings - Proper Hierarchy
-
-- Use H1 (#) for main document title
-- Use H2 (##) for major sections
-- Use H3 (###) for subsections
-- Use H4 (####) for detailed subsections
-- Aim for 8-15+ major sections for comprehensive coverage
-
-### 📊 Output Structure Requirements
-
-- **Structured Hierarchy**: Use proper heading levels (H1-H4) for document structure
-- **Clear Organization**: Organize content with clear sections and subsections
-- **Visual Elements**: Use tables for structured data, Mermaid diagrams for processes/relationships
-- **Comprehensive Descriptions**: Every section must have detailed descriptions (2-3 paragraphs minimum for major sections)
-- **Length Requirements**: 
-  - Standard outputs: 1000-2000 words minimum
-  - Complex analysis: 2000-5000+ words
-  - Each major section: 200-500 words
-  - Each subsection: 100-200 words
-
-### ✍️ Grammar and Diction Quality Requirements
-
-**CRITICAL**: Before finalizing your output, you MUST perform a comprehensive grammar and diction review to ensure professional, error-free content, in the main language of the output.
-
-#### Grammar Check Requirements
-
-- **Spelling**: Verify all words are spelled correctly, including technical terms, proper nouns, and domain-specific vocabulary
-- **Punctuation**: Ensure proper use of commas, periods, semicolons, colons, apostrophes, and quotation marks
-- **Capitalization**: Check proper capitalization of titles, headings, proper nouns, acronyms, and sentence beginnings
-- **Subject-Verb Agreement**: Verify all subjects and verbs agree in number (singular/plural)
-- **Tense Consistency**: Maintain consistent verb tenses throughout each section (avoid switching between past, present, and future unnecessarily)
-- **Pronoun Agreement**: Ensure pronouns match their antecedents in number and gender
-- **Sentence Structure**: Verify complete sentences with proper subject-verb-object structure
-- **Parallel Structure**: Ensure items in lists, series, and comparisons use parallel grammatical forms
-- **Articles (a, an, the)**: Use articles correctly and consistently
-- **Prepositions**: Verify correct preposition usage (in, on, at, for, with, etc.)
-
-#### Diction (Word Choice) Requirements
-
-- **Precision**: Use precise, specific words rather than vague or generic terms
-- **Clarity**: Choose words that clearly convey your intended meaning
-- **Appropriateness**: Use vocabulary appropriate for the audience and context
-- **Consistency**: Use consistent terminology throughout (avoid switching between synonyms unnecessarily)
-- **Formality**: Maintain appropriate level of formality for professional documentation
-- **Conciseness**: Avoid wordiness and redundancy - use the most direct way to express ideas
-- **Technical Accuracy**: Use correct technical terms and industry-standard terminology
-- **Avoid Ambiguity**: Choose words that eliminate ambiguity and multiple interpretations
-- **Active Voice**: Prefer active voice over passive voice for clarity and directness
-- **Strong Verbs**: Use strong, specific verbs rather than weak verb phrases
-
-#### Common Grammar and Diction Errors to Fix
-
-- ❌ Subject-verb disagreement: "The team are working" → "The team is working"
-- ❌ Incorrect pronoun usage: "Each person should bring their book" → "Each person should bring his or her book" or "People should bring their books"
-- ❌ Tense inconsistency: "We analyzed the data and will present findings" → "We analyzed the data and presented findings" (if both are past)
-- ❌ Dangling modifiers: "Walking to the store, the rain started" → "While walking to the store, I noticed the rain started"
-- ❌ Run-on sentences: Break long sentences into shorter, clearer ones
-- ❌ Fragments: Ensure all sentences are complete with subject and verb
-- ❌ Wordiness: "In order to" → "To", "Due to the fact that" → "Because"
-- ❌ Vague language: "Things" → Specific items, "Stuff" → Specific materials
-- ❌ Redundancy: "Free gift" → "Gift", "Past history" → "History"
-- ❌ Incorrect word choice: "Affect" vs "Effect", "Ensure" vs "Insure", "Compliment" vs "Complement"
-
-#### Pre-Output Review Process
-
-**Before finalizing your output, perform these checks in order:**
-
-1. **Content Review**: Ensure all information is accurate and complete
-2. **Grammar Review**: Check spelling, punctuation, capitalization, agreement, and sentence structure
-3. **Diction Review**: Verify word choice, precision, clarity, and consistency
-4. **Formatting Review**: Ensure proper markdown formatting and structure
-5. **Final Proofread**: Read through the entire output one final time to catch any remaining errors
-
-**Quality Standard**: Your output should be publication-ready with zero grammar errors and professional diction throughout.
-
-### ✅ Checklist for Every Output
-
-Before finalizing your output, ensure:
-
-- [ ] **Grammar Check Complete**: All spelling, punctuation, capitalization, and grammar errors are fixed
-- [ ] **Diction Review Complete**: All word choices are precise, clear, and appropriate
-- [ ] **Tense Consistency**: Verb tenses are consistent throughout each section
-- [ ] **Subject-Verb Agreement**: All subjects and verbs agree in number
-- [ ] **Pronoun Agreement**: All pronouns match their antecedents
-- [ ] **Sentence Structure**: All sentences are complete and well-structured
-- [ ] **Parallel Structure**: Lists and series use parallel grammatical forms
-- [ ] **Active Voice**: Prefer active voice for clarity (passive only when appropriate)
-- [ ] **Technical Accuracy**: All technical terms and terminology are correct
-- [ ] All important notes are in blockquotes (>)
-- [ ] Sequential steps use ordered lists (1., 2., 3.)
-- [ ] Important points use unordered lists (- or *)
-- [ ] Action items use task lists (- [ ])
-- [ ] Different subjects are separated with dividers (***)
-- [ ] Tables are properly formatted with headers and separators
-- [ ] All sections have detailed descriptions (2-3 paragraphs minimum)
-- [ ] Output meets length requirements (1000-5000+ words depending on complexity)
-- [ ] Professional formatting throughout
-
-### 🚫 Common Mistakes to Avoid
-
-- ❌ **Grammar and Diction Errors**: Spelling mistakes, punctuation errors, incorrect word choices, tense inconsistencies, subject-verb disagreements
-- ❌ Using bullet lists for sequential steps (use ordered lists)
-- ❌ Using task lists for information (use bullet lists)
-- ❌ Missing blockquotes for important notes
-- ❌ Not using dividers between different subjects
-- ❌ Incomplete or improperly formatted tables
-- ❌ Surface-level descriptions instead of comprehensive analysis
-- ❌ Outputs that are too short or lack depth
-- ❌ Vague or imprecise language that reduces clarity
-- ❌ Inconsistent terminology or word choice throughout the document
-- ❌ **NEVER include \`\`\`markdown code blocks in your output** - This creates nested markdown rendering issues and breaks the display. If you need to show markdown examples, use plain text or code blocks with a different language identifier (like \`\`\`text or \`\`\`plaintext), but avoid \`\`\`markdown at all costs.
+### ✅ Pre-Output Checklist
+- [ ] Grammar & diction review complete
+- [ ] Important notes in blockquotes (>)
+- [ ] Sequential steps in ordered lists (1., 2., 3.)
+- [ ] Important points in unordered lists (- or *)
+- [ ] Action items in task lists (- [ ])
+- [ ] Different subjects separated with dividers (***)
+- [ ] Tables properly formatted
+- [ ] Sections have detailed descriptions (2-3 paragraphs minimum)
+- [ ] Length requirements met
+- [ ] **NEVER use \`\`\`markdown code blocks** - use \`\`\`text or \`\`\`plaintext for examples
 
 ---
 
-**Remember**: These rules apply to ALL string format outputs. Follow them strictly to ensure professional, consistent, meaningful, decision builder and well-formatted markdown output.`;
+**Apply these rules to ALL string format outputs for professional, consistent markdown.**`;
 
 /**
  * Reference and Source Citation Rules
@@ -305,139 +98,60 @@ Before finalizing your output, ensure:
  */
 export const REFERENCE_PROMPT = `
 
-## 📚 REFERENCES AND SOURCE CITATION RULES (APPLIES TO ALL STRING FORMAT AGENTS)
+## 📚 REFERENCES AND SOURCE CITATION RULES
 
-If you use any references, sources, external information, or RAG (Retrieval-Augmented Generation) data in your output, you MUST include a "References" section following these rules.
+**Include References section ONLY if you used external sources, RAG data, search results, regulatory guidelines, research papers, or any source material. If NO references were used, omit entirely.**
 
-### 🎯 When to Include References
+### 📋 Format Requirements
 
-Include a References section if you:
-- Used any external sources, documents, or articles
-- Referenced RAG (Retrieval-Augmented Generation) data or search results
-- Cited regulatory guidelines, standards, or official documentation
-- Referenced research papers, studies, or publications
-- Used information from websites, documentation, or knowledge bases
-- Referenced any source material provided in the input or context
+**Location**: FINAL section, after all content. Add divider \`***\` BEFORE References section.
 
-**If NO references were used, omit the References section entirely.**
-
-### 📋 Reference Section Format
-
-**Location**: The References section MUST be the FINAL section in your output, placed after all other content.
-
-**Divider**: Add a divider (\`***\`) BEFORE the References section to separate it from the main content.
-
-**CRITICAL**: Only output ONE References section with ONE divider. Do NOT duplicate dividers or headings.
-
-**Output Format** (this is what you should output - only once):
+**Output Format** (output ONCE only):
 \`\`\`text
-Add exactly this structure at the end of your output (replace placeholders with actual data):
-
 ***
 ## References
 
 | Source Title | Source Host | Source URL | Description |
 | --- | --- | --- | --- |
-| [Actual Title from Source] | [Actual Host/Domain] | [Actual URL] | [Brief description] |
+| [Actual Title] | [Actual Host] | [Actual URL] | [How source was used] |
 \`\`\`
 
-**DO NOT** include the divider from instruction sections. Only add the divider and References section in your actual output.
+**Table Columns:**
+- **Source Title**: Actual document/article title (e.g., "FDA 21 CFR Part 211")
+- **Source Host**: Domain/organization (e.g., "fda.gov", "ich.org")
+- **Source URL**: Full URL to source
+- **Description**: Brief description of how source was used
 
-### ✅ Reference Table Requirements
+### 🚨 Critical Rules
 
-**Column Definitions:**
-- **Source Title**: The actual title of the document, article, or source (e.g., "FDA 21 CFR Part 211", "ICH Q7 Guidelines", "Pharmaceutical Manufacturing Best Practices")
-- **Source Host**: The domain or organization that hosts the source (e.g., "fda.gov", "ich.org", "example.com")
-- **Source URL**: The full URL to the source (e.g., "https://www.fda.gov/regulations/...")
-- **Description**: A brief description of how this source was used in your analysis or what information it provided
+1. **ONLY Actual Source Data**: NEVER create fake/placeholder sources. Use ONLY data from RAG inputs, search results, user context, preloaded data, or system context. If source info missing, state "Source information not available" rather than inventing.
 
-### 🚨 Critical Rules for References
+2. **Complete Reference List**: Include ALL references used. Cite inline where used (format: \`[Source Title](Source URL) - Source Host\`). Include all RAG sources.
 
-**1. Use ONLY Actual Source Data:**
-- **NEVER** create fake, example, or placeholder source information
-- **NEVER** use values like "Example Host 1", "Example Title", "example.com", or placeholder URLs
-- **ONLY** use actual source data provided in:
-  - RAG inputs
-  - Search results
-  - User-provided context
-  - Preloaded data
-  - System context
+3. **RAG Handling**: MANDATORY - Use ALL RAG references throughout analysis. Display ALL in References table. Extract metadata (host, title, URL) when available.
 
-**2. If Source Information is Missing:**
-- If source information (host, title, URL) is not available in the provided data, clearly state: "Source information not available in provided data"
-- Do NOT invent or guess source information
-- It is better to omit incomplete references than to include fake data
+4. **Single Section**: Output ONE References section with ONE divider (\`***\`) before it. Do NOT duplicate.
 
-**3. Complete Reference List:**
-- **MUST** include ALL references that were used in your analysis
-- **MUST** cite references throughout your output where they are used (not just in the References section)
-- **MUST** ensure every reference from RAG sources is included in the table
-- Even if multiple references cover similar topics, include all of them for complete transparency
+### ✅ Checklist
+- [ ] References section is FINAL section (if references used)
+- [ ] Divider \`***\` before References
+- [ ] All used references included
+- [ ] Only actual source data (no placeholders)
+- [ ] References cited inline in content
+- [ ] All RAG sources included
+- [ ] Properly formatted markdown table
 
-**4. Reference Citation in Content:**
-- Cite sources inline where they are used (e.g., "According to [Source Title](Source URL)...")
-- Reference citations should include source title and URL when possible
-- Format inline citations as: \`[Source Title](Source URL) - Source Host\` or use a simple reference number that maps to the References table
-
-**5. RAG Source Handling:**
-- **MANDATORY**: Use ALL references provided in RAG sources throughout your analysis
-- **MANDATORY**: Display ALL references used in the References section with complete citations
-- **MANDATORY**: Extract source metadata (host, title, URL) from RAG inputs when available
-- Cross-check claims across multiple sources when possible
-- Grade evidence strength (Strong/Moderate/Weak) if relevant to your analysis
-
-### 📝 Example Reference Section
-
-**This is an EXAMPLE only. Output ONE References section like this (do NOT duplicate):**
-
-\`\`\`text
-Example output structure (replace with your actual references):
-
-***
-## References
-
-| Source Title | Source Host | Source URL | Description |
-| --- | --- | --- | --- |
-| FDA 21 CFR Part 211 | fda.gov | https://www.fda.gov/... | Used for regulatory compliance |
-| ICH Q7 Guidelines | ich.org | https://www.ich.org/... | Referenced for API standards |
-\`\`\`
-
-**CRITICAL REMINDER**: 
-- Only output ONE References section
-- Only ONE divider (\`***\`) before it
-- Do NOT duplicate dividers from instruction sections
-- Do NOT include multiple References sections
-
-### ✅ Checklist for References
-
-Before finalizing your output, ensure:
-
-- [ ] If references were used, a References section is included as the FINAL section
-- [ ] A divider (\`***\`) is placed BEFORE the References section
-- [ ] All references used in the analysis are included in the table
-- [ ] Source Title, Source Host, Source URL, and Description are provided for each reference
-- [ ] ONLY actual source data is used (no fake, example, or placeholder information)
-- [ ] If source information is missing, it is clearly stated rather than invented
-- [ ] References are cited inline where they are used in the content
-- [ ] All RAG sources are included if RAG data was used
-- [ ] The References section is properly formatted as a markdown table
-
-### 🚫 Common Mistakes to Avoid
-
-- ❌ Creating fake or example source information
-- ❌ Using placeholder values like "Example Host 1" or "example.com"
-- ❌ Omitting references that were actually used
-- ❌ Including a References section when no references were used
-- ❌ Placing References section in the middle of the document (must be final section)
-- ❌ Missing the divider before the References section
-- ❌ **DUPLICATING the References section, divider, or heading** - Only ONE References section with ONE divider
-- ❌ Including multiple dividers (\`---\`, \`***\`) or multiple References headings
-- ❌ Incomplete reference information (missing host, URL, or description)
-- ❌ Not citing references inline where they are used
+### 🚫 Avoid
+- ❌ Fake/placeholder source information
+- ❌ Omitting used references
+- ❌ Including References when none used
+- ❌ Placing References mid-document
+- ❌ Duplicating References section/divider
+- ❌ Missing inline citations
 
 ---
 
-**Remember**: References provide transparency and traceability. If you used sources, cite them properly. If you didn't use sources, don't include a References section.`;
+**If sources used → cite properly. If no sources → omit References section.**`;
 
 /**
  * Mermaid Diagram Rules
@@ -448,139 +162,62 @@ export const MERMAID_RULES = `
 
 ---
 
-## 📊 MERMAID DIAGRAM RULES (APPLIES TO ALL STRING FORMAT AGENTS)
+## 📊 MERMAID DIAGRAM RULES
 
-When creating Mermaid diagrams in your output, follow these rules strictly to ensure proper rendering and professional appearance.
+### 🎯 Diagram Type Selection
+- **\`flowchart\`**: Process flows, workflows, sequential actions, decision trees
+- **\`stateDiagram-v2\`**: State transitions, state machines, state-based workflows
+- **\`mindmap\`**: Hierarchical information, concept mapping, knowledge organization
+- **\`timeline\`**: Chronological sequences, historical events, project phases
+- **\`journey\`**: User experiences, process experiences with actors
 
-### 🎯 Choose the Right Diagram Type
+### 🚫 CRITICAL RULES (Apply to ALL diagram types)
 
-**Use \`flowchart\` for process flows:**
-- Step-by-step processes
-- Workflows and procedures
-- Sequential actions
-- Task dependencies
-- Process flows
-- Decision trees with labeled branches
+**1. NO PARENTHESES RULE:**
+- **NEVER use parentheses in node names, state names, labels, transition labels, action names, phase names, or any text content**
+- **ONLY exception**: Flowchart shape syntax \`([Start])\` and \`([End])\` (shape delimiters, not content)
+- Use underscores instead: \`State_With_Parentheses\` ✅, \`State(With)Parentheses\` ❌
 
-**Use \`stateDiagram-v2\` for state changes:**
-- State transitions
-- State machines
-- System states
-- Decision flows (when modeling state changes, not process steps)
-- State-based workflows
+**2. PIPE SYNTAX \`|Label|\` RULE:**
+- **EXCLUSIVE to flowcharts ONLY**: \`Node1 -->|Label| Node2\` ✅
+- **NEVER use in stateDiagram-v2, mindmap, timeline, or journey** - causes parse errors
+- **StateDiagram-v2**: Use colon syntax \`State1 --> State2 : Label\` instead
 
-**Use \`mindmap\` for hierarchical information:**
-- Concept mapping
-- Brainstorming
-- Knowledge organization
-- Topic hierarchies
-- Idea relationships
-- Subject breakdowns
+**3. General Formatting:**
+- Each statement on its own line with proper spacing
+- Include all decision points, branches, alternative flows (not just happy paths)
+- Wrap in \`\`\`mermaid code blocks
+- Use descriptive labels (without parentheses)
 
-**Use \`timeline\` for chronological sequences:**
-- Historical events
-- Project phases
-- Milestones over time
-- Sequential events
-- Development stages
-- Time-based progressions
+### 📋 Syntax by Type
 
-**Use \`journey\` for user experiences:**
-- User journeys
-- Process experiences
-- Step-by-step experiences with actors
-- Workflow experiences
-- Customer journeys
-- Task sequences with participants
-
-### 📋 Flowchart Rules (for process flows)
-
-**Syntax:**
+**Flowchart:**
 \`\`\`mermaid
 flowchart TD
-    Start --> Step1[Step 1: Action]
-    Step1 --> Decision{Decision Point}
-    Decision -->|Yes| Step2[Step 2: Action A]
-    Decision -->|No| Step3[Step 3: Action B]
-    Step2 --> End
-    Step3 --> End
+    ([Start]) --> Step1[Action]
+    Step1 --> Decision{Decision?}
+    Decision -->|Yes| Step2[Action A]
+    Decision -->|No| Step3[Action B]
+    Step2 --> ([End])
 \`\`\`
-
-**Requirements:**
 - Use \`flowchart TD\` (top-down) or \`flowchart LR\` (left-right)
-- Use \`([Start])\` and \`([End])\` for start/end nodes (rounded rectangles) - parentheses here are shape syntax, NOT content
-- Use \`{Decision}\` for decision points (diamonds)
-- Use \`[Action]\` for process steps (rectangles)
-- **NEVER use parentheses in node names or labels** - use underscores instead
-- **Label edges/arrows using pipe syntax**: \`Node1 -->|Label| Node2\` (this syntax is ONLY allowed in flowcharts, not in any other diagram type)
-- **IMPORTANT**: The \`|Label|\` syntax with pipes is EXCLUSIVE to flowcharts - do NOT use it in stateDiagram-v2, mindmap, timeline, or journey diagrams
-- Keep labels concise and descriptive (without parentheses)
-- Each statement MUST be on its own line with proper spacing
-- Include all decision points, branches, and alternative flows
-- Show complete workflows, not just happy paths
-- Use descriptive node labels (without parentheses)
+- \`([Start])\` / \`([End])\` for rounded rectangles, \`{Decision}\` for diamonds, \`[Action]\` for rectangles
+- Label edges: \`Node1 -->|Label| Node2\` (ONLY in flowcharts)
 
-### 📋 StateDiagram-v2 Rules (for state changes)
-
-**Syntax:**
+**StateDiagram-v2:**
 \`\`\`mermaid
 stateDiagram-v2
     [*] --> Initial_State
     Initial_State --> Processing_State
-    Processing_State --> Decision_Point
-    Decision_Point --> Final_State : Success
-    Decision_Point --> Error_State : Failure
-    Final_State --> [*]
-    Error_State --> [*]
+    Processing_State --> Success_State : Valid
+    Processing_State --> Error_State : Invalid
+    Success_State --> [*]
 \`\`\`
+- **ALWAYS use \`[*]\` for start/end states** (never "Start"/"End")
+- **NEVER use spaces in node names** - use underscores: \`Check_Stop_Code\` ✅
+- Label transitions: \`State1 --> State2 : Label\` (colon syntax, NOT \`|Label|\`)
 
-**Note**: If you need transition labels, use \`State1 --> State2 : Label\` syntax, NOT \`State1 -->|Label| State2\`
-
-**CRITICAL REQUIREMENTS:**
-
-1. **NO PARENTHESES - ABSOLUTE RULE:**
-   - **NEVER use parentheses in state names, node names, transition labels, or any content**
-   - **Parentheses are FORBIDDEN in stateDiagram-v2 diagrams**
-   - Example: \`Check_Stop_Code\` (correct)
-   - Example: \`Check(Stop)Code\` (WRONG - will cause parsing errors)
-   - Example: \`State1 --> State2 : Label_Note\` (correct)
-   - Example: \`State1 --> State2 : Label (Note)\` (WRONG - parentheses not allowed)
-   - If you need to include additional information, use underscores, hyphens, or separate states
-
-2. **Start and End States:**
-   - **ALWAYS use \`[*]\` for start and end states**
-   - **NEVER use custom labels like "Start", "End", "Begin", or "Finish"**
-   - Example: \`[*] --> Initial_State\` (correct)
-   - Example: \`Start --> Initial_State\` (WRONG)
-
-3. **Node Names:**
-   - **NEVER use spaces in node names** - use underscores instead
-   - Example: \`Check_Stop_Code\` (correct)
-   - Example: \`Check Stop Code\` (WRONG - will cause errors)
-   - Example: \`CheckStopCode\` (acceptable but underscores preferred)
-   - All node names must be single words or use underscores to separate words
-   - Keep node names short and descriptive
-
-4. **Transitions:**
-   - **NEVER use \`|Label|\` syntax in stateDiagram-v2** - this pipe syntax is ONLY for flowcharts
-   - **The \`|Label|\` syntax is EXCLUSIVE to flowcharts** - it will cause parse errors in stateDiagram-v2
-   - **If you need labels, use the colon syntax**: \`State1 --> State2 : Label\` (no parentheses in labels)
-   - Simple transitions without labels: \`State1 --> State2\` (correct)
-   - Labeled transitions: \`State1 --> State2 : Label\` (correct)
-   - **WRONG**: \`State1 -->|Label| State2\` (this syntax causes parse errors in stateDiagram-v2 - use colon syntax instead)
-   - **WRONG**: \`State1 --> State2 : Label (Note)\` (parentheses not allowed)
-   - If you don't need labels, use simple transitions: \`State1 --> State2\`
-
-5. **Structure:**
-   - Model decision points, not just steps
-   - Reflect real-world branching behavior
-   - Keep it minimal and readable
-   - Use branching decisions
-   - Include escalation and stop conditions
-
-### 📋 Mindmap Rules (for hierarchical information)
-
-**Syntax:**
+**Mindmap:**
 \`\`\`mermaid
 mindmap
   Root_Subject
@@ -588,215 +225,46 @@ mindmap
       Leaf1
       Leaf2
     Branch2
-      Leaf3
-        SubLeaf1
 \`\`\`
+- Use indentation (2 spaces per level) for hierarchy
+- No parentheses, no \`|Label|\` syntax
 
-**Requirements:**
-- Start with a root node (main subject)
-- Use indentation to show hierarchy (2 spaces per level)
-- **NEVER use parentheses in node names** - use underscores instead
-- **NEVER use \`|Label|\` syntax** - this pipe syntax is ONLY for flowcharts, not mindmaps
-- Keep node names concise and descriptive (without parentheses)
-- Use underscores for multi-word nodes if needed
-- Each level should be indented consistently
-- Show relationships through hierarchy structure
-- Each branch/leaf must be on its own line
-
-### 📋 Timeline Rules (for chronological sequences)
-
-**Syntax:**
+**Timeline:**
 \`\`\`mermaid
 timeline
     title Timeline Title
-    Phase 1 : Event 1
-    Phase 2 : Event 2
-             : Event 3
-    Phase 3 : Event 4
+    Phase_1 : Event_1
+    Phase_2 : Event_2
+             : Event_3
 \`\`\`
+- Always include \`title\`
+- Use colons to separate phase from event
+- No parentheses in phase/event names
 
-**Requirements:**
-- Always include a title using \`title Timeline Title\` (no parentheses in title)
-- Use phases or time periods as main sections
-- **NEVER use parentheses in phase or event names** - use underscores or hyphens instead
-- **NEVER use \`|Label|\` syntax** - this pipe syntax is ONLY for flowcharts, not timelines
-- Multiple events can share the same phase (indent with spaces to align with the colon)
-- Use colons (\`:\`) to separate phase from event
-- Keep phase and event names concise (without parentheses)
-- Show chronological progression from top to bottom
-- Each phase/event must be on its own line
-
-### 📋 Journey Rules (for user experiences)
-
-**Syntax:**
+**Journey:**
 \`\`\`mermaid
 journey
     title Journey Title
-    section Section Name
-      Action 1: 5: Actor1
-      Action 2: 3: Actor1, Actor2
-    section Next Section
-      Action 3: 4: Actor2
+    section Section_Name
+      Action_1: 5: Actor1
+      Action_2: 3: Actor1, Actor2
 \`\`\`
+- Format: \`Action_Name: Score: Actor1, Actor2\`
+- Score typically 1-5
+- No parentheses in action/section/actor names
 
-**Requirements:**
-- Always include a title using \`title Journey Title\` (no parentheses in title)
-- Use \`section\` to group related actions
-- Format: \`Action Name: Score: Actor1, Actor2\`
-- **NEVER use parentheses in action names, section names, or actor names** - use underscores instead
-- **NEVER use \`|Label|\` syntax** - this pipe syntax is ONLY for flowcharts, not journeys
-- Score is typically 1-5 (satisfaction, importance, effort, etc.)
-- Multiple actors can be listed (comma-separated, no parentheses)
-- Each action must be on its own line
-- Use descriptive action names (without parentheses)
-- Show progression through sections
-- Indent actions under their section (2 spaces)
-
-### ✅ General Mermaid Requirements
-
-**🚫 CRITICAL: NO PARENTHESES RULE**
-- **NEVER use parentheses in node names, state names, labels, or any content within Mermaid diagrams**
-- **NEVER use parentheses in transition labels, action names, phase names, or any text content**
-- Parentheses are ONLY allowed in flowchart syntax for node shapes: \`([Start])\` and \`([End])\` (these are shape delimiters, not content)
-- **ALL other uses of parentheses are FORBIDDEN and will cause parsing errors**
-- Examples of FORBIDDEN usage:
-  - ❌ \`State(With)Parentheses\` → Use \`State_With_Parentheses\`
-  - ❌ \`Node(Name)\` → Use \`Node_Name\`
-  - ❌ \`Action (Step 1)\` → Use \`Action_Step_1\` or \`Action_Step1\`
-  - ❌ \`Phase (1)\` → Use \`Phase_1\` or \`Phase1\`
-  - ❌ \`State1 --> State2 : Label (Note)\` → Use \`State1 --> State2 : Label_Note\`
-- This rule applies to ALL diagram types: flowchart, stateDiagram-v2, mindmap, timeline, and journey
-
-**🚫 CRITICAL: PIPE SYNTAX \`|Label|\` RULE**
-- **The \`|Label|\` syntax with pipes is EXCLUSIVE to flowcharts ONLY**
-- **NEVER use \`|Label|\` syntax in stateDiagram-v2, mindmap, timeline, or journey diagrams**
-- **Flowcharts**: Use \`Node1 -->|Label| Node2\` for labeled edges (correct)
-- **StateDiagram-v2**: Use \`State1 --> State2 : Label\` with colon syntax instead (NOT \`|Label|\`)
-- **Mindmap, Timeline, Journey**: These diagram types do NOT support edge labels with pipes
-- Using \`|Label|\` in non-flowchart diagrams will cause parsing errors
-- Examples:
-  - ✅ Flowchart: \`Decision -->|Yes| Step1\` (correct)
-  - ❌ StateDiagram-v2: \`State1 -->|Label| State2\` → Use \`State1 --> State2 : Label\` instead
-  - ❌ Mindmap/Timeline/Journey: Do not use \`|Label|\` syntax at all
-
-**Formatting:**
-- Each statement MUST be on its own line with proper spacing
-- Use proper indentation for readability
-- Include all decision points, branches, and alternative flows
-- Show complete workflows, not just happy paths
-- Use descriptive node/state labels (without parentheses)
-
-**Completeness:**
-- Create complete, comprehensive diagrams
-- Include all decision points, branches, loops, and end states
-- Show all alternative paths, not just the happy path
-- Include error handling and edge cases when relevant
-
-**Code Block Format:**
-- Always wrap Mermaid diagrams in code blocks with \`mermaid\` language identifier
-- Format: \`\`\`mermaid followed by diagram code, then \`\`\`
-- Ensure proper closing of code blocks
-
-### 🚫 Common Mistakes to Avoid
-
-- ❌ **USING PARENTHESES IN ANY MERMAID CONTENT** - This is the #1 mistake. NEVER use parentheses in node names, state names, labels, transition labels, action names, phase names, section names, or any text content. Use underscores or hyphens instead. The ONLY exception is flowchart shape syntax: \`([Start])\` and \`([End])\` which are shape delimiters, not content.
-- ❌ **USING \`|Label|\` PIPE SYNTAX IN NON-FLOWCHART DIAGRAMS** - The \`|Label|\` syntax is EXCLUSIVE to flowcharts. NEVER use it in stateDiagram-v2, mindmap, timeline, or journey diagrams. In stateDiagram-v2, use colon syntax: \`State1 --> State2 : Label\` instead.
-- ❌ Using spaces in stateDiagram-v2 node names (use underscores)
-- ❌ Using custom labels for start/end states instead of \`[*]\`
-- ❌ Using \`stateDiagram-v2\` for process flows (use \`flowchart\` instead)
-- ❌ Using \`flowchart\` for state machines (use \`stateDiagram-v2\` instead)
-- ❌ Using wrong diagram type for the use case (choose flowchart, stateDiagram-v2, mindmap, timeline, or journey based on content)
-- ❌ Incomplete diagrams (missing paths or decision points)
-- ❌ Only showing happy paths without alternatives
-- ❌ Not properly closing code blocks
-- ❌ Mixing flowchart and stateDiagram syntax incorrectly
-
-### 📝 Examples
-
-**Correct Flowchart (process flow):**
-\`\`\`mermaid
-flowchart TD
-    Start --> Validate{Valid Input?}
-    Validate -->|Yes| Process[Process Data]
-    Validate -->|No| Error[Show Error]
-    Process --> End
-    Error --> End
-\`\`\`
-
-**Correct StateDiagram-v2 (state changes):**
-\`\`\`mermaid
-stateDiagram-v2
-    [*] --> Initial_State
-    Initial_State --> Processing_State
-    Processing_State --> Validation_State
-    Validation_State --> Success_State : Valid
-    Validation_State --> Error_State : Invalid
-    Success_State --> [*]
-    Error_State --> [*]
-\`\`\`
-
-**Note**: Use \`State1 --> State2 : Label\` for labeled transitions, NOT \`State1 -->|Label| State2\`
-
-**Correct Mindmap (hierarchical information):**
-\`\`\`mermaid
-mindmap
-  Subject
-    Origins
-      Long_history
-      Popularisation
-        British_author
-    Research
-      Effectiveness
-      Automatic_creation
-        Uses
-          Creative_techniques
-          Strategic_planning
-\`\`\`
-
-**Correct Timeline (chronological sequences):**
-\`\`\`mermaid
-timeline
-    title History of Social Media Platform
-    Phase 1 : LinkedIn
-    Phase 2 : Facebook
-             : Google
-    Phase 3 : YouTube
-    Phase 4 : Twitter
-\`\`\`
-
-**Correct Journey (user experiences):**
-\`\`\`mermaid
-journey
-    title My working day
-    section Go to work
-      Make tea: 5: Me
-      Go upstairs: 3: Me
-      Do work: 1: Me, Cat
-    section Go home
-      Go downstairs: 5: Me
-      Sit down: 5: Me
-\`\`\`
-
-**Incorrect Examples:**
-- ❌ \`State(With)Parentheses\` → **WRONG** - Use \`State_With_Parentheses\` (NEVER use parentheses in node/state names)
-- ❌ \`Action (Step 1)\` → **WRONG** - Use \`Action_Step_1\` or \`Action_Step1\` (NEVER use parentheses in action names)
-- ❌ \`State1 --> State2 : Label (Note)\` → **WRONG** - Use \`State1 --> State2 : Label_Note\` (NEVER use parentheses in transition labels)
-- ❌ \`Phase (1)\` → **WRONG** - Use \`Phase_1\` or \`Phase1\` (NEVER use parentheses in phase names)
-- ❌ \`State1 -->|Label| State2\` in stateDiagram-v2 → **WRONG** - The \`|Label|\` pipe syntax is ONLY for flowcharts. In stateDiagram-v2, use \`State1 --> State2 : Label\` with colon syntax instead
-- ❌ \`State1 -->|Label| State2\` in mindmap/timeline/journey → **WRONG** - These diagram types do NOT support \`|Label|\` syntax at all
-- ❌ \`Start --> State\` → **WRONG** - Should use \`[*] --> State\`
-- ❌ \`Check Stop Code\` → **WRONG** - Should use \`Check_Stop_Code\`
+### 🚫 Common Mistakes
+- ❌ Using parentheses in any content (except flowchart shape syntax)
+- ❌ Using \`|Label|\` syntax in non-flowchart diagrams
+- ❌ Spaces in stateDiagram-v2 node names (use underscores)
+- ❌ Custom start/end labels instead of \`[*]\`
+- ❌ Wrong diagram type for use case
+- ❌ Incomplete diagrams (missing paths/decision points)
+- ❌ Not closing code blocks properly
 
 ---
 
-**Remember**: Choose the right diagram type based on your content:
-- **flowchart** for process flows and workflows
-- **stateDiagram-v2** for state changes and state machines
-- **mindmap** for hierarchical information and concept mapping
-- **timeline** for chronological sequences and historical events
-- **journey** for user experiences and step-by-step experiences with actors
-
-Follow syntax rules strictly, and create complete, comprehensive diagrams that show all paths and decision points.`;
+**Choose the right type, follow syntax rules, create complete diagrams with all paths.**`;
 
 /**
  * Load AI models from API route with caching

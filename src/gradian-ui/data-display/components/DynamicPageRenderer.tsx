@@ -173,9 +173,31 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
   const [companySchema, setCompanySchema] = useState<FormSchema | null>(null);
 
-  // Pagination state
+  // Pagination state - set initial page size based on view mode
+  // Hierarchy view uses 500, other views use 50
+  const initialPageSize = schema?.allowHierarchicalParent === true ? 500 : DEFAULT_LIMIT;
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState<number | 'all'>(DEFAULT_LIMIT);
+  const [pageSize, setPageSize] = useState<number | 'all'>(initialPageSize);
+  const prevViewModeRef = useRef<'grid' | 'list' | 'table' | 'hierarchy'>(viewMode);
+  
+  // Update page size when view mode changes
+  useEffect(() => {
+    // Only update if view mode actually changed
+    if (prevViewModeRef.current !== viewMode) {
+      if (viewMode === 'hierarchy') {
+        // Set to 500 for hierarchy view (unless user selected 'all')
+        if (pageSize !== 'all' && pageSize !== 500) {
+          setPageSize(500);
+        }
+      } else {
+        // Set to 50 for other views (unless user selected 'all' or a custom value)
+        if (pageSize === 500) {
+          setPageSize(DEFAULT_LIMIT);
+        }
+      }
+      prevViewModeRef.current = viewMode;
+    }
+  }, [viewMode, pageSize]);
 
   // Use the dynamic entity hook for entity management
   const {
@@ -928,7 +950,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         enabled: false, // Disabled - pagination is shown in page header
         pageSize: DEFAULT_LIMIT,
         showPageSizeSelector: true,
-        pageSizeOptions: [10, 25, 50, 100, 'all'],
+        pageSizeOptions: [10, 25, 50, 100, 500, 'all'],
         alwaysShow: false,
       },
       sorting: {
@@ -1176,7 +1198,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               totalPages={paginationMeta?.totalPages || 1}
               totalItems={paginationMeta?.totalItems || filteredEntities.length}
               pageSize={pageSize}
-              pageSizeOptions={[10, 25, 50, 100, 'all']}
+              pageSizeOptions={[10, 25, 50, 100, 500, 'all']}
               showPageSizeSelector={true}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}

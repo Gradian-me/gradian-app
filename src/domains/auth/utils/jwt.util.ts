@@ -114,10 +114,24 @@ export function extractTokenFromCookies(cookies: string | null, cookieName: stri
   cookies.split(';').forEach((cookie) => {
     const [name, ...valueParts] = cookie.trim().split('=');
     const value = valueParts.join('=');
+    // Store with original case for exact match, but also enable case-insensitive lookup
     cookieMap.set(name, decodeURIComponent(value));
   });
 
-  return cookieMap.get(cookieName) || null;
+  // Try exact match first
+  let token = cookieMap.get(cookieName);
+  
+  // If not found, try case-insensitive match
+  if (!token) {
+    for (const [name, value] of cookieMap.entries()) {
+      if (name.toLowerCase() === cookieName.toLowerCase()) {
+        token = value;
+        break;
+      }
+    }
+  }
+
+  return token || null;
 }
 
 /**

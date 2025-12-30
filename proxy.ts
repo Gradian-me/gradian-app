@@ -479,12 +479,30 @@ export async function proxy(request: NextRequest) {
     if (cookies) {
       const cookieNames = cookies.split(';').map(c => c.trim().split('=')[0]);
       loggingCustom(LogType.LOGIN_LOG, 'debug', `Available cookie names: ${cookieNames.join(', ')}`);
+      // Check if refresh_token cookie exists (case-insensitive)
+      const hasRefreshTokenCookie = cookieNames.some(name => name.toLowerCase() === REFRESH_TOKEN_COOKIE.toLowerCase());
+      loggingCustom(LogType.LOGIN_LOG, 'debug', `Refresh token cookie check: ${JSON.stringify({
+        lookingFor: REFRESH_TOKEN_COOKIE,
+        found: hasRefreshTokenCookie,
+        allCookies: cookieNames,
+      })}`);
     }
 
     const refreshToken = getRefreshTokenFromCookies(cookies, REFRESH_TOKEN_COOKIE);
-    loggingCustom(LogType.LOGIN_LOG, 'debug', `Refresh token: ${refreshToken ? `${refreshToken.substring(0, 20)}...` : 'Missing'}`);
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Refresh token: ${refreshToken ? `${refreshToken.substring(0, 20)}...` : 'Missing'} ${JSON.stringify({
+      cookieName: REFRESH_TOKEN_COOKIE,
+      hasCookies: !!cookies,
+      cookiesLength: cookies?.length || 0,
+    })}`);
 
     if (!refreshToken) {
+      // For API routes, allow them to handle authentication themselves (return 401)
+      // This allows client-side token refresh to work properly
+      if (pathname.startsWith('/api/')) {
+        loggingCustom(LogType.LOGIN_LOG, 'info', 'No refresh token available for API route, allowing request to proceed (API route will return 401)');
+        return NextResponse.next();
+      }
+      
       const referer = request.headers.get('referer');
       if (referer && referer.includes('/authentication/login')) {
         loggingCustom(LogType.LOGIN_LOG, 'warn', 'Already redirected from login, allowing request to prevent loop');

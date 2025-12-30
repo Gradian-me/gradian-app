@@ -332,7 +332,7 @@ export function SchemaManagerWrapper() {
                 totalPages={totalPages}
                 totalItems={filteredSchemas.length}
                 pageSize={pageSize}
-                pageSizeOptions={[10, 25, 50, 100, 'all']}
+                pageSizeOptions={[10, 25, 50, 100, 500, 'all']}
                 showPageSizeSelector={true}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}

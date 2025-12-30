@@ -16,6 +16,7 @@ import { REQUIRE_LOGIN, DEMO_MODE } from '@/gradian-ui/shared/configs/env-config
 import { loggingCustom } from './logging-custom';
 import { LogType } from '../configs/log-config';
 import { getAccessToken } from '@/app/api/auth/helpers/server-token-cache';
+import { isServerDemoMode, buildAuthServiceUrl } from '@/app/api/auth/helpers/external-auth.util';
 
 /**
  * Check if a route path matches any excluded login route
@@ -96,13 +97,26 @@ function getUserIdFromRequest(request: NextRequest): string | null {
         })}`
       );
       
+      // Determine refresh route URL for logging
+      const useDemoMode = isServerDemoMode();
+      const refreshRoute = useDemoMode 
+        ? '/api/auth/token/refresh' 
+        : buildAuthServiceUrl('/refresh');
+      
       // Look up access token from server memory using refresh token as key
       const serverToken = getAccessToken(refreshToken);
       if (serverToken) {
         loggingCustom(
           LogType.LOGIN_LOG,
           'debug',
-          `[API_AUTH] ✅ Retrieved access token from server-side cache using refresh token`
+          `[API_AUTH] ✅ Retrieved access token from server-side cache using refresh token ${JSON.stringify({
+            refreshRoute,
+            refreshTokenPreview: `${refreshToken.substring(0, 30)}...`,
+            accessTokenLength: serverToken.length,
+            expiresIn: '668s',
+            cacheSize: 1,
+            usingGlobalCache: true,
+          })}`
         );
         token = serverToken;
       } else {

@@ -15,7 +15,7 @@ export const DataDisplayPagination: React.FC<DataDisplayPaginationProps> = ({
 }) => {
   const {
     enabled = true,
-    pageSizeOptions = [10, 25, 50, 100],
+    pageSizeOptions = [10, 25, 50, 100, 500],
     showPageSizeSelector = true,
     showPageInfo = true,
     showFirstLast = true,

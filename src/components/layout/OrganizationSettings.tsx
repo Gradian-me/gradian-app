@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Building2, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -11,10 +11,13 @@ import { useTenantStore } from '@/stores/tenant.store';
 import { useCompanyStore } from '@/stores/company.store';
 import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { cn } from '@/gradian-ui/shared/utils';
+import { useTheme } from 'next-themes';
 
 export function OrganizationSettings() {
   const { selectedTenant } = useTenantStore();
   const { selectedCompany } = useCompanyStore();
+  const { resolvedTheme } = useTheme();
+  const [isMounted, setIsMounted] = useState(false);
 
   const tenantLabel =
     selectedTenant && (selectedTenant.title || selectedTenant.name)
@@ -31,6 +34,12 @@ export function OrganizationSettings() {
 
   const [isOpen, setIsOpen] = useState(false);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const isDarkVariant = isMounted && resolvedTheme === 'dark';
+
   return (
     <Tooltip open={isOpen ? false : undefined}>
       <TooltipTrigger asChild>
@@ -42,7 +51,9 @@ export function OrganizationSettings() {
                 size="sm"
                 className={cn(
                   'flex items-center space-x-2 rounded-xl transition-colors outline-none ring-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 h-10',
-                  'border border-violet-200 bg-white text-violet-700 hover:bg-violet-50 hover:border-violet-300 dark:border-violet-300/60 dark:bg-gray-900 dark:text-violet-200 dark:hover:bg-gray-800'
+                  isDarkVariant
+                    ? 'border border-violet-300/60 bg-gray-900 text-violet-200 hover:bg-gray-800 focus-visible:ring-violet-500 focus-visible:ring-offset-gray-900'
+                    : 'border border-violet-200 bg-white text-violet-700 hover:bg-violet-50 hover:border-violet-300 focus-visible:ring-violet-500 focus-visible:ring-offset-white'
                 )}
                 aria-label="Organization settings"
               >
@@ -50,7 +61,13 @@ export function OrganizationSettings() {
                 <span className="hidden sm:inline text-xs font-medium">
                   {hasSelection ? 'Organization' : 'Select organization'}
                 </span>
-                <ChevronDown className="h-3 w-3 opacity-70" />
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 shrink-0 transition-transform duration-200",
+                    isDarkVariant ? "text-gray-300" : "text-gray-500",
+                    isOpen && "rotate-180"
+                  )}
+                />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-72 p-2 space-y-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg">

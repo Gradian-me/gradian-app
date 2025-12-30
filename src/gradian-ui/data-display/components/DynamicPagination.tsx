@@ -24,7 +24,7 @@ export function DynamicPagination({
   totalPages,
   totalItems,
   pageSize,
-  pageSizeOptions = [10, 25, 50, 100, 'all'],
+  pageSizeOptions = [10, 25, 50, 100, 500, 'all'],
   showPageSizeSelector = true,
   onPageChange,
   onPageSizeChange,

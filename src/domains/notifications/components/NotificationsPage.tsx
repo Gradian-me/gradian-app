@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,8 @@ import {
   CheckCheck
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Accordion } from '@/components/ui/accordion';
+import { HierarchyExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 
 export function NotificationsPage() {
   const {
@@ -43,6 +45,41 @@ export function NotificationsPage() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [accordionValue, setAccordionValue] = useState<string[]>([]);
+
+  // Track if we've initialized the accordion
+  const hasInitialized = useRef(false);
+
+  // Initialize accordion with all groups open by default when groupedNotifications are loaded
+  useEffect(() => {
+    if (groupedNotifications.length > 0) {
+      const allGroupValues = groupedNotifications.map((group) => `group-${group.category}`);
+      // Only initialize once when first loaded
+      if (!hasInitialized.current) {
+        setAccordionValue(allGroupValues);
+        hasInitialized.current = true;
+      } else {
+        // Update accordion value when groupedNotifications change (add new groups)
+        setAccordionValue((prev) => {
+          // Keep existing open groups, add new ones
+          const existing = prev.filter((v) => allGroupValues.includes(v));
+          const newGroups = allGroupValues.filter((v) => !prev.includes(v));
+          return newGroups.length > 0 ? [...existing, ...newGroups] : existing;
+        });
+      }
+    }
+  }, [groupedNotifications]);
+
+  const handleExpandAll = useCallback(() => {
+    if (groupedNotifications.length > 0) {
+      const allGroupValues = groupedNotifications.map((group) => `group-${group.category}`);
+      setAccordionValue(allGroupValues);
+    }
+  }, [groupedNotifications]);
+
+  const handleCollapseAll = useCallback(() => {
+    setAccordionValue([]);
+  }, []);
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
@@ -135,10 +172,10 @@ export function NotificationsPage() {
   const cardClass = 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm';
 
   return (
-    <MainLayout title="Notifications">
+    <MainLayout title="Notifications" icon="Bell">
       <div className="space-y-6">
         {/* Header Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className={cardClass}>
             <CardContent className="p-4">
               <div className="flex items-center space-x-2">
@@ -189,12 +226,36 @@ export function NotificationsPage() {
         </div>
 
         {/* Search and Filters */}
-        <Card className={cardClass}>
+        <Card className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
           <CardHeader>
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Search & Filter</CardTitle>
-              <div className="w-full md:w-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-flow-col lg:auto-cols-max gap-2">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Search & Filter</CardTitle>
+                <div className="flex items-center gap-2">
+                  <HierarchyExpandCollapseControls
+                    onExpandAll={handleExpandAll}
+                    onCollapseAll={handleCollapseAll}
+                    variant="nobackground"
+                    size="sm"
+                    expandDisabled={accordionValue.length === groupedNotifications.length}
+                    collapseDisabled={accordionValue.length === 0}
+                  />
+                  {unreadCount > 0 && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={markAllAsRead}
+                      className="bg-violet-600 hover:bg-violet-700 text-white shrink-0"
+                    >
+                      <CheckCircle2 className="h-4 w-4 me-2" />
+                      <span className="hidden sm:inline">Mark All Read</span>
+                      <span className="sm:hidden">Mark Read</span>
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 w-full">
+                <div className="flex-1 min-w-0">
                   <Select
                     options={groupByOptions}
                     value={groupBy}
@@ -202,33 +263,22 @@ export function NotificationsPage() {
                     placeholder="Group by..."
                     config={{ name: 'groupBy', label: '' }}
                     size="sm"
-                    className="w-full"
+                    className="w-full [&>button]:h-10"
                   />
+                </div>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setShowFilters(!showFilters)}
-                    className="w-full"
+                  className="shrink-0"
                   >
                     <Filter className="h-4 w-4 me-2" />
                     Filters
                   </Button>
-                  {unreadCount > 0 && (
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={markAllAsRead}
-                      className="w-full bg-violet-600 hover:bg-violet-700 text-white"
-                    >
-                      <CheckCircle2 className="h-4 w-4 me-2" />
-                      Mark All Read
-                    </Button>
-                  )}
-                </div>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 pt-0">
             <div className="space-y-4">
               {/* Search */}
               <SearchInput
@@ -340,7 +390,12 @@ export function NotificationsPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-6">
+          <Accordion
+            type="multiple"
+            value={accordionValue}
+            onValueChange={setAccordionValue}
+            className="space-y-6"
+          >
             {groupedNotifications.map((group) => (
               <NotificationGroup
                 key={group.category}
@@ -349,9 +404,10 @@ export function NotificationsPage() {
                 onMarkAsRead={markAsRead}
                 onAcknowledge={acknowledge}
                 onMarkAsUnread={markAsUnread}
+                value={`group-${group.category}`}
               />
             ))}
-          </div>
+          </Accordion>
         )}
       </div>
     </MainLayout>

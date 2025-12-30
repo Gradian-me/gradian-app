@@ -286,16 +286,16 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
         <Button 
           variant="outline" 
           size="icon" 
-          className="relative rounded-xl"
+          className="relative h-11 w-11 p-0 rounded-xl"
           aria-label="Notifications"
           disabled={!isMounted}
           type="button"
           suppressHydrationWarning
         >
-            <Bell className="h-5 w-5" />
+            <Bell className="h-4 w-4" />
             {isMounted && notificationCount > 0 && (
               <Badge 
-                variant="destructive" 
+                variant="default" 
                 className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs p-0"
               >
                 {notificationCount}
@@ -330,10 +330,10 @@ export function NotificationsDropdown({ initialCount = 3 }: NotificationsDropdow
           
           <div className="relative">
             <ScrollArea 
-              className="h-80 [&_[data-radix-scroll-area-scrollbar]]:opacity-100 [&_[data-radix-scroll-area-thumb]]:!bg-gray-400 [&_[data-radix-scroll-area-thumb]]:hover:!bg-gray-500 dark:[&_[data-radix-scroll-area-thumb]]:!bg-gray-500 dark:[&_[data-radix-scroll-area-thumb]]:hover:!bg-gray-400" 
+              className="h-80 [&_[data-radix-scroll-area-scrollbar]]:opacity-100 [&_[data-radix-scroll-area-scrollbar]]:z-10 [&_[data-radix-scroll-area-scrollbar]]:right-0 [&_[data-radix-scroll-area-thumb]]:!bg-gray-400 [&_[data-radix-scroll-area-thumb]]:hover:!bg-gray-500 dark:[&_[data-radix-scroll-area-thumb]]:!bg-gray-500 dark:[&_[data-radix-scroll-area-thumb]]:hover:!bg-gray-400" 
               scrollbarVariant="default"
             >
-              <div className="p-2 pr-3 space-y-2">
+              <div className="p-2 pr-4 space-y-2">
               {isLoading ? (
                 <>
                   {[1, 2, 3, 4].map((i) => (
