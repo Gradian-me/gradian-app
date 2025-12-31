@@ -19,6 +19,7 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { truncateText } from '@/domains/chat/utils/text-utils';
 import { formatSearchResultsToToon, type SearchResult } from '../utils/ai-search-utils';
+import { summarizePrompt } from '../utils/ai-summarization-utils';
 
 interface UseAiBuilderReturn {
   userPrompt: string;
@@ -226,8 +227,37 @@ export function useAiBuilder(): UseAiBuilderReturn {
       // Search is enabled when searchType is set and is not 'no-search'
       const searchType = request.body?.searchType || 'no-search';
       const isSearchEnabled = searchType && searchType !== 'no-search';
-      let enhancedPrompt = request.userPrompt.trim();
+      
+      // Check if image generation is enabled
+      const imageType = request.imageType || request.body?.imageType;
+      const isImageEnabled = imageType && imageType !== 'none' && agentId !== 'image-generator';
+      
+      // Store original prompt for main AI call
+      const originalPrompt = request.userPrompt.trim();
+      let enhancedPrompt = originalPrompt;
       let searchResultsData: SearchResult[] | null = null;
+      
+      // Summarization: If enabled and search/image is needed, summarize the prompt first
+      const shouldSummarize = request.summarizeBeforeSearchImage !== false && (isSearchEnabled || isImageEnabled);
+      let summarizedPrompt: string | null = null;
+      
+      if (shouldSummarize) {
+        if (isDevelopment) {
+          loggingCustom(LogType.AI_BODY_LOG, 'info', `Summarizing prompt before search/image operations...`);
+        }
+        try {
+          summarizedPrompt = await summarizePrompt(originalPrompt, abortController.signal);
+          if (isDevelopment && summarizedPrompt !== originalPrompt) {
+            loggingCustom(LogType.AI_BODY_LOG, 'info', `Prompt summarized successfully. Original: ${originalPrompt.length} chars, Summarized: ${summarizedPrompt.length} chars`);
+          }
+        } catch (summarizeError) {
+          // If summarization fails, fallback to original prompt
+          if (isDevelopment) {
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `Summarization failed, using original prompt: ${summarizeError instanceof Error ? summarizeError.message : 'Unknown error'}`);
+          }
+          summarizedPrompt = null;
+        }
+      }
 
       // Debug logging
       if (isDevelopment) {
@@ -261,8 +291,11 @@ export function useAiBuilder(): UseAiBuilderReturn {
             'exa_ai-search': 0.025,
           };
 
+          // Use summarized prompt for search if available, otherwise use original
+          const promptForSearch = summarizedPrompt || originalPrompt;
+          
           // Clean the query - remove common prefixes that might be added by form building
-          const cleanQuery = enhancedPrompt
+          const cleanQuery = promptForSearch
             .replace(/^(?:User Prompt|Prompt|User Prompt:)\s*:?\s*/i, '')
             .trim();
 
@@ -365,14 +398,16 @@ export function useAiBuilder(): UseAiBuilderReturn {
 
       // If imageType is set and not "none", run both requests in parallel with Promise.allSettled
       // UNLESS the agent is image-generator itself, in which case use the normal flow (no duplicate call)
-      const imageType = request.imageType || request.body?.imageType;
       const isImageGeneratorAgent = agentId === 'image-generator';
       
-      if (imageType && imageType !== 'none' && !isImageGeneratorAgent) {
+      if (isImageEnabled && !isImageGeneratorAgent) {
         // For non-image-generator agents with imageType, make both requests in parallel
         // For image-generator agent, skip this and use the normal flow below
         try {
-            const [mainResult, imageResult] = await Promise.allSettled([
+          // Use summarized prompt for image if available, otherwise use original
+          const promptForImage = summarizedPrompt || originalPrompt;
+          
+          const [mainResult, imageResult] = await Promise.allSettled([
             // Main agent request
             fetch(`/api/ai-builder/${agentId}`, {
               method: 'POST',
@@ -396,10 +431,10 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                userPrompt: enhancedPrompt,
+                userPrompt: promptForImage,
                 body: {
                   imageType: imageType,
-                  prompt: enhancedPrompt,
+                  prompt: promptForImage,
                   ...(request.body || {}), // Include other body params if any
                 },
                 extra_body: {

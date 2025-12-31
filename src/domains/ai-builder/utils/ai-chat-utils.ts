@@ -701,8 +701,11 @@ export const MERMAID_RULES = `
 
 **1. NO PARENTHESES RULE:**
 - **NEVER use parentheses in node names, state names, labels, transition labels, action names, phase names, or any text content**
-- **ONLY exception**: Flowchart shape syntax \`([Start])\` and \`([End])\` (shape delimiters, not content)
+- **ONLY exception**: Flowchart shape syntax delimiters \`(Rounded)\`, \`([Stadium])\`, \`{Diamond}\` (shape delimiters, not content)
 - Use underscores instead: \`State_With_Parentheses\` ✅, \`State(With)Parentheses\` ❌
+- **Node IDs**: Always use node IDs before shape syntax: \`A[Text]\`, \`B(Text)\`, \`C{Text}\` ✅
+- **CRITICAL**: Never use parentheses/brackets as labels inside node definitions: \`F(M)Text\` ❌ → Use \`F(Text)\` ✅ or \`F[Text]\` ✅
+- **Malformed nodes**: \`F(M)بسته امنیت\` ❌ → \`F(بسته امنیت)\` ✅ or \`F[بسته امنیت]\` ✅
 
 **2. PIPE SYNTAX \`|Label|\` RULE:**
 - **EXCLUSIVE to flowcharts ONLY**: \`Node1 -->|Label| Node2\` ✅
@@ -720,15 +723,18 @@ export const MERMAID_RULES = `
 **Flowchart:**
 \`\`\`mermaid
 flowchart TD
-    ([Start]) --> Step1[Action]
-    Step1 --> Decision{Decision?}
-    Decision -->|Yes| Step2[Action A]
-    Decision -->|No| Step3[Action B]
-    Step2 --> ([End])
+    A[Christmas] -->|Get money| B[Go shopping]
+    B --> C{Let me think}
+    C -->|One| D[Laptop]
+    C -->|Two| E[iPhone]
+    C -->|Three| F[fa:fa-car Car]
 \`\`\`
 - Use \`flowchart TD\` (top-down) or \`flowchart LR\` (left-right)
-- \`([Start])\` / \`([End])\` for rounded rectangles, \`{Decision}\` for diamonds, \`[Action]\` for rectangles
-- Label edges: \`Node1 -->|Label| Node2\` (ONLY in flowcharts)
+- **Node ID format**: Always define nodes with an ID first: \`NodeID[Text]\`, \`NodeID(Text)\`, \`NodeID{Text}\`
+- **Shapes**: \`A[Rectangle]\` for rectangles, \`C{Diamond}\` for decisions, \`D([Stadium])\` for stadium shapes
+- **Icons**: Use Font Awesome syntax: \`F[fa:fa-car Car]\` (icon prefix before text)
+- **Edge labels**: \`Node1 -->|Label| Node2\` (ONLY in flowcharts, use pipe syntax)
+- **Reuse nodes**: Reference nodes by their ID: \`C -->|One| D\` (don't redefine the shape)
 
 **StateDiagram-v2:**
 \`\`\`mermaid
@@ -780,7 +786,11 @@ journey
 - No parentheses in action/section/actor names
 
 ### 🚫 Common Mistakes
-- ❌ Using parentheses in any content (except flowchart shape syntax)
+- ❌ Using parentheses in any content (except flowchart shape syntax delimiters)
+- ❌ Missing node IDs in flowcharts: \`[Text]\` ❌ (use \`A[Text]\` ✅)
+- ❌ Malformed node definitions: \`F(M)Text\` ❌ or \`F[M]Text\` ❌ (use \`F(Text)\` ✅ or \`F[Text]\` ✅)
+- ❌ Using parentheses/brackets as labels: \`NodeID(Label)Content\` ❌ → \`NodeID(Content)\` ✅
+- ❌ Redefining node shapes instead of reusing IDs: \`([Start]) --> ([Start])\` ❌ (use \`Start([Start]) --> Start\` ✅)
 - ❌ Using \`|Label|\` syntax in non-flowchart diagrams
 - ❌ Spaces in stateDiagram-v2 node names (use underscores)
 - ❌ Custom start/end labels instead of \`[*]\`

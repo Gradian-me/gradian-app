@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 // In-memory cache for models
 let cachedModels: any[] | null = null;
@@ -82,6 +83,11 @@ function clearCache() {
  * - GET /api/ai-models?id=gpt-4o - returns only gpt-4o model
  */
 export async function GET(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
   try {
     const searchParams = request.nextUrl.searchParams;
     const modelId = searchParams.get('id');

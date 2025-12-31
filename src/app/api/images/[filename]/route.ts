@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 const PUBLIC_IMAGES_DIR = join(process.cwd(), 'public', 'images', 'ai-generated');
 
@@ -17,6 +18,12 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ filename: string }> }
 ) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
     const { filename } = await params;
     

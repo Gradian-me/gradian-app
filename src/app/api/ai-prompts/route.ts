@@ -6,12 +6,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readAllPrompts, createPrompt, filterPrompts } from '@/domains/ai-prompts/utils/prompts-storage.util';
 import type { CreateAiPromptRequest, AiPromptFilters } from '@/domains/ai-prompts/types';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 /**
  * GET - Retrieve AI prompts with optional filters
  * Query params: username, aiAgent, startDate, endDate, search
  */
 export async function GET(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
     const searchParams = request.nextUrl.searchParams;
     
@@ -56,6 +63,12 @@ export async function GET(request: NextRequest) {
  * Body: CreateAiPromptRequest
  */
 export async function POST(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
     const body: CreateAiPromptRequest = await request.json();
     

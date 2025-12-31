@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 const DATA_FILE = join(process.cwd(), 'data', 'all-integrations.json');
 
@@ -8,6 +9,12 @@ const DATA_FILE = join(process.cwd(), 'data', 'all-integrations.json');
  * GET - Get all integrations
  */
 export async function GET(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
     const fileContent = await readFile(DATA_FILE, 'utf-8');
     const integrations = JSON.parse(fileContent);
@@ -46,6 +53,12 @@ export async function GET(request: NextRequest) {
  * POST - Create a new integration
  */
 export async function POST(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
     const body = await request.json();
     

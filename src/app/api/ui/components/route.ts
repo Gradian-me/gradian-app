@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 /**
  * Load components from JSON file
@@ -26,6 +27,12 @@ async function loadComponents(): Promise<any[]> {
  * - GET /api/ui/components?category=form-elements - returns only form-elements
  */
 export async function GET(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category');

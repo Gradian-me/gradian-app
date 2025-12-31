@@ -59,23 +59,11 @@ export default function DynamicQueryTablePage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Query Results</CardTitle>
-            <CardDescription>
-              {flatten
-                ? 'Displaying results as a flat table with dot-notation keys'
-                : 'Displaying results as nested expandable tables'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DynamicQueryTable
-              dynamicQueryId={dynamicQueryId}
-              flatten={flatten}
-              onFlattenChange={setFlatten}
-            />
-          </CardContent>
-        </Card>
+        <DynamicQueryTable
+          dynamicQueryId={dynamicQueryId}
+          flatten={flatten}
+          onFlattenChange={setFlatten}
+        />
       </div>
     </MainLayout>
   );

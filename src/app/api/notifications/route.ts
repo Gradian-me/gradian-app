@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 /**
  * Load notifications from notifications.json file
@@ -51,6 +52,12 @@ function saveNotifications(notifications: any[]): void {
  * Example: GET /api/notifications?search=test&type=info&category=quotation&isRead=false
  */
 export async function GET(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
     const { searchParams } = new URL(request.url);
     
@@ -152,6 +159,12 @@ export async function GET(request: NextRequest) {
  * POST - Create a new notification
  */
 export async function POST(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
     const body = await request.json();
     

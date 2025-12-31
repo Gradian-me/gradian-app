@@ -33,6 +33,8 @@ interface PromptPreviewSheetProps {
   agent?: any;
   formValues?: Record<string, any>;
   baseUrl?: string;
+  summarizedPrompt?: string; // Summarized version of the prompt (for search/image)
+  isSummarizing?: boolean; // Whether summarization is in progress
 }
 
 export function PromptPreviewSheet({
@@ -48,6 +50,8 @@ export function PromptPreviewSheet({
   agent,
   formValues,
   baseUrl,
+  summarizedPrompt,
+  isSummarizing = false,
 }: PromptPreviewSheetProps) {
   const [builtSystemPrompt, setBuiltSystemPrompt] = useState<string>(legacySystemPrompt || '');
   const [isLoadingPreload, setIsLoadingPreload] = useState<boolean>(legacyIsLoadingPreload || false);
@@ -137,22 +141,62 @@ export function PromptPreviewSheet({
                     </div>
                   </div>
                 ) : (
-                  <div>
-                    <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
-                      User Prompt:
-                    </h3>
-                    {userPrompt.trim() ? (
-                      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-                        <MarkdownViewer 
-                          content={userPrompt.trim()}
-                          showToggle={false}
-                        />
-                      </div>
-                    ) : (
-                      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          (No user prompt - prompt will be built from form fields)
-                        </p>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                        User Prompt:
+                      </h3>
+                      {userPrompt.trim() ? (
+                        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                          <MarkdownViewer 
+                            content={userPrompt.trim()}
+                            showToggle={false}
+                          />
+                        </div>
+                      ) : (
+                        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            (No user prompt - prompt will be built from form fields)
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    {/* Show summarized prompt if available and different from original */}
+                    {(summarizedPrompt || isSummarizing) && (
+                      <div>
+                        <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                          Summarized Prompt (for search/image):
+                          {isSummarizing && (
+                            <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
+                              <Loader2 className="h-3 w-3 inline animate-spin me-1" />
+                              Summarizing...
+                            </span>
+                          )}
+                        </h3>
+                        {isSummarizing ? (
+                          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Generating summary...
+                            </div>
+                          </div>
+                        ) : summarizedPrompt && summarizedPrompt.trim() && summarizedPrompt !== userPrompt.trim() ? (
+                          <div className="rounded-lg border border-violet-200 dark:border-violet-700 bg-violet-50/50 dark:bg-violet-950/20 p-4">
+                            <MarkdownViewer 
+                              content={summarizedPrompt.trim()}
+                              showToggle={false}
+                            />
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                              This summarized version will be used for search queries and image generation.
+                            </p>
+                          </div>
+                        ) : summarizedPrompt && summarizedPrompt.trim() === userPrompt.trim() ? (
+                          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              Summary is the same as original prompt.
+                            </p>
+                          </div>
+                        ) : null}
                       </div>
                     )}
                   </div>

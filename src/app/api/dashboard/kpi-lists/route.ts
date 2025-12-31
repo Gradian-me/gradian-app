@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 const DATA_FILE = join(process.cwd(), 'data', 'kpi-lists.json');
 const DATA_DIR = join(process.cwd(), 'data');
@@ -55,6 +56,11 @@ async function readKpiLists(): Promise<any[]> {
  * Filter KPI lists by type parameter
  */
 export async function GET(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
   try {
     const searchParams = request.nextUrl.searchParams;
     const type = searchParams.get('type');

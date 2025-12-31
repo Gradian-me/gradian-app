@@ -1,8 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { readSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
 import { calculateDashboardMetrics, calculateSpendAnalysis, calculateMonthlyTrends } from '@/lib/measures';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
   try {
     // Use dynamic data storage for mock data
     const purchaseOrders = readSchemaData('purchaseOrders');

@@ -1,0 +1,63 @@
+[
+  {
+    "id": "system-inactive",
+    "name": "inactive",
+    "label": "Inactive",
+    "component": "switch"
+  },
+  {
+    "id": "system-force",
+    "name": "isForce",
+    "label": "Force",
+    "component": "switch"
+  },
+  {
+    "id": "system-force-reason",
+    "name": "forceReason",
+    "label": "Force Reason",
+    "component": "textarea"
+  },
+  {
+    "id": "system-assigned-to",
+    "name": "assignedTo",
+    "label": "Assigned To",
+    "component": "picker"
+  },
+  {
+    "id": "system-due-date",
+    "name": "dueDate",
+    "label": "Due Date",
+    "component": "date"
+  },
+  {
+    "id": "system-status",
+    "name": "status",
+    "label": "Status",
+    "component": "picker"
+  },
+  {
+    "id": "system-entity-type",
+    "name": "entityType",
+    "label": "Entity Type",
+    "component": "picker"
+  },
+  {
+    "id": "system-parent",
+    "name": "parent",
+    "label": "Parent (hierarchical)",
+    "component": "picker"
+  },
+  {
+    "id": "system-related-companies",
+    "name": "relatedCompanies",
+    "label": "Related Companies",
+    "component": "picker"
+  },
+  {
+    "id": "system-related-tenants",
+    "name": "relatedTenants",
+    "label": "Related Tenants",
+    "component": "picker"
+  }
+]
+

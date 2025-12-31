@@ -64,14 +64,28 @@ function loadAuthConfig(): AuthConfig {
 
 export const AUTH_CONFIG = loadAuthConfig();
 
-// Routes excluded from login requirements
-// These routes are accessible without authentication
+// Public pages that don't require authentication
+// These pages are accessible without authentication
+// Supports exact matches and prefix patterns (e.g., /authentication/*)
+export const PUBLIC_PAGES: string[] = [
+  // Authentication pages
+  '/authentication',
+  
+  // Form embed page - needs to be public for external embedding
+  '/forms/embed',
+  
+  // Markdown renderer - public documentation pages
+  '/render/md',
+  
+  // Health check pages
+  '/health',
+  '/builder/health',
+];
+
+// Routes excluded from login requirements (API routes only)
+// These API routes are accessible without authentication
 // Supports exact matches and wildcard patterns (e.g., /api/auth/*)
 export const EXCLUDED_LOGIN_ROUTES: string[] = [
-  // Page routes
-  '/authentication',
-  '/health',
-  
   // API auth routes (login, logout, token refresh, etc.)
   '/api/auth/*',
   

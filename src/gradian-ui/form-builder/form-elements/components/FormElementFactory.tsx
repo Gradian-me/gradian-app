@@ -51,6 +51,8 @@ export interface FormElementFactoryProps extends Omit<FormElementProps, 'config'
   config?: any;
   field?: FormField;
   touched?: boolean | boolean[];
+  checked?: boolean; // For switch/checkbox components
+  rows?: number; // For textarea components
 }
 
 export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => {

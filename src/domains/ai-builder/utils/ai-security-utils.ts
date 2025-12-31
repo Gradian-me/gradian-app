@@ -6,7 +6,7 @@
 // Security constants
 const MAX_PROMPT_LENGTH = 100000; // 100KB max prompt length
 const MAX_JSON_SIZE = 10 * 1024 * 1024; // 10MB max JSON size
-const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB max file size
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB max file size
 const ALLOWED_MIME_PREFIXES = ['audio/', 'video/'];
 const VALID_IMAGE_SIZES = ['1024x1024', '1024x1792', '1792x1024'] as const;
 const VALID_VIDEO_SIZES = ['1280x720', '1920x1080', '1024x1024'] as const;

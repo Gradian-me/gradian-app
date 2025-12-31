@@ -10,15 +10,11 @@ import { cn } from '@/gradian-ui/shared/utils';
 
 export default function MermaidViewerPage() {
   const [mermaidCode, setMermaidCode] = useState(`flowchart TD
-    A[Start] -->|Get money| B(Go shopping)
-    B --> C{Decision Point}
-    C -->|One| D[Action A]
-    C -->|Two| E[Action B]
-    C -->|Three| F[Alternative Step]
-    D --> G[Process Step 2]
-    E --> H[End]
-    F --> H
-    G --> H`);
+    A[Christmas] -->|Get money| B[Go shopping]
+    B --> C{Let me think}
+    C -->|One| D[Laptop]
+    C -->|Two| E[iPhone]
+    C -->|Three| F[fa:fa-car Car]`);
   
   const [displayCode, setDisplayCode] = useState(mermaidCode);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -72,13 +68,18 @@ export default function MermaidViewerPage() {
             onChange={(e) => setMermaidCode(e.target.value)}
             placeholder="Paste or type your Mermaid diagram code here...
 
-Example:
+Example (follows MERMAID_RULES):
 flowchart TD
-    A[Start] --> B[Process Step]
-    B --> C{Decision}
-    C -->|Yes| D[Action]
-    C -->|No| E[End]
-    D --> E"
+    A[Christmas] -->|Get money| B[Go shopping]
+    B --> C{Let me think}
+    C -->|One| D[Laptop]
+    C -->|Two| E[iPhone]
+    C -->|Three| F[fa:fa-car Car]
+
+Remember:
+- Always use node IDs: A[Text], B(Text), C{Text}
+- Edge labels: A -->|Label| B (flowcharts only)
+- Shapes: [Rectangle], (Rounded), {Diamond}, ([Stadium])"
             className={cn(
               "min-h-[200px] font-mono text-sm",
               "resize-y",
@@ -88,9 +89,16 @@ flowchart TD
             )}
           />
           
-          <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+          <div className="mt-3 text-xs text-gray-500 dark:text-gray-400 space-y-1">
             <p>
               💡 <strong>Tip:</strong> Paste your Mermaid code above and click "Render Diagram" to preview it.
+            </p>
+            <p>
+              ⚠️ <strong>Common Error:</strong> Keep arrows and target nodes on the same line. 
+              Use <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">A --&gt; B[Text]</code> not <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">A --&gt;&lt;br/&gt;B[Text]</code>
+            </p>
+            <p>
+              ✅ <strong>Always use node IDs:</strong> <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">A[Text]</code>, <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">B(Text)</code>, <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">{"C{Text}"}</code>
             </p>
             <p className="mt-1">
               Supports flowcharts, sequence diagrams, gantt charts, and more. Learn more at{' '}

@@ -4,7 +4,7 @@
  */
 
 // Security constants for audio files
-const MAX_AUDIO_FILE_SIZE = 25 * 1024 * 1024; // 25MB max audio file size
+const MAX_AUDIO_FILE_SIZE = 50 * 1024 * 1024; // 25MB max audio file size
 const ALLOWED_AUDIO_MIME_TYPES = [
   'audio/mpeg', // MP3
   'audio/mp4', // MP4 audio

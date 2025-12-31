@@ -24,6 +24,7 @@ import type { AiAgent } from '../types';
 import { useBusinessRuleEffects, getFieldEffects } from '@/domains/business-rule-engine';
 import type { BusinessRuleWithEffects, BusinessRuleEffectsMap } from '@/domains/business-rule-engine';
 import { extractParametersBySectionId } from '../utils/ai-shared-utils';
+import { summarizePrompt } from '../utils/ai-summarization-utils';
 
 // Separate component for field item to allow hook usage
 interface FieldItemProps {
@@ -294,11 +295,17 @@ export function AiBuilderForm({
     // Search configuration defaults
     searchType: 'no-search',
     max_results: 5,
+    // Summarization toggle (default: true)
+    summarizeBeforeSearchImage: true,
   });
 
   // State for form errors
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  
+  // State for summarized prompt (for preview)
+  const [summarizedPrompt, setSummarizedPrompt] = useState<string | null>(null);
+  const [isSummarizing, setIsSummarizing] = useState(false);
 
   // Build concatenated prompt from all field labels and values
   const buildConcatenatedPrompt = useCallback((values: Record<string, any>) => {
@@ -511,6 +518,8 @@ export function AiBuilderForm({
     // Initialize search configuration defaults
     initialValues.searchType = initialValues.searchType ?? 'no-search';
     initialValues.max_results = initialValues.max_results ?? 5;
+    // Initialize summarization toggle (default: true)
+    initialValues.summarizeBeforeSearchImage = initialValues.summarizeBeforeSearchImage ?? true;
     
     setFormValues(initialValues);
     
@@ -639,6 +648,52 @@ export function AiBuilderForm({
       });
     }
   }, [selectedAgentId, selectedAgent, formFields.length, formValues, buildConcatenatedPrompt, onPromptChange]);
+
+  // Compute summarized prompt for preview when sheet opens and summarization is enabled
+  useEffect(() => {
+    if (!isSheetOpen) {
+      // Reset when sheet closes
+      setSummarizedPrompt(null);
+      setIsSummarizing(false);
+      return;
+    }
+
+    // Check if summarization is enabled
+    const shouldSummarize = formValues.summarizeBeforeSearchImage !== false;
+    const searchType = formValues.searchType || 'no-search';
+    const isSearchEnabled = searchType && searchType !== 'no-search';
+    const imageType = formValues.imageType || 'none';
+    const isImageEnabled = imageType && imageType !== 'none';
+    
+    // Only summarize if enabled and search/image is configured
+    if (shouldSummarize && (isSearchEnabled || isImageEnabled) && userPrompt.trim()) {
+      setIsSummarizing(true);
+      const abortController = new AbortController();
+      
+      summarizePrompt(userPrompt.trim(), abortController.signal)
+        .then((summary) => {
+          if (!abortController.signal.aborted) {
+            setSummarizedPrompt(summary);
+            setIsSummarizing(false);
+          }
+        })
+        .catch((error) => {
+          if (!abortController.signal.aborted) {
+            // On error, don't show summary (will fallback to original)
+            setSummarizedPrompt(null);
+            setIsSummarizing(false);
+          }
+        });
+      
+      return () => {
+        abortController.abort();
+      };
+    } else {
+      // Reset if summarization is not needed
+      setSummarizedPrompt(null);
+      setIsSummarizing(false);
+    }
+  }, [isSheetOpen, formValues.summarizeBeforeSearchImage, formValues.searchType, formValues.imageType, userPrompt]);
 
   // Sync userPrompt with formValues when userPrompt changes externally
   // This handles external updates to userPrompt (e.g., from parent component)
@@ -1241,6 +1296,31 @@ export function AiBuilderForm({
                           />
                         </div>
                       </div>
+                      {/* Summarization Toggle */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Switch
+                          id="summarize-before-search-image"
+                          checked={formValues.summarizeBeforeSearchImage ?? true}
+                          onCheckedChange={(checked) => {
+                            const newFormValues = {
+                              ...formValues,
+                              summarizeBeforeSearchImage: checked,
+                            };
+                            setFormValues(newFormValues);
+                            if (onFormValuesChange) {
+                              onFormValuesChange(newFormValues);
+                            }
+                          }}
+                          disabled={isLoading || disabled}
+                        />
+                        <Label
+                          htmlFor="summarize-before-search-image"
+                          className="text-sm font-normal cursor-pointer"
+                          title="Summarize the prompt before sending to search and image generation for better results"
+                        >
+                          Summarize
+                        </Label>
+                      </div>
                       {(() => {
                         const params = selectedAgent && formValues 
                           ? extractParametersBySectionId(selectedAgent, formValues)
@@ -1260,6 +1340,8 @@ export function AiBuilderForm({
                             agent={selectedAgent}
                             formValues={formValues}
                             baseUrl={baseUrl}
+                            summarizedPrompt={summarizedPrompt || undefined}
+                            isSummarizing={isSummarizing}
                           />
                         );
                       })()}

@@ -16,6 +16,7 @@ interface SchemaNotFoundProps {
   showHomeButton?: boolean;
   onRefresh?: () => void | Promise<void>;
   refreshing?: boolean;
+  errorCodeText?: string;
 }
 
 export function SchemaNotFound({
@@ -28,6 +29,7 @@ export function SchemaNotFound({
   showHomeButton = true,
   onRefresh,
   refreshing = false,
+  errorCodeText,
 }: SchemaNotFoundProps) {
   const handleGoBack = () => {
     if (onGoBack) {
@@ -138,7 +140,9 @@ export function SchemaNotFound({
               transition={{ delay: 0.7 }}
               className="pt-8 border-t border-gray-200 w-full"
             >
-              <p className="text-xs text-gray-500 dark:text-gray-300">Error Code: 404 | Schema Not Found</p>
+              <p className="text-xs text-gray-500 dark:text-gray-300">
+                Error Code: 404 | {errorCodeText || 'Schema Not Found'}
+              </p>
             </motion.div>
           </div>
         </Card>

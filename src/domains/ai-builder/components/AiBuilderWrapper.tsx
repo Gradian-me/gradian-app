@@ -317,12 +317,18 @@ export function AiBuilderWrapper({
       }
     }
     
+    // Extract summarization flag from formValues (default: true)
+    const summarizeBeforeSearchImage = formValues.summarizeBeforeSearchImage !== undefined 
+      ? formValues.summarizeBeforeSearchImage 
+      : true;
+    
     generateResponse({
       userPrompt,
       agentId: selectedAgentId,
       body,
       extra_body,
       imageType: imageType && imageType !== 'none' ? imageType : undefined,
+      summarizeBeforeSearchImage,
     });
 
     // Scroll to loading indicator after a short delay to ensure it's rendered

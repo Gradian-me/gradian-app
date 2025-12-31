@@ -34,6 +34,10 @@ interface DynamicFilterPaneProps {
   onSortChange?: (sortConfig: SortConfig[]) => void; // Callback when sort changes
   schema?: FormSchema | null; // Schema for available columns
   excludedFieldIds?: Set<string>; // Field IDs to exclude from sort options
+  showIds?: boolean; // Show IDs switch
+  onShowIdsChange?: (showIds: boolean) => void; // Callback when show IDs changes
+  showOnlyViews?: ('grid' | 'list' | 'table' | 'hierarchy')[]; // Only show specified views in ViewSwitcher
+  showAddButton?: boolean; // Show/hide the Add button
 }
 
 export const DynamicFilterPane = ({
@@ -55,6 +59,10 @@ export const DynamicFilterPane = ({
   onSortChange,
   schema,
   excludedFieldIds,
+  showIds,
+  onShowIdsChange,
+  showOnlyViews,
+  showAddButton = true, // Default to showing the button
 }: DynamicFilterPaneProps) => {
   const [isSortDialogOpen, setIsSortDialogOpen] = useState(false);
 
@@ -171,31 +179,41 @@ export const DynamicFilterPane = ({
               onViewChange={onViewModeChange}
               className="h-full"
               showHierarchy={showHierarchy}
+              showOnly={showOnlyViews}
+              onExpandAll={onExpandAllHierarchy}
+              onCollapseAll={onCollapseAllHierarchy}
+              showExpandCollapse={viewMode === 'hierarchy' && !!onExpandAllHierarchy && !!onCollapseAllHierarchy}
             />
-            {viewMode === 'hierarchy' && onExpandAllHierarchy && onCollapseAllHierarchy && (
-              <HierarchyExpandCollapseControls
-                onExpandAll={onExpandAllHierarchy}
-                onCollapseAll={onCollapseAllHierarchy}
-                variant="nobackground"
-                showBorder
-              />
-            )}
           </div>
           {customActions && (
             <div className="flex items-center border-l border-gray-300 dark:border-gray-500 ps-2">
               {customActions}
             </div>
           )}
-          <Button 
-            variant="default" 
-            size="sm" 
-            className="h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap text-xs sm:text-sm shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
-            onClick={onAddNew}
-          >
-            <Plus className="h-4 w-4 sm:me-2" />
-            <span className="hidden sm:inline">{addButtonText}</span>
-            <span className="sm:hidden">Add</span>
-          </Button>
+          {showIds !== undefined && onShowIdsChange && (
+            <div className="flex items-center gap-2 border-l border-gray-300 dark:border-gray-500 ps-2">
+              <Label htmlFor="show-ids-switch-filter" className="text-sm cursor-pointer whitespace-nowrap">
+                Show IDs
+              </Label>
+              <Switch
+                id="show-ids-switch-filter"
+                checked={showIds}
+                onCheckedChange={onShowIdsChange}
+              />
+            </div>
+          )}
+          {showAddButton && (
+            <Button 
+              variant="default" 
+              size="sm" 
+              className="h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap text-xs sm:text-sm shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+              onClick={onAddNew}
+            >
+              <Plus className="h-4 w-4 sm:me-2" />
+              <span className="hidden sm:inline">{addButtonText}</span>
+              <span className="sm:hidden">Add</span>
+            </Button>
+          )}
         </div>
       </div>
     </motion.div>

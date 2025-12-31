@@ -117,6 +117,7 @@ export interface GeneratePromptRequest {
   body?: Record<string, any>; // Parameters with sectionId: "body"
   extra_body?: Record<string, any>; // Parameters with sectionId: "extra"
   imageType?: string; // Image type to generate (e.g., "infographic", "creative", etc.) - if set and not "none", will generate image in parallel
+  summarizeBeforeSearchImage?: boolean; // Whether to summarize prompt before sending to search and image generation (default: true)
 }
 
 export interface ApproveRequest {

@@ -1994,10 +1994,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-30T11:50:37.141Z",
+      "updatedAt": "2025-12-31T13:31:08.737Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-12-30T11:50:37.141Z",
+      "lastSynced": "2025-12-31T13:31:08.737Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2037,8 +2037,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-30T11:50:45.391Z",
-      "lastSynced": "2025-12-30T11:50:45.391Z",
+      "updatedAt": "2025-12-31T13:31:16.126Z",
+      "lastSynced": "2025-12-31T13:31:16.126Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2098,9 +2098,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-30T11:51:16.091Z",
+      "updatedAt": "2025-12-31T13:39:09.822Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-30T11:51:16.091Z",
+      "lastSynced": "2025-12-31T13:39:09.822Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2111,7 +2111,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1, nodes updated: 1329, edges created: 160, nodes failed: 0, edges failed: 0.",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 1331, edges created: 160, nodes failed: 0, edges failed: 0.",
       "isTenantBased": false
     },
     {
@@ -2275,8 +2275,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-30T11:51:44.352Z",
-      "lastSynced": "2025-12-30T11:51:44.352Z",
+      "updatedAt": "2025-12-31T13:32:00.357Z",
+      "lastSynced": "2025-12-31T13:32:00.357Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2315,7 +2315,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-30T11:51:56.803Z",
+      "updatedAt": "2025-12-31T13:32:07.115Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2325,7 +2325,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-30T11:51:56.803Z",
+      "lastSynced": "2025-12-31T13:32:07.115Z",
       "lastSyncMessage": "Generated relations for 40 out of 40 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -2374,7 +2374,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-30T11:52:07.169Z",
+      "updatedAt": "2025-12-31T13:38:19.479Z",
       "category": [
         {
           "id": "production-integration",
@@ -2383,8 +2383,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-30T11:52:07.169Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1, nodes updated: 232, edges created: 117, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2025-12-31T13:38:19.479Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 234, edges created: 117, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
@@ -5737,7 +5737,7 @@
   "process-mappings": [
     {
       "code": "1",
-      "title": "Develop Vision and Strategy",
+      "title": "Develop Vision and Strategies",
       "id": "01JGFJJZ00DE3B4WZZ6KYE37BB",
       "parent": null,
       "entityType": [
@@ -5749,7 +5749,9 @@
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "incomplete": false,
+      "updatedAt": "2025-12-31T05:54:47.568Z"
     },
     {
       "code": "1.1",
@@ -17999,6 +18001,283 @@
       "id": "01KDQDXXJH77ZZR5D8Y6PNZ65N",
       "createdAt": "2025-12-30T10:47:44.478Z",
       "updatedAt": "2025-12-30T10:47:44.478Z"
+    },
+    {
+      "includeUserId": false,
+      "includeCompanyId": false,
+      "metadata": {
+        "applyRBAC": false,
+        "patterns": [
+          {
+            "from": {
+              "schemaId": "inquiries",
+              "alias": ""
+            }
+          },
+          {
+            "from": {
+              "schemaId": "inquiries",
+              "alias": ""
+            },
+            "to": {
+              "schemaId": "tenders",
+              "alias": ""
+            },
+            "edge": "HAS_TENDER",
+            "optional": true
+          },
+          {
+            "from": {
+              "schemaId": "tenders",
+              "alias": ""
+            },
+            "to": {
+              "schemaId": "tender-items",
+              "alias": ""
+            },
+            "edge": "HAS_ITEM",
+            "optional": true
+          },
+          {
+            "from": {
+              "schemaId": "tenders",
+              "alias": ""
+            },
+            "to": {
+              "schemaId": "tender-invitations",
+              "alias": ""
+            },
+            "edge": "HAS_INVITATION",
+            "optional": true
+          },
+          {
+            "from": {
+              "schemaId": "tender-invitations",
+              "alias": ""
+            },
+            "to": {
+              "schemaId": "quotations",
+              "alias": ""
+            },
+            "edge": "HAS_QUOTATION",
+            "optional": true
+          },
+          {
+            "from": {
+              "schemaId": "quotations",
+              "alias": ""
+            },
+            "to": {
+              "schemaId": "quotation-items",
+              "alias": ""
+            },
+            "edge": "HAS_QUOTATION_ITEM",
+            "optional": true
+          }
+        ],
+        "columns": [
+          {
+            "schemaId": "inquiries",
+            "fieldId": "id",
+            "selectOrder": 1,
+            "groupOrder": 1
+          },
+          {
+            "schemaId": "inquiries",
+            "fieldId": "inquiryNumber",
+            "selectOrder": 2,
+            "groupOrder": 1
+          },
+          {
+            "schemaId": "inquiries",
+            "fieldId": "description",
+            "selectOrder": 3,
+            "groupOrder": 1
+          },
+          {
+            "schemaId": "inquiries",
+            "fieldId": "inquiryDate",
+            "selectOrder": 4,
+            "groupOrder": 1
+          },
+          {
+            "schemaId": "tenders",
+            "fieldId": "id",
+            "selectOrder": 5,
+            "groupOrder": 2
+          },
+          {
+            "schemaId": "tenders",
+            "fieldId": "description",
+            "selectOrder": 6,
+            "groupOrder": 2
+          },
+          {
+            "schemaId": "tenders",
+            "fieldId": "dueDate",
+            "selectOrder": 7,
+            "groupOrder": 2
+          },
+          {
+            "schemaId": "tender-items",
+            "fieldId": "id",
+            "selectOrder": 8,
+            "groupOrder": 3
+          },
+          {
+            "schemaId": "tender-items",
+            "fieldId": "quantity",
+            "selectOrder": 9,
+            "groupOrder": 3
+          },
+          {
+            "schemaId": "tender-items",
+            "fieldId": "description",
+            "selectOrder": 10,
+            "groupOrder": 3
+          },
+          {
+            "schemaId": "tender-items",
+            "fieldId": "partCode",
+            "selectOrder": 11,
+            "groupOrder": 3
+          },
+          {
+            "schemaId": "tender-items",
+            "fieldId": "partName",
+            "selectOrder": 12,
+            "groupOrder": 3
+          },
+          {
+            "schemaId": "tender-items",
+            "fieldId": "brand",
+            "selectOrder": 13,
+            "groupOrder": 3
+          },
+          {
+            "schemaId": "tender-items",
+            "fieldId": "catNo",
+            "selectOrder": 14,
+            "groupOrder": 3
+          },
+          {
+            "schemaId": "tender-invitations",
+            "fieldId": "id",
+            "selectOrder": 15,
+            "groupOrder": 3
+          },
+          {
+            "schemaId": "tender-invitations",
+            "fieldId": "vendor",
+            "selectOrder": 16,
+            "groupOrder": 3
+          },
+          {
+            "schemaId": "quotations",
+            "fieldId": "id",
+            "selectOrder": 17,
+            "groupOrder": 4
+          },
+          {
+            "schemaId": "quotations",
+            "fieldId": "quotationNumber",
+            "selectOrder": 18,
+            "groupOrder": 4
+          },
+          {
+            "schemaId": "quotations",
+            "fieldId": "quotationDate",
+            "selectOrder": 19,
+            "groupOrder": 4
+          },
+          {
+            "schemaId": "quotations",
+            "fieldId": "description",
+            "selectOrder": 20,
+            "groupOrder": 4
+          },
+          {
+            "schemaId": "quotations",
+            "fieldId": "currency",
+            "selectOrder": 21,
+            "groupOrder": 4
+          },
+          {
+            "schemaId": "quotations",
+            "fieldId": "incoterm",
+            "selectOrder": 22,
+            "groupOrder": 4
+          },
+          {
+            "schemaId": "quotations",
+            "fieldId": "transportMode",
+            "selectOrder": 23,
+            "groupOrder": 4
+          },
+          {
+            "schemaId": "quotation-items",
+            "fieldId": "id",
+            "selectOrder": 24,
+            "groupOrder": 5
+          },
+          {
+            "schemaId": "quotation-items",
+            "fieldId": "unitPrice",
+            "selectOrder": 25,
+            "groupOrder": 5
+          },
+          {
+            "schemaId": "quotation-items",
+            "fieldId": "totalPrice",
+            "selectOrder": 26,
+            "groupOrder": 5
+          },
+          {
+            "schemaId": "quotation-items",
+            "fieldId": "tenderItem",
+            "selectOrder": 27,
+            "groupOrder": 5
+          },
+          {
+            "schemaId": "quotation-items",
+            "fieldId": "expirationDate",
+            "selectOrder": 28,
+            "groupOrder": 5
+          },
+          {
+            "schemaId": "quotation-items",
+            "fieldId": "estimatedDeliveryDate",
+            "selectOrder": 29,
+            "groupOrder": 5
+          },
+          {
+            "schemaId": "quotation-items",
+            "fieldId": "storageCondition",
+            "selectOrder": 30,
+            "groupOrder": 5
+          }
+        ],
+        "pagination": {
+          "strategy": "offset",
+          "limit": 100,
+          "offset": 0
+        }
+      },
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "name": "Inquiries → Tenders → (Tender Items/Invitations) → Quotations → Quotation Items",
+      "description": "Five-level nested query showing the full hierarchy: inquiries contain tenders, which contain tender items and invitations. Tender items contain quotations, which contain quotation items.",
+      "incomplete": false,
+      "datatype": [],
+      "isRequired": false,
+      "id": "01KDT7XAH1V7CKTPKZFA5VC6H3",
+      "createdAt": "2025-12-31T13:00:16.810Z",
+      "updatedAt": "2025-12-31T13:37:47.994Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
   "external_nodes": [

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
-import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
+import { AUTH_CONFIG, PUBLIC_PAGES } from '@/gradian-ui/shared/configs/auth-config';
 import { REQUIRE_LOGIN } from '@/gradian-ui/shared/configs/env-config';
 import { encryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util';
 
@@ -79,9 +79,17 @@ export function AuthGuard({ children }: AuthGuardProps) {
       return true;
     }
 
-    // Skip auth check for authentication pages
-    if (pathname.startsWith('/authentication/')) {
-      return false;
+    // Check if pathname matches any public page
+    for (const publicPage of PUBLIC_PAGES) {
+      // Exact match
+      if (pathname === publicPage) {
+        return false;
+      }
+      
+      // Prefix match (e.g., /authentication matches /authentication/login)
+      if (pathname.startsWith(publicPage + '/')) {
+        return false;
+      }
     }
 
     return true;

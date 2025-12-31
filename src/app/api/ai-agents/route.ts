@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
 // In-memory cache for agents
 let cachedAgents: any[] | null = null;
@@ -114,6 +115,12 @@ function clearCache() {
  * - GET /api/ai-agents?id=app-builder - returns only app-builder agent
  */
 export async function GET(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
+  
   try {
     const searchParams = request.nextUrl.searchParams;
     const agentId = searchParams.get('id');
@@ -273,6 +280,11 @@ export async function GET(request: NextRequest) {
  * - POST /api/ai-agents - creates multiple agents (array of objects)
  */
 export async function POST(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
   try {
     const requestData = await request.json();
 

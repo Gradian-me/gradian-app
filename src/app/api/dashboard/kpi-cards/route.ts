@@ -1,6 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Check authentication if REQUIRE_LOGIN is true
+  const authResult = await requireApiAuth(request);
+  if (authResult instanceof NextResponse) {
+    return authResult; // Return 401 if not authenticated
+  }
   try {
     // Mock KPI cards data
     const kpiCards = [
