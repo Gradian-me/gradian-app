@@ -27,6 +27,8 @@ export function DynamicQueryTable({
   onRefreshReady,
   expandAllTrigger,
   onExpandAllReady,
+  flattenedSchemas,
+  onStatusChange,
 }: DynamicQueryTableProps) {
   const [internalFlatten, setInternalFlatten] = useState(controlledFlatten);
   const [internalShowIds, setInternalShowIds] = useState(controlledShowIds);
@@ -39,6 +41,14 @@ export function DynamicQueryTable({
   const setShowIds = onShowIdsChange || setInternalShowIds;
 
   const { loading, error, statusCode, responseData, refetch } = useDynamicQueryData(dynamicQueryId, flatten, queryParams);
+
+  // Expose status to parent component
+  React.useEffect(() => {
+    if (onStatusChange) {
+      const isSuccess = !loading && !error && statusCode === 200 && !!responseData?.data;
+      onStatusChange(isSuccess, statusCode, loading, error);
+    }
+  }, [onStatusChange, loading, error, statusCode, responseData]);
 
   // Expose refresh function to parent component
   React.useEffect(() => {
@@ -284,6 +294,7 @@ export function DynamicQueryTable({
           expandAllTrigger={expandAllTrigger}
           onExpandAllReady={onExpandAllReady}
           showIds={showIds}
+          flattenedSchemas={flattenedSchemas}
         />
       )}
     </div>

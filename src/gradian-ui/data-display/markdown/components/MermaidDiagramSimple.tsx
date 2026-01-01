@@ -15,55 +15,98 @@ interface MermaidDiagramSimpleProps {
   markdownLoadedTimestamp?: number;
 }
 
+// Supported Mermaid diagram types
+const SUPPORTED_DIAGRAM_TYPES = [
+  'graph',
+  'flowchart',
+  'sequenceDiagram',
+  'gantt',
+  'pie',
+  'journey',
+  'classDiagram',
+  'stateDiagram',
+  'stateDiagram-v2',
+  'erDiagram',
+  'gitgraph',
+  'mindmap',
+  'timeline',
+  'quadrantChart',
+  'requirement',
+] as const;
+
+type DiagramType = (typeof SUPPORTED_DIAGRAM_TYPES)[number];
+
 // Global state to ensure mermaid is loaded and initialized only once
 const globalMermaidState = {
   instance: null as any,
   initialized: false,
   currentTheme: '',
-  loadingPromise: null as Promise<any> | null
+  loadingPromise: null as Promise<any> | null,
 };
 
-export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimestamp }: MermaidDiagramSimpleProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { resolvedTheme } = useTheme();
-  const [isMounted, setIsMounted] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const lastRenderKeyRef = useRef<string>('');
-  const [isRendering, setIsRendering] = useState<boolean>(false);
-  const [hasSvg, setHasSvg] = useState<boolean>(false);
-  const styleElementRef = useRef<HTMLStyleElement | null>(null);
-  const mountedRef = useRef<boolean>(false); // Keep for internal checks in callbacks
-  const isRenderingRef = useRef<boolean>(false); // Keep for internal checks in callbacks
+/**
+ * Detects the diagram type from the diagram code
+ */
+function detectDiagramType(diagram: string): { type: DiagramType | null; direction?: string } {
+  if (!diagram?.trim()) {
+    return { type: null };
+  }
 
-  // Clean and format the diagram code
-  const cleanDiagram = useMemo(() => {
-    if (!diagram?.trim()) return '';
-    
-    let cleaned = diagram.trim();
-    
-    // Remove markdown code block markers if present
-    cleaned = cleaned.replace(/^```\s*mermaid\s*\n?/i, '');
-    cleaned = cleaned.replace(/```\s*$/i, '');
-    cleaned = cleaned.trim();
-    
-    // Fix any malformed arrows (spaces inside arrow operators)
+  const firstLine = diagram.trim().split('\n')[0].trim();
+  
+  // Match diagram type with direction (e.g., "flowchart TD", "graph LR")
+  const withDirectionMatch = firstLine.match(/^(graph|flowchart)\s+(TD|LR|TB|BT|RL)/i);
+  if (withDirectionMatch) {
+    return { type: withDirectionMatch[1].toLowerCase() as DiagramType, direction: withDirectionMatch[2] };
+  }
+
+  // Match diagram type without direction
+  for (const type of SUPPORTED_DIAGRAM_TYPES) {
+    const regex = new RegExp(`^${type}(?:-v2)?\\s*$`, 'i');
+    if (regex.test(firstLine)) {
+      return { type: type as DiagramType };
+    }
+  }
+
+  return { type: null };
+}
+
+/**
+ * Cleans and formats diagram code for consistent rendering
+ */
+function cleanDiagramCode(diagram: string): string {
+  if (!diagram?.trim()) return '';
+
+  let cleaned = diagram.trim();
+
+  // Remove markdown code block markers if present
+  cleaned = cleaned.replace(/^```\s*mermaid\s*\n?/i, '');
+  cleaned = cleaned.replace(/```\s*$/i, '');
+  cleaned = cleaned.trim();
+
+  // Detect diagram type
+  const { type: diagramType } = detectDiagramType(cleaned);
+  
+  // Different cleaning strategies based on diagram type
+  if (!diagramType || ['graph', 'flowchart'].includes(diagramType)) {
+    // Flowchart-specific cleaning
     cleaned = cleaned.replace(/\s*--\s*>\s*/g, ' --> ');
     cleaned = cleaned.replace(/\s*==\s*>\s*/g, ' ==> ');
     
     // Split into lines and process each line
     let lines = cleaned.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     
-    let diagramType = '';
+    let typeDeclaration = '';
     if (lines.length > 0) {
       const firstLine = lines[0];
-      const diagramMatch = firstLine.match(/^(graph|flowchart|sequenceDiagram|gantt|pie|journey|classDiagram|stateDiagram|erDiagram|gitgraph|mindmap|timeline|quadrantChart|requirement)\s+(TD|LR|TB|BT|RL)/i);
+      const diagramMatch = firstLine.match(/^(graph|flowchart)\s+(TD|LR|TB|BT|RL)/i);
       if (diagramMatch) {
-        diagramType = `${diagramMatch[1]} ${diagramMatch[2]}`;
+        typeDeclaration = `${diagramMatch[1]} ${diagramMatch[2]}`;
         lines = lines.slice(1);
       } else {
-        const diagramMatchSimple = firstLine.match(/^(graph|flowchart|sequenceDiagram|gantt|pie|journey|classDiagram|stateDiagram|erDiagram|gitgraph|mindmap|timeline|quadrantChart|requirement)\s*$/i);
+        const diagramMatchSimple = firstLine.match(/^(graph|flowchart)\s*$/i);
         if (diagramMatchSimple) {
-          diagramType = diagramMatchSimple[1];
+          typeDeclaration = diagramMatchSimple[1];
           lines = lines.slice(1);
         }
       }
@@ -109,13 +152,239 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
     }).filter(line => line.length > 0);
     
     const result: string[] = [];
-    if (diagramType) {
-      result.push(diagramType);
+    if (typeDeclaration) {
+      result.push(typeDeclaration);
     }
     result.push(...processedLines.map(line => '    ' + line));
     
     return result.join('\n').trim();
-  }, [diagram]);
+  } else {
+    // For other diagram types, just clean up basic formatting
+    const lines = cleaned.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    
+    // Preserve indentation for diagram types that use it (mindmap, timeline, etc.)
+    const needsIndentation = ['mindmap', 'timeline', 'journey'].includes(diagramType);
+    
+    if (needsIndentation) {
+      return lines.join('\n');
+    } else {
+      // For other types, normalize spacing but preserve structure
+      return lines.map(line => {
+        // Normalize multiple spaces to single space, but preserve colons for stateDiagram, journey, etc.
+        return line.replace(/\s+/g, ' ').trim();
+      }).join('\n');
+    }
+  }
+}
+
+/**
+ * Gets comprehensive Mermaid configuration for all chart types
+ */
+function getMermaidConfig(isDark: boolean) {
+  const theme = isDark ? 'dark' : 'default';
+  
+  const themeVariables = {
+    // Violet-based color scheme for readability in both dark and light modes
+    primaryColor: isDark ? '#8b5cf6' : '#7c3aed',
+    primaryTextColor: isDark ? '#e9d5ff' : '#4c1d95',
+    primaryBorderColor: isDark ? '#a78bfa' : '#6d28d9',
+    lineColor: isDark ? '#a78bfa' : '#7c3aed',
+    secondaryColor: isDark ? '#a78bfa' : '#8b5cf6',
+    tertiaryColor: isDark ? '#c4b5fd' : '#a78bfa',
+    background: isDark ? '#1f2937' : '#ffffff',
+    mainBkgColor: isDark ? '#1f2937' : '#ffffff',
+    secondBkgColor: isDark ? '#374151' : '#f9fafb',
+    textColor: isDark ? '#f3f4f6' : '#1f2937',
+    edgeLabelBackground: isDark ? '#374151' : '#f3f4f6',
+    fontSize: '14px',
+    fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+    nodeBorder: isDark ? '#a78bfa' : '#7c3aed',
+    nodeBkg: isDark ? '#1f2937' : '#ffffff',
+    clusterBkg: isDark ? '#374151' : '#f9fafb',
+    clusterBorder: isDark ? '#8b5cf6' : '#7c3aed',
+    defaultLinkColor: isDark ? '#a78bfa' : '#7c3aed',
+    titleColor: isDark ? '#f3f4f6' : '#1f2937',
+    // Additional variables for different chart types (violet shades)
+    cScale0: isDark ? '#8b5cf6' : '#7c3aed',
+    cScale1: isDark ? '#a78bfa' : '#8b5cf6',
+    cScale2: isDark ? '#c4b5fd' : '#a78bfa',
+    // State diagram colors
+    stateBkg: isDark ? '#374151' : '#f3f4f6',
+    stateBorder: isDark ? '#a78bfa' : '#6d28d9',
+    // Class diagram colors
+    classText: isDark ? '#f3f4f6' : '#111827',
+    classBkg: isDark ? '#1f2937' : '#ffffff',
+    // ER diagram colors
+    erBkg: isDark ? '#1f2937' : '#ffffff',
+    erBorder: isDark ? '#a78bfa' : '#6d28d9',
+  };
+
+  return {
+    theme,
+    themeVariables,
+    // Comprehensive configuration for all chart types
+    startOnLoad: false,
+    securityLevel: 'loose' as const,
+    
+    // Flowchart/Graph configuration
+    flowchart: {
+      htmlLabels: true,
+      curve: 'basis' as const,
+      useMaxWidth: true,
+      nodeSpacing: 50,
+      rankSpacing: 30,
+      padding: 10,
+    },
+    
+    // Sequence diagram configuration
+    sequence: {
+      useMaxWidth: true,
+      diagramMarginX: 10,
+      diagramMarginY: 10,
+      actorMargin: 50,
+      width: 150,
+      height: 65,
+      boxMargin: 10,
+      boxTextMargin: 5,
+      noteMargin: 10,
+      messageMargin: 35,
+      mirrorActors: true,
+      bottomMarginAdj: 1,
+      rightAngles: false,
+      showSequenceNumbers: false,
+    },
+    
+    // Gantt chart configuration
+    gantt: {
+      useMaxWidth: true,
+      leftPadding: 75,
+      gridLineStartPadding: 35,
+      fontSize: 11,
+      fontFamily: themeVariables.fontFamily,
+      numberSectionStyles: 4,
+      axisFormat: '%Y-%m-%d',
+      bottomPadding: 25,
+    },
+    
+    // Pie chart configuration
+    pie: {
+      useMaxWidth: true,
+      textPosition: 0.75,
+    },
+    
+    // Journey diagram configuration
+    journey: {
+      useMaxWidth: true,
+      diagramMarginX: 50,
+      diagramMarginY: 10,
+      leftMargin: 150,
+      width: 150,
+      height: 50,
+      taskMargin: 10,
+      loopHeight: 75,
+      taskFontSize: 13,
+      taskFontFamily: themeVariables.fontFamily,
+      labelFontSize: 13,
+      labelFontFamily: themeVariables.fontFamily,
+      sectionFontSize: 13,
+      sectionFontFamily: themeVariables.fontFamily,
+      sectionBkgColor: isDark ? '#374151' : '#f3f4f6',
+      altSectionBkgColor: isDark ? '#1f2937' : '#ffffff',
+      gridColor: isDark ? '#4b5563' : '#d1d5db',
+      doneTaskBkgColor: isDark ? '#10b981' : '#059669',
+      doneTaskBorderColor: isDark ? '#059669' : '#047857',
+      activeTaskBkgColor: isDark ? '#6366f1' : '#4f46e5',
+      activeTaskBorderColor: isDark ? '#4f46e5' : '#4338ca',
+      gridBkgColor: isDark ? '#1f2937' : '#ffffff',
+    },
+    
+    // State diagram configuration
+    state: {
+      useMaxWidth: true,
+      diagramMarginX: 50,
+      diagramMarginY: 50,
+      nodeSpacing: 100,
+      rankSpacing: 100,
+    },
+    
+    // Class diagram configuration
+    class: {
+      useMaxWidth: true,
+      padding: 10,
+      dividerMargin: 10,
+      paddingX: 10,
+      paddingY: 10,
+    },
+    
+    // ER diagram configuration
+    er: {
+      useMaxWidth: true,
+      padding: 20,
+      diagramPadding: 20,
+      layoutDirection: 'TB' as const,
+      minEntityWidth: 100,
+      minEntityHeight: 75,
+      entityPadding: 15,
+      stroke: themeVariables.erBorder,
+      fill: themeVariables.erBkg,
+      fontSize: 13,
+      fontFamily: themeVariables.fontFamily,
+    },
+    
+    // Gitgraph configuration
+    gitGraph: {
+      useMaxWidth: true,
+      theme: theme,
+      themeVariables: {
+        primaryColor: themeVariables.primaryColor,
+        primaryTextColor: themeVariables.textColor,
+        primaryBorderColor: themeVariables.primaryBorderColor,
+        lineColor: themeVariables.lineColor,
+        secondaryColor: themeVariables.secondaryColor,
+        tertiaryColor: themeVariables.tertiaryColor,
+        background: themeVariables.background,
+        mainBkgColor: themeVariables.mainBkgColor,
+        textColor: themeVariables.textColor,
+        commitLabelFontSize: 12,
+        commitLabelFontFamily: themeVariables.fontFamily,
+        commitLabelFontWeight: 'normal',
+        commitLabelColor: themeVariables.textColor,
+      },
+    },
+    
+    // Mindmap configuration
+    mindmap: {
+      useMaxWidth: true,
+      padding: 5,
+      maxNodeWidth: 200,
+    },
+    
+    // Timeline configuration
+    timeline: {
+      useMaxWidth: true,
+      padding: 10,
+      backgroundColor: themeVariables.background,
+      fontColor: themeVariables.textColor,
+      fontSize: themeVariables.fontSize,
+      fontFamily: themeVariables.fontFamily,
+    },
+  };
+}
+
+export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimestamp }: MermaidDiagramSimpleProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { resolvedTheme } = useTheme();
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const lastRenderKeyRef = useRef<string>('');
+  const [isRendering, setIsRendering] = useState<boolean>(false);
+  const [hasSvg, setHasSvg] = useState<boolean>(false);
+  const styleElementRef = useRef<HTMLStyleElement | null>(null);
+  const mountedRef = useRef<boolean>(false);
+  const isRenderingRef = useRef<boolean>(false);
+
+  // Clean and format the diagram code
+  const cleanDiagram = useMemo(() => cleanDiagramCode(diagram), [diagram]);
 
   // Create a stable render key
   const renderKey = useMemo(() => {
@@ -123,6 +392,12 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
     const theme = resolvedTheme || 'dark';
     return `${cleanDiagram}-${theme}`;
   }, [cleanDiagram, resolvedTheme]);
+
+  // Memoize Mermaid configuration based on theme
+  const mermaidConfig = useMemo(() => {
+    const isDark = (resolvedTheme || 'dark') === 'dark';
+    return getMermaidConfig(isDark);
+  }, [resolvedTheme]);
 
   // Initialize mermaid (only once)
   const initializeMermaid = useCallback(async () => {
@@ -237,39 +512,6 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
     return globalMermaidState.loadingPromise;
   }, []);
 
-  // Get theme configuration
-  const getThemeConfig = useCallback((isDark: boolean) => {
-    return {
-      theme: isDark ? 'dark' : 'default',
-      themeVariables: {
-        primaryColor: isDark ? '#8b5cf6' : '#7c3aed',
-        primaryTextColor: isDark ? '#e9d5ff' : '#4c1d95',
-        primaryBorderColor: isDark ? '#a78bfa' : '#6d28d9',
-        lineColor: isDark ? '#6366f1' : '#4f46e5',
-        secondaryColor: isDark ? '#6366f1' : '#4f46e5',
-        tertiaryColor: isDark ? '#3b82f6' : '#2563eb',
-        background: isDark ? '#1f2937' : '#ffffff',
-        mainBkgColor: isDark ? '#1f2937' : '#ffffff',
-        secondBkgColor: isDark ? '#374151' : '#f9fafb',
-        textColor: isDark ? '#f3f4f6' : '#111827',
-        edgeLabelBackground: isDark ? '#374151' : '#f3f4f6',
-        // Use sans-serif font
-        fontSize: '13px',
-        fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-        // Node dimensions
-        nodeBorder: isDark ? '#a78bfa' : '#6d28d9',
-        nodeBkg: isDark ? '#1f2937' : '#ffffff',
-        // Cluster dimensions
-        clusterBkg: isDark ? '#374151' : '#f9fafb',
-        clusterBorder: isDark ? '#6366f1' : '#4f46e5',
-        // Default link color
-        defaultLinkColor: isDark ? '#6366f1' : '#4f46e5',
-        // Title color
-        titleColor: isDark ? '#f3f4f6' : '#111827',
-      },
-    };
-  }, []);
-
   // Store the last rendered diagram to prevent re-rendering the same content
   const lastRenderedDiagramRef = useRef<string>('');
   const forceRefreshRef = useRef<boolean>(false);
@@ -313,32 +555,14 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
 
     try {
       const mermaidInstance = await initializeMermaid();
-      const isDark = (resolvedTheme || 'dark') === 'dark';
-      const { theme, themeVariables } = getThemeConfig(isDark);
+      const currentConfig = mermaidConfig;
 
       // Reinitialize mermaid only if theme changes or not initialized yet
-      if (!globalMermaidState.initialized || globalMermaidState.currentTheme !== theme) {
-        mermaidInstance.initialize({
-          startOnLoad: false,
-          theme,
-          themeVariables,
-          securityLevel: 'loose',
-          flowchart: { 
-            htmlLabels: true, 
-            curve: 'basis', 
-            useMaxWidth: true,
-            nodeSpacing: 50,
-            rankSpacing: 30,
-            padding: 10
-          },
-          sequence: { useMaxWidth: true, diagramMarginX: 10, diagramMarginY: 10 },
-          gantt: { useMaxWidth: true },
-          pie: { useMaxWidth: true },
-          journey: { useMaxWidth: true },
-        });
+      if (!globalMermaidState.initialized || globalMermaidState.currentTheme !== currentConfig.theme) {
+        mermaidInstance.initialize(currentConfig);
         globalMermaidState.initialized = true;
-        globalMermaidState.currentTheme = theme;
-        console.log(`Mermaid initialized with theme: ${theme}`);
+        globalMermaidState.currentTheme = currentConfig.theme;
+        console.log(`Mermaid initialized with theme: ${currentConfig.theme}`);
       }
 
       if (!mountedRef.current || savedRenderKey !== lastRenderKeyRef.current || savedCleanDiagram !== lastRenderedDiagramRef.current) {
@@ -386,14 +610,26 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
           container.insertAdjacentHTML('beforeend', sanitizedSvg);
         }
         
-        // Ensure SVG is centered and make nodes smaller
+        // Apply styling and post-processing
         const insertedSvg = container.querySelector('svg');
+        
+        // Add rounded corners to all rectangles
+        if (insertedSvg) {
+          const rects = insertedSvg.querySelectorAll('rect');
+          rects.forEach((rect) => {
+            // Add roundness if not already set (preserve existing rx/ry)
+            const currentRx = rect.getAttribute('rx');
+            if (!currentRx || currentRx === '0') {
+              rect.setAttribute('rx', '6');
+              rect.setAttribute('ry', '6');
+            }
+          });
+        }
         if (insertedSvg) {
           insertedSvg.style.display = 'block';
           insertedSvg.style.margin = '0 auto';
           insertedSvg.style.maxWidth = '100%';
           insertedSvg.style.height = 'auto';
-          insertedSvg.style.transform = 'scale(1)';
           insertedSvg.style.transformOrigin = 'center center';
           
           // Clean up previous style element if it exists
@@ -402,7 +638,7 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
             styleElementRef.current = null;
           }
           
-          // Make nodes smaller by scaling down font sizes and node dimensions
+          // Create comprehensive styles for all chart types
           const svgId = insertedSvg.id || `mermaid-${Math.random().toString(36).substr(2, 9)}`;
           if (!insertedSvg.id) {
             insertedSvg.id = svgId;
@@ -417,22 +653,35 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
               margin: 0 !important;
               padding: 0 !important;
             }
-            #${svgId} .flowchart-label {
-              margin: 0 !important;
-            }
-            #${svgId} .node rect,
-            #${svgId} .node circle,
-            #${svgId} .node ellipse,
-            #${svgId} .node polygon,
-            #${svgId} .node path {
+            #${svgId} text,
+            #${svgId} .nodeLabel,
+            #${svgId} .edgeLabel,
+            #${svgId} .cluster-label,
+            #${svgId} .label,
+            #${svgId} .labelText,
+            #${svgId} .sectionTitle,
+            #${svgId} .taskText,
+            #${svgId} .taskTextOutsideRight,
+            #${svgId} .taskTextOutsideLeft,
+            #${svgId} .state-note,
+            #${svgId} .stateLabel,
+            #${svgId} .noteText,
+            #${svgId} .messageText,
+            #${svgId} .actor,
+            #${svgId} .titleText,
+            #${svgId} .pieTitleText,
+            #${svgId} .slice,
+            #${svgId} .journey-section,
+            #${svgId} .classText,
+            #${svgId} .classBoxText,
+            #${svgId} .entityBoxText {
               font-size: 13px !important;
               font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+              word-wrap: break-word !important;
+              overflow-wrap: break-word !important;
             }
-            #${svgId} .nodeLabel {
-              font-size: 13px !important;
-              font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-            }
-            #${svgId} .nodeLabel tspan {
+            #${svgId} .nodeLabel tspan,
+            #${svgId} .edgeLabel tspan {
               word-wrap: break-word !important;
               overflow-wrap: break-word !important;
               white-space: normal !important;
@@ -452,34 +701,12 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
               box-sizing: border-box !important;
               font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
             }
-            #${svgId} .nodeLabel foreignObject > div > p {
+            #${svgId} .nodeLabel foreignObject > div > p,
+            #${svgId} .nodeLabel foreignObject > div > span {
               margin: 0 !important;
               word-wrap: break-word !important;
               overflow-wrap: break-word !important;
               white-space: normal !important;
-            }
-            #${svgId} .nodeLabel foreignObject > div > span {
-              word-wrap: break-word !important;
-              overflow-wrap: break-word !important;
-              white-space: normal !important;
-            }
-            #${svgId} .edgeLabel {
-              font-size: 11px !important;
-              word-wrap: break-word !important;
-              overflow-wrap: break-word !important;
-              font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-            }
-            #${svgId} .cluster-label {
-              font-size: 13px !important;
-              word-wrap: break-word !important;
-              overflow-wrap: break-word !important;
-              font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-            }
-            #${svgId} text {
-              font-size: 13px !important;
-              word-wrap: break-word !important;
-              overflow-wrap: break-word !important;
-              font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
             }
             #${svgId} .node {
               min-width: 80px !important;
@@ -489,142 +716,121 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
               ry: 6px !important;
             }
             #${svgId} .nodeLabel foreignObject {
-              overflow: visible !important;
-              height: auto !important;
               min-width: 80px !important;
+            }
+            #${svgId} .flowchart-label {
+              margin: 0 !important;
             }
           `;
           document.head.appendChild(style);
           styleElementRef.current = style;
           
-          // Post-process to ensure all node labels wrap properly
-          // Use multiple animation frames to ensure DOM is fully rendered and measured
-          const processNodes = () => {
-            // Process HTML labels (foreignObject)
-            const foreignObjects = insertedSvg.querySelectorAll('.nodeLabel foreignObject');
-            foreignObjects.forEach((fo: any) => {
-              const div = fo.querySelector('div');
-              if (div) {
-                const textContent = div.textContent || '';
-                
-                // Calculate required width based on text length
-                // For 11px font, estimate ~6-7px per character
-                // Allow for wrapping: if text is long, set a reasonable max width
-                const charCount = textContent.length;
-                let requiredWidth: number;
-                
-                if (charCount <= 20) {
-                  // Short text: single line (adjusted for 13px font)
-                  requiredWidth = Math.max(charCount * 8 + 40, 120);
-                } else if (charCount <= 40) {
-                  // Medium text: allow 2 lines
-                  requiredWidth = Math.max(charCount * 4 + 40, 180);
-                } else {
-                  // Long text: allow 3+ lines
-                  requiredWidth = Math.min(charCount * 3 + 40, 450);
-                }
-                
-                // Get current width
-                const currentWidth = parseFloat(fo.getAttribute('width') || '0');
-                
-                // Set new width if needed
-                if (requiredWidth > currentWidth) {
-                  fo.setAttribute('width', requiredWidth.toString());
-                }
-                
-                // Ensure div can wrap
-                div.style.width = '100%';
-                div.style.maxWidth = '100%';
-                
-                // Update foreignObject height to accommodate wrapped text
-                const divHeight = div.scrollHeight || div.offsetHeight;
-                if (divHeight > 0) {
-                  const currentHeight = parseFloat(fo.getAttribute('height') || '0');
-                  if (divHeight + 8 > currentHeight) {
-                    fo.setAttribute('height', (divHeight + 8).toString());
+          // Post-process to ensure all node labels wrap properly (mainly for flowcharts)
+          const diagramType = detectDiagramType(savedCleanDiagram);
+          if (diagramType.type === 'flowchart' || diagramType.type === 'graph') {
+            const processNodes = () => {
+              // Process HTML labels (foreignObject)
+              const foreignObjects = insertedSvg.querySelectorAll('.nodeLabel foreignObject');
+              foreignObjects.forEach((fo: any) => {
+                const div = fo.querySelector('div');
+                if (div) {
+                  const textContent = div.textContent || '';
+                  const charCount = textContent.length;
+                  let requiredWidth: number;
+                  
+                  if (charCount <= 20) {
+                    requiredWidth = Math.max(charCount * 8 + 40, 120);
+                  } else if (charCount <= 40) {
+                    requiredWidth = Math.max(charCount * 4 + 40, 180);
+                  } else {
+                    requiredWidth = Math.min(charCount * 3 + 40, 450);
                   }
-                }
-                
-                // Update the node rectangle to match foreignObject dimensions
-                const node = fo.closest('.node');
-                if (node) {
-                  const rect = node.querySelector('rect');
-                  if (rect) {
-                    // Update width
-                    const currentRectWidth = parseFloat(rect.getAttribute('width') || '0');
-                    if (requiredWidth > currentRectWidth) {
-                      rect.setAttribute('width', requiredWidth.toString());
+                  
+                  const currentWidth = parseFloat(fo.getAttribute('width') || '0');
+                  if (requiredWidth > currentWidth) {
+                    fo.setAttribute('width', requiredWidth.toString());
+                  }
+                  
+                  div.style.width = '100%';
+                  div.style.maxWidth = '100%';
+                  
+                  const divHeight = div.scrollHeight || div.offsetHeight;
+                  if (divHeight > 0) {
+                    const currentHeight = parseFloat(fo.getAttribute('height') || '0');
+                    if (divHeight + 8 > currentHeight) {
+                      fo.setAttribute('height', (divHeight + 8).toString());
                     }
-                    // Update height
-                    const foHeight = parseFloat(fo.getAttribute('height') || '0');
-                    const currentRectHeight = parseFloat(rect.getAttribute('height') || '0');
-                    if (foHeight > currentRectHeight) {
-                      rect.setAttribute('height', foHeight.toString());
+                  }
+                  
+                  const node = fo.closest('.node');
+                  if (node) {
+                    const rect = node.querySelector('rect');
+                    if (rect) {
+                      const currentRectWidth = parseFloat(rect.getAttribute('width') || '0');
+                      if (requiredWidth > currentRectWidth) {
+                        rect.setAttribute('width', requiredWidth.toString());
+                      }
+                      const foHeight = parseFloat(fo.getAttribute('height') || '0');
+                      const currentRectHeight = parseFloat(rect.getAttribute('height') || '0');
+                      if (foHeight > currentRectHeight) {
+                        rect.setAttribute('height', foHeight.toString());
+                      }
                     }
                   }
                 }
-              }
-            });
-            
-            // Process SVG text labels (non-HTML)
-            const allNodes = insertedSvg.querySelectorAll('.node');
-            allNodes.forEach((node: any) => {
-              const hasForeignObject = node.querySelector('.nodeLabel foreignObject');
-              if (!hasForeignObject) {
-                const rect = node.querySelector('rect');
-                const textEl = node.querySelector('.nodeLabel text');
-                if (rect && textEl) {
-                  try {
-                    const textBBox = textEl.getBBox();
-                    const currentWidth = parseFloat(rect.getAttribute('width') || '0');
-                    // Expand node if text is wider than current width (with padding)
-                    if (textBBox.width + 20 > currentWidth) {
-                      rect.setAttribute('width', (textBBox.width + 20).toString());
-                    }
-                  } catch (e) {
-                    // getBBox might fail if element is not rendered yet
-                    console.debug('Could not get text bbox:', e);
-                  }
-                }
-              }
-            });
-          };
-          
-          // Use multiple frames to ensure proper measurement
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              processNodes();
+              });
               
-              // Adjust container height to fit the diagram
-              if (insertedSvg && container) {
-                // Wait a bit more for final layout
-                setTimeout(() => {
-                  const svgRect = insertedSvg.getBoundingClientRect();
-                  const viewBox = insertedSvg.viewBox?.baseVal;
-                  
-                  // Use viewBox height if available (more accurate), otherwise use rendered height
-                  let svgHeight = 0;
-                  if (viewBox && viewBox.height > 0) {
-                    svgHeight = viewBox.height;
-                  } else if (svgRect.height > 0) {
-                    // If using rendered height, account for scale already applied
-                    svgHeight = svgRect.height / 1; // Reverse the scale to get original height
+              // Process SVG text labels (non-HTML)
+              const allNodes = insertedSvg.querySelectorAll('.node');
+              allNodes.forEach((node: any) => {
+                const hasForeignObject = node.querySelector('.nodeLabel foreignObject');
+                if (!hasForeignObject) {
+                  const rect = node.querySelector('rect');
+                  const textEl = node.querySelector('.nodeLabel text');
+                  if (rect && textEl) {
+                    try {
+                      const textBBox = textEl.getBBox();
+                      const currentWidth = parseFloat(rect.getAttribute('width') || '0');
+                      if (textBBox.width + 20 > currentWidth) {
+                        rect.setAttribute('width', (textBBox.width + 20).toString());
+                      }
+                    } catch (e) {
+                      console.debug('Could not get text bbox:', e);
+                    }
                   }
-                  
-                  // Account for the scale transform (1)
-                  const scaledHeight = svgHeight * 1;
-                  
-                  // Set container height to fit the scaled diagram with minimal padding
-                  if (scaledHeight > 0 && container) {
-                    container.style.height = `${scaledHeight + 8}px`; // 8px for minimal vertical padding
-                    container.style.minHeight = 'auto';
-                    container.style.maxHeight = 'none';
-                    container.style.overflow = 'visible';
-                  }
-                }, 100);
-              }
+                }
+              });
+            };
+            
+            // Use multiple frames to ensure proper measurement
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                processNodes();
+                
+                // Adjust container height to fit the diagram
+                if (insertedSvg && container) {
+                  setTimeout(() => {
+                    const svgRect = insertedSvg.getBoundingClientRect();
+                    const viewBox = insertedSvg.viewBox?.baseVal;
+                    
+                    let svgHeight = 0;
+                    if (viewBox && viewBox.height > 0) {
+                      svgHeight = viewBox.height;
+                    } else if (svgRect.height > 0) {
+                      svgHeight = svgRect.height;
+                    }
+                    
+                    if (svgHeight > 0 && container) {
+                      container.style.height = `${svgHeight + 8}px`;
+                      container.style.minHeight = 'auto';
+                      container.style.maxHeight = 'none';
+                      container.style.overflow = 'visible';
+                    }
+                  }, 100);
+                }
+              });
             });
-          });
+          }
         }
         
         if (bindFunctions && typeof bindFunctions === 'function') {
@@ -648,7 +854,7 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
         container.innerHTML = '';
       }
     }
-  }, [cleanDiagram, renderKey, resolvedTheme, initializeMermaid, getThemeConfig]);
+  }, [cleanDiagram, renderKey, mermaidConfig, initializeMermaid]);
 
   // Refresh handler
   const handleRefresh = useCallback(() => {
@@ -961,7 +1167,7 @@ export function MermaidDiagramSimple({ diagram, className, markdownLoadedTimesta
       ) : (
         <div 
           ref={containerRef} 
-            className="mermaid w-full flex justify-center"
+          className="mermaid w-full flex justify-center"
           suppressHydrationWarning
         />
       )}

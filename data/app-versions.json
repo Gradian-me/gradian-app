@@ -5517,5 +5517,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KDQFLATTENEDSCHEMAS001",
+    "timestamp": "2025-12-31T00:00:00.000Z",
+    "version": "1.41.001",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Added support for flattened schemas in dynamic query components, improving data handling and visualization",
+        "priority": "Medium",
+        "affectedDomains": [
+          "dynamic-query-table",
+          "data-display",
+          "data-visualization"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Modified all-data.json to include new flattenedSchemas property for better query management",
+        "priority": "LOW",
+        "affectedDomains": [
+          "data-management",
+          "dynamic-queries"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated DynamicQueryTable and NestedTableView components to accommodate flattened data structures, enhancing overall functionality and user experience. This update significantly improves data organization and user interaction capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "dynamic-query-table",
+          "data-display",
+          "components",
+          "user-experience"
+        ]
+      }
+    ]
   }
 ]

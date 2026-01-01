@@ -18269,6 +18269,7 @@
           "label": "Supply Chain Management"
         }
       ],
+      "flattenedSchemas": ["inquiries", "tenders"],
       "name": "Inquiries → Tenders → (Tender Items/Invitations) → Quotations → Quotation Items",
       "description": "Five-level nested query showing the full hierarchy: inquiries contain tenders, which contain tender items and invitations. Tender items contain quotations, which contain quotation items.",
       "incomplete": false,

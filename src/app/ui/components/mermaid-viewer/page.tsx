@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
-import { MermaidDiagramSimple } from '@/gradian-ui/data-display/markdown/components/MermaidDiagramSimple';
+import { MermaidSimple } from './MermaidSimple';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { RefreshCw } from 'lucide-react';
@@ -14,7 +14,7 @@ export default function MermaidViewerPage() {
     B --> C{Let me think}
     C -->|One| D[Laptop]
     C -->|Two| E[iPhone]
-    C -->|Three| F[fa:fa-car Car]`);
+    C -->|Three| F[Car]`);
   
   const [displayCode, setDisplayCode] = useState(mermaidCode);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -74,7 +74,7 @@ flowchart TD
     B --> C{Let me think}
     C -->|One| D[Laptop]
     C -->|Two| E[iPhone]
-    C -->|Three| F[fa:fa-car Car]
+    C -->|Three| F[Car]
 
 Remember:
 - Always use node IDs: A[Text], B(Text), C{Text}
@@ -117,10 +117,10 @@ Remember:
         {/* Diagram Display Section */}
         {displayCode && (
           <div className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-            <MermaidDiagramSimple 
+            <MermaidSimple 
               key={refreshKey}
               diagram={displayCode}
-              className="w-full"
+              className="w-full flex justify-center"
             />
           </div>
         )}

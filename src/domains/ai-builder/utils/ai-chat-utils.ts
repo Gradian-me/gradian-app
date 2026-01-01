@@ -727,12 +727,12 @@ flowchart TD
     B --> C{Let me think}
     C -->|One| D[Laptop]
     C -->|Two| E[iPhone]
-    C -->|Three| F[fa:fa-car Car]
+    C -->|Three| F[Car]
 \`\`\`
 - Use \`flowchart TD\` (top-down) or \`flowchart LR\` (left-right)
 - **Node ID format**: Always define nodes with an ID first: \`NodeID[Text]\`, \`NodeID(Text)\`, \`NodeID{Text}\`
 - **Shapes**: \`A[Rectangle]\` for rectangles, \`C{Diamond}\` for decisions, \`D([Stadium])\` for stadium shapes
-- **Icons**: Use Font Awesome syntax: \`F[fa:fa-car Car]\` (icon prefix before text)
+- **Icons**: Use Font Awesome syntax: \`F[Car]\` (icon prefix before text)
 - **Edge labels**: \`Node1 -->|Label| Node2\` (ONLY in flowcharts, use pipe syntax)
 - **Reuse nodes**: Reference nodes by their ID: \`C -->|One| D\` (don't redefine the shape)
 

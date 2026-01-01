@@ -10,6 +10,7 @@ interface DynamicQueryPageClientProps {
   queryName?: string;
   queryDescription?: string;
   queryParams?: Record<string, any>;
+  flattenedSchemas?: string[];
 }
 
 export function DynamicQueryPageClient({
@@ -17,11 +18,13 @@ export function DynamicQueryPageClient({
   queryName,
   queryDescription,
   queryParams,
+  flattenedSchemas,
 }: DynamicQueryPageClientProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [flatten, setFlatten] = useState(false);
   const [showIds, setShowIds] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(true); // Default to true to show filter pane initially
   const refreshFnRef = useRef<(() => Promise<void>) | null>(null);
   
   // Sync viewMode with flatten state: hierarchy for flatten=false, table for flatten=true
@@ -76,24 +79,26 @@ export function DynamicQueryPageClient({
       showEndLine={false}
     >
       <div className="container mx-auto px-4 py-6 space-y-4">
-        <DynamicFilterPane
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          viewMode={viewMode}
-          onViewModeChange={handleViewModeChange}
-          onAddNew={handleAddNew}
-          onRefresh={handleRefresh}
-          isRefreshing={isRefreshing}
-          searchPlaceholder="Search results..."
-          addButtonText="Add New"
-          showHierarchy={true}
-          showOnlyViews={['hierarchy', 'table']}
-          showIds={showIds}
-          onShowIdsChange={setShowIds}
-          onExpandAllHierarchy={handleExpandAll}
-          onCollapseAllHierarchy={handleCollapseAll}
-          showAddButton={false}
-        />
+        {isSuccess && (
+          <DynamicFilterPane
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            viewMode={viewMode}
+            onViewModeChange={handleViewModeChange}
+            onAddNew={handleAddNew}
+            onRefresh={handleRefresh}
+            isRefreshing={isRefreshing}
+            searchPlaceholder="Search results..."
+            addButtonText="Add New"
+            showHierarchy={true}
+            showOnlyViews={['hierarchy', 'table']}
+            showIds={showIds}
+            onShowIdsChange={setShowIds}
+            onExpandAllHierarchy={handleExpandAll}
+            onCollapseAllHierarchy={handleCollapseAll}
+            showAddButton={false}
+          />
+        )}
         <DynamicQueryTableWrapper 
           dynamicQueryId={dynamicQueryId}
           queryParams={queryParams}
@@ -102,12 +107,16 @@ export function DynamicQueryPageClient({
           onFlattenChange={setFlatten}
           showIds={showIds}
           onShowIdsChange={setShowIds}
+          flattenedSchemas={flattenedSchemas}
           onRefreshReady={(refreshFn) => {
             refreshFnRef.current = refreshFn;
           }}
           onExpandAllReady={(expandFn, collapseFn) => {
             expandAllRef.current = expandFn;
             collapseAllRef.current = collapseFn;
+          }}
+          onStatusChange={(success) => {
+            setIsSuccess(success);
           }}
         />
       </div>

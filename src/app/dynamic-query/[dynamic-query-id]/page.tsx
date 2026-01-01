@@ -35,6 +35,7 @@ export default async function DynamicQueryPage({ params, searchParams }: PagePro
   // Load query metadata for page title and description
   let queryName: string | undefined;
   let queryDescription: string | undefined;
+  let flattenedSchemas: string[] | undefined;
   
   try {
     const dynamicQueriesData = readSchemaData<any>('dynamic-queries') || [];
@@ -45,6 +46,7 @@ export default async function DynamicQueryPage({ params, searchParams }: PagePro
     if (query) {
       queryName = query.name;
       queryDescription = query.description;
+      flattenedSchemas = query.flattenedSchemas;
     } else if (dynamicQueriesData.length > 0) {
       // If we have queries data and the query doesn't exist, show 404
       notFound();
@@ -67,6 +69,7 @@ export default async function DynamicQueryPage({ params, searchParams }: PagePro
         queryName={queryName}
         queryDescription={queryDescription}
         queryParams={queryParams}
+        flattenedSchemas={flattenedSchemas}
       />
     </Suspense>
   );

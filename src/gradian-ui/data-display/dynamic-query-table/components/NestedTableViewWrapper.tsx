@@ -16,6 +16,7 @@ export function NestedTableViewWrapper({
   expandAllTrigger: externalExpandAllTrigger,
   onExpandAllReady,
   showIds,
+  flattenedSchemas,
 }: NestedTableViewWrapperProps) {
   const [internalExpandAllTrigger, setInternalExpandAllTrigger] = useState(0);
   
@@ -51,6 +52,7 @@ export function NestedTableViewWrapper({
       flatten={flatten}
       onFlattenChange={onFlattenChange}
       showIds={showIds}
+      flattenedSchemas={flattenedSchemas}
     />
   );
 }
