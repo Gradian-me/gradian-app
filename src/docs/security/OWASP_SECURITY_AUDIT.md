@@ -37,7 +37,7 @@ This document provides a comprehensive security audit based on OWASP Top 10 2021
    - **Status**: All object property access now uses safe utilities that prevent prototype pollution
 
 2. **XSS (Cross-Site Scripting)** ✅ VERIFIED
-   - **Files**: `ChatInput.tsx`, `MermaidDiagramSimple.tsx`
+   - **Files**: `ChatInput.tsx`, `MermaidSimple.tsx`
    - **Status**: All `innerHTML` usage properly sanitizes content (HTML escaping before processing)
    - **Note**: `dangerouslySetInnerHTML` used for KaTeX (safe - KaTeX sanitizes output)
 

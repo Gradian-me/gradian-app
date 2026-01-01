@@ -70,6 +70,7 @@ export function sanitizeSvg(svg: string): string {
       'class', 'id', 'width', 'height', 'viewBox', 'xmlns', 'xmlns:xlink',
       'x', 'y', 'cx', 'cy', 'r', 'rx', 'ry', 'd', 'points', 'fill',
       'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin',
+      'stroke-dasharray', 'stroke-dashoffset', 'stroke-opacity',
       'transform', 'opacity', 'font-family', 'font-size', 'text-anchor',
       'dominant-baseline', 'href', 'xlink:href', 'style'
     ],

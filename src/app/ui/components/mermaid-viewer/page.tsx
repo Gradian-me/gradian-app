@@ -85,6 +85,8 @@ Remember:
               "resize-y",
               "border-gray-300 dark:border-gray-600",
               "bg-gray-50 dark:bg-gray-900/50",
+              "text-gray-900 dark:text-gray-100",
+              "placeholder:text-gray-500 dark:placeholder:text-gray-400",
               "focus:ring-violet-500 focus:border-violet-500"
             )}
           />

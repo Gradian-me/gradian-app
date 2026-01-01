@@ -4,7 +4,7 @@ import React from 'react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
-import { MermaidDiagramSimple } from '../MermaidDiagramSimple';
+import { MermaidSimple } from '@/app/ui/components/mermaid-viewer/MermaidSimple';
 import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
 import { extractLanguage, extractLanguageFromNode, getCodeContent } from '../../utils/markdownComponentUtils';
 import { sanitizeHtml } from '@/gradian-ui/shared/utils/html-sanitizer';
@@ -107,9 +107,9 @@ export function CodeComponent({
     if (diagram) {
       return (
         <div className="my-6">
-          <MermaidDiagramSimple 
-            diagram={diagram} 
-            markdownLoadedTimestamp={markdownLoadedTimestamp} 
+          <MermaidSimple 
+            diagram={diagram}
+            showSaveCopyButtons={false}
           />
         </div>
       );
