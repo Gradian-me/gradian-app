@@ -171,19 +171,60 @@ async function callPreloadRoute(
       };
     }
 
-    const responseData = await response.json();
-    const extractedData = extractDataByPath(responseData, preloadRoute.jsonPath);
+    // Check content-type to handle both JSON and text/plain (for TOON format)
+    const contentType = response.headers.get('content-type') || '';
+    let responseData: any;
     
-    // Always return full JSON - filtering will happen later during formatting
-    // This ensures we have all data available for dynamic field selection
-
-    return {
-      route: preloadRoute.route,
-      title: preloadRoute.title,
-      description: preloadRoute.description,
-      success: true,
-      data: extractedData,
-    };
+    if (contentType.includes('application/json') || contentType.includes('text/json')) {
+      // Parse as JSON
+      responseData = await response.json();
+      const extractedData = extractDataByPath(responseData, preloadRoute.jsonPath);
+      
+      return {
+        route: preloadRoute.route,
+        title: preloadRoute.title,
+        description: preloadRoute.description,
+        success: true,
+        data: extractedData,
+      };
+    } else {
+      // Handle text/plain (e.g., TOON format) or other text formats
+      const responseText = await response.text();
+      
+      // If outputFormat is 'toon', return the text as-is
+      if (preloadRoute.outputFormat === 'toon') {
+        return {
+          route: preloadRoute.route,
+          title: preloadRoute.title,
+          description: preloadRoute.description,
+          success: true,
+          data: responseText,
+        };
+      }
+      
+      // Try to parse as JSON if it looks like JSON
+      try {
+        responseData = JSON.parse(responseText);
+        const extractedData = extractDataByPath(responseData, preloadRoute.jsonPath);
+        
+        return {
+          route: preloadRoute.route,
+          title: preloadRoute.title,
+          description: preloadRoute.description,
+          success: true,
+          data: extractedData,
+        };
+      } catch {
+        // If parsing fails, return as string
+        return {
+          route: preloadRoute.route,
+          title: preloadRoute.title,
+          description: preloadRoute.description,
+          success: true,
+          data: responseText,
+        };
+      }
+    }
   } catch (error) {
     return {
       route: preloadRoute.route,
@@ -279,7 +320,15 @@ export function formatPreloadRouteResult(
   const outputFormat = (route.outputFormat || 'json').toLowerCase();
 
   if (outputFormat === 'toon') {
-    // TOON format: Get includedFields dynamically, filter data, then format to TOON
+    // Check if data is already a TOON-formatted string (from API response)
+    if (typeof result.data === 'string') {
+      // Data is already in TOON format, use it directly
+      return `## ${cleanText(result.title)}\n${cleanText(result.description)}\n\n` +
+        `Data from ${result.route}:\n\`\`\`text\n${result.data}\n\`\`\`\n`;
+    }
+    
+    // Otherwise, format JSON data to TOON format
+    // Get includedFields dynamically, filter data, then format to TOON
     const dynamicIncludedFields = getDynamicIncludedFields(
       route.outputFormat,
       route.route,

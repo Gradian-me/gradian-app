@@ -1,0 +1,107 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "label": {
+        "en": "CinnoVex",
+        "fa": "سینووکس"
+      }
+    },
+    {
+      "id": "2",
+      "label": {
+        "en": "CinnalF",
+        "fa": "سینال اف"
+      }
+    },
+    {
+      "id": "3",
+      "label": {
+        "en": "CinnaPoietin",
+        "fa": "سیناپویتین"
+      }
+    },
+    {
+      "id": "4",
+      "label": {
+        "en": "CinnoRA",
+        "fa": "سینورا"
+      }
+    },
+    {
+      "id": "5",
+      "label": {
+        "en": "Spartina",
+        "fa": "اسپارتینا"
+      }
+    },
+    {
+      "id": "6",
+      "label": {
+        "en": "CinnaTropin",
+        "fa": "سیناتروپین"
+      }
+    },
+    {
+      "id": "7",
+      "label": {
+        "en": "ReciGen",
+        "fa": "رسیژن"
+      }
+    }
+  ],
+  "organization_chart": [
+    {
+      "id": "427",
+      "label": {
+        "en": "Dr. Haleh Hamedifar",
+        "fa": "دکتر هاله حامدی فر"
+      },
+      "post": {
+        "en": "Chairwoman of the board",
+        "fa": "رئیس هئیت مدیره"
+      }
+    },
+    {
+      "id": "129",
+      "label": {
+        "en": "Mehran Montajabi",
+        "fa": "مهران منتجبی"
+      },
+      "post": {
+        "en": "CEO",
+        "fa": "مدیر عامل"
+      }
+    }
+  ],
+  "companies": [
+    {
+      "id": "01K94V4PJSFKCXS6AVX07P86N5",
+      "label": {
+        "en": "CinnaGen",
+        "fa": "سیناژن"
+      }
+    },
+    {
+      "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "label": {
+        "en": "AryoGen",
+        "fa": "آریوژن"
+      }
+    },
+    {
+      "id": "01KB85MPFBMS4GQ6KGA0EGJNGA",
+      "label": {
+        "en": "NanoAlvand",
+        "fa": "نانوالوند"
+      }
+    },
+    {
+      "id": "01KB9VFNMVC92XF1JRND69S4Z9",
+      "label": {
+        "en": "Arvand Pharmed",
+        "fa": "اروند فارمد"
+      }
+    }
+  ]
+}

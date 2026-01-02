@@ -5632,5 +5632,63 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KDZORGRAG001",
+    "timestamp": "2025-12-31T21:00:00.000Z",
+    "version": "1.42.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "ORGANIZATION RAG - Enhanced organizational data access with improved preload routes and response handling",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "organization-rag",
+          "preload-routes"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Added new preloadRoutes in ai-agents.json for improved organizational data access",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "preload-routes"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated prompt-concatenation-utils.ts to enhance system prompt structure and clarity",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "prompt-concatenation",
+          "utils"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Modified text-utils.ts to replace commas with dashes in formatted output to avoid conflicts",
+        "priority": "Medium",
+        "affectedDomains": [
+          "text-utils",
+          "formatters",
+          "data-display"
+        ]
+      },
+      {
+        "changeType": "fix",
+        "description": "Fixed JSON parsing error in organization-rag API endpoint by handling text/plain content-type responses for TOON format",
+        "priority": "High",
+        "affectedDomains": [
+          "api",
+          "organization-rag",
+          "preload-routes",
+          "error-handling"
+        ]
+      }
+    ]
   }
 ]

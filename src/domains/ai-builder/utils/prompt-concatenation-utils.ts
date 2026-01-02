@@ -246,34 +246,43 @@ function buildCompleteSystemPrompt(params: {
     systemPrompt += '\n\n***\n\n' + params.additionalSystemPrompt;
   }
   
-  // 5. Graph generation prompt (for graph agents)
-  if (params.graphGenerationPrompt) {
-    systemPrompt += '\n\n***\n\n' + params.graphGenerationPrompt;
-  }
-  
-  // 6. Image generation prompt (for image agents)
-  if (params.imageGenerationPrompt) {
-    systemPrompt += '\n\n***\n\n' + params.imageGenerationPrompt;
-  }
-  
-  // 7. General markdown output rules (for string format agents)
-  if (params.generalMarkdownRules) {
-    systemPrompt += '\n\n***\n\n' + params.generalMarkdownRules;
-  }
-  
-  // 8. Mermaid diagram rules (for string format agents)
-  if (params.mermaidRules) {
-    systemPrompt += '\n\n' + params.mermaidRules;
-  }
-  
-  // 9. Reference and source citation rules (for string format agents)
+  // 5. Reference and source citation rules (for string format agents)
   if (params.referencePrompt) {
     systemPrompt += '\n\n' + params.referencePrompt;
   }
   
-  // 10. Preloaded context (added at the end)
+  // 6. Preloaded context (added at the end)
   if (params.preloadedContext) {
-    systemPrompt += '\n\n***\n\n' + params.preloadedContext;
+    systemPrompt += '\n\n***\n\n' + '## Preloaded Context for RAG:\n\n' 
+    + '---'
+    + '\n'
+    + '**RAG Data Enhancement:**'
+    + '\n'
+    + 'If RAG data exists (such as Organizational RAG), use the keywords and terminology inside it based on the selected language to make the context more concise and enriched. Prioritize using the exact keywords, product names, organizational names and roles, and terminology from the RAG data that match the selected language, as this will ensure consistency with organizational standards and improve the accuracy and relevance of your responses.'
+    + '\n'
+    + '---'
+    + '\n\n'
+    + params.preloadedContext;
+  }
+
+  // 7. Graph generation prompt (for graph agents)
+  if (params.graphGenerationPrompt) {
+    systemPrompt += '\n\n***\n\n' + params.graphGenerationPrompt;
+  }
+  
+  // 8. Image generation prompt (for image agents)
+  if (params.imageGenerationPrompt) {
+    systemPrompt += '\n\n***\n\n' + params.imageGenerationPrompt;
+  }
+  
+  // 9. General markdown output rules (for string format agents)
+  if (params.generalMarkdownRules) {
+    systemPrompt += '\n\n***\n\n' + params.generalMarkdownRules;
+  }
+  
+  // 10. Mermaid diagram rules (for string format agents)
+  if (params.mermaidRules) {
+    systemPrompt += '\n\n' + params.mermaidRules;
   }
   
   return systemPrompt;

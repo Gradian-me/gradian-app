@@ -21,6 +21,35 @@ import { truncateText } from '@/domains/chat/utils/text-utils';
 import { formatSearchResultsToToon, type SearchResult } from '../utils/ai-search-utils';
 import { summarizePrompt } from '../utils/ai-summarization-utils';
 
+/**
+ * Extract organization RAG data from preloaded context
+ * @param preloadedContext - The full preloaded context string
+ * @returns Organization RAG section if found, empty string otherwise
+ */
+function extractOrganizationRagFromPreloadedContext(preloadedContext: string): string {
+  if (!preloadedContext || !preloadedContext.trim()) {
+    return '';
+  }
+
+  // Look for the organization RAG section in preloaded context
+  // It should be formatted as: "## Organizational RAG Data\n..."
+  const orgRagMatch = preloadedContext.match(/##\s+Organizational\s+RAG\s+Data[\s\S]*?(?=##\s+\w+|$)/i);
+  if (orgRagMatch) {
+    return orgRagMatch[0].trim();
+  }
+
+  // Also check for "## Preloaded Context Data" section that might contain org RAG
+  const preloadMatch = preloadedContext.match(/##\s+Preloaded\s+Context\s+Data[\s\S]*?##\s+Organizational\s+RAG\s+Data[\s\S]*?(?=##\s+\w+|$)/i);
+  if (preloadMatch) {
+    const orgRagInPreload = preloadMatch[0].match(/##\s+Organizational\s+RAG\s+Data[\s\S]*?(?=##\s+\w+|$)/i);
+    if (orgRagInPreload) {
+      return orgRagInPreload[0].trim();
+    }
+  }
+
+  return '';
+}
+
 interface UseAiBuilderReturn {
   userPrompt: string;
   setUserPrompt: (prompt: string) => void;
@@ -148,18 +177,61 @@ export function useAiBuilder(): UseAiBuilderReturn {
               };
             }
 
-            const responseData = await response.json();
+            // Check content-type to handle both JSON and text/plain (for TOON format)
+            const contentType = response.headers.get('content-type') || '';
+            let responseData: any;
             
-            // Extract data using jsonPath (using shared utility)
-            const extractedData = extractDataByPath(responseData, route.jsonPath);
-
-            return {
-              route: route.route,
-              title: route.title,
-              description: route.description,
-              success: true,
-              data: extractedData,
-            };
+            if (contentType.includes('application/json') || contentType.includes('text/json')) {
+              // Parse as JSON
+              responseData = await response.json();
+              // Extract data using jsonPath (using shared utility)
+              const extractedData = extractDataByPath(responseData, route.jsonPath);
+              
+              return {
+                route: route.route,
+                title: route.title,
+                description: route.description,
+                success: true,
+                data: extractedData,
+              };
+            } else {
+              // Handle text/plain (e.g., TOON format) or other text formats
+              const responseText = await response.text();
+              
+              // If outputFormat is 'toon', return the text as-is
+              if (route.outputFormat === 'toon') {
+                return {
+                  route: route.route,
+                  title: route.title,
+                  description: route.description,
+                  success: true,
+                  data: responseText,
+                };
+              }
+              
+              // Try to parse as JSON if it looks like JSON
+              try {
+                responseData = JSON.parse(responseText);
+                const extractedData = extractDataByPath(responseData, route.jsonPath);
+                
+                return {
+                  route: route.route,
+                  title: route.title,
+                  description: route.description,
+                  success: true,
+                  data: extractedData,
+                };
+              } catch {
+                // If parsing fails, return as string
+                return {
+                  route: route.route,
+                  title: route.title,
+                  description: route.description,
+                  success: true,
+                  data: responseText,
+                };
+              }
+            }
           } catch (error) {
             return {
               route: route.route,
@@ -247,8 +319,31 @@ export function useAiBuilder(): UseAiBuilderReturn {
         if (isDevelopment) {
           loggingCustom(LogType.AI_BODY_LOG, 'info', `Summarizing prompt before search/image operations...`);
         }
+        
+        // Non-blocking call to organization-rag API
+        // Fire and forget - don't wait for response
+        fetch('/api/organization-rag?format=toon', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          signal: abortController.signal,
+        }).catch((error) => {
+          // Silently handle errors - this is non-blocking
+          if (isDevelopment && !(error instanceof Error && error.name === 'AbortError')) {
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `Organization RAG API call failed (non-blocking): ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
+        });
+        
         try {
-          summarizedPromptValue = await summarizePrompt(originalPrompt, abortController.signal);
+          // Extract organization RAG from preloaded context
+          const organizationRag = extractOrganizationRagFromPreloadedContext(preloadedContext);
+          
+          summarizedPromptValue = await summarizePrompt(
+            originalPrompt, 
+            abortController.signal,
+            60000
+          );
           if (isDevelopment && summarizedPromptValue !== originalPrompt) {
             loggingCustom(LogType.AI_BODY_LOG, 'info', `Prompt summarized successfully. Original: ${originalPrompt.length} chars, Summarized: ${summarizedPromptValue.length} chars`);
           }

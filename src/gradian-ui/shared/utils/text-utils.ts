@@ -151,8 +151,8 @@ export const formatToToon = (
       if (value === null || value === undefined) {
         return '';
       }
-      // Convert to string and clean
-      return cleanText(String(value));
+      // Convert to string, clean, and replace commas with dashes to avoid conflicts
+      return cleanText(String(value)).replace(/,/g, '-');
     });
     return `  ${values.join(',')}`;
   });

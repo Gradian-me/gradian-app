@@ -9,6 +9,62 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 /**
+ * Fetch organization RAG data non-blocking
+ * Returns the data if available within timeout, otherwise returns empty string
+ * @param timeout - Maximum time to wait in milliseconds (default: 2000ms)
+ * @returns Organization RAG data in TOON format, or empty string if timeout
+ */
+async function fetchOrganizationRagNonBlocking(timeout: number = 2000): Promise<string> {
+  try {
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const url = `${baseUrl}/api/organization-rag?format=toon`;
+
+    // Create a promise that rejects after timeout
+    const timeoutPromise = new Promise<string>((_, reject) => {
+      setTimeout(() => reject(new Error('Timeout')), timeout);
+    });
+
+    // Create the fetch promise
+    const fetchPromise = fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      // Check content-type to handle both JSON and text/plain (for TOON format)
+      const contentType = response.headers.get('content-type') || '';
+      
+      if (contentType.includes('text/plain')) {
+        // Handle TOON format (text/plain)
+        const text = await response.text();
+        return text.trim();
+      } else {
+        // Handle JSON format
+        const data = await response.json();
+        // Extract data if wrapped in response object
+        const extractedData = data.data || data;
+        // Convert to string representation if needed
+        return typeof extractedData === 'string' ? extractedData : JSON.stringify(extractedData);
+      }
+    });
+
+    // Race between fetch and timeout - if timeout wins, return empty string
+    const result = await Promise.race([fetchPromise, timeoutPromise]);
+    return result || '';
+  } catch (error) {
+    // On any error (including timeout), return empty string (non-blocking)
+    if (isDevelopment) {
+      loggingCustom(LogType.CLIENT_LOG, 'info', `Organization RAG fetch skipped: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+    return '';
+  }
+}
+
+/**
  * Summarize a prompt using the professional-writing agent with summarizer style
  * @param prompt - The original prompt text to summarize
  * @param signal - Optional AbortSignal for cancellation
