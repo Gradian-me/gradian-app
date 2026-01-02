@@ -85,12 +85,32 @@ export async function summarizePrompt(
       loggingCustom(LogType.AI_BODY_LOG, 'info', `Starting prompt summarization for prompt: ${prompt.substring(0, 100)}...`);
     }
 
+    // Fetch organization RAG data non-blocking (with 2 second timeout)
+    // Start the fetch immediately but don't wait if it takes too long
+    let orgRagData = '';
+    try {
+      orgRagData = await fetchOrganizationRagNonBlocking(2000);
+      if (isDevelopment && orgRagData) {
+        loggingCustom(LogType.AI_BODY_LOG, 'info', `Organization RAG data fetched for summarization (${orgRagData.length} chars)`);
+      }
+    } catch (error) {
+      // Silently continue without organization RAG if fetch fails or times out
+      if (isDevelopment) {
+        loggingCustom(LogType.CLIENT_LOG, 'info', 'Organization RAG fetch timed out or failed, proceeding without it');
+      }
+    }
+
     // Build user prompt for summarizer style
     // According to the professional-writing agent config, summarizer should:
     // "Deeply analyze the text to understand meaning, context, relationships, and key details.
     // Synthesize and completely rephrase all content into one or two flowing narrative paragraphs
     // that capture the essence, main ideas, and critical information."
-    const userPrompt = `Please deeply analyze the following text to understand its meaning, context, relationships, and key details. Synthesize and completely rephrase all content into one or two flowing narrative paragraphs that capture the essence, main ideas, and critical information. Output MUST be plain text only - NO headings, sections, bullet points, markdown, or structured formatting. Create continuous, natural-flowing prose that reads as if written from scratch based on comprehensive understanding, not a condensed or reorganized version of the original:\n\n${prompt.trim()}`;
+    let userPrompt = `Please deeply analyze the following text to understand its meaning, context, relationships, and key details. Synthesize and completely rephrase all content into one or two flowing narrative paragraphs that capture the essence, main ideas, and critical information. Output MUST be plain text only - NO headings, sections, bullet points, markdown, or structured formatting. Create continuous, natural-flowing prose that reads as if written from scratch based on comprehensive understanding, not a condensed or reorganized version of the original:\n\n${prompt.trim()}`;
+
+    // Include organization RAG data if available
+    if (orgRagData && orgRagData.trim()) {
+      userPrompt = `**Organizational Context:**\n\n${orgRagData.trim()}\n\n---\n\n**Text to Summarize:**\n\n${userPrompt}`;
+    }
 
     // Create abort controller with timeout if signal not provided
     let abortController: AbortController | null = null;

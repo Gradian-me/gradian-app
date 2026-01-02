@@ -140,6 +140,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
           required={required ?? config.validation?.required ?? false}
           disabled={disabled}
           className={textareaClasses}
+          style={{ paddingRight: '3rem' }}
           dir="auto"
           {...props}
         />
