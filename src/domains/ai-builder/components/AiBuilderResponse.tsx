@@ -32,6 +32,7 @@ import { truncateText } from '@/domains/chat/utils/text-utils';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 import { detectMessageRenderType } from '@/domains/chat/utils/message-render-utils';
 import type { ChatMessage } from '@/domains/chat/types';
+import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
 
 interface AiBuilderResponseProps {
   response: string;
@@ -526,7 +527,11 @@ export function AiBuilderResponse({
     if (!isGraphFormat) return null;
     
     try {
-      const parsed = JSON.parse(displayContent);
+      // First, try to extract JSON from markdown code blocks if present
+      const extractedJson = extractJson(displayContent);
+      const jsonString = extractedJson || displayContent;
+      
+      const parsed = JSON.parse(jsonString);
       
       // Check if this is an error response
       if (parsed && typeof parsed === 'object' && parsed.error && !parsed.success) {
@@ -555,6 +560,31 @@ export function AiBuilderResponse({
   // Check if graphData is actually an error
   const isGraphError = graphData && typeof graphData === 'object' && (graphData as any)._isError === true;
   const actualGraphData = isGraphError ? null : graphData;
+  
+  // Parse graph data from renderData if needed
+  const parsedGraphData = useMemo(() => {
+    if (actualGraphData) return actualGraphData;
+    if (!renderData.graphData) return null;
+    
+    if (typeof renderData.graphData === 'string') {
+      try {
+        const extractedJson = extractJson(renderData.graphData);
+        const jsonString = extractedJson || renderData.graphData;
+        const parsed = JSON.parse(jsonString);
+        if (parsed && typeof parsed === 'object' && 
+            Array.isArray(parsed.nodes) && Array.isArray(parsed.edges)) {
+          return parsed.graph || parsed;
+        }
+      } catch (e) {
+        console.warn('Failed to parse renderData.graphData:', e);
+      }
+    } else if (typeof renderData.graphData === 'object' && 
+              Array.isArray(renderData.graphData.nodes) && 
+              Array.isArray(renderData.graphData.edges)) {
+      return renderData.graphData;
+    }
+    return null;
+  }, [actualGraphData, renderData.graphData]);
 
   // Determine if we should render as graph
   // Show graph section if: agent is graph format OR we have graph data OR we have an error response for graph agent
@@ -1541,7 +1571,7 @@ export function AiBuilderResponse({
           </details>
         </div>
       ) : renderData.type === 'graph' || shouldRenderGraph ? (
-        (renderData.graphData || actualGraphData) ? (
+        parsedGraphData ? (
           <div className="space-y-4">
             <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -1563,11 +1593,11 @@ export function AiBuilderResponse({
               <div className="w-full h-[600px] min-h-[400px] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
                 <GraphViewer
                   data={{
-                    nodes: (renderData.graphData || actualGraphData)?.nodes || [],
-                    edges: (renderData.graphData || actualGraphData)?.edges || [],
-                    nodeTypes: (renderData.graphData || actualGraphData)?.nodeTypes,
-                    relationTypes: (renderData.graphData || actualGraphData)?.relationTypes,
-                    schemas: (renderData.graphData || actualGraphData)?.schemas,
+                    nodes: parsedGraphData.nodes || [],
+                    edges: parsedGraphData.edges || [],
+                    nodeTypes: parsedGraphData.nodeTypes,
+                    relationTypes: parsedGraphData.relationTypes,
+                    schemas: parsedGraphData.schemas,
                   }}
                   height="100%"
                 />
@@ -1602,7 +1632,7 @@ export function AiBuilderResponse({
               </summary>
               <div className="mt-2">
                 <CodeViewer
-                  code={JSON.stringify(actualGraphData, null, 2)}
+                  code={JSON.stringify(parsedGraphData, null, 2)}
                   programmingLanguage="json"
                   title="Raw Graph Data"
                   initialLineNumbers={10}
@@ -1611,7 +1641,6 @@ export function AiBuilderResponse({
             </details>
           </div>
         ) : isGraphError ? (
-          // Show graph error with the error message from graphData
           <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-6 mb-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -1640,76 +1669,7 @@ export function AiBuilderResponse({
               </details>
             )}
           </div>
-        ) : (
-          <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-red-600 dark:text-red-400" />
-                <h3 className="text-sm font-semibold text-red-900 dark:text-red-100">
-                  Graph Generation Error
-                </h3>
-              </div>
-            </div>
-            {displayContent && displayContent.trim() ? (
-              <>
-                {(() => {
-                  try {
-                    const parsed = JSON.parse(displayContent);
-                    if (parsed && typeof parsed === 'object' && parsed.error) {
-                      // Show error message from API response
-                      return (
-                        <>
-                          <p className="text-sm text-red-700 dark:text-red-300 mb-4 font-medium">
-                            {parsed.error}
-                          </p>
-                          <details className="text-sm">
-                            <summary className="cursor-pointer text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-100 mb-2">
-                              View Full Error Details
-                            </summary>
-                            <div className="mt-2">
-                              <CodeViewer
-                                code={displayContent}
-                                programmingLanguage="json"
-                                title="Error Response"
-                                initialLineNumbers={10}
-                              />
-                            </div>
-                          </details>
-                        </>
-                      );
-                    }
-                  } catch {
-                    // Not JSON, fall through to default error message
-                  }
-                  return (
-                    <>
-                      <p className="text-sm text-red-700 dark:text-red-300 mb-4">
-                        Unable to parse graph data from response. The response may contain an error or invalid format.
-                      </p>
-                      <details className="text-sm">
-                        <summary className="cursor-pointer text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-100 mb-2">
-                          View Error Details
-                        </summary>
-                        <div className="mt-2">
-                          <CodeViewer
-                            code={displayContent}
-                            programmingLanguage="json"
-                            title="Error Response"
-                            initialLineNumbers={10}
-                          />
-                        </div>
-                      </details>
-                    </>
-                  );
-                })()}
-              </>
-            ) : (
-              <p className="text-sm text-red-700 dark:text-red-300">
-                No response received from graph generation service. Please check the API configuration and try again.
-              </p>
-            )}
-          </div>
-        )
+        ) : null
       ) : agent?.requiredOutputFormat === 'string' ? (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">

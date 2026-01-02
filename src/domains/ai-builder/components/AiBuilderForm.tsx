@@ -238,6 +238,7 @@ interface AiBuilderFormProps {
   selectedLanguage?: string;
   onLanguageChange?: (language: string) => void;
   onFormValuesChange?: (formValues: Record<string, any>) => void; // Callback to expose formValues
+  hidePreviewButton?: boolean; // Hide the preview button in PromptPreviewSheet (useful for dialog mode)
 }
 
 export function AiBuilderForm({
@@ -260,6 +261,7 @@ export function AiBuilderForm({
   selectedLanguage = 'text',
   onLanguageChange,
   onFormValuesChange,
+  hidePreviewButton = false,
 }: AiBuilderFormProps) {
   // Get selected agent
   const selectedAgent = agents.find(agent => agent.id === selectedAgentId);
@@ -1342,6 +1344,7 @@ export function AiBuilderForm({
                             baseUrl={baseUrl}
                             summarizedPrompt={summarizedPrompt || undefined}
                             isSummarizing={isSummarizing}
+                            hideButton={hidePreviewButton}
                           />
                         );
                       })()}

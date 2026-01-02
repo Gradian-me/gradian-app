@@ -18269,7 +18269,10 @@
           "label": "Supply Chain Management"
         }
       ],
-      "flattenedSchemas": ["inquiries", "tenders"],
+      "flattenedSchemas": [
+        "inquiries",
+        "tenders"
+      ],
       "name": "Inquiries → Tenders → (Tender Items/Invitations) → Quotations → Quotation Items",
       "description": "Five-level nested query showing the full hierarchy: inquiries contain tenders, which contain tender items and invitations. Tender items contain quotations, which contain quotation items.",
       "incomplete": false,
@@ -18293,6 +18296,326 @@
       "id": "active-directory",
       "label": "active-directory",
       "sourceUrl": "field-options:users:authentication-type"
+    },
+    {
+      "id": "high",
+      "label": "High",
+      "icon": "ArrowUp",
+      "color": "orange",
+      "sourceUrl": "field-options:deviation-management:impact-product-quality"
+    },
+    {
+      "id": "low",
+      "label": "Low",
+      "icon": "ArrowDown",
+      "color": "green",
+      "sourceUrl": "field-options:deviation-management:impact-patient-safety"
+    },
+    {
+      "id": "critical",
+      "label": "Critical",
+      "sourceUrl": "field-options:deviation-management:impact-data-integrity"
+    },
+    {
+      "id": "high",
+      "label": "High",
+      "icon": "ArrowUp",
+      "color": "orange",
+      "sourceUrl": "field-options:deviation-management:impact-regulatory-compliance"
+    },
+    {
+      "id": "unplanned",
+      "label": "Unplanned",
+      "color": "orange",
+      "sourceUrl": "field-options:deviation-management:deviation-type"
+    },
+    {
+      "id": "critical",
+      "label": "Critical",
+      "sourceUrl": "field-options:deviation-management:deviation-criticality"
+    },
+    {
+      "id": "repeat",
+      "label": "Repeat",
+      "icon": "Repeat",
+      "color": "purple",
+      "sourceUrl": "field-options:deviation-management:recurrence-indicator"
+    },
+    {
+      "id": "5-why",
+      "label": "5-Why",
+      "icon": "Brain",
+      "color": "blue",
+      "sourceUrl": "field-options:deviation-management:root-cause-analysis-method"
+    },
+    {
+      "id": "effective",
+      "label": "Effective",
+      "icon": "CheckCircle",
+      "color": "green",
+      "sourceUrl": "field-options:deviation-management:effectiveness-result"
+    }
+  ],
+  "deviation-management": [
+    {
+      "id": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
+      "deviationNumber": "DEV-2025-0147",
+      "deviationDetectionDateTime": "2025-06-18T09:35",
+      "detectedBy": [
+        {
+          "id": "01KCPC8YBMRYB3X846103R11MH"
+        }
+      ],
+      "deviationTitle": "Non-contemporaneous recording of environmental monitoring results",
+      "deviationDescription": "During routine QA review of environmental monitoring (EM) records for Grade B cleanroom (Room B-204), it was observed that EM results for settle plates and active air sampling dated 2025-06-15 were recorded in the official logbook on 2025-06-17. The entries were not recorded at the time the activity was performed.",
+      "expectedCondition": "According to SOP QC-EM-012, all environmental monitoring results must be recorded contemporaneously at the time of sampling or immediately after completion of the activity, with date and time documented.",
+      "actualConditionObserved": "EM results were transcribed from analyst personal notes into the official logbook two days after sampling. No contemporaneous time stamps or raw notes were attached to the record.",
+      "locationArea": "Manufacturing Building 2 – Grade B Cleanroom B-204",
+      "affectedProductMaterial": [
+        {
+          "id": "item-1767387960451-prodmaterial",
+          "label": "Sterile injectable Product X (API Lot AX-442)"
+        }
+      ],
+      "affectedBatchNumbers": [
+        {
+          "id": "item-1767387960452-batchnum",
+          "label": "BX-250615-01"
+        }
+      ],
+      "affectedEquipmentSystem": [
+        {
+          "id": "item-1767387960453-equipment",
+          "label": "Active Air Sampler ID: AAS-017"
+        }
+      ],
+      "impactProductQuality": [
+        {
+          "id": "high"
+        }
+      ],
+      "impactPatientSafety": [
+        {
+          "id": "low"
+        }
+      ],
+      "impactDataIntegrity": [
+        {
+          "id": "critical"
+        }
+      ],
+      "impactRegulatoryCompliance": [
+        {
+          "id": "high"
+        }
+      ],
+      "quarantineHoldApplied": true,
+      "productionStopped": false,
+      "qaInitialDecision": "Full deviation investigation required; batch disposition decision deferred until completion.",
+      "deviationType": [
+        {
+          "id": "unplanned"
+        }
+      ],
+      "deviationCategory": [
+        {
+          "id": "Data Integrity / Documentation"
+        }
+      ],
+      "deviationCriticality": [
+        {
+          "id": "critical"
+        }
+      ],
+      "recurrenceIndicator": [
+        {
+          "id": "repeat"
+        }
+      ],
+      "investigationRequired": true,
+      "investigationLead": [],
+      "rootCauseAnalysisMethod": [
+        {
+          "id": "5-why"
+        }
+      ],
+      "identifiedRootCauses": [
+        {
+          "id": "item-1767387960454-rootcause",
+          "label": "Inadequate enforcement of contemporaneous documentation requirements and reliance on informal note-taking during EM activities."
+        }
+      ],
+      "contributingFactors": [
+        {
+          "id": "item-1767387960455-factor1",
+          "label": "Insufficient training emphasis on ALCOA+ principles"
+        },
+        {
+          "id": "item-1767387960456-factor2",
+          "label": "High workload during aseptic operations"
+        },
+        {
+          "id": "item-1767387960457-factor3",
+          "label": "Lack of real-time documentation tools in cleanroom"
+        },
+        {
+          "id": "item-1767387960458-factor4",
+          "label": "Inadequate QA oversight of EM logbooks"
+        }
+      ],
+      "scientificTechnicalRationale": [
+        {
+          "id": "item-1767387960459-rationale",
+          "label": "Environmental monitoring data is a critical element of sterility assurance. Delayed transcription compromises data reliability and prevents confirmation that conditions were acceptable at the time of manufacture."
+        }
+      ],
+      "capa": [
+        {
+          "actionTitle": "QA review of all EM records for the affected batch",
+          "actionType": {
+            "id": "corrective",
+            "label": "Corrective",
+            "icon": "Wrench",
+            "color": "orange"
+          },
+          "capaOwner": {
+            "id": "01KBSMDRHJTDY7SFEY6VWK2HEK",
+            "label": "Quality Assurance Manager"
+          },
+          "capaDueDate": "2025-07-01"
+        },
+        {
+          "actionTitle": "Independent verification of raw EM data where available",
+          "actionType": {
+            "id": "corrective",
+            "label": "Corrective",
+            "icon": "Wrench",
+            "color": "orange"
+          },
+          "capaOwner": {
+            "id": "01KCPC8YBMRYB3X846103R11MH",
+            "label": "QC Analyst"
+          },
+          "capaDueDate": "2025-07-05"
+        },
+        {
+          "actionTitle": "Batch disposition decision documented with risk assessment",
+          "actionType": {
+            "id": "corrective",
+            "label": "Corrective",
+            "icon": "Wrench",
+            "color": "orange"
+          },
+          "capaOwner": {
+            "id": "01KBF8N88CG4YPK6VDNQAE420Z",
+            "label": "Head of Quality Control"
+          },
+          "capaDueDate": "2025-07-10"
+        },
+        {
+          "actionTitle": "Revision of SOP QC-EM-012 to explicitly prohibit post-shift transcription",
+          "actionType": {
+            "id": "preventive",
+            "label": "Preventive",
+            "icon": "ShieldCheck",
+            "color": "green"
+          },
+          "capaOwner": {
+            "id": "01KBSTVK8P6Y3P4MW060HNNKB1",
+            "label": "Change Management Supervisor"
+          },
+          "capaDueDate": "2025-08-15"
+        },
+        {
+          "actionTitle": "Introduction of controlled EM data capture sheets used inside cleanroom",
+          "actionType": {
+            "id": "preventive",
+            "label": "Preventive",
+            "icon": "ShieldCheck",
+            "color": "green"
+          },
+          "capaOwner": {
+            "id": "01KBSMDRHJTDY7SFEY6VWK2HEK",
+            "label": "Quality Assurance Manager"
+          },
+          "capaDueDate": "2025-08-20"
+        },
+        {
+          "actionTitle": "Mandatory ALCOA+ refresher training for QC and Manufacturing personnel",
+          "actionType": {
+            "id": "preventive",
+            "label": "Preventive",
+            "icon": "ShieldCheck",
+            "color": "green"
+          },
+          "capaOwner": {
+            "id": "01KBZ64EBC9SWWTCCYKEMGK21E",
+            "label": "QA Deputy"
+          },
+          "capaDueDate": "2025-09-01"
+        },
+        {
+          "actionTitle": "Increased QA presence during EM activities for 3 months",
+          "actionType": {
+            "id": "preventive",
+            "label": "Preventive",
+            "icon": "ShieldCheck",
+            "color": "green"
+          },
+          "capaOwner": {
+            "id": "01KBZ64EBC9SWWTCCYKEMGK21E",
+            "label": "QA Deputy"
+          },
+          "capaDueDate": "2025-09-15"
+        }
+      ],
+      "needForChangeControl": true,
+      "effectivenessCriteria": [
+        {
+          "id": "item-1767387960460-effectiveness",
+          "label": "100% of EM records completed contemporaneously with no retrospective entries over a 3-month monitoring period."
+        }
+      ],
+      "effectivenessReviewDate": "2025-12-15",
+      "effectivenessResult": [
+        {
+          "id": "effective"
+        }
+      ],
+      "additionalActionsRequired": false,
+      "qaFinalReview": "Investigation, CAPA, and effectiveness verification reviewed and found adequate. Data integrity risk addressed systemically. Approved – Head of Quality Assurance",
+      "deviationClosureDate": "2025-12-20",
+      "justificationForClosure": "Root cause adequately identified, CAPA implemented and verified effective, and no recurrence observed during monitoring period.",
+      "linkedChangeControls": [
+        {
+          "id": "01KCDG346XD1GBAKQEADRABBHB"
+        }
+      ],
+      "relatedPreviousDeviations": [],
+      "createdAt": "2025-06-18T09:35:00.000Z",
+      "updatedAt": "2026-01-02T21:10:50.539Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "affectedProcesses": [
+        {
+          "id": "01JGFJJZ00CYR47QV0E9C1029P"
+        }
+      ],
+      "deviationCategories": [
+        {
+          "id": "01KD0683FRE85PCAZPR42MX8GE"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "actionType": [],
+      "capaOwner": [],
+      "immediateActionTaken": [
+        {
+          "id": "item-1767387960450-wqbtdu7j1",
+          "label": "Batch BX-250615-01 was placed on QA hold pending investigation outcome."
+        }
+      ]
     }
   ]
 }

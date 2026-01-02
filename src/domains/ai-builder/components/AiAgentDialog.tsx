@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { Modal } from '@/gradian-ui/data-display/components/Modal';
 import { AiBuilderWrapper } from './AiBuilderWrapper';
 import type { QuickAction } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -16,6 +16,9 @@ import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store'
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { formatJsonForMarkdown } from '@/gradian-ui/shared/utils/text-utils';
+import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
+import { Button } from '@/components/ui/button';
+import { Eye } from 'lucide-react';
 
 export interface AiAgentDialogProps {
   isOpen: boolean;
@@ -48,6 +51,7 @@ export function AiAgentDialog({
   const [userPrompt, setUserPrompt] = useState<string>('');
   const [processedBody, setProcessedBody] = useState<Record<string, any> | undefined>(undefined);
   const [processedExtraBody, setProcessedExtraBody] = useState<Record<string, any> | undefined>(undefined);
+  const openPreviewRef = useRef<(() => void) | null>(null);
 
   // Process preset body and extra_body with dynamic context replacement
   useEffect(() => {
@@ -231,6 +235,20 @@ export function AiAgentDialog({
     setUserPrompt(promptParts.join('\n'));
   }, [isOpen, data, schema, action.selectedFields, action.selectedSections, action.additionalSystemPrompt]);
 
+  // Register the open preview function from AiBuilderWrapper
+  const handleOpenPreviewRequest = useCallback((callback: () => void) => {
+    openPreviewRef.current = callback;
+  }, []);
+
+  // Handle preview button click
+  const handlePreviewClick = useCallback(() => {
+    if (openPreviewRef.current) {
+      openPreviewRef.current();
+    } else {
+      console.warn('Preview callback not yet registered');
+    }
+  }, []);
+
   if (!agent) {
     return null;
   }
@@ -243,6 +261,19 @@ export function AiAgentDialog({
       description={agent.description}
       size="xl"
       showCloseButton={true}
+      footerLeftActions={
+        DEMO_MODE ? (
+          <Button
+            variant="outline"
+            size="default"
+            onClick={handlePreviewClick}
+            className="h-10"
+          >
+            <Eye className="h-4 w-4 me-2" />
+            Preview
+          </Button>
+        ) : undefined
+      }
     >
       <AiBuilderWrapper
         initialAgentId={action.agentId || agent.id}
@@ -256,6 +287,7 @@ export function AiAgentDialog({
         agent={agent}
         initialBody={processedBody}
         initialExtraBody={processedExtraBody}
+        onOpenPreviewRequest={handleOpenPreviewRequest}
       />
     </Modal>
   );

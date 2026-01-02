@@ -35,6 +35,7 @@ interface PromptPreviewSheetProps {
   baseUrl?: string;
   summarizedPrompt?: string; // Summarized version of the prompt (for search/image)
   isSummarizing?: boolean; // Whether summarization is in progress
+  hideButton?: boolean; // Hide the preview button (useful when button is rendered elsewhere, e.g., in dialog footer)
 }
 
 export function PromptPreviewSheet({
@@ -52,6 +53,7 @@ export function PromptPreviewSheet({
   baseUrl,
   summarizedPrompt,
   isSummarizing = false,
+  hideButton = false,
 }: PromptPreviewSheetProps) {
   const [builtSystemPrompt, setBuiltSystemPrompt] = useState<string>(legacySystemPrompt || '');
   const [isLoadingPreload, setIsLoadingPreload] = useState<boolean>(legacyIsLoadingPreload || false);
@@ -101,18 +103,20 @@ export function PromptPreviewSheet({
 
   return (
     <>
-      <Button
-        variant="outline"
-        size="default"
-        disabled={!canPreview || disabled}
-        className="h-10"
-        onClick={() => onOpenChange(true)}
-      >
-        <Eye className="h-4 w-4 me-2" />
-        Preview
-      </Button>
+      {!hideButton && (
+        <Button
+          variant="outline"
+          size="default"
+          disabled={!canPreview || disabled}
+          className="h-10"
+          onClick={() => onOpenChange(true)}
+        >
+          <Eye className="h-4 w-4 me-2" />
+          Preview
+        </Button>
+      )}
       <Sheet open={isOpen} onOpenChange={onOpenChange}>
-        <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0 h-full [&>button]:z-20">
+        <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0 h-full [&>button]:z-20 !z-[60]" overlayClassName="!z-[55]">
           <SheetHeader className="px-6 pt-6 pb-4 pe-12 border-b border-gray-200 dark:border-gray-700 shrink-0 sticky top-0 bg-white dark:bg-gray-900 z-10">
             <SheetTitle>Prompt Sent to LLM</SheetTitle>
             <SheetDescription>

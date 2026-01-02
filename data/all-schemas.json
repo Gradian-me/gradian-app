@@ -3867,6 +3867,1146 @@
     ]
   },
   {
+    "id": "deviation-management",
+    "description": "GMP-compliant deviation management system for tracking and managing deviations from standard operating procedures and specifications",
+    "singular_name": "Deviation",
+    "plural_name": "Deviations",
+    "fields": [
+      {
+        "id": "deviation-number",
+        "name": "deviationNumber",
+        "label": "Deviation Number",
+        "sectionId": "deviation-identification",
+        "component": "text",
+        "placeholder": "Enter deviation number",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1,
+        "role": "code"
+      },
+      {
+        "id": "deviation-detection-date-time",
+        "name": "deviationDetectionDateTime",
+        "label": "Deviation Detection Date & Time",
+        "sectionId": "deviation-identification",
+        "component": "datetime",
+        "placeholder": "Select detection date and time",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "detected-by",
+        "name": "detectedBy",
+        "label": "Detected By",
+        "sectionId": "deviation-identification",
+        "component": "picker",
+        "placeholder": "Click to select person or role",
+        "description": "Select person or role who detected the deviation",
+        "targetSchema": "users",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 3,
+        "role": "person"
+      },
+      {
+        "id": "deviation-title",
+        "name": "deviationTitle",
+        "label": "Deviation Title",
+        "sectionId": "deviation-identification",
+        "component": "text",
+        "placeholder": "Enter deviation title",
+        "validation": {
+          "required": true,
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "colSpan": 2,
+        "order": 4,
+        "role": "title"
+      },
+      {
+        "id": "deviation-description",
+        "name": "deviationDescription",
+        "label": "Deviation Description (What Actually Happened)",
+        "sectionId": "deviation-details",
+        "component": "textarea",
+        "placeholder": "Describe what actually happened (facts only)",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "description"
+      },
+      {
+        "id": "expected-condition",
+        "name": "expectedCondition",
+        "label": "Expected Condition (per SOP / Spec)",
+        "sectionId": "deviation-details",
+        "component": "textarea",
+        "placeholder": "Describe the expected condition per SOP or specification",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 2
+      },
+      {
+        "id": "actual-condition-observed",
+        "name": "actualConditionObserved",
+        "label": "Actual Condition Observed",
+        "sectionId": "deviation-details",
+        "component": "textarea",
+        "placeholder": "Describe the actual condition observed",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "location-area",
+        "name": "locationArea",
+        "label": "Location / Area",
+        "sectionId": "deviation-details",
+        "component": "text",
+        "placeholder": "Enter location or area where deviation occurred",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "affected-product-material",
+        "name": "affectedProductMaterial",
+        "label": "Affected Product / Material",
+        "sectionId": "impact-scope-assessment",
+        "component": "list-input",
+        "placeholder": "Enter affected product or material",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "affected-batch-numbers",
+        "name": "affectedBatchNumbers",
+        "label": "Affected Batch Number(s)",
+        "sectionId": "impact-scope-assessment",
+        "component": "list-input",
+        "placeholder": "Enter affected batch numbers",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 2
+      },
+      {
+        "id": "affected-equipment-system",
+        "name": "affectedEquipmentSystem",
+        "label": "Affected Equipment / System",
+        "sectionId": "impact-scope-assessment",
+        "component": "list-input",
+        "placeholder": "Enter affected equipment or system",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "affected-processes",
+        "name": "affectedProcesses",
+        "label": "Affected Processes",
+        "sectionId": "impact-scope-assessment",
+        "component": "picker",
+        "placeholder": "Click to select affected processes",
+        "description": "Select affected processes from popup picker",
+        "targetSchema": "process-mappings",
+        "allowMultiselect": true,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "impact-product-quality",
+        "name": "impactProductQuality",
+        "label": "Product Quality Impact",
+        "sectionId": "impact-scope-assessment",
+        "component": "select",
+        "placeholder": "Select product quality impact",
+        "options": [
+          {
+            "id": "none",
+            "label": "None",
+            "icon": "Circle",
+            "color": "gray"
+          },
+          {
+            "id": "low",
+            "label": "Low",
+            "icon": "ArrowDown",
+            "color": "green"
+          },
+          {
+            "id": "medium",
+            "label": "Medium",
+            "icon": "ArrowRight",
+            "color": "yellow"
+          },
+          {
+            "id": "high",
+            "label": "High",
+            "icon": "ArrowUp",
+            "color": "orange"
+          },
+          {
+            "id": "critical",
+            "label": "Critical",
+            "icon": "AlertOctagon",
+            "color": "red"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "impact-patient-safety",
+        "name": "impactPatientSafety",
+        "label": "Patient Safety Impact",
+        "sectionId": "impact-scope-assessment",
+        "component": "select",
+        "placeholder": "Select patient safety impact",
+        "options": [
+          {
+            "id": "none",
+            "label": "None",
+            "icon": "Circle",
+            "color": "gray"
+          },
+          {
+            "id": "low",
+            "label": "Low",
+            "icon": "ArrowDown",
+            "color": "green"
+          },
+          {
+            "id": "medium",
+            "label": "Medium",
+            "icon": "ArrowRight",
+            "color": "yellow"
+          },
+          {
+            "id": "high",
+            "label": "High",
+            "icon": "ArrowUp",
+            "color": "orange"
+          },
+          {
+            "id": "critical",
+            "label": "Critical",
+            "icon": "AlertOctagon",
+            "color": "red"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "impact-data-integrity",
+        "name": "impactDataIntegrity",
+        "label": "Data Integrity Impact",
+        "sectionId": "impact-scope-assessment",
+        "component": "select",
+        "placeholder": "Select data integrity impact",
+        "options": [
+          {
+            "id": "none",
+            "label": "None",
+            "icon": "Circle",
+            "color": "gray"
+          },
+          {
+            "id": "low",
+            "label": "Low",
+            "icon": "ArrowDown",
+            "color": "green"
+          },
+          {
+            "id": "medium",
+            "label": "Medium",
+            "icon": "ArrowRight",
+            "color": "yellow"
+          },
+          {
+            "id": "high",
+            "label": "High",
+            "icon": "ArrowUp",
+            "color": "orange"
+          },
+          {
+            "id": "critical",
+            "label": "Critical",
+            "icon": "AlertOctagon",
+            "color": "red"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 7
+      },
+      {
+        "id": "impact-regulatory-compliance",
+        "name": "impactRegulatoryCompliance",
+        "label": "Regulatory Compliance Impact",
+        "sectionId": "impact-scope-assessment",
+        "component": "select",
+        "placeholder": "Select regulatory compliance impact",
+        "options": [
+          {
+            "id": "none",
+            "label": "None",
+            "icon": "Circle",
+            "color": "gray"
+          },
+          {
+            "id": "low",
+            "label": "Low",
+            "icon": "ArrowDown",
+            "color": "green"
+          },
+          {
+            "id": "medium",
+            "label": "Medium",
+            "icon": "ArrowRight",
+            "color": "yellow"
+          },
+          {
+            "id": "high",
+            "label": "High",
+            "icon": "ArrowUp",
+            "color": "orange"
+          },
+          {
+            "id": "critical",
+            "label": "Critical",
+            "icon": "AlertOctagon",
+            "color": "red"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 8
+      },
+      {
+        "id": "immediate-action-taken",
+        "name": "immediateActionTaken",
+        "label": "Immediate Action Taken",
+        "sectionId": "immediate-actions-containment",
+        "component": "list-input",
+        "placeholder": "Describe immediate actions taken",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "quarantine-hold-applied",
+        "name": "quarantineHoldApplied",
+        "label": "Quarantine / Hold Applied",
+        "sectionId": "immediate-actions-containment",
+        "component": "switch",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "production-stopped",
+        "name": "productionStopped",
+        "label": "Production Stopped",
+        "sectionId": "immediate-actions-containment",
+        "component": "switch",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "qa-initial-decision",
+        "name": "qaInitialDecision",
+        "label": "QA Initial Decision",
+        "sectionId": "immediate-actions-containment",
+        "component": "textarea",
+        "placeholder": "Enter QA initial decision",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "deviation-categories",
+        "name": "deviationCategories",
+        "label": "Deviation Categories",
+        "sectionId": "deviation-classification",
+        "component": "picker",
+        "placeholder": "Click to select deviation category",
+        "description": "Select deviation category from popup picker",
+        "targetSchema": "change-categories",
+        "allowMultiselect": true,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "deviation-type",
+        "name": "deviationType",
+        "label": "Deviation Type",
+        "sectionId": "deviation-classification",
+        "component": "select",
+        "placeholder": "Select deviation type",
+        "options": [
+          {
+            "id": "planned",
+            "label": "Planned",
+            "lucideIcon": "CalendarCheck",
+            "color": "green"
+          },
+          {
+            "id": "unplanned",
+            "label": "Unplanned",
+            "lucideIcon": "AlertTriangle",
+            "color": "orange"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "deviation-category",
+        "name": "deviationCategory",
+        "label": "Deviation Category Type",
+        "sectionId": "deviation-classification",
+        "component": "select",
+        "placeholder": "Select deviation category type",
+        "targetSchema": "change-classifications",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "deviation-criticality",
+        "name": "deviationCriticality",
+        "label": "Deviation Criticality",
+        "sectionId": "deviation-classification",
+        "component": "select",
+        "placeholder": "Select deviation criticality",
+        "options": [
+          {
+            "label": "Critical",
+            "value": "critical"
+          },
+          {
+            "label": "Major",
+            "value": "major"
+          },
+          {
+            "label": "Minor",
+            "value": "minor"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "recurrence-indicator",
+        "name": "recurrenceIndicator",
+        "label": "Recurrence Indicator",
+        "sectionId": "deviation-classification",
+        "component": "select",
+        "placeholder": "Select recurrence indicator",
+        "options": [
+          {
+            "id": "first-time",
+            "label": "First-time",
+            "icon": "ClockStart",
+            "color": "blue"
+          },
+          {
+            "id": "repeat",
+            "label": "Repeat",
+            "icon": "Repeat",
+            "color": "purple"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "investigation-required",
+        "name": "investigationRequired",
+        "label": "Investigation Required",
+        "sectionId": "investigation-root-cause",
+        "component": "switch",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "investigation-lead",
+        "name": "investigationLead",
+        "label": "Investigation Lead",
+        "sectionId": "investigation-root-cause",
+        "component": "picker",
+        "placeholder": "Click to select investigation lead",
+        "description": "Select investigation lead from popup picker",
+        "targetSchema": "users",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "person"
+      },
+      {
+        "id": "root-cause-analysis-method",
+        "name": "rootCauseAnalysisMethod",
+        "label": "Root Cause Analysis Method",
+        "sectionId": "investigation-root-cause",
+        "component": "select",
+        "placeholder": "Select root cause analysis method",
+        "options": [
+            {
+              "id": "5-why",
+              "label": "5-Why",
+              "icon": "Brain",
+              "color": "blue"
+            },
+            {
+              "id": "fishbone",
+              "label": "Fishbone (Ishikawa)",
+              "icon": "Brain",
+              "color": "blue"
+            },
+            {
+              "id": "fault-tree",
+              "label": "Fault Tree Analysis",
+              "icon": "Brain",
+              "color": "blue"
+            },
+            {
+              "id": "pareto",
+              "label": "Pareto Analysis",
+              "icon": "Brain",
+              "color": "blue"
+            },
+            {
+              "id": "other",
+              "label": "Other",
+              "icon": "Brain",
+              "color": "blue"
+            }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "identified-root-causes",
+        "name": "identifiedRootCauses",
+        "label": "Identified Root Cause(s)",
+        "sectionId": "investigation-root-cause",
+        "component": "list-input",
+        "placeholder": "Describe identified root cause(s)",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "contributing-factors",
+        "name": "contributingFactors",
+        "label": "Contributing Factors",
+        "sectionId": "investigation-root-cause",
+        "component": "list-input",
+        "placeholder": "Describe contributing factors",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 5
+      },
+      {
+        "id": "scientific-technical-rationale",
+        "name": "scientificTechnicalRationale",
+        "label": "Scientific / Technical Rationale",
+        "sectionId": "investigation-root-cause",
+        "component": "list-input",
+        "placeholder": "Enter scientific or technical rationale",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 6
+      },
+      {
+        "id": "action-title",
+        "name": "actionTitle",
+        "label": "Action Title",
+        "sectionId": "capa",
+        "component": "text",
+        "placeholder": "Enter the action title",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "action-type",
+        "name": "actionType",
+        "label": "Action Type",
+        "sectionId": "capa",
+        "component": "select",
+        "placeholder": "Select the type of action",
+        "options": [
+          {
+            "id": "immediate",
+            "label": "Immediate",
+            "icon": "Zap",
+            "color": "blue"
+          },
+          {
+            "id": "corrective",
+            "label": "Corrective",
+            "icon": "Wrench",
+            "color": "orange"
+          },
+          {
+            "id": "preventive",
+            "label": "Preventive",
+            "icon": "ShieldCheck",
+            "color": "green"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 2
+      },
+      {
+        "id": "capa-owner",
+        "name": "capaOwner",
+        "label": "CAPA Owner",
+        "sectionId": "capa",
+        "component": "picker",
+        "placeholder": "Click to select CAPA owner",
+        "description": "Select a single CAPA owner from popup picker",
+        "targetSchema": "users",
+        "allowMultiselect": false,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3,
+        "role": "person"
+      },
+      {
+        "id": "capa-due-date",
+        "name": "capaDueDate",
+        "label": "CAPA Due Date",
+        "sectionId": "capa",
+        "component": "date",
+        "placeholder": "Enter CAPA due date",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4,
+        "role": "duedate"
+      },
+      {
+        "id": "need-for-change-control",
+        "name": "needForChangeControl",
+        "label": "Need for Change Control",
+        "sectionId": "capa-effectiveness-check",
+        "component": "switch",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 0
+      },
+      {
+        "id": "effectiveness-criteria",
+        "name": "effectivenessCriteria",
+        "label": "Effectiveness Criteria",
+        "sectionId": "capa-effectiveness-check",
+        "component": "list-input",
+        "placeholder": "Enter effectiveness criteria for CAPA",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "effectiveness-review-date",
+        "name": "effectivenessReviewDate",
+        "label": "Effectiveness Review Date",
+        "sectionId": "capa-effectiveness-check",
+        "component": "date",
+        "placeholder": "Select effectiveness review date",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2,
+        "role": "duedate"
+      },
+      {
+        "id": "effectiveness-result",
+        "name": "effectivenessResult",
+        "label": "Effectiveness Result",
+        "sectionId": "capa-effectiveness-check",
+        "component": "select",
+        "placeholder": "Select effectiveness result",
+        "options": [
+          {
+            "id": "effective",
+            "label": "Effective",
+            "icon": "CheckCircle",
+            "color": "green"
+          },
+          {
+            "id": "partially-effective",
+            "label": "Partially Effective",
+            "icon": "CheckCircle",
+            "color": "yellow"
+          },
+          {
+            "id": "ineffective",
+            "label": "Ineffective",
+            "icon": "XCircle",
+            "color": "pink"
+          },
+          {
+            "id": "not-applicable",
+            "label": "Not Applicable",
+            "icon": "Circle",
+            "color": "gray"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "additional-actions-required",
+        "name": "additionalActionsRequired",
+        "label": "Additional Actions Required",
+        "sectionId": "capa-effectiveness-check",
+        "component": "switch",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "qa-final-review",
+        "name": "qaFinalReview",
+        "label": "QA Final Review",
+        "sectionId": "qa-review-closure",
+        "component": "textarea",
+        "placeholder": "Enter QA final review",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "deviation-closure-date",
+        "name": "deviationClosureDate",
+        "label": "Deviation Closure Date",
+        "sectionId": "qa-review-closure",
+        "component": "date",
+        "placeholder": "Select deviation closure date",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "justification-for-closure",
+        "name": "justificationForClosure",
+        "label": "Justification for Closure",
+        "sectionId": "qa-review-closure",
+        "component": "textarea",
+        "placeholder": "Enter justification for closure",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "linked-change-controls",
+        "name": "linkedChangeControls",
+        "label": "Linked Change Control(s)",
+        "sectionId": "related-records-linkages",
+        "component": "picker",
+        "placeholder": "Click to select linked change control(s)",
+        "description": "Select linked change control(s) from popup picker",
+        "targetSchema": "change-management",
+        "allowMultiselect": true,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "related-previous-deviations",
+        "name": "relatedPreviousDeviations",
+        "label": "Related Previous Deviations",
+        "sectionId": "related-records-linkages",
+        "component": "picker",
+        "placeholder": "Click to select related previous deviation(s)",
+        "description": "Select related previous deviation(s) from popup picker",
+        "targetSchema": "deviation-management",
+        "allowMultiselect": true,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 5
+      }
+    ],
+    "sections": [
+      {
+        "id": "deviation-identification",
+        "title": "1. Deviation Identification",
+        "description": "Basic deviation identification information",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "deviation-details",
+        "title": "2. Deviation Details (Facts Only)",
+        "description": "Factual details of the deviation occurrence",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "impact-scope-assessment",
+        "title": "3. Impact & Scope Assessment",
+        "description": "Assessment of deviation impact and scope",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "immediate-actions-containment",
+        "title": "4. Immediate Actions / Containment",
+        "description": "Immediate actions taken and containment measures",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "deviation-classification",
+        "title": "5. Deviation Classification",
+        "description": "Classification and categorization of the deviation",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "investigation-root-cause",
+        "title": "6. Investigation & Root Cause Analysis",
+        "description": "Investigation details and root cause analysis",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "capa",
+        "title": "7. Corrective and Preventive Actions (CAPA)",
+        "description": "Corrective and preventive actions planned or taken",
+        "initialState": "expanded",
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 0,
+          "maxItems": 100,
+          "fieldRelationType": "addFields",
+          "addType": "addOnly",
+          "deleteType": "itemAndRelation"
+        },
+        "columns": 2
+      },
+      {
+        "id": "capa-effectiveness-check",
+        "title": "8. CAPA Effectiveness Check",
+        "description": "Evaluation of CAPA effectiveness",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "qa-review-closure",
+        "title": "9. QA Review & Closure",
+        "description": "QA review and deviation closure information",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "related-records-linkages",
+        "title": "10. Related Records & Linkages",
+        "description": "Links to related records and documents",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "quality-assurance-analyst-deviation",
+          "label": "Quality Assurance Analyst",
+          "icon": "Brain",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "quality-assurance-analyst",
+          "selectedFields": [
+            "deviation-number",
+            "deviation-title",
+            "deviation-description",
+            "expected-condition",
+            "actual-condition-observed",
+            "deviation-categories",
+            "impact-product-quality",
+            "impact-patient-safety",
+            "impact-data-integrity",
+            "impact-regulatory-compliance",
+            "deviation-criticality",
+            "identified-root-causes",
+            "contributing-factors",
+            "corrective-actions",
+            "preventive-actions",
+            "related-processes",
+            "qa-final-review"
+          ],
+          "selectedSections": [
+            "deviation-identification",
+            "deviation-details",
+            "impact-scope-assessment",
+            "deviation-classification",
+            "investigation-root-cause",
+            "capa",
+            "qa-review-closure"
+          ],
+          "additionalSystemPrompt": "Analyze this deviation management record from a Quality Assurance Analyst perspective using the 6M root cause analysis model. Provide comprehensive analysis including risk assessment, compliance evaluation, and recommendations based on GMP, WHO guidelines, ISO 9001, FDA 21 CFR Part 11, and pharmaceutical quality standards. Focus on data integrity, patient safety, and regulatory compliance.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "summarize-deviation-with-ai",
+          "label": "Summarize with AI",
+          "icon": "FileText",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "professional-writing",
+          "body": {
+            "writingStyle": "summarizer"
+          },
+          "selectedFields": [
+            "deviation-title",
+            "deviation-description",
+            "expected-condition",
+            "actual-condition-observed",
+            "deviation-categories",
+            "identified-root-causes",
+            "contributing-factors",
+            "corrective-actions",
+            "preventive-actions",
+            "qa-final-review"
+          ],
+          "additionalSystemPrompt": "Summarize this deviation management record into one or two flowing narrative paragraphs that capture the essence, main ideas, and critical information. Focus on the deviation details, root causes, impacts, and key corrective/preventive actions.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "create-sketch-deviation",
+          "label": "Create Sketch",
+          "icon": "Pencil",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "sketch"
+          },
+          "selectedFields": [
+            "deviation-title",
+            "deviation-description",
+            "expected-condition",
+            "actual-condition-observed",
+            "deviation-categories",
+            "identified-root-causes"
+          ],
+          "additionalSystemPrompt": "Create a sketch-style illustration based on the deviation management information provided, showing the deviation scenario, root causes, and corrective actions.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "create-comic-book-deviation",
+          "label": "Create Comic Book",
+          "icon": "BookOpen",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "comic-book"
+          },
+          "selectedFields": [
+            "deviation-title",
+            "deviation-description",
+            "expected-condition",
+            "actual-condition-observed",
+            "deviation-categories",
+            "identified-root-causes",
+            "qa-final-review"
+          ],
+          "additionalSystemPrompt": "Create a comic-book-style illustration based on the deviation management information provided, showing the deviation scenario, root causes, and corrective actions in a vibrant comic book artistic style with bold outlines, dynamic panels, and expressive characters.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "create-lego-style-deviation",
+          "label": "Create Lego Style",
+          "icon": "Image",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "lego-style"
+          },
+          "selectedFields": [
+            "deviation-title",
+            "deviation-description",
+            "expected-condition",
+            "actual-condition-observed",
+            "deviation-categories",
+            "identified-root-causes",
+            "corrective-actions"
+          ],
+          "additionalSystemPrompt": "Create a lego-style illustration based on the deviation management information provided, visualizing the deviation scenario, root causes, and corrective actions in a playful lego aesthetic.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "generate-root-cause-graph",
+          "label": "Generate Root Cause Graph",
+          "icon": "Network",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "graph-generator",
+          "selectedFields": [
+            "deviation-title",
+            "deviation-description",
+            "expected-condition",
+            "actual-condition-observed",
+            "identified-root-causes",
+            "contributing-factors",
+            "scientific-technical-rationale",
+            "root-cause-analysis-method"
+          ],
+          "additionalSystemPrompt": "Generate a comprehensive root cause analysis graph using the 6M model (Man, Machine, Mother Nature, Material, Method, Management) based on the deviation information. Create nodes for root causes and contributing factors, with edges showing relationships and labeled with the appropriate 6M category. Focus on visualizing the cause-and-effect relationships and interactions between different factors.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        },
+        {
+          "id": "analyze-deviation-with-ai",
+          "label": "Analyze Deviation with AI",
+          "icon": "BarChart",
+          "variant": "default",
+          "action": "runAiAgent",
+          "agentId": "general-assistant",
+          "selectedFields": [
+            "deviation-title",
+            "deviation-description",
+            "expected-condition",
+            "actual-condition-observed",
+            "deviation-categories",
+            "impact-product-quality",
+            "impact-patient-safety",
+            "impact-data-integrity",
+            "impact-regulatory-compliance",
+            "deviation-criticality",
+            "identified-root-causes",
+            "corrective-actions",
+            "preventive-actions",
+            "effectiveness-result",
+            "related-processes",
+            "qa-final-review"
+          ],
+          "additionalSystemPrompt": "Perform comprehensive analysis of the deviation management data including risk assessment, trend analysis, root cause patterns, and improvement opportunities. Focus on GMP compliance and quality assurance.",
+          "displayType": "hideForm",
+          "runType": "automatic"
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "AlertTriangle",
+    "schemaType": "business"
+  },
+  {
     "id": "quality-assurance-analysis",
     "description": "Quality assurance analysis reports and findings",
     "singular_name": "Quality Assurance Analysis",
@@ -4064,6 +5204,80 @@
         "id": "basic-information",
         "title": "Change Category Information",
         "description": "Basic change category details",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": true,
+    "icon": "Tag",
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ],
+    "syncStrategy": "schema-and-data",
+    "isNotCompanyBased": true
+  },
+  {
+    "id": "deviation-categories",
+    "description": "Manage deviation categories with multilingual labels, hierarchical support, and linkage to change categories",
+    "singular_name": "Deviation Category",
+    "plural_name": "Deviation Categories",
+    "allowHierarchicalParent": true,
+    "fields": [
+      {
+        "id": "deviation-category-label-en",
+        "name": "label_en",
+        "label": "Label (English)",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter English label",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1,
+        "role": "title"
+      },
+      {
+        "id": "deviation-category-label-fa",
+        "name": "label_fa",
+        "label": "Label (Farsi)",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter Farsi label",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "related-change-categories",
+        "name": "relatedChangeCategories",
+        "label": "Related Change Categories",
+        "sectionId": "basic-information",
+        "component": "picker",
+        "placeholder": "Click to select related change category",
+        "description": "Select related change category from popup picker",
+        "targetSchema": "change-categories",
+        "allowMultiselect": true,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 3
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Deviation Category Information",
+        "description": "Basic deviation category details and linkage to change categories",
         "initialState": "expanded",
         "columns": 2
       }

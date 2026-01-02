@@ -51,6 +51,7 @@ export interface AiBuilderWrapperProps {
   agent?: AiAgent | null; // Optional: If provided, use this agent directly without fetching
   initialBody?: Record<string, any>; // Preset body parameters for AI agent (with context replacement applied)
   initialExtraBody?: Record<string, any>; // Preset extra_body parameters for AI agent (with context replacement applied)
+  onOpenPreviewRequest?: (callback: () => void) => void; // Callback to register a function that opens the preview sheet
 }
 
 export function AiBuilderWrapper({
@@ -67,6 +68,7 @@ export function AiBuilderWrapper({
   agent: providedAgent,
   initialBody,
   initialExtraBody,
+  onOpenPreviewRequest,
 }: AiBuilderWrapperProps) {
   const [selectedAgentId, setSelectedAgentId] = useState<string>(initialAgentId);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -174,6 +176,19 @@ export function AiBuilderWrapper({
       setIsApplyingAnnotations(false);
     }
   }, [aiResponse, tokenUsage, isLoading, userPrompt, hookLastPromptId, isApplyingAnnotations]);
+
+  // Expose function to open preview sheet via callback
+  // Use useCallback to ensure stable reference
+  const openPreview = useCallback(() => {
+    setIsSheetOpen(true);
+  }, []);
+
+  useEffect(() => {
+    if (onOpenPreviewRequest && openPreview) {
+      // Register the callback to open the preview sheet
+      onOpenPreviewRequest(openPreview);
+    }
+  }, [onOpenPreviewRequest, openPreview]);
 
   // Get selected agent
   const selectedAgent = agents.find(agent => agent.id === selectedAgentId) || null;
@@ -582,6 +597,7 @@ export function AiBuilderWrapper({
           runType={runType}
           selectedLanguage={selectedLanguage}
           onLanguageChange={setSelectedLanguage}
+          hidePreviewButton={mode === 'dialog'}
           onFormValuesChange={setFormValues}
         />
       )}

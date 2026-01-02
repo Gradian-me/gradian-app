@@ -484,6 +484,37 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     return detailMetadata?.tableRenderers || [];
   }, [detailMetadata?.tableRenderers]);
 
+  // Automatically create tableRenderers for repeating sections that don't have explicit tableRenderer configurations
+  const autoTableRenderers = useMemo(() => {
+    if (!schema?.sections) return [];
+    
+    const repeatingSections = schema.sections.filter(section => section.isRepeatingSection);
+    const explicitSectionIds = new Set(tableRenderersFromMetadata.map(tr => tr.sectionId));
+    
+    return repeatingSections
+      .filter(section => !explicitSectionIds.has(section.id))
+      .map(section => {
+        const isRelationBased = !!(section.repeatingConfig?.targetSchema && section.repeatingConfig?.relationTypeId);
+        const tableRenderer: RepeatingTableRendererConfig = {
+          id: `auto-table-${section.id}`,
+          schemaId: schema.id,
+          sectionId: section.id,
+          title: section.title || section.id,
+          description: section.description,
+          ...(isRelationBased && section.repeatingConfig ? {
+            targetSchema: section.repeatingConfig.targetSchema,
+            relationTypeId: section.repeatingConfig.relationTypeId,
+          } : {}),
+        };
+        return tableRenderer;
+      });
+  }, [schema?.sections, schema?.id, tableRenderersFromMetadata]);
+
+  // Combine explicit and auto-generated table renderers
+  const allTableRenderers = useMemo(() => {
+    return [...tableRenderersFromMetadata, ...autoTableRenderers];
+  }, [tableRenderersFromMetadata, autoTableRenderers]);
+
   // Handle edit - use EditModal component
   const handleEdit = useCallback(() => {
     if (data?.id && schema?.id) {
@@ -496,11 +527,11 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   // Memoize covered target schemas to prevent unnecessary re-renders
   const coveredTargetSchemasSet = useMemo(() => {
     return new Set(
-      tableRenderersFromMetadata
+      allTableRenderers
         .filter((tr) => tr.targetSchema)
         .map((tr) => tr.targetSchema!)
     );
-  }, [tableRenderersFromMetadata]);
+  }, [allTableRenderers]);
 
   // Fetch all relations and find distinct related schemas
   // This must be called unconditionally and early in the component to maintain hook order
@@ -582,7 +613,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
 
   const requiredTargetSchemaIds = useMemo(() => {
     const ids = new Set<string>();
-    tableRenderersFromMetadata.forEach((renderer) => {
+    allTableRenderers.forEach((renderer) => {
       if (renderer.targetSchema) {
         ids.add(renderer.targetSchema);
       }
@@ -590,7 +621,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     relatedSchemas.forEach((schemaId) => ids.add(schemaId));
     ids.delete(schema?.id || '');
     return Array.from(ids);
-  }, [relatedSchemas, tableRenderersFromMetadata, schema?.id]);
+  }, [relatedSchemas, allTableRenderers, schema?.id]);
 
   useEffect(() => {
     if (!requiredTargetSchemaIds.length) {
@@ -996,7 +1027,8 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   // Separate sections, component renderers, and table renderers
   const metadataSections = detailMetadata?.sections || [];
   const componentRenderers = detailMetadata?.componentRenderers || [];
-  const tableRenderers = detailMetadata?.tableRenderers || [];
+  // Use allTableRenderers (includes both explicit and auto-generated) for rendering
+  const tableRenderers = allTableRenderers;
   // quickActions already extracted above for debugging
 
   // Get default sections (includes badges if schema has badge fields)

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { TextInput, NumberInput, Label, Badge, Switch, ButtonMinimal, Select, Slider, NameInput } from '@/gradian-ui/form-builder/form-elements';
+import { TextInput, NumberInput, Label, Badge, Switch, ButtonMinimal, Select, Slider, NameInput, Textarea } from '@/gradian-ui/form-builder/form-elements';
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit } from 'lucide-react';
 import { FieldEditorProps } from '../types/builder';
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { toCamelCase } from '@/gradian-ui/shared/utils/text-utils';
 import { ComponentConfigEditor } from './ComponentConfigEditor';
+import { PopupPicker } from '@/gradian-ui/form-builder/form-elements';
 
 export function FieldEditor({
   field,
@@ -37,6 +38,7 @@ export function FieldEditor({
   const [availableComponents, setAvailableComponents] = useState<Array<{ value: string; label: string; description?: string }>>([]);
   const [componentsLoading, setComponentsLoading] = useState(true);
   const [componentsError, setComponentsError] = useState<string | null>(null);
+  const [isTargetSchemaPickerOpen, setIsTargetSchemaPickerOpen] = useState(false);
 
   // Fetch components from API - rigid access, no fallback
   useEffect(() => {
@@ -121,6 +123,11 @@ export function FieldEditor({
             {field.role && (
               <Badge variant="default" size="sm" className="text-[10px] px-1.5 py-0 bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-200">
                 {field.role}
+              </Badge>
+            )}
+            {field.targetSchema && (
+              <Badge variant="outline" size="sm" className="text-[10px] px-1.5 py-0 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200 border-blue-200 dark:border-blue-700">
+                {field.targetSchema}
               </Badge>
             )}
             {field.validation?.required && <Badge variant="danger" size="sm" className="text-[10px] px-1.5 py-0">Required</Badge>}
@@ -262,19 +269,96 @@ export function FieldEditor({
                   />
                 </div>
               </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <TextInput
+                    config={{
+                      name: 'placeholder',
+                      label: 'Placeholder',
+                      type: 'text',
+                      placeholder: 'Enter placeholder text...'
+                    }}
+                    value={tempField.placeholder || ''}
+                    onChange={(value) => setTempField({ ...tempField, placeholder: value })}
+                    className="h-9"
+                  />
+                </div>
+                <div>
+                  <NumberInput
+                    config={{
+                      name: 'order',
+                      label: 'Order',
+                      type: 'number',
+                      placeholder: 'Field display order'
+                    }}
+                    value={tempField.order ?? undefined}
+                    onChange={(value) => setTempField({ ...tempField, order: value !== null && value !== undefined ? Number(value) : undefined })}
+                    className="h-9"
+                  />
+                </div>
+              </div>
               <div>
-                <TextInput
+                <Textarea
                   config={{
-                    name: 'placeholder',
-                    label: 'Placeholder',
-                    type: 'text',
-                    placeholder: 'Enter placeholder text...'
+                    name: 'description',
+                    label: 'Description',
+                    placeholder: 'Enter field description...'
                   }}
-                  value={tempField.placeholder || ''}
-                  onChange={(value) => setTempField({ ...tempField, placeholder: value })}
-                  className="h-9"
+                  value={tempField.description || ''}
+                  onChange={(value) => setTempField({ ...tempField, description: value })}
+                  rows={3}
                 />
               </div>
+              {tempField.component === 'picker' && (
+                <div>
+                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Target Schema</Label>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsTargetSchemaPickerOpen(true)}
+                    className="w-full justify-between"
+                  >
+                    {tempField.targetSchema || 'Select target schema...'}
+                  </Button>
+                  <PopupPicker
+                    isOpen={isTargetSchemaPickerOpen}
+                    onClose={() => setIsTargetSchemaPickerOpen(false)}
+                    sourceUrl="/api/schemas?summary=true"
+                    selectedIds={tempField.targetSchema ? [tempField.targetSchema] : []}
+                    onSelect={async (selections) => {
+                      if (selections.length > 0) {
+                        setTempField({
+                          ...tempField,
+                          targetSchema: selections[0].id || undefined,
+                        });
+                      } else {
+                        setTempField({
+                          ...tempField,
+                          targetSchema: undefined,
+                        });
+                      }
+                      setIsTargetSchemaPickerOpen(false);
+                    }}
+                    title="Select Target Schema"
+                    description="Choose a schema for the picker component"
+                    allowMultiselect={false}
+                    columnMap={{
+                      response: { data: 'data' },
+                      item: {
+                        id: 'id',
+                        label: 'plural_name',
+                        title: 'plural_name',
+                        name: 'singular_name',
+                      },
+                    }}
+                    sourceColumnRoles={[
+                      { column: 'singular_name', role: 'title' },
+                      { column: 'description', role: 'description' },
+                      { column: 'icon', role: 'icon' },
+                    ]}
+                    sortType="ASC"
+                  />
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Role</Label>
@@ -320,6 +404,111 @@ export function FieldEditor({
                   max={4}
                   step={1}
                 />
+              </div>
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">Validation Rules</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <NumberInput
+                      config={{
+                        name: 'minLength',
+                        label: 'Min Length',
+                        type: 'number',
+                        placeholder: 'Minimum length'
+                      }}
+                      value={tempField.validation?.minLength ?? undefined}
+                      onChange={(value) => setTempField({
+                        ...tempField,
+                        validation: {
+                          ...tempField.validation,
+                          minLength: value !== null && value !== undefined ? Number(value) : undefined,
+                        }
+                      })}
+                      className="h-9"
+                      min={0}
+                    />
+                  </div>
+                  <div>
+                    <NumberInput
+                      config={{
+                        name: 'maxLength',
+                        label: 'Max Length',
+                        type: 'number',
+                        placeholder: 'Maximum length'
+                      }}
+                      value={tempField.validation?.maxLength ?? undefined}
+                      onChange={(value) => setTempField({
+                        ...tempField,
+                        validation: {
+                          ...tempField.validation,
+                          maxLength: value !== null && value !== undefined ? Number(value) : undefined,
+                        }
+                      })}
+                      className="h-9"
+                      min={0}
+                    />
+                  </div>
+                  <div>
+                    <NumberInput
+                      config={{
+                        name: 'min',
+                        label: 'Min Value',
+                        type: 'number',
+                        placeholder: 'Minimum value'
+                      }}
+                      value={tempField.validation?.min ?? undefined}
+                      onChange={(value) => setTempField({
+                        ...tempField,
+                        validation: {
+                          ...tempField.validation,
+                          min: value !== null && value !== undefined ? Number(value) : undefined,
+                        }
+                      })}
+                      className="h-9"
+                    />
+                  </div>
+                  <div>
+                    <NumberInput
+                      config={{
+                        name: 'max',
+                        label: 'Max Value',
+                        type: 'number',
+                        placeholder: 'Maximum value'
+                      }}
+                      value={tempField.validation?.max ?? undefined}
+                      onChange={(value) => setTempField({
+                        ...tempField,
+                        validation: {
+                          ...tempField.validation,
+                          max: value !== null && value !== undefined ? Number(value) : undefined,
+                        }
+                      })}
+                      className="h-9"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <TextInput
+                      config={{
+                        name: 'pattern',
+                        label: 'Pattern (Regex)',
+                        type: 'text',
+                        placeholder: 'Enter regex pattern (e.g., ^[A-Za-z]+$)'
+                      }}
+                      value={typeof tempField.validation?.pattern === 'string' ? tempField.validation.pattern : ''}
+                      onChange={(value) => setTempField({
+                        ...tempField,
+                        validation: {
+                          ...tempField.validation,
+                          pattern: value || undefined,
+                        }
+                      })}
+                      className="h-9"
+                    />
+                    <p className="text-xs text-gray-500 mt-1.5">
+                      Enter a regular expression pattern for validation
+                    </p>
+                  </div>
+                </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Switch

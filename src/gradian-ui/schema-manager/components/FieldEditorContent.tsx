@@ -64,6 +64,11 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
                   {field.role}
                 </Badge>
               )}
+              {field.targetSchema && (
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200 border-blue-200 dark:border-blue-700">
+                  {field.targetSchema}
+                </Badge>
+              )}
               {field.validation?.required && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Required</Badge>}
             </div>
             <span className={`text-[10px] truncate block mt-0.5 ${

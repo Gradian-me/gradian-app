@@ -21,6 +21,7 @@ export const Modal: React.FC<ModalProps> = ({
   className,
   hideDialogHeader = false,
   hideCloseButton = false,
+  footerLeftActions,
   ...props
 }) => {
   const sizeClasses = {
@@ -74,7 +75,15 @@ export const Modal: React.FC<ModalProps> = ({
           {children}
         </div>
         {showCloseButton && (
-          <div className="flex justify-end px-6 pb-4 pt-2 border-t shrink-0">
+          <div className={cn(
+            "flex px-6 pb-4 pt-2 border-t shrink-0",
+            footerLeftActions ? "justify-between" : "justify-end"
+          )}>
+            {footerLeftActions && (
+              <div className="flex items-center gap-2">
+                {footerLeftActions}
+              </div>
+            )}
             <Button variant="outline" onClick={onClose}>
               Close
             </Button>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
 import type { GraphNodeData, GraphEdgeData } from '@/domains/graph-designer/types';
@@ -638,7 +638,11 @@ export default function GraphViewerPage() {
             />
             <div className="flex justify-end">
               <button
-                onClick={() => handleJsonChange(jsonCode)}
+                onClick={() => {
+                  // Always parse and render the JSON from textarea when clicking Refresh Graph
+                  // This ensures that if graph has no data but textarea has JSON, it will be rendered
+                  handleJsonChange(jsonCode);
+                }}
                 className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium transition-colors"
               >
                 Refresh Graph

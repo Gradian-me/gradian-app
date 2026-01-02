@@ -238,11 +238,18 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
             {fields.map((field: any) => {
               const isTextarea = field.component === 'textarea';
               const isJson = field.component === 'json';
+              const isListInput = field.component === 'list-input';
+              const isPicker = field.component === 'picker' || 
+                               field.component === 'popup-picker' ||
+                               field.component === 'popuppicker' ||
+                               field.component === 'popup-picker-input' ||
+                               field.component === 'pickerinput';
               const fieldClasses = cn(
                 "space-y-1",
-                (isTextarea || isJson) && gridColumns === 1 && "col-span-1",
-                (isTextarea || isJson) && gridColumns === 2 && "col-span-1 md:col-span-2",
-                (isTextarea || isJson) && gridColumns === 3 && "col-span-1 md:col-span-2 lg:col-span-3"
+                (isTextarea || isJson || isListInput || isPicker) && gridColumns === 1 && "col-span-1",
+                (isTextarea || isJson || isListInput || isPicker) && gridColumns === 2 && "col-span-1 md:col-span-2",
+                (isTextarea || isJson || isListInput || isPicker) && gridColumns === 3 && "col-span-1 md:col-span-2 lg:col-span-3",
+                (isListInput || isPicker) && "min-w-0"
               );
               
               // Handle JSON fields with CodeViewer
@@ -300,8 +307,15 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                     )}
                     {field.label}
                   </label>
-                  <div className="flex items-center gap-2">
-                    <div className="text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word flex-1">
+                  <div className={cn(
+                    "flex items-center gap-2",
+                    (isListInput || isPicker) && "flex-col items-start"
+                  )}>
+                    <div className={cn(
+                      "text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word",
+                      (isListInput || isPicker) ? "w-full" : "flex-1",
+                      (isListInput || isPicker) && "min-w-0"
+                    )}>
                       {field.component === 'formula' && field.formula ? (
                         <FormulaDisplay field={field} data={data} schema={schema} />
                       ) : (

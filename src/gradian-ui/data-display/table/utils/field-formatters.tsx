@@ -357,7 +357,7 @@ export const formatFieldValue = (
     return wrapWithForceIcon(
       <ul className="list-disc list-inside space-y-0.5 text-sm text-gray-700 dark:text-gray-300">
         {itemLabels.map((label: string, index: number) => (
-          <li key={index} className="truncate">{label}</li>
+          <li key={index} className="break-words overflow-wrap-anywhere">{label}</li>
         ))}
       </ul>,
       isForce,
@@ -1043,6 +1043,35 @@ export const formatFieldValue = (
     );
   }
 
+  // Handle datetime fields early (before switch) to ensure they're caught
+  // Check both displayType and componentType to catch all variations
+  if (displayType === 'datetime' || displayType === 'datetime-local' || 
+      componentType === 'datetime' || componentType === 'datetime-local') {
+    try {
+      const dateValue = typeof value === 'string' ? new Date(value) : value;
+      if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
+        return wrapWithForceIcon(
+          <span>
+            {formatDate(dateValue, {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+            })}
+          </span>,
+          isForce,
+          field,
+          row
+        );
+      }
+      // If date parsing fails, fall through to default handling
+    } catch {
+      // If date parsing fails, fall through to default handling
+    }
+  }
+
   switch (displayType) {
     case 'currency':
       return wrapWithForceIcon(
@@ -1072,6 +1101,27 @@ export const formatFieldValue = (
         row
       );
     case 'date':
+      try {
+        const dateValue = typeof value === 'string' ? new Date(value) : value;
+        if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
+          return wrapWithForceIcon(
+            <span>
+              {formatDate(dateValue, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </span>,
+            isForce,
+            field,
+            row
+          );
+        }
+        return wrapWithForceIcon(<span>{String(value)}</span>, isForce, field, row);
+      } catch {
+        return wrapWithForceIcon(<span>{String(value)}</span>, isForce, field, row);
+      }
+    case 'datetime':
     case 'datetime-local':
       try {
         const dateValue = typeof value === 'string' ? new Date(value) : value;
@@ -1082,6 +1132,9 @@ export const formatFieldValue = (
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
               })}
             </span>,
             isForce,
@@ -1173,6 +1226,44 @@ export const formatFieldValue = (
           row
         );
       }
+      
+      // Check if it's an ISO datetime string (e.g., "2025-12-28T14:30" or "2025-12-28T14:30:00")
+      // This handles cases where datetime values aren't explicitly typed as datetime component
+      const isoDateTimePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d{3})?(Z|[+-]\d{2}:\d{2})?$/;
+      if (isoDateTimePattern.test(stringValue.trim())) {
+        try {
+          const dateValue = new Date(stringValue);
+          if (!isNaN(dateValue.getTime())) {
+            // Check if field component is 'date' (not 'datetime' or 'datetime-local')
+            const isDateOnly = field?.component === 'date';
+            
+            return wrapWithForceIcon(
+              <span>
+                {isDateOnly
+                  ? formatDate(dateValue, {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })
+                  : formatDate(dateValue, {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true,
+                    })}
+              </span>,
+              isForce,
+              field,
+              row
+            );
+          }
+        } catch {
+          // Fall through to default string display
+        }
+      }
+      
       return wrapWithForceIcon(<span>{stringValue}</span>, isForce, field, row);
   }
 };

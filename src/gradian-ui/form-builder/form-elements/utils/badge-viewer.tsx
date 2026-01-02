@@ -214,9 +214,9 @@ const getBadgePresentation = (color?: string) => {
     // For related companies, use custom Badge with violet color and building icon
     if (isRelatedCompanies) {
       const badgeContent = (
-        <span className="inline-flex items-center gap-1.5">
-          <IconRenderer iconName="Building" className="h-3 w-3" />
-          <span>{itemLabel}</span>
+        <span className="inline-flex items-center gap-1.5 max-w-xs">
+          <IconRenderer iconName="Building" className="h-3 w-3 shrink-0" />
+          <span className="truncate">{itemLabel}</span>
         </span>
       );
       
@@ -254,7 +254,7 @@ const getBadgePresentation = (color?: string) => {
           <Badge 
             color="violet"
             size="sm"
-            className="inline-flex items-center gap-1.5"
+            className="inline-flex items-center gap-1.5 max-w-full"
           >
             {badgeContent}
           </Badge>
@@ -264,9 +264,9 @@ const getBadgePresentation = (color?: string) => {
     
     // Default rendering for non-related-companies badges
     const badgeContent = renderBadge ? renderBadge(item, idx) : (
-      <span className="inline-flex items-center gap-1.5">
-        {itemIcon && <span className="flex items-center">{itemIcon}</span>}
-        <span>{itemLabel}</span>
+      <span className="inline-flex items-center gap-1.5 max-w-xs">
+        {itemIcon && <span className="flex items-center shrink-0">{itemIcon}</span>}
+        <span className="truncate">{itemLabel}</span>
       </span>
     );
     
@@ -308,7 +308,7 @@ const getBadgePresentation = (color?: string) => {
         >
           <RadixBadge 
             variant={finalVariant as any}
-            className="inline-flex items-center gap-1.5"
+            className="inline-flex items-center gap-1.5 max-w-full"
           >
             {badgeContent}
           </RadixBadge>

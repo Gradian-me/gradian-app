@@ -5727,5 +5727,43 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KE1DEVIATIONMANAGEMENT001",
+    "timestamp": "2026-01-03T00:13:03+0330",
+    "version": "1.43.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Added deviation management schema with comprehensive fields for tracking deviations, enhancing data integrity and compliance",
+        "priority": "High",
+        "affectedDomains": [
+          "schema-manager",
+          "data-management",
+          "deviation-management",
+          "compliance"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated all-data.json to include new deviation management schema and related properties for improved data organization",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "deviation-management"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Modified FieldEditor component to support new validation rules and target schema selection, improving user experience and functionality",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "schema-manager",
+          "ui",
+          "validation"
+        ]
+      }
+    ]
   }
 ]

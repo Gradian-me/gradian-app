@@ -29,6 +29,7 @@ import { Badge } from '@/components/ui/badge';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
+import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
 import {
   Dialog,
   DialogContent,
@@ -251,7 +252,11 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     if (!isGraphFormat) return null;
     
     try {
-      const parsed = JSON.parse(aiResponse);
+      // Extract JSON from markdown code blocks if present
+      const extractedJson = extractJson(aiResponse);
+      if (!extractedJson) return null;
+      
+      const parsed = JSON.parse(extractedJson);
       // Check if response has graph structure
       if (parsed && typeof parsed === 'object') {
         const graph = parsed.graph || parsed;
@@ -710,17 +715,32 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
             )
           ) : shouldRenderGraph ? (
             graphData ? (
-              <div className="w-full h-[600px] min-h-[400px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <GraphViewer
-                  data={{
-                    nodes: graphData.nodes || [],
-                    edges: graphData.edges || [],
-                    nodeTypes: graphData.nodeTypes,
-                    relationTypes: graphData.relationTypes,
-                    schemas: graphData.schemas,
-                  }}
-                  height="100%"
-                />
+              <div className="space-y-4">
+                <div className="w-full h-[600px] min-h-[400px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  <GraphViewer
+                    data={{
+                      nodes: graphData.nodes || [],
+                      edges: graphData.edges || [],
+                      nodeTypes: graphData.nodeTypes,
+                      relationTypes: graphData.relationTypes,
+                      schemas: graphData.schemas,
+                    }}
+                    height="100%"
+                  />
+                </div>
+                <details className="text-sm">
+                  <summary className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+                    View Raw Graph Data
+                  </summary>
+                  <div className="mt-2">
+                    <CodeViewer
+                      code={JSON.stringify(graphData, null, 2)}
+                      programmingLanguage="json"
+                      title="Raw Graph Data"
+                      initialLineNumbers={10}
+                    />
+                  </div>
+                </details>
               </div>
             ) : (
               <CodeViewer

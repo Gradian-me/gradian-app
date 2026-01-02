@@ -102,7 +102,7 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
   );
 
   const actionCellRenderer = useCallback(
-    (_row: any, itemId: string | number | undefined) => {
+    (_row: any, itemId: string | number | undefined, _index?: number) => {
       if (!itemId) return null;
       return (
         <RelationActionCell
@@ -116,11 +116,24 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
     [handleViewDetails, refresh]
   );
 
+  // Check if there are any actions to show by testing with actual data
+  const hasAnyActions = useMemo(() => {
+    if (!actionCellRenderer || sectionData.length === 0) {
+      return false;
+    }
+    // Test with first row to see if any actions would be rendered
+    const firstRow = sectionData[0];
+    const firstRowId = firstRow?.id;
+    if (!firstRowId) return false;
+    const testResult = actionCellRenderer(firstRow, firstRowId, 0);
+    return testResult !== null && testResult !== undefined;
+  }, [actionCellRenderer, sectionData]);
+
   const columns = useRepeatingTableColumns({
     fields: fieldsToDisplay,
     schemaForColumns: schemaForColumns || null,
     columnWidths,
-    renderActionCell: actionCellRenderer,
+    renderActionCell: hasAnyActions ? actionCellRenderer : undefined,
     getRowId: (row) => row?.id,
   });
 
