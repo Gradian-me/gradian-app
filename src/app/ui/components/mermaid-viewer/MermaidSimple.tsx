@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import mermaid from 'mermaid';
 import { useTheme } from 'next-themes';
-import { ZoomIn, ZoomOut, RotateCcw, Download } from 'lucide-react';
+import { ZoomIn, ZoomOut, RotateCcw, Download, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { sanitizeSvg } from '@/gradian-ui/shared/utils/html-sanitizer';
@@ -258,22 +258,70 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+    // Wait for container to be visible and have dimensions before rendering
+    // This prevents "Could not find a suitable point for the given distance" errors
+    const checkAndRender = () => {
+      const wrapper = wrapperRef.current;
+      if (!wrapper) return false;
 
-    mermaid.render(id, diagram).then(async (result) => {
-      if (!containerRef.current || !canvasRef.current) return;
-
-      const svgString = result.svg || '';
+      const rect = wrapper.getBoundingClientRect();
+      const isVisible = rect.width > 0 && rect.height > 0 && 
+                       rect.top < window.innerHeight && 
+                       rect.bottom > 0;
       
-      // SECURITY: Sanitize SVG content using DOMPurify to prevent XSS
-      const sanitizedSvg = sanitizeSvg(svgString);
-      
-      // Parse SVG
-      const parser = new DOMParser();
-      const svgDoc = parser.parseFromString(sanitizedSvg, 'image/svg+xml');
-      const svgElement = svgDoc.documentElement as unknown as SVGSVGElement;
+      return isVisible;
+    };
 
-      if (svgElement && svgElement.tagName === 'svg') {
+    const attemptRender = (retries = 0) => {
+      if (!checkAndRender()) {
+        // Container not ready yet, retry after a short delay
+        if (retries < 10) {
+          setTimeout(() => attemptRender(retries + 1), 100);
+          return;
+        } else {
+          // Fallback: render anyway after max retries
+          console.warn('Mermaid container not visible after retries, rendering anyway');
+        }
+      }
+
+      // Ensure wrapper has minimum dimensions for Mermaid layout calculations
+      const wrapper = wrapperRef.current;
+      if (wrapper) {
+        const rect = wrapper.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) {
+          // Set temporary dimensions if container has none (Mermaid needs dimensions for layout)
+          const originalMinWidth = wrapper.style.minWidth;
+          const originalMinHeight = wrapper.style.minHeight;
+          wrapper.style.minWidth = '800px';
+          wrapper.style.minHeight = '600px';
+          
+          // Clean up temporary styles after a short delay (after Mermaid has calculated layout)
+          setTimeout(() => {
+            const currentWrapper = wrapperRef.current;
+            if (currentWrapper) {
+              currentWrapper.style.minWidth = originalMinWidth;
+              currentWrapper.style.minHeight = originalMinHeight;
+            }
+          }, 1000);
+        }
+      }
+
+      const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+
+      mermaid.render(id, diagram).then(async (result) => {
+        if (!containerRef.current || !canvasRef.current) return;
+
+        const svgString = result.svg || '';
+        
+        // SECURITY: Sanitize SVG content using DOMPurify to prevent XSS
+        const sanitizedSvg = sanitizeSvg(svgString);
+        
+        // Parse SVG
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(sanitizedSvg, 'image/svg+xml');
+        const svgElement = svgDoc.documentElement as unknown as SVGSVGElement;
+
+        if (svgElement && svgElement.tagName === 'svg') {
         // Handle <br/> tags in text elements (convert to line breaks for SVG)
         const textElements = svgElement.querySelectorAll('text, tspan');
         textElements.forEach((textEl) => {
@@ -329,11 +377,10 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
             
             sourceCtx.drawImage(svgCanvas, 0, 0);
             
-            // Reset zoom and position only on diagram change
-            scaleRef.current = 1;
+            // Reset position only on diagram change
             positionRef.current = { x: 0, y: 0 };
-            setZoomLevel(100);
             
+            // Calculate initial zoom to fit diagram to canvas
             // Manually draw canvas after initial render (use requestAnimationFrame to ensure DOM is ready)
             requestAnimationFrame(() => {
               const displayCanvas = displayCanvasRef.current;
@@ -352,7 +399,34 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
                   displayCanvas.style.width = `${width}px`;
                   displayCanvas.style.height = `${height}px`;
                   
-                  // Enable high-quality image smoothing
+                  // Calculate fit-to-screen zoom level
+                  // Source canvas is rendered at 3x resolution, so we need to account for that
+                  const sourceWidth = sourceCanvas.width / 3; // Actual display width
+                  const sourceHeight = sourceCanvas.height / 3; // Actual display height
+                  
+                  // Add padding (10px on each side = 20px total)
+                  const padding = 20;
+                  const availableWidth = width - padding;
+                  const availableHeight = height - padding;
+                  
+                  // Calculate scale to fit both width and height, taking the smaller one
+                  const scaleX = availableWidth / sourceWidth;
+                  const scaleY = availableHeight / sourceHeight;
+                  let fitScale = Math.min(scaleX, scaleY, 1); // Don't zoom in beyond 100%
+                  
+                  // Apply additional scale reduction to make initial view smaller (70% of fit size)
+                  fitScale = fitScale * 0.7;
+                  
+                  // Convert scale to zoom level (scale is 0-1, zoomLevel is 25-200)
+                  const fitZoomLevel = Math.max(25, Math.min(200, Math.round(fitScale * 100)));
+                  
+                  // Set initial zoom to fit and update scale ref
+                  scaleRef.current = fitZoomLevel / 100;
+                  setZoomLevel(fitZoomLevel);
+                  
+                  // The useEffect watching zoomLevel will automatically call drawCanvas
+                  // But we need to ensure canvas is drawn immediately, so call it here too
+                  // Use the fitZoomLevel directly in the scale calculation
                   displayCtx.imageSmoothingEnabled = true;
                   displayCtx.imageSmoothingQuality = 'high';
                   
@@ -365,8 +439,8 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
                   
                   displayCtx.save();
                   displayCtx.translate(centerX, centerY);
-                  // Scale down by 1/3 since sourceCanvas is rendered at 3x resolution
-                  displayCtx.scale(1 / 3, 1 / 3);
+                  // Scale down by 1/3 since sourceCanvas is rendered at 3x resolution, then apply fit zoom
+                  displayCtx.scale(fitScale / 3, fitScale / 3);
                   displayCtx.drawImage(sourceCanvas, -sourceCanvas.width / 2, -sourceCanvas.height / 2);
                   displayCtx.restore();
                 }
@@ -378,14 +452,24 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
           setError('Failed to render diagram');
         }
       }
-    }).catch((err) => {
-      console.error('Mermaid render error:', err);
-      setError(err.message || 'Failed to render diagram');
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-    });
+      }).catch((err) => {
+        console.error('Mermaid render error:', err);
+        setError(err.message || 'Failed to render diagram');
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      });
+    };
+
+    // Start render attempt with a small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      attemptRender();
+    }, 50);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [diagram, isDark, svgToCanvas]);
 
   const handleZoomIn = () => {
@@ -393,7 +477,7 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
   };
 
   const handleZoomOut = () => {
-    setZoomLevel((prev) => Math.max(prev - 10, 50));
+    setZoomLevel((prev) => Math.max(prev - 10, 25));
   };
 
   const handleResetZoom = () => {
@@ -533,7 +617,7 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
         
         // Update zoom level
         setZoomLevel((prevZoom) => {
-          const newZoom = Math.max(50, Math.min(200, prevZoom * scaleChange));
+          const newZoom = Math.max(25, Math.min(200, prevZoom * scaleChange));
           scaleRef.current = newZoom / 100;
           return newZoom;
         });
@@ -597,91 +681,103 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
   }
 
   return (
-    <div className={`relative ${className}`}>
-      {(showZoomControls || showSaveCopyButtons) && (
-        <div className="absolute top-2 right-2 z-10 flex items-center gap-2 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-          {showSaveCopyButtons && (
-            <>
-              <CopyContent content={diagram} />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleSavePng}
-                className="h-7 w-7 p-0"
-                title="Save as PNG"
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-              {showZoomControls && <div className="w-px h-5 bg-gray-300 dark:bg-gray-600" />}
-            </>
-          )}
-          {showZoomControls && (
-            <>
-              <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleZoomOut}
-            disabled={zoomLevel <= 50}
-            className="h-7 w-7 p-0"
-            title="Zoom Out"
-          >
-            <ZoomOut className="h-4 w-4" />
-          </Button>
-          <Slider
-            value={[zoomLevel]}
-            onValueChange={handleSliderChange}
-            min={50}
+    <div className={`rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-800 ${className}`}>
+      <div className="relative">
+        {(showZoomControls || showSaveCopyButtons) && (
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-2 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm" dir="ltr">
+            {showSaveCopyButtons && (
+              <>
+                <CopyContent content={diagram} />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSavePng}
+                  className="h-7 w-7 p-0"
+                  title="Save as PNG"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+                {showZoomControls && <div className="w-px h-5 bg-gray-300 dark:bg-gray-600" />}
+              </>
+            )}
+            {showZoomControls && (
+              <>
+                <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleZoomOut}
+              disabled={zoomLevel <= 25}
+              className="h-7 w-7 p-0"
+              title="Zoom Out"
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <Slider
+              value={[zoomLevel]}
+              onValueChange={handleSliderChange}
+            min={25}
             max={200}
             step={5}
-            className="w-24"
+              className="w-24"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleZoomIn}
+              disabled={zoomLevel >= 200}
+              className="h-7 w-7 p-0"
+              title="Zoom In"
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleResetZoom}
+              className="h-7 w-7 p-0"
+              title="Reset Zoom"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+              </>
+            )}
+          </div>
+        )}
+        <div 
+          ref={wrapperRef}
+          className="overflow-hidden relative w-full bg-gray-50 dark:bg-gray-900/50"
+          style={{ minHeight: '300px', height: '500px', maxHeight: '80vh' }}
+        >
+          <canvas
+            ref={canvasRef}
+            style={{ display: 'none' }}
           />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleZoomIn}
-            disabled={zoomLevel >= 200}
-            className="h-7 w-7 p-0"
-            title="Zoom In"
-          >
-            <ZoomIn className="h-4 w-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleResetZoom}
-            className="h-7 w-7 p-0"
-            title="Reset Zoom"
-          >
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-            </>
-          )}
+          <canvas
+            ref={displayCanvasRef}
+            className="bg-transparent"
+            style={{ 
+              display: 'block', 
+              cursor: 'grab', 
+              touchAction: 'none',
+              width: '100%',
+              height: '100%'
+            }}
+          />
+          <div ref={containerRef} style={{ display: 'none' }} />
         </div>
-      )}
-      <div 
-        ref={wrapperRef}
-        className="overflow-hidden relative w-full"
-        style={{ minHeight: '400px', height: '600px', maxHeight: '80vh' }}
-      >
-        <canvas
-          ref={canvasRef}
-          style={{ display: 'none' }}
-        />
-        <canvas
-          ref={displayCanvasRef}
-          style={{ 
-            display: 'block', 
-            cursor: 'grab', 
-            touchAction: 'none',
-            width: '100%',
-            height: '100%'
-          }}
-        />
-        <div ref={containerRef} style={{ display: 'none' }} />
+      </div>
+      {/* Powered by Gradian AI - Footer like CodeViewer header */}
+      <div className="flex items-center justify-between px-3 py-2 border-t border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800" dir="ltr">
+        <div className="flex items-center gap-1.5">
+          <Sparkles className="h-3 w-3 text-violet-600 dark:text-violet-400" />
+          <span className="text-xs font-medium text-gray-900 dark:text-gray-100">
+            Powered by Gradian AI
+          </span>
+        </div>
       </div>
     </div>
   );

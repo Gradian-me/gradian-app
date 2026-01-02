@@ -41,6 +41,7 @@ interface UseAiBuilderReturn {
   searchError: string | null; // Search error
   searchDuration: number | null; // Search duration in milliseconds
   searchUsage: { cost: number; tool: string } | null; // Search usage (cost and tool)
+  summarizedPrompt: string | null; // Summarized version of the prompt (for search/image)
   generateResponse: (request: GeneratePromptRequest) => Promise<void>;
   stopGeneration: () => void;
   approveResponse: (response: string, agent: AiAgent) => Promise<void>;
@@ -76,6 +77,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [searchDuration, setSearchDuration] = useState<number | null>(null);
   const [searchUsage, setSearchUsage] = useState<{ cost: number; tool: string } | null>(null);
+  const [summarizedPrompt, setSummarizedPrompt] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   
   const user = useUserStore((state) => state.user);
@@ -239,24 +241,30 @@ export function useAiBuilder(): UseAiBuilderReturn {
       
       // Summarization: If enabled and search/image is needed, summarize the prompt first
       const shouldSummarize = request.summarizeBeforeSearchImage !== false && (isSearchEnabled || isImageEnabled);
-      let summarizedPrompt: string | null = null;
+      let summarizedPromptValue: string | null = null;
       
       if (shouldSummarize) {
         if (isDevelopment) {
           loggingCustom(LogType.AI_BODY_LOG, 'info', `Summarizing prompt before search/image operations...`);
         }
         try {
-          summarizedPrompt = await summarizePrompt(originalPrompt, abortController.signal);
-          if (isDevelopment && summarizedPrompt !== originalPrompt) {
-            loggingCustom(LogType.AI_BODY_LOG, 'info', `Prompt summarized successfully. Original: ${originalPrompt.length} chars, Summarized: ${summarizedPrompt.length} chars`);
+          summarizedPromptValue = await summarizePrompt(originalPrompt, abortController.signal);
+          if (isDevelopment && summarizedPromptValue !== originalPrompt) {
+            loggingCustom(LogType.AI_BODY_LOG, 'info', `Prompt summarized successfully. Original: ${originalPrompt.length} chars, Summarized: ${summarizedPromptValue.length} chars`);
           }
+          // Store summarized prompt in state for display
+          setSummarizedPrompt(summarizedPromptValue);
         } catch (summarizeError) {
           // If summarization fails, fallback to original prompt
           if (isDevelopment) {
             loggingCustom(LogType.CLIENT_LOG, 'warn', `Summarization failed, using original prompt: ${summarizeError instanceof Error ? summarizeError.message : 'Unknown error'}`);
           }
-          summarizedPrompt = null;
+          summarizedPromptValue = null;
+          setSummarizedPrompt(null);
         }
+      } else {
+        // Clear summarized prompt if summarization is disabled
+        setSummarizedPrompt(null);
       }
 
       // Debug logging
@@ -292,7 +300,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
           };
 
           // Use summarized prompt for search if available, otherwise use original
-          const promptForSearch = summarizedPrompt || originalPrompt;
+          const promptForSearch = summarizedPromptValue || originalPrompt;
           
           // Clean the query - remove common prefixes that might be added by form building
           const cleanQuery = promptForSearch
@@ -405,7 +413,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
         // For image-generator agent, skip this and use the normal flow below
         try {
           // Use summarized prompt for image if available, otherwise use original
-          const promptForImage = summarizedPrompt || originalPrompt;
+          const promptForImage = summarizedPromptValue || originalPrompt;
           
           const [mainResult, imageResult] = await Promise.allSettled([
             // Main agent request
@@ -1166,6 +1174,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
   }, [setUserPrompt]);
 
   const clearResponse = useCallback(() => {
+    setSummarizedPrompt(null);
     setAiResponse('');
     setTokenUsage(null);
     setVideoUsage(null);
@@ -1209,6 +1218,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
     searchError,
     searchDuration,
     searchUsage,
+    summarizedPrompt,
     generateResponse,
     stopGeneration,
     approveResponse,

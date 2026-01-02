@@ -66,6 +66,7 @@ export default function AiBuilderPromptPage() {
     successMessage,
     preloadedContext,
     isLoadingPreload,
+    summarizedPrompt,
     lastPromptId: hookLastPromptId,
     generateResponse,
     stopGeneration,
@@ -528,6 +529,7 @@ export default function AiBuilderPromptPage() {
             onAnnotationsChange={handleAnnotationChange}
             onRemoveSchema={handleRemoveSchema}
             onApplyAnnotations={handleApplyAnnotations}
+            summarizedPrompt={summarizedPrompt}
           />
         )}
 

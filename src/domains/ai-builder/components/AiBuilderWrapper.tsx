@@ -129,6 +129,7 @@ export function AiBuilderWrapper({
     searchError,
     searchDuration,
     searchUsage,
+    summarizedPrompt,
     lastPromptId: hookLastPromptId,
     generateResponse,
     stopGeneration,
@@ -626,6 +627,7 @@ export function AiBuilderWrapper({
               searchError={searchError}
               searchDuration={searchDuration}
               searchUsage={searchUsage}
+              summarizedPrompt={summarizedPrompt}
             />
           </motion.div>
         ) : null}
