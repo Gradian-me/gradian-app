@@ -239,6 +239,12 @@ interface AiBuilderFormProps {
   onLanguageChange?: (language: string) => void;
   onFormValuesChange?: (formValues: Record<string, any>) => void; // Callback to expose formValues
   hidePreviewButton?: boolean; // Hide the preview button in PromptPreviewSheet (useful for dialog mode)
+  hideAgentSelector?: boolean; // Hide agent dropdown selector
+  hideSearchConfig?: boolean; // Hide search type and summarization controls
+  hideImageConfig?: boolean; // Hide image type selector
+  hideEditAgent?: boolean; // Hide Edit Agent button
+  hidePromptHistory?: boolean; // Hide Prompt History button
+  hideLanguageSelector?: boolean; // Hide language selector from form (use in footer instead)
 }
 
 export function AiBuilderForm({
@@ -262,8 +268,19 @@ export function AiBuilderForm({
   onLanguageChange,
   onFormValuesChange,
   hidePreviewButton = false,
+  hideAgentSelector = false,
+  hideSearchConfig = false,
+  hideImageConfig = false,
+  hideEditAgent = false,
+  hidePromptHistory = false,
+  hideLanguageSelector = false,
 }: AiBuilderFormProps) {
-  // Get selected agent
+  // Filter agents to only show those with showInAgentMenu !== false
+  const visibleAgents = useMemo(() => {
+    return agents.filter(agent => agent.showInAgentMenu !== false);
+  }, [agents]);
+
+  // Get selected agent (from all agents, not just visible ones, to support programmatic selection)
   const selectedAgent = agents.find(agent => agent.id === selectedAgentId);
 
   // Feature flag: show model badge only when AI_MODEL_LOG is enabled
@@ -1019,12 +1036,12 @@ export function AiBuilderForm({
               <div className="flex flex-col md:flex-row justify-end items-stretch md:items-center flex-wrap gap-3 md:gap-4">
                 <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-2 w-full md:w-auto">
                   {/* Agent Select - use renderComponents if available, otherwise fallback */}
-                  {agentSelectField ? (
+                  {!hideAgentSelector && (agentSelectField ? (
                     <div className="w-full md:w-72">
                       <FormElementFactory
                         config={{
                           ...agentSelectField,
-                          options: agents.map(agent => ({
+                          options: visibleAgents.map(agent => ({
                             id: agent.id,
                             label: agent.label,
                             icon: agent.icon,
@@ -1056,7 +1073,7 @@ export function AiBuilderForm({
                           label: '',
                           component: 'select',
                           type: 'select',
-                          options: agents.map(agent => ({
+                          options: visibleAgents.map(agent => ({
                             id: agent.id,
                             label: agent.label,
                             icon: agent.icon,
@@ -1076,9 +1093,9 @@ export function AiBuilderForm({
                         className="w-full"
                       />
                     </div>
-                  )}
+                  ))}
                   <div className="flex items-center gap-2 flex-wrap">
-                    {DEMO_MODE && selectedAgentId && (
+                    {!hideEditAgent && DEMO_MODE && selectedAgentId && (
                       <Link href={`/builder/ai-agents/${selectedAgentId}`} className="flex-1 sm:flex-initial">
                         <Button
                           variant="outline"
@@ -1103,13 +1120,15 @@ export function AiBuilderForm({
                         <RotateCcw className="h-4 w-4" />
                       </Button>
                     )}
-                    <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer" className="flex-1 md:flex-initial">
-                      <Button variant="outline" size="sm" className="gap-2 w-full md:w-auto shrink-0">
-                        <History className="h-4 w-4" />
-                        <span className="hidden md:inline">Prompt History</span>
-                        <span className="md:hidden">History</span>
-                      </Button>
-                    </Link>
+                    {!hidePromptHistory && (
+                      <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer" className="flex-1 md:flex-initial">
+                        <Button variant="outline" size="sm" className="gap-2 w-full md:w-auto shrink-0">
+                          <History className="h-4 w-4" />
+                          <span className="hidden md:inline">Prompt History</span>
+                          <span className="md:hidden">History</span>
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1170,7 +1189,7 @@ export function AiBuilderForm({
                 <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto md:flex-wrap min-w-0">
                   {onSheetOpenChange && (
                     <>
-                      {onLanguageChange && (
+                      {!hideLanguageSelector && onLanguageChange && (
                         <div className="w-full md:w-36 min-w-0 shrink-0">
                           <LanguageSelector
                             config={{
@@ -1204,125 +1223,131 @@ export function AiBuilderForm({
                           />
                         </div>
                       )}
-                      <div className="w-full md:w-40 min-w-0 shrink-0">
-                        <FormElementFactory
-                          config={{
-                            ...effectiveImageTypeField,
-                            label: '',
-                          }}
-                          value={formValues[effectiveImageTypeField.name] || effectiveImageTypeField.defaultValue || 'none'}
-                          onChange={(value) => {
-                            // Handle both string and NormalizedOption[] from Select
-                            let actualValue = value;
-                            if (Array.isArray(value) && value.length > 0) {
-                              actualValue = value[0].id || value[0].value || value;
-                            } else if (typeof value === 'string') {
-                              actualValue = value;
-                            }
-                            
-                              const newFormValues = {
-                                ...formValues,
-                              [effectiveImageTypeField.name]: actualValue,
-                              };
-                              setFormValues(newFormValues);
-                              // Notify parent of formValues change
-                              if (onFormValuesChange) {
-                                onFormValuesChange(newFormValues);
-                              }
-                            }}
-                            disabled={isLoading || disabled}
-                          error={formErrors[effectiveImageTypeField.name]}
-                          touched={touched[effectiveImageTypeField.name]}
-                          onBlur={() => handleFieldBlur(effectiveImageTypeField.name)}
-                          onFocus={() => handleFieldFocus(effectiveImageTypeField.name)}
-                          className="w-full"
-                          />
-                        </div>
-                      {/* Search Configuration */}
-                      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto min-w-0">
-                        <div className="w-full md:w-48 min-w-0 shrink-0">
+                      {!hideImageConfig && (
+                        <div className="w-full md:w-40 min-w-0 shrink-0">
                           <FormElementFactory
                             config={{
-                              id: 'search-type',
-                              name: 'searchType',
+                              ...effectiveImageTypeField,
                               label: '',
-                              component: 'select',
-                              type: 'select',
-                              options: [
-                                { 
-                                  id: 'no-search', 
-                                  label: 'No Search',
-                                  icon: 'X',
-                                  color: 'default'
-                                },
-                                { 
-                                  id: 'basic', 
-                                  label: 'Basic Search',
-                                  icon: 'Search',
-                                  color: 'default'
-                                },
-                                { 
-                                  id: 'advanced', 
-                                  label: 'Advanced Search',
-                                  icon: 'Search',
-                                  color: 'default'
-                                },
-                                { 
-                                  id: 'deep', 
-                                  label: 'Deep Search',
-                                  icon: 'Search',
-                                  color: 'default'
-                                },
-                              ],
-                              defaultValue: 'no-search',
                             }}
-                            value={formValues.searchType || 'no-search'}
+                            value={formValues[effectiveImageTypeField.name] || effectiveImageTypeField.defaultValue || 'none'}
                             onChange={(value) => {
+                              // Handle both string and NormalizedOption[] from Select
                               let actualValue = value;
                               if (Array.isArray(value) && value.length > 0) {
                                 actualValue = value[0].id || value[0].value || value;
                               } else if (typeof value === 'string') {
                                 actualValue = value;
                               }
-                              const newFormValues = {
-                                ...formValues,
-                                searchType: actualValue,
-                              };
-                              setFormValues(newFormValues);
-                              if (onFormValuesChange) {
-                                onFormValuesChange(newFormValues);
-                              }
-                            }}
-                            disabled={isLoading || disabled}
+                              
+                                const newFormValues = {
+                                  ...formValues,
+                                [effectiveImageTypeField.name]: actualValue,
+                                };
+                                setFormValues(newFormValues);
+                                // Notify parent of formValues change
+                                if (onFormValuesChange) {
+                                  onFormValuesChange(newFormValues);
+                                }
+                              }}
+                              disabled={isLoading || disabled}
+                            error={formErrors[effectiveImageTypeField.name]}
+                            touched={touched[effectiveImageTypeField.name]}
+                            onBlur={() => handleFieldBlur(effectiveImageTypeField.name)}
+                            onFocus={() => handleFieldFocus(effectiveImageTypeField.name)}
                             className="w-full"
-                          />
-                        </div>
-                      </div>
-                      {/* Summarization Toggle */}
-                      <div className="flex items-center gap-2 shrink-0">
-                        <Switch
-                          id="summarize-before-search-image"
-                          checked={formValues.summarizeBeforeSearchImage ?? true}
-                          onCheckedChange={(checked) => {
-                            const newFormValues = {
-                              ...formValues,
-                              summarizeBeforeSearchImage: checked,
-                            };
-                            setFormValues(newFormValues);
-                            if (onFormValuesChange) {
-                              onFormValuesChange(newFormValues);
-                            }
-                          }}
-                          disabled={isLoading || disabled}
-                        />
-                        <Label
-                          htmlFor="summarize-before-search-image"
-                          className="text-sm font-normal cursor-pointer"
-                          title="Summarize the prompt before sending to search and image generation for better results"
-                        >
-                          Summarize
-                        </Label>
-                      </div>
+                            />
+                          </div>
+                        )}
+                      {/* Search Configuration */}
+                      {!hideSearchConfig && (
+                        <>
+                          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto min-w-0">
+                            <div className="w-full md:w-48 min-w-0 shrink-0">
+                              <FormElementFactory
+                                config={{
+                                  id: 'search-type',
+                                  name: 'searchType',
+                                  label: '',
+                                  component: 'select',
+                                  type: 'select',
+                                  options: [
+                                    { 
+                                      id: 'no-search', 
+                                      label: 'No Search',
+                                      icon: 'X',
+                                      color: 'default'
+                                    },
+                                    { 
+                                      id: 'basic', 
+                                      label: 'Basic Search',
+                                      icon: 'Search',
+                                      color: 'default'
+                                    },
+                                    { 
+                                      id: 'advanced', 
+                                      label: 'Advanced Search',
+                                      icon: 'Search',
+                                      color: 'default'
+                                    },
+                                    { 
+                                      id: 'deep', 
+                                      label: 'Deep Search',
+                                      icon: 'Search',
+                                      color: 'default'
+                                    },
+                                  ],
+                                  defaultValue: 'no-search',
+                                }}
+                                value={formValues.searchType || 'no-search'}
+                                onChange={(value) => {
+                                  let actualValue = value;
+                                  if (Array.isArray(value) && value.length > 0) {
+                                    actualValue = value[0].id || value[0].value || value;
+                                  } else if (typeof value === 'string') {
+                                    actualValue = value;
+                                  }
+                                  const newFormValues = {
+                                    ...formValues,
+                                    searchType: actualValue,
+                                  };
+                                  setFormValues(newFormValues);
+                                  if (onFormValuesChange) {
+                                    onFormValuesChange(newFormValues);
+                                  }
+                                }}
+                                disabled={isLoading || disabled}
+                                className="w-full"
+                              />
+                            </div>
+                          </div>
+                          {/* Summarization Toggle */}
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Switch
+                              id="summarize-before-search-image"
+                              checked={formValues.summarizeBeforeSearchImage ?? true}
+                              onCheckedChange={(checked) => {
+                                const newFormValues = {
+                                  ...formValues,
+                                  summarizeBeforeSearchImage: checked,
+                                };
+                                setFormValues(newFormValues);
+                                if (onFormValuesChange) {
+                                  onFormValuesChange(newFormValues);
+                                }
+                              }}
+                              disabled={isLoading || disabled}
+                            />
+                            <Label
+                              htmlFor="summarize-before-search-image"
+                              className="text-sm font-normal cursor-pointer"
+                              title="Summarize the prompt before sending to search and image generation for better results"
+                            >
+                              Summarize
+                            </Label>
+                          </div>
+                        </>
+                      )}
                       {(() => {
                         const params = selectedAgent && formValues 
                           ? extractParametersBySectionId(selectedAgent, formValues)

@@ -52,6 +52,14 @@ export interface AiBuilderWrapperProps {
   initialBody?: Record<string, any>; // Preset body parameters for AI agent (with context replacement applied)
   initialExtraBody?: Record<string, any>; // Preset extra_body parameters for AI agent (with context replacement applied)
   onOpenPreviewRequest?: (callback: () => void) => void; // Callback to register a function that opens the preview sheet
+  hideAgentSelector?: boolean; // Hide agent dropdown selector
+  hideSearchConfig?: boolean; // Hide search type and summarization controls
+  hideImageConfig?: boolean; // Hide image type selector
+  hideEditAgent?: boolean; // Hide Edit Agent button
+  hidePromptHistory?: boolean; // Hide Prompt History button
+  hideLanguageSelector?: boolean; // Hide language selector from form (use in footer instead)
+  initialSelectedLanguage?: string; // Initial language value
+  onLanguageChange?: (language: string) => void; // Callback when language changes
 }
 
 export function AiBuilderWrapper({
@@ -69,11 +77,32 @@ export function AiBuilderWrapper({
   initialBody,
   initialExtraBody,
   onOpenPreviewRequest,
+  hideAgentSelector = false,
+  hideSearchConfig = false,
+  hideImageConfig = false,
+  hideEditAgent = false,
+  hidePromptHistory = false,
+  hideLanguageSelector = false,
+  initialSelectedLanguage,
+  onLanguageChange,
 }: AiBuilderWrapperProps) {
   const [selectedAgentId, setSelectedAgentId] = useState<string>(initialAgentId);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [previewSchema, setPreviewSchema] = useState<{ schema: FormSchema; schemaId: string } | null>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('en'); // Default language for string output agents
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(initialSelectedLanguage || 'en'); // Default language for string output agents
+  
+  // Sync language with external changes
+  useEffect(() => {
+    if (initialSelectedLanguage !== undefined && initialSelectedLanguage !== selectedLanguage) {
+      setSelectedLanguage(initialSelectedLanguage);
+    }
+  }, [initialSelectedLanguage]);
+  
+  // Notify parent when language changes
+  const handleLanguageChange = useCallback((language: string) => {
+    setSelectedLanguage(language);
+    onLanguageChange?.(language);
+  }, [onLanguageChange]);
   const [annotations, setAnnotations] = useState<Map<string, SchemaAnnotation>>(new Map());
   const [lastPromptId, setLastPromptId] = useState<string | null>(null);
   const [firstPromptId, setFirstPromptId] = useState<string | null>(null);
@@ -596,9 +625,15 @@ export function AiBuilderWrapper({
           displayType={displayType}
           runType={runType}
           selectedLanguage={selectedLanguage}
-          onLanguageChange={setSelectedLanguage}
+          onLanguageChange={handleLanguageChange}
           hidePreviewButton={mode === 'dialog'}
           onFormValuesChange={setFormValues}
+          hideAgentSelector={hideAgentSelector}
+          hideSearchConfig={hideSearchConfig}
+          hideImageConfig={hideImageConfig}
+          hideEditAgent={hideEditAgent}
+          hidePromptHistory={hidePromptHistory}
+          hideLanguageSelector={hideLanguageSelector}
         />
       )}
 

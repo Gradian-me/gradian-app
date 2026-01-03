@@ -26,6 +26,10 @@ import { FormModal } from './FormModal';
 import { FormSystemSection } from './FormSystemSection';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { replaceDynamicContext } from '../utils/dynamic-context-replacer';
+import { AiFormFillerDialog } from '@/domains/ai-builder/components/AiFormFillerDialog';
+import { Sparkles, MoreVertical } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { DynamicQuickActions } from '@/gradian-ui/data-display/components/DynamicQuickActions';
 
 // Form Context
 const FormContext = createContext<FormContextType | null>(null);
@@ -436,6 +440,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   const [hasSubmitted, setHasSubmitted] = React.useState(false);
   // Track which sections need items (for better error message)
   const [incompleteSections, setIncompleteSections] = React.useState<string[]>([]);
+  
+  // State for AI Form Filler dialog
+  const [isFormFillerOpen, setIsFormFillerOpen] = React.useState(false);
   
   // State to track which sections are expanded
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>(() => {
@@ -1482,10 +1489,24 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             </div>
           )}
           
-          {actionConfigs.length > 0 && !hideActions && (
+          {!hideActions && (
             <div className="space-y-3 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10">
-              <div className="flex justify-end space-x-3 py-1">
-                {actionConfigs.map((config) => {
+              <div className="flex justify-end items-center space-x-3 py-1">
+                {/* Fill With AI Button - Only show in create mode */}
+                {!editMode && (
+                  <Button
+                    type="button"
+                    variant="default"
+                    onClick={() => setIsFormFillerOpen(true)}
+                    disabled={disabled}
+                    className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    <span className="hidden md:inline">Fill With AI</span>
+                  </Button>
+                )}
+                
+                {actionConfigs.length > 0 && actionConfigs.map((config) => {
                   if (config.type === 'submit') {
                     return (
                       <Button
@@ -1544,6 +1565,28 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                   }
                   return null;
                 })}
+                
+                {/* Quick Actions Popover (Ellipsis) - Inline with buttons */}
+                {schema?.detailPageMetadata?.quickActions?.length ? (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Quick actions">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="w-80 p-0">
+                      <div className="p-3">
+                        <DynamicQuickActions
+                          actions={schema.detailPageMetadata.quickActions}
+                          schema={schema}
+                          data={referenceEntityData || {}}
+                          disableAnimation
+                          className="space-y-2"
+                        />
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                ) : null}
               </div>
             </div>
           )}
@@ -1691,6 +1734,20 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           </form>
         )}
       </FormContext.Provider>
+      
+      {/* AI Form Filler Dialog */}
+      <AiFormFillerDialog
+        isOpen={isFormFillerOpen}
+        onClose={() => setIsFormFillerOpen(false)}
+        schema={schema}
+        formData={state.values}
+        setValue={setValue}
+        onFillComplete={(data) => {
+          // Form fields are already populated by the dialog
+          setIsFormFillerOpen(false);
+        }}
+      />
+      
       {/* Go to Top Button */}
       {!hideGoToTopButton && <GoToTopForm threshold={100} />}
     </>

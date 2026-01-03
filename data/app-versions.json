@@ -5765,5 +5765,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KE2AIFORMFILLER001",
+    "timestamp": "2026-01-03T09:58:41+0330",
+    "version": "1.44.000",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "AI FORM FILLER",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "form-builder",
+          "ai-form-filler"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Added visibility control for agent selector, search configuration, image type selector, edit agent button, prompt history, and language selector in AiBuilderForm and AiBuilderWrapper components to improve user customization options",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Modified ai-agents.json to include 'showInAgentMenu' property for better agent management. This update enhances user experience by allowing more flexible UI configurations",
+        "priority": "LOW",
+        "affectedDomains": [
+          "ai-builder",
+          "ai-agents",
+          "configuration"
+        ]
+      }
+    ]
   }
 ]

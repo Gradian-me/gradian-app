@@ -15,6 +15,7 @@ export interface AiAgent {
   model?: string;
   systemPrompt?: string;
   loadingTextSwitches?: string | string[];
+  showInAgentMenu?: boolean; // Whether to show this agent in the agent selector menu (default: true)
   renderComponents?: Array<Partial<FormField> & {
     id: string;
     name: string;

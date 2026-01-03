@@ -364,29 +364,7 @@ export const FormModal: React.FC<FormModalProps> = ({
       hideDialogHeader={hideDialogHeader}
       hideCloseButton={hideCloseButton}
     >
-      {/* Quick actions popover in form dialog */}
-      {targetSchema?.detailPageMetadata?.quickActions?.length ? (
-        <div className="mb-3 flex justify-end">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Quick actions">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-80 p-0">
-              <div className="p-3">
-                <DynamicQuickActions
-                  actions={targetSchema.detailPageMetadata.quickActions}
-                  schema={targetSchema}
-                  data={referenceEntityData || {}}
-                  disableAnimation
-                  className="space-y-2"
-                />
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-      ) : null}
+      {/* Quick actions popover is now rendered inline with action buttons in FormLifecycleManager */}
 
       {/* Loading indicator for schema/entity loading */}
       {isLoading && showLoadingSpinner && (
