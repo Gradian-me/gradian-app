@@ -5802,5 +5802,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KE3FLATTENEDSCHEMAS002",
+    "timestamp": "2026-01-03T21:41:39+0330",
+    "version": "1.44.001",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated NestedTableView component to support depth-based schema flattening, improving data handling in dynamic queries",
+        "priority": "Medium",
+        "affectedDomains": [
+          "dynamic-query-table",
+          "data-display",
+          "nested-table-view"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Modified types to accommodate new flattenedSchemas structure, enhancing compatibility and functionality",
+        "priority": "Medium",
+        "affectedDomains": [
+          "dynamic-query-table",
+          "types",
+          "data-display"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Adjusted log configuration to enable AI response logging for better monitoring",
+        "priority": "LOW",
+        "affectedDomains": [
+          "logging",
+          "configuration",
+          "ai-builder"
+        ]
+      }
+    ]
   }
 ]

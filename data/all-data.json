@@ -3887,7 +3887,7 @@
         }
       ],
       "changeNumber": "CM-2025-0417",
-      "changeRequestDate": "2025-12-31",
+      "changeRequestDate": "2026-01-09",
       "changeTitle": "Replacement of Failed Primary Temperature Control Module & Integration of New Redundant Monitoring Logic in MAb Production Bioreactors (BR-12 & BR-14)",
       "changeDescription": "During routine monitoring of upstream production, repeated deviations were observed in temperature feedback from BR-12 and BR-14. Investigation confirmed that the primary temperature control module in both reactors showed progressive signal drift and intermittent communication loss.\n\nGiven the failure mode and the fact that temperature is a critical process parameter (CPP) for mAb cell-culture viability and product quality, this change is classified as High Criticality.\n\nThe approved change involves:\n\nRemoval of the defective temperature control modules.\n\nInstallation of validated replacement modules.\n\nIntegration of a redundant dual-sensor verification logic within the control system to flag early drift and automatically shift to secondary sensor input.\n\nRequalification of reactors post-installation (high-level only).\n\nNo recipe, culture-handling, or operational parameters were modified.\n\n\nIssue Identified:\n\nIntermittent, non-linear temperature feedback fluctuations over several production cycles.\n\nDrift exceeding historical process variability limits.\n\nAlarms triggered inconsistently due to communication dropouts between the module and the automation system.\n\nScope of Change:\n\nApplies to Bioreactors BR-12 and BR-14 used for clinical and commercial mAb campaigns.\n\nAffects upstream equipment only; downstream systems remain unaffected.\n\nIncludes engineering replacement, system integration, and software configuration for new redundancy checks.\n\nRisk Assessment Summary:\n\nProcess Risk: Moderate–High without corrective action.\n\nQuality Risk: Medium due to CPP involvement.\n\nRegulatory Risk: Low–Moderate; mitigated by documented change and requalification.\n\nOperational Risk: Reduced after implementing redundant logic.",
       "changeSolution": "Engineering Removal & Installation\nReplace faulty modules with validated, supplier-qualified units.\n\nAutomation Update\nAdd dual-sensor plausibility logic:\n\nAutomatic flag if discrepancy exceeds predefined limit.\n\nAuto-switch to secondary sensor in real time.\n\nGMP Documentation\n\nUpdate equipment qualification package (IQ/OQ high-level summary only).\n\nRevise equipment maintenance SOP to incorporate new drift-monitoring requirements.\n\nRequalification Activities\n\nConduct controlled functional tests verifying temperature stability and response accuracy.\n\nPerform system-level calibration checks.\n\nTraining\n\nBrief operators and engineering staff on revised alarm behavior and redundancy monitoring.",
@@ -3901,7 +3901,7 @@
       "changeProcedure": [],
       "id": "01KCDG346XD1GBAKQEADRABBHB",
       "createdAt": "2025-12-14T03:57:26.114Z",
-      "updatedAt": "2025-12-22T08:02:02.666Z",
+      "updatedAt": "2026-01-03T08:20:09.272Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "affectedProcesses": []
@@ -5099,7 +5099,7 @@
           "id": "01KC3FBM8YXB7V70SQMEBN0151"
         }
       ],
-      "dueDate": "2025-12-23",
+      "dueDate": "2026-01-09",
       "status": [
         {
           "id": "01KBSVZ9NT2Z23FXK7B1G7AYS8",
@@ -5113,7 +5113,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBSYN40BXYQ9JNGREYPQRH2P",
       "createdAt": "2025-12-06T13:47:07.147Z",
-      "updatedAt": "2025-12-06T13:47:07.147Z",
+      "updatedAt": "2026-01-03T08:46:06.419Z",
       "entityType": [
         {
           "id": "01KCDZTASK001WORK000000000001",
@@ -18270,8 +18270,20 @@
         }
       ],
       "flattenedSchemas": [
-        "inquiries",
-        "tenders"
+        {
+          "depth": 0,
+          "schemas": [
+            "inquiries",
+            "tenders"
+          ]
+        },
+        {
+          "depth": 1,
+          "schemas": [
+            "tender-invitations",
+            "tender-items"
+          ]
+        }
       ],
       "name": "Inquiries → Tenders → (Tender Items/Invitations) → Quotations → Quotation Items",
       "description": "Five-level nested query showing the full hierarchy: inquiries contain tenders, which contain tender items and invitations. Tender items contain quotations, which contain quotation items.",
@@ -18354,6 +18366,13 @@
       "icon": "CheckCircle",
       "color": "green",
       "sourceUrl": "field-options:deviation-management:effectiveness-result"
+    },
+    {
+      "id": "in-use",
+      "label": "In Use",
+      "icon": "Loading",
+      "color": "blue",
+      "sourceUrl": "field-options:equipment-log-book:status"
     }
   ],
   "deviation-management": [
@@ -18616,6 +18635,30 @@
           "label": "Batch BX-250615-01 was placed on QA hold pending investigation outcome."
         }
       ]
+    }
+  ],
+  "deviation-categories": [],
+  "equipment-log-book": [
+    {
+      "assignedUser": [
+        {
+          "id": "01KDG66XCHTD0GGQX3A2E69T85"
+        }
+      ],
+      "equipmentId": "asdasd",
+      "equipmentName": "asdasd",
+      "status": [
+        {
+          "id": "in-use"
+        }
+      ],
+      "dateAssigned": "2026-01-30",
+      "returnDate": "2026-02-03",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KE1H5250YPSB86Y39F079K1R",
+      "createdAt": "2026-01-03T08:56:28.578Z",
+      "updatedAt": "2026-01-03T08:56:28.884Z"
     }
   ]
 }

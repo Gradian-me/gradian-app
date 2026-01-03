@@ -4420,36 +4420,36 @@
         "component": "select",
         "placeholder": "Select root cause analysis method",
         "options": [
-            {
-              "id": "5-why",
-              "label": "5-Why",
-              "icon": "Brain",
-              "color": "blue"
-            },
-            {
-              "id": "fishbone",
-              "label": "Fishbone (Ishikawa)",
-              "icon": "Brain",
-              "color": "blue"
-            },
-            {
-              "id": "fault-tree",
-              "label": "Fault Tree Analysis",
-              "icon": "Brain",
-              "color": "blue"
-            },
-            {
-              "id": "pareto",
-              "label": "Pareto Analysis",
-              "icon": "Brain",
-              "color": "blue"
-            },
-            {
-              "id": "other",
-              "label": "Other",
-              "icon": "Brain",
-              "color": "blue"
-            }
+          {
+            "id": "5-why",
+            "label": "5-Why",
+            "icon": "Brain",
+            "color": "blue"
+          },
+          {
+            "id": "fishbone",
+            "label": "Fishbone (Ishikawa)",
+            "icon": "Brain",
+            "color": "blue"
+          },
+          {
+            "id": "fault-tree",
+            "label": "Fault Tree Analysis",
+            "icon": "Brain",
+            "color": "blue"
+          },
+          {
+            "id": "pareto",
+            "label": "Pareto Analysis",
+            "icon": "Brain",
+            "color": "blue"
+          },
+          {
+            "id": "other",
+            "label": "Other",
+            "icon": "Brain",
+            "color": "blue"
+          }
         ],
         "validation": {
           "required": false
@@ -7478,6 +7478,16 @@
       }
     ],
     "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "show-dynamic-query-table",
+          "label": "Show Dynamic Query Table",
+          "icon": "Table",
+          "variant": "default",
+          "action": "openUrl",
+          "targetUrl": "/dynamic-query/{{formData.id}}"
+        }
+      ],
       "sections": [
         {
           "id": "dynamic-query-overview",
@@ -7562,5 +7572,150 @@
       ]
     },
     "applyToAllTenants": true
+  },
+  {
+    "id": "equipment-log-book",
+    "description": "Log book for tracking equipment details, assignments, and status.",
+    "singular_name": "Equipment Log Book",
+    "plural_name": "Equipment Log Books",
+    "icon": "BookOpen",
+    "fields": [
+      {
+        "id": "equipment-id",
+        "name": "equipmentId",
+        "label": "Equipment ID",
+        "sectionId": "equipment-info",
+        "type": "text",
+        "component": "text",
+        "required": true,
+        "role": "code",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "equipment-name",
+        "name": "equipmentName",
+        "label": "Equipment Name",
+        "sectionId": "equipment-info",
+        "type": "text",
+        "component": "text",
+        "required": true,
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "equipment-info",
+        "type": "textarea",
+        "component": "textarea",
+        "role": "description",
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "assigned-user",
+        "name": "assignedUser",
+        "label": "Assigned User",
+        "sectionId": "equipment-info",
+        "type": "picker",
+        "component": "picker",
+        "required": true,
+        "role": "title",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 4,
+        "targetSchema": "users"
+      },
+      {
+        "id": "status",
+        "name": "status",
+        "label": "Status",
+        "sectionId": "equipment-info",
+        "type": "select",
+        "component": "select",
+        "required": true,
+        "role": "status",
+        "options": [
+          {
+            "id": "available",
+            "label": "Available",
+            "icon": "CheckCircle",
+            "color": "emerald"
+          },
+          {
+            "id": "in-use",
+            "label": "In Use",
+            "icon": "Loading",
+            "color": "blue"
+          },
+          {
+            "id": "maintenance",
+            "label": "Maintenance",
+            "icon": "Wrench",
+            "color": "amber"
+          },
+          {
+            "id": "out-of-service",
+            "label": "Out of Service",
+            "icon": "XCircle",
+            "color": "red"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "date-assigned",
+        "name": "dateAssigned",
+        "label": "Date Assigned",
+        "sectionId": "equipment-info",
+        "type": "date",
+        "component": "date",
+        "required": true,
+        "role": "duedate",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "return-date",
+        "name": "returnDate",
+        "label": "Return Date",
+        "sectionId": "equipment-info",
+        "type": "date",
+        "component": "date",
+        "role": "duedate",
+        "colSpan": 1,
+        "order": 7
+      }
+    ],
+    "sections": [
+      {
+        "id": "equipment-info",
+        "title": "Equipment Information",
+        "columns": 2,
+        "initialState": "expanded"
+      }
+    ],
+    "showInNavigation": true
   }
 ]

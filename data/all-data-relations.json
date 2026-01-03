@@ -851,7 +851,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "virtual-assignedTo-tasks",
     "createdAt": "2025-12-14T09:24:21.012Z",
-    "updatedAt": "2025-12-14T10:24:07.169Z",
+    "updatedAt": "2026-01-03T08:46:06.312Z",
     "inactive": true
   },
   {
@@ -863,7 +863,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "virtual-assignedTo-tasks",
     "createdAt": "2025-12-14T10:09:15.817Z",
-    "updatedAt": "2025-12-14T10:24:07.169Z"
+    "updatedAt": "2026-01-03T08:46:06.312Z"
   },
   {
     "id": "01KCE9MJKZ5CVJN6AF99K4TVZ9",
@@ -1662,50 +1662,6 @@
     "updatedAt": "2026-01-02T21:10:48.330Z"
   },
   {
-    "id": "01KE08DXA2PNSYHEJ2TV5J1RQC",
-    "sourceSchema": "deviation-management",
-    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
-    "targetSchema": "external-nodes",
-    "targetId": "high",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "impact-product-quality",
-    "createdAt": "2026-01-02T21:04:46.913Z",
-    "updatedAt": "2026-01-02T21:10:48.391Z"
-  },
-  {
-    "id": "01KE08DXDB7S6MF4KHN8E95C3X",
-    "sourceSchema": "deviation-management",
-    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
-    "targetSchema": "external-nodes",
-    "targetId": "low",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "impact-patient-safety",
-    "createdAt": "2026-01-02T21:04:47.019Z",
-    "updatedAt": "2026-01-02T21:10:48.464Z"
-  },
-  {
-    "id": "01KE08DXFYZD8VBJJT8GDKE0NX",
-    "sourceSchema": "deviation-management",
-    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
-    "targetSchema": "external-nodes",
-    "targetId": "critical",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "impact-data-integrity",
-    "createdAt": "2026-01-02T21:04:47.101Z",
-    "updatedAt": "2026-01-02T21:10:48.593Z"
-  },
-  {
-    "id": "01KE08DXM7HM4QKJJXA8CNNXQV",
-    "sourceSchema": "deviation-management",
-    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
-    "targetSchema": "external-nodes",
-    "targetId": "high",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "impact-regulatory-compliance",
-    "createdAt": "2026-01-02T21:04:47.239Z",
-    "updatedAt": "2026-01-02T21:10:48.701Z"
-  },
-  {
     "id": "01KE08DXNGTY863MWPYXF3WE8C",
     "sourceSchema": "deviation-management",
     "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
@@ -1717,72 +1673,6 @@
     "updatedAt": "2026-01-02T21:10:48.719Z"
   },
   {
-    "id": "01KE08DXSYZ3YCCM10EGSAQFCZ",
-    "sourceSchema": "deviation-management",
-    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
-    "targetSchema": "external-nodes",
-    "targetId": "unplanned",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "deviation-type",
-    "createdAt": "2026-01-02T21:04:47.422Z",
-    "updatedAt": "2026-01-02T21:10:48.906Z"
-  },
-  {
-    "id": "01KE08DXV62BWYCYG3MHF2EXDQ",
-    "sourceSchema": "deviation-management",
-    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
-    "targetSchema": "change-classifications",
-    "targetId": "Data Integrity / Documentation",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "deviation-category",
-    "createdAt": "2026-01-02T21:04:47.462Z",
-    "updatedAt": "2026-01-02T21:10:48.992Z"
-  },
-  {
-    "id": "01KE08DY0BC8GXNDVTK40TNDED",
-    "sourceSchema": "deviation-management",
-    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
-    "targetSchema": "external-nodes",
-    "targetId": "critical",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "deviation-criticality",
-    "createdAt": "2026-01-02T21:04:47.627Z",
-    "updatedAt": "2026-01-02T21:10:49.203Z"
-  },
-  {
-    "id": "01KE08DY6BZWVKZG742G8X7CPV",
-    "sourceSchema": "deviation-management",
-    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
-    "targetSchema": "external-nodes",
-    "targetId": "repeat",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "recurrence-indicator",
-    "createdAt": "2026-01-02T21:04:47.819Z",
-    "updatedAt": "2026-01-02T21:10:49.484Z"
-  },
-  {
-    "id": "01KE08DYB8ES9E4DC8JN6XQREB",
-    "sourceSchema": "deviation-management",
-    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
-    "targetSchema": "external-nodes",
-    "targetId": "5-why",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "root-cause-analysis-method",
-    "createdAt": "2026-01-02T21:04:47.975Z",
-    "updatedAt": "2026-01-02T21:10:49.818Z"
-  },
-  {
-    "id": "01KE08DYHXD8YBGRGW1H95VDTC",
-    "sourceSchema": "deviation-management",
-    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
-    "targetSchema": "external-nodes",
-    "targetId": "effective",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "effectiveness-result",
-    "createdAt": "2026-01-02T21:04:48.188Z",
-    "updatedAt": "2026-01-02T21:10:50.107Z"
-  },
-  {
     "id": "01KE08S024BRRJN7TP7T0GHSF0",
     "sourceSchema": "deviation-management",
     "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
@@ -1792,5 +1682,16 @@
     "fieldId": "linked-change-controls",
     "createdAt": "2026-01-02T21:10:50.179Z",
     "updatedAt": "2026-01-02T21:10:50.179Z"
+  },
+  {
+    "id": "01KE1H528RACZXKB4EJDP53CYV",
+    "sourceSchema": "equipment-log-book",
+    "sourceId": "01KE1H5250YPSB86Y39F079K1R",
+    "targetSchema": "users",
+    "targetId": "01KDG66XCHTD0GGQX3A2E69T85",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "assigned-user",
+    "createdAt": "2026-01-03T08:56:28.695Z",
+    "updatedAt": "2026-01-03T08:56:28.695Z"
   }
 ]

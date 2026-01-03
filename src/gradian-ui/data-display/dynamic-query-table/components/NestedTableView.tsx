@@ -5,7 +5,7 @@ import { ChevronDown, ChevronRight } from 'lucide-react';
 import { cn } from '@/gradian-ui/shared/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { NestedTableViewProps, Schema, ColumnGroup } from '../types';
+import { NestedTableViewProps, Schema, ColumnGroup, FlattenedSchemasConfig } from '../types';
 import { createColumnsFromSchema, getSchemaHeaderBorderColor, getBorderColorClasses, createColumnToGroupInfoMap } from '../utils';
 import { useNestedTableExpansion } from '../hooks';
 import { TableColumn } from '../../table/types';
@@ -27,17 +27,42 @@ export function NestedTableView({
   showIds = false,
   flattenedSchemas = []
 }: NestedTableViewProps) {
-  // Helper function to check if a schema ID is in flattenedSchemas
-  const isSchemaFlattened = useCallback((schemaId: string): boolean => {
+  // Helper function to check if a schema ID is in flattenedSchemas at the current depth
+  const isSchemaFlattened = useCallback((schemaId: string, currentDepth: number): boolean => {
     if (!flattenedSchemas || flattenedSchemas.length === 0) return false;
-    return flattenedSchemas.some(flattenedId => {
-      const normalizedFlattened = flattenedId.replace(/-/g, '');
-      const normalizedSchema = schemaId.replace(/-/g, '');
-      return flattenedId === schemaId || 
-             normalizedFlattened === normalizedSchema ||
-             schemaId.includes(flattenedId) || 
-             flattenedId.includes(schemaId);
-    });
+    
+    // Detect structure type
+    const firstItem = flattenedSchemas[0];
+    
+    if (typeof firstItem === 'object' && firstItem !== null && 'depth' in firstItem) {
+      // Object array format: Array<{ depth: number; schemas: string[] }>
+      const depthConfig = (flattenedSchemas as FlattenedSchemasConfig)
+        .find(config => config.depth === currentDepth);
+      
+      if (!depthConfig || !depthConfig.schemas || depthConfig.schemas.length === 0) {
+        return false;
+      }
+      
+      return depthConfig.schemas.some(flattenedId => {
+        // Existing matching logic (normalize and compare)
+        const normalizedFlattened = flattenedId.replace(/-/g, '');
+        const normalizedSchema = schemaId.replace(/-/g, '');
+        return flattenedId === schemaId || 
+               normalizedFlattened === normalizedSchema ||
+               schemaId.includes(flattenedId) || 
+               flattenedId.includes(schemaId);
+      });
+    } else {
+      // Backward compatibility: flat array string[]
+      return (flattenedSchemas as string[]).some(flattenedId => {
+        const normalizedFlattened = flattenedId.replace(/-/g, '');
+        const normalizedSchema = schemaId.replace(/-/g, '');
+        return flattenedId === schemaId || 
+               normalizedFlattened === normalizedSchema ||
+               schemaId.includes(flattenedId) || 
+               flattenedId.includes(schemaId);
+      });
+    }
   }, [flattenedSchemas]);
 
   // Generate base columns from current schema
@@ -115,7 +140,7 @@ export function NestedTableView({
         
         if (!matchingSchema) return;
         
-        if (isSchemaFlattened(childSchemaId)) {
+        if (isSchemaFlattened(childSchemaId, depth)) {
           // Group flattened children by schema
           let flattenedGroup = flattenedChildren.find(g => g.schema.id === matchingSchema.id);
           if (!flattenedGroup) {
@@ -129,7 +154,9 @@ export function NestedTableView({
       });
       
       // Also check for nested children that come from flattened items
-      // (e.g., if tenders are flattened, tender-items from all tenders should be aggregated as nested children)
+      // (e.g., if tenders are flattened, tender-items from all tenders should be aggregated)
+      // Note: Children that should be flattened at depth + 1 are added to nestedChildren,
+      // and will be flattened when the nested table renders at depth + 1
       flattenedChildren.forEach((flattenedGroup) => {
         flattenedGroup.items.forEach((flattenedItem: any) => {
           const itemChildren = Array.isArray(flattenedItem.children) ? flattenedItem.children : [];
@@ -137,18 +164,16 @@ export function NestedTableView({
             const itemChildSchemaId = itemChild.schema;
             if (!itemChildSchemaId) return;
             
-            // Only add if not already flattened
-            if (!isSchemaFlattened(itemChildSchemaId)) {
-              // Aggregate children by schema - combine data from all flattened items
-              const existingChild = nestedChildren.find((nc: any) => nc.schema === itemChildSchemaId);
-              if (existingChild) {
-                // Merge data arrays
-                const existingData = Array.isArray(existingChild.data) ? existingChild.data : [];
-                const newData = Array.isArray(itemChild.data) ? itemChild.data : [];
-                existingChild.data = [...existingData, ...newData];
-              } else {
-                nestedChildren.push({ ...itemChild });
-              }
+            // Always add to nestedChildren - the nested table at depth + 1 will handle flattening
+            // if the schema should be flattened at that depth
+            const existingChild = nestedChildren.find((nc: any) => nc.schema === itemChildSchemaId);
+            if (existingChild) {
+              // Merge data arrays
+              const existingData = Array.isArray(existingChild.data) ? existingChild.data : [];
+              const newData = Array.isArray(itemChild.data) ? itemChild.data : [];
+              existingChild.data = [...existingData, ...newData];
+            } else {
+              nestedChildren.push({ ...itemChild });
             }
           });
         });
@@ -160,7 +185,7 @@ export function NestedTableView({
         nestedChildren,
       };
     });
-  }, [data, schemas, isSchemaFlattened]);
+  }, [data, schemas, isSchemaFlattened, depth]);
 
   // Generate columns for flattened schemas
   const flattenedColumns = useMemo(() => {

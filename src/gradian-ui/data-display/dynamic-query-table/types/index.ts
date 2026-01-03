@@ -1,5 +1,12 @@
 import { TableColumn } from '../../table/types';
 
+export type FlattenedSchemasConfig = Array<{
+  depth: number;
+  schemas: string[];
+}>;
+
+export type FlattenedSchemas = FlattenedSchemasConfig | string[];
+
 export interface DynamicQueryTableProps {
   dynamicQueryId: string;
   flatten?: boolean;
@@ -7,7 +14,7 @@ export interface DynamicQueryTableProps {
   onFlattenChange?: (flatten: boolean) => void;
   showIds?: boolean;
   onShowIdsChange?: (showIds: boolean) => void;
-  flattenedSchemas?: string[];
+  flattenedSchemas?: FlattenedSchemas;
   queryParams?: Record<string, any>;
   highlightQuery?: string;
   onRefreshReady?: (refreshFn: () => Promise<void>) => void;
@@ -52,7 +59,7 @@ export interface NestedTableViewWrapperProps {
   expandAllTrigger?: number;
   onExpandAllReady?: (expandFn: () => void, collapseFn: () => void) => void;
   showIds?: boolean;
-  flattenedSchemas?: string[];
+  flattenedSchemas?: FlattenedSchemas;
 }
 
 export interface NestedTableViewProps {
@@ -68,7 +75,7 @@ export interface NestedTableViewProps {
   flatten?: boolean;
   onFlattenChange?: (flatten: boolean) => void;
   showIds?: boolean;
-  flattenedSchemas?: string[];
+  flattenedSchemas?: FlattenedSchemas;
 }
 
 export interface FlatTableRendererProps {
@@ -92,7 +99,7 @@ export interface NestedTableRendererProps {
   expandAllTrigger?: number;
   onExpandAllReady?: (expandFn: () => void, collapseFn: () => void) => void;
   showIds?: boolean;
-  flattenedSchemas?: string[];
+  flattenedSchemas?: FlattenedSchemas;
 }
 
 export interface ColumnGroup {
