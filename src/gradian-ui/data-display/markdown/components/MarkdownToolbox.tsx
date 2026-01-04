@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Button } from '@/components/ui/button';
-import { Eye, FileCode, FileDown, Loader2, Pencil, Sparkles } from 'lucide-react';
+import { Eye, FileCode, FileDown, Loader2, Pencil, Printer, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/lib/utils';
@@ -15,6 +15,8 @@ export interface MarkdownToolboxProps {
   onViewModeChange: (value: 'editor' | 'preview' | 'raw') => void;
   onExportPdf?: () => Promise<void>;
   showPdfExport?: boolean;
+  onPrint?: () => Promise<void>;
+  showPrint?: boolean;
   showEditor?: boolean;
   aiAgentId?: string;
   onAiAgentClick?: () => void;
@@ -26,12 +28,15 @@ export function MarkdownToolbox({
   onViewModeChange,
   onExportPdf,
   showPdfExport = true,
+  onPrint,
+  showPrint = false,
   showEditor = false,
   aiAgentId,
   onAiAgentClick,
   hasContent = false
 }: MarkdownToolboxProps) {
   const [isExporting, setIsExporting] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   const handleExportPdf = async () => {
     if (!onExportPdf) return;
@@ -45,6 +50,20 @@ export function MarkdownToolbox({
       toast.error('Failed to export PDF. Please try again.');
     } finally {
       setIsExporting(false);
+    }
+  };
+
+  const handlePrint = async () => {
+    if (!onPrint) return;
+    
+    setIsPrinting(true);
+    try {
+      await onPrint();
+    } catch (error) {
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Print error: ${error instanceof Error ? error.message : String(error)}`);
+      toast.error('Failed to print. Please try again.');
+    } finally {
+      setIsPrinting(false);
     }
   };
 
@@ -84,6 +103,27 @@ export function MarkdownToolbox({
               <>
                 <FileDown className="h-4 w-4" />
                 <span>Export PDF</span>
+              </>
+            )}
+          </Button>
+        )}
+        {showPrint && onPrint && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePrint}
+            disabled={isPrinting || viewMode === 'raw' || viewMode === 'editor'}
+            className="gap-2"
+          >
+            {isPrinting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Printing...</span>
+              </>
+            ) : (
+              <>
+                <Printer className="h-4 w-4" />
+                <span>Print</span>
               </>
             )}
           </Button>

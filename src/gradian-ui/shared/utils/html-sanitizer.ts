@@ -1,10 +1,35 @@
 /**
  * HTML Sanitization Utility
  * Uses DOMPurify to sanitize HTML content and prevent XSS attacks
+ * Note: DOMPurify only works in browser environments, so we skip sanitization on the server
  */
 
-import DOMPurify from 'dompurify';
 import type { Config } from 'dompurify';
+
+// Lazy load DOMPurify only in browser environment
+let DOMPurify: any = null;
+
+function getDOMPurify() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  
+  if (!DOMPurify) {
+    try {
+      // Dynamic import for browser-only usage
+      DOMPurify = require('dompurify');
+      // Handle both default export and named export
+      if (DOMPurify.default) {
+        DOMPurify = DOMPurify.default;
+      }
+    } catch (error) {
+      console.warn('DOMPurify not available:', error);
+      return null;
+    }
+  }
+  
+  return DOMPurify;
+}
 
 /**
  * Sanitize HTML content using DOMPurify
@@ -21,6 +46,18 @@ export function sanitizeHtml(
 ): string {
   if (!html || typeof html !== 'string') {
     return '';
+  }
+
+  // On server-side, return HTML as-is (will be sanitized on client)
+  if (typeof window === 'undefined') {
+    return html;
+  }
+
+  const purify = getDOMPurify();
+  if (!purify || typeof purify.sanitize !== 'function') {
+    // Fallback: return HTML as-is if DOMPurify is not available
+    console.warn('DOMPurify.sanitize is not available, returning unsanitized HTML');
+    return html;
   }
 
   // Default configuration for markdown content (safe tags only)
@@ -45,7 +82,7 @@ export function sanitizeHtml(
     : defaultConfig;
 
   // Sanitize HTML (convert TrustedHTML to string if needed)
-  const sanitized = DOMPurify.sanitize(html, config);
+  const sanitized = purify.sanitize(html, config);
   return typeof sanitized === 'string' ? sanitized : String(sanitized);
 }
 
@@ -57,6 +94,18 @@ export function sanitizeHtml(
 export function sanitizeSvg(svg: string): string {
   if (!svg || typeof svg !== 'string') {
     return '';
+  }
+
+  // On server-side, return SVG as-is (will be sanitized on client)
+  if (typeof window === 'undefined') {
+    return svg;
+  }
+
+  const purify = getDOMPurify();
+  if (!purify || typeof purify.sanitize !== 'function') {
+    // Fallback: return SVG as-is if DOMPurify is not available
+    console.warn('DOMPurify.sanitize is not available, returning unsanitized SVG');
+    return svg;
   }
 
   // More permissive config for SVG (needed for Mermaid diagrams)
@@ -81,7 +130,7 @@ export function sanitizeSvg(svg: string): string {
   };
 
   // Sanitize SVG (convert TrustedHTML to string if needed)
-  const sanitized = DOMPurify.sanitize(svg, config);
+  const sanitized = purify.sanitize(svg, config);
   return typeof sanitized === 'string' ? sanitized : String(sanitized);
 }
 
@@ -95,6 +144,18 @@ export function sanitizeForContentEditable(html: string): string {
     return '';
   }
 
+  // On server-side, return HTML as-is (will be sanitized on client)
+  if (typeof window === 'undefined') {
+    return html;
+  }
+
+  const purify = getDOMPurify();
+  if (!purify || typeof purify.sanitize !== 'function') {
+    // Fallback: return HTML as-is if DOMPurify is not available
+    console.warn('DOMPurify.sanitize is not available, returning unsanitized HTML');
+    return html;
+  }
+
   // Very restrictive config for contentEditable (only formatting tags)
   const config: Config = {
     ALLOWED_TAGS: ['span', 'code', 'pre', 'strong', 'em', 'del', 'br'],
@@ -104,7 +165,7 @@ export function sanitizeForContentEditable(html: string): string {
   };
 
   // Sanitize HTML (convert TrustedHTML to string if needed)
-  const sanitized = DOMPurify.sanitize(html, config);
+  const sanitized = purify.sanitize(html, config);
   return typeof sanitized === 'string' ? sanitized : String(sanitized);
 }
 

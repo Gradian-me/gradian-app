@@ -199,26 +199,42 @@ export const FormModal: React.FC<FormModalProps> = ({
     
     // Add encrypted skip_key to body for POST/PUT/PATCH requests if passSkipKey is true
     if (qa.passSkipKey) {
-      const { getEncryptedSkipKey } = await import('@/gradian-ui/shared/utils/skip-key-storage');
-      const method = qa.submitMethod || 'POST';
-      const isBodyMethod = method === 'POST' || method === 'PUT' || method === 'PATCH';
-      
-      if (isBodyMethod) {
-        const encryptedSkipKey = getEncryptedSkipKey(false); // Get as object for body (not URL-encoded)
-        if (encryptedSkipKey) {
-          payload = {
-            ...(typeof payload === 'object' && payload !== null ? payload : {}),
-            skip_key: encryptedSkipKey, // This will be an object {ciphertext, iv} that gets properly stringified
-          };
-          loggingCustom(LogType.CLIENT_LOG, 'log', `[FormModal] Added encrypted skip_key to action form payload: ${JSON.stringify({
-            endpoint: qa.submitRoute,
-            method,
-            hasSkipKey: !!payload.skip_key,
-            skipKeyType: typeof payload.skip_key,
-          })}`);
+      try {
+        const { getEncryptedSkipKey } = await import('@/gradian-ui/shared/utils/skip-key-storage');
+        const method = qa.submitMethod || 'POST';
+        const isBodyMethod = method === 'POST' || method === 'PUT' || method === 'PATCH';
+        
+        if (isBodyMethod) {
+          const encryptedSkipKey = getEncryptedSkipKey(false); // Get as object for body (not URL-encoded)
+          if (encryptedSkipKey) {
+            // Ensure payload is an object before adding skip_key
+            const basePayload = typeof payload === 'object' && payload !== null ? payload : {};
+            payload = {
+              ...basePayload,
+              skip_key: encryptedSkipKey, // This will be an object {ciphertext, iv} that gets properly stringified
+            };
+            loggingCustom(LogType.CLIENT_LOG, 'log', `[FormModal] Added encrypted skip_key to action form payload: ${JSON.stringify({
+              endpoint: qa.submitRoute,
+              method,
+              hasSkipKey: !!payload.skip_key,
+              skipKeyType: typeof payload.skip_key,
+              skipKeyStructure: payload.skip_key && typeof payload.skip_key === 'object' ? Object.keys(payload.skip_key) : 'N/A',
+            })}`);
+          } else {
+            loggingCustom(LogType.CLIENT_LOG, 'warn', '[FormModal] passSkipKey is true but encrypted skip key is not available. Make sure NEXT_PUBLIC_SKIP_KEY is set and initializeSkipKeyStorage() has been called.');
+          }
         } else {
-          loggingCustom(LogType.CLIENT_LOG, 'warn', '[FormModal] passSkipKey is true but encrypted skip key is not available.');
+          // For GET/DELETE requests, add skip_key to query parameters
+          const encryptedSkipKey = getEncryptedSkipKey(true); // Get as URL-encoded string for query params
+          if (encryptedSkipKey) {
+            const url = new URL(qa.submitRoute, window.location.origin);
+            url.searchParams.set('skip_key', encryptedSkipKey as string);
+            // Note: endpoint will be replaced below, but we need to handle this differently
+            loggingCustom(LogType.CLIENT_LOG, 'warn', '[FormModal] passSkipKey for GET/DELETE requests should be handled via DynamicQuickActions, not FormModal.');
+          }
         }
+      } catch (error) {
+        loggingCustom(LogType.CLIENT_LOG, 'error', `[FormModal] Error adding skip_key: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
     
@@ -231,11 +247,38 @@ export const FormModal: React.FC<FormModalProps> = ({
       } as any
     );
     const method = qa.submitMethod || 'POST';
-    await apiRequest(endpoint, {
+    
+    // Log the final payload before sending (especially to verify skip_key)
+    if (qa.passSkipKey) {
+      loggingCustom(LogType.CLIENT_LOG, 'log', `[FormModal] Sending request with payload: ${JSON.stringify({
+        endpoint,
+        method,
+        hasSkipKey: !!(payload && typeof payload === 'object' && 'skip_key' in payload),
+        payloadKeys: payload && typeof payload === 'object' ? Object.keys(payload) : [],
+        skipKeyPresent: !!(payload && typeof payload === 'object' && payload.skip_key),
+      })}`);
+    }
+    
+    const response = await apiRequest(endpoint, {
       method,
       body: payload,
       callerName: 'FormModal.customActionSubmit',
     });
+    
+    // Check if the request was successful
+    if (!response.success) {
+      const errorMessage = response.error || 'Request failed';
+      loggingCustom(LogType.CLIENT_LOG, 'error', `[FormModal] API request failed: ${JSON.stringify({
+        endpoint,
+        method,
+        error: errorMessage,
+        statusCode: response.statusCode,
+        hasSkipKey: !!(payload && typeof payload === 'object' && 'skip_key' in payload),
+      })}`);
+      throw new Error(errorMessage);
+    }
+    
+    return response;
   }, [referenceEntityData]);
 
   const {

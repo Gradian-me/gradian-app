@@ -9,12 +9,16 @@ interface MarkdownPageClientProps {
   content: string;
   navigationHeadingLevels?: number[];
   stickyHeadings?: string[];
+  documentTitle?: string;
+  documentNumber?: string;
 }
 
 export function MarkdownPageClient({ 
   content, 
   navigationHeadingLevels = [],
-  stickyHeadings = []
+  stickyHeadings = [],
+  documentTitle,
+  documentNumber
 }: MarkdownPageClientProps) {
   const [navigationData, setNavigationData] = useState<{
     headings: Array<{ id: string; text: string; level: number }>;
@@ -58,6 +62,12 @@ export function MarkdownPageClient({
           stickyHeadings={stickyHeadings}
           navigationHeadingLevels={navigationHeadingLevels}
           onNavigationData={handleNavigationData}
+          enablePrint={true}
+          printConfig={{
+            includeHeader: true,
+            documentTitle: documentTitle,
+            documentNumber: documentNumber,
+          }}
         />
       </div>
 

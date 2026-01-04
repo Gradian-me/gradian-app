@@ -41,7 +41,10 @@ interface AiBuilderResponseProps {
   videoUsage?: VideoUsage | null;
   duration: number | null;
   isApproving: boolean;
-  isLoading?: boolean;
+  isLoading?: boolean; // This is isMainLoading from wrapper
+  isImageLoading?: boolean; // Tracks image loading state
+  isSearchLoading?: boolean; // Tracks search loading state
+  isMainLoading?: boolean; // Explicit main loading state
   onApprove: (content?: string) => void;
   onCardClick?: (cardData: { id: string; label: string; icon?: string }, schemaData: any) => void;
   annotations?: SchemaAnnotation[];
@@ -131,6 +134,84 @@ function parseTableData(response: string): { data: any[]; isValid: boolean } {
   }
 }
 
+// Skeleton Components for Progressive Loading
+function SearchSkeleton() {
+  return (
+    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 space-y-4">
+      <div className="flex items-center gap-2">
+        <div className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+      </div>
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="space-y-2">
+            <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-3 w-1/2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MainResponseSkeleton() {
+  return (
+    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 space-y-4">
+      <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+      <div className="space-y-3">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        ))}
+        <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+function ImageSkeleton() {
+  return (
+    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+      {/* Header skeleton */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+          <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+        </div>
+        <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+      </div>
+      
+      {/* Image placeholder with gradient and shimmer effect */}
+      <div className="relative w-full aspect-square max-w-2xl mx-auto rounded-lg overflow-hidden">
+        {/* Gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-100 via-purple-100 to-indigo-100 dark:from-violet-900/20 dark:via-purple-900/20 dark:to-indigo-900/20 animate-pulse" />
+        
+        {/* Shimmer overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent dark:via-white/10 animate-shimmer" />
+        
+        {/* Loading spinner centered */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="relative">
+              <Loader2 className="h-10 w-10 text-violet-600 dark:text-violet-400 animate-spin" />
+              <div className="absolute inset-0 blur-xl bg-violet-400/30 dark:bg-violet-500/30 rounded-full" />
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+              Generating image...
+            </div>
+          </div>
+        </div>
+        
+        {/* Decorative elements */}
+        <div className="absolute top-4 left-4 w-16 h-16 bg-white/20 dark:bg-white/5 rounded-lg blur-sm" />
+        <div className="absolute bottom-4 right-4 w-20 h-20 bg-white/20 dark:bg-white/5 rounded-lg blur-sm" />
+      </div>
+    </div>
+  );
+}
+
 export function AiBuilderResponse({
   response,
   agent,
@@ -138,7 +219,10 @@ export function AiBuilderResponse({
   videoUsage,
   duration,
   isApproving,
-  isLoading = false,
+  isLoading = false, // This is isMainLoading from wrapper
+  isImageLoading = false,
+  isSearchLoading = false,
+  isMainLoading, // Explicit main loading state (optional, falls back to isLoading)
   onApprove,
   onCardClick,
   annotations = [],
@@ -988,17 +1072,24 @@ export function AiBuilderResponse({
         </div>
       )}
 
-      {/* Search Results - shown before everything else (only for "respond after search" flow, not for direct search agent) */}
-      {searchResults && searchResults.length > 0 && !isSearchResultsFormat && (
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
-          <AISearchResults results={searchResults} />
-        </div>
-      )}
-      {searchError && (
-        <div className="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30 p-4">
-          <p className="text-sm text-orange-800 dark:text-orange-200">
-            Search Error: {searchError}
-          </p>
+      {/* Search Results Container - shown before everything else (only for "respond after search" flow, not for direct search agent) */}
+      {(isSearchLoading || searchResults || searchError) && !isSearchResultsFormat && (
+        <div className="space-y-4">
+          {isSearchLoading && !searchResults && !searchError && (
+            <SearchSkeleton />
+          )}
+          {searchResults && searchResults.length > 0 && (
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+              <AISearchResults results={searchResults} />
+            </div>
+          )}
+          {searchError && (
+            <div className="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30 p-4">
+              <p className="text-sm text-orange-800 dark:text-orange-200">
+                Search Error: {searchError}
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -1102,8 +1193,13 @@ export function AiBuilderResponse({
         />
       )}
 
-      {/* Parallel Image - shown after MetricCard, before main response */}
-      {parallelImageData && (
+      {/* Parallel Image Container - shown after MetricCard, before main response */}
+      {(isImageLoading || parallelImageData || imageError) && imageType && (
+        <div className="space-y-4">
+          {isImageLoading && !parallelImageData && !imageError && (
+            <ImageSkeleton />
+          )}
+          {parallelImageData && (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -1234,10 +1330,17 @@ export function AiBuilderResponse({
               </p>
             </div>
           )}
-          {imageError && (
+          {imageError && !parallelImageData && (
+            <div className="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30 p-4">
+              <p className="text-sm text-orange-800 dark:text-orange-200">{imageError}</p>
+            </div>
+          )}
+          {parallelImageData && imageError && (
             <div className="mt-4 p-3 bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-lg">
               <p className="text-sm text-orange-800 dark:text-orange-200">{imageError}</p>
             </div>
+          )}
+          </div>
           )}
         </div>
       )}
@@ -1260,7 +1363,13 @@ export function AiBuilderResponse({
         />
       )}
 
-      {shouldRenderImage ? (
+      {/* Main Response Container */}
+      {/* Show skeleton only when main loading and no content */}
+      {(isMainLoading ?? isLoading) && !displayContent && (
+        <MainResponseSkeleton />
+      )}
+      {/* Show content when main loading is complete (don't wait for image) */}
+      {!(isMainLoading ?? isLoading) && displayContent && shouldRenderImage ? (
         imageData ? (
           <div className="space-y-4">
             <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
@@ -1670,7 +1779,7 @@ export function AiBuilderResponse({
             )}
           </div>
         ) : null
-      ) : agent?.requiredOutputFormat === 'string' ? (
+      ) : !(isMainLoading ?? isLoading) && agent?.requiredOutputFormat === 'string' ? (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2">
@@ -1696,11 +1805,17 @@ export function AiBuilderResponse({
                 showToggle={true}
                 isEditable={true}
                 onChange={handleContentChange}
+                enablePrint={true}
+                printConfig={{
+                  includeHeader: true,
+                  documentTitle: agent?.label || 'AI Generated Content',
+                  documentNumber: agent?.id ? `AI-${agent.id}` : undefined,
+                }}
               />
             </div>
           </div>
         </div>
-      ) : renderData.type === 'markdown' || (displayContent && displayContent.trim() && agentFormat !== 'json' && agentFormat !== 'string' && !shouldRenderTable && !shouldRenderGraph) ? (
+      ) : !(isMainLoading ?? isLoading) && (renderData.type === 'markdown' || (displayContent && displayContent.trim() && agentFormat !== 'json' && agentFormat !== 'string' && !shouldRenderTable && !shouldRenderGraph)) ? (
         // Show markdown content (for agents that use search as a tool, this shows after search results)
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
@@ -1727,11 +1842,17 @@ export function AiBuilderResponse({
                 showToggle={true}
                 isEditable={true}
                 onChange={handleContentChange}
+                enablePrint={true}
+                printConfig={{
+                  includeHeader: true,
+                  documentTitle: agent?.label || 'AI Generated Content',
+                  documentNumber: agent?.id ? `AI-${agent.id}` : undefined,
+                }}
               />
             </div>
           </div>
         </div>
-      ) : (
+      ) : !(isMainLoading ?? isLoading) ? (
         <CodeViewer
           code={displayContent}
           programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}
@@ -1742,7 +1863,7 @@ export function AiBuilderResponse({
           }
           initialLineNumbers={10}
         />
-      )}
+      ) : null}
     </div>
   );
 }

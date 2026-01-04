@@ -128,6 +128,17 @@ const nextConfig: NextConfig = {
     return config;
   },
   
+  // Rewrite rules for serving static assets
+  async rewrites() {
+    return [
+      // Serve KaTeX fonts from public directory
+      {
+        source: '/fonts/katex/:path*',
+        destination: '/fonts/katex/:path*',
+      },
+    ];
+  },
+
   // Security headers for production
   async headers() {
     return [

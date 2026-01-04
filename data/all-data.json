@@ -1336,7 +1336,9 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KDK3NM3EEJ7DJ81BJ0JDAWDT",
       "createdAt": "2025-12-28T18:31:29.171Z",
-      "updatedAt": "2025-12-28T18:31:29.839Z"
+      "updatedAt": "2026-01-04T10:56:49.992Z",
+      "password": "$argon2id$v=19$m=32768,t=3,p=4$3eGoHL+ko+09K7BK9cjrxg$ghwgqGONz+WvBBxfgiv2SrM9keCVzuYu/qPvcveo0q0",
+      "hashType": "argon2"
     },
     {
       "company": "CinnaGen",
@@ -2374,7 +2376,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2025-12-31T13:38:19.479Z",
+      "updatedAt": "2026-01-04T10:57:13.750Z",
       "category": [
         {
           "id": "production-integration",
@@ -2383,7 +2385,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-31T13:38:19.479Z",
+      "lastSynced": "2026-01-04T10:57:13.750Z",
       "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 234, edges created: 117, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -18635,30 +18637,6 @@
           "label": "Batch BX-250615-01 was placed on QA hold pending investigation outcome."
         }
       ]
-    }
-  ],
-  "deviation-categories": [],
-  "equipment-log-book": [
-    {
-      "assignedUser": [
-        {
-          "id": "01KDG66XCHTD0GGQX3A2E69T85"
-        }
-      ],
-      "equipmentId": "asdasd",
-      "equipmentName": "asdasd",
-      "status": [
-        {
-          "id": "in-use"
-        }
-      ],
-      "dateAssigned": "2026-01-30",
-      "returnDate": "2026-02-03",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KE1H5250YPSB86Y39F079K1R",
-      "createdAt": "2026-01-03T08:56:28.578Z",
-      "updatedAt": "2026-01-03T08:56:28.884Z"
     }
   ]
 }

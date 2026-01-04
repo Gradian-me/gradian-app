@@ -4,6 +4,7 @@ import type React from 'react';
 // Additional domain-level types are available via the modules re-exported below.
 
 export * from './common';
+export * from './print-management';
 
 export interface BaseComponentProps {
   id?: string;

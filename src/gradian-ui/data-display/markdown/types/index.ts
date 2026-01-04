@@ -1,3 +1,5 @@
+import type { PrintHeaderConfig } from '@/gradian-ui/shared/types/print-management';
+
 export interface MarkdownViewerProps {
   content: string;
   showToggle?: boolean;
@@ -34,6 +36,20 @@ export interface MarkdownViewerProps {
    * Defaults to true
    */
   showEndLine?: boolean;
+  /**
+   * Enable print functionality
+   * When true, shows a print button in the toolbox
+   */
+  enablePrint?: boolean;
+  /**
+   * Print header configuration
+   * Includes options for header with logo, document number, and title
+   */
+  printConfig?: PrintHeaderConfig;
+  /**
+   * Callback fired when print is triggered
+   */
+  onPrint?: () => Promise<void>;
 }
 
 export interface TableParseResult {

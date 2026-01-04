@@ -9,6 +9,14 @@ import { processAiAgent, AgentRequestData } from '@/domains/ai-builder/utils/ai-
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
+// Configure maximum duration for this route
+// This allows long-running AI requests (up to 5 minutes / 300 seconds)
+// Note: This requires Next.js 13.4+ and may vary by hosting platform limits
+// Vercel: 60s (Pro), 10s (Hobby), 300s (Enterprise)
+// Self-hosted: No limit (but should set reasonable value)
+export const maxDuration = 300; // 5 minutes (300 seconds)
+export const dynamic = 'force-dynamic';
+
 /**
  * Load AI agents from JSON file
  */

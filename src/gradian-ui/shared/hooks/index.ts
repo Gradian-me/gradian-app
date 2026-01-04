@@ -399,3 +399,7 @@ export type { UseEditModalOptions, UseEditModalReturn } from './use-edit-modal';
 // Re-export form modal helpers from the form-builder package
 export { useFormModal } from '../../form-builder';
 export type { UseFormModalOptions, UseFormModalReturn, FormModalMode } from '../../form-builder';
+
+// Re-export print hook
+export { usePrint } from './use-print';
+export type { UsePrintReturn } from './use-print';

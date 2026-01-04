@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
@@ -27,6 +27,13 @@ export function CodeComponent({
   markdownLoadedTimestamp,
   ...props 
 }: CodeComponentProps) {
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Ensure component only renders KaTeX on client to avoid hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
   // Extract language from className
   let language = extractLanguage(className);
   
@@ -47,9 +54,26 @@ export function CodeComponent({
       return null;
     }
     
+    // On server, render a placeholder to avoid hydration mismatch
+    if (!isMounted) {
+      if (inline) {
+        return (
+          <span className="katex-inline" suppressHydrationWarning>
+            {mathContent}
+          </span>
+        );
+      } else {
+        return (
+          <div className="my-4 katex-display" suppressHydrationWarning>
+            <code className="text-sm">{mathContent}</code>
+          </div>
+        );
+      }
+    }
+    
     let html: string;
     try {
-      // Render with KaTeX
+      // Render with KaTeX (only on client)
       html = katex.renderToString(mathContent, {
         throwOnError: false,
         displayMode: !inline, // Block mode for code blocks, inline for inline code
@@ -87,6 +111,7 @@ export function CodeComponent({
         <span 
           className="katex-inline"
           dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+          suppressHydrationWarning
         />
       );
     } else {
@@ -96,6 +121,7 @@ export function CodeComponent({
         <div 
           className="my-4 katex-display"
           dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+          suppressHydrationWarning
         />
       );
     }

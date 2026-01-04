@@ -27,6 +27,7 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="/odometer-theme-minimal.css" />
         <link rel="stylesheet" href="/fonts/estedad/estedad.css" />
+        <link rel="stylesheet" href="/fonts/katex/katex-fonts.css" />
         {/* Preload logo images for faster LCP */}
         <link
           rel="preload"

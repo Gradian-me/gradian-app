@@ -36,16 +36,23 @@ export async function POST(request: NextRequest) {
     let skipKeyRaw: string | Record<string, string> | null = null;
     
     // For POST requests, check body first
-  if (body.skip_key) {
-    skipKeyRaw = body.skip_key as string | Record<string, string>;
-  } else {
+    if (body.skip_key) {
+      skipKeyRaw = body.skip_key as string | Record<string, string>;
+      loggingCustom(LogType.LOGIN_LOG, 'log', `[Auth] Password reset: skip_key found in body, type: ${typeof skipKeyRaw}, isObject: ${typeof skipKeyRaw === 'object' && skipKeyRaw !== null}`);
+    } else {
       // Fallback to query parameter
       const querySkipKey = new URL(request.url).searchParams.get('skip_key');
       skipKeyRaw = querySkipKey;
+      loggingCustom(LogType.LOGIN_LOG, 'log', `[Auth] Password reset: skip_key found in query params: ${!!querySkipKey}`);
     }
     
     const skipKey = skipKeyRaw ? await decryptSkipKeyFromRequest(request, skipKeyRaw) : null;
-  const expectedSkipKey = process.env.PASSWORD_RESET_SKIP_KEY;
+    if (skipKeyRaw && !skipKey) {
+      loggingCustom(LogType.LOGIN_LOG, 'warn', `[Auth] Password reset: skip_key provided but decryption failed or returned null`);
+    }
+    // Check both PASSWORD_RESET_SKIP_KEY (server-only) and NEXT_PUBLIC_SKIP_KEY (client-side, but available on server too)
+    // Prefer PASSWORD_RESET_SKIP_KEY if set, otherwise fall back to NEXT_PUBLIC_SKIP_KEY
+    const expectedSkipKey = process.env.PASSWORD_RESET_SKIP_KEY || process.env.NEXT_PUBLIC_SKIP_KEY;
     
     // Normalize the skip key (remove any surrounding quotes or whitespace)
     let normalizedSkipKey = skipKey?.trim() || null;
@@ -55,7 +62,23 @@ export async function POST(request: NextRequest) {
     }
     const normalizedExpectedKey = expectedSkipKey?.trim() || null;
     
+    // Calculate whether we should skip OTP validation
     const shouldSkipOTP = normalizedSkipKey && normalizedExpectedKey && normalizedSkipKey === normalizedExpectedKey;
+    
+    // Log skip key validation for debugging
+    loggingCustom(LogType.LOGIN_LOG, 'log', `[Auth] Password reset skip key validation: ${JSON.stringify({
+      hasSkipKeyRaw: !!skipKeyRaw,
+      skipKeyRawType: skipKeyRaw ? typeof skipKeyRaw : 'null',
+      hasDecryptedSkipKey: !!skipKey,
+      decryptedSkipKeyLength: skipKey?.length || 0,
+      normalizedSkipKeyLength: normalizedSkipKey?.length || 0,
+      hasExpectedSkipKey: !!expectedSkipKey,
+      expectedSkipKeyLength: expectedSkipKey?.length || 0,
+      normalizedExpectedKeyLength: normalizedExpectedKey?.length || 0,
+      shouldSkipOTP,
+      usingPasswordResetKey: !!process.env.PASSWORD_RESET_SKIP_KEY,
+      usingPublicKey: !process.env.PASSWORD_RESET_SKIP_KEY && !!process.env.NEXT_PUBLIC_SKIP_KEY,
+    })}`);
 
     if (!username) {
       return NextResponse.json(

@@ -40,6 +40,35 @@ export function OrganizationSettings() {
 
   const isDarkVariant = isMounted && resolvedTheme === 'dark';
 
+  // Render button without Popover on server to avoid hydration mismatch
+  if (!isMounted) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn(
+              'flex items-center space-x-2 rounded-xl transition-colors outline-none ring-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 h-10',
+              'border border-violet-200 bg-white text-violet-700 hover:bg-violet-50 hover:border-violet-300 focus-visible:ring-violet-500 focus-visible:ring-offset-white'
+            )}
+            aria-label="Organization settings"
+            disabled
+          >
+            <Building2 className="h-4 w-4" />
+            <span className="hidden sm:inline text-xs font-medium">
+              {hasSelection ? 'Organization' : 'Select organization'}
+            </span>
+            <ChevronDown className="h-4 w-4 shrink-0 text-gray-500" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="max-w-xs">{tooltipText}</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
   return (
     <Tooltip open={isOpen ? false : undefined}>
       <TooltipTrigger asChild>

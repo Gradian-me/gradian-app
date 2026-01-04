@@ -40,12 +40,61 @@ export function createAbortController(timeoutMs: number): {
 /**
  * Parse error response from API
  * DRY: Centralized error parsing
+ * Handles JSON errors, HTML error pages (e.g., Cloudflare), and plain text errors
  */
 export async function parseErrorResponse(response: Response): Promise<string> {
-  let errorMessage = `Request failed: ${response.statusText}`;
+  const status = response.status;
+  const statusText = response.statusText || 'Unknown error';
+  
+  // Provide user-friendly messages for common HTTP errors
+  const httpErrorMessages: Record<number, string> = {
+    502: 'Bad Gateway - The AI service is temporarily unavailable. Please try again in a few minutes.',
+    503: 'Service Unavailable - The AI service is currently overloaded. Please try again later.',
+    504: 'Gateway Timeout - The AI service took too long to respond. Please try again or simplify your request.',
+    500: 'Internal Server Error - The AI service encountered an error. Please try again.',
+    429: 'Too Many Requests - Rate limit exceeded. Please wait before trying again.',
+  };
+
+  // If we have a predefined message for this status, use it
+  if (httpErrorMessages[status]) {
+    return httpErrorMessages[status];
+  }
+
+  let errorMessage = `Request failed: ${statusText} (${status})`;
   
   try {
     const errorText = await response.text();
+    
+    // Check if response is HTML (common for Cloudflare/gateway errors)
+    if (errorText.trim().startsWith('<!DOCTYPE') || errorText.trim().startsWith('<html')) {
+      // Try to extract meaningful error from HTML
+      const titleMatch = errorText.match(/<title[^>]*>([^<]+)<\/title>/i);
+      const h1Match = errorText.match(/<h1[^>]*>([^<]+)<\/h1>/i);
+      const errorCodeMatch = errorText.match(/(\d{3}):\s*([^<\n]+)/i);
+      
+      if (errorCodeMatch) {
+        // Extract error code and message (e.g., "502: Bad gateway")
+        const [, code, message] = errorCodeMatch;
+        errorMessage = `${code}: ${message.trim()}`;
+      } else if (titleMatch) {
+        // Extract from title tag (e.g., "api.avalai.ir | 502: Bad gateway")
+        const title = titleMatch[1];
+        const codeMatch = title.match(/(\d{3}):\s*([^|]+)/i);
+        if (codeMatch) {
+          errorMessage = `${codeMatch[1]}: ${codeMatch[2].trim()}`;
+        } else {
+          errorMessage = title;
+        }
+      } else if (h1Match) {
+        // Extract from h1 tag
+        errorMessage = h1Match[1].trim();
+      } else {
+        // Fallback: use HTTP status message
+        errorMessage = httpErrorMessages[status] || `HTTP ${status}: ${statusText}`;
+      }
+      
+      return errorMessage;
+    }
     
     // Try to parse as JSON
     try {
@@ -58,14 +107,18 @@ export async function parseErrorResponse(response: Response): Promise<string> {
         errorMessage = errorData.error;
       }
     } catch {
-      // If not JSON, use text as error message
-      if (errorText) {
-        errorMessage = errorText;
+      // If not JSON and not HTML, check if it's a reasonable text error
+      if (errorText && errorText.length < 500) {
+        // Use text if it's short (likely a meaningful error message)
+        errorMessage = errorText.trim();
+      } else if (errorText.length >= 500) {
+        // For long text, use HTTP status message
+        errorMessage = httpErrorMessages[status] || `HTTP ${status}: ${statusText}`;
       }
     }
   } catch {
-    // If we can't read the response, use status text
-    errorMessage = response.statusText || 'Unknown error';
+    // If we can't read the response, use status-based message or status text
+    errorMessage = httpErrorMessages[status] || statusText || 'Unknown error';
   }
 
   return errorMessage;

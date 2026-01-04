@@ -148,6 +148,9 @@ export function AiBuilderWrapper({
     videoUsage,
     duration,
     isLoading,
+    isMainLoading,
+    isImageLoading,
+    isSearchLoading,
     isApproving,
     error,
     successMessage,
@@ -646,7 +649,7 @@ export function AiBuilderWrapper({
       )}
 
       <AnimatePresence mode="wait">
-        {(aiResponse || imageResponse || (error && selectedAgent && (selectedAgent.id === 'graph-generator' || selectedAgent.requiredOutputFormat === 'graph'))) && selectedAgent ? (
+        {(aiResponse || isMainLoading || imageResponse || isImageLoading || searchResults || searchError || isSearchLoading || (error && selectedAgent && (selectedAgent.id === 'graph-generator' || selectedAgent.requiredOutputFormat === 'graph'))) && selectedAgent ? (
           <motion.div
             key="ai-response"
             initial={{ opacity: 0, y: 20 }}
@@ -661,7 +664,9 @@ export function AiBuilderWrapper({
               videoUsage={videoUsage}
               duration={duration}
               isApproving={isApproving}
-              isLoading={isLoading}
+              isLoading={isMainLoading}
+              isImageLoading={isImageLoading}
+              isSearchLoading={isSearchLoading}
               onApprove={handleApprove}
               onCardClick={handleCardClick}
               annotations={annotationsArray}

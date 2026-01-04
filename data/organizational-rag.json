@@ -48,6 +48,174 @@
         "en": "ReciGen",
         "fa": "رسیژن"
       }
+    },
+    {
+      "id": "8",
+      "label": {
+        "en": "CinnaFact",
+        "fa": "سینافکت"
+      }
+    },
+    {
+      "id": "9",
+      "label": {
+        "en": "CinnoPar",
+        "fa": "سینوپار"
+      }
+    },
+    {
+      "id": "10",
+      "label": {
+        "en": "KidiPeg",
+        "fa": "کیدی پگ"
+      }
+    },
+    {
+      "id": "11",
+      "label": {
+        "en": "PegaGen",
+        "fa": "پگاژن"
+      }
+    },
+    {
+      "id": "12",
+      "label": {
+        "en": "CinnoMer",
+        "fa": "سینومر"
+      }
+    },
+    {
+      "id": "13",
+      "label": {
+        "en": "Pectuna",
+        "fa": "پکتونا"
+      }
+    },
+    {
+      "id": "14",
+      "label": {
+        "en": "Araxya",
+        "fa": "آراکسیا"
+      }
+    },
+    {
+      "id": "15",
+      "label": {
+        "en": "Ablyze",
+        "fa": "ابلایز"
+      }
+    },
+    {
+      "id": "16",
+      "label": {
+        "en": "Maciza",
+        "fa": "ماسیزا"
+      }
+    },
+    {
+      "id": "17",
+      "label": {
+        "en": "Melitide",
+        "fa": "ملیتاید"
+      }
+    },
+    {
+      "id": "18",
+      "label": {
+        "en": "Xacrel",
+        "fa": "زکرل"
+      }
+    },
+    {
+      "id": "19",
+      "label": {
+        "en": "Tyalia",
+        "fa": "تیالیا"
+      }
+    },
+    {
+      "id": "20",
+      "label": {
+        "en": "Zerafil",
+        "fa": "زرافیل"
+      }
+    },
+    {
+      "id": "21",
+      "label": {
+        "en": "Zak Aria",
+        "fa": "زاک آریا"
+      }
+    },
+    { 
+      "id": "22",
+      "label": {
+        "en": "Gylava",
+        "fa": "گیلاوا"
+      }
+    },
+    {
+      "id": "23",
+      "label": {
+        "en": "Herozyme",
+        "fa": "هیروزایم"
+      }
+    },
+    {
+      "id": "24",
+      "label": {
+        "en": "CinnaStim",
+        "fa": "سیناستیم"
+      }
+    },
+    {
+      "id": "25",
+      "label": {
+        "en": "Xetarem",
+        "fa": "زتارم"
+      }
+    },
+    {
+      "id": "26",
+      "label": {
+        "en": "Eldixia",
+        "fa": "الدیکسیا"
+      }
+    },
+    {
+      "id": "27",
+      "label": {
+        "en": "Xtramab",
+        "fa": "اکسترامب"
+      }
+    },
+    {
+      "id": "28",
+      "label": {
+        "en": "Lixafert",
+        "fa": "لیکزافرت"
+      }
+    },
+    {
+      "id": "29",
+      "label": {
+        "en": "Alentiva",
+        "fa": "آلنتیوا"
+      }
+    },
+    {
+      "id": "30",
+      "label": {
+        "en": "Acravia",
+        "fa": "آکراویا"
+      }
+    },
+    {
+      "id": "31",
+      "label": {
+        "en": "Nowaria",
+        "fa": "نواریا"
+      }
     }
   ],
   "organization_chart": [

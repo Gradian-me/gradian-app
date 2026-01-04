@@ -64,12 +64,27 @@ async function callGenericApi(params: {
 
     if (!response.ok) {
       const errorMessage = await parseErrorResponse(response);
+      
+      // Log detailed error information in development
       if (isDevelopment) {
-        loggingCustom(LogType.INFRA_LOG, 'error', `API error: ${errorMessage}`);
+        const contentType = response.headers.get('content-type') || '';
+        const isHtmlError = contentType.includes('text/html') || errorMessage.includes('<!DOCTYPE');
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'error',
+          `API error (${response.status}): ${errorMessage}${isHtmlError ? ' [HTML error page detected]' : ''}`
+        );
       }
+      
+      // Provide user-friendly error messages for gateway errors
+      let userFriendlyError = errorMessage;
+      if (response.status === 502 || response.status === 503 || response.status === 504) {
+        userFriendlyError = `The AI service is temporarily unavailable (${response.status}). This could be due to:\n• Server maintenance or overload\n• Network connectivity issues\n• The service taking too long to respond\n\nPlease try again in a few minutes.`;
+      }
+      
       return {
         success: false,
-        error: sanitizeErrorMessage(errorMessage, isDevelopment),
+        error: sanitizeErrorMessage(userFriendlyError, isDevelopment),
         response,
       };
     }

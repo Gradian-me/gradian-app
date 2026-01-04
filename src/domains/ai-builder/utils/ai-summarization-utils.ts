@@ -14,7 +14,7 @@ const isDevelopment = process.env.NODE_ENV === 'development';
  * @param timeout - Maximum time to wait in milliseconds (default: 2000ms)
  * @returns Organization RAG data in TOON format, or empty string if timeout
  */
-async function fetchOrganizationRagNonBlocking(timeout: number = 2000): Promise<string> {
+async function fetchOrganizationRagNonBlocking(timeout: number = 10000): Promise<string> {
   try {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
     const url = `${baseUrl}/api/organization-rag?format=toon`;
@@ -56,10 +56,9 @@ async function fetchOrganizationRagNonBlocking(timeout: number = 2000): Promise<
     const result = await Promise.race([fetchPromise, timeoutPromise]);
     return result || '';
   } catch (error) {
-    // On any error (including timeout), return empty string (non-blocking)
-    if (isDevelopment) {
-      loggingCustom(LogType.CLIENT_LOG, 'info', `Organization RAG fetch skipped: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
+    // On any error (including timeout), log and return empty string (non-blocking)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    loggingCustom(LogType.CLIENT_LOG, isDevelopment ? 'info' : 'warn', `Organization RAG fetch skipped: ${errorMessage}`);
     return '';
   }
 }
@@ -69,12 +68,14 @@ async function fetchOrganizationRagNonBlocking(timeout: number = 2000): Promise<
  * @param prompt - The original prompt text to summarize
  * @param signal - Optional AbortSignal for cancellation
  * @param timeout - Timeout in milliseconds (default: 60000)
+ * @param organizationRag - Optional pre-fetched organization RAG data to avoid duplicate API calls
  * @returns Summarized prompt, or original prompt if summarization fails
  */
 export async function summarizePrompt(
   prompt: string,
   signal?: AbortSignal,
-  timeout: number = 60000
+  timeout: number = 60000,
+  organizationRag?: string
 ): Promise<string> {
   if (!prompt || !prompt.trim()) {
     return prompt;
@@ -85,19 +86,21 @@ export async function summarizePrompt(
       loggingCustom(LogType.AI_BODY_LOG, 'info', `Starting prompt summarization for prompt: ${prompt.substring(0, 100)}...`);
     }
 
-    // Fetch organization RAG data non-blocking (with 2 second timeout)
-    // Start the fetch immediately but don't wait if it takes too long
-    let orgRagData = '';
-    try {
-      orgRagData = await fetchOrganizationRagNonBlocking(2000);
-      if (isDevelopment && orgRagData) {
-        loggingCustom(LogType.AI_BODY_LOG, 'info', `Organization RAG data fetched for summarization (${orgRagData.length} chars)`);
+    // Use provided organization RAG if available, otherwise fetch it non-blocking (with 2 second timeout)
+    let orgRagData = organizationRag || '';
+    if (!orgRagData) {
+      try {
+        orgRagData = await fetchOrganizationRagNonBlocking(10000);
+        if (isDevelopment && orgRagData) {
+          loggingCustom(LogType.AI_BODY_LOG, 'info', `Organization RAG data fetched for summarization (${orgRagData.length} chars)`);
+        }
+      } catch (error) {
+        // Log error but continue without organization RAG if fetch fails or times out
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        loggingCustom(LogType.CLIENT_LOG, isDevelopment ? 'info' : 'warn', `Organization RAG fetch timed out or failed (${errorMessage}), proceeding without it`);
       }
-    } catch (error) {
-      // Silently continue without organization RAG if fetch fails or times out
-      if (isDevelopment) {
-        loggingCustom(LogType.CLIENT_LOG, 'info', 'Organization RAG fetch timed out or failed, proceeding without it');
-      }
+    } else if (isDevelopment) {
+      loggingCustom(LogType.AI_BODY_LOG, 'info', `Using pre-provided organization RAG data (${orgRagData.length} chars)`);
     }
 
     // Build user prompt for summarizer style
@@ -156,9 +159,7 @@ export async function summarizePrompt(
         }
         const errorMessage = errorData?.error || errorText || `HTTP ${response.status}: ${response.statusText}`;
         
-        if (isDevelopment) {
-          loggingCustom(LogType.CLIENT_LOG, 'warn', `Summarization failed: ${errorMessage}`);
-        }
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `Summarization failed: ${errorMessage}`);
         
         // Fallback to original prompt on error
         return prompt;
@@ -180,9 +181,7 @@ export async function summarizePrompt(
       }
 
       // If no valid response, fallback to original
-      if (isDevelopment) {
-        loggingCustom(LogType.CLIENT_LOG, 'warn', 'Summarization returned empty or invalid response, using original prompt');
-      }
+      loggingCustom(LogType.CLIENT_LOG, 'warn', 'Summarization returned empty or invalid response, using original prompt');
       return prompt;
     } catch (fetchError) {
       // Clear timeout on error
@@ -192,25 +191,19 @@ export async function summarizePrompt(
 
       // Handle abort errors gracefully
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        if (isDevelopment) {
-          loggingCustom(LogType.CLIENT_LOG, 'info', 'Summarization was aborted');
-        }
+        loggingCustom(LogType.CLIENT_LOG, isDevelopment ? 'info' : 'warn', 'Summarization was aborted');
         return prompt;
       }
 
       // Handle other fetch errors
       const errorMessage = fetchError instanceof Error ? fetchError.message : 'Unknown error during summarization';
-      if (isDevelopment) {
-        loggingCustom(LogType.CLIENT_LOG, 'error', `Summarization fetch error: ${errorMessage}`);
-      }
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Summarization fetch error: ${errorMessage}`);
       return prompt;
     }
   } catch (error) {
     // Handle any other errors
     const errorMessage = error instanceof Error ? error.message : 'Unknown error during summarization';
-    if (isDevelopment) {
-      loggingCustom(LogType.CLIENT_LOG, 'error', `Summarization error: ${errorMessage}`);
-    }
+    loggingCustom(LogType.CLIENT_LOG, 'error', `Summarization error: ${errorMessage}`);
     // Always fallback to original prompt on any error
     return prompt;
   }

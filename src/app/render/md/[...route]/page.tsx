@@ -143,6 +143,8 @@ export default async function MarkdownRenderPage({ params, searchParams }: PageP
               content={fileContents}
               stickyHeadings={['##']}
               navigationHeadingLevels={[1, 2]}
+              documentTitle={title}
+              documentNumber={fileName}
             />
           </div>
         </div>

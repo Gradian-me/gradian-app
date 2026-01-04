@@ -1682,16 +1682,5 @@
     "fieldId": "linked-change-controls",
     "createdAt": "2026-01-02T21:10:50.179Z",
     "updatedAt": "2026-01-02T21:10:50.179Z"
-  },
-  {
-    "id": "01KE1H528RACZXKB4EJDP53CYV",
-    "sourceSchema": "equipment-log-book",
-    "sourceId": "01KE1H5250YPSB86Y39F079K1R",
-    "targetSchema": "users",
-    "targetId": "01KDG66XCHTD0GGQX3A2E69T85",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "assigned-user",
-    "createdAt": "2026-01-03T08:56:28.695Z",
-    "updatedAt": "2026-01-03T08:56:28.695Z"
   }
 ]

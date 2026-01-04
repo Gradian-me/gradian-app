@@ -58,6 +58,9 @@ interface UseAiBuilderReturn {
   videoUsage: VideoUsage | null;
   duration: number | null;
   isLoading: boolean;
+  isMainLoading: boolean; // Tracks main AI response loading
+  isImageLoading: boolean; // Tracks image generation loading
+  isSearchLoading: boolean; // Tracks search request loading
   isApproving: boolean;
   error: string | null;
   successMessage: string | null;
@@ -92,7 +95,11 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
   const [videoUsage, setVideoUsage] = useState<VideoUsage | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isMainLoading, setIsMainLoading] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(false);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
+  // Computed loading state for backward compatibility
+  const isLoading = isMainLoading || isImageLoading || isSearchLoading;
   const [isApproving, setIsApproving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -280,7 +287,10 @@ export function useAiBuilder(): UseAiBuilderReturn {
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
 
-    setIsLoading(true);
+    // Reset all loading states - they will be set individually as requests start
+    setIsMainLoading(false);
+    setIsImageLoading(false);
+    setIsSearchLoading(false);
     setError(null);
     setSuccessMessage(null);
     setAiResponse('');
@@ -288,6 +298,10 @@ export function useAiBuilder(): UseAiBuilderReturn {
     setImageError(null);
     setSearchResults(null);
     setSearchError(null);
+    // Clear all metrics from previous requests
+    setTokenUsage(null);
+    setVideoUsage(null);
+    setDuration(null);
     setSearchDuration(null);
     setSearchUsage(null);
 
@@ -320,31 +334,38 @@ export function useAiBuilder(): UseAiBuilderReturn {
           loggingCustom(LogType.AI_BODY_LOG, 'info', `Summarizing prompt before search/image operations...`);
         }
         
-        // Non-blocking call to organization-rag API
-        // Fire and forget - don't wait for response
-        fetch('/api/organization-rag?format=toon', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          signal: abortController.signal,
-        }).catch((error) => {
-          // Silently handle errors - this is non-blocking
-          if (isDevelopment && !(error instanceof Error && error.name === 'AbortError')) {
-            loggingCustom(LogType.CLIENT_LOG, 'warn', `Organization RAG API call failed (non-blocking): ${error instanceof Error ? error.message : 'Unknown error'}`);
-          }
-        });
-        
         try {
-          // Extract organization RAG from preloaded context
+          // Extract organization RAG from preloaded context if available
+          // Pass it to summarizePrompt to avoid duplicate API calls
           const organizationRag = extractOrganizationRagFromPreloadedContext(preloadedContext);
           
-          summarizedPromptValue = await summarizePrompt(
+          // Use shorter timeout (20 seconds) to fail fast if summarization is slow
+          // Use Promise.race with a timeout to ensure we don't wait too long
+          const summarizationPromise = summarizePrompt(
             originalPrompt, 
             abortController.signal,
-            60000
+            20000, // Reduced to 20 seconds for faster fallback
+            organizationRag // Pass preloaded organization RAG to avoid duplicate fetch
           );
-          if (isDevelopment && summarizedPromptValue !== originalPrompt) {
+          
+          const timeoutPromise = new Promise<string>((_, reject) => {
+            setTimeout(() => {
+              reject(new Error('Summarization timeout after 20 seconds'));
+            }, 20000);
+          });
+          
+          summarizedPromptValue = await Promise.race([
+            summarizationPromise,
+            timeoutPromise
+          ]).catch((error) => {
+            // If summarization fails or times out, fallback to original prompt
+            if (isDevelopment) {
+              loggingCustom(LogType.CLIENT_LOG, 'warn', `Summarization failed or timed out: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            }
+            return originalPrompt; // Return original prompt as fallback
+          });
+          
+          if (isDevelopment && summarizedPromptValue && summarizedPromptValue !== originalPrompt) {
             loggingCustom(LogType.AI_BODY_LOG, 'info', `Prompt summarized successfully. Original: ${originalPrompt.length} chars, Summarized: ${summarizedPromptValue.length} chars`);
           }
           // Store summarized prompt in state for display
@@ -354,7 +375,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
           if (isDevelopment) {
             loggingCustom(LogType.CLIENT_LOG, 'warn', `Summarization failed, using original prompt: ${summarizeError instanceof Error ? summarizeError.message : 'Unknown error'}`);
           }
-          summarizedPromptValue = null;
+          summarizedPromptValue = originalPrompt; // Use original prompt as fallback
           setSummarizedPrompt(null);
         }
       } else {
@@ -369,6 +390,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
 
       // If search is enabled, call search API first
       if (isSearchEnabled) {
+        setIsSearchLoading(true);
         if (isDevelopment) {
           loggingCustom(LogType.AI_BODY_LOG, 'info', `Starting search API call with query: ${enhancedPrompt.substring(0, 100)}...`);
         }
@@ -437,6 +459,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
               }
               const errorMessage = errorData?.error || errorText || `HTTP ${searchResponse.status}: ${searchResponse.statusText}`;
               setSearchError(errorMessage);
+              setIsSearchLoading(false);
               loggingCustom(LogType.CLIENT_LOG, 'error', `Search API error: ${errorMessage}`);
             } else {
               const searchResponseData = await searchResponse.json();
@@ -479,11 +502,14 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 } else {
                   setSearchError('No search results found');
                 }
+                setIsSearchLoading(false);
               } else {
                 setSearchError(searchResponseData.error || 'Search failed');
+                setIsSearchLoading(false);
               }
             }
           } catch (searchFetchError) {
+            setIsSearchLoading(false);
             if (!(searchFetchError instanceof Error && searchFetchError.name === 'AbortError')) {
               const errorMessage = searchFetchError instanceof Error ? searchFetchError.message : 'Search fetch error';
               setSearchError(errorMessage);
@@ -491,6 +517,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
             }
           }
         } catch (searchErr) {
+          setIsSearchLoading(false);
           if (!(searchErr instanceof Error && searchErr.name === 'AbortError')) {
             const errorMessage = searchErr instanceof Error ? searchErr.message : 'Search error';
             setSearchError(errorMessage);
@@ -510,6 +537,16 @@ export function useAiBuilder(): UseAiBuilderReturn {
           // Use summarized prompt for image if available, otherwise use original
           const promptForImage = summarizedPromptValue || originalPrompt;
           
+          // Set loading states before starting requests
+          setIsMainLoading(true);
+          setIsImageLoading(true);
+          
+          // Create timeout for image generation (60 seconds)
+          const imageTimeoutController = new AbortController();
+          const imageTimeoutId = setTimeout(() => {
+            imageTimeoutController.abort();
+          }, 60000);
+          
           const [mainResult, imageResult] = await Promise.allSettled([
             // Main agent request
             fetch(`/api/ai-builder/${agentId}`, {
@@ -527,25 +564,34 @@ export function useAiBuilder(): UseAiBuilderReturn {
               }),
               signal: abortController.signal,
             }),
-            // Image generation request
-            fetch(`/api/ai-builder/image-generator`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                userPrompt: promptForImage,
-                body: {
-                  imageType: imageType,
-                  prompt: promptForImage,
-                  ...(request.body || {}), // Include other body params if any
+            // Image generation request with timeout
+            Promise.race([
+              fetch(`/api/ai-builder/image-generator`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
                 },
-                extra_body: {
-                  output_format: 'png',
-                  ...(request.extra_body || {}), // Include other extra params if any
-                },
+                body: JSON.stringify({
+                  userPrompt: promptForImage,
+                  body: {
+                    imageType: imageType,
+                    prompt: promptForImage,
+                    ...(request.body || {}), // Include other body params if any
+                  },
+                  extra_body: {
+                    output_format: 'png',
+                    ...(request.extra_body || {}), // Include other extra params if any
+                  },
+                }),
+                signal: abortController.signal,
               }),
-              signal: abortController.signal,
+              new Promise<Response>((_, reject) => {
+                setTimeout(() => {
+                  reject(new Error('Image generation timeout after 60 seconds'));
+                }, 60000);
+              })
+            ]).finally(() => {
+              clearTimeout(imageTimeoutId);
             }),
           ]);
 
@@ -565,6 +611,9 @@ export function useAiBuilder(): UseAiBuilderReturn {
             const response = mainResult.value;
             try {
               if (!response.ok) {
+                // Immediately set loading to false for non-ok responses (especially timeouts)
+                setIsMainLoading(false);
+                
                 let errorText = '';
                 let errorData: any = null;
                 try {
@@ -574,9 +623,18 @@ export function useAiBuilder(): UseAiBuilderReturn {
                   } catch {}
                 } catch {}
                 const errorMessage = errorData?.error || errorText || `HTTP ${response.status}: ${response.statusText}`;
+                
+                // Provide specific error message for 504 Gateway Timeout
+                let errorDisplay: string;
+                if (response.status === 504) {
+                  errorDisplay = `Gateway Timeout (504): ${errorMessage}\n\nThe server took too long to respond. This could be due to:\n• The AI service is processing a complex request\n• Network latency issues\n• Server overload or resource constraints\n• The request exceeded the server's timeout limit\n\nPlease try again or simplify your request.`;
+                } else {
+                  errorDisplay = `Server Error (${response.status}): ${errorMessage}`;
+                }
+                
                 // Only set error if image generation also failed - otherwise show image
                 if (!checkImageSucceeded()) {
-                  setError(`Server Error (${response.status}): ${errorMessage}`);
+                  setError(errorDisplay);
                 } else {
                   setError(null); // Image succeeded, don't show error
                 }
@@ -584,6 +642,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 setTokenUsage(null);
                 setVideoUsage(null);
                 setDuration(null);
+                abortControllerRef.current = null;
               } else {
                 // Try to parse as JSON, but handle non-JSON responses gracefully
                 let data: any;
@@ -605,6 +664,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
                     setTokenUsage(null);
                     setVideoUsage(null);
                     setDuration(null);
+                    setIsMainLoading(false);
                     return; // Exit early, don't try to process invalid response
                   }
                 } catch (readError) {
@@ -619,6 +679,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
                   setTokenUsage(null);
                   setVideoUsage(null);
                   setDuration(null);
+                  setIsMainLoading(false);
                   return;
                 }
                 
@@ -634,6 +695,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
                   setTokenUsage(null);
                   setVideoUsage(null);
                   setDuration(null);
+                  setIsMainLoading(false);
                 } else {
                   const builderResponse: AiBuilderResponseData = data.data;
                   setAiResponse(builderResponse.response);
@@ -666,12 +728,16 @@ export function useAiBuilder(): UseAiBuilderReturn {
                     }
                   }
 
-                  // Save prompt to history
+                  // Set loading to false immediately after setting response
+                  setIsMainLoading(false);
+                  
+                  // Save prompt to history (non-blocking - don't wait for it)
                   if (builderResponse.response && builderResponse.tokenUsage) {
                     const username = user?.name || user?.email || 'anonymous';
                     const pricing = builderResponse.tokenUsage.pricing;
                     
-                    const savedPrompt = await createPrompt({
+                    // Don't await - let it run in background
+                    createPrompt({
                       username: user?.username || '',
                       aiAgent: request.agentId,
                       userPrompt: enhancedPrompt,
@@ -688,15 +754,23 @@ export function useAiBuilder(): UseAiBuilderReturn {
                       duration: builderResponse.timing?.duration,
                       referenceId: request.referenceId,
                       annotations: request.annotations,
+                    }).then((savedPrompt) => {
+                      if (savedPrompt?.id) {
+                        setLastPromptId(savedPrompt.id);
+                      }
+                    }).catch((error) => {
+                      // Silently handle errors - prompt saving shouldn't block UI
+                      if (isDevelopment) {
+                        loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to save prompt to history: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                      }
                     });
-                    
-                    if (savedPrompt?.id) {
-                      setLastPromptId(savedPrompt.id);
-                    }
                   }
                 }
               }
             } catch (err) {
+              // Immediately set loading to false when error occurs
+              setIsMainLoading(false);
+              
               if (!(err instanceof Error && err.name === 'AbortError')) {
                 const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
                 // Only set error if image generation also failed
@@ -709,10 +783,13 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 setTokenUsage(null);
                 setVideoUsage(null);
                 setDuration(null);
+                abortControllerRef.current = null;
               }
             }
           } else {
-            // Main request rejected
+            // Main request rejected - immediately set loading to false
+            setIsMainLoading(false);
+            
             const errorMessage = mainResult.reason instanceof Error ? mainResult.reason.message : 'Unknown error';
             // Only set error if image generation also failed
             if (!checkImageSucceeded()) {
@@ -724,6 +801,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
             setTokenUsage(null);
             setVideoUsage(null);
             setDuration(null);
+            abortControllerRef.current = null;
           }
 
         // Handle image generation response independently
@@ -742,6 +820,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
               const errorMessage = errorData?.error || errorText || `HTTP ${response.status}: ${response.statusText}`;
               setImageError(`Image Generation Error (${response.status}): ${errorMessage}`);
               setImageResponse(null);
+              setIsImageLoading(false);
             } else {
               // Try to parse as JSON, but handle non-JSON responses gracefully
               let data: any;
@@ -755,12 +834,14 @@ export function useAiBuilder(): UseAiBuilderReturn {
                   const errorMessage = errorMatch ? errorMatch[1] : 'Invalid response format (not JSON)';
                   setImageError(`Image Response Parse Error: ${errorMessage}`);
                   setImageResponse(null);
+                  setIsImageLoading(false);
                   return; // Exit early
                 }
               } catch (readError) {
                 const errorMessage = readError instanceof Error ? readError.message : 'Failed to read response';
                 setImageError(`Image Response Read Error: ${errorMessage}`);
                 setImageResponse(null);
+                setIsImageLoading(false);
                 return;
               }
               
@@ -768,13 +849,16 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 const errorMessage = data.error || 'Failed to generate image';
                 setImageError(`Image Generation Error: ${errorMessage}`);
                 setImageResponse(null);
+                setIsImageLoading(false);
               } else {
                 const builderResponse: AiBuilderResponseData = data.data;
                 setImageResponse(builderResponse.response);
                 setImageError(null);
+                setIsImageLoading(false);
               }
             }
           } catch (err) {
+            setIsImageLoading(false);
             if (!(err instanceof Error && err.name === 'AbortError')) {
               const errorMessage = err instanceof Error ? err.message : 'Unknown error';
               setImageError(`Image Generation Error: ${errorMessage}`);
@@ -783,15 +867,25 @@ export function useAiBuilder(): UseAiBuilderReturn {
           }
         } else {
           // Image request rejected
+          setIsImageLoading(false);
           const errorMessage = imageResult.reason instanceof Error ? imageResult.reason.message : 'Unknown error';
           setImageError(`Image Generation Error: ${errorMessage}`);
           setImageResponse(null);
         }
-        } finally {
-          setIsLoading(false);
+        } catch (parallelError) {
+          // Handle any errors in the parallel request setup
+          setIsMainLoading(false);
+          setIsImageLoading(false);
+          
+          if (!(parallelError instanceof Error && parallelError.name === 'AbortError')) {
+            const errorMessage = parallelError instanceof Error ? parallelError.message : 'Unknown error';
+            setError(`Parallel Request Error: ${errorMessage}`);
+            setImageError(`Parallel Request Error: ${errorMessage}`);
+          }
         }
       } else {
         // Original single request flow when imageType is not set or is "none"
+        setIsMainLoading(true);
         let response: Response;
         try {
           response = await fetch(`/api/ai-builder/${agentId}`, {
@@ -837,11 +931,15 @@ export function useAiBuilder(): UseAiBuilderReturn {
           detailedError = `Connection Error: ${errorMessage}\n\nThis could be due to:\n• Server configuration issues\n• Network connectivity problems\n• Request timeout\n• SSL/TLS certificate issues`;
         }
         
+        setIsMainLoading(false);
         throw new Error(detailedError);
       }
 
       // Check if response is ok before trying to parse JSON
       if (!response.ok) {
+        // Immediately set loading to false for non-ok responses (especially timeouts)
+        setIsMainLoading(false);
+        
         let errorText = '';
         let errorData: any = null;
         
@@ -859,7 +957,14 @@ export function useAiBuilder(): UseAiBuilderReturn {
         }
         
         const errorMessage = errorData?.error || errorText || `HTTP ${response.status}: ${response.statusText}`;
-        const detailedError = `Server Error (${response.status}): ${errorMessage}\n\nPossible causes:\n• API endpoint is not available\n• Server is experiencing issues\n• Request format is invalid\n• Authentication/authorization failed`;
+        
+        // Provide specific error message for 504 Gateway Timeout
+        let detailedError: string;
+        if (response.status === 504) {
+          detailedError = `Gateway Timeout (504): ${errorMessage}\n\nThe server took too long to respond. This could be due to:\n• The AI service is processing a complex request\n• Network latency issues\n• Server overload or resource constraints\n• The request exceeded the server's timeout limit\n\nPlease try again or simplify your request.`;
+        } else {
+          detailedError = `Server Error (${response.status}): ${errorMessage}\n\nPossible causes:\n• API endpoint is not available\n• Server is experiencing issues\n• Request format is invalid\n• Authentication/authorization failed`;
+        }
         
         // For graph/image/video agents, preserve error details in response for better error display
         const agentFormat = request.agentId === 'graph-generator' || request.agentId === 'image-generator' || request.agentId === 'video-generator';
@@ -867,6 +972,14 @@ export function useAiBuilder(): UseAiBuilderReturn {
           // Store error as JSON so it can be displayed in the response component
           setAiResponse(JSON.stringify({ error: errorMessage, success: false, status: response.status }, null, 2));
         }
+        
+        // Set error immediately so it's displayed right away
+        setError(detailedError);
+        setAiResponse('');
+        setTokenUsage(null);
+        setDuration(null);
+        setVideoUsage(null);
+        abortControllerRef.current = null;
         
         throw new Error(detailedError);
       }
@@ -889,6 +1002,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
           setAiResponse(JSON.stringify({ error: data.error, success: false }, null, 2));
         }
         
+        setIsMainLoading(false);
         throw new Error(detailedError);
       }
 
@@ -922,12 +1036,16 @@ export function useAiBuilder(): UseAiBuilderReturn {
         }
       }
 
-      // Save prompt to history
+      // Set loading to false immediately after setting response
+      setIsMainLoading(false);
+      
+      // Save prompt to history (non-blocking - don't wait for it)
       if (builderResponse.response && builderResponse.tokenUsage) {
         const username = user?.name || user?.email || 'anonymous';
         const pricing = builderResponse.tokenUsage.pricing;
         
-        const savedPrompt = await createPrompt({
+        // Don't await - let it run in background
+        createPrompt({
           username: user?.username || '',
           aiAgent: request.agentId,
           userPrompt: enhancedPrompt,
@@ -944,14 +1062,22 @@ export function useAiBuilder(): UseAiBuilderReturn {
           duration: builderResponse.timing?.duration,
           referenceId: request.referenceId,
           annotations: request.annotations,
+        }).then((savedPrompt) => {
+          if (savedPrompt?.id) {
+            setLastPromptId(savedPrompt.id);
+          }
+        }).catch((error) => {
+          // Silently handle errors - prompt saving shouldn't block UI
+          if (isDevelopment) {
+            loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to save prompt to history: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
         });
-        
-        if (savedPrompt?.id) {
-          setLastPromptId(savedPrompt.id);
-        }
       }
       }
     } catch (err) {
+      // Immediately set loading to false so error is visible right away
+      setIsMainLoading(false);
+      
       // Don't show error if request was aborted
       if (err instanceof Error && err.name === 'AbortError') {
         setError(null);
@@ -985,12 +1111,13 @@ export function useAiBuilder(): UseAiBuilderReturn {
         
         setTokenUsage(null);
         setDuration(null);
+        setVideoUsage(null);
         
         // Log detailed error for debugging
         loggingCustom(LogType.CLIENT_LOG, 'error', `AI Builder Error: ${errorMessage}, agentId: ${request.agentId}, userPrompt: ${truncateText(request.userPrompt, 64, '...')}`);
       }
-    } finally {
-      setIsLoading(false);
+      
+      // Clear abort controller reference
       abortControllerRef.current = null;
     }
   }, [user, createPrompt]);
@@ -998,7 +1125,9 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const stopGeneration = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
-      setIsLoading(false);
+      setIsMainLoading(false);
+      setIsImageLoading(false);
+      setIsSearchLoading(false);
       setError(null);
       setAiResponse('');
       setTokenUsage(null);
@@ -1283,6 +1412,9 @@ export function useAiBuilder(): UseAiBuilderReturn {
     setSearchError(null);
     setSearchDuration(null);
     setSearchUsage(null);
+    setIsMainLoading(false);
+    setIsImageLoading(false);
+    setIsSearchLoading(false);
   }, []);
 
   const clearError = useCallback(() => {
@@ -1301,6 +1433,9 @@ export function useAiBuilder(): UseAiBuilderReturn {
     videoUsage,
     duration,
     isLoading,
+    isMainLoading,
+    isImageLoading,
+    isSearchLoading,
     isApproving,
     error,
     successMessage,

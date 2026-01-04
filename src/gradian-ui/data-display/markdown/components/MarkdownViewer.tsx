@@ -21,6 +21,7 @@ import { exportMarkdownToPdf } from '../utils/pdfExport';
 import { ProfessionalWritingModal } from '@/gradian-ui/communication/professional-writing';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { usePrint } from '@/gradian-ui/shared/hooks/use-print';
 
 /**
  * Clean markdown content by removing problematic nested markdown code blocks
@@ -73,7 +74,10 @@ export function MarkdownViewer({
   navigationHeadingLevels = [],
   onNavigationData,
   aiAgentId,
-  showEndLine = true
+  showEndLine = true,
+  enablePrint = false,
+  printConfig,
+  onPrint
 }: MarkdownViewerProps) {
   const [viewMode, setViewMode] = useState<'editor' | 'preview' | 'raw'>('preview');
   const [headings, setHeadings] = useState<Array<{ id: string; text: string; level: number }>>([]);
@@ -302,6 +306,36 @@ export function MarkdownViewer({
     }
   }, [viewMode]);
 
+  // Print functionality
+  const printOptions = useMemo(() => {
+    if (!enablePrint || !printConfig) {
+      return undefined;
+    }
+    return {
+      title: printConfig.documentTitle || 'Markdown Document',
+      header: printConfig,
+    };
+  }, [enablePrint, printConfig]);
+
+  const { print: handlePrintInternal, isPrinting } = usePrint(
+    markdownContentRef,
+    enablePrint ? printOptions : undefined
+  );
+
+  const handlePrint = useCallback(async () => {
+    if (viewMode !== 'preview' || !markdownContentRef.current) {
+      return;
+    }
+
+    try {
+      await handlePrintInternal();
+      onPrint?.();
+    } catch (error) {
+      loggingCustom(LogType.CLIENT_LOG, 'error', `Print error: ${error instanceof Error ? error.message : String(error)}`);
+      throw error;
+    }
+  }, [viewMode, handlePrintInternal, onPrint]);
+
   // AI agent handler
   const handleAiAgentClick = useCallback(() => {
     setIsAiModalOpen(true);
@@ -320,6 +354,8 @@ export function MarkdownViewer({
           onViewModeChange={setViewMode}
           onExportPdf={handleExportPdf}
           showPdfExport={true}
+          onPrint={enablePrint ? handlePrint : undefined}
+          showPrint={enablePrint}
           showEditor={isEditable}
           aiAgentId={aiAgentId}
           onAiAgentClick={handleAiAgentClick}
