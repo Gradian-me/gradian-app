@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
-import { PopupPicker, SearchInput, Select } from '@/gradian-ui/form-builder/form-elements';
+import { PopupPicker, SearchInput, Select, ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements';
 import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
@@ -271,6 +271,7 @@ interface Integration {
   isCompanyScoped?: boolean;
   category?: string | { label?: string; value?: string; id?: string; icon?: string; color?: string } | Array<{ label?: string; value?: string; id?: string; icon?: string; color?: string }>;
   isTenantBased?: boolean;
+  inactive?: boolean;
 }
 
 interface EmailTemplateSyncResponse {
@@ -302,6 +303,7 @@ export default function IntegrationsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   const [hasInitializedExpanded, setHasInitializedExpanded] = useState(false);
+  const [showSyncAllConfirm, setShowSyncAllConfirm] = useState(false);
 
 
   const fetchIntegrations = async () => {
@@ -489,6 +491,11 @@ export default function IntegrationsPage() {
   };
 
   const handleSync = async (integration: Integration) => {
+    // Skip sync for inactive integrations
+    if (integration.inactive === true) {
+      return;
+    }
+    
     const cardTenant = cardTenants[integration.id];
     const companiesForCard = cardCompanies[integration.id] || [];
     if (integration.isTenantBased && !cardTenant) {
@@ -700,9 +707,19 @@ export default function IntegrationsPage() {
   };
 
   const handleSyncAll = async () => {
-    // Sync all integrations in parallel
-    const syncPromises = integrations.map(integration => handleSync(integration));
+    // Sync all active integrations in parallel (exclude inactive ones)
+    const activeIntegrations = integrations.filter(integration => integration.inactive !== true);
+    const syncPromises = activeIntegrations.map(integration => handleSync(integration));
     await Promise.all(syncPromises);
+  };
+
+  const handleSyncAllClick = () => {
+    setShowSyncAllConfirm(true);
+  };
+
+  const handleSyncAllConfirm = async () => {
+    setShowSyncAllConfirm(false);
+    await handleSyncAll();
   };
 
   // Skeleton component for integration cards
@@ -925,6 +942,40 @@ export default function IntegrationsPage() {
 
   return (
     <MainLayout title="Integrations" icon="Plug">
+      <ConfirmationMessage
+        isOpen={showSyncAllConfirm}
+        onOpenChange={setShowSyncAllConfirm}
+        title="Sync All Integrations"
+        message={
+          <div className="space-y-2">
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              Are you sure you want to sync all {integrations.filter(i => i.inactive !== true).length} active integration{integrations.filter(i => i.inactive !== true).length !== 1 ? 's' : ''}? This action will attempt to synchronize data for all active configured integrations.
+            </p>
+            <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                <div className="text-sm text-amber-800 dark:text-amber-200">
+                  <p className="font-semibold mb-1">Warning:</p>
+                  <p>This operation may take some time and could impact system performance. Ensure all integrations are properly configured before proceeding.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+        variant="warning"
+        buttons={[
+          {
+            label: 'Cancel',
+            variant: 'outline',
+            action: () => setShowSyncAllConfirm(false),
+          },
+          {
+            label: 'Sync All',
+            variant: 'default',
+            action: handleSyncAllConfirm,
+          },
+        ]}
+      />
       <div className="space-y-6">
         {/* Header */}
         <motion.div
@@ -940,8 +991,8 @@ export default function IntegrationsPage() {
           <div className="flex space-x-2 w-full sm:w-auto">
             <Button
               variant="outline"
-              onClick={handleSyncAll}
-              disabled={loading || integrations.length === 0 || syncing.size > 0}
+              onClick={handleSyncAllClick}
+              disabled={loading || integrations.filter(i => i.inactive !== true).length === 0 || syncing.size > 0}
               className="w-full sm:w-auto"
             >
               <RefreshCw className={`h-4 w-4 me-2 ${syncing.size > 0 ? 'animate-spin' : ''}`} />
@@ -1231,7 +1282,7 @@ export default function IntegrationsPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
                           >
-              <Card className={`hover:shadow-lg transition-shadow duration-200 ${syncing.has(integration.id) ? 'relative overflow-visible' : ''}`}>
+              <Card className={`transition-shadow duration-200 ${syncing.has(integration.id) ? 'relative overflow-visible' : ''} ${integration.inactive === true ? 'opacity-60 grayscale pointer-events-none' : 'hover:shadow-lg'}`}>
                 {syncing.has(integration.id) && (
                   <div className="absolute -top-2 -right-2 z-10">
                     <span className="flex h-4 w-4">
@@ -1333,9 +1384,9 @@ export default function IntegrationsPage() {
                           variant="outline"
                           size="icon"
                           onClick={() => handleSync(integration)}
-                          disabled={syncing.has(integration.id)}
+                          disabled={syncing.has(integration.id) || integration.inactive === true}
                           className="h-9 w-9"
-                          title="Sync"
+                          title={integration.inactive === true ? "Inactive integration cannot be synced" : "Sync"}
                         >
                           <RefreshCw className={`h-4 w-4 ${syncing.has(integration.id) ? 'animate-spin' : ''}`} />
                         </Button>

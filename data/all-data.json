@@ -299,10 +299,7 @@
     {
       "type": [
         {
-          "id": "VENDOR",
-          "label": "Vendor",
-          "icon": "ShoppingBasket",
-          "color": "emerald"
+          "id": "VENDOR"
         }
       ],
       "color": "emerald",
@@ -311,9 +308,12 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9YC60QXPW8XNMTE151YCY0",
       "createdAt": "2025-11-30T08:34:23.383Z",
-      "updatedAt": "2025-11-30T08:34:23.383Z",
+      "updatedAt": "2026-01-04T11:41:29.709Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "members": [],
+      "access-policies": [],
+      "addMembersAutomatically": true
     },
     {
       "type": [
@@ -376,10 +376,7 @@
       "parent": "01KBSTF0BYDZ82KH018CM2EPWV",
       "type": [
         {
-          "id": "GENERAL_ROLE",
-          "label": "General Role",
-          "icon": "User",
-          "color": "cyan"
+          "id": "GENERAL_ROLE"
         }
       ],
       "name": "CEO",
@@ -388,9 +385,11 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSTFQSKSN3W9CGK59VZ1FRX",
       "createdAt": "2025-12-06T12:34:16.500Z",
-      "updatedAt": "2025-12-06T12:34:16.500Z",
+      "updatedAt": "2026-01-04T11:34:58.575Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "members": [],
+      "access-policies": []
     },
     {
       "parent": "01KBSTFQSKSN3W9CGK59VZ1FRX",
@@ -574,6 +573,72 @@
       "updatedAt": "2025-12-11T07:30:17.046Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "parent": "01KBSTFQSKSN3W9CGK59VZ1FRX",
+      "type": [
+        {
+          "id": "GENERAL_ROLE"
+        }
+      ],
+      "name": "Commercial Deputy",
+      "color": "emerald",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KE4C760Y3VY0YJBT0Q0D3C4J",
+      "createdAt": "2026-01-04T11:27:58.497Z",
+      "updatedAt": "2026-01-04T11:32:04.445Z",
+      "members": [],
+      "access-policies": []
+    },
+    {
+      "parent": "01KE4C760Y3VY0YJBT0Q0D3C4J",
+      "type": [
+        {
+          "id": "GENERAL_ROLE"
+        }
+      ],
+      "color": "emerald",
+      "name": "Foreign Commercial Manager",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KE4C8G1AHNKBQ4RENCQ9900Z",
+      "createdAt": "2026-01-04T11:28:41.517Z",
+      "updatedAt": "2026-01-04T11:32:16.221Z",
+      "access-policies": []
+    },
+    {
+      "parent": "01KE4C8G1AHNKBQ4RENCQ9900Z",
+      "type": [
+        {
+          "id": "GENERAL_ROLE"
+        }
+      ],
+      "name": "Foreign Commercial Supervisor",
+      "color": "emerald",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KE4C9215DWPER7K2KG57GK74",
+      "createdAt": "2026-01-04T11:28:59.945Z",
+      "updatedAt": "2026-01-04T11:32:24.376Z",
+      "members": [],
+      "access-policies": []
+    },
+    {
+      "parent": "01KE4C9215DWPER7K2KG57GK74",
+      "type": [
+        {
+          "id": "GENERAL_ROLE"
+        }
+      ],
+      "color": "emerald",
+      "name": "Foreign Commercial Expert",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KE4C9GAFQYHSSPFPB3C5683V",
+      "createdAt": "2026-01-04T11:29:14.578Z",
+      "updatedAt": "2026-01-04T11:32:34.347Z",
+      "access-policies": []
     }
   ],
   "users": [
@@ -1385,6 +1450,52 @@
       "id": "01KDK3V3153CFBWENVSF15E7RR",
       "createdAt": "2025-12-28T18:34:28.278Z",
       "updatedAt": "2025-12-28T18:34:28.740Z"
+    },
+    {
+      "company": "CinnaGen",
+      "authenticationType": [
+        {
+          "id": "active-directory"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "username": "montajabim@cinnagen.com",
+      "firstName": "Mehran",
+      "lastName": "Montajabi",
+      "email": "montajabim@cinnagen.com",
+      "postTitle": "CEO",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KE4CJ37WKF60JWQGQ0BD0WF4",
+      "createdAt": "2026-01-04T11:33:56.096Z",
+      "updatedAt": "2026-01-04T11:33:56.219Z"
     }
   ],
   "purchaseOrders": [],
@@ -1996,10 +2107,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2025-12-31T13:31:08.737Z",
+      "updatedAt": "2026-01-04T13:53:54.536Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2025-12-31T13:31:08.737Z",
+      "lastSynced": "2026-01-04T13:53:54.536Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2012,7 +2123,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 49 schemas: 49 succeeded, 0 failed (0 created, 49 updated)"
+      "lastSyncMessage": "Processed 50 schemas: 50 succeeded, 0 failed (0 created, 50 updated)"
     },
     {
       "color": "blue",
@@ -2039,8 +2150,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2025-12-31T13:31:16.126Z",
-      "lastSynced": "2025-12-31T13:31:16.126Z",
+      "updatedAt": "2026-01-04T13:53:58.417Z",
+      "lastSynced": "2026-01-04T13:53:58.417Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2053,7 +2164,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Generated relations for 54 out of 54 schemas",
+      "lastSyncMessage": "Generated relations for 55 out of 55 schemas",
       "sourceRoute": []
     },
     {
@@ -2100,9 +2211,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2025-12-31T13:39:09.822Z",
+      "updatedAt": "2026-01-04T14:55:27.958Z",
       "targetDataPath": "data",
-      "lastSynced": "2025-12-31T13:39:09.822Z",
+      "lastSynced": "2026-01-04T14:55:27.958Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2113,7 +2224,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 1331, edges created: 160, nodes failed: 0, edges failed: 0.",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 5, nodes updated: 1366, edges created: 181, nodes failed: 0, edges failed: 0.",
       "isTenantBased": false
     },
     {
@@ -2121,10 +2232,14 @@
       "title": "Email Template Sync",
       "description": "Email template cache synchronization and management",
       "icon": "Mail",
-      "lastSynced": "",
+      "lastSynced": "2026-01-04T13:30:10.600Z",
       "targetRoute": [
         {
-          "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X"
+          "id": "01KA8T4J3F2VCEQ1ABVQG3YD0X",
+          "label": "Email Template Sync",
+          "metadata": {
+            "address": "https://octa.cinnagen.com/integration/notifications/cache/refresh"
+          }
         }
       ],
       "targetMethod": [
@@ -2137,7 +2252,7 @@
       ],
       "id": "email_template_sync",
       "createdAt": "2025-11-17T12:05:23.829Z",
-      "updatedAt": "2025-11-17T12:05:23.829Z",
+      "updatedAt": "2026-01-04T13:30:10.600Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2150,7 +2265,8 @@
           "color": "purple"
         }
       ],
-      "sourceRoute": []
+      "sourceRoute": [],
+      "lastSyncMessage": "Unauthorized"
     },
     {
       "color": "violet",
@@ -2159,7 +2275,11 @@
       "icon": "Palette",
       "targetRoute": [
         {
-          "id": "01KA9LUCIDEICONSYNC001"
+          "id": "01KA9LUCIDEICONSYNC001",
+          "label": "Lucide Icons Sync",
+          "metadata": {
+            "address": "http://localhost:3000/api/integrations/lucide-icons/sync"
+          }
         }
       ],
       "targetMethod": [
@@ -2172,7 +2292,11 @@
       ],
       "sourceRoute": [
         {
-          "id": "01KA9LUCIDEICONS001"
+          "id": "01KA9LUCIDEICONS001",
+          "label": "Lucide Icons",
+          "metadata": {
+            "address": "http://localhost:3000/api/integrations/lucide-icons"
+          }
         }
       ],
       "sourceMethod": [
@@ -2185,8 +2309,8 @@
       ],
       "id": "lucide_icons_sync",
       "createdAt": "2025-11-17T18:00:00.000Z",
-      "updatedAt": "2025-11-17T18:00:00.000Z",
-      "lastSynced": "2025-12-02T14:41:55.872Z",
+      "updatedAt": "2026-01-04T13:30:30.375Z",
+      "lastSynced": "2026-01-04T13:30:30.375Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2198,7 +2322,8 @@
         }
       ],
       "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "lastSyncMessage": "Lucide icons synced to C:\\Mahyar\\NextJS Projects\\gradian-app\\data\\all-icons.json"
     },
     {
       "color": "amber",
@@ -2208,7 +2333,6 @@
       "targetRoute": [
         {
           "id": "01KASYNCENV001GITLABSYNC",
-          "label": "Git Sync Environment Variables",
           "metadata": {
             "address": "http://localhost:3000/api/git/sync-env"
           }
@@ -2216,30 +2340,26 @@
       ],
       "targetMethod": [
         {
-          "id": "POST",
-          "label": "POST",
-          "icon": "Upload",
-          "color": "emerald"
+          "id": "POST"
         }
       ],
       "id": "git_sync_env",
       "createdAt": "2025-11-23T15:00:59.000Z",
-      "updatedAt": "2025-11-23T15:00:59.000Z",
-      "lastSynced": "2025-12-18T21:34:53.920Z",
+      "updatedAt": "2026-01-04T13:33:23.808Z",
+      "lastSynced": "2026-01-04T13:30:22.724Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
         {
-          "id": "infrastructure-integration",
-          "label": "Infrastructure Integration",
-          "icon": "Server",
-          "color": "purple"
+          "id": "infrastructure-integration"
         }
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Replaced all variables: deleted 20, created 25",
-      "sourceRoute": []
+      "lastSyncMessage": "Replaced all variables: deleted 20, created 20",
+      "sourceRoute": [],
+      "sourceMethod": [],
+      "inactive": true
     },
     {
       "color": "blue",
@@ -2277,8 +2397,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2025-12-31T13:32:00.357Z",
-      "lastSynced": "2025-12-31T13:32:00.357Z",
+      "updatedAt": "2026-01-04T13:54:17.501Z",
+      "lastSynced": "2026-01-04T13:54:17.501Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2317,7 +2437,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2025-12-31T13:32:07.115Z",
+      "updatedAt": "2026-01-04T13:54:21.740Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2327,7 +2447,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2025-12-31T13:32:07.115Z",
+      "lastSynced": "2026-01-04T13:54:21.740Z",
       "lastSyncMessage": "Generated relations for 40 out of 40 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -2376,7 +2496,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2026-01-04T10:57:13.750Z",
+      "updatedAt": "2026-01-04T14:55:12.171Z",
       "category": [
         {
           "id": "production-integration",
@@ -2385,8 +2505,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-01-04T10:57:13.750Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 234, edges created: 117, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2026-01-04T14:55:12.171Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 270, edges created: 136, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
@@ -2999,7 +3119,230 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
-  "app-permissions": [],
+  "app-permissions": [
+    {
+      "resourceType": [
+        {
+          "id": "schemas"
+        }
+      ],
+      "resource": [
+        {
+          "id": "vendors"
+        },
+        {
+          "id": "inquiries"
+        },
+        {
+          "id": "tenders"
+        },
+        {
+          "id": "tender-items"
+        },
+        {
+          "id": "tender-invitations"
+        },
+        {
+          "id": "quotation-items"
+        },
+        {
+          "id": "quotations"
+        }
+      ],
+      "actionTypes": [
+        {
+          "id": "VIEW"
+        }
+      ],
+      "permissionType": [
+        {
+          "id": "ALLOW"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KE4C0G6FH9TYD0XSQ7ZTNAKN",
+      "createdAt": "2026-01-04T11:24:19.539Z",
+      "updatedAt": "2026-01-04T14:18:05.588Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "resourceType": [
+        {
+          "id": "schemas"
+        }
+      ],
+      "resource": [
+        {
+          "id": "quotations"
+        },
+        {
+          "id": "quotation-items"
+        }
+      ],
+      "actionTypes": [
+        {
+          "id": "VIEW"
+        },
+        {
+          "id": "CREATE"
+        },
+        {
+          "id": "EDIT"
+        }
+      ],
+      "permissionType": [
+        {
+          "id": "ALLOW"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KE4C32YZD7VMYSK1WF3ESQQZ",
+      "createdAt": "2026-01-04T11:25:44.291Z",
+      "updatedAt": "2026-01-04T14:18:10.637Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "resourceType": [
+        {
+          "id": "schemas"
+        }
+      ],
+      "resource": [
+        {
+          "id": "inquiries"
+        },
+        {
+          "id": "tenders"
+        },
+        {
+          "id": "tender-items"
+        },
+        {
+          "id": "tender-invitations"
+        }
+      ],
+      "actionTypes": [
+        {
+          "id": "CREATE"
+        },
+        {
+          "id": "VIEW"
+        },
+        {
+          "id": "EDIT"
+        }
+      ],
+      "permissionType": [
+        {
+          "id": "ALLOW"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KE4CD2Y64E0NMB87RT7Z0SPV",
+      "createdAt": "2026-01-04T11:31:11.944Z",
+      "updatedAt": "2026-01-04T14:18:15.729Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "resourceType": [
+        {
+          "id": "schemas"
+        }
+      ],
+      "resource": [
+        {
+          "id": "quotations"
+        },
+        {
+          "id": "quotation-items"
+        }
+      ],
+      "actionTypes": [
+        {
+          "id": "VIEW"
+        }
+      ],
+      "permissionType": [
+        {
+          "id": "ALLOW"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KE4CDYMKKNP1H0Z56E0DSZX7",
+      "createdAt": "2026-01-04T11:31:40.310Z",
+      "updatedAt": "2026-01-04T14:18:19.242Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "resourceType": [
+        {
+          "id": "schemas"
+        }
+      ],
+      "resource": [
+        {
+          "id": "tenders"
+        },
+        {
+          "id": "quotation-items"
+        },
+        {
+          "id": "tender-invitations"
+        },
+        {
+          "id": "quotations"
+        },
+        {
+          "id": "inquiries"
+        }
+      ],
+      "actionTypes": [
+        {
+          "id": "VIEW"
+        }
+      ],
+      "permissionType": [
+        {
+          "id": "ALLOW"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KE4CKW57SRD7AG1WCVJKM1Z0",
+      "createdAt": "2026-01-04T11:34:54.378Z",
+      "updatedAt": "2026-01-04T14:18:22.762Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "resourceType": [
+        {
+          "id": "dynamic-queries"
+        }
+      ],
+      "resource": [
+        {
+          "id": "01KDT7XAH1V7CKTPKZFA5VC6H3"
+        }
+      ],
+      "actionTypes": [
+        {
+          "id": "VIEW"
+        }
+      ],
+      "permissionType": [
+        {
+          "id": "ALLOW"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KE4KZBHWTJPYC96EKDFFNZC1",
+      "createdAt": "2026-01-04T13:43:30.626Z",
+      "updatedAt": "2026-01-04T14:34:54.724Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    }
+  ],
   "access-policies": [],
   "app-access-policies": [
     {
@@ -3020,6 +3363,47 @@
       "permissions": [],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Supply Chain | Vendor Access",
+      "accessPolicyType": [
+        {
+          "id": "CONTRIBUTOR"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KE4BZ8EYJQD6WSMP15MKWS6H",
+      "createdAt": "2026-01-04T11:23:38.849Z",
+      "updatedAt": "2026-01-04T11:26:14.997Z",
+      "permissions": []
+    },
+    {
+      "title": "Supply Chain | Commercial Access",
+      "accessPolicyType": [
+        {
+          "id": "CONTRIBUTOR"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KE4CB1XSP709AXKBN9GTXWK5",
+      "createdAt": "2026-01-04T11:30:05.371Z",
+      "updatedAt": "2026-01-04T11:31:43.057Z",
+      "permissions": []
+    },
+    {
+      "title": "Supply Chain | All Viewer",
+      "accessPolicyType": [
+        {
+          "id": "READER"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KE4CJW76P9RQC931TH0ENJ75",
+      "createdAt": "2026-01-04T11:34:21.674Z",
+      "updatedAt": "2026-01-04T11:34:56.611Z",
+      "permissions": []
     }
   ],
   "menu-items": [
@@ -17973,7 +18357,7 @@
       "datatype": [],
       "id": "01KD5E6TZ97SEF9SVS32PR1DTQ",
       "createdAt": "2025-12-23T11:06:16.945Z",
-      "updatedAt": "2025-12-28T14:10:41.356Z",
+      "updatedAt": "2026-01-04T13:11:55.843Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "includeUserId": false,
       "includeCompanyId": false,
@@ -18002,7 +18386,7 @@
       "isRequired": false,
       "id": "01KDQDXXJH77ZZR5D8Y6PNZ65N",
       "createdAt": "2025-12-30T10:47:44.478Z",
-      "updatedAt": "2025-12-30T10:47:44.478Z"
+      "updatedAt": "2026-01-04T13:11:51.027Z"
     },
     {
       "includeUserId": false,
@@ -18296,6 +18680,78 @@
       "createdAt": "2025-12-31T13:00:16.810Z",
       "updatedAt": "2025-12-31T13:37:47.994Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "includeUserId": true,
+      "includeCompanyId": false,
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "metadata": {
+        "applyRBAC": false,
+        "patterns": [
+          {
+            "from": {
+              "schemaId": "user-roles",
+              "alias": ""
+            }
+          },
+          {
+            "from": {
+              "schemaId": "user-roles",
+              "alias": ""
+            },
+            "to": {
+              "schemaId": "users",
+              "alias": ""
+            },
+            "edge": "HAS_MEMBER",
+            "optional": true
+          },
+          {
+            "from": {
+              "schemaId": "user-roles",
+              "alias": ""
+            },
+            "to": {
+              "schemaId": "app-access-policies",
+              "alias": ""
+            },
+            "edge": "HAS_ACCESS_POLICY",
+            "optional": true
+          },
+          {
+            "from": {
+              "schemaId": "app-access-policies",
+              "alias": ""
+            },
+            "to": {
+              "schemaId": "app-permissions",
+              "alias": ""
+            },
+            "edge": "HAS_APP_PERMISSION",
+            "optional": true
+          }
+        ],
+        "columns": [],
+        "pagination": {
+          "strategy": "offset",
+          "limit": 1000,
+          "offset": 0
+        }
+      },
+      "name": "User Roles with Members, Access Policies, and Permissions",
+      "description": "Get all user roles with their members (users), access policies, and app permissions. Shows the complete hierarchy: User_roles → users (HAS_MEMBER), User_roles → App_access_policies (HAS_ACCESS_POLICY), App_access_policies → App_permissions (HAS_APP_PERMISSION)",
+      "incomplete": false,
+      "datatype": [],
+      "isRequired": false,
+      "id": "01KE4H5ZG9TZ405BTPP903GAG3",
+      "createdAt": "2026-01-04T12:54:41.935Z",
+      "updatedAt": "2026-01-04T14:07:41.455Z",
+      "dynamic-query-parameters": []
     }
   ],
   "external_nodes": [
@@ -18308,8 +18764,10 @@
     },
     {
       "id": "active-directory",
-      "label": "active-directory",
-      "sourceUrl": "field-options:users:authentication-type"
+      "label": "Active Directory",
+      "sourceUrl": "field-options:users:authentication-type",
+      "icon": "Server",
+      "color": "success"
     },
     {
       "id": "high",
@@ -18375,6 +18833,104 @@
       "icon": "Loading",
       "color": "blue",
       "sourceUrl": "field-options:equipment-log-book:status"
+    },
+    {
+      "id": "VENDOR",
+      "label": "Vendor",
+      "icon": "ShoppingBasket",
+      "color": "emerald",
+      "sourceUrl": "field-options:user-roles:user-role-type"
+    },
+    {
+      "id": "CONTRIBUTOR",
+      "label": "Contributor",
+      "icon": "Edit",
+      "color": "warning",
+      "sourceUrl": "field-options:app-access-policies:access-policy-type"
+    },
+    {
+      "id": "SCHEMA",
+      "label": "Schema",
+      "icon": "Database",
+      "color": "warning",
+      "sourceUrl": "field-options:app-permissions:resource-type"
+    },
+    {
+      "id": "VIEW",
+      "label": "View",
+      "icon": "Eye",
+      "color": "info",
+      "sourceUrl": "field-options:app-permissions:action-types"
+    },
+    {
+      "id": "ALLOW",
+      "label": "Allow",
+      "icon": "CheckCircle",
+      "color": "success",
+      "sourceUrl": "field-options:app-permissions:permission-type"
+    },
+    {
+      "id": "CREATE",
+      "label": "Create",
+      "icon": "Plus",
+      "color": "success",
+      "sourceUrl": "field-options:app-permissions:action-types"
+    },
+    {
+      "id": "EDIT",
+      "label": "Edit",
+      "icon": "Edit",
+      "color": "warning",
+      "sourceUrl": "field-options:app-permissions:action-types"
+    },
+    {
+      "id": "GENERAL_ROLE",
+      "label": "General Role",
+      "icon": "User",
+      "color": "cyan",
+      "sourceUrl": "field-options:user-roles:user-role-type"
+    },
+    {
+      "id": "READER",
+      "label": "Reader",
+      "icon": "Eye",
+      "color": "info",
+      "sourceUrl": "field-options:app-access-policies:access-policy-type"
+    },
+    {
+      "id": "schemas",
+      "label": "Schema",
+      "icon": "Database",
+      "color": "warning",
+      "sourceUrl": "field-options:app-permissions:resource-type"
+    },
+    {
+      "id": "infrastructure-integration",
+      "label": "Infrastructure Integration",
+      "icon": "Server",
+      "color": "purple",
+      "sourceUrl": "field-options:integrations:integration-category"
+    },
+    {
+      "id": "POST",
+      "label": "POST",
+      "icon": "Upload",
+      "color": "emerald",
+      "sourceUrl": "field-options:integrations:integration-target-method"
+    },
+    {
+      "id": "dynamic-queries",
+      "label": "Dynamic Query",
+      "icon": "Database",
+      "color": "default",
+      "sourceUrl": "field-options:app-permissions:resource-type"
+    },
+    {
+      "id": "applications",
+      "label": "Application",
+      "icon": "AppWindow",
+      "color": "info",
+      "sourceUrl": "field-options:app-permissions:resource-type"
     }
   ],
   "deviation-management": [

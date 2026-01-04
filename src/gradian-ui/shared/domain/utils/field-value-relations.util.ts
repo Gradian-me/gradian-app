@@ -5,6 +5,7 @@ import { FormSchema, DataRelation } from '@/gradian-ui/schema-manager/types/form
 import { getSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
 import { upsertFieldValueRelations } from './relations-storage.util';
 import { upsertExternalNodeFromOption } from './external-nodes.util';
+import { replaceDynamicContext } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 
 type NormalizedOptionLike = {
   id?: string | number;
@@ -185,9 +186,16 @@ export async function syncHasFieldValueRelationsForEntity(params: {
   for (const field of relationFields) {
     const fieldName = (field as any).name as string;
     const fieldId = field.id || fieldName;
-    const targetSchemaId = (field as any).targetSchema as string | undefined;
+    const rawTargetSchemaId = (field as any).targetSchema as string | undefined;
     const sourceUrl = (field as any).sourceUrl as string | undefined;
     const fieldOptions = (field as any).options as Array<{ id?: string; label?: string; value?: string; icon?: string; color?: string }> | undefined;
+
+    // Resolve dynamic targetSchema (e.g., "{{formData.resourceType}}") using entity data
+    // The entity contains the formData values, so we can use it to resolve templates
+    // This ensures relations are saved with the actual schema ID, not the template string
+    const targetSchemaId = rawTargetSchemaId 
+      ? replaceDynamicContext(rawTargetSchemaId, { formSchema: schema, formData: entity })
+      : undefined;
 
     const rawValue = entity[fieldName];
     // For single-select components (select, radio, toggle-group), convert to array
@@ -556,12 +564,14 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
               label: externalNode.label || externalNode.id,
               icon: externalNode.icon,
               color: externalNode.color,
+              targetSchema: rel.targetSchema, // Include targetSchema from relation for badge navigation
               ...(storedMetadata ? { metadata: storedMetadata } : {}),
             };
           }
           return {
             id: rel.targetId,
             label: rel.targetId,
+            targetSchema: rel.targetSchema, // Include targetSchema from relation for badge navigation
             ...(storedMetadata ? { metadata: storedMetadata } : {}),
           };
         } else {
@@ -593,12 +603,14 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
               label: typeof label === 'string' ? label : String(label),
               icon: icon ? String(icon) : undefined,
               color: color ? String(color) : undefined,
+              targetSchema: rel.targetSchema, // Include targetSchema from relation for badge navigation
               ...(Object.keys(metadata).length > 0 ? { metadata } : {}),
             };
           }
           return {
             id: rel.targetId,
             label: rel.targetId,
+            targetSchema: rel.targetSchema, // Include targetSchema from relation for badge navigation
             ...(storedMetadata ? { metadata: storedMetadata } : {}),
           };
         }

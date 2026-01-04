@@ -25,6 +25,7 @@ import { getDisplayStrings, getPrimaryDisplayString, hasDisplayValue } from '../
 import { renderHighlightedText } from '../../shared/utils/highlighter';
 import { formatFieldValue } from '../table/utils/field-formatters';
 import { EntityMetadata } from './CreateUpdateDetail';
+import { replaceDynamicContext } from '../../form-builder/utils/dynamic-context-replacer';
 
 export interface DynamicCardRendererProps {
   schema: FormSchema;
@@ -135,13 +136,20 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     }
 
     if (field.targetSchema) {
-      valuesArray.forEach((entry) => {
-        const normalized = normalizeOptionArray(entry)[0];
-        const entryId = normalized?.id ?? (typeof entry === 'string' ? entry : undefined);
-        if (entryId) {
-          badgeValueTargetSchema.set(entryId, field.targetSchema as string);
-        }
-      });
+      // Resolve dynamic targetSchema (e.g., "{{formData.resourceType}}") using data
+      // The data contains the formData values, so we can use it to resolve templates
+      const resolvedTargetSchema = replaceDynamicContext(field.targetSchema as string, { formSchema: schema, formData: data });
+      
+      // Only set if resolved (doesn't contain unresolved templates)
+      if (!resolvedTargetSchema.includes('{{') || !resolvedTargetSchema.includes('}}')) {
+        valuesArray.forEach((entry) => {
+          const normalized = normalizeOptionArray(entry)[0];
+          const entryId = normalized?.id ?? (typeof entry === 'string' ? entry : undefined);
+          if (entryId) {
+            badgeValueTargetSchema.set(entryId, resolvedTargetSchema);
+          }
+        });
+      }
     }
 
     // Collect options from all fields
@@ -299,18 +307,40 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   const isBadgeItemClickable = (item: BadgeItem): boolean => {
     const candidateId = item.normalized?.id ?? item.id;
     if (!candidateId) return false;
-    return (
-      badgeValueTargetSchema.has(candidateId) ||
-      badgeValueTargetSchema.has(item.id)
+    
+    // Check if item has targetSchema from enriched value (from relation)
+    // Check normalized, original, and direct item properties
+    const hasTargetSchemaFromItem = Boolean(
+      item.normalized?.targetSchema || 
+      (item.original as any)?.targetSchema ||
+      (item as any).targetSchema
     );
+    
+    // Check if badgeValueTargetSchema map has this item
+    const hasTargetSchemaFromMap = badgeValueTargetSchema.has(candidateId) || badgeValueTargetSchema.has(item.id);
+    
+    return hasTargetSchemaFromItem || hasTargetSchemaFromMap;
   };
 
   const handleBadgeClick = (item: BadgeItem) => {
-    if (!isBadgeItemClickable(item)) return;
     const candidateId = item.normalized?.id ?? item.id;
-    const targetSchema =
-      badgeValueTargetSchema.get(candidateId) ||
-      badgeValueTargetSchema.get(item.id);
+    if (!candidateId) return;
+    
+    // For dynamic fields, use targetSchema from the enriched value item (from relation)
+    // This is the resolved targetSchema from /api/relations, not the template
+    // Check normalized, original, and direct item properties
+    let targetSchema: string | undefined = 
+      item.normalized?.targetSchema || 
+      (item.original as any)?.targetSchema ||
+      (item as any).targetSchema;
+    
+    // Fallback to badgeValueTargetSchema map if not available in item
+    if (!targetSchema) {
+      targetSchema =
+        badgeValueTargetSchema.get(candidateId) ||
+        badgeValueTargetSchema.get(item.id);
+    }
+    
     if (!targetSchema) return;
     handleNavigateToEntity(targetSchema, candidateId);
   };

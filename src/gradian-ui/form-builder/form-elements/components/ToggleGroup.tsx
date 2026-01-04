@@ -12,6 +12,7 @@ import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
+import { replaceDynamicContext } from '../../utils/dynamic-context-replacer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
@@ -79,7 +80,10 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
         : Boolean(allowMultiselectSetting);
 
     // Get dynamic context for reference-based filtering
-    const dynamicContext = useDynamicFormContextStore();
+    // Use selector to ensure reactivity when formSchema or formData changes
+    const formSchema = useDynamicFormContextStore((state) => state.formSchema);
+    const formData = useDynamicFormContextStore((state) => state.formData);
+    const dynamicContext = { formSchema, formData };
 
     // Check for reference-based filtering fields in config
     const referenceSchema = config?.referenceSchema;
@@ -95,15 +99,35 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
     
     // Extract targetSchema with defensive checks for production
     // Try multiple possible property names and handle empty strings
+    // Process through dynamic context replacer to support templates like {{formData.resourceType}}
     const targetSchemaFromConfig = React.useMemo(() => {
       const ts = configTargetSchema || configTargetSchemaUnderscore || configTargetSchemaDash;
-      const result = ts && String(ts).trim() !== '' ? String(ts).trim() : null;
+      
+      if (!ts || String(ts).trim() === '') {
+        return null;
+      }
+      
+      const rawTargetSchema = String(ts).trim();
+      
+      // Process through dynamic context replacer to resolve templates like {{formData.resourceType}}
+      const resolvedTargetSchema = replaceDynamicContext(rawTargetSchema, dynamicContext);
+      
+      // Check if the result still contains unresolved templates (still has {{ and }})
+      // If so, return null to prevent invalid schema fetches
+      if (resolvedTargetSchema.includes('{{') && resolvedTargetSchema.includes('}}')) {
+        return null;
+      }
+      
+      // Return null for empty string, otherwise return the resolved value
+      const result = resolvedTargetSchema.trim() !== '' ? resolvedTargetSchema.trim() : null;
+      
       // Log in production to help debug issues
       if (process.env.NODE_ENV === 'production' && !result && ((config as any)?.component === 'toggle-group' || (config as any)?.component === 'togglegroup') && (configTargetSchema || configTargetSchemaUnderscore || configTargetSchemaDash)) {
-        loggingCustom(LogType.CLIENT_LOG, 'warn', `[ToggleGroup] targetSchema is null/empty for field: ${configName || configId}, targetSchema value: ${JSON.stringify(ts)}, config keys: ${Object.keys(config || {}).join(', ')}`);
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `[ToggleGroup] targetSchema is null/empty for field: ${configName || configId}, targetSchema value: ${JSON.stringify(ts)}, resolved: ${JSON.stringify(resolvedTargetSchema)}, config keys: ${Object.keys(config || {}).join(', ')}`);
       }
+      
       return result;
-    }, [configTargetSchema, configTargetSchemaUnderscore, configTargetSchemaDash, configName, configId]);
+    }, [configTargetSchema, configTargetSchemaUnderscore, configTargetSchemaDash, configName, configId, dynamicContext.formSchema, dynamicContext.formData]);
 
     // Check if referenceEntityId is static (no dynamic context syntax)
     const isStaticReferenceId = React.useMemo(() => {

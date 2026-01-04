@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
 import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
+import { replaceDynamicContext } from '../../utils/dynamic-context-replacer';
 
 export interface PickerInputProps {
   config: any;
@@ -49,6 +50,8 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [targetSchema, setTargetSchema] = useState<FormSchema | null>(null);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [fetchedItems, setFetchedItems] = useState<Map<string, any>>(new Map());
+  const fetchingItemsRef = useRef<Set<string>>(new Set());
   const [isLoadingSchema, setIsLoadingSchema] = useState(false);
   const [lastValidSelection, setLastValidSelection] = useState<NormalizedOption[] | null>(null);
   const queryClient = useQueryClient();
@@ -63,17 +66,36 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   // Memoize these to prevent unnecessary re-renders when config object reference changes
   // Ensure we handle empty strings and other falsy values correctly
   // Also check for alternative property names that might be used in production
+  // Process through dynamic context replacer to support templates like {{formData.resourceType}}
   const targetSchemaId = useMemo(() => {
     // Try multiple possible property names
     const ts = (config as any).targetSchema || (config as any).target_schema || (config as any)['target-schema'];
-    // Return null for falsy values (null, undefined, empty string) to ensure consistent behavior
-    const result = ts && String(ts).trim() !== '' ? String(ts).trim() : null;
+    
+    if (!ts || String(ts).trim() === '') {
+      return null;
+    }
+    
+    const rawTargetSchema = String(ts).trim();
+    
+    // Process through dynamic context replacer to resolve templates like {{formData.resourceType}}
+    const resolvedTargetSchema = replaceDynamicContext(rawTargetSchema, dynamicContext);
+    
+    // Check if the result still contains unresolved templates (still has {{ and }})
+    // If so, return null to prevent invalid schema fetches
+    if (resolvedTargetSchema.includes('{{') && resolvedTargetSchema.includes('}}')) {
+      return null;
+    }
+    
+    // Return null for empty string, otherwise return the resolved value
+    const result = resolvedTargetSchema.trim() !== '' ? resolvedTargetSchema.trim() : null;
+    
     // Log in production to help debug issues
     if (process.env.NODE_ENV === 'production' && !result && (config as any).component === 'picker') {
-      loggingCustom(LogType.CLIENT_LOG, 'warn', `[PickerInput] targetSchemaId is null/empty for field: ${(config as any).name || (config as any).id}, targetSchema value: ${JSON.stringify(ts)}, config keys: ${Object.keys(config || {}).join(', ')}`);
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `[PickerInput] targetSchemaId is null/empty for field: ${(config as any).name || (config as any).id}, targetSchema value: ${JSON.stringify(ts)}, resolved: ${JSON.stringify(resolvedTargetSchema)}, config keys: ${Object.keys(config || {}).join(', ')}`);
     }
+    
     return result;
-  }, [(config as any).targetSchema, (config as any).target_schema, (config as any)['target-schema'], (config as any).name, (config as any).id]);
+  }, [(config as any).targetSchema, (config as any).target_schema, (config as any)['target-schema'], (config as any).name, (config as any).id, dynamicContext.formSchema, dynamicContext.formData]);
   
   // Check for reference-based filtering fields
   const referenceSchema = (config as any).referenceSchema;
@@ -175,30 +197,51 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     return normalizeOptionArray(normalizedValue);
   }, [normalizedValue]);
 
-  // Enrich normalized selection with icon/color from selectedItem (only for display, not as dependency)
+  // Enrich normalized selection with icon/color/label from selectedItem/fetchedItems (only for display, not as dependency)
   const normalizedSelection = useMemo(() => {
     const normalized = baseNormalizedSelection;
     
-    // If normalized selection doesn't have icon/color, try to enrich it from selectedItem
-    if (normalized.length > 0 && normalized[0]?.id && (!normalized[0]?.icon && !normalized[0]?.color)) {
-      // If selectedItem has icon/color, use them to enrich the normalized selection
-      // This works for both sourceUrl and targetSchema (like users)
-      if (selectedItem && (selectedItem.icon || selectedItem.color)) {
-        return normalized.map((opt, idx) => {
-          if (idx === 0 && String(opt.id) === String(selectedItem.id)) {
-            return {
-              ...opt,
-              icon: opt.icon || selectedItem.icon,
-              color: opt.color || selectedItem.color,
-            };
-          }
-          return opt;
-        });
+    // Enrich all items that need enrichment (label equals ID, or missing icon/color)
+    return normalized.map((opt) => {
+      const optId = String(opt.id);
+      const labelNeedsEnrichment = !opt.label || String(opt.label) === optId;
+      const needsEnrichment = labelNeedsEnrichment || !opt.icon || !opt.color;
+      
+      if (!needsEnrichment) {
+        return opt;
       }
-    }
-    
-    return normalized;
-  }, [baseNormalizedSelection, selectedItem]);
+      
+      // Try to get enriched data from fetchedItems map first, then selectedItem
+      let fetchedItem = fetchedItems.get(optId);
+      if (!fetchedItem && selectedItem && String(selectedItem.id) === optId) {
+        fetchedItem = selectedItem;
+      }
+      
+      if (!fetchedItem) {
+        // If no fetched item available, return as-is (will be fetched by useEffect)
+        return opt;
+      }
+      
+      // Get label from fetchedItem (prefer role-based lookup for targetSchema, then name/title/label)
+      let enrichedLabel = opt.label;
+      if (labelNeedsEnrichment) {
+        if (targetSchema && fetchedItem) {
+          // For targetSchema, use role-based lookup to get title (proper display value)
+          enrichedLabel = getValueByRole(targetSchema, fetchedItem, 'title') || fetchedItem.name || fetchedItem.title || fetchedItem.label || optId;
+        } else {
+          // For sourceUrl or other cases, use name/title/label from fetchedItem
+          enrichedLabel = fetchedItem.label || fetchedItem.name || fetchedItem.title || optId;
+        }
+      }
+      
+      return {
+        ...opt,
+        label: enrichedLabel,
+        icon: opt.icon || fetchedItem.icon,
+        color: opt.color || fetchedItem.color,
+      };
+    });
+  }, [baseNormalizedSelection, selectedItem, fetchedItems, targetSchema]);
   const selectedIdsForPicker = useMemo(
     () =>
       normalizedSelection
@@ -210,7 +253,21 @@ export const PickerInput: React.FC<PickerInputProps> = ({
 
   // Fetch target schema when component mounts or targetSchemaId changes (skip if using sourceUrl or staticItems)
   useEffect(() => {
-    if (targetSchemaId && !targetSchema && !sourceUrl && !staticItems) {
+    // Clear targetSchema and selectedItem if targetSchemaId changes or becomes null
+    if (!targetSchemaId) {
+      setTargetSchema(null);
+      setSelectedItem(null);
+      return;
+    }
+
+    // Check if we need to fetch a new schema (either no schema or schema id doesn't match)
+    const needsFetch = !targetSchema || targetSchema.id !== targetSchemaId;
+    
+    if (targetSchemaId && needsFetch && !sourceUrl && !staticItems) {
+      // Clear old schema and selected item before fetching new one
+      setTargetSchema(null);
+      setSelectedItem(null);
+      
       setIsLoadingSchema(true);
       const fetchSchema = async () => {
         try {
@@ -337,15 +394,19 @@ export const PickerInput: React.FC<PickerInputProps> = ({
         if (response.success && response.data) {
           const itemData = response.data;
           // Add default icon/color for users schema if missing
-          if (targetSchemaId === 'users') {
-            setSelectedItem({
-              ...itemData,
-              icon: itemData.icon || 'User',
-              color: itemData.color || 'blue',
-            });
-          } else {
-            setSelectedItem(itemData);
-          }
+          const enrichedItem = targetSchemaId === 'users' ? {
+            ...itemData,
+            icon: itemData.icon || 'User',
+            color: itemData.color || 'blue',
+          } : itemData;
+          
+          // Store in fetchedItems map for all items, and in selectedItem for primary item
+          setFetchedItems(prev => {
+            const newMap = new Map(prev);
+            newMap.set(resolvedId, enrichedItem);
+            return newMap;
+          });
+          setSelectedItem(enrichedItem);
           return;
         }
 
@@ -370,14 +431,72 @@ export const PickerInput: React.FC<PickerInputProps> = ({
 
     if (normalizedValue.length === 0) {
       setSelectedItem(null);
+      setFetchedItems(new Map());
+      fetchingItemsRef.current.clear();
       return;
     }
 
+    // Fetch primary item first (for selectedItem state)
     const primaryValue = baseNormalizedSelection[0] ?? normalizedValue[0];
     fetchSelectedItem(primaryValue);
+
+    // Fetch remaining items that need enrichment (for multiselect)
+    // Only fetch items where label equals ID (they need enrichment)
+    if (baseNormalizedSelection.length > 1 && targetSchemaId && targetSchema) {
+      baseNormalizedSelection.forEach(opt => {
+        const optId = String(opt.id);
+        // Skip primary item (already being fetched)
+        if (optId === String(primaryValue?.id || '')) {
+          return;
+        }
+        
+        // Only fetch if label equals ID (needs enrichment)
+        const labelNeedsEnrichment = !opt.label || String(opt.label) === optId;
+        if (!labelNeedsEnrichment) {
+          return;
+        }
+        
+        // Skip if already fetching (using ref to track in-flight requests)
+        if (fetchingItemsRef.current.has(optId)) {
+          return;
+        }
+        
+        // Mark as fetching
+        fetchingItemsRef.current.add(optId);
+        
+        // Fetch individual item
+        const fetchItem = async () => {
+          try {
+            const response = await apiRequest<any>(`/api/data/${targetSchemaId}/${optId}`);
+            if (response.success && response.data) {
+              const itemData = response.data;
+              const enrichedItem = targetSchemaId === 'users' ? {
+                ...itemData,
+                icon: itemData.icon || 'User',
+                color: itemData.color || 'blue',
+              } : itemData;
+              
+              setFetchedItems(prev => {
+                const newMap = new Map(prev);
+                newMap.set(optId, enrichedItem);
+                return newMap;
+              });
+            }
+          } catch (err) {
+            loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching item ${optId}: ${err instanceof Error ? err.message : String(err)}`);
+          } finally {
+            // Remove from fetching set
+            fetchingItemsRef.current.delete(optId);
+          }
+        };
+        fetchItem();
+      });
+    }
+    
     // Note: sourceUrl is intentionally NOT in dependencies - we only want to re-fetch when value changes,
     // not when sourceUrl changes. sourceUrl is just configuration, not a trigger for re-fetching.
     // Use baseNormalizedSelection instead of normalizedSelection to avoid circular dependency with selectedItem
+    // fetchedItems is intentionally NOT in dependencies to avoid infinite loop (we update it inside this effect)
   }, [normalizedValue, baseNormalizedSelection, targetSchemaId, targetSchema]);
 
   const handleSelect = async (selectedOptions: NormalizedOption[], rawItems: any[]) => {
@@ -403,15 +522,35 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       return;
     }
 
+    // Enrich selectedOptions with proper labels/icon/color from rawItems for targetSchema
+    // This ensures the saved data has proper labels, not just IDs
+    let enrichedOptions = selectedOptions;
+    if (!sourceUrl && targetSchema && rawItems && rawItems.length > 0) {
+      enrichedOptions = selectedOptions.map((option, idx) => {
+        const rawItem = rawItems[idx];
+        if (rawItem && String(option.id) === String(rawItem.id)) {
+          // Get proper label from rawItem using role-based lookup
+          const properLabel = getValueByRole(targetSchema, rawItem, 'title') || rawItem.name || rawItem.title || rawItem.label || option.label;
+          return {
+            ...option,
+            label: properLabel,
+            icon: option.icon || rawItem.icon,
+            color: option.color || rawItem.color,
+          };
+        }
+        return option;
+      });
+    }
+
     // Store valid selection before calling onChange to prevent race conditions
-    setLastValidSelection(selectedOptions);
-    // Call onChange with the valid selection
-    onChange?.(selectedOptions);
+    setLastValidSelection(enrichedOptions);
+    // Call onChange with the enriched selection
+    onChange?.(enrichedOptions);
 
     // For sourceUrl, use the normalized option which has label/icon/color from columnMap
     // For targetSchema, prefer rawItems which has full schema data
     if (sourceUrl) {
-      const primaryOption = selectedOptions[0];
+      const primaryOption = enrichedOptions[0];
       if (primaryOption) {
         setSelectedItem({
           id: primaryOption.id,
@@ -427,7 +566,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       if (primaryRawItem) {
         setSelectedItem(primaryRawItem);
       } else {
-        const primaryOption = selectedOptions[0];
+        const primaryOption = enrichedOptions[0];
         setSelectedItem({
           id: primaryOption.id,
           name: primaryOption.label,

@@ -704,6 +704,16 @@
         ],
         "colSpan": 1,
         "order": 3
+      },
+      {
+        "id": "add-members-automatically",
+        "name": "addMembersAutomatically",
+        "label": "Add Members Automatically",
+        "sectionId": "basic-information",
+        "component": "switch",
+        "order": 4,
+        "description": "Add Members Automatically based on Role Type and the Entity Type defined in Users schema for each user.",
+        "placeholder": "Add Members Automatically Based On Role Type"
       }
     ],
     "sections": [
@@ -766,7 +776,8 @@
     "icon": "UserCircle",
     "allowDataInactive": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "business-areas",
@@ -1742,7 +1753,7 @@
         "order": 6
       },
       {
-        "id": "integration-source-data-path",
+        "id": "integration-target-data-path",
         "name": "targetDataPath",
         "label": "Target Data Path",
         "sectionId": "routing-information",
@@ -1798,7 +1809,8 @@
     "icon": "Settings",
     "isNotCompanyBased": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "allowDataInactive": true
   },
   {
     "id": "databases",
@@ -2876,40 +2888,46 @@
         },
         "options": [
           {
-            "id": "BUSINESS_AREA",
+            "id": "business-areas",
             "label": "Business Area",
             "icon": "Folder",
             "color": "info"
           },
           {
-            "id": "APPLICATION",
+            "id": "applications",
             "label": "Application",
             "icon": "AppWindow",
             "color": "info"
           },
           {
-            "id": "SCHEMA",
+            "id": "schemas",
             "label": "Schema",
             "icon": "Database",
             "color": "warning"
           },
           {
-            "id": "SECTION",
+            "id": "sections",
             "label": "Section",
             "icon": "Layout",
             "color": "default"
           },
           {
-            "id": "FIELD",
+            "id": "fields",
             "label": "Field",
             "icon": "FileText",
             "color": "muted"
           },
           {
-            "id": "URL_REPOSITORY",
+            "id": "url-repositories",
             "label": "URL Repository",
             "icon": "Link",
             "color": "success"
+          },
+          {
+            "id": "dynamic-queries",
+            "label": "Dynamic Query",
+            "icon": "Database",
+            "color": "default"
           }
         ],
         "colSpan": 1,
@@ -2923,7 +2941,7 @@
         "component": "picker",
         "placeholder": "Click to select resource",
         "description": "Select resource from /api/schemas",
-        "targetSchema": "schemas",
+        "targetSchema": "{{formData.resourceType}}",
         "allowMultiselect": true,
         "validation": {
           "required": true
@@ -3027,7 +3045,8 @@
     "icon": "Shield",
     "isNotCompanyBased": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "app-access-policies",
@@ -3142,7 +3161,8 @@
     "icon": "Lock",
     "isNotCompanyBased": true,
     "schemaType": "system",
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "menu-items",
@@ -3450,7 +3470,7 @@
         "label": "AryoGen"
       }
     ],
-    "syncStrategy": "schema-and-data",
+    "syncStrategy": "schema-only",
     "isNotCompanyBased": true
   },
   {
@@ -5217,7 +5237,7 @@
         "label": "AryoGen"
       }
     ],
-    "syncStrategy": "schema-and-data",
+    "syncStrategy": "schema-only",
     "isNotCompanyBased": true
   },
   {
@@ -5368,7 +5388,7 @@
       }
     ],
     "isNotCompanyBased": true,
-    "syncStrategy": "schema-and-data"
+    "syncStrategy": "schema-only"
   },
   {
     "id": "tasks",
@@ -6015,7 +6035,7 @@
         "label": "AryoGen"
       }
     ],
-    "syncStrategy": "schema-and-data",
+    "syncStrategy": "schema-only",
     "applyToAllTenants": false,
     "isNotCompanyBased": true
   },
@@ -6134,7 +6154,7 @@
     ],
     "showInNavigation": true,
     "schemaType": "business",
-    "syncStrategy": "schema-and-data",
+    "syncStrategy": "schema-only",
     "applyToAllTenants": false,
     "relatedTenants": [
       {

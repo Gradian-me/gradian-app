@@ -22,6 +22,7 @@ import { toast } from 'sonner';
 import { cn } from '@/gradian-ui/shared/utils';
 import { CodeBadge } from '@/gradian-ui/form-builder/form-elements/components/CodeBadge';
 import { FormulaDisplay } from '@/gradian-ui/form-builder/form-elements/components/FormulaDisplay';
+import { replaceDynamicContext } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 
 export const getFieldValue = (field: any, row: any): any => {
   if (!field || !row) return null;
@@ -225,10 +226,60 @@ export const formatFieldValue = (
     const handleBadgeClick = (item: BadgeItem) => {
       const candidateId = item.normalized?.id ?? item.id;
       if (!candidateId) return;
-      const targetSchema = field?.targetSchema;
-      if (!targetSchema) return;
+      
+      // For dynamic fields, use targetSchema from the enriched value item (from relation)
+      // This is the resolved targetSchema from /api/relations, not the template
+      // FIRST: Check the row data directly (most reliable source for enriched data)
+      let targetSchema: string | undefined;
+      if (row && field?.name) {
+        const fieldValue = row[field.name];
+        if (Array.isArray(fieldValue)) {
+          const matchingItem = fieldValue.find((val: any) => {
+            const valId = typeof val === 'object' && val !== null ? val.id : val;
+            return String(valId) === String(candidateId);
+          });
+          if (matchingItem && typeof matchingItem === 'object' && matchingItem !== null) {
+            targetSchema = (matchingItem as any).targetSchema;
+          }
+        } else if (fieldValue && typeof fieldValue === 'object') {
+          const valId = fieldValue.id;
+          if (String(valId) === String(candidateId)) {
+            targetSchema = (fieldValue as any).targetSchema;
+          }
+        }
+      }
+      
+      // SECOND: Check normalized, original, and direct item properties
+      if (!targetSchema) {
+        targetSchema = 
+          item.normalized?.targetSchema || 
+          (item.original as any)?.targetSchema ||
+          (item as any).targetSchema;
+      }
+      
+      // Fallback to field.targetSchema if not available in item (for non-relation cases)
+      if (!targetSchema) {
+        const rawTargetSchema = field?.targetSchema;
+        if (!rawTargetSchema) return;
 
-      const url = `/page/${targetSchema}/${encodeURIComponent(candidateId)}?showBack=true`;
+        // Resolve dynamic targetSchema (e.g., "{{formData.resourceType}}") using row data
+        // The row contains the formData values, so we can use it to resolve templates
+        targetSchema = replaceDynamicContext(rawTargetSchema, { formData: row });
+
+        // Skip if still contains unresolved templates
+        if (targetSchema.includes('{{') && targetSchema.includes('}}')) {
+          console.warn('[formatFieldValue] Could not resolve targetSchema template:', rawTargetSchema, 'with row:', row);
+          return;
+        }
+      }
+
+      // Ensure we have a valid targetSchema before creating URL
+      if (!targetSchema || targetSchema.trim() === '') {
+        console.warn('[formatFieldValue] Empty targetSchema for item:', item);
+        return;
+      }
+
+      const url = `/page/${targetSchema.trim()}/${encodeURIComponent(candidateId)}?showBack=true`;
       if (typeof window !== 'undefined') {
         window.open(url, '_self');
       }
@@ -285,10 +336,60 @@ export const formatFieldValue = (
       const handleBadgeClick = (item: BadgeItem) => {
         const candidateId = item.normalized?.id ?? item.id;
         if (!candidateId) return;
-        const targetSchema = field?.targetSchema;
-        if (!targetSchema) return;
+        
+        // For dynamic fields, use targetSchema from the enriched value item (from relation)
+        // This is the resolved targetSchema from /api/relations, not the template
+        // FIRST: Check the row data directly (most reliable source for enriched data)
+        let targetSchema: string | undefined;
+        if (row && field?.name) {
+          const fieldValue = row[field.name];
+          if (Array.isArray(fieldValue)) {
+            const matchingItem = fieldValue.find((val: any) => {
+              const valId = typeof val === 'object' && val !== null ? val.id : val;
+              return String(valId) === String(candidateId);
+            });
+            if (matchingItem && typeof matchingItem === 'object' && matchingItem !== null) {
+              targetSchema = (matchingItem as any).targetSchema;
+            }
+          } else if (fieldValue && typeof fieldValue === 'object') {
+            const valId = fieldValue.id;
+            if (String(valId) === String(candidateId)) {
+              targetSchema = (fieldValue as any).targetSchema;
+            }
+          }
+        }
+        
+        // SECOND: Check normalized, original, and direct item properties
+        if (!targetSchema) {
+          targetSchema = 
+            item.normalized?.targetSchema || 
+            (item.original as any)?.targetSchema ||
+            (item as any).targetSchema;
+        }
+        
+        // Fallback to field.targetSchema if not available in item (for non-relation cases)
+        if (!targetSchema) {
+          const rawTargetSchema = field?.targetSchema;
+          if (!rawTargetSchema) return;
 
-        const url = `/page/${targetSchema}/${encodeURIComponent(candidateId)}?showBack=true`;
+          // Resolve dynamic targetSchema (e.g., "{{formData.resourceType}}") using row data
+          // The row contains the formData values, so we can use it to resolve templates
+          targetSchema = replaceDynamicContext(rawTargetSchema, { formData: row });
+
+          // Skip if still contains unresolved templates
+          if (targetSchema.includes('{{') && targetSchema.includes('}}')) {
+            console.warn('[formatFieldValue] Could not resolve targetSchema template:', rawTargetSchema, 'Row data:', row);
+            return;
+          }
+        }
+
+        // Ensure we have a valid targetSchema before creating URL
+        if (!targetSchema || targetSchema.trim() === '') {
+          console.warn('[formatFieldValue] Empty targetSchema for item:', item);
+          return;
+        }
+
+        const url = `/page/${targetSchema.trim()}/${encodeURIComponent(candidateId)}?showBack=true`;
         if (typeof window !== 'undefined') {
           window.open(url, '_self');
         }
@@ -442,10 +543,60 @@ export const formatFieldValue = (
       const handleBadgeClick = (item: BadgeItem) => {
         const candidateId = item.normalized?.id ?? item.id;
         if (!candidateId) return;
-        const targetSchema = field?.targetSchema;
-        if (!targetSchema) return;
+        
+        // For dynamic fields, use targetSchema from the enriched value item (from relation)
+        // This is the resolved targetSchema from /api/relations, not the template
+        // FIRST: Check the row data directly (most reliable source for enriched data)
+        let targetSchema: string | undefined;
+        if (row && field?.name) {
+          const fieldValue = row[field.name];
+          if (Array.isArray(fieldValue)) {
+            const matchingItem = fieldValue.find((val: any) => {
+              const valId = typeof val === 'object' && val !== null ? val.id : val;
+              return String(valId) === String(candidateId);
+            });
+            if (matchingItem && typeof matchingItem === 'object' && matchingItem !== null) {
+              targetSchema = (matchingItem as any).targetSchema;
+            }
+          } else if (fieldValue && typeof fieldValue === 'object') {
+            const valId = fieldValue.id;
+            if (String(valId) === String(candidateId)) {
+              targetSchema = (fieldValue as any).targetSchema;
+            }
+          }
+        }
+        
+        // SECOND: Check normalized, original, and direct item properties
+        if (!targetSchema) {
+          targetSchema = 
+            item.normalized?.targetSchema || 
+            (item.original as any)?.targetSchema ||
+            (item as any).targetSchema;
+        }
+        
+        // Fallback to field.targetSchema if not available in item (for non-relation cases)
+        if (!targetSchema) {
+          const rawTargetSchema = field?.targetSchema;
+          if (!rawTargetSchema) return;
 
-        const url = `/page/${targetSchema}/${encodeURIComponent(candidateId)}?showBack=true`;
+          // Resolve dynamic targetSchema (e.g., "{{formData.resourceType}}") using row data
+          // The row contains the formData values, so we can use it to resolve templates
+          targetSchema = replaceDynamicContext(rawTargetSchema, { formData: row });
+
+          // Skip if still contains unresolved templates
+          if (targetSchema.includes('{{') && targetSchema.includes('}}')) {
+            console.warn('[formatFieldValue] Could not resolve targetSchema template:', rawTargetSchema, 'Row data:', row);
+            return;
+          }
+        }
+
+        // Ensure we have a valid targetSchema before creating URL
+        if (!targetSchema || targetSchema.trim() === '') {
+          console.warn('[formatFieldValue] Empty targetSchema for item:', item);
+          return;
+        }
+
+        const url = `/page/${targetSchema.trim()}/${encodeURIComponent(candidateId)}?showBack=true`;
         if (typeof window !== 'undefined') {
           window.open(url, '_self');
         }
@@ -1014,10 +1165,61 @@ export const formatFieldValue = (
     const handleBadgeClick = (item: BadgeItem) => {
       const candidateId = item.normalized?.id ?? item.id;
       if (!candidateId) return;
-      const targetSchema = field?.targetSchema;
-      if (!targetSchema) return;
+      
+      // For dynamic fields, use targetSchema from the enriched value item (from relation)
+      // This is the resolved targetSchema from /api/relations, not the template
+      // FIRST: Check the row data directly (most reliable source for enriched data)
+      let targetSchema: string | undefined;
+      if (row && field?.name) {
+        const fieldValue = row[field.name];
+        if (Array.isArray(fieldValue)) {
+          const matchingItem = fieldValue.find((val: any) => {
+            const valId = typeof val === 'object' && val !== null ? val.id : val;
+            return String(valId) === String(candidateId);
+          });
+          if (matchingItem && typeof matchingItem === 'object' && matchingItem !== null) {
+            targetSchema = (matchingItem as any).targetSchema;
+          }
+        } else if (fieldValue && typeof fieldValue === 'object') {
+          const valId = fieldValue.id;
+          if (String(valId) === String(candidateId)) {
+            targetSchema = (fieldValue as any).targetSchema;
+          }
+        }
+      }
+      
+      // SECOND: Check normalized, original, and direct item properties
+      if (!targetSchema) {
+        targetSchema = 
+          item.normalized?.targetSchema || 
+          (item.original as any)?.targetSchema ||
+          (item as any).targetSchema;
+      }
+      
+      // Fallback to field.targetSchema if not available in item (for non-relation cases)
+      if (!targetSchema) {
+        targetSchema = field?.targetSchema;
+        if (!targetSchema) return;
+        
+        // If field.targetSchema contains a template, try to resolve it
+        if (targetSchema.includes('{{') && targetSchema.includes('}}')) {
+          targetSchema = replaceDynamicContext(targetSchema, { formData: row });
+          
+          // Skip if still contains unresolved templates
+          if (targetSchema.includes('{{') && targetSchema.includes('}}')) {
+            console.warn('[formatFieldValue] Could not resolve targetSchema template:', field?.targetSchema, 'Row data:', row);
+            return;
+          }
+        }
+      }
 
-      const url = `/page/${targetSchema}/${encodeURIComponent(candidateId)}?showBack=true`;
+      // Ensure we have a valid targetSchema before creating URL
+      if (!targetSchema || targetSchema.trim() === '') {
+        console.warn('[formatFieldValue] Empty targetSchema for item:', item);
+        return;
+      }
+
+      const url = `/page/${targetSchema.trim()}/${encodeURIComponent(candidateId)}?showBack=true`;
       if (typeof window !== 'undefined') {
         window.open(url, '_self');
       }

@@ -88,7 +88,38 @@ export const renderCardSection = ({ section, schema, data, maxMetrics = 3, onBad
                                   ? (item) => {
                                       const itemId = item.normalized?.id ?? item.id;
                                       if (!itemId) return;
-                                      onBadgeNavigate?.(field.targetSchema!, itemId);
+                                      
+                                      // For dynamic fields, use targetSchema from the enriched value item (from relation)
+                                      // This is the resolved targetSchema from /api/relations, not the template
+                                      // Check normalized, original, and direct item properties
+                                      let targetSchema: string | undefined = 
+                                        item.normalized?.targetSchema || 
+                                        (item.original as any)?.targetSchema ||
+                                        (item as any).targetSchema;
+                                      
+                                      // Fallback to field.targetSchema if not available in item (for non-relation cases)
+                                      if (!targetSchema) {
+                                        const rawTargetSchema = field.targetSchema!;
+                                        
+                                        // Resolve dynamic targetSchema (e.g., "{{formData.resourceType}}") using data
+                                        // The data contains the formData values, so we can use it to resolve templates
+                                        const { replaceDynamicContext } = require('../../form-builder/utils/dynamic-context-replacer');
+                                        targetSchema = replaceDynamicContext(rawTargetSchema, { formSchema: schema, formData: data });
+                                        
+                                        // Skip if still contains unresolved templates
+                                        if (targetSchema.includes('{{') && targetSchema.includes('}}')) {
+                                          console.warn('[renderCardSection] Could not resolve targetSchema template:', rawTargetSchema);
+                                          return;
+                                        }
+                                      }
+                                      
+                                      // Ensure we have a valid targetSchema before navigating
+                                      if (!targetSchema || targetSchema.trim() === '') {
+                                        console.warn('[renderCardSection] Empty targetSchema for item:', item);
+                                        return;
+                                      }
+                                      
+                                      onBadgeNavigate?.(targetSchema.trim(), itemId);
                                     }
                                   : undefined
                               }

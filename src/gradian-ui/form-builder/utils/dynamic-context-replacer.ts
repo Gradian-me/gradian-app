@@ -110,7 +110,43 @@ export function extractValueFromContext(
   }
   
   // Convert to string (not URI-encoded)
-  return current !== null && current !== undefined ? String(current) : '';
+  // Handle objects by extracting 'id' property if it exists (common for picker/select values)
+  if (current !== null && current !== undefined) {
+    // Check if it's an array first (arrays are objects in JS)
+    if (Array.isArray(current)) {
+      // If it's an array, try to extract id from first element
+      if (current.length > 0) {
+        const first = current[0];
+        if (typeof first === 'object' && first !== null) {
+          if ('id' in first && first.id !== undefined && first.id !== null) {
+            return String(first.id);
+          }
+          if ('value' in first && first.value !== undefined && first.value !== null) {
+            return String(first.value);
+          }
+        } else if (first !== undefined && first !== null) {
+          return String(first);
+        }
+      }
+      return '';
+    }
+    
+    // If it's an object (but not an array), try to extract 'id' or 'value' property
+    if (typeof current === 'object') {
+      // Try to extract 'id' property (common pattern for picker/select values)
+      if ('id' in current && current.id !== undefined && current.id !== null) {
+        return String(current.id);
+      }
+      // If no 'id' property, try 'value' property as fallback
+      if ('value' in current && current.value !== undefined && current.value !== null) {
+        return String(current.value);
+      }
+    }
+    
+    // Fallback to string conversion
+    return String(current);
+  }
+  return '';
 }
 
 /**
@@ -169,7 +205,12 @@ export function replaceDynamicContext(
       data || context
     );
 
-    return value || match; // Return value or original if not found
+    // Return value if found (even if empty string), otherwise return original match
+    // Use !== '' to distinguish between empty string (valid value) and not found (returns '' from extractValueFromContext)
+    // However, if value is empty string, we should still return it (to clear the template)
+    // But in practice, if value is empty, we probably want to keep the template
+    // So we return value if it's not empty, otherwise return match
+    return value !== '' ? value : match; // Return value if found, otherwise return original template
   });
 }
 
