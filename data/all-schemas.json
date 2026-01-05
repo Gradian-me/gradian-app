@@ -6637,14 +6637,6 @@
         "columns": 2
       },
       {
-        "id": "description",
-        "title": "Description",
-        "description": "Item description and details",
-        "initialState": "expanded",
-        "columns": 2,
-        "inactive": true
-      },
-      {
         "id": "requirements-storage",
         "title": "Requirements & Storage",
         "description": "Required documents, storage conditions, and expiration date",
@@ -6976,6 +6968,51 @@
     "plural_name": "Quotation Items",
     "fields": [
       {
+        "id": "tender-invitaiton",
+        "name": "tenderInvitaiton",
+        "label": "Tender Invitation",
+        "sectionId": "tender-invitaiton",
+        "component": "picker",
+        "order": 0,
+        "placeholder": "Select Tender Invitation",
+        "targetSchema": "tender-invitations",
+        "role": "title",
+        "validation": {
+          "required": true
+        }
+      },
+      {
+        "id": "currency",
+        "name": "currency",
+        "label": "Currency",
+        "sectionId": "financial-details",
+        "component": "select",
+        "placeholder": "Select currency",
+        "description": "Select currency from parameter items",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KD33VYXBTM8CR7NRAK76MS8M",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "unit-price",
+        "name": "unitPrice",
+        "label": "Unit Price",
+        "sectionId": "financial-details",
+        "component": "number",
+        "placeholder": "Enter unit price",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
         "id": "unit-price",
         "name": "unitPrice",
         "label": "Unit Price",
@@ -7073,6 +7110,16 @@
       }
     ],
     "sections": [
+      {
+        "id": "tender-invitaiton",
+        "title": "Tender Invitation",
+        "columns": 2,
+        "isRepeatingSection": false,
+        "repeatingConfig": {
+          "fieldRelationType": "addFields",
+          "minItems": 0
+        }
+      },
       {
         "id": "financial-details",
         "title": "Financial Details",

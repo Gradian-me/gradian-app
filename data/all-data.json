@@ -1510,7 +1510,7 @@
   "purchaseOrders": [],
   "tenders": [
     {
-      "dueDate": "2025-12-25",
+      "dueDate": "2026-01-19",
       "status": [
         {
           "id": "01KCXSVBPFH4B4BNCHC0TY98ZN",
@@ -1519,13 +1519,15 @@
           "color": "yellow"
         }
       ],
-      "description": "test",
-      "incomplete": false,
+      "tenderRound": 1,
+      "incomplete": true,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KDG1MGJXNHB3EMD64GBZ9YDP",
-      "createdAt": "2025-12-27T13:58:12.319Z",
-      "updatedAt": "2025-12-27T13:58:44.129Z",
-      "tender-items-section": []
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KE6NDNSEFMWNY3D4EAGR7Q3W",
+      "createdAt": "2026-01-05T08:47:17.297Z",
+      "updatedAt": "2026-01-05T08:52:11.861Z",
+      "tender-items-section": [],
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
     }
   ],
   "shipments": [],
@@ -2413,8 +2415,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-01-05T08:22:26.514Z",
-      "lastSynced": "2026-01-05T08:22:26.514Z",
+      "updatedAt": "2026-01-05T09:37:51.591Z",
+      "lastSynced": "2026-01-05T09:37:51.591Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2454,7 +2456,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-01-05T08:22:33.552Z",
+      "updatedAt": "2026-01-05T09:15:46.015Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2464,7 +2466,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-01-05T08:22:33.552Z",
+      "lastSynced": "2026-01-05T09:15:46.015Z",
       "lastSyncMessage": "Generated relations for 39 out of 39 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -2515,7 +2517,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2026-01-05T08:22:53.737Z",
+      "updatedAt": "2026-01-05T09:38:02.538Z",
       "category": [
         {
           "id": "production-integration",
@@ -2524,8 +2526,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-01-05T08:22:53.737Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 8, nodes updated: 263, edges created: 121, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2026-01-05T09:38:02.538Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1, nodes updated: 272, edges created: 122, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
@@ -3693,6 +3695,22 @@
       ],
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
+    },
+    {
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "menuTitle": "Tender List",
+      "menuIcon": "BadgeDollarSign",
+      "menuUrl": "/dynamic-query/01KDT7XAH1V7CKTPKZFA5VC6H3",
+      "incomplete": false,
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KE6R5XH3EAZJK9N82D1NEVZ1",
+      "createdAt": "2026-01-05T09:35:28.807Z",
+      "updatedAt": "2026-01-05T09:35:28.807Z"
     }
   ],
   "status-groups": [
@@ -4195,6 +4213,16 @@
       "id": "01KE6KXW48QNQZRYPRDKGFWBFG",
       "createdAt": "2026-01-05T08:21:10.925Z",
       "updatedAt": "2026-01-05T08:21:10.925Z"
+    },
+    {
+      "label": "Submitted",
+      "icon": "Mail",
+      "color": "blue",
+      "incomplete": false,
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KE6Q5VWW26YNBA67BH07R9TN",
+      "createdAt": "2026-01-05T09:17:58.560Z",
+      "updatedAt": "2026-01-05T09:17:58.560Z"
     }
   ],
   "tenants": [
@@ -17560,44 +17588,19 @@
       "inquiryNumber": "INQ-CG-001",
       "inquiryDate": "2025-12-22",
       "description": "Test Description",
-      "incomplete": false,
+      "incomplete": true,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KCZVDJHHKT672CHJC27ZGF5C",
       "createdAt": "2025-12-21T07:01:42.585Z",
-      "updatedAt": "2025-12-21T07:01:42.585Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "inquiryNumber": "INQ 2",
-      "inquiryDate": "2026-01-01",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-      "id": "01KD0TBZ4TNEQEVAWE11B1R1SK",
-      "createdAt": "2025-12-21T16:02:35.816Z",
-      "updatedAt": "2025-12-21T16:05:01.274Z",
-      "tenders": [],
-      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
-    },
-    {
-      "inquiryNumber": "INQ-03",
-      "inquiryDate": "2025-12-23",
-      "description": "Test Inquiry",
-      "incomplete": true,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-      "id": "01KD5D2AZ6AVRV8P5ZNJEX5DQK",
-      "createdAt": "2025-12-23T10:46:20.911Z",
-      "updatedAt": "2026-01-05T07:37:47.134Z",
-      "tenders": [],
-      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "updatedAt": "2026-01-05T08:44:57.143Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
       "status": [
         {
-          "id": "01KCXSC6PE82FJ8BDJTNK8SJSS",
-          "label": "Draft",
-          "icon": "LucideNotebookPen",
-          "color": "blue"
+          "id": "01KCXSVBPFH4B4BNCHC0TY98ZN",
+          "label": "Published For Vendors",
+          "icon": "FileUser",
+          "color": "yellow"
         }
       ]
     }
@@ -18283,40 +18286,82 @@
   ],
   "tender-items": [
     {
-      "partCode": "123",
-      "partName": "123",
-      "brand": "123",
-      "catNo": "123",
-      "quantity": 123,
+      "partCode": "511000715921",
+      "partName": "Sodium Hydroxide",
+      "brand": "Merck",
+      "catNo": "S51512",
+      "description": "Test Description",
+      "quantity": 120,
       "unit": [
         {
-          "id": "01KCXXG00000000000000000004"
+          "id": "01KCXXKG0000000000000000003"
         }
       ],
-      "packSize": "4124",
-      "description": "4124",
+      "packSize": "Container of 20 KGs",
       "requiredDocuments": [
         {
-          "id": "01KCXVM1P39PPQN6X6870BT1QK"
+          "id": "01KCXV8VPYF3PTEZC539WDEM28"
         }
       ],
       "storageCondition": [
         {
-          "id": "01KCXW8CYMG126FZHMJ9PBQMVW"
+          "id": "01KCXW3E9NA1WH19ZJCBCCS11N"
         }
       ],
-      "minimumExpirationDate": "2025-12-25",
+      "minimumExpirationDate": "2026-05-12",
       "relatedPurchaseRequests": [
         {
-          "id": "item-1766843915954-iymi23c6c",
-          "label": "OR-J515121"
+          "id": "item-1767602904343-q3l8fhmix",
+          "label": "OR-K015124"
         }
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KDG1ND73G7BD67MSFC5BT9K6",
-      "createdAt": "2025-12-27T13:58:41.637Z",
-      "updatedAt": "2025-12-27T13:58:41.780Z"
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KE6NG0WV554A78NJ9P9DEX2S",
+      "createdAt": "2026-01-05T08:48:34.207Z",
+      "updatedAt": "2026-01-05T08:52:31.599Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "partCode": "511000512315",
+      "partName": "Feed A",
+      "brand": "Himedia",
+      "catNo": "HM51234",
+      "description": "Test Description",
+      "quantity": 250,
+      "unit": [
+        {
+          "id": "01KCXXLITERS000000000000002"
+        }
+      ],
+      "packSize": "Container of 50 Liters",
+      "requiredDocuments": [
+        {
+          "id": "01KCXV8VPYF3PTEZC539WDEM28"
+        },
+        {
+          "id": "01KCXVH1Q682VQ085PZJA8K8FY"
+        }
+      ],
+      "storageCondition": [
+        {
+          "id": "01KCXW5JYYQ811SSE26DA2C9K8"
+        }
+      ],
+      "minimumExpirationDate": "2026-06-23",
+      "relatedPurchaseRequests": [
+        {
+          "id": "item-1767602978755-1filaafs7",
+          "label": "OR-K051298"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KE6NJ758RQ62V3A3J1NF1RX6",
+      "createdAt": "2026-01-05T08:49:46.159Z",
+      "updatedAt": "2026-01-05T08:49:46.341Z"
     }
   ],
   "pages": [
@@ -18348,15 +18393,36 @@
       ],
       "vendor": [
         {
-          "id": "01KCX516BRTDCD254DYWXM5F6B"
+          "id": "01KCX516BZD0THVCNDXVKSQHT3"
         }
       ],
       "incomplete": false,
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-      "id": "01KDHY0X5A0M2A91XPFCCV7M7R",
-      "createdAt": "2025-12-28T07:33:32.986Z",
-      "updatedAt": "2025-12-28T07:33:33.111Z"
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KE6NXCX0PJQFCPAMQ4R20X97",
+      "createdAt": "2026-01-05T08:55:52.487Z",
+      "updatedAt": "2026-01-05T08:55:52.614Z"
+    },
+    {
+      "status": [
+        {
+          "id": "01KCXSVBPFH4B4BNCHC0TY98ZN",
+          "label": "Published For Vendors",
+          "icon": "FileUser",
+          "color": "yellow"
+        }
+      ],
+      "vendor": [
+        {
+          "id": "01KCX516BZD0THVCNDXVKSQHT3"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KE6NY1SDTJVEHX8GHZ65V6ZT",
+      "createdAt": "2026-01-05T08:56:13.876Z",
+      "updatedAt": "2026-01-05T08:56:13.992Z"
     }
   ],
   "page-metadata-editor-form": [],
@@ -18420,80 +18486,351 @@
       "includeUserId": false,
       "includeCompanyId": false,
       "metadata": {
-        "applyRBAC": false,
+        "columns": [
+          {
+            "fieldId": "id",
+            "schemaId": "inquiries",
+            "groupOrder": 1,
+            "selectOrder": 1
+          },
+          {
+            "fieldId": "inquiryNumber",
+            "schemaId": "inquiries",
+            "groupOrder": 1,
+            "selectOrder": 2
+          },
+          {
+            "fieldId": "description",
+            "schemaId": "inquiries",
+            "groupOrder": 1,
+            "selectOrder": 3
+          },
+          {
+            "fieldId": "inquiryDate",
+            "schemaId": "inquiries",
+            "groupOrder": 1,
+            "selectOrder": 4
+          },
+          {
+            "fieldId": "id",
+            "schemaId": "tenders",
+            "groupOrder": 2,
+            "selectOrder": 5
+          },
+          {
+            "fieldId": "description",
+            "schemaId": "tenders",
+            "groupOrder": 2,
+            "selectOrder": 6
+          },
+          {
+            "fieldId": "dueDate",
+            "schemaId": "tenders",
+            "groupOrder": 2,
+            "selectOrder": 7
+          },
+          {
+            "fieldId": "id",
+            "schemaId": "tender-items",
+            "groupOrder": 3,
+            "selectOrder": 8
+          },
+          {
+            "fieldId": "quantity",
+            "schemaId": "tender-items",
+            "groupOrder": 3,
+            "selectOrder": 9
+          },
+          {
+            "fieldId": "description",
+            "schemaId": "tender-items",
+            "groupOrder": 3,
+            "selectOrder": 10
+          },
+          {
+            "fieldId": "partCode",
+            "schemaId": "tender-items",
+            "groupOrder": 3,
+            "selectOrder": 11
+          },
+          {
+            "fieldId": "partName",
+            "schemaId": "tender-items",
+            "groupOrder": 3,
+            "selectOrder": 12
+          },
+          {
+            "fieldId": "brand",
+            "schemaId": "tender-items",
+            "groupOrder": 3,
+            "selectOrder": 13
+          },
+          {
+            "fieldId": "catNo",
+            "schemaId": "tender-items",
+            "groupOrder": 3,
+            "selectOrder": 14
+          },
+          {
+            "fieldId": "id",
+            "schemaId": "tender-invitations",
+            "groupOrder": 3,
+            "selectOrder": 15
+          },
+          {
+            "fieldId": "vendor",
+            "schemaId": "tender-invitations",
+            "groupOrder": 3,
+            "selectOrder": 16
+          },
+          {
+            "fieldId": "id",
+            "schemaId": "quotations",
+            "groupOrder": 4,
+            "selectOrder": 17
+          },
+          {
+            "fieldId": "quotationNumber",
+            "schemaId": "quotations",
+            "groupOrder": 4,
+            "selectOrder": 18
+          },
+          {
+            "fieldId": "quotationDate",
+            "schemaId": "quotations",
+            "groupOrder": 4,
+            "selectOrder": 19
+          },
+          {
+            "fieldId": "description",
+            "schemaId": "quotations",
+            "groupOrder": 4,
+            "selectOrder": 20
+          },
+          {
+            "fieldId": "currency",
+            "schemaId": "quotations",
+            "groupOrder": 4,
+            "selectOrder": 21
+          },
+          {
+            "fieldId": "incoterm",
+            "schemaId": "quotations",
+            "groupOrder": 4,
+            "selectOrder": 22
+          },
+          {
+            "fieldId": "transportMode",
+            "schemaId": "quotations",
+            "groupOrder": 4,
+            "selectOrder": 23
+          },
+          {
+            "fieldId": "id",
+            "schemaId": "quotation-items",
+            "groupOrder": 5,
+            "selectOrder": 24
+          },
+          {
+            "fieldId": "unitPrice",
+            "schemaId": "quotation-items",
+            "groupOrder": 5,
+            "selectOrder": 25
+          },
+          {
+            "fieldId": "totalPrice",
+            "schemaId": "quotation-items",
+            "groupOrder": 5,
+            "selectOrder": 26
+          },
+          {
+            "fieldId": "tenderItem",
+            "schemaId": "quotation-items",
+            "groupOrder": 5,
+            "selectOrder": 27
+          },
+          {
+            "fieldId": "expirationDate",
+            "schemaId": "quotation-items",
+            "groupOrder": 5,
+            "selectOrder": 28
+          },
+          {
+            "fieldId": "estimatedDeliveryDate",
+            "schemaId": "quotation-items",
+            "groupOrder": 5,
+            "selectOrder": 29
+          },
+          {
+            "fieldId": "storageCondition",
+            "schemaId": "quotation-items",
+            "groupOrder": 5,
+            "selectOrder": 30
+          },
+          {
+            "fieldId": "tenderRound",
+            "schemaId": "tenders",
+            "groupOrder": 2,
+            "selectOrder": 31
+          },
+          {
+            "fieldId": "unit",
+            "schemaId": "tender-items",
+            "groupOrder": 3,
+            "selectOrder": 32
+          },
+          {
+            "fieldId": "packSize",
+            "schemaId": "tender-items",
+            "groupOrder": 3,
+            "selectOrder": 33
+          },
+          {
+            "fieldId": "requiredDocuments",
+            "schemaId": "tender-items",
+            "groupOrder": 3,
+            "selectOrder": 34
+          },
+          {
+            "fieldId": "minimumExpirationDate",
+            "schemaId": "tender-items",
+            "groupOrder": 3,
+            "selectOrder": 35
+          },
+          {
+            "fieldId": "relatedPurchaseRequests",
+            "schemaId": "tender-items",
+            "groupOrder": 3,
+            "selectOrder": 36
+          },
+          {
+            "fieldId": "advancedPaymentAmount",
+            "schemaId": "quotations",
+            "groupOrder": 4,
+            "selectOrder": 37
+          },
+          {
+            "fieldId": "freightCharges",
+            "schemaId": "quotations",
+            "groupOrder": 4,
+            "selectOrder": 38
+          },
+          {
+            "fieldId": "otherCharges",
+            "schemaId": "quotations",
+            "groupOrder": 4,
+            "selectOrder": 39
+          },
+          {
+            "fieldId": "discounts",
+            "schemaId": "quotations",
+            "groupOrder": 4,
+            "selectOrder": 40
+          },
+          {
+            "fieldId": "netPrice",
+            "schemaId": "quotations",
+            "groupOrder": 4,
+            "selectOrder": 41
+          },
+          {
+            "fieldId": "description",
+            "schemaId": "quotation-items",
+            "groupOrder": 5,
+            "selectOrder": 42
+          },
+          {
+            "fieldId": "currency",
+            "schemaId": "quotation-items",
+            "groupOrder": 5,
+            "selectOrder": 43
+          },
+          {
+            "fieldId": "packageSize",
+            "schemaId": "quotation-items",
+            "groupOrder": 5,
+            "selectOrder": 44
+          },
+          {
+            "fieldId": "tenderInvitaiton",
+            "schemaId": "quotation-items",
+            "groupOrder": 5,
+            "selectOrder": 45
+          }
+        ],
         "patterns": [
           {
             "from": {
-              "schemaId": "inquiries",
-              "alias": ""
+              "alias": "",
+              "schemaId": "inquiries"
             }
           },
           {
-            "from": {
-              "schemaId": "inquiries",
-              "alias": ""
-            },
             "to": {
-              "schemaId": "tenders",
-              "alias": ""
+              "alias": "",
+              "schemaId": "tenders"
             },
             "edge": "HAS_TENDER",
+            "from": {
+              "alias": "",
+              "schemaId": "inquiries"
+            },
             "optional": true
           },
           {
-            "from": {
-              "schemaId": "tenders",
-              "alias": ""
-            },
             "to": {
-              "schemaId": "tender-items",
-              "alias": ""
+              "alias": "",
+              "schemaId": "tender-items"
             },
             "edge": "HAS_ITEM",
+            "from": {
+              "alias": "",
+              "schemaId": "tenders"
+            },
             "optional": true
           },
           {
-            "from": {
-              "schemaId": "tenders",
-              "alias": ""
-            },
             "to": {
-              "schemaId": "tender-invitations",
-              "alias": ""
+              "alias": "",
+              "schemaId": "tender-invitations"
             },
             "edge": "HAS_INVITATION",
+            "from": {
+              "alias": "",
+              "schemaId": "tenders"
+            },
             "optional": true
           },
           {
-            "from": {
-              "schemaId": "tender-invitations",
-              "alias": ""
-            },
             "to": {
-              "schemaId": "quotations",
-              "alias": ""
-            },
-            "edge": "HAS_QUOTATION",
-            "optional": true
-          },
-          {
-            "from": {
-              "schemaId": "tender-items",
-              "alias": ""
-            },
-            "to": {
-              "schemaId": "quotation-items",
-              "alias": ""
+              "alias": "",
+              "schemaId": "quotation-items"
             },
             "edge": "HAS_QUOTATION_ITEM",
+            "from": {
+              "alias": "",
+              "schemaId": "tender-items"
+            },
+            "optional": true
+          },
+          {
+            "to": {
+              "alias": "",
+              "schemaId": "quotations"
+            },
+            "edge": "HAS_QUOTATION",
+            "from": {
+              "alias": "",
+              "schemaId": "tender-invitations"
+            },
             "optional": true
           }
         ],
-        "columns": [],
+        "applyRBAC": false,
         "pagination": {
-          "strategy": "offset",
           "limit": 100,
-          "offset": 0
+          "offset": 0,
+          "strategy": "offset"
         }
       },
       "relatedTenants": [
@@ -18525,7 +18862,7 @@
       "isRequired": false,
       "id": "01KDT7XAH1V7CKTPKZFA5VC6H3",
       "createdAt": "2025-12-31T13:00:16.810Z",
-      "updatedAt": "2026-01-05T08:02:17.542Z",
+      "updatedAt": "2026-01-05T10:47:57.406Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
