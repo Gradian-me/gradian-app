@@ -6333,6 +6333,12 @@
         "id": "01KBFBAZR3K04CS80DMHGPHMHF",
         "label": "Supply Chain Management"
       }
+    ],
+    "statusGroup": [
+      {
+        "id": "01KCXSBQMD17BR96WWSKBJMEZ4",
+        "label": "Inquiry Tender Status"
+      }
     ]
   },
   {
@@ -6352,6 +6358,21 @@
         "role": "description",
         "colSpan": 2,
         "order": 2
+      },
+      {
+        "id": "field-1767598824661",
+        "name": "tenderRound",
+        "label": "Tender Round",
+        "sectionId": "basic-information",
+        "component": "number",
+        "order": 1,
+        "placeholder": "Enter Tender Round",
+        "role": "title",
+        "validation": {
+          "min": 1,
+          "max": 100,
+          "required": true
+        }
       }
     ],
     "sections": [
@@ -6405,7 +6426,7 @@
         "label": "Supply Chain Management"
       }
     ],
-    "allowDataForce": true,
+    "allowDataForce": false,
     "allowDataDueDate": true,
     "statusGroup": [
       {
@@ -6525,7 +6546,7 @@
         "id": "description",
         "name": "description",
         "label": "Description",
-        "sectionId": "description",
+        "sectionId": "part-information",
         "component": "textarea",
         "placeholder": "Enter description",
         "validation": {
@@ -6533,7 +6554,7 @@
         },
         "role": "description",
         "colSpan": 2,
-        "order": 1
+        "order": 5
       },
       {
         "id": "required-documents",
@@ -6620,7 +6641,8 @@
         "title": "Description",
         "description": "Item description and details",
         "initialState": "expanded",
-        "columns": 2
+        "columns": 2,
+        "inactive": true
       },
       {
         "id": "requirements-storage",
@@ -6635,6 +6657,19 @@
         "description": "Purchase request codes related to this tender item",
         "initialState": "expanded",
         "columns": 2
+      },
+      {
+        "id": "quotation-items",
+        "title": "Quotation Items",
+        "description": "Manage Quotation Items linked to tender items with financial details",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "connectToSchema",
+          "minItems": 0,
+          "targetSchema": "quotation-items",
+          "relationTypeId": "HAS_QUOTATION_ITEM"
+        }
       }
     ],
     "showInNavigation": false,
@@ -6921,23 +6956,6 @@
         "description": "Financial information including charges and pricing",
         "initialState": "expanded",
         "columns": 2
-      },
-      {
-        "id": "quotation-items-section",
-        "title": "Quotation Items",
-        "description": "Items included in this quotation",
-        "initialState": "expanded",
-        "columns": 2,
-        "isRepeatingSection": true,
-        "repeatingConfig": {
-          "fieldRelationType": "connectToSchema",
-          "minItems": 1,
-          "targetSchema": "quotation-items",
-          "addType": "addOnly",
-          "relationTypeId": "HAS_QUOTATION_ITEM",
-          "deleteType": "itemAndRelation",
-          "isUnique": true
-        }
       }
     ],
     "showInNavigation": false,
@@ -6957,22 +6975,6 @@
     "singular_name": "Quotation Item",
     "plural_name": "Quotation Items",
     "fields": [
-      {
-        "id": "tender-item",
-        "name": "tenderItem",
-        "label": "Tender Item",
-        "sectionId": "tender-item-details",
-        "component": "picker",
-        "placeholder": "Select tender item",
-        "description": "Link this quotation item to a tender item",
-        "targetSchema": "tender-items",
-        "role": "reference",
-        "validation": {
-          "required": true
-        },
-        "colSpan": 2,
-        "order": 1
-      },
       {
         "id": "unit-price",
         "name": "unitPrice",
@@ -7071,13 +7073,6 @@
       }
     ],
     "sections": [
-      {
-        "id": "tender-item-details",
-        "title": "Tender Item Details",
-        "description": "Select the tender item for this quotation",
-        "initialState": "expanded",
-        "columns": 2
-      },
       {
         "id": "financial-details",
         "title": "Financial Details",

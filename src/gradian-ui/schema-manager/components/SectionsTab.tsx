@@ -87,8 +87,10 @@ export function SectionsTab({
     return hasNoFields && isNotRepeating;
   };
 
-  // Check if there are any incomplete sections
-  const hasIncompleteSections = safeSections.some(isSectionIncomplete);
+  // Check if there are any incomplete sections (excluding inactive ones)
+  const hasIncompleteSections = safeSections
+    .filter(s => !s.inactive)
+    .some(isSectionIncomplete);
   
   // Check if there are any inactive sections
   const hasInactiveSections = useMemo(() => safeSections.some(s => s.inactive), [safeSections]);

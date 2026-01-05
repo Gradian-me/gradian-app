@@ -131,26 +131,6 @@
   },
   {
     "sourceSchema": "status-groups",
-    "sourceId": "01KBHDSGKBHTTEH1YPGB5TECZZ",
-    "targetSchema": "status-items",
-    "targetId": "01KBHDVF89P8TK0FNX350VNFWJ",
-    "relationTypeId": "HAS_STATUS_ITEM",
-    "id": "01KBHDVFCYG0RBKYFMXF8ZPQD0",
-    "createdAt": "2025-12-03T06:19:34.174Z",
-    "updatedAt": "2025-12-03T06:19:34.174Z"
-  },
-  {
-    "sourceSchema": "status-groups",
-    "sourceId": "01KBHDSGKBHTTEH1YPGB5TECZZ",
-    "targetSchema": "status-items",
-    "targetId": "01KBHDWYYB2TZT92CM9MJEMK3B",
-    "relationTypeId": "HAS_STATUS_ITEM",
-    "id": "01KBHDWZ2T6WQJN0VZQ9SDKTNS",
-    "createdAt": "2025-12-03T06:20:23.002Z",
-    "updatedAt": "2025-12-03T06:20:23.002Z"
-  },
-  {
-    "sourceSchema": "status-groups",
     "sourceId": "01KBHD90EMZKAT502KNVVDQZC7",
     "targetSchema": "status-items",
     "targetId": "01KBHGRPA3CWWXY3YXJPB6667Q",
@@ -402,7 +382,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSSDQG4GFD4NPDSC2751A6Y",
     "createdAt": "2025-12-06T12:15:42.084Z",
-    "updatedAt": "2025-12-06T12:15:42.084Z"
+    "updatedAt": "2026-01-05T07:30:56.702Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -412,7 +393,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSSG0GGHYNVQMF44P0QF5NY",
     "createdAt": "2025-12-06T12:16:56.848Z",
-    "updatedAt": "2025-12-06T12:16:56.848Z"
+    "updatedAt": "2026-01-05T07:30:56.708Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -422,7 +404,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSSGF1T2EKZMBKZ1MQRER3G",
     "createdAt": "2025-12-06T12:17:11.738Z",
-    "updatedAt": "2025-12-06T12:17:11.738Z"
+    "updatedAt": "2026-01-05T07:30:56.711Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -432,7 +415,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSSK2GWSQC8TT6GCZMHGM7F",
     "createdAt": "2025-12-06T12:18:37.212Z",
-    "updatedAt": "2025-12-06T12:18:37.212Z"
+    "updatedAt": "2026-01-05T07:30:56.715Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -442,7 +426,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSSMTD4ZJXVE21PS7X7MDS2",
     "createdAt": "2025-12-06T12:19:34.436Z",
-    "updatedAt": "2025-12-06T12:19:34.436Z"
+    "updatedAt": "2026-01-05T07:30:56.719Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -452,7 +437,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSSNSYAE2CGCCSF5RBRCM2D",
     "createdAt": "2025-12-06T12:20:06.730Z",
-    "updatedAt": "2025-12-06T12:20:06.730Z"
+    "updatedAt": "2026-01-05T07:30:56.723Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -462,7 +448,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSSP4PFR8J9QPJE4B7DM9PT",
     "createdAt": "2025-12-06T12:20:17.742Z",
-    "updatedAt": "2025-12-06T12:20:17.742Z"
+    "updatedAt": "2026-01-05T07:30:56.726Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -472,7 +459,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSSPJWAP4W83CP1TK6J9D1X",
     "createdAt": "2025-12-06T12:20:32.266Z",
-    "updatedAt": "2025-12-06T12:20:32.266Z"
+    "updatedAt": "2026-01-05T07:30:56.730Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -482,7 +470,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSSR4XC2Q49Y6KB7G9BSZNK",
     "createdAt": "2025-12-06T12:21:23.500Z",
-    "updatedAt": "2025-12-06T12:21:23.500Z"
+    "updatedAt": "2026-01-05T07:30:56.734Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -2209,5 +2198,76 @@
     "fieldId": "resource",
     "createdAt": "2026-01-04T14:17:58.267Z",
     "updatedAt": "2026-01-04T14:34:54.664Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KCXSBQMD17BR96WWSKBJMEZ4",
+    "targetSchema": "status-items",
+    "targetId": "01KCXSC6PE82FJ8BDJTNK8SJSS",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KCXSC6SK4ZFA14HMRXPH1W6M",
+    "createdAt": "2025-12-20T11:47:31.680Z",
+    "updatedAt": "2025-12-20T11:47:31.680Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KCXSBQMD17BR96WWSKBJMEZ4",
+    "targetSchema": "status-items",
+    "targetId": "01KCXSVBPFH4B4BNCHC0TY98ZN",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KCXSVBSK4ZFA14HMRXPH1W6N",
+    "createdAt": "2025-12-20T11:55:48.334Z",
+    "updatedAt": "2025-12-20T11:55:48.334Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KCXSBQMD17BR96WWSKBJMEZ4",
+    "targetSchema": "status-items",
+    "targetId": "01KCXSZ6VTQX3P3Z3J5Q4JJ1P5",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KCXSZ6SK4ZFA14HMRXPH1W6P",
+    "createdAt": "2025-12-20T11:57:54.431Z",
+    "updatedAt": "2025-12-20T11:57:54.431Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KCXSBQMD17BR96WWSKBJMEZ4",
+    "targetSchema": "status-items",
+    "targetId": "01KCXT066WCM231G176JGVGSWJ",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KCXT06SK4ZFA14HMRXPH1W6Q",
+    "createdAt": "2025-12-20T11:58:26.530Z",
+    "updatedAt": "2025-12-20T11:58:26.530Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KCXSBQMD17BR96WWSKBJMEZ4",
+    "targetSchema": "status-items",
+    "targetId": "01KCXT1B3PC7FQKF0QFH0318NA",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KCXT1BSK4ZFA14HMRXPH1W6R",
+    "createdAt": "2025-12-20T11:59:04.330Z",
+    "updatedAt": "2025-12-20T11:59:04.330Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KCXSBQMD17BR96WWSKBJMEZ4",
+    "targetSchema": "status-items",
+    "targetId": "01KDFX74SR0S1165EVS0SCT2RB",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KDFX74SK4ZFA14HMRXPH1W6S",
+    "createdAt": "2025-12-27T12:40:59.974Z",
+    "updatedAt": "2025-12-27T12:40:59.974Z"
+  },
+  {
+    "id": "01KE6HZ7G9K80CA1W2J57WSXY5",
+    "sourceSchema": "users",
+    "sourceId": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+    "targetSchema": "external_nodes",
+    "targetId": "form-based",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-01-05T07:46:58.183Z",
+    "updatedAt": "2026-01-05T07:46:58.183Z"
   }
 ]
