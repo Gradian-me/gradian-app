@@ -7097,6 +7097,12 @@
         "id": "01KBFBAZR3K04CS80DMHGPHMHF",
         "label": "Supply Chain Management"
       }
+    ],
+    "statusGroup": [
+      {
+        "id": "01KE6KVDWCP165V68F3RC7J952",
+        "label": "Quotation Item Status"
+      }
     ]
   },
   {

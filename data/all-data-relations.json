@@ -137,7 +137,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBHGRY38YYYCH9GDQPP5WBSW",
     "createdAt": "2025-12-03T07:10:36.647Z",
-    "updatedAt": "2025-12-03T07:10:36.647Z"
+    "updatedAt": "2026-01-05T08:19:24.605Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -147,7 +148,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBHGVB7SBZ536N8SX62E9HKV",
     "createdAt": "2025-12-03T07:11:55.641Z",
-    "updatedAt": "2025-12-03T07:11:55.641Z"
+    "updatedAt": "2026-01-05T08:19:24.609Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -157,7 +159,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBHH03H86RJC7VEEVCWW73TV",
     "createdAt": "2025-12-03T07:14:31.591Z",
-    "updatedAt": "2025-12-03T07:14:31.591Z"
+    "updatedAt": "2026-01-05T08:19:24.614Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -167,7 +170,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBHH1R8KG66CC1RPZ1RJ7MXK",
     "createdAt": "2025-12-03T07:15:25.587Z",
-    "updatedAt": "2025-12-03T07:15:25.587Z"
+    "updatedAt": "2026-01-05T08:19:24.623Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -177,7 +181,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBHH3HSD5VNRFVM7CFVG6SWR",
     "createdAt": "2025-12-03T07:16:24.493Z",
-    "updatedAt": "2025-12-03T07:16:24.493Z"
+    "updatedAt": "2026-01-05T08:19:24.628Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -187,7 +192,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBHH7C1QGMS54XPVZBEWYTGB",
     "createdAt": "2025-12-03T07:18:29.687Z",
-    "updatedAt": "2025-12-03T07:18:29.687Z"
+    "updatedAt": "2026-01-05T08:19:24.633Z",
+    "inactive": true
   },
   {
     "id": "01KBMHCVR5JTMYJTVEPS4MXP1W",
@@ -481,7 +487,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSVYXK372B44E23PP7ZE11A",
     "createdAt": "2025-12-06T13:00:02.531Z",
-    "updatedAt": "2025-12-06T13:00:02.531Z"
+    "updatedAt": "2026-01-05T08:19:17.671Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -491,7 +498,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSVZ3PXSAQPJ0Q3XBT8JX6B",
     "createdAt": "2025-12-06T13:00:08.797Z",
-    "updatedAt": "2025-12-06T13:00:08.797Z"
+    "updatedAt": "2026-01-05T08:19:17.675Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -501,7 +509,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSVZ9Q510GHWCT98S5HCZK4",
     "createdAt": "2025-12-06T13:00:14.949Z",
-    "updatedAt": "2025-12-06T13:00:14.949Z"
+    "updatedAt": "2026-01-05T08:19:17.679Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -511,7 +520,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSVZHH6461M96D5M1WP3S69",
     "createdAt": "2025-12-06T13:00:22.950Z",
-    "updatedAt": "2025-12-06T13:00:22.950Z"
+    "updatedAt": "2026-01-05T08:19:17.684Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -521,7 +531,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KBSVZZF1C2R17BK1AK5P2H24",
     "createdAt": "2025-12-06T13:00:37.217Z",
-    "updatedAt": "2025-12-06T13:00:37.217Z"
+    "updatedAt": "2026-01-05T08:19:17.689Z",
+    "inactive": true
   },
   {
     "id": "01KC3F79Z4TWYW4AVB7VKZCETY",
@@ -2207,7 +2218,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KCXSC6SK4ZFA14HMRXPH1W6M",
     "createdAt": "2025-12-20T11:47:31.680Z",
-    "updatedAt": "2025-12-20T11:47:31.680Z"
+    "updatedAt": "2026-01-05T08:19:06.622Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -2217,7 +2229,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KCXSVBSK4ZFA14HMRXPH1W6N",
     "createdAt": "2025-12-20T11:55:48.334Z",
-    "updatedAt": "2025-12-20T11:55:48.334Z"
+    "updatedAt": "2026-01-05T08:19:06.626Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -2227,7 +2240,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KCXSZ6SK4ZFA14HMRXPH1W6P",
     "createdAt": "2025-12-20T11:57:54.431Z",
-    "updatedAt": "2025-12-20T11:57:54.431Z"
+    "updatedAt": "2026-01-05T08:19:06.630Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -2237,7 +2251,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KCXT06SK4ZFA14HMRXPH1W6Q",
     "createdAt": "2025-12-20T11:58:26.530Z",
-    "updatedAt": "2025-12-20T11:58:26.530Z"
+    "updatedAt": "2026-01-05T08:19:06.636Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -2247,7 +2262,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KCXT1BSK4ZFA14HMRXPH1W6R",
     "createdAt": "2025-12-20T11:59:04.330Z",
-    "updatedAt": "2025-12-20T11:59:04.330Z"
+    "updatedAt": "2026-01-05T08:19:06.639Z",
+    "inactive": true
   },
   {
     "sourceSchema": "status-groups",
@@ -2257,7 +2273,8 @@
     "relationTypeId": "HAS_STATUS_ITEM",
     "id": "01KDFX74SK4ZFA14HMRXPH1W6S",
     "createdAt": "2025-12-27T12:40:59.974Z",
-    "updatedAt": "2025-12-27T12:40:59.974Z"
+    "updatedAt": "2026-01-05T08:19:06.645Z",
+    "inactive": true
   },
   {
     "id": "01KE6HZ7G9K80CA1W2J57WSXY5",
@@ -2269,5 +2286,27 @@
     "fieldId": "authentication-type",
     "createdAt": "2026-01-05T07:46:58.183Z",
     "updatedAt": "2026-01-05T07:46:58.183Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KE6KVDWCP165V68F3RC7J952",
+    "targetSchema": "status-items",
+    "targetId": "01KE6KXA2RZ16TR8Q6RMSPACZ1",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KE6KXA5CDF9MQTV2TFVCNWVX",
+    "createdAt": "2026-01-05T08:20:52.524Z",
+    "updatedAt": "2026-01-05T08:21:12.849Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KE6KVDWCP165V68F3RC7J952",
+    "targetSchema": "status-items",
+    "targetId": "01KE6KXW48QNQZRYPRDKGFWBFG",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KE6KXW7FYSZFQTT9RHMRKAKA",
+    "createdAt": "2026-01-05T08:21:11.023Z",
+    "updatedAt": "2026-01-05T08:21:12.853Z",
+    "inactive": true
   }
 ]
