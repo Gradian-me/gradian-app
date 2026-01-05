@@ -5874,5 +5874,43 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KE5COLORREFACTOR001",
+    "timestamp": "2026-01-05T09:25:39+0330",
+    "version": "1.44.003",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "Updated targetSchema references from 'external-nodes' to 'external_nodes' across multiple files for consistency",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "data-management",
+          "codebase"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved data validation and handling in clean-relations.js by integrating all-schemas.json for better relation checks",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-management",
+          "relations",
+          "validation"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Adjusted color properties in all-data.json and all-schemas.json for better UI consistency. This update enhances data integrity and user experience across the application",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "data-management",
+          "schemas",
+          "user-experience"
+        ]
+      }
+    ]
   }
 ]

@@ -30,6 +30,7 @@ import { replaceDynamicContext } from '../../utils/dynamic-context-replacer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
+import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
 
 export interface SelectOption {
   id?: string;
@@ -202,17 +203,17 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const referenceRelationTypeId = config?.referenceRelationTypeId;
   const referenceEntityId = config?.referenceEntityId;
   
-  // Extract config values for dependency array (must be simple expressions)
-  const configTargetSchema = (config as any)?.targetSchema;
-  const configTargetSchemaUnderscore = (config as any)?.target_schema;
-  const configTargetSchemaDash = (config as any)?.['target-schema'];
-  const configName = (config as any)?.name;
-  const configId = (config as any)?.id;
-  
   // Extract targetSchema with defensive checks for production
   // Try multiple possible property names and handle empty strings
   // Process through dynamic context replacer to support templates like {{formData.resourceType}}
   const targetSchemaFromConfig = React.useMemo(() => {
+    // Access config properties directly inside the memo to satisfy React Compiler
+    const configTargetSchema = (config as any)?.targetSchema;
+    const configTargetSchemaUnderscore = (config as any)?.target_schema;
+    const configTargetSchemaDash = (config as any)?.['target-schema'];
+    const configName = (config as any)?.name;
+    const configId = (config as any)?.id;
+    
     const ts = configTargetSchema || configTargetSchemaUnderscore || configTargetSchemaDash;
     
     if (!ts || String(ts).trim() === '') {
@@ -226,12 +227,12 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     
     // Check if the result still contains unresolved templates (still has {{ and }})
     // If so, return null to prevent invalid schema fetches
-    if (resolvedTargetSchema.includes('{{') && resolvedTargetSchema.includes('}}')) {
+    if (typeof resolvedTargetSchema === 'string' && resolvedTargetSchema.includes('{{') && resolvedTargetSchema.includes('}}')) {
       return null;
     }
     
     // Return null for empty string, otherwise return the resolved value
-    const result = resolvedTargetSchema.trim() !== '' ? resolvedTargetSchema.trim() : null;
+    const result = typeof resolvedTargetSchema === 'string' && resolvedTargetSchema.trim() !== '' ? resolvedTargetSchema.trim() : null;
     
     // Log in production to help debug issues
     if (process.env.NODE_ENV === 'production' && !result && (config as any)?.component === 'select' && (configTargetSchema || configTargetSchemaUnderscore || configTargetSchemaDash)) {
@@ -239,7 +240,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     }
     
     return result;
-  }, [configTargetSchema, configTargetSchemaUnderscore, configTargetSchemaDash, configName, configId, dynamicContext.formSchema, dynamicContext.formData]);
+  }, [config, dynamicContext]);
 
   // Check if referenceEntityId is static (no dynamic context syntax)
   const isStaticReferenceId = React.useMemo(() => {
@@ -507,8 +508,11 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   // Check if color is a valid badge variant, custom color, or Tailwind classes
   const isValidBadgeVariant = (color?: string): boolean => {
     if (!color) return false;
-    const validVariants = ['default', 'secondary', 'destructive', 'success', 'warning', 'info', 'outline', 'gradient', 'muted'];
-    return validVariants.includes(color);
+    // Use getValidBadgeVariant to check if it's a valid badge variant
+    // The function returns the color if valid, or 'outline' as fallback for invalid colors
+    const variant = getValidBadgeVariant(color);
+    // If the variant matches the input, it's a valid variant (including 'outline' itself)
+    return variant === color;
   };
 
   const isHexColor = (color: string): boolean => {

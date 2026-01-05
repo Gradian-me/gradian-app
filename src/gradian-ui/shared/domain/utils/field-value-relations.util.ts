@@ -254,7 +254,7 @@ export async function syncHasFieldValueRelationsForEntity(params: {
           });
 
           targets.push({
-            targetSchema: 'external-nodes',
+            targetSchema: 'external_nodes',
             targetId: externalNode.id,
           });
         } else {
@@ -268,13 +268,13 @@ export async function syncHasFieldValueRelationsForEntity(params: {
           });
 
           targets.push({
-            targetSchema: 'external-nodes',
+            targetSchema: 'external_nodes',
             targetId: externalNode.id,
           });
         }
       } else if (fieldOptions && Array.isArray(fieldOptions) && fieldOptions.length > 0) {
         // Field has options defined directly (select, checkbox-list, radio, toggle-group with static options)
-        // Create relations to external-nodes for these options
+        // Create relations to external_nodes for these options
         let optionId: string | undefined;
         let optionLabel: string | undefined;
         let optionIcon: string | undefined;
@@ -316,7 +316,7 @@ export async function syncHasFieldValueRelationsForEntity(params: {
           });
 
           targets.push({
-            targetSchema: 'external-nodes',
+            targetSchema: 'external_nodes',
             targetId: externalNode.id,
           });
         }
@@ -466,7 +466,7 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
 
     await Promise.all(
       Array.from(relationsByTargetSchema.keys())
-        .filter((schemaId) => schemaId !== 'external-nodes')
+        .filter((schemaId) => schemaId !== 'external_nodes')
         .map(async (targetSchemaId) => {
           try {
             const [targetSchema, allEntities] = await Promise.all([
@@ -556,7 +556,7 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
         const storedItem = existingValueMap.get(String(rel.targetId));
         const storedMetadata = storedItem?.metadata;
 
-        if (rel.targetSchema === 'external-nodes') {
+        if (rel.targetSchema === 'external_nodes') {
           const externalNode = externalNodeMap.get(rel.targetId);
           if (externalNode) {
             return {

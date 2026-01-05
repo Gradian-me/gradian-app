@@ -107,7 +107,7 @@ export const renderCardSection = ({ section, schema, data, maxMetrics = 3, onBad
                                         targetSchema = replaceDynamicContext(rawTargetSchema, { formSchema: schema, formData: data });
                                         
                                         // Skip if still contains unresolved templates
-                                        if (targetSchema.includes('{{') && targetSchema.includes('}}')) {
+                                        if (targetSchema && typeof targetSchema === 'string' && targetSchema.includes('{{') && targetSchema.includes('}}')) {
                                           console.warn('[renderCardSection] Could not resolve targetSchema template:', rawTargetSchema);
                                           return;
                                         }

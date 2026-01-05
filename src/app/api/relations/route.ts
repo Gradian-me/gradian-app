@@ -134,7 +134,7 @@ export async function GET(request: NextRequest) {
       // Group internal relations by targetSchema to batch fetch
       const relationsBySchema = new Map<string, DataRelation[]>();
       for (const rel of relations) {
-        if (rel.targetSchema !== 'external-nodes') {
+        if (rel.targetSchema !== 'external_nodes') {
           if (!relationsBySchema.has(rel.targetSchema)) {
             relationsBySchema.set(rel.targetSchema, []);
           }
@@ -178,7 +178,7 @@ export async function GET(request: NextRequest) {
         try {
           let targetData: { id: string; label?: string; icon?: string; color?: string } | null = null;
 
-          if (rel.targetSchema === 'external-nodes') {
+          if (rel.targetSchema === 'external_nodes') {
             // Lookup from pre-loaded external nodes map
             const externalNode = externalNodeMap.get(rel.targetId);
             if (externalNode) {

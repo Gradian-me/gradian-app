@@ -75,7 +75,7 @@
     "applyToAllTenants": true
   },
   {
-    "id": "external-nodes",
+    "id": "external_nodes",
     "description": "Manage external nodes from external data sources and APIs",
     "singular_name": "External Node",
     "plural_name": "External Nodes",

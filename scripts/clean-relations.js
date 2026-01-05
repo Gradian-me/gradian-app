@@ -11,6 +11,7 @@ const fs = require('fs');
 const path = require('path');
 
 const DATA_FILE = path.join(__dirname, '..', 'data', 'all-data.json');
+const SCHEMAS_FILE = path.join(__dirname, '..', 'data', 'all-schemas.json');
 const RELATIONS_FILE = path.join(__dirname, '..', 'data', 'all-data-relations.json');
 const RELATIONS_TMP = path.join(__dirname, '..', 'data', 'all-data-relations.tmp.json');
 
@@ -48,32 +49,58 @@ function buildIdIndex(allData) {
   return index;
 }
 
-function isRelationValid(relation, idIndex) {
+function buildSchemasIdIndex(allSchemas) {
+  const ids = new Set();
+  
+  if (!Array.isArray(allSchemas)) {
+    return ids;
+  }
+
+  for (const schema of allSchemas) {
+    if (schema && schema.id !== undefined && schema.id !== null) {
+      ids.add(String(schema.id));
+    }
+  }
+
+  return ids;
+}
+
+function isRelationValid(relation, idIndex, schemasIdIndex) {
   if (!relation || !relation.sourceSchema || !relation.targetSchema) {
     return false;
   }
 
   const sourceIds = idIndex.get(relation.sourceSchema);
-  const targetIds = idIndex.get(relation.targetSchema);
-
-  if (!sourceIds || !targetIds) {
+  if (!sourceIds || !sourceIds.has(String(relation.sourceId))) {
     return false;
   }
 
-  return sourceIds.has(String(relation.sourceId)) && targetIds.has(String(relation.targetId));
+  // Special case: if targetSchema is "schemas", check all-schemas.json instead
+  if (relation.targetSchema === 'schemas') {
+    return schemasIdIndex.has(String(relation.targetId));
+  }
+
+  const targetIds = idIndex.get(relation.targetSchema);
+  if (!targetIds || !targetIds.has(String(relation.targetId))) {
+    return false;
+  }
+
+  return true;
 }
 
 function main() {
   const allData = loadJson(DATA_FILE, 'all-data.json');
+  const allSchemas = loadJson(SCHEMAS_FILE, 'all-schemas.json');
   const allRelations = loadJson(RELATIONS_FILE, 'all-data-relations.json');
 
   const idIndex = buildIdIndex(allData);
+  const schemasIdIndex = buildSchemasIdIndex(allSchemas);
 
   const validRelations = [];
   let removedCount = 0;
 
   for (const relation of Array.isArray(allRelations) ? allRelations : []) {
-    if (isRelationValid(relation, idIndex)) {
+    if (isRelationValid(relation, idIndex, schemasIdIndex)) {
       validRelations.push(relation);
     } else {
       removedCount += 1;
@@ -81,7 +108,7 @@ function main() {
   }
 
   if (removedCount === 0) {
-    console.log('✅ Relations are already consistent with all-data.json');
+    console.log('✅ Relations are already consistent with all-data.json and all-schemas.json');
     return;
   }
 

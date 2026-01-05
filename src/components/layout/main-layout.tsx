@@ -628,7 +628,7 @@ function MainLayoutContent({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           className={cn(
-            "flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900",
+            "flex-1 overflow-y-auto bg-slate-100 dark:bg-gray-900",
             hidePadding ? "p-0" : "p-2 md:p-4 lg:p-6"
           )}
           data-scroll-container="main-content"

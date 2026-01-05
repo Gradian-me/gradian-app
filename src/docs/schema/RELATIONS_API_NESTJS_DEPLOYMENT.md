@@ -1864,7 +1864,7 @@ export class CreateEntityDto {
 - **Timestamp Format**: Use ISO 8601 format (e.g., `2024-01-15T10:30:00.000Z`)
 - **Soft Delete**: Use `inactive` boolean field rather than hard deletes for audit trail
 - **Backward Compatibility**: Support legacy query parameters for existing clients
-- **External Nodes**: If your system uses external nodes, implement lookup logic for `targetSchema === 'external-nodes'`
+- **External Nodes**: If your system uses external nodes, implement lookup logic for `targetSchema === 'external_nodes'`
 - **Schema Registry**: Implement schema lookup service to resolve field roles (`title`, `icon`, `color`, `addToReferenceMetadata`)
 - **Demo Mode**: Consider supporting demo mode for development/testing (use local file storage instead of database)
 - **Migration Strategy**: Plan migration path from file-based storage to database

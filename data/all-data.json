@@ -16745,7 +16745,6 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
-  "external-nodes": [],
   "related-documents": [],
   "sync-strategies": [],
   "reset-password-form": [],
@@ -18845,42 +18844,42 @@
       "id": "CONTRIBUTOR",
       "label": "Contributor",
       "icon": "Edit",
-      "color": "warning",
+      "color": "amber",
       "sourceUrl": "field-options:app-access-policies:access-policy-type"
     },
     {
       "id": "SCHEMA",
       "label": "Schema",
       "icon": "Database",
-      "color": "warning",
+      "color": "amber",
       "sourceUrl": "field-options:app-permissions:resource-type"
     },
     {
       "id": "VIEW",
       "label": "View",
       "icon": "Eye",
-      "color": "info",
+      "color": "blue",
       "sourceUrl": "field-options:app-permissions:action-types"
     },
     {
       "id": "ALLOW",
       "label": "Allow",
       "icon": "CheckCircle",
-      "color": "success",
+      "color": "green",
       "sourceUrl": "field-options:app-permissions:permission-type"
     },
     {
       "id": "CREATE",
       "label": "Create",
       "icon": "Plus",
-      "color": "success",
+      "color": "green",
       "sourceUrl": "field-options:app-permissions:action-types"
     },
     {
       "id": "EDIT",
       "label": "Edit",
       "icon": "Edit",
-      "color": "warning",
+      "color": "amber",
       "sourceUrl": "field-options:app-permissions:action-types"
     },
     {
@@ -18894,14 +18893,14 @@
       "id": "READER",
       "label": "Reader",
       "icon": "Eye",
-      "color": "info",
+      "color": "blue",
       "sourceUrl": "field-options:app-access-policies:access-policy-type"
     },
     {
       "id": "schemas",
       "label": "Schema",
       "icon": "Database",
-      "color": "warning",
+      "color": "amber",
       "sourceUrl": "field-options:app-permissions:resource-type"
     },
     {
@@ -18915,21 +18914,21 @@
       "id": "POST",
       "label": "POST",
       "icon": "Upload",
-      "color": "emerald",
+      "color": "green",
       "sourceUrl": "field-options:integrations:integration-target-method"
     },
     {
       "id": "dynamic-queries",
       "label": "Dynamic Query",
       "icon": "Database",
-      "color": "default",
+      "color": "cyan",
       "sourceUrl": "field-options:app-permissions:resource-type"
     },
     {
       "id": "applications",
       "label": "Application",
       "icon": "AppWindow",
-      "color": "info",
+      "color": "purple",
       "sourceUrl": "field-options:app-permissions:resource-type"
     }
   ],

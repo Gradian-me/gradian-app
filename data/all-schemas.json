@@ -1158,37 +1158,37 @@
             "id": "development",
             "label": "Development",
             "icon": "Code",
-            "color": "info"
+            "color": "blue"
           },
           {
             "id": "validation",
             "label": "Validation",
             "icon": "CheckCircle",
-            "color": "warning"
+            "color": "amber"
           },
           {
             "id": "staging",
             "label": "Staging",
             "icon": "Server",
-            "color": "success"
+            "color": "green"
           },
           {
             "id": "production",
             "label": "Production",
             "icon": "Server",
-            "color": "success"
+            "color": "green"
           },
           {
             "id": "maintenance",
             "label": "Maintenance",
             "icon": "Server",
-            "color": "muted"
+            "color": "gray"
           },
           {
             "id": "discontinued",
             "label": "Discontinued",
             "icon": "Server",
-            "color": "destructive"
+            "color": "red"
           }
         ],
         "colSpan": 1,
@@ -1342,13 +1342,13 @@
             "id": "GET",
             "label": "GET",
             "icon": "ArrowRight",
-            "color": "info"
+            "color": "blue"
           },
           {
             "id": "POST",
             "label": "POST",
             "icon": "ArrowRight",
-            "color": "success"
+            "color": "green"
           },
           {
             "id": "PUT",
@@ -1686,13 +1686,13 @@
             "id": "GET",
             "label": "GET",
             "icon": "Download",
-            "color": "info"
+            "color": "blue"
           },
           {
             "id": "POST",
             "label": "POST",
             "icon": "Upload",
-            "color": "success"
+            "color": "green"
           }
         ],
         "colSpan": 1,
@@ -1728,13 +1728,13 @@
             "id": "GET",
             "label": "GET",
             "icon": "Download",
-            "color": "info"
+            "color": "blue"
           },
           {
             "id": "POST",
             "label": "POST",
             "icon": "Upload",
-            "color": "success"
+            "color": "green"
           }
         ],
         "colSpan": 1,
@@ -1865,55 +1865,55 @@
             "id": "SQL_SERVER",
             "label": "SQL Server",
             "icon": "Server",
-            "color": "info"
+            "color": "blue"
           },
           {
             "id": "POSTGRESQL",
             "label": "PostgreSQL",
             "icon": "Database",
-            "color": "info"
+            "color": "blue"
           },
           {
             "id": "MYSQL",
             "label": "MySQL",
             "icon": "Database",
-            "color": "warning"
+            "color": "amber"
           },
           {
             "id": "MONGODB",
             "label": "MongoDB",
             "icon": "Box",
-            "color": "success"
+            "color": "green"
           },
           {
             "id": "ORACLE",
             "label": "Oracle",
             "icon": "Database",
-            "color": "destructive"
+            "color": "red"
           },
           {
             "id": "SQLITE",
             "label": "SQLite",
             "icon": "HardDrive",
-            "color": "muted"
+            "color": "gray"
           },
           {
             "id": "MARIADB",
             "label": "MariaDB",
             "icon": "Database",
-            "color": "warning"
+            "color": "amber"
           },
           {
             "id": "REDIS",
             "label": "Redis",
             "icon": "Circle",
-            "color": "destructive"
+            "color": "red"
           },
           {
             "id": "CASSANDRA",
             "label": "Cassandra",
             "icon": "Database",
-            "color": "info"
+            "color": "blue"
           }
         ],
         "validation": {
@@ -2891,43 +2891,49 @@
             "id": "business-areas",
             "label": "Business Area",
             "icon": "Folder",
-            "color": "info"
+            "color": "blue"
           },
           {
             "id": "applications",
             "label": "Application",
             "icon": "AppWindow",
-            "color": "info"
+            "color": "purple"
           },
           {
             "id": "schemas",
             "label": "Schema",
             "icon": "Database",
-            "color": "warning"
-          },
-          {
-            "id": "sections",
-            "label": "Section",
-            "icon": "Layout",
-            "color": "default"
-          },
-          {
-            "id": "fields",
-            "label": "Field",
-            "icon": "FileText",
-            "color": "muted"
+            "color": "amber"
           },
           {
             "id": "url-repositories",
             "label": "URL Repository",
             "icon": "Link",
-            "color": "success"
+            "color": "green"
           },
           {
             "id": "dynamic-queries",
             "label": "Dynamic Query",
             "icon": "Database",
-            "color": "default"
+            "color": "cyan"
+          },
+          {
+            "id": "menu-items",
+            "label": "Menu Item",
+            "icon": "Menu",
+            "color": "indigo"
+          },
+          {
+            "id": "sections",
+            "label": "Section",
+            "icon": "Layout",
+            "color": "slate"
+          },
+          {
+            "id": "fields",
+            "label": "Field",
+            "icon": "FileText",
+            "color": "gray"
           }
         ],
         "colSpan": 1,
@@ -2966,25 +2972,25 @@
             "id": "CREATE",
             "label": "Create",
             "icon": "Plus",
-            "color": "success"
+            "color": "green"
           },
           {
             "id": "VIEW",
             "label": "View",
             "icon": "Eye",
-            "color": "info"
+            "color": "blue"
           },
           {
             "id": "EDIT",
             "label": "Edit",
             "icon": "Edit",
-            "color": "warning"
+            "color": "amber"
           },
           {
             "id": "DELETE",
             "label": "Delete",
             "icon": "Trash2",
-            "color": "destructive"
+            "color": "red"
           }
         ],
         "colSpan": 1,
@@ -3007,13 +3013,13 @@
             "id": "ALLOW",
             "label": "Allow",
             "icon": "CheckCircle",
-            "color": "success"
+            "color": "green"
           },
           {
             "id": "DENY",
             "label": "Deny",
             "icon": "XCircle",
-            "color": "destructive"
+            "color": "red"
           }
         ],
         "colSpan": 1,
@@ -3092,25 +3098,25 @@
             "id": "ALL_ACTIONS",
             "label": "All Actions",
             "icon": "CheckCircle",
-            "color": "success"
+            "color": "green"
           },
           {
             "id": "CONTRIBUTOR",
             "label": "Contributor",
             "icon": "Edit",
-            "color": "warning"
+            "color": "amber"
           },
           {
             "id": "READER",
             "label": "Reader",
             "icon": "Eye",
-            "color": "info"
+            "color": "blue"
           },
           {
             "id": "NO_ACCESS",
             "label": "No Access",
             "icon": "XCircle",
-            "color": "destructive"
+            "color": "red"
           }
         ],
         "colSpan": 1,
