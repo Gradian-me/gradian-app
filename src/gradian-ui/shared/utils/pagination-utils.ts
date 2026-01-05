@@ -22,7 +22,7 @@ const clamp = (value: number, min: number, max: number): number => Math.max(min,
 
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_LIMIT = 50;
-export const MAX_LIMIT = 200;
+export const MAX_LIMIT = 1000;
 
 export const parsePaginationParams = (
   input?: PaginationParamsInput,

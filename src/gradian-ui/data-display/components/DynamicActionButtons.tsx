@@ -72,6 +72,8 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
   };
 
   const handleClick = (action: ActionConfig) => (e: React.MouseEvent) => {
+    // The Button component handles ctrl+click and middle-click for new tab opening
+    // This handler only runs for normal clicks
     e.preventDefault();
     if (stopPropagation) {
       e.stopPropagation();
@@ -99,7 +101,6 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
       >
         {actions.map((action, index) => {
           const config = getActionConfig(action.type);
-          const isViewWithNewTab = action.type === 'view' && action.canOpenInNewTab === true && !!action.href;
           return (
             <Button
               key={`${action.type}-${index}`}
@@ -108,8 +109,8 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
               size="sm"
               onClick={handleClick(action)}
               disabled={action.disabled}
-              href={isViewWithNewTab ? action.href : undefined}
-              canOpenInNewTab={isViewWithNewTab ? true : undefined}
+              href={action.href}
+              canOpenInNewTab={action.canOpenInNewTab}
               className={cn(
                 'flex-1 transition-all duration-200 text-xs bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600',
                 config.hoverClass
@@ -134,7 +135,6 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
     >
       {actions.map((action, index) => {
         const config = getActionConfig(action.type);
-        const isViewWithNewTab = action.type === 'view' && action.canOpenInNewTab === true && !!action.href;
         return (
           <Button
             key={`${action.type}-${index}`}
@@ -143,8 +143,8 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
             size="sm"
             onClick={handleClick(action)}
             disabled={action.disabled}
-            href={isViewWithNewTab ? action.href : undefined}
-            canOpenInNewTab={isViewWithNewTab ? true : undefined}
+            href={action.href}
+            canOpenInNewTab={action.canOpenInNewTab}
             className={cn(
               'h-8 w-8 p-0 transition-all duration-200 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600',
               config.hoverClass

@@ -23,6 +23,10 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { CodeBadge } from '@/gradian-ui/form-builder/form-elements/components/CodeBadge';
 import { FormulaDisplay } from '@/gradian-ui/form-builder/form-elements/components/FormulaDisplay';
 import { replaceDynamicContext } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
+import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 
 export const getFieldValue = (field: any, row: any): any => {
   if (!field || !row) return null;
@@ -117,6 +121,85 @@ export const formatFieldValue = (
   if (field?.component === 'formula' && field?.formula) {
     return wrapWithForceIcon(
       <FormulaDisplay field={field} data={row} />,
+      isForce,
+      field,
+      row
+    );
+  }
+  
+  // Handle JSON fields - show button that opens dialog with CodeViewer
+  if (field?.component === 'json') {
+    // Convert value to JSON string if it's an object/array
+    let jsonString: string;
+    if (value === null || value === undefined) {
+      jsonString = 'null';
+    } else if (typeof value === 'string') {
+      // Try to parse and reformat if it's already a JSON string
+      try {
+        const parsed = JSON.parse(value);
+        jsonString = JSON.stringify(parsed, null, 2);
+      } catch {
+        // If parsing fails, use as-is
+        jsonString = value;
+      }
+    } else {
+      // Convert object/array to JSON string
+      try {
+        jsonString = JSON.stringify(value, null, 2);
+      } catch {
+        jsonString = String(value);
+      }
+    }
+    
+    // Helper to truncate JSON for preview
+    const truncateJson = (json: string, maxLength: number = 100): string => {
+      if (json.length <= maxLength) return json;
+      return json.substring(0, maxLength).trim() + '...';
+    };
+    
+    const previewText = truncateJson(jsonString);
+    const fieldLabel = field?.label || field?.name || 'JSON';
+    
+    return wrapWithForceIcon(
+      <Dialog>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium font-mono text-left max-w-full"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+            }}
+            title="Click to view full JSON"
+          >
+            {previewText}
+          </button>
+        </DialogTrigger>
+        <DialogContent 
+          className={cn(
+            "w-full h-full lg:max-w-5xl lg:h-auto lg:max-h-[90vh] overflow-hidden flex flex-col"
+          )}
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle>{fieldLabel}</DialogTitle>
+              <CopyContent content={jsonString} />
+            </div>
+          </DialogHeader>
+          <div className="mt-4 flex-1 overflow-auto">
+            <CodeViewer
+              code={jsonString}
+              programmingLanguage="json"
+              title={fieldLabel}
+              initialLineNumbers={20}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>,
       isForce,
       field,
       row

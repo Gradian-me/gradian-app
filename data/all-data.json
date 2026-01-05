@@ -2075,6 +2075,7 @@
         {
           "id": "01KA8TP4ZVMWVCGK25KPDQDPW1",
           "label": "Schema Bulk Sync",
+          "targetSchema": "url-repositories",
           "metadata": {
             "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas"
           }
@@ -2092,6 +2093,7 @@
         {
           "id": "01KA8VXHQFZR5TH0470163433K",
           "label": "Schemas",
+          "targetSchema": "url-repositories",
           "metadata": {
             "address": "http://localhost:3000/api/schemas"
           }
@@ -2107,10 +2109,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2026-01-04T13:53:54.536Z",
+      "updatedAt": "2026-01-05T06:48:10.096Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2026-01-04T13:53:54.536Z",
+      "lastSynced": "2026-01-05T06:48:10.096Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2134,6 +2136,7 @@
         {
           "id": "01KABM5QX5HRPWMPA1M7YK21WJ",
           "label": "Schema Related Schemas Sync",
+          "targetSchema": "url-repositories",
           "metadata": {
             "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/schemas/relations/generate"
           }
@@ -2150,8 +2153,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2026-01-04T13:53:58.417Z",
-      "lastSynced": "2026-01-04T13:53:58.417Z",
+      "updatedAt": "2026-01-05T06:48:19.551Z",
+      "lastSynced": "2026-01-05T06:48:19.551Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2176,6 +2179,7 @@
         {
           "id": "01KANZNMEFM5H7211V450ZX2P8",
           "label": "Backend Graph API",
+          "targetSchema": "url-repositories",
           "metadata": {
             "address": "http://cg-gr-api-dev-1.cinnagen.com:3001/api/graph"
           }
@@ -2193,6 +2197,7 @@
         {
           "id": "01KANYZDJKCA9FNEFE7ZEY0KSD",
           "label": "Graph API",
+          "targetSchema": "url-repositories",
           "metadata": {
             "address": "http://localhost:3000/api/graph"
           }
@@ -2211,9 +2216,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2026-01-04T14:55:27.958Z",
+      "updatedAt": "2026-01-05T06:49:01.196Z",
       "targetDataPath": "data",
-      "lastSynced": "2026-01-04T14:55:27.958Z",
+      "lastSynced": "2026-01-05T06:49:01.196Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2224,7 +2229,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 5, nodes updated: 1366, edges created: 181, nodes failed: 0, edges failed: 0.",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 1372, edges created: 191, nodes failed: 0, edges failed: 0.",
       "isTenantBased": false
     },
     {
@@ -2370,6 +2375,7 @@
         {
           "id": "01KBATJ4GH09B0YETWF7W1SKM7",
           "label": "Gradian Genora Schema",
+          "targetSchema": "url-repositories",
           "metadata": {
             "address": "https://genora.cinnagen.com/api/schemas"
           }
@@ -2387,6 +2393,7 @@
         {
           "id": "01KA8VXHQFZR5TH0470163433K",
           "label": "Schemas",
+          "targetSchema": "url-repositories",
           "metadata": {
             "address": "http://localhost:3000/api/schemas"
           }
@@ -2397,8 +2404,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-01-04T13:54:17.501Z",
-      "lastSynced": "2026-01-04T13:54:17.501Z",
+      "updatedAt": "2026-01-05T06:46:41.292Z",
+      "lastSynced": "2026-01-05T06:46:41.292Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2419,6 +2426,7 @@
         {
           "id": "01KBSH199BZ64HYDFMS2JP6F22",
           "label": "Schema Related Schemas Sync",
+          "targetSchema": "url-repositories",
           "metadata": {
             "address": "https://genora.cinnagen.com/api/schemas/relations/generate"
           }
@@ -2437,7 +2445,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-01-04T13:54:21.740Z",
+      "updatedAt": "2026-01-05T06:46:49.439Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2447,7 +2455,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-01-04T13:54:21.740Z",
+      "lastSynced": "2026-01-05T06:46:49.439Z",
       "lastSyncMessage": "Generated relations for 40 out of 40 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -2460,6 +2468,7 @@
         {
           "id": "01KBSH31P7JNZD64ED1A09DYK6",
           "label": "Backend Graph API",
+          "targetSchema": "url-repositories",
           "metadata": {
             "address": "https://genora.cinnagen.com/api/graph"
           }
@@ -2479,6 +2488,7 @@
         {
           "id": "01KANYZDJKCA9FNEFE7ZEY0KSD",
           "label": "Graph API",
+          "targetSchema": "url-repositories",
           "metadata": {
             "address": "http://localhost:3000/api/graph"
           }
@@ -2496,7 +2506,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2026-01-04T14:55:12.171Z",
+      "updatedAt": "2026-01-05T06:47:03.137Z",
       "category": [
         {
           "id": "production-integration",
@@ -2505,8 +2515,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-01-04T14:55:12.171Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 270, edges created: 136, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2026-01-05T06:47:03.137Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 5, nodes updated: 266, edges created: 115, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
@@ -18751,6 +18761,71 @@
       "createdAt": "2026-01-04T12:54:41.935Z",
       "updatedAt": "2026-01-04T14:07:41.455Z",
       "dynamic-query-parameters": []
+    },
+    {
+      "includeUserId": true,
+      "includeCompanyId": false,
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "name": "Users with User Roles, Access Policies, and Permissions",
+      "description": "Get all user with their roles , access policies, and app permissions. Shows the complete hierarchy:  users → User_roles (HAS_MEMBER), User_roles → App_access_policies (HAS_ACCESS_POLICY), App_access_policies → App_permissions (HAS_APP_PERMISSION)\n",
+      "metadata": {
+        "applyRBAC": false,
+        "patterns": [
+          {
+            "from": {
+              "schemaId": "users",
+              "alias": ""
+            }
+          },
+          {
+            "from": {
+              "schemaId": "users",
+              "alias": ""
+            },
+            "to": {
+              "schemaId": "user-roles",
+              "alias": ""
+            },
+            "edge": "HAS_MEMBER",
+            "optional": false
+          },
+          {
+            "from": {
+              "schemaId": "user-roles",
+              "alias": ""
+            },
+            "to": {
+              "schemaId": "app-access-policies",
+              "alias": ""
+            },
+            "edge": "HAS_ACCESS_POLICY",
+            "optional": false
+          },
+          {
+            "from": {
+              "schemaId": "app-access-policies",
+              "alias": ""
+            },
+            "to": {
+              "schemaId": "app-permissions",
+              "alias": ""
+            },
+            "edge": "HAS_APP_PERMISSION",
+            "optional": false
+          }
+        ]
+      },
+      "incomplete": false,
+      "datatype": [],
+      "isRequired": false,
+      "id": "01KE6DTVPDC1PAHHXVZJHCP16B",
+      "createdAt": "2026-01-05T06:34:40.731Z",
+      "updatedAt": "2026-01-05T06:34:40.734Z"
     }
   ],
   "external_nodes": [

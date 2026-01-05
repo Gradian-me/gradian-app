@@ -1178,6 +1178,8 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   ...(onViewDetail || onView ? [{
                     type: 'view' as const,
                     onClick: onViewDetail ? () => onViewDetail(data) : () => onView?.(data),
+                    href: data?.id && schema?.id ? `/page/${schema.id}/${data.id}` : undefined,
+                    canOpenInNewTab: true,
                   }] : []),
                   ...(onEdit ? [{
                     type: 'edit' as const,
@@ -1201,6 +1203,8 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   ...(onViewDetail || onView ? [{
                     type: 'view' as const,
                     onClick: onViewDetail ? () => onViewDetail(data) : () => onView?.(data),
+                    href: data?.id && schema?.id ? `/page/${schema.id}/${data.id}` : undefined,
+                    canOpenInNewTab: true,
                   }] : []),
                   ...(onEdit ? [{
                     type: 'edit' as const,

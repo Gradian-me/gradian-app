@@ -372,6 +372,8 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                       onView(entity);
                     }
                   },
+                  href: entity?.id && schema?.id ? `/page/${schema.id}/${entity.id}` : undefined,
+                  canOpenInNewTab: true,
                 }] : []),
                 ...(onEdit ? [{
                   type: 'edit' as const,

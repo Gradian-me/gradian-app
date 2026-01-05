@@ -745,6 +745,8 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               {
                 type: 'view',
                 onClick: () => handleViewDetailPage(row),
+                href: row?.id && schema?.id ? `/page/${schema.id}/${row.id}` : undefined,
+                canOpenInNewTab: true,
               },
               {
                 type: 'edit',

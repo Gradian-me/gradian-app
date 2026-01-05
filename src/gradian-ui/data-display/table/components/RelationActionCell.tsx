@@ -7,6 +7,7 @@ import { DynamicActionButtons, type ActionConfig } from '@/gradian-ui/data-displ
 type RelationActionCellProps = {
   itemId: string | number;
   relationId?: string | null;
+  schemaId?: string; // Schema ID for constructing view URL
   onView?: (itemId: string | number) => void;
   onEdit?: (itemId: string | number) => void;
   onDeleted?: () => Promise<void> | void;
@@ -22,6 +23,7 @@ type RelationActionCellProps = {
 export function RelationActionCell({
   itemId,
   relationId,
+  schemaId,
   onView,
   onEdit,
   onDeleted,
@@ -69,6 +71,8 @@ export function RelationActionCell({
     actions.push({
       type: 'view',
       onClick: handleView,
+      href: schemaId && itemId ? `/page/${schemaId}/${itemId}?showBack=true` : undefined,
+      canOpenInNewTab: true,
     });
   }
 

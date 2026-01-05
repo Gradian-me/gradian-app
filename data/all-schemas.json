@@ -6594,7 +6594,7 @@
         "addButtonText": "Add Purchase Request",
         "validation": {
           "required": false,
-          "pattern": "^[A-Z0-9-]+$"
+          "pattern": "^[A-Z0-9]+(-[A-Z0-9]+)*$"
         },
         "colSpan": 2,
         "order": 1

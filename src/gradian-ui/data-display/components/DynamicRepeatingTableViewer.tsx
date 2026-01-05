@@ -108,12 +108,13 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
         <RelationActionCell
           itemId={itemId}
           relationId={_row?.__relationId}
+          schemaId={navigationSchemaId}
           onView={handleViewDetails}
           onDeleted={refresh}
         />
       );
     },
-    [handleViewDetails, refresh]
+    [handleViewDetails, refresh, navigationSchemaId]
   );
 
   // Check if there are any actions to show by testing with actual data
