@@ -260,64 +260,72 @@ async function getApiUrl(apiPath: string): Promise<string> {
   // IMPORTANT: do NOT use NEXTAUTH_URL here because it may point to an external
   // auth host (e.g., https://octa.../auth) which causes 401s when we call our
   // own API routes. Always prefer this app's origin.
-  // Priority: Extract from request DNS → INTERNAL_API_BASE_URL env → localhost with PORT
+  // Priority: INTERNAL_API_BASE_URL env → Extract from request DNS → localhost with PORT
   let baseUrl: string | undefined;
 
-  // PRIORITY 1: Extract from incoming request headers (DNS-based for multi-tenant)
-  // This ensures the internal API URL matches the actual domain being accessed
-  try {
-    const hMaybe = nextHeaders();
-    // Next.js may return a Promise in async contexts - await it properly
-    let h: any;
-    if (hMaybe && typeof (hMaybe as any).then === 'function') {
-      // In async context, await the Promise
-      h = await (hMaybe as Promise<any>);
-    } else {
-      h = hMaybe as any;
-    }
-    
-    if (h && typeof h.get === 'function') {
-      const forwardedHost = h.get('x-forwarded-host');
-      const hostHeader = h.get('host');
-      const host = (forwardedHost || hostHeader || '').trim();
-      // Extract protocol from headers or default to https for production
-      const proto = h.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : 'http');
-      if (host) {
-        // Extract just the hostname (remove port if present in forwarded-host)
-        const hostname = host.split(':')[0];
-        // Only use real domains, not localhost (which would be handled by fallback)
-        if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
-          baseUrl = `${proto}://${hostname}`;
-          loggingCustom(
-            LogType.SCHEMA_LOADER,
-            'debug',
-            `[getApiUrl] Extracted baseUrl from headers: ${baseUrl}`
-          );
-        }
-      }
-    }
-  } catch (error) {
-    // headers() may not be available in all contexts; fallback below
+  // PRIORITY 1: Use INTERNAL_API_BASE_URL environment variable if set
+  if (process.env.INTERNAL_API_BASE_URL) {
+    baseUrl = process.env.INTERNAL_API_BASE_URL.replace(/\/+$/, '');
     loggingCustom(
       LogType.SCHEMA_LOADER,
       'debug',
-      `[getApiUrl] Error extracting from headers: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `[getApiUrl] Using baseUrl from INTERNAL_API_BASE_URL environment variable: ${baseUrl}`
     );
   }
 
-  // PRIORITY 2: Fallback to environment variable (if DNS extraction failed)
+  // PRIORITY 2: Extract from incoming request headers (DNS-based for multi-tenant)
+  // This ensures the internal API URL matches the actual domain being accessed
+  // Only used if INTERNAL_API_BASE_URL is not set
   if (!baseUrl) {
-    baseUrl =
-      process.env.INTERNAL_API_BASE_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
-    
-    if (baseUrl) {
+    try {
+      const hMaybe = nextHeaders();
+      // Next.js may return a Promise in async contexts - await it properly
+      let h: any;
+      if (hMaybe && typeof (hMaybe as any).then === 'function') {
+        // In async context, await the Promise
+        h = await (hMaybe as Promise<any>);
+      } else {
+        h = hMaybe as any;
+      }
+      
+      if (h && typeof h.get === 'function') {
+        const forwardedHost = h.get('x-forwarded-host');
+        const hostHeader = h.get('host');
+        const host = (forwardedHost || hostHeader || '').trim();
+        // Extract protocol from headers or default to https for production
+        const proto = h.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : 'http');
+        if (host) {
+          // Extract just the hostname (remove port if present in forwarded-host)
+          const hostname = host.split(':')[0];
+          // Only use real domains, not localhost (which would be handled by fallback)
+          if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+            baseUrl = `${proto}://${hostname}`;
+            loggingCustom(
+              LogType.SCHEMA_LOADER,
+              'debug',
+              `[getApiUrl] Extracted baseUrl from headers: ${baseUrl}`
+            );
+          }
+        }
+      }
+    } catch (error) {
+      // headers() may not be available in all contexts; fallback below
       loggingCustom(
         LogType.SCHEMA_LOADER,
         'debug',
-        `[getApiUrl] Using baseUrl from environment variable: ${baseUrl}`
+        `[getApiUrl] Error extracting from headers: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
+  }
+
+  // PRIORITY 3: Fallback to VERCEL_URL if available (if both above failed)
+  if (!baseUrl && process.env.VERCEL_URL) {
+    baseUrl = `https://${process.env.VERCEL_URL}`;
+    loggingCustom(
+      LogType.SCHEMA_LOADER,
+      'debug',
+      `[getApiUrl] Using baseUrl from VERCEL_URL: ${baseUrl}`
+    );
   }
 
   if (!baseUrl) {

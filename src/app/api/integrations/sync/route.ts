@@ -22,18 +22,28 @@ function getApiUrl(apiPath: string): string {
   }
 
   // For relative URLs, construct absolute URL for server-side fetch
-  // Priority: NEXTAUTH_URL > VERCEL_URL > localhost (default for development)
-  let baseUrl = process.env.NEXTAUTH_URL;
+  // Priority: INTERNAL_API_BASE_URL > NEXTAUTH_URL > VERCEL_URL > localhost (default for development)
+  let baseUrl: string | undefined;
 
+  // PRIORITY 1: Use INTERNAL_API_BASE_URL environment variable if set
+  if (process.env.INTERNAL_API_BASE_URL) {
+    baseUrl = process.env.INTERNAL_API_BASE_URL.replace(/\/+$/, '');
+  }
+
+  // PRIORITY 2: Fallback to NEXTAUTH_URL if INTERNAL_API_BASE_URL is not set
   if (!baseUrl) {
-    // Use Vercel URL if available (for Vercel deployments)
-    if (process.env.VERCEL_URL) {
-      baseUrl = `https://${process.env.VERCEL_URL}`;
-    } else {
-      // Default to localhost for local development
-      const port = process.env.PORT || '3000';
-      baseUrl = `http://localhost:${port}`;
-    }
+    baseUrl = process.env.NEXTAUTH_URL;
+  }
+
+  // PRIORITY 3: Fallback to VERCEL_URL if available
+  if (!baseUrl && process.env.VERCEL_URL) {
+    baseUrl = `https://${process.env.VERCEL_URL}`;
+  }
+
+  // PRIORITY 4: Default to localhost for local development
+  if (!baseUrl) {
+    const port = process.env.PORT || '3000';
+    baseUrl = `http://localhost:${port}`;
   }
 
   // Clean and combine paths
