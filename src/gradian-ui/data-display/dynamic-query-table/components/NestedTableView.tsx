@@ -6,10 +6,11 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { NestedTableViewProps, Schema, ColumnGroup, FlattenedSchemasConfig } from '../types';
-import { createColumnsFromSchema, getSchemaHeaderBorderColor, getBorderColorClasses, createColumnToGroupInfoMap } from '../utils';
+import { createColumnsFromSchema, getSchemaHeaderBorderColor, getBorderColorClasses, createColumnToGroupInfoMap, getActionButtonsForSchema } from '../utils';
 import { useNestedTableExpansion } from '../hooks';
 import { TableColumn } from '../../table/types';
 import { formatFieldValue } from '../../table/utils/field-formatters';
+import { DynamicActionButtons } from '@/gradian-ui/data-display/components/DynamicActionButtons';
 // Import will be handled via forward reference
 
 export function NestedTableView({ 
@@ -25,7 +26,10 @@ export function NestedTableView({
   flatten, 
   onFlattenChange,
   showIds = false,
-  flattenedSchemas = []
+  flattenedSchemas = [],
+  dynamicQueryActions,
+  dynamicQueryId,
+  onEditEntity
 }: NestedTableViewProps) {
   // Helper function to check if a schema ID is in flattenedSchemas at the current depth
   const isSchemaFlattened = useCallback((schemaId: string, currentDepth: number): boolean => {
@@ -264,14 +268,16 @@ export function NestedTableView({
     ];
   }, [baseColumns, flattenedColumns]);
 
+  // All column groups (main + flattened) for schema access
+  const allGroups: ColumnGroup[] = useMemo(() => [
+    { schema, columns: baseColumns, startIndex: 0 },
+    ...flattenedColumns
+  ], [baseColumns, flattenedColumns, schema]);
+
   // Column to group info map for styling
   const columnToGroupInfo = useMemo(() => {
-    const allGroups: ColumnGroup[] = [
-      { schema, columns: baseColumns, startIndex: 0 },
-      ...flattenedColumns
-    ];
     return createColumnToGroupInfoMap(allGroups);
-  }, [baseColumns, flattenedColumns, schema]);
+  }, [allGroups]);
 
   // Generate expanded rows (with flattened children)
   const expandedRowsData = useMemo(() => {
@@ -347,21 +353,32 @@ export function NestedTableView({
             {flattenedColumns.length > 0 && (
               <tr className="bg-violet-200 dark:bg-violet-950/90 border-b border-gray-200 dark:border-gray-700">
                 <th className="w-10 px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300"></th>
-                <th 
-                  colSpan={baseColumns.length} 
-                  className={cn(
-                    'px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
-                    getSchemaHeaderBorderColor(-1, false)
-                  )}
-                >
-                  {schema.label || schema.id}
-                </th>
+                {/* Main schema header with action column if needed */}
+                {(() => {
+                  const hasMainSchemaActions = dynamicQueryId && dynamicQueryActions && 
+                    getActionButtonsForSchema(schema, dynamicQueryActions, dynamicQueryId, undefined, onEditEntity);
+                  const mainSchemaColSpan = baseColumns.length + (hasMainSchemaActions ? 1 : 0);
+                  return (
+                    <th 
+                      colSpan={mainSchemaColSpan} 
+                      className={cn(
+                        'px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
+                        getSchemaHeaderBorderColor(-1, false)
+                      )}
+                    >
+                      {schema.label || schema.id}
+                    </th>
+                  );
+                })()}
                 {flattenedColumns.map((group, groupIndex) => {
                   const isLast = groupIndex === flattenedColumns.length - 1;
+                  const hasGroupActions = dynamicQueryId && dynamicQueryActions && 
+                    getActionButtonsForSchema(group.schema, dynamicQueryActions, dynamicQueryId, undefined, onEditEntity);
+                  const groupColSpan = group.columns.length + (hasGroupActions ? 1 : 0);
                   return (
                     <th
                       key={group.schema.id}
-                      colSpan={group.columns.length}
+                      colSpan={groupColSpan}
                       className={cn(
                         'px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
                         getSchemaHeaderBorderColor(groupIndex, isLast)
@@ -378,16 +395,27 @@ export function NestedTableView({
               <th className="w-10 px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200"></th>
               {columns.map((column, colIndex) => {
                 const isLastColumn = colIndex === columns.length - 1;
+                const columnGroup = columnToGroupInfo.get(column.id);
+                const isFirstColumnInGroup = columnGroup && columnGroup.columnIndex === 0;
+                const groupSchema = columnGroup && allGroups[columnGroup.groupIndex]?.schema;
+                const groupHasActions = groupSchema && dynamicQueryId && dynamicQueryActions && 
+                  getActionButtonsForSchema(groupSchema, dynamicQueryActions, dynamicQueryId, undefined, onEditEntity);
+                
                 return (
-                <th
-                  key={column.id}
-                    className={cn(
-                      'px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider',
-                      isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo)
+                  <React.Fragment key={column.id}>
+                    {/* Action column header before each schema group that has actions */}
+                    {isFirstColumnInGroup && groupHasActions && (
+                      <th className="w-20 px-2 py-3 text-center text-xs font-semibold text-gray-900 dark:text-gray-200"></th>
                     )}
-                >
-                  {column.label}
-                </th>
+                    <th
+                      className={cn(
+                        'px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider',
+                        isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo)
+                      )}
+                    >
+                      {column.label}
+                    </th>
+                  </React.Fragment>
                 );
               })}
             </tr>
@@ -474,19 +502,45 @@ export function NestedTableView({
                     {columns.map((column, colIndex) => {
                       const value = typeof column.accessor === 'function' ? column.accessor(processedRow) : processedRow[column.accessor as string];
                       const isLastColumn = colIndex === columns.length - 1;
+                      const columnGroup = columnToGroupInfo.get(column.id);
+                      const isFirstColumnInGroup = columnGroup && columnGroup.columnIndex === 0;
+                      const groupSchema = columnGroup && allGroups[columnGroup.groupIndex]?.schema;
+                      
+                      // Get row ID for flattened schema groups
+                      const getRowIdForSchema = (schemaId: string) => {
+                        // For flattened schemas, try to get ID from the flattened data
+                        if (schemaId !== schema.id) {
+                          const flattenedIdPath = `${schemaId}.id`;
+                          return processedRow[flattenedIdPath] || processedRow[`${schemaId}id`] || null;
+                        }
+                        return processedRow?.id || originalRow?.id;
+                      };
                       
                       return (
-                        <td
-                          key={column.id}
-                          className={cn(
-                            'p-3 text-xs text-gray-900 dark:text-gray-200',
-                            isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo),
-                            column.align === 'center' && 'text-center',
-                            column.align === 'right' && 'text-right'
-                          )}
-                        >
-                          {column.render ? column.render(value, processedRow, rowIndex) : <span>{String(value ?? '—')}</span>}
-                        </td>
+                        <React.Fragment key={column.id}>
+                          {/* Action buttons cell before each schema group that has actions */}
+                          {isFirstColumnInGroup && groupSchema && (() => {
+                            const groupRowId = getRowIdForSchema(groupSchema.id);
+                            const groupActionButtons = dynamicQueryId && dynamicQueryActions 
+                              ? getActionButtonsForSchema(groupSchema, dynamicQueryActions, dynamicQueryId, groupRowId, onEditEntity)
+                              : null;
+                            return groupActionButtons ? (
+                              <td className="p-2 text-center">
+                                <DynamicActionButtons actions={groupActionButtons} variant="minimal" />
+                              </td>
+                            ) : null;
+                          })()}
+                          <td
+                            className={cn(
+                              'p-3 text-xs text-gray-900 dark:text-gray-200',
+                              isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo),
+                              column.align === 'center' && 'text-center',
+                              column.align === 'right' && 'text-right'
+                            )}
+                          >
+                            {column.render ? column.render(value, processedRow, rowIndex) : <span>{String(value ?? '—')}</span>}
+                          </td>
+                        </React.Fragment>
                       );
                     })}
                   </tr>
@@ -541,6 +595,8 @@ export function NestedTableView({
                                       onCollapseAll={onCollapseAll}
                                       showIds={showIds}
                                       flattenedSchemas={flattenedSchemas}
+                                      dynamicQueryActions={dynamicQueryActions}
+                                      dynamicQueryId={dynamicQueryId}
                                     />
                                   </div>
                                 );

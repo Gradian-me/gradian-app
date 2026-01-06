@@ -3,7 +3,7 @@
 // Unified hook for managing form modals (create and edit) with dynamic schema loading
 // Can be used to open create or edit modals for any schema ID
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
@@ -376,6 +376,9 @@ export function useFormModal(
   const [formMessage, setFormMessage] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Track last toast shown to prevent duplicates
+  const lastToastRef = useRef<{ schemaId?: string; entityId?: string; timestamp?: number } | null>(null);
 
   /**
    * Open form modal - unified function that handles both create and edit modes
@@ -468,6 +471,23 @@ export function useFormModal(
             loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to load entity: ${errorMessage}`);
             setLoadError(errorMessage);
             setIsLoading(false);
+            
+            // Show toast notification for entity not found (only once per entity)
+            const now = Date.now();
+            const lastToast = lastToastRef.current;
+            const isDuplicate = lastToast && 
+              lastToast.schemaId === schemaId && 
+              lastToast.entityId === editEntityId &&
+              (now - (lastToast.timestamp || 0)) < 2000; // Prevent duplicates within 2 seconds
+            
+            if (!isDuplicate) {
+              lastToastRef.current = { schemaId, entityId: editEntityId, timestamp: now };
+              toast.error('Entity not found', {
+                description: errorMessage,
+                duration: 5000,
+              });
+            }
+            
             return; // Exit early without opening the modal
           }
 

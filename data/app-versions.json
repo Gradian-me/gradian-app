@@ -6015,5 +6015,43 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KE8DYNAMICQUERYACTIONS001",
+    "timestamp": "2026-01-06T10:54:30+0330",
+    "version": "1.45.000",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated dynamic query handling by integrating token management with audience support in route.ts and sync/route.ts for improved authentication",
+        "priority": "High",
+        "affectedDomains": [
+          "auth",
+          "dynamic-queries",
+          "api",
+          "token-management"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced dynamic query actions configuration in DynamicQueryPageClient and related components to enhance user interaction capabilities",
+        "priority": "Medium",
+        "affectedDomains": [
+          "dynamic-queries",
+          "data-display",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Cleaned up logging mechanisms and header management across multiple components for better maintainability and performance",
+        "priority": "Medium",
+        "affectedDomains": [
+          "logging",
+          "components",
+          "performance"
+        ]
+      }
+    ]
   }
 ]

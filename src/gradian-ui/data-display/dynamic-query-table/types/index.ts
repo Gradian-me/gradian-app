@@ -1,4 +1,5 @@
 import { TableColumn } from '../../table/types';
+import { DynamicQueryActionsConfig } from '../utils/action-helpers';
 
 export type FlattenedSchemasConfig = Array<{
   depth: number;
@@ -21,6 +22,8 @@ export interface DynamicQueryTableProps {
   expandAllTrigger?: number;
   onExpandAllReady?: (expandFn: () => void, collapseFn: () => void) => void;
   onStatusChange?: (isSuccess: boolean, statusCode?: number, loading?: boolean, error?: string | null) => void;
+  dynamicQueryActions?: DynamicQueryActionsConfig;
+  onEditEntity?: (schemaId: string, entityId: string) => void;
 }
 
 export interface DynamicQueryResponse {
@@ -60,6 +63,9 @@ export interface NestedTableViewWrapperProps {
   onExpandAllReady?: (expandFn: () => void, collapseFn: () => void) => void;
   showIds?: boolean;
   flattenedSchemas?: FlattenedSchemas;
+  dynamicQueryActions?: DynamicQueryActionsConfig;
+  dynamicQueryId?: string;
+  onEditEntity?: (schemaId: string, entityId: string) => void;
 }
 
 export interface NestedTableViewProps {
@@ -76,6 +82,9 @@ export interface NestedTableViewProps {
   onFlattenChange?: (flatten: boolean) => void;
   showIds?: boolean;
   flattenedSchemas?: FlattenedSchemas;
+  dynamicQueryActions?: DynamicQueryActionsConfig;
+  dynamicQueryId?: string;
+  onEditEntity?: (schemaId: string, entityId: string) => void;
 }
 
 export interface FlatTableRendererProps {
@@ -87,6 +96,9 @@ export interface FlatTableRendererProps {
   showIds?: boolean;
   onShowIdsChange?: (showIds: boolean) => void;
   highlightQuery?: string;
+  dynamicQueryActions?: DynamicQueryActionsConfig;
+  dynamicQueryId?: string;
+  onEditEntity?: (schemaId: string, entityId: string) => void;
 }
 
 export interface NestedTableRendererProps {
@@ -100,6 +112,9 @@ export interface NestedTableRendererProps {
   onExpandAllReady?: (expandFn: () => void, collapseFn: () => void) => void;
   showIds?: boolean;
   flattenedSchemas?: FlattenedSchemas;
+  dynamicQueryActions?: DynamicQueryActionsConfig;
+  dynamicQueryId?: string;
+  onEditEntity?: (schemaId: string, entityId: string) => void;
 }
 
 export interface ColumnGroup {

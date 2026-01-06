@@ -3,12 +3,9 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { readSchemaData, writeSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
-import { extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
-import { addAudienceToToken } from '@/domains/auth/utils/jwt.util';
-import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 // system-token.util is server-only - import directly
 import { getSystemTokenForTargetRoute, getAudienceIdFromTargetRoute } from '@/gradian-ui/shared/utils/system-token.util';
-import { getAccessToken } from '@/app/api/auth/helpers/server-token-cache';
+import { getTokenWithAudience } from '@/gradian-ui/shared/utils/token-audience.util';
 import { enrichEntityPickerFieldsFromRelations } from '@/gradian-ui/shared/domain/utils/field-value-relations.util';
 
 /**
@@ -395,74 +392,6 @@ export async function POST(request: NextRequest) {
       }, tenantIds: ${tenantIds || 'not provided'}, companyIds: ${companyIds || 'not provided'}`,
     );
     
-    // Extract authorization header from incoming request
-    // Priority: Authorization header > Access token cookie > Server memory (via refresh token)
-    let authHeader = request.headers.get('authorization');
-    let authToken: string | null = null;
-    
-    // Try to extract token from Authorization header
-    if (authHeader) {
-      authToken = extractTokenFromHeader(authHeader);
-      if (authToken) {
-        const headerPrefix = authToken.substring(0, 10);
-        const headerLength = authToken.length;
-        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Authorization header present: ${headerPrefix}... (length: ${headerLength})`);
-      }
-    }
-    
-    // If no token from header, try to extract from access token cookie
-    if (!authToken) {
-      const cookies = request.headers.get('cookie');
-      authToken = extractTokenFromCookies(cookies, AUTH_CONFIG.ACCESS_TOKEN_COOKIE);
-      if (authToken) {
-        const tokenPrefix = authToken.substring(0, 10);
-        const tokenLength = authToken.length;
-        loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Authorization token extracted from access token cookie: ${tokenPrefix}... (length: ${tokenLength})`);
-        // Format as Bearer token
-        authHeader = `Bearer ${authToken}`;
-      }
-    }
-    
-    // If still no token, try to get access token from SERVER MEMORY using refresh token from cookies
-    // This is the preferred method for server-to-server requests
-    if (!authToken) {
-      const cookies = request.headers.get('cookie');
-      const refreshToken = extractTokenFromCookies(cookies, AUTH_CONFIG.REFRESH_TOKEN_COOKIE);
-      
-      if (refreshToken) {
-        // Look up access token from server memory using refresh token as key
-        authToken = getAccessToken(refreshToken);
-        
-        if (authToken) {
-          authHeader = `Bearer ${authToken}`;
-          loggingCustom(
-            LogType.INTEGRATION_LOG,
-            'info',
-            `[INTEGRATION_SYNC] Retrieved access token from server memory using refresh token (refresh token: ${refreshToken.substring(0, 30)}...)`
-          );
-        } else {
-          loggingCustom(
-            LogType.INTEGRATION_LOG,
-            'warn',
-            `[INTEGRATION_SYNC] Access token not found in server memory for refresh token: ${refreshToken.substring(0, 30)}... (may need refresh)`
-          );
-        }
-      } else {
-        loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'No refresh token found in cookies');
-      }
-    }
-    
-    // Ensure header is in Bearer format if we have a token
-    if (!authHeader && authToken) {
-      authHeader = `Bearer ${authToken}`;
-    } else if (authHeader && !authHeader.toLowerCase().startsWith('bearer ') && authToken) {
-      authHeader = `Bearer ${authToken}`;
-    }
-    
-    if (!authToken) {
-      loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'No authorization token found in header, cookies, or server memory');
-    }
-    
     loggingCustom(LogType.INTEGRATION_LOG, 'info', `Starting integration sync for id: ${id}`);
     
     if (!id) {
@@ -654,6 +583,13 @@ export async function POST(request: NextRequest) {
         // This is critical for server-to-server requests - cookies are not automatically forwarded
         const cookieHeader = request.headers.get('cookie');
         
+        // Get token for source route (without audienceId, as it's just a pass-through)
+        const sourceAuthHeader = await getTokenWithAudience({
+          request,
+          audienceId: null, // Source route doesn't need audienceId
+          logContext: '[INTEGRATION_SYNC]',
+        });
+        
         const sourceFetchOptions: RequestInit = {
           method: sourceMethod as any,
           headers: {
@@ -661,7 +597,7 @@ export async function POST(request: NextRequest) {
             // Forward cookies from incoming request (includes refresh_token for authentication)
             ...(cookieHeader ? { 'cookie': cookieHeader } : {}),
             // Pass authorization header to source route if present
-            ...(authHeader ? { 'Authorization': authHeader } : {}),
+            ...(sourceAuthHeader ? { 'Authorization': sourceAuthHeader } : {}),
             // For tenant-based integrations, override tenant domain for source route as well
             ...(tenantDomainForHeader ? { 'x-tenant-domain': tenantDomainForHeader } : {}),
           },
@@ -670,7 +606,7 @@ export async function POST(request: NextRequest) {
         loggingCustom(LogType.INTEGRATION_LOG, 'debug', `Source fetch options: ${JSON.stringify({
           method: sourceMethod,
           hasCookies: !!cookieHeader,
-          hasAuthHeader: !!authHeader,
+          hasAuthHeader: !!sourceAuthHeader,
           hasTenantDomain: !!tenantDomainForHeader,
         })}`);
         
@@ -798,28 +734,36 @@ export async function POST(request: NextRequest) {
         // Use system token instead of client JWT
         finalAuthHeader = systemToken;
         loggingCustom(LogType.INTEGRATION_LOG, 'info', 'Using system token for target route authorization');
-      } else if (authHeader) {
+      } else {
         // Fall back to client JWT, but add audienceId if available
         try {
           const audienceId = await getAudienceIdFromTargetRoute(integration.targetRoute);
           if (audienceId) {
-            // Extract token from Bearer header
-            const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader;
-            // Add audienceId to the token
-            const tokenWithAudience = addAudienceToToken(token, audienceId);
-            finalAuthHeader = `Bearer ${tokenWithAudience}`;
-            loggingCustom(LogType.INTEGRATION_LOG, 'info', `Using client JWT with audienceId: ${audienceId}`);
+            // Use utility to get token with audienceId
+            finalAuthHeader = await getTokenWithAudience({
+              request,
+              audienceId,
+              logContext: '[INTEGRATION_SYNC]',
+            });
+            if (finalAuthHeader) {
+              loggingCustom(LogType.INTEGRATION_LOG, 'info', `Using client JWT with audienceId: ${audienceId}`);
+            }
           } else {
-            finalAuthHeader = authHeader;
-            loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Using client JWT for target route authorization (no audienceId found)');
+            // No audienceId found, use utility without adding audienceId
+            finalAuthHeader = await getTokenWithAudience({
+              request,
+              audienceId: null, // Explicitly set to null to skip adding audienceId
+              logContext: '[INTEGRATION_SYNC]',
+            });
+            if (finalAuthHeader) {
+              loggingCustom(LogType.INTEGRATION_LOG, 'debug', 'Using client JWT for target route authorization (no audienceId found)');
+            }
           }
         } catch (error) {
-          // If adding audience fails, use original token
-          finalAuthHeader = authHeader;
           loggingCustom(
             LogType.INTEGRATION_LOG,
             'warn',
-            `Failed to add audienceId to token: ${error instanceof Error ? error.message : String(error)}. Using original token.`
+            `Failed to get token with audience: ${error instanceof Error ? error.message : String(error)}`
           );
         }
       }

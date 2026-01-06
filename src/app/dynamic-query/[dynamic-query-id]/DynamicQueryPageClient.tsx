@@ -4,6 +4,8 @@ import { useState, useCallback, useRef } from 'react';
 import { DynamicQueryTableWrapper } from '@/gradian-ui/data-display/dynamic-query-table/components/DynamicQueryTableWrapper';
 import { MainLayout } from '@/components/layout/main-layout';
 import { DynamicFilterPane } from '@/gradian-ui/shared/components/DynamicFilterPane';
+import { FormModal } from '@/gradian-ui/form-builder';
+import { DynamicQueryActionsConfig } from '@/gradian-ui/data-display/dynamic-query-table/utils/action-helpers';
 
 interface DynamicQueryPageClientProps {
   dynamicQueryId: string;
@@ -11,6 +13,7 @@ interface DynamicQueryPageClientProps {
   queryDescription?: string;
   queryParams?: Record<string, any>;
   flattenedSchemas?: string[];
+  dynamicQueryActions?: DynamicQueryActionsConfig;
 }
 
 export function DynamicQueryPageClient({
@@ -19,12 +22,14 @@ export function DynamicQueryPageClient({
   queryDescription,
   queryParams,
   flattenedSchemas,
+  dynamicQueryActions,
 }: DynamicQueryPageClientProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [flatten, setFlatten] = useState(false);
   const [showIds, setShowIds] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(true); // Default to true to show filter pane initially
+  const [editEntityId, setEditEntityId] = useState<{ schemaId: string; entityId: string } | null>(null);
   const refreshFnRef = useRef<(() => Promise<void>) | null>(null);
   
   // Sync viewMode with flatten state: hierarchy for flatten=false, table for flatten=true
@@ -71,6 +76,17 @@ export function DynamicQueryPageClient({
     }
   }, []);
 
+  const handleEditEntity = useCallback((schemaId: string, entityId: string) => {
+    // Prevent setting the same entity if already editing it (prevents loops)
+    setEditEntityId((current) => {
+      if (current && current.schemaId === schemaId && current.entityId === entityId) {
+        // Already editing this entity, don't update
+        return current;
+      }
+      return { schemaId, entityId };
+    });
+  }, []);
+
   return (
     <MainLayout
       title={queryName || `Dynamic Query: ${dynamicQueryId}`}
@@ -108,6 +124,8 @@ export function DynamicQueryPageClient({
           showIds={showIds}
           onShowIdsChange={setShowIds}
           flattenedSchemas={flattenedSchemas}
+          dynamicQueryActions={dynamicQueryActions}
+          onEditEntity={handleEditEntity}
           onRefreshReady={(refreshFn) => {
             refreshFnRef.current = refreshFn;
           }}
@@ -120,6 +138,31 @@ export function DynamicQueryPageClient({
           }}
         />
       </div>
+
+      {/* Edit Modal */}
+      {editEntityId && (
+        <FormModal
+          key={`edit-${editEntityId.schemaId}-${editEntityId.entityId}`}
+          schemaId={editEntityId.schemaId}
+          entityId={editEntityId.entityId}
+          mode="edit"
+          onSuccess={async () => {
+            // Refresh the query data after successful edit
+            if (refreshFnRef.current) {
+              await refreshFnRef.current();
+            }
+            setEditEntityId(null);
+          }}
+          onClose={() => {
+            setEditEntityId(null);
+          }}
+          getInitialEntityData={(requestedSchemaId, requestedEntityId) => {
+            // Return null to force API fetch, but this also allows us to handle 404s
+            // The FormModal will handle the error and prevent retries
+            return null;
+          }}
+        />
+      )}
     </MainLayout>
   );
 }

@@ -29,6 +29,8 @@ export function DynamicQueryTable({
   onExpandAllReady,
   flattenedSchemas,
   onStatusChange,
+  dynamicQueryActions,
+  onEditEntity,
 }: DynamicQueryTableProps) {
   const [internalFlatten, setInternalFlatten] = useState(controlledFlatten);
   const [internalShowIds, setInternalShowIds] = useState(controlledShowIds);
@@ -282,6 +284,9 @@ export function DynamicQueryTable({
           showIds={showIds}
           onShowIdsChange={setShowIds}
           highlightQuery={highlightQuery}
+          dynamicQueryActions={dynamicQueryActions}
+          dynamicQueryId={dynamicQueryId}
+          onEditEntity={onEditEntity}
         />
       ) : (
         <NestedTableRenderer 
@@ -295,6 +300,9 @@ export function DynamicQueryTable({
           onExpandAllReady={onExpandAllReady}
           showIds={showIds}
           flattenedSchemas={flattenedSchemas}
+          dynamicQueryActions={dynamicQueryActions}
+          dynamicQueryId={dynamicQueryId}
+          onEditEntity={onEditEntity}
         />
       )}
     </div>

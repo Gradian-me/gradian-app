@@ -17,6 +17,9 @@ export function NestedTableViewWrapper({
   onExpandAllReady,
   showIds,
   flattenedSchemas,
+  dynamicQueryActions,
+  dynamicQueryId,
+  onEditEntity,
 }: NestedTableViewWrapperProps) {
   const [internalExpandAllTrigger, setInternalExpandAllTrigger] = useState(0);
   
@@ -53,6 +56,9 @@ export function NestedTableViewWrapper({
       onFlattenChange={onFlattenChange}
       showIds={showIds}
       flattenedSchemas={flattenedSchemas}
+      dynamicQueryActions={dynamicQueryActions}
+      dynamicQueryId={dynamicQueryId}
+      onEditEntity={onEditEntity}
     />
   );
 }

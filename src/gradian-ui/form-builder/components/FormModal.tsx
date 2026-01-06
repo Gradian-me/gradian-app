@@ -313,31 +313,81 @@ export const FormModal: React.FC<FormModalProps> = ({
   useDialogBackHandler(isOpen, closeFormModal, 'modal', 'form-modal');
 
   // Track the last opened combination to prevent duplicate opens
-  const lastOpenedRef = React.useRef<{ schemaId?: string; entityId?: string; mode?: FormModalMode }>({});
+  const lastOpenedRef = React.useRef<{ schemaId?: string; entityId?: string; mode?: FormModalMode; attempted?: boolean; hasError?: boolean }>({});
+  const isOpeningRef = React.useRef(false);
 
   // Auto-open modal if schemaId is provided
   React.useEffect(() => {
-    const shouldOpen = schemaId && (!isOpen && !targetSchema && !isLoading);
-    const isNewCombination = 
-      lastOpenedRef.current.schemaId !== schemaId || 
-      lastOpenedRef.current.entityId !== entityId ||
-      lastOpenedRef.current.mode !== mode;
+    // Prevent if already opening
+    if (isOpeningRef.current) {
+      return;
+    }
+
+    const combinationKey = `${schemaId}-${entityId}-${mode}`;
+    const lastCombinationKey = `${lastOpenedRef.current.schemaId}-${lastOpenedRef.current.entityId}-${lastOpenedRef.current.mode}`;
+    const isNewCombination = combinationKey !== lastCombinationKey;
     
-    if (shouldOpen && isNewCombination) {
-      lastOpenedRef.current = { schemaId, entityId, mode };
+    // Check if we've already attempted this exact combination
+    const hasAttempted = lastOpenedRef.current.attempted && combinationKey === lastCombinationKey;
+    const hasError = lastOpenedRef.current.hasError && combinationKey === lastCombinationKey;
+    
+    // Don't open if:
+    // 1. Already attempted this combination (prevents loops)
+    // 2. There's a current load error for this combination
+    // 3. Modal is already open or loading
+    const shouldOpen = schemaId && 
+      (!isOpen && !targetSchema && !isLoading) && 
+      (isNewCombination || (!hasAttempted && !hasError)) &&
+      !loadError;
+    
+    if (shouldOpen) {
+      isOpeningRef.current = true;
+      lastOpenedRef.current = { 
+        schemaId, 
+        entityId, 
+        mode, 
+        attempted: true,
+        hasError: false // Reset error flag for new attempt
+      };
       
       if (mode === 'edit' && entityId) {
-        openFormModal(schemaId, 'edit', entityId);
+        openFormModal(schemaId, 'edit', entityId).catch(() => {
+          // Mark as having error if openFormModal fails
+          if (lastOpenedRef.current.schemaId === schemaId && 
+              lastOpenedRef.current.entityId === entityId &&
+              lastOpenedRef.current.mode === mode) {
+            lastOpenedRef.current.hasError = true;
+          }
+        }).finally(() => {
+          isOpeningRef.current = false;
+        });
       } else {
-        openFormModal(schemaId, 'create');
+        openFormModal(schemaId, 'create').catch(() => {
+          // Mark as having error if openFormModal fails
+          if (lastOpenedRef.current.schemaId === schemaId && 
+              lastOpenedRef.current.entityId === entityId &&
+              lastOpenedRef.current.mode === mode) {
+            lastOpenedRef.current.hasError = true;
+          }
+        }).finally(() => {
+          isOpeningRef.current = false;
+        });
       }
     }
     
-    // Reset when modal closes
-    if (!isOpen && !targetSchema) {
-      lastOpenedRef.current = {};
+    // Update error flag if loadError is set
+    if (loadError && combinationKey === lastCombinationKey) {
+      lastOpenedRef.current.hasError = true;
     }
-  }, [schemaId, entityId, mode, isOpen, targetSchema, isLoading, openFormModal]);
+    
+    // Reset when modal closes or when schemaId/entityId changes to a new combination
+    if (!isOpen && !targetSchema && !isLoading) {
+      if (isNewCombination || !schemaId) {
+        lastOpenedRef.current = {};
+        isOpeningRef.current = false;
+      }
+    }
+  }, [schemaId, entityId, mode, isOpen, targetSchema, isLoading, loadError, openFormModal]);
 
   const entityDisplayTitle = React.useMemo(
     () => getEntityDisplayTitle(targetSchema ?? undefined, entityData ?? undefined),

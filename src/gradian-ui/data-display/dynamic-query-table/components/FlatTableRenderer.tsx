@@ -6,7 +6,8 @@ import { formatFieldValue } from '../../table/utils/field-formatters';
 import { resolveColumnWidth } from '../../table/utils/column-config';
 import { cn } from '@/gradian-ui/shared/utils';
 import { FlatTableRendererProps, Schema, SchemaField, ColumnGroup } from '../types';
-import { parseFlattenedData, getSchemaInfoFromPath, getBorderColorClasses, getSchemaHeaderBorderColor, createColumnToGroupInfoMap } from '../utils';
+import { parseFlattenedData, getSchemaInfoFromPath, getBorderColorClasses, getSchemaHeaderBorderColor, createColumnToGroupInfoMap, getActionButtonsForSchema } from '../utils';
+import { DynamicActionButtons } from '@/gradian-ui/data-display/components/DynamicActionButtons';
 
 // Helper to infer field component type from value structure
 function inferFieldComponent(fieldName: string, value: any): string {
@@ -93,7 +94,7 @@ function createSyntheticField(fieldName: string, value: any, schema: Schema): Sc
   };
 }
 
-export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, onFlattenChange, showIds = false, onShowIdsChange, highlightQuery }: FlatTableRendererProps) {
+export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, onFlattenChange, showIds = false, onShowIdsChange, highlightQuery, dynamicQueryActions, dynamicQueryId, onEditEntity }: FlatTableRendererProps) {
   const schemaList = schemas || [];
 
   // Parse data and group columns by schema and determine order
@@ -315,10 +316,13 @@ export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, o
             <tr className="bg-violet-200 dark:bg-violet-950/90 border-b border-gray-200 dark:border-gray-700">
               {columnGroups.map((group, groupIndex) => {
                 const isLast = groupIndex === columnGroups.length - 1;
+                const hasGroupActions = dynamicQueryId && dynamicQueryActions && 
+                  getActionButtonsForSchema(group.schema, dynamicQueryActions, dynamicQueryId, undefined, onEditEntity);
+                const groupColSpan = group.columns.length + (hasGroupActions ? 1 : 0);
                 return (
                   <th
                     key={group.schema.id}
-                    colSpan={group.columns.length}
+                    colSpan={groupColSpan}
                     className={cn(
                       'px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
                       getSchemaHeaderBorderColor(groupIndex, isLast)
@@ -333,86 +337,132 @@ export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, o
             <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-700">
               {allColumns.map((column, colIndex) => {
                 const isLastColumn = colIndex === allColumns.length - 1;
+                const columnGroup = columnToGroupInfo.get(column.id);
+                const isFirstColumnInGroup = columnGroup && columnGroup.columnIndex === 0;
+                const groupSchema = columnGroup && columnGroups[columnGroup.groupIndex]?.schema;
+                const groupHasActions = groupSchema && dynamicQueryId && dynamicQueryActions && 
+                  getActionButtonsForSchema(groupSchema, dynamicQueryActions, dynamicQueryId, undefined, onEditEntity);
                 
                 return (
-                  <th
-                    key={column.id}
-                    className={cn(
-                      'px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider',
-                      isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo)
+                  <React.Fragment key={column.id}>
+                    {/* Action column header before each schema group that has actions */}
+                    {isFirstColumnInGroup && groupHasActions && (
+                      <th className="w-20 px-2 py-3 text-center text-xs font-semibold text-gray-900 dark:text-gray-200"></th>
                     )}
-                    style={{
-                      // Apply width constraints to headers to match cells
-                      minWidth: column.minWidth ? `${column.minWidth}px` : undefined,
-                      maxWidth: column.maxWidth ? `${column.maxWidth}px` : undefined,
-                      width: column.width ? (typeof column.width === 'number' ? `${column.width}px` : column.width) : undefined,
-                      boxSizing: 'border-box',
-                      whiteSpace: column.maxWidth ? 'normal' : 'nowrap',
-                    }}
-                  >
-                    {column.label}
-                  </th>
+                    <th
+                      className={cn(
+                        'px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider',
+                        isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo)
+                      )}
+                      style={{
+                        // Apply width constraints to headers to match cells
+                        minWidth: column.minWidth ? `${column.minWidth}px` : undefined,
+                        maxWidth: column.maxWidth ? `${column.maxWidth}px` : undefined,
+                        width: column.width ? (typeof column.width === 'number' ? `${column.width}px` : column.width) : undefined,
+                        boxSizing: 'border-box',
+                        whiteSpace: column.maxWidth ? 'normal' : 'nowrap',
+                      }}
+                    >
+                      {column.label}
+                    </th>
+                  </React.Fragment>
                 );
               })}
             </tr>
           </thead>
           <tbody>
-            {rowsWithIds.map((row, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className={cn(
-                  'transition-colors border-b border-gray-200 dark:border-gray-700',
-                  rowIndex % 2 === 1 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900',
-                  'hover:bg-gray-200 dark:hover:bg-gray-600'
-                )}
-              >
-                {allColumns.map((column, colIndex) => {
-                  const value = typeof column.accessor === 'function' 
-                    ? column.accessor(row)
-                    : row[column.accessor as string];
-                  const isLastColumn = colIndex === allColumns.length - 1;
-                  
-                  // Determine if this is a badge field that needs wrapping
-                  const isBadgeField = column.field?.role === 'status' || 
-                                      column.field?.role === 'badge' || 
-                                      column.field?.role === 'entityType' ||
-                                      column.field?.component === 'select' ||
-                                      column.field?.component === 'checkbox-list' ||
-                                      column.field?.component === 'picker';
-                  
-                  const shouldAllowWrapping = column.allowWrap !== false && (column.maxWidth != null || isBadgeField);
-                  
-                  return (
-                    <td
-                      key={column.id}
-                      className={cn(
-                        'p-3 text-xs text-gray-900 dark:text-gray-200',
-                        isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo),
-                        column.align === 'center' && 'text-center',
-                        column.align === 'right' && 'text-right'
-                      )}
-                      style={{
-                        // Apply width constraints for badge columns
-                        minWidth: column.minWidth ? `${column.minWidth}px` : undefined,
-                        maxWidth: column.maxWidth ? `${column.maxWidth}px` : undefined,
-                        width: column.width ? (typeof column.width === 'number' ? `${column.width}px` : column.width) : undefined,
-                        boxSizing: 'border-box',
-                        // Allow wrapping for badge columns
-                        whiteSpace: shouldAllowWrapping ? 'normal' : 'nowrap',
-                        wordBreak: shouldAllowWrapping ? 'break-word' : 'normal',
-                        overflowWrap: shouldAllowWrapping ? 'break-word' : 'normal',
-                        overflowX: 'hidden',
-                        overflowY: shouldAllowWrapping ? 'visible' : 'hidden',
-                      }}
-                    >
-                      <div className={shouldAllowWrapping ? "min-w-0 w-full" : ""}>
-                        {column.render ? column.render(value, row, rowIndex) : <span>{String(value ?? '—')}</span>}
-                      </div>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+            {rowsWithIds.map((row, rowIndex) => {
+              // Helper to get row ID for a specific schema
+              const getRowIdForSchema = (schemaId: string) => {
+                // Try various ID field paths
+                const idPaths = [
+                  `${schemaId}.id`,
+                  `${schemaId}id`,
+                  'id',
+                  'data.id',
+                ];
+                
+                for (const path of idPaths) {
+                  const value = row[path];
+                  if (value) return value;
+                }
+                
+                return null;
+              };
+              
+              return (
+                <tr
+                  key={rowIndex}
+                  className={cn(
+                    'transition-colors border-b border-gray-200 dark:border-gray-700',
+                    rowIndex % 2 === 1 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900',
+                    'hover:bg-gray-200 dark:hover:bg-gray-600'
+                  )}
+                >
+                  {allColumns.map((column, colIndex) => {
+                    const value = typeof column.accessor === 'function' 
+                      ? column.accessor(row)
+                      : row[column.accessor as string];
+                    const isLastColumn = colIndex === allColumns.length - 1;
+                    const columnGroup = columnToGroupInfo.get(column.id);
+                    const isFirstColumnInGroup = columnGroup && columnGroup.columnIndex === 0;
+                    const groupSchema = columnGroup && columnGroups[columnGroup.groupIndex]?.schema;
+                    
+                    // Determine if this is a badge field that needs wrapping
+                    const isBadgeField = column.field?.role === 'status' || 
+                                        column.field?.role === 'badge' || 
+                                        column.field?.role === 'entityType' ||
+                                        column.field?.component === 'select' ||
+                                        column.field?.component === 'checkbox-list' ||
+                                        column.field?.component === 'picker';
+                    
+                    const shouldAllowWrapping = column.allowWrap !== false && (column.maxWidth != null || isBadgeField);
+                    
+                    return (
+                      <React.Fragment key={column.id}>
+                        {/* Action buttons cell before each schema group that has actions */}
+                        {isFirstColumnInGroup && groupSchema && (() => {
+                          const groupRowId = getRowIdForSchema(groupSchema.id);
+                          const groupActionButtons = dynamicQueryId && dynamicQueryActions 
+                            ? getActionButtonsForSchema(groupSchema, dynamicQueryActions, dynamicQueryId, groupRowId, onEditEntity)
+                            : null;
+                          return groupActionButtons ? (
+                            <td className="p-2 text-center">
+                              <DynamicActionButtons actions={groupActionButtons} variant="minimal" />
+                            </td>
+                          ) : null;
+                        })()}
+                        <td
+                          className={cn(
+                            'p-3 text-xs text-gray-900 dark:text-gray-200',
+                            isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo),
+                            column.align === 'center' && 'text-center',
+                            column.align === 'right' && 'text-right'
+                          )}
+                          style={{
+                            // Apply width constraints for badge columns
+                            minWidth: column.minWidth ? `${column.minWidth}px` : undefined,
+                            maxWidth: column.maxWidth ? `${column.maxWidth}px` : undefined,
+                            width: column.width ? (typeof column.width === 'number' ? `${column.width}px` : column.width) : undefined,
+                            boxSizing: 'border-box',
+                            // Allow wrapping for badge columns
+                            whiteSpace: shouldAllowWrapping ? 'normal' : 'nowrap',
+                            wordBreak: shouldAllowWrapping ? 'break-word' : 'normal',
+                            overflowWrap: shouldAllowWrapping ? 'break-word' : 'normal',
+                            overflowX: 'hidden',
+                            overflowY: shouldAllowWrapping ? 'visible' : 'hidden',
+                          }}
+                        >
+                          <div className={shouldAllowWrapping ? "min-w-0 w-full" : ""}>
+                            {column.render ? column.render(value, row, rowIndex) : <span>{String(value ?? '—')}</span>}
+                          </div>
+                        </td>
+                      </React.Fragment>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

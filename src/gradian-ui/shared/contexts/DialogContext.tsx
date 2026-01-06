@@ -91,6 +91,16 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
 export function useDialogContext() {
   const context = useContext(DialogContext);
   if (!context) {
+    // During SSR, provide a fallback context to prevent errors
+    // This will be replaced with the real context on the client
+    if (typeof window === 'undefined') {
+      return {
+        registerDialog: () => {},
+        unregisterDialog: () => {},
+        closeAllDialogs: () => false,
+        hasOpenDialogs: () => false,
+      };
+    }
     throw new Error('useDialogContext must be used within DialogProvider');
   }
   return context;

@@ -327,3 +327,11 @@ export function createColumnToGroupInfoMap(columnGroups: ColumnGroup[]): Map<str
   return map;
 }
 
+// Export action helpers
+export {
+  type DynamicQueryActionsConfig,
+  findActionMetadataForSchema,
+  createActionConfigs,
+  getActionButtonsForSchema,
+} from './action-helpers';
+

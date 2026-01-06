@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { DynamicQueryPageClient } from './DynamicQueryPageClient';
 import { readSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
+import { DynamicQueryActionsConfig } from '@/gradian-ui/data-display/dynamic-query-table/utils/action-helpers';
 
 interface PageProps {
   params: Promise<{
@@ -31,6 +32,25 @@ export default async function DynamicQueryPage({ params, searchParams }: PagePro
       queryParams[key] = Array.isArray(value) ? value[0] : value;
     }
   });
+
+  // Hardcoded dynamicQueryActions - TODO: Replace with dynamic data later
+  const dynamicQueryActions: DynamicQueryActionsConfig = {
+    dynamicQueryId: "01KDT7XAH1V7CKTPKZFA5VC6H3",
+    actionMetadata: [
+      {
+        schema: "inquiries",
+        actions: ["view", "edit"]
+      },
+      {
+        schema: "tenders",
+        actions: ["view", "edit"]
+      },
+      {
+        schema: "tender-items",
+        actions: ["view", "edit"]
+      }
+    ]
+  };
 
   // Load query metadata for page title and description
   let queryName: string | undefined;
@@ -70,6 +90,7 @@ export default async function DynamicQueryPage({ params, searchParams }: PagePro
         queryDescription={queryDescription}
         queryParams={queryParams}
         flattenedSchemas={flattenedSchemas}
+        dynamicQueryActions={dynamicQueryActions}
       />
     </Suspense>
   );

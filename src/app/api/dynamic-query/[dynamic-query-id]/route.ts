@@ -7,9 +7,29 @@ import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 import { loadAllCompanies } from '@/gradian-ui/shared/utils/companies-loader';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
-import { extractTokenFromHeader, extractTokenFromCookies } from '@/domains/auth';
-import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
-import { getAccessToken } from '@/app/api/auth/helpers/server-token-cache';
+import { getTokenWithAudience } from '@/gradian-ui/shared/utils/token-audience.util';
+import { extractTokenFromCookies } from '@/domains/auth';
+
+// Utility functions for logging response bodies
+const MAX_LOG_LENGTH = 2000;
+
+const stringifyForLog = (value: unknown): string => {
+  try {
+    if (typeof value === 'string') {
+      return value;
+    }
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value);
+  }
+};
+
+const truncateForLog = (value: string): string => {
+  if (value.length <= MAX_LOG_LENGTH) {
+    return value;
+  }
+  return `${value.slice(0, MAX_LOG_LENGTH)}… (truncated)`;
+};
 
 /**
  * POST - Proxy dynamic query request to backend
@@ -144,31 +164,13 @@ export async function POST(
       }
     }
 
-    // Get access token (same logic as proxyDataRequest)
-    let authHeader: string | null = null;
-    let authToken: string | null = null;
-    const cookies = request.headers.get('cookie');
-    const refreshToken = extractTokenFromCookies(cookies, AUTH_CONFIG.REFRESH_TOKEN_COOKIE);
-
-    if (refreshToken) {
-      authToken = getAccessToken(refreshToken);
-      if (authToken) {
-        authHeader = `Bearer ${authToken}`;
-      }
-    }
-
-    // Fallback: Try to get token from incoming Authorization header
-    if (!authToken) {
-      const incomingAuthHeader = request.headers.get('authorization') || request.headers.get('Authorization');
-      if (incomingAuthHeader) {
-        authToken = extractTokenFromHeader(incomingAuthHeader);
-        if (authToken) {
-          authHeader = incomingAuthHeader.toLowerCase().startsWith('bearer ') 
-            ? incomingAuthHeader 
-            : `Bearer ${authToken}`;
-        }
-      }
-    }
+    // Get access token with audienceId from environment variable
+    const appId = process.env.APP_ID;
+    const authHeader = await getTokenWithAudience({
+      request,
+      audienceId: appId,
+      logContext: '[Dynamic Query]',
+    });
 
     // Extract fingerprint (same logic as proxyDataRequest)
     let fingerprint: string | null = null;
@@ -177,13 +179,16 @@ export async function POST(
     if (fingerprintHeader) {
       fingerprint = fingerprintHeader.trim();
     } else {
+      const cookies = request.headers.get('cookie');
       const fingerprintFromCookie = extractTokenFromCookies(cookies, 'x-fingerprint');
       if (fingerprintFromCookie) {
         fingerprint = fingerprintFromCookie;
-      } else if (authToken) {
+      } else if (authHeader) {
         // Extract fingerprint from JWT token payload
         try {
-          const parts = authToken.split('.');
+          // Extract token from Bearer header
+          const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader;
+          const parts = token.split('.');
           if (parts.length === 3) {
             const payload = parts[1];
             let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
@@ -205,8 +210,21 @@ export async function POST(
     // Build headers for backend request
     const headers = new Headers();
     
+    // Set Authorization header if we have a token (REQUIRED for backend authentication)
+    // Use 'Authorization' (capital A) as some backends are case-sensitive
     if (authHeader) {
       headers.set('Authorization', authHeader);
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'info',
+        `[Dynamic Query] Authorization header set for backend request (length: ${authHeader.length}, format: ${authHeader.substring(0, 10)}...)`
+      );
+    } else {
+      loggingCustom(
+        LogType.CALL_BACKEND,
+        'warn',
+        `[Dynamic Query] WARNING: No Authorization header available for backend request to ${targetUrl}`
+      );
     }
     
     if (tenantDomain) {
@@ -217,10 +235,39 @@ export async function POST(
       headers.set('x-fingerprint', fingerprint);
     }
 
-    // Convert Headers object to plain object for fetch()
+    // Final verification: Check that required headers are present
+    const hasAuthorization = headers.has('Authorization') || headers.has('authorization');
+    const hasTenantDomain = headers.has('x-tenant-domain') || headers.has('X-Tenant-Domain');
+    const hasFingerprint = headers.has('x-fingerprint') || headers.has('X-Fingerprint');
+    
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      hasAuthorization && hasTenantDomain && hasFingerprint ? 'info' : 'warn',
+      `[Dynamic Query] Header verification: Authorization=${hasAuthorization ? '✓' : '✗'}, x-tenant-domain=${hasTenantDomain ? '✓' : '✗'}, x-fingerprint=${hasFingerprint ? '✓' : '✗'}`
+    );
+
+    // Log all headers being sent to backend for debugging (including complete Authorization header)
+    const headersToSend: Record<string, string> = {};
+    headers.forEach((value, key) => {
+      headersToSend[key] = value; // Show complete headers including full Authorization Bearer token
+    });
+    loggingCustom(
+      LogType.CALL_BACKEND,
+      'info',
+      `[Dynamic Query] Headers being sent to backend: ${JSON.stringify(headersToSend)}`
+    );
+
+    // Convert Headers object to plain object for fetch() to ensure proper serialization
+    // Some fetch implementations may not properly serialize Headers objects
+    // IMPORTANT: Use exact case for Authorization header as some backends are case-sensitive
     const headersObject: Record<string, string> = {};
     headers.forEach((value, key) => {
-      headersObject[key] = value;
+      // Ensure Authorization header uses capital A (some backends are case-sensitive)
+      if (key.toLowerCase() === 'authorization') {
+        headersObject['Authorization'] = value;
+      } else {
+        headersObject[key] = value;
+      }
     });
 
     loggingCustom(LogType.CALL_BACKEND, 'info', `→ POST ${targetUrl}`);
@@ -259,21 +306,55 @@ export async function POST(
     // Handle JSON responses
     if (contentType && contentType.includes('application/json')) {
       const data = await response.json();
+      const logLevel = response.status < 400 ? 'info' : response.status >= 500 ? 'error' : 'warn';
       loggingCustom(
         LogType.CALL_BACKEND,
-        'info',
+        logLevel,
         `← ${response.status} ${response.statusText || ''} (JSON)`
       );
+      // Log response body - always log for 4xx/5xx errors, use 'debug' for success
+      if (response.status >= 400) {
+        const bodyLogLevel = response.status >= 500 ? 'error' : 'warn';
+        loggingCustom(
+          LogType.CALL_BACKEND,
+          bodyLogLevel,
+          `Response body: ${truncateForLog(stringifyForLog(data))}`
+        );
+      } else {
+        loggingCustom(
+          LogType.CALL_BACKEND,
+          'debug',
+          `Response body: ${truncateForLog(stringifyForLog(data))}`
+        );
+      }
       return NextResponse.json(data, { status: response.status });
     }
 
     // Handle text responses
     const text = await response.text();
+    const logLevel = response.status < 400 ? 'info' : response.status >= 500 ? 'error' : 'warn';
     loggingCustom(
       LogType.CALL_BACKEND,
-      response.status < 400 ? 'info' : 'warn',
+      logLevel,
       `← ${response.status} ${response.statusText || ''} (text)`
     );
+    // Log response text - always log for 4xx/5xx errors, use 'debug' for success
+    if (text) {
+      if (response.status >= 400) {
+        const bodyLogLevel = response.status >= 500 ? 'error' : 'warn';
+        loggingCustom(
+          LogType.CALL_BACKEND,
+          bodyLogLevel,
+          `Response text: ${truncateForLog(text)}`
+        );
+      } else {
+        loggingCustom(
+          LogType.CALL_BACKEND,
+          'debug',
+          `Response text: ${truncateForLog(text)}`
+        );
+      }
+    }
     
     const payload: Record<string, unknown> = {
       success: response.status < 400,

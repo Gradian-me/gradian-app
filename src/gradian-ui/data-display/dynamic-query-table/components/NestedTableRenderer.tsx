@@ -4,7 +4,7 @@ import React from 'react';
 import { NestedTableRendererProps, Schema } from '../types';
 import { NestedTableViewWrapper } from './NestedTableViewWrapper';
 
-export function NestedTableRenderer({ data, schemas, showFlattenSwitch, flatten, onFlattenChange, highlightQuery, expandAllTrigger, onExpandAllReady, showIds, flattenedSchemas }: NestedTableRendererProps) {
+export function NestedTableRenderer({ data, schemas, showFlattenSwitch, flatten, onFlattenChange, highlightQuery, expandAllTrigger, onExpandAllReady, showIds, flattenedSchemas, dynamicQueryActions, dynamicQueryId, onEditEntity }: NestedTableRendererProps) {
   // New structure: { schema: string, data: array, schemas: array }
   const rootSchemaId = data.schema;
   const rootData = Array.isArray(data.data) ? data.data : [];
@@ -34,6 +34,9 @@ export function NestedTableRenderer({ data, schemas, showFlattenSwitch, flatten,
         onExpandAllReady={onExpandAllReady}
         showIds={showIds}
         flattenedSchemas={flattenedSchemas}
+        dynamicQueryActions={dynamicQueryActions}
+        dynamicQueryId={dynamicQueryId}
+        onEditEntity={onEditEntity}
       />
     </div>
   );

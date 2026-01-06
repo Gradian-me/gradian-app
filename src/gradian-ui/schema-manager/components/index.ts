@@ -22,5 +22,6 @@ export { CreateSchemaDialog } from './CreateSchemaDialog';
 export { SchemaCardGrid, SchemaCardSkeletonGrid } from './SchemaCardGrid';
 export { SchemaLoadError } from './SchemaLoadError';
 export { SchemaNotFound } from './SchemaNotFound';
+export { EntityNotFound } from './EntityNotFound';
 export { AccessDenied } from './AccessDenied';
 

@@ -39,6 +39,7 @@ import { EntityMetadata } from './CreateUpdateDetail';
 import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { CardWrapper, CardHeader, CardContent, CardTitle } from '../card/components/CardWrapper';
 import { EndLine } from '../../layout/end-line/components/EndLine';
+import { EntityNotFound } from '@/gradian-ui/schema-manager/components';
 
 export interface DynamicDetailPageRendererProps {
   schema: FormSchema;
@@ -1008,19 +1009,38 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   // Only show error if not refreshing and not a standalone page
   // Standalone pages can render without data
   if (error && !isRefreshing && !isStandalonePage) {
+    const entityName = schema.singular_name || schema.name || 'Entity';
+    // Try to extract entity ID from data, URL, or error message
+    const entityId = data?.id || (() => {
+      if (typeof window !== 'undefined') {
+        const pathParts = window.location.pathname.split('/');
+        const dataIdIndex = pathParts.findIndex(part => part === schema.id) + 1;
+        if (dataIdIndex > 0 && pathParts[dataIdIndex]) {
+          return pathParts[dataIdIndex];
+        }
+      }
+      // Try to extract from error message
+      const idMatch = error.match(/ID\s+"([^"]+)"/);
+      return idMatch ? idMatch[1] : null;
+    })();
+    
+    const isNotFound = error.toLowerCase().includes('not found') || 
+                      error.toLowerCase().includes('doesn\'t exist') ||
+                      error.toLowerCase().includes('doesn\'t exist');
+    
     return (
-      <div className="container mx-auto px-4 py-6">
-        <div className="text-center py-12">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-300 mb-2">Error</h3>
-          <p className="text-gray-500 mb-4">{error || 'Data not found'}</p>
-          {onBack && (
-            <Button onClick={onBack} variant="outline">
-              <ArrowLeft className="h-4 w-4 me-2" />
-              {showBack ? 'Back' : (schema.plural_name || 'Back')}
-            </Button>
-          )}
-        </div>
-      </div>
+      <EntityNotFound
+        entityName={entityName}
+        entityId={entityId || undefined}
+        description={isNotFound ? undefined : error}
+        listHref={schema.id ? `/page/${schema.id}` : undefined}
+        showListButton={!!schema.id}
+        onGoBack={onBack}
+        showGoBackButton={!!onBack}
+        onRefresh={onRefreshData}
+        refreshing={isRefreshing}
+        errorCodeText={isNotFound ? `${entityName} Not Found` : 'Error Loading Entity'}
+      />
     );
   }
 

@@ -2,6 +2,7 @@
 // A reusable component for rendering view, edit, delete action buttons
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/gradian-ui/form-builder/form-elements';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/gradian-ui/shared/utils';
@@ -50,6 +51,8 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
   className,
   stopPropagation = true,
 }) => {
+  const router = useRouter();
+
   const getActionConfig = (type: ActionType) => {
     const configs: Record<ActionType, { icon: string; label: string; hoverClass: string }> = {
       view: {
@@ -78,7 +81,14 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
     if (stopPropagation) {
       e.stopPropagation();
     }
-    action.onClick();
+    
+    // If href is provided, use Next.js router for navigation
+    if (action.href) {
+      router.push(action.href);
+    } else {
+      // Otherwise call the onClick handler
+      action.onClick();
+    }
   };
 
   const containerProps = stopPropagation
