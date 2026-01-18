@@ -7586,5 +7586,486 @@
       ]
     },
     "applyToAllTenants": true
+  },
+  {
+    "id": "lean-management",
+    "description": "Manage lean management waste analysis and improvement opportunities",
+    "singular_name": "Lean Management",
+    "plural_name": "Lean Management",
+    "fields": [
+      {
+        "id": "lean-date",
+        "name": "date",
+        "label": "Date",
+        "sectionId": "basic-context",
+        "component": "date",
+        "placeholder": "Select date",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 1,
+        "role": "duedate"
+      },
+      {
+        "id": "lean-observer",
+        "name": "observer",
+        "label": "Observer",
+        "sectionId": "basic-context",
+        "component": "picker",
+        "placeholder": "Click to select observer",
+        "description": "Select observer from popup picker",
+        "targetSchema": "users",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "lean-category",
+        "name": "category",
+        "label": "Category",
+        "sectionId": "basic-context",
+        "component": "picker",
+        "placeholder": "Click to select categories",
+        "description": "Select categories from popup picker",
+        "targetSchema": "change-categories",
+        "allowMultiselect": true,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "lean-location",
+        "name": "location",
+        "label": "Location",
+        "sectionId": "basic-context",
+        "component": "text",
+        "placeholder": "Enter location",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4,
+        "role": "location"
+      },
+      {
+        "id": "lean-brief-waste-description",
+        "name": "briefWasteDescription",
+        "label": "Brief Waste Description",
+        "sectionId": "basic-context",
+        "component": "textarea",
+        "placeholder": "Enter brief waste description",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 5
+      },
+      {
+        "id": "lean-waste-defects",
+        "name": "wasteDefects",
+        "label": "Defects",
+        "sectionId": "waste-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "lean-waste-overproduction",
+        "name": "wasteOverproduction",
+        "label": "Overproduction",
+        "sectionId": "waste-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "lean-waste-waiting",
+        "name": "wasteWaiting",
+        "label": "Waiting",
+        "sectionId": "waste-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "lean-waste-non-utilized-talent",
+        "name": "wasteNonUtilizedTalent",
+        "label": "Non-Utilized Talent",
+        "sectionId": "waste-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "lean-waste-transportation",
+        "name": "wasteTransportation",
+        "label": "Transportation",
+        "sectionId": "waste-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "lean-waste-inventory",
+        "name": "wasteInventory",
+        "label": "Inventory",
+        "sectionId": "waste-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "lean-waste-motion",
+        "name": "wasteMotion",
+        "label": "Motion",
+        "sectionId": "waste-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 7
+      },
+      {
+        "id": "lean-waste-extra-processing",
+        "name": "wasteExtraProcessing",
+        "label": "Extra Processing",
+        "sectionId": "waste-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 8
+      },
+      {
+        "id": "lean-waste-assessment-justification",
+        "name": "wasteAssessmentJustification",
+        "label": "Waste Assessment Justification",
+        "sectionId": "waste-analysis",
+        "component": "textarea",
+        "placeholder": "Enter waste assessment justification",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 9
+      },
+      {
+        "id": "lean-impact-time",
+        "name": "impactTime",
+        "label": "Time",
+        "sectionId": "impact-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "lean-impact-cost",
+        "name": "impactCost",
+        "label": "Cost",
+        "sectionId": "impact-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "lean-impact-quality",
+        "name": "impactQuality",
+        "label": "Quality",
+        "sectionId": "impact-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "lean-impact-safety",
+        "name": "impactSafety",
+        "label": "Safety",
+        "sectionId": "impact-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "lean-impact-compliance",
+        "name": "impactCompliance",
+        "label": "Compliance",
+        "sectionId": "impact-analysis",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "lean-impact-analysis-justification",
+        "name": "impactAnalysisJustification",
+        "label": "Impact Analysis Justification",
+        "sectionId": "impact-analysis",
+        "component": "textarea",
+        "placeholder": "Enter impact analysis justification",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 6
+      },
+      {
+        "id": "lean-root-causes",
+        "name": "rootCauses",
+        "label": "Root Causes",
+        "sectionId": "root-cause",
+        "component": "list-input",
+        "placeholder": "Enter root causes",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "lean-improvement-idea",
+        "name": "improvementIdea",
+        "label": "Improvement Idea",
+        "sectionId": "improvement-opportunity",
+        "component": "textarea",
+        "placeholder": "Enter improvement idea",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "lean-method-suggested",
+        "name": "leanMethodSuggested",
+        "label": "Lean Method Suggested",
+        "sectionId": "improvement-opportunity",
+        "component": "select",
+        "placeholder": "Select lean method",
+        "validation": {
+          "required": false
+        },
+        "options": [
+          {
+            "id": "5S",
+            "label": "5S",
+            "icon": "Layers"
+          },
+          {
+            "id": "STANDARD_WORK",
+            "label": "Standard Work",
+            "icon": "ClipboardCheck"
+          },
+          {
+            "id": "FLOW_PULL",
+            "label": "Flow / Pull",
+            "icon": "GitBranch"
+          },
+          {
+            "id": "VISUAL_MANAGEMENT",
+            "label": "Visual Management",
+            "icon": "Eye"
+          },
+          {
+            "id": "ERROR_PROOFING_POKA_YOKE",
+            "label": "Error Proofing (Poka-Yoke)",
+            "icon": "ShieldCheck"
+          },
+          {
+            "id": "AUTOMATION_DIGITAL",
+            "label": "Automation / Digital",
+            "icon": "Zap"
+          }
+        ],
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "lean-needs-change-management",
+        "name": "needsChangeManagement",
+        "label": "Needs Change Management",
+        "sectionId": "improvement-opportunity",
+        "component": "switch",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "lean-related-change-management",
+        "name": "relatedChangeManagement",
+        "label": "Related Change Management",
+        "sectionId": "improvement-opportunity",
+        "component": "picker",
+        "placeholder": "Click to select change management",
+        "description": "Select related change management from popup picker",
+        "targetSchema": "change-management",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "lean-time-saved",
+        "name": "timeSaved",
+        "label": "Time Saved (hours)",
+        "sectionId": "effectiveness-assessment",
+        "component": "number",
+        "placeholder": "Enter time saved in hours",
+        "validation": {
+          "required": false,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "lean-cost-avoided",
+        "name": "costAvoided",
+        "label": "Cost Avoided (IRR)",
+        "sectionId": "effectiveness-assessment",
+        "component": "number",
+        "placeholder": "Enter cost avoided",
+        "validation": {
+          "required": false,
+          "min": 0
+        },
+        "displayType": "currency",
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "lean-overall-effectiveness",
+        "name": "overallEffectiveness",
+        "label": "Overall Effectiveness",
+        "sectionId": "effectiveness-assessment",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "lean-overall-assessment-description",
+        "name": "overallAssessmentDescription",
+        "label": "Overall Assessment Description",
+        "sectionId": "effectiveness-assessment",
+        "component": "textarea",
+        "placeholder": "Enter overall assessment description",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-context",
+        "title": "Basic Context",
+        "description": "Basic information about the lean management observation",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "waste-analysis",
+        "title": "Waste Analysis",
+        "description": "Analysis of different types of waste using rating components",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "impact-analysis",
+        "title": "Impact Analysis",
+        "description": "Analysis of impact on various aspects using rating components",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "root-cause",
+        "title": "Root Cause",
+        "description": "Root causes identified",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "improvement-opportunity",
+        "title": "Improvement Opportunity",
+        "description": "Improvement ideas and suggested methods",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "follow-ups",
+        "title": "Follow Ups",
+        "description": "Related tasks for follow-up",
+        "initialState": "expanded",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "connectToSchema",
+          "minItems": 0,
+          "targetSchema": "tasks",
+          "relationTypeId": "HAS_FOLLOW_UP_TASK"
+        }
+      },
+      {
+        "id": "effectiveness-assessment",
+        "title": "Effectiveness Assessment",
+        "description": "Assessment of the effectiveness of improvements",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": true,
+    "icon": "TrendingUp",
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ]
   }
 ]
