@@ -176,7 +176,7 @@ export function AISearchResults({ results, className }: AISearchResultsProps) {
                     </div>
 
                     {/* Title */}
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                    <h4 dir="auto" className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
                       {result.title}
                     </h4>
 
@@ -308,7 +308,7 @@ export function AISearchResults({ results, className }: AISearchResultsProps) {
                         </Button>
                       </div>
 
-                      <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                      <h4 dir="auto" className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
                         {result.title}
                       </h4>
 

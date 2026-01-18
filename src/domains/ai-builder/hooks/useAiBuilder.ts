@@ -415,7 +415,34 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
       let enhancedPrompt = originalPrompt;
       let searchResultsData: SearchResult[] | null = null;
       
-      // Extract language instruction from original prompt to preserve it in summarized version
+      // Extract output language from formValues or prompt for summarization
+      const languageFieldNames = ['language', 'outputLanguage', 'output-language', 'output_language', 'outputLanguageCode', 'lang'];
+      let outputLanguageForSummarization: string | undefined = undefined;
+      if (request.formValues) {
+        for (const fieldName of languageFieldNames) {
+          const value = request.formValues[fieldName];
+          if (value && typeof value === 'string' && value.trim() && value.toLowerCase() !== 'en' && value !== 'text') {
+            outputLanguageForSummarization = value.trim();
+            break;
+          }
+        }
+      }
+      
+      // If not found in formValues, try to extract from prompt
+      if (!outputLanguageForSummarization) {
+        const languageInstructionPattern = /IMPORTANT OUTPUT LANGUAGE REQUIREMENT:[\s\S]*$/;
+        const languageInstructionMatch = originalPrompt.match(languageInstructionPattern);
+        if (languageInstructionMatch) {
+          // Try to extract language code from the instruction (e.g., "Persian (Farsi) (FA)" -> "fa")
+          const instructionText = languageInstructionMatch[0];
+          const languageCodeMatch = instructionText.match(/\(([A-Z]{2})\)/);
+          if (languageCodeMatch && languageCodeMatch[1]) {
+            outputLanguageForSummarization = languageCodeMatch[1].toLowerCase();
+          }
+        }
+      }
+      
+      // Extract language instruction from original prompt to preserve it in summarized version (for backward compatibility)
       const languageInstructionPattern = /IMPORTANT OUTPUT LANGUAGE REQUIREMENT:[\s\S]*$/;
       const languageInstructionMatch = originalPrompt.match(languageInstructionPattern);
       const languageInstruction = languageInstructionMatch ? languageInstructionMatch[0] : null;
@@ -445,11 +472,13 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
           // Use shorter timeout (20 seconds) to fail fast if summarization is slow
           // Use Promise.race with a timeout to ensure we don't wait too long
           // Summarize the prompt WITHOUT language instruction (to avoid confusion in summarization)
+          // Pass outputLanguage directly to summarizePrompt so it can add the language instruction internally
           const summarizationPromise = summarizePrompt(
             promptWithoutLanguage, // Use prompt without language instruction for cleaner summarization
             abortController.signal,
             20000, // Reduced to 20 seconds for faster fallback
-            organizationRag // Pass preloaded organization RAG to avoid duplicate fetch
+            organizationRag, // Pass preloaded organization RAG to avoid duplicate fetch
+            outputLanguageForSummarization // Pass output language so summary will be in that language
           );
           
           const timeoutPromise = new Promise<string>((_, reject) => {
@@ -469,10 +498,13 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
             return promptWithoutLanguage; // Return prompt without language instruction as fallback
           });
           
-          // Append language instruction back to summarized prompt if it existed in original
-          if (languageInstruction) {
+          // If outputLanguage was passed to summarizePrompt, it will already include the language instruction
+          // Only append language instruction if we didn't pass outputLanguage and it existed in original
+          // (for backward compatibility with old approach)
+          if (languageInstruction && !outputLanguageForSummarization) {
             summarizedPromptValue = `${summarizedText.trim()}\n\n${languageInstruction}`;
           } else {
+            // summarizePrompt already handled language instruction if outputLanguage was provided
             summarizedPromptValue = summarizedText;
           }
           

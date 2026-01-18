@@ -74,7 +74,7 @@ export function Table<T = any>({
     <div className={containerClasses} style={{ width: '-webkit-fill-available' }}>
       {config.bordered ? (
         <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-x-auto overflow-y-hidden w-full">
-          <table className={tableClasses} style={tableStyle}>
+          <table className={tableClasses} style={tableStyle} dir="auto">
             <TableHeader
               columns={config.columns}
               sortBy={state.sortBy}
@@ -103,7 +103,7 @@ export function Table<T = any>({
           </table>
         </div>
       ) : (
-        <table className={tableClasses} style={tableStyle}>
+        <table className={tableClasses} style={tableStyle} dir="auto">
           <TableHeader
             columns={config.columns}
             sortBy={state.sortBy}

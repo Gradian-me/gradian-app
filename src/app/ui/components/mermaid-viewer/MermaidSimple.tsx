@@ -19,6 +19,20 @@ interface MermaidSimpleProps {
 let initialized = false;
 let currentTheme = '';
 
+/**
+ * Detect if content contains RTL characters (Arabic, Persian/Farsi, Hebrew, etc.)
+ */
+function isRTLContent(text: string): boolean {
+  if (!text) return false;
+  
+  // RTL character ranges:
+  // Arabic: \u0600-\u06FF
+  // Persian/Farsi: \u0600-\u06FF, \u0750-\u077F, \u08A0-\u08FF, \uFB50-\uFDFF, \uFE70-\uFEFF
+  // Hebrew: \u0590-\u05FF
+  const rtlPattern = /[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+  return rtlPattern.test(text);
+}
+
 export function MermaidSimple({ diagram, className, showZoomControls = true, showSaveCopyButtons = true }: MermaidSimpleProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,6 +42,7 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
   const [error, setError] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(100);
   const isDark = (resolvedTheme || 'dark') === 'dark';
+  const isRTL = isRTLContent(diagram);
   const scaleRef = useRef<number>(1);
   const positionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const isDraggingRef = useRef<boolean>(false);
@@ -346,9 +361,27 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
         const svgElement = svgDoc.documentElement as unknown as SVGSVGElement;
 
         if (svgElement && svgElement.tagName === 'svg') {
+        // Apply RTL direction to SVG if RTL content detected
+        if (isRTL) {
+          svgElement.setAttribute('dir', 'rtl');
+          // Also apply RTL to SVG root style for text elements
+          const existingStyle = svgElement.getAttribute('style') || '';
+          if (!existingStyle.includes('direction')) {
+            svgElement.setAttribute('style', `${existingStyle}; direction: rtl;`.trim());
+          }
+        }
+        
         // Handle <br/> tags in text elements (convert to line breaks for SVG)
         const textElements = svgElement.querySelectorAll('text, tspan');
         textElements.forEach((textEl) => {
+          // Apply RTL direction to text elements if RTL content detected
+          // Let the browser handle text rendering, don't override text-anchor which may break Mermaid's layout
+          if (isRTL) {
+            const existingTextStyle = textEl.getAttribute('style') || '';
+            if (!existingTextStyle.includes('direction')) {
+              textEl.setAttribute('style', `${existingTextStyle}; direction: rtl;`.trim());
+            }
+          }
           const textContent = textEl.textContent || '';
           if (textContent.includes('<br/>') || textContent.includes('<br>')) {
             // Create tspan elements for each line
@@ -717,10 +750,10 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
   }
 
   return (
-    <div className={`rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-800 ${className}`}>
+    <div className={`rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-800 ${className}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="relative">
         {(showZoomControls || showSaveCopyButtons) && (
-          <div className="absolute top-2 right-2 z-10 flex items-center gap-2 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm" dir="ltr">
+          <div className={`absolute z-10 flex items-center gap-2 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm ${isRTL ? 'top-2 left-2' : 'top-2 right-2'}`} dir="ltr">
             {showSaveCopyButtons && (
               <>
                 <CopyContent content={diagram} />
@@ -786,7 +819,7 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
         <div 
           ref={wrapperRef}
           className="overflow-hidden relative w-full bg-gray-50 dark:bg-gray-900/50"
-          style={{ minHeight: '300px', height: '500px', maxHeight: '80vh' }}
+          style={{ minHeight: '300px', height: '500px', maxHeight: '80vh', direction: isRTL ? 'rtl' : 'ltr' }}
         >
           <canvas
             ref={canvasRef}

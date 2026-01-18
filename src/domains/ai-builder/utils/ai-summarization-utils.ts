@@ -70,13 +70,15 @@ async function fetchOrganizationRagNonBlocking(timeout: number = 10000): Promise
  * @param signal - Optional AbortSignal for cancellation
  * @param timeout - Timeout in milliseconds (default: 60000)
  * @param organizationRag - Optional pre-fetched organization RAG data to avoid duplicate API calls
+ * @param outputLanguage - Optional output language code (e.g., 'fa', 'ar', 'en') - if provided, summary will be in that language
  * @returns Summarized prompt, or original prompt if summarization fails
  */
 export async function summarizePrompt(
   prompt: string,
   signal?: AbortSignal,
   timeout: number = 60000,
-  organizationRag?: string
+  organizationRag?: string,
+  outputLanguage?: string
 ): Promise<string> {
   if (!prompt || !prompt.trim()) {
     return prompt;
@@ -110,6 +112,28 @@ export async function summarizePrompt(
     // Synthesize and completely rephrase all content into one or two flowing narrative paragraphs
     // that capture the essence, main ideas, and critical information."
     let userPrompt = `Please deeply analyze the following text to understand its meaning, context, relationships, and key details. Synthesize and completely rephrase all content into one or two flowing narrative paragraphs that capture the essence, main ideas, and critical information. Output MUST be plain text only - NO headings, sections, bullet points, markdown, or structured formatting. Create continuous, natural-flowing prose that reads as if written from scratch based on comprehensive understanding, not a condensed or reorganized version of the original:\n\n${prompt.trim()}`;
+
+    // Add language instruction if outputLanguage is specified and not English or 'text'
+    if (outputLanguage && typeof outputLanguage === 'string' && outputLanguage.trim() && outputLanguage.toLowerCase() !== 'en' && outputLanguage !== 'text') {
+      const languageMap: Record<string, string> = {
+        'en': 'English',
+        'fa': 'Persian (Farsi)',
+        'ar': 'Arabic',
+        'es': 'Spanish',
+        'fr': 'French',
+        'de': 'German',
+        'it': 'Italian',
+        'pt': 'Portuguese',
+        'ru': 'Russian'
+      };
+      
+      const languageCode = outputLanguage.trim().toLowerCase();
+      const languageName = languageMap[languageCode] || languageCode.toUpperCase();
+      
+      const languageInstruction = `\n\nIMPORTANT OUTPUT LANGUAGE REQUIREMENT:\nAll output must be in ${languageName} (${languageCode.toUpperCase()}). This includes:\n- All titles, subtitles, and headings\n- All body text and descriptions\n- All user-facing content\n\nHowever, keep the following in English:\n- Professional and technical abbreviations (e.g., API, JSON, HTTP, CSS, HTML, SQL, UUID, ID, URL)\n- Industry-standard terms and acronyms (e.g., SEO, CRM, UX, UI, SDK, IDE, CLI, GMP, GLP, GDP, etc)\n- Programming language keywords and syntax\n- Technical specification names and standards\n- Brand names and product names that are internationally recognized\n- Scientific and medical terminology abbreviations\n\nEnsure natural, fluent ${languageName} while preserving essential English technical terms.`;
+      
+      userPrompt += languageInstruction;
+    }
 
     // Include organization RAG data if available
     // The improved ORGANIZATION_RAG_PROMPT will instruct the AI to only use it when relevant
@@ -170,7 +194,12 @@ export async function summarizePrompt(
       const data = await response.json();
 
       if (data.success && data.data?.response) {
-        const summarizedText = data.data.response.trim();
+        let summarizedText = data.data.response.trim();
+        
+        // Remove language requirement section if present (everything from "IMPORTANT OUTPUT LANGUAGE REQUIREMENT" to end)
+        // This prevents the AI from including the language instruction in the output
+        // Pattern matches with optional whitespace/newlines before the requirement text
+        summarizedText = summarizedText.replace(/[\s\n]*IMPORTANT OUTPUT LANGUAGE REQUIREMENT:[\s\S]*$/i, '').trim();
         
         if (isDevelopment) {
           loggingCustom(LogType.AI_BODY_LOG, 'info', `Summarization successful. Original length: ${prompt.length}, Summarized length: ${summarizedText.length}`);

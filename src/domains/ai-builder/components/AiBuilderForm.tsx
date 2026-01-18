@@ -718,7 +718,7 @@ export function AiBuilderForm({
       setLocalIsSummarizing(true);
       const abortController = new AbortController();
       
-      summarizePrompt(userPrompt.trim(), abortController.signal)
+      summarizePrompt(userPrompt.trim(), abortController.signal, 60000, undefined, selectedLanguage)
         .then((summary) => {
           if (!abortController.signal.aborted) {
             setLocalSummarizedPrompt(summary);
@@ -741,7 +741,7 @@ export function AiBuilderForm({
       setLocalSummarizedPrompt(null);
       setLocalIsSummarizing(false);
     }
-  }, [isSheetOpen, formValues.summarizeBeforeSearchImage, formValues.searchType, formValues.imageType, userPrompt, propSummarizedPrompt, propIsSummarizing]);
+  }, [isSheetOpen, formValues.summarizeBeforeSearchImage, formValues.searchType, formValues.imageType, userPrompt, selectedLanguage, propSummarizedPrompt, propIsSummarizing]);
 
   // Sync userPrompt with formValues when userPrompt changes externally
   // This handles external updates to userPrompt (e.g., from parent component)

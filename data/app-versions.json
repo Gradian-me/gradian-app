@@ -6053,5 +6053,44 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KE9MULTILINGUAL001",
+    "timestamp": "2026-01-18T12:04:18+0330",
+    "version": "1.45.001",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Added support for RTL content detection in Mermaid diagrams, improving rendering for languages like Persian and Arabic",
+        "priority": "Medium",
+        "affectedDomains": [
+          "mermaid-viewer",
+          "visualization",
+          "multilingual"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Modified AiBuilderForm and AISearchResults components to handle language instructions for summarization, ensuring outputs are generated in the specified language",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "summarization",
+          "multilingual",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Cleaned up useAiBuilder hook to extract output language from prompts, enhancing summarization accuracy",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "hooks",
+          "summarization",
+          "multilingual"
+        ]
+      }
+    ]
   }
 ]
