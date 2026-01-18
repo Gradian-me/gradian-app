@@ -6092,5 +6092,23 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KEALEANMANAGEMENT001",
+    "timestamp": "2026-01-18T12:47:57+0330",
+    "version": "1.45.002",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated Lean Management schema in all-schemas.json to include new required fields for waste analysis and impact assessment, improving data validation and user input handling. This update ensures that critical information is captured effectively during lean management processes",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "lean-management",
+          "form-builder",
+          "data-validation"
+        ]
+      }
+    ]
   }
 ]

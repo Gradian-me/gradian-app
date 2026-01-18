@@ -7594,6 +7594,19 @@
     "plural_name": "Lean Management",
     "fields": [
       {
+        "id": "lean-brief-waste-description",
+        "name": "briefWasteDescription",
+        "label": "Brief Waste Description",
+        "sectionId": "basic-context",
+        "component": "textarea",
+        "placeholder": "Enter brief waste description",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 2,
+        "order": 0
+      },
+      {
         "id": "lean-date",
         "name": "date",
         "label": "Date",
@@ -7617,7 +7630,7 @@
         "description": "Select observer from popup picker",
         "targetSchema": "users",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 2
@@ -7633,7 +7646,7 @@
         "targetSchema": "change-categories",
         "allowMultiselect": true,
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 3
@@ -7646,24 +7659,11 @@
         "component": "text",
         "placeholder": "Enter location",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 4,
         "role": "location"
-      },
-      {
-        "id": "lean-brief-waste-description",
-        "name": "briefWasteDescription",
-        "label": "Brief Waste Description",
-        "sectionId": "basic-context",
-        "component": "textarea",
-        "placeholder": "Enter brief waste description",
-        "validation": {
-          "required": false
-        },
-        "colSpan": 2,
-        "order": 5
       },
       {
         "id": "lean-waste-defects",
@@ -7672,7 +7672,7 @@
         "sectionId": "waste-analysis",
         "component": "rating",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 1
@@ -7684,7 +7684,7 @@
         "sectionId": "waste-analysis",
         "component": "rating",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 2
@@ -7696,7 +7696,7 @@
         "sectionId": "waste-analysis",
         "component": "rating",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 3
@@ -7708,7 +7708,7 @@
         "sectionId": "waste-analysis",
         "component": "rating",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 4
@@ -7720,7 +7720,7 @@
         "sectionId": "waste-analysis",
         "component": "rating",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 5
@@ -7744,7 +7744,7 @@
         "sectionId": "waste-analysis",
         "component": "rating",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 7
@@ -7756,7 +7756,7 @@
         "sectionId": "waste-analysis",
         "component": "rating",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 8
@@ -7769,7 +7769,7 @@
         "component": "textarea",
         "placeholder": "Enter waste assessment justification",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 2,
         "order": 9
@@ -7781,7 +7781,7 @@
         "sectionId": "impact-analysis",
         "component": "rating",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 1
@@ -7805,7 +7805,7 @@
         "sectionId": "impact-analysis",
         "component": "rating",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 3
@@ -7817,7 +7817,7 @@
         "sectionId": "impact-analysis",
         "component": "rating",
         "validation": {
-          "required": false
+            "required": true
         },
         "colSpan": 1,
         "order": 4
@@ -7829,7 +7829,7 @@
         "sectionId": "impact-analysis",
         "component": "rating",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 5
@@ -7842,7 +7842,7 @@
         "component": "textarea",
         "placeholder": "Enter impact analysis justification",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 2,
         "order": 6
@@ -7855,7 +7855,7 @@
         "component": "list-input",
         "placeholder": "Enter root causes",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 2,
         "order": 1
@@ -7868,7 +7868,7 @@
         "component": "textarea",
         "placeholder": "Enter improvement idea",
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 2,
         "order": 1
@@ -7942,7 +7942,7 @@
         "validation": {
           "required": false
         },
-        "colSpan": 1,
+        "colSpan": 2,
         "order": 4
       },
       {
@@ -8063,8 +8063,129 @@
     "schemaType": "business",
     "relatedTenants": [
       {
-        "id": "01KBFBD109G6CYRT7RA04TMMXC",
-        "label": "AryoGen"
+        "id": "01KBFBGV9151FQN481NB2CT4MX",
+        "label": "Development Environment"
+      }
+    ],
+    "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "lean-analyst",
+          "label": "Lean Analyst",
+          "icon": "Brain",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "lean-analyst",
+          "selectedFields": [
+            "lean-date",
+            "lean-observer",
+            "lean-category",
+            "lean-location",
+            "lean-brief-waste-description",
+            "lean-waste-defects",
+            "lean-waste-overproduction",
+            "lean-waste-waiting",
+            "lean-waste-non-utilized-talent",
+            "lean-waste-transportation",
+            "lean-waste-inventory",
+            "lean-waste-motion",
+            "lean-waste-extra-processing",
+            "lean-waste-assessment-justification",
+            "lean-impact-time",
+            "lean-impact-cost",
+            "lean-impact-quality",
+            "lean-impact-safety",
+            "lean-impact-compliance",
+            "lean-impact-analysis-justification",
+            "lean-root-causes",
+            "lean-improvement-idea",
+            "lean-method-suggested",
+            "lean-needs-change-management",
+            "lean-related-change-management",
+            "lean-time-saved",
+            "lean-cost-avoided",
+            "lean-overall-effectiveness",
+            "lean-overall-assessment-description"
+          ],
+          "selectedSections": [
+            "basic-context",
+            "waste-analysis",
+            "impact-analysis",
+            "root-cause",
+            "improvement-opportunity",
+            "follow-ups",
+            "effectiveness-assessment"
+          ],
+          "additionalSystemPrompt": "Analyze this lean management record from a lean analyst perspective. Provide comprehensive analysis including waste identification, impact assessment, root cause analysis, and improvement recommendations based on lean principles (5S, Standard Work, Flow/Pull, Visual Management, Error Proofing/Poka-Yoke, Automation/Digital). Focus on identifying the 8 types of waste (Defects, Overproduction, Waiting, Non-Utilized Talent, Transportation, Inventory, Motion, Extra Processing) and providing actionable improvement suggestions.",
+          "displayType": "hideForm",
+          "runType": "manual",
+          "language": "en"
+        },
+        {
+          "id": "create-sketch-image",
+          "label": "Create Sketch Image",
+          "icon": "Pencil",
+          "variant": "outline",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "sketch"
+          },
+          "selectedFields": [
+            "lean-brief-waste-description",
+            "lean-improvement-idea",
+            "lean-waste-assessment-justification",
+            "lean-impact-analysis-justification",
+            "lean-root-causes",
+            "lean-overall-assessment-description"
+          ],
+          "selectedSections": [
+            "basic-context",
+            "waste-analysis",
+            "improvement-opportunity"
+          ],
+          "additionalSystemPrompt": "Create a sketch-style illustration based on the lean management information provided. Visualize the waste analysis, improvement opportunities, and lean principles.",
+          "displayType": "hideForm",
+          "runType": "manual",
+          "language": "en"
+        },
+        {
+          "id": "create-lego-image",
+          "label": "Create Lego Image",
+          "icon": "Box",
+          "variant": "outline",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "lego"
+          },
+          "selectedFields": [
+            "lean-brief-waste-description",
+            "lean-improvement-idea",
+            "lean-waste-assessment-justification",
+            "lean-impact-analysis-justification",
+            "lean-root-causes",
+            "lean-overall-assessment-description"
+          ],
+          "selectedSections": [
+            "basic-context",
+            "waste-analysis",
+            "improvement-opportunity"
+          ],
+          "additionalSystemPrompt": "Create a Lego-style illustration based on the lean management information provided. Visualize the waste analysis, improvement opportunities, and lean principles in a playful Lego construction style.",
+          "displayType": "hideForm",
+          "runType": "manual",
+          "language": "en"
+        }
+      ]
+    },
+    "allowDataDueDate": true,
+    "allowDataAssignedTo": false,
+    "allowDataForce": false,
+    "statusGroup": [
+      {
+        "id": "01KBSSD57TNGK1EP7SG2JGYH1C",
+        "label": "Change Management Status"
       }
     ]
   }
