@@ -5,6 +5,7 @@
 
 import { AgentRequestData, AgentResponse } from './ai-agent-utils';
 import { extractParametersBySectionId, parseUserPromptToFormValues } from './ai-shared-utils';
+import { buildStandardizedPrompt } from './prompt-builder';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import {
@@ -4026,10 +4027,20 @@ export async function processImageRequest(
       }
     }
 
-    // Build prompt from promptParams (fields without sectionId or with other sectionId)
-    // Concatenate all prompt fields into a single string
+    // Build prompt from formValues using buildStandardizedPrompt (like processChatRequest does)
+    // This ensures we get the full prompt with all form field values, not just promptParams
     let cleanPrompt = '';
-    if (Object.keys(promptParams).length > 0) {
+    
+    // First, try to build from formValues using buildStandardizedPrompt
+    if (requestData.formValues && agent.renderComponents) {
+      const builtPrompt = buildStandardizedPrompt(agent, requestData.formValues);
+      if (builtPrompt && builtPrompt.trim()) {
+        cleanPrompt = builtPrompt;
+      }
+    }
+    
+    // If buildStandardizedPrompt didn't produce a prompt, try promptParams (fields without sectionId)
+    if (!cleanPrompt && Object.keys(promptParams).length > 0) {
       // If we have prompt params, concatenate them in order
       const promptParts: string[] = [];
       // Get components that are in promptParams, sorted by order
@@ -4052,7 +4063,7 @@ export async function processImageRequest(
     }
 
     // For image generation, prompt should come from bodyParams.prompt if available
-    // Otherwise fallback to userPrompt or promptParams
+    // Otherwise fallback to userPrompt
     if (!cleanPrompt) {
       // Try to get prompt from bodyParams first (for image generation)
       if (bodyParams.prompt) {
@@ -4067,7 +4078,7 @@ export async function processImageRequest(
         }
       }
     } else if (bodyParams.prompt && bodyParams.prompt !== cleanPrompt) {
-      // If we have a cleanPrompt from promptParams but bodyParams also has a prompt,
+      // If we have a cleanPrompt from formValues/promptParams but bodyParams also has a prompt,
       // prefer bodyParams.prompt for image generation (it's the actual user prompt)
       cleanPrompt = bodyParams.prompt;
     }

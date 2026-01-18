@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData } from './utils';
+import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData, ensurePasswordFieldsAreSensitive } from './utils';
 import { SCHEMA_SUMMARY_EXCLUDED_KEYS } from '@/gradian-ui/shared/configs/general-config';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
@@ -417,9 +417,13 @@ export async function POST(request: NextRequest) {
     const requestData = await request.json();
 
     // Normalize nested fields (e.g., parse repeatingConfig JSON strings to objects)
+    // Also ensure password fields are marked as sensitive
     const normalizedRequestData = Array.isArray(requestData)
-      ? requestData.map(schema => normalizeSchemaData(schema))
-      : normalizeSchemaData(requestData);
+      ? requestData.map(schema => {
+          const normalized = normalizeSchemaData(schema);
+          return ensurePasswordFieldsAreSensitive(normalized);
+        })
+      : ensurePasswordFieldsAreSensitive(normalizeSchemaData(requestData));
 
     // Debug: Log if repeatingConfig was normalized (in development)
     if (process.env.NODE_ENV === 'development') {

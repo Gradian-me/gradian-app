@@ -74,6 +74,29 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
           cScale3: isDark ? '#ddd6fe' : '#c4b5fd', // Third level
           cScale4: isDark ? '#ede9fe' : '#ddd6fe', // Fourth level
           cScale5: isDark ? '#f5f3ff' : '#ede9fe', // Fifth level
+          // Task/Gantt chart colors - improved contrast for dark mode
+          taskBkgColor: isDark ? '#4b5563' : '#e5e7eb', // Regular task background
+          taskTextColor: isDark ? '#f9fafb' : '#111827', // Task text color
+          taskTextLightColor: isDark ? '#e5e7eb' : '#4b5563', // Light task text
+          taskTextDarkColor: isDark ? '#f9fafb' : '#111827', // Dark task text
+          taskTextOutsideColor: isDark ? '#e5e7eb' : '#374151', // Text outside task bar
+          taskTextClickableColor: isDark ? '#c4b5fd' : '#7c3aed', // Clickable task text
+          activeTaskBkgColor: isDark ? '#6366f1' : '#818cf8', // Active task background
+          activeTaskBorderColor: isDark ? '#818cf8' : '#6366f1', // Active task border
+          doneTaskBkgColor: isDark ? '#10b981' : '#34d399', // Completed task background
+          doneTaskBorderColor: isDark ? '#34d399' : '#10b981', // Completed task border
+          critTaskBkgColor: isDark ? '#ef4444' : '#f87171', // Critical task background
+          critTaskBorderColor: isDark ? '#f87171' : '#ef4444', // Critical task border
+          critTaskTextColor: isDark ? '#fef2f2' : '#7f1d1d', // Critical task text
+          milestoneBkgColor: isDark ? '#f59e0b' : '#fbbf24', // Milestone background
+          milestoneBorderColor: isDark ? '#fbbf24' : '#f59e0b', // Milestone border
+          sectionBkgColor: isDark ? '#4b5563' : '#d1d5db', // Section background
+          sectionBkgColor2: isDark ? '#6b7280' : '#e5e7eb', // Alternate section background
+          altSectionBkgColor: isDark ? '#6b7280' : '#e5e7eb', // Alt section background
+          excludeBkgColor: isDark ? '#374151' : '#f3f4f6', // Excluded task background
+          todayLineColor: isDark ? '#ef4444' : '#dc2626', // Today line color
+          gridColor: isDark ? '#6b7280' : '#9ca3af', // Grid lines color
+          secondaryTextColor: isDark ? '#d1d5db' : '#6b7280', // Secondary text color
         },
       });
       initialized = true;
@@ -252,6 +275,7 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
 
     setError(null);
     const canvas = canvasRef.current;
+    if (!canvas) return; // Check if canvas is still available
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -364,9 +388,10 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
         try {
           const svgCanvas = await svgToCanvas(svgElement);
           const sourceCanvas = canvasRef.current;
+          if (!sourceCanvas) return; // Check if canvas is still available
           const sourceCtx = sourceCanvas.getContext('2d');
           
-          if (sourceCanvas && sourceCtx) {
+          if (sourceCtx) {
             // Render at native size - quality will be maintained by imageSmoothingQuality in drawCanvas
             sourceCanvas.width = svgCanvas.width;
             sourceCanvas.height = svgCanvas.height;
@@ -388,8 +413,8 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
               const wrapper = wrapperRef.current;
               if (displayCanvas && sourceCanvas && wrapper) {
                 const displayCtx = displayCanvas.getContext('2d');
-                if (displayCtx) {
-                  const rect = wrapper.getBoundingClientRect();
+                if (!displayCtx) return; // Check if context is available
+                const rect = wrapper.getBoundingClientRect();
                   const dpr = window.devicePixelRatio || 1;
                   const width = rect.width || 800;
                   const height = rect.height || 600;
@@ -443,7 +468,6 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
                   displayCtx.scale(fitScale / 3, fitScale / 3);
                   displayCtx.drawImage(sourceCanvas, -sourceCanvas.width / 2, -sourceCanvas.height / 2);
                   displayCtx.restore();
-                }
               }
             });
           }
@@ -455,9 +479,13 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
       }).catch((err) => {
         console.error('Mermaid render error:', err);
         setError(err.message || 'Failed to render diagram');
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Check if canvas still exists before accessing it
+        const currentCanvas = canvasRef.current;
+        if (currentCanvas) {
+          const ctx = currentCanvas.getContext('2d');
+          if (ctx) {
+            ctx.clearRect(0, 0, currentCanvas.width, currentCanvas.height);
+          }
         }
       });
     };
@@ -607,7 +635,15 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
     };
 
     const handleTouchMove = (e: TouchEvent) => {
+      // Only prevent default if we're handling a gesture and the event is cancelable
+      const isHandlingGesture = 
+        (e.touches.length === 2 && lastTouchRef.current && lastTouchRef.current.distance > 0) ||
+        (e.touches.length === 1 && lastTouchRef.current);
+      
+      if (isHandlingGesture && e.cancelable) {
       e.preventDefault();
+      }
+      
       if (e.touches.length === 2 && lastTouchRef.current && lastTouchRef.current.distance > 0) {
         // Pinch zoom
         const touch1 = e.touches[0];

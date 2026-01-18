@@ -222,10 +222,10 @@ export function buildStandardizedPrompt(
       return;
     }
 
-    // Skip fields with sectionId "body" or "extra" - these go in body/extra_body, not in prompt
-    if (field.sectionId === 'body' || field.sectionId === 'extra') {
-      return;
-    }
+    // Include ALL fields in the prompt, regardless of sectionId
+    // sectionId only determines where they go in the API request (body/extra_body),
+    // but ALL field values should be included in the prompt text for the AI to process
+    // This ensures the AI has access to all form data (text, numbers, dates, lists, etc.)
 
     // Format the value based on field type
     let formattedValue = '';

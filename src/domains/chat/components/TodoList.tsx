@@ -18,7 +18,7 @@ import { TodoEditDialog } from './TodoEditDialog';
 import { TodoGraphViewerDialog } from './TodoGraphViewerDialog';
 import { extractTodoParameters, formatParameterValue, getParameterLabel, isDependencyOutputValue } from '../utils/todo-parameter-utils';
 import { useAiAgents } from '@/domains/ai-builder';
-import { truncateText } from '../utils/text-utils';
+import { truncateText } from '@/gradian-ui/shared/utils/text-utils';
 import { ButtonMinimal } from '@/gradian-ui/form-builder/form-elements';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { PromptPreviewSheet } from '@/domains/ai-builder/components/PromptPreviewSheet';

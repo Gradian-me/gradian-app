@@ -352,6 +352,11 @@ export interface QuickAction {
   displayType?: 'default' | 'hideForm' | 'showFooter'; // Control what parts of the form to show
   runType?: 'manual' | 'automatic'; // manual: user clicks "Do the Magic", automatic: auto-runs when dialog opens
   /**
+   * Default language for AI agent output (e.g., 'en', 'fa', 'ar', 'es', etc.)
+   * If not specified, defaults to 'fa' for non-image-generation agents, 'en' for image-generation agents
+   */
+  language?: string;
+  /**
    * Maximum height (in pixels) for the AI agent response container content.
    * If set, the content will be scrollable. If null or 0, content will show in full without scrolling.
    */

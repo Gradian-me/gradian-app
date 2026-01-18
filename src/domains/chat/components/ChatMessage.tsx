@@ -26,7 +26,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useUserStore } from '@/stores/user.store';
 import { useLanguageStore } from '@/stores/language.store';
 import { formatRelativeTime, formatTime } from '@/gradian-ui/shared/utils/date-utils';
-import { processTextWithStyledHashtagsAndMentions } from '../utils/text-utils';
+import { processTextWithStyledHashtagsAndMentions } from '@/gradian-ui/shared/utils/text-utils';
 import { MessageMetadataDialog } from './MessageMetadataDialog';
 import type { ChatMessage as ChatMessageType } from '../types';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';

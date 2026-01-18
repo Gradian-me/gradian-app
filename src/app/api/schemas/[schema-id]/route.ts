@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData } from '../utils';
+import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData, ensurePasswordFieldsAreSensitive } from '../utils';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
 import { clearCache as clearSharedSchemaCache } from '@/gradian-ui/shared/utils/data-loader';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
@@ -310,7 +310,8 @@ export async function PUT(
     const updatedSchemaRaw = await request.json();
 
     // Normalize nested fields (e.g., parse repeatingConfig JSON strings to objects)
-    const updatedSchema = normalizeSchemaData(updatedSchemaRaw);
+    // Also ensure password fields are marked as sensitive
+    const updatedSchema = ensurePasswordFieldsAreSensitive(normalizeSchemaData(updatedSchemaRaw));
 
     // Load schemas (with caching)
     const schemas = loadSchemas();

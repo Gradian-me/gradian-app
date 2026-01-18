@@ -271,6 +271,65 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // For HAS_FIELD_VALUE edges: include target nodes even if they don't pass tenant/company filters
+    // This ensures that picker field values are visible in the graph
+    const hasFieldValueTargets = new Set<string>();
+    for (const relation of allRelations) {
+      if (
+        relation.relationTypeId === 'HAS_FIELD_VALUE' &&
+        relation.inactive !== true
+      ) {
+        const sourceKey = `${relation.sourceSchema}:${String(relation.sourceId)}`;
+        // Check if source node exists in filtered nodes
+        const sourceExists = nodes.some(
+          (node: any) =>
+            node &&
+            node.id != null &&
+            node.schemaId === relation.sourceSchema &&
+            String(node.id) === String(relation.sourceId),
+        );
+        
+        if (sourceExists) {
+          // Mark target node to be included
+          hasFieldValueTargets.add(`${relation.targetSchema}:${String(relation.targetId)}`);
+        }
+      }
+    }
+
+    // Add target nodes for HAS_FIELD_VALUE edges if they exist in data but weren't included
+    for (const targetKey of hasFieldValueTargets) {
+      // Split on first colon only (in case targetId contains colons)
+      const colonIndex = targetKey.indexOf(':');
+      if (colonIndex === -1) continue;
+      
+      const targetSchema = targetKey.substring(0, colonIndex);
+      const targetId = targetKey.substring(colonIndex + 1);
+      
+      const existingNode = nodes.find(
+        (node: any) =>
+          node &&
+          node.schemaId === targetSchema &&
+          String(node.id) === targetId,
+      );
+      
+      if (!existingNode && allData[targetSchema]) {
+        // Find the entity in the data
+        const entities = allData[targetSchema];
+        if (Array.isArray(entities)) {
+          const entity = entities.find(
+            (e: any) => e && String(e.id) === targetId,
+          );
+          if (entity) {
+            // Add the target node even though it doesn't pass filters
+            nodes.push({
+              ...entity,
+              schemaId: targetSchema,
+            });
+          }
+        }
+      }
+    }
+
     // Precompute node lookup for edge filtering: only keep edges whose endpoints are present as nodes
     const nodeKeySet = new Set(
       nodes
@@ -286,17 +345,34 @@ export async function GET(request: NextRequest) {
     const edges: any[] = [];
     
     for (const relation of allRelations) {
+      // Skip inactive relations (similar to /api/relations behavior)
+      if (relation.inactive === true) {
+        continue;
+      }
+
       // Ensure both source and target schemas are tenant-visible (when tenantIds are provided)
+      // Exception: For HAS_FIELD_VALUE edges, be more lenient with target schema visibility
+      const isHasFieldValue = relation.relationTypeId === 'HAS_FIELD_VALUE';
       if (
         hasTenantFilter &&
+        !isHasFieldValue &&
         (!tenantVisibleSchemas.has(relation.sourceSchema) ||
           !tenantVisibleSchemas.has(relation.targetSchema))
+      ) {
+        continue;
+      }
+      // For HAS_FIELD_VALUE, only check source schema visibility
+      if (
+        hasTenantFilter &&
+        isHasFieldValue &&
+        !tenantVisibleSchemas.has(relation.sourceSchema)
       ) {
         continue;
       }
 
       const sourceKey = `${relation.sourceSchema}:${String(relation.sourceId)}`;
       const targetKey = `${relation.targetSchema}:${String(relation.targetId)}`;
+      
       // Only include edges where both endpoints are present as nodes after filtering
       if (!nodeKeySet.has(sourceKey) || !nodeKeySet.has(targetKey)) {
         continue;

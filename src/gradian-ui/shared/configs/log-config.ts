@@ -26,7 +26,7 @@ const defaultLogConfig: Record<LogType, boolean> = {
   [LogType.REQUEST_RESPONSE]: true,
   [LogType.AI_BODY_LOG]: true,
   [LogType.AI_RESPONSE_LOG]: true,
-  [LogType.AI_MODEL_LOG]: false,
+  [LogType.AI_MODEL_LOG]: true,
   [LogType.SCHEMA_LOADER]: true,
   [LogType.CALL_BACKEND]: true,
   [LogType.ENDPOINT_LOG]: true,

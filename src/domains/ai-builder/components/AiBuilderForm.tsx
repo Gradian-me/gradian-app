@@ -203,7 +203,7 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
         onBlur={() => handleFieldBlur(field.name)}
         onFocus={() => handleFieldFocus(field.name)}
         disabled={isDisabled}
-        error={undefined} // Don't show error messages
+        error={fieldError && fieldTouched ? fieldError : undefined} // Show error only when field is touched
         touched={fieldTouched}
         required={isRequired}
         className={customClassName}
@@ -245,6 +245,8 @@ interface AiBuilderFormProps {
   hideEditAgent?: boolean; // Hide Edit Agent button
   hidePromptHistory?: boolean; // Hide Prompt History button
   hideLanguageSelector?: boolean; // Hide language selector from form (use in footer instead)
+  summarizedPrompt?: string; // Summarized version of the prompt (for search/image)
+  isSummarizing?: boolean; // Whether summarization is in progress
 }
 
 export function AiBuilderForm({
@@ -264,7 +266,7 @@ export function AiBuilderForm({
   onReset,
   displayType = 'default',
   runType = 'manual',
-  selectedLanguage = 'text',
+  selectedLanguage = 'fa',
   onLanguageChange,
   onFormValuesChange,
   hidePreviewButton = false,
@@ -274,6 +276,8 @@ export function AiBuilderForm({
   hideEditAgent = false,
   hidePromptHistory = false,
   hideLanguageSelector = false,
+  summarizedPrompt: propSummarizedPrompt,
+  isSummarizing: propIsSummarizing,
 }: AiBuilderFormProps) {
   // Filter agents to only show those with showInAgentMenu !== false
   const visibleAgents = useMemo(() => {
@@ -322,9 +326,11 @@ export function AiBuilderForm({
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   
-  // State for summarized prompt (for preview)
-  const [summarizedPrompt, setSummarizedPrompt] = useState<string | null>(null);
-  const [isSummarizing, setIsSummarizing] = useState(false);
+  // Use props for summarized prompt if provided, otherwise use local state (for backward compatibility)
+  const [localSummarizedPrompt, setLocalSummarizedPrompt] = useState<string | null>(null);
+  const [localIsSummarizing, setLocalIsSummarizing] = useState(false);
+  const summarizedPrompt = propSummarizedPrompt !== undefined ? propSummarizedPrompt : localSummarizedPrompt;
+  const isSummarizing = propIsSummarizing !== undefined ? propIsSummarizing : localIsSummarizing;
 
   // Build concatenated prompt from all field labels and values
   const buildConcatenatedPrompt = useCallback((values: Record<string, any>) => {
@@ -457,10 +463,15 @@ export function AiBuilderForm({
     
     let finalPrompt = parts.join('\n\n');
     
+    // Check if the prompt already contains a language instruction
+    // This prevents duplicating language instructions when user pastes text that already includes them
+    const hasLanguageInstruction = /IMPORTANT OUTPUT LANGUAGE REQUIREMENT/i.test(finalPrompt);
+    
     // Add language instructions if language is specified (check common language field names)
     // Also check selectedLanguage prop as fallback
+    // Only add if not already present in the prompt
     const outputLanguage = values['output-language'] || values['outputLanguage'] || values['language'] || values['lang'] || selectedLanguage;
-    if (outputLanguage && typeof outputLanguage === 'string' && outputLanguage.trim() && outputLanguage.toLowerCase() !== 'en' && outputLanguage !== 'text') {
+    if (!hasLanguageInstruction && outputLanguage && typeof outputLanguage === 'string' && outputLanguage.trim() && outputLanguage.toLowerCase() !== 'en' && outputLanguage !== 'text') {
       const languageMap: Record<string, string> = {
         'en': 'English',
         'fa': 'Persian (Farsi)',
@@ -470,10 +481,7 @@ export function AiBuilderForm({
         'de': 'German',
         'it': 'Italian',
         'pt': 'Portuguese',
-        'ru': 'Russian',
-        'zh': 'Chinese',
-        'ja': 'Japanese',
-        'ko': 'Korean',
+        'ru': 'Russian'
       };
       
       const languageCode = outputLanguage.trim().toLowerCase();
@@ -515,12 +523,24 @@ export function AiBuilderForm({
     // Initialize all fields with their defaultValues or empty values
     fields.forEach((field) => {
       if (field.name === 'userPrompt' || field.id === 'user-prompt') {
-        // Use current userPrompt value for prompt field, but strip any existing "User Prompt:" prefix
-        // to avoid duplication when building the concatenated prompt
+        // Extract only the actual user prompt text, not the concatenated version with metadata
+        // The input field should only show the user's actual prompt text
+        // Metadata (language requirement, max_results, etc.) will be added when generating
         let promptValue = userPrompt || '';
         if (promptValue) {
           // Remove "User Prompt:" prefix if it exists (case insensitive, with optional whitespace)
           promptValue = promptValue.replace(/^User\s+Prompt:\s*/i, '').trim();
+          
+          // Remove language requirement section if present (everything from "IMPORTANT OUTPUT LANGUAGE REQUIREMENT" to end)
+          promptValue = promptValue.replace(/\n\nIMPORTANT OUTPUT LANGUAGE REQUIREMENT:[\s\S]*$/i, '').trim();
+          
+          // Remove other metadata fields that might be in the prompt
+          // These patterns match field labels like "Max_results: 5", "Search Type: ...", etc.
+          promptValue = promptValue.replace(/\n\n(Max_results|Max Results|Search Type|Image Type|Summarize Before Search Image|Summarize Before Search|Output Language|Language):\s*[^\n]*(?:\n|$)/gi, '').trim();
+          
+          // Remove any remaining field labels that might have been added
+          // This catches any "Field Name: value" patterns that weren't caught above
+          promptValue = promptValue.replace(/\n\n[A-Z][^:]+:\s*[^\n]*(?:\n|$)/g, '').trim();
         }
         initialValues[field.name] = promptValue;
       } else {
@@ -568,10 +588,14 @@ export function AiBuilderForm({
         onFormValuesChange(initialValues);
       }
       
-      // Build initial concatenated prompt and update userPrompt
-      const initialPrompt = buildConcatenatedPromptForResetRef.current(initialValues);
-      if (initialPrompt) {
-        onPromptChange(initialPrompt);
+      // Don't update userPrompt here - it should only contain the actual user prompt text
+      // The full concatenated prompt (with metadata) will be built when generating
+      // For now, just set the user prompt to the extracted text value
+      const promptFieldValue = initialValues['userPrompt'] || initialValues['user-prompt'] || '';
+      if (promptFieldValue) {
+        onPromptChange(promptFieldValue);
+      } else {
+        onPromptChange('');
       }
     });
   }, [selectedAgentId, selectedAgent, userPrompt, onFormValuesChange, onPromptChange, selectedLanguage]); // Only reset when agent ID changes, not when buildConcatenatedPrompt changes
@@ -606,9 +630,7 @@ export function AiBuilderForm({
       if (selectedLanguage && selectedLanguage !== 'text') {
         // Only update if language is different from current formValues
         if (newFormValues['output-language'] === selectedLanguage) {
-          // Language hasn't changed, but we still need to rebuild prompt in case other values changed
-          const concatenatedPrompt = buildConcatenatedPromptRef.current(newFormValues);
-          onPromptChangeRef.current(concatenatedPrompt);
+          // Language hasn't changed, no need to update
           return prevFormValues; // Return previous to avoid unnecessary update
         }
         
@@ -619,9 +641,7 @@ export function AiBuilderForm({
         if (newFormValues['output-language']) {
           delete newFormValues['output-language'];
         } else {
-          // No language field to remove, just rebuild prompt
-          const concatenatedPrompt = buildConcatenatedPromptRef.current(newFormValues);
-          onPromptChangeRef.current(concatenatedPrompt);
+          // No language field to remove, no change needed
           return prevFormValues; // Return previous to avoid unnecessary update
         }
       }
@@ -631,16 +651,19 @@ export function AiBuilderForm({
         onFormValuesChangeRef.current(newFormValues);
       }
       
-      // Rebuild prompt with updated language
-      const concatenatedPrompt = buildConcatenatedPromptRef.current(newFormValues);
-      onPromptChangeRef.current(concatenatedPrompt);
+      // Don't update userPrompt here - it should only contain the actual user prompt text
+      // The full concatenated prompt (with language instruction) will be built when generating
+      // Extract just the user prompt text from formValues
+      const promptFieldValue = newFormValues['userPrompt'] || newFormValues['user-prompt'] || '';
+      const promptText = typeof promptFieldValue === 'string' ? promptFieldValue : String(promptFieldValue || '');
+      onPromptChangeRef.current(promptText);
       
       return newFormValues;
     });
   }, [selectedLanguage]); // Only depend on selectedLanguage
 
   // Build initial prompt when component mounts with formValues
-  // This ensures prompt is built even when language is 'en' and no onChange event occurs
+  // This ensures prompt is built even when language is 'fa' and no onChange event occurs
   // This is especially important for 'en' because no language instruction is added, so the prompt
   // relies entirely on form field values
   const hasBuiltInitialPromptRef = useRef(false);
@@ -653,27 +676,33 @@ export function AiBuilderForm({
       hasBuiltInitialPromptRef.current = false; // Reset for new agent
     }
     
-    // Build prompt when agent/formFields are ready and formValues exist
-    // This is critical for 'en' language where no language instruction is added
+    // When agent/formFields are ready and formValues exist, extract just the user prompt text
+    // Don't build the full concatenated prompt here - that will be done when generating
     if (!hasBuiltInitialPromptRef.current && selectedAgent && formFields.length > 0 && Object.keys(formValues).length > 0) {
       hasBuiltInitialPromptRef.current = true;
-      // Build prompt from current formValues
-      const initialPrompt = buildConcatenatedPrompt(formValues);
-      // Always update to ensure prompt is set, even if empty (for 'en' language case)
-      // This ensures the preview can show the current state
+      // Extract just the user prompt text from formValues (no metadata)
+      const promptFieldValue = formValues['userPrompt'] || formValues['user-prompt'] || '';
+      const promptText = typeof promptFieldValue === 'string' ? promptFieldValue : String(promptFieldValue || '');
       // Defer to avoid updating parent state during render
       queueMicrotask(() => {
-        onPromptChange(initialPrompt);
+        onPromptChange(promptText);
       });
     }
   }, [selectedAgentId, selectedAgent, formFields.length, formValues, buildConcatenatedPrompt, onPromptChange]);
 
   // Compute summarized prompt for preview when sheet opens and summarization is enabled
+  // Only run if props are not provided (for backward compatibility)
+  // If props are provided, summarization is handled in useAiBuilder
   useEffect(() => {
+    // If props are provided, don't do local summarization
+    if (propSummarizedPrompt !== undefined || propIsSummarizing !== undefined) {
+      return;
+    }
+
     if (!isSheetOpen) {
       // Reset when sheet closes
-      setSummarizedPrompt(null);
-      setIsSummarizing(false);
+      setLocalSummarizedPrompt(null);
+      setLocalIsSummarizing(false);
       return;
     }
 
@@ -686,21 +715,21 @@ export function AiBuilderForm({
     
     // Only summarize if enabled and search/image is configured
     if (shouldSummarize && (isSearchEnabled || isImageEnabled) && userPrompt.trim()) {
-      setIsSummarizing(true);
+      setLocalIsSummarizing(true);
       const abortController = new AbortController();
       
       summarizePrompt(userPrompt.trim(), abortController.signal)
         .then((summary) => {
           if (!abortController.signal.aborted) {
-            setSummarizedPrompt(summary);
-            setIsSummarizing(false);
+            setLocalSummarizedPrompt(summary);
+            setLocalIsSummarizing(false);
           }
         })
         .catch((error) => {
           if (!abortController.signal.aborted) {
             // On error, don't show summary (will fallback to original)
-            setSummarizedPrompt(null);
-            setIsSummarizing(false);
+            setLocalSummarizedPrompt(null);
+            setLocalIsSummarizing(false);
           }
         });
       
@@ -709,23 +738,34 @@ export function AiBuilderForm({
       };
     } else {
       // Reset if summarization is not needed
-      setSummarizedPrompt(null);
-      setIsSummarizing(false);
+      setLocalSummarizedPrompt(null);
+      setLocalIsSummarizing(false);
     }
-  }, [isSheetOpen, formValues.summarizeBeforeSearchImage, formValues.searchType, formValues.imageType, userPrompt]);
+  }, [isSheetOpen, formValues.summarizeBeforeSearchImage, formValues.searchType, formValues.imageType, userPrompt, propSummarizedPrompt, propIsSummarizing]);
 
   // Sync userPrompt with formValues when userPrompt changes externally
   // This handles external updates to userPrompt (e.g., from parent component)
-  // Note: We don't want to rebuild the prompt here since it's already built from formValues
+  // When displayType is 'hideForm', we need to ensure userPrompt is in formValues
   useEffect(() => {
-    // Only sync if userPrompt is different from what we would generate
+    // When displayType is 'hideForm', sync userPrompt prop directly to formValues
+    if (displayType === 'hideForm') {
+      const currentPromptValue = formValues['userPrompt'] || formValues['user-prompt'] || '';
+      if (userPrompt !== currentPromptValue && userPrompt.trim() !== '') {
+        setFormValues((prev) => ({
+          ...prev,
+          userPrompt: userPrompt,
+        }));
+      }
+    } else {
+      // For other display types, only sync if userPrompt is different from what we would generate
     const currentConcatenatedPrompt = buildConcatenatedPrompt(formValues);
     if (userPrompt !== currentConcatenatedPrompt && userPrompt.trim() !== '') {
       // If userPrompt was set externally and doesn't match our concatenated version,
       // we might need to parse it back, but for now we'll just ignore external updates
       // since the prompt should be built from formValues
     }
-  }, [userPrompt, formValues, buildConcatenatedPrompt]);
+    }
+  }, [userPrompt, formValues, buildConcatenatedPrompt, displayType]);
 
   // Handle field value change
   const handleFieldChange = useCallback((fieldName: string, value: any) => {
@@ -756,14 +796,24 @@ export function AiBuilderForm({
       onFormValuesChange(newFormValues);
     }
 
-    // Build concatenated prompt from all fields and update userPrompt
-    // Pass the original value array to buildConcatenatedPrompt so it can extract labels
-    const valuesForPrompt = {
-      ...newFormValues,
-      [fieldName]: value, // Keep original value for prompt building (to get labels)
-    };
-    const concatenatedPrompt = buildConcatenatedPrompt(valuesForPrompt);
-    onPromptChange(concatenatedPrompt);
+    // For userPrompt field, only update with the actual text (no metadata)
+    // The full concatenated prompt (with metadata) will be built by buildStandardizedPrompt when generating
+    if (fieldName === 'userPrompt' || fieldName === 'user-prompt') {
+      // Use the actual text value directly - no need to build concatenated prompt
+      // The input field should only show the user's actual prompt text
+      const promptText = typeof actualValue === 'string' ? actualValue : String(actualValue || '');
+      onPromptChange(promptText);
+    } else {
+      // For other fields, we still need to update the userPrompt to reflect changes
+      // But we should extract only the user prompt text from formValues, not build the full concatenated version
+      // The full prompt will be built when generating
+      const promptFieldValue = newFormValues['userPrompt'] || newFormValues['user-prompt'] || '';
+      // Extract just the text, removing any metadata that might have been added
+      let promptText = typeof promptFieldValue === 'string' ? promptFieldValue : String(promptFieldValue || '');
+      promptText = promptText.replace(/\n\nIMPORTANT OUTPUT LANGUAGE REQUIREMENT:[\s\S]*$/i, '').trim();
+      promptText = promptText.replace(/\n\n(Max_results|Max Results|Search Type|Image Type|Summarize Before Search Image|Summarize Before Search|Output Language|Language):\s*[^\n]*(?:\n|$)/gi, '').trim();
+      onPromptChange(promptText);
+    }
 
     // Clear error when user starts typing
     if (formErrors[fieldName]) {
@@ -1023,8 +1073,10 @@ export function AiBuilderForm({
   );
 
   // Determine what to show based on displayType
-  const showForm = displayType === 'default' || displayType === 'showFooter';
-  const showFooter = displayType === 'showFooter' || displayType === 'default';
+  // Show form container when default/showFooter OR when runType is manual (to show footer)
+  const showForm = displayType === 'default' || displayType === 'showFooter' || (displayType === 'hideForm' && runType === 'manual');
+  // Show footer when showFooter/default OR when runType is manual (even if hideForm)
+  const showFooter = displayType === 'showFooter' || displayType === 'default' || (displayType === 'hideForm' && runType === 'manual');
 
   return (
     <div className="space-y-6">
@@ -1197,12 +1249,12 @@ export function AiBuilderForm({
                               label: '',
                               placeholder: 'Language',
                             }}
-                            value={selectedLanguage || 'en'}
+                            value={selectedLanguage || 'fa'}
                             onChange={(lang) => {
-                              const languageValue = lang || 'en';
+                              const languageValue = lang || 'fa';
                               onLanguageChange(languageValue);
                               // Also update formValues to include language
-                              const newFormValues = {
+                              const newFormValues: Record<string, any> = {
                                 ...formValues,
                                 'output-language': languageValue,
                               };
@@ -1211,14 +1263,14 @@ export function AiBuilderForm({
                               if (onFormValuesChange) {
                                 onFormValuesChange(newFormValues);
                               }
-                              // Rebuild prompt with new language
-                              const valuesForPrompt = {
-                                ...newFormValues,
-                              };
-                              const concatenatedPrompt = buildConcatenatedPrompt(valuesForPrompt);
-                              onPromptChange(concatenatedPrompt);
+                              // Don't update userPrompt here - it should only contain the actual user prompt text
+                              // The full concatenated prompt (with language instruction) will be built when generating
+                              // Extract just the user prompt text from formValues
+                              const promptFieldValue = newFormValues['userPrompt'] || newFormValues['user-prompt'] || '';
+                              const promptText = typeof promptFieldValue === 'string' ? promptFieldValue : String(promptFieldValue || '');
+                              onPromptChange(promptText);
                             }}
-                            defaultLanguage="en"
+                            defaultLanguage="fa"
                             disabled={isLoading || disabled}
                           />
                         </div>
@@ -1401,15 +1453,42 @@ export function AiBuilderForm({
                   ) : (
                     <Button
                       onClick={() => {
-                        // Validate all fields before generating
-                        if (validateAllFields()) {
+                        // When displayType is 'hideForm', only check if userPrompt exists
+                        if (displayType === 'hideForm') {
+                          // Check both formValues and the userPrompt prop
+                          const promptValue = formValues['userPrompt'] || formValues['user-prompt'] || userPrompt || '';
+                          const promptText = typeof promptValue === 'string' ? promptValue : String(promptValue || '');
+                          if (!promptText.trim()) {
+                            // Show error for empty prompt
+                            setFormErrors((prev) => ({
+                              ...prev,
+                              userPrompt: 'Prompt is required',
+                            }));
+                            return;
+                          }
+                          // Clear any errors and proceed
+                          setFormErrors({});
                           onGenerate();
+                          return;
                         }
+                        
+                        // For other display types, validate all fields before generating
+                        const isValid = validateAllFields();
+                        if (!isValid) {
+                          // Show validation errors by touching all fields
+                          const allTouched: Record<string, boolean> = {};
+                          formFields.forEach((field) => {
+                            allTouched[field.name] = true;
+                          });
+                          setTouched(allTouched);
+                          return;
+                        }
+                        onGenerate();
                       }}
-                      disabled={!isFormValid || !userPrompt.trim() || disabled || runType === 'automatic'}
+                      disabled={isLoading || disabled || runType === 'automatic'}
                       size="default"
                       variant="default"
-                      className="h-10 shadow-sm w-full md:w-auto bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                      className="h-10 shadow-sm w-full md:w-auto bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
                     >
                       <Sparkles className="h-4 w-4 me-2" />
                       <span className="hidden md:inline">Do the Magic</span>

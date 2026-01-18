@@ -5,7 +5,7 @@
  */
 
 import { getGeneralSystemPrompt } from './ai-general-utils';
-import { GENERAL_MARKDOWN_OUTPUT_RULES, REFERENCE_PROMPT, MERMAID_RULES } from './ai-chat-utils';
+import { GENERAL_MARKDOWN_OUTPUT_RULES, REFERENCE_PROMPT, MERMAID_RULES, ORGANIZATION_RAG_PROMPT } from './ai-chat-utils';
 import { GRAPH_GENERATION_PROMPT } from './ai-graph-utils';
 import { GENERAL_IMAGE_PROMPT, IMAGE_TYPE_PROMPTS } from './ai-image-utils';
 import { preloadRoutes } from '@/gradian-ui/shared/utils/preload-routes';
@@ -254,12 +254,8 @@ function buildCompleteSystemPrompt(params: {
   // 6. Preloaded context (added at the end)
   if (params.preloadedContext) {
     systemPrompt += '\n\n***\n\n' + '## Preloaded Context for RAG:\n\n' 
-    + '---'
-    + '\n'
-    + '**RAG Data Enhancement:**'
-    + '\n'
-    + 'If RAG data exists (such as Organizational RAG), use the keywords and terminology inside it based on the selected language to make the context more concise and enriched. Prioritize using the exact keywords, product names, organizational names and roles, and terminology from the RAG data that match the selected language, as this will ensure consistency with organizational standards and improve the accuracy and relevance of your responses.'
-    + '\n'
+    + ORGANIZATION_RAG_PROMPT
+    + '\n\n'
     + '---'
     + '\n\n'
     + params.preloadedContext;
@@ -388,13 +384,37 @@ export async function buildSystemPrompt(params: {
     : undefined;
 
   // 10. Preload routes - called internally in parallel
+  // Always include organization-rag globally for all agents
+  const globalPreloadRoutes = [
+    {
+      route: '/api/organization-rag',
+      title: 'Organization RAG',
+      description: 'MANDATORY: Organization RAG data for context-aware AI processing',
+      method: 'GET' as const,
+      jsonPath: 'data',
+      queryParameters: {
+        format: 'toon',
+      },
+    },
+  ];
+
+  // Merge global preload routes with agent-specific preload routes
+  // Agent-specific routes take precedence (appear first), but global routes are always included
+  const allPreloadRoutes = [
+    ...(agent.preloadRoutes || []),
+    // Add global organization-rag only if not already present in agent's preloadRoutes
+    ...(agent.preloadRoutes?.some((route: any) => route.route === '/api/organization-rag') 
+      ? [] 
+      : globalPreloadRoutes),
+  ];
+
   let preloadedContext = '';
   let isLoadingPreload = false;
   
-  if (agent.preloadRoutes && Array.isArray(agent.preloadRoutes) && agent.preloadRoutes.length > 0 && baseUrl) {
+  if (allPreloadRoutes.length > 0 && baseUrl) {
     isLoadingPreload = true;
     try {
-      preloadedContext = await preloadRoutes(agent.preloadRoutes, baseUrl);
+      preloadedContext = await preloadRoutes(allPreloadRoutes, baseUrl);
     } catch (error) {
       loggingCustom(
         LogType.INFRA_LOG,

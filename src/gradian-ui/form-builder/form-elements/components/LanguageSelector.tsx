@@ -71,40 +71,12 @@ const DEFAULT_LANGUAGES: SelectOption[] = [
     color: 'default',
   },
   {
-    id: 'pt',
-    value: 'pt',
-    label: 'Português',
-    icon: 'Languages',
-    color: 'default',
-  },
-  {
     id: 'ru',
     value: 'ru',
     label: 'Русский',
     icon: 'Languages',
     color: 'default',
-  },
-  {
-    id: 'zh',
-    value: 'zh',
-    label: '中文',
-    icon: 'Languages',
-    color: 'default',
-  },
-  {
-    id: 'ja',
-    value: 'ja',
-    label: '日本語',
-    icon: 'Languages',
-    color: 'default',
-  },
-  {
-    id: 'ko',
-    value: 'ko',
-    label: '한국어',
-    icon: 'Languages',
-    color: 'default',
-  },
+  }
 ];
 
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({

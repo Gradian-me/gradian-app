@@ -25,7 +25,7 @@ import { callChatApi } from './ai-api-caller';
 const MODELS_CACHE_TTL = 5 * 60 * 1000;
 
 /** Default model fallback */
-const DEFAULT_MODEL = 'gpt-4o-mini';
+const DEFAULT_MODEL = 'gemini-3-flash-preview';
 
 /** Default API base URL for server-side */
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
@@ -618,6 +618,41 @@ export const GENERAL_MARKDOWN_OUTPUT_RULES = `
 **Apply these rules to ALL string format outputs for professional, consistent markdown.**`;
 
 /**
+ * Strict organization RAG usage rules (terminology-only, no new facts)
+ * Only use when context is relevant to the user's prompt
+ */
+export const ORGANIZATION_RAG_PROMPT = `
+## Organizational Context (CONDITIONAL USAGE - RELEVANCE REQUIRED)
+
+**CRITICAL: Only use this organizational context if it is DIRECTLY RELEVANT to the user's prompt content.**
+
+### When to USE this context:
+- The prompt mentions specific terms, names, processes, or concepts that appear in this organizational context
+- The prompt asks about organizational procedures, terminology, or standards
+- The prompt contains keywords or entities that match items in this organizational context
+- The user's content explicitly references organizational information
+
+### When to IGNORE this context:
+- The prompt is about general topics unrelated to the organization
+- The prompt contains no keywords, terms, or concepts that appear in this organizational context
+- The prompt is about external subjects, general knowledge, or topics outside organizational scope
+- There is no clear connection between the prompt and the organizational context
+
+### Usage Rules (if relevant):
+- Use ONLY to correct terminology/keywords/names that already appear in the prompt
+- Do NOT add, infer, or guess any facts, numbers, dates, or entities not present in the prompt
+- Do NOT introduce new information from this context if it's not mentioned in the user's prompt
+- Prioritize fidelity to the user content; no hallucinations or guesses
+- If the context is not relevant, completely ignore it and proceed as if it doesn't exist
+
+**Decision Process:**
+1. First, analyze the user's prompt for keywords, terms, and concepts
+2. Check if any of these appear in the organizational context below
+3. If NO match is found, ignore this context entirely
+4. If matches are found, use ONLY the relevant matching information to enhance terminology accuracy
+`;
+
+/**
  * Reference and Source Citation Rules
  * This prompt is automatically appended to all chat agents with string output format
  * to ensure consistent, professional reference formatting when sources are used
@@ -626,7 +661,7 @@ export const REFERENCE_PROMPT = `
 
 ## 📚 REFERENCES AND SOURCE CITATION RULES
 
-**Include References section ONLY if you used external sources, RAG data, search results, regulatory guidelines, research papers, or any source material. If NO references were used, omit entirely.**
+**CRITICAL: Include References section ONLY if you used external sources, RAG data, search results, regulatory guidelines, research papers, or any source material. If NO references were used, you MUST completely omit the References section. DO NOT add any text, message, or statement about missing references. Simply end your output without any reference-related content.**
 
 ### 📋 Format Requirements
 
@@ -658,26 +693,37 @@ export const REFERENCE_PROMPT = `
 
 4. **Single Section**: Output ONE References section with ONE divider (\`***\`) before it. Do NOT duplicate.
 
+5. **NO REFERENCES = NO TEXT**: If you did NOT use any external sources, RAG data, search results, or reference material, you MUST:
+   - NOT add a References section
+   - NOT add any divider (\`***\`)
+   - NOT add any message like "No references were used" or "No explicit references were made"
+   - NOT add any text about missing references
+   - Simply end your output after the last required section
+   - This applies to ALL languages (English, Persian, Arabic, etc.)
+
 ### ✅ Checklist
 - [ ] References section is FINAL section (if references used)
-- [ ] Divider \`***\` before References
+- [ ] Divider \`***\` before References (only if references exist)
 - [ ] All used references included
 - [ ] Only actual source data (no placeholders)
 - [ ] References cited inline in content
 - [ ] All RAG sources included
 - [ ] Properly formatted markdown table
+- [ ] If no references: NO text added about missing references
 
 ### 🚫 Avoid
 - ❌ Fake/placeholder source information
 - ❌ Omitting used references
 - ❌ Including References when none used
+- ❌ Adding messages like "No references were used" or "No explicit references were made"
+- ❌ Adding any text about missing references in any language
 - ❌ Placing References mid-document
 - ❌ Duplicating References section/divider
 - ❌ Missing inline citations
 
 ---
 
-**If sources used → cite properly. If no sources → omit References section.**`;
+**If sources used → cite properly. If no sources → omit References section COMPLETELY (no text, no message, nothing).**`;
 
 /**
  * Mermaid Diagram Rules

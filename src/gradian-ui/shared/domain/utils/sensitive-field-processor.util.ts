@@ -49,11 +49,29 @@ export async function processSensitiveFields(
     const fieldName = field.name;
     const fieldValue = processedData[fieldName];
 
+    // SECURITY: Skip password fields - they should be hashed, not encrypted
+    // Password fields are handled by processPasswordFields() which uses one-way hashing
+    // Encryption is for fields that need to be decrypted later (like API keys, connection strings)
+    if (field.component === 'password' || field.role === 'password') {
+      continue;
+    }
+
     // Only encrypt if field value is provided and is a string
     if (fieldValue && typeof fieldValue === 'string' && fieldValue.trim() !== '') {
       // Check if already encrypted
       if (isEncryptedValue(fieldValue)) {
         // Field is already encrypted, skip
+        continue;
+      }
+
+      // SECURITY: Skip hashed passwords (they start with $argon2id$, $argon2i$, or $argon2d$)
+      // These are one-way hashes and should not be encrypted
+      const isHashedPassword = 
+        fieldValue.startsWith('$argon2id$') ||
+        fieldValue.startsWith('$argon2i$') ||
+        fieldValue.startsWith('$argon2d$');
+      
+      if (isHashedPassword) {
         continue;
       }
 

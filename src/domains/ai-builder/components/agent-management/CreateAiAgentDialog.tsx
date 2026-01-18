@@ -28,7 +28,7 @@ const INITIAL_FORM_STATE = {
   icon: 'Sparkles',
   description: '',
   requiredOutputFormat: 'json' as 'json' | 'string' | 'table' | 'search-results' | 'search-card',
-  model: 'gpt-4o-mini',
+  model: 'gemini-3-flash-preview',
   systemPrompt: '',
   loadingTextSwitches: [] as string[],
   renderComponents: [] as any[],
@@ -181,7 +181,7 @@ export function CreateAiAgentDialog({ open, onOpenChange, onSubmit }: CreateAiAg
                   config={{ 
                     name: 'agent-model', 
                     label: 'Model',
-                    placeholder: 'e.g., gpt-4o-mini'
+                    placeholder: 'e.g., gemini-3-flash-preview'
                   }}
                   value={formState.model}
                   onChange={(value) => setFormState(prev => ({ ...prev, model: value }))}

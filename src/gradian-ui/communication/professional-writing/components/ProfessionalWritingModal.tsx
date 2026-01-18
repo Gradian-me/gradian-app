@@ -154,7 +154,7 @@ export function ProfessionalWritingModal({
                   label: 'Target Language',
                   placeholder: 'Select a language',
                 }}
-                value={targetLanguage}
+                value={targetLanguage || 'fa'}
                 onChange={(value) => {
                   setTargetLanguage(value);
                   clearResponse();

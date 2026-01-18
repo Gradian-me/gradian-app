@@ -1110,10 +1110,10 @@
         "label": "Server Address",
         "sectionId": "basic-information",
         "component": "url",
-        "placeholder": "Enter server address (e.g., https://api.example.com)",
+        "placeholder": "Enter server address (e.g., https://api.example.com or localhost:3000)",
         "validation": {
           "required": true,
-          "pattern": "^https?:\\/\\/.+"
+          "pattern": "^(https?:\\/\\/)?.+"
         },
         "isSensitive": true,
         "colSpan": 1,
@@ -2054,6 +2054,7 @@
         "component": "password",
         "placeholder": "Enter password",
         "required": false,
+        "isSensitive": true,
         "validation": {
           "minLength": 1
         },
@@ -3810,7 +3811,8 @@
           ],
           "additionalSystemPrompt": "Analyze this change management record from a change management analyst perspective. Provide comprehensive analysis including risk assessment, compliance evaluation, and recommendations based on GMP, WHO guidelines, ISO 9001, and pharmaceutical quality standards.",
           "displayType": "hideForm",
-          "runType": "automatic"
+          "runType": "manual",
+          "language": "en"
         },
         {
           "id": "create-comic-book",
@@ -3829,7 +3831,8 @@
           ],
           "additionalSystemPrompt": "Create a comic book style illustration based on the change management information provided.",
           "displayType": "hideForm",
-          "runType": "automatic"
+          "runType": "automatic",
+          "language": "en"
         },
         {
           "id": "create-sketch",
@@ -3850,7 +3853,8 @@
           ],
           "additionalSystemPrompt": "Create a sketch-style illustration based on the change management information provided.",
           "displayType": "hideForm",
-          "runType": "automatic"
+          "runType": "automatic",
+          "language": "en"
         },
         {
           "id": "analyze-with-ai",
@@ -3872,7 +3876,8 @@
           ],
           "additionalSystemPrompt": "Perform comprehensive analysis of the change management data including strengths, weaknesses, risks, and improvement opportunities.",
           "displayType": "hideForm",
-          "runType": "automatic"
+          "runType": "automatic",
+          "language": "en"
         }
       ]
     },
@@ -4880,7 +4885,8 @@
           ],
           "additionalSystemPrompt": "Analyze this deviation management record from a Quality Assurance Analyst perspective using the 6M root cause analysis model. Provide comprehensive analysis including risk assessment, compliance evaluation, and recommendations based on GMP, WHO guidelines, ISO 9001, FDA 21 CFR Part 11, and pharmaceutical quality standards. Focus on data integrity, patient safety, and regulatory compliance.",
           "displayType": "hideForm",
-          "runType": "automatic"
+          "runType": "automatic",
+          "language": "en"
         },
         {
           "id": "summarize-deviation-with-ai",
@@ -4906,7 +4912,8 @@
           ],
           "additionalSystemPrompt": "Summarize this deviation management record into one or two flowing narrative paragraphs that capture the essence, main ideas, and critical information. Focus on the deviation details, root causes, impacts, and key corrective/preventive actions.",
           "displayType": "hideForm",
-          "runType": "automatic"
+          "runType": "automatic",
+          "language": "en"
         },
         {
           "id": "create-sketch-deviation",
@@ -4928,7 +4935,8 @@
           ],
           "additionalSystemPrompt": "Create a sketch-style illustration based on the deviation management information provided, showing the deviation scenario, root causes, and corrective actions.",
           "displayType": "hideForm",
-          "runType": "automatic"
+          "runType": "automatic",
+          "language": "en"
         },
         {
           "id": "create-comic-book-deviation",
@@ -4951,7 +4959,8 @@
           ],
           "additionalSystemPrompt": "Create a comic-book-style illustration based on the deviation management information provided, showing the deviation scenario, root causes, and corrective actions in a vibrant comic book artistic style with bold outlines, dynamic panels, and expressive characters.",
           "displayType": "hideForm",
-          "runType": "automatic"
+          "runType": "automatic",
+          "language": "en"
         },
         {
           "id": "create-lego-style-deviation",
@@ -4974,7 +4983,8 @@
           ],
           "additionalSystemPrompt": "Create a lego-style illustration based on the deviation management information provided, visualizing the deviation scenario, root causes, and corrective actions in a playful lego aesthetic.",
           "displayType": "hideForm",
-          "runType": "automatic"
+          "runType": "automatic",
+          "language": "en"
         },
         {
           "id": "generate-root-cause-graph",
@@ -4995,7 +5005,8 @@
           ],
           "additionalSystemPrompt": "Generate a comprehensive root cause analysis graph using the 6M model (Man, Machine, Mother Nature, Material, Method, Management) based on the deviation information. Create nodes for root causes and contributing factors, with edges showing relationships and labeled with the appropriate 6M category. Focus on visualizing the cause-and-effect relationships and interactions between different factors.",
           "displayType": "hideForm",
-          "runType": "automatic"
+          "runType": "automatic",
+          "language": "en"
         },
         {
           "id": "analyze-deviation-with-ai",
@@ -5024,7 +5035,8 @@
           ],
           "additionalSystemPrompt": "Perform comprehensive analysis of the deviation management data including risk assessment, trend analysis, root cause patterns, and improvement opportunities. Focus on GMP compliance and quality assurance.",
           "displayType": "hideForm",
-          "runType": "automatic"
+          "runType": "automatic",
+          "language": "en"
         }
       ]
     },
@@ -5920,6 +5932,7 @@
           "agentId": "oox-analyzer-quality-control",
           "runType": "automatic",
           "displayType": "hideForm",
+          "language": "en",
           "selectedFields": [
             "oox-date",
             "operator",
@@ -5957,7 +5970,8 @@
           ],
           "additionalSystemPrompt": "Create a sketch-style illustration based on the OOX analyzer information provided.",
           "displayType": "hideForm",
-          "runType": "automatic"
+          "runType": "automatic",
+          "language": "en"
         }
       ]
     }

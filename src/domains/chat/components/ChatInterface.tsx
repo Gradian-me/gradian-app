@@ -17,7 +17,7 @@ import { TodoList } from './TodoList';
 import { useChat } from '../hooks/useChat';
 import { executeApprovedTodos } from '@/domains/ai-builder/utils/ai-orchestrator-utils';
 import { EmptyState } from '@/gradian-ui/data-display/components/EmptyState';
-import { extractHashtags, extractMentions } from '../utils/text-utils';
+import { extractHashtags, extractMentions } from '@/gradian-ui/shared/utils/text-utils';
 import { BotMessageSquare, Plus } from 'lucide-react';
 import type { Chat, Todo } from '../types';
 import { formatSearchResultsToToon } from '@/domains/ai-builder/utils/ai-search-utils';

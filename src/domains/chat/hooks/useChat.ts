@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback, useRef, startTransition, useMemo } from 'react';
 import { useUserStore } from '@/stores/user.store';
-import { extractHashtags, extractMentions } from '../utils/text-utils';
+import { extractHashtags, extractMentions } from '@/gradian-ui/shared/utils/text-utils';
 import { REQUIRE_LOGIN, DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import type { Chat, ChatMessage, AddMessageRequest, Todo } from '../types';
 

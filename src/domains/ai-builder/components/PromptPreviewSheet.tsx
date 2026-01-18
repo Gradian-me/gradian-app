@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -17,7 +17,11 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Eye } from 'lucide-react';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown';
 import { buildSystemPrompt } from '../utils/prompt-concatenation-utils';
+import { buildStandardizedPrompt } from '../utils/prompt-builder';
 import { formatJsonForMarkdown } from '@/gradian-ui/shared/utils/text-utils';
+import { VoicePoweredOrb } from '@/components/ui/voice-powered-orb';
+import { TextSwitcher } from '@/components/ui/text-switcher';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface PromptPreviewSheetProps {
   isOpen: boolean;
@@ -95,7 +99,21 @@ export function PromptPreviewSheet({
   }, [isMounted, agent, formValues, bodyParams, baseUrl, legacySystemPrompt, legacyIsLoadingPreload]);
 
   const effectiveSystemPrompt = builtSystemPrompt;
-  const hasPrompt = effectiveSystemPrompt || userPrompt.trim();
+  
+  // Build unified prompt from formValues using buildStandardizedPrompt (same logic as useAiBuilder)
+  const effectiveUserPrompt = useMemo(() => {
+    // Use buildStandardizedPrompt to build the unified prompt (same as useAiBuilder hook)
+    if (formValues && agent && agent.renderComponents) {
+      const builtPrompt = buildStandardizedPrompt(agent, formValues);
+      if (builtPrompt && builtPrompt.trim()) {
+        return builtPrompt;
+      }
+    }
+    // Fallback to userPrompt if building from formValues didn't work
+    return userPrompt;
+  }, [userPrompt, formValues, agent]);
+  
+  const hasPrompt = effectiveSystemPrompt || effectiveUserPrompt.trim();
   const hasExtraBody = extraBody && Object.keys(extraBody).length > 0;
   const hasBodyParams = bodyParams && Object.keys(bodyParams).length > 0;
   // Enable preview if there's a prompt OR if there are body/extra params (for image generation, etc.)
@@ -116,7 +134,7 @@ export function PromptPreviewSheet({
         </Button>
       )}
       <Sheet open={isOpen} onOpenChange={onOpenChange}>
-        <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0 h-full [&>button]:z-20 !z-[60]" overlayClassName="!z-[55]">
+        <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0 h-full [&>button]:z-20 !z-[100]" overlayClassName="!z-[95]">
           <SheetHeader className="px-6 pt-6 pb-4 pe-12 border-b border-gray-200 dark:border-gray-700 shrink-0 sticky top-0 bg-white dark:bg-gray-900 z-10">
             <SheetTitle>Prompt Sent to LLM</SheetTitle>
             <SheetDescription>
@@ -132,7 +150,7 @@ export function PromptPreviewSheet({
             {(hasPrompt || hasBodyParams || hasExtraBody) ? (
               <div className="space-y-4">
                 {/* Show prompt from bodyParams if userPrompt is empty but bodyParams has prompt */}
-                {(!userPrompt.trim() && bodyParams?.prompt) ? (
+                {(!effectiveUserPrompt.trim() && bodyParams?.prompt) ? (
                   <div>
                     <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
                       Prompt (from body parameters):
@@ -150,10 +168,10 @@ export function PromptPreviewSheet({
                       <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
                         User Prompt:
                       </h3>
-                      {userPrompt.trim() ? (
+                      {effectiveUserPrompt.trim() ? (
                         <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                           <MarkdownViewer 
-                            content={userPrompt.trim()}
+                            content={effectiveUserPrompt.trim()}
                             showToggle={false}
                           />
                         </div>
@@ -178,13 +196,33 @@ export function PromptPreviewSheet({
                           )}
                         </h3>
                         {isSummarizing ? (
-                          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
-                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                              Generating summary...
-                            </div>
-                          </div>
-                        ) : summarizedPrompt && summarizedPrompt.trim() && summarizedPrompt !== userPrompt.trim() ? (
+                          <AnimatePresence>
+                            <motion.div
+                              key="summarizing-orb"
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -20 }}
+                              transition={{ duration: 0.3, ease: "easeOut" }}
+                              className="w-full h-96 relative rounded-xl overflow-hidden"
+                            >
+                              <VoicePoweredOrb
+                                enableVoiceControl={false}
+                                className="rounded-xl overflow-hidden"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4">
+                                <div className="max-w-[85%]">
+                                  <TextSwitcher
+                                    texts={['Summarizing prompt...', 'Preparing summary...', 'Analyzing content...']}
+                                    className="text-violet-900 dark:text-white font-medium text-sm md:text-base px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
+                                    switchInterval={2000}
+                                    transitionDuration={0.5}
+                                    shimmerDuration={1}
+                                  />
+                                </div>
+                              </div>
+                            </motion.div>
+                          </AnimatePresence>
+                        ) : summarizedPrompt && summarizedPrompt.trim() && summarizedPrompt !== effectiveUserPrompt.trim() ? (
                           <div className="rounded-lg border border-violet-200 dark:border-violet-700 bg-violet-50/50 dark:bg-violet-950/20 p-4">
                             <MarkdownViewer 
                               content={summarizedPrompt.trim()}
@@ -194,7 +232,7 @@ export function PromptPreviewSheet({
                               This summarized version will be used for search queries and image generation.
                             </p>
                           </div>
-                        ) : summarizedPrompt && summarizedPrompt.trim() === userPrompt.trim() ? (
+                        ) : summarizedPrompt && summarizedPrompt.trim() === effectiveUserPrompt.trim() ? (
                           <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
                             <p className="text-sm text-gray-500 dark:text-gray-400">
                               Summary is the same as original prompt.

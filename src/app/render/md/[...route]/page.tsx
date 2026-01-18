@@ -3,7 +3,6 @@ import fs from 'fs';
 import path from 'path';
 import { notFound } from 'next/navigation';
 import { GoToTop } from '@/gradian-ui/layout/go-to-top/components/GoToTop';
-import { ModeToggle } from '@/gradian-ui/layout/mode-toggle/components/ModeToggle';
 import { Logo } from '@/gradian-ui/layout/logo';
 import { 
   getMarkdownPath,
@@ -128,7 +127,6 @@ export default async function MarkdownRenderPage({ params, searchParams }: PageP
                   layout="inline"
                   className="w-auto"
                 />
-                <ModeToggle />
               </div>
             </div>
           </div>

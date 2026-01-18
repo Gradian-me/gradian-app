@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { MainLayout } from '@/components/layout/main-layout';
 import { AiBuilderWrapper } from '@/domains/ai-builder/components/AiBuilderWrapper';
@@ -10,7 +10,13 @@ import { Badge } from '@/components/ui/badge';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 
 export default function AiBuilderPage() {
-  const showModelBadge = LOG_CONFIG[LogType.AI_MODEL_LOG] === true;
+  const [mounted, setMounted] = useState(false);
+  const [showModelBadge, setShowModelBadge] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    setShowModelBadge(LOG_CONFIG[LogType.AI_MODEL_LOG] === true);
+  }, []);
 
   return (
     <MainLayout
@@ -21,7 +27,7 @@ export default function AiBuilderPage() {
     >
       <div className="space-y-6 max-w-5xl mx-auto">
         <div className="flex items-center justify-between">
-          {showModelBadge ? (
+          {mounted && showModelBadge ? (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Sparkles className="h-3 w-3 text-violet-500" />
               <Badge

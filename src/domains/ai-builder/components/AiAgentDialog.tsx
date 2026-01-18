@@ -288,6 +288,10 @@ export function AiAgentDialog({
         initialBody={processedBody}
         initialExtraBody={processedExtraBody}
         onOpenPreviewRequest={handleOpenPreviewRequest}
+        initialSelectedLanguage={
+          action.language || 
+          (agent.agentType === 'image-generation' ? 'en' : 'fa')
+        } // Use language from action if provided, otherwise set to English for image-generation agents, default to Persian for others
       />
     </Modal>
   );

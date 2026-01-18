@@ -389,7 +389,47 @@ export function formatPreloadRouteResult(
 }
 
 /**
+ * Cache for preload route results
+ * Key: route URL with query params, Value: { result: PreloadResult, timestamp: number }
+ */
+const preloadCache = new Map<string, { result: PreloadResult; timestamp: number }>();
+
+/**
+ * Cache TTL in milliseconds (5 minutes)
+ */
+const CACHE_TTL = 5 * 60 * 1000;
+
+/**
+ * Generate cache key from route configuration
+ */
+function getCacheKey(route: PreloadRoute, baseUrl: string): string {
+  const method = route.method || 'GET';
+  let routePath = route.route;
+  
+  // Build URL with query parameters for GET requests
+  if (method === 'GET' && route.queryParameters) {
+    routePath = buildUrlWithQuery(route.route, route.queryParameters);
+  }
+  
+  // Build full URL
+  const fullUrl = routePath.startsWith('http') 
+    ? routePath 
+    : `${baseUrl}${routePath.startsWith('/') ? routePath : '/' + routePath}`;
+  
+  // Include method and jsonPath in cache key to ensure uniqueness
+  return `${method}:${fullUrl}:${route.jsonPath || ''}`;
+}
+
+/**
+ * Check if cached data is still valid
+ */
+function isCacheValid(timestamp: number): boolean {
+  return Date.now() - timestamp < CACHE_TTL;
+}
+
+/**
  * Call all preload routes in parallel and format results for system prompt
+ * Results are cached to prevent unnecessary refetches
  */
 export async function preloadRoutes(
   preloadRoutes: PreloadRoute[],
@@ -399,15 +439,59 @@ export async function preloadRoutes(
     return '';
   }
 
-  // Call all routes in parallel
-  const results = await Promise.all(
-    preloadRoutes.map((route) => callPreloadRoute(route, baseUrl))
-  );
+  // Check cache and fetch only routes that need updating
+  const routesToFetch: Array<{ route: PreloadRoute; index: number; cacheKey: string }> = [];
+  const cachedResults: Array<{ result: PreloadResult; index: number }> = [];
+
+  preloadRoutes.forEach((route, index) => {
+    const cacheKey = getCacheKey(route, baseUrl);
+    const cached = preloadCache.get(cacheKey);
+    
+    if (cached && isCacheValid(cached.timestamp)) {
+      // Use cached result
+      cachedResults.push({
+        result: cached.result,
+        index,
+      });
+    } else {
+      // Need to fetch
+      routesToFetch.push({ route, index, cacheKey });
+    }
+  });
+
+  // Fetch routes that aren't cached or are stale
+  const fetchResults = routesToFetch.length > 0
+    ? await Promise.all(
+        routesToFetch.map(({ route }) => callPreloadRoute(route, baseUrl))
+      )
+    : [];
+
+  // Combine cached and fetched results in correct order
+  const allResults: PreloadResult[] = new Array(preloadRoutes.length);
+  
+  // Add cached results
+  cachedResults.forEach(({ result, index }) => {
+    allResults[index] = result;
+  });
+  
+  // Add fetched results and update cache
+  fetchResults.forEach((result, fetchIndex) => {
+    const { index, cacheKey } = routesToFetch[fetchIndex];
+    allResults[index] = result;
+    
+    // Cache successful results
+    if (result.success) {
+      preloadCache.set(cacheKey, {
+        result,
+        timestamp: Date.now(),
+      });
+    }
+  });
 
   // Format results for system prompt
   const sections: string[] = [];
 
-  results.forEach((result, index) => {
+  allResults.forEach((result, index) => {
     const route = preloadRoutes[index];
     sections.push(formatPreloadRouteResult(result, route));
   });

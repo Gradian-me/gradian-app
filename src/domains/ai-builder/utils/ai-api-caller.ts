@@ -9,7 +9,7 @@ import { getApiKey, sanitizeErrorMessage, safeJsonParse } from './ai-security-ut
 import { createAbortController, parseErrorResponse, buildTimingInfo } from './ai-common-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType, LOG_CONFIG } from '@/gradian-ui/shared/configs/log-config';
-import { truncateText } from '@/domains/chat/utils/text-utils';
+import { truncateText } from '@/gradian-ui/shared/utils/text-utils';
 import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
 import { cleanMarkdownResponse } from './ai-security-utils';
 

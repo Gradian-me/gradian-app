@@ -5,6 +5,7 @@
 
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { ORGANIZATION_RAG_PROMPT } from './ai-chat-utils';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -111,8 +112,9 @@ export async function summarizePrompt(
     let userPrompt = `Please deeply analyze the following text to understand its meaning, context, relationships, and key details. Synthesize and completely rephrase all content into one or two flowing narrative paragraphs that capture the essence, main ideas, and critical information. Output MUST be plain text only - NO headings, sections, bullet points, markdown, or structured formatting. Create continuous, natural-flowing prose that reads as if written from scratch based on comprehensive understanding, not a condensed or reorganized version of the original:\n\n${prompt.trim()}`;
 
     // Include organization RAG data if available
+    // The improved ORGANIZATION_RAG_PROMPT will instruct the AI to only use it when relevant
     if (orgRagData && orgRagData.trim()) {
-      userPrompt = `**Organizational Context:**\n\n${orgRagData.trim()}\n\n---\n\n**Text to Summarize:**\n\n${userPrompt}`;
+      userPrompt = `${ORGANIZATION_RAG_PROMPT.trim()}\n\n${orgRagData.trim()}\n\n---\n\n**Text to Summarize:**\n\n${userPrompt}`;
     }
 
     // Create abort controller with timeout if signal not provided

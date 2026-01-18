@@ -192,10 +192,7 @@
     {
       "type": [
         {
-          "id": "SYSTEM_ADMINISTRATOR",
-          "label": "System Administrator",
-          "icon": "Shield",
-          "color": "red"
+          "id": "SYSTEM_ADMINISTRATOR"
         }
       ],
       "color": "rose",
@@ -204,9 +201,10 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9Y0NBAS53JY4VRB9H1FN33",
       "createdAt": "2025-11-30T08:28:05.874Z",
-      "updatedAt": "2025-11-30T08:28:05.874Z",
+      "updatedAt": "2026-01-06T11:25:34.796Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "addMembersAutomatically": true
     },
     {
       "type": [
@@ -224,85 +222,6 @@
       "id": "01KB9Y1HDTQCBR2CF8MHWSYRJG",
       "createdAt": "2025-11-30T08:28:34.619Z",
       "updatedAt": "2025-11-30T08:28:34.619Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "type": [
-        {
-          "id": "GENERAL_ROLE",
-          "label": "General Role",
-          "icon": "User",
-          "color": "slate"
-        }
-      ],
-      "color": "indigo",
-      "name": "Our Users",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KB9Y24BEVCHQXMRSZXPDGARY",
-      "createdAt": "2025-11-30T08:28:54.008Z",
-      "updatedAt": "2025-11-30T08:28:54.008Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "parent": "01KB9Y24BEVCHQXMRSZXPDGARY",
-      "type": [
-        {
-          "id": "GENERAL_ROLE",
-          "label": "General Role",
-          "icon": "User",
-          "color": "cyan"
-        }
-      ],
-      "color": "indigo",
-      "name": "Supply Chain Deputy",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KB9Y4R56A3F9W2NH7KYBDQ98",
-      "createdAt": "2025-11-30T08:30:19.815Z",
-      "updatedAt": "2025-11-30T08:30:19.815Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "parent": "01KB9Y4R56A3F9W2NH7KYBDQ98",
-      "type": [
-        {
-          "id": "GENERAL_ROLE",
-          "label": "General Role",
-          "icon": "User",
-          "color": "slate"
-        }
-      ],
-      "color": "blue",
-      "name": "Supply Chain Supervisor",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KB9Y5NKY5ZZS6BFYPC8684E9",
-      "createdAt": "2025-11-30T08:30:49.982Z",
-      "updatedAt": "2025-11-30T08:30:49.982Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "parent": "01KB9Y5NKY5ZZS6BFYPC8684E9",
-      "type": [
-        {
-          "id": "GENERAL_ROLE",
-          "label": "General Role",
-          "icon": "User",
-          "color": "slate"
-        }
-      ],
-      "color": "blue",
-      "name": "Supply Chain Expert",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KB9Y679HCAP3EZY1PF2NRTSR",
-      "createdAt": "2025-11-30T08:31:08.082Z",
-      "updatedAt": "2025-11-30T08:31:08.082Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -347,10 +266,7 @@
     {
       "type": [
         {
-          "id": "CUSTOMER",
-          "label": "Customer",
-          "icon": "User",
-          "color": "slate"
+          "id": "CUSTOMER"
         }
       ],
       "color": "indigo",
@@ -359,9 +275,10 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9YDFQ30N3GMGZZTEDX2XN2",
       "createdAt": "2025-11-30T08:35:06.084Z",
-      "updatedAt": "2025-11-30T08:35:06.084Z",
+      "updatedAt": "2026-01-06T11:25:43.728Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "addMembersAutomatically": true
     },
     {
       "type": [
@@ -395,9 +312,9 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSTFQSKSN3W9CGK59VZ1FRX",
       "createdAt": "2025-12-06T12:34:16.500Z",
-      "updatedAt": "2026-01-04T11:34:58.575Z",
+      "updatedAt": "2026-01-06T11:24:54.098Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "members": [],
       "access-policies": []
     },
@@ -565,26 +482,6 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "parent": "01KB9Y5NKY5ZZS6BFYPC8684E9",
-      "type": [
-        {
-          "id": "GENERAL_ROLE",
-          "label": "General Role",
-          "icon": "User",
-          "color": "cyan"
-        }
-      ],
-      "name": "test",
-      "color": "red",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KC652PSQFD5BYMZ1QW3SMBHC",
-      "createdAt": "2025-12-11T07:30:17.046Z",
-      "updatedAt": "2025-12-11T07:30:17.046Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
       "parent": "01KBSTFQSKSN3W9CGK59VZ1FRX",
       "type": [
         {
@@ -597,9 +494,10 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KE4C760Y3VY0YJBT0Q0D3C4J",
       "createdAt": "2026-01-04T11:27:58.497Z",
-      "updatedAt": "2026-01-04T11:32:04.445Z",
+      "updatedAt": "2026-01-06T11:25:03.286Z",
       "members": [],
-      "access-policies": []
+      "access-policies": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
       "parent": "01KE4C760Y3VY0YJBT0Q0D3C4J",
@@ -630,9 +528,10 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KE4C9215DWPER7K2KG57GK74",
       "createdAt": "2026-01-04T11:28:59.945Z",
-      "updatedAt": "2026-01-04T11:32:24.376Z",
+      "updatedAt": "2026-01-06T11:25:24.336Z",
       "members": [],
-      "access-policies": []
+      "access-policies": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
       "parent": "01KE4C9215DWPER7K2KG57GK74",
@@ -1505,6 +1404,52 @@
       "id": "01KE4CJ37WKF60JWQGQ0BD0WF4",
       "createdAt": "2026-01-04T11:33:56.096Z",
       "updatedAt": "2026-01-04T11:33:56.219Z"
+    },
+    {
+      "company": "CinnaGen",
+      "authenticationType": [
+        {
+          "id": "active-directory"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ],
+      "username": "taghipouram@cinnagen.com",
+      "firstName": "Amir",
+      "lastName": "Taghipour",
+      "email": "taghipouram@cinnagen.com",
+      "postTitle": "BI Supervisor",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KE9M6RS2HZPTC88WMG7XZVAX",
+      "createdAt": "2026-01-06T12:23:45.701Z",
+      "updatedAt": "2026-01-06T12:23:45.797Z"
     }
   ],
   "purchaseOrders": [],
@@ -1844,6 +1789,27 @@
       "updatedAt": "2025-11-30T16:45:18.122Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "name": "Gradian ETL",
+      "address": "{\"ciphertext\":\"YSg7kZkqmyABP9Dtm2QIfUjPKNKUzja/rxVeuEXs/sGKON5prVo=\",\"iv\":\"8U3AT4H2qJ2B3y1f\"}",
+      "environment": [
+        {
+          "id": "production"
+        }
+      ],
+      "owners": [
+        {
+          "id": "01KE9M6RS2HZPTC88WMG7XZVAX"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KE9M8PA85J81ZAT786GAKPFE",
+      "createdAt": "2026-01-06T12:24:48.714Z",
+      "updatedAt": "2026-01-06T12:36:26.071Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "databases": []
     }
   ],
   "url-repositories": [
@@ -2074,6 +2040,43 @@
       "updatedAt": "2025-12-06T09:50:03.477Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "url-parameters": [
+        {
+          "schema": "lookupId",
+          "title": "Lookup ID",
+          "dataType": [
+            {
+              "id": "string",
+              "label": "String"
+            }
+          ],
+          "description": "",
+          "isRequired": true
+        },
+        {
+          "schema": "params",
+          "title": "Parameters",
+          "dataType": [
+            {
+              "id": "string",
+              "label": "String"
+            }
+          ],
+          "description": "",
+          "isRequired": ""
+        }
+      ],
+      "title": "OCTA Lookup",
+      "address": "https://octa.cinnagen.com/integration/lookup/{{lookupId}}/",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "dataType": [],
+      "id": "01KE9VYXF07MD58NP977AE5KJD",
+      "createdAt": "2026-01-06T14:39:16.967Z",
+      "updatedAt": "2026-01-06T14:40:26.646Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
   "integrations": [
@@ -2120,10 +2123,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2026-01-05T08:03:06.926Z",
+      "updatedAt": "2026-01-06T13:59:25.843Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2026-01-05T08:03:06.926Z",
+      "lastSynced": "2026-01-06T13:59:25.843Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2136,7 +2139,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 50 schemas: 50 succeeded, 0 failed (0 created, 50 updated)"
+      "lastSyncMessage": "Processed 50 schemas: 50 succeeded, 0 failed (50 created, 0 updated)"
     },
     {
       "color": "blue",
@@ -2164,8 +2167,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2026-01-05T08:03:11.050Z",
-      "lastSynced": "2026-01-05T08:03:11.050Z",
+      "updatedAt": "2026-01-06T13:59:35.844Z",
+      "lastSynced": "2026-01-06T13:59:35.844Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2178,7 +2181,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Generated relations for 55 out of 55 schemas",
+      "lastSyncMessage": "Generated relations for 50 out of 50 schemas",
       "sourceRoute": []
     },
     {
@@ -2227,9 +2230,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2026-01-05T08:03:41.173Z",
+      "updatedAt": "2026-01-06T14:01:12.756Z",
       "targetDataPath": "data",
-      "lastSynced": "2026-01-05T08:03:41.173Z",
+      "lastSynced": "2026-01-06T14:01:12.756Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2240,7 +2243,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 1369, edges created: 196, nodes failed: 0, edges failed: 0.",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1363, nodes updated: 9, edges created: 183, nodes failed: 0, edges failed: 0.",
       "isTenantBased": false
     },
     {
@@ -2415,8 +2418,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-01-05T09:37:51.591Z",
-      "lastSynced": "2026-01-05T09:37:51.591Z",
+      "updatedAt": "2026-01-06T14:06:24.411Z",
+      "lastSynced": "2026-01-06T14:06:24.411Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2428,7 +2431,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 39 schemas: 39 succeeded, 0 failed (0 created, 39 updated)"
+      "lastSyncMessage": "Missing bearer token"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -2456,7 +2459,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-01-05T09:15:46.015Z",
+      "updatedAt": "2026-01-06T13:22:14.118Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2466,7 +2469,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-01-05T09:15:46.015Z",
+      "lastSynced": "2026-01-06T13:22:14.118Z",
       "lastSyncMessage": "Generated relations for 39 out of 39 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -2517,7 +2520,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2026-01-05T09:38:02.538Z",
+      "updatedAt": "2026-01-06T14:07:16.139Z",
       "category": [
         {
           "id": "production-integration",
@@ -2526,8 +2529,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-01-05T09:38:02.538Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1, nodes updated: 272, edges created: 122, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2026-01-06T14:07:16.139Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 14, nodes updated: 269, edges created: 128, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
@@ -2537,34 +2540,29 @@
       "name": "Gradian_DW",
       "databaseType": [
         {
-          "id": "SQL_SERVER",
-          "label": "SQL Server",
-          "icon": "Server",
-          "color": "sky"
+          "id": "SQL_SERVER"
         }
       ],
       "timezone": [
         {
-          "id": "Asia/Tehran",
-          "label": "Asia/Tehran"
+          "id": "Asia/Tehran"
         }
       ],
       "authenticationType": [
         {
-          "id": "MANUAL",
-          "label": "Manual Authentication",
-          "icon": "Key",
-          "color": "amber"
+          "id": "MANUAL"
         }
       ],
       "username": "biuser",
-      "password": "BIP@ss7631",
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KA99S0PGBRJEQ61ZS1XZ41PQ",
-      "createdAt": "2025-11-17T16:18:42.004Z",
-      "updatedAt": "2025-11-17T16:18:42.004Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "password": "$argon2id$v=19$m=32768,t=3,p=4$/El7QUhmSt8rO2YwmCZ7xQ$iPAd4q2uUN56MgF2yx4xG3NDu4remqnbh2pjjK8Rqpw",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "hashType": "argon2",
+      "_passwordHashed": true,
+      "id": "01KE9MXVNGYMQ45DDP7A2613KM",
+      "createdAt": "2026-01-06T12:36:22.323Z",
+      "updatedAt": "2026-01-06T12:38:59.999Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
   "logical-operators": [
@@ -4330,16 +4328,39 @@
       "changeConclusion": "The temperature control module failure created a clear risk to process stability in mAb production. The executed change—hardware replacement plus integration of enhanced redundancy logic—reduced this risk significantly and improved early-warning capability for future deviations.\n\nAll engineering, automation, and QA assessments concluded that bioreactors BR-12 and BR-14 are fit for continued GMP use following requalification.\n\nChange implemented successfully without unplanned downtime.\n\nAll post-change verification data met predefined acceptance criteria.\n\nRedundant control logic demonstrated correct failover response during testing.\n\nNo recurrence of drift or signal interruptions observed after 30-day monitoring period.\n\nFinal QA disposition: Change Closed – High Criticality, Fully Mitigated.",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "changeManagementTypes": [],
+      "changeManagementTypes": [
+        {
+          "id": "01KBSR7B9B3S0A9JMAWHWNJ8S3"
+        }
+      ],
       "changeSubjectTypes": [],
-      "changeCategories": [],
-      "changeProcedure": [],
+      "changeCategories": [
+        {
+          "id": "01KD0683FRMXZKW61FKBM0RY9Q"
+        }
+      ],
+      "changeProcedure": [
+        {
+          "id": "01KD079DB9ZJG64D3RW22QTD0J"
+        }
+      ],
       "id": "01KCDG346XD1GBAKQEADRABBHB",
       "createdAt": "2025-12-14T03:57:26.114Z",
-      "updatedAt": "2026-01-03T08:20:09.272Z",
+      "updatedAt": "2026-01-07T05:57:56.822Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-      "affectedProcesses": []
+      "affectedProcesses": [
+        {
+          "id": "01JGFJJZ006QQWDQPMW4ZJKA6R"
+        },
+        {
+          "id": "01JGFJJZ00HJ9BXFBM0GRAY6WN"
+        },
+        {
+          "id": "01JGFJJZ00EBBKVEA4SXPSMQRH"
+        }
+      ],
+      "follow-up": []
     }
   ],
   "change-classifications": [
@@ -4373,66 +4394,6 @@
       "id": "01KCH4F85M3Q8BNTXH67GJTKS5",
       "createdAt": "2025-12-15T13:51:18.204Z",
       "updatedAt": "2025-12-15T13:51:18.204Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    }
-  ],
-  "change-subject-types": [
-    {
-      "label_fa": "تغییرات نرم افزاری",
-      "label_en": "Software Change",
-      "incomplete": false,
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01KBSSBGXTJPDC00J7QPRQCR7S",
-      "createdAt": "2025-12-06T12:14:29.822Z",
-      "updatedAt": "2025-12-06T12:14:29.822Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "label_fa": "WHO-TRS-1011:2015",
-      "label_en": "WHO-TRS-1011",
-      "incomplete": false,
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01KBSVAZFKZGE307FSXWR5JGP3",
-      "createdAt": "2025-12-06T12:49:09.108Z",
-      "updatedAt": "2025-12-06T12:49:09.108Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "parent": "01KBSVAZFKZGE307FSXWR5JGP3",
-      "label_fa": "S01",
-      "label_en": "S01",
-      "incomplete": false,
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01KBSVE4TZEN99T6NA6R4MQEV9",
-      "createdAt": "2025-12-06T12:50:52.896Z",
-      "updatedAt": "2025-12-06T12:50:52.896Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "parent": "01KBSVE4TZEN99T6NA6R4MQEV9",
-      "label_fa": "S01.P01",
-      "label_en": "S01.P01",
-      "incomplete": false,
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01KBSVEMRCZ2X8C6BMM0QPJG0J",
-      "createdAt": "2025-12-06T12:51:09.196Z",
-      "updatedAt": "2025-12-06T12:51:09.196Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "parent": "01KBSVEMRCZ2X8C6BMM0QPJG0J",
-      "label_fa": "P022.A",
-      "label_en": "P022.A",
-      "incomplete": false,
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01KBSVN7WEH5NHR7ZK731VPYCK",
-      "createdAt": "2025-12-06T12:54:45.391Z",
-      "updatedAt": "2025-12-06T12:54:45.391Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
@@ -4530,6 +4491,29 @@
       "updatedAt": "2025-12-06T12:45:41.971Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "date": "2026-01-07",
+      "analyst": [
+        {
+          "id": "01KCPC8YBMRYB3X846103R11MH"
+        }
+      ],
+      "analysisItems": [
+        {
+          "id": "item-1767795763341-jct6vj1iz",
+          "label": "nhvh"
+        },
+        {
+          "id": "item-1767795766051-zg4ugd6k7",
+          "label": "iuiku"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KECDEA21BBHYZH6M2363BFNT",
+      "createdAt": "2026-01-07T14:23:16.071Z",
+      "updatedAt": "2026-01-07T14:23:16.378Z"
     }
   ],
   "qa-guideline-analysis": [
@@ -5591,6 +5575,101 @@
       "updatedAt": "2025-12-14T11:23:52.289Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "isForce": false,
+      "assignedTo": [
+        {
+          "id": "01KCPC8YBMRYB3X846103R11MH"
+        }
+      ],
+      "dueDate": "2026-01-29",
+      "status": [
+        {
+          "id": "01KBSVZ3N828YPGRXFDY84D15W",
+          "label": "In Progress",
+          "icon": "Loader",
+          "color": "blue"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCDZTASK001WORK000000000001",
+          "label": "Work",
+          "icon": "Briefcase",
+          "color": "blue"
+        }
+      ],
+      "taskTitle": "test task 1",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KEBGGFMFEYNAA45J8T928GAG",
+      "createdAt": "2026-01-07T05:57:38.591Z",
+      "updatedAt": "2026-01-07T05:57:38.799Z"
+    },
+    {
+      "assignedTo": [
+        {
+          "id": "01KDG66XCHTD0GGQX3A2E69T85"
+        }
+      ],
+      "dueDate": "2026-01-28",
+      "status": [
+        {
+          "id": "01KBSVZ3N828YPGRXFDY84D15W",
+          "label": "In Progress",
+          "icon": "Loader",
+          "color": "blue"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCDZTASK004HEALTH0000000004",
+          "label": "Health",
+          "icon": "Heart",
+          "color": "red"
+        }
+      ],
+      "taskTitle": "test task",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KEBX0709K2G44QVF3DKE7CC3",
+      "createdAt": "2026-01-07T09:35:56.962Z",
+      "updatedAt": "2026-01-07T09:35:57.237Z"
+    },
+    {
+      "isForce": true,
+      "assignedTo": [
+        {
+          "id": "01KE4CJ37WKF60JWQGQ0BD0WF4"
+        }
+      ],
+      "dueDate": "2026-01-21",
+      "status": [
+        {
+          "id": "01KBSVZ3N828YPGRXFDY84D15W",
+          "label": "In Progress",
+          "icon": "Loader",
+          "color": "blue"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCDZTASK001WORK000000000001",
+          "label": "Work",
+          "icon": "Briefcase",
+          "color": "blue"
+        }
+      ],
+      "taskTitle": "ghcghch",
+      "taskDescription": "fhfh",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KECBRJJ18CMXVYHACBYWVM86",
+      "createdAt": "2026-01-07T13:53:55.291Z",
+      "updatedAt": "2026-01-07T13:53:55.606Z"
     }
   ],
   "change-procedure": [
@@ -19181,6 +19260,46 @@
       "icon": "AppWindow",
       "color": "purple",
       "sourceUrl": "field-options:app-permissions:resource-type"
+    },
+    {
+      "id": "SYSTEM_ADMINISTRATOR",
+      "label": "System Administrator",
+      "icon": "Shield",
+      "color": "red",
+      "sourceUrl": "field-options:user-roles:user-role-type"
+    },
+    {
+      "id": "CUSTOMER",
+      "label": "Customer",
+      "icon": "User",
+      "color": "slate",
+      "sourceUrl": "field-options:user-roles:user-role-type"
+    },
+    {
+      "id": "production",
+      "label": "Production",
+      "icon": "Server",
+      "color": "green",
+      "sourceUrl": "field-options:servers:server-environment"
+    },
+    {
+      "id": "SQL_SERVER",
+      "label": "SQL Server",
+      "icon": "Server",
+      "color": "blue",
+      "sourceUrl": "field-options:databases:database-type"
+    },
+    {
+      "id": "Asia/Tehran",
+      "label": "Asia/Tehran",
+      "sourceUrl": "field-options:databases:timezone"
+    },
+    {
+      "id": "MANUAL",
+      "label": "Manual Authentication",
+      "icon": "Key",
+      "color": "warning",
+      "sourceUrl": "field-options:databases:authentication-type"
     }
   ],
   "deviation-management": [

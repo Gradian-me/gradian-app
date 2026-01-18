@@ -22,6 +22,7 @@ import { ProfessionalWritingModal } from '@/gradian-ui/communication/professiona
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { usePrint } from '@/gradian-ui/shared/hooks/use-print';
+import { convertPersianNumeralsInLists } from '@/gradian-ui/shared/utils/text-utils';
 
 /**
  * Clean markdown content by removing problematic nested markdown code blocks
@@ -34,6 +35,9 @@ function cleanMarkdownContent(content: string): string {
   }
 
   let cleaned = content;
+
+  // First, convert Persian numerals in list markers to regular numbers
+  cleaned = convertPersianNumeralsInLists(cleaned);
 
   // Remove all ```markdown code blocks (these cause nested markdown rendering issues)
   // Pattern: ```markdown followed by content and closing ```

@@ -171,7 +171,7 @@ If isGeneral is true, I will answer the question directly. If false, proceed wit
         Authorization: `Bearer ${apiKeyResult.key}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gemini-3-flash-preview',
         messages,
         temperature: 0.3,
         max_tokens: 500,
@@ -249,7 +249,7 @@ IMPORTANT: At the end of your response, add 2-4 relevant hashtags that summarize
             Authorization: `Bearer ${apiKeyResult.key}`,
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
+            model: 'gemini-3-flash-preview',
             messages: answerMessages,
             temperature: 0.7,
             max_tokens: 1000,
@@ -366,7 +366,7 @@ Consider:
         'Authorization': `Bearer ${apiKeyResult.key}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gemini-3-flash-preview',
         messages,
         temperature: 0.3,
         response_format: { type: 'json_object' },
@@ -864,7 +864,7 @@ Each todo (except the first) MUST have dependencies set to the previous todo's I
         'Authorization': `Bearer ${apiKeyResult.key}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gemini-3-flash-preview',
         messages,
         temperature: 0.3,
         response_format: { type: 'json_object' },

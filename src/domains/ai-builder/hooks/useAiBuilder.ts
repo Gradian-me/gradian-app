@@ -10,6 +10,7 @@ import type { AiAgent, AiBuilderResponseData, GeneratePromptRequest, TokenUsage,
 import { useAiPrompts } from '@/domains/ai-prompts/hooks/useAiPrompts';
 import { useUserStore } from '@/stores/user.store';
 import { useTenantStore } from '@/stores/tenant.store';
+import { useAiAgents } from './useAiAgents';
 import {
   extractDataByPath,
   formatPreloadRouteResult,
@@ -17,9 +18,11 @@ import {
 } from '@/gradian-ui/shared/utils/preload-routes';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
-import { truncateText } from '@/domains/chat/utils/text-utils';
+import { truncateText } from '@/gradian-ui/shared/utils/text-utils';
 import { formatSearchResultsToToon, type SearchResult } from '../utils/ai-search-utils';
 import { summarizePrompt } from '../utils/ai-summarization-utils';
+import { buildStandardizedPrompt } from '../utils/prompt-builder';
+import { ORGANIZATION_RAG_PROMPT } from '../utils/ai-chat-utils';
 
 /**
  * Extract organization RAG data from preloaded context
@@ -74,6 +77,7 @@ interface UseAiBuilderReturn {
   searchDuration: number | null; // Search duration in milliseconds
   searchUsage: { cost: number; tool: string } | null; // Search usage (cost and tool)
   summarizedPrompt: string | null; // Summarized version of the prompt (for search/image)
+  isSummarizing: boolean; // Whether prompt summarization is in progress
   generateResponse: (request: GeneratePromptRequest) => Promise<void>;
   stopGeneration: () => void;
   approveResponse: (response: string, agent: AiAgent) => Promise<void>;
@@ -86,10 +90,16 @@ interface UseAiBuilderReturn {
 
 /**
  * Hook to manage AI builder state and operations
+ * @param agents - Array of AI agents (optional, will be fetched if not provided)
  */
-export function useAiBuilder(): UseAiBuilderReturn {
+export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
   const tenantId = useTenantStore((state) => state.getTenantId());
   const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  // Fetch agents if not provided
+  const { agents: fetchedAgents } = useAiAgents(agents ? { enabled: false } : undefined);
+  const effectiveAgents = agents || fetchedAgents;
+  
   const [userPrompt, setUserPrompt] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
@@ -114,6 +124,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
   const [searchDuration, setSearchDuration] = useState<number | null>(null);
   const [searchUsage, setSearchUsage] = useState<{ cost: number; tool: string } | null>(null);
   const [summarizedPrompt, setSummarizedPrompt] = useState<string | null>(null);
+  const [isSummarizing, setIsSummarizing] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   
   const user = useUserStore((state) => state.user);
@@ -273,7 +284,12 @@ export function useAiBuilder(): UseAiBuilderReturn {
   }, []);
 
   const generateResponse = useCallback(async (request: GeneratePromptRequest) => {
-    if (!request.userPrompt.trim()) {
+    // Check if we have either a userPrompt OR formValues that can build a prompt
+    // The prompt will be built from formValues on the server side if userPrompt is empty
+    const hasUserPrompt = request.userPrompt && request.userPrompt.trim();
+    const hasFormValues = request.formValues && Object.keys(request.formValues).length > 0;
+    
+    if (!hasUserPrompt && !hasFormValues) {
       setError('Please enter a prompt');
       return;
     }
@@ -291,6 +307,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
     setIsMainLoading(false);
     setIsImageLoading(false);
     setIsSearchLoading(false);
+    setIsSummarizing(false);
     setError(null);
     setSuccessMessage(null);
     setAiResponse('');
@@ -320,18 +337,104 @@ export function useAiBuilder(): UseAiBuilderReturn {
       const imageType = request.imageType || request.body?.imageType;
       const isImageEnabled = imageType && imageType !== 'none' && agentId !== 'image-generator';
       
-      // Store original prompt for main AI call
-      const originalPrompt = request.userPrompt.trim();
+      // STEP 1: Build unified final prompt from formValues or userPrompt
+      // This is the single source of truth for the prompt
+      let finalPrompt = '';
+      
+      // Load agent config to build prompt
+      const agent = effectiveAgents.find(a => a.id === agentId);
+      
+      if (agent && request.formValues && Object.keys(request.formValues).length > 0) {
+        // Build prompt from formValues using buildStandardizedPrompt
+        finalPrompt = buildStandardizedPrompt(agent, request.formValues);
+      }
+      
+      // If building from formValues didn't produce a prompt (or only produced language instruction),
+      // use userPrompt and append language instruction if needed
+      if (!finalPrompt || !finalPrompt.trim()) {
+        finalPrompt = (request.userPrompt || '').trim();
+        
+        // If userPrompt is provided and formValues has language, append language instruction
+        if (finalPrompt && request.formValues) {
+          const languageFieldNames = ['language', 'outputLanguage', 'output-language', 'output_language', 'outputLanguageCode', 'lang'];
+          let outputLanguage: string | null = null;
+          for (const fieldName of languageFieldNames) {
+            const value = request.formValues[fieldName];
+            if (value && typeof value === 'string' && value.trim() && value.toLowerCase() !== 'en' && value !== 'text') {
+              outputLanguage = value.trim();
+              break;
+            }
+          }
+          
+          // Append language instruction if language is found and not already in prompt
+          if (outputLanguage && !finalPrompt.includes('IMPORTANT OUTPUT LANGUAGE REQUIREMENT:')) {
+            const languageMap: Record<string, string> = {
+              'en': 'English',
+              'fa': 'Persian (Farsi)',
+              'ar': 'Arabic',
+              'es': 'Spanish',
+              'fr': 'French',
+              'de': 'German',
+              'it': 'Italian',
+              'pt': 'Portuguese',
+              'ru': 'Russian',
+            };
+            const languageCode = outputLanguage.toLowerCase();
+            const languageName = languageMap[languageCode] || languageCode.toUpperCase();
+            finalPrompt += `\n\nIMPORTANT OUTPUT LANGUAGE REQUIREMENT:\nAll output must be in ${languageName} (${languageCode.toUpperCase()}). This includes:\n- All titles, subtitles, and headings\n- All body text and descriptions\n- All user-facing content\n\nHowever, keep the following in English:\n- Professional and technical abbreviations (e.g., API, JSON, HTTP, CSS, HTML, SQL, UUID, ID, URL)\n- Industry-standard terms and acronyms (e.g., SEO, CRM, UX, UI, SDK, IDE, CLI, GMP, GLP, GDP, etc)\n- Programming language keywords and syntax\n- Technical specification names and standards\n- Brand names and product names that are internationally recognized\n- Scientific and medical terminology abbreviations\n\nEnsure natural, fluent ${languageName} while preserving essential English technical terms.`;
+          }
+        }
+      } else if (request.userPrompt && request.userPrompt.trim()) {
+        // If buildStandardizedPrompt produced a prompt but userPrompt is also provided,
+        // check if the built prompt is just the language instruction
+        // If so, combine userPrompt + language instruction
+        const languageInstructionPattern = /IMPORTANT OUTPUT LANGUAGE REQUIREMENT:[\s\S]*$/;
+        if (languageInstructionPattern.test(finalPrompt) && !finalPrompt.replace(languageInstructionPattern, '').trim()) {
+          // The built prompt is only the language instruction, combine with userPrompt
+          const languageInstruction = finalPrompt.match(languageInstructionPattern)?.[0] || '';
+          finalPrompt = `${request.userPrompt.trim()}\n\n${languageInstruction}`;
+        }
+      }
+
+      // If still empty but formValues exist, build a simple key/value fallback prompt
+      if ((!finalPrompt || !finalPrompt.trim()) && request.formValues && Object.keys(request.formValues).length > 0) {
+        const fallbackParts = Object.entries(request.formValues)
+          .filter(([, v]) => v !== undefined && v !== null && String(v).trim() !== '')
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : String(v)}`);
+        finalPrompt = fallbackParts.join('\n').trim();
+      }
+      
+      // If still no prompt, error out
+      if (!finalPrompt || !finalPrompt.trim()) {
+        setError('Please enter a prompt or fill in form fields');
+        return;
+      }
+      
+      // Store the final built prompt
+      const originalPrompt = finalPrompt;
       let enhancedPrompt = originalPrompt;
       let searchResultsData: SearchResult[] | null = null;
       
-      // Summarization: If enabled and search/image is needed, summarize the prompt first
-      const shouldSummarize = request.summarizeBeforeSearchImage !== false && (isSearchEnabled || isImageEnabled);
+      // Extract language instruction from original prompt to preserve it in summarized version
+      const languageInstructionPattern = /IMPORTANT OUTPUT LANGUAGE REQUIREMENT:[\s\S]*$/;
+      const languageInstructionMatch = originalPrompt.match(languageInstructionPattern);
+      const languageInstruction = languageInstructionMatch ? languageInstructionMatch[0] : null;
+      const promptWithoutLanguage = languageInstruction 
+        ? originalPrompt.replace(languageInstructionPattern, '').trim()
+        : originalPrompt;
+      
+      // STEP 2: Summarization: If enabled, summarize the unified prompt (even without search/image) so the summarized version is visible/usable
+      // Skip summarization for non-text output agents (image-generator, graph-generator, video-generator)
+      // as these agents don't produce text and summarizing their prompts can distort the image generation instructions
+      const isNonTextOutputAgent = agentId === 'image-generator' || agentId === 'graph-generator' || agentId === 'video-generator';
+      const shouldSummarize = request.summarizeBeforeSearchImage !== false && !isNonTextOutputAgent;
       let summarizedPromptValue: string | null = null;
       
       if (shouldSummarize) {
+        // Set summarization loading state immediately
+        setIsSummarizing(true);
         if (isDevelopment) {
-          loggingCustom(LogType.AI_BODY_LOG, 'info', `Summarizing prompt before search/image operations...`);
+          loggingCustom(LogType.AI_BODY_LOG, 'info', `Summarizing unified prompt before search/image operations...`);
         }
         
         try {
@@ -341,8 +444,9 @@ export function useAiBuilder(): UseAiBuilderReturn {
           
           // Use shorter timeout (20 seconds) to fail fast if summarization is slow
           // Use Promise.race with a timeout to ensure we don't wait too long
+          // Summarize the prompt WITHOUT language instruction (to avoid confusion in summarization)
           const summarizationPromise = summarizePrompt(
-            originalPrompt, 
+            promptWithoutLanguage, // Use prompt without language instruction for cleaner summarization
             abortController.signal,
             20000, // Reduced to 20 seconds for faster fallback
             organizationRag // Pass preloaded organization RAG to avoid duplicate fetch
@@ -354,39 +458,57 @@ export function useAiBuilder(): UseAiBuilderReturn {
             }, 20000);
           });
           
-          summarizedPromptValue = await Promise.race([
+          const summarizedText = await Promise.race([
             summarizationPromise,
             timeoutPromise
           ]).catch((error) => {
-            // If summarization fails or times out, fallback to original prompt
+            // If summarization fails or times out, fallback to original prompt (without language instruction)
             if (isDevelopment) {
               loggingCustom(LogType.CLIENT_LOG, 'warn', `Summarization failed or timed out: ${error instanceof Error ? error.message : 'Unknown error'}`);
             }
-            return originalPrompt; // Return original prompt as fallback
+            return promptWithoutLanguage; // Return prompt without language instruction as fallback
           });
+          
+          // Append language instruction back to summarized prompt if it existed in original
+          if (languageInstruction) {
+            summarizedPromptValue = `${summarizedText.trim()}\n\n${languageInstruction}`;
+          } else {
+            summarizedPromptValue = summarizedText;
+          }
           
           if (isDevelopment && summarizedPromptValue && summarizedPromptValue !== originalPrompt) {
             loggingCustom(LogType.AI_BODY_LOG, 'info', `Prompt summarized successfully. Original: ${originalPrompt.length} chars, Summarized: ${summarizedPromptValue.length} chars`);
           }
           // Store summarized prompt in state for display
           setSummarizedPrompt(summarizedPromptValue);
+          setIsSummarizing(false);
         } catch (summarizeError) {
           // If summarization fails, fallback to original prompt
           if (isDevelopment) {
             loggingCustom(LogType.CLIENT_LOG, 'warn', `Summarization failed, using original prompt: ${summarizeError instanceof Error ? summarizeError.message : 'Unknown error'}`);
           }
-          summarizedPromptValue = originalPrompt; // Use original prompt as fallback
+          summarizedPromptValue = originalPrompt; // Use original unified prompt as fallback
           setSummarizedPrompt(null);
+          setIsSummarizing(false);
         }
       } else {
         // Clear summarized prompt if summarization is disabled
         setSummarizedPrompt(null);
+        setIsSummarizing(false);
       }
 
       // Debug logging
       if (isDevelopment) {
         loggingCustom(LogType.AI_BODY_LOG, 'info', `Search check - searchType: ${searchType}, enabled: ${isSearchEnabled}, body keys: ${Object.keys(request.body || {}).join(', ')}`);
       }
+
+      // Helper: append organization RAG with conditional usage rules (only when relevant)
+      // The ORGANIZATION_RAG_PROMPT will instruct the AI to only use it when directly relevant
+      const buildPromptWithOrgRag = (basePrompt: string): string => {
+        const orgRag = extractOrganizationRagFromPreloadedContext(preloadedContext);
+        if (!orgRag || !orgRag.trim()) return basePrompt;
+        return `${basePrompt}\n\n---\n\n${ORGANIZATION_RAG_PROMPT.trim()}\n\n${orgRag}`;
+      };
 
       // If search is enabled, call search API first
       if (isSearchEnabled) {
@@ -416,8 +538,8 @@ export function useAiBuilder(): UseAiBuilderReturn {
             'exa_ai-search': 0.025,
           };
 
-          // Use summarized prompt for search if available, otherwise use original
-          const promptForSearch = summarizedPromptValue || originalPrompt;
+          // Use summarized prompt for search if available, otherwise use unified original prompt
+          const promptForSearch = buildPromptWithOrgRag(summarizedPromptValue || originalPrompt);
           
           // Clean the query - remove common prefixes that might be added by form building
           const cleanQuery = promptForSearch
@@ -534,8 +656,8 @@ export function useAiBuilder(): UseAiBuilderReturn {
         // For non-image-generator agents with imageType, make both requests in parallel
         // For image-generator agent, skip this and use the normal flow below
         try {
-          // Use summarized prompt for image if available, otherwise use original
-          const promptForImage = summarizedPromptValue || originalPrompt;
+          // Use summarized prompt for image if available, otherwise use unified original prompt
+          const promptForImage = buildPromptWithOrgRag(summarizedPromptValue || originalPrompt);
           
           // Set loading states before starting requests
           setIsMainLoading(true);
@@ -547,9 +669,8 @@ export function useAiBuilder(): UseAiBuilderReturn {
             imageTimeoutController.abort();
           }, 60000);
           
-          const [mainResult, imageResult] = await Promise.allSettled([
-            // Main agent request
-            fetch(`/api/ai-builder/${agentId}`, {
+          // Start both requests independently and process results as they arrive
+          const mainRequest = fetch(`/api/ai-builder/${agentId}`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -561,22 +682,28 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 annotations: request.annotations,
                 body: request.body,
                 extra_body: request.extra_body,
+                formValues: request.formValues,
               }),
               signal: abortController.signal,
-            }),
-            // Image generation request with timeout
-            Promise.race([
+          });
+
+          const imageRequest = Promise.race([
               fetch(`/api/ai-builder/image-generator`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                  userPrompt: promptForImage,
+                  userPrompt: promptForImage, // Use unified prompt (summarized if enabled)
                   body: {
                     imageType: imageType,
                     prompt: promptForImage,
-                    ...(request.body || {}), // Include other body params if any
+                  // Exclude imageType and prompt from request.body to avoid conflicts
+                  ...(request.body ? Object.fromEntries(
+                    Object.entries(request.body).filter(([key]) => 
+                      key !== 'imageType' && key !== 'prompt'
+                    )
+                  ) : {}), // Include other body params if any (excluding imageType and prompt)
                   },
                   extra_body: {
                     output_format: 'png',
@@ -592,26 +719,92 @@ export function useAiBuilder(): UseAiBuilderReturn {
               })
             ]).finally(() => {
               clearTimeout(imageTimeoutId);
-            }),
-          ]);
+          });
 
-          // Helper function to check if image generation succeeded
-          // Note: This checks the promise result, but actual success is determined after parsing
-          const checkImageSucceeded = (): boolean => {
-            if (imageResult.status === 'rejected') return false;
-            if (imageResult.status === 'fulfilled') {
-              const imgResponse = imageResult.value;
-              return imgResponse.ok;
+          // Track if image succeeded for error handling
+          let imageSucceeded = false;
+
+          // Process image result independently as soon as it arrives
+          imageRequest
+            .then(async (response) => {
+              try {
+                if (!response.ok) {
+                  let errorText = '';
+                  let errorData: any = null;
+                  try {
+                    errorText = await response.text();
+                    try {
+                      errorData = JSON.parse(errorText);
+                    } catch {}
+                  } catch {}
+                  const errorMessage = errorData?.error || errorText || `HTTP ${response.status}: ${response.statusText}`;
+                  setImageError(`Image Generation Error (${response.status}): ${errorMessage}`);
+                  setImageResponse(null);
+                  setIsImageLoading(false);
+                  imageSucceeded = false;
+                } else {
+                  let data: any;
+                  try {
+                    const responseText = await response.text();
+                    try {
+                      data = JSON.parse(responseText);
+                    } catch (parseError) {
+                      const errorMatch = responseText.match(/error["\s:]+([^"}\n]+)/i);
+                      const errorMessage = errorMatch ? errorMatch[1] : 'Invalid response format (not JSON)';
+                      setImageError(`Image Response Parse Error: ${errorMessage}`);
+                      setImageResponse(null);
+                      setIsImageLoading(false);
+                      imageSucceeded = false;
+                      return;
+                    }
+                  } catch (readError) {
+                    const errorMessage = readError instanceof Error ? readError.message : 'Failed to read response';
+                    setImageError(`Image Response Read Error: ${errorMessage}`);
+                    setImageResponse(null);
+                    setIsImageLoading(false);
+                    imageSucceeded = false;
+                    return;
+                  }
+                  
+                  if (!data.success) {
+                    const errorMessage = data.error || 'Failed to generate image';
+                    setImageError(`Image Generation Error: ${errorMessage}`);
+                    setImageResponse(null);
+                    setIsImageLoading(false);
+                    imageSucceeded = false;
+                  } else {
+                    const builderResponse: AiBuilderResponseData = data.data;
+                    setImageResponse(builderResponse.response);
+                    setImageError(null);
+                    setIsImageLoading(false);
+                    imageSucceeded = true;
             }
-            return false;
-          };
+                }
+              } catch (err) {
+                setIsImageLoading(false);
+                imageSucceeded = false;
+                if (!(err instanceof Error && err.name === 'AbortError')) {
+                  const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+                  setImageError(`Image Generation Error: ${errorMessage}`);
+                  setImageResponse(null);
+                }
+              }
+            })
+            .catch((err) => {
+              setIsImageLoading(false);
+              imageSucceeded = false;
+              if (!(err instanceof Error && err.name === 'AbortError')) {
+                const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+                setImageError(`Image Generation Error: ${errorMessage}`);
+                setImageResponse(null);
+              }
+            });
 
-          // Handle main agent response independently
-          if (mainResult.status === 'fulfilled') {
-            const response = mainResult.value;
+          // Process main agent response independently as soon as it arrives
+          mainRequest
+            .then(async (response) => {
             try {
               if (!response.ok) {
-                // Immediately set loading to false for non-ok responses (especially timeouts)
                 setIsMainLoading(false);
                 
                 let errorText = '';
@@ -624,7 +817,6 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 } catch {}
                 const errorMessage = errorData?.error || errorText || `HTTP ${response.status}: ${response.statusText}`;
                 
-                // Provide specific error message for 504 Gateway Timeout
                 let errorDisplay: string;
                 if (response.status === 504) {
                   errorDisplay = `Gateway Timeout (504): ${errorMessage}\n\nThe server took too long to respond. This could be due to:\n• The AI service is processing a complex request\n• Network latency issues\n• Server overload or resource constraints\n• The request exceeded the server's timeout limit\n\nPlease try again or simplify your request.`;
@@ -632,11 +824,11 @@ export function useAiBuilder(): UseAiBuilderReturn {
                   errorDisplay = `Server Error (${response.status}): ${errorMessage}`;
                 }
                 
-                // Only set error if image generation also failed - otherwise show image
-                if (!checkImageSucceeded()) {
+                  // Only set error if image generation also failed
+                  if (!imageSucceeded) {
                   setError(errorDisplay);
                 } else {
-                  setError(null); // Image succeeded, don't show error
+                    setError(null);
                 }
                 setAiResponse('');
                 setTokenUsage(null);
@@ -644,32 +836,28 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 setDuration(null);
                 abortControllerRef.current = null;
               } else {
-                // Try to parse as JSON, but handle non-JSON responses gracefully
                 let data: any;
                 try {
                   const responseText = await response.text();
                   try {
                     data = JSON.parse(responseText);
                   } catch (parseError) {
-                    // If response is not JSON, it might be a direct error response
-                    // Check if image generation succeeded - if so, don't show error
-                    if (!checkImageSucceeded()) {
+                      if (!imageSucceeded) {
                       const errorMatch = responseText.match(/error["\s:]+([^"}\n]+)/i);
                       const errorMessage = errorMatch ? errorMatch[1] : 'Invalid response format (not JSON)';
                       setError(`Response Parse Error: ${errorMessage}`);
                     } else {
-                      setError(null); // Image succeeded, don't show error
+                        setError(null);
                     }
                     setAiResponse('');
                     setTokenUsage(null);
                     setVideoUsage(null);
                     setDuration(null);
                     setIsMainLoading(false);
-                    return; // Exit early, don't try to process invalid response
+                      return;
                   }
                 } catch (readError) {
-                  // If we can't read the response at all
-                  if (!checkImageSucceeded()) {
+                    if (!imageSucceeded) {
                     const errorMessage = readError instanceof Error ? readError.message : 'Failed to read response';
                     setError(`Response Read Error: ${errorMessage}`);
                   } else {
@@ -685,11 +873,10 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 
                 if (!data.success) {
                   const errorMessage = data.error || 'Failed to get AI response';
-                  // Only set error if image generation also failed
-                  if (!checkImageSucceeded()) {
+                    if (!imageSucceeded) {
                     setError(`AI Builder Error: ${errorMessage}`);
                   } else {
-                    setError(null); // Image succeeded, don't show error
+                      setError(null);
                   }
                   setAiResponse('');
                   setTokenUsage(null);
@@ -703,17 +890,15 @@ export function useAiBuilder(): UseAiBuilderReturn {
                   setVideoUsage(builderResponse.videoUsage || null);
                   setDuration(builderResponse.timing?.duration || null);
                   setError(null);
+                    setIsMainLoading(false);
 
                   // Extract search results if format is 'search-results' or 'search-card'
                   if (builderResponse.format === 'search-results' || builderResponse.format === 'search-card') {
-                    // First check if searchResults is directly in the response data (from ai-search-utils)
                     if (builderResponse.searchResults && Array.isArray(builderResponse.searchResults)) {
                       setSearchResults(builderResponse.searchResults);
                     } else {
-                      // Try to parse search results from the response string
                       try {
                         const parsedResponse = JSON.parse(builderResponse.response);
-                        // Check for different possible structures
                         if (parsedResponse.results && Array.isArray(parsedResponse.results)) {
                           setSearchResults(parsedResponse.results);
                         } else if (parsedResponse.search?.results && Array.isArray(parsedResponse.search.results)) {
@@ -722,21 +907,16 @@ export function useAiBuilder(): UseAiBuilderReturn {
                           setSearchResults(parsedResponse);
                         }
                       } catch (parseError) {
-                        // If parsing fails, search results might be in a different format
-                        // Leave searchResults as null, will be handled by response component
+                          // Leave searchResults as null
                       }
                     }
                   }
 
-                  // Set loading to false immediately after setting response
-                  setIsMainLoading(false);
-                  
-                  // Save prompt to history (non-blocking - don't wait for it)
+                    // Save prompt to history (non-blocking)
                   if (builderResponse.response && builderResponse.tokenUsage) {
                     const username = user?.name || user?.email || 'anonymous';
                     const pricing = builderResponse.tokenUsage.pricing;
                     
-                    // Don't await - let it run in background
                     createPrompt({
                       username: user?.username || '',
                       aiAgent: request.agentId,
@@ -759,7 +939,6 @@ export function useAiBuilder(): UseAiBuilderReturn {
                         setLastPromptId(savedPrompt.id);
                       }
                     }).catch((error) => {
-                      // Silently handle errors - prompt saving shouldn't block UI
                       if (isDevelopment) {
                         loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to save prompt to history: ${error instanceof Error ? error.message : 'Unknown error'}`);
                       }
@@ -768,16 +947,14 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 }
               }
             } catch (err) {
-              // Immediately set loading to false when error occurs
               setIsMainLoading(false);
               
               if (!(err instanceof Error && err.name === 'AbortError')) {
                 const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
-                // Only set error if image generation also failed
-                if (!checkImageSucceeded()) {
+                  if (!imageSucceeded) {
                   setError(`Main Agent Error: ${errorMessage}`);
                 } else {
-                  setError(null); // Image succeeded, don't show error
+                    setError(null);
                 }
                 setAiResponse('');
                 setTokenUsage(null);
@@ -786,16 +963,16 @@ export function useAiBuilder(): UseAiBuilderReturn {
                 abortControllerRef.current = null;
               }
             }
-          } else {
-            // Main request rejected - immediately set loading to false
+            })
+            .catch((err) => {
             setIsMainLoading(false);
             
-            const errorMessage = mainResult.reason instanceof Error ? mainResult.reason.message : 'Unknown error';
-            // Only set error if image generation also failed
-            if (!checkImageSucceeded()) {
+              if (!(err instanceof Error && err.name === 'AbortError')) {
+                const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+                if (!imageSucceeded) {
               setError(`Main Agent Error: ${errorMessage}`);
             } else {
-              setError(null); // Image succeeded, don't show error
+                  setError(null);
             }
             setAiResponse('');
             setTokenUsage(null);
@@ -803,75 +980,10 @@ export function useAiBuilder(): UseAiBuilderReturn {
             setDuration(null);
             abortControllerRef.current = null;
           }
+            });
 
-        // Handle image generation response independently
-        if (imageResult.status === 'fulfilled') {
-          const response = imageResult.value;
-          try {
-            if (!response.ok) {
-              let errorText = '';
-              let errorData: any = null;
-              try {
-                errorText = await response.text();
-                try {
-                  errorData = JSON.parse(errorText);
-                } catch {}
-              } catch {}
-              const errorMessage = errorData?.error || errorText || `HTTP ${response.status}: ${response.statusText}`;
-              setImageError(`Image Generation Error (${response.status}): ${errorMessage}`);
-              setImageResponse(null);
-              setIsImageLoading(false);
-            } else {
-              // Try to parse as JSON, but handle non-JSON responses gracefully
-              let data: any;
-              try {
-                const responseText = await response.text();
-                try {
-                  data = JSON.parse(responseText);
-                } catch (parseError) {
-                  // If response is not JSON, it might be a direct error response
-                  const errorMatch = responseText.match(/error["\s:]+([^"}\n]+)/i);
-                  const errorMessage = errorMatch ? errorMatch[1] : 'Invalid response format (not JSON)';
-                  setImageError(`Image Response Parse Error: ${errorMessage}`);
-                  setImageResponse(null);
-                  setIsImageLoading(false);
-                  return; // Exit early
-                }
-              } catch (readError) {
-                const errorMessage = readError instanceof Error ? readError.message : 'Failed to read response';
-                setImageError(`Image Response Read Error: ${errorMessage}`);
-                setImageResponse(null);
-                setIsImageLoading(false);
-                return;
-              }
-              
-              if (!data.success) {
-                const errorMessage = data.error || 'Failed to generate image';
-                setImageError(`Image Generation Error: ${errorMessage}`);
-                setImageResponse(null);
-                setIsImageLoading(false);
-              } else {
-                const builderResponse: AiBuilderResponseData = data.data;
-                setImageResponse(builderResponse.response);
-                setImageError(null);
-                setIsImageLoading(false);
-              }
-            }
-          } catch (err) {
-            setIsImageLoading(false);
-            if (!(err instanceof Error && err.name === 'AbortError')) {
-              const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-              setImageError(`Image Generation Error: ${errorMessage}`);
-              setImageResponse(null);
-            }
-          }
-        } else {
-          // Image request rejected
-          setIsImageLoading(false);
-          const errorMessage = imageResult.reason instanceof Error ? imageResult.reason.message : 'Unknown error';
-          setImageError(`Image Generation Error: ${errorMessage}`);
-          setImageResponse(null);
-        }
+          // Wait for both to complete (but results are already displayed as they arrive)
+          await Promise.allSettled([mainRequest, imageRequest]);
         } catch (parallelError) {
           // Handle any errors in the parallel request setup
           setIsMainLoading(false);
@@ -1077,6 +1189,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
     } catch (err) {
       // Immediately set loading to false so error is visible right away
       setIsMainLoading(false);
+      setIsSummarizing(false);
       
       // Don't show error if request was aborted
       if (err instanceof Error && err.name === 'AbortError') {
@@ -1128,6 +1241,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
       setIsMainLoading(false);
       setIsImageLoading(false);
       setIsSearchLoading(false);
+      setIsSummarizing(false);
       setError(null);
       setAiResponse('');
       setTokenUsage(null);
@@ -1449,6 +1563,7 @@ export function useAiBuilder(): UseAiBuilderReturn {
     searchDuration,
     searchUsage,
     summarizedPrompt,
+    isSummarizing,
     generateResponse,
     stopGeneration,
     approveResponse,

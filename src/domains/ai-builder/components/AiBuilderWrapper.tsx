@@ -89,7 +89,7 @@ export function AiBuilderWrapper({
   const [selectedAgentId, setSelectedAgentId] = useState<string>(initialAgentId);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [previewSchema, setPreviewSchema] = useState<{ schema: FormSchema; schemaId: string } | null>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>(initialSelectedLanguage || 'en'); // Default language for string output agents
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(initialSelectedLanguage || 'fa'); // Default language for string output agents
   
   // Sync language with external changes
   useEffect(() => {
@@ -121,9 +121,39 @@ export function AiBuilderWrapper({
     if (initialExtraBody) {
       Object.assign(initial, initialExtraBody);
     }
+    // Include language in formValues if selectedLanguage is set (for unified prompt building)
+    if (initialSelectedLanguage && initialSelectedLanguage !== 'text') {
+      initial['output-language'] = initialSelectedLanguage;
+    }
     return initial;
   });
   const [currentImageType, setCurrentImageType] = useState<string | undefined>(undefined);
+  
+  // Ensure formValues includes output-language when selectedLanguage changes
+  // This is critical for unified prompt building to append language instructions
+  useEffect(() => {
+    if (selectedLanguage && selectedLanguage !== 'text') {
+      setFormValues((prev) => {
+        // Only update if language actually changed
+        if (prev['output-language'] === selectedLanguage) {
+          return prev; // No change needed
+        }
+        return {
+          ...prev,
+          'output-language': selectedLanguage,
+        };
+      });
+    } else {
+      // Remove language if set to 'text' or empty
+      setFormValues((prev) => {
+        if (prev['output-language']) {
+          const { 'output-language': _, ...rest } = prev;
+          return rest;
+        }
+        return prev;
+      });
+    }
+  }, [selectedLanguage]);
 
   // If agent is provided, use it directly without fetching. Otherwise, fetch agents
   // For dialog mode with initialAgentId, fetch only that specific agent
@@ -164,13 +194,14 @@ export function AiBuilderWrapper({
     searchDuration,
     searchUsage,
     summarizedPrompt,
+    isSummarizing,
     lastPromptId: hookLastPromptId,
     generateResponse,
     stopGeneration,
     approveResponse,
     loadPreloadRoutes,
     clearResponse,
-  } = useAiBuilder();
+  } = useAiBuilder(agents);
 
   // Initialize user prompt if provided (only on mount or when initialUserPrompt changes)
   const [hasInitializedPrompt, setHasInitializedPrompt] = useState(false);
@@ -365,6 +396,12 @@ export function AiBuilderWrapper({
       }
     }
     
+    // Ensure language from footer selector is included in body for professional-writing agent
+    // The footer uses 'output-language' but the agent expects 'language' in body
+    if (selectedAgentId === 'professional-writing' && selectedLanguage && selectedLanguage !== 'text') {
+      body.language = selectedLanguage;
+    }
+    
     // Extract summarization flag from formValues (default: true)
     const summarizeBeforeSearchImage = formValues.summarizeBeforeSearchImage !== undefined 
       ? formValues.summarizeBeforeSearchImage 
@@ -375,6 +412,7 @@ export function AiBuilderWrapper({
       agentId: selectedAgentId,
       body,
       extra_body,
+      formValues, // Pass formValues so the API can build the full prompt with metadata
       imageType: imageType && imageType !== 'none' ? imageType : undefined,
       summarizeBeforeSearchImage,
     });
@@ -383,7 +421,7 @@ export function AiBuilderWrapper({
     setTimeout(() => {
       scrollToLoadingIndicator();
     }, 100);
-  }, [selectedAgentId, userPrompt, generateResponse, selectedAgent, formValues, initialBody, initialExtraBody, scrollToLoadingIndicator]);
+  }, [selectedAgentId, userPrompt, generateResponse, selectedAgent, formValues, initialBody, initialExtraBody, scrollToLoadingIndicator, selectedLanguage]);
 
   // Reset auto-generated flag when agent or prompt changes
   useEffect(() => {
@@ -610,14 +648,14 @@ export function AiBuilderWrapper({
 
   return (
     <div className={`space-y-6 ${className}`}>
-      {displayType !== 'hideForm' && (
+      {(displayType !== 'hideForm' || (displayType === 'hideForm' && runType === 'manual')) && (
         <AiBuilderForm
           userPrompt={userPrompt}
           onPromptChange={setUserPrompt}
           agents={agents}
           selectedAgentId={selectedAgentId}
           onAgentChange={setSelectedAgentId}
-          isLoading={isLoading}
+          isLoading={isLoading || isSummarizing}
           onGenerate={handleGenerate}
           onStop={stopGeneration}
           systemPrompt={promptForLLM?.systemPrompt || ''}
@@ -637,6 +675,8 @@ export function AiBuilderWrapper({
           hideEditAgent={hideEditAgent}
           hidePromptHistory={hidePromptHistory}
           hideLanguageSelector={hideLanguageSelector}
+          summarizedPrompt={summarizedPrompt || undefined}
+          isSummarizing={isSummarizing}
         />
       )}
 
@@ -759,7 +799,7 @@ export function AiBuilderWrapper({
       {/* Loading Indicator - Voice Powered Orb */}
       <div ref={loadingIndicatorRef}>
       <AiBuilderLoadingIndicator
-        isLoading={isLoading && !aiResponse}
+        isLoading={(isLoading || isSummarizing) && !aiResponse}
         agent={selectedAgent}
         className={mode === 'page' ? 'mt-6' : ''}
       />

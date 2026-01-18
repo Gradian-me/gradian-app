@@ -60,26 +60,6 @@
     "updatedAt": "2025-11-30T10:06:09.560Z"
   },
   {
-    "sourceSchema": "user-roles",
-    "sourceId": "01KB9Y5NKY5ZZS6BFYPC8684E9",
-    "targetSchema": "app-access-policies",
-    "targetId": "01KBA5MV6M0A74BHVCJFQMHK6S",
-    "relationTypeId": "HAS_ACCESS_POLICY",
-    "id": "01KBA5Z9GHFGYQNWNWXKN3YWKB",
-    "createdAt": "2025-11-30T10:47:09.584Z",
-    "updatedAt": "2025-11-30T10:47:09.584Z"
-  },
-  {
-    "sourceSchema": "user-roles",
-    "sourceId": "01KB9Y5NKY5ZZS6BFYPC8684E9",
-    "targetSchema": "users",
-    "targetId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-    "relationTypeId": "HAS_MEMBER",
-    "id": "01KBA5ZXW0Z1XSXGQHQSP7Q7B5",
-    "createdAt": "2025-11-30T10:47:30.432Z",
-    "updatedAt": "2025-11-30T10:47:30.432Z"
-  },
-  {
     "sourceSchema": "servers",
     "sourceId": "01KBAT7P2B5NZYX26HVWYV28N1",
     "targetSchema": "url-repositories",
@@ -1485,17 +1465,6 @@
     "updatedAt": "2025-12-22T12:00:00.000Z"
   },
   {
-    "id": "01KDHY0X83CCZZN7ZSZ2JRFKR6",
-    "sourceSchema": "tender-invitations",
-    "sourceId": "01KDHY0X5A0M2A91XPFCCV7M7R",
-    "targetSchema": "vendors",
-    "targetId": "01KCX516BRTDCD254DYWXM5F6B",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "tender-invitation-vendor",
-    "createdAt": "2025-12-28T07:33:33.059Z",
-    "updatedAt": "2025-12-28T07:33:33.059Z"
-  },
-  {
     "id": "01KE08DX43WTRAN01JANWFTGJC",
     "sourceSchema": "deviation-management",
     "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
@@ -1737,7 +1706,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "user-role-type",
     "createdAt": "2026-01-04T11:27:58.544Z",
-    "updatedAt": "2026-01-04T11:32:04.416Z"
+    "updatedAt": "2026-01-06T11:25:03.256Z"
   },
   {
     "id": "01KE4C8G2V54GDX4HM25V9GH7E",
@@ -1759,7 +1728,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "user-role-type",
     "createdAt": "2026-01-04T11:28:59.992Z",
-    "updatedAt": "2026-01-04T11:32:24.340Z"
+    "updatedAt": "2026-01-06T11:25:24.312Z"
   },
   {
     "id": "01KE4C9GBZN67ANN54XVG37QH4",
@@ -2034,7 +2003,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "user-role-type",
     "createdAt": "2026-01-04T11:34:58.549Z",
-    "updatedAt": "2026-01-04T11:34:58.549Z"
+    "updatedAt": "2026-01-06T11:24:54.076Z"
   },
   {
     "id": "01KE4G1Z0E9932QRRJ2CMJPA41",
@@ -2428,5 +2397,278 @@
     "id": "01KE6Q5VZA5R9F8YB2Z22VYVXA",
     "createdAt": "2026-01-05T09:17:58.634Z",
     "updatedAt": "2026-01-05T09:17:58.634Z"
+  },
+  {
+    "sourceSchema": "user-roles",
+    "sourceId": "01KBSTFQSKSN3W9CGK59VZ1FRX",
+    "targetSchema": "users",
+    "targetId": "01KE4CJ37WKF60JWQGQ0BD0WF4",
+    "relationTypeId": "HAS_MEMBER",
+    "id": "01KE9GTXPACR5PDF4XRQFSDMJX",
+    "createdAt": "2026-01-06T11:24:51.786Z",
+    "updatedAt": "2026-01-06T11:24:54.122Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "user-roles",
+    "sourceId": "01KE4C760Y3VY0YJBT0Q0D3C4J",
+    "targetSchema": "users",
+    "targetId": "01KDFEH9R5NH6C1QXN7PE3HK43",
+    "relationTypeId": "HAS_MEMBER",
+    "id": "01KE9GV75BWHX97PGXD66HG7YH",
+    "createdAt": "2026-01-06T11:25:01.483Z",
+    "updatedAt": "2026-01-06T11:25:03.307Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "user-roles",
+    "sourceId": "01KE4C9215DWPER7K2KG57GK74",
+    "targetSchema": "users",
+    "targetId": "01KDFEG5Z10VPAMAG3E76KJMCG",
+    "relationTypeId": "HAS_MEMBER",
+    "id": "01KE9GVVXSMCBQQ1QG0T4GC5SA",
+    "createdAt": "2026-01-06T11:25:22.745Z",
+    "updatedAt": "2026-01-06T11:25:24.359Z",
+    "inactive": true
+  },
+  {
+    "id": "01KE9GW7NC7G09Y1WERGH0E8YE",
+    "sourceSchema": "user-roles",
+    "sourceId": "01KB9Y0NBAS53JY4VRB9H1FN33",
+    "targetSchema": "external_nodes",
+    "targetId": "SYSTEM_ADMINISTRATOR",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "user-role-type",
+    "createdAt": "2026-01-06T11:25:34.764Z",
+    "updatedAt": "2026-01-06T11:25:34.764Z"
+  },
+  {
+    "id": "01KE9GWGCJKKR2ZQZV6F7A68KS",
+    "sourceSchema": "user-roles",
+    "sourceId": "01KB9YDFQ30N3GMGZZTEDX2XN2",
+    "targetSchema": "external_nodes",
+    "targetId": "CUSTOMER",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "user-role-type",
+    "createdAt": "2026-01-06T11:25:43.698Z",
+    "updatedAt": "2026-01-06T11:25:43.698Z"
+  },
+  {
+    "id": "01KE9M6RV3QBPZJ6PT7CG9D365",
+    "sourceSchema": "users",
+    "sourceId": "01KE9M6RS2HZPTC88WMG7XZVAX",
+    "targetSchema": "external_nodes",
+    "targetId": "active-directory",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-01-06T12:23:45.763Z",
+    "updatedAt": "2026-01-06T12:23:45.763Z"
+  },
+  {
+    "id": "01KE9M8PBQNXHYK9G3B3VG1JB3",
+    "sourceSchema": "servers",
+    "sourceId": "01KE9M8PA85J81ZAT786GAKPFE",
+    "targetSchema": "external_nodes",
+    "targetId": "production",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-environment",
+    "createdAt": "2026-01-06T12:24:48.758Z",
+    "updatedAt": "2026-01-06T12:36:26.045Z"
+  },
+  {
+    "id": "01KE9M8PBXVE9VE7VYS8TVH7VX",
+    "sourceSchema": "servers",
+    "sourceId": "01KE9M8PA85J81ZAT786GAKPFE",
+    "targetSchema": "users",
+    "targetId": "01KE9M6RS2HZPTC88WMG7XZVAX",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "server-owners",
+    "createdAt": "2026-01-06T12:24:48.765Z",
+    "updatedAt": "2026-01-06T12:36:26.050Z"
+  },
+  {
+    "id": "01KE9MXVPPXF7KDM0THDGJMG5Z",
+    "sourceSchema": "databases",
+    "sourceId": "01KE9MXVNGYMQ45DDP7A2613KM",
+    "targetSchema": "external_nodes",
+    "targetId": "SQL_SERVER",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "database-type",
+    "createdAt": "2026-01-06T12:36:22.358Z",
+    "updatedAt": "2026-01-06T12:38:59.937Z"
+  },
+  {
+    "id": "01KE9MXVQ78T0589MAPP8460EE",
+    "sourceSchema": "databases",
+    "sourceId": "01KE9MXVNGYMQ45DDP7A2613KM",
+    "targetSchema": "external_nodes",
+    "targetId": "Asia/Tehran",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "timezone",
+    "createdAt": "2026-01-06T12:36:22.375Z",
+    "updatedAt": "2026-01-06T12:38:59.961Z"
+  },
+  {
+    "id": "01KE9MXVR0WVVJP70FZ5JFN3F6",
+    "sourceSchema": "databases",
+    "sourceId": "01KE9MXVNGYMQ45DDP7A2613KM",
+    "targetSchema": "external_nodes",
+    "targetId": "MANUAL",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-01-06T12:36:22.400Z",
+    "updatedAt": "2026-01-06T12:38:59.977Z"
+  },
+  {
+    "sourceSchema": "servers",
+    "sourceId": "01KE9M8PA85J81ZAT786GAKPFE",
+    "targetSchema": "databases",
+    "targetId": "01KE9MXVNGYMQ45DDP7A2613KM",
+    "relationTypeId": "HAS_DATABASE",
+    "id": "01KE9MXVVMA3GR3T14DQBZ7HHW",
+    "createdAt": "2026-01-06T12:36:22.516Z",
+    "updatedAt": "2026-01-06T12:36:26.092Z",
+    "inactive": true
+  },
+  {
+    "id": "01KEBGGFREQ9EFQ4MPG40VKBH8",
+    "sourceSchema": "tasks",
+    "sourceId": "01KEBGGFMFEYNAA45J8T928GAG",
+    "targetSchema": "users",
+    "targetId": "01KCPC8YBMRYB3X846103R11MH",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "virtual-assignedTo-tasks",
+    "createdAt": "2026-01-07T05:57:38.701Z",
+    "updatedAt": "2026-01-07T05:57:38.701Z"
+  },
+  {
+    "sourceSchema": "change-management",
+    "sourceId": "01KCDG346XD1GBAKQEADRABBHB",
+    "targetSchema": "tasks",
+    "targetId": "01KEBGGFMFEYNAA45J8T928GAG",
+    "relationTypeId": "HAS_TASK",
+    "id": "01KEBGGG0970RJ70J90Q8RF2MM",
+    "createdAt": "2026-01-07T05:57:38.953Z",
+    "updatedAt": "2026-01-07T05:57:56.930Z",
+    "inactive": true
+  },
+  {
+    "id": "01KEBGH1996MB2HK5781Q65CFB",
+    "sourceSchema": "change-management",
+    "sourceId": "01KCDG346XD1GBAKQEADRABBHB",
+    "targetSchema": "process-mappings",
+    "targetId": "01JGFJJZ006QQWDQPMW4ZJKA6R",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "affected-processes",
+    "createdAt": "2026-01-07T05:57:56.649Z",
+    "updatedAt": "2026-01-07T05:57:56.649Z"
+  },
+  {
+    "id": "01KEBGH19AQFMAHEAWQVX4KAJE",
+    "sourceSchema": "change-management",
+    "sourceId": "01KCDG346XD1GBAKQEADRABBHB",
+    "targetSchema": "process-mappings",
+    "targetId": "01JGFJJZ00HJ9BXFBM0GRAY6WN",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "affected-processes",
+    "createdAt": "2026-01-07T05:57:56.649Z",
+    "updatedAt": "2026-01-07T05:57:56.649Z"
+  },
+  {
+    "id": "01KEBGH19BG7JQPCXJFT5SDG3F",
+    "sourceSchema": "change-management",
+    "sourceId": "01KCDG346XD1GBAKQEADRABBHB",
+    "targetSchema": "process-mappings",
+    "targetId": "01JGFJJZ00EBBKVEA4SXPSMQRH",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "affected-processes",
+    "createdAt": "2026-01-07T05:57:56.649Z",
+    "updatedAt": "2026-01-07T05:57:56.649Z"
+  },
+  {
+    "id": "01KEBGH19TPSFDS6YXFK5NN9YJ",
+    "sourceSchema": "change-management",
+    "sourceId": "01KCDG346XD1GBAKQEADRABBHB",
+    "targetSchema": "change-categories",
+    "targetId": "01KD0683FRMXZKW61FKBM0RY9Q",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-categories",
+    "createdAt": "2026-01-07T05:57:56.666Z",
+    "updatedAt": "2026-01-07T05:57:56.666Z"
+  },
+  {
+    "id": "01KEBGH1AJB1GK7VPF4HN3QQ15",
+    "sourceSchema": "change-management",
+    "sourceId": "01KCDG346XD1GBAKQEADRABBHB",
+    "targetSchema": "change-classifications",
+    "targetId": "01KBSR7B9B3S0A9JMAWHWNJ8S3",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-classification",
+    "createdAt": "2026-01-07T05:57:56.690Z",
+    "updatedAt": "2026-01-07T05:57:56.690Z"
+  },
+  {
+    "id": "01KEBGH1BJPPEFJ4RKDC8Q09WP",
+    "sourceSchema": "change-management",
+    "sourceId": "01KCDG346XD1GBAKQEADRABBHB",
+    "targetSchema": "change-procedure",
+    "targetId": "01KD079DB9ZJG64D3RW22QTD0J",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-procedure",
+    "createdAt": "2026-01-07T05:57:56.722Z",
+    "updatedAt": "2026-01-07T05:57:56.722Z"
+  },
+  {
+    "id": "01KEBX075E4MSJRN5SN7GXS7XN",
+    "sourceSchema": "tasks",
+    "sourceId": "01KEBX0709K2G44QVF3DKE7CC3",
+    "targetSchema": "users",
+    "targetId": "01KDG66XCHTD0GGQX3A2E69T85",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "virtual-assignedTo-tasks",
+    "createdAt": "2026-01-07T09:35:57.101Z",
+    "updatedAt": "2026-01-07T09:35:57.101Z"
+  },
+  {
+    "id": "01KECBRJR0530BS6JKSWWQRYJP",
+    "sourceSchema": "tasks",
+    "sourceId": "01KECBRJJ18CMXVYHACBYWVM86",
+    "targetSchema": "users",
+    "targetId": "01KE4CJ37WKF60JWQGQ0BD0WF4",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "virtual-assignedTo-tasks",
+    "createdAt": "2026-01-07T13:53:55.455Z",
+    "updatedAt": "2026-01-07T13:53:55.455Z"
+  },
+  {
+    "sourceSchema": "change-management",
+    "sourceId": "01KCDG346XD1GBAKQEADRABBHB",
+    "targetSchema": "tasks",
+    "targetId": "01KECBRJJ18CMXVYHACBYWVM86",
+    "relationTypeId": "HAS_TASK",
+    "id": "01KECBRKXYKT9FGFA4TPJFQJ16",
+    "createdAt": "2026-01-07T13:53:56.670Z",
+    "updatedAt": "2026-01-07T13:53:56.670Z"
+  },
+  {
+    "id": "01KECDEA84FYSACK6W4SGQ9ESE",
+    "sourceSchema": "quality-assurance-analysis",
+    "sourceId": "01KECDEA21BBHYZH6M2363BFNT",
+    "targetSchema": "users",
+    "targetId": "01KCPC8YBMRYB3X846103R11MH",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "analyst",
+    "createdAt": "2026-01-07T14:23:16.227Z",
+    "updatedAt": "2026-01-07T14:23:16.227Z"
+  },
+  {
+    "sourceSchema": "change-management",
+    "sourceId": "01KCDG346XD1GBAKQEADRABBHB",
+    "targetSchema": "quality-assurance-analysis",
+    "targetId": "01KECDEA21BBHYZH6M2363BFNT",
+    "relationTypeId": "HAS_QUALITY_ASSURANCE_ANALYSIS",
+    "id": "01KECDEAMB4NXZ256C34FX4M6S",
+    "createdAt": "2026-01-07T14:23:16.619Z",
+    "updatedAt": "2026-01-07T14:23:16.619Z"
   }
 ]

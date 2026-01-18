@@ -29,6 +29,13 @@ function stringToRegExp(pattern: string | undefined): RegExp | undefined {
 function processField(field: any): FormField {
   const processedField = { ...field };
   
+  // SECURITY: Automatically mark password fields as sensitive
+  // Password fields (component="password" or role="password") should always be treated as sensitive
+  // This ensures they are encrypted and never returned to the client
+  if (processedField.component === 'password' || processedField.role === 'password') {
+    processedField.isSensitive = true;
+  }
+  
   // Convert pattern string to RegExp
   if (processedField.validation?.pattern && typeof processedField.validation.pattern === 'string') {
     processedField.validation.pattern = stringToRegExp(processedField.validation.pattern);

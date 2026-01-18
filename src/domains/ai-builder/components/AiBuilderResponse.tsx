@@ -28,7 +28,7 @@ import type { AiAgent, TokenUsage, VideoUsage, SchemaAnnotation, AnnotationItem 
 import { cleanMarkdownResponse } from '../utils/ai-security-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
-import { truncateText } from '@/domains/chat/utils/text-utils';
+import { truncateText } from '@/gradian-ui/shared/utils/text-utils';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 import { detectMessageRenderType } from '@/domains/chat/utils/message-render-utils';
 import type { ChatMessage } from '@/domains/chat/types';
@@ -1063,7 +1063,7 @@ export function AiBuilderResponse({
             </div>
             <div className="mt-4 pl-11">
               <div className="prose prose-sm dark:prose-invert max-w-none">
-                <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words">
+                <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words" dir="auto">
                   {summarizedPrompt.trim()}
                 </p>
               </div>

@@ -15,6 +15,7 @@ import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { useAiAgents } from '@/domains/ai-builder';
+import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
 
 interface DetailPageMetadataTabProps {
   schema: FormSchema;
@@ -941,6 +942,22 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                 </SelectContent>
                               </UiSelect>
                             </div>
+                          </div>
+                          <div>
+                            <Label className="text-sm font-medium text-gray-700 mb-2 block">Default Language</Label>
+                            <LanguageSelector
+                              config={{
+                                name: 'language',
+                                label: '',
+                                placeholder: 'Select default language...',
+                              }}
+                              value={action.language || ''}
+                              onChange={(value) => updateQuickAction(action.id, { language: value || undefined })}
+                              defaultLanguage="fa"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                              Default language for AI agent output. If not set, uses 'fa' for most agents or 'en' for image-generation agents.
+                            </p>
                           </div>
                         </>
                       )}

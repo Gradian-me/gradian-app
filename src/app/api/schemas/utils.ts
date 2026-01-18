@@ -343,6 +343,40 @@ const tryParseJsonString = (str: string): { isJson: boolean; parsed?: any } => {
 };
 
 /**
+ * Ensures password fields are marked as sensitive
+ * Password fields (component="password" or role="password") should always have isSensitive=true
+ */
+export const ensurePasswordFieldsAreSensitive = (schema: any): any => {
+  if (!schema || typeof schema !== 'object') {
+    return schema;
+  }
+
+  const normalized = { ...schema };
+
+  // Process fields array if it exists
+  if (Array.isArray(normalized.fields)) {
+    normalized.fields = normalized.fields.map((field: any) => {
+      if (!field || typeof field !== 'object') {
+        return field;
+      }
+
+      // SECURITY: Automatically mark password fields as sensitive
+      // Password fields should always be treated as sensitive for encryption and filtering
+      if (field.component === 'password' || field.role === 'password') {
+        return {
+          ...field,
+          isSensitive: true,
+        };
+      }
+
+      return field;
+    });
+  }
+
+  return normalized;
+};
+
+/**
  * Normalizes schema data by parsing JSON strings in nested fields to objects/arrays
  * Specifically handles repeatingConfig fields that may be sent as JSON strings
  */

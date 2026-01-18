@@ -7,7 +7,7 @@ import { AgentRequestData, AgentResponse } from './ai-agent-utils';
 import { extractParametersBySectionId, parseUserPromptToFormValues } from './ai-shared-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType, LOG_CONFIG } from '@/gradian-ui/shared/configs/log-config';
-import { truncateText } from '@/domains/chat/utils/text-utils';
+import { truncateText } from '@/gradian-ui/shared/utils/text-utils';
 import {
   sanitizePrompt,
   sanitizeErrorMessage,

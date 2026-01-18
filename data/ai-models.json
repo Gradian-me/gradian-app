@@ -60,6 +60,18 @@
     }
   },
   {
+    "id": "gemini-3-flash-preview",
+    "label": "Gemini 3 Flash Preview",
+    "provider": "google",
+    "category": "chat",
+    "description": "Google's latest Gemini 3 Flash Preview model with improved performance",
+    "pricing": {
+      "input": 0.5,
+      "cached_input": 0.25,
+      "output": 3
+    }
+  },
+  {
     "id": "gemini-2.0-flash-exp",
     "label": "Gemini 2.0 Flash",
     "provider": "google",
@@ -122,11 +134,39 @@
     }
   },
   {
+    "id": "gpt-image-1.5",
+    "label": "GPT Image 1.5",
+    "provider": "openai",
+    "category": "image_generation",
+    "description": "OpenAI's cost-effective GPT Image 1.5 model for image generation",
+    "pricing": {
+      "input": 2.0,
+      "image_input": 2.5,
+      "cached_input": 0.25,
+      "output": 8.0,
+      "image_output": 8.0
+    }
+  },
+  {
     "id": "gpt-image-1-mini",
     "label": "GPT Image 1 Mini",
     "provider": "openai",
     "category": "image_generation",
     "description": "OpenAI's cost-effective GPT Image 1 Mini for image generation",
+    "pricing": {
+      "input": 2.0,
+      "image_input": 2.5,
+      "cached_input": 0.25,
+      "output": 8.0,
+      "image_output": 8.0
+    }
+  },
+  {
+    "id": "dall-e-3",
+    "label": "Dall-E 3",
+    "provider": "openai",
+    "category": "image_generation",
+    "description": "OpenAI's Dall-E 3 model for image generation",
     "pricing": {
       "input": 2.0,
       "image_input": 2.5,
