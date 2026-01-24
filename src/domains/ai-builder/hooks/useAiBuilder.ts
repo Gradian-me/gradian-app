@@ -344,9 +344,20 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
       // Load agent config to build prompt
       const agent = effectiveAgents.find(a => a.id === agentId);
       
+      // Always try to build prompt from formValues first if they exist
       if (agent && request.formValues && Object.keys(request.formValues).length > 0) {
         // Build prompt from formValues using buildStandardizedPrompt
-        finalPrompt = buildStandardizedPrompt(agent, request.formValues);
+        const builtPrompt = buildStandardizedPrompt(agent, request.formValues);
+        
+        // Only use built prompt if it's not empty (or if it only contains language instruction, we'll handle that below)
+        if (builtPrompt && builtPrompt.trim()) {
+          finalPrompt = builtPrompt;
+        }
+        
+        // Debug: Log if buildStandardizedPrompt returned empty (shouldn't happen if formValues have data)
+        if (isDevelopment && (!builtPrompt || !builtPrompt.trim())) {
+          loggingCustom(LogType.AI_BODY_LOG, 'warn', `buildStandardizedPrompt returned empty prompt for agent ${agentId} with formValues keys: ${Object.keys(request.formValues).join(', ')}`);
+        }
       }
       
       // If building from formValues didn't produce a prompt (or only produced language instruction),
@@ -398,9 +409,41 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
 
       // If still empty but formValues exist, build a simple key/value fallback prompt
       if ((!finalPrompt || !finalPrompt.trim()) && request.formValues && Object.keys(request.formValues).length > 0) {
+        // Helper to serialize value for prompt string
+        const serializeValue = (v: any): string => {
+          if (v === null || v === undefined) return '';
+          
+          // Handle arrays
+          if (Array.isArray(v)) {
+            if (v.length === 0) return '';
+            // If array contains objects, extract labels or IDs
+            if (typeof v[0] === 'object' && v[0] !== null) {
+              return v.map((item: any) => {
+                if (typeof item === 'object' && item !== null) {
+                  return item.label || item.id || item.value || String(item);
+                }
+                return String(item);
+              }).join(', ');
+            }
+            // Plain array
+            return v.join(', ');
+          }
+          
+          // Handle single object
+          if (typeof v === 'object') {
+            return (v as any).label || (v as any).id || (v as any).value || String(v);
+          }
+          
+          // Primitive value
+          return String(v);
+        };
+        
         const fallbackParts = Object.entries(request.formValues)
-          .filter(([, v]) => v !== undefined && v !== null && String(v).trim() !== '')
-          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : String(v)}`);
+          .filter(([, v]) => {
+            const serialized = serializeValue(v);
+            return serialized !== undefined && serialized !== null && serialized.trim() !== '';
+          })
+          .map(([k, v]) => `${k}: ${serializeValue(v)}`);
         finalPrompt = fallbackParts.join('\n').trim();
       }
       
@@ -450,11 +493,11 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
         ? originalPrompt.replace(languageInstructionPattern, '').trim()
         : originalPrompt;
       
-      // STEP 2: Summarization: If enabled, summarize the unified prompt (even without search/image) so the summarized version is visible/usable
+      // STEP 2: Summarization: Only summarize if enabled AND search/image is actually configured
       // Skip summarization for non-text output agents (image-generator, graph-generator, video-generator)
       // as these agents don't produce text and summarizing their prompts can distort the image generation instructions
       const isNonTextOutputAgent = agentId === 'image-generator' || agentId === 'graph-generator' || agentId === 'video-generator';
-      const shouldSummarize = request.summarizeBeforeSearchImage !== false && !isNonTextOutputAgent;
+      const shouldSummarize = request.summarizeBeforeSearchImage !== false && !isNonTextOutputAgent && (isSearchEnabled || isImageEnabled);
       let summarizedPromptValue: string | null = null;
       
       if (shouldSummarize) {

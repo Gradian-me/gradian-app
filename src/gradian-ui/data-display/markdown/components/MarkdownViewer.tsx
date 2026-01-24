@@ -8,6 +8,7 @@ import remarkAutolinkHeadings from 'remark-autolink-headings';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css'; // KaTeX styles for math rendering
+import { rehypeKatexLtr } from '../utils/rehype-katex-ltr';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { EndLine } from '@/gradian-ui/layout/end-line/components/EndLine';
 import { createMarkdownComponents } from './MarkdownComponents';
@@ -403,7 +404,8 @@ export function MarkdownViewer({
               remarkMath // Support for math syntax - parses $...$ and $$...$$
             ]}
             rehypePlugins={[
-              rehypeKatex // Render math with KaTeX - automatically converts math nodes to KaTeX HTML
+              rehypeKatex, // Render math with KaTeX - automatically converts math nodes to KaTeX HTML
+              rehypeKatexLtr // Wrap KaTeX output with dir="ltr" to ensure LTR rendering in RTL text
             ]}
             components={secureMarkdownComponents}
             // SECURITY: Do not render raw HTML from markdown to prevent XSS

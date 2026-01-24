@@ -270,7 +270,21 @@ export function AiBuilderResponse({
     return state.responses[storageKey] || null;
   });
   
-  // Use stored content if available, otherwise use response
+  // Check if response contains an error
+  const isErrorResponse = useMemo(() => {
+    if (!response || !response.trim()) return false;
+    try {
+      const parsed = JSON.parse(response);
+      return parsed.error || parsed.success === false || parsed._isError === true;
+    } catch {
+      // Not JSON, check for error keywords
+      return response.toLowerCase().includes('"error"') || 
+             response.toLowerCase().includes('error:') ||
+             response.toLowerCase().includes('failed');
+    }
+  }, [response]);
+
+  // Use current response if available, otherwise fall back to stored content
   // For image-generator, graph-generator, and video-generator agents, always use the current response (don't use stored content)
   const displayContent = useMemo(() => {
       // Skip using stored content for image/graph/video generators to avoid showing stale cached responses
@@ -279,11 +293,29 @@ export function AiBuilderResponse({
         return (response && response.trim()) || '';
       }
     
+    // Don't use cached content when loading (new generation in progress)
+    if (isLoading || isMainLoading) {
+      return (response && response.trim()) || '';
+    }
+    
+    // Don't use cached content if there's an error response
+    if (isErrorResponse) {
+      return response;
+    }
+    
+    // Always prioritize current response over cached content to avoid showing stale responses
+    // Only use cached content if there's no current response (e.g., on initial load)
+    if (response && response.trim()) {
+      return response;
+    }
+    
+    // Fallback to cached content only if no current response, not loading, and no error
     if (latestResponse?.content && latestResponse.content.trim()) {
       return latestResponse.content;
     }
-    return (response && response.trim()) || '';
-  }, [latestResponse, response, agent?.id, agentFormat]);
+    
+    return '';
+  }, [latestResponse, response, agent?.id, agentFormat, isLoading, isMainLoading, isErrorResponse]);
 
   // Create a mock ChatMessage-like object for unified detection
   const mockMessage: ChatMessage = useMemo(() => ({

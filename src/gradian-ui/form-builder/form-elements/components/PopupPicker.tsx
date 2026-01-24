@@ -288,6 +288,7 @@ const buildSelectionEntry = (
       };
     }
 
+    // Prioritize label from item if it exists (for staticItems/defaultValue)
     const fallbackLabel = item.label || item.name || item.title || item.singular_name || baseId;
     return {
       id: baseId,
@@ -1356,8 +1357,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       // Use role-based title from schema (concatenates all fields with role "title")
       const displayName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) || 
-          item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
-        : item.name || item.title || item.id || `Item ${index + 1}`;
+          item.label || item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
+        : item.label || item.name || item.title || item.id || `Item ${index + 1}`;
       const iconName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'icon', effectiveSourceColumnRoles) || item.icon
         : item.icon || item.name || item.title;
@@ -1684,7 +1685,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           getValueByRoleFromSourceColumns(data, 'description', effectiveSourceColumnRoles)
         );
       }
-      candidateFields.push(data.name, data.title, data.singular_name, data.email, data.description);
+      candidateFields.push(data.label, data.name, data.title, data.singular_name, data.email, data.description);
 
       if (
         candidateFields.some(
@@ -1745,8 +1746,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       // Use role-based title from schema (concatenates all fields with role "title")
       const displayName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) || 
-          item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
-        : item.name || item.title || item.id || `Item ${index + 1}`;
+          item.label || item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
+        : item.label || item.name || item.title || item.id || `Item ${index + 1}`;
       const iconName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'icon', effectiveSourceColumnRoles) || item.icon
         : item.icon || item.name || item.title;

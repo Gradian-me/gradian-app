@@ -15,8 +15,138 @@ import { cleanMarkdownResponse } from './ai-security-utils';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
+// Rate limiting state - track last request time per API endpoint
+const rateLimitState: Map<string, { lastRequestTime: number; cooldownUntil?: number }> = new Map();
+
+// Rate limiting configuration
+const RATE_LIMIT_CONFIG = {
+  // Minimum delay between requests (ms) - helps prevent hitting rate limits
+  minRequestDelay: 200, // 200ms between requests
+  // Cooldown period after 429 error (ms)
+  cooldownAfter429: 60000, // 60 seconds
+  // Max retries for 429 errors
+  maxRetries429: 3,
+  // Initial retry delay for 429 (ms)
+  initialRetryDelay: 1000, // 1 second
+};
+
 /**
- * Generic API caller with error handling, timeout, and abort signals
+ * Sleep utility
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Get rate limit key for an endpoint
+ */
+function getRateLimitKey(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.origin + urlObj.pathname;
+  } catch {
+    return url;
+  }
+}
+
+/**
+ * Check and enforce rate limiting
+ */
+async function enforceRateLimit(url: string): Promise<void> {
+  const key = getRateLimitKey(url);
+  const now = Date.now();
+  const state = rateLimitState.get(key);
+
+  if (state) {
+    // Check if we're in cooldown period (after 429 error)
+    if (state.cooldownUntil && now < state.cooldownUntil) {
+      const waitTime = state.cooldownUntil - now;
+      if (isDevelopment) {
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'warn',
+          `Rate limit cooldown active for ${key}. Waiting ${Math.ceil(waitTime / 1000)}s before request.`
+        );
+      }
+      await sleep(waitTime);
+    }
+
+    // Enforce minimum delay between requests
+    const timeSinceLastRequest = now - state.lastRequestTime;
+    if (timeSinceLastRequest < RATE_LIMIT_CONFIG.minRequestDelay) {
+      const waitTime = RATE_LIMIT_CONFIG.minRequestDelay - timeSinceLastRequest;
+      await sleep(waitTime);
+    }
+  }
+
+  // Update last request time
+  rateLimitState.set(key, {
+    lastRequestTime: Date.now(),
+    cooldownUntil: state?.cooldownUntil,
+  });
+}
+
+/**
+ * Set cooldown period after 429 error
+ */
+function setCooldown(url: string, retryAfterSeconds?: number): void {
+  const key = getRateLimitKey(url);
+  const cooldownMs = retryAfterSeconds
+    ? retryAfterSeconds * 1000
+    : RATE_LIMIT_CONFIG.cooldownAfter429;
+  
+  rateLimitState.set(key, {
+    lastRequestTime: rateLimitState.get(key)?.lastRequestTime || Date.now(),
+    cooldownUntil: Date.now() + cooldownMs,
+  });
+
+  if (isDevelopment) {
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `Rate limit cooldown set for ${key} until ${new Date(Date.now() + cooldownMs).toISOString()}`
+    );
+  }
+}
+
+/**
+ * Clear cooldown (after successful request)
+ */
+function clearCooldown(url: string): void {
+  const key = getRateLimitKey(url);
+  const state = rateLimitState.get(key);
+  if (state) {
+    rateLimitState.set(key, {
+      lastRequestTime: state.lastRequestTime,
+      cooldownUntil: undefined,
+    });
+  }
+}
+
+/**
+ * Parse Retry-After header (can be seconds or HTTP date)
+ */
+function parseRetryAfter(retryAfter: string | null): number | null {
+  if (!retryAfter) return null;
+  
+  // Try parsing as seconds (number)
+  const seconds = parseInt(retryAfter, 10);
+  if (!isNaN(seconds)) {
+    return seconds;
+  }
+  
+  // Try parsing as HTTP date
+  const date = new Date(retryAfter);
+  if (!isNaN(date.getTime())) {
+    const secondsUntil = Math.ceil((date.getTime() - Date.now()) / 1000);
+    return Math.max(0, secondsUntil);
+  }
+  
+  return null;
+}
+
+/**
+ * Generic API caller with error handling, timeout, abort signals, rate limiting, and retry logic
  */
 async function callGenericApi(params: {
   url: string;
@@ -47,105 +177,210 @@ async function callGenericApi(params: {
 
   const finalSignal = signal || controller.signal;
 
-  try {
-    const response = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
-      body: body ? JSON.stringify(body) : undefined,
-      signal: finalSignal,
-    });
+  // Enforce rate limiting before making request
+  await enforceRateLimit(url);
 
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    if (!response.ok) {
-      const errorMessage = await parseErrorResponse(response);
+  // Retry logic for 429 errors
+  let lastError: { status: number; error: string; retryAfter?: number } | null = null;
+  
+  for (let attempt = 0; attempt <= RATE_LIMIT_CONFIG.maxRetries429; attempt++) {
+    try {
+      // Create new abort controller for each attempt
+      const { controller: attemptController, timeoutId: attemptTimeoutId } = signal
+        ? { controller: { signal }, timeoutId: null }
+        : createAbortController(timeout);
       
-      // Log detailed error information in development
-      if (isDevelopment) {
-        const contentType = response.headers.get('content-type') || '';
-        const isHtmlError = contentType.includes('text/html') || errorMessage.includes('<!DOCTYPE');
+      const attemptSignal = signal || attemptController.signal;
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          ...headers,
+        },
+        body: body ? JSON.stringify(body) : undefined,
+        signal: attemptSignal,
+      });
+
+      if (attemptTimeoutId) {
+        clearTimeout(attemptTimeoutId);
+      }
+
+      if (!response.ok) {
+        const errorMessage = await parseErrorResponse(response);
+        
+        // Handle 429 rate limit errors with retry logic
+        if (response.status === 429) {
+          // Parse Retry-After header if present
+          const retryAfterHeader = response.headers.get('retry-after');
+          const retryAfterSeconds = parseRetryAfter(retryAfterHeader);
+          
+          lastError = {
+            status: response.status,
+            error: errorMessage,
+            retryAfter: retryAfterSeconds || undefined,
+          };
+
+          // Set cooldown period
+          setCooldown(url, retryAfterSeconds || undefined);
+
+          // If we have retries left, wait and retry
+          if (attempt < RATE_LIMIT_CONFIG.maxRetries429) {
+            const delayMs = retryAfterSeconds
+              ? retryAfterSeconds * 1000
+              : RATE_LIMIT_CONFIG.initialRetryDelay * Math.pow(2, attempt);
+            
+            if (isDevelopment) {
+              loggingCustom(
+                LogType.INFRA_LOG,
+                'warn',
+                `Rate limit (429) on attempt ${attempt + 1}/${RATE_LIMIT_CONFIG.maxRetries429 + 1}. Retrying after ${Math.ceil(delayMs / 1000)}s${retryAfterSeconds ? ' (from Retry-After header)' : ''}.`
+              );
+            }
+            
+            await sleep(delayMs);
+            continue; // Retry
+          } else {
+            // No more retries, return error
+            if (isDevelopment) {
+              const contentType = response.headers.get('content-type') || '';
+              const isHtmlError = contentType.includes('text/html') || errorMessage.includes('<!DOCTYPE');
+              loggingCustom(
+                LogType.INFRA_LOG,
+                'error',
+                `API error (${response.status}): ${errorMessage}${isHtmlError ? ' [HTML error page detected]' : ''} - Max retries exceeded`
+              );
+            }
+            
+            return {
+              success: false,
+              error: sanitizeErrorMessage(errorMessage, isDevelopment),
+              response,
+            };
+          }
+        }
+        
+        // For non-429 errors, clear any cooldown and return immediately
+        clearCooldown(url);
+        
+        // Log detailed error information in development
+        if (isDevelopment) {
+          const contentType = response.headers.get('content-type') || '';
+          const isHtmlError = contentType.includes('text/html') || errorMessage.includes('<!DOCTYPE');
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'error',
+            `API error (${response.status}): ${errorMessage}${isHtmlError ? ' [HTML error page detected]' : ''}`
+          );
+        }
+        
+        // Provide user-friendly error messages for gateway errors
+        let userFriendlyError = errorMessage;
+        if (response.status === 502 || response.status === 503 || response.status === 504) {
+          userFriendlyError = `The AI service is temporarily unavailable (${response.status}). This could be due to:\n• Server maintenance or overload\n• Network connectivity issues\n• The service taking too long to respond\n\nPlease try again in a few minutes.`;
+        }
+        
+        return {
+          success: false,
+          error: sanitizeErrorMessage(userFriendlyError, isDevelopment),
+          response,
+        };
+      }
+
+      // Success - clear cooldown
+      clearCooldown(url);
+      
+      // Update timeoutId reference for cleanup
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      // Check content-type header
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json') && !contentType.includes('text/json')) {
+        const responseText = await response.text();
         loggingCustom(
           LogType.INFRA_LOG,
           'error',
-          `API error (${response.status}): ${errorMessage}${isHtmlError ? ' [HTML error page detected]' : ''}`
+          `API returned non-JSON content. Content-Type: ${contentType}. Response preview: ${truncateText(responseText, 500)}`
         );
+        return {
+          success: false,
+          error: `AI service returned unexpected content type (${contentType}). Please check API endpoint configuration.`,
+          response,
+        };
       }
-      
-      // Provide user-friendly error messages for gateway errors
-      let userFriendlyError = errorMessage;
-      if (response.status === 502 || response.status === 503 || response.status === 504) {
-        userFriendlyError = `The AI service is temporarily unavailable (${response.status}). This could be due to:\n• Server maintenance or overload\n• Network connectivity issues\n• The service taking too long to respond\n\nPlease try again in a few minutes.`;
-      }
-      
-      return {
-        success: false,
-        error: sanitizeErrorMessage(userFriendlyError, isDevelopment),
-        response,
-      };
-    }
 
-    // Check content-type header
-    const contentType = response.headers.get('content-type') || '';
-    if (!contentType.includes('application/json') && !contentType.includes('text/json')) {
+      // Parse JSON response
       const responseText = await response.text();
-      loggingCustom(
-        LogType.INFRA_LOG,
-        'error',
-        `API returned non-JSON content. Content-Type: ${contentType}. Response preview: ${truncateText(responseText, 500)}`
-      );
-      return {
-        success: false,
-        error: `AI service returned unexpected content type (${contentType}). Please check API endpoint configuration.`,
-        response,
-      };
-    }
+      const parseResult = safeJsonParse(responseText);
 
-    // Parse JSON response
-    const responseText = await response.text();
-    const parseResult = safeJsonParse(responseText);
-
-    if (!parseResult.success || !parseResult.data) {
-      loggingCustom(
-        LogType.INFRA_LOG,
-        'error',
-        `Failed to parse API response. Error: ${parseResult.error}. Response preview: ${truncateText(responseText, 500)}`
-      );
-      return {
-        success: false,
-        error: parseResult.error || 'Invalid response format from AI service.',
-        response,
-      };
-    }
-
-    return {
-      success: true,
-      data: parseResult.data,
-      response,
-    };
-  } catch (fetchError) {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    // Handle timeout errors
-    if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-      if (isDevelopment) {
-        loggingCustom(LogType.INFRA_LOG, 'error', `Request timeout: ${fetchError.message}`);
+      if (!parseResult.success || !parseResult.data) {
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'error',
+          `Failed to parse API response. Error: ${parseResult.error}. Response preview: ${truncateText(responseText, 500)}`
+        );
+        return {
+          success: false,
+          error: parseResult.error || 'Invalid response format from AI service.',
+          response,
+        };
       }
-      return {
-        success: false,
-        error: sanitizeErrorMessage('Request timeout', isDevelopment),
-      };
-    }
 
-    // Re-throw other errors
-    throw fetchError;
+      return {
+        success: true,
+        data: parseResult.data,
+        response,
+      };
+    } catch (fetchError) {
+      // Handle abort/timeout errors - don't retry these
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+        if (isDevelopment) {
+          loggingCustom(LogType.INFRA_LOG, 'error', `Request timeout: ${fetchError.message}`);
+        }
+        return {
+          success: false,
+          error: sanitizeErrorMessage('Request timeout', isDevelopment),
+        };
+      }
+
+      // For other errors, if we have retries left and last error was 429, continue retrying
+      if (lastError && lastError.status === 429 && attempt < RATE_LIMIT_CONFIG.maxRetries429) {
+        const delayMs = lastError.retryAfter
+          ? lastError.retryAfter * 1000
+          : RATE_LIMIT_CONFIG.initialRetryDelay * Math.pow(2, attempt);
+        
+        if (isDevelopment) {
+          loggingCustom(
+            LogType.INFRA_LOG,
+            'warn',
+            `Fetch error during retry attempt ${attempt + 1}/${RATE_LIMIT_CONFIG.maxRetries429 + 1}. Retrying after ${Math.ceil(delayMs / 1000)}s.`
+          );
+        }
+        
+        await sleep(delayMs);
+        continue; // Retry
+      }
+
+      // Re-throw other errors or if no more retries
+      throw fetchError;
+    }
   }
+
+  // If we exhausted all retries, return the last error
+  if (lastError) {
+    return {
+      success: false,
+      error: sanitizeErrorMessage(lastError.error, isDevelopment),
+    };
+  }
+
+  // This should never be reached, but TypeScript needs it
+  throw new Error('Unexpected error in callGenericApi');
 }
 
 /**

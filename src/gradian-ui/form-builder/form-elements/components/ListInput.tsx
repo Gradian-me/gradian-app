@@ -57,6 +57,7 @@ const SortableListItem: React.FC<{
   inputRef?: React.RefObject<HTMLInputElement | null>; // Ref for focusing input
   onPasteSplit?: (id: string, items: string[]) => void; // Callback when comma-separated values are pasted
   validationPattern?: RegExp | string; // Validation pattern for item labels
+  onCommitAndAddNew?: () => void; // Callback to commit current item and add a new one
 }> = ({ 
   item, 
   onEdit, 
@@ -68,6 +69,7 @@ const SortableListItem: React.FC<{
   inputRef,
   onPasteSplit,
   validationPattern,
+  onCommitAndAddNew,
 }) => {
   const [internalIsEditing, setInternalIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(item.label);
@@ -76,6 +78,7 @@ const SortableListItem: React.FC<{
   const internalInputRef = React.useRef<HTMLInputElement>(null);
   const inputElementRef = inputRef || internalInputRef;
   const isDeletingRef = React.useRef(false);
+  const originalValueRef = React.useRef<string>(''); // Store original value when editing starts
   
   // Validate edit value against pattern
   const validateItem = React.useCallback((value: string): boolean => {
@@ -130,6 +133,8 @@ const SortableListItem: React.FC<{
   };
 
   const handleStartEdit = () => {
+    // Store the original value when editing starts to determine if item was committed
+    originalValueRef.current = item.label;
     setEditValue(item.label);
     if (onEditStateChange) {
       onEditStateChange(item.id, true);
@@ -211,7 +216,29 @@ const SortableListItem: React.FC<{
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      // Ctrl+Enter (or Cmd+Enter on Mac): Commit current item and add new one
+      e.preventDefault();
+      e.stopPropagation();
+      const trimmedValue = editValue.trim();
+      if (trimmedValue) {
+        // Validate before saving
+        if (validateItem(trimmedValue)) {
+          onEdit(item.id, trimmedValue);
+          setItemError(null);
+          // Close edit mode for current item
+          if (onEditStateChange) {
+            onEditStateChange(item.id, false);
+          } else {
+            setInternalIsEditing(false);
+          }
+          // Trigger add new item callback
+          if (onCommitAndAddNew) {
+            onCommitAndAddNew();
+          }
+        }
+      }
+    } else if (e.key === 'Enter') {
       e.preventDefault();
       e.stopPropagation();
       // Just save and submit the current item (don't add new item)
@@ -233,10 +260,14 @@ const SortableListItem: React.FC<{
     } else if (e.key === 'Escape') {
       e.preventDefault();
       e.stopPropagation();
-      // If item is newly added (has no original content), delete it; otherwise just cancel editing
-      if (!item.label || item.label.trim() === '') {
+      // If item was never committed (original value was empty), delete it without confirmation
+      // Otherwise, revert to the original committed value
+      const originalValue = originalValueRef.current;
+      if (!originalValue || originalValue.trim() === '') {
+        // Item was never committed, delete it without confirmation
         onDelete(item.id);
       } else {
+        // Item was committed before, revert to original value
         handleCancelEdit();
       }
     }
@@ -313,7 +344,7 @@ const SortableListItem: React.FC<{
                 <GripVertical className="h-4 w-4" />
               </button>
             )}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0" dir="auto">
               {isEditing ? (
                 <>
                   <input
@@ -339,7 +370,7 @@ const SortableListItem: React.FC<{
                     }}
                     onKeyDown={handleKeyDown}
                     className={cn(
-                      "w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 dark:bg-gray-700 dark:text-gray-100",
+                      "w-full px-2 py-1 text-xs border rounded focus:outline-none focus:ring-2 dark:bg-gray-700 dark:text-gray-100",
                       itemError 
                         ? "border-red-500 focus:ring-red-500 dark:border-red-500" 
                         : "border-gray-300 focus:ring-violet-500 dark:border-gray-600"
@@ -352,7 +383,7 @@ const SortableListItem: React.FC<{
                 </>
               ) : (
                 <span
-                  className="text-sm font-medium text-gray-800 dark:text-gray-200 cursor-text"
+                  className="text-xs font-medium text-gray-800 dark:text-gray-200 cursor-text"
                   onClick={handleStartEdit}
                 >
                   {item.label}
@@ -435,6 +466,12 @@ export const ListInput: React.FC<ListInputProps> = ({
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const inputRefs = React.useRef<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map());
   const [itemRefsMap, setItemRefsMap] = useState<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map());
+  const valueRef = React.useRef<AnnotationItem[]>(value);
+  
+  // Keep ref in sync with value
+  React.useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
   
   // Set up refs for all current items using useEffect to avoid accessing refs during render
   React.useEffect(() => {
@@ -512,6 +549,34 @@ export const ListInput: React.FC<ListInputProps> = ({
       }
     }, 0);
   }, [value, onChange]);
+
+  const handleCommitAndAddNew = useCallback(() => {
+    // Use double requestAnimationFrame to ensure state has updated after commit
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        // Use ref to get the latest value (not the stale closure value)
+        const currentValue = valueRef.current;
+        
+        const newId = `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const newItem: AnnotationItem = {
+          id: newId,
+          label: '',
+        };
+        onChange([...currentValue, newItem]);
+        // Automatically open new item in edit mode
+        setEditingItemId(newId);
+        // Focus the new item's input after it's rendered
+        setTimeout(() => {
+          const newItemRef = inputRefs.current.get(newId);
+          if (newItemRef?.current) {
+            newItemRef.current.focus();
+            // Scroll input into view when focused (especially important on mobile when keyboard opens)
+            scrollInputIntoView(newItemRef.current, { delay: 150 });
+          }
+        }, 0);
+      });
+    });
+  }, [onChange]);
 
   const handleEditItem = useCallback(
     (id: string, label: string) => {
@@ -628,6 +693,7 @@ export const ListInput: React.FC<ListInputProps> = ({
           inputRef={itemRefsMap.get(item.id)}
           onPasteSplit={handlePasteSplit}
           validationPattern={validationPattern}
+          onCommitAndAddNew={handleCommitAndAddNew}
         />
       ))}
     </div>

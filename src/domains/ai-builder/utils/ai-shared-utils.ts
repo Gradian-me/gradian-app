@@ -144,6 +144,63 @@ export function parseUserPromptToFormValues(
  * @param formValues - Form values from the request
  * @returns Object with separated body, extra, and prompt parameters
  */
+/**
+ * Serialize array/object values to extract IDs or labels for API parameters
+ * This prevents [object Object] issues when values are later converted to strings
+ */
+function serializeValueForApi(value: any, component?: any): any {
+  // Handle arrays (from picker, checkbox-list, list-input, etc.)
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return value; // Return empty array as-is
+    }
+    
+    // If array contains objects, extract IDs or labels
+    if (typeof value[0] === 'object' && value[0] !== null) {
+      // For picker/select components, extract IDs
+      if (component?.component === 'picker' || component?.component === 'select' || component?.component === 'checkbox-list') {
+        return value.map((item: any) => {
+          if (typeof item === 'object' && item !== null) {
+            return item.id || item.value || item.label || item;
+          }
+          return item;
+        });
+      }
+      // For list-input, extract labels
+      if (component?.component === 'list-input') {
+        return value.map((item: any) => {
+          if (typeof item === 'object' && item !== null) {
+            return item.label || item.id || item.value || item;
+          }
+          return item;
+        });
+      }
+      // Default: extract IDs
+      return value.map((item: any) => {
+        if (typeof item === 'object' && item !== null) {
+          return item.id || item.value || item.label || item;
+        }
+        return item;
+      });
+    }
+    // Plain array, return as-is
+    return value;
+  }
+  
+  // Handle single object (from radio, toggle-group, etc.)
+  if (typeof value === 'object' && value !== null) {
+    // For select/picker components, extract ID
+    if (component?.component === 'picker' || component?.component === 'select' || component?.component === 'radio') {
+      return value.id || value.value || value.label || value;
+    }
+    // Default: extract ID or label
+    return value.id || value.value || value.label || value;
+  }
+  
+  // Primitive values, return as-is
+  return value;
+}
+
 export function extractParametersBySectionId(
   agent: any,
   formValues: Record<string, any>
@@ -176,13 +233,16 @@ export function extractParametersBySectionId(
     // Map field name to API parameter name
     const apiParamName = fieldToApiMap[fieldName] || fieldName;
 
+    // Serialize value for API (extract IDs/labels from objects/arrays)
+    const serializedValue = serializeValueForApi(value, component);
+
     if (sectionId === 'extra') {
-      extraParams[apiParamName] = value;
+      extraParams[apiParamName] = serializedValue;
     } else if (sectionId === 'body') {
-      bodyParams[apiParamName] = value;
+      bodyParams[apiParamName] = serializedValue;
     } else {
       // Fields without sectionId or with other sectionId values go to prompt
-      promptParams[fieldName] = value;
+      promptParams[fieldName] = serializedValue;
     }
   });
 

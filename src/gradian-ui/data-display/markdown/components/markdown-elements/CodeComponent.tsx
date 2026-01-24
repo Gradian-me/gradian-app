@@ -105,24 +105,26 @@ export function CodeComponent({
       attributes: ['class', 'style', 'data-*']
     });
     if (inline) {
-      // Inline math
+      // Inline math - wrap with dir="ltr" to ensure LTR rendering in RTL text
       // nosemgrep: typescript.react.security.audit.react-dangerouslysetinnerhtml
       return (
-        <span 
-          className="katex-inline"
-          dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
-          suppressHydrationWarning
-        />
+        <span dir="ltr" className="katex-inline">
+          <span 
+            dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+            suppressHydrationWarning
+          />
+        </span>
       );
     } else {
-      // Block math
+      // Block math - wrap with dir="ltr" to ensure LTR rendering in RTL text
       // nosemgrep: typescript.react.security.audit.react-dangerouslysetinnerhtml
       return (
-        <div 
-          className="my-4 katex-display"
-          dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
-          suppressHydrationWarning
-        />
+        <div dir="ltr" className="my-4 katex-display">
+          <div 
+            dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+            suppressHydrationWarning
+          />
+        </div>
       );
     }
   }

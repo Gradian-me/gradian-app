@@ -215,10 +215,23 @@ export function buildStandardizedPrompt(
   });
 
   sortedFields.forEach((field) => {
-    const fieldValue = formValues[field.name || field.id];
+    // Get value from formValues, fallback to defaultValue from field config
+    let fieldValue = formValues[field.name || field.id];
+    
+    // Helper to check if value is empty
+    const isEmpty = (val: any): boolean => {
+      return val === undefined || val === null || 
+             (typeof val === 'string' && val === '') ||
+             (Array.isArray(val) && val.length === 0);
+    };
+    
+    // If value is missing/empty and field has a defaultValue, use it
+    if (isEmpty(fieldValue) && field.defaultValue !== undefined) {
+      fieldValue = field.defaultValue;
+    }
 
-    // Skip empty values
-    if (fieldValue === undefined || fieldValue === null || fieldValue === '') {
+    // Skip empty values (only after checking defaultValue)
+    if (isEmpty(fieldValue)) {
       return;
     }
 
@@ -230,13 +243,31 @@ export function buildStandardizedPrompt(
     // Format the value based on field type
     let formattedValue = '';
 
+    // Helper function to extract label from option object, looking up from field.options if needed
+    const extractLabelFromOption = (item: any, fieldOptions?: any[]): string => {
+      // If item already has a label, use it
+      if (item?.label) return item.label;
+      
+      // If item has an id, try to find the label from field.options
+      if (item?.id && fieldOptions && Array.isArray(fieldOptions)) {
+        const option = fieldOptions.find(
+          (opt: any) => String(opt.id) === String(item.id) || String(opt.value) === String(item.id)
+        );
+        if (option?.label) return option.label;
+      }
+      
+      // Fallback to id, name, value, or string representation
+      return item?.id || item?.name || item?.value || String(item || '');
+    };
+
     // Check if this is an array component that should use TOON format
     const isArrayComponent = [
       'checkbox-list',
       'radio',
       'toggle-group',
       'tag-input',
-      'list-input'
+      'list-input',
+      'picker' // Add picker to array components
     ].includes(field.component);
 
     // Check if select is multiple
@@ -248,54 +279,60 @@ export function buildStandardizedPrompt(
        field.selectionMode === 'multiple' ||
        field.mode === 'multiple');
 
-    if (isArrayComponent || isMultipleSelect) {
-      // Format arrays in TOON format (includes field label)
-      formattedValue = formatArrayFieldToToon(field.name || field.id || 'field', field, fieldValue);
+    // Check if picker allows multiselect
+    const isMultiplePicker = 
+      field.component === 'picker' &&
+      (field.allowMultiselect || field.multiple);
+
+    if (isArrayComponent || isMultipleSelect || isMultiplePicker) {
+      // For picker with objects that only have id, enrich with labels from options
+      if (field.component === 'picker' && Array.isArray(fieldValue) && field.options) {
+        const enrichedValue = fieldValue.map((item: any) => {
+          if (typeof item === 'object' && item !== null) {
+            const label = extractLabelFromOption(item, field.options);
+            return { ...item, label };
+          }
+          return item;
+        });
+        formattedValue = formatArrayFieldToToon(field.name || field.id || 'field', field, enrichedValue);
+      } else {
+        // Format arrays in TOON format (includes field label)
+        formattedValue = formatArrayFieldToToon(field.name || field.id || 'field', field, fieldValue);
+      }
       if (formattedValue) {
         // TOON format includes the field label, so just push it directly
         parts.push(formattedValue);
         return;
       }
     } else if (Array.isArray(fieldValue) && fieldValue.length > 0) {
-      // Handle NormalizedOption array (from single select)
-      if (typeof fieldValue[0] === 'object' && 'id' in fieldValue[0]) {
-        const normalizedOption = fieldValue[0] as NormalizedOption;
-        formattedValue = normalizedOption.label || normalizedOption.id || String(normalizedOption.value || '');
-        
-        // Append option description if available
-        if (normalizedOption.description) {
-          formattedValue += `\n\n${normalizedOption.description}`;
-        } else if (field.options) {
-          // Try to find description from field options
-          const option = field.options.find(
-            (opt: any) => opt.id === normalizedOption.id || opt.value === normalizedOption.value
-          );
-          if (option?.description) {
-            formattedValue += `\n\n${option.description}`;
-          }
-        }
+      // Handle array values (from picker, select, etc.)
+      if (typeof fieldValue[0] === 'object' && fieldValue[0] !== null) {
+        // Array of objects - extract labels
+        formattedValue = fieldValue.map((item: any) => extractLabelFromOption(item, field.options)).join(', ');
       } else {
         // Plain array - join with commas
-        formattedValue = fieldValue.map((item: any) => {
-          if (typeof item === 'object' && item.label) return item.label;
-          if (typeof item === 'object' && item.id) return item.id;
-          return String(item);
-        }).join(', ');
+        formattedValue = fieldValue.map((item: any) => String(item)).join(', ');
       }
-    } else if (field.component === 'select') {
-      // For single select with string/number value, find the option label
-      const option = field.options?.find(
-        (opt: any) => opt.id === fieldValue || opt.value === fieldValue
-      );
-      formattedValue = option?.label || String(fieldValue);
-      
-      // Append option description if available
-      if (option?.description) {
-        formattedValue += `\n\n${option.description}`;
+    } else if (field.component === 'select' || field.component === 'picker') {
+      // For single select/picker with string/number value, find the option label
+      if (typeof fieldValue === 'object' && fieldValue !== null) {
+        // Object value - extract label
+        formattedValue = extractLabelFromOption(fieldValue, field.options);
+      } else {
+        // String/number value - look up from options
+        const option = field.options?.find(
+          (opt: any) => String(opt.id) === String(fieldValue) || String(opt.value) === String(fieldValue)
+        );
+        formattedValue = option?.label || String(fieldValue);
+        
+        // Append option description if available
+        if (option?.description) {
+          formattedValue += `\n\n${option.description}`;
+        }
       }
     } else if (typeof fieldValue === 'object' && fieldValue !== null) {
-      // Handle single object (shouldn't happen but just in case)
-      formattedValue = (fieldValue as any).label || (fieldValue as any).id || String((fieldValue as any).value || '');
+      // Handle single object (for toggle-group, radio, etc.)
+      formattedValue = extractLabelFromOption(fieldValue, field.options);
       
       // Append option description if available
       if ((fieldValue as any).description) {
@@ -303,7 +340,7 @@ export function buildStandardizedPrompt(
       } else if (field.options) {
         // Try to find description from field options
         const option = field.options.find(
-          (opt: any) => opt.id === (fieldValue as any).id || opt.value === (fieldValue as any).value
+          (opt: any) => String(opt.id) === String((fieldValue as any).id) || String(opt.value) === String((fieldValue as any).value)
         );
         if (option?.description) {
           formattedValue += `\n\n${option.description}`;
