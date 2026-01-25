@@ -10,7 +10,7 @@ RUN echo "deb [trusted=yes] https://reg.cinnagen.com/repository/apt-debian-main-
     echo "deb [trusted=yes] https://reg.cinnagen.com/repository/apt-debian-de-bookworm bookworm main" >> /etc/apt/sources.list && \
     echo "deb [trusted=yes] https://reg.cinnagen.com/repository/apt-debian-security-bookworm bookworm main" >> /etc/apt/sources.list
 
-# Update system packages and install runtime dependencies
+# Update system packages and install runtime dependencies 
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update -qq && \
     apt-get --only-upgrade install -y --no-install-recommends \
