@@ -488,6 +488,15 @@ export interface FormSchema {
     size?: 'sm' | 'md' | 'lg';
     className?: string;
   };
+  /**
+   * Related applications for this schema.
+   * Populated by the API when fetching schemas with related application data.
+   */
+  applications?: Array<{
+    id: string;
+    name: string;
+    icon?: string;
+  }>;
   actions?: Array<'submit' | 'cancel' | 'reset'>;
   showActionsInModal?: boolean; // If true, actions will be rendered by Modal component, not in the form itself
   validation?: {

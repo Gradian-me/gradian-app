@@ -108,7 +108,12 @@ const ensureRepeatingItemIds = (
   }
   
   schema.sections.forEach(section => {
-    if (section.isRepeatingSection && newValues[section.id]) {
+    if (section.isRepeatingSection) {
+      // Initialize repeating sections to empty array if they don't exist or are null/undefined
+      if (!newValues[section.id] || !Array.isArray(newValues[section.id])) {
+        newValues[section.id] = [];
+      }
+      
       const items = newValues[section.id];
       if (Array.isArray(items)) {
         newValues[section.id] = items.map((item: any, index: number) => {

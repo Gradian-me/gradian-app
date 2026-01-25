@@ -248,8 +248,9 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
 
 
   // Track previous schemas to detect actual changes (not just re-renders)
-  const prevSchemasKeyRef = useRef<string>('');
-  const prevAccordionOpenRef = useRef<boolean>(false);
+  // Use state instead of refs to avoid accessing refs during render
+  const [prevSchemasKey, setPrevSchemasKey] = React.useState<string>('');
+  const [prevAccordionOpen, setPrevAccordionOpen] = React.useState<boolean>(false);
   const schemasKey = React.useMemo(() => {
     return schemas.map(schema => schema.id).join(',');
   }, [schemas]);
@@ -257,15 +258,15 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   // Only animate if schemas actually changed (new schemas added/removed)
   // or when accordion first opens
   const isAccordionOpen = accordionValue === 'applications';
-  const isAccordionJustOpened = isAccordionOpen && !prevAccordionOpenRef.current;
-  const shouldAnimate = prevSchemasKeyRef.current !== schemasKey || isAccordionJustOpened;
+  const isAccordionJustOpened = isAccordionOpen && !prevAccordionOpen;
+  const shouldAnimate = prevSchemasKey !== schemasKey || isAccordionJustOpened;
   
   React.useEffect(() => {
-    if (prevSchemasKeyRef.current !== schemasKey) {
-      prevSchemasKeyRef.current = schemasKey;
+    if (prevSchemasKey !== schemasKey) {
+      setPrevSchemasKey(schemasKey);
     }
-    prevAccordionOpenRef.current = isAccordionOpen;
-  }, [schemasKey, isAccordionOpen]);
+    setPrevAccordionOpen(isAccordionOpen);
+  }, [schemasKey, isAccordionOpen, prevSchemasKey]);
 
   if (isLoading || schemas.length === 0) {
     return null;
