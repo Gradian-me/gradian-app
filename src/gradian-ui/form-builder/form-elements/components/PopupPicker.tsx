@@ -359,6 +359,7 @@ export interface PopupPickerProps {
   canViewList?: boolean; // If true, shows a button to navigate to the list page
   viewListUrl?: string; // Custom URL for the list page (defaults to /page/{schemaId})
   allowMultiselect?: boolean; // Enables multi-select mode with confirm button
+  confirmButtonText?: string; // Custom text for the confirm button in multiselect mode (default: "Apply")
   columnMap?: ColumnMapConfig; // Optional mapping for request/response and item fields
   staticItems?: any[]; // Optional dataset (skips API calls when provided)
   pageSize?: number; // Page size for paginated data sources
@@ -382,6 +383,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   canViewList = false,
   viewListUrl,
   allowMultiselect = false,
+  confirmButtonText = 'Apply',
   columnMap,
   staticItems,
   pageSize = 200,
@@ -2241,8 +2243,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
             >
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
               {isSubmitting
-                ? 'Applying...'
-                : `Apply${hasPendingSelections ? ` (${selectedCount})` : ''}`}
+                ? `${confirmButtonText}ing...`
+                : `${confirmButtonText}${hasPendingSelections ? ` (${selectedCount})` : ''}`}
             </Button>
           )}
         </div>

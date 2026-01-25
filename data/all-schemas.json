@@ -12,7 +12,7 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter schema ID",
-        "role": "title",
+        "role": "subtitle",
         "validation": {
           "required": true,
           "minLength": 1
@@ -31,7 +31,8 @@
           "required": true
         },
         "colSpan": 1,
-        "order": 2
+        "order": 2,
+        "role": "title"
       },
       {
         "id": "schema-plural-name",
@@ -560,6 +561,7 @@
           "minItems": 0,
           "targetSchema": "schemas",
           "relationTypeId": "HAS_SCHEMA",
+          "deleteType": "relationOnly",
           "addType": "mustSelectFromData",
           "fieldRelationType": "connectToSchema",
           "isUnique": true
@@ -7823,7 +7825,7 @@
         "sectionId": "impact-analysis",
         "component": "rating",
         "validation": {
-            "required": true
+          "required": true
         },
         "colSpan": 1,
         "order": 4

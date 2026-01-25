@@ -529,7 +529,6 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
 
     try {
       const normalizedSelections = Array.isArray(selectedItems) ? selectedItems : [];
-      const existingIds = new Set(relations.map((r) => String(r.targetId)));
       
       // Extract IDs from normalized selections
       const selectionIds = normalizedSelections
@@ -544,12 +543,30 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       // Combine and deduplicate IDs
       const allCandidateIds = Array.from(new Set([...selectionIds, ...rawItemIds]));
       
-      // Filter out already existing relations
-      const toCreateIds = allCandidateIds.filter((id) => !existingIds.has(String(id)));
+      // Check for existing relations with same relationTypeId
+      // A relation is considered duplicate if it has the same:
+      // sourceSchema, sourceId, targetSchema, targetId, and relationTypeId
+      const existingRelationKeys = new Set(
+        relations.map((r) => 
+          `${r.sourceSchema}:${r.sourceId}:${r.targetSchema}:${r.targetId}:${r.relationTypeId}`
+        )
+      );
+      
+      // Filter out IDs that already have a relation with the same relationTypeId
+      const toCreateIds = allCandidateIds.filter((targetId) => {
+        const relationKey = `${sourceSchemaId}:${currentEntityId}:${targetSchema}:${targetId}:${relationTypeId}`;
+        return !existingRelationKeys.has(relationKey);
+      });
 
+      // Track skipped items for user feedback
+      const skippedCount = allCandidateIds.length - toCreateIds.length;
+      
       if (toCreateIds.length === 0) {
-        toast.info('Item already linked', {
-          description: 'This item is already linked to the current record.',
+        // All items already have relations with this type
+        toast.info('Relations already exist', {
+          description: skippedCount === 1 
+            ? 'This item is already linked to the current record with this relation type.'
+            : `All ${skippedCount} selected items are already linked with this relation type.`,
         });
         setIsPickerOpen(false);
         return;
@@ -573,27 +590,60 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       // Execute all operations
       const results = await Promise.all(operations);
       
-      // Check for failures
-      const failedResults = results.filter((response) => !response?.success);
-      const successCount = results.length - failedResults.length;
+      // Separate results into successes, duplicates, and failures
+      // Note: Duplicates should be rare since we filter them client-side, but handle them in case of race conditions
+      const successResults = results.filter((response) => response?.success);
+      const duplicateResults = results.filter((response) => 
+        !response?.success && 
+        response?.error &&
+        (response.error.toLowerCase().includes('already exists') || 
+         response.error.toLowerCase().includes('duplicate') ||
+         response.error.toLowerCase().includes('relation already') ||
+         response.error.toLowerCase().includes('not allowed'))
+      );
+      const failedResults = results.filter((response) => 
+        !response?.success && 
+        !duplicateResults.includes(response)
+      );
+      
+      const successCount = successResults.length;
+      const apiDuplicateCount = duplicateResults.length;
+      const failureCount = failedResults.length;
+      const totalSkipped = skippedCount + apiDuplicateCount;
 
-      if (failedResults.length > 0) {
+      // Build user-friendly messages
+      if (failureCount > 0) {
         loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to create one or more relations from picker: ${JSON.stringify(failedResults)}`);
         const errorMessages = failedResults
           .map((r) => r.error || 'Unknown error')
           .join(', ');
         
-        if (successCount > 0) {
+        const parts: string[] = [];
+        if (successCount > 0) parts.push(`${successCount} created`);
+        if (totalSkipped > 0) parts.push(`${totalSkipped} skipped (already exist)`);
+        
+        if (parts.length > 0) {
           toast.warning('Partial success', {
-            description: `Created ${successCount} relation(s), but ${failedResults.length} failed: ${errorMessages}`,
+            description: `${parts.join(', ')}, but ${failureCount} failed: ${errorMessages}`,
           });
-      } else {
+        } else {
           toast.error('Failed to create relation', {
             description: errorMessages || 'An error occurred while creating the relation.',
           });
         }
+      } else if (totalSkipped > 0 && successCount > 0) {
+        // Some created, some skipped
+        toast.success('Relations processed', {
+          description: `Created ${successCount} relation(s), ${totalSkipped} already existed and were skipped.`,
+        });
+      } else if (totalSkipped > 0 && successCount === 0) {
+        // All skipped (shouldn't happen due to client-side check, but handle API duplicates)
+        toast.info('Relations already exist', {
+          description: `All ${totalSkipped} relation(s) already exist.`,
+        });
       } else {
-        toast.success('Relation created', {
+        // All successful
+        toast.success('Relations created', {
           description: `Successfully linked ${successCount} item(s).`,
         });
       }
@@ -1791,11 +1841,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               schema={targetSchemaData || undefined}
               onSelect={handleSelectFromPicker}
               title={`Select ${targetSchemaData?.plural_name || targetSchemaData?.singular_name || targetSchema}`}
-              description={`Choose an existing ${targetSchemaData?.singular_name || 'item'} to link to this record`}
+              description={`Choose existing ${targetSchemaData?.plural_name || targetSchemaData?.singular_name || 'items'} to link to this record`}
               excludeIds={shouldExcludeIds ? selectedIds : undefined}
               canViewList={true}
               viewListUrl={`/page/${targetSchema}`}
-            allowMultiselect={false}
+              allowMultiselect={true}
+              confirmButtonText="Add Relation"
             />
           )}
           

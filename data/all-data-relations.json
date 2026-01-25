@@ -2780,5 +2780,60 @@
     "fieldId": "integration-target-route",
     "createdAt": "2026-01-25T12:02:17.522Z",
     "updatedAt": "2026-01-25T12:02:17.522Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-classifications",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFTQYP34TDC5SYV0SGRFW8GX",
+    "createdAt": "2026-01-25T14:12:02.275Z",
+    "updatedAt": "2026-01-25T14:23:33.227Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-management",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFTRK92CJFEJ4RXAKEQEKE70",
+    "createdAt": "2026-01-25T14:23:17.068Z",
+    "updatedAt": "2026-01-25T14:23:33.230Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-categories",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFTRK93Y3QNZBRXW6TQMDMEN",
+    "createdAt": "2026-01-25T14:23:17.118Z",
+    "updatedAt": "2026-01-25T14:23:33.234Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-procedure",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFTRK94X1588YG2GT6FYQEVF",
+    "createdAt": "2026-01-25T14:23:17.149Z",
+    "updatedAt": "2026-01-25T14:23:33.242Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "related-documents",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFTRK95SK2P1RWJHPN67GH0B",
+    "createdAt": "2026-01-25T14:23:17.177Z",
+    "updatedAt": "2026-01-25T14:23:33.245Z",
+    "inactive": true
   }
 ]

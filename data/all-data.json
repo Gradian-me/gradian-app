@@ -1496,9 +1496,10 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBFCM00000000000000000001",
       "createdAt": "2025-12-06T12:00:00.000Z",
-      "updatedAt": "2025-12-06T12:00:00.000Z",
+      "updatedAt": "2026-01-25T14:23:33.194Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "application-schemas": []
     },
     {
       "name": "Quality Base Information",
