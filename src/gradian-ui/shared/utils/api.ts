@@ -720,6 +720,26 @@ async function enrichDataEndpoint(
     return { endpoint, params: existingParams };
   }
 
+  // Allow SidebarNavigationMenu to see all menu items when tenant is "local"
+  // by NOT auto-injecting tenantIds/companyIds for the menu-items collection endpoint.
+  // This ensures the sidebar shows all menu items for local tenant.
+  if (
+    callerName === 'SidebarNavigationMenuLocal' &&
+    (endpoint === '/api/data/menu-items' || endpoint.startsWith('/api/data/menu-items?'))
+  ) {
+    return { endpoint, params: existingParams };
+  }
+
+  // Allow AppListWrapper to see all schemas when tenant is "local"
+  // by NOT auto-injecting tenantIds/companyIds for the schemas endpoint.
+  // This ensures the app list shows all apps for local tenant.
+  if (
+    callerName === 'AppListWrapperLocal' &&
+    (endpoint === '/api/schemas' || endpoint.startsWith('/api/schemas?'))
+  ) {
+    return { endpoint, params: existingParams };
+  }
+
   const contextParams = await getContextParams();
   if (!contextParams.tenantIds && !contextParams.companyIds) {
     return { endpoint, params: existingParams };

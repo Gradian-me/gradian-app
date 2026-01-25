@@ -14,12 +14,14 @@ import { cn } from '../../../shared/utils';
 import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { useSchemas } from '@/gradian-ui/schema-manager/hooks/use-schemas';
 import { useTenantStore } from '@/stores/tenant.store';
+import { filterFormSchemas } from '../utils';
 
 interface SidebarNavigationDynamicProps {
   isCollapsed: boolean;
   isMobile: boolean;
   className?: string;
   initialSchemas?: FormSchema[];
+  searchQuery?: string;
 }
 
 const ACCORDION_STATE_KEY = 'gradian-sidebar-accordion-open';
@@ -29,10 +31,15 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   isMobile,
   className,
   initialSchemas,
+  searchQuery,
 }) => {
   const pathname = usePathname();
   const tenantId = useTenantStore((state) => state.getTenantId());
   const selectedTenant = useTenantStore((state) => state.selectedTenant);
+  // Check if tenant name is "local" - if so, don't filter by tenantIds in API call
+  const isLocalTenant = React.useMemo(() => {
+    return Boolean(selectedTenant?.name?.toLowerCase() === 'local');
+  }, [selectedTenant?.name]);
   const [isMounted, setIsMounted] = useState(false);
   // Persist accordion state across route changes
   const [accordionValue, setAccordionValue] = useState<string | undefined>(() => {
@@ -70,7 +77,8 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   const { schemas: allSchemas, isLoading, refetch } = useSchemas({
     initialData: initialSchemas,
     summary: true,
-    tenantIds: tenantId ? String(tenantId) : undefined,
+    // Don't pass tenantIds for "local" tenant to avoid filtering by relatedTenants
+    tenantIds: isLocalTenant ? undefined : (tenantId ? String(tenantId) : undefined),
   });
   
   // Prevent refetch when switching between chat routes (use cached data)
@@ -130,20 +138,42 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   }, [refetch, isRouteChangeWithinChat]);
 
   // Filter schemas that have showInNavigation enabled
-  // If tenant name is "local", show all schemas
+  // If tenant name is "local", show all schemas (already filtered by API when not local)
+  // Then apply search filter if provided
   const schemas = useMemo(() => {
-    const isLocalTenant = selectedTenant?.name?.toLowerCase() === 'local';
+    let filtered = isLocalTenant
+      ? allSchemas // For local tenant, show all schemas (API already returned all)
+      : allSchemas.filter((schema: FormSchema) => 
+          schema.showInNavigation === true
+        );
     
-    if (isLocalTenant) {
-      // Show all schemas when tenant name is "local"
-      return allSchemas;
+    // Apply search filter if provided
+    if (searchQuery) {
+      filtered = filterFormSchemas(filtered, searchQuery);
     }
     
-    // Otherwise, filter by showInNavigation
-    return allSchemas.filter((schema: FormSchema) => 
-      schema.showInNavigation === true
-    );
-  }, [allSchemas, selectedTenant]);
+    return filtered;
+  }, [allSchemas, isLocalTenant, searchQuery]);
+
+  // Track previous schemas to detect actual changes (not just re-renders)
+  const prevSchemasKeyRef = useRef<string>('');
+  const prevAccordionOpenRef = useRef<boolean>(false);
+  const schemasKey = React.useMemo(() => {
+    return schemas.map(schema => schema.id).join(',');
+  }, [schemas]);
+  
+  // Only animate if schemas actually changed (new schemas added/removed)
+  // or when accordion first opens
+  const isAccordionOpen = accordionValue === 'applications';
+  const isAccordionJustOpened = isAccordionOpen && !prevAccordionOpenRef.current;
+  const shouldAnimate = prevSchemasKeyRef.current !== schemasKey || isAccordionJustOpened;
+  
+  React.useEffect(() => {
+    if (prevSchemasKeyRef.current !== schemasKey) {
+      prevSchemasKeyRef.current = schemasKey;
+    }
+    prevAccordionOpenRef.current = isAccordionOpen;
+  }, [schemasKey, isAccordionOpen]);
 
   if (isLoading || schemas.length === 0) {
     return null;
@@ -189,7 +219,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className={cn("w-full px-0 mt-3", className)}>
+      <div className={cn("w-full px-0 mt-3 mb-4", className)}>
         <Separator className="my-4 bg-gray-700" />
         
         {isMounted ? (
@@ -217,22 +247,21 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
               "pe-0 pb-0",
               isCollapsed && !isMobile ? "ps-0" : "ps-3"
             )}>
-              <nav className="space-y-1 mt-1">
+              <nav className="space-y-1 mt-1 mb-2">
                 {schemas.map((schema, index) => {
                   const active = isActive(schema.id);
                   const schemaItem = (
-                    <Link href={`/page/${schema.id}`} prefetch={false}>
+                    <Link key={schema.id} href={`/page/${schema.id}`} prefetch={false}>
                       <motion.div
-                        initial={{ opacity: 0, x:-1, y: 0}}
-                        animate={{ opacity: 1, x:0, y: 0}}
-                        transition={{
-                          duration: 0.25,
-                          delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX),
-                          ease: 'easeOut',
-                        }}
-                        whileHover={!isCollapsed || isMobile ? { scale: 1.02 } : undefined}
+                        initial={shouldAnimate ? { opacity: 0 } : false}
+                        animate={{ opacity: 1 }}
+                        transition={shouldAnimate ? {
+                          duration: 0.15,
+                          delay: index * 0.04,
+                          ease: [0.4, 0, 0.2, 1],
+                        } : { duration: 0 }}
                         className={cn(
-                          "flex items-center py-2 rounded-lg transition-all duration-200",
+                          "flex items-center py-2 rounded-lg transition-colors duration-150",
                           isCollapsed && !isMobile ? "justify-center px-0" : "space-x-3 px-3",
                           active
                             ? "bg-gray-800 text-white"
@@ -250,13 +279,12 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                         <AnimatePresence mode="wait">
                           {(!isCollapsed || isMobile) && (
                             <motion.span
-                              initial={{ opacity: 0, width: 0, x: -8 }}
-                              animate={{ opacity: 1, width: "auto", x: 0 }}
-                              exit={{ opacity: 0, width: 0, x: -8 }}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
                               transition={{ 
-                                duration: 0.2, 
-                                ease: [0.4, 0, 0.2, 1],
-                                opacity: { duration: 0.15 }
+                                duration: 0.15,
+                                ease: 'easeOut'
                               }}
                               className="text-xs font-medium overflow-hidden whitespace-nowrap"
                             >

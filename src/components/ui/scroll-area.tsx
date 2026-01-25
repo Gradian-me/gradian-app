@@ -35,7 +35,7 @@ const ScrollBar = React.forwardRef<
     className={cn(
       "flex touch-none select-none transition-all duration-300",
       variant === 'dark' && "opacity-30 hover:opacity-100 group-hover:opacity-100",
-      variant === 'minimal' && "opacity-20 hover:opacity-100 group-hover:opacity-100",
+      variant === 'minimal' && "opacity-40 hover:opacity-100 group-hover:opacity-100",
       variant === 'default' && "transition-colors hover:bg-gray-100",
       orientation === "vertical" &&
         variant === 'dark' ? "h-full w-1.5 border-l border-l-transparent p-[1px]" :
@@ -53,7 +53,7 @@ const ScrollBar = React.forwardRef<
       className={cn(
         "relative flex-1 rounded-full transition-colors cursor-pointer",
         variant === 'dark' && "bg-gray-600/40 hover:bg-gray-500/60",
-        variant === 'minimal' && "bg-gray-400/30 hover:bg-gray-400/50",
+        variant === 'minimal' && "bg-gray-400/40 hover:bg-gray-400/60",
         variant === 'default' && "bg-gray-300 hover:bg-gray-500"
       )}
     />

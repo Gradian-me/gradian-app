@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { SidebarNavigation } from './SidebarNavigation';
 import { mapMenuItemsToNavigationItems, FALLBACK_HOME_MENU_ITEM } from '../utils';
 import type { SidebarProps } from '../types';
+import { SidebarSearchbox } from './SidebarSearchbox';
 import { useCompanyStore } from '@/stores/company.store';
 import { useMenuItemsStore } from '@/stores/menu-items.store';
 import { useTenantStore } from '@/stores/tenant.store';
@@ -34,6 +35,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
 }) => {
   // Initialize with home button immediately
   const [items, setItems] = useState<NavigationItem[]>([FALLBACK_HOME_MENU_ITEM]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   
   // Initialize currentItemsRef with items state
   React.useEffect(() => {
@@ -45,6 +47,14 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
   const companyId = selectedCompany && selectedCompany.id !== -1 ? selectedCompany.id : null;
   // Get tenantId to ensure it's available before making API calls
   const tenantId = useTenantStore((state) => state.getTenantId());
+  // Get selectedTenant to check if tenant name is "local"
+  const selectedTenant = useTenantStore((state) => state.selectedTenant);
+  // Check if tenant name is "local" - if so, show all menu items
+  // Use useMemo to ensure stable boolean value (always returns boolean, never undefined)
+  const tenantName = selectedTenant?.name;
+  const isLocalTenant = React.useMemo(() => {
+    return Boolean(tenantName?.toLowerCase() === 'local');
+  }, [tenantName]);
   // Get user to detect login state changes
   const user = useUserStore((state) => state.user);
   const userId = user?.id ?? null;
@@ -106,7 +116,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
         // Ensure items are set from cache (in case state was lost)
         setItems((currentItems) => {
           if (currentItems.length === 1 && currentItems[0].id === FALLBACK_HOME_MENU_ITEM.id) {
-            const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId);
+            const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant);
             const merged = mergeItemsWithHome(mapped);
             currentItemsRef.current = merged;
             return merged;
@@ -134,7 +144,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
         const cachedItems = menuItemsStore.getMenuItems(companyId);
         if (cachedItems && cachedItems.length > 0) {
           // Use cached items
-          const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId);
+          const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant);
           if (isMounted) {
             const merged = mergeItemsWithHome(mapped);
             setItems(merged);
@@ -151,8 +161,10 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
       // Cache miss or forced fetch - fetch from API
       try {
         // Use apiRequest which automatically includes tenantIds and companyIds
+        // When tenant is "local", pass special callerName to skip tenant/company filtering
         const response = await apiRequest<any[]>('/api/data/menu-items', {
           disableCache: true,
+          callerName: isLocalTenant ? 'SidebarNavigationMenuLocal' : 'SidebarNavigationMenu',
         });
         
         if (!response.success || !response.data) {
@@ -160,7 +172,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
             // Preserve existing items if available, otherwise keep home button
             const cachedItems = menuItemsStore.getMenuItems(companyId);
             if (cachedItems && cachedItems.length > 0) {
-              const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId);
+              const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant);
               const merged = mergeItemsWithHome(mapped);
               setItems(merged);
               currentItemsRef.current = merged;
@@ -182,7 +194,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
         // Store in cache
         menuItemsStore.setMenuItems(rawItems, companyId);
 
-        const mapped = mapMenuItemsToNavigationItems(rawItems, companyId);
+        const mapped = mapMenuItemsToNavigationItems(rawItems, companyId, isLocalTenant);
         if (isMounted) {
           const merged = mergeItemsWithHome(mapped);
           setItems(merged);
@@ -197,7 +209,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
         if (isMounted) {
           const cachedItems = menuItemsStore.getMenuItems(companyId);
           if (cachedItems && cachedItems.length > 0) {
-            const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId);
+            const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant);
             const merged = mergeItemsWithHome(mapped);
             setItems(merged);
             currentItemsRef.current = merged;
@@ -229,16 +241,25 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
         window.removeEventListener('menu-items-cleared', handleMenuItemsCleared);
       }
     };
-  }, [companyId, tenantId, userId]); // Include userId to detect login state changes
+  }, [companyId, tenantId, userId, isLocalTenant]); // Include userId and isLocalTenant to detect changes
 
   // Always render navigation - never show skeleton, home button is always available
   return (
-    <SidebarNavigation
-      items={items}
-      isCollapsed={isCollapsed}
-      isMobile={isMobile ?? false}
-      navigationSchemas={navigationSchemas}
-    />
+    <>
+      <SidebarSearchbox
+        value={searchQuery}
+        onChange={setSearchQuery}
+        isCollapsed={isCollapsed}
+        isMobile={isMobile ?? false}
+      />
+      <SidebarNavigation
+        items={items}
+        isCollapsed={isCollapsed}
+        isMobile={isMobile ?? false}
+        navigationSchemas={navigationSchemas}
+        searchQuery={searchQuery}
+      />
+    </>
   );
 };
 

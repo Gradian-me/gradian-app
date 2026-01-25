@@ -1554,6 +1554,14 @@
       "updatedAt": "2025-12-06T12:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "name": "System Administration",
+      "icon": "Verified",
+      "incomplete": false,
+      "id": "01KFTQPVC9RCRE9J8ACHECVWNK",
+      "createdAt": "2026-01-25T14:07:45.553Z",
+      "updatedAt": "2026-01-25T14:07:45.554Z"
     }
   ],
   "production-actuals": [],

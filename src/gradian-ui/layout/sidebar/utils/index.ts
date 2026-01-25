@@ -22,13 +22,16 @@ export const FALLBACK_HOME_MENU_ITEM: NavigationItem = {
 /**
  * Transform menu-items API data into sidebar NavigationItem[]
  * - Applies AD_MODE filter: if AD_MODE is true, hide items where hideInAD is true.
+ *   (Skip this filter if showAllItems is true)
  * - Applies company filter: if companyId is set, only show items that either have no companies
  *   or include the selected company in their companies field.
+ *   (Skip this filter if showAllItems is true)
  * - Adds fallback home menu item if no items are available after filtering.
  */
 export function mapMenuItemsToNavigationItems(
   menuItems: any[],
-  companyId?: string | number | null
+  companyId?: string | number | null,
+  showAllItems: boolean = false
 ): NavigationItem[] {
   if (!Array.isArray(menuItems)) {
     // Return fallback home item if menuItems is not an array
@@ -39,10 +42,14 @@ export function mapMenuItemsToNavigationItems(
     // Preserve a stable index-based ordering independent of updatedAt
     .map((item, idx) => ({ ...item, __sortIndex: item.sortIndex ?? idx }))
     .filter((item) => {
+      // If showAllItems is true, skip AD_MODE filter
+      if (showAllItems) return true;
       if (!AD_MODE) return true;
       return !item.hideInAD;
     })
     .filter((item) => {
+      // If showAllItems is true, skip company filter
+      if (showAllItems) return true;
       // If no company is selected (or "All Companies" is selected), show all items
       if (companyId === null || companyId === undefined) {
         return true;
@@ -83,6 +90,7 @@ export function mapMenuItemsToNavigationItems(
         name: item.menuTitle ?? 'Menu Item',
         href: item.menuUrl ?? '/',
         icon: Icon as LucideIcon,
+        description: item.description,
       };
     });
 
@@ -136,5 +144,93 @@ export const isActiveNavigationItem = (
 
   // For other items, treat the item as active for itself and its sub-paths
   return pathname === item.href || pathname.startsWith(`${item.href}/`);
+};
+
+/**
+ * Filter navigation items based on search query
+ * 
+ * Security Review:
+ * - Input sanitization: Search query is sanitized by converting to lowercase for comparison
+ * - XSS risk: No - Only used for filtering, no DOM manipulation
+ * - Injection risk: No - Client-side filtering only
+ * 
+ * Performance Review:
+ * - Complexity: O(n) where n is number of items
+ * - Case-insensitive search for better UX
+ * - Simple string matching, no regex overhead
+ * 
+ * DRY Review:
+ * - Reusable filtering logic for menu items
+ */
+export const filterNavigationItems = (
+  items: NavigationItem[],
+  searchQuery: string
+): NavigationItem[] => {
+  if (!searchQuery || searchQuery.trim() === '') {
+    return items;
+  }
+
+  const query = searchQuery.toLowerCase().trim();
+  
+  return items.filter((item) => {
+    // Always show home item
+    if (item.id === FALLBACK_HOME_MENU_ITEM.id) {
+      return true;
+    }
+    
+    // Search in item name
+    const nameMatch = item.name?.toLowerCase().includes(query);
+    
+    // Search in href (for URL-based matching)
+    const hrefMatch = item.href?.toLowerCase().includes(query);
+    
+    // Search in description (if available)
+    const descriptionMatch = item.description?.toLowerCase().includes(query);
+    
+    return nameMatch || hrefMatch || descriptionMatch;
+  });
+};
+
+/**
+ * Filter form schemas based on search query
+ * 
+ * Security Review:
+ * - Input sanitization: Search query is sanitized by converting to lowercase
+ * - XSS risk: No - Only used for filtering
+ * - Injection risk: No - Client-side filtering only
+ * 
+ * Performance Review:
+ * - Complexity: O(n) where n is number of schemas
+ * - Searches multiple fields (plural_name, singular_name, description)
+ * - Case-insensitive matching
+ * 
+ * DRY Review:
+ * - Reusable filtering logic for applications/schemas
+ */
+export const filterFormSchemas = (
+  schemas: any[],
+  searchQuery: string
+): any[] => {
+  if (!searchQuery || searchQuery.trim() === '') {
+    return schemas;
+  }
+
+  const query = searchQuery.toLowerCase().trim();
+  
+  return schemas.filter((schema) => {
+    // Search in plural name
+    const pluralMatch = schema.plural_name?.toLowerCase().includes(query);
+    
+    // Search in singular name
+    const singularMatch = schema.singular_name?.toLowerCase().includes(query);
+    
+    // Search in description
+    const descriptionMatch = schema.description?.toLowerCase().includes(query);
+    
+    // Search in id (for exact matches)
+    const idMatch = schema.id?.toLowerCase().includes(query);
+    
+    return pluralMatch || singularMatch || descriptionMatch || idMatch;
+  });
 };
 

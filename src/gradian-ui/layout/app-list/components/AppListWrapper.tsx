@@ -307,6 +307,11 @@ export function AppListWrapper() {
   const user = useUserStore((state) => state.user);
   const language = useLanguageStore((state) => state.language || 'en');
   const tenantId = useTenantStore((state) => state.getTenantId());
+  const selectedTenant = useTenantStore((state) => state.selectedTenant);
+  // Check if tenant name is "local" - if so, show all apps
+  const isLocalTenant = React.useMemo(() => {
+    return Boolean(selectedTenant?.name?.toLowerCase() === 'local');
+  }, [selectedTenant?.name]);
   const [isMounted, setIsMounted] = useState(false);
   
   // Ensure component is mounted before enabling the query
@@ -317,7 +322,10 @@ export function AppListWrapper() {
   const { schemas, isLoading, error, refetch } = useSchemas({ 
     summary: true,
     enabled: isMounted,
-    tenantIds: tenantId ? String(tenantId) : undefined,
+    // Don't pass tenantIds when tenant is "local" to show all apps
+    tenantIds: isLocalTenant ? undefined : (tenantId ? String(tenantId) : undefined),
+    // Pass special callerName when tenant is "local" to skip tenant/company filtering
+    callerName: isLocalTenant ? 'AppListWrapperLocal' : 'AppListWrapper',
   });
 
   const [searchQuery, setSearchQuery] = useState('');

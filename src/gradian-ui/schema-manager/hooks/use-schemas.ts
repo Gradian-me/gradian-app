@@ -19,10 +19,11 @@ interface UseSchemasOptions {
   summary?: boolean;
   includeStatistics?: boolean;
   tenantIds?: string[] | string;
+  callerName?: string;
 }
 
 export function useSchemas(options?: UseSchemasOptions) {
-  const { enabled, initialData, summary, includeStatistics, tenantIds } = options || {};
+  const { enabled, initialData, summary, includeStatistics, tenantIds, callerName } = options || {};
   const isSummary = summary === true;
   const includeStats = includeStatistics === true;
   const queryParams: Record<string, string> = {};
@@ -61,6 +62,7 @@ export function useSchemas(options?: UseSchemasOptions) {
       const response = await apiRequest<FormSchema[]>(apiPath, {
         params: Object.keys(queryParams).length > 0 ? queryParams : undefined,
         disableCache: true, // Force network to make call visible and fresh
+        callerName,
       });
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to fetch schemas');

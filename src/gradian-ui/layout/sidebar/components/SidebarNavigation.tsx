@@ -7,13 +7,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { SidebarNavigationProps } from '../types';
-import { isActiveNavigationItem } from '../utils';
+import { isActiveNavigationItem, filterNavigationItems } from '../utils';
 import { cn } from '../../../shared/utils';
 import { SidebarNavigationDynamic } from './SidebarNavigationDynamic';
 import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
-
-// Track if navigation items have been mounted before (persists across route changes)
-let navigationItemsMounted = false;
 
 export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   items,
@@ -23,43 +20,50 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   onItemClick,
   className,
   navigationSchemas,
+  searchQuery,
 }) => {
   const pathname = usePathname();
   const currentPath = activePath || pathname;
-  const hasMountedRef = useRef(navigationItemsMounted);
-  const [hasMounted, setHasMounted] = React.useState(navigationItemsMounted);
-
-  useEffect(() => {
-    if (!hasMountedRef.current) {
-      navigationItemsMounted = true;
-      hasMountedRef.current = true;
-      setHasMounted(true);
-    }
-  }, []);
-
   const shouldShowTooltip = isCollapsed && !isMobile;
+  
+  // Filter items based on search query
+  const filteredItems = React.useMemo(() => {
+    return filterNavigationItems(items, searchQuery || '');
+  }, [items, searchQuery]);
+
+  // Track previous items to detect actual changes (not just re-renders)
+  const prevItemsKeyRef = useRef<string>('');
+  const itemsKey = React.useMemo(() => {
+    return filteredItems.map(item => item.id || item.name).join(',');
+  }, [filteredItems]);
+  
+  // Only animate if items actually changed (new items added/removed)
+  const shouldAnimate = prevItemsKeyRef.current !== itemsKey;
+  React.useEffect(() => {
+    prevItemsKeyRef.current = itemsKey;
+  }, [itemsKey]);
 
   return (
     <TooltipProvider delayDuration={200}>
-      <ScrollArea className={cn("h-full px-2", className)} scrollbarVariant="dark">
-        <nav className="space-y-3 pt-2 pb-4">
-          {items.map((item, index) => {
+      <ScrollArea className={cn("h-full px-2", className)} scrollbarVariant="minimal">
+        <nav className="space-y-3 pt-2 pb-6">
+          {filteredItems.map((item, index) => {
             const isActive = isActiveNavigationItem(item, currentPath);
             const Icon = item.icon;
             
             const content = (
               <Link href={item.href} prefetch={false} onClick={() => onItemClick?.(item)}>
                 <motion.div
-                  initial={{ opacity: 0, y: 6, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{
-                    duration: 0.25,
-                    delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX),
-                    ease: 'easeOut',
-                  }}
-                  whileHover={!isCollapsed || isMobile ? { scale: 1.02 } : undefined}
+                  key={`${item.id || item.name}-${shouldAnimate}`}
+                  initial={shouldAnimate ? { opacity: 0 } : false}
+                  animate={{ opacity: 1 }}
+                  transition={shouldAnimate ? {
+                    duration: 0.15,
+                    delay: index * 0.04,
+                    ease: [0.4, 0, 0.2, 1],
+                  } : { duration: 0 }}
                   className={cn(
-                    "flex items-center px-3 py-2 rounded-lg transition-all duration-200",
+                    "flex items-center px-3 py-2 rounded-lg transition-colors duration-150",
                     isCollapsed && !isMobile ? "justify-center" : "space-x-3",
                     isActive
                       ? "bg-gray-800 text-white"
@@ -70,13 +74,12 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                   <AnimatePresence mode="wait">
                     {(!isCollapsed || isMobile) && (
                       <motion.span
-                        initial={{ opacity: 0, width: 0, x: -8 }}
-                        animate={{ opacity: 1, width: "auto", x: 0 }}
-                        exit={{ opacity: 0, width: 0, x: -8 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         transition={{ 
-                          duration: 0.2, 
-                          ease: [0.4, 0, 0.2, 1],
-                          opacity: { duration: 0.15 }
+                          duration: 0.15,
+                          ease: 'easeOut'
                         }}
                         className="text-xs font-medium overflow-hidden whitespace-nowrap"
                       >
@@ -115,6 +118,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         isCollapsed={isCollapsed}
         isMobile={isMobile}
         initialSchemas={navigationSchemas}
+        searchQuery={searchQuery}
       />
     </ScrollArea>
     </TooltipProvider>

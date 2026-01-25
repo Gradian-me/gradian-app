@@ -100,6 +100,11 @@ export interface NavigationItem {
   icon: LucideIcon;
   
   /**
+   * Description of the menu item (for search purposes)
+   */
+  description?: string;
+  
+  /**
    * Whether the item is active
    */
   isActive?: boolean;
@@ -173,6 +178,7 @@ export interface SidebarNavigationProps extends BaseComponentProps {
   activePath?: string;
   onItemClick?: (item: NavigationItem) => void;
   navigationSchemas?: FormSchema[];
+  searchQuery?: string;
 }
 
 export interface SidebarUserProfileProps extends BaseComponentProps {
