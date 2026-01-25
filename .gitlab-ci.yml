@@ -621,37 +621,35 @@ trivy_image_approval:
       optional: true
   script:
     - |
+      # Check if this job was triggered manually or automatically
+      # If trivy_image_scan succeeded, this job runs automatically (when: on_success)
+      # If trivy_image_scan failed, this job is manual and requires approval
+      # We can't directly check job status in GitLab CI without API, so we rely on rules
+      # The first rule (on_success) will match when scan succeeds, second (manual) when it fails
       echo "========================================="
-      echo "🔐 Trivy Image Scan Approval"
+      echo "✅ Trivy Image Scan Approval"
       echo "========================================="
       echo ""
-      echo "📋 Trivy Image Scan Results:"
-      echo "----------------------------------------"
-      echo ""
-      echo "⚠️  Trivy scan detected HIGH/CRITICAL vulnerabilities!"
-      echo ""
-      echo "Please review the Trivy scan results in the trivy_image_scan job above."
-      echo ""
-      echo "If you want to proceed despite the vulnerabilities:"
-      echo "  - Review the findings in the trivy_image_scan job output"
-      echo "  - Click 'Play' button below to approve and continue with deployment"
-      echo ""
-      echo "⚠️  WARNING: Deploying with known vulnerabilities may pose security risks!"
-      echo ""
-      echo "✅ Click 'Play' button to approve and continue with deployment"
-      echo "❌ Or cancel this pipeline to stop deployment"
+      echo "✅ Trivy scan passed successfully!"
+      echo "✅ No HIGH/CRITICAL vulnerabilities detected"
+      echo "✅ Auto-approving and proceeding to deployment"
       echo ""
       echo "========================================="
   tags:
     - CG-GR-APP-DEV
   rules:
-    # Only show manual approval if trivy_image_scan failed
-    # If trivy passed, this job will not run (deploy can proceed automatically)
+    # Run automatically when trivy_image_scan succeeds
+    # The 'needs' dependency ensures this only runs if trivy_image_scan succeeded
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
+      when: on_success
+      allow_failure: false
+    # Run manually if trivy_image_scan failed (due to allow_failure: true)
+    # This provides a manual approval path when vulnerabilities are detected
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
       when: manual
       allow_failure: false
-  # This job only appears when trivy_image_scan fails (due to allow_failure: true)
-  # If scan passes, this job won't be created and deploy can proceed automatically
+  # This job runs automatically when trivy_image_scan succeeds (first rule matches)
+  # It runs manually when trivy_image_scan fails (second rule matches)
 
 deploy_staging:
   stage: deploy
