@@ -32,6 +32,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
 }) => {
   const pathname = usePathname();
   const tenantId = useTenantStore((state) => state.getTenantId());
+  const selectedTenant = useTenantStore((state) => state.selectedTenant);
   const [isMounted, setIsMounted] = useState(false);
   // Persist accordion state across route changes
   const [accordionValue, setAccordionValue] = useState<string | undefined>(() => {
@@ -129,11 +130,20 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   }, [refetch, isRouteChangeWithinChat]);
 
   // Filter schemas that have showInNavigation enabled
+  // If tenant name is "local", show all schemas
   const schemas = useMemo(() => {
+    const isLocalTenant = selectedTenant?.name?.toLowerCase() === 'local';
+    
+    if (isLocalTenant) {
+      // Show all schemas when tenant name is "local"
+      return allSchemas;
+    }
+    
+    // Otherwise, filter by showInNavigation
     return allSchemas.filter((schema: FormSchema) => 
       schema.showInNavigation === true
     );
-  }, [allSchemas]);
+  }, [allSchemas, selectedTenant]);
 
   if (isLoading || schemas.length === 0) {
     return null;

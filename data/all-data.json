@@ -2077,6 +2077,46 @@
       "createdAt": "2026-01-06T14:39:16.967Z",
       "updatedAt": "2026-01-06T14:40:26.646Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "title": "Schema Bulk Sync - Localhost",
+      "address": "http://localhost:3001/api/schemas",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "methods": [
+        {
+          "id": "POST",
+          "label": "POST",
+          "icon": "ArrowRight",
+          "color": "emerald"
+        }
+      ],
+      "dataType": [],
+      "id": "01KFT6X0RXYAT87ABMKQA4SJ5Z",
+      "createdAt": "2026-01-25T09:14:01.891Z",
+      "updatedAt": "2026-01-25T09:14:01.891Z"
+    },
+    {
+      "title": "Schema Related Schemas Sync Local",
+      "address": "http://localhost:3001/api/schemas/relations/generate",
+      "enableSystemToken": true,
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "dataType": [],
+      "id": "01KFTGA32WBGKVREKPVEDN4ZRY",
+      "createdAt": "2026-01-25T11:58:27.424Z",
+      "updatedAt": "2026-01-25T11:58:27.424Z"
+    },
+    {
+      "title": "Backend Graph API Local",
+      "address": "http://localhost:3001/api/graph",
+      "enableSystemToken": true,
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "dataType": [],
+      "id": "01KFTGCHJGDSHJW0ERKZQ4Z7NA",
+      "createdAt": "2026-01-25T11:59:47.795Z",
+      "updatedAt": "2026-01-25T11:59:47.795Z"
     }
   ],
   "integrations": [
@@ -2533,6 +2573,150 @@
       "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 14, nodes updated: 269, edges created: 128, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Schema Sync Local",
+      "description": "Schema Sync Local",
+      "icon": "Laptop",
+      "color": "violet",
+      "category": {
+        "id": "local-integration",
+        "label": "Local Integration",
+        "icon": "Laptop",
+        "color": "violet",
+        "targetSchema": "external_nodes"
+      },
+      "targetRoute": [
+        {
+          "id": "01KFT6X0RXYAT87ABMKQA4SJ5Z",
+          "label": "Schema Bulk Sync - Localhost",
+          "targetSchema": "url-repositories",
+          "metadata": {
+            "address": "http://localhost:3001/api/schemas"
+          }
+        }
+      ],
+      "targetMethod": {
+        "id": "POST",
+        "label": "POST",
+        "icon": "Upload",
+        "color": "green",
+        "targetSchema": "external_nodes"
+      },
+      "sourceRoute": [
+        {
+          "id": "01KA8VXHQFZR5TH0470163433K",
+          "label": "Schemas",
+          "targetSchema": "url-repositories",
+          "metadata": {
+            "address": "http://localhost:3000/api/schemas"
+          }
+        }
+      ],
+      "sourceMethod": {
+        "id": "GET",
+        "label": "GET",
+        "icon": "Download",
+        "color": "blue",
+        "targetSchema": "external_nodes"
+      },
+      "sourceDataPath": "",
+      "targetDataPath": "",
+      "incomplete": false,
+      "id": "schemasynclocal",
+      "createdAt": "2026-01-25T09:57:40.963Z",
+      "updatedAt": "2026-01-25T11:56:27.027Z",
+      "lastSynced": "2026-01-25T11:56:27.027Z",
+      "lastSyncMessage": "Processed 51 schemas: 51 succeeded, 0 failed (0 created, 51 updated)"
+    },
+    {
+      "title": "Schema Related Schemas Sync Local",
+      "description": "Schema Related Schemas Sync Local",
+      "icon": "LaptopMinimalCheck",
+      "color": "violet",
+      "category": {
+        "id": "local-integration",
+        "label": "Local Integration",
+        "icon": "Laptop",
+        "color": "violet",
+        "targetSchema": "external_nodes"
+      },
+      "targetRoute": [
+        {
+          "id": "01KFTGA32WBGKVREKPVEDN4ZRY",
+          "label": "Schema Related Schemas Sync Local",
+          "targetSchema": "url-repositories",
+          "metadata": {
+            "address": "http://localhost:3001/api/schemas/relations/generate"
+          }
+        }
+      ],
+      "targetMethod": {
+        "id": "POST",
+        "label": "POST",
+        "icon": "Upload",
+        "color": "green",
+        "targetSchema": "external_nodes"
+      },
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "sourceRoute": [],
+      "sourceMethod": [],
+      "id": "schema_related_schemas_sync_local",
+      "createdAt": "2026-01-25T12:00:58.851Z",
+      "updatedAt": "2026-01-25T12:02:24.292Z",
+      "lastSynced": "2026-01-25T12:02:24.292Z",
+      "lastSyncMessage": "Generated relations for 51 out of 51 schemas"
+    },
+    {
+      "title": "Graph Data Sync Local",
+      "description": "Graph Data Sync Local",
+      "icon": "LucideLaptopMinimalCheck",
+      "color": "violet",
+      "category": {
+        "id": "local-integration",
+        "label": "Local Integration",
+        "icon": "Laptop",
+        "color": "violet",
+        "targetSchema": "external_nodes"
+      },
+      "targetRoute": [
+        {
+          "id": "01KFTGCHJGDSHJW0ERKZQ4Z7NA",
+          "label": "Backend Graph API Local",
+          "targetSchema": "url-repositories",
+          "metadata": {
+            "address": "http://localhost:3001/api/graph"
+          }
+        }
+      ],
+      "targetMethod": [
+        {
+          "id": "POST"
+        }
+      ],
+      "targetDataPath": "data",
+      "sourceDataPath": "data",
+      "sourceRoute": [
+        {
+          "id": "01KANYZDJKCA9FNEFE7ZEY0KSD",
+          "metadata": {
+            "address": "http://localhost:3000/api/graph"
+          }
+        }
+      ],
+      "sourceMethod": [
+        {
+          "id": "GET"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "graph_data_sync_local",
+      "createdAt": "2026-01-25T12:02:17.466Z",
+      "updatedAt": "2026-01-25T12:03:03.926Z",
+      "lastSynced": "2026-01-25T12:03:03.926Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1377, nodes updated: 9, edges created: 205, nodes failed: 0, edges failed: 0."
     }
   ],
   "databases": [
@@ -3451,14 +3635,18 @@
       "openInNewTab": false,
       "id": "01KBSIAIBUILDER0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2026-01-25T11:55:51.933Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "companies": [],
       "relatedTenants": [
         {
           "id": "01KBFBGV9151FQN481NB2CT4MX",
           "label": "Development Environment"
+        },
+        {
+          "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+          "label": "Local Development"
         }
       ],
       "incomplete": false,
@@ -3474,14 +3662,18 @@
       "openInNewTab": false,
       "id": "01KBSICHATBOT0000000000000",
       "createdAt": "2025-12-01T00:00:00.000Z",
-      "updatedAt": "2025-12-01T00:00:00.000Z",
+      "updatedAt": "2026-01-25T11:56:02.915Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "companies": [],
       "relatedTenants": [
         {
           "id": "01KBFBGV9151FQN481NB2CT4MX",
           "label": "Development Environment"
+        },
+        {
+          "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+          "label": "Local Development"
         }
       ],
       "incomplete": false,
@@ -4305,6 +4497,33 @@
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "name": "local",
+      "title": "Local Development",
+      "domain": "localhost:3000",
+      "defaultDomain": "localhost:3000",
+      "dbname": "gradian_graph",
+      "incomplete": false,
+      "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+      "createdAt": "2026-01-25T10:56:03.290Z",
+      "updatedAt": "2026-01-25T10:56:33.837Z",
+      "relatedTenants": [
+        {
+          "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+          "label": "Local Development"
+        }
+      ]
     }
   ],
   "routes": [],
@@ -19300,6 +19519,20 @@
       "icon": "Key",
       "color": "warning",
       "sourceUrl": "field-options:databases:authentication-type"
+    },
+    {
+      "id": "local-integration",
+      "label": "Local Integration",
+      "icon": "Laptop",
+      "color": "violet",
+      "sourceUrl": "field-options:integrations:integration-category"
+    },
+    {
+      "id": "GET",
+      "label": "GET",
+      "icon": "Download",
+      "color": "blue",
+      "sourceUrl": "field-options:integrations:integration-source-method"
     }
   ],
   "deviation-management": [

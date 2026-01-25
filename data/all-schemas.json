@@ -1620,6 +1620,12 @@
         "description": "Category classification for the integration",
         "options": [
           {
+            "id": "local-integration",
+            "label": "Local Integration",
+            "icon": "Laptop",
+            "color": "violet"
+          },
+          {
             "id": "development-integration",
             "label": "Development Integration",
             "icon": "Code",

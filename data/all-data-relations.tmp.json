@@ -2780,5 +2780,16 @@
     "fieldId": "integration-target-route",
     "createdAt": "2026-01-25T12:02:17.522Z",
     "updatedAt": "2026-01-25T12:02:17.522Z"
+  },
+  {
+    "id": "01KFTGH3T7WKZ2WRT8R9D99JBA",
+    "sourceSchema": "integrations",
+    "sourceId": "graph_data_sync_local",
+    "targetSchema": "external_nodes",
+    "targetId": "POST",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "integration-target-method",
+    "createdAt": "2026-01-25T12:02:17.543Z",
+    "updatedAt": "2026-01-25T12:02:17.543Z"
   }
 ]
