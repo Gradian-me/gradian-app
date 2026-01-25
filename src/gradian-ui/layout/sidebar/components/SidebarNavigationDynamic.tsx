@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { AnimatePresence, motion } from 'framer-motion';
-import { LayoutGrid } from 'lucide-react';
+import { LayoutGrid, Package } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useMemo, useEffect, useState, useRef } from 'react';
@@ -47,6 +47,9 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
     const stored = localStorage.getItem(ACCORDION_STATE_KEY);
     return stored === 'open' ? 'applications' : undefined;
   });
+  
+  // Track which application groups are open (nested accordions)
+  const [openApplicationGroups, setOpenApplicationGroups] = useState<Set<string>>(new Set());
   
   // Track previous pathname to detect route changes within chat
   // Use state instead of ref to avoid accessing refs during render
@@ -155,6 +158,95 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
     return filtered;
   }, [allSchemas, isLocalTenant, searchQuery]);
 
+  // Group schemas by their first application
+  // If a schema has no applications, categorize it under "Uncategorized"
+  const groupedSchemas = useMemo(() => {
+    const groups = new Map<string, { application: { id: string; name: string; icon?: string } | null; schemas: FormSchema[] }>();
+    
+    schemas.forEach((schema: FormSchema & { applications?: Array<{ id: string; name: string; icon?: string }> }) => {
+      // Get first application from applications array
+      const firstApplication = schema.applications && schema.applications.length > 0 
+        ? schema.applications[0] 
+        : null;
+      
+      // Use application name as key, or "Uncategorized" if no application
+      const groupKey = firstApplication ? firstApplication.name : 'Uncategorized';
+      
+      if (!groups.has(groupKey)) {
+        groups.set(groupKey, {
+          application: firstApplication,
+          schemas: [],
+        });
+      }
+      
+      groups.get(groupKey)!.schemas.push(schema);
+    });
+    
+    // Convert to array and sort: Uncategorized last, others alphabetically
+    const groupsArray = Array.from(groups.entries()).map(([key, value]) => ({
+      key,
+      ...value,
+      // Sort schemas within each group by name
+      schemas: [...value.schemas].sort((a, b) => {
+        const nameA = a.plural_name || a.singular_name || a.name || a.id || '';
+        const nameB = b.plural_name || b.singular_name || b.name || b.id || '';
+        return nameA.localeCompare(nameB);
+      }),
+    }));
+    
+    // Sort: Uncategorized last, others by application name
+    groupsArray.sort((a, b) => {
+      if (a.key === 'Uncategorized') return 1;
+      if (b.key === 'Uncategorized') return -1;
+      return a.key.localeCompare(b.key);
+    });
+    
+    return groupsArray;
+  }, [schemas]);
+
+  // Auto-open application groups that contain schemas matching the search query
+  useEffect(() => {
+    if (searchQuery && searchQuery.trim().length > 0) {
+      const matchingGroups = new Set<string>();
+      const searchLower = searchQuery.toLowerCase();
+      
+      groupedSchemas.forEach((group) => {
+        // Check if application name matches
+        const applicationNameMatch = group.application?.name?.toLowerCase().includes(searchLower);
+        
+        // Check if any schema in this group matches the search
+        const schemaMatch = group.schemas.some((schema) => {
+          return (
+            schema.plural_name?.toLowerCase().includes(searchLower) ||
+            schema.singular_name?.toLowerCase().includes(searchLower) ||
+            schema.id?.toLowerCase().includes(searchLower) ||
+            schema.description?.toLowerCase().includes(searchLower) ||
+            // Also check if schema's applications match
+            schema.applications?.some((app: { name?: string }) => 
+              app.name?.toLowerCase().includes(searchLower)
+            )
+          );
+        });
+        
+        if (applicationNameMatch || schemaMatch) {
+          matchingGroups.add(group.key);
+        }
+      });
+      
+      // Open matching groups and the main applications accordion
+      if (matchingGroups.size > 0) {
+        setOpenApplicationGroups(matchingGroups);
+        if (accordionValue !== 'applications') {
+          setAccordionValue('applications');
+        }
+      }
+    } else {
+      // Close all application groups when search is cleared
+      setOpenApplicationGroups(new Set());
+    }
+  }, [searchQuery, groupedSchemas, accordionValue]);
+
+
   // Track previous schemas to detect actual changes (not just re-renders)
   const prevSchemasKeyRef = useRef<string>('');
   const prevAccordionOpenRef = useRef<boolean>(false);
@@ -219,7 +311,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className={cn("w-full px-0 mt-3 mb-4", className)}>
+      <div className={cn("w-full px-0 mt-3 mb-8", className)}>
         <Separator className="my-4 bg-gray-700" />
         
         {isMounted ? (
@@ -247,71 +339,171 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
               "pe-0 pb-0",
               isCollapsed && !isMobile ? "ps-0" : "ps-3"
             )}>
-              <nav className="space-y-1 mt-1 mb-2">
-                {schemas.map((schema, index) => {
-                  const active = isActive(schema.id);
-                  const schemaItem = (
-                    <Link key={schema.id} href={`/page/${schema.id}`} prefetch={false}>
-                      <motion.div
-                        initial={shouldAnimate ? { opacity: 0 } : false}
-                        animate={{ opacity: 1 }}
-                        transition={shouldAnimate ? {
-                          duration: 0.15,
-                          delay: index * 0.04,
-                          ease: [0.4, 0, 0.2, 1],
-                        } : { duration: 0 }}
-                        className={cn(
-                          "flex items-center py-2 rounded-lg transition-colors duration-150",
-                          isCollapsed && !isMobile ? "justify-center px-0" : "space-x-3 px-3",
-                          active
-                            ? "bg-gray-800 text-white"
-                            : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                        )}
-                      >
-                        {schema.icon ? (
-                          <IconRenderer 
-                            iconName={schema.icon} 
-                            className="h-5 w-5 shrink-0" 
-                          />
-                        ) : (
-                          <div className="h-5 w-5 shrink-0 rounded bg-gray-700" />
-                        )}
-                        <AnimatePresence mode="wait">
-                          {(!isCollapsed || isMobile) && (
-                            <motion.span
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ 
-                                duration: 0.15,
-                                ease: 'easeOut'
-                              }}
-                              className="text-xs font-medium overflow-hidden whitespace-nowrap"
-                            >
-                              {schema.plural_name}
-                            </motion.span>
+              <AnimatePresence mode="wait">
+                {isAccordionOpen && (
+                  <motion.nav
+                    key="applications-nav"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-1 mt-1 mb-2"
+                  >
+                    <Accordion 
+                      type="multiple" 
+                      className="w-full"
+                      value={Array.from(openApplicationGroups)}
+                      onValueChange={(values) => {
+                        setOpenApplicationGroups(new Set(values));
+                      }}
+                    >
+                      {groupedSchemas.map((group, groupIndex) => {
+                        const isUncategorized = group.key === 'Uncategorized';
+                        const isGroupOpen = openApplicationGroups.has(group.key);
+                        const groupValue = group.key;
+                        
+                        return (
+                          <motion.div
+                            key={group.key}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{
+                              duration: 0.35,
+                              delay: groupIndex * 0.03,
+                              ease: "easeIn",
+                            }}
+                          >
+                        <AccordionItem 
+                          value={groupValue}
+                          className="border-none"
+                        >
+                          {/* Application Group Header - Accordion Trigger */}
+                          <AccordionTrigger
+                          className={cn(
+                            "px-3 py-2.5 hover:no-underline rounded-lg transition-colors",
+                            "text-gray-300 hover:text-white hover:bg-gray-800/50",
+                            "data-[state=open]:text-white data-[state=open]:bg-gray-800/70",
+                            "border-l-2 border-l-transparent data-[state=open]:border-l-violet-500"
                           )}
-                        </AnimatePresence>
-                      </motion.div>
-                    </Link>
-                  );
+                        >
+                          <div className={cn(
+                            "flex items-center flex-1",
+                            isCollapsed && !isMobile ? "justify-center" : "space-x-2"
+                          )}>
+                            {group.application?.icon ? (
+                              <IconRenderer 
+                                iconName={group.application.icon} 
+                                className="h-4 w-4 shrink-0" 
+                              />
+                            ) : group.key === 'Uncategorized' ? (
+                              <Package className="h-4 w-4 shrink-0" />
+                            ) : null}
+                            <AnimatePresence mode="wait">
+                              {(!isCollapsed || isMobile) && (
+                                <motion.span
+                                  initial={{ opacity: 0, width: 0 }}
+                                  animate={{ opacity: 1, width: "auto" }}
+                                  exit={{ opacity: 0, width: 0 }}
+                                  transition={{ 
+                                    duration: 0.15,
+                                    ease: 'easeOut'
+                                  }}
+                                  className="text-[11px] font-semibold uppercase tracking-wider truncate"
+                                >
+                                  {group.key}
+                                </motion.span>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        </AccordionTrigger>
+                        
+                        {/* Schemas in this group - Accordion Content */}
+                        <AccordionContent className="pe-0 pb-0 pt-0">
+                          <AnimatePresence mode="wait">
+                            {isGroupOpen && (
+                              <motion.div
+                                key={`group-${group.key}`}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="space-y-1 mt-1 border-l-2 border-l-violet-500/30 ml-3 pl-1.5"
+                              >
+                                {group.schemas.map((schema, schemaIndex) => {
+                                  const active = isActive(schema.id);
+                                  const schemaItem = (
+                                    <Link key={schema.id} href={`/page/${schema.id}`} prefetch={false}>
+                                      <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{
+                                          duration: 0.35,
+                                          delay: schemaIndex * 0.03,
+                                          ease: "easeIn",
+                                        }}
+                                    className={cn(
+                                      "flex items-center py-2 rounded-lg transition-colors duration-150",
+                                      isCollapsed && !isMobile ? "justify-center px-0" : "space-x-3 px-3",
+                                      active
+                                        ? "bg-gray-800 text-white"
+                                        : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                                    )}
+                                  >
+                                    {schema.icon ? (
+                                      <IconRenderer 
+                                        iconName={schema.icon} 
+                                        className="h-5 w-5 shrink-0" 
+                                      />
+                                    ) : (
+                                      <div className="h-5 w-5 shrink-0 rounded bg-gray-700" />
+                                    )}
+                                    <AnimatePresence mode="wait">
+                                      {(!isCollapsed || isMobile) && (
+                                        <motion.span
+                                          initial={{ opacity: 0 }}
+                                          animate={{ opacity: 1 }}
+                                          exit={{ opacity: 0 }}
+                                          transition={{ 
+                                            duration: 0.15,
+                                            ease: 'easeOut'
+                                          }}
+                                          className="text-xs font-medium overflow-hidden whitespace-nowrap"
+                                        >
+                                          {schema.plural_name}
+                                        </motion.span>
+                                      )}
+                                    </AnimatePresence>
+                                  </motion.div>
+                                </Link>
+                              );
 
-                  if (shouldShowTooltip) {
-                    return (
-                      <Tooltip key={schema.id}>
-                        <TooltipTrigger asChild>
-                          {schemaItem}
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="bg-gray-900 text-white border-gray-700">
-                          <p>{schema.plural_name}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    );
-                  }
+                              if (shouldShowTooltip) {
+                                return (
+                                  <Tooltip key={schema.id}>
+                                    <TooltipTrigger asChild>
+                                      {schemaItem}
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="bg-gray-900 text-white border-gray-700">
+                                      <p>{schema.plural_name}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                );
+                              }
 
-                  return <React.Fragment key={schema.id}>{schemaItem}</React.Fragment>;
-                })}
-              </nav>
+                                  return <React.Fragment key={schema.id}>{schemaItem}</React.Fragment>;
+                                })}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </AccordionContent>
+                      </AccordionItem>
+                        </motion.div>
+                      );
+                    })}
+                  </Accordion>
+                </motion.nav>
+              )}
+            </AnimatePresence>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

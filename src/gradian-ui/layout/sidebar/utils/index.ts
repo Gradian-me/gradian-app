@@ -201,7 +201,7 @@ export const filterNavigationItems = (
  * 
  * Performance Review:
  * - Complexity: O(n) where n is number of schemas
- * - Searches multiple fields (plural_name, singular_name, description)
+ * - Searches multiple fields (plural_name, singular_name, description, applications)
  * - Case-insensitive matching
  * 
  * DRY Review:
@@ -230,7 +230,12 @@ export const filterFormSchemas = (
     // Search in id (for exact matches)
     const idMatch = schema.id?.toLowerCase().includes(query);
     
-    return pluralMatch || singularMatch || descriptionMatch || idMatch;
+    // Search in application names
+    const applicationMatch = schema.applications?.some((app: { name?: string }) => 
+      app.name?.toLowerCase().includes(query)
+    );
+    
+    return pluralMatch || singularMatch || descriptionMatch || idMatch || applicationMatch;
   });
 };
 

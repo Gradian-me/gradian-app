@@ -11,6 +11,9 @@ import { clearCache as clearSharedSchemaCache } from '@/gradian-ui/shared/utils/
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
+import { readAllRelations } from '@/gradian-ui/shared/domain/utils/relations-storage.util';
+import { readAllData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
+import { getValueByRole, getSingleValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 
 const MAX_SCHEMA_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
 const SCHEMA_FILE_PATH = path.join(process.cwd(), 'data', 'all-schemas.json');
@@ -105,17 +108,129 @@ function loadSchemas(): any[] {
   
   // Cache miss, expired, or file changed - read from file and update cache
   const fileContents = fs.readFileSync(SCHEMA_FILE_PATH, 'utf8');
-  cachedSchemas = JSON.parse(fileContents);
+  
+  // Check if file is empty or just whitespace
+  if (!fileContents || fileContents.trim().length === 0) {
+    cachedSchemas = [];
+    cacheTimestamp = now;
+    cachedFileMtime = currentMtime;
+    return [];
+  }
+  
+  const parsed = JSON.parse(fileContents);
+  
+  // Normalize to array format
+  let normalizedSchemas: any[] = [];
+  if (Array.isArray(parsed)) {
+    normalizedSchemas = parsed;
+  } else if (typeof parsed === 'object' && parsed !== null) {
+    if (Array.isArray(parsed.data)) {
+      normalizedSchemas = parsed.data;
+    } else if (Object.keys(parsed).length > 0) {
+      normalizedSchemas = Object.values(parsed);
+    }
+  }
+  
+  cachedSchemas = normalizedSchemas;
   cacheTimestamp = now;
   cachedFileMtime = currentMtime;
   
-  return cachedSchemas || [];
+  return cachedSchemas;
 }
 
 function writeSchemasAtomically(schemas: any[]): void {
   const payload = JSON.stringify(schemas, null, 2);
   fs.writeFileSync(SCHEMA_FILE_TMP_PATH, payload, { encoding: 'utf8', mode: 0o600 });
   fs.renameSync(SCHEMA_FILE_TMP_PATH, SCHEMA_FILE_PATH);
+}
+
+/**
+ * Get related applications for a schema
+ * Uses the same method as /api/data/all-relations to find applications
+ * that have a HAS_SCHEMA relation to this schema
+ * 
+ * Relation structure: application (source) -> schema (target) with relationTypeId "HAS_SCHEMA"
+ */
+function getRelatedApplications(schemaId: string, tenantIds?: string[]): Array<{ id: string; name: string; icon?: string }> {
+  try {
+    // Read all relations
+    const allRelations = readAllRelations();
+    
+    // Filter relations where:
+    // - targetSchema is "schemas" and targetId is the schemaId (schema is the target)
+    // - sourceSchema is "applications" (application is the source)
+    // - relationTypeId is "HAS_SCHEMA"
+    // Note: We include inactive relations to show all applications that have been linked,
+    // even if the relation was later marked as inactive (for historical context)
+    const filteredRelations = allRelations.filter((r) => {
+      return (
+        r.targetSchema === 'schemas' &&
+        r.targetId === schemaId &&
+        r.sourceSchema === 'applications' &&
+        r.relationTypeId === 'HAS_SCHEMA'
+      );
+    });
+
+    if (filteredRelations.length === 0) {
+      return [];
+    }
+
+    // Read all data to get application entities
+    const allData = readAllData();
+    const applications = allData['applications'] || [];
+
+    // Get application IDs from relations (sourceId is the application ID)
+    const applicationIds = new Set<string>(
+      filteredRelations.map((r) => r.sourceId).filter((id): id is string => Boolean(id))
+    );
+
+    // Get application schema to resolve name and icon fields
+    const schemas = loadSchemas();
+    const applicationSchema = schemas.find((s: any) => s.id === 'applications');
+
+    // Build result array with id, name, and icon
+    const result: Array<{ id: string; name: string; icon?: string }> = [];
+    
+    for (const applicationId of applicationIds) {
+      const application = applications.find((app: any) => app.id === applicationId);
+      
+      if (application) {
+        // Filter by tenant if provided
+        if (tenantIds && tenantIds.length > 0) {
+          const appTenantId = application.companyId || application.tenantId;
+          if (appTenantId && !tenantIds.includes(appTenantId)) {
+            continue;
+          }
+        }
+
+        // Get name and icon using field roles
+        // name field has role "title" in applications schema
+        // icon field has role "icon" in applications schema
+        const name = applicationSchema
+          ? (getValueByRole(applicationSchema, application, 'title') || application.name || application.title || applicationId)
+          : (application.name || application.title || applicationId);
+        
+        const icon = applicationSchema
+          ? (getSingleValueByRole(applicationSchema, application, 'icon') || application.icon)
+          : application.icon;
+
+        result.push({
+          id: applicationId,
+          name: typeof name === 'string' ? name : String(name),
+          icon: icon ? String(icon) : undefined,
+        });
+      }
+    }
+
+    return result;
+  } catch (error) {
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `[API] Failed to get related applications for schema "${schemaId}": ${error instanceof Error ? error.message : String(error)}`,
+    );
+    return [];
+  }
 }
 
 /**
@@ -186,10 +301,28 @@ export async function GET(
                 'info',
                 `[Schema API] Found schema "${schemaId}" in local fallback`
               );
+              
+              // Get tenantIds from query params if available
+              const searchParams = request.nextUrl.searchParams;
+              const tenantIdsParam = searchParams.get('tenantIds');
+              const tenantIds = tenantIdsParam
+                ?.split(',')
+                .map((id) => id.trim())
+                .filter((id) => id.length > 0);
+              
+              // Get related applications for this schema
+              const relatedApplications = getRelatedApplications(schemaId, tenantIds);
+              
+              // Add applications to response
+              const responseData = {
+                ...schema,
+                applications: relatedApplications,
+              };
+              
               const corsHeaders = getCorsHeaders(request);
               return NextResponse.json({
                 success: true,
-                data: schema
+                data: responseData
               }, {
                 headers: {
                   'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -248,13 +381,30 @@ export async function GET(
       );
     }
 
+    // Get tenantIds from query params if available
+    const searchParams = request.nextUrl.searchParams;
+    const tenantIdsParam = searchParams.get('tenantIds');
+    const tenantIds = tenantIdsParam
+      ?.split(',')
+      .map((id) => id.trim())
+      .filter((id) => id.length > 0);
+    
+    // Get related applications for this schema
+    const relatedApplications = getRelatedApplications(schemaId, tenantIds);
+    
+    // Add applications to response
+    const responseData = {
+      ...schema,
+      applications: relatedApplications,
+    };
+
     // Get CORS headers
     const corsHeaders = getCorsHeaders(request);
 
     // Return response with cache-busting headers to prevent browser caching
     return NextResponse.json({
       success: true,
-      data: schema
+      data: responseData
     }, {
       headers: {
         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',

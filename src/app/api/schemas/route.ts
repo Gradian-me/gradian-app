@@ -11,6 +11,9 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { calculateSchemaStatistics } from '@/gradian-ui/schema-manager/utils/schema-statistics-utils';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
+import { readAllRelations } from '@/gradian-ui/shared/domain/utils/relations-storage.util';
+import { readAllData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
+import { getValueByRole, getSingleValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 
 const SCHEMA_SUMMARY_EXCLUDED_KEY_SET = new Set<string>(SCHEMA_SUMMARY_EXCLUDED_KEYS);
 const MAX_SCHEMA_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
@@ -174,6 +177,136 @@ function writeSchemasAtomically(schemas: any[]): void {
 }
 
 /**
+ * Get related applications for a schema
+ * Uses the same method as /api/data/all-relations to find applications
+ * that have a HAS_SCHEMA relation to this schema
+ * 
+ * Relation structure: application (source) -> schema (target) with relationTypeId "HAS_SCHEMA"
+ */
+function getRelatedApplications(schemaId: string, tenantIds?: string[]): Array<{ id: string; name: string; icon?: string }> {
+  try {
+    // Read all relations
+    const allRelations = readAllRelations();
+    
+    // Filter relations where:
+    // - targetSchema is "schemas" and targetId is the schemaId (schema is the target)
+    // - sourceSchema is "applications" (application is the source)
+    // - relationTypeId is "HAS_SCHEMA"
+    // Note: We include inactive relations to show all applications that have been linked,
+    // even if the relation was later marked as inactive (for historical context)
+    const filteredRelations = allRelations.filter((r) => {
+      return (
+        r.targetSchema === 'schemas' &&
+        r.targetId === schemaId &&
+        r.sourceSchema === 'applications' &&
+        r.relationTypeId === 'HAS_SCHEMA'
+      );
+    });
+
+    if (filteredRelations.length === 0) {
+      return [];
+    }
+
+    // Read all data to get application entities
+    const allData = readAllData();
+    const applications = allData['applications'] || [];
+
+    // Get application IDs from relations (sourceId is the application ID)
+    const applicationIds = new Set<string>(
+      filteredRelations.map((r) => r.sourceId).filter((id): id is string => Boolean(id))
+    );
+
+    // Get application schema to resolve name and icon fields
+    const schemas = loadSchemasSync();
+    const applicationSchema = schemas.find((s: any) => s.id === 'applications');
+
+    // Build result array with id, name, and icon
+    const result: Array<{ id: string; name: string; icon?: string }> = [];
+    
+    for (const applicationId of applicationIds) {
+      const application = applications.find((app: any) => app.id === applicationId);
+      
+      if (application) {
+        // Filter by tenant if provided
+        if (tenantIds && tenantIds.length > 0) {
+          const appTenantId = application.companyId || application.tenantId;
+          if (appTenantId && !tenantIds.includes(appTenantId)) {
+            continue;
+          }
+        }
+
+        // Get name and icon using field roles
+        // name field has role "title" in applications schema
+        // icon field has role "icon" in applications schema
+        const name = applicationSchema
+          ? (getValueByRole(applicationSchema, application, 'title') || application.name || application.title || applicationId)
+          : (application.name || application.title || applicationId);
+        
+        const icon = applicationSchema
+          ? (getSingleValueByRole(applicationSchema, application, 'icon') || application.icon)
+          : application.icon;
+
+        result.push({
+          id: applicationId,
+          name: typeof name === 'string' ? name : String(name),
+          icon: icon ? String(icon) : undefined,
+        });
+      }
+    }
+
+    return result;
+  } catch (error) {
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `[API] Failed to get related applications for schema "${schemaId}": ${error instanceof Error ? error.message : String(error)}`,
+    );
+    return [];
+  }
+}
+
+/**
+ * Synchronous version of loadSchemas for use in helper functions
+ */
+function loadSchemasSync(): any[] {
+  if (!fs.existsSync(SCHEMA_FILE_PATH)) {
+    return [];
+  }
+  
+  try {
+    const { size } = fs.statSync(SCHEMA_FILE_PATH);
+    if (size > MAX_SCHEMA_FILE_BYTES) {
+      return [];
+    }
+
+    const fileContents = fs.readFileSync(SCHEMA_FILE_PATH, 'utf8');
+    
+    if (!fileContents || fileContents.trim().length === 0) {
+      return [];
+    }
+    
+    const parsed = JSON.parse(fileContents);
+    
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+    
+    if (typeof parsed === 'object' && parsed !== null) {
+      if (Array.isArray(parsed.data)) {
+        return parsed.data;
+      }
+      if (Object.keys(parsed).length > 0) {
+        return Object.values(parsed);
+      }
+    }
+    
+    return [];
+  } catch (error) {
+    return [];
+  }
+}
+
+/**
  * GET - Get all schemas or a specific schema by ID
  * Example: 
  * - GET /api/schemas - returns all schemas
@@ -327,9 +460,18 @@ export async function GET(request: NextRequest) {
         ? matchedSchemas.map((schema) => buildSchemaSummary(schema, includeStatistics))
         : matchedSchemas;
 
+      // Add applications to each schema
+      const schemasWithApplications = responseData.map((schema: any) => {
+        const relatedApplications = getRelatedApplications(schema.id, tenantIds);
+        return {
+          ...schema,
+          applications: relatedApplications,
+        };
+      });
+
       return NextResponse.json({
         success: true,
-        data: responseData,
+        data: schemasWithApplications,
         meta: {
           requestedIds: uniqueSchemaIds,
           returnedCount: matchedSchemas.length,
@@ -356,9 +498,18 @@ export async function GET(request: NextRequest) {
 
       const responseSchema = isSummaryRequested ? buildSchemaSummary(schema, includeStatistics) : schema;
 
+      // Get related applications for this schema
+      const relatedApplications = getRelatedApplications(schemaId, tenantIds);
+      
+      // Add applications to response
+      const responseData = {
+        ...responseSchema,
+        applications: relatedApplications,
+      };
+
       return NextResponse.json({
         success: true,
-        data: responseSchema
+        data: responseData
       }, {
         headers: {
           'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -374,9 +525,18 @@ export async function GET(request: NextRequest) {
       ? filteredSchemas.map((schema) => buildSchemaSummary(schema, includeStatistics))
       : filteredSchemas;
 
+    // Add applications to each schema
+    const schemasWithApplications = responseSchemas.map((schema: any) => {
+      const relatedApplications = getRelatedApplications(schema.id, tenantIds);
+      return {
+        ...schema,
+        applications: relatedApplications,
+      };
+    });
+
     return NextResponse.json({
       success: true,
-      data: responseSchemas
+      data: schemasWithApplications
     }, {
       headers: {
         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',

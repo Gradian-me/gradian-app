@@ -1562,7 +1562,17 @@
       "incomplete": false,
       "id": "01KFTQPVC9RCRE9J8ACHECVWNK",
       "createdAt": "2026-01-25T14:07:45.553Z",
-      "updatedAt": "2026-01-25T14:07:45.554Z"
+      "updatedAt": "2026-01-25T15:20:44.722Z",
+      "application-schemas": []
+    },
+    {
+      "name": "Supply Chain Management",
+      "icon": "LucidePlaneTakeoff",
+      "incomplete": false,
+      "id": "01KFTVYHWWEHFEQDME72PKNA75",
+      "createdAt": "2026-01-25T15:21:52.287Z",
+      "updatedAt": "2026-01-25T15:22:16.436Z",
+      "application-schemas": []
     }
   ],
   "production-actuals": [],

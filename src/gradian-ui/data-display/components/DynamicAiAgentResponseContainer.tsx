@@ -609,7 +609,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   // These are safe to compute even if agent is null
   const runType = action.runType || 'manual';
   const hasResponse = aiResponse && aiResponse.trim().length > 0;
-  const showManualButton = runType === 'manual' && !hasResponse && !isLoading;
+  const showManualButton = runType === 'manual' && !hasResponse && !isLoading && !error;
   const showSkeleton = isLoading || (runType === 'automatic' && !hasExecuted && !hasResponse);
 
   // Reusable content renderer function - MUST be defined before any early returns
@@ -617,6 +617,31 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   const renderContent = useCallback(() => {
     // Early return inside the callback is fine - the hook itself is always called
     if (!agent) return null;
+    
+    // Check for error first - show error message instead of manual button or response
+    if (error) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[200px] gap-4 p-6">
+          <Button
+            onClick={executeAgent}
+            size="default"
+            variant="default"
+            className="bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
+          >
+            <RefreshCw className="h-4 w-4 me-2" />
+            Try Again
+          </Button>
+          <div className="text-sm text-red-600 dark:text-red-400 font-medium">
+            Error occurred while generating response
+          </div>
+          <div className="text-xs text-red-500 dark:text-red-500/80 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 max-w-2xl w-full">
+            <div className="font-semibold mb-2">Error details:</div>
+            <div className="whitespace-pre-wrap break-words">{error}</div>
+          </div>
+        </div>
+      );
+    }
+    
     if (showSkeleton) {
       return (
         <AnimatePresence>
@@ -774,14 +799,6 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               initialLineNumbers={10}
             />
           )}
-        </div>
-      );
-    }
-    
-    if (error) {
-      return (
-        <div className="text-sm text-red-600 dark:text-red-400">
-          Error: {error}
         </div>
       );
     }

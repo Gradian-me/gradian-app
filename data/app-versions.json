@@ -6110,5 +6110,43 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KESIDEBARNAVIGATION001",
+    "timestamp": "2026-01-25T00:00:00.000Z",
+    "version": "1.45.003",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Implemented functionality to retrieve related applications for schemas in the API, enhancing data connectivity",
+        "priority": "High",
+        "affectedDomains": [
+          "api",
+          "schemas",
+          "data-connectivity"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated SidebarNavigation and SidebarNavigationDynamic components to support dynamic grouping and improved search functionality, allowing users to filter and navigate schemas more efficiently",
+        "priority": "High",
+        "affectedDomains": [
+          "ui",
+          "sidebar",
+          "navigation",
+          "search"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Cleaned up schema loading and relation handling logic for better performance and maintainability",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "performance",
+          "codebase"
+        ]
+      }
+    ]
   }
 ]
