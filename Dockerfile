@@ -27,7 +27,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
 # Copy package files and install only production dependencies
 COPY package.json package-lock.json* ./
 
-RUN npm ci --only=production \
+RUN npm ci --registry=https://reg.cinnagen.com/repository/npm-group/ --only=production \
     && npm cache clean --force \
     && rm -rf /tmp/* /var/tmp/* /root/.npm /root/.node-gyp
 
