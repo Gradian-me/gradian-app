@@ -10,15 +10,12 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
   DOCKER_BUILDKIT: "1"
-  TRIVY_CACHE_DIR: /tmp/trivy-cache
 
 
 before_script:
   - echo "Authenticating with Docker Registry..."
   - echo "$nexus_password" | docker login -u "$nexus_user" --password-stdin reg.cinnagen.com:8083
   - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-  - export TRIVY_CACHE_DIR=/tmp/trivy-cache
-  - mkdir -p $TRIVY_CACHE_DIR
   
 security_audit:
   stage: security
@@ -570,47 +567,39 @@ trivy_image_scan:
       echo "🐳 Image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
       echo ""
     - |
-      # Ensure cache directory exists"
-      mkdir -p "$TRIVY_CACHE_DIR"
-      echo "📦 Trivy cache directory: $TRIVY_CACHE_DIR"
-      
-      # Pull latest Trivy image
-      echo "🐳 Pulling latest Trivy Docker image..."
-      docker pull reg.cinnagen.com:8083/aquasec/trivy:latest
-      
-      # Mount Docker config for registry authentication
-      DOCKER_CONFIG_DIR="${HOME}/.docker"
-      DOCKER_CONFIG_MOUNT=""
-      if [ -d "$DOCKER_CONFIG_DIR" ]; then
-        DOCKER_CONFIG_MOUNT="-v $DOCKER_CONFIG_DIR:/root/.docker:ro"
-        echo "🔑 Using Docker config for registry authentication"
+      # Verify Trivy is installed
+      if ! command -v trivy &> /dev/null; then
+        echo "❌ Trivy is not installed on this system!"
+        echo "⚠️  Please install Trivy before running the scan."
+        exit 1
       fi
+      
+      echo "✅ Trivy found: $(trivy --version | head -n 1)"
+      echo ""
       
       IMAGE_TO_SCAN="$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
       
       echo "🔍 Running Trivy security scan..."
-      echo "ℹ️  Trivy will automatically check and update database if needed"
+      echo "ℹ️  Using pre-updated databases (updated via cron job)"
+      echo "⚠️  Scan will fail if databases are not available"
       echo ""
       
-      # Run Trivy scan once with table format for readable output
+      # Run Trivy scan with table format for readable output
       # --exit-code 1: Fail if HIGH/CRITICAL vulnerabilities found
       # --severity HIGH,CRITICAL: Only report HIGH and CRITICAL vulnerabilities
       # --no-progress: Disable progress bar
-      # --db-repository: Use custom database repository
-      # Cache directory is mounted to persist database between runs
-      # Trivy automatically checks if database is up-to-date and downloads if needed
-      docker run \
-        --rm \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        $DOCKER_CONFIG_MOUNT \
-        -v "$TRIVY_CACHE_DIR:/root/.cache/trivy:rw" \
-        reg.cinnagen.com:8083/aquasec/trivy:latest \
-        image \
+      # --skip-db-update: Skip updating vulnerability database (use pre-updated DB)
+      # --skip-java-db-update: Skip updating Java vulnerability database
+      # --offline-scan: Run scan offline (don't download databases)
+      # If database doesn't exist, Trivy will fail with an error
+      trivy image \
         --format table \
         --exit-code 1 \
         --severity HIGH,CRITICAL \
         --no-progress \
-        --db-repository ghcr.io/aquasecurity/trivy-db \
+        --skip-db-update \
+        --skip-java-db-update \
+        --offline-scan \
         "$IMAGE_TO_SCAN" || TRIVY_EXIT_CODE=$?
       
       echo ""
