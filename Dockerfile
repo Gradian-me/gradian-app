@@ -5,8 +5,15 @@
 
     WORKDIR /app
     
-    # Copy package files and install only production dependencies
-    COPY package.json package-lock.json* ./
+    # Copy package files and npm config
+    COPY package.json package-lock.json* .npmrc* ./
+    
+    # Configure npm to use internal registry
+    RUN npm config set registry https://reg.cinnagen.com/repository/npm-group/ && \
+        npm config set fetch-retries 5 && \
+        npm config set fetch-retry-mintimeout 20000 && \
+        npm config set fetch-retry-maxtimeout 120000 && \
+        npm config set fetch-timeout 300000
     
     RUN npm ci --only=production \
         && npm cache clean --force \
@@ -26,14 +33,17 @@
     ENV NEXT_PUBLIC_SKIP_KEY=$NEXT_PUBLIC_SKIP_KEY
     ENV NEXT_TELEMETRY_DISABLED=1
     
-    # Copy package files and install all dependencies for build
-    COPY package.json package-lock.json* ./
+    # Copy package files and npm config
+    COPY package.json package-lock.json* .npmrc* ./
     
-    RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    # Configure npm to use internal registry
+    RUN npm config set registry https://reg.cinnagen.com/repository/npm-group/ && \
         npm config set fetch-retries 5 && \
         npm config set fetch-retry-mintimeout 20000 && \
         npm config set fetch-retry-maxtimeout 120000 && \
-        npm config set fetch-timeout 300000 && \
+        npm config set fetch-timeout 300000
+    
+    RUN --mount=type=cache,target=/root/.npm,sharing=locked \
         npm ci --legacy-peer-deps --include=optional --prefer-offline --no-audit \
         && npm cache clean --force
     
