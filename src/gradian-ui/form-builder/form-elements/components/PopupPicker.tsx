@@ -556,8 +556,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       setError(null);
       if (pageToLoad === 1) {
         setIsLoading(true);
-        // Don't clear items immediately - keep previous items visible while loading
-        // Only clear if this is a force refresh or initial load
+        // Clear only on force refresh or initial load. When searching, keep current list for instant
+        // client-side filtering; fetch runs in background and we update when it returns.
         if (forceRefresh || items.length === 0) {
           setItems([]);
           setFilteredItems([]);
@@ -605,8 +605,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
         const dataArray = result.data;
         setItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
-        setFilteredItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
-        
+        if (!trimmedSearch) {
+          setFilteredItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
+        }
+
         setPageMeta((prev) => {
           const meta = result.meta;
           const nextLimit = meta?.limit ?? effectivePageSize;
@@ -659,8 +661,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       setError(null);
       if (pageToLoad === 1) {
         setIsLoading(true);
-        // Don't clear items immediately - keep previous items visible while loading
-        // Only clear if this is a force refresh or initial load
+        // Clear only on force refresh or initial load. When searching, keep current list for instant
+        // client-side filtering; fetch runs in background and we update when it returns.
         if (forceRefresh || items.length === 0) {
           setItems([]);
           setFilteredItems([]);
@@ -701,7 +703,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
         const dataArray = result.data;
         setItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
-        setFilteredItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
+        if (!trimmedSearch) {
+          setFilteredItems((prev) => (append ? [...prev, ...dataArray] : dataArray));
+        }
 
         setPageMeta((prev) => {
           const meta = result.meta;
@@ -982,6 +986,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     if (!isOpen || !supportsPagination) {
       return;
     }
+    // Avoid triggering a duplicate fetch while a manual refresh is in progress
+    if (isRefreshingRef.current) {
+      return;
+    }
     const trimmed = searchQuery.trim();
     const queryKey = `${trimmed}|${includeKey}|${excludeKey}|${companyKey}`;
     if (queryKey === lastQueryKeyRef.current) {
@@ -996,7 +1004,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         totalItems: 0,
       }));
       void loadItems(1, false);
-    }, 250);
+    }, 120);
     return () => clearTimeout(handler);
   }, [isOpen, supportsPagination, searchQuery, includeKey, excludeKey, loadItems, companyKey]);
 
@@ -1023,9 +1031,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       return;
     }
 
-    // When there's a search query, always do client-side filtering for immediate feedback
-    // This ensures filtering works even if API filtering has issues or delays
-
+    // Always apply client-side filtering when there's a search query (paginated or not).
+    // The API may not filter (e.g. /api/schemas); we filter items for display so we never show "all".
+    // Fetch updates only `items` when searching; we derive filteredItems here to avoid knock.
     const query = trimmed.toLowerCase();
     const filtered = items.filter((item) => {
       if (!effectiveSchema) {

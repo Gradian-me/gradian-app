@@ -10,6 +10,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { SidebarNavigationProps } from '../types';
 import { isActiveNavigationItem, filterNavigationItems, FALLBACK_HOME_MENU_ITEM } from '../utils';
 import { cn } from '../../../shared/utils';
+import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
+import { SIDEBAR_HIGHLIGHT_CLASS } from '../utils';
 import { SidebarNavigationDynamic } from './SidebarNavigationDynamic';
 import { Menu } from 'lucide-react';
 
@@ -55,7 +57,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   return (
     <TooltipProvider delayDuration={200}>
       <ScrollArea className={cn("h-full px-2", className)} scrollbarVariant="minimal">
-        <div className="space-y-3 pt-2 pb-4">
+        <div className="space-y-1 pt-2 pb-4">
           {/* Home link - always shown, outside Menu */}
           <div className="space-y-1">
             {shouldShowTooltip ? (
@@ -187,7 +189,9 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                                   }}
                                   className="text-xs font-medium overflow-hidden whitespace-nowrap"
                                 >
-                                  {item.name}
+                                  {searchQuery?.trim()
+                                    ? renderHighlightedText(item.name ?? '', searchQuery.trim(), SIDEBAR_HIGHLIGHT_CLASS)
+                                    : (item.name ?? '')}
                                 </motion.span>
                               )}
                             </AnimatePresence>

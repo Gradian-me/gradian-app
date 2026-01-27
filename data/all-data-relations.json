@@ -3198,5 +3198,115 @@
     "createdAt": "2026-01-25T15:22:14.511Z",
     "updatedAt": "2026-01-25T15:22:16.489Z",
     "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KFTVYHWWEHFEQDME72PKNA75",
+    "targetSchema": "schemas",
+    "targetId": "inquiries",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFZFSKQ04CT3WZZSTHPCVC0F",
+    "createdAt": "2026-01-27T10:25:39.551Z",
+    "updatedAt": "2026-01-27T10:25:41.856Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "guidelines",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFZFT8G226RGAK9X1KFFE1D6",
+    "createdAt": "2026-01-27T10:26:00.834Z",
+    "updatedAt": "2026-01-27T10:26:02.801Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "qa-guideline-analysis",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFZFT8GRB1BKFW3RGWC483MW",
+    "createdAt": "2026-01-27T10:26:00.856Z",
+    "updatedAt": "2026-01-27T10:26:02.804Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KFZFTS259QZVTR2ETNZ1H0GF",
+    "targetSchema": "schemas",
+    "targetId": "process-mappings",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFZFVBB8J323KCY0M1P60FGN",
+    "createdAt": "2026-01-27T10:26:36.520Z",
+    "updatedAt": "2026-01-27T10:26:37.716Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KFZFTS259QZVTR2ETNZ1H0GF",
+    "targetSchema": "schemas",
+    "targetId": "tasks",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFZFVBC3GJD8XAR3DAP6SG7C",
+    "createdAt": "2026-01-27T10:26:36.547Z",
+    "updatedAt": "2026-01-27T10:26:37.720Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "quality-assurance-analysis",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFZFW863GRKTVF0KBN34SFFX",
+    "createdAt": "2026-01-27T10:27:06.051Z",
+    "updatedAt": "2026-01-27T10:27:07.049Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000003",
+    "targetSchema": "schemas",
+    "targetId": "oox-analyzer",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFZFWQSPPS6414SXF6KZ16EV",
+    "createdAt": "2026-01-27T10:27:22.038Z",
+    "updatedAt": "2026-01-27T10:27:23.167Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KFTQPVC9RCRE9J8ACHECVWNK",
+    "targetSchema": "schemas",
+    "targetId": "users",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFZFX70P337SAKPX04NZXXN1",
+    "createdAt": "2026-01-27T10:27:37.622Z",
+    "updatedAt": "2026-01-27T10:27:39.875Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KFTQPVC9RCRE9J8ACHECVWNK",
+    "targetSchema": "schemas",
+    "targetId": "reset-password-form",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFZFX71BF5VMHW98HNJKQB3G",
+    "createdAt": "2026-01-27T10:27:37.643Z",
+    "updatedAt": "2026-01-27T10:27:39.881Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000003",
+    "targetSchema": "schemas",
+    "targetId": "deviation-management",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KFZFXPWAH14F1M2BDTJ43HBT",
+    "createdAt": "2026-01-27T10:27:53.866Z",
+    "updatedAt": "2026-01-27T10:27:54.959Z",
+    "inactive": true
   }
 ]

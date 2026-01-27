@@ -1479,38 +1479,16 @@
   "invoices": [],
   "applications": [
     {
-      "name": "Vendor Management",
-      "icon": "CircleUser",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KBA3JQKBGFABD2PZXJYP0KBZ",
-      "createdAt": "2025-11-30T10:05:20.885Z",
-      "updatedAt": "2025-11-30T10:05:20.885Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
       "name": "Change Management",
       "icon": "GitBranch",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBFCM00000000000000000001",
       "createdAt": "2025-12-06T12:00:00.000Z",
-      "updatedAt": "2026-01-25T14:23:33.194Z",
+      "updatedAt": "2026-01-27T10:27:07.014Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "application-schemas": []
-    },
-    {
-      "name": "Quality Base Information",
-      "icon": "Database",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KBFCM00000000000000000002",
-      "createdAt": "2025-12-06T12:00:00.000Z",
-      "updatedAt": "2025-12-06T12:00:00.000Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
       "name": "Deviation Management",
@@ -1519,9 +1497,10 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBFCM00000000000000000003",
       "createdAt": "2025-12-06T12:00:00.000Z",
-      "updatedAt": "2025-12-06T12:00:00.000Z",
+      "updatedAt": "2026-01-27T10:27:54.934Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "application-schemas": []
     },
     {
       "name": "Risk Management",
@@ -1562,7 +1541,7 @@
       "incomplete": false,
       "id": "01KFTQPVC9RCRE9J8ACHECVWNK",
       "createdAt": "2026-01-25T14:07:45.553Z",
-      "updatedAt": "2026-01-25T15:20:44.722Z",
+      "updatedAt": "2026-01-27T10:27:39.815Z",
       "application-schemas": []
     },
     {
@@ -1571,8 +1550,17 @@
       "incomplete": false,
       "id": "01KFTVYHWWEHFEQDME72PKNA75",
       "createdAt": "2026-01-25T15:21:52.287Z",
-      "updatedAt": "2026-01-25T15:22:16.436Z",
+      "updatedAt": "2026-01-27T10:25:41.825Z",
       "application-schemas": []
+    },
+    {
+      "application-schemas": [],
+      "name": "Process Management",
+      "icon": "Workflow",
+      "incomplete": false,
+      "id": "01KFZFTS259QZVTR2ETNZ1H0GF",
+      "createdAt": "2026-01-27T10:26:17.800Z",
+      "updatedAt": "2026-01-27T10:26:37.689Z"
     }
   ],
   "production-actuals": [],

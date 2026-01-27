@@ -9,6 +9,9 @@ import { NavigationItem } from '../types';
 import { AD_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { getIconComponent, isValidLucideIcon } from '@/gradian-ui/shared/utils/icon-renderer';
 
+/** Minimal highlight class for search matches in sidebar (dark theme) */
+export const SIDEBAR_HIGHLIGHT_CLASS = 'bg-violet-500/15 text-violet-200 rounded-sm px-0.5';
+
 /**
  * Fallback home menu item to show when no menu items are available
  */

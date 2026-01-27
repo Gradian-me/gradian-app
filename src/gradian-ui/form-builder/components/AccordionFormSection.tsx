@@ -1202,7 +1202,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       )}>
             <CardHeader 
               className={cn(
-                "pb-4 px-6 pt-4 transition-colors",
+                "pb-4 px-6 pt-4 transition-colors rounded-2xl",
                 isCollapsible && "cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
               )}
               onClick={isCollapsible ? toggleExpanded : undefined}
@@ -2140,8 +2140,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       )}>
         <CardHeader 
           className={cn(
-            "pb-4 px-6 pt-4 transition-colors",
-            isCollapsible && "cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50 rounded-t-2xl"
+            "pb-4 px-6 pt-4 transition-colors rounded-2xl",
+            isCollapsible && "cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
           )}
           onClick={isCollapsible ? toggleExpanded : undefined}
         >

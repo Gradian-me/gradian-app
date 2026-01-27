@@ -14,7 +14,8 @@ import { cn } from '../../../shared/utils';
 import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { useSchemas } from '@/gradian-ui/schema-manager/hooks/use-schemas';
 import { useTenantStore } from '@/stores/tenant.store';
-import { filterFormSchemas } from '../utils';
+import { filterFormSchemas, SIDEBAR_HIGHLIGHT_CLASS } from '../utils';
+import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 
 interface SidebarNavigationDynamicProps {
   isCollapsed: boolean;
@@ -396,7 +397,9 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                           transition={{ duration: 0.15, ease: 'easeOut' }}
                                           className="text-xs font-medium overflow-hidden whitespace-nowrap"
                                         >
-                                          {schema.plural_name}
+                                          {searchQuery?.trim()
+                                            ? renderHighlightedText(schema.plural_name ?? '', searchQuery.trim(), SIDEBAR_HIGHLIGHT_CLASS)
+                                            : (schema.plural_name ?? '')}
                                         </motion.span>
                                       )}
                                     </AnimatePresence>
@@ -475,9 +478,11 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                     duration: 0.15,
                                     ease: 'easeOut'
                                   }}
-                                  className="text-[11px] font-semibold uppercase tracking-wider truncate"
+                                  className="text-xs font-semibold tracking-wider truncate"
                                 >
-                                  {group.key}
+                                  {searchQuery?.trim()
+                                    ? renderHighlightedText(group.key, searchQuery.trim(), SIDEBAR_HIGHLIGHT_CLASS)
+                                    : group.key}
                                 </motion.span>
                               )}
                             </AnimatePresence>
@@ -536,7 +541,9 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                           }}
                                           className="text-xs font-medium overflow-hidden whitespace-nowrap"
                                         >
-                                          {schema.plural_name}
+                                          {searchQuery?.trim()
+                                            ? renderHighlightedText(schema.plural_name ?? '', searchQuery.trim(), SIDEBAR_HIGHLIGHT_CLASS)
+                                            : (schema.plural_name ?? '')}
                                         </motion.span>
                                       )}
                                     </AnimatePresence>

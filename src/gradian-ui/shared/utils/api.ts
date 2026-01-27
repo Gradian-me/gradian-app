@@ -689,6 +689,25 @@ async function enrichDataEndpoint(
 
   const isDev = isDevEnvironment();
 
+  /**
+   * Helper to determine if the currently selected tenant has name "local".
+   * Uses dynamic import to avoid introducing hard dependencies on the store.
+   */
+  const isLocalTenant = async (): Promise<boolean> => {
+    if (!isBrowserEnvironment()) {
+      return false;
+    }
+    try {
+      const tenantStoreModule = await import('@/stores/tenant.store');
+      const tenantStore = tenantStoreModule.useTenantStore.getState();
+      const selectedTenant = tenantStore.selectedTenant as { name?: string } | null;
+      return Boolean(selectedTenant?.name?.toLowerCase() === 'local');
+    } catch {
+      // If tenant store is not available, default to non-local
+      return false;
+    }
+  };
+
   // For integration cards, NEVER auto-inject tenantIds/companyIds for the tenants collection.
   // This ensures the tenant picker on /integrations always sees all tenants, in all environments.
   if (
@@ -740,7 +759,17 @@ async function enrichDataEndpoint(
     return { endpoint, params: existingParams };
   }
 
-  const contextParams = await getContextParams();
+  // Get tenant/company context from stores
+  let contextParams = await getContextParams();
+
+  // If current tenant name is "local", never auto-inject tenantIds.
+  // This lets local tenant see all schemas/data regardless of tenant scoping,
+  // while still allowing companyIds scoping when available.
+  const localTenant = await isLocalTenant();
+  if (localTenant && contextParams.tenantIds) {
+    delete contextParams.tenantIds;
+  }
+
   if (!contextParams.tenantIds && !contextParams.companyIds) {
     return { endpoint, params: existingParams };
   }
