@@ -11,14 +11,13 @@ import { getValueByRole } from '@/gradian-ui/data-display/utils';
 import { getPrimaryDisplayString, hasDisplayValue } from '@/gradian-ui/data-display/utils/value-display';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { MoreVertical } from 'lucide-react';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { replaceDynamicContext, replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
-import { DynamicQuickActions } from '@/gradian-ui/data-display/components/DynamicQuickActions';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { FormDialogErrorBoundary } from './FormDialogErrorBoundary';
+import { Button } from '@/components/ui/button';
+import { Maximize2, Minimize2 } from 'lucide-react';
 
 const EXCLUDED_TITLE_ROLES = new Set(['code', 'subtitle', 'description']);
 
@@ -37,16 +36,15 @@ const getEntityDisplayTitle = (
     }
   }
 
-  const textFields = schema.fields
-    ?.filter(
-      (field) =>
-        field.component === 'text' &&
-        (!field.role || !EXCLUDED_TITLE_ROLES.has(field.role)) &&
-        hasDisplayValue(data[field.name])
-    )
-    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+  const filtered = schema.fields?.filter(
+    (field) =>
+      field.component === 'text' &&
+      (!field.role || !EXCLUDED_TITLE_ROLES.has(field.role)) &&
+      hasDisplayValue(data[field.name])
+  ) ?? [];
+  const textFields = [...filtered].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
-  if (textFields && textFields.length > 0) {
+  if (textFields.length > 0) {
     const firstField = textFields[0];
     const value = data[firstField.name];
     const primary = getPrimaryDisplayString(value);
@@ -172,6 +170,8 @@ export const FormModal: React.FC<FormModalProps> = ({
   hideCloseButton = false,
   referenceEntityData,
 }) => {
+  const [isMaximized, setIsMaximized] = React.useState(false);
+
   // Create customActionSubmit handler using useCallback to maintain hook order consistency
   const customActionSubmit = React.useCallback(async (formData: Record<string, any>, schema: any) => {
     // Only intercept action-forms that have a callApi quick action
@@ -446,6 +446,8 @@ export const FormModal: React.FC<FormModalProps> = ({
     return null;
   }
 
+  const modalContentResetKey = `${schemaId ?? ''}-${entityId ?? ''}-${mode}`;
+
   return (
     <Modal
       isOpen={isOpen}
@@ -453,77 +455,96 @@ export const FormModal: React.FC<FormModalProps> = ({
       title={modalTitle}
       description={modalDescription}
       size={size}
+      className={isMaximized ? 'lg:max-w-[100vw] lg:max-h-screen' : undefined}
       showCloseButton={false}
       hideDialogHeader={hideDialogHeader}
       hideCloseButton={hideCloseButton}
+      headerActions={
+        !hideDialogHeader ? (
+          <div className="flex items-center justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 rounded-xl"
+              onClick={() => setIsMaximized((prev) => !prev)}
+              aria-label={isMaximized ? 'Restore form size' : 'Maximize form'}
+            >
+              {isMaximized ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            </Button>
+          </div>
+        ) : undefined
+      }
     >
-      {/* Quick actions popover is now rendered inline with action buttons in FormLifecycleManager */}
+      <FormDialogErrorBoundary onClose={closeFormModal} resetKey={modalContentResetKey}>
+        {/* Quick actions popover is now rendered inline with action buttons in FormLifecycleManager */}
 
-      {/* Loading indicator for schema/entity loading */}
-      {isLoading && showLoadingSpinner && (
-        <div className="flex items-center justify-center py-12">
-          <div className="flex flex-col items-center space-y-3">
-            <Spinner size="lg" variant="primary" />
-            <span className="text-sm font-medium text-gray-600">Loading form...</span>
+        {/* Loading indicator for schema/entity loading */}
+        {isLoading && showLoadingSpinner && (
+          <div className="flex items-center justify-center py-12">
+            <div className="flex flex-col items-center space-y-3">
+              <Spinner size="lg" variant="primary" />
+              <span className="text-sm font-medium text-gray-600">Loading form...</span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Loading indicator for form submission */}
-      {isSubmitting && (
-        <div className="absolute inset-0 bg-white/60 dark:bg-gray-800/60 flex items-center justify-center z-50 rounded-lg">
-          <div className="flex flex-col items-center space-y-3 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-blue-100 dark:border-gray-700">
-            <Spinner size="lg" variant="primary" />
-            <span className="text-lg font-medium text-violet-700 dark:text-violet-300">
-              {isEdit ? 'Updating' : 'Creating'} {targetSchema?.name?.toLowerCase() || 'item'}...
-            </span>
+        {/* Loading indicator for form submission */}
+        {isSubmitting && (
+          <div className="absolute inset-0 bg-white/60 dark:bg-gray-800/60 flex items-center justify-center z-50 rounded-lg">
+            <div className="flex flex-col items-center space-y-3 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-blue-100 dark:border-gray-700">
+              <Spinner size="lg" variant="primary" />
+              <span className="text-lg font-medium text-violet-700 dark:text-violet-300">
+                {isEdit ? 'Updating' : 'Creating'} {targetSchema?.name?.toLowerCase() || 'item'}...
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Load error */}
-      {loadError && (
-        <FormAlert
-          type="error"
-          message={loadError}
-          className="mb-4"
-          dismissible
-          onDismiss={clearLoadError}
-        />
-      )}
+        {/* Load error */}
+        {loadError && (
+          <FormAlert
+            type="error"
+            message={loadError}
+            className="mb-4"
+            dismissible
+            onDismiss={clearLoadError}
+          />
+        )}
 
-      {/* Form */}
-      {targetSchema && !isLoading && (
-        <SchemaFormWrapper
-          key={entityId ? `edit-${entityId}-${targetSchema.id}` : `create-${targetSchema.id}`}
-          schema={targetSchema}
-          onSubmit={handleSubmit}
-          onReset={() => {}}
-          onCancel={closeFormModal}
-          initialValues={memoizedInitialValues}
-          referenceEntityData={referenceEntityData}
-          error={formError || undefined}
-          message={formMessage}
-          errorStatusCode={formErrorStatusCode}
-          onErrorDismiss={clearFormError}
-          disabled={isSubmitting}
-          hideCollapseExpandButtons={true}
-          forceExpandedSections={true}
-          hideActions={isActionForm}
-          onMount={(submitFn) => setSubmitForm(() => submitFn)}
-        />
-      )}
-      {isActionForm && !isLoading && (
-        <div className="mt-4 flex justify-end">
-          <Button
-            type="button"
-            onClick={() => submitForm?.()}
+        {/* Form */}
+        {targetSchema && !isLoading && (
+          <SchemaFormWrapper
+            key={entityId ? `edit-${entityId}-${targetSchema.id}` : `create-${targetSchema.id}`}
+            schema={targetSchema}
+            onSubmit={handleSubmit}
+            onReset={() => {}}
+            onCancel={closeFormModal}
+            initialValues={memoizedInitialValues}
+            referenceEntityData={referenceEntityData}
+            error={formError || undefined}
+            message={formMessage}
+            errorStatusCode={formErrorStatusCode}
+            onErrorDismiss={clearFormError}
             disabled={isSubmitting}
-          >
-            {actionFormQuickAction?.label || title || 'Submit'}
-          </Button>
-        </div>
-      )}
+            hideCollapseExpandButtons={true}
+            forceExpandedSections={true}
+            hideActions={isActionForm}
+            onMount={(submitFn) => setSubmitForm(() => submitFn)}
+          />
+        )}
+        {isActionForm && !isLoading && (
+          <div className="mt-4 flex justify-end">
+            <Button
+              type="button"
+              onClick={() => submitForm?.()}
+              disabled={isSubmitting}
+            >
+              {actionFormQuickAction?.label || title || 'Submit'}
+            </Button>
+          </div>
+        )}
+      </FormDialogErrorBoundary>
     </Modal>
   );
 };

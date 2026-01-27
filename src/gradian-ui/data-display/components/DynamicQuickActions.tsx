@@ -37,6 +37,12 @@ export interface DynamicQuickActionsProps {
   schemaCache?: Record<string, FormSchema>;
   // Custom action handler - if returns true, action is handled and default handler is skipped
   onActionClick?: (action: QuickAction) => boolean | void;
+  /**
+   * When true, renders the actions without the default Card container.
+   * Useful when the parent already provides a bordered container (e.g. PopoverContent),
+   * to avoid double borders.
+   */
+  hideContainerCard?: boolean;
 }
 
 export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
@@ -47,6 +53,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
   disableAnimation = false,
   schemaCache,
   onActionClick,
+  hideContainerCard = false,
 }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -347,29 +354,57 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
         transition={disableAnimation ? {} : { duration: 0.3 }}
         className={cn('space-y-2', className)}
       >
-        <Card className="p-4">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-3">Quick Actions</h3>
-          <div className="space-y-2">
-            {buttonActions.map((action) => {
-              const isLoading = loadingActionId === action.id;
-              return (
-                <Button
-                  key={action.id}
-                  variant={action.variant || 'outline'}
-                  onClick={() => handleAction(action)}
-                  disabled={isLoading}
-                  className="w-full justify-start"
-                  size="sm"
-                >
-                  {action.icon && (
-                    <IconRenderer iconName={action.icon} className="h-4 w-4 me-2" />
-                  )}
-                  {isLoading ? 'Loading...' : action.label}
-                </Button>
-              );
-            })}
-          </div>
-        </Card>
+        {hideContainerCard ? (
+          <Card className="p-4 border-0 shadow-none bg-card">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-3">
+              Quick Actions
+            </h3>
+            <div className="space-y-2">
+              {buttonActions.map((action) => {
+                const isLoading = loadingActionId === action.id;
+                return (
+                  <Button
+                    key={action.id}
+                    variant={action.variant || 'outline'}
+                    onClick={() => handleAction(action)}
+                    disabled={isLoading}
+                    className="w-full justify-start"
+                    size="sm"
+                  >
+                    {action.icon && (
+                      <IconRenderer iconName={action.icon} className="h-4 w-4 me-2" />
+                    )}
+                    {isLoading ? 'Loading...' : action.label}
+                  </Button>
+                );
+              })}
+            </div>
+          </Card>
+        ) : (
+          <Card className="p-4">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-3">Quick Actions</h3>
+            <div className="space-y-2">
+              {buttonActions.map((action) => {
+                const isLoading = loadingActionId === action.id;
+                return (
+                  <Button
+                    key={action.id}
+                    variant={action.variant || 'outline'}
+                    onClick={() => handleAction(action)}
+                    disabled={isLoading}
+                    className="w-full justify-start"
+                    size="sm"
+                  >
+                    {action.icon && (
+                      <IconRenderer iconName={action.icon} className="h-4 w-4 me-2" />
+                    )}
+                    {isLoading ? 'Loading...' : action.label}
+                  </Button>
+                );
+              })}
+            </div>
+          </Card>
+        )}
       </motion.div>
 
       {/* Create Modal - using unified FormModal */}

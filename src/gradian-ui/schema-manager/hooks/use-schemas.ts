@@ -5,6 +5,9 @@ import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { FormSchema } from '../types/form-schema';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
 
+/** Stable empty array to avoid new [] on every render when data is undefined (prevents effect dependency churn). */
+const EMPTY_SCHEMAS: FormSchema[] = [];
+
 export const SCHEMAS_QUERY_KEY = ['schemas'] as const;
 export const SCHEMAS_SUMMARY_QUERY_KEY = ['schemas-summary'] as const;
 
@@ -95,7 +98,7 @@ export function useSchemas(options?: UseSchemasOptions) {
   });
 
   return {
-    schemas: data || [],
+    schemas: data ?? EMPTY_SCHEMAS,
     isLoading,
     error,
     refetch,

@@ -26,7 +26,7 @@ export const FALLBACK_HOME_MENU_ITEM: NavigationItem = {
  * - Applies company filter: if companyId is set, only show items that either have no companies
  *   or include the selected company in their companies field.
  *   (Skip this filter if showAllItems is true)
- * - Adds fallback home menu item if no items are available after filtering.
+ * - Returns [] when no items (Home is shown separately, outside the menu).
  */
 export function mapMenuItemsToNavigationItems(
   menuItems: any[],
@@ -34,8 +34,7 @@ export function mapMenuItemsToNavigationItems(
   showAllItems: boolean = false
 ): NavigationItem[] {
   if (!Array.isArray(menuItems)) {
-    // Return fallback home item if menuItems is not an array
-    return [FALLBACK_HOME_MENU_ITEM];
+    return [];
   }
 
   const filtered = menuItems
@@ -72,6 +71,11 @@ export function mapMenuItemsToNavigationItems(
       
       return matches;
     })
+    .filter((item) => {
+      // Exclude Home-like items (href /); Home is shown separately outside the menu
+      const url = (item.menuUrl ?? '/').trim();
+      return url !== '/';
+    })
     .sort((a, b) => {
       const aIdx = Number.isFinite(a.__sortIndex) ? a.__sortIndex : 0;
       const bIdx = Number.isFinite(b.__sortIndex) ? b.__sortIndex : 0;
@@ -94,9 +98,9 @@ export function mapMenuItemsToNavigationItems(
       };
     });
 
-  // If no items after filtering, return fallback home item
+  // If no items after filtering, return empty (Home is shown separately)
   if (filtered.length === 0) {
-    return [FALLBACK_HOME_MENU_ITEM];
+    return [];
   }
 
   return filtered;
@@ -173,11 +177,6 @@ export const filterNavigationItems = (
   const query = searchQuery.toLowerCase().trim();
   
   return items.filter((item) => {
-    // Always show home item
-    if (item.id === FALLBACK_HOME_MENU_ITEM.id) {
-      return true;
-    }
-    
     // Search in item name
     const nameMatch = item.name?.toLowerCase().includes(query);
     

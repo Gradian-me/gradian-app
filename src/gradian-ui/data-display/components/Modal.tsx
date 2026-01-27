@@ -22,6 +22,7 @@ export const Modal: React.FC<ModalProps> = ({
   hideDialogHeader = false,
   hideCloseButton = false,
   footerLeftActions,
+  headerActions,
   ...props
 }) => {
   const sizeClasses = {
@@ -59,11 +60,22 @@ export const Modal: React.FC<ModalProps> = ({
       >
         {hideDialogHeader ? (
           // Visually hidden title for accessibility (no layout impact)
-          <DialogTitle className="sr-only absolute w-0 h-0 overflow-hidden pointer-events-none">{titleContent}</DialogTitle>
-        ) : (title || description) && (
+          <DialogTitle className="sr-only absolute w-0 h-0 overflow-hidden pointer-events-none">
+            {titleContent}
+          </DialogTitle>
+        ) : (title || description || headerActions) && (
           <DialogHeader className="px-6 pt-2 pb-2 shrink-0">
-            {title && <DialogTitle>{title}</DialogTitle>}
-            {description && <DialogDescription>{description}</DialogDescription>}
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                {title && <DialogTitle>{title}</DialogTitle>}
+                {description && <DialogDescription>{description}</DialogDescription>}
+              </div>
+              {headerActions && (
+                <div className="flex items-center gap-2 shrink-0">
+                  {headerActions}
+                </div>
+              )}
+            </div>
           </DialogHeader>
         )}
         {actions && (

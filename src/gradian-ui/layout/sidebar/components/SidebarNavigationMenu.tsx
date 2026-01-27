@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { SidebarNavigation } from './SidebarNavigation';
-import { mapMenuItemsToNavigationItems, FALLBACK_HOME_MENU_ITEM } from '../utils';
+import { mapMenuItemsToNavigationItems } from '../utils';
 import type { SidebarProps } from '../types';
 import { SidebarSearchbox } from './SidebarSearchbox';
 import { useCompanyStore } from '@/stores/company.store';
@@ -18,26 +18,14 @@ type SidebarNavigationMenuProps = Pick<
   'isCollapsed' | 'isMobile' | 'navigationSchemas'
 >;
 
-/**
- * Merge menu items with home button, ensuring home is always first and no duplicates
- */
-function mergeItemsWithHome(menuItems: NavigationItem[]): NavigationItem[] {
-  // Filter out any existing home item from menuItems to avoid duplicates
-  const otherItems = menuItems.filter(item => item.id !== FALLBACK_HOME_MENU_ITEM.id);
-  // Always put home first
-  return [FALLBACK_HOME_MENU_ITEM, ...otherItems];
-}
-
 export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
   isCollapsed,
   isMobile,
   navigationSchemas,
 }) => {
-  // Initialize with home button immediately
-  const [items, setItems] = useState<NavigationItem[]>([FALLBACK_HOME_MENU_ITEM]);
+  const [items, setItems] = useState<NavigationItem[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   
-  // Initialize currentItemsRef with items state
   React.useEffect(() => {
     currentItemsRef.current = items;
   }, [items]);
@@ -68,8 +56,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
   const lastLoadedUserIdRef = React.useRef<string | number | null>(null);
   // Track if items have been loaded at least once
   const hasLoadedRef = React.useRef<boolean>(false);
-  // Track current items to avoid stale closures
-  const currentItemsRef = React.useRef<NavigationItem[]>([FALLBACK_HOME_MENU_ITEM]);
+  const currentItemsRef = React.useRef<NavigationItem[]>([]);
 
   useEffect(() => {
     // Wait for tenantId to be available before making API call (on non-localhost)
@@ -81,8 +68,6 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
     );
     
     if (!isLocalhost && !tenantId) {
-      // On non-localhost, wait for tenantId to be available
-      // Home button is already shown, so we can wait
       return;
     }
 
@@ -113,22 +98,12 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
       // Check cache in case items were cleared somehow
       const cachedItems = menuItemsStore.getMenuItems(companyId);
       if (cachedItems && cachedItems.length > 0) {
-        // Ensure items are set from cache (in case state was lost)
-        setItems((currentItems) => {
-          if (currentItems.length === 1 && currentItems[0].id === FALLBACK_HOME_MENU_ITEM.id) {
-            const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant);
-            const merged = mergeItemsWithHome(mapped);
-            currentItemsRef.current = merged;
-            return merged;
-          }
-          currentItemsRef.current = currentItems;
-          return currentItems;
-        });
-        return; // Skip reload if we have cached items
+        const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant);
+        setItems(mapped);
+        currentItemsRef.current = mapped;
+        return;
       }
-      // No cache - check if we have items in state using ref (avoids stale closure)
-      if (currentItemsRef.current.length > 1) {
-        // We have items in state (more than just home), we're good
+      if (currentItemsRef.current.length > 0) {
         return;
       }
       // No cache and no items - force reload by resetting hasLoadedRef
@@ -143,12 +118,10 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
       if (!forceFetch) {
         const cachedItems = menuItemsStore.getMenuItems(companyId);
         if (cachedItems && cachedItems.length > 0) {
-          // Use cached items
           const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant);
           if (isMounted) {
-            const merged = mergeItemsWithHome(mapped);
-            setItems(merged);
-            currentItemsRef.current = merged;
+            setItems(mapped);
+            currentItemsRef.current = mapped;
             lastLoadedCompanyIdRef.current = companyId;
             lastLoadedTenantIdRef.current = tenantId;
             lastLoadedUserIdRef.current = userId;
@@ -169,17 +142,14 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
         
         if (!response.success || !response.data) {
           if (isMounted) {
-            // Preserve existing items if available, otherwise keep home button
             const cachedItems = menuItemsStore.getMenuItems(companyId);
             if (cachedItems && cachedItems.length > 0) {
               const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant);
-              const merged = mergeItemsWithHome(mapped);
-              setItems(merged);
-              currentItemsRef.current = merged;
+              setItems(mapped);
+              currentItemsRef.current = mapped;
             } else {
-              // No cached items - ensure home button is shown
-              setItems([FALLBACK_HOME_MENU_ITEM]);
-              currentItemsRef.current = [FALLBACK_HOME_MENU_ITEM];
+              setItems([]);
+              currentItemsRef.current = [];
             }
           }
           return;
@@ -196,27 +166,23 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
 
         const mapped = mapMenuItemsToNavigationItems(rawItems, companyId, isLocalTenant);
         if (isMounted) {
-          const merged = mergeItemsWithHome(mapped);
-          setItems(merged);
-          currentItemsRef.current = merged;
+          setItems(mapped);
+          currentItemsRef.current = mapped;
           lastLoadedCompanyIdRef.current = companyId;
           lastLoadedTenantIdRef.current = tenantId;
           lastLoadedUserIdRef.current = userId;
           hasLoadedRef.current = true;
         }
       } catch (error) {
-        // On error, preserve existing items if available, otherwise keep home button
         if (isMounted) {
           const cachedItems = menuItemsStore.getMenuItems(companyId);
           if (cachedItems && cachedItems.length > 0) {
             const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant);
-            const merged = mergeItemsWithHome(mapped);
-            setItems(merged);
-            currentItemsRef.current = merged;
+            setItems(mapped);
+            currentItemsRef.current = mapped;
           } else {
-            // No cached items - ensure home button is shown
-            setItems([FALLBACK_HOME_MENU_ITEM]);
-            currentItemsRef.current = [FALLBACK_HOME_MENU_ITEM];
+            setItems([]);
+            currentItemsRef.current = [];
           }
         }
       }
@@ -225,9 +191,8 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
     loadMenuItems();
 
     const handleMenuItemsCleared = () => {
-      // Force refetch on clear events, but keep home button
-      currentItemsRef.current = [FALLBACK_HOME_MENU_ITEM];
-      setItems([FALLBACK_HOME_MENU_ITEM]);
+      currentItemsRef.current = [];
+      setItems([]);
       void loadMenuItems(true);
     };
 
@@ -243,7 +208,6 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
     };
   }, [companyId, tenantId, userId, isLocalTenant]); // Include userId and isLocalTenant to detect changes
 
-  // Always render navigation - never show skeleton, home button is always available
   return (
     <>
       <SidebarSearchbox

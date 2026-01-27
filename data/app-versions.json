@@ -6148,5 +6148,31 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KFZ68RYYKBZSCZQ8FW1JTH24",
+    "timestamp": "2026-01-27T00:00:00.000Z",
+    "version": "1.45.004",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Improved null safety checks in FormLifecycleManager and FormModal components to prevent potential runtime errors",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined SidebarNavigation components for better performance and maintainability, including dynamic grouping of schemas and improved loading states. This update enhances user experience by ensuring more robust navigation and form handling.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "sidebar",
+          "navigation"
+        ]
+      }
+    ]
   }
 ]

@@ -49,21 +49,21 @@ const mergeInitialValuesWithDefaults = (
   referenceEntityData?: Record<string, any>
 ): FormData => {
   const mergedValues = { ...initialValues };
-  
+
   // Ensure schema has fields array
   if (!schema?.fields || !Array.isArray(schema.fields)) {
     loggingCustom(LogType.CLIENT_LOG, 'warn', `[mergeInitialValuesWithDefaults] Schema fields is missing or not an array: ${JSON.stringify({ schemaId: schema?.id })}`);
     return mergedValues;
   }
-  
+
   // Process all fields to apply default values where needed
   schema.fields.forEach(field => {
     // Skip if field is in a repeating section (handled separately)
-    const section = schema.sections.find(s => s.id === field.sectionId);
+    const section = schema.sections?.find(s => s.id === field.sectionId);
     if (section?.isRepeatingSection) {
       return;
     }
-    
+
     // Check if existing value is a template string that needs resolution
     const currentValue = mergedValues[field.name];
     if (typeof currentValue === 'string' && currentValue.includes('{{') && currentValue.includes('}}')) {
@@ -76,20 +76,20 @@ const mergeInitialValuesWithDefaults = (
     }
     // Apply defaultValue if field value is undefined, null, or empty string
     else if (field.defaultValue !== undefined &&
-        (mergedValues[field.name] === undefined ||
-         mergedValues[field.name] === null ||
-         mergedValues[field.name] === '')) {
+      (mergedValues[field.name] === undefined ||
+        mergedValues[field.name] === null ||
+        mergedValues[field.name] === '')) {
       const resolvedDefault = typeof field.defaultValue === 'string'
         ? replaceDynamicContext(field.defaultValue, {
-            formSchema: schema,
-            formData: mergedValues,
-            referenceData: referenceEntityData ?? useDynamicFormContextStore.getState().referenceData,
-          } as any)
+          formSchema: schema,
+          formData: mergedValues,
+          referenceData: referenceEntityData ?? useDynamicFormContextStore.getState().referenceData,
+        } as any)
         : field.defaultValue;
       mergedValues[field.name] = resolvedDefault;
     }
   });
-  
+
   return mergedValues;
 };
 
@@ -100,20 +100,20 @@ const ensureRepeatingItemIds = (
   referenceEntityData?: Record<string, any>
 ): FormData => {
   const newValues = mergeInitialValuesWithDefaults(values, schema, referenceEntityData);
-  
+
   // Ensure schema has sections array
   if (!schema?.sections || !Array.isArray(schema.sections)) {
     loggingCustom(LogType.CLIENT_LOG, 'warn', `[ensureRepeatingItemIds] Schema sections is missing or not an array: ${JSON.stringify({ schemaId: schema?.id })}`);
     return newValues;
   }
-  
+
   schema.sections.forEach(section => {
     if (section.isRepeatingSection) {
       // Initialize repeating sections to empty array if they don't exist or are null/undefined
       if (!newValues[section.id] || !Array.isArray(newValues[section.id])) {
         newValues[section.id] = [];
       }
-      
+
       const items = newValues[section.id];
       if (Array.isArray(items)) {
         newValues[section.id] = items.map((item: any, index: number) => {
@@ -123,52 +123,52 @@ const ensureRepeatingItemIds = (
               ...item,
               id: ulid()
             };
-            
+
             // Apply default values to repeating section items
             const sectionFields = schema.fields?.filter(f => f.sectionId === section.id) || [];
             sectionFields.forEach(field => {
               if (field.defaultValue !== undefined &&
-                  (itemWithId[field.name] === undefined ||
-                   itemWithId[field.name] === null ||
-                   itemWithId[field.name] === '')) {
+                (itemWithId[field.name] === undefined ||
+                  itemWithId[field.name] === null ||
+                  itemWithId[field.name] === '')) {
                 const resolvedDefault = typeof field.defaultValue === 'string'
                   ? replaceDynamicContext(field.defaultValue, {
-                      formSchema: schema,
-                      formData: itemWithId,
-                      referenceData: referenceEntityData ?? useDynamicFormContextStore.getState().referenceData,
-                    } as any)
+                    formSchema: schema,
+                    formData: itemWithId,
+                    referenceData: referenceEntityData ?? useDynamicFormContextStore.getState().referenceData,
+                  } as any)
                   : field.defaultValue;
                 itemWithId[field.name] = resolvedDefault;
               }
             });
-            
+
             return itemWithId;
           }
-          
+
           // Apply default values to existing items too
           const sectionFields = schema.fields?.filter(f => f.sectionId === section.id) || [];
           sectionFields.forEach(field => {
             if (field.defaultValue !== undefined &&
-                (item[field.name] === undefined ||
-                 item[field.name] === null ||
-                 item[field.name] === '')) {
+              (item[field.name] === undefined ||
+                item[field.name] === null ||
+                item[field.name] === '')) {
               const resolvedDefault = typeof field.defaultValue === 'string'
                 ? replaceDynamicContext(field.defaultValue, {
-                    formSchema: schema,
-                    formData: item,
-                    referenceData: referenceEntityData ?? useDynamicFormContextStore.getState().referenceData,
-                  } as any)
+                  formSchema: schema,
+                  formData: item,
+                  referenceData: referenceEntityData ?? useDynamicFormContextStore.getState().referenceData,
+                } as any)
                 : field.defaultValue;
               item[field.name] = resolvedDefault;
             }
           });
-          
+
           return item;
         });
       }
     }
   });
-  
+
   return newValues;
 };
 
@@ -190,23 +190,23 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
     case 'SET_VALUE': {
       // Handle nested paths for repeating sections (e.g., "contacts[0].name")
       const match = action.fieldName.match(/^(.+)\[(\d+)\]\.(.+)$/);
-      
+
       if (match) {
         // This is a repeating section field
         const [, sectionId, itemIndex, fieldName] = match;
         const index = parseInt(itemIndex);
         const currentArray = state.values[sectionId] || [];
-        
+
         // Create a deep copy of the array to avoid mutations
         const newArray = currentArray.map((item: any) => ({ ...item }));
-        
+
         // Ensure the array is long enough and item exists at this index
         while (newArray.length <= index) {
           newArray.push({
             id: ulid()
           });
         }
-        
+
         // If item at index doesn't have required structure, ensure it has an ID
         if (!newArray[index].id) {
           loggingCustom(LogType.CLIENT_LOG, 'warn', `[FormReducer] Item at index ${index} missing id, adding one`);
@@ -215,13 +215,13 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
             id: ulid()
           };
         }
-        
+
         // Update the specific field in the item, preserving all other fields including id
         newArray[index] = {
           ...newArray[index],
           [fieldName]: action.value,
         };
-        
+
         loggingCustom(LogType.CLIENT_LOG, 'log', `[FormReducer] Updating repeating section item: ${JSON.stringify({
           sectionId,
           itemIndex: index,
@@ -231,7 +231,7 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
           before: currentArray[index],
           after: newArray[index],
         })}`);
-        
+
         return {
           ...state,
           values: {
@@ -241,43 +241,43 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
           dirty: true,
         };
       }
-      
+
       // Regular field update
       loggingCustom(LogType.CLIENT_LOG, 'log', `[FormReducer] Updating regular field: ${JSON.stringify({
         fieldName: action.fieldName,
         value: action.value,
       })}`);
-      
+
       return {
         ...state,
         values: { ...state.values, [action.fieldName]: action.value },
         dirty: true,
       };
     }
-    
+
     case 'SET_ERROR':
       return {
         ...state,
         errors: { ...state.errors, [action.fieldName]: action.error },
       };
-    
+
     case 'SET_TOUCHED':
       return {
         ...state,
         touched: { ...state.touched, [action.fieldName]: action.touched },
       };
-    
+
     case 'SET_SUBMITTING':
       return {
         ...state,
         isSubmitting: action.isSubmitting,
       };
-    
+
     case 'RESET':
       // Dispatch custom event to trigger formula refresh in dialogs
       if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('form-reset', { 
-          detail: { schemaId: action.schema?.id } 
+        window.dispatchEvent(new CustomEvent('form-reset', {
+          detail: { schemaId: action.schema?.id }
         }));
       }
       return {
@@ -288,14 +288,14 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
         isValid: true,
         isSubmitting: false,
       };
-    
+
     case 'VALIDATE_FIELD': {
       // Handle nested paths for repeating sections (e.g., "contacts[0].name")
       const match = action.fieldName.match(/^(.+)\[(\d+)\]\.(.+)$/);
-      
+
       let field;
       let fieldValue;
-      
+
       if (match) {
         // This is a repeating section field
         const [, sectionId, itemIndex, fieldName] = match;
@@ -307,13 +307,13 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
         field = action.schema.fields.find(f => f.name === action.fieldName);
         fieldValue = state.values[action.fieldName];
       }
-      
+
       if (!field) return state;
-      
+
       // Check if field should be validated (required or has validation rules)
       const isRequired = field.validation?.required ?? false;
       if (!isRequired && !field.validation) return state;
-      
+
       const validationRules = {
         ...field.validation,
         required: field.validation?.required ?? false
@@ -327,11 +327,11 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
         },
       };
     }
-    
+
     case 'VALIDATE_FORM': {
       const newErrors: FormErrors = {};
       let isValid = true;
-      
+
       action.schema.fields.forEach(field => {
         // Check if field is required or has validation rules
         const isRequired = field.validation?.required ?? false;
@@ -347,7 +347,7 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
           }
         }
       });
-      
+
       return {
         ...state,
         errors: newErrors,
@@ -384,7 +384,7 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
         dirty: true,
       };
     }
-    
+
     case 'UPDATE_ENTITY_AFTER_SAVE': {
       // Update entity data (especially ID) after save without marking as dirty
       // This allows the form to update when saved as incomplete
@@ -397,7 +397,7 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
         // Don't mark as dirty - this is just updating to reflect saved state
       };
     }
-    
+
     default:
       return state;
   }
@@ -438,17 +438,17 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     isValid: true,
     isSubmitting: false,
   });
-  
+
   const [addItemErrors, setAddItemErrors] = React.useState<Record<string, string | null>>({});
   const [isIncomplete, setIsIncomplete] = React.useState(false);
   // Track if form has been submitted at least once (to show incomplete message only after submit)
   const [hasSubmitted, setHasSubmitted] = React.useState(false);
   // Track which sections need items (for better error message)
   const [incompleteSections, setIncompleteSections] = React.useState<string[]>([]);
-  
+
   // State for AI Form Filler dialog
   const [isFormFillerOpen, setIsFormFillerOpen] = React.useState(false);
-  
+
   // State to track which sections are expanded
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>(() => {
     // Initialize based on section initialState prop or forceExpandedSections
@@ -466,12 +466,12 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   // Deep comparison to avoid unnecessary resets
   const prevInitialValuesRef = React.useRef<string>(JSON.stringify(initialValues));
   const isInitialMountRef = React.useRef<boolean>(true);
-  
+
   // Update form state when initialValues change (for editing scenarios)
   // Only reset if the actual content has changed AND form is not dirty (user hasn't made changes)
   useEffect(() => {
     const currentInitialValues = JSON.stringify(initialValues);
-    
+
     // On initial mount, always initialize (but don't reset if form is already initialized)
     if (isInitialMountRef.current) {
       isInitialMountRef.current = false;
@@ -479,7 +479,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       // Don't reset on initial mount - form is already initialized with initialValues in useReducer
       return;
     }
-    
+
     // Only reset if:
     // 1. The actual content has changed (not just reference)
     // 2. The form is not dirty (user hasn't made changes)
@@ -500,12 +500,12 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       const prevValues = JSON.parse(prevInitialValuesRef.current || '{}');
       const newId = initialValues?.id;
       const prevId = prevValues?.id;
-      
+
       // If ID changed (e.g., from undefined to a value after incomplete save), update it
       if (newId && newId !== prevId && state.values?.id !== newId) {
         dispatch({ type: 'UPDATE_ENTITY_AFTER_SAVE', entityData: { id: newId, ...initialValues } });
       }
-      
+
       // Update the ref even if we don't reset (to prevent future false positives)
       prevInitialValuesRef.current = currentInitialValues;
     }
@@ -518,7 +518,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     }
     return schema.sections.map(s => s.id).join(',');
   }, [schema?.sections]);
-  
+
   useEffect(() => {
     setExpandedSections(prev => {
       const newExpanded: Record<string, boolean> = {};
@@ -526,9 +526,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       if (schema?.sections && Array.isArray(schema.sections)) {
         schema.sections.forEach(section => {
           // If forceExpandedSections is true, always expand; otherwise preserve existing state or use initialState
-          newExpanded[section.id] = forceExpandedSections 
-            ? true 
-            : (prev[section.id] !== undefined 
+          newExpanded[section.id] = forceExpandedSections
+            ? true
+            : (prev[section.id] !== undefined
               ? prev[section.id]
               : (section.initialState !== 'collapsed'));
         });
@@ -541,7 +541,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     loggingCustom(LogType.FORM_DATA, 'info', `Setting field "${fieldName}" to: ${JSON.stringify(value)}`);
     dispatch({ type: 'SET_VALUE', fieldName, value });
     onFieldChange?.(fieldName, value);
-    
+
     if (validationMode === 'onChange') {
       dispatch({ type: 'VALIDATE_FIELD', fieldName, schema });
     }
@@ -553,7 +553,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
   const setTouched = useCallback((fieldName: string, touched: boolean) => {
     dispatch({ type: 'SET_TOUCHED', fieldName, touched });
-    
+
     if (validationMode === 'onBlur') {
       dispatch({ type: 'VALIDATE_FIELD', fieldName, schema });
     }
@@ -569,20 +569,20 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     // This sets isValid - if false, form should not save
     let isValid = true;
     const newErrors: FormErrors = {};
-    
+
     schema.sections.forEach(section => {
       // Check repeating section constraints
       if (section.isRepeatingSection && section.repeatingConfig) {
         const { maxItems } = section.repeatingConfig;
-        
+
         // Check if this is a relation-based repeating section
         const isRelationBased = section.repeatingConfig.targetSchema && section.repeatingConfig.relationTypeId;
-        
+
         // For regular repeating sections, get item count from form values
         if (!isRelationBased) {
           const items = state.values[section.id] || [];
           const itemCount = items.length;
-          
+
           // Validate maxItems (this is a real validation error, not incomplete)
           if (maxItems !== undefined && itemCount > maxItems) {
             const sectionLabel = section.title || section.id;
@@ -590,7 +590,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             newErrors[section.id] = errorMessage;
             isValid = false;
           }
-          
+
           // Validate fields within each repeating item
           const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
           items.forEach((item: any, itemIndex: number) => {
@@ -661,36 +661,36 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         isValid = false;
       }
     }
-    
+
     // Update errors in state immediately and mark fields as touched
     Object.entries(newErrors).forEach(([fieldName, error]) => {
       dispatch({ type: 'SET_ERROR', fieldName, error });
       dispatch({ type: 'SET_TOUCHED', fieldName, touched: true });
     });
-    
+
     // Clear errors for fields that are now valid
     Object.keys(state.errors).forEach(fieldName => {
       if (!newErrors[fieldName] && state.errors[fieldName]) {
         dispatch({ type: 'SET_ERROR', fieldName, error: '' });
       }
     });
-    
+
     // STEP 2: Check minItems - if form is already incomplete, minItems becomes a blocking validation error
     // If form is not yet incomplete, allow saving with incomplete flag (first save)
     let isIncomplete = false;
     const isAlreadyIncomplete = state.values?.incomplete === true || initialValues?.incomplete === true;
-    
+
     if (isValid) {
       // For relation-based sections, we need to fetch relations count for validation
       const relationCounts: Record<string, number> = {};
       const hasEntityId = !!(state.values?.id);
-      
+
       // Fetch relation counts for relation-based sections
       if (hasEntityId) {
         const relationPromises = schema.sections
-          .filter(section => 
-            section.isRepeatingSection && 
-            section.repeatingConfig?.targetSchema && 
+          .filter(section =>
+            section.isRepeatingSection &&
+            section.repeatingConfig?.targetSchema &&
             section.repeatingConfig?.relationTypeId
           )
           .map(async (section) => {
@@ -706,7 +706,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                 queryParams.append('targetSchema', section.repeatingConfig!.targetSchema);
               }
               // If id needs to be added, append it here as the last parameter
-              
+
               const response = await apiRequest<any>(
                 `/api/relations?${queryParams.toString()}`
               );
@@ -727,19 +727,19 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
               relationCounts[section.id] = 0;
             }
           });
-        
+
         await Promise.all(relationPromises);
       }
-      
+
       // Check minItems for all repeating sections (only if main form is valid)
       const sectionsNeedingItems: string[] = [];
       schema.sections.forEach(section => {
         if (section.isRepeatingSection && section.repeatingConfig) {
           const { minItems } = section.repeatingConfig;
-          
+
           if (minItems !== undefined && minItems > 0) {
             const isRelationBased = section.repeatingConfig.targetSchema && section.repeatingConfig.relationTypeId;
-            
+
             let itemCount: number;
             if (isRelationBased) {
               const relationValueArray = Array.isArray(state.values[section.id]) ? state.values[section.id] : [];
@@ -752,13 +752,13 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
               const items = state.values[section.id] || [];
               itemCount = items.length;
             }
-            
+
             if (itemCount < minItems) {
               const sectionLabel = section.title || section.id;
               const itemLabel = minItems === 1 ? 'item' : 'items';
               const errorMessage = `At least ${minItems} ${itemLabel} required for ${sectionLabel}`;
               sectionsNeedingItems.push(sectionLabel);
-              
+
               // If form is already incomplete, minItems becomes a blocking validation error
               // Otherwise, allow first save with incomplete flag
               if (isAlreadyIncomplete) {
@@ -774,10 +774,10 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           }
         }
       });
-      
+
       // Update incomplete sections list
       setIncompleteSections(sectionsNeedingItems);
-      
+
       // Update section errors for incomplete sections (after main validation)
       Object.entries(newErrors).forEach(([fieldName, error]) => {
         // Only update section-level errors (not field errors which were already updated)
@@ -786,7 +786,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           dispatch({ type: 'SET_TOUCHED', fieldName, touched: true });
         }
       });
-      
+
       // Clear errors for sections that are now complete
       schema.sections.forEach(section => {
         if (section.isRepeatingSection && section.repeatingConfig) {
@@ -805,7 +805,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
               const items = state.values[section.id] || [];
               itemCount = items.length;
             }
-            
+
             // Clear error if minItems is now met
             if (itemCount >= minItems && state.errors[section.id] && !newErrors[section.id]) {
               dispatch({ type: 'SET_ERROR', fieldName: section.id, error: '' });
@@ -827,25 +827,25 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         }
       });
     }
-    
+
     return { isValid, isIncomplete };
   }, [schema, state.values, state.errors, initialValues]);
-  
+
   // Check incomplete status (minItems) without full validation
   // This only checks for incomplete status, not required field validation
   const checkIncompleteStatus = useCallback(async (): Promise<boolean> => {
     let isIncomplete = false;
     const hasEntityId = !!(state.values?.id);
-    
+
     // For relation-based sections, we need to fetch relations count for validation
     const relationCounts: Record<string, number> = {};
-    
+
     // Fetch relation counts for relation-based sections
     if (hasEntityId) {
       const relationPromises = schema.sections
-        .filter(section => 
-          section.isRepeatingSection && 
-          section.repeatingConfig?.targetSchema && 
+        .filter(section =>
+          section.isRepeatingSection &&
+          section.repeatingConfig?.targetSchema &&
           section.repeatingConfig?.relationTypeId
         )
         .map(async (section) => {
@@ -861,7 +861,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
               queryParams.append('targetSchema', section.repeatingConfig!.targetSchema);
             }
             // If id needs to be added, append it here as the last parameter
-            
+
             const response = await apiRequest<any>(
               `/api/relations?${queryParams.toString()}`
             );
@@ -882,18 +882,18 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             relationCounts[section.id] = 0;
           }
         });
-      
+
       await Promise.all(relationPromises);
     }
-    
+
     // Only check minItems for incomplete status, don't validate required fields
     schema.sections.forEach(section => {
       if (section.isRepeatingSection && section.repeatingConfig) {
         const { minItems } = section.repeatingConfig;
-        
+
         if (minItems !== undefined && minItems > 0) {
           const isRelationBased = section.repeatingConfig.targetSchema && section.repeatingConfig.relationTypeId;
-          
+
           let itemCount: number;
           if (isRelationBased) {
             const relationValueArray = Array.isArray(state.values[section.id]) ? state.values[section.id] : [];
@@ -906,17 +906,17 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             const items = state.values[section.id] || [];
             itemCount = items.length;
           }
-          
+
           if (itemCount < minItems) {
             isIncomplete = true;
           }
         }
       }
     });
-    
+
     return isIncomplete;
   }, [schema, state.values]);
-  
+
   const reset = useCallback(() => {
     dispatch({ type: 'RESET', initialValues, schema, referenceEntityData: referenceEntityDataRef.current });
     onReset?.();
@@ -929,7 +929,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     targetSchema?: string;
     relationTypeId?: string;
   }>({ isOpen: false, sectionId: '' });
-  
+
   // Trigger to refresh relation-based sections (increments when relations are created)
   const [refreshRelationsTrigger, setRefreshRelationsTrigger] = React.useState(0);
 
@@ -970,7 +970,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   // Re-process defaultValues when referenceEntityData becomes available
   useEffect(() => {
     if (!referenceEntityData || state.dirty) return;
-    
+
     // Check if any field values contain unresolved template strings
     const hasUnresolvedTemplates = schema.fields.some(field => {
       const section = schema.sections.find(s => s.id === field.sectionId);
@@ -978,18 +978,18 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       const value = state.values[field.name];
       return typeof value === 'string' && value.includes('{{') && value.includes('}}');
     });
-    
+
     if (hasUnresolvedTemplates) {
       // Re-process all values with ensureRepeatingItemIds which will resolve templates
       const processedValues = ensureRepeatingItemIds(state.values, schema, referenceEntityData);
-      
+
       // Check if any values actually changed
       const hasChanges = schema.fields.some(field => {
         const section = schema.sections.find(s => s.id === field.sectionId);
         if (section?.isRepeatingSection) return false;
         return state.values[field.name] !== processedValues[field.name];
       });
-      
+
       if (hasChanges) {
         // Update all changed values
         schema.fields.forEach(field => {
@@ -1040,24 +1040,24 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   const addRepeatingItem = useCallback((sectionId: string) => {
     const section = schema.sections.find(s => s.id === sectionId);
     if (!section?.isRepeatingSection) return;
-    
+
     // Check if this is a relation-based repeating section
     const isRelationBased = section.repeatingConfig?.targetSchema && section.repeatingConfig?.relationTypeId;
-    
+
     if (isRelationBased && section.repeatingConfig) {
       // For relation-based sections, open FormModal for target schema
       const currentEntityId = state.values?.id;
-      
+
       if (!currentEntityId) {
         // Entity must be saved first
-        setAddItemErrors(prev => ({ 
-          ...prev, 
-          [sectionId]: 'Please save the form first before adding related items' 
+        setAddItemErrors(prev => ({
+          ...prev,
+          [sectionId]: 'Please save the form first before adding related items'
         }));
         setTimeout(() => setAddItemErrors(prev => ({ ...prev, [sectionId]: null })), 5000);
         return;
       }
-      
+
       // Open modal for creating new entity in target schema
       setRelationModalState({
         isOpen: true,
@@ -1065,20 +1065,20 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         targetSchema: section.repeatingConfig.targetSchema,
         relationTypeId: section.repeatingConfig.relationTypeId,
       });
-      
+
       return;
     }
-    
+
     // Traditional inline fields repeating section
     // Clear any previous add item error for this section
     setAddItemErrors(prev => ({ ...prev, [sectionId]: null }));
-    
+
     // Validate existing items before allowing a new one
     const items = state.values[sectionId] || [];
     let hasErrors = false;
     const newErrors: FormErrors = {};
     const errorFields: string[] = [];
-    
+
     // Check if there are existing items to validate
     if (items.length > 0) {
       const sectionFields = schema.fields.filter(f => f.sectionId === sectionId);
@@ -1098,46 +1098,46 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
               newErrors[errorKey] = result.error || 'Invalid value';
               hasErrors = true;
               errorFields.push(`Item ${itemIndex + 1} - ${field.label || field.name}`);
-              
+
               // Mark field as touched to show the error
               dispatch({ type: 'SET_TOUCHED', fieldName: errorKey, touched: true });
             }
           }
         });
       });
-      
+
       // Update errors in state
       Object.entries(newErrors).forEach(([fieldName, error]) => {
         dispatch({ type: 'SET_ERROR', fieldName, error });
       });
     }
-    
+
     // If there are validation errors, don't add a new item
     if (hasErrors) {
       const errorMessage = `Please fix validation errors in existing items before adding a new one. Fields with errors: ${errorFields.slice(0, 3).join(', ')}${errorFields.length > 3 ? ` and ${errorFields.length - 3} more...` : ''}`;
-      
+
       setAddItemErrors(prev => ({ ...prev, [sectionId]: errorMessage }));
-      
-      loggingCustom(LogType.FORM_DATA, 'warn', 
+
+      loggingCustom(LogType.FORM_DATA, 'warn',
         `Cannot add new item to "${section.title}": Please fix validation errors in existing items first.`
       );
-      
+
       // Clear the error after 5 seconds
       setTimeout(() => setAddItemErrors(prev => ({ ...prev, [sectionId]: null })), 5000);
-      
+
       return;
     }
-    
+
     // Add the new item
     const sectionFields = schema.fields.filter(f => f.sectionId === sectionId);
     const defaultValue = sectionFields.reduce((acc, field) => {
       if (field.defaultValue !== undefined) {
         const resolvedDefault = typeof field.defaultValue === 'string'
           ? replaceDynamicContext(field.defaultValue, {
-              formSchema: schema,
-              formData: state.values,
-              referenceData: referenceEntityDataRef.current ?? useDynamicFormContextStore.getState().referenceData,
-            } as any)
+            formSchema: schema,
+            formData: state.values,
+            referenceData: referenceEntityDataRef.current ?? useDynamicFormContextStore.getState().referenceData,
+          } as any)
           : field.defaultValue;
         acc[field.name] = resolvedDefault;
       } else {
@@ -1145,11 +1145,11 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       }
       return acc;
     }, {} as any);
-    
-    loggingCustom(LogType.FORM_DATA, 'info', 
+
+    loggingCustom(LogType.FORM_DATA, 'info',
       `Adding new item to repeating section "${section.title}"`
     );
-    
+
     dispatch({ type: 'ADD_REPEATING_ITEM', sectionId, defaultValue });
   }, [schema, state.values]);
 
@@ -1159,54 +1159,54 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
   const submit = useCallback(async () => {
     if (disabled) return { isValid: false, isIncomplete: false };
-    
+
     // Mark that form has been submitted (to show incomplete message)
     setHasSubmitted(true);
-    
+
     dispatch({ type: 'SET_SUBMITTING', isSubmitting: true });
-    
+
     // Log form data before validation
     loggingCustom(LogType.FORM_DATA, 'info', '=== FORM SUBMISSION STARTED ===');
     loggingCustom(LogType.FORM_DATA, 'info', `Form Values: ${JSON.stringify(state.values, null, 2)}`);
-    
+
     // Validate synchronously
     const validationResult = await validateForm();
     const { isValid, isIncomplete } = validationResult;
-    
+
     // Log validation results
     loggingCustom(LogType.FORM_DATA, isValid ? 'info' : 'warn', `Form Validation Status: ${isValid ? 'VALID' : 'INVALID'}${isIncomplete ? ' (INCOMPLETE)' : ''}`);
-    
+
     // Log errors for each field
     Object.entries(state.errors).forEach(([fieldName, error]) => {
       if (error) {
         loggingCustom(LogType.FORM_DATA, 'error', `Field "${fieldName}": ${error}`);
       }
     });
-    
+
     // Log section-level validation
     schema.sections.forEach(section => {
       let sectionValid = true;
       const sectionErrors: string[] = [];
-      
+
       if (section.isRepeatingSection && section.repeatingConfig) {
         const items = state.values[section.id] || [];
         const { minItems, maxItems } = section.repeatingConfig;
-        
+
         // Check if this is a relation-based repeating section
         const isRelationBased = section.repeatingConfig.targetSchema && section.repeatingConfig.relationTypeId;
         const hasEntityId = !!(state.values?.id);
-        
+
         const sectionLabel = section.title || section.id;
         if (minItems !== undefined && items.length < minItems) {
           sectionValid = false;
           sectionErrors.push(`At least ${minItems} item(s) required for ${sectionLabel}, found ${items.length}`);
         }
-        
+
         if (maxItems !== undefined && items.length > maxItems) {
           sectionValid = false;
           sectionErrors.push(`Maximum ${maxItems} item(s) allowed for ${sectionLabel}, found ${items.length}`);
         }
-        
+
         // Check for errors within repeating items
         const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
         items.forEach((item: any, itemIndex: number) => {
@@ -1228,19 +1228,19 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           }
         });
       }
-      
-      loggingCustom(LogType.FORM_DATA, sectionValid ? 'info' : 'warn', 
+
+      loggingCustom(LogType.FORM_DATA, sectionValid ? 'info' : 'warn',
         `Section "${section.title || section.id}": ${sectionValid ? 'VALID' : 'INVALID'}${sectionErrors.length > 0 ? ` - ${sectionErrors.join(', ')}` : ''}`
       );
     });
-    
+
     // Log overall validation summary
     const totalErrors = Object.values(state.errors).filter(err => err).length;
     loggingCustom(LogType.FORM_DATA, 'info', `Validation Summary: ${totalErrors} error(s) found${isIncomplete ? ', form is incomplete' : ''}`);
-    
+
     // Update incomplete status
     setIsIncomplete(isIncomplete);
-    
+
     // Only allow submission if form is valid (no validation errors)
     // isIncomplete is just a flag for minItems, not a validation error
     // If isValid is false, there are real validation errors and we should not save
@@ -1248,15 +1248,15 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       try {
         // If form is incomplete (minItems missing), add incomplete flag
         // Otherwise, explicitly set to false when complete
-        const submissionData = isIncomplete 
+        const submissionData = isIncomplete
           ? { ...state.values, incomplete: true }
           : { ...state.values, incomplete: false }; // Explicitly set to false when complete
         await onSubmit(submissionData, { isIncomplete });
         loggingCustom(LogType.FORM_DATA, 'info', `Form submitted successfully${isIncomplete ? ' (with incomplete flag)' : ' (complete)'}`);
-        
+
         // Update incomplete status based on validation result
         setIsIncomplete(isIncomplete);
-        
+
         // If form was incomplete but is now complete, clear incomplete flag
         if (!isIncomplete) {
           // Form is now complete - clear the incomplete flag from state
@@ -1272,9 +1272,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       // Form has validation errors - don't save
       loggingCustom(LogType.FORM_DATA, 'warn', 'Form submission blocked due to validation errors');
     }
-    
+
     loggingCustom(LogType.FORM_DATA, 'info', '=== FORM SUBMISSION ENDED ===');
-    
+
     dispatch({ type: 'SET_SUBMITTING', isSubmitting: false });
     return { isValid, isIncomplete };
   }, [disabled, validateForm, onSubmit, state.values, state.errors, schema]);
@@ -1352,7 +1352,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   }, [schema.sections, expandedSections]);
 
   // If this is rendered inside a form (FormDialog), don't create another form element
-  const isInsideForm = typeof window !== 'undefined' && 
+  const isInsideForm = typeof window !== 'undefined' &&
     document.getElementById('form-dialog-form')?.closest('form');
 
   const renderSections = () => {
@@ -1367,7 +1367,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           touched={state.touched}
           onChange={setValue}
           onBlur={(fieldName: string) => setTouched(fieldName, true)}
-          onFocus={() => {}}
+          onFocus={() => { }}
           disabled={disabled}
           isExpanded={expandedSections[section.id] ?? (section.initialState !== 'collapsed')}
           onToggleExpanded={() => toggleSection(section.id)}
@@ -1390,10 +1390,10 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       const section = schema.sections.find(s => s.id === key);
       return section?.isRepeatingSection && value;
     });
-    
+
     if (sectionErrors.length > 0) {
       for (const [sectionId, errorMessage] of sectionErrors) {
-      const section = schema.sections.find(s => s.id === sectionId);
+        const section = schema.sections.find(s => s.id === sectionId);
         if (section?.isRepeatingSection && section.repeatingConfig?.targetSchema) {
           const sectionValue = state.values[sectionId];
           if (Array.isArray(sectionValue) && sectionValue.length > 0) {
@@ -1407,12 +1407,12 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         return errorMessage;
       }
     }
-    
+
     // Then check for repeating item field errors
     const repeatingSectionItemErrors = Object.entries(state.errors).filter(([key, value]) => {
       return key.includes('[') && key.includes(']') && value;
     });
-    
+
     if (repeatingSectionItemErrors.length > 0) {
       const [errorKey, errorMessage] = repeatingSectionItemErrors[0];
       // Parse the error key to get section id, item index, and field name
@@ -1421,13 +1421,13 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         const [, sectionId, itemIndex, fieldName] = match;
         const section = schema.sections.find(s => s.id === sectionId);
         const field = schema.fields.find(f => f.sectionId === sectionId && f.name === fieldName);
-        return section 
+        return section
           ? `${section.title} - Item ${parseInt(itemIndex) + 1} (${field?.label || fieldName}): ${errorMessage}`
           : errorMessage;
       }
       return errorMessage;
     }
-    
+
     // Finally check for regular field errors
     const remainingErrorEntry = Object.entries(state.errors).find(([key, err]) => err && !suppressedSectionErrors.has(key));
     return remainingErrorEntry ? remainingErrorEntry[1] : '';
@@ -1440,9 +1440,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           {/* Incomplete Badge - shown when form is saved but incomplete, only after submit */}
           {isIncomplete && hasSubmitted && (
             <div className="mb-4">
-              <FormAlert 
-                type="warning" 
-                message="Form saved but incomplete" 
+              <FormAlert
+                type="warning"
+                message="Form saved but incomplete"
                 subtitle={
                   incompleteSections.length > 0
                     ? `Please add at least one item to the following section${incompleteSections.length > 1 ? 's' : ''}: ${incompleteSections.join(', ')}. The form will remain open until all requirements are met.`
@@ -1453,25 +1453,25 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
               />
             </div>
           )}
-          
+
           {/* Message Alert - shown only when there's a message and no blocking errors */}
           {message && !(error || firstValidationError) && !isIncomplete && (
             <div className="mb-4">
-              <FormAlert 
-                type="info" 
-                message={message} 
+              <FormAlert
+                type="info"
+                message={message}
                 onDismiss={onErrorDismiss}
                 dismissible={!!onErrorDismiss}
               />
             </div>
           )}
-          
+
           {/* Error Alert - shown when there's an error or validation issue */}
           {(error || firstValidationError) && (
             <div ref={errorAlertRef} className="mb-4">
-              <FormAlert 
-                type="error" 
-                message={error || firstValidationError} 
+              <FormAlert
+                type="error"
+                message={error || firstValidationError}
                 subtitle={error && message ? message : undefined}
                 onDismiss={error ? onErrorDismiss : undefined}
                 dismissible={!!error}
@@ -1479,10 +1479,10 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                 action={
                   (() => {
                     const errorMessage = (error || firstValidationError || '').toLowerCase();
-                    return errorMessage.includes('company id is required') || 
-                           errorMessage.includes('cannot create records when') ||
-                           errorMessage.includes('please select a company') ||
-                           errorMessage.includes('please select a specific company');
+                    return errorMessage.includes('company id is required') ||
+                      errorMessage.includes('cannot create records when') ||
+                      errorMessage.includes('please select a company') ||
+                      errorMessage.includes('please select a specific company');
                   })() ? (
                     <div className="flex flex-col gap-2">
                       <p className="text-xs font-medium opacity-80">Select a company:</p>
@@ -1493,111 +1493,117 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
               />
             </div>
           )}
-          
+
           {!hideActions && (
             <div className="space-y-3 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10">
-              <div className="flex justify-end items-center space-x-3 py-1">
+              <div className="flex items-center justify-between py-1 gap-3">
                 {/* Fill With AI Button - Only show in create mode */}
-                {!editMode && (
-                  <Button
-                    type="button"
-                    variant="default"
-                    onClick={() => setIsFormFillerOpen(true)}
-                    disabled={disabled}
-                    className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    <span className="hidden md:inline">Fill With AI</span>
-                  </Button>
-                )}
-                
-                {actionConfigs.length > 0 && actionConfigs.map((config) => {
-                  if (config.type === 'submit') {
-                    return (
-                      <Button
-                        key={config.type}
-                        type="button"
-                        variant={config.variant}
-                        disabled={disabled || state.isSubmitting}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          submit();
-                        }}
-                      >
-                        <div className="flex items-center gap-2">
-                          {!state.isSubmitting && config.icon}
-                          {state.isSubmitting ? (
-                            config.loading || 'Submitting...'
-                          ) : (
+                <div className="flex items-center">
+                  {!editMode && (
+                    <Button
+                      type="button"
+                      variant="link"
+                      onClick={() => setIsFormFillerOpen(true)}
+                      disabled={disabled}
+                      className="flex items-center gap-2"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      <span className="hidden md:inline">Fill With AI</span>
+                    </Button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {actionConfigs.length > 0 && actionConfigs.map((config) => {
+                    if (config.type === 'submit') {
+                      return (
+                        <Button
+                          key={config.type}
+                          type="button"
+                          variant="gradient"
+                          disabled={disabled || state.isSubmitting}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            submit();
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            {!state.isSubmitting && config.icon}
+                            {state.isSubmitting ? (
+                              config.loading || 'Submitting...'
+                            ) : (
+                              <span className="hidden md:inline">{config.label}</span>
+                            )}
+                          </div>
+                        </Button>
+                      );
+                    } else if (config.type === 'cancel') {
+                      return (
+                        <Button
+                          key={config.type}
+                          type="button"
+                          variant={config.variant}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            onCancel?.();
+                          }}
+                          disabled={disabled}
+                        >
+                          <div className="flex items-center gap-2">
+                            {config.icon}
                             <span className="hidden md:inline">{config.label}</span>
-                          )}
+                          </div>
+                        </Button>
+                      );
+                    } else if (config.type === 'reset') {
+                      return (
+                        <Button
+                          key={config.type}
+                          type="button"
+                          variant={config.variant}
+                          onClick={reset}
+                          disabled={disabled}
+                        >
+                          <div className="flex items-center gap-2">
+                            {config.icon}
+                            <span className="hidden md:inline">{config.label}</span>
+                          </div>
+                        </Button>
+                      );
+                    }
+                    return null;
+                  })}
+
+                  {/* Quick Actions Popover (Ellipsis) - Inline with buttons */}
+                  {schema?.detailPageMetadata?.quickActions?.length ? (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Quick actions">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent align="end" className="w-80 p-0">
+                        <div className="p-3">
+                          <DynamicQuickActions
+                            actions={schema.detailPageMetadata.quickActions}
+                            schema={schema}
+                            data={referenceEntityData || {}}
+                            disableAnimation
+                            className="space-y-2"
+                            hideContainerCard
+                          />
                         </div>
-                      </Button>
-                    );
-                  } else if (config.type === 'cancel') {
-                    return (
-                      <Button
-                        key={config.type}
-                        type="button"
-                        variant={config.variant}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onCancel?.();
-                        }}
-                        disabled={disabled}
-                      >
-                        <div className="flex items-center gap-2">
-                          {config.icon}
-                          <span className="hidden md:inline">{config.label}</span>
-                        </div>
-                      </Button>
-                    );
-                  } else if (config.type === 'reset') {
-                    return (
-                      <Button
-                        key={config.type}
-                        type="button"
-                        variant={config.variant}
-                        onClick={reset}
-                        disabled={disabled}
-                      >
-                        <div className="flex items-center gap-2">
-                          {config.icon}
-                          <span className="hidden md:inline">{config.label}</span>
-                        </div>
-                      </Button>
-                    );
-                  }
-                  return null;
-                })}
-                
-                {/* Quick Actions Popover (Ellipsis) - Inline with buttons */}
-                {schema?.detailPageMetadata?.quickActions?.length ? (
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Quick actions">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent align="end" className="w-80 p-0">
-                      <div className="p-3">
-                        <DynamicQuickActions
-                          actions={schema.detailPageMetadata.quickActions}
-                          schema={schema}
-                          data={referenceEntityData || {}}
-                          disableAnimation
-                          className="space-y-2"
-                        />
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                ) : null}
+                      </PopoverContent>
+                    </Popover>
+                  ) : null}
+                </div>
+
               </div>
             </div>
           )}
-          
+
           {/* Collapse/Expand All Buttons */}
-          {schema.sections.length > 0 && schema.isCollapsibleSections !== false && !hideCollapseExpandButtons && (
+          {(schema?.sections?.length ?? 0) > 0 && schema.isCollapsibleSections !== false && !hideCollapseExpandButtons && (
             <div className="flex justify-end mb-4">
               <ExpandCollapseControls
                 onExpandAll={expandAll}
@@ -1610,7 +1616,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
               />
             </div>
           )}
-          
+
           <div className="space-y-4">
             <FormSystemSection
               schema={schema}
@@ -1625,7 +1631,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           </div>
         </>
       )}
-      
+
       {/* FormModal for relation-based repeating sections */}
       {relationModalState.isOpen && relationModalState.targetSchema && (
         <FormModal
@@ -1639,12 +1645,12 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             // After successful entity creation, create the relation
             const currentEntityId = state.values?.id;
             const targetEntityId = createdEntity?.id || (createdEntity as any)?.data?.id;
-            
+
             if (currentEntityId && relationModalState.relationTypeId && targetEntityId && relationModalState.targetSchema) {
               try {
                 // Check if the created entity is incomplete
                 const isTargetIncomplete = createdEntity?.incomplete === true || (createdEntity as any)?.data?.incomplete === true;
-                
+
                 const relationResponse = await apiRequest('/api/relations', {
                   method: 'POST',
                   body: {
@@ -1657,7 +1663,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                   },
                   callerName: 'FormLifecycleManager.createRelationFromModal',
                 });
-                
+
                 if (!relationResponse.success) {
                   loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to create relation: ${relationResponse.error}`);
                   // Could show an error message here
@@ -1670,7 +1676,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                 loggingCustom(LogType.CLIENT_LOG, 'error', `Error creating relation: ${error instanceof Error ? error.message : String(error)}`);
               }
             }
-            
+
             // Close modal and clear state
             setRelationModalState({ isOpen: false, sectionId: '' });
           }}
@@ -1678,7 +1684,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             // When form is saved as incomplete, still create the relation
             const currentEntityId = state.values?.id;
             const targetEntityId = createdEntity?.id || (createdEntity as any)?.data?.id;
-            
+
             if (currentEntityId && relationModalState.relationTypeId && targetEntityId && relationModalState.targetSchema) {
               try {
                 // Target entity is incomplete, so relation should also be marked as incomplete
@@ -1694,7 +1700,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                   },
                   callerName: 'FormLifecycleManager.createRelationFromModal.incomplete',
                 });
-                
+
                 if (!relationResponse.success) {
                   loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to create relation for incomplete entity: ${relationResponse.error}`);
                 } else {
@@ -1739,7 +1745,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           </form>
         )}
       </FormContext.Provider>
-      
+
       {/* AI Form Filler Dialog */}
       <AiFormFillerDialog
         isOpen={isFormFillerOpen}
@@ -1752,7 +1758,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           setIsFormFillerOpen(false);
         }}
       />
-      
+
       {/* Go to Top Button */}
       {!hideGoToTopButton && <GoToTopForm threshold={100} />}
     </>

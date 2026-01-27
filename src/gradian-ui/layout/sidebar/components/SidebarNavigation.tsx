@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,10 +8,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { SidebarNavigationProps } from '../types';
-import { isActiveNavigationItem, filterNavigationItems } from '../utils';
+import { isActiveNavigationItem, filterNavigationItems, FALLBACK_HOME_MENU_ITEM } from '../utils';
 import { cn } from '../../../shared/utils';
 import { SidebarNavigationDynamic } from './SidebarNavigationDynamic';
-import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { Menu } from 'lucide-react';
 
 export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
@@ -28,42 +27,87 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   const currentPath = activePath || pathname;
   const shouldShowTooltip = isCollapsed && !isMobile;
   
-  // Filter items based on search query
   const filteredItems = React.useMemo(() => {
     return filterNavigationItems(items, searchQuery || '');
   }, [items, searchQuery]);
 
-  // Track previous items to detect actual changes (not just re-renders)
   const prevItemsKeyRef = useRef<string>('');
   const itemsKey = React.useMemo(() => {
     return filteredItems.map(item => item.id || item.name).join(',');
   }, [filteredItems]);
-  
-  // Only animate if items actually changed (new items added/removed)
-  const shouldAnimate = prevItemsKeyRef.current !== itemsKey;
   React.useEffect(() => {
     prevItemsKeyRef.current = itemsKey;
   }, [itemsKey]);
 
-  // Control Menu accordion state - open by default, or when search matches
   const [menuAccordionValue, setMenuAccordionValue] = React.useState<string | undefined>('menu-items');
-  
-  // Auto-open Menu accordion when search finds matches
   React.useEffect(() => {
     if (searchQuery && searchQuery.trim().length > 0 && filteredItems.length > 0) {
       setMenuAccordionValue('menu-items');
     } else if (!searchQuery || searchQuery.trim().length === 0) {
-      // Keep it open by default when no search
       setMenuAccordionValue('menu-items');
     }
   }, [searchQuery, filteredItems.length]);
+
+  const hasMenuItems = items.length > 0;
+  const homeActive = isActiveNavigationItem(FALLBACK_HOME_MENU_ITEM, currentPath);
+  const HomeIcon = FALLBACK_HOME_MENU_ITEM.icon;
 
   return (
     <TooltipProvider delayDuration={200}>
       <ScrollArea className={cn("h-full px-2", className)} scrollbarVariant="minimal">
         <div className="space-y-3 pt-2 pb-4">
-          {/* Menu Items Accordion */}
-          {filteredItems.length > 0 && (
+          {/* Home link - always shown, outside Menu */}
+          <div className="space-y-1">
+            {shouldShowTooltip ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link href="/" prefetch={false} className="block">
+                    <div
+                      className={cn(
+                        "flex items-center py-2 rounded-lg transition-colors duration-150",
+                        isCollapsed && !isMobile ? "justify-center px-0" : "space-x-3 px-3",
+                        homeActive
+                          ? "bg-gray-800 text-white"
+                          : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                      )}
+                    >
+                      <HomeIcon className="h-5 w-5 shrink-0" />
+                      {(!isCollapsed || isMobile) && (
+                        <span className="text-xs font-medium overflow-hidden whitespace-nowrap">
+                          {FALLBACK_HOME_MENU_ITEM.name}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-gray-900 text-white border-gray-700">
+                  <p>{FALLBACK_HOME_MENU_ITEM.name}</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Link href="/" prefetch={false} className="block">
+                <div
+                  className={cn(
+                    "flex items-center py-2 rounded-lg transition-colors duration-150",
+                    isCollapsed && !isMobile ? "justify-center px-0" : "space-x-3 px-3",
+                    homeActive
+                      ? "bg-gray-800 text-white"
+                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  )}
+                >
+                  <HomeIcon className="h-5 w-5 shrink-0" />
+                  {(!isCollapsed || isMobile) && (
+                    <span className="text-xs font-medium overflow-hidden whitespace-nowrap">
+                      {FALLBACK_HOME_MENU_ITEM.name}
+                    </span>
+                  )}
+                </div>
+              </Link>
+            )}
+          </div>
+
+          {/* Menu accordion - only when there are other menu items */}
+          {hasMenuItems && (
             <Accordion type="single" collapsible value={menuAccordionValue} onValueChange={setMenuAccordionValue} className="w-full">
               <AccordionItem value="menu-items" className="border-none">
                 <AccordionTrigger

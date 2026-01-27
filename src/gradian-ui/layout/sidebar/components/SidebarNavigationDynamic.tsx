@@ -158,8 +158,9 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
     return filtered;
   }, [allSchemas, isLocalTenant, searchQuery]);
 
-  // Group schemas by their first application
-  // If a schema has no applications, categorize it under "Uncategorized"
+  // Group schemas by their first application.
+  // When no application is defined for any schema (only "Uncategorized" would exist),
+  // do not categorize under Uncategorized — show schemas as first-level items.
   const groupedSchemas = useMemo(() => {
     const groups = new Map<string, { application: { id: string; name: string; icon?: string } | null; schemas: FormSchema[] }>();
     
@@ -193,6 +194,18 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
         return nameA.localeCompare(nameB);
       }),
     }));
+    
+    // When the only group is "Uncategorized" (no application defined for any schema),
+    // show schemas as first-level under Applications — do not show an Uncategorized category.
+    const uncategorizedOnly = groupsArray.length === 1 && groupsArray[0].key === 'Uncategorized';
+    if (uncategorizedOnly) {
+      return [{
+        key: '__flat_first_level__',
+        application: null,
+        schemas: groupsArray[0].schemas,
+        flatFirstLevel: true,
+      }];
+    }
     
     // Sort: Uncategorized last, others by application name
     groupsArray.sort((a, b) => {
@@ -241,8 +254,8 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
         }
       }
     } else {
-      // Close all application groups when search is cleared
-      setOpenApplicationGroups(new Set());
+      // Close all application groups when search is cleared (functional update avoids re-render when already empty)
+      setOpenApplicationGroups((prev) => (prev.size === 0 ? prev : new Set()));
     }
   }, [searchQuery, groupedSchemas, accordionValue]);
 
@@ -261,12 +274,12 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   const isAccordionJustOpened = isAccordionOpen && !prevAccordionOpen;
   const shouldAnimate = prevSchemasKey !== schemasKey || isAccordionJustOpened;
   
+  // Sync derived "prev" state when schemas or accordion state change. Do not include prevSchemasKey
+  // in deps to avoid re-running when we update it (which would cause an infinite update loop).
   React.useEffect(() => {
-    if (prevSchemasKey !== schemasKey) {
-      setPrevSchemasKey(schemasKey);
-    }
+    setPrevSchemasKey((prev) => (prev !== schemasKey ? schemasKey : prev));
     setPrevAccordionOpen(isAccordionOpen);
-  }, [schemasKey, isAccordionOpen, prevSchemasKey]);
+  }, [schemasKey, isAccordionOpen]);
 
   if (isLoading || schemas.length === 0) {
     return null;
@@ -350,18 +363,71 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                     transition={{ duration: 0.2 }}
                     className="space-y-1 mt-1 mb-2"
                   >
-                    <Accordion 
-                      type="multiple" 
-                      className="w-full"
-                      value={Array.from(openApplicationGroups)}
-                      onValueChange={(values) => {
-                        setOpenApplicationGroups(new Set(values));
-                      }}
-                    >
-                      {groupedSchemas.map((group, groupIndex) => {
-                        const isUncategorized = group.key === 'Uncategorized';
-                        const isGroupOpen = openApplicationGroups.has(group.key);
-                        const groupValue = group.key;
+                    {(() => {
+                      const flatGroup = groupedSchemas.length === 1 && groupedSchemas[0] && 'flatFirstLevel' in groupedSchemas[0] ? groupedSchemas[0] : null;
+                      if (flatGroup && 'schemas' in flatGroup && flatGroup.schemas) {
+                        return (
+                          <div className="space-y-1 mt-1">
+                            {flatGroup.schemas.map((schema, schemaIndex) => {
+                              const active = isActive(schema.id);
+                              const schemaItem = (
+                                <Link key={schema.id} href={`/page/${schema.id}`} prefetch={false}>
+                                  <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.35, delay: schemaIndex * 0.03, ease: "easeIn" }}
+                                    className={cn(
+                                      "flex items-center py-2 rounded-lg transition-colors duration-150",
+                                      isCollapsed && !isMobile ? "justify-center px-0" : "space-x-3 px-3",
+                                      active ? "bg-gray-800 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                                    )}
+                                  >
+                                    {schema.icon ? (
+                                      <IconRenderer iconName={schema.icon} className="h-5 w-5 shrink-0" />
+                                    ) : (
+                                      <div className="h-5 w-5 shrink-0 rounded bg-gray-700" />
+                                    )}
+                                    <AnimatePresence mode="wait">
+                                      {(!isCollapsed || isMobile) && (
+                                        <motion.span
+                                          initial={{ opacity: 0 }}
+                                          animate={{ opacity: 1 }}
+                                          exit={{ opacity: 0 }}
+                                          transition={{ duration: 0.15, ease: 'easeOut' }}
+                                          className="text-xs font-medium overflow-hidden whitespace-nowrap"
+                                        >
+                                          {schema.plural_name}
+                                        </motion.span>
+                                      )}
+                                    </AnimatePresence>
+                                  </motion.div>
+                                </Link>
+                              );
+                              if (shouldShowTooltip) {
+                                return (
+                                  <Tooltip key={schema.id}>
+                                    <TooltipTrigger asChild>{schemaItem}</TooltipTrigger>
+                                    <TooltipContent side="right" className="bg-gray-900 text-white border-gray-700">
+                                      <p>{schema.plural_name}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                );
+                              }
+                              return <React.Fragment key={schema.id}>{schemaItem}</React.Fragment>;
+                            })}
+                          </div>
+                        );
+                      }
+                      return (
+                        <Accordion
+                          type="multiple"
+                          className="w-full"
+                          value={Array.from(openApplicationGroups)}
+                          onValueChange={(values) => setOpenApplicationGroups(new Set(values))}
+                        >
+                          {groupedSchemas.map((group, groupIndex) => {
+                            const isGroupOpen = openApplicationGroups.has(group.key);
+                            const groupValue = group.key;
                         
                         return (
                           <motion.div
@@ -491,17 +557,19 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                 );
                               }
 
-                                  return <React.Fragment key={schema.id}>{schemaItem}</React.Fragment>;
-                                })}
+                                            return <React.Fragment key={schema.id}>{schemaItem}</React.Fragment>;
+                                          })}
+                                        </motion.div>
+                                      )}
+                                    </AnimatePresence>
+                                  </AccordionContent>
+                                </AccordionItem>
                               </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </AccordionContent>
-                      </AccordionItem>
-                        </motion.div>
+                            );
+                          })}
+                        </Accordion>
                       );
-                    })}
-                  </Accordion>
+                    })()}
                 </motion.nav>
               )}
             </AnimatePresence>
