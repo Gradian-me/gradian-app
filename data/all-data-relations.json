@@ -50,16 +50,6 @@
     "updatedAt": "2025-11-22T14:32:13.083Z"
   },
   {
-    "sourceSchema": "business-areas",
-    "sourceId": "01KBA3HVK0QBJ28FYBJP5FYQD0",
-    "targetSchema": "applications",
-    "targetId": "01KBA3JQKBGFABD2PZXJYP0KBZ",
-    "relationTypeId": "HAS_ADDRESS",
-    "id": "01KBA3M74SVF2CBPFMSEV324T7",
-    "createdAt": "2025-11-30T10:06:09.560Z",
-    "updatedAt": "2025-11-30T10:06:09.560Z"
-  },
-  {
     "sourceSchema": "servers",
     "sourceId": "01KBAT7P2B5NZYX26HVWYV28N1",
     "targetSchema": "url-repositories",
@@ -589,16 +579,6 @@
     "id": "01KC3JJ6DR2K8NA0K1P2HPBSN9",
     "createdAt": "2025-12-10T07:28:12.728Z",
     "updatedAt": "2025-12-10T07:28:12.728Z"
-  },
-  {
-    "sourceSchema": "business-areas",
-    "sourceId": "01KBFQM00000000000000000001",
-    "targetSchema": "applications",
-    "targetId": "01KBFCM00000000000000000002",
-    "relationTypeId": "HAS_ADDRESS",
-    "id": "01KC3JJBP5RFDX00AWWJ6NYASN",
-    "createdAt": "2025-12-10T07:28:18.117Z",
-    "updatedAt": "2025-12-10T07:28:18.117Z"
   },
   {
     "sourceSchema": "business-areas",
@@ -3307,6 +3287,39 @@
     "id": "01KFZFXPWAH14F1M2BDTJ43HBT",
     "createdAt": "2026-01-27T10:27:53.866Z",
     "updatedAt": "2026-01-27T10:27:54.959Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KFTQPVC9RCRE9J8ACHECVWNK",
+    "targetSchema": "schemas",
+    "targetId": "attachments",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KG9W575EGQB4B1RMSF74JYQ2",
+    "createdAt": "2026-01-31T11:14:07.150Z",
+    "updatedAt": "2026-01-31T11:14:08.676Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KFTQPVC9RCRE9J8ACHECVWNK",
+    "targetSchema": "schemas",
+    "targetId": "attachment-folders",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KG9W576HSJ6HJHR51YTM3BHY",
+    "createdAt": "2026-01-31T11:14:07.185Z",
+    "updatedAt": "2026-01-31T11:14:08.681Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KFZFTS259QZVTR2ETNZ1H0GF",
+    "targetSchema": "schemas",
+    "targetId": "lean-management",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KG9W66JQHXT3H69081WY3KSH",
+    "createdAt": "2026-01-31T11:14:39.319Z",
+    "updatedAt": "2026-01-31T11:14:40.711Z",
     "inactive": true
   }
 ]

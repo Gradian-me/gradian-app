@@ -1541,8 +1541,9 @@
       "incomplete": false,
       "id": "01KFTQPVC9RCRE9J8ACHECVWNK",
       "createdAt": "2026-01-25T14:07:45.553Z",
-      "updatedAt": "2026-01-27T10:27:39.815Z",
-      "application-schemas": []
+      "updatedAt": "2026-01-31T11:14:08.614Z",
+      "application-schemas": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
       "name": "Supply Chain Management",
@@ -1560,7 +1561,8 @@
       "incomplete": false,
       "id": "01KFZFTS259QZVTR2ETNZ1H0GF",
       "createdAt": "2026-01-27T10:26:17.800Z",
-      "updatedAt": "2026-01-27T10:26:37.689Z"
+      "updatedAt": "2026-01-31T11:14:40.684Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
   "production-actuals": [],

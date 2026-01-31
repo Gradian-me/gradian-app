@@ -50,16 +50,17 @@ const mergeInitialValuesWithDefaults = (
 ): FormData => {
   const mergedValues = { ...initialValues };
 
-  // Ensure schema has fields array
-  if (!schema?.fields || !Array.isArray(schema.fields)) {
+  const fields = Array.isArray(schema?.fields) ? schema.fields : [];
+  const sections = Array.isArray(schema?.sections) ? schema.sections : [];
+  if (fields.length === 0) {
     loggingCustom(LogType.CLIENT_LOG, 'warn', `[mergeInitialValuesWithDefaults] Schema fields is missing or not an array: ${JSON.stringify({ schemaId: schema?.id })}`);
     return mergedValues;
   }
 
   // Process all fields to apply default values where needed
-  schema.fields.forEach(field => {
+  fields.forEach(field => {
     // Skip if field is in a repeating section (handled separately)
-    const section = schema.sections?.find(s => s.id === field.sectionId);
+    const section = sections.find(s => s.id === field.sectionId);
     if (section?.isRepeatingSection) {
       return;
     }
@@ -101,13 +102,14 @@ const ensureRepeatingItemIds = (
 ): FormData => {
   const newValues = mergeInitialValuesWithDefaults(values, schema, referenceEntityData);
 
-  // Ensure schema has sections array
-  if (!schema?.sections || !Array.isArray(schema.sections)) {
+  const sections = Array.isArray(schema?.sections) ? schema.sections : [];
+  const fields = Array.isArray(schema?.fields) ? schema.fields : [];
+  if (sections.length === 0) {
     loggingCustom(LogType.CLIENT_LOG, 'warn', `[ensureRepeatingItemIds] Schema sections is missing or not an array: ${JSON.stringify({ schemaId: schema?.id })}`);
     return newValues;
   }
 
-  schema.sections.forEach(section => {
+  sections.forEach(section => {
     if (section.isRepeatingSection) {
       // Initialize repeating sections to empty array if they don't exist or are null/undefined
       if (!newValues[section.id] || !Array.isArray(newValues[section.id])) {
@@ -125,7 +127,7 @@ const ensureRepeatingItemIds = (
             };
 
             // Apply default values to repeating section items
-            const sectionFields = schema.fields?.filter(f => f.sectionId === section.id) || [];
+            const sectionFields = fields.filter(f => f.sectionId === section.id);
             sectionFields.forEach(field => {
               if (field.defaultValue !== undefined &&
                 (itemWithId[field.name] === undefined ||
@@ -146,7 +148,7 @@ const ensureRepeatingItemIds = (
           }
 
           // Apply default values to existing items too
-          const sectionFields = schema.fields?.filter(f => f.sectionId === section.id) || [];
+          const sectionFields = fields.filter(f => f.sectionId === section.id);
           sectionFields.forEach(field => {
             if (field.defaultValue !== undefined &&
               (item[field.name] === undefined ||
@@ -290,6 +292,7 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
       };
 
     case 'VALIDATE_FIELD': {
+      const fields = Array.isArray(action.schema?.fields) ? action.schema.fields : [];
       // Handle nested paths for repeating sections (e.g., "contacts[0].name")
       const match = action.fieldName.match(/^(.+)\[(\d+)\]\.(.+)$/);
 
@@ -300,11 +303,11 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
         // This is a repeating section field
         const [, sectionId, itemIndex, fieldName] = match;
         const index = parseInt(itemIndex);
-        field = action.schema.fields.find(f => f.sectionId === sectionId && f.name === fieldName);
+        field = fields.find(f => f.sectionId === sectionId && f.name === fieldName);
         fieldValue = state.values[sectionId]?.[index]?.[fieldName];
       } else {
         // Regular field
-        field = action.schema.fields.find(f => f.name === action.fieldName);
+        field = fields.find(f => f.name === action.fieldName);
         fieldValue = state.values[action.fieldName];
       }
 
@@ -331,8 +334,9 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
     case 'VALIDATE_FORM': {
       const newErrors: FormErrors = {};
       let isValid = true;
+      const fields = Array.isArray(action.schema?.fields) ? action.schema.fields : [];
 
-      action.schema.fields.forEach(field => {
+      fields.forEach(field => {
         // Check if field is required or has validation rules
         const isRequired = field.validation?.required ?? false;
         if (isRequired || field.validation) {
@@ -426,12 +430,29 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   hideGoToTopButton = false,
   ...props
 }) => {
+  // Normalize schema so sections/fields are always arrays (never null) - prevents "Cannot read properties of null (reading 'length')"
+  const safeSchema = useMemo(
+    () => ({
+      ...schema,
+      sections: Array.isArray(schema?.sections) ? schema.sections : [],
+      fields: Array.isArray(schema?.fields) ? schema.fields : [],
+      ...(schema?.detailPageMetadata && {
+        detailPageMetadata: {
+          ...schema.detailPageMetadata,
+          tableRenderers: Array.isArray(schema.detailPageMetadata?.tableRenderers) ? schema.detailPageMetadata.tableRenderers : [],
+          quickActions: Array.isArray(schema.detailPageMetadata?.quickActions) ? schema.detailPageMetadata.quickActions : [],
+        },
+      }),
+    }),
+    [schema]
+  );
+
   // Ref for error alert to scroll to on 400 errors
   const errorAlertRef = useRef<HTMLDivElement>(null);
   const lastErrorStatusCodeRef = useRef<number | undefined>(undefined);
 
   const [state, dispatch] = useReducer(formReducer, {
-    values: ensureRepeatingItemIds(initialValues, schema, referenceEntityData),
+    values: ensureRepeatingItemIds(initialValues, safeSchema, referenceEntityData),
     errors: {},
     touched: {},
     dirty: false,
@@ -453,9 +474,8 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>(() => {
     // Initialize based on section initialState prop or forceExpandedSections
     const initial: Record<string, boolean> = {};
-    // Ensure schema has sections array
-    if (schema?.sections && Array.isArray(schema.sections)) {
-      schema.sections.forEach(section => {
+    if (safeSchema.sections.length > 0) {
+      safeSchema.sections.forEach(section => {
         // If forceExpandedSections is true, always expand; otherwise use initialState
         initial[section.id] = forceExpandedSections ? true : (section.initialState !== 'collapsed');
       });
@@ -485,7 +505,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     // 2. The form is not dirty (user hasn't made changes)
     if (prevInitialValuesRef.current !== currentInitialValues && !state.dirty) {
       prevInitialValuesRef.current = currentInitialValues;
-      dispatch({ type: 'RESET', initialValues, schema, referenceEntityData: referenceEntityDataRef.current });
+      dispatch({ type: 'RESET', initialValues, schema: safeSchema, referenceEntityData: referenceEntityDataRef.current });
       // Check if loaded entity is incomplete (only for edit mode)
       if (initialValues?.incomplete === true) {
         setIsIncomplete(true);
@@ -513,18 +533,18 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
   // Update expanded sections when schema sections change
   const sectionIds = useMemo(() => {
-    if (!schema?.sections || !Array.isArray(schema.sections)) {
+    if (!safeSchema?.sections || !Array.isArray(safeSchema.sections)) {
       return '';
     }
-    return schema.sections.map(s => s.id).join(',');
-  }, [schema?.sections]);
+    return safeSchema.sections.map(s => s.id).join(',');
+  }, [safeSchema?.sections]);
 
   useEffect(() => {
     setExpandedSections(prev => {
       const newExpanded: Record<string, boolean> = {};
       // Ensure schema has sections array
-      if (schema?.sections && Array.isArray(schema.sections)) {
-        schema.sections.forEach(section => {
+      if (safeSchema?.sections && Array.isArray(safeSchema.sections)) {
+        safeSchema.sections.forEach(section => {
           // If forceExpandedSections is true, always expand; otherwise preserve existing state or use initialState
           newExpanded[section.id] = forceExpandedSections
             ? true
@@ -535,7 +555,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       }
       return newExpanded;
     });
-  }, [sectionIds, forceExpandedSections, schema?.sections]);
+  }, [sectionIds, forceExpandedSections, safeSchema?.sections]);
 
   const setValue = useCallback((fieldName: string, value: any) => {
     loggingCustom(LogType.FORM_DATA, 'info', `Setting field "${fieldName}" to: ${JSON.stringify(value)}`);
@@ -543,9 +563,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     onFieldChange?.(fieldName, value);
 
     if (validationMode === 'onChange') {
-      dispatch({ type: 'VALIDATE_FIELD', fieldName, schema });
+      dispatch({ type: 'VALIDATE_FIELD', fieldName, schema: safeSchema });
     }
-  }, [onFieldChange, validationMode, schema]);
+  }, [onFieldChange, validationMode, safeSchema]);
 
   const setError = useCallback((fieldName: string, error: string) => {
     dispatch({ type: 'SET_ERROR', fieldName, error });
@@ -555,14 +575,14 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     dispatch({ type: 'SET_TOUCHED', fieldName, touched });
 
     if (validationMode === 'onBlur') {
-      dispatch({ type: 'VALIDATE_FIELD', fieldName, schema });
+      dispatch({ type: 'VALIDATE_FIELD', fieldName, schema: safeSchema });
     }
-  }, [validationMode, schema]);
+  }, [validationMode, safeSchema]);
 
   const validateField = useCallback((fieldName: string) => {
-    dispatch({ type: 'VALIDATE_FIELD', fieldName, schema });
+    dispatch({ type: 'VALIDATE_FIELD', fieldName, schema: safeSchema });
     return !state.errors[fieldName];
-  }, [schema, state.errors]);
+  }, [safeSchema, state.errors]);
 
   const validateForm = useCallback(async (): Promise<{ isValid: boolean; isIncomplete: boolean }> => {
     // STEP 1: Validate main form first (required fields, maxItems, field validations)
@@ -570,7 +590,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     let isValid = true;
     const newErrors: FormErrors = {};
 
-    schema.sections.forEach(section => {
+    safeSchema.sections.forEach(section => {
       // Check repeating section constraints
       if (section.isRepeatingSection && section.repeatingConfig) {
         const { maxItems } = section.repeatingConfig;
@@ -592,7 +612,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           }
 
           // Validate fields within each repeating item
-          const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
+          const sectionFields = safeSchema.fields.filter(f => f.sectionId === section.id);
           items.forEach((item: any, itemIndex: number) => {
             sectionFields.forEach(field => {
               // Check if field is required or has validation rules
@@ -616,7 +636,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         // Note: For relation-based sections, field validation is handled by the relation items themselves
       } else {
         // Validate individual fields in non-repeating sections
-        const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
+        const sectionFields = safeSchema.fields.filter(f => f.sectionId === section.id);
         sectionFields.forEach(field => {
           // Check if field is required or has validation rules
           const isRequired = field.validation?.required ?? false;
@@ -687,7 +707,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
       // Fetch relation counts for relation-based sections
       if (hasEntityId) {
-        const relationPromises = schema.sections
+        const relationPromises = safeSchema.sections
           .filter(section =>
             section.isRepeatingSection &&
             section.repeatingConfig?.targetSchema &&
@@ -733,7 +753,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
       // Check minItems for all repeating sections (only if main form is valid)
       const sectionsNeedingItems: string[] = [];
-      schema.sections.forEach(section => {
+      safeSchema.sections.forEach(section => {
         if (section.isRepeatingSection && section.repeatingConfig) {
           const { minItems } = section.repeatingConfig;
 
@@ -781,14 +801,14 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       // Update section errors for incomplete sections (after main validation)
       Object.entries(newErrors).forEach(([fieldName, error]) => {
         // Only update section-level errors (not field errors which were already updated)
-        if (schema.sections.some(s => s.id === fieldName && s.isRepeatingSection)) {
+        if (safeSchema.sections.some(s => s.id === fieldName && s.isRepeatingSection)) {
           dispatch({ type: 'SET_ERROR', fieldName, error });
           dispatch({ type: 'SET_TOUCHED', fieldName, touched: true });
         }
       });
 
       // Clear errors for sections that are now complete
-      schema.sections.forEach(section => {
+      safeSchema.sections.forEach(section => {
         if (section.isRepeatingSection && section.repeatingConfig) {
           const { minItems } = section.repeatingConfig;
           if (minItems !== undefined && minItems > 0) {
@@ -817,7 +837,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       // If form is invalid, clear incomplete sections and their errors
       setIncompleteSections([]);
       // Clear any incomplete section errors when form is invalid
-      schema.sections.forEach(section => {
+      safeSchema.sections.forEach(section => {
         if (section.isRepeatingSection && section.repeatingConfig?.minItems && state.errors[section.id]) {
           // Only clear if it's an incomplete error (not a maxItems error)
           const errorMsg = state.errors[section.id];
@@ -842,7 +862,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
     // Fetch relation counts for relation-based sections
     if (hasEntityId) {
-      const relationPromises = schema.sections
+      const relationPromises = safeSchema.sections
         .filter(section =>
           section.isRepeatingSection &&
           section.repeatingConfig?.targetSchema &&
@@ -887,7 +907,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     }
 
     // Only check minItems for incomplete status, don't validate required fields
-    schema.sections.forEach(section => {
+    safeSchema.sections.forEach(section => {
       if (section.isRepeatingSection && section.repeatingConfig) {
         const { minItems } = section.repeatingConfig;
 
@@ -972,8 +992,8 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     if (!referenceEntityData || state.dirty) return;
 
     // Check if any field values contain unresolved template strings
-    const hasUnresolvedTemplates = schema.fields.some(field => {
-      const section = schema.sections.find(s => s.id === field.sectionId);
+    const hasUnresolvedTemplates = safeSchema.fields.some(field => {
+      const section = safeSchema.sections.find(s => s.id === field.sectionId);
       if (section?.isRepeatingSection) return false;
       const value = state.values[field.name];
       return typeof value === 'string' && value.includes('{{') && value.includes('}}');
@@ -984,16 +1004,16 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       const processedValues = ensureRepeatingItemIds(state.values, schema, referenceEntityData);
 
       // Check if any values actually changed
-      const hasChanges = schema.fields.some(field => {
-        const section = schema.sections.find(s => s.id === field.sectionId);
+      const hasChanges = safeSchema.fields.some(field => {
+        const section = safeSchema.sections.find(s => s.id === field.sectionId);
         if (section?.isRepeatingSection) return false;
         return state.values[field.name] !== processedValues[field.name];
       });
 
       if (hasChanges) {
         // Update all changed values
-        schema.fields.forEach(field => {
-          const section = schema.sections.find(s => s.id === field.sectionId);
+        safeSchema.fields.forEach(field => {
+          const section = safeSchema.sections.find(s => s.id === field.sectionId);
           if (section?.isRepeatingSection) return;
           const oldValue = state.values[field.name];
           const newValue = processedValues[field.name];
@@ -1038,7 +1058,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   }, [error, errorStatusCode]);
 
   const addRepeatingItem = useCallback((sectionId: string) => {
-    const section = schema.sections.find(s => s.id === sectionId);
+    const section = safeSchema.sections.find(s => s.id === sectionId);
     if (!section?.isRepeatingSection) return;
 
     // Check if this is a relation-based repeating section
@@ -1081,7 +1101,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
     // Check if there are existing items to validate
     if (items.length > 0) {
-      const sectionFields = schema.fields.filter(f => f.sectionId === sectionId);
+      const sectionFields = safeSchema.fields.filter(f => f.sectionId === sectionId);
       items.forEach((item: any, itemIndex: number) => {
         sectionFields.forEach(field => {
           // Check if field is required or has validation rules
@@ -1129,7 +1149,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     }
 
     // Add the new item
-    const sectionFields = schema.fields.filter(f => f.sectionId === sectionId);
+    const sectionFields = safeSchema.fields.filter(f => f.sectionId === sectionId);
     const defaultValue = sectionFields.reduce((acc, field) => {
       if (field.defaultValue !== undefined) {
         const resolvedDefault = typeof field.defaultValue === 'string'
@@ -1184,7 +1204,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     });
 
     // Log section-level validation
-    schema.sections.forEach(section => {
+    safeSchema.sections.forEach(section => {
       let sectionValid = true;
       const sectionErrors: string[] = [];
 
@@ -1208,7 +1228,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         }
 
         // Check for errors within repeating items
-        const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
+        const sectionFields = safeSchema.fields.filter(f => f.sectionId === section.id);
         items.forEach((item: any, itemIndex: number) => {
           sectionFields.forEach(field => {
             const errorKey = `${section.id}[${itemIndex}].${field.name}`;
@@ -1220,7 +1240,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         });
       } else {
         // Check errors for non-repeating section fields
-        const sectionFields = schema.fields.filter(f => f.sectionId === section.id);
+        const sectionFields = safeSchema.fields.filter(f => f.sectionId === section.id);
         sectionFields.forEach(field => {
           if (state.errors[field.name]) {
             sectionValid = false;
@@ -1320,19 +1340,19 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   // Collapse/Expand all functions
   const collapseAll = useCallback(() => {
     const collapsed: Record<string, boolean> = {};
-    schema.sections.forEach(section => {
+    safeSchema.sections.forEach(section => {
       collapsed[section.id] = false;
     });
     setExpandedSections(collapsed);
-  }, [schema.sections]);
+  }, [safeSchema.sections]);
 
   const expandAll = useCallback(() => {
     const expanded: Record<string, boolean> = {};
-    schema.sections.forEach(section => {
+    safeSchema.sections.forEach(section => {
       expanded[section.id] = true;
     });
     setExpandedSections(expanded);
-  }, [schema.sections]);
+  }, [safeSchema.sections]);
 
   // Toggle individual section
   const toggleSection = useCallback((sectionId: string) => {
@@ -1344,19 +1364,19 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
   // Check if all sections are expanded or collapsed
   const allExpanded = useMemo(() => {
-    return schema.sections.every(section => expandedSections[section.id] === true);
-  }, [schema.sections, expandedSections]);
+    return safeSchema.sections.every(section => expandedSections[section.id] === true);
+  }, [safeSchema.sections, expandedSections]);
 
   const allCollapsed = useMemo(() => {
-    return schema.sections.every(section => expandedSections[section.id] === false);
-  }, [schema.sections, expandedSections]);
+    return safeSchema.sections.every(section => expandedSections[section.id] === false);
+  }, [safeSchema.sections, expandedSections]);
 
   // If this is rendered inside a form (FormDialog), don't create another form element
   const isInsideForm = typeof window !== 'undefined' &&
     document.getElementById('form-dialog-form')?.closest('form');
 
   const renderSections = () => {
-    return schema.sections.map((section) => {
+    return safeSchema.sections.map((section) => {
       return (
         <AccordionFormSection
           key={section.id}
@@ -1387,13 +1407,13 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     // First check for section-level errors (min/max items)
     const suppressedSectionErrors = new Set<string>();
     const sectionErrors = Object.entries(state.errors).filter(([key, value]) => {
-      const section = schema.sections.find(s => s.id === key);
+      const section = safeSchema.sections.find(s => s.id === key);
       return section?.isRepeatingSection && value;
     });
 
     if (sectionErrors.length > 0) {
       for (const [sectionId, errorMessage] of sectionErrors) {
-        const section = schema.sections.find(s => s.id === sectionId);
+        const section = safeSchema.sections.find(s => s.id === sectionId);
         if (section?.isRepeatingSection && section.repeatingConfig?.targetSchema) {
           const sectionValue = state.values[sectionId];
           if (Array.isArray(sectionValue) && sectionValue.length > 0) {
@@ -1419,8 +1439,8 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       const match = errorKey.match(/^(.+)\[(\d+)\]\.(.+)$/);
       if (match) {
         const [, sectionId, itemIndex, fieldName] = match;
-        const section = schema.sections.find(s => s.id === sectionId);
-        const field = schema.fields.find(f => f.sectionId === sectionId && f.name === fieldName);
+        const section = safeSchema.sections.find(s => s.id === sectionId);
+        const field = safeSchema.fields.find(f => f.sectionId === sectionId && f.name === fieldName);
         return section
           ? `${section.title} - Item ${parseInt(itemIndex) + 1} (${field?.label || fieldName}): ${errorMessage}`
           : errorMessage;
@@ -1431,7 +1451,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     // Finally check for regular field errors
     const remainingErrorEntry = Object.entries(state.errors).find(([key, err]) => err && !suppressedSectionErrors.has(key));
     return remainingErrorEntry ? remainingErrorEntry[1] : '';
-  }, [state.errors, schema.sections, schema.fields, state.values]);
+  }, [state.errors, safeSchema.sections, safeSchema.fields, state.values]);
 
   const formContent = (
     <>
@@ -1575,7 +1595,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                   })}
 
                   {/* Quick Actions Popover (Ellipsis) - Inline with buttons */}
-                  {schema?.detailPageMetadata?.quickActions?.length ? (
+                  {(Array.isArray(safeSchema.detailPageMetadata?.quickActions) && safeSchema.detailPageMetadata.quickActions.length > 0) ? (
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Quick actions">
@@ -1585,8 +1605,8 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                       <PopoverContent align="end" className="w-80 p-0">
                         <div className="p-3">
                           <DynamicQuickActions
-                            actions={schema.detailPageMetadata.quickActions}
-                            schema={schema}
+                            actions={safeSchema.detailPageMetadata?.quickActions ?? []}
+                            schema={safeSchema}
                             data={referenceEntityData || {}}
                             disableAnimation
                             className="space-y-2"
@@ -1603,7 +1623,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           )}
 
           {/* Collapse/Expand All Buttons */}
-          {(schema?.sections?.length ?? 0) > 0 && schema.isCollapsibleSections !== false && !hideCollapseExpandButtons && (
+          {(safeSchema.sections.length > 0) && schema?.isCollapsibleSections !== false && !hideCollapseExpandButtons && (
             <div className="flex justify-end mb-4">
               <ExpandCollapseControls
                 onExpandAll={expandAll}
