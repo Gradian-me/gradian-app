@@ -405,8 +405,14 @@ export function useFormModal(
       });
       
       if (response.success && response.data) {
-        schemaSource = response.data;
-        await cacheSchemaClientSide(schemaSource, { queryClient, persist: false });
+        // Handle both { data: schema } and { data: { data: schema } } response structures
+        const rawData = response.data as any;
+        const hasSchemaStructure = rawData?.id != null && typeof rawData === 'object';
+        const nestedSchema = rawData?.data && typeof rawData.data === 'object' && rawData.data?.id != null;
+        schemaSource = hasSchemaStructure ? rawData : (nestedSchema ? rawData.data : rawData);
+        if (schemaSource?.id) {
+          await cacheSchemaClientSide(schemaSource, { queryClient, persist: false });
+        }
       } else {
         // Fallback to getInitialSchema if API fetch fails
         if (getInitialSchema) {

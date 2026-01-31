@@ -14,6 +14,7 @@ import { FormAlert } from '../../../components/ui/form-alert';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { DataRelation, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { asFormBuilderSchema } from '@/gradian-ui/schema-manager/utils/schema-utils';
 import { FormModal } from './FormModal';
 import { Rating, PopupPicker, ConfirmationMessage, AddButtonFull, CodeBadge, Badge } from '../form-elements';
 import { Skeleton } from '../../../components/ui/skeleton';
@@ -119,8 +120,13 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         try {
           const response = await apiRequest<FormSchema>(`/api/schemas/${targetSchema}`);
           if (response.success && response.data) {
-            await cacheSchemaClientSide(response.data, { queryClient, persist: false });
-            setTargetSchemaData(response.data);
+            const rawData = response.data as any;
+            const schemaObj = rawData?.id != null ? rawData : (rawData?.data && rawData.data?.id ? rawData.data : rawData);
+            if (schemaObj?.id) {
+              const normalized = asFormBuilderSchema(schemaObj);
+              await cacheSchemaClientSide(normalized, { queryClient, persist: false });
+              setTargetSchemaData(normalized);
+            }
           }
         } catch (error) {
           loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching target schema: ${error instanceof Error ? error.message : String(error)}`);

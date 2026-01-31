@@ -42,6 +42,10 @@ export const asFormSchema = (schema: ExtendedFormSchema): SharedFormSchema => {
  * never cause "Cannot read properties of null (reading 'length')" in consumers.
  */
 export const asFormBuilderSchema = (schema: ExtendedFormSchema): FormBuilderFormSchema => {
+  if (!schema || typeof schema !== 'object') {
+    throw new Error('asFormBuilderSchema: schema must be a non-null object');
+  }
+
   // Ensure name is set (required by form-builder FormSchema)
   const name = schema.name || schema.singular_name || 'Item';
   
@@ -50,17 +54,33 @@ export const asFormBuilderSchema = (schema: ExtendedFormSchema): FormBuilderForm
   
   // Normalize arrays so backend null/undefined never cause .length access on null
   const fields = Array.isArray(schema.fields) ? schema.fields : [];
-  const sections = Array.isArray(schema.sections) ? schema.sections : [];
+  const sections = Array.isArray(schema.sections)
+    ? schema.sections.map((s: any) => (s && typeof s === 'object'
+        ? {
+            ...s,
+            // Ensure repeatingConfig exists and is object if section is repeating
+            ...(s.isRepeatingSection && (!s.repeatingConfig || typeof s.repeatingConfig !== 'object')
+              ? { repeatingConfig: s.repeatingConfig || {} }
+              : {}),
+          }
+        : s))
+    : [];
   const cardMetadata = Array.isArray(schema.cardMetadata) ? schema.cardMetadata : [];
-  const detailPageMetadata = schema.detailPageMetadata
+  
+  // Always provide detailPageMetadata structure when it exists - normalize all nested arrays
+  const detailPageMetadata = schema.detailPageMetadata != null
     ? {
         ...schema.detailPageMetadata,
-        sections: Array.isArray(schema.detailPageMetadata.sections) ? schema.detailPageMetadata.sections : [],
-        componentRenderers: Array.isArray(schema.detailPageMetadata.componentRenderers) ? schema.detailPageMetadata.componentRenderers : [],
-        tableRenderers: Array.isArray(schema.detailPageMetadata.tableRenderers) ? schema.detailPageMetadata.tableRenderers : [],
-        quickActions: Array.isArray(schema.detailPageMetadata.quickActions) ? schema.detailPageMetadata.quickActions : [],
+        sections: Array.isArray(schema.detailPageMetadata?.sections) ? schema.detailPageMetadata.sections : [],
+        componentRenderers: Array.isArray(schema.detailPageMetadata?.componentRenderers) ? schema.detailPageMetadata.componentRenderers : [],
+        tableRenderers: Array.isArray(schema.detailPageMetadata?.tableRenderers) ? schema.detailPageMetadata.tableRenderers : [],
+        quickActions: Array.isArray(schema.detailPageMetadata?.quickActions) ? schema.detailPageMetadata.quickActions : [],
       }
     : undefined;
+  
+  // Normalize statusGroup and entityTypeGroup for consumers that expect arrays
+  const statusGroup = Array.isArray(schema.statusGroup) ? schema.statusGroup : [];
+  const entityTypeGroup = Array.isArray(schema.entityTypeGroup) ? schema.entityTypeGroup : [];
   
   const formBuilderSchema = {
     ...schema,
@@ -71,6 +91,8 @@ export const asFormBuilderSchema = (schema: ExtendedFormSchema): FormBuilderForm
     sections,
     cardMetadata,
     detailPageMetadata,
+    statusGroup: statusGroup.length > 0 ? statusGroup : schema.statusGroup,
+    entityTypeGroup: entityTypeGroup.length > 0 ? entityTypeGroup : schema.entityTypeGroup,
     layout: schema.layout,
     styling: schema.styling,
     validation: schema.validation || {

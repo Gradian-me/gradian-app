@@ -431,21 +431,36 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   ...props
 }) => {
   // Normalize schema so sections/fields are always arrays (never null) - prevents "Cannot read properties of null (reading 'length')"
-  const safeSchema = useMemo(
-    () => ({
+  const safeSchema = useMemo(() => {
+    if (!schema || typeof schema !== 'object') {
+      return {
+        id: 'unknown',
+        name: 'Item',
+        title: 'Items',
+        sections: [],
+        fields: [],
+        detailPageMetadata: { sections: [], componentRenderers: [], tableRenderers: [], quickActions: [] },
+      };
+    }
+    const sections = Array.isArray(schema.sections) ? schema.sections : [];
+    const fields = Array.isArray(schema.fields) ? schema.fields : [];
+    const dpm = schema.detailPageMetadata;
+    const detailPageMetadata = dpm != null
+      ? {
+          ...dpm,
+          sections: Array.isArray(dpm.sections) ? dpm.sections : [],
+          componentRenderers: Array.isArray(dpm.componentRenderers) ? dpm.componentRenderers : [],
+          tableRenderers: Array.isArray(dpm.tableRenderers) ? dpm.tableRenderers : [],
+          quickActions: Array.isArray(dpm.quickActions) ? dpm.quickActions : [],
+        }
+      : { sections: [] as any[], componentRenderers: [] as any[], tableRenderers: [] as any[], quickActions: [] as any[] };
+    return {
       ...schema,
-      sections: Array.isArray(schema?.sections) ? schema.sections : [],
-      fields: Array.isArray(schema?.fields) ? schema.fields : [],
-      ...(schema?.detailPageMetadata && {
-        detailPageMetadata: {
-          ...schema.detailPageMetadata,
-          tableRenderers: Array.isArray(schema.detailPageMetadata?.tableRenderers) ? schema.detailPageMetadata.tableRenderers : [],
-          quickActions: Array.isArray(schema.detailPageMetadata?.quickActions) ? schema.detailPageMetadata.quickActions : [],
-        },
-      }),
-    }),
-    [schema]
-  );
+      sections,
+      fields,
+      detailPageMetadata,
+    };
+  }, [schema]);
 
   // Ref for error alert to scroll to on 400 errors
   const errorAlertRef = useRef<HTMLDivElement>(null);
