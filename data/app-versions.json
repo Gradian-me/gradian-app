@@ -6174,5 +6174,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0REFINE000000000000002",
+    "timestamp": "2026-01-31T00:00:00.000Z",
+    "version": "1.46.000",
+    "changes": [
+      {
+        "changeType": "refine",
+        "description": "Improved null safety checks in DynamicPageRenderer and schema-utils to prevent runtime errors from null/undefined values. This update enhances data handling and ensures more robust rendering of components.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "schema-manager",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Added tooltip functionality to various components including CodeBadge, PickerInput, and PopupPicker for improved user experience.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "data-display",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Adjusted badge and tooltip integration across multiple components for consistency and better UI responsiveness.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "data-display",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

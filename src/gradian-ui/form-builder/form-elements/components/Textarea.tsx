@@ -5,9 +5,9 @@ import { TextareaProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
 import { CopyContent } from './CopyContent';
 import { ProfessionalWritingModal } from '@/gradian-ui/communication/professional-writing';
-import { IconRenderer } from '../../../shared/utils/icon-renderer';
 import { VoiceInputDialog } from '@/gradian-ui/communication/voice/components/VoiceInputDialog';
-import { Mic } from 'lucide-react';
+import { TextareaAiEnhanceButton } from './TextareaAiEnhanceButton';
+import { TextareaVoiceInputButton } from './TextareaVoiceInputButton';
 import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
 
 export const Textarea = forwardRef<FormElementRef, TextareaProps>(
@@ -140,48 +140,24 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
           required={required ?? config.validation?.required ?? false}
           disabled={disabled}
           className={textareaClasses}
-          style={{ paddingRight: '3rem' }}
+          style={(aiAgentId || enableVoiceInput) ? { paddingRight: '3rem' } : undefined}
           dir="auto"
           {...props}
         />
           <div className="absolute right-3 top-2 flex items-center gap-1">
             {aiAgentId && value && value.trim() && (
-              <button
-                type="button"
+              <TextareaAiEnhanceButton
                 onClick={handleAiAgentClick}
                 disabled={disabled}
-                className={cn(
-                  'h-8 w-8 rounded-full border border-violet-200/70 bg-white/80 text-violet-600 shadow-sm transition-all',
-                  'flex items-center justify-center',
-                  'hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 hover:shadow-md',
-                  'dark:border-violet-500/50 dark:bg-gray-900/80 dark:text-violet-200 dark:hover:bg-violet-500/10',
-                  'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-violet-200/70 disabled:hover:bg-white/80',
-                  'focus:outline-none focus:ring-2 focus:ring-violet-300 dark:focus:ring-violet-700'
-                )}
-                title="Enhance with AI"
-              >
-                <IconRenderer iconName="Sparkles" className="h-3.5 w-3.5" />
-              </button>
+              />
             )}
           </div>
           {enableVoiceInput && (
             <div className="absolute right-3 bottom-4 flex items-center gap-1">
-              <button
-                type="button"
+              <TextareaVoiceInputButton
                 onClick={handleVoiceInputClick}
                 disabled={disabled}
-                className={cn(
-                  'h-8 w-8 rounded-full border border-violet-200/70 bg-white/80 text-violet-600 shadow-sm transition-all',
-                  'flex items-center justify-center',
-                  'hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 hover:shadow-md',
-                  'dark:border-violet-500/50 dark:bg-gray-900/80 dark:text-violet-200 dark:hover:bg-violet-500/10',
-                  'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-violet-200/70 disabled:hover:bg-white/80',
-                  'focus:outline-none focus:ring-2 focus:ring-violet-300 dark:focus:ring-violet-700'
-                )}
-                title="Voice Input"
-              >
-                <Mic className="h-3.5 w-3.5" />
-              </button>
+              />
             </div>
           )}
         </div>

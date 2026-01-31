@@ -939,7 +939,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                       transition={disableAnimation ? {} : { duration: 0.3 }}
                       className={cn(
-                        "text-base font-semibold text-gray-900 dark:text-gray-200 break-words flex-1 min-w-0 line-clamp-3",
+                        "text-sm font-semibold text-gray-900 dark:text-gray-200 break-words flex-1 min-w-0 line-clamp-3",
                         !disableAnimation && "group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors duration-100"
                       )}
                       whileHover={disableAnimation ? undefined : {

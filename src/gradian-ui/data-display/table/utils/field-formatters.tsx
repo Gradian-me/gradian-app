@@ -1023,12 +1023,21 @@ export const formatFieldValue = (
     
     // Use the same Badge component and approach as DynamicCardRenderer for consistency
     return wrapWithForceIcon(
-      <div className="inline-flex items-center whitespace-nowrap">
-        <Badge variant={badgeVariant}>
-          {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
-          <span className="text-xs">{badgeLabel}</span>
-        </Badge>
-      </div>,
+      <TooltipProvider delayDuration={300}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="inline-flex items-center whitespace-nowrap">
+              <Badge variant={badgeVariant}>
+                {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
+                <span className="text-xs">{badgeLabel}</span>
+              </Badge>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-sm">
+            <span>{badgeLabel}</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>,
       isForce,
       field,
       row
@@ -1086,12 +1095,21 @@ export const formatFieldValue = (
     const badgeVariant = getValidBadgeVariant(badgeColor || undefined);
     
     return wrapWithForceIcon(
-      <div className="inline-flex items-center whitespace-nowrap">
-        <Badge variant={badgeVariant}>
-          {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
-          <span className="text-xs">{badgeLabel}</span>
-        </Badge>
-      </div>,
+      <TooltipProvider delayDuration={300}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="inline-flex items-center whitespace-nowrap">
+              <Badge variant={badgeVariant}>
+                {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
+                <span className="text-xs">{badgeLabel}</span>
+              </Badge>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-sm">
+            <span>{badgeLabel}</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>,
       isForce,
       field,
       row

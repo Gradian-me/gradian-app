@@ -640,16 +640,17 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     prevSearchRef.current = searchTermLocal;
   }, [searchTermLocal, viewMode]);
 
-  // Get repeating sections from schema
+  // Get repeating sections from schema (guard against null/undefined from backend)
   const repeatingSections = useMemo(() => {
-    return schema?.sections?.filter((section) => section.isRepeatingSection) || [];
+    return Array.isArray(schema?.sections) ? schema.sections.filter((section) => section.isRepeatingSection) : [];
   }, [schema?.sections]);
 
   // Get field IDs that belong to repeating sections (to exclude from main table)
   const repeatingSectionFieldIds = useMemo(() => {
     const fieldIds = new Set<string>();
+    const fields = Array.isArray(schema?.fields) ? schema.fields : [];
     repeatingSections.forEach((section) => {
-      const sectionFields = schema?.fields?.filter((field: any) => field.sectionId === section.id) || [];
+      const sectionFields = fields.filter((field: any) => field.sectionId === section.id);
       sectionFields.forEach((field: any) => {
         fieldIds.add(field.id);
       });
@@ -659,7 +660,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
 
   // Build table columns from all schema fields
   const tableColumns = useMemo(() => {
-    if (!schema?.fields || schema.fields.length === 0) {
+    if (!Array.isArray(schema?.fields) || schema.fields.length === 0) {
       return [];
     }
 

@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { PopupPicker } from './PopupPicker';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
@@ -705,6 +706,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   const fieldPlaceholder = (config as any).placeholder || 'Click to select...';
 
   return (
+    <TooltipProvider delayDuration={300}>
     <div className={cn('w-full space-y-2', className)}>
       {fieldLabel && (
         <label
@@ -739,7 +741,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
               
               // Determine badge variant or style based on color
               let badgeVariant: any = 'outline';
-              let badgeClassName = 'flex items-center gap-1.5 px-2 py-1 text-xs';
+              let badgeClassName = 'flex items-center gap-1.5 px-2 py-1 text-sm';
               let badgeStyle: React.CSSProperties | undefined = undefined;
               
               if (optionColor) {
@@ -762,30 +764,36 @@ export const PickerInput: React.FC<PickerInputProps> = ({
               }
               
               return (
-                <Badge
-                  key={optionId}
-                  variant={badgeVariant}
-                  className={badgeClassName}
-                  style={badgeStyle}
-                >
-                  {optionIcon && (
-                    <IconRenderer iconName={optionIcon} className="h-3 w-3" />
-                  )}
-                  <span className="max-w-[200px] truncate">{optionLabel}</span>
-                  {!disabled && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveItem(optionId);
-                      }}
-                      className="ms-0.5 rounded-full hover:bg-violet-200 dark:hover:bg-violet-800 focus:outline-none p-0.5 transition-colors"
-                      aria-label={`Remove ${optionLabel}`}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  )}
-                </Badge>
+                <Tooltip key={optionId}>
+                  <TooltipTrigger asChild>
+                    <Badge
+                        variant={badgeVariant}
+                        className={badgeClassName}
+                        style={badgeStyle}
+                      >
+                        {optionIcon && (
+                          <IconRenderer iconName={optionIcon} className="h-3 w-3" />
+                        )}
+                        <span className="max-w-[200px] truncate">{optionLabel}</span>
+                        {!disabled && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveItem(optionId);
+                            }}
+                            className="ms-0.5 rounded-full hover:bg-violet-200 dark:hover:bg-violet-800 focus:outline-none p-0.5 transition-colors"
+                            aria-label={`Remove ${optionLabel}`}
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        )}
+                      </Badge>
+                    </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-sm">
+                    <span>{optionLabel}</span>
+                  </TooltipContent>
+                </Tooltip>
               );
             })}
           </div>
@@ -854,7 +862,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                       // Hex color - use inline style
                       badgeContent = (
                         <div 
-                          className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium"
+                          className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-sm font-medium"
                           style={{ backgroundColor: optionColor, color: '#fff', border: 'none' }}
                         >
                           {iconEl}
@@ -866,7 +874,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                       const hasTextColor = optionColor.includes('text-');
                       const defaultTextColor = hasTextColor ? '' : 'text-white';
                       badgeContent = (
-                        <div className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium border ${defaultTextColor} ${optionColor}`}>
+                        <div className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-sm font-medium border ${defaultTextColor} ${optionColor}`}>
                           {iconEl}
                           <span className="max-w-[200px] truncate">{optionLabel}</span>
                         </div>
@@ -886,7 +894,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                     badgeContent = (
                       <Badge
                         variant="outline"
-                        className="flex items-center gap-1.5 px-2 py-1 text-xs bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800"
+                        className="flex items-center gap-1.5 px-2 py-1 text-sm bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800"
                       >
                         {iconEl}
                         <span className="max-w-[200px] truncate">{optionLabel}</span>
@@ -896,7 +904,14 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                   
                   return (
                     <div key={optionId} className="flex items-center gap-2 flex-1">
-                      {badgeContent}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex min-w-0 max-w-full">{badgeContent}</span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-sm">
+                          <span>{optionLabel}</span>
+                        </TooltipContent>
+                      </Tooltip>
                       {!disabled && !allowMultiselect && (
                         <Button
                           type="button"
@@ -1025,6 +1040,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
         />
       )}
     </div>
+    </TooltipProvider>
   );
 };
 

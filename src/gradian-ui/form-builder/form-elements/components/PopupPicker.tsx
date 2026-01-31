@@ -29,6 +29,7 @@ import { formatFieldValue, getFieldValue } from '@/gradian-ui/data-display/table
 import { getBadgeConfig } from '@/gradian-ui/data-display/utils';
 import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { AddButtonFull } from './AddButtonFull';
@@ -1616,16 +1617,34 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   <div className="flex flex-col items-end gap-1.5 shrink-0">
                     {ratingFieldNode && <div className="flex items-center gap-1">{ratingFieldNode}</div>}
                     {statusBadgeConfig && (
-                      <Badge variant={getValidBadgeVariant(statusBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
-                        {statusBadgeConfig.icon && <IconRenderer iconName={statusBadgeConfig.icon} className="h-3 w-3" />}
-                        <span>{statusBadgeConfig.label}</span>
-                      </Badge>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Badge variant={getValidBadgeVariant(statusBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                              {statusBadgeConfig.icon && <IconRenderer iconName={statusBadgeConfig.icon} className="h-3 w-3" />}
+                              <span>{statusBadgeConfig.label}</span>
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs">
+                            <span>{statusBadgeConfig.label}</span>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     )}
                     {entityTypeBadgeConfig && (
-                      <Badge variant={getValidBadgeVariant(entityTypeBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
-                        {entityTypeBadgeConfig.icon && <IconRenderer iconName={entityTypeBadgeConfig.icon} className="h-3 w-3" />}
-                        <span>{entityTypeBadgeConfig.label}</span>
-                      </Badge>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Badge variant={getValidBadgeVariant(entityTypeBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                              {entityTypeBadgeConfig.icon && <IconRenderer iconName={entityTypeBadgeConfig.icon} className="h-3 w-3" />}
+                              <span>{entityTypeBadgeConfig.label}</span>
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs">
+                            <span>{entityTypeBadgeConfig.label}</span>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     )}
                   </div>
                 )}
@@ -2004,16 +2023,34 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   {(statusBadgeConfig || entityTypeBadgeConfig) && (
                     <div className="flex flex-col items-end gap-1.5 shrink-0">
                       {statusBadgeConfig && (
-                        <Badge variant={getValidBadgeVariant(statusBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
-                          {statusBadgeConfig.icon && <IconRenderer iconName={statusBadgeConfig.icon} className="h-3 w-3" />}
-                          <span>{statusBadgeConfig.label}</span>
-                        </Badge>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge variant={getValidBadgeVariant(statusBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                                {statusBadgeConfig.icon && <IconRenderer iconName={statusBadgeConfig.icon} className="h-3 w-3" />}
+                                <span>{statusBadgeConfig.label}</span>
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs">
+                              <span>{statusBadgeConfig.label}</span>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       )}
                       {entityTypeBadgeConfig && (
-                        <Badge variant={getValidBadgeVariant(entityTypeBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
-                          {entityTypeBadgeConfig.icon && <IconRenderer iconName={entityTypeBadgeConfig.icon} className="h-3 w-3" />}
-                          <span>{entityTypeBadgeConfig.label}</span>
-                        </Badge>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge variant={getValidBadgeVariant(entityTypeBadgeConfig.color)} className="flex items-center gap-1 px-1.5 py-0.5 text-xs">
+                                {entityTypeBadgeConfig.icon && <IconRenderer iconName={entityTypeBadgeConfig.icon} className="h-3 w-3" />}
+                                <span>{entityTypeBadgeConfig.label}</span>
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs">
+                              <span>{entityTypeBadgeConfig.label}</span>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       )}
                     </div>
                   )}

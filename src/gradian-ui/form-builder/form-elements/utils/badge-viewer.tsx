@@ -14,6 +14,7 @@ import { findBadgeOption, getBadgeMetadata, BadgeOption } from './badge-utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { normalizeOptionArray, NormalizedOption } from './option-normalizer';
 import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export type BadgeItem = {
   id: string;
@@ -231,34 +232,40 @@ const getBadgePresentation = (color?: string) => {
       };
 
       return (
-        <motion.div
-          key={itemId}
-          className={cn("shrink-0", clickable && "cursor-pointer")}
-          initial={{ opacity: 0, scale: 0.8, y: 5 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ 
-            duration: 0.3, 
-            delay: idx * 0.05,
-            ease: [0.25, 0.46, 0.45, 0.94]
-          }}
-          whileHover={
-            clickable
-              ? {
-                  scale: 1.05,
-                  transition: { duration: 0.1, ease: "easeOut" },
-                }
-              : undefined
-          }
-          onClick={clickable ? handleItemClick : undefined}
-        >
-          <Badge 
-            color="violet"
-            size="sm"
-            className="inline-flex items-center gap-1.5 max-w-full"
-          >
-            {badgeContent}
-          </Badge>
-        </motion.div>
+        <Tooltip key={itemId}>
+          <TooltipTrigger asChild>
+            <motion.div
+              className={cn("shrink-0", clickable && "cursor-pointer")}
+              initial={{ opacity: 0, scale: 0.8, y: 5 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ 
+                duration: 0.3, 
+                delay: idx * 0.05,
+                ease: [0.25, 0.46, 0.45, 0.94]
+              }}
+              whileHover={
+                clickable
+                  ? {
+                      scale: 1.05,
+                      transition: { duration: 0.1, ease: "easeOut" },
+                    }
+                  : undefined
+              }
+              onClick={clickable ? handleItemClick : undefined}
+            >
+              <Badge 
+                color="violet"
+                size="sm"
+                className="inline-flex items-center gap-1.5 max-w-full"
+              >
+                {badgeContent}
+              </Badge>
+            </motion.div>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-sm">
+            <span>{itemLabel}</span>
+          </TooltipContent>
+        </Tooltip>
       );
     }
     
@@ -286,33 +293,39 @@ const getBadgePresentation = (color?: string) => {
       : (badgeVariantFromColor || badgeVariant);
 
       return (
-        <motion.div
-          key={itemId}
-          className={cn("shrink-0", clickable && "cursor-pointer")}
-          initial={{ opacity: 0, scale: 0.8, y: 5 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ 
-            duration: 0.3, 
-            delay: idx * 0.05,
-            ease: [0.25, 0.46, 0.45, 0.94]
-          }}
-          whileHover={
-            clickable
-              ? {
-                  scale: 1.05,
-                  transition: { duration: 0.1, ease: "easeOut" },
-                }
-              : undefined
-          }
-          onClick={clickable ? handleItemClick : undefined}
-        >
-          <RadixBadge 
-            variant={finalVariant as any}
-            className="inline-flex items-center gap-1.5 max-w-full"
-          >
-            {badgeContent}
-          </RadixBadge>
-        </motion.div>
+        <Tooltip key={itemId}>
+          <TooltipTrigger asChild>
+            <motion.div
+              className={cn("shrink-0", clickable && "cursor-pointer")}
+              initial={{ opacity: 0, scale: 0.8, y: 5 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ 
+                duration: 0.3, 
+                delay: idx * 0.05,
+                ease: [0.25, 0.46, 0.45, 0.94]
+              }}
+              whileHover={
+                clickable
+                  ? {
+                      scale: 1.05,
+                      transition: { duration: 0.1, ease: "easeOut" },
+                    }
+                  : undefined
+              }
+              onClick={clickable ? handleItemClick : undefined}
+            >
+              <RadixBadge 
+                variant={finalVariant as any}
+                className="inline-flex items-center gap-1.5 max-w-full"
+              >
+                {badgeContent}
+              </RadixBadge>
+            </motion.div>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-sm">
+            <span>{itemLabel}</span>
+          </TooltipContent>
+        </Tooltip>
       );
   };
 
@@ -346,13 +359,15 @@ const getBadgePresentation = (color?: string) => {
   };
 
   return (
-    <div className={containerClasses}>
-      {/* Render visible badges */}
-      {visibleBadges.map((item, idx) => renderBadgeItem(item, idx))}
-      
-      {/* Render +X more indicator if needed */}
-      {renderMoreIndicator()}
-    </div>
+    <TooltipProvider delayDuration={300}>
+      <div className={containerClasses}>
+        {/* Render visible badges */}
+        {visibleBadges.map((item, idx) => renderBadgeItem(item, idx))}
+        
+        {/* Render +X more indicator if needed */}
+        {renderMoreIndicator()}
+      </div>
+    </TooltipProvider>
   );
 };
 

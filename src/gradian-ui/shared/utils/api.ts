@@ -760,7 +760,7 @@ async function enrichDataEndpoint(
   }
 
   // Get tenant/company context from stores
-  let contextParams = await getContextParams();
+  const contextParams = await getContextParams();
 
   // If current tenant name is "local", never auto-inject tenantIds.
   // This lets local tenant see all schemas/data regardless of tenant scoping,

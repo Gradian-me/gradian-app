@@ -37,7 +37,9 @@ export const asFormSchema = (schema: ExtendedFormSchema): SharedFormSchema => {
 };
 
 /**
- * Convert ExtendedFormSchema to FormBuilderFormSchema for form-builder components
+ * Convert ExtendedFormSchema to FormBuilderFormSchema for form-builder components.
+ * Normalizes fields, sections, and detailPageMetadata so null/undefined from backend
+ * never cause "Cannot read properties of null (reading 'length')" in consumers.
  */
 export const asFormBuilderSchema = (schema: ExtendedFormSchema): FormBuilderFormSchema => {
   // Ensure name is set (required by form-builder FormSchema)
@@ -46,15 +48,29 @@ export const asFormBuilderSchema = (schema: ExtendedFormSchema): FormBuilderForm
   // Ensure title is set (required by form-builder FormSchema)
   const title = schema.title || schema.plural_name || 'Items';
   
-  // Create a new object with required fields
+  // Normalize arrays so backend null/undefined never cause .length access on null
+  const fields = Array.isArray(schema.fields) ? schema.fields : [];
+  const sections = Array.isArray(schema.sections) ? schema.sections : [];
+  const cardMetadata = Array.isArray(schema.cardMetadata) ? schema.cardMetadata : [];
+  const detailPageMetadata = schema.detailPageMetadata
+    ? {
+        ...schema.detailPageMetadata,
+        sections: Array.isArray(schema.detailPageMetadata.sections) ? schema.detailPageMetadata.sections : [],
+        componentRenderers: Array.isArray(schema.detailPageMetadata.componentRenderers) ? schema.detailPageMetadata.componentRenderers : [],
+        tableRenderers: Array.isArray(schema.detailPageMetadata.tableRenderers) ? schema.detailPageMetadata.tableRenderers : [],
+        quickActions: Array.isArray(schema.detailPageMetadata.quickActions) ? schema.detailPageMetadata.quickActions : [],
+      }
+    : undefined;
+  
   const formBuilderSchema = {
     ...schema,
     name,
     title,
     description: schema.description,
-    fields: schema.fields,
-    sections: schema.sections,
-    cardMetadata: schema.cardMetadata,
+    fields,
+    sections,
+    cardMetadata,
+    detailPageMetadata,
     layout: schema.layout,
     styling: schema.styling,
     validation: schema.validation || {
