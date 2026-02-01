@@ -431,16 +431,18 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   ...props
 }) => {
   // Normalize schema so sections/fields are always arrays (never null) - prevents "Cannot read properties of null (reading 'length')"
-  const safeSchema = useMemo(() => {
+  const safeSchema = useMemo((): FormSchema => {
     if (!schema || typeof schema !== 'object') {
       return {
         id: 'unknown',
         name: 'Item',
         title: 'Items',
+        singular_name: 'Item',
+        plural_name: 'Items',
         sections: [],
         fields: [],
         detailPageMetadata: { sections: [], componentRenderers: [], tableRenderers: [], quickActions: [] },
-      };
+      } as FormSchema;
     }
     const sections = Array.isArray(schema.sections) ? schema.sections : [];
     const fields = Array.isArray(schema.fields) ? schema.fields : [];
@@ -459,7 +461,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       sections,
       fields,
       detailPageMetadata,
-    };
+    } as FormSchema;
   }, [schema]);
 
   // Ref for error alert to scroll to on 400 errors
