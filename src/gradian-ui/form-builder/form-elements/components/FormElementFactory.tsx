@@ -45,6 +45,11 @@ import { LanguageSelector } from './LanguageSelector';
 import { FormulaField } from './FormulaField';
 import { ImageViewer } from './ImageViewer';
 import { VideoViewer } from './VideoViewer';
+import {
+  normalizeChecklistValue,
+  checklistToListInputItems,
+  listInputItemsToChecklist,
+} from '@/gradian-ui/form-builder/form-elements/utils/checklist-value-utils';
 
 // Support both config-based and field-based interfaces
 export interface FormElementFactoryProps extends Omit<FormElementProps, 'config' | 'touched'> {
@@ -590,6 +595,30 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         />
       );
     
+    case 'checklist': {
+      const checklistItems = normalizeChecklistValue(restProps.value);
+      const listInputValue = checklistToListInputItems(checklistItems);
+      return (
+        <ListInput
+          value={listInputValue}
+          onChange={(items) => restProps.onChange?.(listInputItemsToChecklist(items))}
+          placeholder={(config as any).placeholder || 'Add item'}
+          addButtonText={(config as any).addButtonText || 'Add item'}
+          label={(config as any).label}
+          disabled={restProps.disabled}
+          error={restProps.error}
+          required={restProps.required}
+          className={restProps.className}
+          config={config}
+          showCheckbox={true}
+          allowReorder={true}
+          commitOnBlur={true}
+          name={(config as any).name}
+          transformForSubmit={(items) => listInputItemsToChecklist(items)}
+        />
+      );
+    }
+
     case 'list-input':
       return (
         <ListInput

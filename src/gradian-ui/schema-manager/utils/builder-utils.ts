@@ -46,6 +46,7 @@ export const ROLES: Array<{
   { value: 'title', label: 'Title', description: 'Primary heading' },
   { value: 'subtitle', label: 'Subtitle', description: 'Secondary heading' },
   { value: 'description', label: 'Description', description: 'Descriptive text' },
+  { value: 'list', label: 'List', description: 'List/checklist shown on card after description' },
   { value: 'image', label: 'Image', description: 'Image display' },
   { value: 'avatar', label: 'Avatar', description: 'User avatar' },
   { value: 'icon', label: 'Icon', description: 'Icon display' },

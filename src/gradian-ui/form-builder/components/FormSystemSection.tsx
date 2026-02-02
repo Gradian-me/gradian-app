@@ -52,12 +52,8 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
       // When placed inside a grid layout (e.g. 2-column forms), make the system section span 2 columns
       'md:col-span-2'
     )}>
-      <CardHeader className="pb-4 px-6 pt-4">
-        <CardTitle className="text-base font-medium text-gray-900 dark:text-gray-100">
-          System Section
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-0 px-6 pb-6 overflow-visible">
+      
+      <CardContent className="p-6 overflow-visible">
         <div className="space-y-4">
           {/* Switch fields (Inactive, Force) */}
           {switchFields.length > 0 && (

@@ -11,11 +11,12 @@ import {
   FormState,
   FormWrapperProps
 } from '@/gradian-ui/schema-manager/types/form-schema';
+import { FormContext } from '@/gradian-ui/schema-manager/context/FormContext';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { cn, validateField as validateFieldUtil } from '@/gradian-ui/shared/utils';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import { ulid } from 'ulid';
 import { GoToTopForm } from '../form-elements/go-to-top-form';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
@@ -30,9 +31,6 @@ import { AiFormFillerDialog } from '@/domains/ai-builder/components/AiFormFiller
 import { Sparkles, MoreVertical } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { DynamicQuickActions } from '@/gradian-ui/data-display/components/DynamicQuickActions';
-
-// Form Context
-const FormContext = createContext<FormContextType | null>(null);
 
 export const useFormContext = () => {
   const context = useContext(FormContext);
@@ -503,6 +501,14 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   // Deep comparison to avoid unnecessary resets
   const prevInitialValuesRef = React.useRef<string>(JSON.stringify(initialValues));
   const isInitialMountRef = React.useRef<boolean>(true);
+  // Fields that commit on blur (e.g. list/checklist): flush their current value into submission when submit runs
+  const deferredFieldsRef = React.useRef<Map<string, () => unknown>>(new Map());
+  const registerDeferredField = useCallback((fieldName: string, getValue: () => unknown) => {
+    deferredFieldsRef.current.set(fieldName, getValue);
+  }, []);
+  const unregisterDeferredField = useCallback((fieldName: string) => {
+    deferredFieldsRef.current.delete(fieldName);
+  }, []);
 
   // Update form state when initialValues change (for editing scenarios)
   // Only reset if the actual content has changed AND form is not dirty (user hasn't made changes)
@@ -1283,11 +1289,13 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     // If isValid is false, there are real validation errors and we should not save
     if (isValid && onSubmit) {
       try {
-        // If form is incomplete (minItems missing), add incomplete flag
-        // Otherwise, explicitly set to false when complete
-        const submissionData = isIncomplete
+        // Merge deferred field values (e.g. list/checklist with commitOnBlur) so they are included on submit
+        const submissionData: FormData = isIncomplete
           ? { ...state.values, incomplete: true }
-          : { ...state.values, incomplete: false }; // Explicitly set to false when complete
+          : { ...state.values, incomplete: false };
+        deferredFieldsRef.current.forEach((getValue, fieldName) => {
+          submissionData[fieldName] = getValue();
+        });
         await onSubmit(submissionData, { isIncomplete });
         loggingCustom(LogType.FORM_DATA, 'info', `Form submitted successfully${isIncomplete ? ' (with incomplete flag)' : ' (complete)'}`);
 
@@ -1341,6 +1349,8 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       removeRepeatingItem,
     },
     schema,
+    registerDeferredField,
+    unregisterDeferredField,
   };
 
   // Call onMount with submit function if provided

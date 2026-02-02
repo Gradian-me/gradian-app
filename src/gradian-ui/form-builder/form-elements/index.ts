@@ -49,6 +49,7 @@ export * from './go-to-top-form';
 export * from './components/Tabs';
 export * from './components/SortableSelector';
 export * from './components/ListInput';
+export * from './utils/checklist-value-utils';
 export * from './components/TagInput';
 export * from './components/LanguageSelector';
 export * from './components/ForceIcon';

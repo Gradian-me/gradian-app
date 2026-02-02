@@ -19806,5 +19806,40 @@
       ]
     }
   ],
-  "lean-management": []
+  "lean-management": [],
+  "notes": [
+    {
+      "color": "cyan",
+      "title": "تست متن فارسی",
+      "noteContent": "i want to have a page /notes which is a comprehensive page for the user to keep his notes and checklists\n\n\nfirst create notes schema (title, color,  noteContent, checklist (listitem),category (text), isBookmarked)\n\nso the routes uses /api/data/notes\n\nbut in this page it would be custom form not the default form (show as modern note like google keep)\n\nthe notes would be shown like modern sticky notes beautiful\nthey can shown as accordion thatn collapsed and just show title, also show note as sticky and if longer, show more  and open dialog to show sticky\n\nalso i want to group notes by category and show pinned items on top\n\nalso search ability and filter category \n\nfor the bookmark ability, create the feature allowDataBookmark in builder schema in schemas like allow data force and show as a modern icon favorite icon in system section @src/gradian-ui/form-builder/configs/system-section-fields.ts",
+      "category": "Work",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGF6M26309P00Y0GJVBCN2QK",
+      "createdAt": "2026-02-02T12:53:11.499Z",
+      "updatedAt": "2026-02-02T17:47:17.270Z",
+      "isBookmarked": false,
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "checklist": [
+        {
+          "id": "item-1770039091444-hdndo2ico",
+          "content": "asfdasd",
+          "isCompleted": false,
+          "order": 0
+        },
+        {
+          "id": "item-1770039081316-j6mfptdeq",
+          "content": "asdasd",
+          "isCompleted": false,
+          "order": 1
+        },
+        {
+          "id": "item-1770039087625-bj3g60e46",
+          "content": "sdasd",
+          "isCompleted": false,
+          "order": 2
+        }
+      ]
+    }
+  ]
 }

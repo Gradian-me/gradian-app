@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link as LinkIcon, Check, X } from 'lucide-react';
+import { Link as LinkIcon, Check, X, CheckSquare, Square } from 'lucide-react';
 import { formatCurrency, formatDate, formatNumber } from '@/gradian-ui/shared/utils';
 import { BadgeViewer } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
 import type { BadgeItem } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
@@ -511,33 +511,73 @@ export const formatFieldValue = (
     }
   }
 
-  // Handle list-input component FIRST - render as bullet list (before picker field check)
+  // Helper: get display text from a list item (string or object with content/text/label/etc.)
+  const getListItemLabel = (item: any): string => {
+    if (item === null || item === undefined) return '';
+    if (typeof item === 'string') return item;
+    if (typeof item === 'object') {
+      return (
+        item.content ??
+        item.text ??
+        item.label ??
+        item.name ??
+        item.title ??
+        item.value ??
+        (item.id != null ? String(item.id) : '')
+      );
+    }
+    return String(item);
+  };
+
+  // Handle checklist component - render as list with checkbox icon and check when done
+  if (field?.component === 'checklist') {
+    if (!value || (Array.isArray(value) && value.length === 0)) {
+      return <span className="text-gray-400">—</span>;
+    }
+    const listItems = Array.isArray(value) ? value : [value];
+    return wrapWithForceIcon(
+      <ul className="list-none space-y-1 text-sm text-gray-700 dark:text-gray-300 pl-0">
+        {listItems.map((item: any, index: number) => {
+          const text = getListItemLabel(item);
+          const isDone =
+            typeof item === 'object' && item !== null
+              ? item.isCompleted === true || item.completed === true
+              : false;
+          if (!text && !isDone) return null;
+          return (
+            <li key={item?.id ?? index} className="flex items-center gap-2 break-words overflow-wrap-anywhere">
+              <span className="shrink-0 text-gray-500 dark:text-gray-400" aria-hidden>
+                {isDone ? (
+                  <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400" aria-label="Done" />
+                ) : (
+                  <Square className="h-4 w-4 text-gray-400 dark:text-gray-500" aria-label="Not done" />
+                )}
+              </span>
+              <span className={cn(isDone && 'line-through text-gray-500 dark:text-gray-400')}>
+                {text || '—'}
+              </span>
+            </li>
+          );
+        })}
+      </ul>,
+      isForce,
+      field,
+      row
+    );
+  }
+
+  // Handle list-input component - render as bullet list; support array of objects (content/text/label)
   if (field?.component === 'list-input' || field?.component === 'listinput') {
     if (!value || (Array.isArray(value) && value.length === 0)) {
       return <span className="text-gray-400">—</span>;
     }
-    
-    // Normalize value to array format
     const listItems = Array.isArray(value) ? value : [value];
-    if (listItems.length === 0) {
-      return <span className="text-gray-400">—</span>;
-    }
-    
-    // Extract labels from list items
-    const itemLabels = listItems.map((item: any) => {
-      if (typeof item === 'string') {
-        return item;
-      }
-      if (typeof item === 'object' && item !== null) {
-        return item.label || item.name || item.title || item.value || item.id || String(item);
-      }
-      return String(item);
-    }).filter((label: string) => label && label.trim() !== '');
-    
+    const itemLabels = listItems
+      .map((item: any) => getListItemLabel(item))
+      .filter((label: string) => label != null && String(label).trim() !== '');
     if (itemLabels.length === 0) {
       return <span className="text-gray-400">—</span>;
     }
-    
     return wrapWithForceIcon(
       <ul className="list-disc list-inside space-y-0.5 text-sm text-gray-700 dark:text-gray-300">
         {itemLabels.map((label: string, index: number) => (
@@ -1255,11 +1295,12 @@ export const formatFieldValue = (
   ]);
   const componentKey = (field?.component || '').toString().toLowerCase();
   const hasFieldOptions = Array.isArray(field?.options) && field.options.length > 0;
-  // Exclude list-input from badge rendering (it's handled separately above)
+  // Exclude list-input and checklist from badge rendering (handled separately above)
   const shouldRenderAsBadges =
     (field?.role === 'badge' || candidateComponents.has(componentKey)) &&
     componentKey !== 'list-input' &&
     componentKey !== 'listinput' &&
+    componentKey !== 'checklist' &&
     (hasStructuredOptions || hasFieldOptions || Array.isArray(value));
 
   if (shouldRenderAsBadges) {

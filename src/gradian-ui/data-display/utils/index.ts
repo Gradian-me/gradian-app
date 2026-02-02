@@ -54,6 +54,8 @@ export {
   renderCardSection as renderSection,
 } from './card-renderer';
 
+export { getCardBackgroundClass } from './card-color';
+
 // Rating utilities
 export {
   renderRatingStars,

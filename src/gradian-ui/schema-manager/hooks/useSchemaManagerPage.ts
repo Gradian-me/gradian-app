@@ -578,6 +578,7 @@ export const useSchemaManagerPage = () => {
       allowDataHardDelete,
       allowDataAssignedTo,
       allowDataDueDate,
+      allowDataBookmark,
     } = payload;
 
     if (!schemaId || !singularName || !pluralName) {
@@ -613,6 +614,7 @@ export const useSchemaManagerPage = () => {
         allowDataHardDelete,
         allowDataAssignedTo,
         allowDataDueDate,
+        allowDataBookmark,
         fields: [],
         sections: [],
       };

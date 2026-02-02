@@ -42,6 +42,7 @@ export const ROLES = [
   { value: 'title', label: 'Title' },
   { value: 'subtitle', label: 'Subtitle' },
   { value: 'description', label: 'Description' },
+  { value: 'list', label: 'List' },
   { value: 'image', label: 'Image' },
   { value: 'avatar', label: 'Avatar' },
   { value: 'icon', label: 'Icon' },

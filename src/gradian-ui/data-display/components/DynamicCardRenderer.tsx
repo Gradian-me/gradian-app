@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import React, { KeyboardEvent } from 'react';
+import { CheckSquare, Square } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { BadgeProps } from '@/components/ui/badge';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -10,7 +11,7 @@ import { CardSection, FormSchema } from '@/gradian-ui/schema-manager/types/form-
 import { cn } from '@/gradian-ui/shared/utils';
 import { CardContent } from '@/gradian-ui/data-display/card/components/CardContent';
 import { CardWrapper } from '@/gradian-ui/data-display/card/components/CardWrapper';
-import { getArrayValuesByRole, getBadgeConfig, getSingleValueByRole, getValueByRole, renderCardSection, RoleBasedAvatar, getValidBadgeVariant } from '../utils';
+import { getArrayValuesByRole, getBadgeConfig, getSingleValueByRole, getValueByRole, renderCardSection, RoleBasedAvatar, getValidBadgeVariant, getCardBackgroundClass } from '../utils';
 import { AvatarUser } from './AvatarUser';
 import { BadgeViewer, BadgeRenderer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { getFieldsByRole } from '../../form-builder/form-elements/utils/field-resolver';
@@ -112,6 +113,11 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   const hasAvatarField = schema?.fields?.some(field => field.role === 'avatar') || false;
   const hasIconField = schema?.fields?.some(field => field.role === 'icon') || false;
   const hasColorField = schema?.fields?.some(field => field.role === 'color') || false;
+  const colorRoleValue = hasColorField ? getSingleValueByRole(schema, data, 'color') : undefined;
+  const colorBgClass = getCardBackgroundClass(colorRoleValue != null ? String(colorRoleValue) : '');
+  const iconRoleValue = hasIconField ? getSingleValueByRole(schema, data, 'icon') : undefined;
+  const hasIconToShow = hasIconField && iconRoleValue != null && String(getPrimaryDisplayString(iconRoleValue) ?? iconRoleValue ?? '').trim() !== '';
+  const showAvatarInCard = hasIconToShow || (hasAvatarField && getSingleValueByRole(schema, data, 'avatar') != null);
   // Check for person field by role OR by schema allowDataAssignedTo property
   const hasPersonField = schema?.fields?.some(field => field.role === 'person') || schema?.allowDataAssignedTo || false;
 
@@ -297,6 +303,26 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   const descriptionStrings = getDisplayStrings(descriptionValue);
   const description = descriptionStrings.length > 0 ? descriptionStrings.join(' | ') : null;
 
+  // List role: fields with role 'list' shown after description (checklist = Square/CheckSquare, else bullets)
+  const listRoleFields = schema?.fields?.filter((f) => f.role === 'list') ?? [];
+  const hasListRole = listRoleFields.length > 0;
+  const getListItemLabel = (item: any): string => {
+    if (item == null) return '';
+    if (typeof item === 'string') return item;
+    if (typeof item === 'object') {
+      return (
+        item.content ??
+        item.text ??
+        item.label ??
+        item.name ??
+        item.title ??
+        item.value ??
+        (item.id != null ? String(item.id) : '')
+      );
+    }
+    return String(item);
+  };
+
   const handleNavigateToEntity = (schemaId: string, entityId: string) => {
     if (!schemaId || !entityId) {
       return;
@@ -418,7 +444,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     title = getValueByRole(schema, data, 'title') || data.name || 'Unknown';
   } else {
     // Find first text field that doesn't have excluded roles (sorted by order)
-    const excludedRoles = ['code', 'subtitle', 'description'];
+    const excludedRoles = ['code', 'subtitle', 'description', 'list'];
     const textFields = schema?.fields
       ?.filter(field =>
         field.component === 'text' &&
@@ -538,10 +564,14 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
           id: `dynamic-card-${data.id || index}`,
           name: `Dynamic Card ${cardConfig.title}`,
           styling: { variant: 'default', size: 'md' },
-          behavior: { hoverable: !disableAnimation, clickable: true }
+          behavior: {
+            hoverable: !disableAnimation && !isInDialog,
+            clickable: !isInDialog
+          }
         }}
         className={cn(
-          "h-full bg-white dark:bg-gray-800 overflow-hidden rounded-xl",
+          "h-full overflow-hidden rounded-xl",
+          colorBgClass || "bg-white dark:bg-gray-800",
           isInDialog 
             ? "rounded-lg sm:rounded-xl" 
             : viewMode === 'list'
@@ -552,7 +582,11 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
           isIncomplete 
             ? "border-amber-400 dark:border-amber-500 bg-amber-50/30 dark:bg-amber-950/20" 
             : "border-gray-200 dark:border-gray-700",
-          !disableAnimation && !isInDialog && "transition-colors hover:bg-gray-200 dark:hover:bg-gray-600",
+          !disableAnimation && !isInDialog && (
+            colorBgClass
+              ? "transition-[filter] hover:brightness-[0.97] dark:hover:brightness-110"
+              : "transition-colors hover:bg-gray-200 dark:hover:bg-gray-600"
+          ),
           isIncomplete && !disableAnimation && !isInDialog && "hover:bg-amber-100/40 dark:hover:bg-amber-950/30",
           className?.includes('border-none') 
             ? "focus-within:ring-0 border-none" 
@@ -588,7 +622,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   "flex items-center gap-2",
                   isInDialog ? "w-full sm:flex-1 min-w-0" : "flex-1 min-w-0"
                 )}>
-                  {(hasAvatarField || hasIconField || hasColorField) && (
+                  {showAvatarInCard && (
                     <motion.div
                       initial={disableAnimation ? false : { opacity: 0, scale: 0.8 }}
                       animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
@@ -607,7 +641,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <motion.div
-                        className="flex items-center gap-1.5 flex-1 min-w-0 pe-2 flex-wrap"
+                        className="flex items-center gap-1.5 min-w-0 pe-2 flex-wrap flex-initial"
                         initial={disableAnimation ? false : { opacity: 0, x: 5 }}
                         animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                         transition={disableAnimation ? {} : { duration: 0.3 }}
@@ -616,7 +650,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} />
                         <motion.h3
                           className={cn(
-                            "font-semibold text-gray-900 dark:text-gray-50 transition-colors duration-100 flex-1 min-w-0",
+                            "font-semibold text-gray-900 dark:text-gray-50 transition-colors duration-100 min-w-0 flex-initial",
                             isInDialog 
                               ? "text-sm sm:text-base break-words" 
                               : "text-md break-words line-clamp-3",
@@ -741,13 +775,76 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   animate={disableAnimation ? false : { opacity: 1, y: 0 }}
                   transition={disableAnimation ? {} : { duration: 0.3 }}
                   className="w-full mb-2"
-                  whileHover={{ x: 2, transition: { duration: 0.15 } }}
+                  whileHover={isInDialog ? undefined : { x: 2, transition: { duration: 0.15 } }}
                 >
-                  <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
+                  <p className={cn(
+                    "text-xs text-gray-600 dark:text-gray-300 break-words",
+                    !isInDialog && "line-clamp-2"
+                  )}>
                     {renderHighlightedText(description, normalizedHighlightQuery)}
                   </p>
                 </motion.div>
               )}
+
+              {/* List role: after description; each with field label; checklist = Square/CheckSquare, else bullets; multiple list roles shown one after the other */}
+              {hasListRole && listRoleFields.map((listField) => {
+                const listValue = data[listField.name];
+                const items = Array.isArray(listValue) ? listValue : listValue != null ? [listValue] : [];
+                if (items.length === 0) return null;
+                const isChecklist = listField.component === 'checklist' || items.some(
+                  (item: any) => typeof item === 'object' && item != null && ('isCompleted' in item || 'completed' in item)
+                );
+                const fieldLabel = listField.label ?? listField.name ?? 'List';
+                return (
+                  <motion.div
+                    key={listField.name}
+                    initial={disableAnimation ? false : { opacity: 0, y: 5 }}
+                    animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+                    transition={disableAnimation ? {} : { duration: 0.3 }}
+                    className="w-full mb-2"
+                  >
+                    <p className="text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
+                      {fieldLabel}
+                    </p>
+                    {isChecklist ? (
+                      <ul className="list-none space-y-1 text-xs text-gray-600 dark:text-gray-300 pl-0">
+                        {items.map((item: any, idx: number) => {
+                          const text = getListItemLabel(item);
+                          const isDone = typeof item === 'object' && item != null
+                            ? (item.isCompleted === true || item.completed === true)
+                            : false;
+                          return (
+                            <li key={item?.id ?? idx} className="flex items-center gap-2 break-words overflow-wrap-anywhere">
+                              <span className="shrink-0 text-gray-500 dark:text-gray-400" aria-hidden>
+                                {isDone ? (
+                                  <CheckSquare className="h-3.5 w-3.5 text-green-600 dark:text-green-300" aria-label="Done" />
+                                ) : (
+                                  <Square className="h-3.5 w-3.5 text-gray-400 dark:text-gray-400" aria-label="Not done" />
+                                )}
+                              </span>
+                              <span className={cn(isDone && 'line-through text-gray-500 dark:text-gray-400')}>
+                                {text ? renderHighlightedText(text, normalizedHighlightQuery) : '—'}
+                              </span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <ul className="list-disc list-inside space-y-0.5 text-xs text-gray-600 dark:text-gray-300">
+                        {items.map((item: any, idx: number) => {
+                          const label = getListItemLabel(item);
+                          if (label == null || String(label).trim() === '') return null;
+                          return (
+                            <li key={idx} className="break-words overflow-wrap-anywhere">
+                              {renderHighlightedText(label, normalizedHighlightQuery)}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </motion.div>
+                );
+              })}
 
               {/* Force Reason */}
               {isForce && forceReason && (
@@ -914,7 +1011,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
             // List view layout
             <div className="flex items-start space-x-4 w-full flex-wrap gap-2 justify-between">
               <div className="flex items-start gap-2 flex-1 min-w-0">
-                {(hasAvatarField || hasIconField || hasColorField) && (
+                {showAvatarInCard && (
                   <motion.div
                     initial={disableAnimation ? false : { opacity: 0, scale: 0.8 }}
                     animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
@@ -939,7 +1036,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                       transition={disableAnimation ? {} : { duration: 0.3 }}
                       className={cn(
-                        "text-sm font-semibold text-gray-900 dark:text-gray-200 break-words flex-1 min-w-0 line-clamp-3",
+                        "text-sm font-semibold text-gray-900 dark:text-gray-200 break-words min-w-0 flex-initial line-clamp-3",
                         !disableAnimation && "group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors duration-100"
                       )}
                       whileHover={disableAnimation ? undefined : {

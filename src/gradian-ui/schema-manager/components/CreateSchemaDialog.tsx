@@ -45,6 +45,7 @@ const INITIAL_FORM_STATE: CreateSchemaPayload = {
   allowDataHardDelete: false,
   allowDataAssignedTo: false,
   allowDataDueDate: false,
+  allowDataBookmark: false,
 };
 
 export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchemaDialogProps) {
@@ -117,6 +118,7 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
       | 'allowDataHardDelete'
       | 'allowDataAssignedTo'
       | 'allowDataDueDate'
+      | 'allowDataBookmark'
   ) => (checked: boolean) => {
     setFormState(prev => ({
       ...prev,
@@ -304,6 +306,11 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
                 config={{ name: 'allowDataDueDate', label: 'Allow Due Date' }}
                 value={formState.allowDataDueDate || false}
                 onChange={handleSwitchChange('allowDataDueDate')}
+              />
+              <FormSwitch
+                config={{ name: 'allowDataBookmark', label: 'Allow Data Bookmark' }}
+                value={formState.allowDataBookmark || false}
+                onChange={handleSwitchChange('allowDataBookmark')}
               />
             </div>
           </div>

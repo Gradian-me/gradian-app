@@ -86,6 +86,31 @@ export const getSystemSectionFields = (
     });
   }
 
+  if (schema.allowDataBookmark === true) {
+    fields.push({
+      field: {
+        id: 'system-bookmark',
+        name: 'isBookmarked',
+        label: 'Bookmark',
+        sectionId: 'system-section',
+        component: 'switch',
+        order: 2.5,
+      },
+      shouldShow: () => schema.allowDataBookmark === true,
+      getFieldConfig: () => ({
+        id: 'system-bookmark',
+        name: 'isBookmarked',
+        label: 'Bookmark',
+        sectionId: 'system-section',
+        component: 'switch',
+      }),
+      getValue: (vals) => vals?.isBookmarked === true,
+      onChange: (value, onChange) => onChange('isBookmarked', value),
+      group: 'switches',
+      order: 2.5,
+    });
+  }
+
   // Force reason (conditional on force being enabled)
   if (schema.allowDataForce === true) {
     fields.push({

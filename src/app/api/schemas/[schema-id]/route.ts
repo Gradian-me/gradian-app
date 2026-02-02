@@ -73,11 +73,18 @@ function clearSchemaCache() {
 
 /**
  * Load schemas with caching
- * Cache is invalidated if file modification time changes or TTL expires
+ * Cache is invalidated if file modification time changes or TTL expires.
+ * When bypassCache is true (e.g. client sent cacheBust), always read from file.
  */
-function loadSchemas(): any[] {
+function loadSchemas(bypassCache?: boolean): any[] {
   if (!fs.existsSync(SCHEMA_FILE_PATH)) {
     return [];
+  }
+
+  if (bypassCache) {
+    cachedSchemas = null;
+    cacheTimestamp = null;
+    cachedFileMtime = null;
   }
   
   // Check file modification time
@@ -361,8 +368,10 @@ export async function GET(
   }
 
   try {
-    // Load schemas (with caching)
-    const schemas = loadSchemas();
+    // Bypass in-memory cache when client sends cache-bust (e.g. builder refresh)
+    const searchParams = request.nextUrl.searchParams;
+    const hasCacheBust = searchParams.has('cacheBust') || searchParams.has('_t');
+    const schemas = loadSchemas(hasCacheBust);
     
     if (!schemas || schemas.length === 0) {
       return NextResponse.json(
@@ -381,8 +390,7 @@ export async function GET(
       );
     }
 
-    // Get tenantIds from query params if available
-    const searchParams = request.nextUrl.searchParams;
+    // Get tenantIds from query params if available (searchParams already declared above)
     const tenantIdsParam = searchParams.get('tenantIds');
     const tenantIds = tenantIdsParam
       ?.split(',')

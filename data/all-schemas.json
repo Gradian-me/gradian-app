@@ -8196,5 +8196,91 @@
         "label": "Change Management Status"
       }
     ]
+  },
+  {
+    "id": "notes",
+    "description": "Personal notes and checklists - sticky-note style workspace",
+    "singular_name": "Note",
+    "plural_name": "Notes",
+    "fields": [
+      {
+        "id": "note-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "note-content",
+        "component": "text",
+        "placeholder": "Note title",
+        "role": "title",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "note-color",
+        "name": "color",
+        "label": "Color",
+        "sectionId": "note-content",
+        "component": "color-picker",
+        "placeholder": "Select color",
+        "role": "color",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "note-content",
+        "name": "noteContent",
+        "label": "Content",
+        "sectionId": "note-content",
+        "component": "textarea",
+        "placeholder": "Write your note...",
+        "role": "description",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "note-checklist",
+        "name": "checklist",
+        "label": "Checklist",
+        "sectionId": "note-content",
+        "component": "checklist",
+        "placeholder": "Add checklist items",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4,
+        "role": "list"
+      }
+    ],
+    "sections": [
+      {
+        "id": "note-content",
+        "title": "Note",
+        "description": "Note content and checklist",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "StickyNote",
+    "isNotCompanyBased": true,
+    "schemaType": "business",
+    "allowDataBookmark": true,
+    "applications": [],
+    "entityTypeGroup": [
+      {
+        "id": "01KCDZTASKGROUP0000000000001",
+        "label": "Task Types"
+      }
+    ],
+    "applyToAllTenants": true
   }
 ]

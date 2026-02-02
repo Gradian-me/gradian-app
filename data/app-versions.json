@@ -6215,7 +6215,7 @@
   {
     "id": "01KG0REFINE000000000000003",
     "timestamp": "2026-01-31T00:00:00.000Z",
-    "version": "1.476.001",
+    "version": "1.46.001",
     "changes": [
       {
         "changeType": "refine",
@@ -6242,6 +6242,42 @@
         "priority": "Low",
         "affectedDomains": [
           "data"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01KG0V46003000000000000001",
+    "timestamp": "2026-02-02T00:00:00.000Z",
+    "version": "1.46.004",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Introduced a new 'notes' schema for personal notes and checklists, enhancing user functionality.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "data",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved caching logic in loadSchemas function to support cache-busting.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "performance"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated DynamicCardRenderer and ListInput components to support checklist functionality with visual indicators for completed items. This update improves data handling and user experience across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "form-builder",
+          "ui"
         ]
       }
     ]

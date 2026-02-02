@@ -175,6 +175,12 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
               disabled={readonly}
             />
             <Switch
+              config={{ name: 'allow-data-bookmark', label: 'Allow Data Bookmark' }}
+              value={schema.allowDataBookmark || false}
+              onChange={(checked: boolean) => onUpdate({ allowDataBookmark: checked })}
+              disabled={readonly}
+            />
+            <Switch
               config={{ name: 'allow-hierarchical-parent', label: 'Allow Hierarchical Parent' }}
               value={schema.allowHierarchicalParent || false}
               onChange={(checked: boolean) => onUpdate({ allowHierarchicalParent: checked })}

@@ -90,19 +90,19 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
         className={cn(
           // Width & max-width: full‑bleed on small screens, constrained on larger
           "w-full max-w-full sm:max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl",
-          // Height: near full‑screen on mobile, scrollable content
-          "max-h-[90vh]",
+          // Height: use most of viewport so card fits without scroll when possible
+          "max-h-[96vh]",
           // Make mobile dialog feel like a full‑screen sheet
           "rounded-none sm:rounded-2xl",
-          // Internal scrolling instead of viewport overflow
-          "overflow-y-auto",
+          // Flex column so header stays fixed and card area scrolls
+          "flex flex-col overflow-hidden",
           // Responsive padding so content fits on small heights
           "p-2 sm:p-4 md:p-6",
           className
         )} 
         data-test-id="dynamic-card-dialog-content"
       >
-        <DialogHeader className="px-0 sm:px-1">
+        <DialogHeader className="px-0 sm:px-1 shrink-0">
           <DialogTitle className="text-base sm:text-lg font-semibold flex items-center gap-2 flex-wrap">
             <span className="truncate">{title}</span>
             {data?.id && (
@@ -116,11 +116,12 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
         
-        <div className="mt-2 sm:mt-4">
+        <div className="mt-2 sm:mt-4 flex-1 min-h-0 overflow-y-auto overflow-x-hidden min-w-0">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25 }}
+            className="min-h-0 min-w-0 w-full max-w-full"
           >
             <DynamicCardRenderer
               schema={schema}

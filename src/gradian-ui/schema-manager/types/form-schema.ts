@@ -8,7 +8,7 @@ export interface FormField {
   name: string;
   label: string;
   sectionId: string; // Reference to the section this field belongs to
-  component: 'text' | 'email' | 'tel' | 'number' | 'password' | 'url' | 'textarea' | 'json' | 'select' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'datetime-local' | 'datetime' | 'file' | 'picker' | 'icon' | 'image-text' | 'image-viewer' | 'name' | 'avatar' | 'color-picker' | 'rating' | 'badge' | 'countdown' | 'code-viewer' | 'list-input' | 'tag-input' | 'toggle' | 'toggle-group' | 'switch' | 'formula';
+  component: 'text' | 'email' | 'tel' | 'number' | 'password' | 'url' | 'textarea' | 'json' | 'select' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'datetime-local' | 'datetime' | 'file' | 'picker' | 'icon' | 'image-text' | 'image-viewer' | 'name' | 'avatar' | 'color-picker' | 'rating' | 'badge' | 'countdown' | 'code-viewer' | 'list-input' | 'tag-input' | 'toggle' | 'toggle-group' | 'switch' | 'formula' | 'checklist';
   placeholder?: string;
   icon?: string;
   displayType?: 'text' | 'number' | 'currency' | 'percentage' | 'array' | 'computed';
@@ -21,7 +21,7 @@ export interface FormField {
   inactive?: boolean;
   addToReferenceMetadata?: boolean;
   isSensitive?: boolean; // If true, field value will be encrypted before storage and decrypted for display
-  role?: 'title' | 'subtitle' | 'description' | 'image' | 'avatar' | 'icon' | 'rating' | 'badge' | 'status' | 'email' | 'location' | 'tel' | 'duedate' | 'code' | 'color' | 'person' | 'entityType';
+  role?: 'title' | 'subtitle' | 'description' | 'list' | 'image' | 'avatar' | 'icon' | 'rating' | 'badge' | 'status' | 'email' | 'location' | 'tel' | 'duedate' | 'code' | 'color' | 'person' | 'entityType';
   roleColor?: 'default' | 'secondary' | 'outline' | 'destructive' | 'gradient' | 'success' | 'warning' | 'info' | 'muted';
   validation?: {
     required?: boolean;
@@ -425,6 +425,11 @@ export interface FormSchema {
   inactive?: boolean;
   allowDataInactive?: boolean;
   allowDataForce?: boolean;
+  /**
+   * When true, shows a bookmark/favorite toggle in the System Section.
+   * Stored in data as `isBookmarked` (boolean).
+   */
+  allowDataBookmark?: boolean;
   allowDataHardDelete?: boolean;
   /**
    * When true, shows an "Assigned To" user selector in the System Section.
@@ -543,10 +548,17 @@ export interface FormActions {
   removeRepeatingItem: (sectionId: string, index: number) => void;
 }
 
+/** Optional: register a getter so this field's value is merged into submission data on submit (e.g. list fields that commit on blur). */
+export type DeferredFieldGetter = () => unknown;
+
 export interface FormContextType {
   state: FormState;
   actions: FormActions;
   schema: FormSchema;
+  /** When provided, register a field that should be flushed into submission data on submit (used by list/checklist with commitOnBlur). */
+  registerDeferredField?: (fieldName: string, getValue: DeferredFieldGetter) => void;
+  /** Unregister a deferred field (on unmount). */
+  unregisterDeferredField?: (fieldName: string) => void;
 }
 
 export interface FormWrapperProps {

@@ -21,6 +21,7 @@ export interface CreateSchemaPayload {
   allowDataHardDelete?: boolean;
    allowDataAssignedTo?: boolean;
    allowDataDueDate?: boolean;
+  allowDataBookmark?: boolean;
 }
 
 export interface SchemaCreateResult {
