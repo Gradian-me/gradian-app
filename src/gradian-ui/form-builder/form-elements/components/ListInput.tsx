@@ -357,9 +357,11 @@ const SortableListItem: React.FC<{
             <div className="flex items-center gap-3">
             {isSortable && (
               <button
+                type="button"
                 {...attributes}
                 {...listeners}
-                className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 hover:bg-gray-200/60 rounded-lg p-1.5 transition-colors shrink-0 dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-gray-700/60"
+                className="touch-none cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 hover:bg-gray-200/60 rounded-lg p-1.5 transition-colors shrink-0 dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-gray-700/60"
+                aria-label="Drag to reorder"
               >
                 <GripVertical className="h-4 w-4" />
               </button>
@@ -525,20 +527,9 @@ export const ListInput: React.FC<ListInputProps> = ({
     valueRef.current = displayValue;
   }, [displayValue]);
   
-  // When commitOnBlur: commit to parent when focus leaves the list (e.g. user clicks Update form or another field)
-  React.useEffect(() => {
-    if (!commitOnBlur || !containerRef.current) return;
-    const el = containerRef.current;
-    const onFocusOut = (e: FocusEvent) => {
-      if (!el.contains(e.relatedTarget as Node)) {
-        const current = valueRef.current;
-        lastSyncedJsonRef.current = JSON.stringify(current);
-        onChange(current);
-      }
-    };
-    el.addEventListener('focusout', onFocusOut);
-    return () => el.removeEventListener('focusout', onFocusOut);
-  }, [commitOnBlur, onChange]);
+  // When commitOnBlur: do NOT flush to parent on focusout. Value is only committed on form submit via
+  // registerDeferredField. This prevents reorder (in any direction) or other in-list edits from triggering save.
+  // (Focusout flush was unreliable: multiple focusouts or timing could still call onChange and save.)
 
   // Register with form so this field's value is merged into submission data on submit (when user clicks Update form without blurring the list)
   React.useEffect(() => {

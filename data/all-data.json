@@ -19817,27 +19817,37 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KGF6M26309P00Y0GJVBCN2QK",
       "createdAt": "2026-02-02T12:53:11.499Z",
-      "updatedAt": "2026-02-02T17:47:17.270Z",
+      "updatedAt": "2026-02-02T20:32:24.715Z",
       "isBookmarked": false,
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "checklist": [
         {
-          "id": "item-1770039091444-hdndo2ico",
-          "content": "asfdasd",
-          "isCompleted": false,
-          "order": 0
-        },
-        {
           "id": "item-1770039081316-j6mfptdeq",
           "content": "asdasd",
-          "isCompleted": false,
-          "order": 1
+          "isCompleted": false
+        },
+        {
+          "id": "item-1770039091444-hdndo2ico",
+          "content": "asfdasd",
+          "isCompleted": false
+        },
+        {
+          "id": "item-1770064301767-vru8wrr9c",
+          "content": "SDASDASD",
+          "isCompleted": false
         },
         {
           "id": "item-1770039087625-bj3g60e46",
           "content": "sdasd",
-          "isCompleted": false,
-          "order": 2
+          "isCompleted": false
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCDZTASK003FAMILY00000000003",
+          "label": "Family",
+          "icon": "Users",
+          "color": "pink"
         }
       ]
     }

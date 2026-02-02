@@ -26,24 +26,19 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
     const wasEmpty = dialogsRef.current.size === 0;
     dialogsRef.current.set(id, { id, type, onClose });
     
-    // Push history state when first dialog opens (on mobile)
+    // Push history state when first dialog opens so back button triggers popstate (and we can show unsaved confirm)
     if (wasEmpty && typeof window !== 'undefined') {
-      const isMobile = window.innerWidth < 768;
-      if (isMobile) {
-        window.history.pushState({ dialogOpen: true }, '', window.location.href);
-        historyStatePushedRef.current = true;
-      }
+      window.history.pushState({ dialogOpen: true }, '', window.location.href);
+      historyStatePushedRef.current = true;
     }
   }, []);
 
   const unregisterDialog = useCallback((id: string) => {
     dialogsRef.current.delete(id);
     
-    // If all dialogs are closed and we pushed a history state, go back
+    // If all dialogs are closed and we had pushed a history state, clear the flag (state already popped when user closed)
     if (dialogsRef.current.size === 0 && historyStatePushedRef.current && typeof window !== 'undefined') {
-      const isMobile = window.innerWidth < 768;
-      if (isMobile && window.history.state?.dialogOpen) {
-        // Don't actually navigate, just remove the state we added
+      if (window.history.state?.dialogOpen) {
         historyStatePushedRef.current = false;
       }
     }

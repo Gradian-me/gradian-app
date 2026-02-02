@@ -60,3 +60,17 @@ export function listInputItemsToChecklist(
     order: index,
   }));
 }
+
+/**
+ * Same as listInputItemsToChecklist but omits the order property for API payloads.
+ * Array position is the source of truth; no separate order column needed.
+ */
+export function listInputItemsToChecklistForSubmit(
+  items: { id: string; label: string; completed?: boolean }[]
+): Omit<ChecklistItemType, 'order'>[] {
+  return items.map((item) => ({
+    id: item.id,
+    content: item.label,
+    isCompleted: item.completed === true,
+  }));
+}

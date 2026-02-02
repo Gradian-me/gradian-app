@@ -49,6 +49,7 @@ import {
   normalizeChecklistValue,
   checklistToListInputItems,
   listInputItemsToChecklist,
+  listInputItemsToChecklistForSubmit,
 } from '@/gradian-ui/form-builder/form-elements/utils/checklist-value-utils';
 
 // Support both config-based and field-based interfaces
@@ -614,7 +615,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           allowReorder={true}
           commitOnBlur={true}
           name={(config as any).name}
-          transformForSubmit={(items) => listInputItemsToChecklist(items)}
+          transformForSubmit={(items) => listInputItemsToChecklistForSubmit(items)}
         />
       );
     }

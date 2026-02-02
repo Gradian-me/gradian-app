@@ -241,20 +241,17 @@ function MainLayoutContent({
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const handlePopState = (event: PopStateEvent) => {
-      // Check if we're on mobile
-      const isMobile = window.innerWidth < DESKTOP_BREAKPOINT;
-      if (!isMobile) {
-        return; // Allow normal back navigation on desktop
+    const handlePopState = () => {
+      // If there are open dialogs (e.g. form modal with unsaved changes), intercept back on both mobile and desktop
+      if (hasOpenDialogs()) {
+        // Push state so we stay on the current page (cancel the back navigation)
+        window.history.pushState({ dialogOpen: true }, '', window.location.href);
+        closeAllDialogs(); // This runs each dialog's onClose (e.g. form modal shows unsaved confirm)
+        return;
       }
 
-      // If there are open dialogs/dropdowns, close them and prevent navigation
-      if (hasOpenDialogs()) {
-        // Push a new state to prevent navigation
-        window.history.pushState({ dialogOpen: true }, '', window.location.href);
-        // Close all dialogs
-        closeAllDialogs();
-      }
+      // On mobile we pushed state when first dialog opened; on desktop we don't push, so back normally navigates.
+      // No dialogs open: allow normal back navigation.
     };
     
     window.addEventListener('popstate', handlePopState);

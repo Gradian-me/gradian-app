@@ -574,6 +574,8 @@ export interface FormWrapperProps {
   className?: string;
   children?: React.ReactNode;
   onMount?: (submitFn: () => Promise<{ isValid: boolean; isIncomplete: boolean }>) => void;
+  /** Called when form dirty state changes (e.g. for unsaved-changes warning on close/refresh/navigation). */
+  onFormStateChange?: (state: { dirty: boolean }) => void;
   hideActions?: boolean;
   error?: string | null;
   message?: string | null;

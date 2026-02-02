@@ -6281,5 +6281,41 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V46005000000000000001",
+    "timestamp": "2026-02-02T00:00:00.000Z",
+    "version": "1.46.005",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Implemented unsaved changes confirmation dialog in FormModal to enhance user experience when navigating away from unsaved forms.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved form state management in FormLifecycleManager and ListInput components to ensure accurate tracking of form dirty states.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "schema-manager",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated checklist handling in FormElementFactory to streamline data submission processes. This update improves data integrity and user interaction across form components.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "data-display",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

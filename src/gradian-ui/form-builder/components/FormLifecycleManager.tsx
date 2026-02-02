@@ -418,6 +418,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   className,
   children,
   onMount,
+  onFormStateChange,
   hideActions = false,
   error,
   message,
@@ -1357,6 +1358,11 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   useEffect(() => {
     onMount?.(submit);
   }, [submit]);
+
+  // Notify parent when form dirty state changes (for unsaved-changes warning on close/refresh/navigation)
+  useEffect(() => {
+    onFormStateChange?.({ dirty: state.dirty });
+  }, [state.dirty, onFormStateChange]);
 
   const formClasses = cn(
     'w-full space-y-6',

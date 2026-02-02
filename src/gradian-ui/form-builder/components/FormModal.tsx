@@ -17,6 +17,16 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { FormDialogErrorBoundary } from './FormDialogErrorBoundary';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Maximize2, Minimize2 } from 'lucide-react';
 
 const EXCLUDED_TITLE_ROLES = new Set(['code', 'subtitle', 'description']);
@@ -308,9 +318,43 @@ export const FormModal: React.FC<FormModalProps> = ({
   });
 
   const [submitForm, setSubmitForm] = React.useState<(() => void) | null>(null);
+  const [formDirty, setFormDirty] = React.useState(false);
+  const [showUnsavedConfirm, setShowUnsavedConfirm] = React.useState(false);
 
-  // Register dialog for back button handling on mobile
-  useDialogBackHandler(isOpen, closeFormModal, 'modal', 'form-modal');
+  const handleClose = React.useCallback(() => {
+    if (formDirty) {
+      setShowUnsavedConfirm(true);
+      return;
+    }
+    closeFormModal();
+  }, [formDirty, closeFormModal]);
+
+  const handleConfirmDiscard = React.useCallback(() => {
+    setShowUnsavedConfirm(false);
+    setFormDirty(false);
+    closeFormModal();
+  }, [closeFormModal]);
+
+  // Reset dirty when modal closes so next open doesn't show stale state
+  React.useEffect(() => {
+    if (!isOpen) {
+      setFormDirty(false);
+      setShowUnsavedConfirm(false);
+    }
+  }, [isOpen]);
+
+  // Register dialog for back button handling on mobile (uses handleClose so unsaved warning can show)
+  useDialogBackHandler(isOpen, handleClose, 'modal', 'form-modal');
+
+  // Warn before refresh or closing tab when form has unsaved changes
+  React.useEffect(() => {
+    if (!isOpen || !formDirty) return;
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isOpen, formDirty]);
 
   // Track the last opened combination to prevent duplicate opens
   const lastOpenedRef = React.useRef<{ schemaId?: string; entityId?: string; mode?: FormModalMode; attempted?: boolean; hasError?: boolean }>({});
@@ -449,9 +493,10 @@ export const FormModal: React.FC<FormModalProps> = ({
   const modalContentResetKey = `${schemaId ?? ''}-${entityId ?? ''}-${mode}`;
 
   return (
+    <>
     <Modal
       isOpen={isOpen}
-      onClose={closeFormModal}
+      onClose={handleClose}
       title={modalTitle}
       description={modalDescription}
       size={size}
@@ -476,7 +521,7 @@ export const FormModal: React.FC<FormModalProps> = ({
         ) : undefined
       }
     >
-      <FormDialogErrorBoundary onClose={closeFormModal} resetKey={modalContentResetKey}>
+      <FormDialogErrorBoundary onClose={handleClose} resetKey={modalContentResetKey}>
         {/* Quick actions popover is now rendered inline with action buttons in FormLifecycleManager */}
 
         {/* Loading indicator for schema/entity loading */}
@@ -519,7 +564,7 @@ export const FormModal: React.FC<FormModalProps> = ({
             schema={targetSchema}
             onSubmit={handleSubmit}
             onReset={() => {}}
-            onCancel={closeFormModal}
+            onCancel={handleClose}
             initialValues={memoizedInitialValues}
             referenceEntityData={referenceEntityData}
             error={formError || undefined}
@@ -531,6 +576,7 @@ export const FormModal: React.FC<FormModalProps> = ({
             forceExpandedSections={true}
             hideActions={isActionForm}
             onMount={(submitFn) => setSubmitForm(() => submitFn)}
+            onFormStateChange={(s) => setFormDirty(s.dirty)}
           />
         )}
         {isActionForm && !isLoading && (
@@ -546,6 +592,25 @@ export const FormModal: React.FC<FormModalProps> = ({
         )}
       </FormDialogErrorBoundary>
     </Modal>
+
+    {/* Unsaved changes confirmation */}
+    <AlertDialog open={showUnsavedConfirm} onOpenChange={(open) => !open && setShowUnsavedConfirm(false)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Unsaved changes</AlertDialogTitle>
+          <AlertDialogDescription>
+            You have unsaved changes. Are you sure you want to leave? Your changes will be lost.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={() => setShowUnsavedConfirm(false)}>Stay</AlertDialogCancel>
+          <AlertDialogAction onClick={handleConfirmDiscard} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            Discard
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </>
   );
 };
 
