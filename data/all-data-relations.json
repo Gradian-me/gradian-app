@@ -2776,17 +2776,6 @@
     "sourceSchema": "applications",
     "sourceId": "01KBFCM00000000000000000001",
     "targetSchema": "schemas",
-    "targetId": "change-management",
-    "relationTypeId": "HAS_SCHEMA",
-    "id": "01KFTRK92CJFEJ4RXAKEQEKE70",
-    "createdAt": "2026-01-25T14:23:17.068Z",
-    "updatedAt": "2026-01-25T14:23:33.230Z",
-    "inactive": true
-  },
-  {
-    "sourceSchema": "applications",
-    "sourceId": "01KBFCM00000000000000000001",
-    "targetSchema": "schemas",
     "targetId": "change-categories",
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTRK93Y3QNZBRXW6TQMDMEN",
@@ -3331,6 +3320,17 @@
     "id": "01KGH1V94J566PAVQ2YFGBDBEX",
     "createdAt": "2026-02-03T06:08:13.969Z",
     "updatedAt": "2026-02-03T06:08:18.472Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KBFCM00000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "change-management-records",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KGJ5P9WS6DXKP5VHYFQABVW3",
+    "createdAt": "2026-02-03T16:34:39.638Z",
+    "updatedAt": "2026-02-03T16:34:42.303Z",
     "inactive": true
   }
 ]

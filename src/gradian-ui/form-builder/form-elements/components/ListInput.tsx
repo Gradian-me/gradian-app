@@ -180,6 +180,11 @@ const SortableListItem: React.FC<{
   };
 
   const handleCancelEdit = () => {
+    const hasNoValue = !item.label || item.label.trim() === '';
+    if (hasNoValue) {
+      onDelete(item.id);
+      return;
+    }
     setEditValue(item.label);
     if (onEditStateChange) {
       onEditStateChange(item.id, false);

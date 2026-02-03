@@ -286,8 +286,13 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
     return null;
   }
 
+  // Match by first path segment after /page/ so parent slugs (e.g. change-management)
+  // don't match child slugs (e.g. change-management-records).
   const isActive = (schemaId: string) => {
-    return pathname.includes(`/page/${schemaId}`);
+    const pagePrefix = '/page/';
+    if (!pathname.startsWith(pagePrefix)) return false;
+    const segment = pathname.slice(pagePrefix.length).split('/')[0];
+    return segment === schemaId;
   };
 
   const shouldShowTooltip = isCollapsed && !isMobile;

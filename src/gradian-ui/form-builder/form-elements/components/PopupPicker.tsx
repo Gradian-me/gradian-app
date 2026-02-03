@@ -421,13 +421,6 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   const [pendingSelections, setPendingSelections] = useState<Map<string, PendingSelection>>(new Map());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
-  const effectivePageSize = Math.max(1, pageSize);
-  const [pageMeta, setPageMeta] = useState({
-    page: 1,
-    limit: effectivePageSize,
-    totalItems: 0,
-    hasMore: true,
-  });
   const selectedCompany = useCompanyStore((state) => state.selectedCompany);
   const activeCompanyId = selectedCompany && selectedCompany.id !== -1 ? String(selectedCompany.id) : null;
   // When using hardcoded schemas config, don't use schema-based logic
@@ -437,6 +430,17 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     }
     return schema ?? providedSchema ?? null;
   }, [schema, providedSchema, schemaId, effectiveSourceUrl]);
+
+  // Use larger page size for hierarchical parent schemas to allow more nodes in one page
+  const isHierarchicalSchema = effectiveSchema?.allowHierarchicalParent === true;
+  const basePageSize = isHierarchicalSchema ? Math.max(pageSize, 1000) : pageSize;
+  const effectivePageSize = Math.max(1, basePageSize);
+  const [pageMeta, setPageMeta] = useState({
+    page: 1,
+    limit: effectivePageSize,
+    totalItems: 0,
+    hasMore: true,
+  });
   const isHierarchical = Boolean(effectiveSchema?.allowHierarchicalParent);
   const shouldFilterByCompany = useMemo(() => {
     // If we have the schema, check isNotCompanyBased property
@@ -2089,7 +2093,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         onClose();
       }
     }}>
-      <DialogContent className="max-w-3xl w-full h-full rounded-none md:rounded-2xl md:max-h-[70vh] flex flex-col" onPointerDownOutside={(e) => {
+      <DialogContent className="max-w-3xl w-full h-full rounded-none md:rounded-2xl md:max-h-[85vh] flex flex-col" onPointerDownOutside={(e) => {
         // Prevent closing on outside click during loading or submission
         if (isLoading || isSubmitting) {
           e.preventDefault();

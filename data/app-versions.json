@@ -6362,5 +6362,49 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V47002000000000000002",
+    "timestamp": "2026-02-02T00:00:00.000Z",
+    "version": "1.47.002",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "Updated schema handling in all-data.json to reflect new sync details and improve data accuracy.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data",
+          "schema-manager"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved FormModal component to utilize singular schema names for better clarity in titles.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented validation in ListInput to delete items with no label, enhancing user experience.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Adjusted PopupPicker component to support larger page sizes for hierarchical schemas, improving data loading efficiency.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "data-display",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

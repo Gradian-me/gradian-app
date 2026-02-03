@@ -447,8 +447,8 @@ export const FormModal: React.FC<FormModalProps> = ({
     (qa) => qa.action === 'callApi'
   );
 
-  const schemaName = targetSchema?.name || 'Item';
-  const defaultTitle = isEdit ? (entityDisplayTitle ? `Edit ${schemaName}: ${entityDisplayTitle}` : `Edit ${schemaName}`) : `Create New ${schemaName}`;
+  const schemaDisplayName = targetSchema?.singular_name || targetSchema?.name || 'Item';
+  const defaultTitle = isEdit ? (entityDisplayTitle ? `Edit ${schemaDisplayName}: ${entityDisplayTitle}` : `Edit ${schemaDisplayName}`) : `Create New ${schemaDisplayName}`;
 
   const schemaIconName = targetSchema?.icon;
 
@@ -483,8 +483,8 @@ export const FormModal: React.FC<FormModalProps> = ({
   }, [isEdit, entityData, entityId, initialValues]);
     
   const modalDescription = description || (isEdit
-    ? `Update ${(targetSchema?.name || 'item').toLowerCase()} information`
-    : `Add a new ${(targetSchema?.name || 'item').toLowerCase()} to your system`);
+    ? `Update ${(targetSchema?.singular_name || targetSchema?.name || 'item').toLowerCase()} information`
+    : `Add a new ${(targetSchema?.singular_name || targetSchema?.name || 'item').toLowerCase()} to your system`);
 
   if (!shouldRender) {
     return null;

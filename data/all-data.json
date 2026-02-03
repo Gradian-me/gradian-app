@@ -1485,7 +1485,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBFCM00000000000000000001",
       "createdAt": "2025-12-06T12:00:00.000Z",
-      "updatedAt": "2026-01-27T10:27:07.014Z",
+      "updatedAt": "2026-02-03T16:34:42.231Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "application-schemas": []
@@ -2183,10 +2183,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2026-01-06T13:59:25.843Z",
+      "updatedAt": "2026-02-03T08:49:24.901Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2026-01-06T13:59:25.843Z",
+      "lastSynced": "2026-02-03T08:49:24.901Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2199,7 +2199,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 50 schemas: 50 succeeded, 0 failed (50 created, 0 updated)"
+      "lastSyncMessage": "Processed 53 schemas: 53 succeeded, 0 failed (3 created, 50 updated)"
     },
     {
       "color": "blue",
@@ -2478,8 +2478,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-02-03T07:29:57.610Z",
-      "lastSynced": "2026-02-03T07:29:57.610Z",
+      "updatedAt": "2026-02-03T12:40:48.790Z",
+      "lastSynced": "2026-02-03T12:40:48.790Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2491,7 +2491,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 44 schemas: 44 succeeded, 0 failed (2 created, 42 updated)"
+      "lastSyncMessage": "Processed 43 schemas: 43 succeeded, 0 failed (0 created, 43 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -2519,7 +2519,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-01-06T13:22:14.118Z",
+      "updatedAt": "2026-02-03T12:41:04.422Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2529,8 +2529,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-01-06T13:22:14.118Z",
-      "lastSyncMessage": "Generated relations for 39 out of 39 schemas",
+      "lastSynced": "2026-02-03T12:41:04.422Z",
+      "lastSyncMessage": "Generated relations for 46 out of 46 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
