@@ -1561,7 +1561,18 @@
       "incomplete": false,
       "id": "01KFZFTS259QZVTR2ETNZ1H0GF",
       "createdAt": "2026-01-27T10:26:17.800Z",
-      "updatedAt": "2026-01-31T11:14:40.684Z",
+      "updatedAt": "2026-02-03T06:08:39.454Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "application-schemas": [],
+      "name": "General Applications",
+      "icon": "Briefcase",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGH1TMXDH89EPZRWA1MYR12Z",
+      "createdAt": "2026-02-03T06:07:53.278Z",
+      "updatedAt": "2026-02-03T06:08:18.319Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
@@ -2467,8 +2478,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-01-06T14:06:24.411Z",
-      "lastSynced": "2026-01-06T14:06:24.411Z",
+      "updatedAt": "2026-02-03T07:29:57.610Z",
+      "lastSynced": "2026-02-03T07:29:57.610Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2480,7 +2491,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Missing bearer token"
+      "lastSyncMessage": "Processed 44 schemas: 44 succeeded, 0 failed (2 created, 42 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -19851,5 +19862,7 @@
         }
       ]
     }
-  ]
+  ],
+  "change-managements": [],
+  "change-management-records": []
 }

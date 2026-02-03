@@ -6317,5 +6317,50 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V47001000000000000001",
+    "timestamp": "2026-02-03T00:00:00.000Z",
+    "version": "1.47.001",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Add Schema Change-Management-Records",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "data",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Introduced new application-schema relations for 'notes' and 'tasks' in all-data-relations.json to enhance data management.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data",
+          "schema-manager"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved form state management in FormLifecycleManager to allow for optional dirty state tracking.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated form data filtering logic to ensure consistent handling of schema fields and sections, improving data integrity across form submissions. This update enhances user experience and data handling across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "schema-manager",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

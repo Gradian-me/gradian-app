@@ -3225,17 +3225,6 @@
   },
   {
     "sourceSchema": "applications",
-    "sourceId": "01KFZFTS259QZVTR2ETNZ1H0GF",
-    "targetSchema": "schemas",
-    "targetId": "tasks",
-    "relationTypeId": "HAS_SCHEMA",
-    "id": "01KFZFVBC3GJD8XAR3DAP6SG7C",
-    "createdAt": "2026-01-27T10:26:36.547Z",
-    "updatedAt": "2026-01-27T10:26:37.720Z",
-    "inactive": true
-  },
-  {
-    "sourceSchema": "applications",
     "sourceId": "01KBFCM00000000000000000001",
     "targetSchema": "schemas",
     "targetId": "quality-assurance-analysis",
@@ -3320,6 +3309,28 @@
     "id": "01KG9W66JQHXT3H69081WY3KSH",
     "createdAt": "2026-01-31T11:14:39.319Z",
     "updatedAt": "2026-01-31T11:14:40.711Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KGH1TMXDH89EPZRWA1MYR12Z",
+    "targetSchema": "schemas",
+    "targetId": "notes",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KGH1V901D4AP2W3SA7AB16B4",
+    "createdAt": "2026-02-03T06:08:13.825Z",
+    "updatedAt": "2026-02-03T06:08:18.450Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KGH1TMXDH89EPZRWA1MYR12Z",
+    "targetSchema": "schemas",
+    "targetId": "tasks",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KGH1V94J566PAVQ2YFGBDBEX",
+    "createdAt": "2026-02-03T06:08:13.969Z",
+    "updatedAt": "2026-02-03T06:08:18.472Z",
     "inactive": true
   }
 ]

@@ -5050,7 +5050,549 @@
     },
     "showInNavigation": true,
     "icon": "AlertTriangle",
-    "schemaType": "business"
+    "schemaType": "business",
+    "applications": [
+      {
+        "id": "01KBFCM00000000000000000003",
+        "name": "Deviation Management",
+        "icon": "AlertTriangle"
+      }
+    ],
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ]
+  },
+  {
+    "id": "change-management-records",
+    "description": "GMP-compliant change management system for tracking and managing changes with impact assessment, QA analysis, and closure",
+    "singular_name": "Change Management Record",
+    "plural_name": "Change Management Records",
+    "fields": [
+      {
+        "id": "change-number",
+        "name": "changeNumber",
+        "label": "Change Number",
+        "sectionId": "change-identification",
+        "component": "text",
+        "placeholder": "Enter change number",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1,
+        "role": "code"
+      },
+      {
+        "id": "issue-date",
+        "name": "issueDate",
+        "label": "Issue Date",
+        "sectionId": "change-identification",
+        "component": "date",
+        "placeholder": "Select issue date",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "change-title",
+        "name": "changeTitle",
+        "label": "Change Title",
+        "sectionId": "change-identification",
+        "component": "text",
+        "placeholder": "Enter change title",
+        "validation": {
+          "required": true,
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "colSpan": 2,
+        "order": 3,
+        "role": "title"
+      },
+      {
+        "id": "change-category",
+        "name": "changeCategory",
+        "label": "Change Category",
+        "sectionId": "change-identification",
+        "component": "picker",
+        "placeholder": "Click to select change category",
+        "description": "Select change category from popup picker",
+        "targetSchema": "change-categories",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "change-description",
+        "name": "changeDescription",
+        "label": "Change Description",
+        "sectionId": "change-details",
+        "component": "textarea",
+        "placeholder": "Enter change description",
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "description"
+      },
+      {
+        "id": "proposed-solution",
+        "name": "proposedSolution",
+        "label": "Proposed Solution",
+        "sectionId": "change-details",
+        "component": "textarea",
+        "placeholder": "Enter proposed solution",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 2
+      },
+      {
+        "id": "affected-product-material",
+        "name": "affectedProductMaterial",
+        "label": "Affected Product / Material",
+        "sectionId": "impact-scope-assessment",
+        "component": "list-input",
+        "placeholder": "Enter affected product or material",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "affected-batch-numbers",
+        "name": "affectedBatchNumbers",
+        "label": "Affected Batch Number(s)",
+        "sectionId": "impact-scope-assessment",
+        "component": "list-input",
+        "placeholder": "Enter affected batch numbers",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 2
+      },
+      {
+        "id": "affected-equipment-system",
+        "name": "affectedEquipmentSystem",
+        "label": "Affected Equipment / System",
+        "sectionId": "impact-scope-assessment",
+        "component": "list-input",
+        "placeholder": "Enter affected equipment or system",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "affected-processes",
+        "name": "affectedProcesses",
+        "label": "Affected Processes",
+        "sectionId": "impact-scope-assessment",
+        "component": "picker",
+        "placeholder": "Click to select affected processes",
+        "description": "Select affected processes from popup picker",
+        "targetSchema": "process-mappings",
+        "allowMultiselect": true,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "impact-product-quality",
+        "name": "impactProductQuality",
+        "label": "Product Quality Impact",
+        "sectionId": "impact-scope-assessment",
+        "component": "select",
+        "placeholder": "Select product quality impact",
+        "options": [
+          {
+            "id": "none",
+            "label": "None",
+            "icon": "Circle",
+            "color": "gray"
+          },
+          {
+            "id": "low",
+            "label": "Low",
+            "icon": "ArrowDown",
+            "color": "green"
+          },
+          {
+            "id": "medium",
+            "label": "Medium",
+            "icon": "ArrowRight",
+            "color": "yellow"
+          },
+          {
+            "id": "high",
+            "label": "High",
+            "icon": "ArrowUp",
+            "color": "orange"
+          },
+          {
+            "id": "critical",
+            "label": "Critical",
+            "icon": "AlertOctagon",
+            "color": "red"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "impact-patient-safety",
+        "name": "impactPatientSafety",
+        "label": "Patient Safety Impact",
+        "sectionId": "impact-scope-assessment",
+        "component": "select",
+        "placeholder": "Select patient safety impact",
+        "options": [
+          {
+            "id": "none",
+            "label": "None",
+            "icon": "Circle",
+            "color": "gray"
+          },
+          {
+            "id": "low",
+            "label": "Low",
+            "icon": "ArrowDown",
+            "color": "green"
+          },
+          {
+            "id": "medium",
+            "label": "Medium",
+            "icon": "ArrowRight",
+            "color": "yellow"
+          },
+          {
+            "id": "high",
+            "label": "High",
+            "icon": "ArrowUp",
+            "color": "orange"
+          },
+          {
+            "id": "critical",
+            "label": "Critical",
+            "icon": "AlertOctagon",
+            "color": "red"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "impact-data-integrity",
+        "name": "impactDataIntegrity",
+        "label": "Data Integrity Impact",
+        "sectionId": "impact-scope-assessment",
+        "component": "select",
+        "placeholder": "Select data integrity impact",
+        "options": [
+          {
+            "id": "none",
+            "label": "None",
+            "icon": "Circle",
+            "color": "gray"
+          },
+          {
+            "id": "low",
+            "label": "Low",
+            "icon": "ArrowDown",
+            "color": "green"
+          },
+          {
+            "id": "medium",
+            "label": "Medium",
+            "icon": "ArrowRight",
+            "color": "yellow"
+          },
+          {
+            "id": "high",
+            "label": "High",
+            "icon": "ArrowUp",
+            "color": "orange"
+          },
+          {
+            "id": "critical",
+            "label": "Critical",
+            "icon": "AlertOctagon",
+            "color": "red"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 7
+      },
+      {
+        "id": "impact-regulatory-compliance",
+        "name": "impactRegulatoryCompliance",
+        "label": "Regulatory Compliance Impact",
+        "sectionId": "impact-scope-assessment",
+        "component": "select",
+        "placeholder": "Select regulatory compliance impact",
+        "options": [
+          {
+            "id": "none",
+            "label": "None",
+            "icon": "Circle",
+            "color": "gray"
+          },
+          {
+            "id": "low",
+            "label": "Low",
+            "icon": "ArrowDown",
+            "color": "green"
+          },
+          {
+            "id": "medium",
+            "label": "Medium",
+            "icon": "ArrowRight",
+            "color": "yellow"
+          },
+          {
+            "id": "high",
+            "label": "High",
+            "icon": "ArrowUp",
+            "color": "orange"
+          },
+          {
+            "id": "critical",
+            "label": "Critical",
+            "icon": "AlertOctagon",
+            "color": "red"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 8
+      },
+      {
+        "id": "change-procedure",
+        "name": "changeProcedure",
+        "label": "Change Procedure",
+        "sectionId": "change-classification",
+        "component": "picker",
+        "placeholder": "Click to select change procedure",
+        "description": "Select change procedure from popup picker",
+        "targetSchema": "change-procedure",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "change-classification",
+        "name": "changeClassification",
+        "label": "Change Classification",
+        "sectionId": "change-classification",
+        "component": "picker",
+        "placeholder": "Click to select change classification",
+        "description": "Select change classification from popup picker",
+        "targetSchema": "change-classifications",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "related-guidelines",
+        "name": "relatedGuidelines",
+        "label": "Related Guidelines",
+        "sectionId": "change-classification",
+        "component": "picker",
+        "placeholder": "Click to select guidelines",
+        "description": "Select related guidelines from popup picker",
+        "targetSchema": "guidelines",
+        "allowMultiselect": true,
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "change-classification-justification",
+        "name": "changeClassificationJustification",
+        "label": "Change Classification Justification",
+        "sectionId": "change-classification",
+        "component": "textarea",
+        "placeholder": "Enter change classification justification",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4
+      },
+      {
+        "id": "qa-final-review",
+        "name": "qaFinalReview",
+        "label": "QA Final Review",
+        "sectionId": "qa-review-closure",
+        "component": "textarea",
+        "placeholder": "Enter QA final review",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "closure-date",
+        "name": "closureDate",
+        "label": "Closure Date",
+        "sectionId": "qa-review-closure",
+        "component": "date",
+        "placeholder": "Select closure date",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "justification-for-closure",
+        "name": "justificationForClosure",
+        "label": "Justification for Closure",
+        "sectionId": "qa-review-closure",
+        "component": "textarea",
+        "placeholder": "Enter justification for closure",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "change-is-effective",
+        "name": "changeIsEffective",
+        "label": "Change is Effective",
+        "sectionId": "qa-review-closure",
+        "component": "switch",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      }
+    ],
+    "sections": [
+      {
+        "id": "change-identification",
+        "title": "1. Change Identification",
+        "description": "Basic change identification information",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "change-details",
+        "title": "2. Change Details",
+        "description": "Change description and proposed solution",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "impact-scope-assessment",
+        "title": "3. Impact & Scope Assessment",
+        "description": "Assessment of change impact and scope",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "quality-assurance-analyses",
+        "title": "4. Quality Assurance Analysis",
+        "description": "Quality assurance analysis reports for this change",
+        "isRepeatingSection": true,
+        "initialState": "expanded",
+        "columns": 2,
+        "repeatingConfig": {
+          "minItems": 0,
+          "maxItems": 100,
+          "targetSchema": "quality-assurance-analysis",
+          "relationTypeId": "HAS_QUALITY_ASSURANCE_ANALYSIS",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
+        }
+      },
+      {
+        "id": "change-classification",
+        "title": "5. Change Classification",
+        "description": "Change procedure, classification, and related guidelines",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "follow-ups",
+        "title": "6. Follow Ups",
+        "description": "Follow-up tasks for this change",
+        "isRepeatingSection": true,
+        "initialState": "expanded",
+        "columns": 2,
+        "repeatingConfig": {
+          "minItems": 0,
+          "maxItems": 100,
+          "targetSchema": "tasks",
+          "relationTypeId": "HAS_FOLLOW_UP_TASK",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": true,
+          "fieldRelationType": "connectToSchema"
+        }
+      },
+      {
+        "id": "qa-review-closure",
+        "title": "7. QA Review & Closure",
+        "description": "QA final review and change closure information",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": true,
+    "icon": "GitBranch",
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ],
+    "applications": [],
+    "statusGroup": [
+      {
+        "id": "01KBSSD57TNGK1EP7SG2JGYH1C",
+        "label": "Change Management Status"
+      }
+    ]
   },
   {
     "id": "quality-assurance-analysis",
@@ -5461,8 +6003,8 @@
         "columns": 2
       }
     ],
-    "showInNavigation": false,
-    "icon": "Checklist",
+    "showInNavigation": true,
+    "icon": "ListCheck",
     "statusGroup": [
       {
         "id": "01KBSVY7K52MC3H25R3JQQAKCA",
@@ -5472,14 +6014,22 @@
     "allowDataDueDate": true,
     "allowDataAssignedTo": true,
     "allowDataForce": true,
-    "schemaType": "business",
+    "schemaType": "system",
     "entityTypeGroup": [
       {
         "id": "01KCDZTASKGROUP0000000000001",
         "label": "Task Types"
       }
     ],
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "applications": [
+      {
+        "id": "01KFZFTS259QZVTR2ETNZ1H0GF",
+        "name": "Process Management",
+        "icon": "Workflow"
+      }
+    ],
+    "isSystemSchema": true
   },
   {
     "id": "attachments",
@@ -8269,10 +8819,10 @@
         "columns": 2
       }
     ],
-    "showInNavigation": false,
+    "showInNavigation": true,
     "icon": "StickyNote",
     "isNotCompanyBased": true,
-    "schemaType": "business",
+    "schemaType": "system",
     "allowDataBookmark": true,
     "applications": [],
     "entityTypeGroup": [
@@ -8281,6 +8831,7 @@
         "label": "Task Types"
       }
     ],
-    "applyToAllTenants": true
+    "applyToAllTenants": true,
+    "isSystemSchema": true
   }
 ]

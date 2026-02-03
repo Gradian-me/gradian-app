@@ -29,19 +29,23 @@ export function filterFormDataForSubmission(
     removeRepeatingItemIds = true,
   } = options;
 
+  // Normalize so null/undefined from API never cause .length or .map on null
+  const fields = Array.isArray(schema?.fields) ? schema.fields : [];
+  const sections = Array.isArray(schema?.sections) ? schema.sections : [];
+
   // Get list of field names from schema
-  const schemaFieldNames = new Set(schema.fields.map(f => f.name));
+  const schemaFieldNames = new Set(fields.map(f => f.name));
   
   // Get list of hidden/inactive fields
   const hiddenFields = new Set(
-    schema.fields
+    fields
       .filter(f => f.hidden || f.inactive || (f as any).layout?.hidden)
       .map(f => f.name)
   );
 
   // Get repeating section IDs
   const repeatingSectionIds = new Set(
-    schema.sections
+    sections
       .filter(s => s.isRepeatingSection)
       .map(s => s.id)
   );
@@ -72,9 +76,9 @@ export function filterFormDataForSubmission(
           }
           
           // Only include fields that are in the schema
-          const section = schema.sections.find(s => s.id === fieldName);
+          const section = sections.find(s => s.id === fieldName);
           if (section?.isRepeatingSection) {
-            const sectionFields = schema.fields.filter(f => f.sectionId === fieldName);
+            const sectionFields = fields.filter(f => f.sectionId === fieldName);
             const fieldNames = new Set(sectionFields.map(f => f.name));
             
             if (fieldNames.has(key)) {

@@ -67,7 +67,7 @@ export const asFormBuilderSchema = (schema: ExtendedFormSchema): FormBuilderForm
     : [];
   const cardMetadata = Array.isArray(schema.cardMetadata) ? schema.cardMetadata : [];
   
-  // Always provide detailPageMetadata structure when it exists - normalize all nested arrays
+  // Always provide detailPageMetadata as an object with arrays (never null/undefined) so consumers never hit .length on null
   const detailPageMetadata = schema.detailPageMetadata != null
     ? {
         ...schema.detailPageMetadata,
@@ -76,9 +76,14 @@ export const asFormBuilderSchema = (schema: ExtendedFormSchema): FormBuilderForm
         tableRenderers: Array.isArray(schema.detailPageMetadata?.tableRenderers) ? schema.detailPageMetadata.tableRenderers : [],
         quickActions: Array.isArray(schema.detailPageMetadata?.quickActions) ? schema.detailPageMetadata.quickActions : [],
       }
-    : undefined;
+    : {
+        sections: [] as any[],
+        componentRenderers: [] as any[],
+        tableRenderers: [] as any[],
+        quickActions: [] as any[],
+      };
   
-  // Normalize statusGroup and entityTypeGroup for consumers that expect arrays
+  // Normalize statusGroup and entityTypeGroup - always use arrays so backend null never causes .length on null
   const statusGroup = Array.isArray(schema.statusGroup) ? schema.statusGroup : [];
   const entityTypeGroup = Array.isArray(schema.entityTypeGroup) ? schema.entityTypeGroup : [];
   
@@ -91,8 +96,8 @@ export const asFormBuilderSchema = (schema: ExtendedFormSchema): FormBuilderForm
     sections,
     cardMetadata,
     detailPageMetadata,
-    statusGroup: statusGroup.length > 0 ? statusGroup : schema.statusGroup,
-    entityTypeGroup: entityTypeGroup.length > 0 ? entityTypeGroup : schema.entityTypeGroup,
+    statusGroup,
+    entityTypeGroup,
     layout: schema.layout,
     styling: schema.styling,
     validation: schema.validation || {

@@ -174,7 +174,7 @@ const ensureRepeatingItemIds = (
 
 // Form State Reducer
 type FormAction =
-  | { type: 'SET_VALUE'; fieldName: string; value: any }
+  | { type: 'SET_VALUE'; fieldName: string; value: any; skipDirty?: boolean }
   | { type: 'SET_ERROR'; fieldName: string; error: string }
   | { type: 'SET_TOUCHED'; fieldName: string; touched: boolean }
   | { type: 'SET_SUBMITTING'; isSubmitting: boolean }
@@ -238,7 +238,7 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
             ...state.values,
             [sectionId]: newArray,
           },
-          dirty: true,
+          dirty: action.skipDirty ? state.dirty : true,
         };
       }
 
@@ -251,7 +251,7 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
       return {
         ...state,
         values: { ...state.values, [action.fieldName]: action.value },
-        dirty: true,
+        dirty: action.skipDirty ? state.dirty : true,
       };
     }
 
@@ -1035,14 +1035,14 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       });
 
       if (hasChanges) {
-        // Update all changed values
+        // Update all changed values (template resolution) without marking form dirty
         safeSchema.fields.forEach(field => {
           const section = safeSchema.sections.find(s => s.id === field.sectionId);
           if (section?.isRepeatingSection) return;
           const oldValue = state.values[field.name];
           const newValue = processedValues[field.name];
           if (oldValue !== newValue) {
-            dispatch({ type: 'SET_VALUE', fieldName: field.name, value: newValue });
+            dispatch({ type: 'SET_VALUE', fieldName: field.name, value: newValue, skipDirty: true });
           }
         });
       }
@@ -1414,7 +1414,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         <AccordionFormSection
           key={section.id}
           section={section}
-          schema={schema}
+          schema={safeSchema}
           values={state.values}
           errors={state.errors}
           touched={state.touched}

@@ -595,7 +595,7 @@ export const FormModal: React.FC<FormModalProps> = ({
 
     {/* Unsaved changes confirmation */}
     <AlertDialog open={showUnsavedConfirm} onOpenChange={(open) => !open && setShowUnsavedConfirm(false)}>
-      <AlertDialogContent>
+      <AlertDialogContent className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 shadow-xl">
         <AlertDialogHeader>
           <AlertDialogTitle>Unsaved changes</AlertDialogTitle>
           <AlertDialogDescription>
