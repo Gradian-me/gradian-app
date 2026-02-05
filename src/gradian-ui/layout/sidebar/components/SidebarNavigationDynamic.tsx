@@ -69,12 +69,22 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
     setPrevPathname(pathname || null);
   }, [pathname]);
 
-  // When sidebar is opened (transition from collapsed -> expanded), auto-open Applications accordion
+  // When sidebar state changes, sync Applications accordion:
+  // - On expand (collapsed -> expanded): auto-open Applications
+  // - On collapse (expanded -> collapsed): collapse Applications by default
   useEffect(() => {
     const prev = prevIsCollapsedRef.current;
+
+    // expanded -> collapsed
+    if (!prev && isCollapsed) {
+      setAccordionValue(undefined);
+    }
+
+    // collapsed -> expanded
     if (prev && !isCollapsed) {
       setAccordionValue('applications');
     }
+
     prevIsCollapsedRef.current = isCollapsed;
   }, [isCollapsed]);
   
@@ -105,13 +115,6 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
     if (typeof window === 'undefined') return;
     localStorage.setItem(ACCORDION_STATE_KEY, accordionValue === 'applications' ? 'open' : 'closed');
   }, [accordionValue]);
-
-  // Close accordion when sidebar is collapsed
-  useEffect(() => {
-    if (isCollapsed && !isMobile && accordionValue === 'applications') {
-      setAccordionValue(undefined);
-    }
-  }, [isCollapsed, isMobile, accordionValue]);
 
   // Listen for cache clear events and refetch schemas
   // Only refetch if not switching between chat routes

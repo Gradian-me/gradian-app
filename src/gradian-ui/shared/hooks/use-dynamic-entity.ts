@@ -15,6 +15,10 @@ interface EntityFilters {
   category?: string;
   companyId?: string; // Backward compatibility - single company ID
   companyIds?: string[]; // Array of company IDs for filtering by multiple companies
+  /** Comma-separated or array of user IDs; filter by createdBy (initiated by) */
+  createdByIds?: string | string[];
+  /** Comma-separated or array of user IDs; filter by assignedTo (assigned to) */
+  assignedToIds?: string | string[];
 }
 
 interface EntityState<T = any> {
@@ -77,6 +81,22 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
       } else if (filters?.companyId) {
         // Backward compatibility: Handle single companyId
         queryParams.append('companyId', filters.companyId);
+      }
+
+      // createdByIds - comma-separated user IDs (filter by creator)
+      if (filters?.createdByIds) {
+        const createdByIds = Array.isArray(filters.createdByIds)
+          ? filters.createdByIds.map(id => String(id)).join(',')
+          : String(filters.createdByIds).trim();
+        if (createdByIds) queryParams.append('createdByIds', createdByIds);
+      }
+
+      // assignedToIds - comma-separated user IDs (filter by assignee)
+      if (filters?.assignedToIds) {
+        const assignedToIds = Array.isArray(filters.assignedToIds)
+          ? filters.assignedToIds.map(id => String(id)).join(',')
+          : String(filters.assignedToIds).trim();
+        if (assignedToIds) queryParams.append('assignedToIds', assignedToIds);
       }
       
       // Add sortArray parameter if provided

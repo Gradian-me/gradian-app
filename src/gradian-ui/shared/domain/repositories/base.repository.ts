@@ -125,6 +125,44 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
       });
     }
 
+    // Handle createdByIds filter - comma-separated user IDs; entity.createdBy (string ID) must match one of the IDs
+    if (filters.createdByIds) {
+      const createdByIds = Array.isArray(filters.createdByIds)
+        ? filters.createdByIds
+        : typeof filters.createdByIds === 'string'
+          ? filters.createdByIds.split(',').map(id => id.trim()).filter(id => id.length > 0)
+          : [];
+      if (createdByIds.length > 0) {
+        filtered = filtered.filter((entity: any) => {
+          const creatorId = entity.createdBy;
+          if (creatorId == null) return false;
+          const normalized = typeof creatorId === 'object' && creatorId !== null && 'id' in creatorId
+            ? String(creatorId.id)
+            : String(creatorId);
+          return createdByIds.includes(normalized);
+        });
+      }
+    }
+
+    // Handle assignedToIds filter - comma-separated user IDs; entity.assignedTo array must contain an item with id in the list
+    if (filters.assignedToIds) {
+      const assignedToIds = Array.isArray(filters.assignedToIds)
+        ? filters.assignedToIds
+        : typeof filters.assignedToIds === 'string'
+          ? filters.assignedToIds.split(',').map(id => id.trim()).filter(id => id.length > 0)
+          : [];
+      if (assignedToIds.length > 0) {
+        filtered = filtered.filter((entity: any) => {
+          const assigned = entity.assignedTo;
+          if (!Array.isArray(assigned) || assigned.length === 0) return false;
+          const entityAssignedIds = assigned
+            .map((item: any) => (item && (item.id != null) ? String(item.id) : null))
+            .filter((id: string | null): id is string => id != null);
+          return entityAssignedIds.some((id: string) => assignedToIds.includes(id));
+        });
+      }
+    }
+
     // Handle tenantIds filter - filter by multiple tenant IDs.
     // SECURITY / MULTI-TENANCY:
     // - Only applies when schema has allowDataRelatedTenants: true (passed as filter.allowDataRelatedTenants)
@@ -177,9 +215,9 @@ export class BaseRepository<T extends BaseEntity> implements IRepository<T> {
       }
     }
 
-    // Apply any other custom filters (excluding companyId/companyIds/tenantIds/allowDataRelatedTenants which we've already handled)
+    // Apply any other custom filters (excluding known keys we've already handled)
     Object.keys(filters).forEach(key => {
-      if (!['search', 'status', 'category', 'page', 'limit', 'sortBy', 'sortOrder', 'includeIds', 'excludeIds', 'companyId', 'companyIds', 'tenantIds', 'allowDataRelatedTenants'].includes(key)) {
+      if (!['search', 'status', 'category', 'page', 'limit', 'sortBy', 'sortOrder', 'includeIds', 'excludeIds', 'companyId', 'companyIds', 'createdByIds', 'assignedToIds', 'tenantIds', 'allowDataRelatedTenants'].includes(key)) {
         filtered = filtered.filter((entity: any) => entity[key] === filters[key]);
       }
     });

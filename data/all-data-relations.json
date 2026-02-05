@@ -3332,5 +3332,16 @@
     "createdAt": "2026-02-03T16:34:39.638Z",
     "updatedAt": "2026-02-03T16:34:42.303Z",
     "inactive": true
+  },
+  {
+    "id": "01KGPGN1G0WB5DCCWBQKAYAR5X",
+    "sourceSchema": "tasks",
+    "sourceId": "01KBSWPJ9SEZN67XGNGZ3YD16S",
+    "targetSchema": "users",
+    "targetId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "virtual-assignedTo-tasks",
+    "createdAt": "2026-02-05T09:03:10.333Z",
+    "updatedAt": "2026-02-05T09:03:10.333Z"
   }
 ]

@@ -437,6 +437,11 @@ export interface FormSchema {
    */
   allowDataAssignedTo?: boolean;
   /**
+   * When true, enables the Assignment Switcher in list views so records
+   * can be filtered by assignee or creator context.
+   */
+  allowAssignTo?: boolean;
+  /**
    * When true, shows a "Due Date" date picker in the System Section.
    * Stored in data as `dueDate` (ISO date string compatible with date input).
    */

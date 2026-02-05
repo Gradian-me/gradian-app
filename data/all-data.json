@@ -5728,8 +5728,7 @@
     {
       "assignedTo": [
         {
-          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-          "label": "Mahyar Abidi"
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2"
         }
       ],
       "dueDate": "2025-12-30",
@@ -5741,12 +5740,12 @@
           "color": "red"
         }
       ],
-      "taskTitle": "Task C",
+      "taskTitle": "The form schema may have missing or invalid data (e.g. fields, sections, or arrays). This can happen when the schema returns null for lists that the form expects to be arrays. Please check the schema or try again.",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSWPJ9SEZN67XGNGZ3YD16S",
       "createdAt": "2025-12-06T13:12:57.404Z",
-      "updatedAt": "2025-12-06T13:12:57.404Z",
+      "updatedAt": "2026-02-05T09:03:10.421Z",
       "taskDescription": "test description",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"

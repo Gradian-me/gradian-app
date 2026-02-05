@@ -43,6 +43,8 @@ import { toast } from 'sonner';
 import { buildHierarchyTree } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
 import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { TableWrapper, TableConfig, buildTableColumns, TableColumn } from '@/gradian-ui/data-display/table';
+import { AssignmentSwitcher } from '@/gradian-ui/data-display/task-management/components/AssignmentSwitcher';
+import { useAssignmentSwitcher } from '@/gradian-ui/data-display/task-management/hooks/useAssignmentSwitcher';
 import { DynamicPagination } from './DynamicPagination';
 import { HierarchyView } from '@/gradian-ui/data-display/hierarchy/HierarchyView';
 import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/PopupPicker';
@@ -221,6 +223,31 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     handleDeleteEntity,
   } = useDynamicEntity(schema);
 
+  const allowAssignmentSwitcher =
+    schema?.allowAssignTo === true || schema?.allowDataAssignedTo === true;
+
+  const [assignmentView, setAssignmentView] = useState<'assignedTo' | 'initiatedBy'>('assignedTo');
+  const [assignmentCountsFromApi, setAssignmentCountsFromApi] = useState<{
+    assignedToCount: number;
+    initiatedByCount: number;
+  } | null>(null);
+  const [assignmentCountRefreshToken, setAssignmentCountRefreshToken] = useState(0);
+
+  const {
+    isEnabled: assignmentSwitcherEnabled,
+    counts: assignmentCounts,
+    selectedUser: assignmentSelectedUser,
+    isUsingDefaultUser: isAssignmentUserDefault,
+    handleUserOptionChange,
+    resetToCurrentUser: resetAssignmentUser,
+  } = useAssignmentSwitcher({
+    isEnabled: allowAssignmentSwitcher,
+    totalItems: paginationMeta?.totalItems ?? entities?.length ?? 0,
+    countsFromApi: assignmentCountsFromApi,
+    activeView: assignmentView,
+    setActiveView: setAssignmentView,
+  });
+
   // Reset to page 1 when filters change (but not when pagination changes)
   const prevFiltersRef = useRef<string>('');
   useEffect(() => {
@@ -329,7 +356,50 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       .filter((company: any) => company.id !== -1 && company.id !== undefined && company.id !== null)
       .map((company: any) => String(company.id));
   }, [companiesData]);
-  
+
+  // Fetch assignment counts from /api/data/[schema-id]/count for badge display
+  useEffect(() => {
+    if (!allowAssignmentSwitcher || !schema?.id || !assignmentSelectedUser?.id) {
+      setAssignmentCountsFromApi(null);
+      return;
+    }
+    const companyIds =
+      schema?.isNotCompanyBased || schema?.id === 'companies'
+        ? []
+        : selectedCompany && selectedCompany.id !== -1
+          ? [String(selectedCompany.id)]
+          : availableCompanyIds;
+    const params = new URLSearchParams();
+    params.set('userId', assignmentSelectedUser.id);
+    if (companyIds.length > 0) {
+      params.set('companyIds', companyIds.join(','));
+    }
+    const url = `/api/data/${schema.id}/count?${params.toString()}`;
+    let cancelled = false;
+    apiRequest<{ assignedToCount: number; initiatedByCount: number }>(url)
+      .then((res) => {
+        if (cancelled || !res.success || !res.data) return;
+        setAssignmentCountsFromApi({
+          assignedToCount: res.data.assignedToCount ?? 0,
+          initiatedByCount: res.data.initiatedByCount ?? 0,
+        });
+      })
+      .catch(() => {
+        if (!cancelled) setAssignmentCountsFromApi(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    allowAssignmentSwitcher,
+    schema?.id,
+    schema?.isNotCompanyBased,
+    assignmentSelectedUser?.id,
+    selectedCompany?.id,
+    availableCompanyIds,
+    assignmentCountRefreshToken,
+  ]);
+
   // Fetch companies schema for grouping (companies data comes from useCompanies hook with caching)
   useEffect(() => {
     // Skip fetching companies schema if schema is not company-based
@@ -368,13 +438,28 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     }
   }, [entities, companiesData, schema?.isNotCompanyBased, companySchema]);
 
-  // Build filters object with company filter
+  // Build filters object with company filter and optional assignment (createdByIds / assignedToIds)
   const buildFilters = useCallback(() => {
+    // When assignment switcher is enabled but no user is selected yet,
+    // avoid fetching unfiltered data. User must pick a POV first.
+    if (allowAssignmentSwitcher && !assignmentSelectedUser?.id) {
+      return null;
+    }
+
     const filters: any = {
       search: currentFilters.search,
       status: currentFilters.status,
       category: currentFilters.category,
     };
+
+    // Assignment filter (backend): createdByIds or assignedToIds as comma-separated user ID(s)
+    if (allowAssignmentSwitcher && assignmentSelectedUser?.id) {
+      if (assignmentView === 'assignedTo') {
+        filters.assignedToIds = assignmentSelectedUser.id;
+      } else {
+        filters.createdByIds = assignmentSelectedUser.id;
+      }
+    }
     
     // Skip company filtering if schema is not company-based
     if (!schema?.isNotCompanyBased) {
@@ -395,7 +480,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     }
     
     return filters;
-  }, [currentFilters, selectedCompany, schema?.isNotCompanyBased, availableCompanyIds]);
+  }, [currentFilters, selectedCompany, schema?.isNotCompanyBased, availableCompanyIds, allowAssignmentSwitcher, assignmentSelectedUser?.id, assignmentView]);
 
   // Handle changing parent for hierarchical items
   const handleChangeParent = useCallback((entity: any) => {
@@ -477,13 +562,17 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         throw new Error(result.error || 'Failed to refresh data');
       }
       toast.success(`${pluralName} updated`, { id: toastId });
+      // Also refresh assignment counts when manual refresh succeeds
+      if (allowAssignmentSwitcher && assignmentSelectedUser?.id) {
+        setAssignmentCountRefreshToken((prev) => prev + 1);
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to refresh data';
       toast.error(errorMessage, { id: toastId });
     } finally {
       setIsManualRefresh(false);
     }
-  }, [buildFilters, fetchEntities, pluralName, currentPage, pageSize, sortConfig]);
+  }, [buildFilters, fetchEntities, pluralName, currentPage, pageSize, sortConfig, allowAssignmentSwitcher, assignmentSelectedUser?.id]);
 
   // Confirm and execute delete
   const confirmDelete = useCallback(async () => {
@@ -598,21 +687,19 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     return () => clearTimeout(timer);
   }, [searchTermLocal]);
 
-  // Filter entities by search term (company filtering is done by backend API)
+  // Filter entities by search term only (company and assignment filtering done by backend via query params)
   const filteredEntities = useMemo(() => {
-    if (!entities) return [];
+    const sourceEntities = Array.isArray(entities) ? entities : [];
     
-    // Apply search filter if search term exists (company filtering is handled by backend)
     if (debouncedSearchTerm && debouncedSearchTerm.trim() !== '') {
       const searchLower = debouncedSearchTerm.toLowerCase();
       
-      const result = entities.filter((entity: any) => {
-        // Search across common text fields dynamically (including generic 'code' field)
+      return sourceEntities.filter((entity: any) => {
         const searchableFields = [
           'name', 'title', 'email', 'phone', 'description',
           'productName', 'requestId', 'batchNumber', 'productSku',
           'companyName', 'tenderTitle', 'projectName',
-          'code' // allows schemas like 'guidelines' that primarily use a code identifier
+          'code'
         ];
         
         return searchableFields.some(field => {
@@ -623,12 +710,9 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           return false;
         });
       });
-
-
-      return result;
     }
     
-    return entities;
+    return sourceEntities;
   }, [entities, debouncedSearchTerm, entityName, schema?.id]);
 
   // Collapse all hierarchy nodes when search is cleared
@@ -1169,7 +1253,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           onViewModeChange={handleViewModeChange}
           onAddNew={handleOpenCreateModal}
           onRefresh={handleManualRefresh}
-          isRefreshing={isLoading || isManualRefresh}
+          isRefreshing={(!(allowAssignmentSwitcher && !assignmentSelectedUser?.id) && (isLoading || isManualRefresh))}
           searchPlaceholder={`Search ${pluralName.toLowerCase()}...`}
           addButtonText={`Add ${singularName}`}
           onExpandAllHierarchy={() => setHierarchyExpandToken((prev) => prev + 1)}
@@ -1181,7 +1265,10 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           excludedFieldIds={repeatingSectionFieldIds}
           customActions={
             <div className="flex items-center gap-2 px-2">
-              <Label htmlFor="metadata-toggle" className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer whitespace-nowrap">
+              <Label
+                htmlFor="metadata-toggle"
+                className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer whitespace-nowrap"
+              >
                 User Details
               </Label>
               <Switch
@@ -1192,6 +1279,20 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             </div>
           }
         />
+
+        {assignmentSwitcherEnabled && (
+          <div className="mt-3">
+            <AssignmentSwitcher
+              activeView={assignmentView}
+              onViewChange={setAssignmentView}
+              counts={assignmentCounts}
+              selectedUser={assignmentSelectedUser}
+              onUserOptionChange={handleUserOptionChange}
+              onResetUser={resetAssignmentUser}
+              isUsingDefaultUser={isAssignmentUserDefault}
+            />
+          </div>
+        )}
 
         {/* Pagination - Show for all views when we have pagination metadata or "all" is selected */}
         {(paginationMeta || pageSize === 'all') && (
@@ -1209,8 +1310,22 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           </div>
         )}
 
-        {/* Entities List - Grouped by Company or Regular List */}
-        {viewMode === 'hierarchy' ? (
+        {/* Entities List or Assignment Placeholder */}
+        {allowAssignmentSwitcher && !assignmentSelectedUser?.id ? (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <EmptyState
+              icon={
+                <IconRenderer iconName="UserCircle2" className="h-12 w-12 text-gray-400" />
+              }
+              title="Select a user to view tasks"
+              description="Use the assignment switcher above to choose whose assigned or initiated tasks you want to see."
+            />
+          </motion.div>
+        ) : viewMode === 'hierarchy' ? (
           <HierarchyView
             schema={schema}
             items={entities || []}
@@ -1479,7 +1594,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               action={
                 <Button
                   onClick={handleOpenCreateModal}
-                  className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
+                  className="bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
                 >
                   <Plus className="h-4 w-4 me-2" />
                   Add {singularName}

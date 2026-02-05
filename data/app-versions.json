@@ -6406,5 +6406,39 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V47003000000000000003",
+    "timestamp": "2026-02-03T00:00:00.000Z",
+    "version": "1.47.003",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Introduced Assignment Switcher functionality in DynamicPageRenderer to filter records by assignee or creator context, enhancing user experience.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data-display",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated form schema to include allowAssignTo property for enabling assignment filtering.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved filtering logic in BaseController and BaseRepository to support createdByIds and assignedToIds, ensuring accurate data retrieval. This update enhances data management and user interaction across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data",
+          "domain",
+          "api"
+        ]
+      }
+    ]
   }
 ]

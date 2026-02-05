@@ -65,6 +65,22 @@ export class BaseController<T extends BaseEntity> {
       }
     }
 
+    // Handle createdByIds - comma-separated user IDs; filter entities where createdBy matches one of the IDs
+    if (searchParams.has('createdByIds')) {
+      const createdByIdsParam = searchParams.get('createdByIds');
+      if (createdByIdsParam) {
+        filters.createdByIds = createdByIdsParam.split(',').map(id => id.trim()).filter(id => id.length > 0);
+      }
+    }
+
+    // Handle assignedToIds - comma-separated user IDs; filter entities where assignedTo array contains one of the IDs
+    if (searchParams.has('assignedToIds')) {
+      const assignedToIdsParam = searchParams.get('assignedToIds');
+      if (assignedToIdsParam) {
+        filters.assignedToIds = assignedToIdsParam.split(',').map(id => id.trim()).filter(id => id.length > 0);
+      }
+    }
+
     // Handle tenantIds - comma-separated string format: tenantIds=id1,id2
     // Used for data filtering based on relatedTenants field when schema has allowDataRelatedTenants: true
     if (searchParams.has('tenantIds')) {
@@ -94,6 +110,8 @@ export class BaseController<T extends BaseEntity> {
           'excludeIds[]',
           'companyIds',
           'companyId',
+          'createdByIds',
+          'assignedToIds',
           'tenantIds',
           'tenantId',
           'allowDataRelatedTenants',

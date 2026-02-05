@@ -639,51 +639,58 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     </motion.div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <motion.div
-                        className="flex items-center gap-1.5 min-w-0 pe-2 flex-wrap flex-initial"
-                        initial={disableAnimation ? false : { opacity: 0, x: 5 }}
-                        animate={disableAnimation ? false : { opacity: 1, x: 0 }}
-                        transition={disableAnimation ? {} : { duration: 0.3 }}
-                        whileHover={{ x: 2, transition: { duration: 0.15, delay: 0 } }}
+                    {/* Title row */}
+                    <motion.div
+                      className="flex items-center gap-1.5 min-w-0 pe-2"
+                      initial={disableAnimation ? false : { opacity: 0, x: 5 }}
+                      animate={disableAnimation ? false : { opacity: 1, x: 0 }}
+                      transition={disableAnimation ? {} : { duration: 0.3 }}
+                      whileHover={{ x: 2, transition: { duration: 0.15, delay: 0 } }}
+                    >
+                      <ForceIcon
+                        isForce={isForce}
+                        size="md"
+                        title={cardConfig.title}
+                        forceReason={forceReason}
+                        showTooltip={false}
+                      />
+                      <motion.h3
+                        className={cn(
+                          "font-semibold text-gray-900 dark:text-gray-50 transition-colors duration-100 wrap-break-word flex-1 min-w-0",
+                          isInDialog 
+                            ? "text-sm sm:text-base" 
+                            : "text-md line-clamp-3",
+                          !isInDialog && "group-hover:text-violet-800 dark:group-hover:text-violet-300"
+                        )}
+                        whileHover={isInDialog ? undefined : { x: 2, transition: { duration: 0.15, delay: 0 } }}
+                        title={title} // Show full title on hover
                       >
-                        <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} />
-                        <motion.h3
-                          className={cn(
-                            "font-semibold text-gray-900 dark:text-gray-50 transition-colors duration-100 min-w-0 flex-initial",
-                            isInDialog 
-                              ? "text-sm sm:text-base break-words" 
-                              : "text-md break-words line-clamp-3",
-                            !isInDialog && "group-hover:text-violet-800 dark:group-hover:text-violet-300"
-                          )}
-                          whileHover={isInDialog ? undefined : { x: 2, transition: { duration: 0.15, delay: 0 } }}
-                          title={title} // Show full title on hover
-                        >
-                          {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
-                        </motion.h3>
-                        <span
-                          onClick={(e) => e.stopPropagation()}
-                          onMouseDown={(e) => e.stopPropagation()}
-                          onKeyDown={(e) => e.stopPropagation()}
-                          className="shrink-0"
-                        >
-                          <CopyContent content={cardConfig.title} />
-                        </span>
+                        {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
+                      </motion.h3>
+                      <span
+                        onClick={(e) => e.stopPropagation()}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                        className="shrink-0"
+                      >
+                        <CopyContent content={cardConfig.title} />
+                      </span>
+                    </motion.div>
+
+                    {/* Badges row - wraps naturally below title when needed */}
+                    {cardConfig.isIncomplete && (
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, y: -4 }}
+                        animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+                        transition={disableAnimation ? {} : { duration: 0.2 }}
+                        className="mt-1 flex justify-start sm:justify-end"
+                      >
+                        <Badge variant="warning" className="flex items-center gap-1 px-1.5 py-0.5 shadow-sm">
+                          <IconRenderer iconName="AlertTriangle" className="h-3 w-3" />
+                          <span className="text-xs">Incomplete</span>
+                        </Badge>
                       </motion.div>
-                      {/* Incomplete Badge */}
-                      {cardConfig.isIncomplete && (
-                        <motion.div
-                          initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
-                          animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
-                          transition={disableAnimation ? {} : { duration: 0.2 }}
-                        >
-                          <Badge variant="warning" className="flex items-center gap-1 px-1.5 py-0.5 shadow-sm">
-                            <IconRenderer iconName="AlertTriangle" className="h-3 w-3" />
-                            <span className="text-xs">Incomplete</span>
-                          </Badge>
-                        </motion.div>
-                      )}
-                    </div>
+                    )}
                     {cardConfig.subtitle && (
                       <motion.div
                         initial={disableAnimation ? false : { opacity: 0, x: 5 }}
@@ -697,9 +704,27 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         </p>
                       </motion.div>
                     )}
+                    {/* Entity Metadata directly under title/subtitle in grid view */}
+                    {showUserDetails && (
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, x: 5 }}
+                        animate={disableAnimation ? false : { opacity: 1, x: 0 }}
+                        transition={disableAnimation ? {} : { duration: 0.3 }}
+                        className="mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800"
+                      >
+                        <EntityMetadata
+                          createdAt={data.createdAt}
+                          createdBy={data.createdBy}
+                          updatedAt={data.updatedAt}
+                          updatedBy={data.updatedBy}
+                          variant="compact"
+                          avatarType="user"
+                        />
+                      </motion.div>
+                    )}
                   </div>
                 </div>
-                {(hasCodeField || hasRatingField || hasStatusField || hasEntityTypeField) && (
+                {(hasCodeField || hasRatingField) && (
                   <div className={cn(
                     "flex gap-2",
                     isInDialog 
@@ -732,38 +757,6 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         />
                       </motion.div>
                     )}
-                    {/* Status */}
-                    {hasStatusField && (statusFieldDef || hasStatusGroup) && normalizedStatusMetadata.label && (
-                      <motion.div
-                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
-                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
-                        transition={disableAnimation ? {} : { duration: 0.2 }}
-                        whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05, transition: { duration: 0.1, delay: 0 } }}
-                      >
-                        <Badge variant={getValidBadgeVariant(normalizedStatusMetadata.color)}>
-                          {normalizedStatusMetadata.icon && (
-                            <IconRenderer iconName={normalizedStatusMetadata.icon} className="h-3 w-3 me-1" />
-                          )}
-                          <span className="text-xs">{normalizedStatusMetadata.label}</span>
-                        </Badge>
-                      </motion.div>
-                    )}
-                    {/* Entity Type */}
-                    {hasEntityTypeField && (entityTypeFieldDef || hasEntityTypeGroup) && normalizedEntityTypeMetadata.label && (
-                      <motion.div
-                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
-                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
-                        transition={disableAnimation ? {} : { duration: 0.2 }}
-                        whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05, transition: { duration: 0.1, delay: 0 } }}
-                      >
-                        <Badge variant={getValidBadgeVariant(normalizedEntityTypeMetadata.color)}>
-                          {normalizedEntityTypeMetadata.icon && (
-                            <IconRenderer iconName={normalizedEntityTypeMetadata.icon} className="h-3 w-3 me-1" />
-                          )}
-                          <span className="text-xs">{normalizedEntityTypeMetadata.label}</span>
-                        </Badge>
-                      </motion.div>
-                    )}
                   </div>
                 )}
               </div>
@@ -778,7 +771,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   whileHover={isInDialog ? undefined : { x: 2, transition: { duration: 0.15 } }}
                 >
                   <p className={cn(
-                    "text-xs text-gray-600 dark:text-gray-300 break-words",
+                    "text-xs text-gray-600 dark:text-gray-300 wrap-break-word",
                     !isInDialog && "line-clamp-2"
                   )}>
                     {renderHighlightedText(description, normalizedHighlightQuery)}
@@ -814,7 +807,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                             ? (item.isCompleted === true || item.completed === true)
                             : false;
                           return (
-                            <li key={item?.id ?? idx} className="flex items-center gap-2 break-words overflow-wrap-anywhere">
+                            <li key={item?.id ?? idx} className="flex items-center gap-2 wrap-break-word overflow-wrap-anywhere">
                               <span className="shrink-0 text-gray-500 dark:text-gray-400" aria-hidden>
                                 {isDone ? (
                                   <CheckSquare className="h-3.5 w-3.5 text-green-600 dark:text-green-300" aria-label="Done" />
@@ -835,7 +828,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                           const label = getListItemLabel(item);
                           if (label == null || String(label).trim() === '') return null;
                           return (
-                            <li key={idx} className="break-words overflow-wrap-anywhere">
+                            <li key={idx} className="wrap-break-word overflow-wrap-anywhere">
                               {renderHighlightedText(label, normalizedHighlightQuery)}
                             </li>
                           );
@@ -920,42 +913,59 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                 <div className="w-full border-t border-gray-100 dark:border-gray-800 mb-3"></div>
               )}
 
-              {/* Entity Metadata */}
-              {showUserDetails && (
-                <motion.div
-                  initial={disableAnimation ? false : { opacity: 0, y: 5 }}
-                  animate={disableAnimation ? false : { opacity: 1, y: 0 }}
-                  transition={disableAnimation ? {} : { duration: 0.3 }}
-                  className="w-full mb-3 pt-2 border-t border-gray-200 dark:border-gray-600"
-                >
-                  <EntityMetadata
-                    createdAt={data.createdAt}
-                    createdBy={data.createdBy}
-                    updatedAt={data.updatedAt}
-                    updatedBy={data.updatedBy}
-                    variant="compact"
-                    avatarType="user"
-                  />
-                </motion.div>
-              )}
-
               {/* Person Field */}
               {hasPersonField && cardConfig.personField && (
                 <motion.div
                   initial={disableAnimation ? false : { opacity: 0, y: 10 }}
                   animate={disableAnimation ? false : { opacity: 1, y: 0 }}
                   transition={disableAnimation ? {} : { duration: 0.3 }}
-                  className="w-full mb-3 flex items-center gap-2"
+                  className="w-full mb-3 flex items-center justify-between gap-2"
                 >
-                  <AvatarUser
-                    user={cardConfig.personField}
-                    avatarType="user"
-                    size="md"
-                    showDialog={true}
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Assigned To</span>
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{cardConfig.personField.label}</span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <AvatarUser
+                      user={cardConfig.personField}
+                      avatarType="user"
+                      size="md"
+                      showDialog={true}
+                    />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Assigned To</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                        {cardConfig.personField.label}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {/* Status badge in front of Assigned To */}
+                    {hasStatusField && (statusFieldDef || hasStatusGroup) && normalizedStatusMetadata.label && (
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
+                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                        transition={disableAnimation ? {} : { duration: 0.2 }}
+                      >
+                        <Badge variant={getValidBadgeVariant(normalizedStatusMetadata.color)}>
+                          {normalizedStatusMetadata.icon && (
+                            <IconRenderer iconName={normalizedStatusMetadata.icon} className="h-3 w-3 me-1" />
+                          )}
+                          <span className="text-xs">{normalizedStatusMetadata.label}</span>
+                        </Badge>
+                      </motion.div>
+                    )}
+                    {/* Entity type badge next to status, also in front of Assigned To */}
+                    {hasEntityTypeField && (entityTypeFieldDef || hasEntityTypeGroup) && normalizedEntityTypeMetadata.label && (
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
+                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                        transition={disableAnimation ? {} : { duration: 0.2 }}
+                      >
+                        <Badge variant={getValidBadgeVariant(normalizedEntityTypeMetadata.color)}>
+                          {normalizedEntityTypeMetadata.icon && (
+                            <IconRenderer iconName={normalizedEntityTypeMetadata.icon} className="h-3 w-3 me-1" />
+                          )}
+                          <span className="text-xs">{normalizedEntityTypeMetadata.label}</span>
+                        </Badge>
+                      </motion.div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -1008,8 +1018,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
               </div>
             </>
           ) : (
-            // List view layout
-            <div className="flex items-start space-x-4 w-full flex-wrap gap-2 justify-between">
+            // List view layout: two rows so title gets full width
+            <div className="flex w-full flex-col gap-3">
+              {/* Row 1: avatar + main text + user details + badges */}
               <div className="flex items-start gap-2 flex-1 min-w-0">
                 {showAvatarInCard && (
                   <motion.div
@@ -1030,13 +1041,20 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start gap-1.5 flex-wrap w-full">
-                    <ForceIcon isForce={isForce} size="md" title={cardConfig.title} forceReason={forceReason} showTooltip={false} className="shrink-0" />
+                    <ForceIcon
+                      isForce={isForce}
+                      size="md"
+                      title={cardConfig.title}
+                      forceReason={forceReason}
+                      showTooltip={false}
+                      className="shrink-0"
+                    />
                     <motion.h3
                       initial={disableAnimation ? false : { opacity: 0, x: 5 }}
                       animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                       transition={disableAnimation ? {} : { duration: 0.3 }}
                       className={cn(
-                        "text-sm font-semibold text-gray-900 dark:text-gray-200 break-words min-w-0 flex-initial line-clamp-3",
+                        "text-sm font-semibold text-gray-900 dark:text-gray-200 wrap-break-word flex-1 min-w-0 line-clamp-3",
                         !disableAnimation && "group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors duration-100"
                       )}
                       whileHover={disableAnimation ? undefined : {
@@ -1086,20 +1104,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       {renderHighlightedText(cardConfig.subtitle, normalizedHighlightQuery)}
                     </motion.p>
                   )}
-                  {/* Force Reason */}
-                  {isForce && forceReason && (
-                    <motion.div
-                      initial={disableAnimation ? false : { opacity: 0, x: 5 }}
-                      animate={disableAnimation ? false : { opacity: 1, x: 0 }}
-                      transition={disableAnimation ? {} : { duration: 0.3 }}
-                      className="mt-1"
-                    >
-                      <p className="text-xs text-pink-700 dark:text-pink-400 truncate">
-                        <span className="font-medium">Force Reason:</span> {forceReason}
-                      </p>
-                    </motion.div>
-                  )}
-                  {/* Entity Metadata */}
+                  {/* Entity Metadata directly under title/subtitle in list view */}
                   {showUserDetails && (
                     <motion.div
                       initial={disableAnimation ? false : { opacity: 0, x: 5 }}
@@ -1115,6 +1120,19 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         variant="compact"
                         avatarType="user"
                       />
+                    </motion.div>
+                  )}
+                  {/* Force Reason */}
+                  {isForce && forceReason && (
+                    <motion.div
+                      initial={disableAnimation ? false : { opacity: 0, x: 5 }}
+                      animate={disableAnimation ? false : { opacity: 1, x: 0 }}
+                      transition={disableAnimation ? {} : { duration: 0.3 }}
+                      className="mt-1"
+                    >
+                      <p className="text-xs text-pink-700 dark:text-pink-400 truncate">
+                        <span className="font-medium">Force Reason:</span> {forceReason}
+                      </p>
                     </motion.div>
                   )}
                   <div
@@ -1153,9 +1171,11 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                   </div>
                 </div>
               </div>
-              {(hasCodeField || hasRatingField || hasStatusField || hasEntityTypeField || hasDuedateField || hasPersonField) && (
-                <div className="flex flex-row items-center justify-between space-y-1 ms-auto gap-2 shrink-0">
-                  <div className="flex items-center gap-2">
+
+              {/* Row 2: assignee / due date / status and action buttons at the end */}
+              {(hasCodeField || hasRatingField || hasStatusField || hasEntityTypeField || hasDuedateField || hasPersonField || onView || onViewDetail || onEdit || onDelete) && (
+                <div className="flex flex-wrap items-center justify-between gap-2 ms-0 sm:ms-11 shrink-0">
+                  <div className="flex items-center gap-2 flex-wrap">
                     {hasPersonField && cardConfig.personField && (
                       <motion.div
                         initial={disableAnimation ? false : { opacity: 0, y: -10 }}
@@ -1196,98 +1216,124 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       </motion.div>
                     )}
                   </div>
-                  <div className="flex items-end gap-2 flex-col">
-                    {/* Code Badge */}
-                    {hasCodeField && cardConfig.codeField && (
-                      <motion.div
-                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
-                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
-                        transition={disableAnimation ? {} : { duration: 0.2 }}
-                        whileHover={disableAnimation ? undefined : {
-                          scale: 1.01,
-                          transition: { type: "spring", stiffness: 300, damping: 30 }
-                        }}
-                      >
-                        <CodeBadge code={cardConfig.codeField} highlightQuery={normalizedHighlightQuery} />
-                      </motion.div>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {/* Meta badges stack */}
+                    {(hasCodeField || hasRatingField || hasStatusField || hasEntityTypeField) && (
+                      <div className="flex items-end gap-1.5 flex-col">
+                        {hasCodeField && cardConfig.codeField && (
+                          <motion.div
+                            initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
+                            animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                            transition={disableAnimation ? {} : { duration: 0.3 }}
+                            whileHover={disableAnimation ? undefined : {
+                              scale: 1.01,
+                              transition: { type: "spring", stiffness: 300, damping: 30 }
+                            }}
+                          >
+                            <CodeBadge code={cardConfig.codeField} highlightQuery={normalizedHighlightQuery} />
+                          </motion.div>
+                        )}
+                        {hasRatingField && (
+                          <motion.div
+                            initial={disableAnimation ? false : { opacity: 0, y: -10 }}
+                            animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+                            transition={disableAnimation ? {} : { duration: 0.3 }}
+                            whileHover={disableAnimation ? undefined : {
+                              scale: 1.01,
+                              transition: { type: "spring", stiffness: 300, damping: 30 }
+                            }}
+                          >
+                            <Rating
+                              value={cardConfig.ratingField}
+                              size="sm"
+                              showValue={true}
+                            />
+                          </motion.div>
+                        )}
+                        {hasStatusField && (statusFieldDef || hasStatusGroup) && normalizedStatusMetadata.label && (
+                          <motion.div
+                            initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
+                            animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                            transition={disableAnimation ? {} : { duration: 0.3 }}
+                            whileHover={disableAnimation ? undefined : {
+                              scale: 1.01,
+                              transition: { type: "spring", stiffness: 300, damping: 30 }
+                            }}
+                          >
+                            <Badge variant={getValidBadgeVariant(normalizedStatusMetadata.color)}>
+                              {normalizedStatusMetadata.icon && (
+                                <IconRenderer iconName={normalizedStatusMetadata.icon} className="h-3 w-3 me-1" />
+                              )}
+                              <span className="text-xs">{normalizedStatusMetadata.label}</span>
+                            </Badge>
+                          </motion.div>
+                        )}
+                        {hasEntityTypeField && (entityTypeFieldDef || hasEntityTypeGroup) && normalizedEntityTypeMetadata.label && (
+                          <motion.div
+                            initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
+                            animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                            transition={disableAnimation ? {} : { duration: 0.3 }}
+                            whileHover={disableAnimation ? undefined : {
+                              scale: 1.01,
+                              transition: { type: "spring", stiffness: 300, damping: 30 }
+                            }}
+                          >
+                            <Badge variant={getValidBadgeVariant(normalizedEntityTypeMetadata.color)}>
+                              {normalizedEntityTypeMetadata.icon && (
+                                <IconRenderer iconName={normalizedEntityTypeMetadata.icon} className="h-3 w-3 me-1" />
+                              )}
+                              <span className="text-xs">{normalizedEntityTypeMetadata.label}</span>
+                            </Badge>
+                          </motion.div>
+                        )}
+                      </div>
                     )}
-                    {hasRatingField && (
-                      <motion.div
-                        initial={disableAnimation ? false : { opacity: 0, y: -10 }}
-                        animate={disableAnimation ? false : { opacity: 1, y: 0 }}
-                        transition={disableAnimation ? {} : { duration: 0.3 }}
-                        whileHover={disableAnimation ? undefined : {
-                          scale: 1.01,
-                          transition: { type: "spring", stiffness: 300, damping: 30 }
-                        }}
-                      >
-                        <Rating
-                          value={cardConfig.ratingField}
-                          size="sm"
-                          showValue={true}
+
+                    {/* Action Buttons for List View at far right */}
+                    {(onView || onViewDetail || onEdit || onDelete) && (
+                      <div className="flex items-center">
+                        <DynamicActionButtons
+                          variant="minimal"
+                          actions={[
+                            ...(onViewDetail || onView
+                              ? [
+                                  {
+                                    type: 'view' as const,
+                                    onClick: onViewDetail
+                                      ? () => onViewDetail(data)
+                                      : () => onView?.(data),
+                                    href:
+                                      data?.id && schema?.id
+                                        ? `/page/${schema.id}/${data.id}`
+                                        : undefined,
+                                    canOpenInNewTab: true,
+                                  },
+                                ]
+                              : []),
+                            ...(onEdit
+                              ? [
+                                  {
+                                    type: 'edit' as const,
+                                    onClick: () => onEdit(data),
+                                  },
+                                ]
+                              : []),
+                            ...(onDelete
+                              ? [
+                                  {
+                                    type: 'delete' as const,
+                                    onClick: () => onDelete(data),
+                                  },
+                                ]
+                              : []),
+                          ]}
                         />
-                      </motion.div>
-                    )}
-                    {hasStatusField && (statusFieldDef || hasStatusGroup) && normalizedStatusMetadata.label && (
-                      <motion.div
-                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
-                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
-                        transition={disableAnimation ? {} : { duration: 0.3 }}
-                        whileHover={disableAnimation ? undefined : {
-                          scale: 1.01,
-                          transition: { type: "spring", stiffness: 300, damping: 30 }
-                        }}
-                      >
-                        <Badge variant={getValidBadgeVariant(normalizedStatusMetadata.color)}>
-                          {normalizedStatusMetadata.icon && (
-                            <IconRenderer iconName={normalizedStatusMetadata.icon} className="h-3 w-3 me-1" />
-                          )}
-                          <span className="text-xs">{normalizedStatusMetadata.label}</span>
-                        </Badge>
-                      </motion.div>
-                    )}
-                    {hasEntityTypeField && (entityTypeFieldDef || hasEntityTypeGroup) && normalizedEntityTypeMetadata.label && (
-                      <motion.div
-                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
-                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
-                        transition={disableAnimation ? {} : { duration: 0.3 }}
-                        whileHover={disableAnimation ? undefined : {
-                          scale: 1.01,
-                          transition: { type: "spring", stiffness: 300, damping: 30 }
-                        }}
-                      >
-                        <Badge variant={getValidBadgeVariant(normalizedEntityTypeMetadata.color)}>
-                          {normalizedEntityTypeMetadata.icon && (
-                            <IconRenderer iconName={normalizedEntityTypeMetadata.icon} className="h-3 w-3 me-1" />
-                          )}
-                          <span className="text-xs">{normalizedEntityTypeMetadata.label}</span>
-                        </Badge>
-                      </motion.div>
+                      </div>
                     )}
                   </div>
                 </div>
               )}
-
-              {/* Action Buttons for List View */}
-              <DynamicActionButtons
-                variant="minimal"
-                actions={[
-                  ...(onViewDetail || onView ? [{
-                    type: 'view' as const,
-                    onClick: onViewDetail ? () => onViewDetail(data) : () => onView?.(data),
-                    href: data?.id && schema?.id ? `/page/${schema.id}/${data.id}` : undefined,
-                    canOpenInNewTab: true,
-                  }] : []),
-                  ...(onEdit ? [{
-                    type: 'edit' as const,
-                    onClick: () => onEdit(data),
-                  }] : []),
-                  ...(onDelete ? [{
-                    type: 'delete' as const,
-                    onClick: () => onDelete(data),
-                  }] : []),
-                ]}
-              />
             </div>
           )}
 
