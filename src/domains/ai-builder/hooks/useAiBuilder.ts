@@ -758,6 +758,7 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
                 body: request.body,
                 extra_body: request.extra_body,
                 formValues: request.formValues,
+                preloadedContext: preloadedContext || undefined,
               }),
               signal: abortController.signal,
           });
@@ -1087,6 +1088,8 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
               annotations: request.annotations,
               body: request.body,
               extra_body: request.extra_body,
+              formValues: request.formValues,
+              preloadedContext: preloadedContext || undefined,
             }),
             signal: abortController.signal,
           });
@@ -1308,7 +1311,7 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
       // Clear abort controller reference
       abortControllerRef.current = null;
     }
-  }, [user, createPrompt]);
+  }, [user, createPrompt, preloadedContext]);
 
   const stopGeneration = useCallback(() => {
     if (abortControllerRef.current) {
@@ -1330,6 +1333,11 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
 
   const approveResponse = useCallback(async (response: string, agent: AiAgent) => {
     if (!response || !agent.nextAction) {
+      return;
+    }
+
+    // Form-filler output is form data; id is assigned on submission. Filling is done via the dialog footer "Fill Form" button.
+    if (agent.id === 'form-filler') {
       return;
     }
 

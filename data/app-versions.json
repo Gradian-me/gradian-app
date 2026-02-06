@@ -6440,5 +6440,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V48001000000000000001",
+    "timestamp": "2026-02-05T00:00:00.000Z",
+    "version": "1.48.001",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Introduced Dynamic Query Builder with GRAPH features for visual pattern design, column configuration, and API integration.",
+        "priority": "High",
+        "affectedDomains": [
+          "dynamic-query-builder",
+          "graph-designer",
+          "api",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated schema handling to include new context actions in node and edge context menus, improving user interaction.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "graph-designer",
+          "schema-manager",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Enhanced error handling in schema loading functions for better resilience against empty or malformed files. This update improves data management and user experience across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema-manager",
+          "data"
+        ]
+      }
+    ]
   }
 ]

@@ -21,6 +21,8 @@ export interface GraphEdgeData {
   targetSchema: string;
   targetId: string;
   relationTypeId: string;
+  /** When true, edge is optional (e.g. LEFT JOIN); shown as dashed in dynamic query builder */
+  optional?: boolean;
 }
 
 export interface GraphRecord {

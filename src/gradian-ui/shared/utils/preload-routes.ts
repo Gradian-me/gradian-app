@@ -77,12 +77,11 @@ export function getDynamicIncludedFields(
   // Auto-determine based on outputFormat (case-insensitive)
   const normalizedFormat = (outputFormat || '').toLowerCase();
   if (normalizedFormat === 'toon') {
-    // For toon format, check if route is related to schemas
+    // For toon format, check if route is related to schemas (TOON flattens to one row; for full schema structure use json)
     if (route && (route.includes('/api/schemas') || route.includes('schemas'))) {
       return ['id', 'description', 'plural_name'];
     }
-    // For other toon routes, you could add more logic here
-    // For now, return undefined to include all fields
+    // For other toon routes, return undefined to include all fields
   }
 
   // For json or string formats, don't filter by default

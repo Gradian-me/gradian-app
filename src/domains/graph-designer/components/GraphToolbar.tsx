@@ -57,6 +57,8 @@ interface GraphToolbarProps {
   onReset: () => void;
   onRefreshLayout: () => void;
   viewMode?: boolean;
+  /** When true, hide the Save button (e.g. parent page has its own save) */
+  hideSave?: boolean;
   nodeTypes?: NodeType[];
   relationTypes?: RelationType[];
   schemas?: Array<{ id: string; label: string; color: string; icon?: string }>;
@@ -90,6 +92,7 @@ export function GraphToolbar(props: GraphToolbarProps) {
     onReset,
     onRefreshLayout,
     viewMode = false,
+    hideSave = false,
     nodeTypes,
     relationTypes,
     schemas,
@@ -261,9 +264,11 @@ export function GraphToolbar(props: GraphToolbarProps) {
             <Button variant="outline" size="icon" onClick={onReset} title="Reset Graph">
               <RotateCcw className="h-4 w-4" />
             </Button>
-            <Button variant="default" size="icon" onClick={onSave} title="Save Graph">
-              <Save className="h-4 w-4" />
-            </Button>
+            {!hideSave && (
+              <Button variant="default" size="icon" onClick={onSave} title="Save Graph">
+                <Save className="h-4 w-4" />
+              </Button>
+            )}
           </>
         )}
       </div>

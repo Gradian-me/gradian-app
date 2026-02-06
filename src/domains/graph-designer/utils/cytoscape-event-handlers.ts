@@ -1,7 +1,7 @@
 import type { Core } from 'cytoscape';
 import type { GraphNodeData } from '../types';
 import { extractNodeDataFromElement } from './node-data-extractor';
-import { createNodeContextMenu } from './node-context-menu';
+import { createNodeContextMenu, type ExtraNodeContextAction } from './node-context-menu';
 import { createEdgeContextMenu } from './edge-context-menu';
 
 /**
@@ -14,7 +14,10 @@ export interface EventHandlersConfig {
   onNodeClick?: (node: GraphNodeData, isMultiSelect: boolean) => void;
   onBackgroundClick?: () => void;
   onNodeContextAction?: (action: 'edit' | 'delete' | 'select', node: GraphNodeData) => void;
-  onEdgeContextAction?: (action: 'delete', edge: any) => void;
+  extraNodeContextActions?: ExtraNodeContextAction[];
+  /** When true, node context menu hides Edit and Select (e.g. dynamic query builder mode) */
+  hideSelectAndEdit?: boolean;
+  onEdgeContextAction?: (action: 'delete' | 'toggleOptional', edge: any) => void;
 }
 
 /**
@@ -29,6 +32,8 @@ export function setupCytoscapeEventHandlers(config: EventHandlersConfig): () => 
     onNodeClick,
     onBackgroundClick,
     onNodeContextAction,
+    extraNodeContextActions,
+    hideSelectAndEdit,
     onEdgeContextAction,
   } = config;
 
@@ -70,7 +75,7 @@ export function setupCytoscapeEventHandlers(config: EventHandlersConfig): () => 
 
   // Setup context menus
   if (onNodeContextAction) {
-    (cy as any).cxtmenu(createNodeContextMenu(onNodeContextAction));
+    (cy as any).cxtmenu(createNodeContextMenu(onNodeContextAction, extraNodeContextActions, { hideSelectAndEdit }));
   }
 
   if (onEdgeContextAction) {

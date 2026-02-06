@@ -136,6 +136,7 @@ export async function POST(
       responseFormat: body.responseFormat,
       body: body.body, // Parameters with sectionId: "body"
       extra_body: body.extra_body, // Parameters with sectionId: "extra"
+      preloadedContext: body.preloadedContext,
     };
 
     // Get base URL for preload routes (only needed for chat agents)

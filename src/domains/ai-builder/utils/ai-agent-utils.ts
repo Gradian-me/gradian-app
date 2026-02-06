@@ -31,6 +31,8 @@ export interface AgentRequestData {
   responseFormat?: 'url' | 'b64_json';
   body?: Record<string, any>; // Parameters with sectionId: "body"
   extra_body?: Record<string, any>; // Parameters with sectionId: "extra"
+  /** Preloaded context from client (resolved preload routes). When set, server uses it instead of fetching agent preload routes (avoids unresolved {{formSchema.id}} etc.). */
+  preloadedContext?: string;
 }
 
 export interface AgentResponse {

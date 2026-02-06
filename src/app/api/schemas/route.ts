@@ -125,7 +125,7 @@ async function loadSchemas(): Promise<any[]> {
     }
 
     const fileContents = fs.readFileSync(SCHEMA_FILE_PATH, 'utf8');
-    
+
     // Check if file is empty or just whitespace
     if (!fileContents || fileContents.trim().length === 0) {
       loggingCustom(
@@ -135,25 +135,36 @@ async function loadSchemas(): Promise<any[]> {
       );
       return [];
     }
-    
-    const parsed = JSON.parse(fileContents);
-    
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(fileContents);
+    } catch (parseError) {
+      const msg = parseError instanceof Error ? parseError.message : 'Unknown parse error';
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'error',
+        `[API] Error parsing schemas file (length ${fileContents.length}) at ${SCHEMA_FILE_PATH}: ${msg}`,
+      );
+      return [];
+    }
+
     // Ensure we return an array
     if (Array.isArray(parsed)) {
       return parsed;
     }
-    
+
     // If it's an object, try to extract an array from it
     if (typeof parsed === 'object' && parsed !== null) {
-      if (Array.isArray(parsed.data)) {
-        return parsed.data;
+      if (Array.isArray((parsed as any).data)) {
+        return (parsed as any).data;
       }
       // If it's an object with schema IDs as keys, convert to array
       if (Object.keys(parsed).length > 0) {
         return Object.values(parsed);
       }
     }
-    
+
     loggingCustom(
       LogType.INFRA_LOG,
       'warn',
@@ -164,9 +175,9 @@ async function loadSchemas(): Promise<any[]> {
     loggingCustom(
       LogType.INFRA_LOG,
       'error',
-      `[API] Error parsing schemas file at ${SCHEMA_FILE_PATH}: ${error instanceof Error ? error.message : String(error)}`,
+      `[API] Error reading schemas file at ${SCHEMA_FILE_PATH}: ${error instanceof Error ? error.message : String(error)}`,
     );
-    throw new Error(`Failed to parse schemas file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    return [];
   }
 }
 
@@ -280,26 +291,37 @@ function loadSchemasSync(): any[] {
     }
 
     const fileContents = fs.readFileSync(SCHEMA_FILE_PATH, 'utf8');
-    
+
     if (!fileContents || fileContents.trim().length === 0) {
       return [];
     }
-    
-    const parsed = JSON.parse(fileContents);
-    
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(fileContents);
+    } catch (parseError) {
+      const msg = parseError instanceof Error ? parseError.message : 'Unknown parse error';
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'error',
+        `[API] Error parsing schemas file (length ${fileContents.length}): ${msg}`,
+      );
+      return [];
+    }
+
     if (Array.isArray(parsed)) {
       return parsed;
     }
-    
+
     if (typeof parsed === 'object' && parsed !== null) {
-      if (Array.isArray(parsed.data)) {
-        return parsed.data;
+      if (Array.isArray((parsed as any).data)) {
+        return (parsed as any).data;
       }
       if (Object.keys(parsed).length > 0) {
         return Object.values(parsed);
       }
     }
-    
+
     return [];
   } catch (error) {
     return [];

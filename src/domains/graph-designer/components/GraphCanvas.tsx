@@ -9,9 +9,10 @@ import edgehandles from 'cytoscape-edgehandles';
 // Undo/redo and other plugins can be added later when integrating full behavior.
 
 import type { GraphEdgeData, GraphLayout, GraphNodeData } from '../types';
+import type { ExtraNodeContextAction } from '../utils/node-context-menu';
 import { LAYOUTS } from '../utils/layouts';
 import { syncCytoscapeGraph } from '../utils/cytoscape-sync';
-import { updateStylesAfterLayout, updateEdgeCurveStyle } from '../utils/cytoscape-styles';
+import { updateStylesAfterLayout, updateEdgeCurveStyle, closeCxtMenus } from '../utils/cytoscape-styles';
 import { initializeCytoscape } from '../utils/cytoscape-initialization';
 import { manageEdgehandles, cleanupEdgehandles } from '../utils/edgehandles-manager';
 import { manageNodeSelection } from '../utils/cytoscape-selection';
@@ -36,7 +37,10 @@ interface GraphCanvasProps {
   onElementsChange?: (nodes: GraphNodeData[], edges: GraphEdgeData[]) => void;
   onReady?: (handle: GraphCanvasHandle) => void;
   onNodeContextAction?: (action: 'edit' | 'delete' | 'select', node: GraphNodeData) => void;
-  onEdgeContextAction?: (action: 'delete', edge: GraphEdgeData) => void;
+  extraNodeContextActions?: ExtraNodeContextAction[];
+  /** When true, node context menu hides Edit and Select (e.g. dynamic query builder) */
+  hideSelectAndEdit?: boolean;
+  onEdgeContextAction?: (action: 'delete' | 'toggleOptional', edge: GraphEdgeData) => void;
   edgeModeEnabled?: boolean;
   onEdgeCreated?: (source: GraphNodeData, target: GraphNodeData) => void;
   onEdgeModeDisable?: () => void;
@@ -63,6 +67,8 @@ export function GraphCanvas(props: GraphCanvasProps) {
     onElementsChange,
     onReady,
     onNodeContextAction,
+    extraNodeContextActions,
+    hideSelectAndEdit,
     onEdgeContextAction,
     edgeModeEnabled,
     onEdgeCreated,
@@ -105,6 +111,8 @@ export function GraphCanvas(props: GraphCanvasProps) {
       onNodeClick: onNodeClick,
       onBackgroundClick: readOnly ? undefined : onBackgroundClick,
       onNodeContextAction: readOnly ? undefined : onNodeContextAction,
+      extraNodeContextActions: readOnly ? undefined : extraNodeContextActions,
+      hideSelectAndEdit,
       onEdgeContextAction: readOnly ? undefined : onEdgeContextAction,
       onEdgeCreated: readOnly ? undefined : onEdgeCreated,
       onEdgeModeDisable: readOnly ? undefined : onEdgeModeDisable,
@@ -144,6 +152,7 @@ export function GraphCanvas(props: GraphCanvasProps) {
         
         // Fit graph to viewport after layout completes
         layoutInstance.one('layoutstop', () => {
+          closeCxtMenus(initResult.cy); // Close context menus when nodes/edges have new positions
           initResult.cy.fit(undefined, 10); // Fit with 10px padding
         });
         

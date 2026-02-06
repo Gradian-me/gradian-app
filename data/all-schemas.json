@@ -7635,6 +7635,14 @@
     "detailPageMetadata": {
       "quickActions": [
         {
+          "id": "edit-in-builder",
+          "label": "Edit in Builder",
+          "icon": "Pencil",
+          "variant": "default",
+          "action": "goToUrl",
+          "targetUrl": "/builder/dynamic-query-builder/{{formData.id}}"
+        },
+        {
           "id": "show-dynamic-query-table",
           "label": "Show Dynamic Query Table",
           "icon": "Table",

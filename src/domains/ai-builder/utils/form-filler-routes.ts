@@ -18,21 +18,29 @@ export interface PreloadRoute {
   includedFields?: string[];
 }
 
+export interface BuildFormFillerPreloadRoutesOptions {
+  /** When true, do not add the schema route (use agent preload with {{formSchema.id}} instead). */
+  skipSchemaRoute?: boolean;
+}
+
 /**
  * Builds preload routes for form filler agent from schema and form data
  * @param schema - The form schema
  * @param formData - Optional current form data (for dynamic context in reference fields)
+ * @param options - Optional: skipSchemaRoute to omit schema route (e.g. when using agent preload with {{formSchema.id}})
  * @returns Array of preload route configurations
  */
 export function buildFormFillerPreloadRoutes(
   schema: FormSchema,
-  formData?: Record<string, any>
+  formData?: Record<string, any>,
+  options?: BuildFormFillerPreloadRoutesOptions
 ): PreloadRoute[] {
   const routes: PreloadRoute[] = [];
   const processedSchemas = new Set<string>(); // Track processed schemas to avoid duplicates
+  const skipSchemaRoute = options?.skipSchemaRoute === true;
 
-  // Always include schema definition as RAG data
-  if (schema.id) {
+  // Include schema definition as RAG data (unless skipped when using agent preload with {{formSchema.id}})
+  if (schema.id && !skipSchemaRoute) {
     routes.push({
       route: `/api/schemas/${schema.id}`,
       title: `${schema.singular_name || schema.name} Schema`,

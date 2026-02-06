@@ -306,11 +306,13 @@ export async function buildSystemPrompt(params: {
   bodyParams?: Record<string, any>;
   additionalSystemPrompt?: string;
   baseUrl?: string;
+  /** When provided (e.g. from client with resolved routes), use it and skip preload fetch. Avoids requesting unresolved URLs like /api/schemas/{{formSchema.id}}. */
+  preloadedContext?: string;
 }): Promise<{
   systemPrompt: string;
   isLoadingPreload: boolean;
 }> {
-  const { agent, formValues, bodyParams, additionalSystemPrompt, baseUrl } = params;
+  const { agent, formValues, bodyParams, additionalSystemPrompt, baseUrl, preloadedContext: preloadedContextParam } = params;
 
   // 1. General system prompt (date/time context)
   const generalSystemPrompt = getGeneralSystemPrompt();
@@ -398,32 +400,36 @@ export async function buildSystemPrompt(params: {
     },
   ];
 
-  // Merge global preload routes with agent-specific preload routes
-  // Agent-specific routes take precedence (appear first), but global routes are always included
-  const allPreloadRoutes = [
-    ...(agent.preloadRoutes || []),
-    // Add global organization-rag only if not already present in agent's preloadRoutes
-    ...(agent.preloadRoutes?.some((route: any) => route.route === '/api/organization-rag') 
-      ? [] 
-      : globalPreloadRoutes),
-  ];
-
-  let preloadedContext = '';
+  // Skip preload fetch when caller already provided context (e.g. form-filler with resolved {{formSchema.id}})
+  let preloadedContext = preloadedContextParam ?? '';
   let isLoadingPreload = false;
-  
-  if (allPreloadRoutes.length > 0 && baseUrl) {
-    isLoadingPreload = true;
-    try {
-      preloadedContext = await preloadRoutes(allPreloadRoutes, baseUrl);
-    } catch (error) {
-      loggingCustom(
-        LogType.INFRA_LOG,
-        'error',
-        `Error preloading routes: ${error instanceof Error ? error.message : String(error)}`
-      );
-      // Continue even if preload fails
-    } finally {
-      isLoadingPreload = false;
+
+  if (!preloadedContextParam) {
+    // Filter out unresolved template routes (e.g. /api/schemas/{{formSchema.id}}) so we never request them
+    const resolvedAgentRoutes = (agent.preloadRoutes || []).filter(
+      (r: { route?: string }) => typeof r.route === 'string' && !r.route.includes('{{')
+    );
+    const allPreloadRoutes = [
+      ...resolvedAgentRoutes,
+      ...(resolvedAgentRoutes.some((route: any) => route.route === '/api/organization-rag')
+        ? []
+        : globalPreloadRoutes),
+    ];
+
+    if (allPreloadRoutes.length > 0 && baseUrl) {
+      isLoadingPreload = true;
+      try {
+        preloadedContext = await preloadRoutes(allPreloadRoutes, baseUrl);
+      } catch (error) {
+        loggingCustom(
+          LogType.INFRA_LOG,
+          'error',
+          `Error preloading routes: ${error instanceof Error ? error.message : String(error)}`
+        );
+        // Continue even if preload fails
+      } finally {
+        isLoadingPreload = false;
+      }
     }
   }
 

@@ -29,7 +29,24 @@ function readSchemasFromFile(): FormSchema[] | null {
     }
 
     const fileContents = fs.readFileSync(dataPath, 'utf8');
-    const schemas = JSON.parse(fileContents);
+
+    if (!fileContents || typeof fileContents !== 'string' || fileContents.trim().length === 0) {
+      loggingCustom(LogType.SCHEMA_LOADER, 'warn', 'Schemas file is empty');
+      return null;
+    }
+
+    let schemas: unknown;
+    try {
+      schemas = JSON.parse(fileContents);
+    } catch (parseError) {
+      const msg = parseError instanceof Error ? parseError.message : 'Unknown parse error';
+      loggingCustom(
+        LogType.SCHEMA_LOADER,
+        'error',
+        `Error parsing schemas file (length ${fileContents.length}): ${msg}`
+      );
+      return null;
+    }
 
     if (!Array.isArray(schemas)) {
       loggingCustom(LogType.SCHEMA_LOADER, 'error', 'Schemas file does not contain an array');

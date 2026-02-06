@@ -60,6 +60,7 @@ export interface AiBuilderWrapperProps {
   hideLanguageSelector?: boolean; // Hide language selector from form (use in footer instead)
   initialSelectedLanguage?: string; // Initial language value
   onLanguageChange?: (language: string) => void; // Callback when language changes
+  hideNextActionButton?: boolean; // Hide the nextAction "Apply" button (e.g. form-filler uses footer Fill Form only)
 }
 
 export function AiBuilderWrapper({
@@ -85,6 +86,7 @@ export function AiBuilderWrapper({
   hideLanguageSelector = false,
   initialSelectedLanguage,
   onLanguageChange,
+  hideNextActionButton = false,
 }: AiBuilderWrapperProps) {
   const [selectedAgentId, setSelectedAgentId] = useState<string>(initialAgentId);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -282,25 +284,44 @@ export function AiBuilderWrapper({
     setCurrentImageType(undefined);
   }, [selectedAgentId, clearResponse]);
 
+  // Dedupe: avoid loading the same preload routes twice (e.g. React Strict Mode or new array refs)
+  const lastPreloadKeyRef = useRef<string | null>(null);
+  const prevAgentIdRef = useRef<string | undefined>(undefined);
+
   // Load preload routes when agent or sheet opens, or when custom routes are provided
   useEffect(() => {
-    if (selectedAgent) {
-      if (customPreloadRoutes && customPreloadRoutes.length > 0) {
-        // Merge custom preload routes with agent's preload routes
-        const mergedAgent = {
-          ...selectedAgent,
-          preloadRoutes: [
-            ...(selectedAgent.preloadRoutes || []),
-            ...customPreloadRoutes,
-          ],
-        };
-        loadPreloadRoutes(mergedAgent);
-      } else if (isSheetOpen || mode === 'dialog') {
-        // For dialog mode, load preload routes immediately if agent has them
+    if (!selectedAgent) return;
+
+    // Reset dedupe key when agent changes so we do load for the new agent
+    if (prevAgentIdRef.current !== selectedAgent.id) {
+      prevAgentIdRef.current = selectedAgent.id;
+      lastPreloadKeyRef.current = null;
+    }
+
+    // When customPreloadRoutes prop is passed (e.g. form-filler), use only those and never agent.preloadRoutes, so we never fetch unresolved URLs like /api/schemas/{{formSchema.id}}
+    const routes =
+      customPreloadRoutes !== undefined
+        ? (customPreloadRoutes || [])
+        : selectedAgent.preloadRoutes || [];
+
+    if (routes.length === 0) {
+      if (customPreloadRoutes === undefined && (isSheetOpen || mode === 'dialog')) {
         loadPreloadRoutes(selectedAgent);
       }
+      return;
     }
-  }, [isSheetOpen, selectedAgent?.id, loadPreloadRoutes, customPreloadRoutes, mode]);
+
+    const routeKey = routes.map((r: { route?: string }) => r.route || '').sort().join('\0');
+    const preloadKey = `${selectedAgent.id}\0${routeKey}`;
+    if (lastPreloadKeyRef.current === preloadKey) return;
+    lastPreloadKeyRef.current = preloadKey;
+
+    const agentToLoad =
+      routes === (selectedAgent.preloadRoutes || [])
+        ? selectedAgent
+        : { ...selectedAgent, preloadRoutes: routes };
+    loadPreloadRoutes(agentToLoad);
+  }, [isSheetOpen, selectedAgent, loadPreloadRoutes, customPreloadRoutes, mode]);
 
   // Convert annotations map to array for ResponseAnnotationViewer
   const annotationsArray = Array.from(annotations.values());
@@ -724,6 +745,7 @@ export function AiBuilderWrapper({
               searchDuration={searchDuration}
               searchUsage={searchUsage}
               summarizedPrompt={summarizedPrompt}
+              hideNextActionButton={hideNextActionButton}
             />
           </motion.div>
         ) : null}

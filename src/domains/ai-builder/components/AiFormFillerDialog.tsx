@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { AiBuilderWrapper } from './AiBuilderWrapper';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
 import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 import { useAiAgents } from '../hooks/useAiAgents';
 import { buildFormFillerPreloadRoutes } from '../utils/form-filler-routes';
 import { validateAndTransformFormData } from '../utils/form-filler-validator';
@@ -73,16 +74,33 @@ export function AiFormFillerDialog({
     }
   }, [agents]);
 
-  // Build preload routes from schema
+  // Build preload routes: resolve agent preload (e.g. /api/schemas/{{formSchema.id}}) with context, then add data routes (picker/reference)
   useEffect(() => {
     if (!isOpen || !schema) {
       setPreloadRoutes([]);
       return;
     }
 
-    const routes = buildFormFillerPreloadRoutes(schema, formData);
-    setPreloadRoutes(routes);
-  }, [isOpen, schema, formData]);
+    const resolvedAgentRoutes = (formFillerAgent?.preloadRoutes || [])
+      .map((route: { route?: string; outputFormat?: string; [k: string]: any }) => {
+        const resolved = replaceDynamicContextInObject(route, { formSchema: schema, formData });
+        // Schema routes: always use JSON so the model sees full fields/sections (cached agent may have toon)
+        if (resolved.route && typeof resolved.route === 'string' && resolved.route.includes('/api/schemas/')) {
+          return { ...resolved, outputFormat: 'json' as const };
+        }
+        return resolved;
+      })
+      .filter(
+        (r: { route?: string }) =>
+          typeof r.route === 'string' && !r.route.includes('{{')
+      );
+
+    const dataRoutes = buildFormFillerPreloadRoutes(schema, formData, {
+      skipSchemaRoute: true,
+    });
+
+    setPreloadRoutes([...resolvedAgentRoutes, ...dataRoutes]);
+  }, [isOpen, schema, formData, formFillerAgent?.preloadRoutes]);
 
   // Check if form has existing data
   const hasExistingData = useMemo(() => {
@@ -266,6 +284,7 @@ export function AiFormFillerDialog({
             hideImageConfig={true}
             hideEditAgent={true}
             hidePromptHistory={true}
+            hideNextActionButton={true}
             hideLanguageSelector={false}
             initialSelectedLanguage={selectedLanguage}
             onLanguageChange={setSelectedLanguage}

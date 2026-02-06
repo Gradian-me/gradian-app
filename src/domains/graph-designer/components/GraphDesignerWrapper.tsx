@@ -1,5 +1,6 @@
 'use client';
 
+/* eslint-disable react-hooks/preserve-manual-memoization -- Controlled-mode callbacks read from ref and call parent onGraphChange; compiler cannot preserve this pattern. */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ulid } from 'ulid';
@@ -24,6 +25,8 @@ import { GraphToolbar } from './GraphToolbar';
 import { GraphCanvas, GraphCanvasHandle } from './GraphCanvas';
 import type { GraphLayout, GraphNodeData, GraphEdgeData } from '../types';
 import { exportGraphAsPng } from '../utils/graph-export';
+import { createEdgeData } from '../utils/edge-handling';
+import type { ExtraNodeContextAction } from '../utils/node-context-menu';
 
 export interface GraphDesignerWrapperProps {
   /**
@@ -31,13 +34,32 @@ export interface GraphDesignerWrapperProps {
    */
   viewMode?: boolean;
   /**
-   * Graph data to display (optional, if not provided uses store data)
+   * Graph data to display (optional, if not provided uses store data).
+   * When used together with onGraphChange, the graph is controlled by the parent.
    */
   graphData?: { nodes: GraphNodeData[]; edges: GraphEdgeData[] };
+  /**
+   * Called when the graph changes (add/remove node or edge, reorder, etc.).
+   * When provided together with graphData, the wrapper operates in controlled mode.
+   */
+  onGraphChange?: (nodes: GraphNodeData[], edges: GraphEdgeData[]) => void;
+  /**
+   * Extra actions to show in the node context menu (e.g. "Configure columns").
+   */
+  extraNodeContextActions?: ExtraNodeContextAction[];
+  /**
+   * When true, do not wrap in MainLayout (no app header/sidebar). Use when embedding inside another page (e.g. Dynamic Query Builder).
+   */
+  embedMode?: boolean;
+  /**
+   * When true, hide Select/Edit in node context menu and hide Save in toolbar (e.g. Dynamic Query Builder uses its own save).
+   */
+  hideSelectEditAndSave?: boolean;
 }
 
 export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
-  const { viewMode = false, graphData } = props;
+  const { viewMode = false, graphData, onGraphChange, extraNodeContextActions, embedMode = false, hideSelectEditAndSave = false } = props;
+  const isControlled = !!(graphData && onGraphChange);
   const tenantId = useTenantStore((state) => state.getTenantId());
   const { schemas, isLoading, refetch } = useSchemaSummaries({ 
     summary: true,
@@ -78,6 +100,90 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
   const nodes = graphData?.nodes ?? storeNodes;
   const edges = graphData?.edges ?? storeEdges;
 
+  // Keep latest nodes/edges in ref for controlled-mode callbacks (avoid stale closure)
+  const controlledGraphRef = useRef<{ nodes: GraphNodeData[]; edges: GraphEdgeData[] }>({ nodes: [], edges: [] });
+  useEffect(() => {
+    if (isControlled && graphData) {
+      controlledGraphRef.current = { nodes: graphData.nodes, edges: graphData.edges };
+    }
+  }, [isControlled, graphData]);
+
+  const addNodeControlled = useCallback(
+    (input: { schemaId: string; title?: string; payload?: Record<string, unknown> }) => {
+      const cur = controlledGraphRef.current;
+      const node: GraphNodeData = {
+        id: ulid(),
+        schemaId: input.schemaId,
+        nodeId: input.payload?.id as string | undefined,
+        title: input.title,
+        incomplete: true,
+        parentId: null,
+        payload: input.payload ?? {},
+      };
+      onGraphChange!([...cur.nodes, node], cur.edges);
+      return node;
+    },
+    [onGraphChange]
+  );
+
+  const addEdgeControlled = useCallback(
+    (input: { source: GraphNodeData; target: GraphNodeData; relationTypeId?: string }) => {
+      const cur = controlledGraphRef.current;
+      const edge = createEdgeData(input, ulid());
+      onGraphChange!(cur.nodes, [...cur.edges, edge]);
+      return edge;
+    },
+    [onGraphChange]
+  );
+
+  const removeNodeControlled = useCallback(
+    (nodeId: string) => {
+      const cur = controlledGraphRef.current;
+      onGraphChange!(
+        cur.nodes.filter((n) => n.id !== nodeId),
+        cur.edges.filter((e) => e.source !== nodeId && e.target !== nodeId)
+      );
+    },
+    [onGraphChange]
+  );
+
+  const removeEdgeControlled = useCallback(
+    (edgeId: string) => {
+      const cur = controlledGraphRef.current;
+      onGraphChange!(cur.nodes, cur.edges.filter((e) => e.id !== edgeId));
+    },
+    [onGraphChange]
+  );
+
+  const updateNodeControlled = useCallback(
+    (node: GraphNodeData) => {
+      const cur = controlledGraphRef.current;
+      onGraphChange!(
+        cur.nodes.map((n) => (n.id === node.id ? node : n)),
+        cur.edges
+      );
+    },
+    [onGraphChange]
+  );
+
+  const setGraphElementsControlled = useCallback(
+    (newNodes: GraphNodeData[], newEdges: GraphEdgeData[]) => {
+      onGraphChange!(newNodes, newEdges);
+    },
+    [onGraphChange]
+  );
+
+  const addNodeEffective = isControlled ? addNodeControlled : addNode;
+  const addEdgeEffective = isControlled ? addEdgeControlled : addEdge;
+  const removeNodeEffective = isControlled ? removeNodeControlled : removeNode;
+  const removeEdgeEffective = isControlled ? removeEdgeControlled : removeEdge;
+  const updateNodeEffective = isControlled ? updateNodeControlled : updateNode;
+  const setGraphElementsEffective = isControlled ? setGraphElementsControlled : setGraphElements;
+  const createNewGraphEffective = useCallback(() => {
+    if (isControlled && onGraphChange) onGraphChange([], []);
+    else createNewGraph();
+  }, [isControlled, onGraphChange, createNewGraph]);
+
   const [layout, setLayout] = useState<GraphLayout>('dagre');
   const [multiSelectEnabled, setMultiSelectEnabled] = useState(false);
   const [edgeModeEnabled, setEdgeModeEnabled] = useState(false);
@@ -93,11 +199,11 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
   // Custom hooks
   const { handleSave } = useGraphActions(graph);
   const { selectedNodeId, selectedNodeIds, activeNodeForForm, setSelectedNodeId, setActiveNodeForForm, handleNodeClick, handleEditNode, clearSelection } = useNodeSelection();
-  const { pickerState, openPicker, closePicker, handleSelect } = useNodePicker(updateNode, nodes);
-  const { deleteConfirmation, openDeleteConfirmation, closeDeleteConfirmation, confirmDelete } = useGraphDeletion(removeNode, removeEdge);
+  const { pickerState, openPicker, closePicker, handleSelect } = useNodePicker(updateNodeEffective, nodes);
+  const { deleteConfirmation, openDeleteConfirmation, closeDeleteConfirmation, confirmDelete } = useGraphDeletion(removeNodeEffective, removeEdgeEffective);
   const { handleDropOnCanvas, handleDragOverCanvas, handleAddSchema } = useSchemaDragDrop({
     schemas,
-    addNode,
+    addNode: addNodeEffective,
     onNodeAdded: (node) => {
       // Always select the newly added node
       // Use setTimeout to ensure the node is rendered in the canvas before selection
@@ -110,7 +216,7 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
   const { handleReset: performReset } = useGraphReset({
     nodes,
     edges,
-    createNewGraph,
+    createNewGraph: createNewGraphEffective,
     onReset: () => {
       clearSelection();
       setEdgeModeEnabled(false);
@@ -131,11 +237,20 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
     exportGraphAsPng(canvasHandleRef.current, graph);
   };
 
-  const handleRefreshLayout = () => {
+  const handleRefreshLayout = useCallback(() => {
     if (canvasHandleRef.current) {
       canvasHandleRef.current.runLayout(layout);
     }
-  };
+  }, [layout]);
+
+  // After sidebar (schemas panel) toggle, refresh layout so graph fits the new canvas size
+  const SIDEBAR_ANIMATION_MS = 250;
+  useEffect(() => {
+    const t = setTimeout(() => {
+      handleRefreshLayout();
+    }, SIDEBAR_ANIMATION_MS);
+    return () => clearTimeout(t);
+  }, [sidebarVisible, handleRefreshLayout]);
 
   // Re-apply layout after nodes or edges are added/changed
   useEffect(() => {
@@ -195,7 +310,7 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
       .concat([parentNode]);
     
     // Batch update all nodes at once
-    setGraphElements(updatedNodes, edges);
+    setGraphElementsEffective(updatedNodes, edges);
     
     // Clear selection after grouping
     clearSelection();
@@ -229,14 +344,8 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
   const activeEntityId = nodeIdIsValid ? nodeId : undefined;
   const activeFormMode: 'create' | 'edit' = activeEntityId ? 'edit' : 'create';
 
-  return (
-    <MainLayout
-      title="Graph Designer"
-      icon="Waypoints"
-      subtitle="Design and manage data relationship graphs."
-      showActionButtons={false}
-    >
-      <div className="flex h-[calc(100vh-6.5rem)] gap-4 overflow-hidden">
+  const graphContent = (
+      <div className={embedMode ? 'flex h-full min-h-0 flex-1 gap-4 overflow-hidden' : 'flex h-[calc(100vh-6.5rem)] gap-4 overflow-hidden'}>
         <AnimatePresence initial={false}>
           {!viewMode && sidebarVisible && (
             <motion.div
@@ -254,7 +363,7 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
           )}
         </AnimatePresence>
         <div
-          className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-gray-400 bg-linear-to-b from-background via-muted/40 to-background dark:border-gray-700"
+          className={`flex min-w-0 flex-1 flex-col overflow-hidden bg-linear-to-b from-background via-muted/40 to-background ${embedMode ? '' : 'rounded-lg border border-gray-400 dark:border-gray-700'}`}
           onDragOver={viewMode ? undefined : handleDragOverCanvas}
           onDrop={viewMode ? undefined : handleDropOnCanvas}
         >
@@ -278,6 +387,7 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
             onReset={handleReset}
             onRefreshLayout={handleRefreshLayout}
             viewMode={viewMode}
+            hideSave={hideSelectEditAndSave}
           />
           <div className="flex-1">
             <GraphCanvas
@@ -286,13 +396,13 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
               layout={layout}
               onNodeClick={viewMode ? undefined : handleNodeClick}
               onBackgroundClick={viewMode ? undefined : clearSelection}
-              onElementsChange={viewMode ? undefined : setGraphElements}
+              onElementsChange={viewMode ? undefined : setGraphElementsEffective}
               onReady={(handle) => {
                 canvasHandleRef.current = handle;
               }}
               edgeModeEnabled={viewMode ? false : edgeModeEnabled}
               onEdgeCreated={viewMode ? undefined : (source, target) => {
-                addEdge({ source, target });
+                addEdgeEffective({ source, target });
               }}
               onEdgeModeDisable={viewMode ? undefined : () => {
                 setEdgeModeEnabled(false);
@@ -317,15 +427,29 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
               onEdgeContextAction={viewMode ? undefined : (action, edge) => {
                 if (action === 'delete') {
                   openDeleteConfirmation('edge', edge);
+                  return;
+                }
+                if (action === 'toggleOptional') {
+                  const newEdges = edges.map((e) =>
+                    e.id === edge.id ? { ...e, optional: !e.optional } : e
+                  );
+                  setGraphElementsEffective(nodes, newEdges);
                 }
               }}
+              extraNodeContextActions={viewMode ? undefined : extraNodeContextActions}
+              hideSelectAndEdit={hideSelectEditAndSave}
               readOnly={viewMode}
             />
           </div>
         </div>
       </div>
+  );
 
-      {!viewMode && activeSchemaId && activeNodeForForm && !formJustSaved && (
+  if (embedMode) {
+    return (
+      <>
+        {graphContent}
+        {!viewMode && activeSchemaId && activeNodeForForm && !formJustSaved && (
         <FormModal
           key={`${activeSchemaId}-${activeEntityId ?? 'new'}-${activeNodeForForm.id}-${activeNodeForForm.nodeId ?? 'no-nodeid'}`}
           schemaId={activeSchemaId}
@@ -514,6 +638,112 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
       )}
 
       {/* Popup Picker for selecting existing data */}
+      {!viewMode && pickerState.schema && (
+        <PopupPicker
+          isOpen={pickerState.isOpen}
+          onClose={closePicker}
+          schemaId={pickerState.node?.schemaId || ''}
+          schema={pickerState.schema}
+          onSelect={handleSelect}
+          title={`Select ${pickerState.schema.plural_name || pickerState.schema.singular_name || pickerState.node?.schemaId}`}
+          description={`Choose an existing ${pickerState.schema.singular_name || 'item'} to replace the current node data`}
+          canViewList={true}
+          viewListUrl={`/page/${pickerState.node?.schemaId}`}
+          allowMultiselect={false}
+        />
+      )}
+    </>
+    );
+  }
+
+  return (
+    <MainLayout
+      title="Graph Designer"
+      icon="Waypoints"
+      subtitle="Design and manage data relationship graphs."
+      showActionButtons={false}
+    >
+      {graphContent}
+      {!viewMode && activeSchemaId && activeNodeForForm && !formJustSaved && (
+        <FormModal
+          key={`${activeSchemaId}-${activeEntityId ?? 'new'}-${activeNodeForForm.id}-${activeNodeForForm.nodeId ?? 'no-nodeid'}`}
+          schemaId={activeSchemaId}
+          entityId={activeEntityId}
+          mode={activeFormMode}
+          onSuccess={(data) => {
+            if (!activeNodeForForm || !activeSchemaId) return;
+            const entityId = (data as any)?.id;
+            if (!entityId) return;
+            const schema = schemas.find((s) => s.id === activeSchemaId);
+            const EXCLUDED_TITLE_ROLES = new Set(['code', 'subtitle', 'description']);
+            let extractedTitle: string = '';
+            if (schema) {
+              if (schema.fields?.some((field) => field.role === 'title')) {
+                const titleByRole = getValueByRole(schema, data as any, 'title');
+                if (typeof titleByRole === 'string' && titleByRole.trim() !== '') extractedTitle = titleByRole;
+              }
+              if (!extractedTitle) {
+                const textFields = schema.fields
+                  ?.filter(
+                    (field) =>
+                      field.component === 'text' &&
+                      (!field.role || !EXCLUDED_TITLE_ROLES.has(field.role)) &&
+                      hasDisplayValue((data as any)[field.name])
+                  )
+                  .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+                if (textFields?.[0]) {
+                  const value = (data as any)[textFields[0].name];
+                  extractedTitle = getPrimaryDisplayString(value) || (value != null ? String(value).trim() : '') || '';
+                }
+              }
+            }
+            if (!extractedTitle) extractedTitle = (data as any).name ?? (data as any).title ?? (data as any).label ?? String(entityId);
+            if (!extractedTitle?.trim()) extractedTitle = String(entityId);
+            const duplicateNode = nodes.find((n) => n.nodeId === entityId && n.id !== activeNodeForForm.id);
+            if (duplicateNode) {
+              toast.error(`This entity is already linked to node "${duplicateNode.title || duplicateNode.id}".`);
+              return;
+            }
+            const updatedNode: GraphNodeData = {
+              id: activeNodeForForm.id,
+              schemaId: activeNodeForForm.schemaId,
+              nodeId: entityId,
+              title: extractedTitle,
+              incomplete: false,
+              parentId: activeNodeForForm.parentId ?? null,
+              payload: { ...(activeNodeForForm.payload ?? {}), ...(data ?? {}), id: entityId },
+            };
+            updateNode(updatedNode);
+            formJustSavedRef.current = true;
+            setFormJustSaved(true);
+            setActiveNodeForForm(null);
+            setTimeout(() => { formJustSavedRef.current = false; setFormJustSaved(false); }, 100);
+          }}
+          onClose={() => setActiveNodeForForm(null)}
+        />
+      )}
+      {!viewMode && (
+        <ConfirmationMessage
+          isOpen={deleteConfirmation.isOpen}
+          onOpenChange={(open) => { if (!open) closeDeleteConfirmation(); }}
+          title={deleteConfirmation.type === 'node' ? 'Delete Node' : 'Delete Edge'}
+          subtitle={deleteConfirmation.type === 'node' ? 'This will permanently remove the node and all its connected edges from the graph.' : 'This will permanently remove the edge from the graph.'}
+          message={deleteConfirmation.type === 'node' && deleteConfirmation.item ? `Are you sure you want to delete the node "${(deleteConfirmation.item as GraphNodeData).title || deleteConfirmation.item.id}"?` : deleteConfirmation.type === 'edge' ? 'Are you sure you want to delete this edge?' : ''}
+          variant="destructive"
+          buttons={[{ label: 'Cancel', variant: 'outline', action: closeDeleteConfirmation }, { label: 'Delete', variant: 'destructive', icon: 'Trash2', action: confirmDelete }]}
+        />
+      )}
+      {!viewMode && (
+        <ConfirmationMessage
+          isOpen={showResetConfirmation}
+          onOpenChange={setShowResetConfirmation}
+          title="Reset Graph"
+          subtitle="This will permanently clear all nodes and edges from the current graph."
+          message={`Are you sure you want to reset the graph? This action cannot be undone. You will lose all ${nodes.length} node(s) and ${edges.length} edge(s).`}
+          variant="warning"
+          buttons={[{ label: 'Cancel', variant: 'outline', action: () => setShowResetConfirmation(false) }, { label: 'Reset Graph', variant: 'destructive', icon: 'RotateCcw', action: confirmReset }]}
+        />
+      )}
       {!viewMode && pickerState.schema && (
         <PopupPicker
           isOpen={pickerState.isOpen}

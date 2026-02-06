@@ -62,6 +62,7 @@ interface AiBuilderResponseProps {
   searchDuration?: number | null; // Search duration in milliseconds
   searchUsage?: { cost: number; tool: string } | null; // Search usage (cost and tool)
   summarizedPrompt?: string | null; // Summarized version of the prompt (for search/image)
+  hideNextActionButton?: boolean; // Hide the nextAction Apply button (e.g. form-filler uses footer only)
 }
 
 // Utility function to generate table columns from JSON data
@@ -240,6 +241,7 @@ export function AiBuilderResponse({
   searchDuration,
   searchUsage,
   summarizedPrompt,
+  hideNextActionButton = false,
 }: AiBuilderResponseProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const prevIsLoadingRef = useRef<boolean>(isLoading);
@@ -1036,7 +1038,7 @@ export function AiBuilderResponse({
         >
           Your Creation
         </h2>
-        {agent?.nextAction && (
+        {agent?.nextAction && !hideNextActionButton && (
           <Button
             onClick={() => {
               // Use displayContent from store (which includes any edits)

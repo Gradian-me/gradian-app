@@ -9,6 +9,7 @@ import { createEdgehandles } from './edgehandles-config';
 import { setupEdgehandlesEvents } from './edgehandles-events';
 import { setupCytoscapeEventHandlers } from './cytoscape-event-handlers';
 import type { GraphEdgeData, GraphNodeData } from '../types';
+import type { ExtraNodeContextAction } from './node-context-menu';
 
 /**
  * Configuration for initializing Cytoscape instance
@@ -23,7 +24,9 @@ export interface CytoscapeInitConfig {
   onNodeClick?: (node: GraphNodeData, isMultiSelect: boolean) => void;
   onBackgroundClick?: () => void;
   onNodeContextAction?: (action: 'edit' | 'delete' | 'select', node: GraphNodeData) => void;
-  onEdgeContextAction?: (action: 'delete', edge: GraphEdgeData) => void;
+  extraNodeContextActions?: ExtraNodeContextAction[];
+  hideSelectAndEdit?: boolean;
+  onEdgeContextAction?: (action: 'delete' | 'toggleOptional', edge: GraphEdgeData) => void;
   onEdgeCreated?: (source: GraphNodeData, target: GraphNodeData) => void;
   onEdgeModeDisable?: () => void;
   edges: GraphEdgeData[];
@@ -57,6 +60,8 @@ export function initializeCytoscape(config: CytoscapeInitConfig): CytoscapeInitR
     onNodeClick,
     onBackgroundClick,
     onNodeContextAction,
+    extraNodeContextActions,
+    hideSelectAndEdit,
     onEdgeContextAction,
     onEdgeCreated,
     onEdgeModeDisable,
@@ -87,6 +92,8 @@ export function initializeCytoscape(config: CytoscapeInitConfig): CytoscapeInitR
     onNodeClick,
     onBackgroundClick: readOnly ? undefined : onBackgroundClick,
     onNodeContextAction: readOnly ? undefined : onNodeContextAction,
+    extraNodeContextActions,
+    hideSelectAndEdit,
     onEdgeContextAction: readOnly ? undefined : onEdgeContextAction,
   });
 

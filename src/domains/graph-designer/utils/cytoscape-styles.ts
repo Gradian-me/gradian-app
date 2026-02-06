@@ -27,6 +27,20 @@ export function updateEdgeCurveStyle(cy: Core, layout: GraphLayout): void {
 }
 
 /**
+ * Closes any open cytoscape-cxtmenu context menus.
+ * Call when layout completes (nodes/edges have new positions) so the menu doesn't stay open in the wrong place.
+ */
+export function closeCxtMenus(cy: Core): void {
+  const container = cy.container();
+  if (!container) return;
+  const menus = container.querySelectorAll('.cxtmenu');
+  menus.forEach((menu) => {
+    const parent = menu.firstElementChild as HTMLElement | null;
+    if (parent?.style) parent.style.display = 'none';
+  });
+}
+
+/**
  * Updates styles after layout completes
  */
 export function updateStylesAfterLayout(cy: Core, layoutInstance: any): void {

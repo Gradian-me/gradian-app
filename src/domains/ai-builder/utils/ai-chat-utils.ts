@@ -484,6 +484,7 @@ export async function processChatRequest(
       formValues: requestData.formValues,
       bodyParams,
       baseUrl,
+      preloadedContext: requestData.preloadedContext,
     });
 
     // Step 6: Format annotations if present

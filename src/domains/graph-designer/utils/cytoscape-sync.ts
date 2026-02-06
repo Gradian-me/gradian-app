@@ -2,7 +2,7 @@ import type { Core, ElementDefinition } from 'cytoscape';
 import type { GraphEdgeData, GraphLayout, GraphNodeData } from '../types';
 import { LAYOUTS } from './layouts';
 import { getNodeType, nodeDataToCytoscapeData, getIncompleteValue } from './node-data-extractor';
-import { updateNodeStyles, updateStylesAfterLayout, updateEdgeCurveStyle } from './cytoscape-styles';
+import { updateNodeStyles, updateStylesAfterLayout, updateEdgeCurveStyle, closeCxtMenus } from './cytoscape-styles';
 import { getNodeBackgroundColor, getNodeBorderColor, getEdgeColor, generateBadgeSvg } from './color-mapper';
 
 /**
@@ -169,6 +169,7 @@ export function syncCytoscapeGraph(config: CytoscapeSyncConfig): void {
               targetId: edge.targetId,
               relationTypeId: edge.relationTypeId,
               relationColor: edgeColor,
+              optional: edge.optional,
             },
           };
         }),
@@ -259,12 +260,21 @@ export function syncCytoscapeGraph(config: CytoscapeSyncConfig): void {
           targetId: edge.targetId,
           relationTypeId: edge.relationTypeId,
           relationColor: edgeColor,
+          optional: edge.optional,
         });
         
         // Apply color if available
         if (edgeColor) {
           existing.style('line-color', edgeColor);
           existing.style('target-arrow-color', edgeColor);
+        }
+        // Optional edges: dashed line
+        if (edge.optional) {
+          existing.style('line-style', 'dashed');
+          existing.style('line-dash-pattern', [6, 3]);
+        } else {
+          existing.style('line-style', 'solid');
+          existing.style('line-dash-pattern', []);
         }
         
         // Show edge if it was hidden
@@ -311,12 +321,16 @@ export function syncCytoscapeGraph(config: CytoscapeSyncConfig): void {
       }
     });
     
-    // Apply colors to newly added edges
-    added.edges().forEach((edge) => {
-      const relationColor = edge.data('relationColor');
+    // Apply colors and optional (dashed) style to newly added edges
+    added.edges().forEach((edgeEl) => {
+      const relationColor = edgeEl.data('relationColor');
       if (relationColor) {
-        edge.style('line-color', relationColor);
-        edge.style('target-arrow-color', relationColor);
+        edgeEl.style('line-color', relationColor);
+        edgeEl.style('target-arrow-color', relationColor);
+      }
+      if (edgeEl.data('optional')) {
+        edgeEl.style('line-style', 'dashed');
+        edgeEl.style('line-dash-pattern', [6, 3]);
       }
     });
     
@@ -341,6 +355,7 @@ export function syncCytoscapeGraph(config: CytoscapeSyncConfig): void {
   
   // Fit graph to viewport after layout completes to prevent items from being pushed out
   layoutInstance.one('layoutstop', () => {
+    closeCxtMenus(cy); // Close context menus when nodes/edges have new positions
     cy.fit(undefined, 10); // Fit with 10px padding
   });
   

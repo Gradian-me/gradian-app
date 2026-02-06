@@ -35,6 +35,7 @@ export function createEdgeData(
     targetSchema: input.target.schemaId,
     targetId: input.target.id,
     relationTypeId: input.relationTypeId ?? 'relation-default',
+    optional: false, // New edges are required (solid); user can toggle to optional (dashed) via context menu
   };
 }
 

@@ -82,6 +82,21 @@
     "stats": []
   },
   {
+    "id": "dynamic-query-builder",
+    "title": "Dynamic Query Builder",
+    "description": "Design dynamic queries with graph patterns, column selection per schema, and pagination options",
+    "icon": "GitBranch",
+    "href": "/builder/dynamic-query-builder/new",
+    "color": "cyan",
+    "features": [
+      "Visual pattern design with graph designer",
+      "Configure columns per schema (group and select order)",
+      "Apply RBAC and pagination settings",
+      "Save and edit via API"
+    ],
+    "stats": []
+  },
+  {
     "id": "health",
     "title": "Health Monitoring",
     "description": "Monitor the health and status of all services with real-time status tracking and automated health checks",
